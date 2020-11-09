@@ -31,10 +31,10 @@ fn get_load_item(exe: &[u8], start: usize) -> usize {
 use winapi::um::wincon::AttachConsole;
 
 unsafe fn attach_stdout(pid: u32) {
+    AttachConsole(pid);
     env_logger::Builder::new()
         .filter(None, log::LevelFilter::Debug)
         .init();
-    AttachConsole(pid);
 }
 
 #[no_mangle]
