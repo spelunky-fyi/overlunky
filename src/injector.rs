@@ -1,21 +1,68 @@
-use sysinfo::*;
-
-pub struct Process {
-    handle: HANDLE,
-    pub pid: Pid,
-}
-
 use std::ffi;
+use std::mem;
 use std::ptr;
+use sysinfo::*;
 use winapi::shared::minwindef::LPVOID;
 use winapi::um::errhandlingapi::GetLastError;
 use winapi::um::libloaderapi::*;
 use winapi::um::memoryapi::*;
 use winapi::um::minwinbase::LPTHREAD_START_ROUTINE;
 use winapi::um::processthreadsapi::{CreateRemoteThread, OpenProcess};
+use winapi::um::psapi::GetModuleBaseNameA;
 use winapi::um::synchapi::WaitForSingleObject;
 use winapi::um::winbase::INFINITE;
+use winapi::um::winnt::MEMORY_BASIC_INFORMATION;
 use winapi::um::winnt::{HANDLE, MEM_COMMIT, PROCESS_ALL_ACCESS};
+
+pub struct MemoryMap {
+    addr: usize,
+    name: String,
+}
+
+pub struct Process {
+    handle: HANDLE,
+    pub pid: Pid,
+}
+
+pub unsafe fn memory_map(proc: &Process) -> Vec<MemoryMap> {
+    let mut result: Vec<MemoryMap> = vec![];
+    let mut cur = 0;
+    let mut mbf: MEMORY_BASIC_INFORMATION = mem::zeroed();
+    let mut buffer = vec![0u8; 0x1000];
+
+    while VirtualQueryEx(
+        proc.handle,
+        mem::transmute(cur),
+        &mut mbf,
+        mem::size_of::<MEMORY_BASIC_INFORMATION>(),
+    ) != 0
+    {
+        let res = GetModuleBaseNameA(
+            proc.handle,
+            mem::transmute(cur),
+            buffer.as_mut_ptr() as *mut i8,
+            buffer.len() as u32,
+        );
+        if res != 0 {
+            let name = std::str::from_utf8_unchecked(&buffer[0..res as usize]);
+            result.push(MemoryMap {
+                addr: cur,
+                name: name.to_string(),
+            })
+        };
+        cur += mbf.RegionSize;
+    }
+    result
+}
+
+pub unsafe fn find_base(proc: &Process, name: &str) -> Option<usize> {
+    let map = memory_map(proc);
+    let mut res = map
+        .iter()
+        .filter(|item| name.to_lowercase().contains(&item.name.to_lowercase()));
+
+    Some(res.next()?.addr)
+}
 
 unsafe fn alloc(proc: &Process, size: usize) -> LPVOID {
     let res = VirtualAllocEx(
@@ -28,10 +75,7 @@ unsafe fn alloc(proc: &Process, size: usize) -> LPVOID {
     if res.is_null() {
         panic!(format!("Allocation failed: {:x}", GetLastError()))
     }
-    log::debug!(
-        "Allocated memory: {:x}",
-        res as usize
-    );
+    log::debug!("Allocated memory: {:x}", res as usize);
     res
 }
 
@@ -51,19 +95,28 @@ unsafe fn write_mem(proc: &Process, addr: LPVOID, str: &str) {
     );
 }
 
-pub unsafe fn find_function(library: &str, function: &str) -> LPTHREAD_START_ROUTINE {
+pub unsafe fn find_function(
+    proc: &Process,
+    library: &str,
+    function: &str,
+) -> LPTHREAD_START_ROUTINE {
     let library_name = ffi::CString::new(library).unwrap();
     let function_name = ffi::CString::new(function).unwrap();
     let library_ptr = LoadLibraryA(library_name.as_ptr());
-    std::mem::transmute(GetProcAddress(library_ptr, function_name.as_ptr()))
+    std::mem::transmute(
+        GetProcAddress(library_ptr, function_name.as_ptr()) as usize - library_ptr as usize
+            + find_base(proc, library).unwrap(),
+    )
 }
 
 pub unsafe fn inject_dll(proc: &Process, name: &str) {
-    // create_pid_file();
-
     let str = alloc_str(proc, name);
     log::debug!("Injecting DLL into process... {}", name);
-    call(proc, find_function("kernel32.dll", "LoadLibraryA"), str);
+    call(
+        proc,
+        find_function(proc, "kernel32.dll", "LoadLibraryA"),
+        str,
+    );
 }
 
 pub unsafe fn call(proc: &Process, addr: LPTHREAD_START_ROUTINE, args: LPVOID) {
@@ -92,33 +145,9 @@ pub unsafe fn find_process(name: &str) -> Option<Process> {
     for (pid, proc_) in system.get_processes() {
         if proc_.name().to_lowercase() == name.to_lowercase() {
             let handle = OpenProcess(PROCESS_ALL_ACCESS, 0, *pid as u32);
-            return Some(Process {
-                handle,
-                pid: *pid,
-            });
+            return Some(Process { handle, pid: *pid });
         }
     }
 
     None
 }
-
-// fn pid_file_path() -> std::path::PathBuf {
-//     std::env::temp_dir().join("Spel2.pid")
-// }
-
-// pub fn create_pid_file() -> std::io::Result<()> {
-//     let path = pid_file_path();
-
-//     let mut f = std::fs::File::create(path)?;
-//     write!(f, "{}", std::process::id())?;
-//     Ok(())
-// }
-
-// pub fn read_pid_file() -> std::io::Result<u32> {
-//     let path = pid_file_path();
-//     let f = std::fs::read_to_string(path)?;
-//     match str::parse::<u32>(f) {
-//         Ok(result) => Ok(result),
-//         Err(_) => Err(())
-//     }
-// }

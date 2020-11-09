@@ -1,4 +1,19 @@
-use winapi::um::processthreadsapi::{OpenThread};
+// Use dummy lock for now.
+
+pub struct CriticalSectionManager;
+pub struct CriticalSection;
+
+impl CriticalSectionManager {
+    pub fn new() -> CriticalSectionManager {
+        CriticalSectionManager {}
+    }
+    pub fn lock(&self) -> CriticalSection {
+        CriticalSection{}
+    }
+}
+
+/*
+use winapi::um::processthreadsapi::OpenThread;
 use winapi::um::tlhelp32::*;
 use winapi::um::winnt::{HANDLE, THREAD_ALL_ACCESS};
 
@@ -8,7 +23,6 @@ pub struct CriticalSectionManager {
 
 impl CriticalSectionManager {
     pub fn new() -> CriticalSectionManager {
-        // TODO: get main thread by enumerating all threads
         let main_thread = 0 as HANDLE;
         // let pid = std::process::id();
         // unsafe {
@@ -31,9 +45,7 @@ impl CriticalSectionManager {
         //         res = Thread32Next(snapshot, &mut entry);
         //     }
         // }
-        CriticalSectionManager {
-            main_thread,
-        }
+        CriticalSectionManager { main_thread }
     }
     pub unsafe fn lock(&self) -> CriticalSection {
         // SuspendThread(self.main_thread);
@@ -55,3 +67,4 @@ impl Drop for CriticalSection {
         // }
     }
 }
+*/

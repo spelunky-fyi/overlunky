@@ -8,25 +8,12 @@ use hex_literal::*;
 use models::{Memory, State};
 use search::{find_after_bundle, find_inst};
 use std::ffi::CString;
-use std::process::Command;
 use std::ptr;
 use winapi::um::libloaderapi::LoadLibraryA;
 
 #[no_mangle]
-pub extern "C" fn DllMain(_: *const u8, reason: u32, _: *const u8) -> u32 {
+pub extern "C" fn DllMain(_: *const u8, _reason: u32, _: *const u8) -> u32 {
     1 // TRUE
-}
-
-fn message(payload: String) {
-    Command::new("msg").arg("*").arg(payload).output().unwrap();
-}
-
-fn set_panic_hook() {
-    std::panic::set_hook(Box::new(|info| {
-        if let Some(s) = info.payload().downcast_ref::<&str>() {
-            message(s.to_string());
-        }
-    }))
 }
 
 unsafe fn memory_view<'a>(addr: *mut u8) -> &'a mut [u8] {
@@ -41,9 +28,19 @@ fn get_load_item(exe: &[u8], start: usize) -> usize {
     off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5
 }
 
+use winapi::um::wincon::AttachConsole;
+
+unsafe fn attach_stdout(pid: u32) {
+    env_logger::Builder::new()
+        .filter(None, log::LevelFilter::Debug)
+        .init();
+    AttachConsole(pid);
+}
+
 #[no_mangle]
-unsafe extern "C" fn main() {
-    set_panic_hook();
+unsafe extern "C" fn main(pid: u32) {
+    attach_stdout(pid);
+    log::info!("Hello from injected library!");
 
     let spel2_name = CString::new("Spel2.exe").unwrap();
     let spel2_ptr = LoadLibraryA(spel2_name.as_ptr());
@@ -66,11 +63,12 @@ unsafe extern "C" fn main() {
 
         match state.items().player(0) {
             None => {
-                message("Player not initialized yet. Select a character first!".to_string());
+                log::error!("Player not initialized yet. Select a character first!");
             }
             Some(player) => {
                 let (x, y) = player.position();
                 let layer = state.layer(0);
+                log::debug!("Player X, Y: {}, {}", x, y);
                 load_item(layer, 878, x, y);
             }
         }

@@ -27,6 +27,7 @@ debug = true
     "errhandlingapi",
     "libloaderapi",
     "tlhelp32",
+    "psapi",
 ] }
 "sysinfo" = { version = "0.15.3" }
 log = "0.4.11"
