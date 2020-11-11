@@ -1,11 +1,9 @@
-use std::ffi;
-use std::mem;
-use std::ptr;
+use std::{ffi, mem, ptr};
 use sysinfo::*;
 use winapi::shared::minwindef::LPVOID;
 use winapi::um::errhandlingapi::GetLastError;
-use winapi::um::libloaderapi::*;
-use winapi::um::memoryapi::*;
+use winapi::um::libloaderapi::{GetProcAddress, LoadLibraryA};
+use winapi::um::memoryapi::{VirtualAllocEx, VirtualQueryEx, WriteProcessMemory};
 use winapi::um::minwinbase::LPTHREAD_START_ROUTINE;
 use winapi::um::processthreadsapi::{CreateRemoteThread, OpenProcess};
 use winapi::um::psapi::GetModuleBaseNameA;
@@ -95,17 +93,24 @@ unsafe fn write_mem(proc: &Process, addr: LPVOID, str: &str) {
     );
 }
 
+macro_rules! to_cstr {
+    ($l:expr) => {
+        ffi::CString::new($l).unwrap()
+    };
+}
+
 pub unsafe fn find_function(
     proc: &Process,
     library: &str,
     function: &str,
 ) -> LPTHREAD_START_ROUTINE {
-    let library_name = ffi::CString::new(library).unwrap();
-    let function_name = ffi::CString::new(function).unwrap();
+    let library_name = to_cstr!(library);
+    let function_name = to_cstr!(function);
     let library_ptr = LoadLibraryA(library_name.as_ptr());
-    std::mem::transmute(
-        GetProcAddress(library_ptr, function_name.as_ptr()) as usize - library_ptr as usize
-            + find_base(proc, library).unwrap(),
+    mem::transmute(
+        (GetProcAddress(library_ptr, function_name.as_ptr()) as usize)
+            .wrapping_sub(library_ptr as usize)
+            .wrapping_add(find_base(proc, library).unwrap()),
     )
 }
 
@@ -120,6 +125,10 @@ pub unsafe fn inject_dll(proc: &Process, name: &str) {
 }
 
 pub unsafe fn call(proc: &Process, addr: LPTHREAD_START_ROUTINE, args: LPVOID) {
+    log::info!(
+        "Calling: {:x}",
+        std::mem::transmute::<LPTHREAD_START_ROUTINE, usize>(addr)
+    );
     let handle = CreateRemoteThread(
         proc.handle,
         ptr::null_mut(),

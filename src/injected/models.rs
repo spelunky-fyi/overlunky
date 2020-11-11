@@ -8,11 +8,11 @@ pub struct Memory<'a> {
 }
 
 impl<'a> Memory<'a> {
-    fn r64(&self, addr: usize) -> usize {
+    pub fn r64(&self, addr: usize) -> usize {
         LE::read_u64(&self.mem[addr..]) as usize
     }
 
-    fn f32(&self, addr: usize) -> f32 {
+    pub fn f32(&self, addr: usize) -> f32 {
         LE::read_f32(&self.mem[addr..])
     }
 }
@@ -52,8 +52,8 @@ impl<'a> State<'a> {
         LE::read_u64(&self.memory.exe[self.location..]) as usize
     }
 
-    pub fn layer(&self, index: usize) -> usize {
-        self.memory.r64(self.ptr() + self.off_layers + index * 8)
+    pub fn layer(&self, index: u8) -> usize {
+        self.memory.r64(self.ptr() + self.off_layers + index as usize * 8)
     }
 
     pub fn items(&self) -> Items {
@@ -106,5 +106,9 @@ impl<'a> Player<'a> {
             }
         }
         (x, y)
+    }
+
+    pub fn layer(&self) -> u8 {
+        self.memory.mem[self.pointer + 0x98]
     }
 }
