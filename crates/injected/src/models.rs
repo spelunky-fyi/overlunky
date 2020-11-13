@@ -5,6 +5,8 @@ use hex_literal::*;
 pub struct Memory<'a> {
     pub mem: &'a [u8],
     pub exe: &'a [u8],
+    pub exe_ptr: usize,
+    pub after_bundle: usize,
 }
 
 impl<'a> Memory<'a> {
@@ -14,6 +16,10 @@ impl<'a> Memory<'a> {
 
     pub fn f32(&self, addr: usize) -> f32 {
         LE::read_f32(&self.mem[addr..])
+    }
+
+    pub fn at_exe(&self, offset: usize) -> usize {
+        self.exe_ptr + offset
     }
 }
 
@@ -53,7 +59,8 @@ impl<'a> State<'a> {
     }
 
     pub fn layer(&self, index: u8) -> usize {
-        self.memory.r64(self.ptr() + self.off_layers + index as usize * 8)
+        self.memory
+            .r64(self.ptr() + self.off_layers + index as usize * 8)
     }
 
     pub fn items(&self) -> Items {
