@@ -64,7 +64,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::NewFrame();
 
     ImGui::Begin("ImGui Window");
-    ImGui::SetWindowSize({100, 100});
+    ImGui::SetWindowSize({500, 500});
+    int current_item = 1;
+    const char *items[] = {
+        "Item1",
+        "Item2",
+        "Item3"
+    };
+    ImGui::ListBox("List label", &current_item, items, 3, -1);
+    auto pos = ImGui::GetIO().MousePos;
+
+    ImGui::Text("%d %d\n", pos.x, pos.y);
     ImGui::End();
 
     ImGui::Render();
