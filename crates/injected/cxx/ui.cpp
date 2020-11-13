@@ -74,7 +74,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::ListBox("List label", &current_item, items, 3, -1);
     auto pos = ImGui::GetIO().MousePos;
 
-    ImGui::Text("%d %d\n", pos.x, pos.y);
+    ImGui::Text("%f %f\n", pos.x, pos.y);
     ImGui::End();
 
     ImGui::Render();
