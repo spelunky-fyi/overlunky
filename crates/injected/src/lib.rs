@@ -78,14 +78,6 @@ impl<'a> API<'a> {
     unsafe fn swap_chain(&self) -> usize {
         self.memory.r64(self.renderer() + BASE)
     }
-
-    unsafe fn device(&self) -> *mut winapi::um::d3d11::ID3D11Device {
-        std::mem::transmute(self.memory.r64(self.renderer() + BASE + 8))
-    }
-
-    unsafe fn context(&self) -> *mut winapi::um::d3d11::ID3D11DeviceContext {
-        std::mem::transmute(self.memory.r64(self.renderer() + BASE + 16))
-    }
 }
 
 #[no_mangle]
@@ -108,15 +100,15 @@ unsafe extern "C" fn main(handle: u32) {
         after_bundle,
     };
     let state = State::new(&memory, after_bundle);
-    // list_entities(&memory, after_bundle);
+    let entities = list_entities(&memory, after_bundle);
+    ui::ffi::create_box(entities.iter().map(|item| item.name.clone()).collect());
 
     let api = API::new(&memory);
 
-    let device = api.device();
-    let context = api.context();
-    let swap_chain = api.swap_chain();
-
-    ui::ffi::init_hooks(swap_chain);
+    if let Err(err) = ui::ffi::init_hooks(api.swap_chain()) {
+        log::error!("{}", err);
+        return;
+    }
 
     let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
         std::mem::transmute(get_load_item(exe, after_bundle) + spel2_ptr as usize);

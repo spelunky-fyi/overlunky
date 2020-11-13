@@ -1,6 +1,6 @@
 #[cxx::bridge]
 mod ffi {
-    struct EntityItem {
+    pub struct EntityItem {
         pub name: String,
         pub id: u16,
     }
@@ -17,7 +17,7 @@ use crate::{
 };
 use hex_literal::hex;
 
-pub unsafe fn list_entities(mem: &Memory, start: usize) {
+pub unsafe fn list_entities(mem: &Memory, start: usize) -> Vec<ffi::EntityItem> {
     let entity_ptr = mem.at_exe(decode_pc(
         mem.exe,
         find_inst(
@@ -27,8 +27,5 @@ pub unsafe fn list_entities(mem: &Memory, start: usize) {
         ) - 7,
     ));
 
-    let entities = ffi::list_entities(mem.r64(entity_ptr));
-    for item in entities {
-        log::info!("{:?}: {}", item.name, item.id);
-    }
+    ffi::list_entities(mem.r64(entity_ptr))
 }
