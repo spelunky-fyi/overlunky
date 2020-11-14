@@ -73,6 +73,7 @@ bool process_keys(
         // Out-window keys
         if (wParam == VK_F1)
         {
+            ImGui::SetWindowCollapsed("Entity spawner (F1)", false);
             set_focus = true;
             return true;
         }
@@ -102,6 +103,7 @@ bool process_keys(
             break;
         case VK_F1:
             ImGui::FocusWindow(NULL);
+            ImGui::SetWindowCollapsed("Entity spawner (F1)", true);
             return true;
         }
 
