@@ -11,7 +11,7 @@ use critical_section::CriticalSectionManager;
 use db::list_entities;
 use hex_literal::*;
 use models::{Memory, State};
-use search::{decode_pc, find_inst};
+use search::{decode_imm, decode_pc, find_inst};
 
 use winapi::um::{
     consoleapi::SetConsoleCtrlHandler, processthreadsapi::ExitThread, wincon::AttachConsole,
@@ -55,7 +55,6 @@ struct API<'a> {
     api: *const usize,
 }
 
-const BASE: usize = 0x80fa8;
 impl<'a> API<'a> {
     unsafe fn new(memory: &'a Memory) -> API<'a> {
         let api: *const usize = std::mem::transmute(get_api(&memory));
@@ -68,7 +67,15 @@ impl<'a> API<'a> {
     }
 
     unsafe fn swap_chain(&self) -> usize {
-        self.memory.r64(self.renderer() + BASE)
+        let off = decode_imm(
+            self.memory.exe,
+            find_inst(
+                self.memory.exe,
+                &hex!("BA F0 FF FF FF 41 B8 00 00 00 90"),
+                self.memory.after_bundle,
+            ) + 17,
+        );
+        self.memory.r64(self.renderer() + off)
     }
 }
 
