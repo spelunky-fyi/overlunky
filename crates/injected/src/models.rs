@@ -1,6 +1,7 @@
-use crate::search::{decode_imm, decode_pc, find_inst};
+use crate::search::{decode_imm, decode_pc, find_after_bundle, find_inst};
 use byteorder::*;
 use hex_literal::*;
+use winapi::um::libloaderapi::LoadLibraryA;
 
 pub struct Memory<'a> {
     pub mem: &'a [u8],
@@ -9,9 +10,48 @@ pub struct Memory<'a> {
     pub after_bundle: usize,
 }
 
+unsafe fn memory_view<'a>(addr: *mut u8) -> &'a mut [u8] {
+    std::slice::from_raw_parts_mut(addr, usize::MAX)
+}
+
 impl<'a> Memory<'a> {
+    pub unsafe fn new() -> Memory<'a> {
+        let spel2_ptr = LoadLibraryA("Spel2.exe\0".as_ptr() as *const i8);
+        let exe = memory_view(spel2_ptr as *mut u8);
+        let mem = memory_view(std::ptr::null_mut());
+
+        // Skipping bundle for faster memory search
+        let after_bundle = find_after_bundle(exe);
+
+        Memory {
+            mem,
+            exe,
+            exe_ptr: spel2_ptr as usize,
+            after_bundle,
+        }
+    }
+
     pub fn r64(&self, addr: usize) -> usize {
         LE::read_u64(&self.mem[addr..]) as usize
+    }
+
+    pub fn write(&self, addr: usize, payload: &[u8]) {
+        let mut old_protect: u32 = 0;
+        unsafe {
+            winapi::um::memoryapi::VirtualProtect(
+                std::mem::transmute(addr),
+                0x1000,
+                winapi::um::winnt::PAGE_EXECUTE_READWRITE,
+                &mut old_protect,
+            );
+            &mut memory_view(std::ptr::null_mut())[addr..addr + payload.len()].copy_from_slice(payload);
+            winapi::um::memoryapi::VirtualProtect(
+                std::mem::transmute(addr),
+                0x1000,
+                old_protect,
+                &mut old_protect,
+            );
+        }
     }
 
     pub fn f32(&self, addr: usize) -> f32 {
@@ -59,6 +99,8 @@ impl<'a> State<'a> {
             memory.exe,
             find_inst(memory.exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
         ) as usize;
+        let off_send = find_inst(memory.exe, &hex!("45 8D 41 50"), start) + 12;
+        memory.write(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"));
         State {
             memory,
             location,

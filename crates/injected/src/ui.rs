@@ -1,4 +1,7 @@
-use crate::{models::State, get_memory, db::ffi::EntityItem};
+use crate::{
+    db::ffi::EntityItem,
+    models::{Memory, State},
+};
 
 #[cxx::bridge]
 pub mod ffi {
@@ -20,7 +23,7 @@ pub unsafe fn create_box(items: &Vec<EntityItem>) {
 
 // TODO: expose this to RPC
 pub unsafe fn spawn_entity(id: usize, x: f32, y: f32) {
-    let memory = get_memory();
+    let memory = Memory::new();
     let state = State::new(&memory);
 
     match state.items().player(0) {

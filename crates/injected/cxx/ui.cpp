@@ -28,7 +28,7 @@ struct CXXEntityItem
 };
 
 int g_x = 0, g_y = 0;
-size_t g_current_item = 0, g_filtered_count = 0;
+int g_current_item = 0, g_filtered_count = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 
@@ -124,7 +124,7 @@ bool process_keys(
         {
             // List navigation
             if (y != 0)
-                g_current_item = std::min(g_current_item + y, g_items.size());
+                g_current_item = std::min(std::max(g_current_item - y, 0), (int)g_items.size() - 1);
             if (x == 0)
                 return false;
         }
