@@ -35,19 +35,19 @@ impl<'a> Memory<'a> {
         LE::read_u64(&self.mem[addr..]) as usize
     }
 
-    pub fn write(&self, addr: usize, payload: &[u8]) {
+    pub fn write(&self, addr: usize, payload: &[u8], size: usize) {
         let mut old_protect: u32 = 0;
         unsafe {
             winapi::um::memoryapi::VirtualProtect(
                 std::mem::transmute(addr),
-                0x1000,
+                size,
                 winapi::um::winnt::PAGE_EXECUTE_READWRITE,
                 &mut old_protect,
             );
             &mut memory_view(std::ptr::null_mut())[addr..addr + payload.len()].copy_from_slice(payload);
             winapi::um::memoryapi::VirtualProtect(
                 std::mem::transmute(addr),
-                0x1000,
+                size,
                 old_protect,
                 &mut old_protect,
             );
@@ -100,7 +100,7 @@ impl<'a> State<'a> {
             find_inst(memory.exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
         ) as usize;
         let off_send = find_inst(memory.exe, &hex!("45 8D 41 50"), start) + 12;
-        memory.write(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"));
+        memory.write(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"), 0x1000);
         State {
             memory,
             location,
@@ -185,7 +185,23 @@ impl<'a> Player<'a> {
                 break;
             }
         }
+        log::info!("Position is {}, {}", x, y);
         (x, y)
+    }
+
+    pub fn teleport(&self, dx: f32, dy: f32) {
+        let (mut x, mut y) = self.position();
+        if self.pointer != 0 {
+            x += dx;
+            y += dy;
+            let px = self.pointer + 0x40;
+            let py = self.pointer + 0x44;
+            log::info!("Teleporting to {}, {}", x, y);
+            unsafe {
+                &mut memory_view(std::ptr::null_mut())[px..px + 4].copy_from_slice(&x.to_le_bytes());
+                &mut memory_view(std::ptr::null_mut())[py..py + 4].copy_from_slice(&y.to_le_bytes());
+            }
+        }
     }
 
     pub fn layer(&self) -> u8 {

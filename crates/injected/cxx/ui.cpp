@@ -27,13 +27,20 @@ struct CXXEntityItem
     CXXEntityItem(std::string name, uint16_t id) : name(name), id(id) {}
 };
 
-int g_x = 0, g_y = 0;
+float g_x = 0, g_y = 0;
 int g_current_item = 0, g_filtered_count = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 
 // Set focus on search box
-bool set_focus = false;
+bool set_focus = true;
+bool click_spawn = false;
+bool click_teleport = false;
+
+bool process_mouse(
+    _In_ int nCode,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam);
 
 bool process_keys(
     _In_ int nCode,
@@ -54,8 +61,49 @@ LRESULT CALLBACK window_hook(
     if (process_keys(msg->message, msg->wParam, msg->lParam))
         return 0;
 
+    if (process_mouse(msg->message, msg->wParam, msg->lParam))
+        return 0;
+
     return ImGui_ImplWin32_WndProcHandler(msg->hwnd, msg->message, msg->wParam, msg->lParam);
     // TODO: if ImGui::GetIO().WantCaptureKeyboard == true, can we block keyboard message going to existing WndProc?
+}
+
+bool process_mouse(
+    _In_ int nCode,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    if(ImGui::IsMouseReleased(0) && click_spawn == false)
+    {
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        g_x = (pos.x-res.x/2)*(10/(res.x/2));
+        g_y = -(pos.y-res.y/2)*(5.5/(res.y/2));
+        click_spawn = true;
+        return true;
+    }
+    if(click_spawn)
+    {
+        click_spawn = false;
+        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
+        g_x = 0; g_y = 0;
+    }
+    if(ImGui::IsMouseReleased(1) && click_teleport == false)
+    {
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        g_x = (pos.x-res.x/2)*(10.0/(res.x/2));
+        g_y = -(pos.y-res.y/2)*(5.5/(res.y/2));
+        click_teleport = true;
+        return true;
+    }
+    if(click_teleport)
+    {
+        click_teleport = false;
+        teleport(g_x, g_y);
+        g_x = 0; g_y = 0;
+    }
 }
 
 bool process_keys(
@@ -107,7 +155,13 @@ bool process_keys(
             return true;
         }
 
-        if (enter && g_items.size())
+        auto ctrl = GetAsyncKeyState(VK_CONTROL);
+        if(ctrl & 0x8000 && enter)
+        {
+            teleport(g_x, g_y);
+            return true;
+        }
+        else if (enter && g_items.size())
         {
             spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
             return true;
@@ -116,7 +170,6 @@ bool process_keys(
         if (x == 0 && y == 0)
             return false;
 
-        auto ctrl = GetAsyncKeyState(VK_CONTROL);
         if (ctrl & 0x8000)
         {
             g_x += x;
@@ -254,8 +307,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
     ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
     ImGui::PushItemWidth(-1);
-
-    ImGui::Text("Spawning at x: %+d, y: %+d (Ctrl+Arrow)", g_x, g_y);
+    ImGui::Text("Ctrl+Enter or right click to teleport");
+    ImGui::Text("Spawning at x: %+f, y: %+f (Ctrl+Arrow)", g_x, g_y);
     render_input();
     render_list();
 
