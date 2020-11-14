@@ -31,7 +31,6 @@ crate-type = ["cdylib"]
 ] }
 log = "0.4.11"
 env_logger = "0.8.1"
-tempfile = "3.1.0"
 byteorder = "*"
 hex-literal = "*"
 twoway = "*"

@@ -28,10 +28,23 @@ pub struct State<'a> {
     location: usize,
     off_items: usize,
     off_layers: usize,
+    ptr_load_item: usize,
+}
+
+fn get_load_item(memory: &Memory) -> usize {
+    let Memory {
+        exe, after_bundle, ..
+    } = memory;
+    let needle = &hex!("BA 88 02 00 00");
+    let off = find_inst(exe, needle, *after_bundle);
+    let off: usize = find_inst(exe, needle, off + 5) + 8;
+
+    memory.at_exe(off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5)
 }
 
 impl<'a> State<'a> {
-    pub fn new(memory: &'a Memory, start: usize) -> State<'a> {
+    pub fn new(memory: &'a Memory) -> State<'a> {
+        let start = memory.after_bundle;
         // Global state pointer
         let location = decode_pc(
             memory.exe,
@@ -51,6 +64,7 @@ impl<'a> State<'a> {
             location,
             off_items,
             off_layers,
+            ptr_load_item: get_load_item(&memory),
         }
     }
 
@@ -58,9 +72,13 @@ impl<'a> State<'a> {
         LE::read_u64(&self.memory.exe[self.location..]) as usize
     }
 
-    pub fn layer(&self, index: u8) -> usize {
-        self.memory
-            .r64(self.ptr() + self.off_layers + index as usize * 8)
+    pub fn layer(&self, index: u8) -> Layer {
+        Layer {
+            pointer: self
+                .memory
+                .r64(self.ptr() + self.off_layers + index as usize * 8),
+            ptr_load_item: self.ptr_load_item,
+        }
     }
 
     pub fn items(&self) -> Items {
@@ -69,6 +87,19 @@ impl<'a> State<'a> {
             memory: self.memory,
             pointer,
         }
+    }
+}
+
+pub struct Layer {
+    pointer: usize,
+    ptr_load_item: usize,
+}
+
+impl Layer {
+    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32) {
+        let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
+            std::mem::transmute(self.ptr_load_item);
+        load_item(self.pointer, id, x, y);
     }
 }
 

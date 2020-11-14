@@ -27,19 +27,12 @@ unsafe fn memory_view<'a>(addr: *mut u8) -> &'a mut [u8] {
     std::slice::from_raw_parts_mut(addr, usize::MAX)
 }
 
-fn get_load_item(exe: &[u8], start: usize) -> usize {
-    let needle = &hex!("BA 88 02 00 00");
-    let off = find_inst(exe, needle, start);
-    let off: usize = find_inst(exe, needle, off + 5) + 8;
-
-    off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5
-}
-
-fn get_api(exe: &[u8], start: usize) -> usize {
-    let off = find_inst(exe, &hex!("48 8B 50 10 48 89"), start) - 5;
+fn get_api(memory: &Memory) -> usize {
+    let Memory {exe, after_bundle, ..} = memory;
+    let off = find_inst(exe, &hex!("48 8B 50 10 48 89"), *after_bundle) - 5;
     let off = off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5;
 
-    decode_pc(exe, off + 6)
+    memory.at_exe(decode_pc(exe, off + 6))
 }
 
 unsafe fn attach_stdout(pid: u32) {
@@ -66,7 +59,7 @@ const BASE: usize = 0x80fa8;
 impl<'a> API<'a> {
     unsafe fn new(memory: &'a Memory) -> API<'a> {
         let api: *const usize =
-            std::mem::transmute(get_api(memory.exe, memory.after_bundle) + memory.exe_ptr as usize);
+            std::mem::transmute(get_api(&memory));
 
         API { memory, api }
     }
@@ -80,12 +73,7 @@ impl<'a> API<'a> {
     }
 }
 
-#[no_mangle]
-unsafe extern "C" fn main(handle: u32) {
-    attach_stdout(handle);
-    set_panic_hook();
-    log::info!("Hello from injected library!");
-
+unsafe fn get_memory<'a>() -> Memory<'a> {
     let spel2_ptr = LoadLibraryA("Spel2.exe\0".as_ptr() as *const i8);
     let exe = memory_view(spel2_ptr as *mut u8);
     let mem = memory_view(ptr::null_mut());
@@ -93,15 +81,24 @@ unsafe extern "C" fn main(handle: u32) {
     // Skipping bundle for faster memory search
     let after_bundle = find_after_bundle(exe);
 
-    let memory = Memory {
+    Memory {
         mem,
         exe,
         exe_ptr: spel2_ptr as usize,
         after_bundle,
-    };
-    let state = State::new(&memory, after_bundle);
-    let entities = list_entities(&memory, after_bundle);
-    ui::ffi::create_box(entities.iter().map(|item| item.name.clone()).collect());
+    }
+}
+
+#[no_mangle]
+unsafe extern "C" fn main(handle: u32) {
+    attach_stdout(handle);
+    set_panic_hook();
+    log::info!("Hello from injected library!");
+
+    let memory = get_memory();
+    let state = State::new(&memory);
+    let entities = list_entities(&memory);
+    ui::create_box(&entities);
 
     let api = API::new(&memory);
 
@@ -109,9 +106,6 @@ unsafe extern "C" fn main(handle: u32) {
         log::error!("{}", err);
         return;
     }
-
-    let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
-        std::mem::transmute(get_load_item(exe, after_bundle) + spel2_ptr as usize);
 
     let c = CriticalSectionManager::new();
     loop {
@@ -136,7 +130,7 @@ unsafe extern "C" fn main(handle: u32) {
                     let (x, y) = player.position();
                     let layer = player.layer();
                     log::debug!("Player X, Y: {}, {}", x, y);
-                    load_item(state.layer(layer), item, x, y);
+                    state.layer(layer).spawn_entity(item, x, y);
                 }
             }
         }
