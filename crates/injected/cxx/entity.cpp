@@ -85,8 +85,8 @@ list_entities(size_t map_ptr)
     for (const auto &kv : *map)
     {
         result.push_back(EntityItem{kv.first, kv.second});
-        // Entity *entity = entities[kv.second];
-        // printf("%d %f %f\n", kv.second, entity.width, entity.height);
+        // Entity *entity = &entities[kv.second];
+        // printf("%d %d %d\n", entity->id, (entity->map)[0], (entity->map)[1]);
     }
 
     return result;

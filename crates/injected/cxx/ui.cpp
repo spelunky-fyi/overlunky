@@ -74,6 +74,10 @@ bool process_mouse(
     _In_ LPARAM lParam)
 {
     ImGuiIO &io = ImGui::GetIO();
+    ImGuiWindow* win = ImGui::FindWindowByName("Entity spawner (F1)");
+    if(io.WantCaptureMouse || win->Collapsed) {
+        return false;
+    }
     if(ImGui::IsMouseReleased(0) && click_spawn == false)
     {
         ImVec2 res = io.DisplaySize;
