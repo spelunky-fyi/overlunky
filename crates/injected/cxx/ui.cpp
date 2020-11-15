@@ -35,10 +35,12 @@ std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 
 // Set focus on search box
-bool set_focus = true;
+bool set_focus = false;
 bool set_focus_world = false;
 bool click_spawn = false;
 bool click_teleport = false;
+bool hidegui = false;
+bool clickevents = false;
 
 bool process_mouse(
     _In_ int nCode,
@@ -86,7 +88,7 @@ bool process_mouse(
 {
     ImGuiIO &io = ImGui::GetIO();
     ImGuiWindow* win = ImGui::FindWindowByName("Entity spawner (F1)");
-    if(io.WantCaptureMouse || win->Collapsed) {
+    if(io.WantCaptureMouse || win->Collapsed || !clickevents) {
         return false;
     }
     if(ImGui::IsMouseReleased(0) && click_spawn == false)
@@ -144,6 +146,11 @@ bool process_keys(
     if (nCode != WM_KEYDOWN)
         return false;
 
+    if(wParam == VK_F11) {
+        hidegui = !hidegui;
+        return true;
+    }
+
     switch (ImGui::GetIO().WantCaptureKeyboard)
     {
     case false:
@@ -200,9 +207,15 @@ bool process_keys(
             teleport(g_x, g_y);
             return true;
         }
-        else if (enter && g_items.size())
+        else if (enter && g_items.size() && !ImGui::FindWindowByName("Entity spawner (F1)")->Collapsed)
         {
             spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
+            return true;
+        }
+        else if (enter && ImGui::FindWindowByName("Entity spawner (F1)")->Collapsed && !ImGui::FindWindowByName("Door to Narnia (F2)")->Collapsed)
+        {
+            spawn_entity(770, g_x, g_y);
+            spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
             return true;
         }
 
@@ -419,24 +432,31 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+    if(!hidegui) {
+        ImGui::Begin("Entity spawner (F1)");
+        ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
+        ImGui::PushItemWidth(-1);
+        ImGui::Text("Ctrl+Enter or right click to teleport");
+        ImGui::Text("Left click to spawn at cursor");
+        ImGui::Checkbox("##clickevents", &clickevents);
+        ImGui::SameLine();
+        ImGui::Text("Enable click events (buggy)");
+        ImGui::Text("Spawning at x: %+.2f, y: %+.2f (Ctrl+Arrow)", g_x, g_y);
+        render_input();
+        render_list();
+        ImGui::PopItemWidth();
+        ImGui::SetWindowCollapsed("Entity spawner (F1)", true, ImGuiCond_FirstUseEver);
+        ImGui::End();
 
-    ImGui::Begin("Entity spawner (F1)");
-    ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
-    ImGui::PushItemWidth(-1);
-    ImGui::Text("Ctrl+Enter or right click to teleport");
-    ImGui::Text("Spawning at x: %+f, y: %+f (Ctrl+Arrow)", g_x, g_y);
-    render_input();
-    render_list();
-    ImGui::PopItemWidth();
-    ImGui::End();
-
-    ImGui::Begin("Door to Narnia (F2)");
-    ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
-    ImGui::PushItemWidth(-1);
-    ImGui::Text("Spawn a door to:");
-    render_narnia();
-    ImGui::PopItemWidth();
-    ImGui::End();
+        ImGui::Begin("Door to Narnia (F2)");
+        ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
+        ImGui::PushItemWidth(-1);
+        ImGui::Text("Spawn a door to:");
+        render_narnia();
+        ImGui::PopItemWidth();
+        ImGui::SetWindowCollapsed("Door to Narnia (F2)", true, ImGuiCond_FirstUseEver);
+        ImGui::End();
+    }
 
     ImGui::Render();
 
