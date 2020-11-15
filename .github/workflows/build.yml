@@ -33,17 +33,19 @@ jobs:
 
       - name: Create artifacts
         run: |
-          mkdir dist
-          move target\debug\injected.dll dist
-          move target\debug\main.exe dist
+          mkdir rust-injector
+          move target\debug\injected.dll rust-injector
+          move target\debug\main.exe rust-injector\injector.exe
+          7z a rust-injector.zip rust-injector\injector.exe rust-injector\injected.dll
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Binary
-          path: ./dist
+          path: ./rust-injector
 
-      - uses: ncipollo/release-action@v1
+      - name: Create release
+        uses: ncipollo/release-action@v1
         with:
-          artifacts: "*"
+          artifacts: rust-injector_${{ github.ref }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
