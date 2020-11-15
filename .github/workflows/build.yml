@@ -36,7 +36,7 @@ jobs:
           mkdir rust-injector
           move target\debug\injected.dll rust-injector
           move target\debug\main.exe rust-injector\injector.exe
-          7z a rust-injector_${{ github.ref }}.zip rust-injector\injector.exe rust-injector\injected.dll
+          7z a rust-injector.zip rust-injector\injector.exe rust-injector\injected.dll
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
