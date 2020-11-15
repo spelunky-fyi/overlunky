@@ -1,0 +1,44 @@
+name: Builds
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    name: Build
+
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ./target
+          key: windows-$${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Rust
+        run: |
+          rustup update --no-self-update
+
+      - name: Build
+        run: cargo build
+
+      - name: Create artifacts
+        run: |
+          mkdir dist
+          move target\release\injected.dll dist
+          move target\release\main.exe dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Binary
+          path: ./dist
