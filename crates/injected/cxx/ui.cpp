@@ -432,10 +432,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     if(!hidegui) {
-        ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({400, 400}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Entity spawner (F1)");
-        ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
         ImGui::PushItemWidth(-1);
         ImGui::Text("Ctrl+Enter or right click to teleport");
         ImGui::Text("Left click to spawn at cursor");
