@@ -163,7 +163,7 @@ bool process_keys(
             return true;
         } else if (wParam == VK_F2)
         {
-            ImGui::SetWindowCollapsed("Door to Narnia (F2)", false);
+            ImGui::SetWindowCollapsed("Door to anywhere (F2)", false);
             set_focus_world = true;
             return true;
         }
@@ -197,7 +197,7 @@ bool process_keys(
             return true;
         case VK_F2:
             ImGui::FocusWindow(NULL);
-            ImGui::SetWindowCollapsed("Door to Narnia (F2)", true);
+            ImGui::SetWindowCollapsed("Door to anywhere (F2)", true);
             return true;
         }
 
@@ -212,7 +212,7 @@ bool process_keys(
             spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
             return true;
         }
-        else if (enter && ImGui::FindWindowByName("Entity spawner (F1)")->Collapsed && !ImGui::FindWindowByName("Door to Narnia (F2)")->Collapsed)
+        else if (enter && ImGui::FindWindowByName("Entity spawner (F1)")->Collapsed && !ImGui::FindWindowByName("Door to anywhere (F2)")->Collapsed)
         {
             spawn_entity(770, g_x, g_y);
             spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
@@ -354,8 +354,7 @@ void render_narnia()
         spawn_entity(770, g_x, g_y);
         spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
     }
-    ImGui::Text("You need to set the right theme to get the right results.");
-    ImGui::Text("Don't use this in camp, it doesn't go to Narnia! D:");
+    ImGui::Text("Don't use this in camp!");
 }
 
 void create_render_target()
@@ -433,6 +432,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     if(!hidegui) {
+        ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Entity spawner (F1)");
         ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
         ImGui::PushItemWidth(-1);
@@ -445,16 +446,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         render_input();
         render_list();
         ImGui::PopItemWidth();
-        ImGui::SetWindowCollapsed("Entity spawner (F1)", true, ImGuiCond_FirstUseEver);
         ImGui::End();
 
-        ImGui::Begin("Door to Narnia (F2)");
-        ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({300, 200}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos({400, 0}, ImGuiCond_FirstUseEver);
+        ImGui::Begin("Door to anywhere (F2)");
         ImGui::PushItemWidth(-1);
         ImGui::Text("Spawn a door to:");
         render_narnia();
         ImGui::PopItemWidth();
-        ImGui::SetWindowCollapsed("Door to Narnia (F2)", true, ImGuiCond_FirstUseEver);
         ImGui::End();
     }
 
