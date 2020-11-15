@@ -143,13 +143,13 @@ pub unsafe fn call(proc: &Process, addr: LPTHREAD_START_ROUTINE, args: LPVOID) {
 
 pub unsafe fn find_process(name: &str) -> Option<Process> {
     let mut system = sysinfo::System::new_all();
-    log::debug!("Refreshing the process list...");
+    //log::debug!("Refreshing the process list...");
     system.refresh_processes();
 
-    log::debug!(
+    /*log::debug!(
         "Iterating through {} processes...",
         system.get_processes().len()
-    );
+    );*/
 
     for (pid, proc_) in system.get_processes() {
         if proc_.name().to_lowercase() == name.to_lowercase() {
