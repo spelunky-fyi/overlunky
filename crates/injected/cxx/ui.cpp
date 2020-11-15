@@ -10,6 +10,7 @@
 #include <Shlwapi.h>
 #include <algorithm>
 
+IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
 ID3D11DeviceContext *pContext;
 ID3D11RenderTargetView *mainRenderTargetView;
@@ -50,7 +51,12 @@ bool process_keys(
     _In_ WPARAM wParam,
     _In_ LPARAM lParam);
 
-LRESULT CALLBACK window_hook(
+bool process_resizing(
+    _In_ int nCode,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam);
+
+LRESULT CALLBACK msg_hook(
     _In_ int nCode,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam)
@@ -65,6 +71,9 @@ LRESULT CALLBACK window_hook(
         return 0;
 
     if (process_mouse(msg->message, msg->wParam, msg->lParam))
+        return 0;
+
+    if (process_resizing(msg->message, msg->wParam, msg->lParam))
         return 0;
 
     return ImGui_ImplWin32_WndProcHandler(msg->hwnd, msg->message, msg->wParam, msg->lParam);
@@ -111,6 +120,21 @@ bool process_mouse(
         teleport(g_x, g_y);
         g_x = 0; g_y = 0;
     }
+}
+
+LRESULT CALLBACK window_hook(
+    _In_ int nCode,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam)
+{
+    auto msg = (CWPSTRUCT *)(lParam);
+    if (msg->hwnd != window)
+        return 0;
+
+    if (process_resizing(msg->message, msg->wParam, msg->lParam))
+        return 0;
+
+    return 0;
 }
 
 bool process_keys(
@@ -196,7 +220,7 @@ bool process_keys(
             // List navigation
             if (y != 0)
                 g_current_item = std::min(std::max(g_current_item - y, 0), (int)g_items.size() - 1);
-            if (x == 0)
+            if (x != 0)
                 return false;
         }
         return true;
@@ -214,20 +238,13 @@ void init_imgui()
     ImGui_ImplDX11_Init(pDevice, pContext);
     freopen("CONOUT$", "w", stdout);
 
-    MEMORY_BASIC_INFORMATION mbi;
-    HMODULE hMod;
-    if (VirtualQuery(window_hook, &mbi, sizeof(mbi)))
+    if (!SetWindowsHookExA(WH_GETMESSAGE, msg_hook, 0, GetCurrentThreadId()))
     {
-        hMod = (HMODULE)mbi.AllocationBase;
+        printf("Message hook error: 0x%x\n", GetLastError());
     }
-    else
+    if (!SetWindowsHookExA(WH_CALLWNDPROC, window_hook, 0, GetCurrentThreadId()))
     {
-        printf("VirtualQuery Error: 0x%x\n", GetLastError());
-    }
-
-    if (!SetWindowsHookExA(WH_GETMESSAGE, window_hook, 0, GetCurrentThreadId()))
-    {
-        printf("Error: 0x%x\n", GetLastError());
+        printf("WndProc hook error: 0x%x\n", GetLastError());
     }
 }
 
@@ -241,7 +258,6 @@ void update_filter(const char *s)
             g_filtered_items[count++] = i;
         }
     }
-    printf("%d / %d\n", count, g_items.size());
     g_filtered_count = count;
     g_current_item = 0;
 }
@@ -330,6 +346,52 @@ void render_narnia()
     ImGui::Text("Don't use this in camp, it doesn't go to Narnia! D:");
 }
 
+void create_render_target()
+{
+    ID3D11Texture2D *pBackBuffer;
+    pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&pBackBuffer);
+    pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
+    pBackBuffer->Release();
+}
+
+void cleanup_render_target()
+{
+    if (mainRenderTargetView)
+    {
+        mainRenderTargetView->Release();
+        mainRenderTargetView = NULL;
+    }
+}
+
+bool process_resizing(_In_ int nCode,
+                      _In_ WPARAM wParam,
+                      _In_ LPARAM lParam)
+{
+    static bool on_titlebar = false;
+    switch (nCode)
+    {
+    case WM_NCLBUTTONDOWN:
+        return on_titlebar = true;
+    case WM_LBUTTONUP:
+        if (on_titlebar && GetCapture() == window)
+        {
+            on_titlebar = false;
+            return true;
+        }
+        break;
+    case WM_SIZE:
+        // When display mode is changed
+        if (pDevice != NULL && wParam != SIZE_MINIMIZED)
+        {
+            cleanup_render_target();
+            pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
+            create_render_target();
+        }
+        break;
+    }
+    return false;
+}
+
 HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags)
 {
     static bool init = false;
@@ -343,10 +405,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             DXGI_SWAP_CHAIN_DESC sd;
             pSwapChain->GetDesc(&sd);
             window = sd.OutputWindow;
-            ID3D11Texture2D *pBackBuffer;
-            pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&pBackBuffer);
-            pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
-            pBackBuffer->Release();
+            create_render_target();
             init_imgui();
             init = true;
         }
@@ -385,14 +444,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     return oPresent(pSwapChain, SyncInterval, Flags);
-}
-
-char *my_strdup(const char *s, int size)
-{
-    auto result = new char[size + 1];
-    memcpy(result, s, size);
-    result[size] = '\0';
-    return result;
 }
 
 void create_box(rust::Vec<rust::String> names, rust::Vec<uint16_t> ids)
@@ -440,7 +491,7 @@ PresentPtr &vtable_find(T *obj, int index)
 
 bool init_hooks(size_t _ptr)
 {
-    IDXGISwapChain *pSwapChain = reinterpret_cast<IDXGISwapChain *>(_ptr);
+    pSwapChain = reinterpret_cast<IDXGISwapChain *>(_ptr);
     PresentPtr &ptr = vtable_find(pSwapChain, 8);
     DWORD oldProtect;
     if (!VirtualProtect(
