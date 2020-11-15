@@ -28,13 +28,22 @@ struct CXXEntityItem
     CXXEntityItem(std::string name, uint16_t id) : name(name), id(id) {}
 };
 
-int g_x = 0, g_y = 0;
+float g_x = 0, g_y = 0;
 int g_current_item = 0, g_filtered_count = 0;
+int g_level = 1, g_world = 1, g_from = 1, g_to = 1;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 
 // Set focus on search box
-bool set_focus = false;
+bool set_focus = true;
+bool set_focus_world = false;
+bool click_spawn = false;
+bool click_teleport = false;
+
+bool process_mouse(
+    _In_ int nCode,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam);
 
 bool process_keys(
     _In_ int nCode,
@@ -60,11 +69,56 @@ LRESULT CALLBACK msg_hook(
     if (process_keys(msg->message, msg->wParam, msg->lParam))
         return 0;
 
+    if (process_mouse(msg->message, msg->wParam, msg->lParam))
+        return 0;
+
     if (process_resizing(msg->message, msg->wParam, msg->lParam))
         return 0;
 
     return ImGui_ImplWin32_WndProcHandler(msg->hwnd, msg->message, msg->wParam, msg->lParam);
     // TODO: if ImGui::GetIO().WantCaptureKeyboard == true, can we block keyboard message going to existing WndProc?
+}
+
+bool process_mouse(
+    _In_ int nCode,
+    _In_ WPARAM wParam,
+    _In_ LPARAM lParam)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImGuiWindow* win = ImGui::FindWindowByName("Entity spawner (F1)");
+    if(io.WantCaptureMouse || win->Collapsed) {
+        return false;
+    }
+    if(ImGui::IsMouseReleased(0) && click_spawn == false)
+    {
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        g_x = (pos.x-res.x/2)*(10/(res.x/2));
+        g_y = -(pos.y-res.y/2)*(5.5/(res.y/2));
+        click_spawn = true;
+        return true;
+    }
+    if(click_spawn)
+    {
+        click_spawn = false;
+        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
+        g_x = 0; g_y = 0;
+    }
+    if(ImGui::IsMouseReleased(1) && click_teleport == false)
+    {
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        g_x = (pos.x-res.x/2)*(10.0/(res.x/2));
+        g_y = -(pos.y-res.y/2)*(5.5/(res.y/2));
+        click_teleport = true;
+        return true;
+    }
+    if(click_teleport)
+    {
+        click_teleport = false;
+        teleport(g_x, g_y);
+        g_x = 0; g_y = 0;
+    }
 }
 
 LRESULT CALLBACK window_hook(
@@ -97,7 +151,13 @@ bool process_keys(
         // Out-window keys
         if (wParam == VK_F1)
         {
+            ImGui::SetWindowCollapsed("Entity spawner (F1)", false);
             set_focus = true;
+            return true;
+        } else if (wParam == VK_F2)
+        {
+            ImGui::SetWindowCollapsed("Door to Narnia (F2)", false);
+            set_focus_world = true;
             return true;
         }
         break;
@@ -126,10 +186,21 @@ bool process_keys(
             break;
         case VK_F1:
             ImGui::FocusWindow(NULL);
+            ImGui::SetWindowCollapsed("Entity spawner (F1)", true);
+            return true;
+        case VK_F2:
+            ImGui::FocusWindow(NULL);
+            ImGui::SetWindowCollapsed("Door to Narnia (F2)", true);
             return true;
         }
 
-        if (enter && g_items.size())
+        auto ctrl = GetAsyncKeyState(VK_CONTROL);
+        if(ctrl & 0x8000 && enter)
+        {
+            teleport(g_x, g_y);
+            return true;
+        }
+        else if (enter && g_items.size())
         {
             spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
             return true;
@@ -138,7 +209,6 @@ bool process_keys(
         if (x == 0 && y == 0)
             return false;
 
-        auto ctrl = GetAsyncKeyState(VK_CONTROL);
         if (ctrl & 0x8000)
         {
             g_x += x;
@@ -232,6 +302,49 @@ void render_input()
     }
 }
 
+void render_narnia()
+{
+    static char world[3];
+    static char level[3];
+    static int from = 0;
+    static int to = 0;
+    ImGui::Text("Area");
+    ImGui::SameLine(53);
+    ImGui::Text("Level");
+    ImGui::SameLine(100);
+    ImGui::Text("Theme");
+    ImGui::SetNextItemWidth(40);
+    if(set_focus_world) {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_world = false;
+    }
+    if(ImGui::InputText("##World", world, sizeof(world), 0, NULL)) {
+        g_world = atoi(world);
+        if(g_world < 1) {
+            g_world = 1;
+        }
+    }
+    ImGui::SameLine(52);
+    ImGui::SetNextItemWidth(44);
+    if(ImGui::InputText("##Level", level, sizeof(level), 0, NULL)) {
+        g_level = atoi(level);
+        if(g_level < 1) {
+            g_level = 1;
+        }
+    }
+    ImGui::SameLine(100);
+    ImGui::SetNextItemWidth(200);
+    if(ImGui::Combo("##Theme", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0Tide Pool\0Temple\0Ice Caves\0Neo Babylon\0Sunken City\0Cosmic Ocean\0City of Gold\0Duat\0Abzu\0Tiamat\0Eggplant World\0Hundun\0\0")) {
+        g_to = to+1;
+    }
+    if(ImGui::Button("Create door")) {
+        spawn_entity(770, g_x, g_y);
+        spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
+    }
+    ImGui::Text("You need to set the right theme to get the right results.");
+    ImGui::Text("Don't use this in camp, it doesn't go to Narnia! D:");
+}
+
 void create_render_target()
 {
     ID3D11Texture2D *pBackBuffer;
@@ -308,14 +421,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::NewFrame();
 
     ImGui::Begin("Entity spawner (F1)");
-
     ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
     ImGui::PushItemWidth(-1);
-
-    ImGui::Text("Spawning at x: %+d, y: %+d (Ctrl+Arrow)", g_x, g_y);
+    ImGui::Text("Ctrl+Enter or right click to teleport");
+    ImGui::Text("Spawning at x: %+f, y: %+f (Ctrl+Arrow)", g_x, g_y);
     render_input();
     render_list();
+    ImGui::PopItemWidth();
+    ImGui::End();
 
+    ImGui::Begin("Door to Narnia (F2)");
+    ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
+    ImGui::PushItemWidth(-1);
+    ImGui::Text("Spawn a door to:");
+    render_narnia();
     ImGui::PopItemWidth();
     ImGui::End();
 
