@@ -37,15 +37,19 @@ fn main() {
 
     unsafe {
         log::info!("Searching for Spel2.exe process...");
+        let mut started: bool = true;
         let proc = loop {
             if let Some(proc) = find_process("Spel2.exe") {
                 break proc;
             }
+            started = false;
             thread::sleep(time::Duration::from_millis(1000));
         };
         log::info!("Found Spel2.exe PID: {}", proc.pid);
-        log::info!("Waiting a while for the game to load...");
-        thread::sleep(time::Duration::from_millis(5000));
+        if !started {
+            log::info!("Waiting a while for the game to load...");
+            thread::sleep(time::Duration::from_millis(3000));
+        }
         inject_dll(&proc, temp_path.to_str().unwrap());
         call(
             &proc,
