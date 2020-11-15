@@ -34,8 +34,8 @@ jobs:
       - name: Create artifacts
         run: |
           mkdir dist
-          move target\release\injected.dll dist
-          move target\release\main.exe dist
+          move target\debug\injected.dll dist
+          move target\debug\main.exe dist
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
