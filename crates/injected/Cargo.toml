@@ -36,7 +36,6 @@ hex-literal = "*"
 twoway = "*"
 backtrace = "*"
 cxx = "*"
-imgui-sys = "*"
 
 [build-dependencies]
 cxx-build = "*"
