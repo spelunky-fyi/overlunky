@@ -7,6 +7,7 @@ use crate::{
 pub mod ffi {
     extern "Rust" {
         fn spawn_entity(id: usize, x: f32, y: f32);
+        fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
         fn teleport(x: f32, y: f32);
     }
     extern "C++" {
@@ -32,6 +33,20 @@ pub unsafe fn spawn_entity(id: usize, x: f32, y: f32) {
             let (_x, _y) = player.position();
             log::info!("Spawning {} on {}, {}", id, x + _x, y + _y);
             state.layer(player.layer()).spawn_entity(id, x + _x, y + _y);
+        }
+        None => {}
+    }
+}
+
+pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
+    let memory = Memory::new();
+    let state = State::new(&memory);
+
+    match state.items().player(0) {
+        Some(player) => {
+            let (_x, _y) = player.position();
+            log::info!("Spawning door on {}, {}", x + _x, y + _y);
+            state.layer(player.layer()).spawn_door(x + _x, y + _y, l, w, f, t);
         }
         None => {}
     }

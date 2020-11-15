@@ -141,7 +141,20 @@ impl Layer {
     pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32) {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(self.ptr_load_item);
-        load_item(self.pointer, id, x, y);
+        let addr: usize = load_item(self.pointer, id, x, y);
+        log::info!("Spawned {:x?}", addr);
+    }
+
+    pub unsafe fn spawn_door(&self, x: f32, y: f32, w: u8, l: u8, f: u8, t: u8) {
+        let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
+            std::mem::transmute(self.ptr_load_item);
+        let addr: usize = load_item(self.pointer, 23, x, y);
+        log::info!("Spawned door {:x?}", addr);
+        let array: [u8; 5] = [1, l, f, w, t];
+        log::info!("Making a door to {:x?}", array);
+        unsafe {
+            &mut memory_view(std::ptr::null_mut())[addr+0xc1..addr + 0xc6].copy_from_slice(&array);
+        }
     }
 }
 

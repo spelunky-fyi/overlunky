@@ -29,13 +29,16 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0;
 int g_current_item = 0, g_filtered_count = 0;
+int g_level = 1, g_world = 1, g_from = 1, g_to = 1;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 
 // Set focus on search box
 bool set_focus = true;
+bool set_focus_world = false;
 bool click_spawn = false;
 bool click_teleport = false;
+const char* themes[] = { "Dwelling", "Jungle", "Volcana", "Olmec", "Tide Pool", "Temple", "Ice Caves", "Neo Babylon", "Sunken City", "Cosmic Ocean", "City of Gold", "Duat", "Abzu", "Tiamat", "Eggplant World", "Hundun" };
 
 bool process_mouse(
     _In_ int nCode,
@@ -128,6 +131,11 @@ bool process_keys(
             ImGui::SetWindowCollapsed("Entity spawner (F1)", false);
             set_focus = true;
             return true;
+        } else if (wParam == VK_F2)
+        {
+            ImGui::SetWindowCollapsed("Door to Narnia (F2)", false);
+            set_focus_world = true;
+            return true;
         }
         break;
     }
@@ -156,6 +164,10 @@ bool process_keys(
         case VK_F1:
             ImGui::FocusWindow(NULL);
             ImGui::SetWindowCollapsed("Entity spawner (F1)", true);
+            return true;
+        case VK_F2:
+            ImGui::FocusWindow(NULL);
+            ImGui::SetWindowCollapsed("Door to Narnia (F2)", true);
             return true;
         }
 
@@ -275,6 +287,56 @@ void render_input()
     }
 }
 
+void render_narnia()
+{
+    static char world[3];
+    static char level[3];
+    static int from = 0;
+    static int to = 0;
+    ImGui::Text("Area");
+    ImGui::SameLine(53);
+    ImGui::Text("Level");
+    ImGui::SameLine(100);
+    ImGui::Text("From");
+    ImGui::SameLine(200);
+    ImGui::Text("To (theme)");
+    ImGui::SetNextItemWidth(40);
+    if(set_focus_world) {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_world = false;
+    }
+    if(ImGui::InputText("##World", world, sizeof(world), 0, NULL)) {
+        g_world = atoi(world);
+        if(g_world < 1) {
+            g_world = 1;
+        }
+    }
+    ImGui::SameLine(52);
+    ImGui::SetNextItemWidth(43);
+    if(ImGui::InputText("##Level", level, sizeof(level), 0, NULL)) {
+        g_level = atoi(level);
+        if(g_level < 1) {
+            g_level = 1;
+        }
+    }
+    ImGui::SameLine(100);
+    ImGui::SetNextItemWidth(95);
+    if(ImGui::Combo("##From", &from, "Dwelling\0Jungle\0Volcana\0Olmec\0TidePool\0Temple\0IceCaves\0NeoBabylon\0SunkenCity\0CosmicOcean\0CityofGold\0Duat\0Abzu\0Tiamat\0EggplantWorld\0Hundun\0\0")) {
+        g_from = from+1;
+    }
+    ImGui::SameLine(200);
+    ImGui::SetNextItemWidth(95);
+    if(ImGui::Combo("##To", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0TidePool\0Temple\0IceCaves\0NeoBabylon\0SunkenCity\0CosmicOcean\0CityofGold\0Duat\0Abzu\0Tiamat\0EggplantWorld\0Hundun\0\0")) {
+        g_to = to+1;
+    }
+    if(ImGui::Button("Create door")) {
+        spawn_entity(770, g_x, g_y);
+        spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
+    }
+    ImGui::Text("You need to set the right theme to get the right results.");
+    ImGui::Text("Don't use this in camp, it doesn't go to Narnia! D:");
+}
+
 HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags)
 {
     static bool init = false;
@@ -308,14 +370,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::NewFrame();
 
     ImGui::Begin("Entity spawner (F1)");
-
     ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
     ImGui::PushItemWidth(-1);
     ImGui::Text("Ctrl+Enter or right click to teleport");
     ImGui::Text("Spawning at x: %+f, y: %+f (Ctrl+Arrow)", g_x, g_y);
     render_input();
     render_list();
+    ImGui::PopItemWidth();
+    ImGui::End();
 
+    ImGui::Begin("Door to Narnia (F2)");
+    ImGui::SetWindowSize({500, 500}, ImGuiCond_FirstUseEver);
+    ImGui::PushItemWidth(-1);
+    ImGui::Text("Spawn a door to:");
+    render_narnia();
     ImGui::PopItemWidth();
     ImGui::End();
 
