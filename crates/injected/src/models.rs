@@ -152,9 +152,7 @@ impl Layer {
         log::info!("Spawned door {:x?}", addr);
         let array: [u8; 5] = [1, l, f, w, t];
         log::info!("Making a door to {:x?}", array);
-        unsafe {
-            &mut memory_view(std::ptr::null_mut())[addr+0xc1..addr + 0xc6].copy_from_slice(&array);
-        }
+        &mut memory_view(std::ptr::null_mut())[addr+0xc1..addr + 0xc6].copy_from_slice(&array);
     }
 }
 
