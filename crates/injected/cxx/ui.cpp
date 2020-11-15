@@ -39,7 +39,6 @@ bool set_focus = true;
 bool set_focus_world = false;
 bool click_spawn = false;
 bool click_teleport = false;
-const char* themes[] = { "Dwelling", "Jungle", "Volcana", "Olmec", "Tide Pool", "Temple", "Ice Caves", "Neo Babylon", "Sunken City", "Cosmic Ocean", "City of Gold", "Duat", "Abzu", "Tiamat", "Eggplant World", "Hundun" };
 
 bool process_mouse(
     _In_ int nCode,
@@ -335,7 +334,7 @@ void render_narnia()
     }
     ImGui::SameLine(100);
     ImGui::SetNextItemWidth(200);
-    if(ImGui::Combo("##Theme", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0Tide Pool\0Temple\0Ice Caves\0Neo Babylon\0Sunken City\0Cosmic Ocean\0City of Gold\0Duat\0Abzu\0Tiamat\0EggplantWorld\0Hundun\0\0")) {
+    if(ImGui::Combo("##Theme", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0Tide Pool\0Temple\0Ice Caves\0Neo Babylon\0Sunken City\0Cosmic Ocean\0City of Gold\0Duat\0Abzu\0Tiamat\0Eggplant World\0Hundun\0\0")) {
         g_to = to+1;
     }
     if(ImGui::Button("Create door")) {
