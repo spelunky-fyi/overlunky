@@ -35,7 +35,7 @@ std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 
 // Set focus on search box
-bool set_focus = false;
+bool set_focus_entity = false;
 bool set_focus_world = false;
 bool click_spawn = false;
 bool click_teleport = false;
@@ -98,7 +98,6 @@ bool process_mouse(
         g_x = (pos.x-res.x/2)*(10/(res.x/2));
         g_y = -(pos.y-res.y/2)*(5.5/(res.y/2));
         click_spawn = true;
-        return true;
     }
     if(click_spawn)
     {
@@ -113,7 +112,6 @@ bool process_mouse(
         g_x = (pos.x-res.x/2)*(10.0/(res.x/2));
         g_y = -(pos.y-res.y/2)*(5.5/(res.y/2));
         click_teleport = true;
-        return true;
     }
     if(click_teleport)
     {
@@ -138,6 +136,23 @@ LRESULT CALLBACK window_hook(
     return 0;
 }
 
+bool toggle(const char* name) {
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* current = g.NavWindow;
+    ImGuiWindow* win = ImGui::FindWindowByName(name);
+    if(win != NULL) {
+        if(win->Collapsed || win != current) {
+            win->Collapsed = false;
+            ImGui::FocusWindow(win);
+            return true;
+        } else {
+            win->Collapsed = true;
+            ImGui::FocusWindow(NULL);
+        }
+    }
+    return false;
+}
+
 bool process_keys(
     _In_ int nCode,
     _In_ WPARAM wParam,
@@ -150,26 +165,22 @@ bool process_keys(
         hidegui = !hidegui;
         return true;
     }
-
-    switch (ImGui::GetIO().WantCaptureKeyboard)
+    else if (wParam == VK_F1)
     {
-    case false:
-    {
-        // Out-window keys
-        if (wParam == VK_F1)
-        {
-            ImGui::SetWindowCollapsed("Entity spawner (F1)", false);
-            set_focus = true;
-            return true;
-        } else if (wParam == VK_F2)
-        {
-            ImGui::SetWindowCollapsed("Door to anywhere (F2)", false);
-            set_focus_world = true;
-            return true;
+        if(toggle("Entity spawner (F1)")) {
+            set_focus_entity = true;
         }
-        break;
+        return true;
     }
-    case true:
+    else if (wParam == VK_F2)
+    {
+        if(toggle("Door to anywhere (F2)")) {
+            set_focus_world = true;
+        }
+        return true;
+    }
+
+    if(ImGui::GetIO().WantCaptureKeyboard)
     { // In-window keys
         int x = 0, y = 0;
         bool enter = false;
@@ -191,14 +202,6 @@ bool process_keys(
         case VK_RETURN:
             enter = true;
             break;
-        case VK_F1:
-            ImGui::FocusWindow(NULL);
-            ImGui::SetWindowCollapsed("Entity spawner (F1)", true);
-            return true;
-        case VK_F2:
-            ImGui::FocusWindow(NULL);
-            ImGui::SetWindowCollapsed("Door to anywhere (F2)", true);
-            return true;
         }
 
         auto ctrl = GetAsyncKeyState(VK_CONTROL);
@@ -236,7 +239,6 @@ bool process_keys(
                 return false;
         }
         return true;
-    }
     }
 }
 
@@ -304,10 +306,10 @@ void render_list()
 void render_input()
 {
     static char text[100];
-    if (set_focus)
+    if (set_focus_entity)
     {
         ImGui::SetKeyboardFocusHere();
-        set_focus = false;
+        set_focus_entity = false;
     }
     if (ImGui::InputText("##Input", text, sizeof(text), 0, NULL))
     {
