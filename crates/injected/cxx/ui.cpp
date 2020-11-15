@@ -297,9 +297,7 @@ void render_narnia()
     ImGui::SameLine(53);
     ImGui::Text("Level");
     ImGui::SameLine(100);
-    ImGui::Text("From");
-    ImGui::SameLine(200);
-    ImGui::Text("To (theme)");
+    ImGui::Text("Theme");
     ImGui::SetNextItemWidth(40);
     if(set_focus_world) {
         ImGui::SetKeyboardFocusHere();
@@ -312,7 +310,7 @@ void render_narnia()
         }
     }
     ImGui::SameLine(52);
-    ImGui::SetNextItemWidth(43);
+    ImGui::SetNextItemWidth(44);
     if(ImGui::InputText("##Level", level, sizeof(level), 0, NULL)) {
         g_level = atoi(level);
         if(g_level < 1) {
@@ -320,13 +318,8 @@ void render_narnia()
         }
     }
     ImGui::SameLine(100);
-    ImGui::SetNextItemWidth(95);
-    if(ImGui::Combo("##From", &from, "Dwelling\0Jungle\0Volcana\0Olmec\0TidePool\0Temple\0IceCaves\0NeoBabylon\0SunkenCity\0CosmicOcean\0CityofGold\0Duat\0Abzu\0Tiamat\0EggplantWorld\0Hundun\0\0")) {
-        g_from = from+1;
-    }
-    ImGui::SameLine(200);
-    ImGui::SetNextItemWidth(95);
-    if(ImGui::Combo("##To", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0TidePool\0Temple\0IceCaves\0NeoBabylon\0SunkenCity\0CosmicOcean\0CityofGold\0Duat\0Abzu\0Tiamat\0EggplantWorld\0Hundun\0\0")) {
+    ImGui::SetNextItemWidth(200);
+    if(ImGui::Combo("##Theme", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0Tide Pool\0Temple\0Ice Caves\0Neo Babylon\0Sunken City\0Cosmic Ocean\0City of Gold\0Duat\0Abzu\0Tiamat\0EggplantWorld\0Hundun\0\0")) {
         g_to = to+1;
     }
     if(ImGui::Button("Create door")) {
