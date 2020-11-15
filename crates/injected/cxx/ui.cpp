@@ -180,6 +180,9 @@ bool process_keys(
         return true;
     }
 
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* current = g.NavWindow;
+
     if(ImGui::GetIO().WantCaptureKeyboard)
     { // In-window keys
         int x = 0, y = 0;
@@ -210,12 +213,12 @@ bool process_keys(
             teleport(g_x, g_y);
             return true;
         }
-        else if (enter && g_items.size() && !ImGui::FindWindowByName("Entity spawner (F1)")->Collapsed)
+        else if (enter && g_items.size() && current == ImGui::FindWindowByName("Entity spawner (F1)"))
         {
             spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
             return true;
         }
-        else if (enter && ImGui::FindWindowByName("Entity spawner (F1)")->Collapsed && !ImGui::FindWindowByName("Door to anywhere (F2)")->Collapsed)
+        else if (enter && current == ImGui::FindWindowByName("Door to anywhere (F2)"))
         {
             spawn_entity(770, g_x, g_y);
             spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
@@ -315,6 +318,9 @@ void render_input()
     {
         update_filter(text);
     }
+    if(ImGui::Button("Spawn entity") && g_items.size()) {
+        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
+    }
 }
 
 void render_narnia()
@@ -352,7 +358,7 @@ void render_narnia()
     if(ImGui::Combo("##Theme", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0Tide Pool\0Temple\0Ice Caves\0Neo Babylon\0Sunken City\0Cosmic Ocean\0City of Gold\0Duat\0Abzu\0Tiamat\0Eggplant World\0Hundun\0\0")) {
         g_to = to+1;
     }
-    if(ImGui::Button("Create door")) {
+    if(ImGui::Button("Spawn door")) {
         spawn_entity(770, g_x, g_y);
         spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
     }
@@ -438,11 +444,13 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Entity spawner (F1)");
         ImGui::PushItemWidth(-1);
-        ImGui::Text("Ctrl+Enter or right click to teleport");
-        ImGui::Text("Left click to spawn at cursor");
-        ImGui::Checkbox("##clickevents", &clickevents);
-        ImGui::SameLine();
-        ImGui::Text("Enable click events (buggy)");
+        //ImGui::Text("Ctrl+Enter or right click to teleport");
+        ImGui::Text("Ctrl+Enter to teleport");
+        // apparently this doesn't even work in release build, go figure
+        //ImGui::Text("Left click to spawn at cursor");
+        //ImGui::Checkbox("##clickevents", &clickevents);
+        //ImGui::SameLine();
+        //ImGui::Text("Enable click events (buggy)");
         ImGui::Text("Spawning at x: %+.2f, y: %+.2f (Ctrl+Arrow)", g_x, g_y);
         render_input();
         render_list();
