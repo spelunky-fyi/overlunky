@@ -2,7 +2,6 @@ mod critical_section;
 mod db;
 mod models;
 mod search;
-mod support;
 mod ui;
 
 use backtrace::Backtrace;
