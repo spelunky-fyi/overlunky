@@ -31,7 +31,7 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0;
 int g_current_item = 0, g_filtered_count = 0;
-int g_level = 1, g_world = 1, g_from = 1, g_to = 1;
+int g_level = 1, g_world = 1, g_to = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 static char text[500];
@@ -43,6 +43,8 @@ bool click_spawn = false;
 bool click_teleport = false;
 bool hidegui = false;
 bool clickevents = false;
+
+const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 
 bool process_mouse(
     _In_ int nCode,
@@ -237,7 +239,7 @@ bool process_keys(
         else if (enter && current == ImGui::FindWindowByName("Door to anywhere (F2)"))
         {
             spawn_entity(770, g_x, g_y);
-            spawn_door(0.0, 0.0, g_world, g_level, g_from, g_to);
+            spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
             return true;
         }
 
@@ -252,8 +254,12 @@ bool process_keys(
         else
         {
             // List navigation
-            if (y != 0)
-                g_current_item = std::min(std::max(g_current_item - y, 0), (int)g_items.size() - 1);
+            if (y != 0) {
+                if(current == ImGui::FindWindowByName("Entity spawner (F1)"))
+                    g_current_item = std::min(std::max(g_current_item - y, 0), (int)g_items.size() - 1);
+                else if(current == ImGui::FindWindowByName("Door to anywhere (F2)"))
+                    g_to = std::min(std::max(g_to - y, 0), 15);
+            }
             if (x != 0)
                 return false;
         }
@@ -322,6 +328,31 @@ void render_list()
     ImGui::ListBoxFooter();
 }
 
+void render_themes()
+{
+    // ImGui::ListBox with filter
+    if (!ImGui::BeginCombo("##Theme", themes[g_to]))
+        return;
+    bool value_changed = false;
+    ImGuiListClipper clipper;
+    for (int i = 0; i < 16; i++)
+    {
+        const bool item_selected = (i == g_to);
+        const char* item_text = themes[i];
+
+        ImGui::PushID(i);
+        if (ImGui::Selectable(item_text, item_selected))
+        {
+            g_to = i;
+            value_changed = true;
+        }
+        if (item_selected)
+            ImGui::SetItemDefaultFocus();
+        ImGui::PopID();
+    }
+    ImGui::EndCombo();
+}
+
 void render_input()
 {
     if (set_focus_entity)
@@ -348,7 +379,7 @@ void render_narnia()
     ImGui::SameLine(53);
     ImGui::Text("Level");
     ImGui::SameLine(100);
-    ImGui::Text("Theme");
+    ImGui::Text("Theme (Arrows)");
     ImGui::SetNextItemWidth(40);
     if(set_focus_world) {
         ImGui::SetKeyboardFocusHere();
@@ -370,12 +401,10 @@ void render_narnia()
     }
     ImGui::SameLine(100);
     ImGui::SetNextItemWidth(200);
-    if(ImGui::Combo("##Theme", &to, "Dwelling\0Jungle\0Volcana\0Olmec\0Tide Pool\0Temple\0Ice Caves\0Neo Babylon\0Sunken City\0Cosmic Ocean\0City of Gold\0Duat\0Abzu\0Tiamat\0Eggplant World\0Hundun\0\0")) {
-        g_to = to+1;
-    }
+    render_themes();
     if(ImGui::Button("Spawn door")) {
         spawn_entity(770, g_x, g_y);
-        spawn_door(g_x, g_y, g_world, g_level, g_from, g_to);
+        spawn_door(g_x, g_y, g_world, g_level, 1, g_to+1);
     }
     ImGui::Text("Don't use this in camp!");
 }

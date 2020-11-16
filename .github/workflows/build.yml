@@ -16,6 +16,10 @@ jobs:
           fetch-depth: 1
           submodules: true
 
+      - name: Get tags for release notes
+        shell: bash
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
       - uses: actions/cache@v2
         with:
           path: |
@@ -36,11 +40,23 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
         shell: bash
 
+      - name: Get release notes
+        id: get_message
+        shell: bash
+        run: |
+          content=$(git show -s --format=%s $(git describe) | tail -n +4 | head -n -1 | sed 's/^/- /')
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo $content
+          echo "::set-output name=NOTES::$content"
+
       - name: Create artifacts
         run: |
           mkdir Overlunky
           move target\release\injected.dll Overlunky\injected.dll
           move target\release\main.exe Overlunky\Overlunky.exe
+          move README.md Overlunky\README.txt
           7z a Overlunky_${{ steps.get_version.outputs.VERSION }}.zip Overlunky\Overlunky.exe Overlunky\injected.dll
 
       - name: Upload artifacts
@@ -54,3 +70,14 @@ jobs:
         with:
           artifacts: "*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Discord
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          color: "#3377ff"
+          description: "```${{ steps.get_message.outputs.NOTES }}```"
+          details: "Download **[Overlunky  ${{ steps.get_version.outputs.VERSION }}](https://github.com/spelunky-fyi/overlunky/releases/download/${{ steps.get_version.outputs.VERSION }}/Overlunky_${{ steps.get_version.outputs.VERSION }}.zip)**"
+          text: A new version of Overlunky was just released!
+          footer: I thought you'd like to know :3
+          webhookUrl: https://canary.discord.com/api/webhooks/${{ secrets.WEBHOOK_ID }}/${{ secrets.WEBHOOK_TOKEN }}
