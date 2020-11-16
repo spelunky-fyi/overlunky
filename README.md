@@ -15,7 +15,7 @@ Current features and their keyboard shortcuts:
   - **F11**: Hide overlay completely for screenshots and faking being a god gamer
 
 ## Usage 
-[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest) and extract anywhere. Run the program, leave it running and then start your game, or the other way around!
+**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around!
 
 ## Resources
   - [List of all entity numbers](https://gist.github.com/Dregu/716e2b75488321d9c8ce7a40448d57b5)
