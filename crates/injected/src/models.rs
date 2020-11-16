@@ -58,6 +58,10 @@ impl<'a> Memory<'a> {
         LE::read_f32(&self.mem[addr..])
     }
 
+    pub fn u8(&self, addr: usize) -> u8 {
+        LE::read_uint(&self.mem[addr..], 1) as u8
+    }
+
     pub fn at_exe(&self, offset: usize) -> usize {
         self.exe_ptr + offset
     }
@@ -116,10 +120,12 @@ impl<'a> State<'a> {
 
     pub fn layer(&self, index: u8) -> Layer {
         Layer {
+            memory: self.memory,
             pointer: self
                 .memory
                 .r64(self.ptr() + self.off_layers + index as usize * 8),
             ptr_load_item: self.ptr_load_item,
+            state: self.ptr(),
         }
     }
 
@@ -132,12 +138,14 @@ impl<'a> State<'a> {
     }
 }
 
-pub struct Layer {
+pub struct Layer<'a> {
+    memory: &'a Memory<'a>,
     pointer: usize,
     ptr_load_item: usize,
+    state: usize,
 }
 
-impl Layer {
+impl<'a> Layer<'a> {
     pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32) {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(self.ptr_load_item);
@@ -148,11 +156,21 @@ impl Layer {
     pub unsafe fn spawn_door(&self, x: f32, y: f32, w: u8, l: u8, f: u8, t: u8) {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(self.ptr_load_item);
-        let addr: usize = load_item(self.pointer, 23, x, y);
-        log::info!("Spawned door {:x?}", addr);
-        let array: [u8; 5] = [1, l, f, w, t];
-        log::info!("Making a door to {:x?}", array);
-        &mut memory_view(std::ptr::null_mut())[addr+0xc1..addr + 0xc6].copy_from_slice(&array);
+        let screen: u8 = self.memory.u8(self.state + 0x10);
+        let mut addr: usize = 0;
+        if screen == 11 {
+            log::info!("In camp, spawning starting exit");
+            addr = load_item(self.pointer, 25, x, y);
+        } else if screen == 12 {
+            log::info!("In game, spawning regular exit");
+            addr = load_item(self.pointer, 23, x, y);
+        }
+        if addr != 0 {
+            log::info!("Spawned door {:x?}", addr);
+            let array: [u8; 5] = [1, l, f, w, t];
+            log::info!("Making door go to {:?}", array);
+            &mut memory_view(std::ptr::null_mut())[addr+0xc1..addr + 0xc6].copy_from_slice(&array);
+        }
     }
 }
 

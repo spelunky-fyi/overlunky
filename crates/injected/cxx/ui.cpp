@@ -406,7 +406,6 @@ void render_narnia()
         spawn_entity(770, g_x, g_y);
         spawn_door(g_x, g_y, g_world, g_level, 1, g_to+1);
     }
-    ImGui::Text("Don't use this in camp!");
 }
 
 void create_render_target()
