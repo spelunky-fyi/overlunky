@@ -31,18 +31,23 @@ jobs:
       - name: Build
         run: cargo build --release
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        shell: bash
+
       - name: Create artifacts
         run: |
-          mkdir rust-injector
-          move target\release\injected.dll rust-injector
-          move target\release\main.exe rust-injector\injector.exe
-          7z a rust-injector.zip rust-injector\injector.exe rust-injector\injected.dll
+          mkdir Overlunky
+          move target\release\injected.dll Overlunky\injected.dll
+          move target\release\main.exe Overlunky\Overlunky.exe
+          7z a Overlunky_${{ steps.get_version.outputs.VERSION }}.zip Overlunky\Overlunky.exe Overlunky\injected.dll
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Binary
-          path: ./rust-injector
+          path: ./Overlunky
 
       - name: Create release
         uses: ncipollo/release-action@v1
