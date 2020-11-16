@@ -76,8 +76,8 @@ jobs:
         with:
           severity: info
           color: "#3377ff"
-          description: "```${{ steps.get_message.outputs.NOTES }}```"
-          details: "Download **[Overlunky  ${{ steps.get_version.outputs.VERSION }}](https://github.com/spelunky-fyi/overlunky/releases/download/${{ steps.get_version.outputs.VERSION }}/Overlunky_${{ steps.get_version.outputs.VERSION }}.zip)**"
+          description: "Release notes: ```${{ steps.get_message.outputs.NOTES }}```"
+          details: "Download: **[Overlunky  ${{ steps.get_version.outputs.VERSION }}](https://github.com/spelunky-fyi/overlunky/releases/download/${{ steps.get_version.outputs.VERSION }}/Overlunky_${{ steps.get_version.outputs.VERSION }}.zip)**"
           text: A new version of Overlunky was just released!
           footer: I thought you'd like to know :3
           webhookUrl: https://canary.discord.com/api/webhooks/${{ secrets.WEBHOOK_ID }}/${{ secrets.WEBHOOK_TOKEN }}
