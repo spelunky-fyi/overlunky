@@ -13,7 +13,8 @@ use models::{Memory, State};
 use search::{decode_imm, decode_pc, find_inst};
 
 use winapi::um::{
-    consoleapi::SetConsoleCtrlHandler, processthreadsapi::ExitThread, wincon::AttachConsole,
+    consoleapi::SetConsoleCtrlHandler, processthreadsapi::ExitThread, wincon::AttachConsole, wincon::FreeConsole,
+    wincon::{CTRL_C_EVENT, CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT}
 };
 
 #[no_mangle]
@@ -31,9 +32,20 @@ fn get_api(memory: &Memory) -> usize {
     memory.at_exe(decode_pc(exe, off + 6))
 }
 
+unsafe extern "system" fn ctrl_handler(ctrl_type: u32) -> i32 {
+    match ctrl_type {
+        CTRL_C_EVENT | CTRL_BREAK_EVENT | CTRL_CLOSE_EVENT => {
+            log::info!("Console detached, you can now close this window.");
+            FreeConsole();
+            1
+        }
+        _ => 0,
+    }
+}
+
 unsafe fn attach_stdout(pid: u32) {
     AttachConsole(pid);
-    SetConsoleCtrlHandler(None, 1);
+    SetConsoleCtrlHandler(Some(ctrl_handler), 1);
     env_logger::Builder::new()
         .filter(None, log::LevelFilter::Debug)
         .init();
@@ -45,6 +57,7 @@ unsafe fn set_panic_hook() {
             log::error!("panic: {}", s);
         }
         log::error!("{:?}", Backtrace::new());
+        FreeConsole();
         ExitThread(0);
     }));
 }
@@ -82,7 +95,7 @@ impl<'a> API<'a> {
 unsafe extern "C" fn main(handle: u32) {
     attach_stdout(handle);
     set_panic_hook();
-    log::info!("Hello from injected library!");
+    log::info!("Game injected! Press Ctrl+C to detach this window from the process.");
 
     let memory = Memory::new();
     let state = State::new(&memory);
@@ -95,16 +108,15 @@ unsafe extern "C" fn main(handle: u32) {
         log::error!("{}", err);
         return;
     }
-
     let c = CriticalSectionManager::new();
     loop {
-        println!("Select entity to spawn >");
+        println!("Enter entity #IDs to spawn, one per line >");
         let mut buffer = String::new();
         std::io::stdin().read_line(&mut buffer).unwrap();
         let item = buffer.trim().parse::<usize>().unwrap_or(0);
 
         if item == 0 {
-            break;
+            continue;
         }
 
         {
@@ -118,7 +130,6 @@ unsafe extern "C" fn main(handle: u32) {
                 Some(player) => {
                     let (x, y) = player.position();
                     let layer = player.layer();
-                    log::debug!("Player X, Y: {}, {}", x, y);
                     state.layer(layer).spawn_entity(item, x, y);
                 }
             }

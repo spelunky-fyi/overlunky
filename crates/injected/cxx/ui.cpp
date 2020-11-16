@@ -9,6 +9,7 @@
 #include <Windows.h>
 #include <Shlwapi.h>
 #include <algorithm>
+#include <sstream>
 
 IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
@@ -33,6 +34,7 @@ int g_current_item = 0, g_filtered_count = 0;
 int g_level = 1, g_world = 1, g_from = 1, g_to = 1;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
+static char text[500];
 
 // Set focus on search box
 bool set_focus_entity = false;
@@ -153,6 +155,20 @@ bool toggle(const char* name) {
     return false;
 }
 
+void spawn_entities() {
+    if(g_filtered_count > 0) {
+        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
+    } else {
+        std::string texts(text);
+        std::stringstream textss(texts);
+        int id;
+        std::vector<int> ents;
+        while(textss >> id) {
+            spawn_entity(id, g_x, g_y);
+        }
+    }
+}
+
 bool process_keys(
     _In_ int nCode,
     _In_ WPARAM wParam,
@@ -213,9 +229,9 @@ bool process_keys(
             teleport(g_x, g_y);
             return true;
         }
-        else if (enter && g_items.size() && current == ImGui::FindWindowByName("Entity spawner (F1)"))
+        else if (enter && current == ImGui::FindWindowByName("Entity spawner (F1)"))
         {
-            spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
+            spawn_entities();
             return true;
         }
         else if (enter && current == ImGui::FindWindowByName("Door to anywhere (F2)"))
@@ -308,7 +324,6 @@ void render_list()
 
 void render_input()
 {
-    static char text[100];
     if (set_focus_entity)
     {
         ImGui::SetKeyboardFocusHere();
@@ -318,8 +333,8 @@ void render_input()
     {
         update_filter(text);
     }
-    if(ImGui::Button("Spawn entity") && g_items.size()) {
-        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y);
+    if(ImGui::Button("Spawn entity")) {
+        spawn_entities();
     }
 }
 
@@ -452,6 +467,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         //ImGui::SameLine();
         //ImGui::Text("Enable click events (buggy)");
         ImGui::Text("Spawning at x: %+.2f, y: %+.2f (Ctrl+Arrow)", g_x, g_y);
+        ImGui::Text("Enter many #IDs separated by space to spawn a bunch of stuff at once.");
         render_input();
         render_list();
         ImGui::PopItemWidth();
