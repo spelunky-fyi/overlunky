@@ -10,6 +10,7 @@
 #include <Shlwapi.h>
 #include <algorithm>
 #include <sstream>
+#include <string>
 
 IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
@@ -27,6 +28,11 @@ struct CXXEntityItem
     uint16_t id;
 
     CXXEntityItem(std::string name, uint16_t id) : name(name), id(id) {}
+
+    bool operator < (const CXXEntityItem& item) const
+    {
+        return id < item.id;
+    }
 };
 
 float g_x = 0, g_y = 0;
@@ -271,8 +277,12 @@ void render_list()
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
         {
             const bool item_selected = (i == g_current_item);
-            const char *item_text = g_items[g_filtered_items[i]].name.data();
-
+            std::stringstream item_ss;
+            item_ss << g_items[g_filtered_items[i]].id;
+            std::string item_id = item_ss.str();
+            std::string item_name = g_items[g_filtered_items[i]].name.data();
+            std::string item_concat = item_id+": "+item_name.substr(9);
+            const char *item_text = item_concat.c_str();
             ImGui::PushID(i);
             if (ImGui::Selectable(item_text, item_selected))
             {
@@ -343,7 +353,7 @@ void render_narnia()
         ImGui::SetKeyboardFocusHere();
         set_focus_world = false;
     }
-    if(ImGui::InputText("##World", world, sizeof(world), 0, NULL)) {
+    if(ImGui::InputText("##World", world, sizeof(world), ImGuiInputTextFlags_CharsDecimal, NULL)) {
         g_world = atoi(world);
         if(g_world < 1) {
             g_world = 1;
@@ -351,7 +361,7 @@ void render_narnia()
     }
     ImGui::SameLine(52);
     ImGui::SetNextItemWidth(44);
-    if(ImGui::InputText("##Level", level, sizeof(level), 0, NULL)) {
+    if(ImGui::InputText("##Level", level, sizeof(level), ImGuiInputTextFlags_CharsDecimal, NULL)) {
         g_level = atoi(level);
         if(g_level < 1) {
             g_level = 1;
@@ -486,7 +496,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::Text("(Ctrl+Enter) to teleport");
         }
         ImGui::Text("(Ctrl+Arrow) Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
-        ImGui::Text("Enter many #IDs separated by space to many.");
+        ImGui::Text("Enter numeric IDs separated by space to spawn many.");
         render_input();
         render_list();
         ImGui::PopItemWidth();
@@ -520,6 +530,8 @@ void create_box(rust::Vec<rust::String> names, rust::Vec<uint16_t> ids)
             new_items.emplace_back(std::string(names[i].data(), names[i].size()), ids[i]);
         }
     }
+
+    std::sort(new_items.begin(), new_items.end());
 
     std::vector<int> new_filtered_items(new_items.size());
     for (int i = 0; i < new_items.size(); i++)
