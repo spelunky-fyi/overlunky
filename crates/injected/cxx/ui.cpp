@@ -477,7 +477,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::PushItemWidth(-1);
         ImGui::Checkbox("##clickevents", &clickevents);
         ImGui::SameLine();
-        ImGui::Text("Enable click to spawn/teleport");
+        ImGui::Text("Enable click to spawn/teleport (bit buggy)");
         if(clickevents) {
             ImGui::Text("(Enter) or left click to spawn");
             ImGui::Text("(Ctrl+Enter) or right click to teleport");

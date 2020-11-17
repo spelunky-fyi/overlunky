@@ -264,8 +264,8 @@ impl<'a> Player<'a> {
                 let cx = self.memory.f32(self.memory.at_exe(get_camera(self.memory)));
                 let cy = self.memory.f32(self.memory.at_exe(get_camera(self.memory)+4));
                 log::info!("Camera is at {}, {}", cx, cy);
-                x = cx+10.0*dx;
-                y = cy+5.5*dy;
+                x = (cx+10.0*dx).round();
+                y = (cy+5.5*dy).round();
                 log::info!("Teleporting to {}, {}", x, y);
                 unsafe {
                     &mut memory_view(std::ptr::null_mut())[px..px + 4].copy_from_slice(&x.to_le_bytes());
