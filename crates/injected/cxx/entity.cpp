@@ -16,6 +16,20 @@ struct Rect
     __int16 field_12;
 };
 
+enum RepeatType: uint8_t {
+    NoRepeat,
+    Linear,
+    BackAndForth,
+};
+
+struct Animation {
+    int32_t texture;
+    int32_t count;
+    int32_t interval;
+    uint8_t key;
+    RepeatType repeat;
+};
+
 struct Entity
 {
     // Creates an instance of this entity
@@ -59,7 +73,7 @@ struct Entity
     int field_A4;
     float field_A8;
     int field_AC;
-    std::unordered_map<int, int> map;
+    std::unordered_map<uint8_t, Animation> animations;
     float attachOffsetX;
     float attachOffsetY;
     char init;
