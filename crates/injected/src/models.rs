@@ -2,6 +2,9 @@ use crate::search::{decode_imm, decode_pc, find_after_bundle, find_inst};
 use byteorder::*;
 use hex_literal::*;
 use winapi::um::libloaderapi::LoadLibraryA;
+use std::sync::Once;
+
+static INIT: Once = Once::new();
 
 pub struct Memory<'a> {
     pub mem: &'a [u8],
@@ -86,6 +89,20 @@ fn get_load_item(memory: &Memory) -> usize {
     memory.at_exe(off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5)
 }
 
+static mut CAMERA_OFF: usize = 0;
+fn get_camera(memory: &Memory) -> usize {
+    let Memory {
+        exe: _, after_bundle, ..
+    } = memory;
+    unsafe {
+        INIT.call_once(|| {
+            CAMERA_OFF = find_inst(memory.exe, &hex!("A5 42 1F 00 00 80"), *after_bundle) - 34;
+        });
+        CAMERA_OFF
+    }
+}
+
+
 impl<'a> State<'a> {
     pub fn new(memory: &'a Memory) -> State<'a> {
         let start = memory.after_bundle;
@@ -125,7 +142,7 @@ impl<'a> State<'a> {
                 .memory
                 .r64(self.ptr() + self.off_layers + index as usize * 8),
             ptr_load_item: self.ptr_load_item,
-            state: self.ptr(),
+            state: self.ptr()
         }
     }
 
@@ -153,8 +170,8 @@ impl<'a> Layer<'a> {
             let addr: usize = load_item(self.pointer, id, x, y);
             log::info!("Spawned {:x?}", addr);
         } else {
-            let cx = self.memory.f32(0x7FF6DF42B3C8);
-            let cy = self.memory.f32(0x7FF6DF42B3CC);
+            let cx = self.memory.f32(self.memory.at_exe(get_camera(self.memory)));
+            let cy = self.memory.f32(self.memory.at_exe(get_camera(self.memory)+4));
             let rx = cx+10.0*x;
             let ry = cy+5.5*y;
             let addr: usize = load_item(self.pointer, id, rx, ry);
@@ -244,8 +261,9 @@ impl<'a> Player<'a> {
                 log::info!("Teleporting to screen {}, {}", x, y);
                 let px = self.pointer + 0x40;
                 let py = self.pointer + 0x44;
-                let cx = self.memory.f32(0x7FF6DF42B3C8);
-                let cy = self.memory.f32(0x7FF6DF42B3CC);
+                let cx = self.memory.f32(self.memory.at_exe(get_camera(self.memory)));
+                let cy = self.memory.f32(self.memory.at_exe(get_camera(self.memory)+4));
+                log::info!("Camera is at {}, {}", cx, cy);
                 x = cx+10.0*dx;
                 y = cy+5.5*dy;
                 log::info!("Teleporting to {}, {}", x, y);

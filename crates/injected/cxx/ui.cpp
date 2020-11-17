@@ -89,12 +89,12 @@ bool toggle(const char* name) {
         if(win->Collapsed || win != current) {
             win->Collapsed = false;
             ImGui::FocusWindow(win);
-            ImGui::CaptureMouseFromApp(true);
+            //ImGui::CaptureMouseFromApp(true);
             return true;
         } else {
             win->Collapsed = true;
             ImGui::FocusWindow(NULL);
-            ImGui::CaptureMouseFromApp(false);
+            //ImGui::CaptureMouseFromApp(false);
         }
     }
     return false;
@@ -112,54 +112,6 @@ void spawn_entities(bool s) {
             spawn_entity(id, g_x, g_y, s);
         }
     }
-}
-
-bool process_mouse(
-    _In_ int nCode,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam)
-{
-    ImGuiIO &io = ImGui::GetIO();
-    io.WantCaptureMouse = false;
-    ImGuiWindow* win = ImGui::FindWindowByName("Entity spawner (F1)");
-    if(ImGui::IsMouseClicked(0)) {
-        printf("mouse clicked\n");
-    }
-    if(ImGui::IsMouseReleased(0)) {
-        printf("mouse clxicked\n");
-    }
-    if(win->Collapsed || !clickevents) {
-        return false;
-    }
-    if(ImGui::IsMouseReleased(0) && click_spawn == false)
-    {
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        click_spawn = true;
-    }
-    if(click_spawn)
-    {
-        click_spawn = false;
-        spawn_entities(true);
-        g_x = 0; g_y = 0;
-    }
-    if(ImGui::IsMouseReleased(1) && click_teleport == false)
-    {
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        click_teleport = true;
-    }
-    if(click_teleport)
-    {
-        click_teleport = false;
-        teleport(g_x, g_y, true);
-        g_x = 0; g_y = 0;
-    }
-    return false;
 }
 
 LRESULT CALLBACK window_hook(
@@ -283,10 +235,6 @@ void init_imgui()
     ImGui_ImplDX11_Init(pDevice, pContext);
     freopen("CONOUT$", "w", stdout);
 
-    if (!SetWindowsHookExA(WH_MOUSE, mouse_hook, 0, GetCurrentThreadId()))
-    {
-        printf("Mouse hook error: 0x%x\n", GetLastError());
-    }
     if (!SetWindowsHookExA(WH_GETMESSAGE, msg_hook, 0, GetCurrentThreadId()))
     {
         printf("Message hook error: 0x%x\n", GetLastError());
@@ -424,7 +372,7 @@ void render_clickhandler() {
     ImGui::SetNextWindowPos({0, 0});
     ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
-    if(ImGui::IsMouseClicked(0))
+    if(ImGui::IsMouseReleased(0) && ImGui::IsWindowFocused())
     {
         ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
@@ -433,7 +381,7 @@ void render_clickhandler() {
         spawn_entities(true);
         g_x = 0; g_y = 0;
     }
-    if(ImGui::IsMouseClicked(1))
+    if(ImGui::IsMouseReleased(1) && ImGui::IsWindowFocused())
     {
         ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
@@ -527,18 +475,18 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Entity spawner (F1)");
         ImGui::PushItemWidth(-1);
-        if(clickevents) {
-            ImGui::Text("(Ctrl+Enter) or right click to teleport");
-            ImGui::Text("(Enter) or left click to spawn");
-        } else {
-            ImGui::Text("(Ctrl+Enter) to teleport");
-            ImGui::Text("(Enter) to spawn");
-        }
         ImGui::Checkbox("##clickevents", &clickevents);
         ImGui::SameLine();
-        ImGui::Text("Enable click events");
+        ImGui::Text("Enable click to spawn/teleport");
+        if(clickevents) {
+            ImGui::Text("(Enter) or left click to spawn");
+            ImGui::Text("(Ctrl+Enter) or right click to teleport");
+        } else {
+            ImGui::Text("(Enter) to spawn");
+            ImGui::Text("(Ctrl+Enter) to teleport");
+        }
         ImGui::Text("(Ctrl+Arrow) Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
-        ImGui::Text("Enter many #IDs separated by space to spawn a bunch of stuff at once.");
+        ImGui::Text("Enter many #IDs separated by space to many.");
         render_input();
         render_list();
         ImGui::PopItemWidth();
