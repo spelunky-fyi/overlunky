@@ -28,10 +28,9 @@ pub extern "C" fn DllMain(_: *const u8, _reason: u32, _: *const u8) -> u32 {
 }
 
 fn get_api(memory: &Memory) -> usize {
-    let Memory {
-        exe, after_bundle, ..
-    } = memory;
-    let off = find_inst(exe, &hex!("48 8B 50 10 48 89"), *after_bundle) - 5;
+    let exe = memory.exe();
+    let after_bundle = memory.after_bundle;
+    let off = find_inst(exe, &hex!("48 8B 50 10 48 89"), after_bundle) - 5;
     let off = off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5;
 
     memory.at_exe(decode_pc(exe, off + 6))
@@ -76,9 +75,9 @@ impl API {
     unsafe fn new(memory: &Memory) -> API {
         let api: *const usize = std::mem::transmute(get_api(&memory));
         let off = decode_imm(
-            memory.exe,
+            memory.exe(),
             find_inst(
-                memory.exe,
+                memory.exe(),
                 &hex!("BA F0 FF FF FF 41 B8 00 00 00 90"),
                 memory.after_bundle,
             ) + 17,
@@ -138,7 +137,7 @@ unsafe extern "C" fn main(handle: u32) {
                 Some(player) => {
                     let (x, y) = player.position();
                     let layer = player.layer();
-                    state.layer(layer).spawn_entity(item, x, y);
+                    state.layer(layer).spawn_entity(item, x, y, false);
                 }
             }
         }

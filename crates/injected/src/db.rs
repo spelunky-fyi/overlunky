@@ -19,9 +19,9 @@ use hex_literal::hex;
 
 pub unsafe fn list_entities(mem: &Memory) -> Vec<ffi::EntityItem> {
     let entity_ptr = mem.at_exe(decode_pc(
-        mem.exe,
+        mem.exe(),
         find_inst(
-            mem.exe,
+            mem.exe(),
             &hex!("48 8B 90 B0 81 03 00 48 B9 02 55 A7 74 52 9D 51"),
             mem.after_bundle,
         ) - 7,

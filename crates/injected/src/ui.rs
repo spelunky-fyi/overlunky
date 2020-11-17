@@ -3,9 +3,9 @@ use crate::{db::ffi::EntityItem, memory::Memory, models::State};
 #[cxx::bridge]
 pub mod ffi {
     extern "Rust" {
-        fn spawn_entity(id: usize, x: f32, y: f32);
+        fn spawn_entity(id: usize, x: f32, y: f32, s: bool);
         fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
-        fn teleport(x: f32, y: f32);
+        fn teleport(x: f32, y: f32, s: bool);
     }
     extern "C++" {
         include!("cxx/ui.hpp");
@@ -21,15 +21,20 @@ pub unsafe fn create_box(items: &Vec<EntityItem>) {
 }
 
 // TODO: expose this to RPC
-pub unsafe fn spawn_entity(id: usize, x: f32, y: f32) {
+pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool) {
     let memory = Memory::new();
     let state = State::new(&memory);
 
     match state.items().player(0) {
         Some(player) => {
             let (_x, _y) = player.position();
-            log::info!("Spawning {} on {}, {}", id, x + _x, y + _y);
-            state.layer(player.layer()).spawn_entity(id, x + _x, y + _y);
+            if !s {
+                log::info!("Spawning {} on {}, {}", id, x + _x, y + _y);
+                state.layer(player.layer()).spawn_entity(id, x + _x, y + _y, s);
+            } else {
+                log::info!("Spawning {} on screen {}, {}", id, x, y);
+                state.layer(player.layer()).spawn_entity(id, x, y, s);
+            }
         }
         None => {}
     }
@@ -51,14 +56,14 @@ pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
     }
 }
 
-pub unsafe fn teleport(x: f32, y: f32) {
+pub unsafe fn teleport(x: f32, y: f32, s: bool) {
     let memory = Memory::new();
     let state = State::new(&memory);
 
     match state.items().player(0) {
         Some(player) => {
-            log::info!("Teleporting to relative {}, {}", x, y);
-            player.teleport(x, y);
+            log::info!("Teleporting to relative {}, {}, {}", x, y, s);
+            player.teleport(x, y, s);
         }
         None => {}
     }

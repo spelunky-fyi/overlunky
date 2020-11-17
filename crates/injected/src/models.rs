@@ -4,7 +4,9 @@ use crate::{
 };
 use byteorder::*;
 use hex_literal::*;
-#[derive(Copy, Clone)]
+use std::sync::Once;
+
+static INIT: Once = Once::new();
 pub struct State {
     location: usize,
     off_items: usize,
@@ -13,37 +15,49 @@ pub struct State {
 }
 
 fn get_load_item(memory: &Memory) -> usize {
-    let Memory {
-        exe, after_bundle, ..
-    } = memory;
+    let after_bundle = memory.after_bundle;
+    let exe = memory.exe();
     let needle = &hex!("BA 88 02 00 00");
-    let off = find_inst(exe, needle, *after_bundle);
+    let off = find_inst(exe, needle, after_bundle);
     let off: usize = find_inst(exe, needle, off + 5) + 8;
 
     memory.at_exe(off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5)
 }
 
+static mut CAMERA_OFF: usize = 0;
+fn get_camera(memory: &Memory) -> usize {
+    unsafe {
+        INIT.call_once(|| {
+            CAMERA_OFF = memory.at_exe(
+                find_inst(
+                    memory.exe(),
+                    &hex!("A5 42 1F 00 00 80"),
+                    memory.after_bundle,
+                ) - 34,
+            );
+        });
+        CAMERA_OFF
+    }
+}
+
 impl State {
     pub fn new(memory: &Memory) -> State {
-        let Memory {
-            exe,
-            after_bundle: start,
-            ..
-        } = memory;
         // Global state pointer
+        let exe = memory.exe();
+        let start = memory.after_bundle;
         let location = memory.at_exe(decode_pc(
             exe,
-            find_inst(exe, &hex!("83 78 0C 05 0F 85"), *start) - 15,
+            find_inst(exe, &hex!("83 78 0C 05 0F 85"), start) - 15,
         ));
         // The offset of items field
         let off_items =
-            decode_imm(exe, find_inst(exe, &hex!("33 D2 8B 41 28 01"), *start) - 7) as usize;
+            decode_imm(exe, find_inst(exe, &hex!("33 D2 8B 41 28 01"), start) - 7) as usize;
         let off_layers = decode_imm(
             exe,
-            find_inst(exe, &hex!("C6 80 58 44 06 00 01 "), *start) - 7,
+            find_inst(exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
         ) as usize;
-        let off_send = find_inst(exe, &hex!("45 8D 41 50"), *start) + 12;
-        write_mem(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"));
+        let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
+        write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"), true);
         State {
             location,
             off_items,
@@ -77,11 +91,21 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32) {
+    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool) {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(self.ptr_load_item);
-        let addr: usize = load_item(self.pointer, id, x, y);
-        log::info!("Spawned {:x?}", addr);
+        if !s {
+            let addr: usize = load_item(self.pointer, id, x, y);
+            log::info!("Spawned {:x?}", addr);
+        } else {
+            let memory = Memory::new();
+            let cx = read_f32(get_camera(&memory));
+            let cy = read_f32(get_camera(&memory) + 4);
+            let rx = cx + 10.0 * x;
+            let ry = cy + 5.5 * y;
+            let addr: usize = load_item(self.pointer, id, rx, ry);
+            log::info!("Spawned {:x?}", addr);
+        }
     }
 
     pub unsafe fn spawn_door(&self, x: f32, y: f32, w: u8, l: u8, f: u8, t: u8) {
@@ -152,12 +176,36 @@ impl Player {
         }
     }
 
-    pub fn teleport(&self, dx: f32, dy: f32) {
-        let topmost = self.topmost();
-        let (x, y) = topmost.position();
-        log::info!("Teleporting to {}, {}", x + dx, y + dy);
-        write_mem(topmost.pointer + 0x40, &(x + dx).to_le_bytes());
-        write_mem(topmost.pointer + 0x44, &(y + dy).to_le_bytes());
+    pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
+        let (mut x, mut y) = self.position();
+        if self.pointer != 0 {
+            if !s {
+                // player relative coordinates
+                x += dx;
+                y += dy;
+                let px = self.pointer + 0x40;
+                let py = self.pointer + 0x44;
+                log::info!("Teleporting to {}, {}", x, y);
+                write_mem(px, &x.to_le_bytes());
+                write_mem(py, &y.to_le_bytes());
+            } else {
+                // screen coordinates -1..1
+                log::info!("Teleporting to screen {}, {}", x, y);
+                let px = self.pointer + 0x40;
+                let py = self.pointer + 0x44;
+                unsafe {
+                    let memory = Memory::new();
+                    let cx = read_f32(get_camera(&memory));
+                    let cy = read_f32(get_camera(&memory) + 4);
+                    log::info!("Camera is at {}, {}", cx, cy);
+                    x = (cx + 10.0 * dx).round();
+                    y = (cy + 5.5 * dy).round();
+                    log::info!("Teleporting to {}, {}", x, y);
+                    write_mem(px, &x.to_le_bytes());
+                    write_mem(py, &y.to_le_bytes());
+                }
+            }
+        }
     }
 
     fn topmost(&self) -> Player {
