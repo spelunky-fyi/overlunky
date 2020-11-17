@@ -15,8 +15,8 @@ macro_rules! round_up {
     };
 }
 
-unsafe fn memory_view<'a>(addr: *mut u8) -> &'a mut [u8] {
-    std::slice::from_raw_parts_mut(addr, usize::MAX)
+unsafe fn memory_view<'a>(addr: usize) -> &'a mut [u8] {
+    std::slice::from_raw_parts_mut(std::mem::transmute(addr), isize::MAX as _)
 }
 
 pub fn write_mem_prot(addr: usize, payload: &[u8], prot: bool) {
@@ -33,7 +33,7 @@ pub fn write_mem_prot(addr: usize, payload: &[u8], prot: bool) {
                 &mut old_protect,
             );
         }
-        &mut memory_view(ptr::null_mut())[addr..addr + payload.len()].copy_from_slice(payload);
+        &mut memory_view(addr)[..payload.len()].copy_from_slice(payload);
         if prot {
             winapi::um::memoryapi::VirtualProtect(page, size, old_protect, &mut old_protect);
         }
@@ -46,36 +46,27 @@ pub fn write_mem(addr: usize, payload: &[u8]) {
 
 pub fn read_u8(addr: usize) -> u8 {
     unsafe {
-        let mem = memory_view(ptr::null_mut());
-        mem[addr]
+        let mem = std::slice::from_raw_parts_mut(std::mem::transmute(1 as usize), addr);
+        mem[addr - 1]
     }
 }
 
 pub fn read_u64(addr: usize) -> usize {
-    unsafe {
-        let mem = memory_view(ptr::null_mut());
-        LE::read_u64(&mem[addr..]) as usize
-    }
+    unsafe { LE::read_u64(memory_view(addr)) as _ }
 }
 
 pub fn read_u32(addr: usize) -> u32 {
-    unsafe {
-        let mem = memory_view(ptr::null_mut());
-        LE::read_u32(&mem[addr..]) as u32
-    }
+    unsafe { LE::read_u32(memory_view(addr)) }
 }
 
 pub fn read_f32(addr: usize) -> f32 {
-    unsafe {
-        let mem = memory_view(ptr::null_mut());
-        LE::read_f32(&mem[addr..])
-    }
+    unsafe { LE::read_f32(memory_view(addr)) }
 }
 
 impl Memory {
     pub unsafe fn new() -> Memory {
         let spel2_ptr = GetModuleHandleA("Spel2.exe\0".as_ptr() as *const i8);
-        let exe = memory_view(spel2_ptr as *mut u8);
+        let exe = memory_view(std::mem::transmute(spel2_ptr));
 
         // Skipping bundle for faster memory search
         let after_bundle = find_after_bundle(exe);
