@@ -12,7 +12,7 @@ pub mod ffi {
 }
 
 use crate::{
-    models::Memory,
+    memory::{read_u64, Memory},
     search::{decode_pc, find_inst},
 };
 use hex_literal::hex;
@@ -27,5 +27,5 @@ pub unsafe fn list_entities(mem: &Memory) -> Vec<ffi::EntityItem> {
         ) - 7,
     ));
 
-    ffi::list_entities(mem.r64(entity_ptr))
+    ffi::list_entities(read_u64(entity_ptr))
 }

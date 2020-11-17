@@ -1,7 +1,4 @@
-use crate::{
-    db::ffi::EntityItem,
-    models::{Memory, State},
-};
+use crate::{db::ffi::EntityItem, memory::Memory, models::State};
 
 #[cxx::bridge]
 pub mod ffi {
@@ -46,7 +43,9 @@ pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
         Some(player) => {
             let (_x, _y) = player.position();
             log::info!("Spawning door on {}, {}", x + _x, y + _y);
-            state.layer(player.layer()).spawn_door(x + _x, y + _y, l, w, f, t);
+            state
+                .layer(player.layer())
+                .spawn_door(x + _x, y + _y, l, w, f, t);
         }
         None => {}
     }

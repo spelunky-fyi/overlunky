@@ -1,5 +1,6 @@
 mod critical_section;
 mod db;
+mod memory;
 mod models;
 mod search;
 mod ui;
@@ -9,12 +10,16 @@ use byteorder::*;
 use critical_section::CriticalSectionManager;
 use db::list_entities;
 use hex_literal::*;
-use models::{Memory, State};
+use memory::{read_u64, Memory};
+use models::State;
 use search::{decode_imm, decode_pc, find_inst};
 
 use winapi::um::{
-    consoleapi::SetConsoleCtrlHandler, processthreadsapi::ExitThread, wincon::AttachConsole, wincon::FreeConsole,
-    wincon::{CTRL_C_EVENT, CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT}
+    consoleapi::SetConsoleCtrlHandler,
+    processthreadsapi::ExitThread,
+    wincon::AttachConsole,
+    wincon::FreeConsole,
+    wincon::{CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT, CTRL_C_EVENT},
 };
 
 #[no_mangle]
@@ -62,32 +67,35 @@ unsafe fn set_panic_hook() {
     }));
 }
 
-struct API<'a> {
-    memory: &'a Memory<'a>,
+struct API {
     api: *const usize,
+    swap_chain_off: usize,
 }
 
-impl<'a> API<'a> {
-    unsafe fn new(memory: &'a Memory) -> API<'a> {
+impl API {
+    unsafe fn new(memory: &Memory) -> API {
         let api: *const usize = std::mem::transmute(get_api(&memory));
+        let off = decode_imm(
+            memory.exe,
+            find_inst(
+                memory.exe,
+                &hex!("BA F0 FF FF FF 41 B8 00 00 00 90"),
+                memory.after_bundle,
+            ) + 17,
+        );
 
-        API { memory, api }
+        API {
+            api,
+            swap_chain_off: off,
+        }
     }
 
     unsafe fn renderer(&self) -> usize {
-        self.memory.r64(*self.api + 0x10)
+        read_u64(*self.api + 0x10)
     }
 
     unsafe fn swap_chain(&self) -> usize {
-        let off = decode_imm(
-            self.memory.exe,
-            find_inst(
-                self.memory.exe,
-                &hex!("BA F0 FF FF FF 41 B8 00 00 00 90"),
-                self.memory.after_bundle,
-            ) + 17,
-        );
-        self.memory.r64(self.renderer() + off)
+        read_u64(self.renderer() + self.swap_chain_off)
     }
 }
 
