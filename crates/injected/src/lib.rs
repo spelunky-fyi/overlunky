@@ -130,7 +130,7 @@ unsafe extern "C" fn main(handle: u32) {
                 Some(player) => {
                     let (x, y) = player.position();
                     let layer = player.layer();
-                    state.layer(layer).spawn_entity(item, x, y);
+                    state.layer(layer).spawn_entity(item, x, y, false);
                 }
             }
         }

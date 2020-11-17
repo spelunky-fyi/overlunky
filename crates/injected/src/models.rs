@@ -146,11 +146,20 @@ pub struct Layer<'a> {
 }
 
 impl<'a> Layer<'a> {
-    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32) {
+    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool) {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(self.ptr_load_item);
-        let addr: usize = load_item(self.pointer, id, x, y);
-        log::info!("Spawned {:x?}", addr);
+        if !s {
+            let addr: usize = load_item(self.pointer, id, x, y);
+            log::info!("Spawned {:x?}", addr);
+        } else {
+            let cx = self.memory.f32(0x7FF6DF42B3C8);
+            let cy = self.memory.f32(0x7FF6DF42B3CC);
+            let rx = cx+10.0*x;
+            let ry = cy+5.5*y;
+            let addr: usize = load_item(self.pointer, id, rx, ry);
+            log::info!("Spawned {:x?}", addr);
+        }
     }
 
     pub unsafe fn spawn_door(&self, x: f32, y: f32, w: u8, l: u8, f: u8, t: u8) {
@@ -218,17 +227,32 @@ impl<'a> Player<'a> {
         (x, y)
     }
 
-    pub fn teleport(&self, dx: f32, dy: f32) {
+    pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
         let (mut x, mut y) = self.position();
         if self.pointer != 0 {
-            x += dx;
-            y += dy;
-            let px = self.pointer + 0x40;
-            let py = self.pointer + 0x44;
-            log::info!("Teleporting to {}, {}", x, y);
-            unsafe {
-                &mut memory_view(std::ptr::null_mut())[px..px + 4].copy_from_slice(&x.to_le_bytes());
-                &mut memory_view(std::ptr::null_mut())[py..py + 4].copy_from_slice(&y.to_le_bytes());
+            if !s { // player relative coordinates
+                x += dx;
+                y += dy;
+                let px = self.pointer + 0x40;
+                let py = self.pointer + 0x44;
+                log::info!("Teleporting to {}, {}", x, y);
+                unsafe {
+                    &mut memory_view(std::ptr::null_mut())[px..px + 4].copy_from_slice(&x.to_le_bytes());
+                    &mut memory_view(std::ptr::null_mut())[py..py + 4].copy_from_slice(&y.to_le_bytes());
+                }
+            } else { // screen coordinates -1..1
+                log::info!("Teleporting to screen {}, {}", x, y);
+                let px = self.pointer + 0x40;
+                let py = self.pointer + 0x44;
+                let cx = self.memory.f32(0x7FF6DF42B3C8);
+                let cy = self.memory.f32(0x7FF6DF42B3CC);
+                x = cx+10.0*dx;
+                y = cy+5.5*dy;
+                log::info!("Teleporting to {}, {}", x, y);
+                unsafe {
+                    &mut memory_view(std::ptr::null_mut())[px..px + 4].copy_from_slice(&x.to_le_bytes());
+                    &mut memory_view(std::ptr::null_mut())[py..py + 4].copy_from_slice(&y.to_le_bytes());
+                }
             }
         }
     }
