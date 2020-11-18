@@ -202,7 +202,7 @@ bool process_keys(
         }
         else if (enter && current == ImGui::FindWindowByName("Door to anywhere (F2)"))
         {
-            spawn_entity(770, g_x, g_y, false);
+            spawn_entity(775, g_x, g_y, false);
             spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
             return true;
         }
