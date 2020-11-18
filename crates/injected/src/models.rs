@@ -177,22 +177,24 @@ impl Player {
     }
 
     pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
-        let (mut x, mut y) = self.position();
+        // e.g. topmost == turkey if riding turkey. player has relative coordinate to turkey.
+        let topmost = self.topmost();
+        let (mut x, mut y) = topmost.position();
         if self.pointer != 0 {
             if !s {
                 // player relative coordinates
                 x += dx;
                 y += dy;
-                let px = self.pointer + 0x40;
-                let py = self.pointer + 0x44;
+                let px = topmost.pointer + 0x40;
+                let py = topmost.pointer + 0x44;
                 log::info!("Teleporting to {}, {}", x, y);
                 write_mem(px, &x.to_le_bytes());
                 write_mem(py, &y.to_le_bytes());
             } else {
                 // screen coordinates -1..1
                 log::info!("Teleporting to screen {}, {}", x, y);
-                let px = self.pointer + 0x40;
-                let py = self.pointer + 0x44;
+                let px = topmost.pointer + 0x40;
+                let py = topmost.pointer + 0x44;
                 unsafe {
                     let memory = Memory::new();
                     let cx = read_f32(get_camera(&memory));
