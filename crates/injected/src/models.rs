@@ -17,9 +17,11 @@ pub struct State {
 fn get_load_item(memory: &Memory) -> usize {
     let after_bundle = memory.after_bundle;
     let exe = memory.exe();
-    let needle = &hex!("BA 88 02 00 00");
+    let needle = &hex!("BA B9 01 00 00");
     let off = find_inst(exe, needle, after_bundle);
-    let off: usize = find_inst(exe, needle, off + 5) + 8;
+    let off = find_inst(exe, needle, off + 5);
+    let off = find_inst(exe, needle, off + 5);
+    let off = find_inst(exe, &hex!("E8"), off + 5);
 
     memory.at_exe(off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5)
 }

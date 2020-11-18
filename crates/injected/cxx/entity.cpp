@@ -1,7 +1,7 @@
 #include "entity.hpp"
 #include "injected-dll/src/db.rs.h"
 
-const int NAME_TO_INDEX = 0x381c0;
+const int NAME_TO_INDEX = 0x387c8;
 
 struct EntityInstance;
 

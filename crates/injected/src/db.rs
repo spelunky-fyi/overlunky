@@ -22,7 +22,7 @@ pub unsafe fn list_entities(mem: &Memory) -> Vec<ffi::EntityItem> {
         mem.exe(),
         find_inst(
             mem.exe(),
-            &hex!("48 8B 90 B0 81 03 00 48 B9 02 55 A7 74 52 9D 51"),
+            &hex!("48 B8 02 55 A7 74 52 9D 51 43"),
             mem.after_bundle,
         ) - 7,
     ));
