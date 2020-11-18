@@ -1,8 +1,6 @@
-use byteorder::*;
-use std::ptr;
-use winapi::um::libloaderapi::GetModuleHandleA;
-
 use crate::search::find_after_bundle;
+use byteorder::*;
+use winapi::um::libloaderapi::GetModuleHandleA;
 
 pub struct Memory {
     pub exe_ptr: usize,
