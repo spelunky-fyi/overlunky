@@ -22,3 +22,4 @@ Current features and their keyboard shortcuts:
 ## Current issues
   - If you're playing with keyboard, the keys you type in the overlay still activate in the game too.
   - If you have problems with the entity list not populating, try starting the injector after reaching the camp. (Restart your game first!)
+  - Mouse click coordinates are only translated correctly with the default zoom, e.g. they're not accurate inside shops.
