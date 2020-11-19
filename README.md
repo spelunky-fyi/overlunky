@@ -19,4 +19,4 @@ Current features and their keyboard shortcuts:
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! If you don't get the screen overlay and are using an antivirus there's a high chance this program will get blocked because of the way it works. You need to whitelist it to use it.
 
 ## Current issues
-  - If you're playing with keyboard, the keys you type in Overlunky still activate in the game too.
+  - If you're playing with keyboard, the keys you type in the overlay still activate in the game too.
