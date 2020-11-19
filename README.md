@@ -2,6 +2,9 @@
 
 An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the Spelunky Community Discord.
 
+## Disclaimer
+You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, corrupting your savefile and cheating in the leaderboards. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://gitlab.com/Mr_Goldberg/goldberg_emulator/-/releases) in the game directory. (TL;DR: Copy the steam_api64.dll from the zip to the offline game directory and create steam_appid.txt with the text `418530` in it.) Also block the modded installation in your firewall. If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to Blitworks.
+
 ## Features
 Current features and their keyboard shortcuts:
   - **F-keys**: Collapse/Show the window
@@ -23,6 +26,3 @@ Current features and their keyboard shortcuts:
   - If you're playing with keyboard, the keys you type in the overlay still activate in the game too.
   - If you have problems with the entity list not populating, try starting the injector after reaching the camp. (Restart your game first!)
   - Mouse click coordinates are only translated correctly with the default zoom, e.g. they're not accurate inside shops.
-
-## Disclaimer
-You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, corrupting your savefile and cheating in the leaderboards. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://gitlab.com/Mr_Goldberg/goldberg_emulator/-/releases) in the game directory. (TL;DR: Copy the steam_api64.dll from the zip to the offline game directory and create steam_appid.txt with the text `418530` in it.) Also block the modded installation in your firewall. If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to Blitworks.
