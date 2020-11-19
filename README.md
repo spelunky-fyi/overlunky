@@ -10,7 +10,7 @@ Current features and their keyboard shortcuts:
       + **Ctrl+Arrows**: Move spawn coordinates around you
       + **Ctrl+Enter**: Teleport to coordinates
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
-      + Note: Item numbers can change between versions, so use the search to find the latest ones!
+      + Note: Item numbers can change between versions, so use the search to find the latest ones or check `Spelunky 2/entities.txt`
   - **F2**: Spawn a warp door to any world, level and theme
       + **Enter**: Spawn door. Set the appropriate theme theme too or you will get weird results.
   - **F11**: Hide overlay completely for screenshots and faking being a god gamer

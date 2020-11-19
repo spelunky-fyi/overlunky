@@ -47,8 +47,8 @@ fn main() {
         };
         log::info!("Found Spel2.exe PID: {}", proc.pid);
         if !started {
-            log::info!("Waiting a while for the game to load...");
-            thread::sleep(time::Duration::from_millis(3000));
+            log::info!("Game was just started, waiting a few seconds for it to load before injecting...");
+            thread::sleep(time::Duration::from_millis(8000));
         }
         inject_dll(&proc, temp_path.to_str().unwrap());
         call(

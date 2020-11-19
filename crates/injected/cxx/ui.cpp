@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
@@ -49,6 +51,7 @@ bool click_spawn = false;
 bool click_teleport = false;
 bool hidegui = false;
 bool clickevents = false;
+bool file_written = false;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 
@@ -161,6 +164,11 @@ bool process_keys(
         }
         return true;
     }
+    else if (wParam == VK_F9)
+    {
+        toggle("Help and Options (F9)");
+        return true;
+    }
 
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
@@ -265,6 +273,18 @@ void update_filter(const char *s)
     g_current_item = 0;
 }
 
+void write_file()
+{
+    std::ofstream file;
+    file.open("entities.txt");
+    for (int i = 0; i < g_items.size(); i++)
+    {
+        file << g_items[i].id << ": " << g_items[i].name.data() << std::endl;
+    }
+    file.close();
+    file_written = true;
+}
+
 void render_list()
 {
     // ImGui::ListBox with filter
@@ -328,13 +348,19 @@ void render_input()
         ImGui::SetKeyboardFocusHere();
         set_focus_entity = false;
     }
+    ImVec2 region = ImGui::GetContentRegionMax();
+    ImGui::PushItemWidth(region.x-70);
     if (ImGui::InputText("##Input", text, sizeof(text), 0, NULL))
     {
         update_filter(text);
     }
-    if(ImGui::Button("Spawn entity")) {
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    ImGui::PushItemWidth(60);
+    if(ImGui::Button("Spawn")) {
         spawn_entities(false);
     }
+    ImGui::PopItemWidth();
 }
 
 void render_narnia()
@@ -347,7 +373,7 @@ void render_narnia()
     ImGui::SameLine(53);
     ImGui::Text("Level");
     ImGui::SameLine(100);
-    ImGui::Text("Theme (Arrows)");
+    ImGui::Text("Theme");
     ImGui::SetNextItemWidth(40);
     if(set_focus_world) {
         ImGui::SetKeyboardFocusHere();
@@ -370,7 +396,7 @@ void render_narnia()
     ImGui::SameLine(100);
     ImGui::SetNextItemWidth(200);
     render_themes();
-    if(ImGui::Button("Spawn door")) {
+    if(ImGui::Button("Spawn")) {
         spawn_entity(770, g_x, g_y, false);
         spawn_door(g_x, g_y, g_world, g_level, 1, g_to+1);
     }
@@ -481,38 +507,52 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         if(clickevents) {
             render_clickhandler();
         }
-        ImGui::SetNextWindowSize({400, 400}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Entity spawner (F1)");
         ImGui::PushItemWidth(-1);
-        ImGui::Checkbox("##clickevents", &clickevents);
-        ImGui::SameLine();
-        ImGui::Text("Enable click to spawn/teleport (bit buggy)");
-        if(clickevents) {
-            ImGui::Text("(Enter) or left click to spawn");
-            ImGui::Text("(Ctrl+Enter) or right click to teleport");
-        } else {
-            ImGui::Text("(Enter) to spawn");
-            ImGui::Text("(Ctrl+Enter) to teleport");
-        }
-        ImGui::Text("(Ctrl+Arrow) Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
-        ImGui::Text("Enter numeric IDs separated by space to spawn many.");
+        ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
         render_input();
         render_list();
         ImGui::PopItemWidth();
         ImGui::End();
 
-        ImGui::SetNextWindowSize({300, 200}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({300, 125}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({400, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Door to anywhere (F2)");
         ImGui::PushItemWidth(-1);
-        ImGui::Text("Spawn a door to:");
         render_narnia();
+        ImGui::PopItemWidth();
+        ImGui::End();
+
+        ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, 0}, ImGuiCond_FirstUseEver);
+        ImGui::Begin("Help and Options (F9)");
+        ImGui::PushItemWidth(-1);
+        ImGui::Checkbox("##clickevents", &clickevents);
+        ImGui::SameLine();
+        ImGui::Text("Enable click to spawn/teleport");
+        ImGui::Text("Keys:");
+        if(clickevents) {
+            ImGui::Text("- (Enter) or (Mouse L) Use focused tool");
+            ImGui::Text("- (Ctrl+Enter) or (Mouse R) Teleport");
+        } else {
+            ImGui::Text("- (Enter) Use focused tool");
+            ImGui::Text("- (Ctrl+Enter) Teleport");
+        }
+        ImGui::Text("- (Arrows) Change selection in lists");
+        ImGui::Text("- (Ctrl+Arrows) Change spawning coordinates");
+        ImGui::Text("Write many numerical IDs separated by space in");
+        ImGui::Text("the entity spawner to spawn many items at once.");
         ImGui::PopItemWidth();
         ImGui::End();
     }
 
     ImGui::Render();
+
+    if(!file_written)
+        write_file();
+
 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

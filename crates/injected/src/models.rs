@@ -104,7 +104,7 @@ impl Layer {
             let cx = read_f32(get_camera(&memory));
             let cy = read_f32(get_camera(&memory) + 4);
             let rx = cx + 10.0 * x;
-            let ry = cy + 5.5 * y;
+            let ry = cy + 5.625 * y;
             let addr: usize = load_item(self.pointer, id, rx, ry);
             log::info!("Spawned {:x?}", addr);
         }
@@ -203,7 +203,7 @@ impl Player {
                     let cy = read_f32(get_camera(&memory) + 4);
                     log::info!("Camera is at {}, {}", cx, cy);
                     x = (cx + 10.0 * dx).round();
-                    y = (cy + 5.5 * dy).round();
+                    y = (cy + 5.625 * dy).round();
                     log::info!("Teleporting to {}, {}", x, y);
                     write_mem(px, &x.to_le_bytes());
                     write_mem(py, &y.to_le_bytes());
