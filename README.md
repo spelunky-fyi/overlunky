@@ -14,6 +14,7 @@ Current features and their keyboard shortcuts:
   - **F2**: Spawn a warp door to any world, level and theme
       + **Enter**: Spawn door. Set the appropriate theme theme too or you will get weird results.
   - **F11**: Hide overlay completely for screenshots and faking being a god gamer
+  - Spawn or teleport to mouse cursor (see options)
 
 ## Usage 
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! If you don't get the screen overlay and are using an antivirus there's a high chance this program will get blocked because of the way it works. You need to whitelist it to use it.
