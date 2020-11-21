@@ -12,6 +12,8 @@ pub struct State {
     off_items: usize,
     off_layers: usize,
     ptr_load_item: usize,
+    addr_damage: usize,
+    addr_insta: usize,
 }
 
 macro_rules! entity {
@@ -102,11 +104,15 @@ impl State {
         );
         let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
         write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"), true);
+        let addr_damage = memory.at_exe(find_inst(exe, &hex!("89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 90 00 00 00"), start)) - 1;
+        let addr_insta = memory.at_exe(find_inst(exe, &hex!("57 41 54 48 83 EC 58 48 89 B4 24 80 00 00 00 44 0F B6 E2 4C 89 7C 24 50"), start)) - 1;
         State {
             location,
             off_items,
             off_layers,
             ptr_load_item: get_load_item(&memory),
+            addr_damage,
+            addr_insta,
         }
     }
 
@@ -125,6 +131,17 @@ impl State {
     pub fn items(&self) -> Items {
         let pointer = read_u64(self.ptr() + self.off_items);
         Items { pointer }
+    }
+
+    pub fn godmode(&self, g: bool) {
+        log::debug!("God mode: {:?}", g);
+        if g {
+            write_mem_prot(self.addr_damage, &hex!("C3"), true);
+            write_mem_prot(self.addr_insta, &hex!("C3"), true);
+        } else {
+            write_mem_prot(self.addr_damage, &hex!("48"), true);
+            write_mem_prot(self.addr_insta, &hex!("40"), true);
+        }
     }
 }
 

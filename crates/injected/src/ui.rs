@@ -6,6 +6,7 @@ pub mod ffi {
         unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool);
         unsafe fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
         unsafe fn teleport(x: f32, y: f32, s: bool);
+        unsafe fn godmode(g: bool);
     }
     unsafe extern "C++" {
         include!("cxx/ui.hpp");
@@ -69,4 +70,10 @@ pub unsafe fn teleport(x: f32, y: f32, s: bool) {
         }
         None => {}
     }
+}
+
+pub unsafe fn godmode(g: bool) {
+    let memory = Memory::new();
+    let state = State::new(&memory);
+    state.godmode(g);
 }

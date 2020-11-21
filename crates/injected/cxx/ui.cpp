@@ -52,13 +52,9 @@ bool click_teleport = false;
 bool hidegui = false;
 bool clickevents = false;
 bool file_written = false;
+bool god = false;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
-
-bool process_mouse(
-    _In_ int nCode,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam);
 
 bool process_keys(
     _In_ int nCode,
@@ -532,6 +528,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::Checkbox("##clickevents", &clickevents);
         ImGui::SameLine();
         ImGui::Text("Enable click to spawn/teleport");
+        if(ImGui::Checkbox("##Godmode", &god)) {
+            godmode(god);
+        }
+        ImGui::SameLine();
+        ImGui::Text("Enable peaceful mode");
         ImGui::Text("Keys:");
         if(clickevents) {
             ImGui::Text("- (Enter) or (Mouse L) Use focused tool");
