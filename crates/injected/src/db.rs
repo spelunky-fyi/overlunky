@@ -5,7 +5,7 @@ pub mod ffi {
         pub id: u16,
     }
 
-    extern "C++" {
+    unsafe extern "C++" {
         include!("cxx/entity.hpp");
         fn list_entities(ptr: usize) -> Vec<EntityItem>;
     }

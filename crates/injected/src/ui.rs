@@ -3,11 +3,11 @@ use crate::{db::ffi::EntityItem, memory::Memory, models::State};
 #[cxx::bridge]
 pub mod ffi {
     extern "Rust" {
-        fn spawn_entity(id: usize, x: f32, y: f32, s: bool);
-        fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
-        fn teleport(x: f32, y: f32, s: bool);
+        unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool);
+        unsafe fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
+        unsafe fn teleport(x: f32, y: f32, s: bool);
     }
-    extern "C++" {
+    unsafe extern "C++" {
         include!("cxx/ui.hpp");
         fn create_box(_: Vec<String>, _: Vec<u16>);
         fn init_hooks(_: usize) -> Result<bool>;
@@ -30,7 +30,9 @@ pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool) {
             let (_x, _y) = player.position();
             if !s {
                 log::info!("Spawning {} on {}, {}", id, x + _x, y + _y);
-                state.layer(player.layer()).spawn_entity(id, x + _x, y + _y, s);
+                state
+                    .layer(player.layer())
+                    .spawn_entity(id, x + _x, y + _y, s);
             } else {
                 log::info!("Spawning {} on screen {}, {}", id, x, y);
                 state.layer(player.layer()).spawn_entity(id, x, y, s);

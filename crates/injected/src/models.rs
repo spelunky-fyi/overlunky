@@ -30,13 +30,13 @@ static mut CAMERA_OFF: usize = 0;
 fn get_camera(memory: &Memory) -> usize {
     unsafe {
         INIT.call_once(|| {
-            CAMERA_OFF = memory.at_exe(
-                find_inst(
-                    memory.exe(),
-                    &hex!("A5 42 1F 00 00 80"),
-                    memory.after_bundle,
-                ) - 34,
+            let off = find_inst(
+                memory.exe(),
+                &hex!("C7 87 CC 00 00 00 00 00"),
+                memory.after_bundle,
             );
+            let off = find_inst(memory.exe(), &hex!("F3 0F 11 05"), off) + 1;
+            CAMERA_OFF = memory.at_exe(decode_pc(memory.exe(), off));
         });
         CAMERA_OFF
     }
@@ -52,12 +52,11 @@ impl State {
             find_inst(exe, &hex!("83 78 0C 05 0F 85"), start) - 15,
         ));
         // The offset of items field
-        let off_items =
-            decode_imm(exe, find_inst(exe, &hex!("33 D2 8B 41 28 01"), start) - 7) as usize;
+        let off_items = decode_imm(exe, find_inst(exe, &hex!("33 D2 8B 41 28 01"), start) - 7);
         let off_layers = decode_imm(
             exe,
             find_inst(exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
-        ) as usize;
+        );
         let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
         write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"), true);
         State {
@@ -168,7 +167,7 @@ impl Player {
         // Return the resolved position
         // self.overlay() exists if player is riding something / etc
         let (x, y) = self.position_self();
-        log::info!("Item #{}: Position is {}, {}", self.unique_id(), x, y);
+        log::debug!("Item #{}: Position is {}, {}", self.unique_id(), x, y);
         match self.overlay() {
             Some(new) => {
                 let (_x, _y) = new.position();

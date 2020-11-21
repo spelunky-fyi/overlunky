@@ -63,9 +63,9 @@ checksum = "08c48aae112d48ed9f069b33538ea9e3e90aa263cfa3d1c24309612b1f7472de"
 
 [[package]]
 name = "cc"
-version = "1.0.62"
+version = "1.0.63"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1770ced377336a88a67c473594ccc14eca6f4559217c34f64aac8f83d641b40"
+checksum = "ad9c6140b5a2c7db40ea56eb1821245e5362b44385c05b76288b1a599934ac87"
 
 [[package]]
 name = "cfg-if"
@@ -144,9 +144,9 @@ dependencies = [
 
 [[package]]
 name = "cxx"
-version = "0.5.9"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "645647e76920443ca0f872b0cbe971f690c199e8d3f3bd57134a9b89398c51e3"
+checksum = "ebb9cd4f5178b2da7c930d4b80b513bdb3f40db95d17c76de75e8ebb8ade7789"
 dependencies = [
  "cc",
  "cxxbridge-flags",
@@ -156,9 +156,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-build"
-version = "0.5.9"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dffd04849b3bf7c4200dc4e4e3bfae084b968e6fae7f2020871dc2f62ecd1782"
+checksum = "2a5bb4767800cae7577cf498a3bbf78546c84d6fa9870ee0123cfba2231ddf2a"
 dependencies = [
  "cc",
  "codespan-reporting",
@@ -171,15 +171,15 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-flags"
-version = "0.5.9"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f6fd8dfdfc00a160c392ec0be482a62b9d9c4cb8a40c80d52baeb79a51a31c5"
+checksum = "7adaa1fe538e2c40b057402b26a541cbc95a5ffbe3643c4f49238f64ac642af4"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "0.5.9"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ff40bada5d2e58210ba0ece1c08a716d9dc18cc358f1fb476271a03177513c1"
+checksum = "6f28792a7589c1d6c5623c19b43648ddb4a2ae9e8b893fbac34c678ec7cca585"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -211,9 +211,9 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "env_logger"
-version = "0.8.1"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54532e3223c5af90a6a757c90b5c5521564b07e5e7a958681bcd2afad421cdcd"
+checksum = "f26ecb66b4bdca6c1409b40fb255eefc2bd4f6d135dab3c3124f80ffa2a9661e"
 dependencies = [
  "atty",
  "humantime",
@@ -357,9 +357,9 @@ checksum = "8d3b63360ec3cb337817c2dbd47ab4a0f170d285d8e5a2064600f3def1402397"
 
 [[package]]
 name = "once_cell"
-version = "1.4.1"
+version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "260e51e7efe62b592207e9e13a68e43692a7a279171d6ba57abd208bf23645ad"
+checksum = "13bd41f508810a131401606d54ac32a467c97172d74ba7662562ebba5ad07fa0"
 
 [[package]]
 name = "ppv-lite86"
@@ -544,9 +544,9 @@ dependencies = [
 
 [[package]]
 name = "termcolor"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb6bfa289a4d7c5766392812c0a1f4c1ba45afa1ad47803c11e1f407d846d75f"
+checksum = "bf11676eb135389f21fcda654382c4859bbfc1d2f36e4425a2f829bb41b1e20e"
 dependencies = [
  "winapi-util",
 ]
