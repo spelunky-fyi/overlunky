@@ -14,6 +14,39 @@ pub struct State {
     ptr_load_item: usize,
 }
 
+macro_rules! entity {
+    ($T: ident) => {
+        #[derive(Debug, Copy, Clone)]
+        pub struct $T {
+            entity: Entity,
+        }
+        impl From<usize> for $T {
+            fn from(pointer: usize) -> Self {
+                let entity = Entity { pointer };
+                Self { entity }
+            }
+        }
+
+        impl From<Entity> for $T {
+            fn from(entity: Entity) -> Self {
+                Self { entity }
+            }
+        }
+
+        impl From<$T> for Entity {
+            fn from(object: $T) -> Self {
+                Self {
+                    pointer: object.entity.pointer,
+                }
+            }
+        }
+    };
+}
+
+fn decode_call(memory: &Memory, off: usize) -> usize {
+    off.wrapping_add(LE::read_i32(&memory.exe()[off + 1..]) as usize) + 5
+}
+
 fn get_load_item(memory: &Memory) -> usize {
     let after_bundle = memory.after_bundle;
     let exe = memory.exe();
@@ -23,7 +56,17 @@ fn get_load_item(memory: &Memory) -> usize {
     let off = find_inst(exe, needle, off + 5);
     let off = find_inst(exe, &hex!("E8"), off + 5);
 
-    memory.at_exe(off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5)
+    memory.at_exe(decode_call(memory, off))
+}
+
+fn get_load_item_over(memory: &Memory) -> usize {
+    let off = find_inst(
+        memory.exe(),
+        &hex!("BA B5 00 00 00 C6 44 "),
+        memory.after_bundle,
+    );
+    let off = find_inst(memory.exe(), &hex!("E8"), off + 5);
+    memory.at_exe(decode_call(memory, off))
 }
 
 static mut CAMERA_OFF: usize = 0;
@@ -92,12 +135,13 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool) {
+    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool) -> Entity {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(self.ptr_load_item);
         if !s {
             let addr: usize = load_item(self.pointer, id, x, y);
             log::info!("Spawned {:x?}", addr);
+            Entity { pointer: addr }
         } else {
             let memory = Memory::new();
             let cx = read_f32(get_camera(&memory));
@@ -106,7 +150,16 @@ impl Layer {
             let ry = cy + 5.625 * y;
             let addr: usize = load_item(self.pointer, id, rx, ry);
             log::info!("Spawned {:x?}", addr);
+            Entity { pointer: addr }
         }
+    }
+
+    pub unsafe fn spawn_entity_over(&self, id: usize, overlay: Entity, x: f32, y: f32) -> Entity {
+        let load_item_over: extern "C" fn(usize, usize, usize, f32, f32, bool) -> usize =
+            std::mem::transmute(get_load_item_over(&Memory::new()));
+
+        let pointer = load_item_over(self.pointer, id, overlay.pointer, x, y, true);
+        Entity { pointer }
     }
 
     pub unsafe fn spawn_door(&self, x: f32, y: f32, w: u8, l: u8, f: u8, t: u8) {
@@ -139,7 +192,7 @@ impl Items {
         let pointer = read_u64(self.pointer + 8 + index * 8);
         match pointer {
             0 => None,
-            _ => Some(Player { pointer }),
+            _ => Some(Player::from(pointer)),
         }
     }
 }
@@ -148,19 +201,19 @@ trait ItemDefinition {
     fn unique_id(&self) -> u32;
 }
 
-#[derive(Copy, Clone)]
-pub struct Player {
+#[derive(Copy, Clone, Debug)]
+pub struct Entity {
     pointer: usize,
 }
 
-impl Player {
+impl Entity {
     pub fn unique_id(&self) -> u32 {
         read_u32(self.pointer + 0x38)
     }
-    pub fn overlay(&self) -> Option<Player> {
+    pub fn overlay(&self) -> Option<Entity> {
         match read_u64(self.pointer + 0x10) {
             0 => None,
-            pointer => Some(Player { pointer }),
+            pointer => Some(Entity { pointer }),
         }
     }
     pub fn position(&self) -> (f32, f32) {
@@ -211,7 +264,7 @@ impl Player {
         }
     }
 
-    fn topmost(&self) -> Player {
+    fn topmost(&self) -> Entity {
         let mut topmost = self.clone();
         loop {
             match topmost.overlay() {
@@ -224,11 +277,58 @@ impl Player {
         topmost
     }
 
-    fn position_self(&self) -> (f32, f32) {
+    pub fn position_self(&self) -> (f32, f32) {
         (read_f32(self.pointer + 0x40), read_f32(self.pointer + 0x44))
     }
 
     pub fn layer(&self) -> u8 {
         read_u8(self.pointer + 0x98)
+    }
+}
+
+entity!(Mount);
+
+impl Mount {
+    pub unsafe fn carry(&self, rider: Entity) {
+        let carry: unsafe extern "C" fn(usize, usize) = std::mem::transmute(get_carry());
+        log::info!("{}", read_u8(rider.pointer + 0x10e));
+        write_mem(rider.pointer + 0x10e, &[11u8]);
+        carry(self.entity.pointer, rider.pointer)
+    }
+
+    pub unsafe fn tame(&self, value: bool) {
+        let pointer = self.entity.pointer;
+        write_mem(pointer + 0x149, &[value as u8]);
+        let flags = read_u64(pointer + 0x30);
+        write_mem(pointer + 0x30, &(flags | 0x20000).to_le_bytes());
+    }
+}
+
+unsafe fn get_carry() -> usize {
+    let memory = Memory::new();
+    let off = find_inst(
+        memory.exe(),
+        &hex!("BA E1 00 00 00 49 8B CD "),
+        memory.after_bundle,
+    );
+    let off = find_inst(memory.exe(), &hex!("E8"), off + 1);
+    let off = find_inst(memory.exe(), &hex!("E8"), off + 1);
+
+    memory.at_exe(decode_call(&memory, off))
+}
+
+entity!(Player);
+
+impl Player {
+    pub fn position(&self) -> (f32, f32) {
+        self.entity.position()
+    }
+
+    pub fn layer(&self) -> u8 {
+        self.entity.layer()
+    }
+
+    pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
+        self.entity.teleport(dx, dy, s)
     }
 }
