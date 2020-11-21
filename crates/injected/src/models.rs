@@ -180,23 +180,20 @@ impl Layer {
     }
 
     pub unsafe fn spawn_door(&self, x: f32, y: f32, w: u8, l: u8, f: u8, t: u8) {
-        let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
-            std::mem::transmute(self.ptr_load_item);
         let screen: u8 = read_u8(self.state + 0x10);
-        let mut addr: usize = 0;
-        if screen == 11 {
-            log::info!("In camp, spawning starting exit");
-            addr = load_item(self.pointer, 25, x, y);
-        } else if screen == 12 {
-            log::info!("In game, spawning regular exit");
-            addr = load_item(self.pointer, 23, x, y);
-        }
-        if addr != 0 {
-            log::info!("Spawned door {:x?}", addr);
-            let array: [u8; 5] = [1, l, f, w, t];
-            log::info!("Making door go to {:?}", array);
-            write_mem(addr + 0xc1, &array);
-        }
+        let entity = match screen {
+            11 => {
+                log::info!("In camp, spawning starting exit");
+                self.spawn_entity(25, x, y, false)
+            }
+            12 => {
+                log::info!("In game, spawning regular exit");
+                self.spawn_entity(23, x, y, false)
+            }
+            _ => return,
+        };
+        log::info!("Spawned door {:x?}", entity.pointer);
+        Door::from(entity).set_target(w, l, f, t);
     }
 }
 
@@ -347,5 +344,15 @@ impl Player {
 
     pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
         self.entity.teleport(dx, dy, s)
+    }
+}
+
+entity!(Door);
+
+impl Door {
+    fn set_target(&self, w: u8, l: u8, f: u8, t: u8) {
+        let array: [u8; 5] = [1, l, f, w, t];
+        log::info!("Making door go to {:?}", array);
+        write_mem(self.entity.pointer + 0xc1, &array);
     }
 }
