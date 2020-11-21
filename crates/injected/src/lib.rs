@@ -11,7 +11,7 @@ use critical_section::CriticalSectionManager;
 use db::list_entities;
 use hex_literal::*;
 use memory::{read_u64, Memory};
-use models::State;
+use models::{Mount, State};
 use search::{decode_imm, decode_pc, find_inst};
 
 use winapi::um::{
@@ -95,6 +95,21 @@ impl API {
 
     unsafe fn swap_chain(&self) -> usize {
         read_u64(self.renderer() + self.swap_chain_off)
+    }
+}
+
+unsafe fn mount_poc() {
+    // Spawns caveman riding turkey
+    if false {
+        let state = State::new(&Memory::new());
+        let player = state.items().player(0).unwrap();
+        let position = player.position();
+        let layer = state.layer(player.layer());
+        let turkey: Mount = layer.spawn_entity(884, position.0 + 1.0, position.1, false).into();
+        let caveman = layer.spawn_entity_over(225, turkey.into(), -0.05, 0.52);
+        turkey.carry(caveman);
+        turkey.tame(true);
+        return;
     }
 }
 
