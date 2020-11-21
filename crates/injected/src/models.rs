@@ -103,7 +103,7 @@ impl State {
             find_inst(exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
         );
         let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
-        write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90"), true);
+        write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
         let addr_damage = memory.at_exe(find_inst(exe, &hex!("89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 90 00 00 00"), start)) - 1;
         let addr_insta = memory.at_exe(find_inst(exe, &hex!("57 41 54 48 83 EC 58 48 89 B4 24 80 00 00 00 44 0F B6 E2 4C 89 7C 24 50"), start)) - 1;
         State {
