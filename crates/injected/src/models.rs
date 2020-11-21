@@ -157,7 +157,7 @@ impl Layer {
             std::mem::transmute(self.ptr_load_item);
         if !s {
             let addr: usize = load_item(self.pointer, id, x, y);
-            log::info!("Spawned {:x?}", addr);
+            log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         } else {
             let memory = Memory::new();
@@ -166,7 +166,7 @@ impl Layer {
             let rx = cx + 10.0 * x;
             let ry = cy + 5.625 * y;
             let addr: usize = load_item(self.pointer, id, rx, ry);
-            log::info!("Spawned {:x?}", addr);
+            log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         }
     }

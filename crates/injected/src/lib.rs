@@ -54,7 +54,7 @@ unsafe fn attach_stdout(pid: u32) {
     AttachConsole(pid);
     SetConsoleCtrlHandler(Some(ctrl_handler), 1);
     env_logger::Builder::new()
-        .filter(None, log::LevelFilter::Debug)
+        .filter(None, log::LevelFilter::Info)
         .init();
 }
 
