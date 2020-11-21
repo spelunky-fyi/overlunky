@@ -5,6 +5,9 @@ mod models;
 mod search;
 mod ui;
 
+use std::time;
+use std::thread;
+
 use backtrace::Backtrace;
 use byteorder::*;
 use critical_section::CriticalSectionManager;
@@ -105,7 +108,9 @@ unsafe fn mount_poc() {
         let player = state.items().player(0).unwrap();
         let position = player.position();
         let layer = state.layer(player.layer());
-        let turkey: Mount = layer.spawn_entity(884, position.0 + 1.0, position.1, false).into();
+        let turkey: Mount = layer
+            .spawn_entity(884, position.0 + 1.0, position.1, false)
+            .into();
         let caveman = layer.spawn_entity_over(225, turkey.into(), -0.05, 0.52);
         turkey.carry(caveman);
         turkey.tame(true);
@@ -121,8 +126,14 @@ unsafe extern "C" fn main(handle: u32) {
 
     let memory = Memory::new();
     let state = State::new(&memory);
-    let entities = list_entities(&memory);
-    ui::create_box(&entities);
+    loop {
+        let entities = list_entities(&memory);
+        if entities.len() != 0 {
+            ui::create_box(&entities);
+            break;
+        }
+        thread::sleep(time::Duration::from_millis(100));
+    }
 
     let api = API::new(&memory);
 
