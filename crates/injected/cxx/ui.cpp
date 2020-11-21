@@ -393,7 +393,7 @@ void render_narnia()
     ImGui::SetNextItemWidth(200);
     render_themes();
     if(ImGui::Button("Spawn")) {
-        spawn_entity(770, g_x, g_y, false);
+        spawn_entity(775, g_x, g_y, false);
         spawn_door(g_x, g_y, g_world, g_level, 1, g_to+1);
     }
 }
