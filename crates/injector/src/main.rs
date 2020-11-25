@@ -3,6 +3,8 @@ mod injector;
 use injector::*;
 use std::{thread, time};
 
+#[macro_use] extern crate log;
+
 fn get_dll_path() -> std::path::PathBuf {
     std::env::current_exe()
         .unwrap()
@@ -12,9 +14,9 @@ fn get_dll_path() -> std::path::PathBuf {
 }
 
 fn main() {
-    env_logger::Builder::new()
-        .filter(None, log::LevelFilter::Debug)
-        .init();
+    let env = env_logger::Env::default()
+        .filter_or(env_logger::DEFAULT_FILTER_ENV, "info");
+    env_logger::Builder::from_env(env).init();
 
     let path = get_dll_path();
 

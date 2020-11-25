@@ -183,11 +183,11 @@ impl Layer {
         let screen: u8 = read_u8(self.state + 0x10);
         let entity = match screen {
             11 => {
-                log::info!("In camp, spawning starting exit");
+                log::debug!("In camp, spawning starting exit");
                 self.spawn_entity(25, x, y, false)
             }
             12 => {
-                log::info!("In game, spawning regular exit");
+                log::debug!("In game, spawning regular exit");
                 self.spawn_entity(23, x, y, false)
             }
             _ => return,
@@ -255,22 +255,22 @@ impl Entity {
                 y += dy;
                 let px = topmost.pointer + 0x40;
                 let py = topmost.pointer + 0x44;
-                log::info!("Teleporting to {}, {}", x, y);
+                log::debug!("Teleporting to {}, {}", x, y);
                 write_mem(px, &x.to_le_bytes());
                 write_mem(py, &y.to_le_bytes());
             } else {
                 // screen coordinates -1..1
-                log::info!("Teleporting to screen {}, {}", x, y);
+                log::debug!("Teleporting to screen {}, {}", x, y);
                 let px = topmost.pointer + 0x40;
                 let py = topmost.pointer + 0x44;
                 unsafe {
                     let memory = Memory::new();
                     let cx = read_f32(get_camera(&memory));
                     let cy = read_f32(get_camera(&memory) + 4);
-                    log::info!("Camera is at {}, {}", cx, cy);
+                    log::debug!("Camera is at {}, {}", cx, cy);
                     x = (cx + 10.0 * dx).round();
                     y = (cy + 5.625 * dy).round();
-                    log::info!("Teleporting to {}, {}", x, y);
+                    log::debug!("Teleporting to {}, {}", x, y);
                     write_mem(px, &x.to_le_bytes());
                     write_mem(py, &y.to_le_bytes());
                 }
@@ -352,7 +352,7 @@ entity!(Door);
 impl Door {
     fn set_target(&self, w: u8, l: u8, f: u8, t: u8) {
         let array: [u8; 5] = [1, l, f, w, t];
-        log::info!("Making door go to {:?}", array);
+        log::debug!("Making door go to {:?}", array);
         write_mem(self.entity.pointer + 0xc1, &array);
     }
 }

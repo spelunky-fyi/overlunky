@@ -25,6 +25,9 @@ use winapi::um::{
     wincon::{CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT, CTRL_C_EVENT},
 };
 
+#[macro_use] extern crate log;
+use log::Level;
+
 #[no_mangle]
 pub extern "C" fn DllMain(_: *const u8, _reason: u32, _: *const u8) -> u32 {
     1 // TRUE
@@ -42,7 +45,7 @@ fn get_api(memory: &Memory) -> usize {
 unsafe extern "system" fn ctrl_handler(ctrl_type: u32) -> i32 {
     match ctrl_type {
         CTRL_C_EVENT | CTRL_BREAK_EVENT | CTRL_CLOSE_EVENT => {
-            log::info!("Console detached, you can now close this window.");
+            log::debug!("Console detached, you can now close this window.");
             FreeConsole();
             1
         }
@@ -51,11 +54,13 @@ unsafe extern "system" fn ctrl_handler(ctrl_type: u32) -> i32 {
 }
 
 unsafe fn attach_stdout(pid: u32) {
-    AttachConsole(pid);
-    SetConsoleCtrlHandler(Some(ctrl_handler), 1);
-    env_logger::Builder::new()
-        .filter(None, log::LevelFilter::Info)
-        .init();
+    let env = env_logger::Env::default()
+        .filter_or(env_logger::DEFAULT_FILTER_ENV, "info");
+    env_logger::Builder::from_env(env).init();
+    if log_enabled!(Level::Debug) {
+        AttachConsole(pid);
+        SetConsoleCtrlHandler(Some(ctrl_handler), 1);
+    }
 }
 
 unsafe fn set_panic_hook() {
@@ -122,7 +127,7 @@ unsafe fn mount_poc() {
 unsafe extern "C" fn main(handle: u32) {
     attach_stdout(handle);
     set_panic_hook();
-    log::info!("Game injected! Press Ctrl+C to detach this window from the process.");
+    log::debug!("Game injected! Press Ctrl+C to detach this window from the process.");
 
     let memory = Memory::new();
     let state = State::new(&memory);
@@ -141,29 +146,31 @@ unsafe extern "C" fn main(handle: u32) {
         log::error!("{}", err);
         return;
     }
-    let c = CriticalSectionManager::new();
-    loop {
-        println!("Enter entity #IDs to spawn, one per line >");
-        let mut buffer = String::new();
-        std::io::stdin().read_line(&mut buffer).unwrap();
-        let item = buffer.trim().parse::<usize>().unwrap_or(0);
+    if log_enabled!(Level::Debug) {
+        let c = CriticalSectionManager::new();
+        loop {
+            log::debug!("Enter entity #IDs to spawn, one per line >");
+            let mut buffer = String::new();
+            std::io::stdin().read_line(&mut buffer).unwrap();
+            let item = buffer.trim().parse::<usize>().unwrap_or(0);
 
-        if item == 0 {
-            continue;
-        }
+            if item == 0 {
+                continue;
+            }
 
-        {
-            // This is RAII-style implementation for suspending the main thread, for preventing race conditions.
-            let mut _lock = c.lock();
+            {
+                // This is RAII-style implementation for suspending the main thread, for preventing race conditions.
+                let mut _lock = c.lock();
 
-            match state.items().player(0) {
-                None => {
-                    log::error!("Player not initialized yet. Select a character first!");
-                }
-                Some(player) => {
-                    let (x, y) = player.position();
-                    let layer = player.layer();
-                    state.layer(layer).spawn_entity(item, x, y, false);
+                match state.items().player(0) {
+                    None => {
+                        log::error!("Player not initialized yet. Select a character first!");
+                    }
+                    Some(player) => {
+                        let (x, y) = player.position();
+                        let layer = player.layer();
+                        state.layer(layer).spawn_entity(item, x, y, false);
+                    }
                 }
             }
         }

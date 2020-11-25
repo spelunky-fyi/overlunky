@@ -125,7 +125,7 @@ pub unsafe fn inject_dll(proc: &Process, name: &str) {
 }
 
 pub unsafe fn call(proc: &Process, addr: LPTHREAD_START_ROUTINE, args: LPVOID) {
-    log::info!(
+    log::debug!(
         "Calling: {:x}",
         mem::transmute::<LPTHREAD_START_ROUTINE, usize>(addr)
     );

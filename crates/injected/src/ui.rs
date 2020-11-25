@@ -30,12 +30,12 @@ pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool) {
         Some(player) => {
             let (_x, _y) = player.position();
             if !s {
-                log::info!("Spawning {} on {}, {}", id, x + _x, y + _y);
+                log::debug!("Spawning {} on {}, {}", id, x + _x, y + _y);
                 state
                     .layer(player.layer())
                     .spawn_entity(id, x + _x, y + _y, s);
             } else {
-                log::info!("Spawning {} on screen {}, {}", id, x, y);
+                log::debug!("Spawning {} on screen {}, {}", id, x, y);
                 state.layer(player.layer()).spawn_entity(id, x, y, s);
             }
         }
@@ -50,7 +50,7 @@ pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
     match state.items().player(0) {
         Some(player) => {
             let (_x, _y) = player.position();
-            log::info!("Spawning door on {}, {}", x + _x, y + _y);
+            log::debug!("Spawning door on {}, {}", x + _x, y + _y);
             state
                 .layer(player.layer())
                 .spawn_door(x + _x, y + _y, l, w, f, t);
@@ -65,7 +65,7 @@ pub unsafe fn teleport(x: f32, y: f32, s: bool) {
 
     match state.items().player(0) {
         Some(player) => {
-            log::info!("Teleporting to relative {}, {}, {}", x, y, s);
+            log::debug!("Teleporting to relative {}, {}, {}", x, y, s);
             player.teleport(x, y, s);
         }
         None => {}
