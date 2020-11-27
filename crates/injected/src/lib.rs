@@ -5,8 +5,8 @@ mod models;
 mod search;
 mod ui;
 
-use std::time;
 use std::thread;
+use std::time;
 
 use backtrace::Backtrace;
 use byteorder::*;
@@ -109,7 +109,7 @@ impl API {
 unsafe fn mount_poc() {
     // Spawns caveman riding turkey
     if false {
-        let state = State::new(&Memory::new());
+        let state = State::new();
         let player = state.items().player(0).unwrap();
         let position = player.position();
         let layer = state.layer(player.layer());
@@ -129,8 +129,8 @@ unsafe extern "C" fn main(handle: u32) {
     set_panic_hook();
     log::debug!("Game injected! Press Ctrl+C to detach this window from the process.");
 
-    let memory = Memory::new();
-    let state = State::new(&memory);
+    let memory = Memory::get();
+    let state = State::new();
     loop {
         let entities = list_entities(&memory);
         if entities.len() != 0 {
@@ -152,24 +152,23 @@ unsafe extern "C" fn main(handle: u32) {
             log::debug!("Enter entity #IDs to spawn, one per line >");
             let mut buffer = String::new();
             std::io::stdin().read_line(&mut buffer).unwrap();
-            let item = buffer.trim().parse::<usize>().unwrap_or(0);
-
-            if item == 0 {
-                continue;
-            }
-
-            {
+            if let Ok(item) = buffer.trim().parse::<usize>() {
                 // This is RAII-style implementation for suspending the main thread, for preventing race conditions.
                 let mut _lock = c.lock();
 
-                match state.items().player(0) {
-                    None => {
-                        log::error!("Player not initialized yet. Select a character first!");
-                    }
-                    Some(player) => {
-                        let (x, y) = player.position();
-                        let layer = player.layer();
-                        state.layer(layer).spawn_entity(item, x, y, false);
+                {
+                    // This is RAII-style implementation for suspending the main thread, for preventing race conditions.
+                    let mut _lock = c.lock();
+
+                    match state.items().player(0) {
+                        None => {
+                            log::error!("Player not initialized yet. Select a character first!");
+                        }
+                        Some(player) => {
+                            let (x, y) = player.position();
+                            let layer = player.layer();
+                            state.layer(layer).spawn_entity(item, x, y, false);
+                        }
                     }
                 }
             }

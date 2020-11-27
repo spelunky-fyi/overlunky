@@ -2,11 +2,6 @@ use crate::search::find_after_bundle;
 use byteorder::*;
 use winapi::um::libloaderapi::GetModuleHandleA;
 
-pub struct Memory {
-    pub exe_ptr: usize,
-    pub after_bundle: usize,
-}
-
 macro_rules! round_up {
     ($i: expr, $div: expr) => {
         (($i + $div - 1) / $div) * $div
@@ -61,18 +56,36 @@ pub fn read_f32(addr: usize) -> f32 {
     unsafe { LE::read_f32(memory_view(addr)) }
 }
 
+#[derive(Copy, Clone)]
+pub struct Memory {
+    pub exe_ptr: usize,
+    pub after_bundle: usize,
+}
+
 impl Memory {
-    pub unsafe fn new() -> Memory {
-        let spel2_ptr = GetModuleHandleA("Spel2.exe\0".as_ptr() as *const i8);
-        let exe = memory_view(std::mem::transmute(spel2_ptr));
+    pub fn get() -> Self {
+        static mut MEMORY: Memory = Memory {
+            after_bundle: 0,
+            exe_ptr: 0,
+        };
+        static INIT: std::sync::Once = std::sync::Once::new();
 
-        // Skipping bundle for faster memory search
-        let after_bundle = find_after_bundle(exe);
+        INIT.call_once(|| {
+            unsafe {
+                let spel2_ptr = GetModuleHandleA("Spel2.exe\0".as_ptr() as *const i8);
+                let exe = memory_view(std::mem::transmute(spel2_ptr));
 
-        Memory {
-            exe_ptr: spel2_ptr as usize,
-            after_bundle,
-        }
+                // Skipping bundle for faster memory search
+                let after_bundle = find_after_bundle(exe);
+
+                MEMORY = Memory {
+                    exe_ptr: spel2_ptr as usize,
+                    after_bundle,
+                };
+            }
+        });
+
+        unsafe { MEMORY }
     }
 
     pub fn at_exe(&self, offset: usize) -> usize {

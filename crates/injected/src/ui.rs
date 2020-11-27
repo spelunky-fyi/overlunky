@@ -1,4 +1,4 @@
-use crate::{db::ffi::EntityItem, memory::Memory, models::State};
+use crate::{db::ffi::EntityItem, models::State};
 
 #[cxx::bridge]
 pub mod ffi {
@@ -24,8 +24,7 @@ pub unsafe fn create_box(items: &Vec<EntityItem>) {
 
 // TODO: expose this to RPC
 pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool) {
-    let memory = Memory::new();
-    let state = State::new(&memory);
+    let state = State::new();
 
     match state.items().player(0) {
         Some(player) => {
@@ -45,8 +44,7 @@ pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool) {
 }
 
 pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
-    let memory = Memory::new();
-    let state = State::new(&memory);
+    let state = State::new();
 
     match state.items().player(0) {
         Some(player) => {
@@ -61,8 +59,7 @@ pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
 }
 
 pub unsafe fn teleport(x: f32, y: f32, s: bool) {
-    let memory = Memory::new();
-    let state = State::new(&memory);
+    let state = State::new();
 
     match state.items().player(0) {
         Some(player) => {
@@ -74,13 +71,9 @@ pub unsafe fn teleport(x: f32, y: f32, s: bool) {
 }
 
 pub unsafe fn godmode(g: bool) {
-    let memory = Memory::new();
-    let state = State::new(&memory);
-    state.godmode(g);
+    State::new().godmode(g);
 }
 
 pub unsafe fn zoom(level: f32) {
-    let memory = Memory::new();
-    let state = State::new(&memory);
-    state.zoom(level);
+    State::new().zoom(level);
 }

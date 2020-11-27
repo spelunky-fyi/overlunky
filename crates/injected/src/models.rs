@@ -3,10 +3,9 @@ use crate::{
     search::{decode_imm, decode_pc, find_inst},
 };
 use byteorder::*;
+use cached::proc_macro::cached;
 use hex_literal::*;
-use std::sync::Once;
 
-static INIT: Once = Once::new();
 pub struct State {
     location: usize,
     off_items: usize,
@@ -46,11 +45,14 @@ macro_rules! entity {
     };
 }
 
-fn decode_call(memory: &Memory, off: usize) -> usize {
+fn decode_call(off: usize) -> usize {
+    let memory = Memory::get();
     off.wrapping_add(LE::read_i32(&memory.exe()[off + 1..]) as usize) + 5
 }
 
-fn get_load_item(memory: &Memory) -> usize {
+#[cached]
+fn get_load_item() -> usize {
+    let memory = Memory::get();
     let after_bundle = memory.after_bundle;
     let exe = memory.exe();
     let needle = &hex!("BA B9 01 00 00");
@@ -59,50 +61,47 @@ fn get_load_item(memory: &Memory) -> usize {
     let off = find_inst(exe, needle, off + 5);
     let off = find_inst(exe, &hex!("E8"), off + 5);
 
-    memory.at_exe(decode_call(memory, off))
+    memory.at_exe(decode_call(off))
 }
 
-fn get_load_item_over(memory: &Memory) -> usize {
+#[cached]
+fn get_load_item_over() -> usize {
+    let memory = Memory::get();
     let off = find_inst(
         memory.exe(),
         &hex!("BA B5 00 00 00 C6 44 "),
         memory.after_bundle,
     );
     let off = find_inst(memory.exe(), &hex!("E8"), off + 5);
-    memory.at_exe(decode_call(memory, off))
+    memory.at_exe(decode_call(off))
 }
 
-static mut CAMERA_OFF: usize = 0;
-fn get_camera(memory: &Memory) -> usize {
-    unsafe {
-        INIT.call_once(|| {
-            let off = find_inst(
-                memory.exe(),
-                &hex!("C7 87 CC 00 00 00 00 00"),
-                memory.after_bundle,
-            );
-            let off = find_inst(memory.exe(), &hex!("F3 0F 11 05"), off) + 1;
-            CAMERA_OFF = memory.at_exe(decode_pc(memory.exe(), off));
-        });
-        CAMERA_OFF
-    }
+#[cached]
+fn get_camera() -> usize {
+    let memory = Memory::get();
+    let off = find_inst(
+        memory.exe(),
+        &hex!("C7 87 CC 00 00 00 00 00"),
+        memory.after_bundle,
+    );
+    let off = find_inst(memory.exe(), &hex!("F3 0F 11 05"), off) + 1;
+    memory.at_exe(decode_pc(memory.exe(), off))
 }
 
-static mut ZOOM_OFF: usize = 0;
-fn get_zoom(memory: &Memory) -> usize {
-    unsafe {
-        let off = find_inst(
-            memory.exe(),
-            &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"),
-            memory.after_bundle,
-        );
-        ZOOM_OFF = memory.at_exe(off + 15);
-        ZOOM_OFF
-    }
+#[cached]
+fn get_zoom() -> usize {
+    let memory = Memory::get();
+    let off = find_inst(
+        memory.exe(),
+        &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"),
+        memory.after_bundle,
+    );
+    memory.at_exe(off + 15)
 }
 
 impl State {
-    pub fn new(memory: &Memory) -> State {
+    pub fn new() -> State {
+        let memory = Memory::get();
         // Global state pointer
         let exe = memory.exe();
         let start = memory.after_bundle;
@@ -118,14 +117,26 @@ impl State {
         );
         let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
         write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
-        let addr_damage = memory.at_exe(find_inst(exe, &hex!("89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 90 00 00 00"), start)) - 1;
-        let addr_insta = memory.at_exe(find_inst(exe, &hex!("57 41 54 48 83 EC 58 48 89 B4 24 80 00 00 00 44 0F B6 E2 4C 89 7C 24 50"), start)) - 1;
-        let addr_zoom = memory.at_exe(find_inst(exe, &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"), start)) + 15;
+        let addr_damage = memory.at_exe(find_inst(
+            exe,
+            &hex!("89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 90 00 00 00"),
+            start,
+        )) - 1;
+        let addr_insta = memory.at_exe(find_inst(
+            exe,
+            &hex!("57 41 54 48 83 EC 58 48 89 B4 24 80 00 00 00 44 0F B6 E2 4C 89 7C 24 50"),
+            start,
+        )) - 1;
+        let addr_zoom = memory.at_exe(find_inst(
+            exe,
+            &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"),
+            start,
+        )) + 15;
         State {
             location,
             off_items,
             off_layers,
-            ptr_load_item: get_load_item(&memory),
+            ptr_load_item: get_load_item(),
             addr_damage,
             addr_insta,
             addr_zoom,
@@ -181,10 +192,9 @@ impl Layer {
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         } else {
-            let memory = Memory::new();
-            let cx = read_f32(get_camera(&memory));
-            let cy = read_f32(get_camera(&memory) + 4);
-            let cz = read_f32(get_zoom(&memory));
+            let cx = read_f32(get_camera());
+            let cy = read_f32(get_camera() + 4);
+            let cz = read_f32(get_zoom());
             let rx = cx + 0.74 * cz * x;
             let ry = cy + 0.41625 * cz * y;
             let addr: usize = load_item(self.pointer, id, rx, ry);
@@ -195,7 +205,7 @@ impl Layer {
 
     pub unsafe fn spawn_entity_over(&self, id: usize, overlay: Entity, x: f32, y: f32) -> Entity {
         let load_item_over: extern "C" fn(usize, usize, usize, f32, f32, bool) -> usize =
-            std::mem::transmute(get_load_item_over(&Memory::new()));
+            std::mem::transmute(get_load_item_over());
 
         let pointer = load_item_over(self.pointer, id, overlay.pointer, x, y, true);
         Entity { pointer }
@@ -285,18 +295,15 @@ impl Entity {
                 log::debug!("Teleporting to screen {}, {}", x, y);
                 let px = topmost.pointer + 0x40;
                 let py = topmost.pointer + 0x44;
-                unsafe {
-                    let memory = Memory::new();
-                    let cx = read_f32(get_camera(&memory));
-                    let cy = read_f32(get_camera(&memory) + 4);
-                    let cz = read_f32(get_zoom(&memory));
-                    log::debug!("Camera is at {}, {}", cx, cy);
-                    x = cx + 0.74 * cz * dx;
-                    y = cy + 0.41625 * cz * dy;
-                    log::debug!("Teleporting to {}, {}", x, y);
-                    write_mem(px, &x.to_le_bytes());
-                    write_mem(py, &y.to_le_bytes());
-                }
+                let cx = read_f32(get_camera());
+                let cy = read_f32(get_camera() + 4);
+                let cz = read_f32(get_zoom());
+                log::debug!("Camera is at {}, {}", cx, cy);
+                x = cx + 0.74 * cz * dx;
+                y = cy + 0.41625 * cz * dy;
+                log::debug!("Teleporting to {}, {}", x, y);
+                write_mem(px, &x.to_le_bytes());
+                write_mem(py, &y.to_le_bytes());
             }
             // reset downforce
             let off = read_u64(topmost.pointer + 0x80);
@@ -348,7 +355,7 @@ impl Mount {
 }
 
 unsafe fn get_carry() -> usize {
-    let memory = Memory::new();
+    let memory = Memory::get();
     let off = find_inst(
         memory.exe(),
         &hex!("BA E1 00 00 00 49 8B CD "),
@@ -357,7 +364,7 @@ unsafe fn get_carry() -> usize {
     let off = find_inst(memory.exe(), &hex!("E8"), off + 1);
     let off = find_inst(memory.exe(), &hex!("E8"), off + 1);
 
-    memory.at_exe(decode_call(&memory, off))
+    memory.at_exe(decode_call(off))
 }
 
 entity!(Player);
@@ -373,6 +380,30 @@ impl Player {
 
     pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
         self.entity.teleport(dx, dy, s)
+    }
+
+    fn status(&self) -> PlayerStatus {
+        PlayerStatus {
+            pointer: read_u64(self.entity.pointer + 0x138),
+        }
+    }
+}
+struct PlayerStatus {
+    pointer: usize,
+}
+
+impl PlayerStatus {
+    pub fn bomb(&self) -> u8 {
+        read_u8(self.pointer + 4)
+    }
+    pub fn rope(&self) -> u8 {
+        read_u8(self.pointer + 5)
+    }
+    pub fn set_bomb(&self, value: u8) {
+        write_mem(self.pointer + 4, &[value])
+    }
+    pub fn set_rope(&self, value: u8) {
+        write_mem(self.pointer + 5, &[value])
     }
 }
 

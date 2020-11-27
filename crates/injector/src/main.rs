@@ -2,8 +2,7 @@ mod injector;
 
 use injector::*;
 use std::{thread, time};
-
-#[macro_use] extern crate log;
+use log;
 
 fn get_dll_path() -> std::path::PathBuf {
     std::env::current_exe()

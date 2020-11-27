@@ -29,13 +29,14 @@ crate-type = ["cdylib"]
     "dxgi1_4",
     "dxgi1_5",
 ] }
-log = "0.4.11"
-env_logger = "0.8.1"
+log = "*"
+env_logger = "*"
 byteorder = "*"
 hex-literal = "*"
 twoway = "*"
 backtrace = "*"
 cxx = "*"
+cached = "*"
 
 [build-dependencies]
 cxx-build = "*"
