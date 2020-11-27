@@ -445,7 +445,8 @@ void render_camera()
         set_zoom();
     }
     ImGui::PopItemWidth();
-    ImGui::PushItemWidth(region.x/3-10);
+    ImGui::Text("Lock to:");
+    ImGui::SameLine();
     if(ImGui::Button("3x")) {
         g_zoom = 23.08;
         set_zoom();
@@ -460,7 +461,6 @@ void render_camera()
         g_zoom = 36.66;
         set_zoom();
     }
-    ImGui::PopItemWidth();
 }
 
 void render_clickhandler()

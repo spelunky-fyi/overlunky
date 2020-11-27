@@ -18,6 +18,8 @@ Current features and their keyboard shortcuts:
       + **Enter**: Spawn door. Set the appropriate theme theme too or you will get weird results.
   - **F3**: Camera controls
       + **Ctrl+Comma/Period**: Change the zoom level
+      + Lock horizontal scrolling with the *N*x buttons for *N* wide levels
+      + Note: It only sets the *default* zoom level, which isn't used in camp or shops.
   - **F11**: Hide overlay
   - Spawn or teleport to mouse cursor (see options)
   - Peaceful mode (*nothing* takes damage from anything)
@@ -26,13 +28,13 @@ Current features and their keyboard shortcuts:
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around!
 
 ## Troubleshooting
-  - If your game crashes when launching Overlunky or it just closes and you just don't get the overlay:
+  - If your game crashes when launching Overlunky or it just closes and you don't get the overlay in game:
     + Make sure you are running the latest version of each. We don't support old game versions.
     + Make sure your antivirus is not blocking it.
 
 ## Current issues
-  - **Your antivirus will block this** because of the way it hooks the game, you have to add an exception if you are using one.
+  - **Your antivirus will probably block this** because of the way it hooks the game, you have to add an exception if you are using AV.
   - If you're playing with keyboard, the keys you type in the overlay still activate in the game too.
-  - If you have problems with the entity list not populating, try starting the injector after reaching the camp. (Restart your game first!)
-  - Mouse click coordinates are only translated correctly with the default zoom or the one set with F3, e.g. they're not accurate inside shops or when the game otherwise decides to zoom in.
+  - Mouse clicks are only translated correctly with the default zoom (the one set with F3), e.g. they're not accurate inside shops or when the game otherwise decides to zoom in.
+  - Mouse clicks are also translated wrong if playing fullscreen on non 16:9 resolution with black bars.
   - If you teleport while ledge grabbing or touching anything with physics, that thing is coming with you. Including - but not limited to - mounts, push blocks, ladders and colossal space ship heads.
