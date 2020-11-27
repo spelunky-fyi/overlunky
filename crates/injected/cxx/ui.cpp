@@ -37,7 +37,7 @@ struct CXXEntityItem
     }
 };
 
-float g_x = 0, g_y = 0;
+float g_x = 0, g_y = 0, g_zoom = 13.5;
 int g_current_item = 0, g_filtered_count = 0;
 int g_level = 1, g_world = 1, g_to = 0;
 std::vector<CXXEntityItem> g_items;
@@ -47,6 +47,7 @@ static char text[500];
 // Set focus on search box
 bool set_focus_entity = false;
 bool set_focus_world = false;
+bool set_focus_zoom = false;
 bool click_spawn = false;
 bool click_teleport = false;
 bool hidegui = false;
@@ -119,6 +120,10 @@ void spawn_entities(bool s) {
     }
 }
 
+void set_zoom() {
+    zoom(g_zoom);
+}
+
 LRESULT CALLBACK window_hook(
     _In_ int nCode,
     _In_ WPARAM wParam,
@@ -142,6 +147,8 @@ bool process_keys(
     if (nCode != WM_KEYDOWN)
         return false;
 
+    auto ctrl = GetAsyncKeyState(VK_CONTROL);
+
     if(wParam == VK_F11) {
         hidegui = !hidegui;
         return true;
@@ -160,9 +167,28 @@ bool process_keys(
         }
         return true;
     }
+    else if (wParam == VK_F3)
+    {
+        if(toggle("Camera (F3)")) {
+            set_focus_zoom = true;
+        }
+        return true;
+    }
     else if (wParam == VK_F9)
     {
         toggle("Help and Options (F9)");
+        return true;
+    }
+    else if (ctrl & 0x8000 && wParam == VK_OEM_PERIOD)
+    {
+        g_zoom += 1.0;
+        set_zoom();
+        return true;
+    }
+    else if (ctrl & 0x8000 && wParam == VK_OEM_COMMA)
+    {
+        g_zoom -= 1.0;
+        set_zoom();
         return true;
     }
 
@@ -193,7 +219,6 @@ bool process_keys(
             break;
         }
 
-        auto ctrl = GetAsyncKeyState(VK_CONTROL);
         if(ctrl & 0x8000 && enter)
         {
             teleport(g_x, g_y, false);
@@ -208,6 +233,11 @@ bool process_keys(
         {
             spawn_entity(775, g_x, g_y, false);
             spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
+            return true;
+        }
+        else if (enter && current == ImGui::FindWindowByName("Camera (F3)"))
+        {
+            set_zoom();
             return true;
         }
 
@@ -398,7 +428,43 @@ void render_narnia()
     }
 }
 
-void render_clickhandler() {
+void render_camera()
+{
+    if (set_focus_zoom)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_zoom = false;
+    }
+    ImVec2 region = ImGui::GetContentRegionMax();
+    ImGui::PushItemWidth(50);
+    ImGui::Text("Zoom:");
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    ImGui::PushItemWidth(region.x-60);
+    if(ImGui::InputFloat("##ZoomLevel", &g_zoom, 1.0, 1.0, 2, 0)) {
+        set_zoom();
+    }
+    ImGui::PopItemWidth();
+    ImGui::PushItemWidth(region.x/3-10);
+    if(ImGui::Button("3x")) {
+        g_zoom = 23.08;
+        set_zoom();
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("4x")) {
+        g_zoom = 29.87;
+        set_zoom();
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("5x")) {
+        g_zoom = 36.66;
+        set_zoom();
+    }
+    ImGui::PopItemWidth();
+}
+
+void render_clickhandler()
+{
     ImGuiIO &io = ImGui::GetIO();
     ImGui::SetNextWindowSize(io.DisplaySize);
     ImGui::SetNextWindowPos({0, 0});
@@ -499,10 +565,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+    if(clickevents) {
+        render_clickhandler();
+    }
+    ImGui::SetNextWindowSize({10, 10});
+    ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y-30});
+    ImGui::Begin("Overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .1f), "OL");
+    ImGui::End();
     if(!hidegui) {
-        if(clickevents) {
-            render_clickhandler();
-        }
         ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Entity spawner (F1)");
@@ -518,6 +589,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::Begin("Door to anywhere (F2)");
         ImGui::PushItemWidth(-1);
         render_narnia();
+        ImGui::PopItemWidth();
+        ImGui::End();
+
+        ImGui::SetNextWindowSize({300, 125}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos({700, 0}, ImGuiCond_FirstUseEver);
+        ImGui::Begin("Camera (F3)");
+        ImGui::PushItemWidth(-1);
+        render_camera();
         ImGui::PopItemWidth();
         ImGui::End();
 
@@ -543,6 +622,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         }
         ImGui::Text("- (Arrows) Change selection in lists");
         ImGui::Text("- (Ctrl+Arrows) Change spawning coordinates");
+        ImGui::Text("- (Ctrl+Comma/Period) Change zoom level");
         ImGui::Text("Write many numerical IDs separated by space in");
         ImGui::Text("the entity spawner to spawn many items at once.");
         ImGui::PopItemWidth();

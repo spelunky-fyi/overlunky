@@ -14,6 +14,7 @@ pub struct State {
     ptr_load_item: usize,
     addr_damage: usize,
     addr_insta: usize,
+    addr_zoom: usize,
 }
 
 macro_rules! entity {
@@ -87,6 +88,20 @@ fn get_camera(memory: &Memory) -> usize {
     }
 }
 
+static mut ZOOM_OFF: usize = 0;
+fn get_zoom(memory: &Memory) -> usize {
+    unsafe {
+        let off = find_inst(
+            memory.exe(),
+            &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"),
+            memory.after_bundle,
+        );
+        ZOOM_OFF = memory.at_exe(off + 15);
+        log::debug!("zoom off {:x?}", ZOOM_OFF);
+        ZOOM_OFF
+    }
+}
+
 impl State {
     pub fn new(memory: &Memory) -> State {
         // Global state pointer
@@ -106,6 +121,7 @@ impl State {
         write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
         let addr_damage = memory.at_exe(find_inst(exe, &hex!("89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 90 00 00 00"), start)) - 1;
         let addr_insta = memory.at_exe(find_inst(exe, &hex!("57 41 54 48 83 EC 58 48 89 B4 24 80 00 00 00 44 0F B6 E2 4C 89 7C 24 50"), start)) - 1;
+        let addr_zoom = memory.at_exe(find_inst(exe, &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"), start)) + 15;
         State {
             location,
             off_items,
@@ -113,6 +129,7 @@ impl State {
             ptr_load_item: get_load_item(&memory),
             addr_damage,
             addr_insta,
+            addr_zoom,
         }
     }
 
@@ -143,6 +160,11 @@ impl State {
             write_mem_prot(self.addr_insta, &hex!("40"), true);
         }
     }
+
+    pub fn zoom(&self, level: f32) {
+        log::debug!("Zoom level: {:?}", level);
+        write_mem_prot(self.addr_zoom, &level.to_le_bytes(), true);
+    }
 }
 
 pub struct Layer {
@@ -163,8 +185,9 @@ impl Layer {
             let memory = Memory::new();
             let cx = read_f32(get_camera(&memory));
             let cy = read_f32(get_camera(&memory) + 4);
-            let rx = cx + 10.0 * x;
-            let ry = cy + 5.625 * y;
+            let cz = read_f32(get_zoom(&memory));
+            let rx = cx + 0.74 * cz * x;
+            let ry = cy + 0.41625 * cz * y;
             let addr: usize = load_item(self.pointer, id, rx, ry);
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
@@ -267,9 +290,10 @@ impl Entity {
                     let memory = Memory::new();
                     let cx = read_f32(get_camera(&memory));
                     let cy = read_f32(get_camera(&memory) + 4);
+                    let cz = read_f32(get_zoom(&memory));
                     log::debug!("Camera is at {}, {}", cx, cy);
-                    x = (cx + 10.0 * dx).round();
-                    y = (cy + 5.625 * dy).round();
+                    x = cx + 0.74 * cz * dx;
+                    y = cy + 0.41625 * cz * dy;
                     log::debug!("Teleporting to {}, {}", x, y);
                     write_mem(px, &x.to_le_bytes());
                     write_mem(py, &y.to_le_bytes());

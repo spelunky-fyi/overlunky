@@ -16,15 +16,23 @@ Current features and their keyboard shortcuts:
       + Note: Item numbers can change between versions, so use the search to find the latest ones or check `Spelunky 2/entities.txt`
   - **F2**: Spawn a warp door to any world, level and theme
       + **Enter**: Spawn door. Set the appropriate theme theme too or you will get weird results.
-  - **F11**: Hide overlay completely for screenshots and faking being a god gamer
+  - **F3**: Camera controls
+      + **Ctrl+Comma/Period**: Change the zoom level
+  - **F11**: Hide overlay
   - Spawn or teleport to mouse cursor (see options)
   - Peaceful mode (*nothing* takes damage from anything)
 
 ## Usage 
-**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! If you don't get the screen overlay and are using an antivirus there's a high chance this program will get blocked because of the way it works. You need to whitelist it to use it.
+**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around!
+
+## Troubleshooting
+  - If your game crashes when launching Overlunky or it just closes and you just don't get the overlay:
+    + Make sure you are running the latest version of each. We don't support old game versions.
+    + Make sure your antivirus is not blocking it.
 
 ## Current issues
+  - **Your antivirus will block this** because of the way it hooks the game, you have to add an exception if you are using one.
   - If you're playing with keyboard, the keys you type in the overlay still activate in the game too.
   - If you have problems with the entity list not populating, try starting the injector after reaching the camp. (Restart your game first!)
-  - Mouse click coordinates are only translated correctly with the default zoom, e.g. they're not accurate inside shops.
+  - Mouse click coordinates are only translated correctly with the default zoom or the one set with F3, e.g. they're not accurate inside shops or when the game otherwise decides to zoom in.
   - If you teleport while ledge grabbing or touching anything with physics, that thing is coming with you. Including - but not limited to - mounts, push blocks, ladders and colossal space ship heads.
