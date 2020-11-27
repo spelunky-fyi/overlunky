@@ -191,6 +191,61 @@ bool process_keys(
         set_zoom();
         return true;
     }
+    else if (ctrl & 0x8000 && wParam == 0x32)
+    {
+        g_zoom = 13.5;
+        set_zoom();
+        return true;
+    }
+    else if (ctrl & 0x8000 && wParam == 0x33)
+    {
+        g_zoom = 23.08;
+        set_zoom();
+        return true;
+    }
+    else if (ctrl & 0x8000 && wParam == 0x34)
+    {
+        g_zoom = 29.87;
+        set_zoom();
+        return true;
+    }
+    else if (ctrl & 0x8000 && wParam == 0x35)
+    {
+        g_zoom = 36.66;
+        set_zoom();
+        return true;
+    }
+    else if (ctrl & 0x8000 && wParam == 0x47) // G
+    {
+        god = !god;
+        godmode(god);
+        return true;
+    }
+    else if (ctrl & 0x8000 && wParam == 0x4D) // M
+    {
+        clickevents = !clickevents;
+        return true;
+    }
+    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_LEFT)
+    {
+        teleport(-1, 0, false);
+        return true;
+    }
+    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_RIGHT)
+    {
+        teleport(1, 0, false);
+        return true;
+    }
+    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_UP)
+    {
+        teleport(0, 1, false);
+        return true;
+    }
+    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_DOWN)
+    {
+        teleport(0, -1, false);
+        return true;
+    }
 
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
@@ -445,7 +500,12 @@ void render_camera()
         set_zoom();
     }
     ImGui::PopItemWidth();
-    ImGui::Text("Lock to:");
+    ImGui::Text("Set to:");
+    ImGui::SameLine();
+    if(ImGui::Button("Default")) {
+        g_zoom = 13.5;
+        set_zoom();
+    }
     ImGui::SameLine();
     if(ImGui::Button("3x")) {
         g_zoom = 23.08;
@@ -622,6 +682,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         }
         ImGui::Text("- (Arrows) Change selection in lists");
         ImGui::Text("- (Ctrl+Arrows) Change spawning coordinates");
+        ImGui::Text("- (RAlt+Arrows) Teleport to direction");
         ImGui::Text("- (Ctrl+Comma/Period) Change zoom level");
         ImGui::Text("Write many numerical IDs separated by space in");
         ImGui::Text("the entity spawner to spawn many items at once.");

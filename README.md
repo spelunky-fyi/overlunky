@@ -21,6 +21,10 @@ Current features and their keyboard shortcuts:
       + Lock horizontal scrolling with the *N*x buttons for *N* wide levels
       + Note: It only sets the *default* zoom level, which isn't used in camp or shops.
   - **F11**: Hide overlay
+  - **Ctrl+G**: Toggle peaceful mode
+  - **Ctrl+M**: Toggle click events
+  - **Ctrl+Numbers**: Set zoom level
+  - **RAlt+Arrows**: Teleport to direction
   - Spawn or teleport to mouse cursor (see options)
   - Peaceful mode (*nothing* takes damage from anything)
 

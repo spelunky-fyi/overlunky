@@ -97,7 +97,6 @@ fn get_zoom(memory: &Memory) -> usize {
             memory.after_bundle,
         );
         ZOOM_OFF = memory.at_exe(off + 15);
-        log::debug!("zoom off {:x?}", ZOOM_OFF);
         ZOOM_OFF
     }
 }
@@ -299,6 +298,12 @@ impl Entity {
                     write_mem(py, &y.to_le_bytes());
                 }
             }
+            // reset downforce
+            let off = read_u64(topmost.pointer + 0x80);
+            let off = read_u64(off + 0x128);
+            let off = off + 0x104;
+            let df: f32 = 0.0;
+            write_mem(off, &df.to_le_bytes());
         }
     }
 
