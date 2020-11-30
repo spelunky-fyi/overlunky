@@ -127,11 +127,11 @@ impl State {
             &hex!("57 41 54 48 83 EC 58 48 89 B4 24 80 00 00 00 44 0F B6 E2 4C 89 7C 24 50"),
             start,
         )) - 1;
-        let addr_zoom = memory.at_exe(find_inst(
-            exe,
-            &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"),
-            start,
-        )) + 15;
+        let mut addr_zoom = start;
+        for _ in 0..3 {
+            addr_zoom = find_inst(exe, &hex!("48 8B 48 10 C7 81"), addr_zoom + 1);
+        }
+        let addr_zoom = memory.at_exe(addr_zoom) + 10;
         State {
             location,
             off_items,
