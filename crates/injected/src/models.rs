@@ -423,13 +423,13 @@ impl Player {
         self.entity.teleport(dx, dy, s)
     }
 
-    fn status(&self) -> PlayerStatus {
+    pub fn status(&self) -> PlayerStatus {
         PlayerStatus {
             pointer: read_u64(self.entity.pointer + 0x138),
         }
     }
 }
-struct PlayerStatus {
+pub struct PlayerStatus {
     pointer: usize,
 }
 
