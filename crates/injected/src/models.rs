@@ -6,6 +6,47 @@ use byteorder::*;
 use cached::proc_macro::cached;
 use hex_literal::*;
 
+pub struct API {
+    api: *const usize,
+    swap_chain_off: usize,
+}
+
+fn get_api(memory: &Memory) -> usize {
+    let exe = memory.exe();
+    let after_bundle = memory.after_bundle;
+    let off = find_inst(exe, &hex!("48 8B 50 10 48 89"), after_bundle) - 5;
+    let off = off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5;
+
+    memory.at_exe(decode_pc(exe, off + 6))
+}
+
+impl API {
+    pub unsafe fn new(memory: &Memory) -> API {
+        let api: *const usize = std::mem::transmute(get_api(&memory));
+        let off = decode_imm(
+            memory.exe(),
+            find_inst(
+                memory.exe(),
+                &hex!("BA F0 FF FF FF 41 B8 00 00 00 90"),
+                memory.after_bundle,
+            ) + 17,
+        );
+
+        API {
+            api,
+            swap_chain_off: off,
+        }
+    }
+
+    unsafe fn renderer(&self) -> usize {
+        read_u64(*self.api + 0x10)
+    }
+
+    pub unsafe fn swap_chain(&self) -> usize {
+        read_u64(self.renderer() + self.swap_chain_off)
+    }
+}
+
 pub struct State {
     location: usize,
     off_items: usize,

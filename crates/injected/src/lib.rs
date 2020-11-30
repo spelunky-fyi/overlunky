@@ -5,17 +5,16 @@ mod models;
 mod search;
 mod ui;
 
-use std::thread;
-use std::time;
+mod test;
 
 use backtrace::Backtrace;
-use byteorder::*;
 use critical_section::CriticalSectionManager;
 use db::list_entities;
-use hex_literal::*;
-use memory::{read_u64, Memory};
-use models::{Mount, State};
-use search::{decode_imm, decode_pc, find_inst};
+use log::log_enabled;
+use memory::Memory;
+use models::{API, State};
+use std::thread;
+use std::time;
 
 use winapi::um::{
     consoleapi::SetConsoleCtrlHandler,
@@ -25,21 +24,9 @@ use winapi::um::{
     wincon::{CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT, CTRL_C_EVENT},
 };
 
-#[macro_use] extern crate log;
-use log::Level;
-
 #[no_mangle]
 pub extern "C" fn DllMain(_: *const u8, _reason: u32, _: *const u8) -> u32 {
     1 // TRUE
-}
-
-fn get_api(memory: &Memory) -> usize {
-    let exe = memory.exe();
-    let after_bundle = memory.after_bundle;
-    let off = find_inst(exe, &hex!("48 8B 50 10 48 89"), after_bundle) - 5;
-    let off = off.wrapping_add(LE::read_i32(&exe[off + 1..]) as usize) + 5;
-
-    memory.at_exe(decode_pc(exe, off + 6))
 }
 
 unsafe extern "system" fn ctrl_handler(ctrl_type: u32) -> i32 {
@@ -74,57 +61,8 @@ unsafe fn set_panic_hook() {
     }));
 }
 
-struct API {
-    api: *const usize,
-    swap_chain_off: usize,
-}
-
-impl API {
-    unsafe fn new(memory: &Memory) -> API {
-        let api: *const usize = std::mem::transmute(get_api(&memory));
-        let off = decode_imm(
-            memory.exe(),
-            find_inst(
-                memory.exe(),
-                &hex!("BA F0 FF FF FF 41 B8 00 00 00 90"),
-                memory.after_bundle,
-            ) + 17,
-        );
-
-        API {
-            api,
-            swap_chain_off: off,
-        }
-    }
-
-    unsafe fn renderer(&self) -> usize {
-        read_u64(*self.api + 0x10)
-    }
-
-    unsafe fn swap_chain(&self) -> usize {
-        read_u64(self.renderer() + self.swap_chain_off)
-    }
-}
-
-unsafe fn mount_poc() {
-    // Spawns caveman riding turkey
-    if false {
-        let state = State::new();
-        let player = state.items().player(0).unwrap();
-        let position = player.position();
-        let layer = state.layer(player.layer());
-        let turkey: Mount = layer
-            .spawn_entity(884, position.0 + 1.0, position.1, false)
-            .into();
-        let caveman = layer.spawn_entity_over(225, turkey.into(), -0.05, 0.52);
-        turkey.carry(caveman);
-        turkey.tame(true);
-        return;
-    }
-}
-
 #[no_mangle]
-unsafe extern "C" fn main(handle: u32) {
+unsafe extern "C" fn run(handle: u32) {
     attach_stdout(handle);
     set_panic_hook();
     log::debug!("Game injected! Press Ctrl+C to detach this window from the process.");
