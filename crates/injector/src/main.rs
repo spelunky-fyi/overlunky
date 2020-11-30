@@ -54,7 +54,7 @@ fn main() {
         inject_dll(&proc, temp_path.to_str().unwrap());
         call(
             &proc,
-            find_function(&proc, temp_path.to_str().unwrap(), "main"),
+            find_function(&proc, temp_path.to_str().unwrap(), "run"),
             std::mem::transmute(std::process::id() as usize),
         );
     }

@@ -41,10 +41,9 @@ unsafe extern "system" fn ctrl_handler(ctrl_type: u32) -> i32 {
 }
 
 unsafe fn attach_stdout(pid: u32) {
-    let env = env_logger::Env::default()
-        .filter_or(env_logger::DEFAULT_FILTER_ENV, "info");
+    let env = env_logger::Env::default().filter_or(env_logger::DEFAULT_FILTER_ENV, "info");
     env_logger::Builder::from_env(env).init();
-    if log_enabled!(Level::Debug) {
+    if log_enabled!(log::Level::Debug) {
         AttachConsole(pid);
         SetConsoleCtrlHandler(Some(ctrl_handler), 1);
     }
@@ -84,7 +83,7 @@ unsafe extern "C" fn run(handle: u32) {
         log::error!("{}", err);
         return;
     }
-    if log_enabled!(Level::Debug) {
+    if log_enabled!(log::Level::Debug) {
         let c = CriticalSectionManager::new();
         loop {
             log::debug!("Enter entity #IDs to spawn, one per line >");
