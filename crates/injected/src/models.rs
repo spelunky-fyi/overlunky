@@ -131,12 +131,11 @@ fn get_camera() -> usize {
 #[cached]
 fn get_zoom() -> usize {
     let memory = Memory::get();
-    let off = find_inst(
-        memory.exe(),
-        &hex!("E8 89 49 08 00 48 8B 48 10 C7 81 E8 04 08 00"),
-        memory.after_bundle,
-    );
-    memory.at_exe(off + 15)
+    let mut addr_zoom = memory.after_bundle;
+    for _ in 0..3 {
+        addr_zoom = find_inst(memory.exe(), &hex!("48 8B 48 10 C7 81"), addr_zoom + 1);
+    }
+    memory.at_exe(addr_zoom) + 10
 }
 
 impl State {
@@ -164,14 +163,10 @@ impl State {
         )) - 1;
         let addr_insta = memory.at_exe(find_inst(
             exe,
-            &hex!("57 41 54 48 83 EC 58 48 89 B4 24 80 00 00 00 44 0F B6 E2 4C 89 7C 24 50"),
+            &hex!("57 41 54 48 83 EC 58"),
             start,
         )) - 1;
-        let mut addr_zoom = start;
-        for _ in 0..3 {
-            addr_zoom = find_inst(exe, &hex!("48 8B 48 10 C7 81"), addr_zoom + 1);
-        }
-        let addr_zoom = memory.at_exe(addr_zoom) + 10;
+        let addr_zoom = get_zoom();
         State {
             location,
             off_items,
