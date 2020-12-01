@@ -51,7 +51,6 @@ pub struct State {
     location: usize,
     off_items: usize,
     off_layers: usize,
-    ptr_load_item: usize,
     addr_damage: usize,
     addr_insta: usize,
     addr_zoom: usize,
@@ -177,7 +176,6 @@ impl State {
             location,
             off_items,
             off_layers,
-            ptr_load_item: get_load_item(),
             addr_damage,
             addr_insta,
             addr_zoom,
@@ -191,7 +189,6 @@ impl State {
     pub fn layer(&self, index: u8) -> Layer {
         Layer {
             pointer: read_u64(self.ptr() + self.off_layers + index as usize * 8),
-            ptr_load_item: self.ptr_load_item,
             state: self.ptr(),
         }
     }
@@ -220,14 +217,13 @@ impl State {
 
 pub struct Layer {
     pointer: usize,
-    ptr_load_item: usize,
     state: usize,
 }
 
 impl Layer {
     pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool) -> Entity {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
-            std::mem::transmute(self.ptr_load_item);
+            std::mem::transmute(get_load_item());
         if !s {
             let addr: usize = load_item(self.pointer, id, x, y);
             log::debug!("Spawned {:x?}", addr);
