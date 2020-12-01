@@ -165,7 +165,7 @@ impl State {
             exe,
             &hex!("57 41 54 48 83 EC 58"),
             start,
-        )) - 1;
+        )) - 3;
         let addr_zoom = get_zoom();
         State {
             location,
@@ -200,7 +200,7 @@ impl State {
             write_mem_prot(self.addr_insta, &hex!("C3"), true);
         } else {
             write_mem_prot(self.addr_damage, &hex!("48"), true);
-            write_mem_prot(self.addr_insta, &hex!("40"), true);
+            write_mem_prot(self.addr_insta, &hex!("48"), true);
         }
     }
 
