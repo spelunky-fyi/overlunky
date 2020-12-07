@@ -24,6 +24,10 @@ use winapi::um::{
     wincon::{CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT, CTRL_C_EVENT},
 };
 
+use std::io::Write;
+use std::fs::OpenOptions;
+use chrono::prelude::*;
+
 #[no_mangle]
 pub extern "C" fn DllMain(_: *const u8, _reason: u32, _: *const u8) -> u32 {
     1 // TRUE
@@ -64,8 +68,19 @@ unsafe fn set_panic_hook() {
 unsafe extern "C" fn run(handle: u32) {
     attach_stdout(handle);
     set_panic_hook();
+    match OpenOptions::new().write(true).append(true).open("spelunky.log") {
+        Ok(mut file) => {
+            let local: DateTime<Local> = Local::now();
+            match file.write_all(&local.format("%X: Overlunky loaded\n").to_string().into_bytes()) {
+                Ok(o) => log::debug!("{:?}", o),
+                Err(e) => log::error!("{:?}", e),
+            }
+        }
+        Err(err) => {
+            log::error!("{:?}", err);
+        }
+    }
     log::debug!("Game injected! Press Ctrl+C to detach this window from the process.");
-
     let memory = Memory::get();
     let state = State::new();
     loop {
