@@ -15,7 +15,7 @@ Current features and their keyboard shortcuts:
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
       + Note: Item numbers can change between versions, so use the search to find the latest ones or check `Spelunky 2/entities.txt`
   - **F2**: Spawn a warp door to any world, level and theme
-      + **Enter**: Spawn door. Set the appropriate theme theme too or you will get weird results.
+      + **Enter**: Spawn door. Set the appropriate theme too or you will get weird results.
   - **F3**: Camera controls
       + **Ctrl+Comma/Period**: Change the zoom level
       + Lock horizontal scrolling with the *N*x buttons for *N* wide levels
@@ -29,7 +29,7 @@ Current features and their keyboard shortcuts:
   - Peaceful mode (*nothing* takes damage from anything)
 
 ## Usage 
-**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around!
+**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
 ## Troubleshooting
   - If your game crashes when launching Overlunky or it just closes and you don't get the overlay in game:
