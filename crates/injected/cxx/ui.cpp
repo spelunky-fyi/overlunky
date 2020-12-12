@@ -8,11 +8,14 @@
 
 #include <Windows.h>
 #include <Shlwapi.h>
+#include <Shlobj.h>
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <locale>
+#include <codecvt>
 
 IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
@@ -600,7 +603,7 @@ bool process_resizing(_In_ int nCode,
 HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags)
 {
     static bool init = false;
-    static ImFont *font1;
+    static ImFont *font;
     // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
     if (!init)
     {
@@ -619,21 +622,41 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             return oPresent(pSwapChain, SyncInterval, Flags);
 
         ImGuiIO &io = ImGui::GetIO();
-        font1 = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeuib.ttf", 20.0f);
+        PWSTR fontdir;
+        if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
+        {
+            using cvt_type = std::codecvt_utf8<wchar_t>;
+            std::wstring_convert<cvt_type, wchar_t> cvt;
+
+            std::string fontpath(cvt.to_bytes(fontdir) + "\\segoeuib.ttf");
+            if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+            {
+                font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 20.0f);
+            }
+
+            CoTaskMemFree(fontdir);
+        }
+
+        if (!font)
+        {
+            font = io.Fonts->AddFontDefault();
+        }
     }
 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    if(clickevents) {
+    if (clickevents)
+    {
         render_clickhandler();
     }
     ImGui::SetNextWindowSize({10, 10});
-    ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y-30});
+    ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y - 30});
     ImGui::Begin("Overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .1f), "OL");
     ImGui::End();
-    if(!hidegui) {
+    if (!hidegui)
+    {
         ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Entity spawner (F1)");
