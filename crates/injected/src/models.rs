@@ -138,6 +138,14 @@ fn get_zoom() -> usize {
     memory.at_exe(addr_zoom) + 10
 }
 
+pub fn heap_base() -> usize {
+    unsafe {
+        let result: usize;
+        asm!("mov {}, gs:[0x58]", out(reg) result);
+        read_u64(read_u64(result) + 0x130)
+    }
+}
+
 impl State {
     pub fn new() -> State {
         let memory = Memory::get();
@@ -146,10 +154,14 @@ impl State {
         let start = memory.after_bundle;
         let location = memory.at_exe(decode_pc(
             exe,
-            find_inst(exe, &hex!("83 78 0C 05 0F 85"), start) - 15,
+            find_inst(
+                exe,
+                &hex!("48 8B 05"),
+                find_inst(exe, &hex!("32 01 74"), start) - 0x100,
+            ),
         ));
         // The offset of items field
-        let off_items = decode_imm(exe, find_inst(exe, &hex!("33 D2 8B 41 28 01"), start) - 7);
+        let off_items = decode_imm(exe, find_inst(exe, &hex!("3C 11 41 0F 95 C0"), start) + 11);
         let off_layers = decode_imm(
             exe,
             find_inst(exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
@@ -158,14 +170,14 @@ impl State {
         write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
         let addr_damage = memory.at_exe(find_inst(
             exe,
-            &hex!("89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 90 00 00 00"),
+            &hex!("48 89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 80"),
             start,
-        )) - 1;
+        ));
         let addr_insta = memory.at_exe(find_inst(
             exe,
-            &hex!("57 41 54 48 83 EC 58"),
+            &hex!("48 8B C4 53 55 57 41 54 48 81 EC D8 00 00 00 48"),
             start,
-        )) - 3;
+        ));
         let addr_zoom = get_zoom();
         State {
             location,
@@ -178,7 +190,7 @@ impl State {
     }
 
     fn ptr(&self) -> usize {
-        read_u64(self.location)
+        read_u64(self.location) + heap_base()
     }
 
     pub fn layer(&self, index: u8) -> Layer {

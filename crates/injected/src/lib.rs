@@ -1,3 +1,4 @@
+#![feature(asm)]
 mod critical_section;
 mod db;
 mod memory;
