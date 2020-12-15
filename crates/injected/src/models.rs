@@ -324,38 +324,34 @@ impl Entity {
         // e.g. topmost == turkey if riding turkey. player has relative coordinate to turkey.
         let topmost = self.topmost();
         let (mut x, mut y) = topmost.position();
-        if self.pointer != 0 {
-            if !s {
-                // player relative coordinates
-                x += dx;
-                y += dy;
-                let px = topmost.pointer + 0x40;
-                let py = topmost.pointer + 0x44;
-                log::debug!("Teleporting to {}, {}", x, y);
-                write_mem(px, &x.to_le_bytes());
-                write_mem(py, &y.to_le_bytes());
-            } else {
-                // screen coordinates -1..1
-                log::debug!("Teleporting to screen {}, {}", x, y);
-                let px = topmost.pointer + 0x40;
-                let py = topmost.pointer + 0x44;
-                let cx = read_f32(get_camera());
-                let cy = read_f32(get_camera() + 4);
-                let cz = read_f32(get_zoom());
-                log::debug!("Camera is at {}, {}", cx, cy);
-                x = cx + 0.74 * cz * dx;
-                y = cy + 0.41625 * cz * dy;
-                log::debug!("Teleporting to {}, {}", x, y);
-                write_mem(px, &x.to_le_bytes());
-                write_mem(py, &y.to_le_bytes());
-            }
-            // reset downforce
-            let off = read_u64(topmost.pointer + 0x80);
-            let off = read_u64(off + 0x128);
-            let off = off + 0x104;
-            let df: f32 = 0.0;
-            write_mem(off, &df.to_le_bytes());
+        if !s {
+            // player relative coordinates
+            x += dx;
+            y += dy;
+            let px = topmost.pointer + 0x40;
+            let py = topmost.pointer + 0x44;
+            log::debug!("Teleporting to {}, {}", x, y);
+            write_mem(px, &x.to_le_bytes());
+            write_mem(py, &y.to_le_bytes());
+        } else {
+            // screen coordinates -1..1
+            log::debug!("Teleporting to screen {}, {}", x, y);
+            let px = topmost.pointer + 0x40;
+            let py = topmost.pointer + 0x44;
+            let cx = read_f32(get_camera());
+            let cy = read_f32(get_camera() + 4);
+            let cz = read_f32(get_zoom());
+            log::debug!("Camera is at {}, {}", cx, cy);
+            x = cx + 0.74 * cz * dx;
+            y = cy + 0.41625 * cz * dy;
+            log::debug!("Teleporting to {}, {}", x, y);
+            write_mem(px, &x.to_le_bytes());
+            write_mem(py, &y.to_le_bytes());
         }
+        // reset downforce
+        let df: f32 = 0.0;
+        write_mem(topmost.pointer + 0x104, &df.to_le_bytes());
+        return;
     }
 
     fn topmost(&self) -> Entity {
