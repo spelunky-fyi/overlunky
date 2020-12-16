@@ -146,6 +146,39 @@ pub fn heap_base() -> usize {
     }
 }
 
+fn function_start(off: usize) -> usize {
+    let mut off = off;
+    off &= !0xf;
+    while read_u8(off - 1) != 0xcc {
+        off -= 0x10;
+    }
+    off
+}
+
+#[cached]
+fn get_damage() -> usize {
+    // TODO: get vtable of character and calculate the offset
+    let memory = Memory::get();
+    let mut off = memory.after_bundle;
+    loop {
+        // sub rsp, 0x90; xor reg, reg
+        off = find_inst(memory.exe(), &hex!("48 81 EC 90 00 00 00"), off + 1);
+        if read_u8(memory.at_exe(off + 7)) == 0x33 || read_u8(memory.at_exe(off + 8)) == 0x33 {
+            break;
+        }
+    }
+
+    function_start(memory.at_exe(off))
+}
+
+#[cached]
+fn get_insta() -> usize {
+    let memory = Memory::get();
+    let exe = memory.exe();
+    let off = find_inst(exe, &hex!("45 8B 40 14"), memory.after_bundle);
+    memory.at_exe(decode_call(find_inst(exe, &hex!("E9"), off)))
+}
+
 impl State {
     pub fn new() -> State {
         let memory = Memory::get();
@@ -168,16 +201,9 @@ impl State {
         );
         let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
         write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
-        let addr_damage = memory.at_exe(find_inst(
-            exe,
-            &hex!("48 89 5C 24 20 55 56 57 41 56 41 57 48 81 EC 80"),
-            start,
-        ));
-        let addr_insta = memory.at_exe(find_inst(
-            exe,
-            &hex!("48 8B C4 53 55 57 41 54 48 81 EC D8 00 00 00 48"),
-            start,
-        ));
+        let addr_damage = get_damage();
+        let addr_insta = get_insta();
+        log::debug!("damage: 0x{:x}, insta: 0x{:x}", addr_damage, addr_insta);
         let addr_zoom = get_zoom();
         State {
             location,
