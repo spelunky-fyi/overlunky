@@ -30,6 +30,7 @@ jobs:
 
       - name: Install Rust
         run: |
+          rustup default nightly
           rustup update --no-self-update
 
       - name: Build
