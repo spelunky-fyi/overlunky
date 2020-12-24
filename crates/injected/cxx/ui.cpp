@@ -221,7 +221,7 @@ bool process_keys(
     else if (ctrl & 0x8000 && wParam == 0x47) // G
     {
         god = !god;
-        //godmode(god);
+        godmode(god);
         return true;
     }
     else if (ctrl & 0x8000 && wParam == 0x4D) // M
@@ -690,11 +690,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::Checkbox("##clickevents", &clickevents);
         ImGui::SameLine();
         ImGui::Text("Enable click to spawn/teleport");
-        /*if(ImGui::Checkbox("##Godmode", &god)) {
+        if(ImGui::Checkbox("##Godmode", &god)) {
             godmode(god);
         }
         ImGui::SameLine();
-        ImGui::Text("Enable peaceful mode");*/
+        ImGui::Text("Enable peaceful mode");
         ImGui::Text("Keys:");
         if(clickevents) {
             ImGui::Text("- (Enter) or (Mouse L) Use focused tool");

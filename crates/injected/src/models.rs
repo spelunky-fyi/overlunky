@@ -216,7 +216,9 @@ impl State {
     }
 
     fn ptr(&self) -> usize {
-        read_u64(self.location) + heap_base()
+        let p = read_u64(self.location) + heap_base();
+        log::debug!("State: {:x?}", p);
+        p
     }
 
     pub fn layer(&self, index: u8) -> Layer {
