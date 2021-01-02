@@ -249,6 +249,11 @@ bool process_keys(
         teleport(0, -1, false);
         return true;
     }
+    else if (GetAsyncKeyState(VK_SHIFT) && wParam == VK_RETURN)
+    {
+        spawn_backdoor(0.0, 0.0);
+        return true;
+    }
 
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
@@ -289,7 +294,6 @@ bool process_keys(
         }
         else if (enter && current == ImGui::FindWindowByName("Door to anywhere (F2)"))
         {
-            spawn_entity(775, g_x, g_y, false);
             spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
             return true;
         }
@@ -480,9 +484,12 @@ void render_narnia()
     ImGui::SameLine(100);
     ImGui::SetNextItemWidth(200);
     render_themes();
-    if(ImGui::Button("Spawn")) {
-        spawn_entity(775, g_x, g_y, false);
+    if(ImGui::Button("Spawn warp door")) {
         spawn_door(g_x, g_y, g_world, g_level, 1, g_to+1);
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Spawn layer door")) {
+        spawn_backdoor(g_x, g_y);
     }
 }
 
@@ -694,7 +701,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             godmode(god);
         }
         ImGui::SameLine();
-        ImGui::Text("Enable peaceful mode");
+        ImGui::Text("Enable god mode");
         ImGui::Text("Keys:");
         if(clickevents) {
             ImGui::Text("- (Enter) or (Mouse L) Use focused tool");
@@ -707,6 +714,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::Text("- (Ctrl+Arrows) Change spawning coordinates");
         ImGui::Text("- (RAlt+Arrows) Teleport to direction");
         ImGui::Text("- (Ctrl+Comma/Period) Change zoom level");
+        ImGui::Text("- (Shift+Enter) Spawn a door to back layer");
         ImGui::Text("Write many numerical IDs separated by space in");
         ImGui::Text("the entity spawner to spawn many items at once.");
         ImGui::PopItemWidth();

@@ -260,7 +260,7 @@ impl Layer {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(get_load_item());
         if !s {
-            let addr: usize = load_item(self.pointer, id, x, y);
+            let addr: usize = load_item(self.pointer, id, x.round(), y.round());
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         } else {
@@ -269,7 +269,7 @@ impl Layer {
             let cz = read_f32(get_zoom());
             let rx = cx + 0.74 * cz * x;
             let ry = cy + 0.41625 * cz * y;
-            let addr: usize = load_item(self.pointer, id, rx, ry);
+            let addr: usize = load_item(self.pointer, id, rx.round(), ry.round());
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         }
@@ -288,11 +288,11 @@ impl Layer {
         let entity = match screen {
             11 => {
                 log::debug!("In camp, spawning starting exit");
-                self.spawn_entity(25, x, y, false)
+                self.spawn_entity(25, x.round(), y.round(), false)
             }
             12 => {
                 log::debug!("In game, spawning regular exit");
-                self.spawn_entity(23, x, y, false)
+                self.spawn_entity(23, x.round(), y.round(), false)
             }
             _ => return,
         };
