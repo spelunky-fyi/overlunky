@@ -6,6 +6,7 @@ mod models;
 mod search;
 mod ui;
 
+#[allow(dead_code)]
 mod test;
 
 use backtrace::Backtrace;
@@ -13,7 +14,7 @@ use critical_section::CriticalSectionManager;
 use db::list_entities;
 use log::log_enabled;
 use memory::Memory;
-use models::{API, State};
+use models::{State, API};
 use std::thread;
 use std::time;
 
@@ -25,9 +26,9 @@ use winapi::um::{
     wincon::{CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT, CTRL_C_EVENT},
 };
 
-use std::io::Write;
-use std::fs::OpenOptions;
 use chrono::prelude::*;
+use std::fs::OpenOptions;
+use std::io::Write;
 
 #[no_mangle]
 pub extern "C" fn DllMain(_: *const u8, _reason: u32, _: *const u8) -> u32 {
@@ -66,13 +67,22 @@ unsafe fn set_panic_hook() {
 }
 
 #[no_mangle]
-unsafe extern "C" fn run(handle: u32) {
-    attach_stdout(handle);
+unsafe extern "C" fn run(pid: u32) {
+    attach_stdout(pid);
     set_panic_hook();
-    match OpenOptions::new().write(true).append(true).open("spelunky.log") {
+    match OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open("spelunky.log")
+    {
         Ok(mut file) => {
             let local: DateTime<Local> = Local::now();
-            match file.write_all(&local.format("%X: Overlunky loaded\n").to_string().into_bytes()) {
+            match file.write_all(
+                &local
+                    .format("%X: Overlunky loaded\n")
+                    .to_string()
+                    .into_bytes(),
+            ) {
                 Ok(o) => log::debug!("{:?}", o),
                 Err(e) => log::error!("{:?}", e),
             }
@@ -105,23 +115,18 @@ unsafe extern "C" fn run(handle: u32) {
             log::debug!("Enter entity #IDs to spawn, one per line >");
             let mut buffer = String::new();
             std::io::stdin().read_line(&mut buffer).unwrap();
-            if let Ok(item) = buffer.trim().parse::<usize>() {
+            if let Ok(id) = buffer.trim().parse::<usize>() {
                 // This is RAII-style implementation for suspending the main thread, for preventing race conditions.
                 let mut _lock = c.lock();
 
-                {
-                    // This is RAII-style implementation for suspending the main thread, for preventing race conditions.
-                    let mut _lock = c.lock();
-
-                    match state.items().player(0) {
-                        None => {
-                            log::error!("Player not initialized yet. Select a character first!");
-                        }
-                        Some(player) => {
-                            let (x, y) = player.position();
-                            let layer = player.layer();
-                            state.layer(layer).spawn_entity(item, x, y, false);
-                        }
+                match state.items().player(0) {
+                    None => {
+                        log::error!("Player not initialized yet. Select a character first!");
+                    }
+                    Some(player) => {
+                        let (x, y) = player.position();
+                        let layer = player.layer();
+                        state.layer(layer).spawn_entity(id, x, y, false);
                     }
                 }
             }
