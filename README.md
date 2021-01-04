@@ -45,3 +45,14 @@ Current features and their keyboard shortcuts:
   - If your game crashes when actually trying to use the tools:
     + We're not currently compatible with modlunky2, sorry!
     + Some entities just crash the game, try to avoid them next time.
+    
+## Development
+If you'd rather build it yourself or help with development, clone the repository, get some Rust and C++ build tools and run this to get started:
+```bash
+cd overlunky
+rustup toolchain install nightly
+rustup default nightly
+git submodule update --init --recursive
+cargo build
+```
+The debug build will be in `target/debug/`.
