@@ -1,5 +1,72 @@
 #[cxx::bridge]
 pub mod ffi {
+    struct AnimationMap {
+        padding: [u8; 0x40],
+    }
+    pub struct Rect {
+        masks: i32,
+        up_minus_down: f32,
+        side: f32,
+        up_plus_down: f32,
+        field_10: u8,
+        field_11: u8,
+        field_12: u16,
+    }
+
+    #[derive()]
+pub struct EntityDB {
+        create_func: usize,
+        destroy_func: usize,
+        field_10: i32,
+        /* Entity id (ENT_...) */
+        id: i32,
+        search_flags: u32,
+        width: f32,
+        height: f32,
+        field_24: u8,
+        field_25: u8,
+        field_26: i16,
+        rectCollision: Rect,
+        field_3C: i32,
+        field_40: i32,
+        field_44: i32,
+        field_48: i64,
+        field_50: i32,
+        friction: f32,
+        elasticity: f32,
+        weight: f32,
+        field_60: u8,
+        acceleration: f32,
+        maxSpeed: f32,
+        sprintFactor: f32,
+        jump: f32,
+
+        /* ??? */
+        _a: f32,
+        _b: f32,
+        _c: f32,
+        _d: f32,
+
+        texture: i32,
+        technique: i32,
+        tileX: i32,
+        tileY: i32,
+        damage: u8,
+        life: u8,
+        field_96: u8,
+        field_97: u8,
+        field_98: u8,
+        description: i32,
+        field_a0: i32,
+        field_a4: i32,
+        field_a8: f32,
+        field_AC: i32,
+        animations: AnimationMap,
+        attachOffsetX: f32,
+        attachOffsetY: f32,
+        init: u8,
+    }
+
     pub struct EntityItem {
         pub name: String,
         pub id: u16,
