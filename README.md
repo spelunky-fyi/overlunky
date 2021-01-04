@@ -2,7 +2,11 @@
 
 An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the Spelunky Community Discord.
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.0j-green)
+**Please note that Overlunky is currently not compatible with Modlunky2 repacked executables!** (See [#10](https://github.com/spelunky-fyi/overlunky/issues/10) for more information.)
+
+**Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
+
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.0j-green).
 
 ## Disclaimer
 You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, corrupting your savefile and cheating in the leaderboards. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://gitlab.com/Mr_Goldberg/goldberg_emulator/-/releases) in the game directory. (TL;DR: Copy the steam_api64.dll from the zip to the offline game directory and create steam_appid.txt with the text `418530` in it.) Also block the modded installation in your firewall. If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to BlitWorks.
@@ -35,13 +39,9 @@ Current features and their keyboard shortcuts:
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
 ## Troubleshooting
-  - If your game crashes when launching Overlunky or it just closes and you don't get the overlay in game:
-    + Make sure you are running the latest version of each. We don't support old game versions.
-    + Make sure your antivirus is not blocking it.
-
-## Current issues
-  - **Your antivirus will probably block this** because of the way it hooks the game, you have to add an exception if you are using AV.
-  - If you're playing with keyboard, the keys you type in the overlay still activate in the game too.
-  - Mouse clicks are only translated correctly with the default zoom (the one set with F3), e.g. they're not accurate inside shops or when the game otherwise decides to zoom in.
-  - Mouse clicks are also translated wrong if playing fullscreen on non 16:9 resolution with black bars.
-  - If you teleport while ledge grabbing or touching anything with physics, that thing is coming with you. Including - but not limited to - mounts, push blocks, ladders and colossal space ship heads.
+  - If your game crashes when launching Overlunky or it just closes and you don't ever see the overlay in game:
+    + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either.
+    + Make sure your antivirus is not blocking it. **This is very likely if you're using one.**
+  - If your game crashes when actually trying to use the tools:
+    + We're not currently compatible with modlunky2, sorry!
+    + Some entities just crash the game, try to avoid them next time.
