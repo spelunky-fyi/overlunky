@@ -7,7 +7,7 @@ mod search;
 mod ui;
 
 #[allow(dead_code)]
-mod test;
+mod example;
 
 use backtrace::Backtrace;
 use critical_section::CriticalSectionManager;
@@ -95,7 +95,7 @@ unsafe extern "C" fn run(pid: u32) {
     let memory = Memory::get();
     let state = State::new();
     loop {
-        let entities = list_entities(&memory);
+        let entities = list_entities();
         if entities.len() != 0 {
             ui::create_box(&entities);
             break;
