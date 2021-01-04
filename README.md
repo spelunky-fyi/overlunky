@@ -55,4 +55,4 @@ rustup default nightly
 git submodule update --init --recursive
 cargo build
 ```
-The debug build will be in `target/debug/`.
+The debug build will be in `target/debug/`. To enable debug logging, `set RUST_LOG=debug` in *the game environment*, e.g. where you run Spel2.exe.
