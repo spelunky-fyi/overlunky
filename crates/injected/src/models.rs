@@ -1,10 +1,13 @@
 use crate::{
+    critical_section::get_main_thread,
+    db::ffi::EntityDB,
     memory::*,
     search::{decode_imm, decode_pc, find_inst},
 };
 use byteorder::*;
 use cached::proc_macro::cached;
 use hex_literal::*;
+use ntapi::ntpsapi::{NtQueryInformationThread, ThreadBasicInformation, THREAD_BASIC_INFORMATION};
 
 pub struct API {
     api: *const usize,
@@ -138,11 +141,22 @@ fn get_zoom() -> usize {
     memory.at_exe(addr_zoom) + 10
 }
 
-pub fn heap_base() -> usize {
+#[cached]
+fn heap_base() -> usize {
+    let main = get_main_thread();
+    let mut tib: THREAD_BASIC_INFORMATION = unsafe { std::mem::zeroed() };
+
     unsafe {
-        let result: usize;
-        asm!("mov {}, gs:[0x58]", out(reg) result);
-        read_u64(read_u64(result) + 0x130)
+        NtQueryInformationThread(
+            main,
+            ThreadBasicInformation,
+            std::mem::transmute(&mut tib),
+            std::mem::size_of::<THREAD_BASIC_INFORMATION>() as u32,
+            std::ptr::null_mut(),
+        );
+
+        let result = (*tib.TebBaseAddress).ThreadLocalStoragePointer;
+        read_u64(read_u64(std::mem::transmute(result)) + 0x130)
     }
 }
 
@@ -299,6 +313,20 @@ impl Layer {
         log::info!("Spawned door {:x?}", entity.pointer);
         Door::from(entity).set_target(w, l, f, t);
     }
+
+    pub unsafe fn items(&self) -> &'static [Entity] {
+        let vector = self.pointer + 0x8;
+        log::debug!(
+            "{:x} {:} {:}",
+            read_u64(vector),
+            read_u32(vector + 0x14) as usize,
+            read_u32(vector + 0x10) as usize,
+        );
+        std::slice::from_raw_parts(
+            std::mem::transmute(read_u64(vector)),
+            read_u32(vector + 0x14) as usize,
+        )
+    }
 }
 
 pub struct Items {
@@ -325,6 +353,10 @@ pub struct Entity {
 }
 
 impl Entity {
+    pub fn _type(&self) -> &EntityDB {
+        unsafe { std::mem::transmute(read_u64(self.pointer + 0x8)) }
+    }
+
     pub fn unique_id(&self) -> u32 {
         read_u32(self.pointer + 0x38)
     }

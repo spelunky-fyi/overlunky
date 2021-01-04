@@ -19,6 +19,7 @@ crate-type = ["cdylib"]
     "libloaderapi",
     "tlhelp32",
     "psapi",
+    "basetsd",
     "d3d11",
     "d3d11_1",
     "d3d11sdklayers",
@@ -38,6 +39,7 @@ backtrace = "*"
 cxx = "*"
 cached = "*"
 chrono = "*"
+ntapi = "*"
 
 [build-dependencies]
 cxx-build = "*"
