@@ -5,7 +5,6 @@
 #include "imgui/examples/imgui_impl_dx11.h"
 #include "ui.hpp"
 #include "injected-dll/src/ui.rs.h"
-
 #include <Windows.h>
 #include <Shlwapi.h>
 #include <Shlobj.h>
@@ -17,6 +16,15 @@
 #include <locale>
 #include <codecvt>
 
+int up = 38;
+int down = 40;
+int left = 37;
+int right = 39;
+int hide_ui = 122;
+int etr = 13;
+int click_events = 77;
+int god_mode = 71;
+
 IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
 ID3D11DeviceContext *pContext;
@@ -25,6 +33,33 @@ HWND window;
 
 using PresentPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags);
 PresentPtr oPresent;
+
+void getHotkeys(std::string file) {
+
+    std::ifstream data (file);
+    std::ofstream writeData (file);
+
+    if (data.fail()) {
+        writeData << "# Start lines with '#' to make a comment. These are ignored by the program.\n# changing click_events from 77 to 78 will make it 'ctrl + n' not 'n'\n# because originally click_events was 'ctrl + m'\n\nhide_ui = 122\ndown = 40\nup = 38\nclick_events = 77\ngod_mode = 71\nright = 39\nenter = 13\nleft = 37\n\n# Defaults:\n#   hide_ui = 122\n#   down = 40\n#   up = 38\n#   click_events = 77\n#   god_mode = 71\n#   right = 39\n#   enter = 13\n#   left = 37\n\n# WARNING: IF YOU DON'T UNDERSTAND THIS FILE DO NOT MODIFY IT.\n# https://www.keycode.info/\n# Press a key and put the number seen in one of the blanks above to use that key for that option ^^^\n";
+        writeData.close();
+        std::cout << "wrote hotkeys.ini\n";
+    }
+    std::string line;
+
+    while (std::getline(data,line)) {
+        if (line[0] != '#') {
+            std::cout << "Hotkeys:\n";
+            if ( sscanf(line.c_str(),"hide_ui = %i",&hide_ui) ) { std::cout << "\tHide UI = " << hide_ui << std::endl; }
+            else if ( sscanf(line.c_str(),"down = %i",&down) ) { std::cout << "\tDown = " << down << std::endl; }
+            else if ( sscanf(line.c_str(),"up = %i",&up) ) { std::cout << "\tUp = " << up << std::endl; }
+            else if ( sscanf(line.c_str(),"right = %i",&right) ) { std::cout << "\tRight = " << right << std::endl; }
+            else if ( sscanf(line.c_str(),"left = %i",&left) ) { std::cout << "\tLeft = " << left << std::endl; }
+            else if ( sscanf(line.c_str(),"click_events = %i",&click_events) ) { std::cout << "\tToggle Click Events = " << click_events << std::endl; }
+            else if ( sscanf(line.c_str(),"god_mode = %i",&god_mode) ) { std::cout << "\tToggle God Mode = " << god_mode << std::endl; }
+        }
+    }
+    data.close();
+}
 
 // Global state
 struct CXXEntityItem
@@ -152,7 +187,7 @@ bool process_keys(
 
     auto ctrl = GetAsyncKeyState(VK_CONTROL);
 
-    if(wParam == VK_F11) {
+    if(wParam == hide_ui) {
         hidegui = !hidegui;
         return true;
     }
@@ -229,27 +264,27 @@ bool process_keys(
         clickevents = !clickevents;
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_LEFT)
+    else if (GetAsyncKeyState(VK_MENU) && wParam == left)
     {
         teleport(-1, 0, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_RIGHT)
+    else if (GetAsyncKeyState(VK_MENU) && wParam == right)
     {
         teleport(1, 0, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_UP)
+    else if (GetAsyncKeyState(VK_MENU) && wParam == up)
     {
         teleport(0, 1, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == VK_DOWN)
+    else if (GetAsyncKeyState(VK_MENU) && wParam == down)
     {
         teleport(0, -1, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_SHIFT) && wParam == VK_RETURN)
+    else if (GetAsyncKeyState(VK_SHIFT) && wParam == etr)
     {
         spawn_backdoor(0.0, 0.0);
         return true;
@@ -263,24 +298,24 @@ bool process_keys(
         int x = 0, y = 0;
         bool enter = false;
 
-        switch (wParam)
+        /*switch (wParam)
         {
-        case VK_LEFT:
+        case left:
             x = -1;
             break;
-        case VK_RIGHT:
+        case right:
             x = 1;
             break;
-        case VK_UP:
+        case up:
             y = 1;
             break;
-        case VK_DOWN:
+        case down:
             y = -1;
             break;
-        case VK_RETURN:
+        case etr:
             enter = true;
             break;
-        }
+        }*/
 
         if(ctrl & 0x8000 && enter)
         {
@@ -648,6 +683,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         {
             font = io.Fonts->AddFontDefault();
         }
+
+        getHotkeys("hotkeys.ini");
     }
 
     ImGui_ImplDX11_NewFrame();
