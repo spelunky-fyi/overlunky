@@ -15,11 +15,13 @@ You are strongly discouraged from using any modding tools in your actual online 
 Current features and their *default* keyboard shortcuts:
   - **F1**: Search and spawn entities where you're standing
       + **Enter**: Spawn entity (when tool is active)
+      + **Ctrl+Enter**: Spawn entity
       + **Ctrl+Arrows**: Move spawn coordinates around you
       + **Ctrl+Shift+Arrows**: Teleport to direction
       + **Ctrl+Shift+Space**: Teleport to coordinates
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
+      + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
   - **F2**: Spawn doors to many places
       + **Enter**: Spawn warp door (when tool is active)
@@ -35,6 +37,7 @@ Current features and their *default* keyboard shortcuts:
   - **F9**: Options
       + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
       + **Ctrl+G**: Toggle god mode
+      + **Ctrl+S**: Toggle snap to grid
   - **F11**: Hide overlay
 
 Check `Spelunky 2/hotkeys.ini` after running Overlunky to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
