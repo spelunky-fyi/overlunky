@@ -270,11 +270,15 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool, mut vx: f32, mut vy: f32) -> Entity {
+    pub unsafe fn spawn_entity(&self, id: usize, mut x: f32, mut y: f32, s: bool, vx: f32, vy: f32, snap: bool) -> Entity {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(get_load_item());
         if !s {
-            let addr: usize = load_item(self.pointer, id, x.round(), y.round());
+            if snap {
+                x = x.round();
+                y = y.round();
+            }
+            let addr: usize = load_item(self.pointer, id, x, y);
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         } else {
@@ -283,12 +287,12 @@ impl Layer {
             let cz = read_f32(get_zoom());
             let mut rx = cx + 0.74 * cz * x;
             let mut ry = cy + 0.41625 * cz * y;
-            if vx.abs() + vy.abs() <= 0.01 {
+            if snap && vx.abs() + vy.abs() <= 0.02 {
                 rx = rx.round();
                 ry = ry.round();
             }
             let addr: usize = load_item(self.pointer, id, rx, ry);
-            if vx.abs() + vy.abs() > 0.01 {
+            if vx.abs() + vy.abs() > 0.02 {
                 write_mem(addr + 0x100, &vx.to_le_bytes());
                 write_mem(addr + 0x104, &vy.to_le_bytes());
             }
@@ -310,11 +314,11 @@ impl Layer {
         let entity = match screen {
             11 => {
                 log::debug!("In camp, spawning starting exit");
-                self.spawn_entity(25, x.round(), y.round(), false, 0.0, 0.0)
+                self.spawn_entity(25, x.round(), y.round(), false, 0.0, 0.0, false)
             }
             12 => {
                 log::debug!("In game, spawning regular exit");
-                self.spawn_entity(23, x.round(), y.round(), false, 0.0, 0.0)
+                self.spawn_entity(23, x.round(), y.round(), false, 0.0, 0.0, false)
             }
             _ => return,
         };

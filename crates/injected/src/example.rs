@@ -7,7 +7,7 @@ unsafe fn spawn_caveman_with_turkey() {
     let position = player.position();
     let layer = state.layer(player.layer());
     let turkey: Mount = layer
-        .spawn_entity(884, position.0 + 1.0, position.1, false, 0.0, 0.0)
+        .spawn_entity(884, position.0 + 1.0, position.1, false, 0.0, 0.0, false)
         .into();
     let caveman = layer.spawn_entity_over(225, turkey.into(), -0.05, 0.52);
     turkey.carry(caveman);

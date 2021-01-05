@@ -26,6 +26,7 @@ std::map<std::string, int> keys{
     { "move_down", 0x28 },
     { "toggle_mouse", 0x14d },
     { "toggle_godmode", 0x147 },
+    { "toggle_snap", 0x153 },
     { "tool_entity", 0x70 },
     { "tool_door", 0x71 },
     { "tool_camera", 0x72 },
@@ -98,6 +99,7 @@ bool clickevents = false;
 bool file_written = false;
 bool god = false;
 bool hidedebug = true;
+bool snap_to_grid = true;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 
@@ -234,14 +236,14 @@ bool toggle(std::string tool) {
 
 void spawn_entities(bool s) {
     if(g_filtered_count > 0) {
-        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy);
+        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
     } else {
         std::string texts(text);
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
         while(textss >> id) {
-            spawn_entity(id, g_x, g_y, s, g_vx, g_vy);
+            spawn_entity(id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
         }
     }
 }
@@ -363,6 +365,10 @@ bool process_keys(
     else if (pressed("toggle_mouse", wParam)) // M
     {
         clickevents = !clickevents;
+    }
+    else if (pressed("toggle_snap", wParam)) // M
+    {
+        snap_to_grid = !snap_to_grid;
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -685,17 +691,31 @@ void render_clickhandler()
 
     if((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowFocused())
     {
+        io.MouseDrawCursor = false;
         ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
         startpos = pos;
     }
     if((ImGui::IsMouseDown(0) || ImGui::IsMouseDown(1)) && ImGui::IsWindowFocused())
     {
+        ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
+        ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
+        float length = sqrt(pow(line.x, 2) + pow(line.y, 2));
+        float theta = 0.7;
+        float width = 10+length/15;
+        float tpoint = width / (2 * (tanf(theta) / 2) * length);
+        ImVec2 point = ImVec2(pos.x + (-tpoint * line.x), pos.y + (-tpoint * line.y));
+        ImVec2 normal = ImVec2(-line.x, line.y);
+        float tnormal = width / (2 * length);
+        ImVec2 leftpoint = ImVec2(point.x + tnormal * normal.y, point.y + tnormal * normal.x);
+        ImVec2 rightpoint = ImVec2(point.x + (-tnormal * normal.y), point.y + (-tnormal * normal.x));
         auto* draw_list = ImGui::GetWindowDrawList();
-        draw_list->AddLine(startpos, pos, ImColor(255, 0, 0, 200));
-        draw_list->AddLine(ImVec2(startpos.x-5, startpos.y-5), ImVec2(startpos.x+6, startpos.y+6), ImColor(255, 255, 255, 200));
-        draw_list->AddLine(ImVec2(startpos.x-5, startpos.y+5), ImVec2(startpos.x+6, startpos.y-6), ImColor(255, 255, 255, 200));
+        draw_list->AddLine(ImVec2(startpos.x-9, startpos.y-9), ImVec2(startpos.x+10, startpos.y+10), ImColor(255, 255, 255, 200), 2);
+        draw_list->AddLine(ImVec2(startpos.x-9, startpos.y+9), ImVec2(startpos.x+10, startpos.y-10), ImColor(255, 255, 255, 200), 2);
+        draw_list->AddLine(startpos, pos, ImColor(255, 0, 0, 200), 2);
+        draw_list->AddLine(leftpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+        draw_list->AddLine(rightpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
     }
     if(ImGui::IsMouseReleased(0) && ImGui::IsWindowFocused())
     {
@@ -724,6 +744,9 @@ void render_clickhandler()
         teleport(g_x, g_y, true, g_vx, g_vy);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
+    if(ImGui::IsMouseReleased(0) || ImGui::IsMouseReleased(1)) {
+        io.MouseDrawCursor = true;
+    }
     ImGui::End();
 }
 
@@ -737,6 +760,9 @@ void render_options()
     }
     ImGui::SameLine();
     ImGui::Text("God mode");
+    ImGui::Checkbox("##Snap", &snap_to_grid);
+    ImGui::SameLine();
+    ImGui::Text("Snap entities to grid");
 }
 
 void render_debug()
@@ -890,7 +916,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::PopItemWidth();
         ImGui::End();
 
-        ImGui::SetNextWindowSize({400, 100}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({400, 150}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, 0}, ImGuiCond_FirstUseEver);
         ImGui::Begin(windows["tool_options"].c_str());
         ImGui::PushItemWidth(-1);
