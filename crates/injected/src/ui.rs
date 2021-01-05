@@ -1,5 +1,6 @@
 use crate::{db::ffi::EntityItem, models::State};
 
+
 #[cxx::bridge]
 pub mod ffi {
     extern "Rust" {
@@ -9,6 +10,8 @@ pub mod ffi {
         unsafe fn teleport(x: f32, y: f32, s: bool);
         unsafe fn godmode(g: bool);
         unsafe fn zoom(level: f32);
+        unsafe fn list_items();
+        unsafe fn player_status();
     }
     unsafe extern "C++" {
         include!("cxx/ui.hpp");
@@ -113,4 +116,34 @@ pub unsafe fn godmode(g: bool) {
 
 pub unsafe fn zoom(level: f32) {
     State::new().zoom(level);
+}
+
+pub unsafe fn list_items() {
+    let state = State::new();
+    match state.items().player(0) {
+        Some(player) => {
+            for item in state.layer(player.layer()).items() {
+                log::debug!(
+                    "Item: {} {:x}, position: {:?}",
+                    item.unique_id(),
+                    item._type().search_flags,
+                    item.position_self()
+                );
+            }
+        }
+        None => {}
+    }
+}
+
+pub unsafe fn player_status() {
+    let state = State::new();
+    match state.items().player(0) {
+        Some(player) => {
+            let status = player.status();
+            log::debug!("Player status: {:?}", [status.rope(), status.bomb()]);
+            status.set_rope(99);
+            status.set_bomb(99);
+        }
+        None => {}
+    }
 }

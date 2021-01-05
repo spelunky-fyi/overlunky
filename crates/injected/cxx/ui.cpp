@@ -30,10 +30,10 @@ std::map<std::string, int> keys{
     { "tool_door", 0x71 },
     { "tool_camera", 0x72 },
     { "tool_options", 0x78 },
-    { "spawn_entity", 0x120 },
+    { "tool_debug", 0x344 },
+    { "spawn_entity", 0x10d },
     { "spawn_layer_door", 0x20d },
-    { "spawn_warp_door", 0x220 },
-    { "teleport", 0x10d },
+    { "spawn_warp_door", 0x30d },
     { "hide_ui", 0x7a },
     { "zoom_in", 0x1bc },
     { "zoom_out", 0x1be },
@@ -41,14 +41,15 @@ std::map<std::string, int> keys{
     { "zoom_3x", 0x133 },
     { "zoom_4x", 0x134 },
     { "zoom_5x", 0x135 },
-    { "teleport_left", 0x225 },
-    { "teleport_up", 0x226 },
-    { "teleport_right", 0x227 },
-    { "teleport_down", 0x228 },
+    { "teleport", 0x320 },
+    { "teleport_left", 0x325 },
+    { "teleport_up", 0x326 },
+    { "teleport_right", 0x327 },
+    { "teleport_down", 0x328 },
     { "coordinate_left", 0x125 },
     { "coordinate_up", 0x126 },
     { "coordinate_right", 0x127 },
-    { "coordinate_down", 0x128 }
+    { "coordinate_down", 0x128 },
     //{ "", 0x },
 };
 
@@ -95,6 +96,7 @@ bool hidegui = false;
 bool clickevents = false;
 bool file_written = false;
 bool god = false;
+bool hidedebug = true;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 
@@ -363,19 +365,19 @@ bool process_keys(
     }
     else if (pressed("teleport_left", wParam))
     {
-        teleport(-1, 0, false);
+        teleport(-3, 0, false);
     }
     else if (pressed("teleport_right", wParam))
     {
-        teleport(1, 0, false);
+        teleport(3, 0, false);
     }
     else if (pressed("teleport_up", wParam))
     {
-        teleport(0, 1, false);
+        teleport(0, 3, false);
     }
     else if (pressed("teleport_down", wParam))
     {
-        teleport(0, -1, false);
+        teleport(0, -3, false);
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -448,6 +450,9 @@ bool process_keys(
     else if (pressed("enter", wParam) && active("tool_camera"))
     {
         set_zoom();
+    }
+    else if(pressed("tool_debug", wParam)) {
+        hidedebug = !hidedebug;
     }
     else
     {
@@ -701,12 +706,26 @@ void render_options()
 {
     ImGui::Checkbox("##clickevents", &clickevents);
     ImGui::SameLine();
-    ImGui::Text("Enable click to spawn/teleport");
+    ImGui::Text("Mouse controls");
     if(ImGui::Checkbox("##Godmode", &god)) {
         godmode(god);
     }
     ImGui::SameLine();
-    ImGui::Text("Enable god mode");
+    ImGui::Text("God mode");
+}
+
+void render_debug()
+{
+    ImGui::Text("You're not supposed to be here!");
+    if(ImGui::Button("List items"))
+    {
+        list_items();
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Player status"))
+    {
+        player_status();
+    }
 }
 
 void create_render_target()
@@ -802,6 +821,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_door"] = "Door to anywhere ("+key_string(keys["tool_door"])+")";
         windows["tool_camera"] = "Camera ("+key_string(keys["tool_camera"])+")";
         windows["tool_options"] = "Options ("+key_string(keys["tool_options"])+")";
+        windows["tool_debug"] = "Debug ("+key_string(keys["tool_debug"])+")";
         windows["entities"] = "##Entities";
     }
 
@@ -850,6 +870,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::Begin(windows["tool_options"].c_str());
         ImGui::PushItemWidth(-1);
         render_options();
+        ImGui::PopItemWidth();
+        ImGui::End();
+    }
+
+    if(!hidedebug)
+    {
+        ImGui::SetNextWindowSize({400, ImGui::GetIO().DisplaySize.y-100}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, 100}, ImGuiCond_FirstUseEver);
+        ImGui::Begin(windows["tool_debug"].c_str());
+        ImGui::PushItemWidth(-1);
+        render_debug();
         ImGui::PopItemWidth();
         ImGui::End();
     }

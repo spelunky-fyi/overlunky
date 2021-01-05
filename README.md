@@ -14,17 +14,19 @@ You are strongly discouraged from using any modding tools in your actual online 
 ## Features
 Current features and their *default* keyboard shortcuts:
   - **F1**: Search and spawn entities where you're standing
-      + **Enter**: Spawn entity
+      + **Enter**: Spawn entity (when tool is active)
       + **Ctrl+Arrows**: Move spawn coordinates around you
-      + **Ctrl+Enter**: Teleport to coordinates
-      + **Shift+Arrows**: Teleport to direction
+      + **Ctrl+Shift+Arrows**: Teleport to direction
+      + **Ctrl+Shift+Space**: Teleport to coordinates
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
   - **F2**: Spawn doors to many places
-      + **Enter**: Spawn warp door
+      + **Enter**: Spawn warp door (when tool is active)
       + **Shift+Enter**: Spawn back layer door
+      + **Ctrl+Shift+Enter**: Spawn warp door
   - **F3**: Camera controls
+      + **Enter**: Set zoom (when tool is active)
       + **Ctrl+,**: Zoom in
       + **Ctrl+.**: Zoom out
       + **Ctrl+Numbers**: Set zoom level
