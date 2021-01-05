@@ -12,28 +12,30 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, corrupting your savefile and cheating in the leaderboards. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://gitlab.com/Mr_Goldberg/goldberg_emulator/-/releases) in the game directory. (TL;DR: Copy the steam_api64.dll from the zip to the offline game directory and create steam_appid.txt with the text `418530` in it.) Also block the modded installation in your firewall. If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to BlitWorks.
 
 ## Features
-Current features and their keyboard shortcuts:
-  - **F-keys**: Collapse/Show the window
+Current features and their *default* keyboard shortcuts:
   - **F1**: Search and spawn entities where you're standing
       + **Enter**: Spawn entity
       + **Ctrl+Arrows**: Move spawn coordinates around you
       + **Ctrl+Enter**: Teleport to coordinates
+      + **Shift+Arrows**: Teleport to direction
+      + **Mouse left**: Spawn entity at mouse cursor
+      + **Mouse right**: Teleport to mouse cursor
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
-      + Note: Item numbers can change between versions, so use the search to find the latest ones or check `Spelunky 2/entities.txt`
-  - **F2**: Spawn a warp door to any world, level and theme
-      + **Enter**: Spawn door. Set the appropriate theme too or you will get weird results.
+  - **F2**: Spawn doors to many places
+      + **Enter**: Spawn warp door
+      + **Shift+Enter**: Spawn back layer door
   - **F3**: Camera controls
-      + **Ctrl+Comma/Period**: Change the zoom level
+      + **Ctrl+,**: Zoom in
+      + **Ctrl+.**: Zoom out
+      + **Ctrl+Numbers**: Set zoom level
       + Lock horizontal scrolling with the *N*x buttons for *N* wide levels
       + Note: It only sets the *default* zoom level, which isn't used in camp or shops.
+  - **F9**: Options
+      + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
+      + **Ctrl+G**: Toggle god mode
   - **F11**: Hide overlay
-  - **Ctrl+G**: Toggle god mode
-  - **Ctrl+M**: Toggle click events
-  - **Ctrl+Numbers**: Set zoom level
-  - **RAlt+Arrows**: Teleport to direction
-  - **Shift+Enter**: Spawn a door to back layer
-  - Spawn or teleport to mouse cursor (see options)
-  - Peaceful mode (*nothing* takes damage from anything)
+
+Check `Spelunky 2/hotkeys.ini` after running Overlunky to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
 
 ## Usage 
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
@@ -45,6 +47,10 @@ Current features and their keyboard shortcuts:
   - If your game crashes when actually trying to use the tools:
     + We're not currently compatible with modlunky2, sorry!
     + Some entities just crash the game, try to avoid them next time.
+  - If you're missing some overlay windows:
+    + Delete `Spelunky 2/imgui.ini` to reset tool window positions.
+  - If you mess up your keyboard shortcuts:
+    + Delete `Spelunky 2/hotkeys.ini` to reset shortcut keys.
     
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some Rust and C++ build tools and run this to get started:

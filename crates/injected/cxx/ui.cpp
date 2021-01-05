@@ -176,8 +176,11 @@ void load_hotkeys(std::string file)
             {
                 if(sscanf(line.c_str(), "%s = %i", inikey, &inival))
                 {
-                    std::string keystring(inikey);
-                    keys[keystring] = inival;
+                    std::string keyname(inikey);
+                    if(keys.find(keyname) != keys.end())
+                    {
+                        keys[keyname] = inival;
+                    }
                 }
             }
         }
@@ -277,213 +280,180 @@ bool pressed(std::string keyname, int wParam)
     return wParam == keycode;
 }
 
+bool active(std::string window)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* current = g.NavWindow;
+    return current == ImGui::FindWindowByName(windows[window].c_str());
+}
+
 bool process_keys(
     _In_ int nCode,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam)
 {
-    if(nCode != WM_KEYDOWN) return false;
+    if(nCode != WM_KEYDOWN)
+    {
+        return false;
+    }
 
     if(pressed("hide_ui", wParam)) {
         hidegui = !hidegui;
-        return true;
     }
     else if (pressed("tool_entity", wParam))
     {
         if(toggle("tool_entity")) {
             set_focus_entity = true;
         }
-        return true;
     }
     else if (pressed("tool_door", wParam))
     {
         if(toggle("tool_door")) {
             set_focus_world = true;
         }
-        return true;
     }
     else if (pressed("tool_camera", wParam))
     {
         if(toggle("tool_camera")) {
             set_focus_zoom = true;
         }
-        return true;
     }
     else if (pressed("tool_options", wParam))
     {
         toggle("tool_options");
-        return true;
     }
     else if (pressed("zoom_out", wParam))
     {
         g_zoom += 1.0;
         set_zoom();
-        return true;
     }
     else if (pressed("zoom_in", wParam))
     {
         g_zoom -= 1.0;
         set_zoom();
-        return true;
     }
     else if (pressed("zoom_default", wParam))
     {
         g_zoom = 13.5;
         set_zoom();
-        return true;
     }
     else if (pressed("zoom_3x", wParam))
     {
         g_zoom = 23.08;
         set_zoom();
-        return true;
     }
     else if (pressed("zoom_4x", wParam))
     {
         g_zoom = 29.87;
         set_zoom();
-        return true;
     }
     else if (pressed("zoom_5x", wParam))
     {
         g_zoom = 36.66;
         set_zoom();
-        return true;
     }
     else if (pressed("toggle_godmode", wParam))
     {
         god = !god;
         godmode(god);
-        return true;
     }
     else if (pressed("toggle_mouse", wParam)) // M
     {
         clickevents = !clickevents;
-        return true;
     }
     else if (pressed("teleport_left", wParam))
     {
         teleport(-1, 0, false);
-        return true;
     }
     else if (pressed("teleport_right", wParam))
     {
         teleport(1, 0, false);
-        return true;
     }
     else if (pressed("teleport_up", wParam))
     {
         teleport(0, 1, false);
-        return true;
     }
     else if (pressed("teleport_down", wParam))
     {
         teleport(0, -1, false);
-        return true;
     }
     else if (pressed("spawn_layer_door", wParam))
     {
         spawn_backdoor(0.0, 0.0);
-        return true;
     }
     else if(pressed("teleport", wParam))
     {
         teleport(g_x, g_y, false);
-        return true;
     }
     else if (pressed("coordinate_left", wParam))
     {
         g_x -= 1;
-        return true;
     }
     else if (pressed("coordinate_right", wParam))
     {
         g_x += 1;
-        return true;
     }
     else if (pressed("coordinate_up", wParam))
     {
         g_y += 1;
-        return true;
     }
     else if (pressed("coordinate_down", wParam))
     {
         g_y -= 1;
-        return true;
     }
     else if (pressed("spawn_entity", wParam))
     {
         spawn_entities(false);
-        return true;
     }
     else if (pressed("spawn_warp_door", wParam))
     {
         spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
-        return true;
     }
-
-    ImGuiContext& g = *GImGui;
-    ImGuiWindow* current = g.NavWindow;
-
-    if(ImGui::GetIO().WantCaptureKeyboard)
-    { // In-window keys
-        int x = 0, y = 0;
-
-        if(pressed("move_left", wParam))
-        {
-            x = -1;
-        }
-        else if(pressed("move_right", wParam))
-        {
-            x = 1;
-        }
-        else if(pressed("move_up", wParam))
-        {
-            y = 1;
-        }
-        else if(pressed("move_down", wParam))
-        {
-            y = -1;
-        }
-        else if (pressed("enter", wParam) && current == ImGui::FindWindowByName(windows["tool_entity"].c_str()))
-        {
-            spawn_entities(false);
-            return true;
-        }
-        else if (pressed("enter", wParam) && current == ImGui::FindWindowByName(windows["tool_door"].c_str()))
-        {
-            spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
-            return true;
-        }
-        else if (pressed("enter", wParam) && current == ImGui::FindWindowByName(windows["tool_camera"].c_str()))
-        {
-            set_zoom();
-            return true;
-        }
-
-        if (x == 0 && y == 0)
-        {
-            return false;
-        }
-
-        // List navigation
-        if (y != 0)
-        {
-            if(current == ImGui::FindWindowByName(windows["tool_entity"].c_str()))
-            {
-                g_current_item = std::min(std::max(g_current_item - y, 0), (int)g_items.size() - 1);
-            }
-            else if(current == ImGui::FindWindowByName(windows["tool_door"].c_str()))
-            {
-                g_to = std::min(std::max(g_to - y, 0), 15);
-            }
-        }
-        if (x != 0)
-        {
-            return false;
-        }
-        return true;
+    else if (pressed("move_up", wParam) && (active("tool_entity") || active("entities")))
+    {
+        g_current_item = std::min(std::max(g_current_item - 1, 0), (int)g_items.size() - 1);
+        scroll_to_entity = true;
     }
+    else if (pressed("move_down", wParam) && (active("tool_entity") || active("entities")))
+    {
+        g_current_item = std::min(std::max(g_current_item + 1, 0), (int)g_items.size() - 1);
+        scroll_to_entity = true;
+    }
+    else if (pressed("enter", wParam) && (active("tool_entity") || active("entities")))
+    {
+        spawn_entities(false);
+    }
+    else if (pressed("move_up", wParam) && active("tool_door"))
+    {
+        g_to = std::min(std::max(g_to - 1, 0), 15);
+    }
+    else if (pressed("move_down", wParam) && active("tool_door"))
+    {
+        g_to = std::min(std::max(g_to + 1, 0), 15);
+    }
+    else if (pressed("enter", wParam) && active("tool_door"))
+    {
+        spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
+    }
+    else if (pressed("move_up", wParam) && active("tool_camera"))
+    {
+        g_zoom -= 1.0;
+        set_zoom();
+    }
+    else if (pressed("move_down", wParam) && active("tool_camera"))
+    {
+        g_zoom += 1.0;
+        set_zoom();
+    }
+    else if (pressed("enter", wParam) && active("tool_camera"))
+    {
+        set_zoom();
+    }
+    else
+    {
+        return false;
+    }
+    return true;
 }
 
 void init_imgui()
@@ -832,6 +802,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_door"] = "Door to anywhere ("+key_string(keys["tool_door"])+")";
         windows["tool_camera"] = "Camera ("+key_string(keys["tool_camera"])+")";
         windows["tool_options"] = "Options ("+key_string(keys["tool_options"])+")";
+        windows["entities"] = "##Entities";
     }
 
     ImGui_ImplDX11_NewFrame();
