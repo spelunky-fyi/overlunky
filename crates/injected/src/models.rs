@@ -314,11 +314,11 @@ impl Layer {
         let entity = match screen {
             11 => {
                 log::debug!("In camp, spawning starting exit");
-                self.spawn_entity(25, x.round(), y.round(), false, 0.0, 0.0, false)
+                self.spawn_entity(25, x.round(), y.round(), false, 0.0, 0.0, true)
             }
             12 => {
                 log::debug!("In game, spawning regular exit");
-                self.spawn_entity(23, x.round(), y.round(), false, 0.0, 0.0, false)
+                self.spawn_entity(23, x.round(), y.round(), false, 0.0, 0.0, true)
             }
             _ => return,
         };

@@ -927,8 +927,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
     if(!hidedebug)
     {
-        ImGui::SetNextWindowSize({400, ImGui::GetIO().DisplaySize.y-100}, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, 100}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
         ImGui::Begin(windows["tool_debug"].c_str());
         ImGui::PushItemWidth(-1);
         render_debug();

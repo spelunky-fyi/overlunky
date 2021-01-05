@@ -59,10 +59,10 @@ pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
                 .spawn_door(x + _x, y + _y, l, w, f, t);
             state
                 .layer(player.layer())
-                .spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, false);
+                .spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
             state
                 .layer(player.layer())
-                .spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, false);
+                .spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
         }
         None => {}
     }
@@ -77,22 +77,22 @@ pub unsafe fn spawn_backdoor(x: f32, y: f32) {
             log::debug!("Spawning backdoor on {}, {}", x + _x, y + _y);
             state
                 .layer(0)
-                .spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, false);
+                .spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, true);
             state
                 .layer(1)
-                .spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, false);
+                .spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, true);
             state
                 .layer(0)
-                .spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, false);
+                .spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
             state
                 .layer(1)
-                .spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, false);
+                .spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
             state
                 .layer(0)
-                .spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, false);
+                .spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
             state
                 .layer(1)
-                .spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, false);
+                .spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
         }
         None => {}
     }
