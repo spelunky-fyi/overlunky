@@ -15,15 +15,44 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
+#include <map>
+#include <iomanip>
 
-int up = 38;
-int down = 40;
-int left = 37;
-int right = 39;
-int hide_ui = 122;
-int etr = 13;
-int click_events = 77;
-int god_mode = 71;
+std::map<std::string, int> keys{
+    { "enter", 0x0d },
+    { "move_left", 0x25 },
+    { "move_up", 0x26 },
+    { "move_right", 0x27 },
+    { "move_down", 0x28 },
+    { "toggle_mouse", 0x14d },
+    { "toggle_godmode", 0x147 },
+    { "tool_entity", 0x70 },
+    { "tool_door", 0x71 },
+    { "tool_camera", 0x72 },
+    { "tool_options", 0x78 },
+    { "spawn_entity", 0x120 },
+    { "spawn_layer_door", 0x20d },
+    { "spawn_warp_door", 0x220 },
+    { "teleport", 0x10d },
+    { "hide_ui", 0x7a },
+    { "zoom_in", 0x1bc },
+    { "zoom_out", 0x1be },
+    { "zoom_default", 0x132 },
+    { "zoom_3x", 0x133 },
+    { "zoom_4x", 0x134 },
+    { "zoom_5x", 0x135 },
+    { "teleport_left", 0x225 },
+    { "teleport_up", 0x226 },
+    { "teleport_right", 0x227 },
+    { "teleport_down", 0x228 },
+    { "coordinate_left", 0x125 },
+    { "coordinate_up", 0x126 },
+    { "coordinate_right", 0x127 },
+    { "coordinate_down", 0x128 }
+    //{ "", 0x },
+};
+
+std::map<std::string, std::string> windows;
 
 IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
@@ -33,33 +62,6 @@ HWND window;
 
 using PresentPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags);
 PresentPtr oPresent;
-
-void getHotkeys(std::string file) {
-
-    std::ifstream data (file);
-    std::ofstream writeData (file);
-
-    if (data.fail()) {
-        writeData << "# Start lines with '#' to make a comment. These are ignored by the program.\n# changing click_events from 77 to 78 will make it 'ctrl + n' not 'n'\n# because originally click_events was 'ctrl + m'\n\nhide_ui = 122\ndown = 40\nup = 38\nclick_events = 77\ngod_mode = 71\nright = 39\nenter = 13\nleft = 37\n\n# Defaults:\n#   hide_ui = 122\n#   down = 40\n#   up = 38\n#   click_events = 77\n#   god_mode = 71\n#   right = 39\n#   enter = 13\n#   left = 37\n\n# WARNING: IF YOU DON'T UNDERSTAND THIS FILE DO NOT MODIFY IT.\n# https://www.keycode.info/\n# Press a key and put the number seen in one of the blanks above to use that key for that option ^^^\n";
-        writeData.close();
-        std::cout << "wrote hotkeys.ini\n";
-    }
-    std::string line;
-
-    while (std::getline(data,line)) {
-        if (line[0] != '#') {
-            std::cout << "Hotkeys:\n";
-            if ( sscanf(line.c_str(),"hide_ui = %i",&hide_ui) ) { std::cout << "\tHide UI = " << hide_ui << std::endl; }
-            else if ( sscanf(line.c_str(),"down = %i",&down) ) { std::cout << "\tDown = " << down << std::endl; }
-            else if ( sscanf(line.c_str(),"up = %i",&up) ) { std::cout << "\tUp = " << up << std::endl; }
-            else if ( sscanf(line.c_str(),"right = %i",&right) ) { std::cout << "\tRight = " << right << std::endl; }
-            else if ( sscanf(line.c_str(),"left = %i",&left) ) { std::cout << "\tLeft = " << left << std::endl; }
-            else if ( sscanf(line.c_str(),"click_events = %i",&click_events) ) { std::cout << "\tToggle Click Events = " << click_events << std::endl; }
-            else if ( sscanf(line.c_str(),"god_mode = %i",&god_mode) ) { std::cout << "\tToggle God Mode = " << god_mode << std::endl; }
-        }
-    }
-    data.close();
-}
 
 // Global state
 struct CXXEntityItem
@@ -86,6 +88,7 @@ static char text[500];
 bool set_focus_entity = false;
 bool set_focus_world = false;
 bool set_focus_zoom = false;
+bool scroll_to_entity = false;
 bool click_spawn = false;
 bool click_teleport = false;
 bool hidegui = false;
@@ -104,6 +107,84 @@ bool process_resizing(
     _In_ int nCode,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam);
+
+std::string key_string(int keycode)
+{
+    UCHAR virtualKey = keycode & 0xff;
+    UINT scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
+
+    CHAR szName[128];
+    int result = 0;
+    switch (virtualKey)
+    {
+        case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN:
+        case VK_RCONTROL: case VK_RMENU:
+        case VK_LWIN: case VK_RWIN: case VK_APPS:
+        case VK_PRIOR: case VK_NEXT:
+        case VK_END: case VK_HOME:
+        case VK_INSERT: case VK_DELETE:
+        case VK_DIVIDE:
+        case VK_NUMLOCK:
+            scanCode |= KF_EXTENDED;
+        default:
+            result = GetKeyNameTextA(scanCode << 16, szName, 128);
+    }
+    if(result == 0)
+    {
+        return "Mystery key";
+    }
+
+    std::string name(szName);
+    if(keycode & 0x200)
+    {
+        name = "Shift+"+name;
+    }
+    if(keycode & 0x100)
+    {
+        name = "Ctrl+"+name;
+    }
+    return name;
+}
+
+void save_hotkeys(std::string file)
+{
+    std::ofstream writeData (file);
+    writeData << "# Overlunky hotkeys" << std::endl
+        << "# Syntax:" << std::endl << "# function = keycode_in_hex" << std::endl
+        << "# For modifiers, add 0x100 for Ctrl or 0x200 for Shift" << std::endl
+        << "# For example: G is 0x47, so Ctrl+G is 0x147 etc" << std::endl
+        << "# Get more hex keycodes from https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes" << std::endl
+        << "# If you mess this file up, you can just delete it and run overlunky to get the defaults back" << std::endl;
+    for (const auto& kv : keys)
+    {
+        writeData << std::left << std::setw(16) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# " << key_string(keys[kv.first])<< std::endl;
+    }
+    writeData.close();
+}
+
+void load_hotkeys(std::string file)
+{
+    std::ifstream data(file);
+    if(!data.fail())
+    {
+        std::string line;
+        char inikey[32];
+        int inival;
+        while(std::getline(data, line))
+        {
+            if(line[0] != '#')
+            {
+                if(sscanf(line.c_str(), "%s = %i", inikey, &inival))
+                {
+                    std::string keystring(inikey);
+                    keys[keystring] = inival;
+                }
+            }
+        }
+        data.close();
+    }
+    save_hotkeys(file);
+}
 
 LRESULT CALLBACK msg_hook(
     _In_ int nCode,
@@ -125,7 +206,8 @@ LRESULT CALLBACK msg_hook(
     // TODO: if ImGui::GetIO().WantCaptureKeyboard == true, can we block keyboard message going to existing WndProc?
 }
 
-bool toggle(const char* name) {
+bool toggle(std::string tool) {
+    const char* name = windows[tool].c_str();
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
     ImGuiWindow* win = ImGui::FindWindowByName(name);
@@ -177,116 +259,166 @@ LRESULT CALLBACK window_hook(
     return 0;
 }
 
+bool pressed(std::string keyname, int wParam)
+{
+    if(keys.find(keyname) == keys.end())
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if(GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += 0x100;
+    }
+    if(GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += 0x200;
+    }
+    return wParam == keycode;
+}
+
 bool process_keys(
     _In_ int nCode,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam)
 {
-    if (nCode != WM_KEYDOWN)
-        return false;
+    if(nCode != WM_KEYDOWN) return false;
 
-    auto ctrl = GetAsyncKeyState(VK_CONTROL);
-
-    if(wParam == hide_ui) {
+    if(pressed("hide_ui", wParam)) {
         hidegui = !hidegui;
         return true;
     }
-    else if (wParam == VK_F1)
+    else if (pressed("tool_entity", wParam))
     {
-        if(toggle("Entity spawner (F1)")) {
+        if(toggle("tool_entity")) {
             set_focus_entity = true;
         }
         return true;
     }
-    else if (wParam == VK_F2)
+    else if (pressed("tool_door", wParam))
     {
-        if(toggle("Door to anywhere (F2)")) {
+        if(toggle("tool_door")) {
             set_focus_world = true;
         }
         return true;
     }
-    else if (wParam == VK_F3)
+    else if (pressed("tool_camera", wParam))
     {
-        if(toggle("Camera (F3)")) {
+        if(toggle("tool_camera")) {
             set_focus_zoom = true;
         }
         return true;
     }
-    else if (wParam == VK_F9)
+    else if (pressed("tool_options", wParam))
     {
-        toggle("Help and Options (F9)");
+        toggle("tool_options");
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == VK_OEM_PERIOD)
+    else if (pressed("zoom_out", wParam))
     {
         g_zoom += 1.0;
         set_zoom();
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == VK_OEM_COMMA)
+    else if (pressed("zoom_in", wParam))
     {
         g_zoom -= 1.0;
         set_zoom();
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == 0x32)
+    else if (pressed("zoom_default", wParam))
     {
         g_zoom = 13.5;
         set_zoom();
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == 0x33)
+    else if (pressed("zoom_3x", wParam))
     {
         g_zoom = 23.08;
         set_zoom();
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == 0x34)
+    else if (pressed("zoom_4x", wParam))
     {
         g_zoom = 29.87;
         set_zoom();
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == 0x35)
+    else if (pressed("zoom_5x", wParam))
     {
         g_zoom = 36.66;
         set_zoom();
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == 0x47) // G
+    else if (pressed("toggle_godmode", wParam))
     {
         god = !god;
         godmode(god);
         return true;
     }
-    else if (ctrl & 0x8000 && wParam == 0x4D) // M
+    else if (pressed("toggle_mouse", wParam)) // M
     {
         clickevents = !clickevents;
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == left)
+    else if (pressed("teleport_left", wParam))
     {
         teleport(-1, 0, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == right)
+    else if (pressed("teleport_right", wParam))
     {
         teleport(1, 0, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == up)
+    else if (pressed("teleport_up", wParam))
     {
         teleport(0, 1, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_MENU) && wParam == down)
+    else if (pressed("teleport_down", wParam))
     {
         teleport(0, -1, false);
         return true;
     }
-    else if (GetAsyncKeyState(VK_SHIFT) && wParam == etr)
+    else if (pressed("spawn_layer_door", wParam))
     {
         spawn_backdoor(0.0, 0.0);
+        return true;
+    }
+    else if(pressed("teleport", wParam))
+    {
+        teleport(g_x, g_y, false);
+        return true;
+    }
+    else if (pressed("coordinate_left", wParam))
+    {
+        g_x -= 1;
+        return true;
+    }
+    else if (pressed("coordinate_right", wParam))
+    {
+        g_x += 1;
+        return true;
+    }
+    else if (pressed("coordinate_up", wParam))
+    {
+        g_y += 1;
+        return true;
+    }
+    else if (pressed("coordinate_down", wParam))
+    {
+        g_y -= 1;
+        return true;
+    }
+    else if (pressed("spawn_entity", wParam))
+    {
+        spawn_entities(false);
+        return true;
+    }
+    else if (pressed("spawn_warp_door", wParam))
+    {
+        spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
         return true;
     }
 
@@ -296,67 +428,59 @@ bool process_keys(
     if(ImGui::GetIO().WantCaptureKeyboard)
     { // In-window keys
         int x = 0, y = 0;
-        bool enter = false;
 
-        /*switch (wParam)
+        if(pressed("move_left", wParam))
         {
-        case left:
             x = -1;
-            break;
-        case right:
-            x = 1;
-            break;
-        case up:
-            y = 1;
-            break;
-        case down:
-            y = -1;
-            break;
-        case etr:
-            enter = true;
-            break;
-        }*/
-
-        if(ctrl & 0x8000 && enter)
-        {
-            teleport(g_x, g_y, false);
-            return true;
         }
-        else if (enter && current == ImGui::FindWindowByName("Entity spawner (F1)"))
+        else if(pressed("move_right", wParam))
+        {
+            x = 1;
+        }
+        else if(pressed("move_up", wParam))
+        {
+            y = 1;
+        }
+        else if(pressed("move_down", wParam))
+        {
+            y = -1;
+        }
+        else if (pressed("enter", wParam) && current == ImGui::FindWindowByName(windows["tool_entity"].c_str()))
         {
             spawn_entities(false);
             return true;
         }
-        else if (enter && current == ImGui::FindWindowByName("Door to anywhere (F2)"))
+        else if (pressed("enter", wParam) && current == ImGui::FindWindowByName(windows["tool_door"].c_str()))
         {
             spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
             return true;
         }
-        else if (enter && current == ImGui::FindWindowByName("Camera (F3)"))
+        else if (pressed("enter", wParam) && current == ImGui::FindWindowByName(windows["tool_camera"].c_str()))
         {
             set_zoom();
             return true;
         }
 
         if (x == 0 && y == 0)
+        {
             return false;
-
-        if (ctrl & 0x8000)
-        {
-            g_x += x;
-            g_y += y;
         }
-        else
+
+        // List navigation
+        if (y != 0)
         {
-            // List navigation
-            if (y != 0) {
-                if(current == ImGui::FindWindowByName("Entity spawner (F1)"))
-                    g_current_item = std::min(std::max(g_current_item - y, 0), (int)g_items.size() - 1);
-                else if(current == ImGui::FindWindowByName("Door to anywhere (F2)"))
-                    g_to = std::min(std::max(g_to - y, 0), 15);
+            if(current == ImGui::FindWindowByName(windows["tool_entity"].c_str()))
+            {
+                g_current_item = std::min(std::max(g_current_item - y, 0), (int)g_items.size() - 1);
             }
-            if (x != 0)
-                return false;
+            else if(current == ImGui::FindWindowByName(windows["tool_door"].c_str()))
+            {
+                g_to = std::min(std::max(g_to - y, 0), 15);
+            }
+        }
+        if (x != 0)
+        {
+            return false;
         }
         return true;
     }
@@ -433,7 +557,14 @@ void render_list()
                 value_changed = true;
             }
             if (item_selected)
+            {
+                if(scroll_to_entity)
+                {
+                    ImGui::SetScrollHereY();
+                    scroll_to_entity = false;
+                }
                 ImGui::SetItemDefaultFocus();
+            }
             ImGui::PopID();
         }
     ImGui::ListBoxFooter();
@@ -596,6 +727,18 @@ void render_clickhandler()
     ImGui::End();
 }
 
+void render_options()
+{
+    ImGui::Checkbox("##clickevents", &clickevents);
+    ImGui::SameLine();
+    ImGui::Text("Enable click to spawn/teleport");
+    if(ImGui::Checkbox("##Godmode", &god)) {
+        godmode(god);
+    }
+    ImGui::SameLine();
+    ImGui::Text("Enable god mode");
+}
+
 void create_render_target()
 {
     ID3D11Texture2D *pBackBuffer;
@@ -684,7 +827,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             font = io.Fonts->AddFontDefault();
         }
 
-        getHotkeys("hotkeys.ini");
+        load_hotkeys("hotkeys.ini");
+        windows["tool_entity"] = "Entity spawner ("+key_string(keys["tool_entity"])+")";
+        windows["tool_door"] = "Door to anywhere ("+key_string(keys["tool_door"])+")";
+        windows["tool_camera"] = "Camera ("+key_string(keys["tool_camera"])+")";
+        windows["tool_options"] = "Options ("+key_string(keys["tool_options"])+")";
     }
 
     ImGui_ImplDX11_NewFrame();
@@ -703,7 +850,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     {
         ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
-        ImGui::Begin("Entity spawner (F1)");
+        ImGui::Begin(windows["tool_entity"].c_str());
         ImGui::PushItemWidth(-1);
         ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
         render_input();
@@ -713,7 +860,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
         ImGui::SetNextWindowSize({300, 125}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({400, 0}, ImGuiCond_FirstUseEver);
-        ImGui::Begin("Door to anywhere (F2)");
+        ImGui::Begin(windows["tool_door"].c_str());
         ImGui::PushItemWidth(-1);
         render_narnia();
         ImGui::PopItemWidth();
@@ -721,39 +868,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
         ImGui::SetNextWindowSize({300, 125}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({700, 0}, ImGuiCond_FirstUseEver);
-        ImGui::Begin("Camera (F3)");
+        ImGui::Begin(windows["tool_camera"].c_str());
         ImGui::PushItemWidth(-1);
         render_camera();
         ImGui::PopItemWidth();
         ImGui::End();
 
-        ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({400, 100}, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, 0}, ImGuiCond_FirstUseEver);
-        ImGui::Begin("Help and Options (F9)");
+        ImGui::Begin(windows["tool_options"].c_str());
         ImGui::PushItemWidth(-1);
-        ImGui::Checkbox("##clickevents", &clickevents);
-        ImGui::SameLine();
-        ImGui::Text("Enable click to spawn/teleport");
-        if(ImGui::Checkbox("##Godmode", &god)) {
-            godmode(god);
-        }
-        ImGui::SameLine();
-        ImGui::Text("Enable god mode");
-        ImGui::Text("Keys:");
-        if(clickevents) {
-            ImGui::Text("- (Enter) or (Mouse L) Use focused tool");
-            ImGui::Text("- (Ctrl+Enter) or (Mouse R) Teleport");
-        } else {
-            ImGui::Text("- (Enter) Use focused tool");
-            ImGui::Text("- (Ctrl+Enter) Teleport");
-        }
-        ImGui::Text("- (Arrows) Change selection in lists");
-        ImGui::Text("- (Ctrl+Arrows) Change spawning coordinates");
-        ImGui::Text("- (RAlt+Arrows) Teleport to direction");
-        ImGui::Text("- (Ctrl+Comma/Period) Change zoom level");
-        ImGui::Text("- (Shift+Enter) Spawn a door to back layer");
-        ImGui::Text("Write many numerical IDs separated by space in");
-        ImGui::Text("the entity spawner to spawn many items at once.");
+        render_options();
         ImGui::PopItemWidth();
         ImGui::End();
     }
