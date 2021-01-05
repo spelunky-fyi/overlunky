@@ -78,7 +78,8 @@ struct CXXEntityItem
     }
 };
 
-float g_x = 0, g_y = 0, g_zoom = 13.5;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5;
+ImVec2 startpos;
 int g_current_item = 0, g_filtered_count = 0;
 int g_level = 1, g_world = 1, g_to = 0;
 std::vector<CXXEntityItem> g_items;
@@ -233,14 +234,14 @@ bool toggle(std::string tool) {
 
 void spawn_entities(bool s) {
     if(g_filtered_count > 0) {
-        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s);
+        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy);
     } else {
         std::string texts(text);
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
         while(textss >> id) {
-            spawn_entity(id, g_x, g_y, s);
+            spawn_entity(id, g_x, g_y, s, g_vx, g_vy);
         }
     }
 }
@@ -365,19 +366,19 @@ bool process_keys(
     }
     else if (pressed("teleport_left", wParam))
     {
-        teleport(-3, 0, false);
+        teleport(-3, 0, false, 0, 0);
     }
     else if (pressed("teleport_right", wParam))
     {
-        teleport(3, 0, false);
+        teleport(3, 0, false, 0, 0);
     }
     else if (pressed("teleport_up", wParam))
     {
-        teleport(0, 3, false);
+        teleport(0, 3, false, 0, 0);
     }
     else if (pressed("teleport_down", wParam))
     {
-        teleport(0, -3, false);
+        teleport(0, -3, false, 0, 0);
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -385,7 +386,7 @@ bool process_keys(
     }
     else if(pressed("teleport", wParam))
     {
-        teleport(g_x, g_y, false);
+        teleport(g_x, g_y, false, 0, 0);
     }
     else if (pressed("coordinate_left", wParam))
     {
@@ -681,23 +682,47 @@ void render_clickhandler()
     ImGui::SetNextWindowPos({0, 0});
     ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
+
+    if((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowFocused())
+    {
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        startpos = pos;
+    }
+    if((ImGui::IsMouseDown(0) || ImGui::IsMouseDown(1)) && ImGui::IsWindowFocused())
+    {
+        ImVec2 pos = ImGui::GetMousePos();
+        auto* draw_list = ImGui::GetWindowDrawList();
+        draw_list->AddLine(startpos, pos, ImColor(255, 0, 0, 200));
+        draw_list->AddLine(ImVec2(startpos.x-5, startpos.y-5), ImVec2(startpos.x+6, startpos.y+6), ImColor(255, 255, 255, 200));
+        draw_list->AddLine(ImVec2(startpos.x-5, startpos.y+5), ImVec2(startpos.x+6, startpos.y-6), ImColor(255, 255, 255, 200));
+    }
     if(ImGui::IsMouseReleased(0) && ImGui::IsWindowFocused())
     {
         ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
-        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
+        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
+        g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
+        g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        g_vx = (g_vx - g_x);
+        g_vy = (g_vy - g_y)*0.5625;
         spawn_entities(true);
-        g_x = 0; g_y = 0;
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+
     }
     if(ImGui::IsMouseReleased(1) && ImGui::IsWindowFocused())
     {
         ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
-        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        teleport(g_x, g_y, true);
-        g_x = 0; g_y = 0;
+        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
+        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
+        g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
+        g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        g_vx = (g_vx - g_x);
+        g_vy = (g_vy - g_y)*0.5625;
+        teleport(g_x, g_y, true, g_vx, g_vy);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
     ImGui::End();
 }

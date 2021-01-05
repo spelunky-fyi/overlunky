@@ -126,7 +126,7 @@ unsafe extern "C" fn run(pid: u32) {
                     Some(player) => {
                         let (x, y) = player.position();
                         let layer = player.layer();
-                        state.layer(layer).spawn_entity(id, x, y, false);
+                        state.layer(layer).spawn_entity(id, x, y, false, 0.0, 0.0);
                     }
                 }
             }

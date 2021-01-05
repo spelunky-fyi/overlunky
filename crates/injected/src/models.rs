@@ -270,7 +270,7 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool) -> Entity {
+    pub unsafe fn spawn_entity(&self, id: usize, x: f32, y: f32, s: bool, mut vx: f32, mut vy: f32) -> Entity {
         let load_item: extern "C" fn(usize, usize, f32, f32) -> usize =
             std::mem::transmute(get_load_item());
         if !s {
@@ -281,9 +281,17 @@ impl Layer {
             let cx = read_f32(get_camera());
             let cy = read_f32(get_camera() + 4);
             let cz = read_f32(get_zoom());
-            let rx = cx + 0.74 * cz * x;
-            let ry = cy + 0.41625 * cz * y;
-            let addr: usize = load_item(self.pointer, id, rx.round(), ry.round());
+            let mut rx = cx + 0.74 * cz * x;
+            let mut ry = cy + 0.41625 * cz * y;
+            if vx.abs() + vy.abs() <= 0.01 {
+                rx = rx.round();
+                ry = ry.round();
+            }
+            let addr: usize = load_item(self.pointer, id, rx, ry);
+            if vx.abs() + vy.abs() > 0.01 {
+                write_mem(addr + 0x100, &vx.to_le_bytes());
+                write_mem(addr + 0x104, &vy.to_le_bytes());
+            }
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         }
@@ -302,11 +310,11 @@ impl Layer {
         let entity = match screen {
             11 => {
                 log::debug!("In camp, spawning starting exit");
-                self.spawn_entity(25, x.round(), y.round(), false)
+                self.spawn_entity(25, x.round(), y.round(), false, 0.0, 0.0)
             }
             12 => {
                 log::debug!("In game, spawning regular exit");
-                self.spawn_entity(23, x.round(), y.round(), false)
+                self.spawn_entity(23, x.round(), y.round(), false, 0.0, 0.0)
             }
             _ => return,
         };
@@ -380,7 +388,7 @@ impl Entity {
         }
     }
 
-    pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
+    pub fn teleport(&self, dx: f32, dy: f32, s: bool, vx: f32, vy: f32) {
         // e.g. topmost == turkey if riding turkey. player has relative coordinate to turkey.
         let topmost = self.topmost();
         let (mut x, mut y) = topmost.position();
@@ -408,9 +416,9 @@ impl Entity {
             write_mem(px, &x.to_le_bytes());
             write_mem(py, &y.to_le_bytes());
         }
-        // reset downforce
-        let df: f32 = 0.0;
-        write_mem(topmost.pointer + 0x104, &df.to_le_bytes());
+        // wheeee (doesnt really work)
+        write_mem(topmost.pointer + 0x100, &vx.to_le_bytes());
+        write_mem(topmost.pointer + 0x104, &vy.to_le_bytes());
         return;
     }
 
@@ -478,8 +486,8 @@ impl Player {
         self.entity.layer()
     }
 
-    pub fn teleport(&self, dx: f32, dy: f32, s: bool) {
-        self.entity.teleport(dx, dy, s)
+    pub fn teleport(&self, dx: f32, dy: f32, s: bool, vx: f32, vy: f32) {
+        self.entity.teleport(dx, dy, s, vx, vy)
     }
 
     pub fn status(&self) -> PlayerStatus {
