@@ -21,7 +21,7 @@ Current features and their *default* keyboard shortcuts:
       + **Ctrl+Shift+Space**: Teleport to coordinates
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
-      + **Mouse middle**: Drag most entities around (not stuff like walls)
+      + **Mouse middle**: Drag entities around (not stuff like walls)
       + **Shift+Mouse middle**: Drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
@@ -37,7 +37,7 @@ Current features and their *default* keyboard shortcuts:
       + **Ctrl+.**: Zoom out
       + **Ctrl+Numbers**: Set zoom level
       + Lock horizontal scrolling with the *N*x buttons for *N* wide levels
-      + Note: It only sets the *default* zoom level, which isn't used in camp or shops.
+      + Note: This doesn't work in camp, only levels.
   - **F9**: Options
       + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
       + **Ctrl+G**: Toggle god mode
