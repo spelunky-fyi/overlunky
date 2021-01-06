@@ -137,6 +137,7 @@ fn get_zoom() -> usize {
     let mut addr_zoom = memory.after_bundle;
     for _ in 0..3 {
         addr_zoom = find_inst(memory.exe(), &hex!("48 8B 48 10 C7 81"), addr_zoom + 1);
+        log::debug!("Zoom: {:x?}", addr_zoom);
     }
     memory.at_exe(addr_zoom) + 10
 }
@@ -260,7 +261,16 @@ impl State {
 
     pub fn zoom(&self, level: f32) {
         log::debug!("Zoom level: {:?}", level);
-        write_mem_prot(self.addr_zoom, &level.to_le_bytes(), true);
+        let memory = Memory::get();
+        let mut addr_zoom = memory.after_bundle;
+        let mut real_addr;
+        for i in 0..3 {
+            addr_zoom = find_inst(memory.exe(), &hex!("48 8B 48 10 C7 81"), addr_zoom + 1);
+            if i > 0 {
+                real_addr = memory.at_exe(addr_zoom) + 10;
+                write_mem_prot(real_addr, &level.to_le_bytes(), true);
+            }
+        }
     }
 
     pub fn click_position(&self, x: f32, y: f32) -> (f32, f32) {
