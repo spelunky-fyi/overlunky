@@ -426,17 +426,17 @@ bool process_keys(
     {
         spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
     }
-    else if (pressed("move_up", wParam) && (active("tool_entity") || active("entities")))
+    else if (pressed("move_up", wParam) && (active("tool_entity")))
     {
         g_current_item = std::min(std::max(g_current_item - 1, 0), (int)g_items.size() - 1);
         scroll_to_entity = true;
     }
-    else if (pressed("move_down", wParam) && (active("tool_entity") || active("entities")))
+    else if (pressed("move_down", wParam) && (active("tool_entity")))
     {
         g_current_item = std::min(std::max(g_current_item + 1, 0), (int)g_items.size() - 1);
         scroll_to_entity = true;
     }
-    else if (pressed("enter", wParam) && (active("tool_entity") || active("entities")))
+    else if (pressed("enter", wParam) && (active("tool_entity")))
     {
         spawn_entities(false);
     }
