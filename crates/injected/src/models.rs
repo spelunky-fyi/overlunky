@@ -301,7 +301,7 @@ impl Layer {
                 ry = ry.round();
             }
             let addr: usize = load_item(self.pointer, id, rx, ry);
-            if vx.abs() + vy.abs() > 0.02 {
+            if vx.abs() + vy.abs() > 0.04 {
                 write_mem(addr + 0x100, &vx.to_le_bytes());
                 write_mem(addr + 0x104, &vy.to_le_bytes());
             }
