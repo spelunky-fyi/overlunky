@@ -107,7 +107,7 @@ bool throw_held = false;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 
-const char* flagnames[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through floors", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Going left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI, noclip, nophys", "29: Dead", "30: ", "31: ", "32: " };
+const char* flagnames[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Going left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 
 bool process_keys(
     _In_ int nCode,
@@ -773,7 +773,7 @@ void render_clickhandler()
         }
         g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
         g_flags = get_entity_flags(g_held_entity);
-        g_flags |= 1 << 27;
+        g_flags |= 1 << 4;
         set_entity_flags(g_held_entity, g_flags);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
         g_last_entity = g_held_entity;
@@ -786,6 +786,10 @@ void render_clickhandler()
             startpos = ImGui::GetMousePos();
             throw_held = true;
         }
+        ImVec2 res = io.DisplaySize;
+        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
+        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
+        move_entity(g_held_entity, g_x, g_y, true, 0, 0);
         render_arrow();
     }
     else if(ImGui::IsMouseDown(2) && g_held_entity > 0)
@@ -803,7 +807,7 @@ void render_clickhandler()
         throw_held = false;
         io.MouseDrawCursor = true;
         g_flags = get_entity_flags(g_held_entity);
-        g_flags &= ~(1 << 27);
+        g_flags &= ~(1 << 4);
         set_entity_flags(g_held_entity, g_flags);
         ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
@@ -821,7 +825,7 @@ void render_clickhandler()
         throw_held = false;
         io.MouseDrawCursor = true;
         g_flags = get_entity_flags(g_held_entity);
-        g_flags &= ~(1 << 27);
+        g_flags &= ~(1 << 4);
         set_entity_flags(g_held_entity, g_flags);
         g_held_entity = 0;
     }
