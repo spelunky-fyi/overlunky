@@ -21,7 +21,11 @@ Current features and their *default* keyboard shortcuts:
       + **Ctrl+Shift+Space**: Teleport to coordinates
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
+      + **Mouse middle**: Drag most entities around (not stuff like walls)
+      + **Shift+Mouse middle**: Drag all entities around (even walls and background)
+      + **Ctrl+Mouse middle**: Launch dragged entity with velocity
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
+      + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
   - **F2**: Spawn doors to many places
       + **Enter**: Spawn warp door (when tool is active)

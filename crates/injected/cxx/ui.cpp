@@ -102,12 +102,12 @@ bool clickevents = false;
 bool file_written = false;
 bool god = false;
 bool hidedebug = true;
-bool snap_to_grid = true;
+bool snap_to_grid = false;
 bool throw_held = false;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 
-const char* flagnames[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Going left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
+const char* flagnames[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 
 bool process_keys(
     _In_ int nCode,
@@ -380,19 +380,19 @@ bool process_keys(
     }
     else if (pressed("teleport_left", wParam))
     {
-        teleport(-3, 0, false, 0, 0);
+        teleport(-3, 0, false, 0, 0, snap_to_grid);
     }
     else if (pressed("teleport_right", wParam))
     {
-        teleport(3, 0, false, 0, 0);
+        teleport(3, 0, false, 0, 0, snap_to_grid);
     }
     else if (pressed("teleport_up", wParam))
     {
-        teleport(0, 3, false, 0, 0);
+        teleport(0, 3, false, 0, 0, snap_to_grid);
     }
     else if (pressed("teleport_down", wParam))
     {
-        teleport(0, -3, false, 0, 0);
+        teleport(0, -3, false, 0, 0, snap_to_grid);
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -400,7 +400,7 @@ bool process_keys(
     }
     else if(pressed("teleport", wParam))
     {
-        teleport(g_x, g_y, false, 0, 0);
+        teleport(g_x, g_y, false, 0, 0, snap_to_grid);
     }
     else if (pressed("coordinate_left", wParam))
     {
@@ -773,7 +773,7 @@ void render_clickhandler()
     {
         set_pos(startpos);
         set_vel(ImGui::GetMousePos());
-        teleport(g_x, g_y, true, g_vx, g_vy);
+        teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
     if(ImGui::IsMouseReleased(0) || ImGui::IsMouseReleased(1))
@@ -805,7 +805,7 @@ void render_clickhandler()
             throw_held = true;
         }
         set_pos(startpos);
-        move_entity(g_held_entity, g_x, g_y, true, 0, 0);
+        move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
         render_arrow();
     }
     else if(ImGui::IsMouseDown(2) && g_held_entity > 0)
@@ -813,7 +813,7 @@ void render_clickhandler()
         throw_held = false;
         io.MouseDrawCursor = false;
         set_pos(ImGui::GetMousePos());
-        move_entity(g_held_entity, g_x, g_y, true, 0, 0);
+        move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
     }
     if(ImGui::IsMouseReleased(2) && GetAsyncKeyState(keys["mod_throw"]) & 0x8000 && g_held_entity > 0)
     {
@@ -824,7 +824,7 @@ void render_clickhandler()
         set_entity_flags(g_held_entity, g_flags);
         set_pos(startpos);
         set_vel(ImGui::GetMousePos());
-        move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy);
+        move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
     }
     else if(ImGui::IsMouseReleased(2) && g_held_entity > 0)
@@ -834,7 +834,8 @@ void render_clickhandler()
         g_flags = get_entity_flags(g_held_entity);
         g_flags &= ~(1 << 4);
         set_entity_flags(g_held_entity, g_flags);
-        g_held_entity = 0;
+        move_entity(g_held_entity, g_x, g_y, true, 0, 0, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
     }
     ImGui::End();
 }
@@ -856,7 +857,7 @@ void render_options()
 
 void render_debug()
 {
-    ImGui::Text("You're not supposed to be here!");
+    ImGui::TextWrapped("You're not supposed to be here, but since you already are, you could help me document what all these unknown flags do!");
     if(ImGui::Button("List items"))
     {
         list_items();
@@ -877,7 +878,6 @@ void render_debug()
     if(ImGui::Button("Set flags"))
     {
         set_entity_flags(g_last_entity, g_flags);
-        g_flags = get_entity_flags(g_last_entity);
     }
     unsigned int old_flags = g_flags;
     ImGui::Text("Flags:");

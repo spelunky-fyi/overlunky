@@ -417,7 +417,7 @@ impl Entity {
         }
     }
 
-    pub fn teleport(&self, dx: f32, dy: f32, s: bool, vx: f32, vy: f32) {
+    pub fn teleport(&self, dx: f32, dy: f32, s: bool, vx: f32, vy: f32, snap: bool) {
         // e.g. topmost == turkey if riding turkey. player has relative coordinate to turkey.
         let topmost = self.topmost();
         let (mut x, mut y) = topmost.position();
@@ -425,6 +425,10 @@ impl Entity {
             // player relative coordinates
             x += dx;
             y += dy;
+            if snap {
+                x = x.round();
+                y = y.round();
+            }
             let px = topmost.pointer + 0x40;
             let py = topmost.pointer + 0x44;
             log::debug!("Teleporting to {}, {}", x, y);
@@ -441,6 +445,10 @@ impl Entity {
             log::debug!("Camera is at {}, {}", cx, cy);
             x = cx + 0.74 * cz * dx;
             y = cy + 0.41625 * cz * dy;
+            if snap && vx.abs() + vy.abs() <= 0.04 {
+                x = x.round();
+                y = y.round();
+            }
             log::debug!("Teleporting to {}, {}", x, y);
             write_mem(px, &x.to_le_bytes());
             write_mem(py, &y.to_le_bytes());
@@ -515,8 +523,8 @@ impl Player {
         self.entity.layer()
     }
 
-    pub fn teleport(&self, dx: f32, dy: f32, s: bool, vx: f32, vy: f32) {
-        self.entity.teleport(dx, dy, s, vx, vy)
+    pub fn teleport(&self, dx: f32, dy: f32, s: bool, vx: f32, vy: f32, snap: bool) {
+        self.entity.teleport(dx, dy, s, vx, vy, snap)
     }
 
     pub fn status(&self) -> PlayerStatus {

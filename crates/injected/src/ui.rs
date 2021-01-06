@@ -7,12 +7,12 @@ pub mod ffi {
         unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) -> u32;
         unsafe fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
         unsafe fn spawn_backdoor(x: f32, y: f32);
-        unsafe fn teleport(x: f32, y: f32, s: bool, vx: f32, vy: f32);
+        unsafe fn teleport(x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool);
         unsafe fn godmode(g: bool);
         unsafe fn zoom(level: f32);
         unsafe fn list_items();
         unsafe fn get_entity_at(x: f32, y: f32, s: bool, r: f32, mask: u32) -> u32;
-        unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32);
+        unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool);
         unsafe fn get_entity_flags(id: u32) -> u32;
         unsafe fn set_entity_flags(id: u32, flags: u32);
         unsafe fn player_status();
@@ -102,13 +102,13 @@ pub unsafe fn spawn_backdoor(x: f32, y: f32) {
     }
 }
 
-pub unsafe fn teleport(x: f32, y: f32, s: bool, vx: f32, vy: f32) {
+pub unsafe fn teleport(x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) {
     let state = State::new();
 
     match state.items().player(0) {
         Some(player) => {
             log::debug!("Teleporting to relative {}, {}, {}", x, y, s);
-            player.teleport(x, y, s, vx, vy);
+            player.teleport(x, y, s, vx, vy, snap);
         }
         None => {}
     }
@@ -174,13 +174,13 @@ pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) 
     }
 }
 
-pub unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32) {
+pub unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) {
     let state = State::new();
     match state.items().player(0) {
         Some(player) => {
             for item in state.layer(player.layer()).items() {
                 if item.unique_id() == id {
-                    item.teleport(x, y, s, vx, vy);
+                    item.teleport(x, y, s, vx, vy, snap);
                 }
             }
         }
