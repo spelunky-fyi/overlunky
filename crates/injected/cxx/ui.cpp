@@ -81,8 +81,7 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5;
 ImVec2 startpos;
-int g_current_item = 0, g_filtered_count = 0;
-int g_level = 1, g_world = 1, g_to = 0;
+int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 static char text[500];
@@ -746,6 +745,28 @@ void render_clickhandler()
     }
     if(ImGui::IsMouseReleased(0) || ImGui::IsMouseReleased(1)) {
         io.MouseDrawCursor = true;
+    }
+    if(ImGui::IsMouseClicked(2))
+    {
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
+        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        g_held_entity = get_entity_at(g_x, g_y, true, 2, 0b01111111);
+        g_last_entity = g_held_entity;
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    if(ImGui::IsMouseDown(2) && g_held_entity > 0) {
+        io.MouseDrawCursor = false;
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
+        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        move_entity(g_held_entity, g_x, g_y, true);
+    }
+    if(ImGui::IsMouseReleased(2)) {
+        io.MouseDrawCursor = true;
+        g_held_entity = 0;
     }
     ImGui::End();
 }

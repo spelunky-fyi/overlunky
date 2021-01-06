@@ -11,6 +11,8 @@ pub mod ffi {
         unsafe fn godmode(g: bool);
         unsafe fn zoom(level: f32);
         unsafe fn list_items();
+        unsafe fn get_item_at(x: f32, y: f32, s: bool, r: f32, mask: u32) -> u32;
+        unsafe fn move_item(id: u32, x: f32, y: f32, s: bool);
         unsafe fn player_status();
     }
     unsafe extern "C++" {
@@ -129,6 +131,55 @@ pub unsafe fn list_items() {
                     item._type().search_flags,
                     item.position_self()
                 );
+            }
+        }
+        None => {}
+    }
+}
+
+pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) -> u32 {
+    let state = State::new();
+    if s {
+        let (rx, ry) = state.click_position(x, y);
+        x = rx; y = ry;
+    }
+    log::debug!("Items at {:?}:", (x, y));
+    match state.items().player(0) {
+        Some(player) => {
+            let mut found = Vec::new();
+            for item in state.layer(player.layer()).items() {
+                let (ix, iy) = item.position_self();
+                let flags = item._type().search_flags;
+                let distance = ((x-ix).powi(2) + (y-iy).powi(2)).sqrt();
+                if mask & flags > 0 && distance < r {
+                    log::debug!(
+                        "Item: {}, type: {:x}, position: {:?}, distance: {}",
+                        item.unique_id(),
+                        item._type().search_flags,
+                        item.position_self(),
+                        distance
+                    );
+                    found.push((item.unique_id(), distance));
+                }
+            }
+            if !found.is_empty() {
+                found.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+                return found.first().unwrap().0
+            }
+            0
+        }
+        None => 0
+    }
+}
+
+pub unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool) {
+    let state = State::new();
+    match state.items().player(0) {
+        Some(player) => {
+            for item in state.layer(player.layer()).items() {
+                if item.unique_id() == id {
+                    item.teleport(x, y, s, 0.0, 0.0);
+                }
             }
         }
         None => {}

@@ -262,6 +262,15 @@ impl State {
         log::debug!("Zoom level: {:?}", level);
         write_mem_prot(self.addr_zoom, &level.to_le_bytes(), true);
     }
+
+    pub fn click_position(&self, x: f32, y: f32) -> (f32, f32) {
+        let cx = read_f32(get_camera());
+        let cy = read_f32(get_camera() + 4);
+        let cz = read_f32(get_zoom());
+        let rx = cx + 0.74 * cz * x;
+        let ry = cy + 0.41625 * cz * y;
+        (rx, ry)
+    }
 }
 
 pub struct Layer {
