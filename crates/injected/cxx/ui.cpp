@@ -716,6 +716,16 @@ ImVec2 normalize(ImVec2 pos)
 {
     ImGuiIO &io = ImGui::GetIO();
     ImVec2 res = io.DisplaySize;
+    if(res.x/res.y > 1.78)
+    {
+        pos.x -= (res.x-res.y/9*16)/2;
+        res.x = res.y/9*16;
+    }
+    else if(res.x/res.y < 1.77)
+    {
+        pos.y -= (res.y-res.x/16*9)/2;
+        res.y = res.x/16*9;
+    }
     ImVec2 normal = ImVec2((pos.x-res.x/2)*(1.0/(res.x/2)), -(pos.y-res.y/2)*(1.0/(res.y/2)));
     return normal;
 }
