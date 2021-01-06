@@ -4,15 +4,17 @@ use crate::{db::ffi::EntityItem, models::State};
 #[cxx::bridge]
 pub mod ffi {
     extern "Rust" {
-        unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool);
+        unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) -> u32;
         unsafe fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
         unsafe fn spawn_backdoor(x: f32, y: f32);
         unsafe fn teleport(x: f32, y: f32, s: bool, vx: f32, vy: f32);
         unsafe fn godmode(g: bool);
         unsafe fn zoom(level: f32);
         unsafe fn list_items();
-        unsafe fn get_item_at(x: f32, y: f32, s: bool, r: f32, mask: u32) -> u32;
-        unsafe fn move_item(id: u32, x: f32, y: f32, s: bool);
+        unsafe fn get_entity_at(x: f32, y: f32, s: bool, r: f32, mask: u32) -> u32;
+        unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32);
+        unsafe fn get_entity_flags(id: u32) -> u32;
+        unsafe fn set_entity_flags(id: u32, flags: u32);
         unsafe fn player_status();
     }
     unsafe extern "C++" {
@@ -29,7 +31,7 @@ pub unsafe fn create_box(items: &Vec<EntityItem>) {
 }
 
 // TODO: expose this to RPC
-pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) {
+pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) -> u32 {
     let state = State::new();
 
     match state.items().player(0) {
@@ -37,15 +39,15 @@ pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32,
             let (_x, _y) = player.position();
             if !s {
                 log::debug!("Spawning {} on {}, {}", id, x + _x, y + _y);
-                state
+                return state
                     .layer(player.layer())
-                    .spawn_entity(id, x + _x, y + _y, s, vx, vy, snap);
+                    .spawn_entity(id, x + _x, y + _y, s, vx, vy, snap).unique_id();
             } else {
                 log::debug!("Spawning {} on screen {}, {}", id, x, y);
-                state.layer(player.layer()).spawn_entity(id, x, y, s, vx, vy, snap);
+                return state.layer(player.layer()).spawn_entity(id, x, y, s, vx, vy, snap).unique_id();
             }
         }
-        None => {}
+        None => 0
     }
 }
 
@@ -172,13 +174,48 @@ pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) 
     }
 }
 
-pub unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool) {
+pub unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32) {
     let state = State::new();
     match state.items().player(0) {
         Some(player) => {
             for item in state.layer(player.layer()).items() {
                 if item.unique_id() == id {
-                    item.teleport(x, y, s, 0.0, 0.0);
+                    item.teleport(x, y, s, vx, vy);
+                }
+            }
+        }
+        None => {}
+    }
+}
+
+pub unsafe fn get_entity_flags(id: u32) -> u32 {
+    if id == 0 {
+        return 0
+    }
+    let state = State::new();
+    match state.items().player(0) {
+        Some(player) => {
+            for item in state.layer(player.layer()).items() {
+                if item.unique_id() == id {
+                    return item.flags()
+                }
+            }
+        }
+        None => {}
+    }
+    0
+}
+
+pub unsafe fn set_entity_flags(id: u32, flags: u32) {
+    if id == 0 {
+        return
+    }
+    let state = State::new();
+    match state.items().player(0) {
+        Some(player) => {
+            for item in state.layer(player.layer()).items() {
+                if item.unique_id() == id {
+                    item.set_flags(flags);
                 }
             }
         }

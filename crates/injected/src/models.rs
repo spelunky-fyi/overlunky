@@ -296,7 +296,7 @@ impl Layer {
             let cz = read_f32(get_zoom());
             let mut rx = cx + 0.74 * cz * x;
             let mut ry = cy + 0.41625 * cz * y;
-            if snap && vx.abs() + vy.abs() <= 0.02 {
+            if snap && vx.abs() + vy.abs() <= 0.04 {
                 rx = rx.round();
                 ry = ry.round();
             }
@@ -380,6 +380,12 @@ impl Entity {
 
     pub fn unique_id(&self) -> u32 {
         read_u32(self.pointer + 0x38)
+    }
+    pub fn flags(&self) -> u32 {
+        read_u32(self.pointer + 0x30)
+    }
+    pub fn set_flags(&self, f: u32) {
+        write_mem(self.pointer + 0x30, &f.to_le_bytes());
     }
     pub fn overlay(&self) -> Option<Entity> {
         match read_u64(self.pointer + 0x10) {

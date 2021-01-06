@@ -51,8 +51,11 @@ std::map<std::string, int> keys{
     { "coordinate_up", 0x126 },
     { "coordinate_right", 0x127 },
     { "coordinate_down", 0x128 },
+    { "mod_entity_mask", 0x10 },
+    { "mod_throw", 0x11 },
     //{ "", 0x },
 };
+
 
 std::map<std::string, std::string> windows;
 
@@ -82,6 +85,7 @@ struct CXXEntityItem
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5;
 ImVec2 startpos;
 int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0;
+unsigned int g_flags = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 static char text[500];
@@ -99,8 +103,11 @@ bool file_written = false;
 bool god = false;
 bool hidedebug = true;
 bool snap_to_grid = true;
+bool throw_held = false;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
+
+const char* flagnames[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through floors", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Going left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI, noclip, nophys", "29: Dead", "30: ", "31: ", "32: " };
 
 bool process_keys(
     _In_ int nCode,
@@ -235,14 +242,16 @@ bool toggle(std::string tool) {
 
 void spawn_entities(bool s) {
     if(g_filtered_count > 0) {
-        spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
+        g_last_entity = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
+        g_flags = get_entity_flags(g_last_entity);
     } else {
         std::string texts(text);
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
         while(textss >> id) {
-            spawn_entity(id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
+            g_last_entity = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
+            g_flags = get_entity_flags(g_last_entity);
         }
     }
 }
@@ -680,6 +689,29 @@ void render_camera()
     }
 }
 
+void render_arrow()
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    ImVec2 pos = ImGui::GetMousePos();
+    ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
+    float length = sqrt(pow(line.x, 2) + pow(line.y, 2));
+    float theta = 0.7;
+    float width = 10+length/15;
+    float tpoint = width / (2 * (tanf(theta) / 2) * length);
+    ImVec2 point = ImVec2(pos.x + (-tpoint * line.x), pos.y + (-tpoint * line.y));
+    ImVec2 normal = ImVec2(-line.x, line.y);
+    float tnormal = width / (2 * length);
+    ImVec2 leftpoint = ImVec2(point.x + tnormal * normal.y, point.y + tnormal * normal.x);
+    ImVec2 rightpoint = ImVec2(point.x + (-tnormal * normal.y), point.y + (-tnormal * normal.x));
+    auto* draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddLine(ImVec2(startpos.x-9, startpos.y-9), ImVec2(startpos.x+10, startpos.y+10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(ImVec2(startpos.x-9, startpos.y+9), ImVec2(startpos.x+10, startpos.y-10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(startpos, pos, ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(leftpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(rightpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+}
+
 void render_clickhandler()
 {
     ImGuiIO &io = ImGui::GetIO();
@@ -691,30 +723,11 @@ void render_clickhandler()
     if((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowFocused())
     {
         io.MouseDrawCursor = false;
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        startpos = pos;
+        startpos = ImGui::GetMousePos();
     }
     if((ImGui::IsMouseDown(0) || ImGui::IsMouseDown(1)) && ImGui::IsWindowFocused())
     {
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
-        float length = sqrt(pow(line.x, 2) + pow(line.y, 2));
-        float theta = 0.7;
-        float width = 10+length/15;
-        float tpoint = width / (2 * (tanf(theta) / 2) * length);
-        ImVec2 point = ImVec2(pos.x + (-tpoint * line.x), pos.y + (-tpoint * line.y));
-        ImVec2 normal = ImVec2(-line.x, line.y);
-        float tnormal = width / (2 * length);
-        ImVec2 leftpoint = ImVec2(point.x + tnormal * normal.y, point.y + tnormal * normal.x);
-        ImVec2 rightpoint = ImVec2(point.x + (-tnormal * normal.y), point.y + (-tnormal * normal.x));
-        auto* draw_list = ImGui::GetWindowDrawList();
-        draw_list->AddLine(ImVec2(startpos.x-9, startpos.y-9), ImVec2(startpos.x+10, startpos.y+10), ImColor(255, 255, 255, 200), 2);
-        draw_list->AddLine(ImVec2(startpos.x-9, startpos.y+9), ImVec2(startpos.x+10, startpos.y-10), ImColor(255, 255, 255, 200), 2);
-        draw_list->AddLine(startpos, pos, ImColor(255, 0, 0, 200), 2);
-        draw_list->AddLine(leftpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
-        draw_list->AddLine(rightpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+        render_arrow();
     }
     if(ImGui::IsMouseReleased(0) && ImGui::IsWindowFocused())
     {
@@ -724,8 +737,8 @@ void render_clickhandler()
         g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
         g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
         g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = (g_vx - g_x);
-        g_vy = (g_vy - g_y)*0.5625;
+        g_vx = 2*(g_vx - g_x);
+        g_vy = 2*(g_vy - g_y)*0.5625;
         spawn_entities(true);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
 
@@ -738,12 +751,13 @@ void render_clickhandler()
         g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
         g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
         g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = (g_vx - g_x);
-        g_vy = (g_vy - g_y)*0.5625;
+        g_vx = 2*(g_vx - g_x);
+        g_vy = 2*(g_vy - g_y)*0.5625;
         teleport(g_x, g_y, true, g_vx, g_vy);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
-    if(ImGui::IsMouseReleased(0) || ImGui::IsMouseReleased(1)) {
+    if(ImGui::IsMouseReleased(0) || ImGui::IsMouseReleased(1))
+    {
         io.MouseDrawCursor = true;
     }
     if(ImGui::IsMouseClicked(2))
@@ -752,20 +766,63 @@ void render_clickhandler()
         ImVec2 pos = ImGui::GetMousePos();
         g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
         g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        g_held_entity = get_entity_at(g_x, g_y, true, 2, 0b01111111);
-        g_last_entity = g_held_entity;
+        unsigned int mask = 0b01111111;
+        if(GetAsyncKeyState(keys["mod_entity_mask"]) & 0x8000)
+        {
+            mask = 2147483647;
+        }
+        g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
+        g_flags = get_entity_flags(g_held_entity);
+        g_flags |= 1 << 27;
+        set_entity_flags(g_held_entity, g_flags);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        g_last_entity = g_held_entity;
+        startpos = pos;
     }
-    if(ImGui::IsMouseDown(2) && g_held_entity > 0) {
+    if(ImGui::IsMouseDown(2) && GetAsyncKeyState(keys["mod_throw"]) & 0x8000 && g_held_entity > 0)
+    {
+        if(!throw_held)
+        {
+            startpos = ImGui::GetMousePos();
+            throw_held = true;
+        }
+        render_arrow();
+    }
+    else if(ImGui::IsMouseDown(2) && g_held_entity > 0)
+    {
+        throw_held = false;
         io.MouseDrawCursor = false;
         ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
         g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
         g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        move_entity(g_held_entity, g_x, g_y, true);
+        move_entity(g_held_entity, g_x, g_y, true, 0, 0);
     }
-    if(ImGui::IsMouseReleased(2)) {
+    if(ImGui::IsMouseReleased(2) && GetAsyncKeyState(keys["mod_throw"]) & 0x8000 && g_held_entity > 0)
+    {
+        throw_held = false;
         io.MouseDrawCursor = true;
+        g_flags = get_entity_flags(g_held_entity);
+        g_flags &= ~(1 << 27);
+        set_entity_flags(g_held_entity, g_flags);
+        ImVec2 res = io.DisplaySize;
+        ImVec2 pos = ImGui::GetMousePos();
+        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
+        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
+        g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
+        g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        g_vx = 2*(g_vx - g_x);
+        g_vy = 2*(g_vy - g_y)*0.5625;
+        move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+    }
+    else if(ImGui::IsMouseReleased(2) && g_held_entity > 0)
+    {
+        throw_held = false;
+        io.MouseDrawCursor = true;
+        g_flags = get_entity_flags(g_held_entity);
+        g_flags &= ~(1 << 27);
+        set_entity_flags(g_held_entity, g_flags);
         g_held_entity = 0;
     }
     ImGui::End();
@@ -797,6 +854,29 @@ void render_debug()
     if(ImGui::Button("Player status"))
     {
         player_status();
+    }
+    ImGui::Text("Entity ID:");
+    ImGui::SameLine();
+    ImGui::InputInt("##EntityID", &g_last_entity, 1, 1, 0);
+    if(ImGui::Button("Get flags"))
+    {
+        g_flags = get_entity_flags(g_last_entity);
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Set flags"))
+    {
+        set_entity_flags(g_last_entity, g_flags);
+        g_flags = get_entity_flags(g_last_entity);
+    }
+    unsigned int old_flags = g_flags;
+    ImGui::Text("Flags:");
+    for(int i = 0; i < 32; i++) {
+        ImGui::CheckboxFlags(flagnames[i], &g_flags, pow(2, i));
+    }
+    if(old_flags != g_flags)
+    {
+        old_flags = g_flags;
+        set_entity_flags(g_last_entity, g_flags);
     }
 }
 
