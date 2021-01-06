@@ -31,7 +31,7 @@ std::map<std::string, int> keys{
     { "tool_door", 0x71 },
     { "tool_camera", 0x72 },
     { "tool_options", 0x78 },
-    { "tool_debug", 0x344 },
+    { "tool_debug", 0x37b },
     { "spawn_entity", 0x10d },
     { "spawn_layer_door", 0x20d },
     { "spawn_warp_door", 0x30d },
@@ -1035,17 +1035,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         render_options();
         ImGui::PopItemWidth();
         ImGui::End();
-    }
 
-    if(!hidedebug)
-    {
-        ImGui::SetNextWindowSize({400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
-        ImGui::Begin(windows["tool_debug"].c_str());
-        ImGui::PushItemWidth(-1);
-        render_debug();
-        ImGui::PopItemWidth();
-        ImGui::End();
+        if(!hidedebug)
+        {
+            ImGui::SetNextWindowSize({400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
+            ImGui::Begin(windows["tool_debug"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_debug();
+            ImGui::PopItemWidth();
+            ImGui::End();
+        }
     }
 
     ImGui::Render();
