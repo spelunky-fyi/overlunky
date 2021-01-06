@@ -712,6 +712,28 @@ void render_arrow()
     draw_list->AddLine(rightpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
 }
 
+ImVec2 normalize(ImVec2 pos)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    ImVec2 normal = ImVec2((pos.x-res.x/2)*(1.0/(res.x/2)), -(pos.y-res.y/2)*(1.0/(res.y/2)));
+    return normal;
+}
+
+void set_pos(ImVec2 pos)
+{
+    g_x = normalize(pos).x;
+    g_y = normalize(pos).y;
+}
+
+void set_vel(ImVec2 pos)
+{
+    g_vx = normalize(pos).x;
+    g_vy = normalize(pos).y;
+    g_vx = 2*(g_vx - g_x);
+    g_vy = 2*(g_vy - g_y)*0.5625;
+}
+
 void render_clickhandler()
 {
     ImGuiIO &io = ImGui::GetIO();
@@ -731,28 +753,16 @@ void render_clickhandler()
     }
     if(ImGui::IsMouseReleased(0) && ImGui::IsWindowFocused())
     {
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = 2*(g_vx - g_x);
-        g_vy = 2*(g_vy - g_y)*0.5625;
+        set_pos(startpos);
+        set_vel(ImGui::GetMousePos());
         spawn_entities(true);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
 
     }
     if(ImGui::IsMouseReleased(1) && ImGui::IsWindowFocused())
     {
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = 2*(g_vx - g_x);
-        g_vy = 2*(g_vy - g_y)*0.5625;
+        set_pos(startpos);
+        set_vel(ImGui::GetMousePos());
         teleport(g_x, g_y, true, g_vx, g_vy);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
@@ -762,10 +772,8 @@ void render_clickhandler()
     }
     if(ImGui::IsMouseClicked(2))
     {
-        ImVec2 res = io.DisplaySize;
         ImVec2 pos = ImGui::GetMousePos();
-        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        set_pos(pos);
         unsigned int mask = 0b01111111;
         if(GetAsyncKeyState(keys["mod_entity_mask"]) & 0x8000)
         {
@@ -786,9 +794,7 @@ void render_clickhandler()
             startpos = ImGui::GetMousePos();
             throw_held = true;
         }
-        ImVec2 res = io.DisplaySize;
-        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
+        set_pos(startpos);
         move_entity(g_held_entity, g_x, g_y, true, 0, 0);
         render_arrow();
     }
@@ -796,10 +802,7 @@ void render_clickhandler()
     {
         throw_held = false;
         io.MouseDrawCursor = false;
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        g_x = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(pos.y-res.y/2)*(1.0/(res.y/2));
+        set_pos(ImGui::GetMousePos());
         move_entity(g_held_entity, g_x, g_y, true, 0, 0);
     }
     if(ImGui::IsMouseReleased(2) && GetAsyncKeyState(keys["mod_throw"]) & 0x8000 && g_held_entity > 0)
@@ -809,14 +812,8 @@ void render_clickhandler()
         g_flags = get_entity_flags(g_held_entity);
         g_flags &= ~(1 << 4);
         set_entity_flags(g_held_entity, g_flags);
-        ImVec2 res = io.DisplaySize;
-        ImVec2 pos = ImGui::GetMousePos();
-        g_x = (startpos.x-res.x/2)*(1.0/(res.x/2));
-        g_y = -(startpos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = (pos.x-res.x/2)*(1.0/(res.x/2));
-        g_vy = -(pos.y-res.y/2)*(1.0/(res.y/2));
-        g_vx = 2*(g_vx - g_x);
-        g_vy = 2*(g_vy - g_y)*0.5625;
+        set_pos(startpos);
+        set_vel(ImGui::GetMousePos());
         move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
     }
