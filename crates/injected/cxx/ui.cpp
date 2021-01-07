@@ -132,12 +132,14 @@ bool process_resizing(
 
 std::string key_string(int keycode)
 {
-    if(keycode & 0xff == 0) return "Disabled";
     UCHAR virtualKey = keycode & 0xff;
     CHAR szName[128];
     int result = 0;
     std::string name;
-    if(!(keycode & 0x400)) // keyboard
+    if(keycode & 0xff == 0) {
+        name = "Disabled";
+    }
+    else if(!(keycode & 0x400)) // keyboard
     {
         UINT scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
         switch (virtualKey)
