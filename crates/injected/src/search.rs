@@ -23,7 +23,8 @@ pub fn find_after_bundle(exe: &[u8]) -> usize {
         }
         offset += (8 + l0 + l1) as usize;
     }
-    offset
+
+    find_inst(exe, &[0x48, 0x81, 0xEC, 0xE8, 0x00, 0x00, 0x00], offset)
 }
 
 pub fn find_inst(exe: &[u8], needle: &[u8], start: usize) -> usize {
