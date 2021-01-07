@@ -682,7 +682,7 @@ void write_file()
 {
     std::ofstream file;
     file.open("entities.txt");
-    for (int i = 0; i < g_items.size(); i++)
+    for (int i = 1; i < g_items.size(); i++)
     {
         file << g_items[i].id << ": " << g_items[i].name.data() << std::endl;
     }
