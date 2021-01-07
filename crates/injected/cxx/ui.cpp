@@ -132,6 +132,7 @@ bool process_resizing(
 
 std::string key_string(int keycode)
 {
+    if(keycode & 0xff == 0) return "Disabled";
     UCHAR virtualKey = keycode & 0xff;
     CHAR szName[128];
     int result = 0;
@@ -185,6 +186,7 @@ void save_hotkeys(std::string file)
         << "# Syntax:" << std::endl << "# function = keycode_in_hex" << std::endl
         << "# For modifiers, add 0x100 for Ctrl or 0x200 for Shift" << std::endl
         << "# For mouse buttons, add 0x400" << std::endl
+        << "# Set to 0x0 to disable key" << std::endl
         << "# Example: G is 0x47, so Ctrl+G is 0x147, 0x402 is Mouse2 etc" << std::endl
         << "# Get more hex keycodes from https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes" << std::endl
         << "# If you mess this file up, you can just delete it and run overlunky to get the defaults back" << std::endl;
@@ -263,6 +265,7 @@ bool toggle(std::string tool) {
 }
 
 void spawn_entities(bool s) {
+    if(g_current_item == 0 && g_filtered_count == g_items.size()) return;
     std::string search(text);
     const auto pos = search.find_first_of(" ");
     if(pos == std::string::npos && g_filtered_count > 0) {
@@ -284,8 +287,8 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
 {
     if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
     {
-        data->InsertChars(data->CursorPos, "..");
         if(g_filtered_count == 0) return 1;
+        if(g_current_item == 0 && g_filtered_count == g_items.size()) return 1;
         std::string search(text);
         while(!search.empty() && std::isspace(search.back())) search.pop_back();
         const auto pos = search.find_last_of(" ");
@@ -325,7 +328,7 @@ LRESULT CALLBACK window_hook(
 
 bool pressed(std::string keyname, int wParam)
 {
-    if(keys.find(keyname) == keys.end())
+    if(keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
     {
         return false;
     }
@@ -343,7 +346,7 @@ bool pressed(std::string keyname, int wParam)
 
 bool clicked(std::string keyname) {
     int wParam = 0x400;
-    if(keys.find(keyname) == keys.end())
+    if(keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
     {
         return false;
     }
@@ -369,7 +372,7 @@ bool clicked(std::string keyname) {
 
 bool held(std::string keyname) {
     int wParam = 0x400;
-    if(keys.find(keyname) == keys.end())
+    if(keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
     {
         return false;
     }
@@ -395,7 +398,7 @@ bool held(std::string keyname) {
 
 bool released(std::string keyname) {
     int wParam = 0x400;
-    if(keys.find(keyname) == keys.end())
+    if(keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
     {
         return false;
     }
@@ -646,6 +649,7 @@ void update_filter(const char *s)
     {
         if (s[0] == '\0' || std::isspace(search.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
         {
+            if(g_items[i].id == 0 && s[0] != '\0') continue;
             g_filtered_items[count++] = i;
         }
     }
@@ -1080,7 +1084,7 @@ void render_options()
     ImGui::Text("God mode");
     ImGui::Checkbox("##Snap", &snap_to_grid);
     ImGui::SameLine();
-    ImGui::Text("Snap entities to grid");
+    ImGui::Text("Snap to grid");
 }
 
 void render_debug()
@@ -1290,6 +1294,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 void create_box(rust::Vec<rust::String> names, rust::Vec<uint16_t> ids)
 {
     std::vector<CXXEntityItem> new_items;
+    new_items.emplace_back("ENT_TYPE_Select entity to spawn:", 0); // :D
     if (names.size())
     {
         new_items.reserve(names.size());
