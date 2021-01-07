@@ -15,6 +15,7 @@ You are strongly discouraged from using any modding tools in your actual online 
 Current features and their *default* keyboard shortcuts:
   - **F1**: Search and spawn entities where you're standing
       + **Enter**: Spawn entity (when tool is active)
+      + **Tab**: Add selected itemid to list
       + **Ctrl+Enter**: Spawn entity
       + **Ctrl+Arrows**: Move spawn coordinates around you
       + **Ctrl+Shift+Arrows**: Teleport to direction
@@ -22,6 +23,8 @@ Current features and their *default* keyboard shortcuts:
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
       + **Mouse middle**: Drag entities around (not stuff like walls)
+      + **(Ctrl/Shift+)Mouse 4**: Zap/Boom/Big Bang/Nuke!
+      + **Mouse 5**: Clone gun
       + **Shift+Mouse middle**: Drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
