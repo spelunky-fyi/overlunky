@@ -105,6 +105,7 @@ bool set_focus_entity = false;
 bool set_focus_world = false;
 bool set_focus_zoom = false;
 bool scroll_to_entity = false;
+bool scroll_top = false;
 bool click_spawn = false;
 bool click_teleport = false;
 bool hidegui = false;
@@ -262,7 +263,9 @@ bool toggle(std::string tool) {
 }
 
 void spawn_entities(bool s) {
-    if(g_filtered_count > 0) {
+    std::string search(text);
+    const auto pos = search.find_first_of(" ");
+    if(pos == std::string::npos && g_filtered_count > 0) {
         g_last_entity = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
         g_flags = get_entity_flags(g_last_entity);
     } else {
@@ -275,6 +278,30 @@ void spawn_entities(bool s) {
             g_flags = get_entity_flags(g_last_entity);
         }
     }
+}
+
+int pick_selected_entity(ImGuiInputTextCallbackData* data)
+{
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
+    {
+        data->InsertChars(data->CursorPos, "..");
+        if(g_filtered_count == 0) return 1;
+        std::string search(text);
+        while(!search.empty() && std::isspace(search.back())) search.pop_back();
+        const auto pos = search.find_last_of(" ");
+        if(pos == std::string::npos)
+        {
+            search = "";
+        } else {
+            search = search.substr(0, pos)+" ";
+        }
+        std::stringstream searchss;
+        searchss << search << g_items[g_filtered_items[g_current_item]].id << " ";
+        search = searchss.str();
+        data->DeleteChars(0, data->BufTextLen);
+        data->InsertChars(0, search.data());
+    }
+    return 0;
 }
 
 void set_zoom() {
@@ -525,17 +552,17 @@ bool process_keys(
     {
         spawn_door(0.0, 0.0, g_world, g_level, 1, g_to+1);
     }
-    else if (pressed("move_up", wParam) && (active("tool_entity")))
+    else if (pressed("move_up", wParam) && active("tool_entity"))
     {
-        g_current_item = std::min(std::max(g_current_item - 1, 0), (int)g_items.size() - 1);
+        g_current_item = std::min(std::max(g_current_item - 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
-    else if (pressed("move_down", wParam) && (active("tool_entity")))
+    else if (pressed("move_down", wParam) && active("tool_entity"))
     {
-        g_current_item = std::min(std::max(g_current_item + 1, 0), (int)g_items.size() - 1);
+        g_current_item = std::min(std::max(g_current_item + 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
-    else if (pressed("enter", wParam) && (active("tool_entity")))
+    else if (pressed("enter", wParam) && active("tool_entity"))
     {
         spawn_entities(false);
     }
@@ -595,18 +622,36 @@ void init_imgui()
     }
 }
 
+std::string last_word(std::string str)
+{
+    while(!str.empty() && std::isspace(str.back())) str.pop_back();
+    const auto pos = str.find_last_of(" ");
+    return pos == std::string::npos ? str : str.substr(pos+1);
+}
+
 void update_filter(const char *s)
 {
     int count = 0;
+    std::string search(s);
+    std::string last = last_word(search);
+    int searchid = 0;
+    try
+    {
+        searchid = stoi(last);
+    }
+    catch(const std::exception &err)
+    {
+    }
     for (int i = 0; i < g_items.size(); i++)
     {
-        if (s[0] == '\0' || StrStrIA(g_items[i].name.data(), s))
+        if (s[0] == '\0' || std::isspace(search.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
         {
             g_filtered_items[count++] = i;
         }
     }
     g_filtered_count = count;
     g_current_item = 0;
+    scroll_top = true;
 }
 
 void write_file()
@@ -629,7 +674,13 @@ void render_list()
     bool value_changed = false;
     ImGuiListClipper clipper;
     clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
+    if(scroll_top)
+    {
+        scroll_top = false;
+        ImGui::SetScrollHereY();
+    }
     while (clipper.Step())
+    {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
         {
             const bool item_selected = (i == g_current_item);
@@ -652,10 +703,11 @@ void render_list()
                     ImGui::SetScrollHereY();
                     scroll_to_entity = false;
                 }
-                ImGui::SetItemDefaultFocus();
+                //ImGui::SetItemDefaultFocus();
             }
             ImGui::PopID();
         }
+    }
     ImGui::ListBoxFooter();
 }
 
@@ -665,7 +717,6 @@ void render_themes()
     if (!ImGui::BeginCombo("##Theme", themes[g_to]))
         return;
     bool value_changed = false;
-    ImGuiListClipper clipper;
     for (int i = 0; i < 16; i++)
     {
         const bool item_selected = (i == g_to);
@@ -693,7 +744,7 @@ void render_input()
     }
     ImVec2 region = ImGui::GetContentRegionMax();
     ImGui::PushItemWidth(region.x-70);
-    if (ImGui::InputText("##Input", text, sizeof(text), 0, NULL))
+    if (ImGui::InputText("##Input", text, sizeof(text), ImGuiInputTextFlags_CallbackCompletion, pick_selected_entity))
     {
         update_filter(text);
     }
