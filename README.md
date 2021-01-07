@@ -2,8 +2,6 @@
 
 An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the Spelunky Community Discord.
 
-**Please note that Overlunky is currently not compatible with Modlunky2 repacked executables!** (See [#10](https://github.com/spelunky-fyi/overlunky/issues/10) for more information.)
-
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
 [![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.0j-green).
@@ -57,7 +55,6 @@ Check `Spelunky 2/hotkeys.ini` after running Overlunky to change shortcut keys a
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either.
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.**
   - If your game crashes when actually trying to use the tools:
-    + We're not currently compatible with modlunky2, sorry!
     + Some entities just crash the game, try to avoid them next time.
   - If you're missing some overlay windows:
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions.
