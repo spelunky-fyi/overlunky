@@ -51,8 +51,18 @@ std::map<std::string, int> keys{
     { "coordinate_up", 0x126 },
     { "coordinate_right", 0x127 },
     { "coordinate_down", 0x128 },
-    { "mod_entity_mask", 0x10 },
-    { "mod_throw", 0x11 },
+    { "mouse_spawn", 0x401 },
+    { "mouse_spawn_throw", 0x401 },
+    { "mouse_teleport", 0x402 },
+    { "mouse_teleport_throw", 0x402 },
+    { "mouse_grab", 0x403 },
+    { "mouse_grab_unsafe", 0x603 },
+    { "mouse_grab_throw", 0x503 },
+    { "mouse_zap", 0x404 },
+    { "mouse_boom", 0x504 },
+    { "mouse_big_boom", 0x604 },
+    { "mouse_nuke", 0x704 },
+    { "mouse_clone", 0x405 },
     //{ "", 0x },
 };
 
@@ -122,30 +132,40 @@ bool process_resizing(
 std::string key_string(int keycode)
 {
     UCHAR virtualKey = keycode & 0xff;
-    UINT scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
-
     CHAR szName[128];
     int result = 0;
-    switch (virtualKey)
+    std::string name;
+    if(!(keycode & 0x400)) // keyboard
     {
-        case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN:
-        case VK_RCONTROL: case VK_RMENU:
-        case VK_LWIN: case VK_RWIN: case VK_APPS:
-        case VK_PRIOR: case VK_NEXT:
-        case VK_END: case VK_HOME:
-        case VK_INSERT: case VK_DELETE:
-        case VK_DIVIDE:
-        case VK_NUMLOCK:
-            scanCode |= KF_EXTENDED;
-        default:
-            result = GetKeyNameTextA(scanCode << 16, szName, 128);
+        UINT scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
+        switch (virtualKey)
+        {
+            case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN:
+            case VK_RCONTROL: case VK_RMENU:
+            case VK_LWIN: case VK_RWIN: case VK_APPS:
+            case VK_PRIOR: case VK_NEXT:
+            case VK_END: case VK_HOME:
+            case VK_INSERT: case VK_DELETE:
+            case VK_DIVIDE:
+            case VK_NUMLOCK:
+                scanCode |= KF_EXTENDED;
+            default:
+                result = GetKeyNameTextA(scanCode << 16, szName, 128);
+        }
+        if(result == 0)
+        {
+            name = "Mystery key";
+        }
+        std::string keyname(szName);
+        name = keyname;
     }
-    if(result == 0)
+    else // mouse
     {
-        return "Mystery key";
+        std::stringstream buttonss;
+        buttonss << "Mouse" << (keycode & 0xff);
+        name = buttonss.str();
     }
 
-    std::string name(szName);
     if(keycode & 0x200)
     {
         name = "Shift+"+name;
@@ -163,12 +183,13 @@ void save_hotkeys(std::string file)
     writeData << "# Overlunky hotkeys" << std::endl
         << "# Syntax:" << std::endl << "# function = keycode_in_hex" << std::endl
         << "# For modifiers, add 0x100 for Ctrl or 0x200 for Shift" << std::endl
-        << "# For example: G is 0x47, so Ctrl+G is 0x147 etc" << std::endl
+        << "# For mouse buttons, add 0x400" << std::endl
+        << "# Example: G is 0x47, so Ctrl+G is 0x147, 0x402 is Mouse2 etc" << std::endl
         << "# Get more hex keycodes from https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes" << std::endl
         << "# If you mess this file up, you can just delete it and run overlunky to get the defaults back" << std::endl;
     for (const auto& kv : keys)
     {
-        writeData << std::left << std::setw(16) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# " << key_string(keys[kv.first])<< std::endl;
+        writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# " << key_string(keys[kv.first])<< std::endl;
     }
     writeData.close();
 }
@@ -289,6 +310,84 @@ bool pressed(std::string keyname, int wParam)
     if(GetAsyncKeyState(VK_SHIFT))
     {
         wParam += 0x200;
+    }
+    return wParam == keycode;
+}
+
+bool clicked(std::string keyname) {
+    int wParam = 0x400;
+    if(keys.find(keyname) == keys.end())
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if(GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += 0x100;
+    }
+    if(GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += 0x200;
+    }
+    for(int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if(ImGui::IsMouseClicked(i))
+        {
+            wParam += i+1;
+            break;
+        }
+    }
+    return wParam == keycode;
+}
+
+bool held(std::string keyname) {
+    int wParam = 0x400;
+    if(keys.find(keyname) == keys.end())
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if(GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += 0x100;
+    }
+    if(GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += 0x200;
+    }
+    for(int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if(ImGui::IsMouseDown(i))
+        {
+            wParam += i+1;
+            break;
+        }
+    }
+    return wParam == keycode;
+}
+
+bool released(std::string keyname) {
+    int wParam = 0x400;
+    if(keys.find(keyname) == keys.end())
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if(GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += 0x100;
+    }
+    if(GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += 0x200;
+    }
+    for(int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if(ImGui::IsMouseReleased(i))
+        {
+            wParam += i+1;
+            break;
+        }
     }
     return wParam == keycode;
 }
@@ -712,6 +811,16 @@ void render_arrow()
     draw_list->AddLine(rightpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
 }
 
+void render_cross()
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    ImVec2 pos = ImGui::GetMousePos();
+    auto* draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddLine(ImVec2(startpos.x-9, startpos.y-9), ImVec2(startpos.x+10, startpos.y+10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(ImVec2(startpos.x-9, startpos.y+9), ImVec2(startpos.x+10, startpos.y-10), ImColor(255, 255, 255, 200), 2);
+}
+
 ImVec2 normalize(ImVec2 pos)
 {
     ImGuiIO &io = ImGui::GetIO();
@@ -752,40 +861,57 @@ void render_clickhandler()
     ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
-    if((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowFocused())
+    if((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
     {
         io.MouseDrawCursor = false;
         startpos = ImGui::GetMousePos();
     }
-    if((ImGui::IsMouseDown(0) || ImGui::IsMouseDown(1)) && ImGui::IsWindowFocused())
+    else if((clicked("mouse_spawn") || clicked("mouse_teleport")) && ImGui::IsWindowFocused())
+    {
+        io.MouseDrawCursor = false;
+        startpos = ImGui::GetMousePos();
+    }
+    else if((held("mouse_spawn_throw") || held("mouse_teleport_throw")) && ImGui::IsWindowFocused())
     {
         render_arrow();
     }
-    if(ImGui::IsMouseReleased(0) && ImGui::IsWindowFocused())
+    else if((held("mouse_spawn") || held("mouse_teleport")) && ImGui::IsWindowFocused())
+    {
+        startpos = ImGui::GetMousePos();
+        render_cross();
+    }
+    else if(released("mouse_spawn_throw") && ImGui::IsWindowFocused())
     {
         set_pos(startpos);
         set_vel(ImGui::GetMousePos());
         spawn_entities(true);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-
     }
-    if(ImGui::IsMouseReleased(1) && ImGui::IsWindowFocused())
+    else if(released("mouse_spawn") && ImGui::IsWindowFocused())
+    {
+        set_pos(startpos);
+        spawn_entities(true);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    else if(released("mouse_teleport_throw") && ImGui::IsWindowFocused())
     {
         set_pos(startpos);
         set_vel(ImGui::GetMousePos());
         teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
-    if(ImGui::IsMouseReleased(0) || ImGui::IsMouseReleased(1))
+    else if(released("mouse_teleport") && ImGui::IsWindowFocused())
     {
-        io.MouseDrawCursor = true;
+        set_pos(startpos);
+        teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
-    if(ImGui::IsMouseClicked(2))
+    else if(clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
     {
         ImVec2 pos = ImGui::GetMousePos();
         set_pos(pos);
         unsigned int mask = 0b01111111;
-        if(GetAsyncKeyState(keys["mod_entity_mask"]) & 0x8000)
+        if(held("mouse_grab_unsafe"))
         {
             mask = 2147483647;
         }
@@ -797,7 +923,7 @@ void render_clickhandler()
         g_last_entity = g_held_entity;
         startpos = pos;
     }
-    if(ImGui::IsMouseDown(2) && GetAsyncKeyState(keys["mod_throw"]) & 0x8000 && g_held_entity > 0)
+    else if(held("mouse_grab_throw") && g_held_entity > 0)
     {
         if(!throw_held)
         {
@@ -808,14 +934,15 @@ void render_clickhandler()
         move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
         render_arrow();
     }
-    else if(ImGui::IsMouseDown(2) && g_held_entity > 0)
+    else if((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_entity > 0)
     {
+        startpos = ImGui::GetMousePos();
         throw_held = false;
         io.MouseDrawCursor = false;
         set_pos(ImGui::GetMousePos());
         move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
     }
-    if(ImGui::IsMouseReleased(2) && GetAsyncKeyState(keys["mod_throw"]) & 0x8000 && g_held_entity > 0)
+    if(released("mouse_grab_throw") && g_held_entity > 0)
     {
         throw_held = false;
         io.MouseDrawCursor = true;
@@ -827,7 +954,7 @@ void render_clickhandler()
         move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
     }
-    else if(ImGui::IsMouseReleased(2) && g_held_entity > 0)
+    else if((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_entity > 0)
     {
         throw_held = false;
         io.MouseDrawCursor = true;
@@ -836,6 +963,56 @@ void render_clickhandler()
         set_entity_flags(g_held_entity, g_flags);
         move_entity(g_held_entity, g_x, g_y, true, 0, 0, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+    }
+    else if(released("mouse_clone"))
+    {
+        set_pos(ImGui::GetMousePos());
+        spawn_entity(426, g_x, g_y, true, 0, 0, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    else if(released("mouse_zap"))
+    {
+        set_pos(ImGui::GetMousePos());
+        set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y+200));
+        spawn_entity(380, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    else if(released("mouse_boom"))
+    {
+        set_pos(ImGui::GetMousePos());
+        spawn_entity(630, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    else if(released("mouse_big_boom"))
+    {
+        set_pos(ImGui::GetMousePos());
+        spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    else if(released("mouse_nuke"))
+    {
+        set_pos(ImGui::GetMousePos());
+        spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x-0.2, g_y, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x+0.2, g_y, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x, g_y-0.3, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x, g_y+0.3, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x+0.15, g_y+0.2, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x-0.15, g_y+0.2, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x+0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
+        spawn_entity(631, g_x-0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    int buttons = 0;
+    for(int i = 0; i < ImGuiMouseButton_COUNT; i++) {
+        if(ImGui::IsMouseDown(i))
+        {
+            buttons+=i;
+        }
+    }
+    if(buttons == 0)
+    {
+        io.MouseDrawCursor = true;
     }
     ImGui::End();
 }
