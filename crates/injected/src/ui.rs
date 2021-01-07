@@ -155,11 +155,13 @@ pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) 
                 let distance = ((x-ix).powi(2) + (y-iy).powi(2)).sqrt();
                 if mask & flags > 0 && distance < r {
                     log::debug!(
-                        "Item: {}, type: {:x}, position: {:?}, distance: {}",
+                        "Item: {}, type: {:x}, position: {:?}, distance: {}, {:x?}, {:#?}",
                         item.unique_id(),
                         item._type().search_flags,
                         item.position_self(),
-                        distance
+                        distance,
+                        item.ptr(),
+                        item._type()
                     );
                     found.push((item.unique_id(), distance));
                 }

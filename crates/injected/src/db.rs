@@ -1,8 +1,10 @@
 #[cxx::bridge]
 pub mod ffi {
+    #[derive(Debug)]
     struct AnimationMap {
         padding: [u8; 0x40],
     }
+    #[derive(Debug)]
     pub struct Rect {
         masks: i32,
         up_minus_down: f32,
@@ -12,7 +14,7 @@ pub mod ffi {
         field_11: u8,
         field_12: u16,
     }
-
+    #[derive(Debug)]
     pub struct EntityDB {
         create_func: usize,
         destroy_func: usize,

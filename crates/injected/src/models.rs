@@ -190,8 +190,9 @@ fn get_damage() -> usize {
 fn get_insta() -> usize {
     let memory = Memory::get();
     let exe = memory.exe();
-    let off = find_inst(exe, &hex!("45 8B 40 14"), memory.after_bundle);
-    memory.at_exe(decode_call(find_inst(exe, &hex!("E9"), off)))
+    let mut off = memory.after_bundle;
+    off = find_inst(memory.exe(), &hex!("40 53 56 41 54 41 55 48 83 EC 58"), off + 1); // Spel2.exe+21E37920
+    function_start(memory.at_exe(off))
 }
 
 impl State {
@@ -255,7 +256,7 @@ impl State {
             write_mem_prot(self.addr_insta, &hex!("C3"), true);
         } else {
             write_mem_prot(self.addr_damage, &hex!("48"), true);
-            write_mem_prot(self.addr_insta, &hex!("48"), true);
+            write_mem_prot(self.addr_insta, &hex!("40"), true);
         }
     }
 
@@ -478,6 +479,10 @@ impl Entity {
 
     pub fn layer(&self) -> u8 {
         read_u8(self.pointer + 0x98)
+    }
+
+    pub fn ptr(&self) -> usize {
+        self.pointer
     }
 }
 
