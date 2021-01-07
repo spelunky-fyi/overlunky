@@ -31,3 +31,4 @@ using AnimationMap = std::unordered_map<uint8_t, Animation>;
 
 struct EntityItem;
 rust::Vec<EntityItem> list_entities(size_t map_ptr);
+size_t to_id(size_t map_ptr, rust::String id);
