@@ -24,6 +24,8 @@ std::map<std::string, int> keys{
     { "move_up", 0x26 },
     { "move_right", 0x27 },
     { "move_down", 0x28 },
+    { "move_pageup", 0x21 },
+    { "move_pagedown", 0x22 },
     { "toggle_mouse", 0x14d },
     { "toggle_godmode", 0x147 },
     { "toggle_snap", 0x153 },
@@ -565,6 +567,22 @@ bool process_keys(
     else if (pressed("move_down", wParam) && active("tool_entity"))
     {
         g_current_item = std::min(std::max(g_current_item + 1, 0), g_filtered_count - 1);
+        scroll_to_entity = true;
+    }
+    else if (pressed("move_pageup", wParam) && active("tool_entity"))
+    {
+        ImGuiContext& g = *GImGui;
+        ImGuiWindow* current = g.NavWindow;
+        int page = std::max((int)((current->Size.y-100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = std::min(std::max(g_current_item - page, 0), g_filtered_count - 1);
+        scroll_to_entity = true;
+    }
+    else if (pressed("move_pagedown", wParam) && active("tool_entity"))
+    {
+        ImGuiContext& g = *GImGui;
+        ImGuiWindow* current = g.NavWindow;
+        int page = std::max((int)((current->Size.y-100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = std::min(std::max(g_current_item + page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("enter", wParam) && active("tool_entity"))
