@@ -231,7 +231,7 @@ impl State {
         }
     }
 
-    fn ptr(&self) -> usize {
+    pub fn ptr(&self) -> usize {
         let p = read_u64(self.location) + heap_base();
         log::debug!("State: {:x?}", p);
         p
@@ -279,9 +279,18 @@ impl State {
     }
 
     pub fn click_position(&self, x: f32, y: f32) -> (f32, f32) {
+        let screen: u8 = read_u8(self.ptr() + 0x10);
+        let cz: f32 = match screen {
+            11 => {
+                13.5
+            },
+            13 => {
+                13.5
+            },
+            _ => read_f32(get_zoom())
+        };
         let cx = read_f32(get_camera());
         let cy = read_f32(get_camera() + 4);
-        let cz = read_f32(get_zoom());
         let rx = cx + 0.74 * cz * x;
         let ry = cy + 0.41625 * cz * y;
         (rx, ry)
@@ -306,11 +315,8 @@ impl Layer {
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         } else {
-            let cx = read_f32(get_camera());
-            let cy = read_f32(get_camera() + 4);
-            let cz = read_f32(get_zoom());
-            let mut rx = cx + 0.74 * cz * x;
-            let mut ry = cy + 0.41625 * cz * y;
+            let state = State::new();
+            let (mut rx, mut ry) = state.click_position(x, y);
             if snap && vx.abs() + vy.abs() <= 0.04 {
                 rx = rx.round();
                 ry = ry.round();
@@ -445,12 +451,8 @@ impl Entity {
             log::debug!("Teleporting to screen {}, {}", x, y);
             let px = topmost.pointer + 0x40;
             let py = topmost.pointer + 0x44;
-            let cx = read_f32(get_camera());
-            let cy = read_f32(get_camera() + 4);
-            let cz = read_f32(get_zoom());
-            log::debug!("Camera is at {}, {}", cx, cy);
-            x = cx + 0.74 * cz * dx;
-            y = cy + 0.41625 * cz * dy;
+            let state = State::new();
+            let (mut x, mut y) = state.click_position(dx, dy);
             if snap && vx.abs() + vy.abs() <= 0.04 {
                 x = x.round();
                 y = y.round();
