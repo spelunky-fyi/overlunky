@@ -263,6 +263,10 @@ impl State {
     pub fn zoom(&self, level: f32) {
         log::debug!("Zoom level: {:?}", level);
         let memory = Memory::get();
+        // This technically sets camp zoom but not interactively :(
+        //let mut addr_zoom = find_inst(memory.exe(), &hex!("C7 80 E8 04 08 00"), memory.after_bundle);
+        //write_mem_prot(memory.at_exe(addr_zoom + 6), &level.to_le_bytes(), true);
+        //addr_zoom = memory.after_bundle;
         let mut addr_zoom = memory.after_bundle;
         let mut real_addr;
         for i in 0..3 {
@@ -392,6 +396,7 @@ impl Entity {
     pub fn unique_id(&self) -> u32 {
         read_u32(self.pointer + 0x38)
     }
+
     pub fn flags(&self) -> u32 {
         read_u32(self.pointer + 0x30)
     }

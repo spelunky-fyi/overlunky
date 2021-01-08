@@ -64,7 +64,9 @@ std::map<std::string, int> keys{
     { "mouse_boom", 0x504 },
     { "mouse_big_boom", 0x604 },
     { "mouse_nuke", 0x704 },
-    { "mouse_clone", 0x405 },
+    { "mouse_clone", 0x505 },
+    { "mouse_destroy", 0x405 },
+    { "mouse_destroy_unsafe", 0x605 },
     //{ "", 0x },
 };
 
@@ -988,7 +990,7 @@ void render_clickhandler()
         unsigned int mask = 0b01111111;
         if(held("mouse_grab_unsafe"))
         {
-            mask = 2147483647;
+            mask = 0xffffffff;
         }
         g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
         g_flags = get_entity_flags(g_held_entity);
@@ -1077,6 +1079,23 @@ void render_clickhandler()
         spawn_entity(631, g_x+0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
         spawn_entity(631, g_x-0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    else if(released("mouse_destroy") || released("mouse_destroy_unsafe"))
+    {
+        ImVec2 pos = ImGui::GetMousePos();
+        set_pos(pos);
+        unsigned int mask = 0b01111111;
+        if(released("mouse_destroy_unsafe"))
+        {
+            mask = 0xffffffff;
+        }
+        g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
+        if(g_held_entity > 0)
+        {
+            // lets just sweep this under the rug for now :D
+            move_entity(g_held_entity, 0, -1000, false, 0, 0, true);
+        }
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
     }
     int buttons = 0;
     for(int i = 0; i < ImGuiMouseButton_COUNT; i++) {
