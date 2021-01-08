@@ -9,6 +9,9 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 ## Disclaimer
 You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, corrupting your savefile and cheating in the leaderboards. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://gitlab.com/Mr_Goldberg/goldberg_emulator/-/releases) in the game directory. (TL;DR: Copy the steam_api64.dll from the zip to the offline game directory and create steam_appid.txt with the text `418530` in it.) Also block the modded installation in your firewall. If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to BlitWorks.
 
+## Installation 
+**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
+
 ## Features
 Current features and their *default* keyboard shortcuts:
   - **F1**: Search and spawn entities where you're standing
@@ -48,9 +51,6 @@ Current features and their *default* keyboard shortcuts:
   - **F11**: Hide overlay
 
 Check `Spelunky 2/hotkeys.ini` after running Overlunky to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
-
-## Usage 
-**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
 ## Troubleshooting
   - If your game crashes when launching Overlunky or it just closes and you don't ever see the overlay in game:
