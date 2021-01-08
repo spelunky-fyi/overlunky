@@ -21,10 +21,13 @@ Current features and their *default* keyboard shortcuts:
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
       + **Mouse middle**: Drag entities around (not stuff like walls)
-      + **(Ctrl/Shift+)Mouse 4**: Zap/Boom/Big Bang/Nuke!
-      + **Mouse 5**: Clone gun
-      + **Shift+Mouse middle**: Drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
+      + **Shift+Mouse middle**: Drag all entities around (even walls and background)
+      + **(Ctrl/Shift+)Mouse 4**: Zap / Boom / Big Boom / Nuke!
+      + **Mouse 5**: Destroy entity (not stuff like walls)
+      + **Ctrl+Mouse 5**: Clone entity
+      + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
+
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
