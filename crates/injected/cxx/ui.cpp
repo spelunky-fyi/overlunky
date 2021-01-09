@@ -44,6 +44,7 @@ std::map<std::string, int> keys{
     { "zoom_3x", 0x133 },
     { "zoom_4x", 0x134 },
     { "zoom_5x", 0x135 },
+    { "zoom_auto", 0x130 },
     { "teleport", 0x320 },
     { "teleport_left", 0x325 },
     { "teleport_up", 0x326 },
@@ -98,7 +99,7 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5;
 ImVec2 startpos;
-int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0;
+int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0;
 unsigned int g_flags = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
@@ -500,6 +501,11 @@ bool process_keys(
         g_zoom = 36.66;
         set_zoom();
     }
+    else if (pressed("zoom_auto", wParam))
+    {
+        g_zoom = 0.0;
+        set_zoom();
+    }
     else if (pressed("toggle_godmode", wParam))
     {
         god = !god;
@@ -861,6 +867,11 @@ void render_camera()
     ImGui::SameLine();
     if(ImGui::Button("5x")) {
         g_zoom = 36.66;
+        set_zoom();
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Auto")) {
+        g_zoom = 0.0;
         set_zoom();
     }
 }
@@ -1225,10 +1236,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             init_imgui();
             init = true;
         }
-
-        else
+        else {
             return oPresent(pSwapChain, SyncInterval, Flags);
-
+        }
         ImGuiIO &io = ImGui::GetIO();
         PWSTR fontdir;
         if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
@@ -1324,6 +1334,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(!file_written)
         write_file();
 
+    if(g_zoom == 0.0 && ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate)
+    {
+        g_last_frame = ImGui::GetFrameCount();
+        set_zoom();
+    }
 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

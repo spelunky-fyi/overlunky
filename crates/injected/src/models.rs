@@ -260,13 +260,29 @@ impl State {
         }
     }
 
-    pub fn zoom(&self, level: f32) {
-        log::debug!("Zoom level: {:?}", level);
+    pub fn zoom(&self, mut level: f32) {
         let memory = Memory::get();
+
         // This technically sets camp zoom but not interactively :(
         //let mut addr_zoom = find_inst(memory.exe(), &hex!("C7 80 E8 04 08 00"), memory.after_bundle);
         //write_mem_prot(memory.at_exe(addr_zoom + 6), &level.to_le_bytes(), true);
         //addr_zoom = memory.after_bundle;
+
+        let roomx_addr = self.ptr() + 0x44;
+        let roomx: u8 = read_u8(roomx_addr);
+        if level == 0.0 {
+            level = match roomx {
+                1 => 9.50,
+                2 => 16.29,
+                3 => 23.08,
+                4 => 29.87,
+                5 => 36.66,
+                6 => 43.45,
+                7 => 50.24,
+                8 => 57.03,
+                _ => 13.5
+            }
+        }
         let mut addr_zoom = memory.after_bundle;
         let mut real_addr;
         for i in 0..3 {
@@ -285,6 +301,9 @@ impl State {
                 13.5
             },
             13 => {
+                13.5
+            },
+            14 => {
                 13.5
             },
             _ => read_f32(get_zoom())
