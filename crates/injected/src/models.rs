@@ -438,7 +438,7 @@ impl Entity {
         // Return the resolved position
         // self.overlay() exists if player is riding something / etc
         let (x, y) = self.position_self();
-        log::debug!("Item #{}: Position is {}, {}", self.unique_id(), x, y);
+        //log::debug!("Item #{}: Position is {}, {}", self.unique_id(), x, y);
         match self.overlay() {
             Some(new) => {
                 let (_x, _y) = new.position();
