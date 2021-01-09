@@ -62,7 +62,8 @@ std::map<std::string, int> keys{
     { "mouse_grab_unsafe", 0x603 },
     { "mouse_grab_throw", 0x503 },
     { "mouse_zap", 0x404 },
-    { "mouse_boom", 0x504 },
+    { "mouse_blast", 0x504 },
+    { "mouse_boom", 0x0 },
     { "mouse_big_boom", 0x604 },
     { "mouse_nuke", 0x704 },
     { "mouse_clone", 0x505 },
@@ -99,7 +100,7 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5;
 ImVec2 startpos;
-int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0;
+int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0;
 unsigned int g_flags = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
@@ -1058,27 +1059,38 @@ void render_clickhandler()
         spawn_entity(426, g_x, g_y, true, 0, 0, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
-    else if(released("mouse_zap"))
+    else if(held("mouse_zap") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
     {
+        g_last_gun = ImGui::GetFrameCount();
         set_pos(ImGui::GetMousePos());
         set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y+200));
         spawn_entity(380, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
-    else if(released("mouse_boom"))
+    else if(held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/10)
     {
+        g_last_gun = ImGui::GetFrameCount();
+        set_pos(ImGui::GetMousePos());
+        spawn_entity(687, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+    }
+    else if(held("mouse_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
+    {
+        g_last_gun = ImGui::GetFrameCount();
         set_pos(ImGui::GetMousePos());
         spawn_entity(630, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
-    else if(released("mouse_big_boom"))
+    else if(held("mouse_big_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
     {
+        g_last_gun = ImGui::GetFrameCount();
         set_pos(ImGui::GetMousePos());
         spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
     }
-    else if(released("mouse_nuke"))
+    else if(held("mouse_nuke") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
     {
+        g_last_gun = ImGui::GetFrameCount();
         set_pos(ImGui::GetMousePos());
         spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
         spawn_entity(631, g_x-0.2, g_y, true, g_vx, g_vy, snap_to_grid);
