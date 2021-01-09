@@ -6,10 +6,28 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Overlunky",
+            "name": "Overlunky (Debug)",
             "cargo": {
                 "args": [
                     "build"
+                ],
+                "filter": {
+                    "name": "main",
+                    "kind": "bin",
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": { "RUST_LOG": "debug" }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Overlunky (Release)",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--release"
                 ],
                 "filter": {
                     "name": "main",
@@ -31,8 +49,12 @@
     ],
     "compounds": [
         {
-            "name": "Spelunky 2 + Overlunky",
-            "configurations": ["Spelunky 2", "Overlunky"]
+            "name": "Spelunky 2 + Overlunky (Debug)",
+            "configurations": ["Spelunky 2", "Overlunky (Debug)"]
+        },
+        {
+            "name": "Spelunky 2 + Overlunky (Release)",
+            "configurations": ["Spelunky 2", "Overlunky (Release)"]
         }
     ]
 }
