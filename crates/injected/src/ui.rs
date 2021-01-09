@@ -150,7 +150,7 @@ pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) 
         Some(player) => {
             let mut found = Vec::new();
             for item in state.layer(player.layer()).items() {
-                let (ix, iy) = item.position_self();
+                let (ix, iy) = item.position();
                 let flags = item._type().search_flags;
                 let distance = ((x-ix).powi(2) + (y-iy).powi(2)).sqrt();
                 if mask & flags > 0 && distance < r {
