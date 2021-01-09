@@ -43,7 +43,8 @@ Current features and their *default* keyboard shortcuts:
       + **Enter**: Set zoom (when tool is active)
       + **Ctrl+,**: Zoom in
       + **Ctrl+.**: Zoom out
-      + **Ctrl+Numbers**: Set zoom level
+      + **Ctrl+2345**: Zoom level
+      + **Ctrl+0**: Auto fit level width to screen
       + Lock horizontal scrolling with the *N*x buttons for *N* wide levels
       + Note: This doesn't work in camp, only levels.
   - **F9**: Options

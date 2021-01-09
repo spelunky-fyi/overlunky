@@ -450,11 +450,8 @@ impl Entity {
 
     pub fn teleport(&self, dx: f32, dy: f32, s: bool, vx: f32, vy: f32, snap: bool) {
         // e.g. topmost == turkey if riding turkey. player has relative coordinate to turkey.
-        let mut topmost = self.topmost();
-        if topmost._type().search_flags > 0x40 {
-            write_mem(self.pointer + 0x10, &[0; 8]);
-            topmost = *self;
-        }
+        let mut topmost = self.topmost_mount();
+        write_mem(topmost.pointer + 0x10, &[0; 8]);
         let (mut x, mut y) = topmost.position();
         if !s {
             // player relative coordinates
@@ -496,6 +493,23 @@ impl Entity {
             match topmost.overlay() {
                 Some(new) => {
                     topmost.pointer = new.pointer;
+                }
+                None => break,
+            }
+        }
+        topmost
+    }
+
+    fn topmost_mount(&self) -> Entity {
+        let mut topmost = self.clone();
+        loop {
+            match topmost.overlay() {
+                Some(new) => {
+                    if new._type().search_flags < 0x40 {
+                        topmost.pointer = new.pointer;
+                    } else {
+                        break;
+                    }
                 }
                 None => break,
             }
