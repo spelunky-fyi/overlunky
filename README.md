@@ -51,6 +51,9 @@ Current features and their *default* keyboard shortcuts:
       + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
       + **Ctrl+G**: Toggle god mode
       + **Ctrl+S**: Toggle snap to grid
+      + **Ctrl+P**: Toggle game engine pause
+      + **Ctrl+Shift+P**: Toggle pausing allowed (disables focus loss pause)
+      + **Ctrl+K**: Toggle disabling game keyboard input when typing
   - **F11**: Hide overlay
 
 ## Troubleshooting
