@@ -58,20 +58,23 @@ Current features and their *default* keyboard shortcuts:
 
 ## Troubleshooting
   - If your game crashes when launching Overlunky or it just closes and you don't ever see the overlay in game:
-    + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either.
-    + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** It is very hacky and acts like malware. It isn't, and you can audit the source code and build it yourself if you want.
+    + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
+    + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
   - If your game crashes when actually trying to use the tools:
-    + Some entities just crash the game, try to avoid them next time.
-    + An [incomplete list of glitchy entities](https://gist.github.com/DekeAvell/935f414c715da1f08162deb140975fa8/)
+    + See previous section.
+    + Some entities just crash the game, try to avoid them next time. [A nonexhaustive list of glitchy entities](https://gist.github.com/DekeAvell/935f414c715da1f08162deb140975fa8/).
+  - If your game crashes and you're using **Modlunky2 or Playlunky**:
+    + While we try to keep all the modding tools compatible, some things may break sometimes.
+    + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
   - If you're missing some overlay windows:
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
   - If you mess up your keyboard shortcuts:
     + Delete `Spelunky 2/hotkeys.ini` to reset shortcut keys.
   - If keyboard input no longer works in game after using the tools:
-    + Make sure you're using **borderless or windowed** mode with the `Disable game keys when typing` option enabled, it doesn't work in fullscreen.
+    + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing` option enabled, it doesn't work in fullscreen.
     + Restart the game after changing graphics modes.
     + Try Alt+Tabbing to restore input.
-    + If nothing else works, disable the "Disable game keys" option and try Alt+Tabbing to restore input.
+    + If nothing else works, disable the `Disable game keys when typing` option and try Alt+Tabbing to restore input.
     
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some Rust and C++ build tools and run this to get started:
