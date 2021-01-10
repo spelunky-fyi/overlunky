@@ -219,7 +219,7 @@ impl State {
         write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
         let addr_damage = get_damage();
         let addr_insta = get_insta();
-        log::debug!("damage: 0x{:x}, insta: 0x{:x}", addr_damage, addr_insta);
+        //log::debug!("damage: 0x{:x}, insta: 0x{:x}", addr_damage, addr_insta);
         let addr_zoom = get_zoom();
         State {
             location,
@@ -233,7 +233,7 @@ impl State {
 
     pub fn ptr(&self) -> usize {
         let p = read_u64(self.location) + heap_base();
-        log::debug!("State: {:x?}", p);
+        //log::debug!("State: {:x?}", p);
         p
     }
 
@@ -250,7 +250,7 @@ impl State {
     }
 
     pub fn godmode(&self, g: bool) {
-        log::debug!("God mode: {:?}", g);
+        //log::debug!("God mode: {:?}", g);
         if g {
             write_mem_prot(self.addr_damage, &hex!("C3"), true);
             write_mem_prot(self.addr_insta, &hex!("C3"), true);
@@ -313,6 +313,18 @@ impl State {
         let rx = cx + 0.74 * cz * x;
         let ry = cy + 0.41625 * cz * y;
         (rx, ry)
+    }
+
+    pub fn flags(&self) -> u8 {
+        read_u8(self.ptr() + 0xa0e)
+    }
+
+    pub fn set_flags(&self, f: u8) {
+        write_mem(self.ptr() + 0xa0e, &f.to_le_bytes());
+    }
+
+    pub fn set_pause(&self, p: u8) {
+        write_mem(self.ptr() + 0x32, &p.to_le_bytes());
     }
 }
 
@@ -377,12 +389,12 @@ impl Layer {
 
     pub unsafe fn items(&self) -> &'static [Entity] {
         let vector = self.pointer + 0x8;
-        log::debug!(
+        /*log::debug!(
             "{:x} {:} {:}",
             read_u64(vector),
             read_u32(vector + 0x14) as usize,
             read_u32(vector + 0x10) as usize,
-        );
+        );*/
         std::slice::from_raw_parts(
             std::mem::transmute(read_u64(vector)),
             read_u32(vector + 0x14) as usize,
@@ -463,12 +475,12 @@ impl Entity {
             }
             let px = topmost.pointer + 0x40;
             let py = topmost.pointer + 0x44;
-            log::debug!("Teleporting to {}, {}", x, y);
+            //log::debug!("Teleporting to {}, {}", x, y);
             write_mem(px, &x.to_le_bytes());
             write_mem(py, &y.to_le_bytes());
         } else {
             // screen coordinates -1..1
-            log::debug!("Teleporting to screen {}, {}", x, y);
+            //log::debug!("Teleporting to screen {}, {}", x, y);
             let px = topmost.pointer + 0x40;
             let py = topmost.pointer + 0x44;
             let state = State::new();
@@ -477,7 +489,7 @@ impl Entity {
                 x = x.round();
                 y = y.round();
             }
-            log::debug!("Teleporting to {}, {}", x, y);
+            //log::debug!("Teleporting to {}, {}", x, y);
             write_mem(px, &x.to_le_bytes());
             write_mem(py, &y.to_le_bytes());
         }

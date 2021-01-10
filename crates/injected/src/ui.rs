@@ -15,6 +15,9 @@ pub mod ffi {
         unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool);
         unsafe fn get_entity_flags(id: u32) -> u32;
         unsafe fn set_entity_flags(id: u32, flags: u32);
+        unsafe fn set_hud_flags(flags: u8);
+        unsafe fn get_hud_flags() -> u8;
+        unsafe fn set_pause(pause: u8);
         unsafe fn player_status();
     }
     unsafe extern "C++" {
@@ -222,6 +225,21 @@ pub unsafe fn set_entity_flags(id: u32, flags: u32) {
         }
         None => {}
     }
+}
+
+pub unsafe fn get_hud_flags() -> u8 {
+    let state = State::new();
+    state.flags()
+}
+
+pub unsafe fn set_hud_flags(flags: u8) {
+    let state = State::new();
+    state.set_flags(flags);
+}
+
+pub unsafe fn set_pause(pause: u8) {
+    let state = State::new();
+    state.set_pause(pause);
 }
 
 pub unsafe fn player_status() {

@@ -4,7 +4,7 @@
 #include <vector>
 #include "rust/cxx.h"
 
-enum RepeatType : uint8_t
+/*enum RepeatType : uint8_t
 {
     NoRepeat,
     Linear,
@@ -18,7 +18,7 @@ struct Animation
     int32_t interval;
     uint8_t key;
     RepeatType repeat;
-};
+};*/
 
 /*
 struct EntityInstance;

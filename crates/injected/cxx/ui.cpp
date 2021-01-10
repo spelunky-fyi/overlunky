@@ -3,6 +3,7 @@
 #include "imgui/imgui_internal.h"
 #include "imgui/examples/imgui_impl_win32.h"
 #include "imgui/examples/imgui_impl_dx11.h"
+#include <d3d11.h>
 #include "ui.hpp"
 #include "injected-dll/src/ui.rs.h"
 #include <Windows.h>
@@ -18,8 +19,34 @@
 #include <map>
 #include <iomanip>
 
+const USHORT HID_MOUSE    = 2;
+const USHORT HID_KEYBOARD = 6;
+
+bool HID_RegisterDevice(HWND hTarget, USHORT usage)
+{
+    RAWINPUTDEVICE hid;
+    hid.usUsagePage = 1;
+    hid.usUsage = usage;
+    hid.dwFlags = RIDEV_DEVNOTIFY | RIDEV_INPUTSINK;
+    hid.hwndTarget = hTarget;
+
+    return !!RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
+}
+
+void HID_UnregisterDevice(USHORT usage)
+{
+    RAWINPUTDEVICE hid;
+    hid.usUsagePage = 1;
+    hid.usUsage = usage;
+    hid.dwFlags = RIDEV_REMOVE;
+    hid.hwndTarget = NULL;
+
+    RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
+}
+
 std::map<std::string, int> keys{
     { "enter", 0x0d },
+    { "escape", 0x1b },
     { "move_left", 0x25 },
     { "move_up", 0x26 },
     { "move_right", 0x27 },
@@ -29,6 +56,9 @@ std::map<std::string, int> keys{
     { "toggle_mouse", 0x14d },
     { "toggle_godmode", 0x147 },
     { "toggle_snap", 0x153 },
+    { "toggle_pause", 0x150 },
+    { "toggle_disable_input", 0x14b },
+    { "toggle_allow_pause", 0x350 },
     { "tool_entity", 0x70 },
     { "tool_door", 0x71 },
     { "tool_camera", 0x72 },
@@ -80,6 +110,10 @@ ID3D11Device *pDevice;
 ID3D11DeviceContext *pContext;
 ID3D11RenderTargetView *mainRenderTargetView;
 HWND window;
+HWND gamewindow;
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+WNDPROC orig_wndproc = nullptr;
 
 using PresentPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags);
 PresentPtr oPresent;
@@ -101,7 +135,7 @@ struct CXXEntityItem
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5;
 ImVec2 startpos;
 int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0;
-unsigned int g_flags = 0;
+unsigned int g_entity_flags = 0, g_hud_flags = 8, g_last_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 static char text[500];
@@ -121,10 +155,13 @@ bool god = false;
 bool hidedebug = true;
 bool snap_to_grid = false;
 bool throw_held = false;
+bool paused = false;
+bool disable_input = true;
+bool capture_last = false;
+bool register_keys = false;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
-
-const char* flagnames[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
+const char* entity_flags[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 
 bool process_keys(
     _In_ int nCode,
@@ -232,12 +269,57 @@ void load_hotkeys(std::string file)
     save_hotkeys(file);
 }
 
+HWND FindTopWindow(DWORD pid)
+{
+    std::pair<HWND, DWORD> params = { 0, pid };
+
+    // Enumerate the windows using a lambda to process each window
+    BOOL bResult = EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL 
+    {
+        auto pParams = (std::pair<HWND, DWORD>*)(lParam);
+
+        DWORD processId;
+        if (GetWindowThreadProcessId(hwnd, &processId) && processId == pParams->second && hwnd != window)
+        {
+            // Stop enumerating
+            SetLastError(-1);
+            pParams->first = hwnd;
+            return FALSE;
+        }
+
+        // Continue enumerating
+        return TRUE;
+    }, (LPARAM)&params);
+
+    if (!bResult && GetLastError() == -1 && params.first)
+    {
+        return params.first;
+    }
+
+    return 0;
+}
+
+LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if(process_resizing(message, wParam, lParam)) {
+        gamewindow = FindTopWindow(GetCurrentProcessId());
+        return CallWindowProc(orig_wndproc, window, message, wParam, lParam);
+    }
+    if(!process_keys(message, wParam, lParam)) {
+        ImGui_ImplWin32_WndProcHandler(window, message, wParam, lParam);
+    }
+    if(ImGui::GetIO().WantCaptureKeyboard && message == WM_KEYDOWN) {
+        return 0;
+    } else {
+        return CallWindowProc(orig_wndproc, window, message, wParam, lParam);
+    }
+}
+
 LRESULT CALLBACK msg_hook(
     _In_ int nCode,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam)
 {
-    IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     auto msg = (MSG *)(lParam);
 
     if (msg->hwnd != window)
@@ -272,13 +354,19 @@ bool toggle(std::string tool) {
     return false;
 }
 
+void escape() {
+    ImGui::SetWindowFocus(nullptr);
+    /*ImGuiWindow* win = ImGui::FindWindowByName("Clickhandler");
+    ImGui::FocusWindow(win);*/
+}
+
 void spawn_entities(bool s) {
     if(g_current_item == 0 && g_filtered_count == g_items.size()) return;
     std::string search(text);
     const auto pos = search.find_first_of(" ");
     if(pos == std::string::npos && g_filtered_count > 0) {
         g_last_entity = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
-        g_flags = get_entity_flags(g_last_entity);
+        g_entity_flags = get_entity_flags(g_last_entity);
     } else {
         std::string texts(text);
         std::stringstream textss(texts);
@@ -286,7 +374,7 @@ void spawn_entities(bool s) {
         std::vector<int> ents;
         while(textss >> id) {
             g_last_entity = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
-            g_flags = get_entity_flags(g_last_entity);
+            g_entity_flags = get_entity_flags(g_last_entity);
         }
     }
 }
@@ -512,13 +600,28 @@ bool process_keys(
         god = !god;
         godmode(god);
     }
-    else if (pressed("toggle_mouse", wParam)) // M
+    else if (pressed("toggle_mouse", wParam))
     {
         clickevents = !clickevents;
     }
-    else if (pressed("toggle_snap", wParam)) // M
+    else if (pressed("toggle_snap", wParam))
     {
         snap_to_grid = !snap_to_grid;
+    }
+    else if (pressed("toggle_pause", wParam))
+    {
+        paused = !paused;
+        if(paused) set_pause(0x20);
+        else set_pause(0);
+    }
+    else if (pressed("toggle_allow_pause", wParam))
+    {
+        g_hud_flags ^= 1UL << 3;
+        set_hud_flags(g_hud_flags);
+    }
+    else if (pressed("toggle_disable_input", wParam))
+    {
+        disable_input = !disable_input;
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -624,8 +727,13 @@ bool process_keys(
     {
         set_zoom();
     }
-    else if(pressed("tool_debug", wParam)) {
+    else if(pressed("tool_debug", wParam))
+    {
         hidedebug = !hidedebug;
+    }
+    else if(pressed("escape", wParam))
+    {
+        escape();
     }
     else
     {
@@ -636,22 +744,24 @@ bool process_keys(
 
 void init_imgui()
 {
+
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
     io.MouseDrawCursor = true;
     ImGui_ImplWin32_Init(window);
     ImGui_ImplDX11_Init(pDevice, pContext);
+
     freopen("CONOUT$", "w", stdout);
 
-    if (!SetWindowsHookExA(WH_GETMESSAGE, msg_hook, 0, GetCurrentThreadId()))
+    /*if (!SetWindowsHookExA(WH_GETMESSAGE, msg_hook, 0, GetCurrentThreadId()))
     {
         printf("Message hook error: 0x%x\n", GetLastError());
     }
     if (!SetWindowsHookExA(WH_CALLWNDPROC, window_hook, 0, GetCurrentThreadId()))
     {
         printf("WndProc hook error: 0x%x\n", GetLastError());
-    }
+    }*/
 }
 
 std::string last_word(std::string str)
@@ -944,209 +1054,216 @@ void set_vel(ImVec2 pos)
 
 void render_clickhandler()
 {
-    ImGuiIO &io = ImGui::GetIO();
-    ImGui::SetNextWindowSize(io.DisplaySize);
-    ImGui::SetNextWindowPos({0, 0});
-    ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-    ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
+    if(clickevents)
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        ImGui::SetNextWindowSize(io.DisplaySize);
+        ImGui::SetNextWindowPos({0, 0});
+        ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+        ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
-    if((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
-    {
-        io.MouseDrawCursor = false;
-        startpos = ImGui::GetMousePos();
-    }
-    else if((clicked("mouse_spawn") || clicked("mouse_teleport")) && ImGui::IsWindowFocused())
-    {
-        io.MouseDrawCursor = false;
-        startpos = ImGui::GetMousePos();
-    }
-    else if((held("mouse_spawn_throw") || held("mouse_teleport_throw")) && ImGui::IsWindowFocused())
-    {
-        render_arrow();
-    }
-    else if((held("mouse_spawn") || held("mouse_teleport")) && ImGui::IsWindowFocused())
-    {
-        startpos = ImGui::GetMousePos();
-        render_cross();
-    }
-    else if(released("mouse_spawn_throw") && ImGui::IsWindowFocused())
-    {
-        set_pos(startpos);
-        set_vel(ImGui::GetMousePos());
-        spawn_entities(true);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(released("mouse_spawn") && ImGui::IsWindowFocused())
-    {
-        set_pos(startpos);
-        spawn_entities(true);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(released("mouse_teleport_throw") && ImGui::IsWindowFocused())
-    {
-        set_pos(startpos);
-        set_vel(ImGui::GetMousePos());
-        teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(released("mouse_teleport") && ImGui::IsWindowFocused())
-    {
-        set_pos(startpos);
-        teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
-    {
-        ImVec2 pos = ImGui::GetMousePos();
-        set_pos(pos);
-        unsigned int mask = 0b01111111;
-        if(held("mouse_grab_unsafe"))
+        if((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
         {
-            mask = 0xffffffff;
+            io.MouseDrawCursor = false;
+            startpos = ImGui::GetMousePos();
         }
-        g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
-        g_flags = get_entity_flags(g_held_entity);
-        g_flags |= 1 << 4;
-        set_entity_flags(g_held_entity, g_flags);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-        g_last_entity = g_held_entity;
-        startpos = pos;
-    }
-    else if(held("mouse_grab_throw") && g_held_entity > 0)
-    {
-        if(!throw_held)
+        else if((clicked("mouse_spawn") || clicked("mouse_teleport")) && ImGui::IsWindowFocused())
+        {
+            io.MouseDrawCursor = false;
+            startpos = ImGui::GetMousePos();
+        }
+        else if((held("mouse_spawn_throw") || held("mouse_teleport_throw")) && ImGui::IsWindowFocused())
+        {
+            render_arrow();
+        }
+        else if((held("mouse_spawn") || held("mouse_teleport")) && ImGui::IsWindowFocused())
         {
             startpos = ImGui::GetMousePos();
-            throw_held = true;
+            render_cross();
         }
-        set_pos(startpos);
-        move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
-        render_arrow();
-    }
-    else if((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_entity > 0)
-    {
-        startpos = ImGui::GetMousePos();
-        throw_held = false;
-        io.MouseDrawCursor = false;
-        set_pos(ImGui::GetMousePos());
-        move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
-    }
-    if(released("mouse_grab_throw") && g_held_entity > 0)
-    {
-        throw_held = false;
-        io.MouseDrawCursor = true;
-        g_flags = get_entity_flags(g_held_entity);
-        g_flags &= ~(1 << 4);
-        set_entity_flags(g_held_entity, g_flags);
-        set_pos(startpos);
-        set_vel(ImGui::GetMousePos());
-        move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
-    }
-    else if((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_entity > 0)
-    {
-        throw_held = false;
-        io.MouseDrawCursor = true;
-        g_flags = get_entity_flags(g_held_entity);
-        g_flags &= ~(1 << 4);
-        set_entity_flags(g_held_entity, g_flags);
-        move_entity(g_held_entity, g_x, g_y, true, 0, 0, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
-    }
-    else if(released("mouse_clone"))
-    {
-        set_pos(ImGui::GetMousePos());
-        spawn_entity(426, g_x, g_y, true, 0, 0, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(held("mouse_zap") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
-    {
-        g_last_gun = ImGui::GetFrameCount();
-        set_pos(ImGui::GetMousePos());
-        set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y+200));
-        spawn_entity(380, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/10)
-    {
-        g_last_gun = ImGui::GetFrameCount();
-        set_pos(ImGui::GetMousePos());
-        spawn_entity(687, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(held("mouse_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
-    {
-        g_last_gun = ImGui::GetFrameCount();
-        set_pos(ImGui::GetMousePos());
-        spawn_entity(630, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(held("mouse_big_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
-    {
-        g_last_gun = ImGui::GetFrameCount();
-        set_pos(ImGui::GetMousePos());
-        spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(held("mouse_nuke") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
-    {
-        g_last_gun = ImGui::GetFrameCount();
-        set_pos(ImGui::GetMousePos());
-        spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x-0.2, g_y, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x+0.2, g_y, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x, g_y-0.3, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x, g_y+0.3, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x+0.15, g_y+0.2, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x-0.15, g_y+0.2, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x+0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
-        spawn_entity(631, g_x-0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
-    }
-    else if(released("mouse_destroy") || released("mouse_destroy_unsafe"))
-    {
-        ImVec2 pos = ImGui::GetMousePos();
-        set_pos(pos);
-        unsigned int mask = 0b01111111;
-        if(released("mouse_destroy_unsafe"))
+        else if(released("mouse_spawn_throw") && ImGui::IsWindowFocused())
         {
-            mask = 0xffffffff;
+            set_pos(startpos);
+            set_vel(ImGui::GetMousePos());
+            spawn_entities(true);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
         }
-        g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
-        if(g_held_entity > 0)
+        else if(released("mouse_spawn") && ImGui::IsWindowFocused())
         {
-            // lets just sweep this under the rug for now :D
-            move_entity(g_held_entity, 0, -1000, false, 0, 0, true);
+            set_pos(startpos);
+            spawn_entities(true);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
         }
-        g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
-    }
-    int buttons = 0;
-    for(int i = 0; i < ImGuiMouseButton_COUNT; i++) {
-        if(ImGui::IsMouseDown(i))
+        else if(released("mouse_teleport_throw") && ImGui::IsWindowFocused())
         {
-            buttons+=i;
+            set_pos(startpos);
+            set_vel(ImGui::GetMousePos());
+            teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
         }
+        else if(released("mouse_teleport") && ImGui::IsWindowFocused())
+        {
+            set_pos(startpos);
+            teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        }
+        else if(clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
+        {
+            ImVec2 pos = ImGui::GetMousePos();
+            set_pos(pos);
+            unsigned int mask = 0b01111111;
+            if(held("mouse_grab_unsafe"))
+            {
+                mask = 0xffffffff;
+            }
+            g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
+            g_entity_flags = get_entity_flags(g_held_entity);
+            g_entity_flags |= 1 << 4;
+            set_entity_flags(g_held_entity, g_entity_flags);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+            g_last_entity = g_held_entity;
+            startpos = pos;
+        }
+        else if(held("mouse_grab_throw") && g_held_entity > 0)
+        {
+            if(!throw_held)
+            {
+                startpos = ImGui::GetMousePos();
+                throw_held = true;
+            }
+            set_pos(startpos);
+            move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
+            render_arrow();
+        }
+        else if((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_entity > 0)
+        {
+            startpos = ImGui::GetMousePos();
+            throw_held = false;
+            io.MouseDrawCursor = false;
+            set_pos(ImGui::GetMousePos());
+            move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
+        }
+        if(released("mouse_grab_throw") && g_held_entity > 0)
+        {
+            throw_held = false;
+            io.MouseDrawCursor = true;
+            g_entity_flags = get_entity_flags(g_held_entity);
+            g_entity_flags &= ~(1 << 4);
+            set_entity_flags(g_held_entity, g_entity_flags);
+            set_pos(startpos);
+            set_vel(ImGui::GetMousePos());
+            move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+        }
+        else if((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_entity > 0)
+        {
+            throw_held = false;
+            io.MouseDrawCursor = true;
+            g_entity_flags = get_entity_flags(g_held_entity);
+            g_entity_flags &= ~(1 << 4);
+            set_entity_flags(g_held_entity, g_entity_flags);
+            move_entity(g_held_entity, g_x, g_y, true, 0, 0, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+        }
+        else if(released("mouse_clone"))
+        {
+            set_pos(ImGui::GetMousePos());
+            spawn_entity(426, g_x, g_y, true, 0, 0, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        }
+        else if(held("mouse_zap") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
+        {
+            g_last_gun = ImGui::GetFrameCount();
+            set_pos(ImGui::GetMousePos());
+            set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y+200));
+            spawn_entity(380, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        }
+        else if(held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/10)
+        {
+            g_last_gun = ImGui::GetFrameCount();
+            set_pos(ImGui::GetMousePos());
+            spawn_entity(687, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        }
+        else if(held("mouse_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
+        {
+            g_last_gun = ImGui::GetFrameCount();
+            set_pos(ImGui::GetMousePos());
+            spawn_entity(630, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        }
+        else if(held("mouse_big_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
+        {
+            g_last_gun = ImGui::GetFrameCount();
+            set_pos(ImGui::GetMousePos());
+            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        }
+        else if(held("mouse_nuke") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate/5)
+        {
+            g_last_gun = ImGui::GetFrameCount();
+            set_pos(ImGui::GetMousePos());
+            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x-0.2, g_y, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x+0.2, g_y, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x, g_y-0.3, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x, g_y+0.3, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x+0.15, g_y+0.2, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x-0.15, g_y+0.2, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x+0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x-0.15, g_y-0.2, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
+        }
+        else if(released("mouse_destroy") || released("mouse_destroy_unsafe"))
+        {
+            ImVec2 pos = ImGui::GetMousePos();
+            set_pos(pos);
+            unsigned int mask = 0b01111111;
+            if(released("mouse_destroy_unsafe"))
+            {
+                mask = 0xffffffff;
+            }
+            g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
+            if(g_held_entity > 0)
+            {
+                // lets just sweep this under the rug for now :D
+                move_entity(g_held_entity, 0, -1000, false, 0, 0, true);
+            }
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+        }
+        int buttons = 0;
+        for(int i = 0; i < ImGuiMouseButton_COUNT; i++) {
+            if(ImGui::IsMouseDown(i))
+            {
+                buttons+=i;
+            }
+        }
+        if(buttons == 0)
+        {
+            io.MouseDrawCursor = true;
+        }
+        ImGui::End();
     }
-    if(buttons == 0)
-    {
-        io.MouseDrawCursor = true;
-    }
-    ImGui::End();
 }
 
 void render_options()
 {
-    ImGui::Checkbox("##clickevents", &clickevents);
-    ImGui::SameLine();
-    ImGui::Text("Mouse controls");
-    if(ImGui::Checkbox("##Godmode", &god)) {
+    ImGui::Checkbox("Mouse controls##clickevents", &clickevents);
+    if(ImGui::Checkbox("God Mode##Godmode", &god)) {
         godmode(god);
     }
-    ImGui::SameLine();
-    ImGui::Text("God mode");
-    ImGui::Checkbox("##Snap", &snap_to_grid);
-    ImGui::SameLine();
-    ImGui::Text("Snap to grid");
+    ImGui::Checkbox("Snap to grid##Snap", &snap_to_grid);    
+    if(ImGui::Checkbox("Pause game engine##PauseSim", &paused))
+    {
+        if(paused) set_pause(0x20);
+        else set_pause(0);
+    }
+    if(ImGui::CheckboxFlags("Allow pausing (on lost focus)", &g_hud_flags, 0x8))
+    {
+        set_hud_flags(g_hud_flags);
+    }
+    ImGui::Checkbox("Disable game keys when typing##Typing", &disable_input);
 }
 
 void render_debug()
@@ -1166,22 +1283,22 @@ void render_debug()
     ImGui::InputInt("##EntityID", &g_last_entity, 1, 1, 0);
     if(ImGui::Button("Get flags"))
     {
-        g_flags = get_entity_flags(g_last_entity);
+        g_entity_flags = get_entity_flags(g_last_entity);
     }
     ImGui::SameLine();
     if(ImGui::Button("Set flags"))
     {
-        set_entity_flags(g_last_entity, g_flags);
+        set_entity_flags(g_last_entity, g_entity_flags);
     }
-    unsigned int old_flags = g_flags;
+    unsigned int old_flags = g_entity_flags;
     ImGui::Text("Flags:");
     for(int i = 0; i < 32; i++) {
-        ImGui::CheckboxFlags(flagnames[i], &g_flags, pow(2, i));
+        ImGui::CheckboxFlags(entity_flags[i], &g_entity_flags, pow(2, i));
     }
-    if(old_flags != g_flags)
+    if(old_flags != g_entity_flags)
     {
-        old_flags = g_flags;
-        set_entity_flags(g_last_entity, g_flags);
+        old_flags = g_entity_flags;
+        set_entity_flags(g_last_entity, g_entity_flags);
     }
 }
 
@@ -1236,6 +1353,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     static bool init = false;
     static ImFont *font;
     // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
+
     if (!init)
     {
         if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void **)&pDevice)))
@@ -1244,6 +1362,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             DXGI_SWAP_CHAIN_DESC sd;
             pSwapChain->GetDesc(&sd);
             window = sd.OutputWindow;
+            gamewindow = window;
+            orig_wndproc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(window, GWLP_WNDPROC, LONG_PTR(hkWndProc)));
             create_render_target();
             init_imgui();
             init = true;
@@ -1284,10 +1404,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    if (clickevents)
-    {
-        render_clickhandler();
-    }
+    render_clickhandler();
     ImGui::SetNextWindowSize({10, 10});
     ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y - 30});
     ImGui::Begin("Overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
@@ -1346,10 +1463,43 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(!file_written)
         write_file();
 
-    if(g_zoom == 0.0 && ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate)
+    if(ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate/4)
     {
+        if(g_zoom == 0.0) set_zoom();
+        set_hud_flags(g_hud_flags);
+        if(g_last_entity != 0) g_entity_flags = get_entity_flags(g_last_entity);
         g_last_frame = ImGui::GetFrameCount();
-        set_zoom();
+    }
+    if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera")))
+    {
+        HID_RegisterDevice(window, HID_KEYBOARD);
+        capture_last = true;
+        /*paused = true;
+        g_hud_flags = 0;
+        set_pause(0x20);
+        set_hud_flags(g_hud_flags);*/
+    }
+    else if(disable_input && capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
+    {
+        //HID_UnregisterDevice(HID_KEYBOARD);
+        //FindTopWindow(GetCurrentProcessId());
+        //HID_RegisterDevice(gamewindow, HID_KEYBOARD);
+        capture_last = false;
+        register_keys = true;
+        /*paused = false;
+        g_hud_flags = 8;
+        set_pause(0);
+        set_hud_flags(g_hud_flags);*/
+    } else if(register_keys) {
+        register_keys = false;
+        gamewindow = FindTopWindow(GetCurrentProcessId());
+        HID_RegisterDevice(gamewindow, HID_KEYBOARD);
+    }
+    if(!(active("tool_entity") || active("tool_door") || active("tool_camera")))
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        io.WantCaptureKeyboard = false;
+        io.NavActive = false;
     }
 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
