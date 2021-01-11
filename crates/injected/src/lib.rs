@@ -96,11 +96,16 @@ unsafe extern "C" fn run(pid: u32) {
     let state = State::new();
     loop {
         let entities = list_entities();
-        if entities.len() != 0 {
+        if entities.len() >= 850 {
+            log::debug!("Found {:?} entities, that's enough", entities.len());
+            thread::sleep(time::Duration::from_millis(100));
             ui::create_box(&entities);
+            log::debug!("Added {:?} entities", entities.len());
             break;
+        } else if entities.len() > 0 {
+            log::debug!("Found {:?} entities", entities.len());
         }
-        thread::sleep(time::Duration::from_millis(100));
+        thread::sleep(time::Duration::from_millis(16));
     }
 
     let api = API::new(&memory);
