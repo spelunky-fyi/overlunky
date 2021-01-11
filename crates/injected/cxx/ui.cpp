@@ -178,7 +178,6 @@ void set_colors()
     ImVec4* colors = ImGui::GetStyle().Colors;
     for (int i = 0; i < ImGuiCol_COUNT; i++)
     {
-        std::cout << "changing color " << i << std::endl;
         ImVec4 color = colors[i];
         ImVec4 new_color = hue_shift(color, g_hue);
         colors[i] = new_color;
