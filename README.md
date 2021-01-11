@@ -15,14 +15,11 @@ You are strongly discouraged from using any modding tools in your actual online 
 Check the generated `Spelunky 2/hotkeys.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
 
 ## Features
-Current features and their *default* keyboard shortcuts:
+Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `hotkeys.ini` for cool beans.
+  - **Enter**: Run active tool
   - **F1**: Search and spawn entities where you're standing
-      + **Enter**: Spawn entity (when tool is active)
-      + **Tab**: Add selected itemid to list
       + **Ctrl+Enter**: Spawn entity
-      + **Ctrl+Arrows**: Move spawn coordinates around you
-      + **Ctrl+Shift+Arrows**: Teleport to direction
-      + **Ctrl+Shift+Space**: Teleport to coordinates
+      + **Tab**: Add selected itemid to list
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
       + **Mouse middle**: Drag entities around (not stuff like walls)
@@ -36,17 +33,13 @@ Current features and their *default* keyboard shortcuts:
       + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
   - **F2**: Spawn doors to many places
-      + **Enter**: Spawn warp door (when tool is active)
       + **Shift+Enter**: Spawn back layer door
       + **Ctrl+Shift+Enter**: Spawn warp door
   - **F3**: Camera controls
-      + **Enter**: Set zoom (when tool is active)
       + **Ctrl+,**: Zoom in
       + **Ctrl+.**: Zoom out
-      + **Ctrl+2345**: Zoom level
       + **Ctrl+0**: Auto fit level width to screen
-      + Lock horizontal scrolling with the *N*x buttons for *N* wide levels
-      + Note: This doesn't work in camp, only levels.
+      + **Ctrl+2345**: Zoom to X level width
   - **F9**: Options
       + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
       + **Ctrl+G**: Toggle god mode
@@ -55,6 +48,9 @@ Current features and their *default* keyboard shortcuts:
       + **Ctrl+Shift+P**: Toggle pausing allowed (disables focus loss pause)
       + **Ctrl+K**: Toggle disabling game keyboard input when typing
   - **F11**: Hide overlay
+  - **Ctrl+Shift+U**: Change UI color
+  - **Enter**: Run active tool
+  - **Escape**: Return focus to game from an input
 
 ## Troubleshooting
   - If your game crashes when launching Overlunky or it just closes and you don't ever see the overlay in game:

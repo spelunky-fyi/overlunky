@@ -64,6 +64,12 @@ std::map<std::string, int> keys{
     { "tool_camera", 0x72 },
     { "tool_options", 0x78 },
     { "tool_debug", 0x37b },
+    { "tool_metrics", 0x349 },
+    { "reset_windows", 0x352 },
+    { "reset_windows_vertical", 0x356 },
+    { "save_settings", 0x353 },
+    { "load_settings", 0x34c },
+    { "set_colors", 0x355 },
     { "spawn_entity", 0x10d },
     { "spawn_layer_door", 0x20d },
     { "spawn_warp_door", 0x30d },
@@ -132,7 +138,7 @@ struct CXXEntityItem
     }
 };
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
 int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0;
 unsigned int g_entity_flags = 0, g_hud_flags = 8, g_last_hud_flags = 8;
@@ -141,27 +147,43 @@ std::vector<int> g_filtered_items;
 static char text[500];
 
 // Set focus on search box
-bool set_focus_entity = false;
-bool set_focus_world = false;
-bool set_focus_zoom = false;
-bool scroll_to_entity = false;
-bool scroll_top = false;
-bool click_spawn = false;
-bool click_teleport = false;
-bool hidegui = false;
-bool clickevents = false;
-bool file_written = false;
-bool god = false;
-bool hidedebug = true;
-bool snap_to_grid = false;
-bool throw_held = false;
-bool paused = false;
-bool disable_input = true;
-bool capture_last = false;
-bool register_keys = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false;
 
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 const char* entity_flags[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
+const char* inifile = "imgui.ini";
+const std::string hotkeyfile = "hotkeys.ini";
+
+ImVec4 hue_shift(ImVec4 in, float hue)
+{
+    float U = cos(hue * 3.14159265 / 180);
+    float W = sin(hue * 3.14159265 / 180);
+    ImVec4 out = ImVec4(
+        (.299+.701*U+.168*W)*in.x
+        + (.587-.587*U+.330*W)*in.y
+        + (.114-.114*U-.497*W)*in.z,
+        (.299-.299*U-.328*W)*in.x
+        + (.587+.413*U+.035*W)*in.y
+        + (.114-.114*U+.292*W)*in.z,
+        (.299-.3*U+1.25*W)*in.x
+        + (.587-.588*U-1.05*W)*in.y
+        + (.114+.886*U-.203*W)*in.z,
+        static_cast <float> (rand()) / static_cast <float> (RAND_MAX*0.7)+0.3
+    );
+    return out;
+}
+
+void set_colors()
+{
+    ImVec4* colors = ImGui::GetStyle().Colors;
+    for (int i = 0; i < ImGuiCol_COUNT; i++)
+    {
+        std::cout << "changing color " << i << std::endl;
+        ImVec4 color = colors[i];
+        ImVec4 new_color = hue_shift(color, g_hue);
+        colors[i] = new_color;
+    }
+}
 
 bool process_keys(
     _In_ int nCode,
@@ -731,6 +753,33 @@ bool process_keys(
     {
         hidedebug = !hidedebug;
     }
+    else if(pressed("reset_windows", wParam))
+    {
+        reset_windows = true;
+    }
+    else if(pressed("reset_windows_vertical", wParam))
+    {
+        reset_windows = true;
+        reset_windows_vertical = true;
+    }
+    else if(pressed("save_settings", wParam))
+    {
+        ImGui::SaveIniSettingsToDisk(inifile);
+        save_hotkeys(hotkeyfile);
+    }
+    else if(pressed("load_settings", wParam))
+    {
+        ImGui::LoadIniSettingsFromDisk(inifile);
+        load_hotkeys(hotkeyfile);
+    }
+    else if(pressed("set_colors", wParam))
+    {
+        change_colors = true;
+    }
+    else if(pressed("tool_metrics", wParam))
+    {
+        show_app_metrics = !show_app_metrics;
+    }
     else if(pressed("escape", wParam))
     {
         escape();
@@ -907,7 +956,7 @@ void render_narnia()
     static int from = 0;
     static int to = 0;
     ImGui::Text("Area");
-    ImGui::SameLine(53);
+    ImGui::SameLine(50);
     ImGui::Text("Level");
     ImGui::SameLine(100);
     ImGui::Text("Theme");
@@ -922,7 +971,7 @@ void render_narnia()
             g_world = 1;
         }
     }
-    ImGui::SameLine(52);
+    ImGui::SameLine(50);
     ImGui::SetNextItemWidth(44);
     if(ImGui::InputText("##Level", level, sizeof(level), ImGuiInputTextFlags_CharsDecimal, NULL)) {
         g_level = atoi(level);
@@ -1259,7 +1308,7 @@ void render_options()
         if(paused) set_pause(0x20);
         else set_pause(0);
     }
-    if(ImGui::CheckboxFlags("Allow pausing (on lost focus)", &g_hud_flags, 0x8))
+    if(ImGui::CheckboxFlags("Allow pause menu (on lost focus)", &g_hud_flags, 0x8))
     {
         set_hud_flags(g_hud_flags);
     }
@@ -1268,7 +1317,7 @@ void render_options()
 
 void render_debug()
 {
-    ImGui::TextWrapped("You're not supposed to be here, but since you already are, you could help me document what all these unknown flags do!");
+    ImGui::TextWrapped("Weird tools here. Don't ask.");
     if(ImGui::Button("List items"))
     {
         list_items();
@@ -1281,7 +1330,7 @@ void render_debug()
     ImGui::Text("Entity ID:");
     ImGui::SameLine();
     ImGui::InputInt("##EntityID", &g_last_entity, 1, 1, 0);
-    if(ImGui::Button("Get flags"))
+    /*if(ImGui::Button("Get flags"))
     {
         g_entity_flags = get_entity_flags(g_last_entity);
     }
@@ -1289,7 +1338,7 @@ void render_debug()
     if(ImGui::Button("Set flags"))
     {
         set_entity_flags(g_last_entity, g_entity_flags);
-    }
+    }*/
     unsigned int old_flags = g_entity_flags;
     ImGui::Text("Flags:");
     for(int i = 0; i < 32; i++) {
@@ -1381,7 +1430,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             std::string fontpath(cvt.to_bytes(fontdir) + "\\segoeuib.ttf");
             if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
             {
-                font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 20.0f);
+                font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 18.0f);
             }
 
             CoTaskMemFree(fontdir);
@@ -1392,64 +1441,125 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             font = io.Fonts->AddFontDefault();
         }
 
-        load_hotkeys("hotkeys.ini");
+        load_hotkeys(hotkeyfile);
         windows["tool_entity"] = "Entity spawner ("+key_string(keys["tool_entity"])+")";
         windows["tool_door"] = "Door to anywhere ("+key_string(keys["tool_door"])+")";
         windows["tool_camera"] = "Camera ("+key_string(keys["tool_camera"])+")";
         windows["tool_options"] = "Options ("+key_string(keys["tool_options"])+")";
         windows["tool_debug"] = "Debug ("+key_string(keys["tool_debug"])+")";
         windows["entities"] = "##Entities";
+        g_hue = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/180.0));
+        set_colors();
     }
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    if(change_colors)
+    {
+        g_hue = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/180.0));
+        change_colors = false;
+        set_colors();
+    }
+    style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    style.WindowPadding = ImVec2(4, 4);
+    style.WindowRounding = 0;
+    style.FrameRounding = 0;
+    style.PopupRounding = 0;
+    style.GrabRounding = 0;
+    style.WindowBorderSize = 0;
+    style.FrameBorderSize = 0;
+    style.PopupBorderSize = 0;
 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
     render_clickhandler();
     ImGui::SetNextWindowSize({10, 10});
     ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y - 30});
     ImGui::Begin("Overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .1f), "OL");
     ImGui::End();
+    int win_condition = ImGuiCond_FirstUseEver;
+    if(reset_windows)
+    {
+        win_condition = ImGuiCond_Always;
+    }
+    float lastwidth = 0;
+    float lastheight = 0;
+    float toolwidth = 300;
     if (!hidegui)
     {
-        ImGui::SetNextWindowSize({400, 300}, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({toolwidth, toolwidth-100}, win_condition);
+        ImGui::SetNextWindowPos({0, 0}, win_condition);
+        if(reset_windows_vertical)
+        {
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
+            ImGui::SetNextWindowPos({0, 0}, win_condition);
+        }
         ImGui::Begin(windows["tool_entity"].c_str());
         ImGui::PushItemWidth(-1);
         ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
         render_input();
         render_list();
         ImGui::PopItemWidth();
+        lastwidth += ImGui::GetWindowWidth();
+        lastheight += ImGui::GetWindowHeight();
         ImGui::End();
 
-        ImGui::SetNextWindowSize({300, 125}, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos({400, 0}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+        ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+        if(reset_windows_vertical)
+        {
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({0, lastheight}, win_condition);    
+        }
         ImGui::Begin(windows["tool_door"].c_str());
         ImGui::PushItemWidth(-1);
         render_narnia();
         ImGui::PopItemWidth();
+        lastwidth += ImGui::GetWindowWidth();
+        lastheight += ImGui::GetWindowHeight();
         ImGui::End();
 
-        ImGui::SetNextWindowSize({300, 125}, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos({700, 0}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+        ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+        if(reset_windows_vertical)
+        {
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({0, lastheight}, win_condition);    
+        }
         ImGui::Begin(windows["tool_camera"].c_str());
         ImGui::PushItemWidth(-1);
         render_camera();
         ImGui::PopItemWidth();
+        lastwidth += ImGui::GetWindowWidth();
+        lastheight += ImGui::GetWindowHeight();
         ImGui::End();
 
-        ImGui::SetNextWindowSize({400, 150}, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, 0}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);
+        if(reset_windows_vertical)
+        {
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({0, lastheight}, win_condition);    
+        }
         ImGui::Begin(windows["tool_options"].c_str());
         ImGui::PushItemWidth(-1);
         render_options();
         ImGui::PopItemWidth();
+        lastwidth = ImGui::GetWindowWidth();
+        lastheight = ImGui::GetWindowHeight();
         ImGui::End();
 
         if(!hidedebug)
         {
-            ImGui::SetNextWindowSize({400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-400, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);
+            if(reset_windows_vertical)
+            {
+                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y}, win_condition);
+                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);    
+            }
             ImGui::Begin(windows["tool_debug"].c_str());
             ImGui::PushItemWidth(-1);
             render_debug();
@@ -1458,7 +1568,22 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         }
     }
 
+    if(show_app_metrics)
+    {
+        ImGui::ShowMetricsWindow(&show_app_metrics);
+        ImGui::Begin("Styles");
+        ImGui::ShowStyleEditor();
+        ImGui::End();
+    }
+
     ImGui::Render();
+
+    if(reset_windows)
+    {
+        reset_windows = false;
+        reset_windows_vertical = false;
+        ImGui::SaveIniSettingsToDisk(inifile);
+    }
 
     if(!file_written)
         write_file();
