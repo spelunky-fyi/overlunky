@@ -105,7 +105,7 @@ unsafe extern "C" fn run(pid: u32) {
         } else if entities.len() > 0 {
             log::debug!("Found {:?} entities", entities.len());
         }
-        thread::sleep(time::Duration::from_millis(16));
+        thread::sleep(time::Duration::from_millis(100));
     }
 
     let api = API::new(&memory);
