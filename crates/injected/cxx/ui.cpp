@@ -144,11 +144,9 @@ int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count =
 unsigned int g_entity_flags = 0, g_hud_flags = 8, g_last_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true;
+
 static char text[500];
-
-// Set focus on search box
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false;
-
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 const char* entity_flags[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 const char* inifile = "imgui.ini";
@@ -428,6 +426,13 @@ void set_zoom() {
     zoom(g_zoom);
 }
 
+void force_hud_flags() {
+    g_hud_flags = get_hud_flags();
+    if(hud_allow_pause) g_hud_flags |= 1UL << 3;
+    else g_hud_flags &= ~(1UL << 3);
+    set_hud_flags(g_hud_flags);
+}
+
 LRESULT CALLBACK window_hook(
     _In_ int nCode,
     _In_ WPARAM wParam,
@@ -637,8 +642,8 @@ bool process_keys(
     }
     else if (pressed("toggle_allow_pause", wParam))
     {
-        g_hud_flags ^= 1UL << 3;
-        set_hud_flags(g_hud_flags);
+        hud_allow_pause = !hud_allow_pause;
+        force_hud_flags();
     }
     else if (pressed("toggle_disable_input", wParam))
     {
@@ -1307,9 +1312,9 @@ void render_options()
         if(paused) set_pause(0x20);
         else set_pause(0);
     }
-    if(ImGui::CheckboxFlags("Allow pause menu (on lost focus)", &g_hud_flags, 0x8))
+    if(ImGui::Checkbox("Allow pause menu (on lost focus)", &hud_allow_pause))
     {
-        set_hud_flags(g_hud_flags);
+        force_hud_flags();
     }
     ImGui::Checkbox("Disable game keys when typing##Typing", &disable_input);
 }
@@ -1590,7 +1595,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate/4)
     {
         if(g_zoom == 0.0) set_zoom();
-        set_hud_flags(g_hud_flags);
+        force_hud_flags();
         if(g_last_entity != 0) g_entity_flags = get_entity_flags(g_last_entity);
         g_last_frame = ImGui::GetFrameCount();
     }
