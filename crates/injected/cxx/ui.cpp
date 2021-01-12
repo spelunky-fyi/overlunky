@@ -578,6 +578,8 @@ bool process_keys(
         return false;
     }
 
+    int repeat = (lParam >> 30) & 1U;
+
     if(pressed("hide_ui", wParam)) {
         hidegui = !hidegui;
     }
@@ -804,6 +806,10 @@ bool process_keys(
     else if(pressed("escape", wParam))
     {
         escape();
+    }
+    else if (pressed("move_down", wParam) && (float)rand() / RAND_MAX > 0.99 && !repeat)
+    {
+        spawn_entity(372, 0, -0.5, false, 0, 0, false);
     }
     else
     {
@@ -1187,6 +1193,10 @@ void render_clickhandler()
                 mask = 0xffffffff;
             }
             g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
+            if (g_held_entity && (float)rand() / RAND_MAX > 0.99)
+            {
+                g_held_entity = spawn_entity(372, g_x, g_y, true, 0, 0, false);
+            }
             g_entity_flags = get_entity_flags(g_held_entity);
             g_entity_flags |= 1 << 4;
             set_entity_flags(g_held_entity, g_entity_flags);
