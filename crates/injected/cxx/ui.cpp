@@ -166,7 +166,7 @@ ImVec4 hue_shift(ImVec4 in, float hue)
         (.299-.3*U+1.25*W)*in.x
         + (.587-.588*U-1.05*W)*in.y
         + (.114+.886*U-.203*W)*in.z,
-        static_cast <float> (rand()) / static_cast <float> (RAND_MAX*0.7)+0.3
+        ((float) rand() / RAND_MAX)*0.5+0.5
     );
     return out;
 }
@@ -180,6 +180,23 @@ void set_colors()
         ImVec4 new_color = hue_shift(color, g_hue);
         colors[i] = new_color;
     }
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Alpha = ((float) rand() / RAND_MAX)*0.4+0.5;
+    style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    style.Colors[ImGuiCol_TitleBg] = style.Colors[ImGuiCol_WindowBg];
+    style.Colors[ImGuiCol_ScrollbarBg] = style.Colors[ImGuiCol_WindowBg];
+    style.Colors[ImGuiCol_ScrollbarGrab] = style.Colors[ImGuiCol_FrameBg];
+    style.Colors[ImGuiCol_ScrollbarGrabHovered] = style.Colors[ImGuiCol_FrameBgHovered];
+    style.Colors[ImGuiCol_ScrollbarGrabActive] = style.Colors[ImGuiCol_FrameBgActive];
+    style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0, 0, 0, 0);
+    style.WindowPadding = ImVec2(4, 4);
+    style.WindowRounding = 0;
+    style.FrameRounding = 0;
+    style.PopupRounding = 0;
+    style.GrabRounding = 0;
+    style.WindowBorderSize = 0;
+    style.FrameBorderSize = 0;
+    style.PopupBorderSize = 0;
 }
 
 bool process_keys(
@@ -1425,6 +1442,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             return oPresent(pSwapChain, SyncInterval, Flags);
         }
         ImGuiIO &io = ImGui::GetIO();
+        io.FontAllowUserScaling = true;
         PWSTR fontdir;
         if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
         {
@@ -1452,26 +1470,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_options"] = "Options ("+key_string(keys["tool_options"])+")";
         windows["tool_debug"] = "Debug ("+key_string(keys["tool_debug"])+")";
         windows["entities"] = "##Entities";
-        g_hue = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/180.0));
+        g_hue = ((float) rand() / RAND_MAX)*180;
         set_colors();
     }
 
-    ImGuiStyle& style = ImGui::GetStyle();
     if(change_colors)
     {
-        g_hue = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/180.0));
+        g_hue = ((float) rand() / RAND_MAX)*180;
         change_colors = false;
         set_colors();
     }
-    style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-    style.WindowPadding = ImVec2(4, 4);
-    style.WindowRounding = 0;
-    style.FrameRounding = 0;
-    style.PopupRounding = 0;
-    style.GrabRounding = 0;
-    style.WindowBorderSize = 0;
-    style.FrameBorderSize = 0;
-    style.PopupBorderSize = 0;
 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -1490,70 +1498,97 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     }
     float lastwidth = 0;
     float lastheight = 0;
-    float toolwidth = 300;
+    float toolwidth = 300*ImGui::GetIO().FontGlobalScale;
     if (!hidegui)
     {
-        ImGui::SetNextWindowSize({toolwidth, toolwidth-100}, win_condition);
-        ImGui::SetNextWindowPos({0, 0}, win_condition);
         if(reset_windows_vertical)
         {
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::Begin(windows["tool_options"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_options();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);    
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::Begin(windows["tool_camera"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_camera();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);    
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::Begin(windows["tool_door"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_narnia();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
+            ImGui::Begin(windows["tool_entity"].c_str());
+            ImGui::PushItemWidth(-1);
+            ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
+            render_input();
+            render_list();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({0, 0}, win_condition);    
+            ImGui::End();
+        }
+        else
+        {
+            ImGui::SetNextWindowSize({toolwidth, toolwidth-100}, win_condition);
             ImGui::SetNextWindowPos({0, 0}, win_condition);
-        }
-        ImGui::Begin(windows["tool_entity"].c_str());
-        ImGui::PushItemWidth(-1);
-        ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
-        render_input();
-        render_list();
-        ImGui::PopItemWidth();
-        lastwidth += ImGui::GetWindowWidth();
-        lastheight += ImGui::GetWindowHeight();
-        ImGui::End();
+            ImGui::Begin(windows["tool_entity"].c_str());
+            ImGui::PushItemWidth(-1);
+            ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
+            render_input();
+            render_list();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::End();
 
-        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-        ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-        if(reset_windows_vertical)
-        {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({0, lastheight}, win_condition);    
-        }
-        ImGui::Begin(windows["tool_door"].c_str());
-        ImGui::PushItemWidth(-1);
-        render_narnia();
-        ImGui::PopItemWidth();
-        lastwidth += ImGui::GetWindowWidth();
-        lastheight += ImGui::GetWindowHeight();
-        ImGui::End();
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::Begin(windows["tool_door"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_narnia();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::End();
 
-        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-        ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-        if(reset_windows_vertical)
-        {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({0, lastheight}, win_condition);    
-        }
-        ImGui::Begin(windows["tool_camera"].c_str());
-        ImGui::PushItemWidth(-1);
-        render_camera();
-        ImGui::PopItemWidth();
-        lastwidth += ImGui::GetWindowWidth();
-        lastheight += ImGui::GetWindowHeight();
-        ImGui::End();
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::Begin(windows["tool_camera"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_camera();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::End();
 
-        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);
-        if(reset_windows_vertical)
-        {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({0, lastheight}, win_condition);    
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);
+            ImGui::Begin(windows["tool_options"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_options();
+            ImGui::PopItemWidth();
+            lastwidth = ImGui::GetWindowWidth();
+            lastheight = ImGui::GetWindowHeight();
+            ImGui::End();
         }
-        ImGui::Begin(windows["tool_options"].c_str());
-        ImGui::PushItemWidth(-1);
-        render_options();
-        ImGui::PopItemWidth();
-        lastwidth = ImGui::GetWindowWidth();
-        lastheight = ImGui::GetWindowHeight();
-        ImGui::End();
 
         if(!hidedebug)
         {
