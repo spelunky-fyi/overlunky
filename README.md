@@ -49,6 +49,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+K**: Toggle disabling game keyboard input when typing
   - **F11**: Hide overlay
   - **Ctrl+Shift+U**: Change UI color
+  - **Ctrl+Shift+I**: ImGui internal metrics and settings
+  - **Ctrl+Shift+R**: Reset window positions (stack horizontally)
+  - **Ctrl+Shift+V**: Reset window positions (stack vertically)
   - **Enter**: Run active tool
   - **Escape**: Return focus to game from an input
 
