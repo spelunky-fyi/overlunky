@@ -1192,7 +1192,7 @@ void render_clickhandler()
             {
                 mask = 0xffffffff;
             }
-            g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
+            g_held_entity = get_entity_at(g_x, g_y, true, 1, mask);
             if (g_held_entity && (float)rand() / RAND_MAX > 0.99)
             {
                 g_held_entity = spawn_entity(372, g_x, g_y, true, 0, 0, false);
