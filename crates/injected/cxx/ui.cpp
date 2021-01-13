@@ -156,6 +156,8 @@ const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Pas
 const char* search_flags[] = { "1: Invisible", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " }; //TODO
 const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
 const char* direction_flags[] = { "Left", "Down", "Up", "Right" };
+std::map<int, std::string> entity_names;
+
 const char* inifile = "imgui.ini";
 const std::string hotkeyfile = "hotkeys.ini";
 
@@ -1018,7 +1020,7 @@ void render_input()
         int item;
         while(sss >> item)
         {
-            std::string name = entity_name(item);
+            std::string name = entity_names[item];
             name = name.substr(name.find_last_of("_")+1);
             search += name+", ";
         }
@@ -1455,16 +1457,15 @@ void render_entity_props()
     if(!update_entity()) return;
     if(g_entity == 0) return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
+    char uids[10]; 
+    itoa(g_entity->uid, uids, 10);
+    char ids[10]; 
+    itoa(g_entity_type, ids, 10);
+    ImGui::Text(uids); ImGui::SameLine(); ImGui::Text(ids); ImGui::SameLine(); ImGui::Text(entity_names[g_entity_type].data());
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Type"))
+    if(ImGui::CollapsingHeader("State"))
     {
-        char uids[10]; 
-        itoa(g_entity->uid, uids, 10);
-        char ids[10]; 
-        itoa(g_entity_type, ids, 10);
-        ImGui::Text("UID "); ImGui::SameLine(); ImGui::Text(uids); ImGui::SameLine();
-        ImGui::Text(", "); ImGui::SameLine(); ImGui::Text(ids); ImGui::SameLine();
-        ImGui::Text(": "); ImGui::SameLine(); ImGui::Text(entity_name(g_entity_type));
+
     }
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Position"))
@@ -1485,13 +1486,33 @@ void render_entity_props()
             SliderByte("Ropes", (char *)&g_inventory->ropes, 0, 99);
         }
     }
+    if(ImGui::CollapsingHeader("Items"))
+        {
+            if(g_entity->items_count > 0){
+                int* pitems = (int*) g_entity->items_ptr;
+                for(int i = 0; i < g_entity->items_count; i++)
+                {
+                    char uidc[10];
+                    itoa(pitems[i], uidc, 10);
+                    int ptype = get_entity_type(pitems[i]);
+                    if(ptype == 648) continue;
+                    char typec[10];
+                    itoa(ptype, typec, 10);
+                    const char* pname = entity_names[ptype].data();
+                    ImGui::Text(uidc); ImGui::SameLine(); ImGui::Text(typec); ImGui::SameLine(); ImGui::Text(pname);
+                }                
+            }
+        }
+
     if(ImGui::CollapsingHeader("Style"))
     {
-        ImGui::ColorEdit4("##entity_color", (float*)&g_entity->color);
+        ImGui::ColorEdit4("Color", (float*)&g_entity->color);
         ImGui::SliderFloat("Width", &g_entity->w, 0.0, 10.0, "%.3f", 0);
         ImGui::SliderFloat("Height", &g_entity->h, 0.0, 10.0, "%.3f", 0);
         ImGui::SliderFloat("Box W", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
         ImGui::SliderFloat("Box H", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
+        ImGui::SliderFloat("Off X", &g_entity->offsetx, 0.0, 10.0, "%.3f", 0);
+        ImGui::SliderFloat("Off Y", &g_entity->offsety, 0.0, 10.0, "%.3f", 0);
     }
     ImGui::PopItemWidth();
     if(ImGui::CollapsingHeader("Flags"))
@@ -1859,6 +1880,7 @@ void create_box(rust::Vec<rust::String> names, rust::Vec<uint16_t> ids)
     for (int i = 0; i < new_items.size(); i++)
     {
         new_filtered_items[i] = i;
+        entity_names[new_items[i].id] = new_items[i].name.substr(9);
     }
 
     // TODO: add atomic and wrap it as struct
