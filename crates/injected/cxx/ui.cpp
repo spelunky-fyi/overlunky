@@ -1010,33 +1010,50 @@ void render_themes()
     ImGui::EndCombo();
 }
 
+std::string unique_label(std::string label)
+{
+    label += "##";
+    label += rand();
+    return label;
+}
+
 void render_input()
 {
     int n = 0;
     for(auto i : saved_entities)
     {
+        ImGui::PushID(i.data());
         std::string search = "";
         std::stringstream sss(i);
-        int item;
+        int item = 0;
         while(sss >> item)
         {
             std::string name = entity_names[item];
             name = name.substr(name.find_last_of("_")+1);
-            search += name+", ";
+            if(search.find(name) == std::string::npos) search += name+" ";
         }
-        search.pop_back();search.pop_back();
-        ImGui::TextWrapped(search.data());
-        ImGui::SameLine();
-        if(ImGui::Button("Del"))
-        {
-            saved_entities.erase(saved_entities.begin()+n);
+        if(search.length() > 1){
+            search.pop_back();
         }
-        ImGui::SameLine();
+        if(search.empty()) search = i;
+        ImGui::PushID(n);
         if(ImGui::Button("Spawn"))
         {
             strcpy(text, i.data());
             spawn_entities(false);
         }
+        ImGui::SameLine();
+        ImGui::PopID();
+        ImGui::PushID(2*n);
+        if(ImGui::Button("Del"))
+        {
+            saved_entities.erase(saved_entities.begin()+n);
+        }
+        ImGui::PopID();
+        ImGui::PopID();
+        ImGui::SameLine();
+        ImGui::TextWrapped(search.data());
+        n++;
     }
     if (set_focus_entity)
     {
@@ -1452,20 +1469,116 @@ bool SliderByte(const char *label, char* value, char min = 0, char max = 0, cons
     return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
 }
 
+void render_uid(int uid)
+{
+    char uidc[10];
+    itoa(uid, uidc, 10);
+    int ptype = get_entity_type(uid);
+    if(ptype == 648 || ptype == 0) return;
+    char typec[10];
+    itoa(ptype, typec, 10);
+    const char* pname = entity_names[ptype].data();
+    if(ImGui::Button(uidc))
+    {
+        g_last_entity = uid;
+        update_entity();
+    }
+    ImGui::SameLine(); ImGui::Text(typec); ImGui::SameLine(); ImGui::Text(pname);
+}
+
+void render_state(const char* label, int state)
+{
+    ImGui::Text(label); ImGui::SameLine();
+    if(state == 0) ImGui::Text("Flailing");
+    else if(state == 1) ImGui::Text("Standing");
+    else if(state == 2) ImGui::Text("Sitting");
+    else if(state == 4) ImGui::Text("Hanging");
+    else if(state == 5) ImGui::Text("Ducking");
+    else if(state == 6) ImGui::Text("Climbing");
+    else if(state == 7) ImGui::Text("Pushing");
+    else if(state == 8) ImGui::Text("Jumping");
+    else if(state == 9) ImGui::Text("Falling");
+    else if(state == 10) ImGui::Text("Dropping");
+    else if(state == 12) ImGui::Text("Attacking");
+    else if(state == 17) ImGui::Text("Throwing");
+    else if(state == 18) ImGui::Text("Stunned");
+    else if(state == 19) ImGui::Text("Entering");
+    else if(state == 20) ImGui::Text("Loading");
+    else if(state == 21) ImGui::Text("Exiting");
+    else if(state == 22) ImGui::Text("Dying");
+    else {
+        char statec[10];
+        itoa(state, statec, 10);
+        ImGui::Text(statec);
+    }
+}
+
+void render_ai(const char* label, int state)
+{
+    ImGui::Text(label); ImGui::SameLine();
+    if(state == 0) ImGui::Text("Idling");
+    else if(state == 1) ImGui::Text("Walking");
+    else if(state == 2) ImGui::Text("Jumping");
+    else if(state == 5) ImGui::Text("Jumping");
+    else if(state == 6) ImGui::Text("Attacking");
+    else if(state == 7) ImGui::Text("Meleeing");
+    else {
+        char statec[10];
+        itoa(state, statec, 10);
+        ImGui::Text(statec);
+    }
+}
+
+void render_interaction(const char* label, int state)
+{
+    ImGui::Text(label); ImGui::SameLine();
+    if(state == 1) ImGui::Text("Entering");
+    if(state == 5) ImGui::Text("Shooting");
+    else {
+        char statec[10];
+        itoa(state, statec, 10);
+        ImGui::Text(statec);
+    }
+}
+
 void render_entity_props()
 {
     if(!update_entity()) return;
     if(g_entity == 0) return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
-    char uids[10]; 
-    itoa(g_entity->uid, uids, 10);
-    char ids[10]; 
-    itoa(g_entity_type, ids, 10);
-    ImGui::Text(uids); ImGui::SameLine(); ImGui::Text(ids); ImGui::SameLine(); ImGui::Text(entity_names[g_entity_type].data());
+    render_uid(g_entity->uid);
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("State"))
     {
+        render_state("Current:", g_entity->state);
+        render_state("Last:", g_entity->last_state);
+        render_ai("AI:", g_entity->move_state);
+        render_interaction("Interaction:", g_entity->some_state);
+        if(g_entity->can_use == 0) ImGui::Text("Can interact: No");
+        else if(g_entity->can_use == 1) ImGui::Text("Can interact: Yes");
+        else if(g_entity->can_use == 2) ImGui::Text("Can interact: Disabled");
 
+        if(g_entity->standing_on_uid != -1)
+        {
+            ImGui::Text("Standing on:");
+            render_uid(g_entity->standing_on_uid);
+        }
+        if(g_entity->holding_uid != -1)
+        {
+            ImGui::Text("Holding:");
+            render_uid(g_entity->holding_uid);
+        }
+        EntityMemory* overlay = (EntityMemory*) g_entity->overlay;
+        if(!IsBadReadPtr(overlay, 0x178))
+        {
+            ImGui::Text("Riding:");
+            render_uid(overlay->uid);
+        }
+        if(g_entity->last_attacker_uid != -1)
+        {
+            ImGui::Text("Pwner:");
+            render_uid(g_entity->last_attacker_uid);
+        }
     }
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Position"))
@@ -1481,25 +1594,18 @@ void render_entity_props()
         SliderByte("Health", (char *)&g_entity->health, 1, 99);
         if(g_inventory != 0)
         {
-            ImGui::SliderInt("Money", (int *)&g_inventory->money, 0, 1000000);
             SliderByte("Bombs", (char *)&g_inventory->bombs, 0, 99);
             SliderByte("Ropes", (char *)&g_inventory->ropes, 0, 99);
+            ImGui::SliderInt("Money", (int *)&g_inventory->money, 0, 1000000);
         }
     }
     if(ImGui::CollapsingHeader("Items"))
         {
-            if(g_entity->items_count > 0){
+            if(g_entity->items_count > 0) {
                 int* pitems = (int*) g_entity->items_ptr;
                 for(int i = 0; i < g_entity->items_count; i++)
                 {
-                    char uidc[10];
-                    itoa(pitems[i], uidc, 10);
-                    int ptype = get_entity_type(pitems[i]);
-                    if(ptype == 648) continue;
-                    char typec[10];
-                    itoa(ptype, typec, 10);
-                    const char* pname = entity_names[ptype].data();
-                    ImGui::Text(uidc); ImGui::SameLine(); ImGui::Text(typec); ImGui::SameLine(); ImGui::Text(pname);
+                    render_uid(pitems[i]);
                 }                
             }
         }
@@ -1511,8 +1617,8 @@ void render_entity_props()
         ImGui::SliderFloat("Height", &g_entity->h, 0.0, 10.0, "%.3f", 0);
         ImGui::SliderFloat("Box W", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
         ImGui::SliderFloat("Box H", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
-        ImGui::SliderFloat("Off X", &g_entity->offsetx, 0.0, 10.0, "%.3f", 0);
-        ImGui::SliderFloat("Off Y", &g_entity->offsety, 0.0, 10.0, "%.3f", 0);
+        ImGui::SliderFloat("Off X", &g_entity->offsetx, -10.0, 10.0, "%.3f", 0);
+        ImGui::SliderFloat("Off Y", &g_entity->offsety, -10.0, 10.0, "%.3f", 0);
     }
     ImGui::PopItemWidth();
     if(ImGui::CollapsingHeader("Flags"))
