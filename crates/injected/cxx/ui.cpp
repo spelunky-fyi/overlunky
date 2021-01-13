@@ -1038,16 +1038,17 @@ void render_input()
             search.pop_back();
         }
         if(search.empty()) search = i;
-        ImGui::PushID(n);
-        if(ImGui::Button("Spawn"))
+        ImGui::PushID(2*n);
+        if(ImGui::Button("Load"))
         {
             strcpy(text, i.data());
-            spawn_entities(false);
+            update_filter(text);
+            //spawn_entities(false);
         }
         ImGui::SameLine();
         ImGui::PopID();
-        ImGui::PushID(2*n);
-        if(ImGui::Button("Del"))
+        ImGui::PushID(4*n);
+        if(ImGui::Button("X"))
         {
             saved_entities.erase(saved_entities.begin()+n);
         }
