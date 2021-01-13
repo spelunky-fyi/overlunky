@@ -29,7 +29,7 @@ pub mod ffi {
         pub items_size: u32,
         pub items_count: u32,
         pub flags: u32,
-        pub search_flags: u32,
+        pub more_flags: u32,
         pub uid: u32,
         pub animation: u32,
         pub x: f32,

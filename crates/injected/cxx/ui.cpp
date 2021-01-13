@@ -153,7 +153,7 @@ Inventory* g_inventory;
 static char text[500];
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
 const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
-const char* search_flags[] = { "1: Invisible", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " }; //TODO
+const char* more_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " }; //TODO
 const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
 const char* direction_flags[] = { "Left", "Down", "Up", "Right" };
 std::map<int, std::string> entity_names;
@@ -1580,7 +1580,6 @@ void render_entity_props()
             render_uid(g_entity->last_attacker_uid);
         }
     }
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Position"))
     {
         ImGui::InputFloat("Pos X", &g_entity->x, 0.2, 1.0, 5, 0);
@@ -1588,7 +1587,6 @@ void render_entity_props()
         ImGui::InputFloat("Vel X", &g_entity->velocityx, 0.2, 1.0, 5, 0);
         ImGui::InputFloat("Vel y", &g_entity->velocityy, 0.2, 1.0, 5, 0);
     }
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Inventory"))
     {
         SliderByte("Health", (char *)&g_entity->health, 1, 99);
@@ -1630,7 +1628,7 @@ void render_entity_props()
     if(ImGui::CollapsingHeader("More Flags"))
     {
         for(int i = 0; i < 32; i++) {
-            ImGui::CheckboxFlags(search_flags[i], &g_entity->search_flags, pow(2, i));
+            ImGui::CheckboxFlags(more_flags[i], &g_entity->more_flags, pow(2, i));
         }
     }
     if(ImGui::CollapsingHeader("Input Display"))
