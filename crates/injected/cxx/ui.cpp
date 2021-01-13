@@ -1427,7 +1427,7 @@ void render_entity_props()
         char ids[10]; 
         itoa(g_entity_type, ids, 10);
         ImGui::Text("UID: "); ImGui::SameLine(); ImGui::Text(uids);
-        ImGui::Text("ID:   "); ImGui::SameLine(); ImGui::Text(ids);
+        ImGui::Text("ID:    "); ImGui::SameLine(); ImGui::Text(ids);
         ImGui::Text("Type:"); ImGui::SameLine(); ImGui::Text(entity_name(g_entity_type));
     }
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
@@ -1444,7 +1444,7 @@ void render_entity_props()
         ImGui::Text("Health:"); ImGui::SameLine(); SliderByte("##entity_health", (char *)&g_entity->health, 1, 99);
         if(g_inventory != 0)
         {
-            ImGui::Text("Health:"); ImGui::SameLine(); ImGui::SliderInt("##entity_money", (int *)&g_inventory->money, 0, 1000000);
+            ImGui::Text("Money:"); ImGui::SameLine(); ImGui::SliderInt("##entity_money", (int *)&g_inventory->money, 0, 1000000);
             ImGui::Text("Bombs:"); ImGui::SameLine(); SliderByte("##entity_bombs", (char *)&g_inventory->bombs, 0, 99);
             ImGui::Text("Ropes:"); ImGui::SameLine(); SliderByte("##entity_ropes", (char *)&g_inventory->ropes, 0, 99);
         }
@@ -1456,6 +1456,18 @@ void render_entity_props()
         ImGui::Text("Height:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_h", &g_entity->h, 0.0, 10.0, "%.3f", 0);
         ImGui::Text("Hitbox W:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxx", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
         ImGui::Text("Hitbox H:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxy", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
+    }
+    if(ImGui::CollapsingHeader("Flags"))
+    {
+        for(int i = 0; i < 32; i++) {
+            ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, pow(2, i));
+        }
+    }
+    if(ImGui::CollapsingHeader("More Flags"))
+    {
+        for(int i = 0; i < 32; i++) {
+            ImGui::CheckboxFlags(search_flags[i], &g_entity->search_flags, pow(2, i));
+        }
     }
     if(ImGui::CollapsingHeader("Input Display"))
     {
@@ -1472,18 +1484,6 @@ void render_entity_props()
         for(int i = 0; i < 6; i++) {
             ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, pow(2, i));
             if(i<5) ImGui::SameLine(region.x/6*(i+1));
-        }
-    }
-    if(ImGui::CollapsingHeader("Flags"))
-    {
-        for(int i = 0; i < 32; i++) {
-            ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, pow(2, i));
-        }
-    }
-    if(ImGui::CollapsingHeader("More Flags"))
-    {
-        for(int i = 0; i < 32; i++) {
-            ImGui::CheckboxFlags(search_flags[i], &g_entity->search_flags, pow(2, i));
         }
     }
 }
