@@ -145,6 +145,7 @@ int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count =
 unsigned int g_entity_flags = 0, g_hud_flags = 8, g_last_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
+std::vector<std::string> saved_entities;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true;
 EntityMemory* g_entity;
 Inventory* g_inventory;
@@ -402,11 +403,17 @@ void escape() {
     ImGui::FocusWindow(win);*/
 }
 
+void save_search()
+{
+    std::string search(text);
+    saved_entities.push_back(search);
+}
+
 void spawn_entities(bool s) {
-    if(g_current_item == 0 && g_filtered_count == g_items.size()) return;
     std::string search(text);
     const auto pos = search.find_first_of(" ");
     if(pos == std::string::npos && g_filtered_count > 0) {
+        if(g_current_item == 0 && g_filtered_count == g_items.size()) return;
         g_last_entity = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
         g_entity_flags = get_entity_flags(g_last_entity);
     } else {
@@ -428,8 +435,8 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
         if(g_filtered_count == 0) return 1;
         if(g_current_item == 0 && g_filtered_count == g_items.size()) return 1;
         std::string search(text);
-        while(!search.empty() && std::isspace(search.back())) search.pop_back();
-        const auto pos = search.find_last_of(" ");
+        //while(!search.empty() && std::isspace(search.back())) search.pop_back();
+        const auto pos = search.find_last_of(" 0123456789");
         if(pos == std::string::npos)
         {
             search = "";
@@ -1003,24 +1010,52 @@ void render_themes()
 
 void render_input()
 {
+    int n = 0;
+    for(auto i : saved_entities)
+    {
+        std::string search = "";
+        std::stringstream sss(i);
+        int item;
+        while(sss >> item)
+        {
+            std::string name = entity_name(item);
+            name = name.substr(name.find_last_of("_")+1);
+            search += name+", ";
+        }
+        search.pop_back();search.pop_back();
+        ImGui::TextWrapped(search.data());
+        ImGui::SameLine();
+        if(ImGui::Button("Del"))
+        {
+            saved_entities.erase(saved_entities.begin()+n);
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Spawn"))
+        {
+            strcpy(text, i.data());
+            spawn_entities(false);
+        }
+    }
     if (set_focus_entity)
     {
         ImGui::SetKeyboardFocusHere();
         set_focus_entity = false;
     }
     ImVec2 region = ImGui::GetContentRegionMax();
-    ImGui::PushItemWidth(region.x-70);
+    ImGui::PushItemWidth(region.x-110);
     if (ImGui::InputText("##Input", text, sizeof(text), ImGuiInputTextFlags_CallbackCompletion, pick_selected_entity))
     {
         update_filter(text);
     }
     ImGui::PopItemWidth();
     ImGui::SameLine();
-    ImGui::PushItemWidth(60);
+    if(ImGui::Button("Save")) {
+        save_search();
+    }
+    ImGui::SameLine();
     if(ImGui::Button("Spawn")) {
         spawn_entities(false);
     }
-    ImGui::PopItemWidth();
 }
 
 void render_narnia()
@@ -1419,6 +1454,7 @@ void render_entity_props()
 {
     if(!update_entity()) return;
     if(g_entity == 0) return;
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Type"))
     {
@@ -1426,37 +1462,38 @@ void render_entity_props()
         itoa(g_entity->uid, uids, 10);
         char ids[10]; 
         itoa(g_entity_type, ids, 10);
-        ImGui::Text("UID: "); ImGui::SameLine(); ImGui::Text(uids);
-        ImGui::Text("ID:    "); ImGui::SameLine(); ImGui::Text(ids);
-        ImGui::Text("Type:"); ImGui::SameLine(); ImGui::Text(entity_name(g_entity_type));
+        ImGui::Text("UID "); ImGui::SameLine(); ImGui::Text(uids); ImGui::SameLine();
+        ImGui::Text(", "); ImGui::SameLine(); ImGui::Text(ids); ImGui::SameLine();
+        ImGui::Text(": "); ImGui::SameLine(); ImGui::Text(entity_name(g_entity_type));
     }
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Position"))
     {
-        ImGui::Text("Pos X:"); ImGui::SameLine(); ImGui::InputFloat("##entity_x", &g_entity->x, 0.2, 1.0, 5, 0);
-        ImGui::Text("Pos Y:"); ImGui::SameLine(); ImGui::InputFloat("##entity_y", &g_entity->y, 0.2, 1.0, 5, 0);
-        ImGui::Text("Vel X:"); ImGui::SameLine(); ImGui::InputFloat("##entity_velx", &g_entity->velocityx, 0.2, 1.0, 5, 0);
-        ImGui::Text("Vel Y:"); ImGui::SameLine(); ImGui::InputFloat("##entity_vely", &g_entity->velocityy, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Pos X", &g_entity->x, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Pos Y", &g_entity->y, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Vel X", &g_entity->velocityx, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Vel y", &g_entity->velocityy, 0.2, 1.0, 5, 0);
     }
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Inventory"))
     {
-        ImGui::Text("Health:"); ImGui::SameLine(); SliderByte("##entity_health", (char *)&g_entity->health, 1, 99);
+        SliderByte("Health", (char *)&g_entity->health, 1, 99);
         if(g_inventory != 0)
         {
-            ImGui::Text("Money:"); ImGui::SameLine(); ImGui::SliderInt("##entity_money", (int *)&g_inventory->money, 0, 1000000);
-            ImGui::Text("Bombs:"); ImGui::SameLine(); SliderByte("##entity_bombs", (char *)&g_inventory->bombs, 0, 99);
-            ImGui::Text("Ropes:"); ImGui::SameLine(); SliderByte("##entity_ropes", (char *)&g_inventory->ropes, 0, 99);
+            ImGui::SliderInt("Money", (int *)&g_inventory->money, 0, 1000000);
+            SliderByte("Bombs", (char *)&g_inventory->bombs, 0, 99);
+            SliderByte("Ropes", (char *)&g_inventory->ropes, 0, 99);
         }
     }
     if(ImGui::CollapsingHeader("Style"))
     {
-        ImGui::Text("Color:"); ImGui::SameLine(); ImGui::ColorEdit4("##entity_color", (float*)&g_entity->color);
-        ImGui::Text("Width:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_w", &g_entity->w, 0.0, 10.0, "%.3f", 0);
-        ImGui::Text("Height:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_h", &g_entity->h, 0.0, 10.0, "%.3f", 0);
-        ImGui::Text("Hitbox W:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxx", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
-        ImGui::Text("Hitbox H:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxy", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
+        ImGui::ColorEdit4("##entity_color", (float*)&g_entity->color);
+        ImGui::SliderFloat("Width", &g_entity->w, 0.0, 10.0, "%.3f", 0);
+        ImGui::SliderFloat("Height", &g_entity->h, 0.0, 10.0, "%.3f", 0);
+        ImGui::SliderFloat("Box W", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
+        ImGui::SliderFloat("Box H", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
     }
+    ImGui::PopItemWidth();
     if(ImGui::CollapsingHeader("Flags"))
     {
         for(int i = 0; i < 32; i++) {
@@ -1721,9 +1758,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::PushItemWidth(-1);
             render_entity_props();
             ImGui::PopItemWidth();
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);    
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);    
             ImGui::End();
         }
 
