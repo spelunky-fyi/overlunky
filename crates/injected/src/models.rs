@@ -1,6 +1,7 @@
 use crate::{
     critical_section::get_main_thread,
     db::ffi::EntityDB,
+    ui::ffi::EntityMemory,
     memory::*,
     search::{decode_imm, decode_pc, find_inst},
 };
@@ -429,6 +430,9 @@ impl Entity {
     pub fn _type(&self) -> &EntityDB {
         unsafe { std::mem::transmute(read_u64(self.pointer + 0x8)) }
     }
+    pub fn _memory(&self) -> &EntityMemory {
+        unsafe { std::mem::transmute(self.pointer) }
+    }
 
     pub fn unique_id(&self) -> u32 {
         read_u32(self.pointer + 0x38)
@@ -493,9 +497,11 @@ impl Entity {
             write_mem(px, &x.to_le_bytes());
             write_mem(py, &y.to_le_bytes());
         }
-        // wheeee (doesnt really work)
-        write_mem(topmost.pointer + 0x100, &vx.to_le_bytes());
-        write_mem(topmost.pointer + 0x104, &vy.to_le_bytes());
+        // set velocity
+        if topmost._type().search_flags < 0x80 {
+            write_mem(topmost.pointer + 0x100, &vx.to_le_bytes());
+            write_mem(topmost.pointer + 0x104, &vy.to_le_bytes());
+        }
         return;
     }
 

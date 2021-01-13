@@ -1,8 +1,112 @@
-use crate::{db::ffi::EntityItem, models::State};
+use crate::{db::ffi::EntityItem, ui::ffi::EntityMemory, models::State};
 
 
 #[cxx::bridge]
 pub mod ffi {
+
+    #[derive(Debug)]
+    pub struct Color {
+        pub r: f32,
+        pub g: f32,
+        pub b: f32,
+        pub a: f32
+    }
+
+    #[derive(Debug)]
+    pub struct Inventory {
+        pub money: u32,
+        pub bombs: u8,
+        pub ropes: u8
+    }
+
+    #[derive(Debug)]
+    pub struct EntityMemory {
+        pub create_func: usize,
+        pub destroy_func: usize,
+        pub overlay: usize,
+        pub some_items_func: usize,
+        pub items_ptr: usize,
+        pub items_size: u32,
+        pub items_count: u32,
+        pub flags: u32,
+        pub search_flags: u32,
+        pub uid: u32,
+        pub animation: u32,
+        pub x: f32,
+        pub y: f32,
+        pub w: f32,
+        pub h: f32,
+        pub f50: f32,
+        pub f54: f32,
+        pub color: Color,
+        pub offsetx: f32,
+        pub offsety: f32,
+        pub hitboxx: f32,
+        pub hitboxy: f32,
+        pub duckmask: u32,
+        pub i7c: i32,
+        pub p80: usize,
+        pub p88: usize,
+        pub tilew: f32,
+        pub tileh: f32,
+        pub camera_layer: u8,
+        pub b99: u8,
+        pub b9a: u8,
+        pub b9b: u8,
+        pub i9c: u32,
+        pub pa0: usize,
+        pub ia8: i32,
+        pub iac: i32,
+        pub pb0: usize,
+        pub ib8: i32,
+        pub ibc: i32,
+        pub anim_func: usize,
+        pub ic8: i32,
+        pub icc: i32,
+        pub movex: f32,
+        pub movey: f32,
+        pub buttons: u32,
+        pub stand_counter: u32,
+        pub fe0: f32,
+        pub ie4: i32,
+        pub attacker_uid: u32,
+        pub last_attacker_uid: u32,
+        pub animation_func: usize,
+        pub idle_counter: u32,
+        pub standing_on_uid: u32,
+        pub velocityx: f32,
+        pub velocityy: f32,
+        pub holding_uid: u32,
+        pub state: u8,
+        pub last_state: u8,
+        pub move_state: u8,
+        pub health: u8,
+        pub i110: i32,
+        pub some_state: u32,
+        pub i118: i32,
+        pub i11c: i32,
+        pub i120: i32,
+        pub i124: i32,
+        pub p128: usize,
+        pub has_backpack: u32,
+        pub i134: i32,
+        pub inventory_ptr: usize,
+        pub p140: usize,
+        pub i148: i32,
+        pub i14c: i32,
+        pub i150: i32,
+        pub i154: i32,
+        pub p158: usize,
+        pub p160: usize,
+        pub i168: i32,
+        pub i16c: i32,
+        pub jump_flags: u32,
+        pub some_timer: u8,
+        pub can_use: u8,
+        pub b176: u8,
+        pub b177: u8
+    }
+
     extern "Rust" {
         unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) -> u32;
         unsafe fn spawn_door(x: f32, y: f32, w: u8, l: u8, f: u8, t: u8);
@@ -19,6 +123,7 @@ pub mod ffi {
         unsafe fn get_hud_flags() -> u8;
         unsafe fn set_pause(pause: u8);
         unsafe fn player_status();
+        unsafe fn get_entity_ptr(id: u32) -> usize;
     }
     unsafe extern "C++" {
         include!("cxx/ui.hpp");
@@ -165,12 +270,15 @@ pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) 
                         distance,
                         item.ptr()
                     );
-                    found.push((item.unique_id(), distance));
+                    found.push((item.unique_id(), distance, item._memory()));
                 }
             }
             if !found.is_empty() {
                 found.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-                return found.first().unwrap().0
+                let picked = found.first().unwrap();
+                let entity = picked.2;
+                log::debug!("{:#x?}", entity);
+                return picked.0
             }
             0
         }
@@ -253,4 +361,22 @@ pub unsafe fn player_status() {
         }
         None => {}
     }
+}
+
+pub unsafe fn get_entity_ptr(id: u32) -> usize {
+    if id == 0 {
+        return 0
+    }
+    let state = State::new();
+    match state.items().player(0) {
+        Some(player) => {
+            for item in state.layer(player.layer()).items() {
+                if item.unique_id() == id {
+                    return item.ptr()
+                }
+            }
+        }
+        None => {}
+    }
+    0
 }

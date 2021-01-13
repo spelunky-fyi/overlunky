@@ -62,6 +62,7 @@ std::map<std::string, int> keys{
     { "tool_entity", 0x70 },
     { "tool_door", 0x71 },
     { "tool_camera", 0x72 },
+    { "tool_entity_properties", 0x73 },
     { "tool_options", 0x78 },
     { "tool_debug", 0x37b },
     { "tool_metrics", 0x349 },
@@ -145,10 +146,15 @@ unsigned int g_entity_flags = 0, g_hud_flags = 8, g_last_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true;
+EntityMemory* g_entity;
+Inventory* g_inventory;
 
 static char text[500];
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
-const char* entity_flags[] = { "1: Invisible", "2: ", "3: ", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
+const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
+const char* search_flags[] = { "1: Invisible", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " }; //TODO
+const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
+const char* direction_flags[] = { "Left", "Down", "Up", "Right" };
 const char* inifile = "imgui.ini";
 const std::string hotkeyfile = "hotkeys.ini";
 
@@ -439,6 +445,30 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
     return 0;
 }
 
+bool update_entity()
+{
+    if(g_last_entity != 0)
+    {
+        g_entity = (struct EntityMemory*) get_entity_ptr(g_last_entity);
+        if(IsBadWritePtr(g_entity, 0x178)) g_entity = 0;
+        if(g_entity != 0)
+        {
+            g_inventory = (struct Inventory*) g_entity->inventory_ptr;
+            if(IsBadWritePtr(g_inventory, 0x10)) g_inventory = 0;
+            return true;
+        }
+        else {
+            g_last_entity = 0;
+            g_inventory = 0;
+        }
+    }
+    else {
+        g_entity = 0;
+        g_inventory = 0;
+    }
+    return false;
+}
+
 void set_zoom() {
     zoom(g_zoom);
 }
@@ -600,6 +630,10 @@ bool process_keys(
         if(toggle("tool_camera")) {
             set_focus_zoom = true;
         }
+    }
+    else if (pressed("tool_entity_properties", wParam))
+    {
+        toggle("tool_entity_properties");
     }
     else if (pressed("tool_options", wParam))
     {
@@ -1185,8 +1219,8 @@ void render_clickhandler()
         }
         else if(clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
         {
-            ImVec2 pos = ImGui::GetMousePos();
-            set_pos(pos);
+            startpos = ImGui::GetMousePos();
+            set_pos(startpos);
             unsigned int mask = 0b01111111;
             if(held("mouse_grab_unsafe"))
             {
@@ -1197,12 +1231,7 @@ void render_clickhandler()
             {
                 g_held_entity = spawn_entity(372, g_x, g_y, true, 0, 0, false);
             }
-            g_entity_flags = get_entity_flags(g_held_entity);
-            g_entity_flags |= 1 << 4;
-            set_entity_flags(g_held_entity, g_entity_flags);
-            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0;
             g_last_entity = g_held_entity;
-            startpos = pos;
         }
         else if(held("mouse_grab_throw") && g_held_entity > 0)
         {
@@ -1215,13 +1244,17 @@ void render_clickhandler()
             move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
             render_arrow();
         }
-        else if((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_entity > 0)
+        else if((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_entity > 0 && g_entity != 0)
         {
             startpos = ImGui::GetMousePos();
             throw_held = false;
             io.MouseDrawCursor = false;
-            set_pos(ImGui::GetMousePos());
-            move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
+            set_pos(startpos);
+            if(ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1) || ImGui::IsMouseDragging(keys["mouse_grab_unsafe"] & 0xff - 1))
+            {
+                g_entity->flags |= 1U << 4;
+                move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
+            }
         }
         if(released("mouse_grab_throw") && g_held_entity > 0)
         {
@@ -1235,14 +1268,15 @@ void render_clickhandler()
             move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
             g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
         }
-        else if((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_entity > 0)
+        else if((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_entity > 0 && g_entity != 0)
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            g_entity_flags = get_entity_flags(g_held_entity);
-            g_entity_flags &= ~(1 << 4);
-            set_entity_flags(g_held_entity, g_entity_flags);
-            move_entity(g_held_entity, g_x, g_y, true, 0, 0, snap_to_grid);
+            g_entity->flags &= ~(1 << 4);
+            if(snap_to_grid)
+            {
+                move_entity(g_held_entity, g_x, g_y, true, 0, 0, snap_to_grid);
+            }
             g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
         }
         else if(released("mouse_clone"))
@@ -1358,27 +1392,74 @@ void render_debug()
     {
         player_status();
     }
-    ImGui::Text("Entity ID:");
-    ImGui::SameLine();
-    ImGui::InputInt("##EntityID", &g_last_entity, 1, 1, 0);
-    /*if(ImGui::Button("Get flags"))
+    ImVec2 value_raw = ImGui::GetMouseDragDelta(keys["mouse_grab"] & 0xff - 1, 0.0f);
+    ImGui::Text("  Delta: (%.1f, %.1f)", value_raw.x, value_raw.y);
+    ImGui::Text("  Dragging: (%i)", ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1));
+}
+
+bool SliderByte(const char *label, char* value, char min = 0, char max = 0, const char* format = "%lld")
+{
+    return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
+}
+
+void render_entity_props()
+{
+    if(!update_entity()) return;
+    if(g_entity == 0) return;
+    ImGui::Text("Entity ID:"); ImGui::SameLine(); ImGui::InputInt("##entity_uid", (int *)&g_entity->uid, 1, 1, ImGuiInputTextFlags_ReadOnly);
+    if(ImGui::CollapsingHeader("Position"))
     {
-        g_entity_flags = get_entity_flags(g_last_entity);
+        ImGui::Text("Pos X: "); ImGui::SameLine(); ImGui::InputFloat("##entity_x", &g_entity->x, 0.2, 1.0, 5, 0);
+        ImGui::Text("Pos Y: "); ImGui::SameLine(); ImGui::InputFloat("##entity_y", &g_entity->y, 0.2, 1.0, 5, 0);
+        ImGui::Text("Vel X: "); ImGui::SameLine(); ImGui::InputFloat("##entity_velx", &g_entity->velocityx, 0.2, 1.0, 5, 0);
+        ImGui::Text("Vel Y: "); ImGui::SameLine(); ImGui::InputFloat("##entity_vely", &g_entity->velocityy, 0.2, 1.0, 5, 0);
     }
-    ImGui::SameLine();
-    if(ImGui::Button("Set flags"))
+    if(ImGui::CollapsingHeader("Input Display"))
     {
-        set_entity_flags(g_last_entity, g_entity_flags);
-    }*/
-    unsigned int old_flags = g_entity_flags;
-    ImGui::Text("Flags:");
-    for(int i = 0; i < 32; i++) {
-        ImGui::CheckboxFlags(entity_flags[i], &g_entity_flags, pow(2, i));
+        ImVec2 region = ImGui::GetContentRegionMax();
+        bool dirs[4] = { false, false, false, false };
+        if(g_entity->movex < 0.0) dirs[0] = true;
+        if(g_entity->movey < 0.0) dirs[1] = true;
+        if(g_entity->movey > 0.0) dirs[2] = true;
+        if(g_entity->movex > 0.0) dirs[3] = true;
+        for(int i = 0; i < 4; i++) {
+            ImGui::Checkbox(direction_flags[i], &dirs[i]);
+            if(i<3) ImGui::SameLine(region.x/4*(i+1));
+        }
+        for(int i = 0; i < 6; i++) {
+            ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, pow(2, i));
+            if(i<5) ImGui::SameLine(region.x/6*(i+1));
+        }
     }
-    if(old_flags != g_entity_flags)
+    if(ImGui::CollapsingHeader("Inventory"))
     {
-        old_flags = g_entity_flags;
-        set_entity_flags(g_last_entity, g_entity_flags);
+        ImGui::Text("Health:"); ImGui::SameLine(); SliderByte("##entity_health", (char *)&g_entity->health, 1, 99);
+        if(g_inventory != 0)
+        {
+            ImGui::Text("Health:"); ImGui::SameLine(); ImGui::SliderInt("##entity_money", (int *)&g_inventory->money, 0, 1000000);
+            ImGui::Text("Bombs:"); ImGui::SameLine(); SliderByte("##entity_bombs", (char *)&g_inventory->bombs, 0, 99);
+            ImGui::Text("Ropes:"); ImGui::SameLine(); SliderByte("##entity_ropes", (char *)&g_inventory->ropes, 0, 99);
+        }
+    }
+    if(ImGui::CollapsingHeader("Style"))
+    {
+        ImGui::Text("Color: "); ImGui::SameLine(); ImGui::ColorEdit4("##entity_color", (float*)&g_entity->color);
+        ImGui::Text("Width: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_w", &g_entity->w, 0.0, 10.0, "%.3f", 0);
+        ImGui::Text("Height: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_h", &g_entity->h, 0.0, 10.0, "%.3f", 0);
+        ImGui::Text("Hitbox width: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxx", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
+        ImGui::Text("Hitbox height: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxy", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
+    }
+    if(ImGui::CollapsingHeader("Flags"))
+    {
+        for(int i = 0; i < 32; i++) {
+            ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, pow(2, i));
+        }
+    }
+    if(ImGui::CollapsingHeader("More Flags"))
+    {
+        for(int i = 0; i < 32; i++) {
+            ImGui::CheckboxFlags(search_flags[i], &g_entity->search_flags, pow(2, i));
+        }
     }
 }
 
@@ -1477,6 +1558,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_entity"] = "Entity spawner ("+key_string(keys["tool_entity"])+")";
         windows["tool_door"] = "Door to anywhere ("+key_string(keys["tool_door"])+")";
         windows["tool_camera"] = "Camera ("+key_string(keys["tool_camera"])+")";
+        windows["tool_entity_properties"] = "Entity properties ("+key_string(keys["tool_entity_properties"])+")";
         windows["tool_options"] = "Options ("+key_string(keys["tool_options"])+")";
         windows["tool_debug"] = "Debug ("+key_string(keys["tool_debug"])+")";
         windows["entities"] = "##Entities";
@@ -1554,6 +1636,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({0, 0}, win_condition);    
             ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y}, win_condition);
+            ImGui::Begin(windows["tool_entity_properties"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_entity_props();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);    
+            ImGui::End();
         }
         else
         {
@@ -1598,17 +1690,22 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             lastwidth = ImGui::GetWindowWidth();
             lastheight = ImGui::GetWindowHeight();
             ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
+            ImGui::Begin(windows["tool_entity_properties"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_entity_props();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);    
+            ImGui::End();
         }
 
         if(!hidedebug)
         {
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);
-            if(reset_windows_vertical)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);    
-            }
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth*2, 0}, win_condition);
             ImGui::Begin(windows["tool_debug"].c_str());
             ImGui::PushItemWidth(-1);
             render_debug();
