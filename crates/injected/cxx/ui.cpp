@@ -141,7 +141,7 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
-int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0;
+int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0;
 unsigned int g_entity_flags = 0, g_hud_flags = 8, g_last_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
@@ -445,10 +445,23 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
     return 0;
 }
 
+const char* entity_name(int id)
+{
+    for(int i =0; i < g_items.size(); i++)
+    {
+        if(g_items[i].id == id)
+        {
+            return g_items[i].name.data();
+        }
+    }
+    return "";
+}
+
 bool update_entity()
 {
     if(g_last_entity != 0)
     {
+        g_entity_type = get_entity_type(g_last_entity);
         g_entity = (struct EntityMemory*) get_entity_ptr(g_last_entity);
         if(IsBadWritePtr(g_entity, 0x178)) g_entity = 0;
         if(g_entity != 0)
@@ -1406,13 +1419,43 @@ void render_entity_props()
 {
     if(!update_entity()) return;
     if(g_entity == 0) return;
-    ImGui::Text("Entity ID:"); ImGui::SameLine(); ImGui::InputInt("##entity_uid", (int *)&g_entity->uid, 1, 1, ImGuiInputTextFlags_ReadOnly);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if(ImGui::CollapsingHeader("Type"))
+    {
+        char uids[10]; 
+        itoa(g_entity->uid, uids, 10);
+        char ids[10]; 
+        itoa(g_entity_type, ids, 10);
+        ImGui::Text("UID: "); ImGui::SameLine(); ImGui::Text(uids);
+        ImGui::Text("ID:   "); ImGui::SameLine(); ImGui::Text(ids);
+        ImGui::Text("Type:"); ImGui::SameLine(); ImGui::Text(entity_name(g_entity_type));
+    }
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Position"))
     {
-        ImGui::Text("Pos X: "); ImGui::SameLine(); ImGui::InputFloat("##entity_x", &g_entity->x, 0.2, 1.0, 5, 0);
-        ImGui::Text("Pos Y: "); ImGui::SameLine(); ImGui::InputFloat("##entity_y", &g_entity->y, 0.2, 1.0, 5, 0);
-        ImGui::Text("Vel X: "); ImGui::SameLine(); ImGui::InputFloat("##entity_velx", &g_entity->velocityx, 0.2, 1.0, 5, 0);
-        ImGui::Text("Vel Y: "); ImGui::SameLine(); ImGui::InputFloat("##entity_vely", &g_entity->velocityy, 0.2, 1.0, 5, 0);
+        ImGui::Text("Pos X:"); ImGui::SameLine(); ImGui::InputFloat("##entity_x", &g_entity->x, 0.2, 1.0, 5, 0);
+        ImGui::Text("Pos Y:"); ImGui::SameLine(); ImGui::InputFloat("##entity_y", &g_entity->y, 0.2, 1.0, 5, 0);
+        ImGui::Text("Vel X:"); ImGui::SameLine(); ImGui::InputFloat("##entity_velx", &g_entity->velocityx, 0.2, 1.0, 5, 0);
+        ImGui::Text("Vel Y:"); ImGui::SameLine(); ImGui::InputFloat("##entity_vely", &g_entity->velocityy, 0.2, 1.0, 5, 0);
+    }
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if(ImGui::CollapsingHeader("Inventory"))
+    {
+        ImGui::Text("Health:"); ImGui::SameLine(); SliderByte("##entity_health", (char *)&g_entity->health, 1, 99);
+        if(g_inventory != 0)
+        {
+            ImGui::Text("Health:"); ImGui::SameLine(); ImGui::SliderInt("##entity_money", (int *)&g_inventory->money, 0, 1000000);
+            ImGui::Text("Bombs:"); ImGui::SameLine(); SliderByte("##entity_bombs", (char *)&g_inventory->bombs, 0, 99);
+            ImGui::Text("Ropes:"); ImGui::SameLine(); SliderByte("##entity_ropes", (char *)&g_inventory->ropes, 0, 99);
+        }
+    }
+    if(ImGui::CollapsingHeader("Style"))
+    {
+        ImGui::Text("Color:"); ImGui::SameLine(); ImGui::ColorEdit4("##entity_color", (float*)&g_entity->color);
+        ImGui::Text("Width:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_w", &g_entity->w, 0.0, 10.0, "%.3f", 0);
+        ImGui::Text("Height:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_h", &g_entity->h, 0.0, 10.0, "%.3f", 0);
+        ImGui::Text("Hitbox W:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxx", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
+        ImGui::Text("Hitbox H:"); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxy", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
     }
     if(ImGui::CollapsingHeader("Input Display"))
     {
@@ -1430,24 +1473,6 @@ void render_entity_props()
             ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, pow(2, i));
             if(i<5) ImGui::SameLine(region.x/6*(i+1));
         }
-    }
-    if(ImGui::CollapsingHeader("Inventory"))
-    {
-        ImGui::Text("Health:"); ImGui::SameLine(); SliderByte("##entity_health", (char *)&g_entity->health, 1, 99);
-        if(g_inventory != 0)
-        {
-            ImGui::Text("Health:"); ImGui::SameLine(); ImGui::SliderInt("##entity_money", (int *)&g_inventory->money, 0, 1000000);
-            ImGui::Text("Bombs:"); ImGui::SameLine(); SliderByte("##entity_bombs", (char *)&g_inventory->bombs, 0, 99);
-            ImGui::Text("Ropes:"); ImGui::SameLine(); SliderByte("##entity_ropes", (char *)&g_inventory->ropes, 0, 99);
-        }
-    }
-    if(ImGui::CollapsingHeader("Style"))
-    {
-        ImGui::Text("Color: "); ImGui::SameLine(); ImGui::ColorEdit4("##entity_color", (float*)&g_entity->color);
-        ImGui::Text("Width: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_w", &g_entity->w, 0.0, 10.0, "%.3f", 0);
-        ImGui::Text("Height: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_h", &g_entity->h, 0.0, 10.0, "%.3f", 0);
-        ImGui::Text("Hitbox width: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxx", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
-        ImGui::Text("Hitbox height: "); ImGui::SameLine(); ImGui::SliderFloat("##entity_hitboxy", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
     }
     if(ImGui::CollapsingHeader("Flags"))
     {

@@ -124,6 +124,7 @@ pub mod ffi {
         unsafe fn set_pause(pause: u8);
         unsafe fn player_status();
         unsafe fn get_entity_ptr(id: u32) -> usize;
+        unsafe fn get_entity_type(id: u32) -> i32;
     }
     unsafe extern "C++" {
         include!("cxx/ui.hpp");
@@ -373,6 +374,24 @@ pub unsafe fn get_entity_ptr(id: u32) -> usize {
             for item in state.layer(player.layer()).items() {
                 if item.unique_id() == id {
                     return item.ptr()
+                }
+            }
+        }
+        None => {}
+    }
+    0
+}
+
+unsafe fn get_entity_type(id: u32) -> i32 {
+    if id == 0 {
+        return 0
+    }
+    let state = State::new();
+    match state.items().player(0) {
+        Some(player) => {
+            for item in state.layer(player.layer()).items() {
+                if item.unique_id() == id {
+                    return item._type().id
                 }
             }
         }
