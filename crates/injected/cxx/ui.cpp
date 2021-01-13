@@ -141,13 +141,14 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
-int g_held_entity = 0, g_last_entity = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0;
-unsigned int g_entity_flags = 0, g_hud_flags = 8, g_last_hud_flags = 8;
+int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0;
+unsigned int g_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true, lock_entity = false;
 EntityMemory* g_entity;
+EntityMemory* g_held_entity;
 Inventory* g_inventory;
 
 static char text[500];
@@ -416,17 +417,18 @@ void spawn_entities(bool s) {
     const auto pos = search.find_first_of(" ");
     if(pos == std::string::npos && g_filtered_count > 0) {
         if(g_current_item == 0 && g_filtered_count == g_items.size()) return;
-        g_last_entity = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
-        g_entity_flags = get_entity_flags(g_last_entity);
+        int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
+        if(!lock_entity) g_last_id = spawned;
     } else {
         std::string texts(text);
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
+        int spawned;
         while(textss >> id) {
-            g_last_entity = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
-            g_entity_flags = get_entity_flags(g_last_entity);
+            spawned = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
         }
+        if(!lock_entity) g_last_id = spawned;
     }
 }
 
@@ -468,10 +470,10 @@ const char* entity_name(int id)
 
 bool update_entity()
 {
-    if(g_last_entity != 0)
+    if(g_last_id != 0)
     {
-        g_entity_type = get_entity_type(g_last_entity);
-        g_entity = (struct EntityMemory*) get_entity_ptr(g_last_entity);
+        g_entity_type = get_entity_type(g_last_id);
+        g_entity = (struct EntityMemory*) get_entity_ptr(g_last_id);
         if(IsBadWritePtr(g_entity, 0x178)) g_entity = 0;
         if(g_entity != 0)
         {
@@ -480,7 +482,7 @@ bool update_entity()
             return true;
         }
         else {
-            g_last_entity = 0;
+            g_last_id = 0;
             g_inventory = 0;
         }
     }
@@ -1293,14 +1295,16 @@ void render_clickhandler()
             {
                 mask = 0xffffffff;
             }
-            g_held_entity = get_entity_at(g_x, g_y, true, 1, mask);
-            if (g_held_entity && (float)rand() / RAND_MAX > 0.99)
+            g_held_id = get_entity_at(g_x, g_y, true, 1, mask);
+            g_held_entity = (struct EntityMemory*) get_entity_ptr(g_held_id);
+            if (g_held_id && (float)rand() / RAND_MAX > 0.99)
             {
-                g_held_entity = spawn_entity(372, g_x, g_y, true, 0, 0, false);
+                g_held_id = spawn_entity(372, g_x, g_y, true, 0, 0, false);
+                g_held_entity = (struct EntityMemory*) get_entity_ptr(g_held_id);
             }
-            g_last_entity = g_held_entity;
+            if(!lock_entity) g_last_id = g_held_id;
         }
-        else if(held("mouse_grab_throw") && g_held_entity > 0)
+        else if(held("mouse_grab_throw") && g_held_id > 0)
         {
             if(!throw_held)
             {
@@ -1308,10 +1312,10 @@ void render_clickhandler()
                 throw_held = true;
             }
             set_pos(startpos);
-            move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
+            move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             render_arrow();
         }
-        else if((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_entity > 0 && g_entity != 0)
+        else if((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
         {
             startpos = ImGui::GetMousePos();
             throw_held = false;
@@ -1319,32 +1323,30 @@ void render_clickhandler()
             set_pos(startpos);
             if(ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1) || ImGui::IsMouseDragging(keys["mouse_grab_unsafe"] & 0xff - 1))
             {
-                g_entity->flags |= 1U << 4;
-                move_entity(g_held_entity, g_x, g_y, true, 0, 0, false);
+                g_held_entity->flags |= 1U << 4;
+                move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
         }
-        if(released("mouse_grab_throw") && g_held_entity > 0)
+        if(released("mouse_grab_throw") && g_held_id > 0 && g_entity != 0)
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            g_entity_flags = get_entity_flags(g_held_entity);
-            g_entity_flags &= ~(1 << 4);
-            set_entity_flags(g_held_entity, g_entity_flags);
+            g_held_entity->flags &= ~(1 << 4);
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            move_entity(g_held_entity, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+            move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_id = 0;
         }
-        else if((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_entity > 0 && g_entity != 0)
+        else if((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            g_entity->flags &= ~(1 << 4);
+            g_held_entity->flags &= ~(1 << 4);
             if(snap_to_grid)
             {
-                move_entity(g_held_entity, g_x, g_y, true, 0, 0, snap_to_grid);
+                move_entity(g_held_id, g_x, g_y, true, 0, 0, snap_to_grid);
             }
-            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_id = 0;
         }
         else if(released("mouse_clone"))
         {
@@ -1405,13 +1407,13 @@ void render_clickhandler()
             {
                 mask = 0xffffffff;
             }
-            g_held_entity = get_entity_at(g_x, g_y, true, 2, mask);
-            if(g_held_entity > 0)
+            g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
+            if(g_held_id > 0)
             {
                 // lets just sweep this under the rug for now :D
-                move_entity(g_held_entity, 0, -1000, false, 0, 0, true);
+                move_entity(g_held_id, 0, -1000, false, 0, 0, true);
             }
-            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_entity = 0;
+            g_x = 0; g_y = 0; g_vx = 0; g_vy = 0; g_held_id = 0;
         }
         int buttons = 0;
         for(int i = 0; i < ImGuiMouseButton_COUNT; i++) {
@@ -1480,7 +1482,7 @@ void render_uid(int uid)
     const char* pname = entity_names[ptype].data();
     if(ImGui::Button(uidc))
     {
-        g_last_entity = uid;
+        g_last_id = uid;
         update_entity();
     }
     ImGui::SameLine(); ImGui::Text(typec); ImGui::SameLine(); ImGui::Text(pname);
@@ -1529,20 +1531,17 @@ void render_ai(const char* label, int state)
     }
 }
 
-void render_interaction(const char* label, int state)
+void render_int(const char* label, int state)
 {
     ImGui::Text(label); ImGui::SameLine();
-    if(state == 1) ImGui::Text("Entering");
-    if(state == 5) ImGui::Text("Shooting");
-    else {
-        char statec[10];
-        itoa(state, statec, 10);
-        ImGui::Text(statec);
-    }
+    char statec[15];
+    itoa(state, statec, 10);
+    ImGui::Text(statec);
 }
 
 void render_entity_props()
 {
+    ImGui::Checkbox("Sticky this entity", &lock_entity);
     if(!update_entity()) return;
     if(g_entity == 0) return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
@@ -1553,11 +1552,6 @@ void render_entity_props()
         render_state("Current:", g_entity->state);
         render_state("Last:", g_entity->last_state);
         render_ai("AI:", g_entity->move_state);
-        render_interaction("Interaction:", g_entity->some_state);
-        if(g_entity->can_use == 0) ImGui::Text("Can interact: No");
-        else if(g_entity->can_use == 1) ImGui::Text("Can interact: Yes");
-        else if(g_entity->can_use == 2) ImGui::Text("Can interact: Disabled");
-
         if(g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
@@ -1925,7 +1919,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     {
         if(g_zoom == 0.0) set_zoom();
         force_hud_flags();
-        if(g_last_entity != 0) g_entity_flags = get_entity_flags(g_last_entity);
         g_last_frame = ImGui::GetFrameCount();
     }
     if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera")))
