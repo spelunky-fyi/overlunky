@@ -47,7 +47,6 @@ pub mod ffi {
         pub ia04: i32,
         pub ia08: i32,
         pub hud_flags: u32,
-        
     }
 
     #[derive(Debug)]

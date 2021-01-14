@@ -1798,6 +1798,15 @@ void render_timer()
     ImGui::PopFont();
 }
 
+void render_players()
+{
+    for(int i = 0; i < 4; i++)
+    {
+        //EntityMemory* player = 
+        //render_uid(player->uid, "players");
+    }
+}
+
 void render_game_props()
 {
     if(g_state == 0) return;
@@ -1847,6 +1856,10 @@ void render_game_props()
         SliderByte("To World##Worldnext", (char *)&g_state->world_next, 1, 255);
         SliderByte("To Level##Levelnext", (char *)&g_state->level_next, 1, 255);
         SliderByte("##Themenext", (char *)&g_state->theme_next, 1, 17); ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme_next));
+    }
+    if(ImGui::CollapsingHeader("Players"))
+    {
+        render_players();
     }
     if(ImGui::CollapsingHeader("Flags"))
     {
