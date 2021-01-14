@@ -63,6 +63,7 @@ std::map<std::string, int> keys{
     { "tool_door", 0x71 },
     { "tool_camera", 0x72 },
     { "tool_entity_properties", 0x73 },
+    { "tool_game_properties", 0x74 },
     { "tool_options", 0x78 },
     { "tool_debug", 0x37b },
     { "tool_metrics", 0x349 },
@@ -142,7 +143,7 @@ struct CXXEntityItem
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0;
-uintptr_t g_entity_addr = 0;
+uintptr_t g_entity_addr = 0, g_state_addr = 0;
 unsigned int g_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
@@ -151,9 +152,10 @@ bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, 
 EntityMemory* g_entity = 0;
 EntityMemory* g_held_entity = 0;
 Inventory* g_inventory = 0;
+StateMemory* g_state = 0;
 
 static char text[500];
-const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
+const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun", "0: Base camp" };
 const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Interactable", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 const char* more_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " }; //TODO
 const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
@@ -378,7 +380,6 @@ LRESULT CALLBACK msg_hook(
         return 0;
 
     return ImGui_ImplWin32_WndProcHandler(msg->hwnd, msg->message, msg->wParam, msg->lParam);
-    // TODO: if ImGui::GetIO().WantCaptureKeyboard == true, can we block keyboard message going to existing WndProc?
 }
 
 bool toggle(std::string tool) {
@@ -390,12 +391,10 @@ bool toggle(std::string tool) {
         if(win->Collapsed || win != current) {
             win->Collapsed = false;
             ImGui::FocusWindow(win);
-            //ImGui::CaptureMouseFromApp(true);
             return true;
         } else {
             win->Collapsed = true;
             ImGui::FocusWindow(NULL);
-            //ImGui::CaptureMouseFromApp(false);
         }
     }
     return false;
@@ -668,6 +667,10 @@ bool process_keys(
     else if (pressed("tool_entity_properties", wParam))
     {
         toggle("tool_entity_properties");
+    }
+    else if (pressed("tool_game_properties", wParam))
+    {
+        toggle("tool_game_properties");
     }
     else if (pressed("tool_options", wParam))
     {
@@ -1004,7 +1007,7 @@ void render_themes()
     if (!ImGui::BeginCombo("##Theme", themes[g_to]))
         return;
     bool value_changed = false;
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 17; i++)
     {
         const bool item_selected = (i == g_to);
         const char* item_text = themes[i];
@@ -1482,6 +1485,11 @@ bool SliderByte(const char *label, char* value, char min = 0, char max = 0, cons
     return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
 }
 
+bool DragByte(const char *label, char* value, float speed = 1.0f, char min = 0, char max = 0, const char* format = "%lld")
+{
+    return ImGui::DragScalar(label, ImGuiDataType_U8, value, speed, &min, &max, format);
+}
+
 void render_uid(int uid, const char* section)
 {
     char uidc[10];
@@ -1537,6 +1545,39 @@ void render_ai(const char* label, int state)
     else if(state == 5) ImGui::Text("Jumping");
     else if(state == 6) ImGui::Text("Attacking");
     else if(state == 7) ImGui::Text("Meleeing");
+    else {
+        char statec[10];
+        itoa(state, statec, 10);
+        ImGui::Text(statec);
+    }
+}
+
+void render_screen(const char* label, int state)
+{
+    ImGui::Text(label); ImGui::SameLine();
+    if(state == 0) ImGui::Text("0 Logo");
+    else if(state == 1) ImGui::Text("1 Intro");
+    else if(state == 2) ImGui::Text("2 Prologue");
+    else if(state == 3) ImGui::Text("3 Title");
+    else if(state == 4) ImGui::Text("4 Main menu");
+    else if(state == 5) ImGui::Text("5 Options");
+    else if(state == 8) ImGui::Text("7 Leaderboards");
+    else if(state == 8) ImGui::Text("8 Seed input");
+    else if(state == 9) ImGui::Text("9 Character select");
+    else if(state == 10) ImGui::Text("10 Team select");
+    else if(state == 11) ImGui::Text("11 Camp");
+    else if(state == 12) ImGui::Text("12 Level");
+    else if(state == 13) ImGui::Text("13 Level transition");
+    else if(state == 14) ImGui::Text("14 Death");
+    else if(state == 16) ImGui::Text("16 Ending");
+    else if(state == 17) ImGui::Text("17 Credits");
+    else if(state == 18) ImGui::Text("18 Scores");
+    else if(state == 20) ImGui::Text("20 Recap");
+    else if(state == 21) ImGui::Text("21 Arena menu");
+    else if(state == 25) ImGui::Text("25 Arena intro");
+    else if(state == 26) ImGui::Text("26 Arena match");
+    else if(state == 28) ImGui::Text("28 Loading online");
+    else if(state == 29) ImGui::Text("28 Lobby");
     else {
         char statec[10];
         itoa(state, statec, 10);
@@ -1639,7 +1680,6 @@ void render_entity_props()
         ImGui::SliderFloat("Off X", &g_entity->offsetx, -10.0, 10.0, "%.3f", 0);
         ImGui::SliderFloat("Off Y", &g_entity->offsety, -10.0, 10.0, "%.3f", 0);
     }
-    ImGui::PopItemWidth();
     if(ImGui::CollapsingHeader("Flags"))
     {
         for(int i = 0; i < 32; i++) {
@@ -1669,9 +1709,61 @@ void render_entity_props()
             if(i<5) ImGui::SameLine(region.x/6*(i+1));
         }
     }
-    if(ImGui::CollapsingHeader("Debugging")){
+    if(ImGui::CollapsingHeader("Debug")){
         ImGui::InputScalar("Pointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     }
+    ImGui::PopItemWidth();
+}
+
+const char* theme_name(int theme)
+{
+    if(theme < 1 || theme > 17) return "Crash City";
+    return themes[theme-1];
+}
+
+void render_game_props()
+{
+    if(g_state == 0) return;
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if(ImGui::CollapsingHeader("State"))
+    {
+        render_screen("Current screen:", g_state->screen);
+        render_screen("Last screen:", g_state->screen_last);
+        render_screen("Next screen:", g_state->screen_next);
+        render_int("Ingame:", g_state->ingame);
+        render_int("Playing:", g_state->playing);
+        render_int("Paused:", g_state->pause);
+
+    }
+    if(ImGui::CollapsingHeader("Timer"))
+    {
+        ImGui::InputInt("Level##Leveltime", (int *)&g_state->time_level, 1, 10, 0);
+        ImGui::InputInt("Total##Totaltime", (int *)&g_state->time_total, 1, 10, 0);
+        ImGui::InputInt("Pause##Pausetime", (int *)&g_state->time_pause, 1, 10, 0);
+    }
+    ImGui::PopItemWidth();
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.4f);
+    if(ImGui::CollapsingHeader("Level"))
+    {
+        SliderByte("World##Worldnumber", (char *)&g_state->world, 1, 255);
+        SliderByte("Level##Levelnumber", (char *)&g_state->level, 1, 255);
+        SliderByte("##Themenumber", (char *)&g_state->theme, 1, 17); ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme));
+        SliderByte("To World##Worldnext", (char *)&g_state->world_next, 1, 255);
+        SliderByte("To Level##Levelnext", (char *)&g_state->level_next, 1, 255);
+        SliderByte("##Themenext", (char *)&g_state->theme_next, 1, 17); ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme_next));
+    }
+    if(ImGui::CollapsingHeader("Flags"))
+    {
+        for(int i = 0; i < 32; i++) {
+            //ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, pow(2, i));
+        }
+    }
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if(ImGui::CollapsingHeader("Debug")){
+        ImGui::InputScalar("Pointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+    }
+    ImGui::PopItemWidth();
 }
 
 void create_render_target()
@@ -1770,11 +1862,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_door"] = "Door to anywhere ("+key_string(keys["tool_door"])+")";
         windows["tool_camera"] = "Camera ("+key_string(keys["tool_camera"])+")";
         windows["tool_entity_properties"] = "Entity properties ("+key_string(keys["tool_entity_properties"])+")";
+        windows["tool_game_properties"] = "Game state ("+key_string(keys["tool_game_properties"])+")";
         windows["tool_options"] = "Options ("+key_string(keys["tool_options"])+")";
         windows["tool_debug"] = "Debug ("+key_string(keys["tool_debug"])+")";
         windows["entities"] = "##Entities";
         g_hue = ((float) rand() / RAND_MAX)*180;
         set_colors();
+        g_state = (struct StateMemory*) get_state_ptr();
+        g_state_addr = reinterpret_cast<uintptr_t>(g_state);
     }
 
     if(change_colors)
@@ -1845,17 +1940,27 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, 0}, win_condition);    
+            ImGui::SetWindowPos({0, 0}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y}, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
             ImGui::Begin(windows["tool_entity_properties"].c_str());
             ImGui::PushItemWidth(-1);
             render_entity_props();
             ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);    
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
+            ImGui::Begin(windows["tool_game_properties"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_game_props();
+            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
             ImGui::End();
         }
         else
@@ -1906,6 +2011,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::Begin(windows["tool_entity_properties"].c_str());
             ImGui::PushItemWidth(-1);
             render_entity_props();
+            ImGui::PopItemWidth();
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);    
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
+            ImGui::Begin(windows["tool_game_properties"].c_str());
+            ImGui::PushItemWidth(-1);
+            render_game_props();
             ImGui::PopItemWidth();
             ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);    
             lastwidth += ImGui::GetWindowWidth();

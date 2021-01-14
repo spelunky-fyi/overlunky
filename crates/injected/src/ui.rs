@@ -1,8 +1,50 @@
-use crate::{db::ffi::EntityItem, ui::ffi::EntityMemory, models::State};
+use crate::{db::ffi::EntityItem, models::State};
 
 
 #[cxx::bridge]
 pub mod ffi {
+
+    #[derive(Debug)]
+    pub struct StateMemory {
+        pub p00: usize,
+        pub screen_last: u32,
+        pub screen: u32,
+        pub screen_next: u32,
+        pub i14: i32,
+        pub p18: usize,
+        pub i20: i32,
+        pub i24: i32,
+        pub i28: i32,
+        pub i2c: i32,
+        pub ingame: u8,
+        pub playing: u8,
+        pub pause: u8,
+        pub b33: u8,
+        pub i34: i32,
+        pub i38: i32,
+        pub i3c: i32,
+        pub i40: i32,
+        pub w: u32,
+        pub h: u32,
+        pub i4c: i32,
+        pub i50: i32,
+        pub i54: i32,
+        pub i58: i32,
+        pub feedcode: u32,
+        pub time_total: u32,
+        pub world: u8,
+        pub world_next: u8,
+        pub level: u8,
+        pub level_next: u8,
+        pub leveldata: usize,
+        pub theme: u8,
+        pub theme_next: u8,
+        pub b72: u8,
+        pub b73: u8,
+        pub pad70: [u8; 0x988],
+        pub time_level: u32,
+        pub time_pause: u32,
+    }
 
     #[derive(Debug)]
     pub struct Color {
@@ -125,6 +167,7 @@ pub mod ffi {
         unsafe fn player_status();
         unsafe fn get_entity_ptr(id: u32) -> usize;
         unsafe fn get_entity_type(id: u32) -> i32;
+        unsafe fn get_state_ptr() -> usize;
     }
     unsafe extern "C++" {
         include!("cxx/ui.hpp");
@@ -398,4 +441,9 @@ unsafe fn get_entity_type(id: u32) -> i32 {
         None => {}
     }
     0
+}
+
+pub unsafe fn get_state_ptr() -> usize {
+    let state = State::new();
+    state.ptr()
 }
