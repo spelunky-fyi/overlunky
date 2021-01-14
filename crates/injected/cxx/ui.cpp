@@ -142,13 +142,13 @@ struct CXXEntityItem
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0;
+int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_level_time = -1, g_total_time = -1, g_pause_time = -1;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 unsigned int g_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true, lock_entity = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true, lock_entity = false, freeze_level = false, freeze_total = false, freeze_pause = false;
 EntityMemory* g_entity = 0;
 EntityMemory* g_held_entity = 0;
 Inventory* g_inventory = 0;
@@ -1721,11 +1721,72 @@ const char* theme_name(int theme)
     return themes[theme-1];
 }
 
+std::string format_time(int frames)
+{
+    time_t secs = frames/60;
+    char time[10];
+    std::strftime(time, sizeof(time), "%H:%M:%S", std::gmtime(&secs));
+    return std::string(time);
+}
+
+int parse_time(std::string time)
+{
+    std::tm tm = {};
+    std::stringstream ss(time);
+    ss >> std::get_time(&tm, "%H:%M:%S");
+    return 60*(tm.tm_hour*60*60+tm.tm_min*60+tm.tm_sec);
+}
+
+bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags = 0)
+{
+    return ImGui::InputText(label, (char*)str->c_str(), 9, flags);
+}
+
+void force_time()
+{
+    if(g_state == 0) return;
+    if(freeze_level && g_level_time == -1)
+    {
+        g_level_time = g_state->time_level;
+    }
+    else if(!freeze_level)
+    {
+        g_level_time = -1;
+    }
+    else if(g_level_time >= 0)
+    {
+        g_state->time_level = g_level_time;
+    }
+    if(freeze_total && g_total_time == -1)
+    {
+        g_total_time = g_state->time_total;
+    }
+    else if(!freeze_total)
+    {
+        g_total_time = -1;
+    }
+    else if(g_total_time >= 0)
+    {
+        g_state->time_total = g_total_time;
+    }
+    if(freeze_pause && g_pause_time == -1)
+    {
+        g_pause_time = g_state->time_pause;
+    }
+    else if(!freeze_pause)
+    {
+        g_pause_time = -1;
+    }
+    else if(g_pause_time >= 0)
+    {
+        g_state->time_pause = g_pause_time;
+    }
+}
+
 void render_game_props()
 {
     if(g_state == 0) return;
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
     if(ImGui::CollapsingHeader("State"))
     {
         render_screen("Current screen:", g_state->screen);
@@ -1736,14 +1797,32 @@ void render_game_props()
         render_int("Paused:", g_state->pause);
 
     }
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
     if(ImGui::CollapsingHeader("Timer"))
     {
-        ImGui::InputInt("Level##Leveltime", (int *)&g_state->time_level, 1, 10, 0);
-        ImGui::InputInt("Total##Totaltime", (int *)&g_state->time_total, 1, 10, 0);
-        ImGui::InputInt("Pause##Pausetime", (int *)&g_state->time_pause, 1, 10, 0);
+        std::string leveltime = format_time(g_state->time_level);
+        std::string totaltime = format_time(g_state->time_total);
+        std::string pausetime = format_time(g_state->time_pause);
+        ImGui::Text("Freeze");
+        ImGui::Checkbox("##FreezeLevel", &freeze_level); ImGui::SameLine();
+        if(InputString("Level##LevelTime", &leveltime))
+        {
+            g_level_time = parse_time(leveltime);
+            g_state->time_level = parse_time(leveltime);
+        }
+        ImGui::Checkbox("##FreezeTotal", &freeze_total); ImGui::SameLine();
+        if(InputString("Total##TotalTime", &totaltime))
+        {
+            g_total_time = parse_time(totaltime);
+            g_state->time_total = g_total_time;
+        }
+        ImGui::Checkbox("##FreezePause", &freeze_pause); ImGui::SameLine();
+        if(InputString("Pause##PauseTime", &pausetime))
+        {
+            g_pause_time = parse_time(pausetime);
+            g_state->time_pause = g_pause_time;
+        }
     }
-    ImGui::PopItemWidth();
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.4f);
     if(ImGui::CollapsingHeader("Level"))
     {
         SliderByte("World##Worldnumber", (char *)&g_state->world, 1, 255);
@@ -2064,6 +2143,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     {
         if(g_zoom == 0.0) set_zoom();
         force_hud_flags();
+        force_time();
         g_last_frame = ImGui::GetFrameCount();
     }
     if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("too_debug")))
