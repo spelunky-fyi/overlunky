@@ -144,11 +144,12 @@ static ImFont *font, *bigfont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_level_time = -1, g_total_time = -1, g_pause_time = -1;
+int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
+std::vector<EntityMemory*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true, lock_entity = false, freeze_level = false, freeze_total = false, freeze_pause = false;
 EntityMemory* g_entity = 0;
 EntityMemory* g_held_entity = 0;
@@ -512,6 +513,15 @@ bool update_entity()
 
 void set_zoom() {
     zoom(g_zoom);
+}
+
+void force_zoom()
+{
+    if(g_zoom == 0.0 && g_state != 0 && (g_state->w != g_level_width))
+    {
+        set_zoom();
+        g_level_width = g_state->w;
+    }
 }
 
 void force_hud_flags() {
@@ -1603,7 +1613,6 @@ void render_entity_props()
     if(g_entity == 0) return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
     render_uid(g_entity->uid, "general");
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("State"))
     {
         render_state("Current:", g_entity->state);
@@ -1661,12 +1670,15 @@ void render_entity_props()
     }
     if(ImGui::CollapsingHeader("Container"))
     {
-        ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.3f);
-        ImGui::Text("Has inside:");
-        ImGui::InputInt("##Spawns", (int *)&g_entity->inside, 1, 1);
-        if(g_entity->inside > 0)
+        if(g_entity->inside >= 0)
         {
-            ImGui::SameLine(); ImGui::Text(entity_names[g_entity->inside].data());
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.3f);
+            ImGui::Text("Has inside:");
+            ImGui::InputInt("##Spawns", (int *)&g_entity->inside, 1, 1);
+            if(g_entity->inside > 0)
+            {
+                ImGui::SameLine(); ImGui::Text(entity_names[g_entity->inside].data());
+            }
             ImGui::PopItemWidth();
         }
     }
@@ -1800,10 +1812,10 @@ void render_timer()
 
 void render_players()
 {
-    for(int i = 0; i < 4; i++)
+    get_players();
+    for(auto player : g_players)
     {
-        //EntityMemory* player = 
-        //render_uid(player->uid, "players");
+        render_uid(player->uid, "players");
     }
 }
 
@@ -1867,7 +1879,6 @@ void render_game_props()
             //ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, pow(2, i));
         }
     }
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Debug")){
         ImGui::InputScalar("Pointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     }
@@ -2011,9 +2022,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_options"].c_str());
-            ImGui::PushItemWidth(-1);
             render_options();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);    
@@ -2021,9 +2030,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_camera"].c_str());
-            ImGui::PushItemWidth(-1);
             render_camera();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);    
@@ -2031,9 +2038,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_door"].c_str());
-            ImGui::PushItemWidth(-1);
             render_narnia();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
@@ -2041,11 +2046,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
             ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
             ImGui::Begin(windows["tool_entity"].c_str());
-            ImGui::PushItemWidth(-1);
             ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
             render_input();
             render_list();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({0, 0}, win_condition);
@@ -2053,9 +2056,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
             ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
             ImGui::Begin(windows["tool_entity_properties"].c_str());
-            ImGui::PushItemWidth(-1);
             render_entity_props();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);
@@ -2063,9 +2064,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
             ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
             ImGui::Begin(windows["tool_game_properties"].c_str());
-            ImGui::PushItemWidth(-1);
             render_game_props();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, ImGui::GetIO().DisplaySize.y/2}, win_condition);
@@ -2076,11 +2075,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetNextWindowSize({toolwidth, toolwidth-100}, win_condition);
             ImGui::SetNextWindowPos({0, 0}, win_condition);
             ImGui::Begin(windows["tool_entity"].c_str());
-            ImGui::PushItemWidth(-1);
             ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
             render_input();
             render_list();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
@@ -2088,9 +2085,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_door"].c_str());
-            ImGui::PushItemWidth(-1);
             render_narnia();
-            ImGui::PopItemWidth();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
@@ -2098,9 +2093,23 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_camera"].c_str());
-            ImGui::PushItemWidth(-1);
             render_camera();
-            ImGui::PopItemWidth();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::Begin(windows["tool_entity_properties"].c_str());
+            render_entity_props();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::Begin(windows["tool_game_properties"].c_str());
+            render_game_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
@@ -2108,31 +2117,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_options"].c_str());
-            ImGui::PushItemWidth(-1);
             render_options();
-            ImGui::PopItemWidth();
             lastwidth = ImGui::GetWindowWidth();
             lastheight = ImGui::GetWindowHeight();
-            ImGui::End();
-
-            ImGui::SetNextWindowSize({toolwidth, (ImGui::GetIO().DisplaySize.y-lastheight)/2}, win_condition);
-            ImGui::Begin(windows["tool_entity_properties"].c_str());
-            ImGui::PushItemWidth(-1);
-            render_entity_props();
-            ImGui::PopItemWidth();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);    
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::End();
-
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
-            ImGui::Begin(windows["tool_game_properties"].c_str());
-            ImGui::PushItemWidth(-1);
-            render_game_props();
-            ImGui::PopItemWidth();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth, lastheight}, win_condition);    
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
             ImGui::End();
         }
 
@@ -2141,9 +2128,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y}, win_condition);
             ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth*2, 0}, win_condition);
             ImGui::Begin(windows["tool_debug"].c_str());
-            ImGui::PushItemWidth(-1);
             render_debug();
-            ImGui::PopItemWidth();
             ImGui::End();
         }
     }
@@ -2168,9 +2153,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(!file_written)
         write_file();
 
-    if(true || ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate/4)
+    if(ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate/2)
     {
-        if(g_zoom == 0.0) set_zoom();
+        force_zoom();
         force_hud_flags();
         force_time();
         g_last_frame = ImGui::GetFrameCount();
@@ -2189,12 +2174,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         gamewindow = FindTopWindow(GetCurrentProcessId());
         HID_RegisterDevice(gamewindow, HID_KEYBOARD);
     }
-    if(!(active("tool_entity") || active("tool_door") || active("tool_camera")))
+    /*if(!(active("tool_entity") || active("tool_door") || active("tool_camera")))
     {
         ImGuiIO &io = ImGui::GetIO();
         io.WantCaptureKeyboard = false;
         io.NavActive = false;
-    }
+    }*/
 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -2230,6 +2215,16 @@ void create_box(rust::Vec<rust::String> names, rust::Vec<uint16_t> ids)
         g_filtered_items = new_filtered_items;
         g_filtered_count = g_items.size();
     }
+}
+
+void set_players(rust::Vec<uintptr_t> ids)
+{
+    std::vector<EntityMemory*> new_items;
+    for(int i = 0; i < ids.size(); i++)
+    {
+        new_items.push_back((EntityMemory*) ids[i]);
+    }
+    g_players = new_items;
 }
 
 #define THROW(fmt, ...)                               \

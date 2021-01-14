@@ -171,11 +171,13 @@ pub mod ffi {
         unsafe fn get_entity_ptr(id: u32) -> usize;
         unsafe fn get_entity_type(id: u32) -> i32;
         unsafe fn get_state_ptr() -> usize;
+        unsafe fn get_players();
     }
     unsafe extern "C++" {
         include!("cxx/ui.hpp");
         fn create_box(_: Vec<String>, _: Vec<u16>);
         fn init_hooks(_: usize) -> Result<bool>;
+        fn set_players(_: Vec<usize>);
     }
 }
 
@@ -449,4 +451,18 @@ unsafe fn get_entity_type(id: u32) -> i32 {
 pub unsafe fn get_state_ptr() -> usize {
     let state = State::new();
     state.ptr()
+}
+
+pub unsafe fn get_players() {
+    let state = State::new();
+    let mut found = Vec::new();
+    for i in 0..4 {
+        match state.items().player(i) {
+            Some(player) => {
+                found.push(player.entity.ptr());
+            }
+            None => {}
+        }
+    }
+    ffi::set_players(found);
 }

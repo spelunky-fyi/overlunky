@@ -64,7 +64,7 @@ macro_rules! entity {
     ($T: ident) => {
         #[derive(Debug, Copy, Clone)]
         pub struct $T {
-            entity: Entity,
+            pub entity: Entity,
         }
         impl From<usize> for $T {
             fn from(pointer: usize) -> Self {
