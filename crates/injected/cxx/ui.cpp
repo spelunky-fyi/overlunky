@@ -142,18 +142,19 @@ struct CXXEntityItem
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0;
+uintptr_t g_entity_addr = 0;
 unsigned int g_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true, lock_entity = false;
-EntityMemory* g_entity;
-EntityMemory* g_held_entity;
-Inventory* g_inventory;
+EntityMemory* g_entity = 0;
+EntityMemory* g_held_entity = 0;
+Inventory* g_inventory = 0;
 
 static char text[500];
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun" };
-const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Enterable (door)", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
+const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Interactable", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 const char* more_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " }; //TODO
 const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
 const char* direction_flags[] = { "Left", "Down", "Up", "Right" };
@@ -400,6 +401,20 @@ bool toggle(std::string tool) {
     return false;
 }
 
+bool active(std::string window)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* current = g.NavWindow;
+    return current == ImGui::FindWindowByName(windows[window].c_str());
+}
+
+bool visible(std::string window)
+{
+    ImGuiWindow* win = ImGui::FindWindowByName(windows[window].c_str());
+    if(win != NULL) return !win->Collapsed;
+    return false;
+}
+
 void escape() {
     ImGui::SetWindowFocus(nullptr);
     /*ImGuiWindow* win = ImGui::FindWindowByName("Clickhandler");
@@ -470,10 +485,12 @@ const char* entity_name(int id)
 
 bool update_entity()
 {
+    if(!visible("tool_entity_properties")) return false;
     if(g_last_id != 0)
     {
         g_entity_type = get_entity_type(g_last_id);
         g_entity = (struct EntityMemory*) get_entity_ptr(g_last_id);
+        g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if(IsBadWritePtr(g_entity, 0x178)) g_entity = 0;
         if(g_entity != 0)
         {
@@ -482,13 +499,13 @@ bool update_entity()
             return true;
         }
         else {
-            g_last_id = 0;
             g_inventory = 0;
         }
     }
     else {
         g_entity = 0;
         g_inventory = 0;
+        g_entity_addr = 0;
     }
     return false;
 }
@@ -613,13 +630,6 @@ bool released(std::string keyname) {
         }
     }
     return wParam == keycode;
-}
-
-bool active(std::string window)
-{
-    ImGuiContext& g = *GImGui;
-    ImGuiWindow* current = g.NavWindow;
-    return current == ImGui::FindWindowByName(windows[window].c_str());
 }
 
 bool process_keys(
@@ -1472,7 +1482,7 @@ bool SliderByte(const char *label, char* value, char min = 0, char max = 0, cons
     return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
 }
 
-void render_uid(int uid)
+void render_uid(int uid, const char* section)
 {
     char uidc[10];
     itoa(uid, uidc, 10);
@@ -1481,11 +1491,13 @@ void render_uid(int uid)
     char typec[10];
     itoa(ptype, typec, 10);
     const char* pname = entity_names[ptype].data();
+    ImGui::PushID(section);
     if(ImGui::Button(uidc))
     {
         g_last_id = uid;
         update_entity();
     }
+    ImGui::PopID();
     ImGui::SameLine(); ImGui::Text(typec); ImGui::SameLine(); ImGui::Text(pname);
 }
 
@@ -1542,37 +1554,41 @@ void render_int(const char* label, int state)
 
 void render_entity_props()
 {
-    ImGui::Checkbox("Sticky this entity", &lock_entity);
+    ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+    ImGui::InputInt("Set UID", &g_last_id); ImGui::SameLine();
+    ImGui::Checkbox("Sticky", &lock_entity);
+    ImGui::PopItemWidth();
     if(!update_entity()) return;
     if(g_entity == 0) return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
-    render_uid(g_entity->uid);
+    render_uid(g_entity->uid, "general");
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("State"))
     {
         render_state("Current:", g_entity->state);
         render_state("Last:", g_entity->last_state);
         render_ai("AI:", g_entity->move_state);
+        render_int("Timer:", g_entity->timer);
         if(g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
-            render_uid(g_entity->standing_on_uid);
+            render_uid(g_entity->standing_on_uid, "state");
         }
         if(g_entity->holding_uid != -1)
         {
             ImGui::Text("Holding:");
-            render_uid(g_entity->holding_uid);
+            render_uid(g_entity->holding_uid, "state");
         }
         EntityMemory* overlay = (EntityMemory*) g_entity->overlay;
         if(!IsBadReadPtr(overlay, 0x178))
         {
             ImGui::Text("Riding:");
-            render_uid(overlay->uid);
+            render_uid(overlay->uid, "state");
         }
-        if(g_entity->last_attacker_uid != -1)
+        if(g_entity->last_owner_uid != -1)
         {
-            ImGui::Text("Pwner:");
-            render_uid(g_entity->last_attacker_uid);
+            ImGui::Text("Owner:");
+            render_uid(g_entity->last_owner_uid, "state");
         }
     }
     if(ImGui::CollapsingHeader("Position"))
@@ -1593,16 +1609,26 @@ void render_entity_props()
         }
     }
     if(ImGui::CollapsingHeader("Items"))
-        {
-            if(g_entity->items_count > 0) {
-                int* pitems = (int*) g_entity->items_ptr;
-                for(int i = 0; i < g_entity->items_count; i++)
-                {
-                    render_uid(pitems[i]);
-                }                
+    {
+        if(g_entity->items_count > 0) {
+            int* pitems = (int*) g_entity->items_ptr;
+            for(int i = 0; i < g_entity->items_count; i++)
+            {
+                render_uid(pitems[i], "items");
             }
         }
-
+    }
+    if(ImGui::CollapsingHeader("Container"))
+    {
+        ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.3f);
+        ImGui::Text("Has inside:");
+        ImGui::InputInt("##Spawns", (int *)&g_entity->inside, 1, 1);
+        if(g_entity->inside > 0)
+        {
+            ImGui::SameLine(); ImGui::Text(entity_names[g_entity->inside].data());
+            ImGui::PopItemWidth();
+        }
+    }
     if(ImGui::CollapsingHeader("Style"))
     {
         ImGui::ColorEdit4("Color", (float*)&g_entity->color);
@@ -1642,6 +1668,9 @@ void render_entity_props()
             ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, pow(2, i));
             if(i<5) ImGui::SameLine(region.x/6*(i+1));
         }
+    }
+    if(ImGui::CollapsingHeader("Debugging")){
+        ImGui::InputScalar("Pointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     }
 }
 
@@ -1922,7 +1951,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         force_hud_flags();
         g_last_frame = ImGui::GetFrameCount();
     }
-    if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera")))
+    if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("too_debug")))
     {
         HID_RegisterDevice(window, HID_KEYBOARD);
         capture_last = true;
