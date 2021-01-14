@@ -44,6 +44,10 @@ pub mod ffi {
         pub pad70: [u8; 0x988],
         pub time_level: u32,
         pub time_pause: u32,
+        pub ia04: i32,
+        pub ia08: i32,
+        pub hud_flags: u32,
+        
     }
 
     #[derive(Debug)]

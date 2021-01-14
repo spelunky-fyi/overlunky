@@ -140,11 +140,12 @@ struct CXXEntityItem
     }
 };
 
+static ImFont *font, *bigfont;
+
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_level_time = -1, g_total_time = -1, g_pause_time = -1;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
-unsigned int g_hud_flags = 8;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
@@ -514,10 +515,9 @@ void set_zoom() {
 }
 
 void force_hud_flags() {
-    g_hud_flags = get_hud_flags();
-    if(hud_allow_pause) g_hud_flags |= 1UL << 3;
-    else g_hud_flags &= ~(1UL << 3);
-    set_hud_flags(g_hud_flags);
+    if(g_state == 0) return;
+    if(hud_allow_pause) g_state->hud_flags |= 1U << 19;
+    else g_state->hud_flags &= ~(1U << 19);
 }
 
 LRESULT CALLBACK window_hook(
@@ -727,8 +727,8 @@ bool process_keys(
     else if (pressed("toggle_pause", wParam))
     {
         paused = !paused;
-        if(paused) set_pause(0x20);
-        else set_pause(0);
+        if(paused) g_state->pause = 0x20;
+        else g_state->pause = 0;
     }
     else if (pressed("toggle_allow_pause", wParam))
     {
@@ -1783,6 +1783,21 @@ void force_time()
     }
 }
 
+void render_timer()
+{
+    int frames = g_state->time_total;
+    time_t secs = frames/60;
+    char time[10];
+    std::strftime(time, sizeof(time), "%H:%M:%S", std::gmtime(&secs));
+    std::stringstream ss;
+    ss << time;
+    ss << ".";
+    ss << std::setfill('0') << std::setw(3) << floor((frames%60)*(1000.0/60.0));
+    ImGui::PushFont(bigfont);
+    ImGui::Text(ss.str().data());
+    ImGui::PopFont();
+}
+
 void render_game_props()
 {
     if(g_state == 0) return;
@@ -1800,6 +1815,7 @@ void render_game_props()
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
     if(ImGui::CollapsingHeader("Timer"))
     {
+        render_timer();
         std::string leveltime = format_time(g_state->time_level);
         std::string totaltime = format_time(g_state->time_total);
         std::string pausetime = format_time(g_state->time_pause);
@@ -1894,7 +1910,6 @@ bool process_resizing(_In_ int nCode,
 HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags)
 {
     static bool init = false;
-    static ImFont *font;
     // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
 
     if (!init)
@@ -1926,6 +1941,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
             {
                 font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 18.0f);
+                bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 32.0f);
             }
 
             CoTaskMemFree(fontdir);
@@ -2086,7 +2102,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             lastheight = ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y-lastheight}, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, (ImGui::GetIO().DisplaySize.y-lastheight)/2}, win_condition);
             ImGui::Begin(windows["tool_entity_properties"].c_str());
             ImGui::PushItemWidth(-1);
             render_entity_props();
@@ -2139,33 +2155,22 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(!file_written)
         write_file();
 
-    if(ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate/4)
+    if(true || ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate/4)
     {
         if(g_zoom == 0.0) set_zoom();
         force_hud_flags();
         force_time();
         g_last_frame = ImGui::GetFrameCount();
     }
-    if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("too_debug")))
+    if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("too_debug")))
     {
         HID_RegisterDevice(window, HID_KEYBOARD);
         capture_last = true;
-        /*paused = true;
-        g_hud_flags = 0;
-        set_pause(0x20);
-        set_hud_flags(g_hud_flags);*/
     }
     else if(disable_input && capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
     {
-        //HID_UnregisterDevice(HID_KEYBOARD);
-        //FindTopWindow(GetCurrentProcessId());
-        //HID_RegisterDevice(gamewindow, HID_KEYBOARD);
         capture_last = false;
         register_keys = true;
-        /*paused = false;
-        g_hud_flags = 8;
-        set_pause(0);
-        set_hud_flags(g_hud_flags);*/
     } else if(register_keys) {
         register_keys = false;
         gamewindow = FindTopWindow(GetCurrentProcessId());
