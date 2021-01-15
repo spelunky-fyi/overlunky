@@ -2046,7 +2046,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     }
     float lastwidth = 0;
     float lastheight = 0;
-    float toolwidth = 0.125*ImGui::GetIO().DisplaySize.x*ImGui::GetIO().FontGlobalScale;
+    float toolwidth = 0.128*ImGui::GetIO().DisplaySize.x*ImGui::GetIO().FontGlobalScale;
     if (!hidegui)
     {
         if(reset_windows_vertical)
@@ -2156,7 +2156,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
         if(!hidedebug)
         {
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y}, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x-toolwidth*2, 0}, win_condition);
             ImGui::Begin(windows["tool_debug"].c_str());
             render_debug();
@@ -2184,13 +2184,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(!file_written)
         write_file();
 
-    if(true || ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate)
-    {
-        force_zoom();
-        force_hud_flags();
-        force_time();
-        g_last_frame = ImGui::GetFrameCount();
-    }
     if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("tool_debug")))
     {
         HID_RegisterDevice(window, HID_KEYBOARD);
@@ -2214,6 +2207,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+    force_zoom();
+    force_hud_flags();
+    force_time();
+
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
