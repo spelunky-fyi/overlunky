@@ -160,19 +160,22 @@ static char text[500];
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun", "0: Base camp" };
 const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Interactable", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 const char* more_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
-const char* hud_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: Angry shopkeeper", "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ", "17: ", "18: Tusk mad", "19: Dark level", "20: Allow pause", "21: Hide hud, transition", "22: Hide hud, ?", "23: Have clover", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
+const char* hud_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: Angry shopkeeper", "10: Attacked shopkeeper", "11: Angry Tun", "12: ", "13: ", "14: ", "15: Angry Tusk", "16: ", "17: ", "18: ", "19: Dark level", "20: Allow pause", "21: Hide hud, transition", "22: Hide hud, ?", "23: Have clover", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
 const char* journal_flags[] = { "1: I was a pacifist", "2: I was a vegan", "3: I was a vegetarian", "4: I was a petty criminal", "5: I was a wanted criminal", "6: I was a crime lord", "7: I was a king", "8: I was a queen", "9: I was a fool", "10: I was an eggplant", "11: I didn't care for treasure", "12: I liked pets", "13: I loved pets", "14: I took damage", "15: I survived death once", "16: I slayed Kingu", "17: I slayed Osiris", "18: I defeated Tiamat", "19: I defeated Hundun", "20: I became one with the Cosmos", "21: I eventually died", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
 //const char* empty_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
 
-
 const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
 const char* direction_flags[] = { "Left", "Down", "Up", "Right" };
-
 
 std::map<int, std::string> entity_names;
 
 const char* inifile = "imgui.ini";
 const std::string hotkeyfile = "hotkeys.ini";
+
+const char    s8_zero  = 0,   s8_one  = 1,   s8_fifty  = 50, s8_min  = -128,        s8_max = 127;
+const ImU8    u8_zero  = 0,   u8_one  = 1,   u8_fifty  = 50, u8_min  = 0,           u8_max = 255,           u8_seventeen = 17;;
+const short   s16_zero = 0,   s16_one = 1,   s16_fifty = 50, s16_min = -32768,      s16_max = 32767;
+const ImU16   u16_zero = 0,   u16_one = 1,   u16_fifty = 50, u16_min = 0,           u16_max = 65535;
 
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
@@ -535,8 +538,8 @@ void force_hud_flags() {
     if(g_state == 0) return;
     if(hud_allow_pause) g_state->hud_flags |= 1U << 19;
     else g_state->hud_flags &= ~(1U << 19);
-    //if(hud_dark_level) g_state->hud_flags |= 1U << 17;
-    //else g_state->hud_flags &= ~(1U << 17);
+    if(hud_dark_level) g_state->hud_flags |= 1U << 17;
+    else g_state->hud_flags &= ~(1U << 17);
 }
 
 LRESULT CALLBACK window_hook(
@@ -1620,7 +1623,7 @@ void render_entity_props()
     ImGui::PopItemWidth();
     if(!update_entity()) return;
     if(g_entity == 0) return;
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(g_entity->uid, "general");
     if(ImGui::CollapsingHeader("State"))
     {
@@ -1652,19 +1655,19 @@ void render_entity_props()
     }
     if(ImGui::CollapsingHeader("Position"))
     {
-        ImGui::InputFloat("Pos X", &g_entity->x, 0.2, 1.0, 5, 0);
-        ImGui::InputFloat("Pos Y", &g_entity->y, 0.2, 1.0, 5, 0);
-        ImGui::InputFloat("Vel X", &g_entity->velocityx, 0.2, 1.0, 5, 0);
-        ImGui::InputFloat("Vel y", &g_entity->velocityy, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0, 5, 0);
     }
     if(ImGui::CollapsingHeader("Inventory"))
     {
-        SliderByte("Health", (char *)&g_entity->health, 1, 99);
+        ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char *)&g_entity->health, 0.5f, &u8_one, &u8_max);
         if(g_inventory != 0)
         {
-            SliderByte("Bombs", (char *)&g_inventory->bombs, 0, 99);
-            SliderByte("Ropes", (char *)&g_inventory->ropes, 0, 99);
-            ImGui::SliderInt("Money", (int *)&g_inventory->money, 0, 1000000);
+            ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char *)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
+            ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char *)&g_inventory->ropes, 0.5f, &u8_one, &u8_max);
+            ImGui::DragInt("Money##EntityMoney", (int *)&g_inventory->money, 10.0f, INT_MIN, INT_MAX, "%d", ImGuiSliderFlags_Logarithmic);
         }
     }
     if(ImGui::CollapsingHeader("Items"))
@@ -1679,7 +1682,7 @@ void render_entity_props()
     }
     if(ImGui::CollapsingHeader("Container"))
     {
-        if(g_entity->inside >= 0)
+        if((int)g_entity->inside >= 0)
         {
             ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.3f);
             ImGui::Text("Has inside:");
@@ -1694,12 +1697,12 @@ void render_entity_props()
     if(ImGui::CollapsingHeader("Style"))
     {
         ImGui::ColorEdit4("Color", (float*)&g_entity->color);
-        ImGui::SliderFloat("Width", &g_entity->w, 0.0, 10.0, "%.3f", 0);
-        ImGui::SliderFloat("Height", &g_entity->h, 0.0, 10.0, "%.3f", 0);
-        ImGui::SliderFloat("Box W", &g_entity->hitboxx, 0.0, 10.0, "%.3f", 0);
-        ImGui::SliderFloat("Box H", &g_entity->hitboxy, 0.0, 10.0, "%.3f", 0);
-        ImGui::SliderFloat("Off X", &g_entity->offsetx, -10.0, 10.0, "%.3f", 0);
-        ImGui::SliderFloat("Off Y", &g_entity->offsety, -10.0, 10.0, "%.3f", 0);
+        ImGui::DragFloat("Width##EntityWidth", &g_entity->w, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Height##EntityHeight", &g_entity->h, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Box width##EntityBoxWidth", &g_entity->hitboxx, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Box height##EntityBoxHeight", &g_entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Offset X##EntityOffsetX", &g_entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
+        ImGui::DragFloat("Offset Y##EntityOffsetY", &g_entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
     }
     if(ImGui::CollapsingHeader("Flags"))
     {
@@ -1730,7 +1733,8 @@ void render_entity_props()
             if(i<5) ImGui::SameLine(region.x/6*(i+1));
         }
     }
-    if(ImGui::CollapsingHeader("Debug")){
+    if(ImGui::CollapsingHeader("Debug"))
+    {
         ImGui::InputScalar("Pointer##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     }
     ImGui::PopItemWidth();
@@ -1819,13 +1823,12 @@ void force_time()
 void render_timer()
 {
     int frames = g_state->time_total;
+    if(g_state->screen != 13) frames += g_state->time_pause;
     time_t secs = frames/60;
     char time[10];
     std::strftime(time, sizeof(time), "%H:%M:%S", std::gmtime(&secs));
     std::stringstream ss;
-    ss << time;
-    ss << ".";
-    ss << std::setfill('0') << std::setw(3) << floor((frames%60)*(1000.0/60.0));
+    ss << "Total: " << time << "." << std::setfill('0') << std::setw(3) << floor((frames%60)*(1000.0/60.0));
     ImGui::PushFont(bigfont);
     ImGui::Text(ss.str().data());
     ImGui::PopFont();
@@ -1853,7 +1856,7 @@ void render_game_props()
         render_int("Playing:", g_state->playing);
         render_int("Paused:", g_state->pause);
     }
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.33f);
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     if(ImGui::CollapsingHeader("Timer"))
     {
         render_timer();
@@ -1890,42 +1893,46 @@ void render_game_props()
     if(ImGui::CollapsingHeader("Level"))
     {
         render_int("Levels completed:", g_state->level_count);
-        SliderByte("World##Worldnumber", (char *)&g_state->world, 1, 255);
-        SliderByte("Level##Levelnumber", (char *)&g_state->level, 1, 255);
-        SliderByte("##Themenumber", (char *)&g_state->theme, 1, 17); ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme));
-        SliderByte("To World##Worldnext", (char *)&g_state->world_next, 1, 255);
-        SliderByte("To Level##Levelnext", (char *)&g_state->level_next, 1, 255);
-        SliderByte("##Themenext", (char *)&g_state->theme_next, 1, 17); ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme_next));
-        ImGui::Checkbox("Force dark level##darklevel", &hud_dark_level);
+        ImGui::DragScalar("World##Worldnumber", ImGuiDataType_U8, (char *)&g_state->world, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Level##Levelnumber", ImGuiDataType_U8, (char *)&g_state->level, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("##Themenumber", ImGuiDataType_U8, (char *)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme));
+        ImGui::DragScalar("To World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_next, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("To Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_next, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme_next));
+        //ImGui::Checkbox("Force dark level##darklevel", &hud_dark_level);
     }
     if(ImGui::CollapsingHeader("Street cred"))
     {
-        ImGui::InputInt("Shoppie aggro##ShoppieAggro", (int*)&g_state->shoppie_aggro, 0, 0);
-        ImGui::InputScalar("NPC kills##NPCKills", ImGuiDataType_U8, (char*)&g_state->kills_npc);
-        ImGui::InputScalar("Kali favor##PorFavor", ImGuiDataType_S8, (char *)&g_state->kali_favor);
-        ImGui::InputScalar("Kali status##KaliStatus", ImGuiDataType_U8, (char *)&g_state->kali_status);
-        ImGui::InputScalar("Altars destroyed##KaliAltars", ImGuiDataType_U8, (char *)&g_state->kali_altars_destroyed);
+        ImGui::DragScalar("Shoppie aggro##ShoppieAggro", ImGuiDataType_U16, (wchar_t*)&g_state->shoppie_aggro, 0.5f, &u16_min, &u16_max, "%d");
+        ImGui::DragScalar("Tun aggro##ShoppieAggro", ImGuiDataType_U16, (wchar_t*)&g_state->merchant_aggro, 0.5f, &u16_min, &u16_max, "%d");
+        ImGui::DragScalar("NPC kills##NPCKills", ImGuiDataType_U8, (char*)&g_state->kills_npc, 0.5f, &u8_zero, &u8_max);
+        ImGui::DragScalar("Kali favor##PorFavor", ImGuiDataType_S8, (char *)&g_state->kali_favor, 0.5f, &s8_min, &s8_max);
+        ImGui::DragScalar("Kali status##KaliStatus", ImGuiDataType_S8, (char *)&g_state->kali_status, 0.5f, &s8_min, &s8_max);
+        ImGui::DragScalar("Altars destroyed##KaliAltars", ImGuiDataType_U8, (char *)&g_state->kali_altars_destroyed, 0.5f, &u8_min, &u8_max);
     }
     if(ImGui::CollapsingHeader("Players"))
     {
         render_players();
     }
-    if(ImGui::CollapsingHeader("Game flags"))
+    if(ImGui::CollapsingHeader("Level flags"))
     {
-        ImGui::InputScalar("Debug##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "0x%x");
         for(int i = 0; i < 32; i++) {
             ImGui::CheckboxFlags(hud_flags[i], &g_state->hud_flags, pow(2, i));
         }
     }
     if(ImGui::CollapsingHeader("Journal flags"))
     {
-        ImGui::InputScalar("Debug##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "0x%x");
         for(int i = 0; i < 21; i++) {
             ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, pow(2, i));
         }
     }
-    if(ImGui::CollapsingHeader("Debug")){
+    if(ImGui::CollapsingHeader("Debug"))
+    {
         ImGui::InputScalar("Pointer##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputScalar("Hud flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X");
+        ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X");
     }
     ImGui::PopItemWidth();
 }
