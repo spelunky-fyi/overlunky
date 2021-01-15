@@ -158,9 +158,10 @@ StateMemory* g_state = 0;
 
 static char text[500];
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun", "0: Base camp" };
+const char* themes_short[] = { "Dwelling", "Jungle", "Volcana", "Olmec", "Tide Pool", "Temple", "Ice Caves", "Neo Babylon", "Sunken City", "Cosmic Ocean", "City of Gold", "Duat", "Abzu", "Tiamat", "Eggplant World", "Hundun", "Base camp" };
 const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Interactable", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
 const char* more_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
-const char* hud_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: Angry shopkeeper", "10: Attacked shopkeeper", "11: Angry Tun", "12: ", "13: ", "14: ", "15: Angry Tusk", "16: ", "17: ", "18: ", "19: Dark level", "20: Allow pause", "21: Hide hud, transition", "22: Hide hud, ?", "23: Have clover", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
+const char* hud_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: Angry shopkeeper", "11: Angry Tun", "12: ", "13: ", "14: Angry Yang", "15: Angry Tusk", "16: Angry Waddler", "17: ", "18: ", "19: Dark level", "20: Allow pause", "21: Hide hud, transition", "22: Hide hud, ?", "23: Have clover", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
 const char* journal_flags[] = { "1: I was a pacifist", "2: I was a vegan", "3: I was a vegetarian", "4: I was a petty criminal", "5: I was a wanted criminal", "6: I was a crime lord", "7: I was a king", "8: I was a queen", "9: I was a fool", "10: I was an eggplant", "11: I didn't care for treasure", "12: I liked pets", "13: I loved pets", "14: I took damage", "15: I survived death once", "16: I slayed Kingu", "17: I slayed Osiris", "18: I defeated Tiamat", "19: I defeated Hundun", "20: I became one with the Cosmos", "21: I eventually died", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
 //const char* empty_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
 
@@ -506,7 +507,7 @@ bool update_entity()
         if(g_entity != 0)
         {
             g_inventory = (struct Inventory*) g_entity->inventory_ptr;
-            if(IsBadWritePtr(g_inventory, 0x10)) g_inventory = 0;
+            if(IsBadWritePtr(g_inventory, 0x1428)) g_inventory = 0;
             return true;
         }
         else {
@@ -871,12 +872,13 @@ bool process_keys(
     }
     else if(pressed("reset_windows", wParam))
     {
-        reset_windows = true;
+        reset_windows = !reset_windows;
+        if(reset_windows) reset_windows_vertical = false;
     }
     else if(pressed("reset_windows_vertical", wParam))
     {
-        reset_windows = true;
-        reset_windows_vertical = true;
+        reset_windows_vertical = !reset_windows_vertical;
+        if(reset_windows_vertical) reset_windows = false;
     }
     else if(pressed("save_settings", wParam))
     {
@@ -1483,23 +1485,24 @@ void render_options()
         force_hud_flags();
     }
     ImGui::Checkbox("Disable game keys when typing##Typing", &disable_input);
+    if(ImGui::Checkbox("Stack windows horizontally", &reset_windows))
+    {
+        reset_windows_vertical = false;
+    }
+    if(ImGui::Checkbox("Stack windows vertically", &reset_windows_vertical))
+    {
+        reset_windows = false;
+    }
 }
 
 void render_debug()
 {
-    ImGui::TextWrapped("Weird tools here. Don't ask.");
-    if(ImGui::Button("List items"))
-    {
-        list_items();
-    }
-    ImGui::SameLine();
-    if(ImGui::Button("Player status"))
-    {
-        player_status();
-    }
-    ImVec2 value_raw = ImGui::GetMouseDragDelta(keys["mouse_grab"] & 0xff - 1, 0.0f);
-    ImGui::Text("  Delta: (%.1f, %.1f)", value_raw.x, value_raw.y);
-    ImGui::Text("  Dragging: (%i)", ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1));
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X");
+    ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X");
+    ImGui::PopItemWidth();
 }
 
 bool SliderByte(const char *label, char* value, char min = 0, char max = 0, const char* format = "%lld")
@@ -1533,86 +1536,83 @@ void render_uid(int uid, const char* section)
 
 void render_state(const char* label, int state)
 {
-    ImGui::Text(label); ImGui::SameLine();
-    if(state == 0) ImGui::Text("Flailing");
-    else if(state == 1) ImGui::Text("Standing");
-    else if(state == 2) ImGui::Text("Sitting");
-    else if(state == 4) ImGui::Text("Hanging");
-    else if(state == 5) ImGui::Text("Ducking");
-    else if(state == 6) ImGui::Text("Climbing");
-    else if(state == 7) ImGui::Text("Pushing");
-    else if(state == 8) ImGui::Text("Jumping");
-    else if(state == 9) ImGui::Text("Falling");
-    else if(state == 10) ImGui::Text("Dropping");
-    else if(state == 12) ImGui::Text("Attacking");
-    else if(state == 17) ImGui::Text("Throwing");
-    else if(state == 18) ImGui::Text("Stunned");
-    else if(state == 19) ImGui::Text("Entering");
-    else if(state == 20) ImGui::Text("Loading");
-    else if(state == 21) ImGui::Text("Exiting");
-    else if(state == 22) ImGui::Text("Dying");
+    if(state == 0) ImGui::LabelText(label, "Flailing");
+    else if(state == 1) ImGui::LabelText(label, "Standing");
+    else if(state == 2) ImGui::LabelText(label, "Sitting");
+    else if(state == 4) ImGui::LabelText(label, "Hanging");
+    else if(state == 5) ImGui::LabelText(label, "Ducking");
+    else if(state == 6) ImGui::LabelText(label, "Climbing");
+    else if(state == 7) ImGui::LabelText(label, "Pushing");
+    else if(state == 8) ImGui::LabelText(label, "Jumping");
+    else if(state == 9) ImGui::LabelText(label, "Falling");
+    else if(state == 10) ImGui::LabelText(label, "Dropping");
+    else if(state == 12) ImGui::LabelText(label, "Attacking");
+    else if(state == 17) ImGui::LabelText(label, "Throwing");
+    else if(state == 18) ImGui::LabelText(label, "Stunned");
+    else if(state == 19) ImGui::LabelText(label, "Entering");
+    else if(state == 20) ImGui::LabelText(label, "Loading");
+    else if(state == 21) ImGui::LabelText(label, "Exiting");
+    else if(state == 22) ImGui::LabelText(label, "Dying");
     else {
         char statec[10];
         itoa(state, statec, 10);
-        ImGui::Text(statec);
+        ImGui::LabelText(label, statec);
     }
 }
 
 void render_ai(const char* label, int state)
 {
-    ImGui::Text(label); ImGui::SameLine();
-    if(state == 0) ImGui::Text("Idling");
-    else if(state == 1) ImGui::Text("Walking");
-    else if(state == 2) ImGui::Text("Jumping");
-    else if(state == 5) ImGui::Text("Jumping");
-    else if(state == 6) ImGui::Text("Attacking");
-    else if(state == 7) ImGui::Text("Meleeing");
+    if(state == 0) ImGui::LabelText(label, "0 Idling");
+    else if(state == 1) ImGui::LabelText(label, "1 Walking");
+    else if(state == 2) ImGui::LabelText(label, "2 Jumping");
+    else if(state == 5) ImGui::LabelText(label, "5 Jumping");
+    else if(state == 6) ImGui::LabelText(label, "6 Attacking");
+    else if(state == 7) ImGui::LabelText(label, "7 Meleeing");
+    else if(state == 11) ImGui::LabelText(label, "11 Rolling");
     else {
         char statec[10];
         itoa(state, statec, 10);
-        ImGui::Text(statec);
+        ImGui::LabelText(label, statec);
     }
 }
 
 void render_screen(const char* label, int state)
 {
-    ImGui::Text(label); ImGui::SameLine();
-    if(state == 0) ImGui::Text("0 Logo");
-    else if(state == 1) ImGui::Text("1 Intro");
-    else if(state == 2) ImGui::Text("2 Prologue");
-    else if(state == 3) ImGui::Text("3 Title");
-    else if(state == 4) ImGui::Text("4 Main menu");
-    else if(state == 5) ImGui::Text("5 Options");
-    else if(state == 8) ImGui::Text("7 Leaderboards");
-    else if(state == 8) ImGui::Text("8 Seed input");
-    else if(state == 9) ImGui::Text("9 Character select");
-    else if(state == 10) ImGui::Text("10 Team select");
-    else if(state == 11) ImGui::Text("11 Camp");
-    else if(state == 12) ImGui::Text("12 Level");
-    else if(state == 13) ImGui::Text("13 Level transition");
-    else if(state == 14) ImGui::Text("14 Death");
-    else if(state == 16) ImGui::Text("16 Ending");
-    else if(state == 17) ImGui::Text("17 Credits");
-    else if(state == 18) ImGui::Text("18 Scores");
-    else if(state == 20) ImGui::Text("20 Recap");
-    else if(state == 21) ImGui::Text("21 Arena menu");
-    else if(state == 25) ImGui::Text("25 Arena intro");
-    else if(state == 26) ImGui::Text("26 Arena match");
-    else if(state == 28) ImGui::Text("28 Loading online");
-    else if(state == 29) ImGui::Text("28 Lobby");
+    if(state == 0) ImGui::LabelText(label, "0 Logo");
+    else if(state == 1) ImGui::LabelText(label, "1 Intro");
+    else if(state == 2) ImGui::LabelText(label, "2 Prologue");
+    else if(state == 3) ImGui::LabelText(label, "3 Title");
+    else if(state == 4) ImGui::LabelText(label, "4 Main menu");
+    else if(state == 5) ImGui::LabelText(label, "5 Options");
+    else if(state == 8) ImGui::LabelText(label, "7 Leaderboards");
+    else if(state == 8) ImGui::LabelText(label, "8 Seed input");
+    else if(state == 9) ImGui::LabelText(label, "9 Character select");
+    else if(state == 10) ImGui::LabelText(label, "10 Team select");
+    else if(state == 11) ImGui::LabelText(label, "11 Camp");
+    else if(state == 12) ImGui::LabelText(label, "12 Level");
+    else if(state == 13) ImGui::LabelText(label, "13 Level transition");
+    else if(state == 14) ImGui::LabelText(label, "14 Death");
+    else if(state == 16) ImGui::LabelText(label, "16 Ending");
+    else if(state == 17) ImGui::LabelText(label, "17 Credits");
+    else if(state == 18) ImGui::LabelText(label, "18 Scores");
+    else if(state == 20) ImGui::LabelText(label, "20 Recap");
+    else if(state == 21) ImGui::LabelText(label, "21 Arena menu");
+    else if(state == 25) ImGui::LabelText(label, "25 Arena intro");
+    else if(state == 26) ImGui::LabelText(label, "26 Arena match");
+    else if(state == 28) ImGui::LabelText(label, "28 Loading online");
+    else if(state == 29) ImGui::LabelText(label, "28 Lobby");
     else {
         char statec[10];
         itoa(state, statec, 10);
-        ImGui::Text(statec);
+        ImGui::LabelText(label, statec);
     }
 }
 
 void render_int(const char* label, int state)
 {
-    ImGui::Text(label); ImGui::SameLine();
     char statec[15];
     itoa(state, statec, 10);
-    ImGui::Text(statec);
+    ImGui::LabelText(label, statec);
 }
 
 void render_entity_props()
@@ -1627,10 +1627,10 @@ void render_entity_props()
     render_uid(g_entity->uid, "general");
     if(ImGui::CollapsingHeader("State"))
     {
-        render_state("Current:", g_entity->state);
-        render_state("Last:", g_entity->last_state);
-        render_ai("AI:", g_entity->move_state);
-        render_int("Timer:", g_entity->timer);
+        render_state("Current state", g_entity->state);
+        render_state("Last state", g_entity->last_state);
+        render_ai("AI state", g_entity->move_state);
+        render_int("Timer", g_entity->timer);
         if(g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
@@ -1649,7 +1649,7 @@ void render_entity_props()
         }
         if(g_entity->last_owner_uid != -1)
         {
-            ImGui::Text("Owner:");
+            ImGui::Text("Owner / Attacker:");
             render_uid(g_entity->last_owner_uid, "state");
         }
     }
@@ -1660,14 +1660,16 @@ void render_entity_props()
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0, 5, 0);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0, 5, 0);
     }
-    if(ImGui::CollapsingHeader("Inventory"))
+    if(ImGui::CollapsingHeader("Stats"))
     {
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char *)&g_entity->health, 0.5f, &u8_one, &u8_max);
         if(g_inventory != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char *)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char *)&g_inventory->ropes, 0.5f, &u8_one, &u8_max);
-            ImGui::DragInt("Money##EntityMoney", (int *)&g_inventory->money, 10.0f, INT_MIN, INT_MAX, "%d", ImGuiSliderFlags_Logarithmic);
+            ImGui::DragInt("Money##EntityMoney", (int *)&g_inventory->money, 20.0f, INT_MIN, INT_MAX, "%d");
+            ImGui::DragInt("Level kills##EntityLevelKills", (int *)&g_inventory->kills_level, 0.5f, 0, INT_MAX, "%d");
+            ImGui::DragInt("Total kills##EntityTotalKills", (int *)&g_inventory->kills_total, 0.5f, 0, INT_MAX, "%d");
         }
     }
     if(ImGui::CollapsingHeader("Items"))
@@ -1733,17 +1735,13 @@ void render_entity_props()
             if(i<5) ImGui::SameLine(region.x/6*(i+1));
         }
     }
-    if(ImGui::CollapsingHeader("Debug"))
-    {
-        ImGui::InputScalar("Pointer##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
-    }
     ImGui::PopItemWidth();
 }
 
 const char* theme_name(int theme)
 {
     if(theme < 1 || theme > 17) return "Crash City";
-    return themes[theme-1];
+    return themes_short[theme-1];
 }
 
 std::string format_time(int frames)
@@ -1846,17 +1844,19 @@ void render_players()
 void render_game_props()
 {
     if(g_state == 0) return;
-
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     if(ImGui::CollapsingHeader("State"))
     {
-        render_screen("Current screen:", g_state->screen);
-        render_screen("Last screen:", g_state->screen_last);
-        render_screen("Next screen:", g_state->screen_next);
-        render_int("Ingame:", g_state->ingame);
-        render_int("Playing:", g_state->playing);
-        render_int("Paused:", g_state->pause);
+        render_screen("Current screen", g_state->screen);
+        render_screen("Last screen", g_state->screen_last);
+        render_screen("Next screen", g_state->screen_next);
+        std::string gamestate = "";
+        if(g_state->ingame) gamestate += "Game ";
+        if(g_state->playing) gamestate += "Level ";
+        if(gamestate == "") gamestate += "Menu ";
+        if(g_state->pause) gamestate += "Pause ";
+        ImGui::LabelText("Game state", gamestate.data());
     }
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     if(ImGui::CollapsingHeader("Timer"))
     {
         render_timer();
@@ -1864,7 +1864,7 @@ void render_game_props()
         std::string leveltime = format_time(g_state->time_level);
         std::string totaltime = format_time(g_state->time_total);
         std::string pausetime = format_time(g_state->time_pause);
-        ImGui::Text("Freeze");
+        ImGui::Text("Frz");
         ImGui::Checkbox("##FreezeLast", &freeze_last); ImGui::SameLine();
         if(InputString("Last level##LastTime", &lasttime))
         {
@@ -1892,14 +1892,14 @@ void render_game_props()
     }
     if(ImGui::CollapsingHeader("Level"))
     {
-        render_int("Levels completed:", g_state->level_count);
+        ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char *)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
         ImGui::DragScalar("World##Worldnumber", ImGuiDataType_U8, (char *)&g_state->world, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Level##Levelnumber", ImGuiDataType_U8, (char *)&g_state->level, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("##Themenumber", ImGuiDataType_U8, (char *)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::DragScalar("Theme ##Themenumber", ImGuiDataType_U8, (char *)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme));
         ImGui::DragScalar("To World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_next, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("To Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_next, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::DragScalar("To Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme_next));
         //ImGui::Checkbox("Force dark level##darklevel", &hud_dark_level);
     }
@@ -1927,12 +1927,6 @@ void render_game_props()
         for(int i = 0; i < 21; i++) {
             ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, pow(2, i));
         }
-    }
-    if(ImGui::CollapsingHeader("Debug"))
-    {
-        ImGui::InputScalar("Pointer##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
-        ImGui::InputScalar("Hud flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X");
-        ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X");
     }
     ImGui::PopItemWidth();
 }
@@ -2061,7 +2055,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .1f), "OL");
     ImGui::End();
     int win_condition = ImGuiCond_FirstUseEver;
-    if(reset_windows)
+    if(reset_windows || reset_windows_vertical)
     {
         win_condition = ImGuiCond_Always;
     }
@@ -2195,12 +2189,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
     ImGui::Render();
 
-    if(reset_windows)
+    /*if(reset_windows)
     {
         reset_windows = false;
         reset_windows_vertical = false;
         ImGui::SaveIniSettingsToDisk(inifile);
-    }
+    }*/
 
     if(!file_written)
         write_file();
@@ -2212,7 +2206,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         force_time();
         g_last_frame = ImGui::GetFrameCount();
     }
-    if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("too_debug")))
+    if(disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("tool_debug")))
     {
         HID_RegisterDevice(window, HID_KEYBOARD);
         capture_last = true;

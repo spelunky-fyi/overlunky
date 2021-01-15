@@ -75,7 +75,12 @@ pub mod ffi {
     pub struct Inventory {
         pub money: u32,
         pub bombs: u8,
-        pub ropes: u8
+        pub ropes: u8,
+        pub b06: i8,
+        pub b07: i8,
+        pub pad08: [u8; 0x141c], // specific treasure and killed monsters here, boring
+        pub kills_level: u32,
+        pub kills_total: u32,
     }
 
     #[derive(Debug)]
