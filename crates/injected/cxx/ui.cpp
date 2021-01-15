@@ -2118,7 +2118,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         }
         else
         {
-            ImGui::SetNextWindowSize({toolwidth, toolwidth-100}, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
             ImGui::SetNextWindowPos({0, 0}, win_condition);
             ImGui::Begin(windows["tool_entity"].c_str());
             ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);

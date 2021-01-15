@@ -110,7 +110,7 @@ pub mod ffi {
         pub duckmask: u32,
         pub i7c: i32,
         pub p80: usize,
-        pub p88: usize,
+        pub texture: usize,
         pub tilew: f32,
         pub tileh: f32,
         pub camera_layer: u8,
