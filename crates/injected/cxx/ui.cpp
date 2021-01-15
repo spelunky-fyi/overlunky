@@ -144,13 +144,13 @@ static ImFont *font, *bigfont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0;
+int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<EntityMemory*> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true, lock_entity = false, freeze_level = false, freeze_total = false, freeze_pause = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, change_colors = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false;
 EntityMemory* g_entity = 0;
 EntityMemory* g_held_entity = 0;
 Inventory* g_inventory = 0;
@@ -159,9 +159,16 @@ StateMemory* g_state = 0;
 static char text[500];
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun", "0: Base camp" };
 const char* entity_flags[] = { "1: Invisible", "2: ", "3: Solid (wall)", "4: Passes through objects", "5: Passes through everything", "6: Take no damage", "7: Throwable/Knockbackable", "8: ", "9: ", "10: ", "11: ", "12: ", "13: Collides walls", "14: ", "15: Can be stomped", "16: ", "17: Facing left", "18: Pickupable", "19: ", "20: Interactable", "21: ", "22: ", "23: ", "24: ", "25: Passes through player", "26: ", "27: ", "28: Pause AI and physics", "29: Dead", "30: ", "31: ", "32: " };
-const char* more_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " }; //TODO
+const char* more_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
+const char* hud_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: Angry shopkeeper", "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ", "17: ", "18: Tusk mad", "19: Dark level", "20: Allow pause", "21: Hide hud, transition", "22: Hide hud, ?", "23: Have clover", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
+const char* journal_flags[] = { "1: I was a pacifist", "2: I was a vegan", "3: I was a vegetarian", "4: I was a petty criminal", "5: I was a wanted criminal", "6: I was a crime lord", "7: I was a king", "8: I was a queen", "9: I was a fool", "10: I was an eggplant", "11: I didn't care for treasure", "12: I liked pets", "13: I loved pets", "14: I took damage", "15: I survived death once", "16: I slayed Kingu", "17: I slayed Osiris", "18: I defeated Tiamat", "19: I defeated Hundun", "20: I became one with the Cosmos", "21: I eventually died", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
+//const char* empty_flags[] = { "1: ", "2: ", "3: ", "4: ", "5: ", "6: ", "7: ", "8: ", "9: ", "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ", "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: " };
+
+
 const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
 const char* direction_flags[] = { "Left", "Down", "Up", "Right" };
+
+
 std::map<int, std::string> entity_names;
 
 const char* inifile = "imgui.ini";
@@ -528,6 +535,8 @@ void force_hud_flags() {
     if(g_state == 0) return;
     if(hud_allow_pause) g_state->hud_flags |= 1U << 19;
     else g_state->hud_flags &= ~(1U << 19);
+    //if(hud_dark_level) g_state->hud_flags |= 1U << 17;
+    //else g_state->hud_flags &= ~(1U << 17);
 }
 
 LRESULT CALLBACK window_hook(
@@ -1722,7 +1731,7 @@ void render_entity_props()
         }
     }
     if(ImGui::CollapsingHeader("Debug")){
-        ImGui::InputScalar("Pointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputScalar("Pointer##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     }
     ImGui::PopItemWidth();
 }
@@ -1757,6 +1766,18 @@ bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags 
 void force_time()
 {
     if(g_state == 0) return;
+    if(freeze_last && g_last_time == -1)
+    {
+        g_last_time = g_state->time_last_level;
+    }
+    else if(!freeze_last)
+    {
+        g_last_time = -1;
+    }
+    else if(g_last_time >= 0)
+    {
+        g_state->time_last_level = g_last_time;
+    }    
     if(freeze_level && g_level_time == -1)
     {
         g_level_time = g_state->time_level;
@@ -1831,16 +1852,22 @@ void render_game_props()
         render_int("Ingame:", g_state->ingame);
         render_int("Playing:", g_state->playing);
         render_int("Paused:", g_state->pause);
-
     }
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.33f);
     if(ImGui::CollapsingHeader("Timer"))
     {
         render_timer();
+        std::string lasttime = format_time(g_state->time_last_level);
         std::string leveltime = format_time(g_state->time_level);
         std::string totaltime = format_time(g_state->time_total);
         std::string pausetime = format_time(g_state->time_pause);
         ImGui::Text("Freeze");
+        ImGui::Checkbox("##FreezeLast", &freeze_last); ImGui::SameLine();
+        if(InputString("Last level##LastTime", &lasttime))
+        {
+            g_last_time = parse_time(lasttime);
+            g_state->time_last_level = parse_time(lasttime);
+        }
         ImGui::Checkbox("##FreezeLevel", &freeze_level); ImGui::SameLine();
         if(InputString("Level##LevelTime", &leveltime))
         {
@@ -1862,25 +1889,43 @@ void render_game_props()
     }
     if(ImGui::CollapsingHeader("Level"))
     {
+        render_int("Levels completed:", g_state->level_count);
         SliderByte("World##Worldnumber", (char *)&g_state->world, 1, 255);
         SliderByte("Level##Levelnumber", (char *)&g_state->level, 1, 255);
         SliderByte("##Themenumber", (char *)&g_state->theme, 1, 17); ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme));
         SliderByte("To World##Worldnext", (char *)&g_state->world_next, 1, 255);
         SliderByte("To Level##Levelnext", (char *)&g_state->level_next, 1, 255);
         SliderByte("##Themenext", (char *)&g_state->theme_next, 1, 17); ImGui::SameLine(); ImGui::Text(theme_name(g_state->theme_next));
+        ImGui::Checkbox("Force dark level##darklevel", &hud_dark_level);
+    }
+    if(ImGui::CollapsingHeader("Street cred"))
+    {
+        ImGui::InputInt("Shoppie aggro##ShoppieAggro", (int*)&g_state->shoppie_aggro, 0, 0);
+        ImGui::InputScalar("NPC kills##NPCKills", ImGuiDataType_U8, (char*)&g_state->kills_npc);
+        ImGui::InputScalar("Kali favor##PorFavor", ImGuiDataType_S8, (char *)&g_state->kali_favor);
+        ImGui::InputScalar("Kali status##KaliStatus", ImGuiDataType_U8, (char *)&g_state->kali_status);
+        ImGui::InputScalar("Altars destroyed##KaliAltars", ImGuiDataType_U8, (char *)&g_state->kali_altars_destroyed);
     }
     if(ImGui::CollapsingHeader("Players"))
     {
         render_players();
     }
-    if(ImGui::CollapsingHeader("Flags"))
+    if(ImGui::CollapsingHeader("Game flags"))
     {
+        ImGui::InputScalar("Debug##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "0x%x");
         for(int i = 0; i < 32; i++) {
-            //ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, pow(2, i));
+            ImGui::CheckboxFlags(hud_flags[i], &g_state->hud_flags, pow(2, i));
+        }
+    }
+    if(ImGui::CollapsingHeader("Journal flags"))
+    {
+        ImGui::InputScalar("Debug##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "0x%x");
+        for(int i = 0; i < 21; i++) {
+            ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, pow(2, i));
         }
     }
     if(ImGui::CollapsingHeader("Debug")){
-        ImGui::InputScalar("Pointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputScalar("Pointer##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     }
     ImGui::PopItemWidth();
 }
@@ -2153,7 +2198,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(!file_written)
         write_file();
 
-    if(ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate/2)
+    if(true || ImGui::GetFrameCount() > g_last_frame + ImGui::GetIO().Framerate)
     {
         force_zoom();
         force_hud_flags();
