@@ -140,6 +140,11 @@ struct CXXEntityItem
     }
 };
 
+struct EntityCache {
+    EntityMemory* entity;
+    int type;
+};
+
 static ImFont *font, *bigfont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
@@ -155,6 +160,9 @@ EntityMemory* g_entity = 0;
 EntityMemory* g_held_entity = 0;
 Inventory* g_inventory = 0;
 StateMemory* g_state = 0;
+std::map<int, std::string> entity_names;
+std::map<int, EntityCache> entity_cache;
+int cache_player = 0;
 
 static char text[500];
 const char* themes[] = { "1: Dwelling", "2: Jungle", "2: Volcana", "3: Olmec", "4: Tide Pool", "4: Temple", "5: Ice Caves", "6: Neo Babylon", "7: Sunken City", "8: Cosmic Ocean", "4: City of Gold", "4: Duat", "4: Abzu", "6: Tiamat", "7: Eggplant World", "7: Hundun", "0: Base camp" };
@@ -168,7 +176,6 @@ const char* journal_flags[] = { "1: I was a pacifist", "2: I was a vegan", "3: I
 const char* button_flags[] = { "Jp", "Wp", "Bm", "Rp", "Rn", "Dr" };
 const char* direction_flags[] = { "Left", "Down", "Up", "Right" };
 
-std::map<int, std::string> entity_names;
 
 const char* inifile = "imgui.ini";
 const std::string hotkeyfile = "hotkeys.ini";
@@ -445,6 +452,65 @@ void save_search()
     saved_entities.push_back(search);
 }
 
+int entity_type(int uid)
+{
+    if(entity_cache.find(uid) == entity_cache.end())
+    {
+        EntityCache newcache = { (struct EntityMemory*)get_entity_ptr(uid), (int)get_entity_type(uid) };
+        if(newcache.type != 0)
+        {
+            entity_cache[uid] = newcache;
+        }
+        return newcache.type;
+    }
+    return entity_cache.at(uid).type;
+}
+
+EntityMemory* entity_ptr(int uid)
+{
+    if(entity_cache.find(uid) == entity_cache.end())
+    {
+        EntityCache newcache = { (struct EntityMemory*)get_entity_ptr(uid), (int)get_entity_type(uid) };
+        if(newcache.entity != 0)
+        {
+            entity_cache[uid] = newcache;
+        }
+        return newcache.entity;
+    }
+    return entity_cache.at(uid).entity;
+}
+
+bool update_players()
+{
+    if(g_players.size() > 0)
+    {
+        if(g_players.at(0)->uid != cache_player)
+        {
+            get_players();
+            return true;
+        }
+        return false;
+    }
+    get_players();
+    return true;
+}
+
+bool update_entity_cache()
+{
+    if(g_players.size() > 0)
+    {
+        if(g_players.at(0)->uid != cache_player)
+        {
+            entity_cache.clear();
+            cache_player = g_players.at(0)->uid;
+            return true;
+        }
+        return false;
+    }
+    cache_player = 0;
+    return false;
+}
+
 void spawn_entities(bool s) {
     std::string search(text);
     const auto pos = search.find_first_of(" ");
@@ -506,8 +572,8 @@ bool update_entity()
     if(!visible("tool_entity_properties")) return false;
     if(g_last_id != 0)
     {
-        g_entity_type = get_entity_type(g_last_id);
-        g_entity = (struct EntityMemory*) get_entity_ptr(g_last_id);
+        g_entity_type = entity_type(g_last_id);
+        g_entity = entity_ptr(g_last_id);
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if(IsBadWritePtr(g_entity, 0x178)) g_entity = 0;
         if(g_entity != 0)
@@ -986,6 +1052,13 @@ void write_file()
     file_written = true;
 }
 
+void render_int(const char* label, int state)
+{
+    char statec[15];
+    itoa(state, statec, 10);
+    ImGui::LabelText(label, statec);
+}
+
 void render_list()
 {
     // ImGui::ListBox with filter
@@ -1313,11 +1386,11 @@ void render_clickhandler()
                 mask = 0xffffffff;
             }
             g_held_id = get_entity_at(g_x, g_y, true, 1, mask);
-            g_held_entity = (struct EntityMemory*) get_entity_ptr(g_held_id);
+            g_held_entity = entity_ptr(g_held_id);
             if (g_held_id && (float)rand() / RAND_MAX > 0.99)
             {
                 g_held_id = spawn_entity(372, g_x, g_y, true, 0, 0, false);
-                g_held_entity = (struct EntityMemory*) get_entity_ptr(g_held_id);
+                g_held_entity = entity_ptr(g_held_id);
             }
             if(!lock_entity) g_last_id = g_held_id;
         }
@@ -1481,6 +1554,7 @@ void render_debug()
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X");
     ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X");
+    render_int("Cached entities", entity_cache.size());
     ImGui::PopItemWidth();
 }
 
@@ -1498,7 +1572,7 @@ void render_uid(int uid, const char* section)
 {
     char uidc[10];
     itoa(uid, uidc, 10);
-    int ptype = get_entity_type(uid);
+    int ptype = entity_type(uid);
     if(ptype == 648 || ptype == 0) return;
     char typec[10];
     itoa(ptype, typec, 10);
@@ -1587,24 +1661,15 @@ void render_screen(const char* label, int state)
     }
 }
 
-void render_int(const char* label, int state)
-{
-    char statec[15];
-    itoa(state, statec, 10);
-    ImGui::LabelText(label, statec);
-}
-
 void render_entity_props()
 {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     ImGui::Checkbox("Lock to player one", &lock_player);
     if(lock_player)
     {
-        get_players();
-        if(g_players.size() > 0) {
+        if(!g_players.empty())
+        {
             g_last_id = g_players.at(0)->uid;
-        } else {
-            g_last_id = 0;
         }
     }
     ImGui::InputInt("Set UID", &g_last_id); ImGui::SameLine();
@@ -1819,7 +1884,7 @@ void render_timer()
 
 void render_players()
 {
-    get_players();
+    update_players();
     for(auto player : g_players)
     {
         render_uid(player->uid, "players");
@@ -2211,6 +2276,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     force_zoom();
     force_hud_flags();
     force_time();
+    update_players();
+    update_entity_cache();
 
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
