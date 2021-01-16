@@ -1648,6 +1648,7 @@ void render_screen(const char* label, int state)
     else if(state == 16) ImGui::LabelText(label, "16 Ending");
     else if(state == 17) ImGui::LabelText(label, "17 Credits");
     else if(state == 18) ImGui::LabelText(label, "18 Scores");
+    else if(state == 19) ImGui::LabelText(label, "19 Constellation");
     else if(state == 20) ImGui::LabelText(label, "20 Recap");
     else if(state == 21) ImGui::LabelText(label, "21 Arena menu");
     else if(state == 25) ImGui::LabelText(label, "25 Arena intro");
