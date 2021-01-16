@@ -22,9 +22,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Tab**: Add selected itemid to list
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
-      + **Mouse middle**: Drag entities around (not stuff like walls)
+      + **Mouse middle**: Select or drag entities around (not stuff like walls)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
-      + **Shift+Mouse middle**: Drag all entities around (even walls and background)
+      + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
       + **(Ctrl/Shift+)Mouse 4**: Zap / Boom / Big Boom / Nuke!
       + **Mouse 5**: Destroy entity (not stuff like walls)
       + **Ctrl+Mouse 5**: Clone entity
@@ -40,6 +40,10 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+.**: Zoom out
       + **Ctrl+0**: Auto fit level width to screen
       + **Ctrl+2345**: Zoom to X level width
+  - **F4**: Entity properties
+      + See and change a lot of variables of the selected entity
+  - **F5**: Game state
+      + See and change a lot of variables from the game state
   - **F9**: Options
       + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
       + **Ctrl+G**: Toggle god mode
