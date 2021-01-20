@@ -433,38 +433,30 @@ pub unsafe fn player_status() {
 
 pub unsafe fn get_entity_ptr(id: u32) -> usize {
     if id == 0 {
-        return 0
+        return 0;
     }
     let state = State::get();
     match state.items().player(0) {
-        Some(player) => {
-            for item in state.layer(player.layer()).items() {
-                if item.unique_id() == id {
-                    return item.ptr()
-                }
-            }
-        }
-        None => {}
+        Some(player) => match state.find(id) {
+            Some(p) => p.ptr(),
+            None => 0,
+        },
+        None => 0,
     }
-    0
 }
 
 unsafe fn get_entity_type(id: u32) -> i32 {
     if id == 0 {
-        return 0
+        return 0;
     }
     let state = State::get();
     match state.items().player(0) {
-        Some(player) => {
-            for item in state.layer(player.layer()).items() {
-                if item.unique_id() == id {
-                    return item._type().id
-                }
-            }
-        }
-        None => {}
+        Some(player) => match state.find(id) {
+            Some(p) => p._type().id,
+            None => 0,
+        },
+        None => 0,
     }
-    0
 }
 
 pub unsafe fn get_state_ptr() -> usize {
