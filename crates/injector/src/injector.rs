@@ -107,11 +107,29 @@ pub unsafe fn find_function(
     let library_name = to_cstr!(library);
     let function_name = to_cstr!(function);
     let library_ptr = LoadLibraryA(library_name.as_ptr());
-    mem::transmute(
-        (GetProcAddress(library_ptr, function_name.as_ptr()) as usize)
-            .wrapping_sub(library_ptr as usize)
-            .wrapping_add(find_base(proc, library).unwrap()),
-    )
+
+    if library_ptr as usize == 0 {
+        panic!(format!(
+            "Cannot find the address of the library in current process: {}",
+            library
+        ))
+    }
+
+    let addr = GetProcAddress(library_ptr, function_name.as_ptr()) as usize;
+
+    if addr == 0 {
+        panic!(format!(
+            "Cannot find the address of the function in current process: {} :: {}",
+            library, function
+        ));
+    }
+
+    mem::transmute(addr.wrapping_sub(library_ptr as usize).wrapping_add(
+        find_base(proc, library).expect(&format!(
+            "Cannot find library in the target process: {}",
+            library
+        )),
+    ))
 }
 
 pub unsafe fn inject_dll(proc: &Process, name: &str) {

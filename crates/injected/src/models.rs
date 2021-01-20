@@ -300,7 +300,7 @@ impl State {
                 6 => 43.45,
                 7 => 50.24,
                 8 => 57.03,
-                _ => 13.5
+                _ => 13.5,
             }
         }
         let mut addr_zoom = memory.after_bundle;
@@ -317,16 +317,10 @@ impl State {
     pub fn click_position(&self, x: f32, y: f32) -> (f32, f32) {
         let screen: u8 = read_u8(self.ptr() + 0x10);
         let cz: f32 = match screen {
-            11 => {
-                13.5
-            },
-            13 => {
-                13.5
-            },
-            14 => {
-                13.5
-            },
-            _ => read_f32(get_zoom())
+            11 => 13.5,
+            13 => 13.5,
+            14 => 13.5,
+            _ => read_f32(get_zoom()),
         };
         let cx = read_f32(get_camera());
         let cy = read_f32(get_camera() + 4);
