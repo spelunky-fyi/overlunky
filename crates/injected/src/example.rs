@@ -2,7 +2,7 @@
 use crate::models::{Mount, State};
 
 unsafe fn spawn_caveman_with_turkey() {
-    let state = State::new();
+    let state = State::get();
     let player = state.items().player(0).unwrap();
     let position = player.position();
     let layer = state.layer(player.layer());
@@ -15,7 +15,7 @@ unsafe fn spawn_caveman_with_turkey() {
 }
 
 unsafe fn player_status() {
-    let state = State::new();
+    let state = State::get();
     let player = state.items().player(0).unwrap();
     let status = player.status();
     log::debug!("{:?}", [status.rope(), status.bomb()]);
@@ -25,7 +25,7 @@ unsafe fn player_status() {
 }
 
 unsafe fn list_items() {
-    let state = State::new();
+    let state = State::get();
     for item in state.layer(0).items() {
         log::debug!(
             "Item: {} {:x}, position: {:?}",

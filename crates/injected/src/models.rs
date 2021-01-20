@@ -1,9 +1,9 @@
 use crate::{
     critical_section::get_main_thread,
-    db::ffi::EntityDB,
-    ui::ffi::EntityMemory,
+    db::{self, ffi::EntityDB},
     memory::*,
     search::{decode_imm, decode_pc, find_inst},
+    ui::ffi::EntityMemory,
 };
 use byteorder::*;
 use cached::proc_macro::cached;
@@ -51,6 +51,7 @@ impl API {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct State {
     location: usize,
     off_items: usize,
@@ -190,45 +191,63 @@ fn get_damage() -> usize {
 #[cached]
 fn get_insta() -> usize {
     let memory = Memory::get();
-    let exe = memory.exe();
     let mut off = memory.after_bundle;
-    off = find_inst(memory.exe(), &hex!("40 53 56 41 54 41 55 48 83 EC 58"), off + 1); // Spel2.exe+21E37920
+    off = find_inst(
+        memory.exe(),
+        &hex!("40 53 56 41 54 41 55 48 83 EC 58"),
+        off + 1,
+    ); // Spel2.exe+21E37920
     function_start(memory.at_exe(off))
 }
 
 impl State {
-    pub fn new() -> State {
-        let memory = Memory::get();
-        // Global state pointer
-        let exe = memory.exe();
-        let start = memory.after_bundle;
-        let location = memory.at_exe(decode_pc(
-            exe,
-            find_inst(
-                exe,
-                &hex!("48 8B 05"),
-                find_inst(exe, &hex!("32 01 74"), start) - 0x100,
-            ),
-        ));
-        // The offset of items field
-        let off_items = decode_imm(exe, find_inst(exe, &hex!("3C 11 41 0F 95 C0"), start) + 11);
-        let off_layers = decode_imm(
-            exe,
-            find_inst(exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
-        );
-        let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
-        write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
-        let addr_damage = get_damage();
-        let addr_insta = get_insta();
-        //log::debug!("damage: 0x{:x}, insta: 0x{:x}", addr_damage, addr_insta);
-        let addr_zoom = get_zoom();
-        State {
-            location,
-            off_items,
-            off_layers,
-            addr_damage,
-            addr_insta,
-            addr_zoom,
+    pub fn get() -> Self {
+        unsafe {
+            static mut STATE: State = State {
+                location: 0,
+                off_items: 0,
+                off_layers: 0,
+                addr_damage: 0,
+                addr_insta: 0,
+                addr_zoom: 0,
+            };
+            static INIT: std::sync::Once = std::sync::Once::new();
+            INIT.call_once(|| {
+                let memory = Memory::get();
+                // Global state pointer
+                let exe = memory.exe();
+                let start = memory.after_bundle;
+                let location = memory.at_exe(decode_pc(
+                    exe,
+                    find_inst(
+                        exe,
+                        &hex!("48 8B 05"),
+                        find_inst(exe, &hex!("32 01 74"), start) - 0x100,
+                    ),
+                ));
+                // The offset of items field
+                let off_items =
+                    decode_imm(exe, find_inst(exe, &hex!("3C 11 41 0F 95 C0"), start) + 11);
+                let off_layers = decode_imm(
+                    exe,
+                    find_inst(exe, &hex!("C6 80 58 44 06 00 01 "), start) - 7,
+                );
+                let off_send = find_inst(exe, &hex!("45 8D 41 50"), start) + 12;
+                write_mem_prot(memory.at_exe(off_send), &hex!("31 C0 31 D2 90 90"), true);
+                let addr_damage = get_damage();
+                let addr_insta = get_insta();
+                //log::debug!("damage: 0x{:x}, insta: 0x{:x}", addr_damage, addr_insta);
+                let addr_zoom = get_zoom();
+                STATE = State {
+                    location,
+                    off_items,
+                    off_layers,
+                    addr_damage,
+                    addr_insta,
+                    addr_zoom,
+                }
+            });
+            STATE
         }
     }
 
@@ -327,6 +346,15 @@ impl State {
     pub fn set_pause(&self, p: u8) {
         write_mem(self.ptr() + 0x32, &p.to_le_bytes());
     }
+
+    pub unsafe fn find(&self, id: u32) -> Option<Entity> {
+        // Find item by unique id
+        // TODO: rename as State::find
+        match db::ffi::state_find_item(self.ptr(), id) {
+            0 => None,
+            p => Some(Entity { pointer: p }),
+        }
+    }
 }
 
 pub struct Layer {
@@ -347,7 +375,7 @@ impl Layer {
             log::debug!("Spawned {:x?}", addr);
             Entity { pointer: addr }
         } else {
-            let state = State::new();
+            let state = State::get();
             let (mut rx, mut ry) = state.click_position(x, y);
             if snap && vx.abs() + vy.abs() <= 0.04 {
                 rx = rx.round();
@@ -487,7 +515,7 @@ impl Entity {
             //log::debug!("Teleporting to screen {}, {}", x, y);
             let px = topmost.pointer + 0x40;
             let py = topmost.pointer + 0x44;
-            let state = State::new();
+            let state = State::get();
             let (mut x, mut y) = state.click_position(dx, dy);
             if snap && vx.abs() + vy.abs() <= 0.04 {
                 x = x.round();
