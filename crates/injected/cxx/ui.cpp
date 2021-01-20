@@ -109,10 +109,10 @@ std::map<std::string, int> keys{
     //{ "", 0x },
 };
 
-std::vector<float> randomRGB()
+std::vector<int, float> randomRGB()
 {
-    std::vector<float> rgb;
-    rgb[0] = rand() % 255;
+    std::vector<float> rgb (3);
+    rgb[0] = rand() % 255; 
     rgb[1] = rand() % 255;
     rgb[2] = rand() % 255;
     return rgb;
@@ -198,7 +198,8 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_min = 0, u64_max
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-std::vector<float> guiRGB = randomRGB();
+std::vector<int, float> guiRGB (3);
+guiRGB = randomRGB();
 
 
 ImVec4 hue_shift(ImVec4 in, float hue)
