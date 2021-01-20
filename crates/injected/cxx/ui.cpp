@@ -113,7 +113,7 @@ std::map<std::string, int> keys{
 
 std::vector<float> randomRGB()
 {
-    std::vector<float> rgb{0, 0, 0};
+    std::vector<float> rgb;
     rgb.push_back(rand() % 255);
     rgb.push_back(rand() % 255);
     rgb.push_back(rand() % 255);
@@ -262,7 +262,7 @@ void load_gui_color(std::string file)
             if (line[0] != '#')
             {
                 int red, green, blue;
-                if (sscanf(line.c_str(), "GuiBG = %i, %i, %i", red, green, blue))
+                if (sscanf(line.c_str(), "GuiBG = %i, %i, %i", &red, &green, &blue))
                 {
 
                     guiRGB[0] = red;
