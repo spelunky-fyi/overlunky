@@ -110,15 +110,23 @@ std::map<std::string, int> keys{
     {"mouse_destroy_unsafe", 0x605},
     //{ "", 0x },
 };
-
-std::array<float,3> randomRGB()
+std::map<std::string,bool> options = 
 {
-    std::array<float,3> rgb;
+    {"click_events", false},
+    {"god", false},
+    {"snap_to_grid", false},
+    {"hide_gui", false}
+};
+/*
+std::array<float, 3> randomRGB()
+{
+    std::array<float, 3> rgb;
     rgb[0] = rand() % 255;
     rgb[1] = rand() % 255;
     rgb[2] = rand() % 255;
     return rgb;
 }
+*/
 
 std::map<std::string, std::string> windows;
 
@@ -165,7 +173,7 @@ std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<EntityMemory *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_spawn = false, click_teleport = false, hidegui = false, clickevents = false, file_written = false, god = false, hidedebug = true, snap_to_grid = false, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false;
 EntityMemory *g_entity = 0;
 EntityMemory *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -201,11 +209,41 @@ const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a 
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
 // std::array<float,3> guiRGB;
-void save_options() {
-
+void save_options(std::string file)
+{
+    std::ofstream writeData (file, std::ofstream::app);
+    writeData << "# Default Values for Options\n"
+    << "# These need to be either 'true' or 'false'.\n"
+    << "All of these options are false by default.\n";
+    for (const auto &kv : options)
+    {
+        writeData << kv.first << " = " << kv.second << std::endl;
+    }
 }
-void load_options() {
-    
+void load_options(std::string file)
+{
+    std::ifstream data(file);
+    if (!data.fail())
+    {
+        std::string line;
+        char option [32];
+        std::string val;
+        while (getline(data, line))
+        {
+            if (std::sscanf(line.c_str(),"%s = %s",&option,&val)) 
+            {
+                if (val == "true") 
+                {
+                    options[option] = true;
+                } 
+                else
+                {
+                    options[option] = false;
+                }
+            }
+        }
+    }
+    save_options(file);
 }
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
@@ -246,7 +284,7 @@ void set_colors()
     style.PopupBorderSize = 0;
 }
 
-void save_gui_color(std::string file)
+/* void save_gui_color(std::string file)
 {
     std::ofstream writeData(file, std::ofstream::app);
     writeData << "# Miscellaneous settings" << std::endl
@@ -255,6 +293,7 @@ void save_gui_color(std::string file)
               << "GuiBG = " << guiRGB[0] << ", " << guiRGB[1] << ", " << guiRGB[2] << std::endl;
     writeData.close();
 }
+
 void load_gui_color(std::string file)
 {
     std::ifstream data(file);
@@ -286,7 +325,7 @@ void load_gui_color(std::string file)
                     ImVec4 *colors = ImGui::GetStyle().Colors;
                     for (int i = 0; i < ImGuiCol_COUNT; i++)
                     {
-                        colors[i] = hue_shift(ImVec4(red / 255, green / 255, blue / 255, 1.0f),0);
+                        colors[i] = hue_shift(ImVec4(red / 255, green / 255, blue / 255, 1.0f), 0);
                     }
                 }
             }
@@ -295,7 +334,7 @@ void load_gui_color(std::string file)
     }
     // save_gui_color(file);
 }
-
+*/
 bool process_keys(
     _In_ int nCode,
     _In_ WPARAM wParam,
@@ -600,7 +639,7 @@ void spawn_entities(bool s)
     {
         if (g_current_item == 0 && g_filtered_count == g_items.size())
             return;
-        int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
+        int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
         if (!lock_entity)
             g_last_id = spawned;
     }
@@ -613,7 +652,7 @@ void spawn_entities(bool s)
         int spawned;
         while (textss >> id)
         {
-            spawned = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, snap_to_grid);
+            spawned = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
         }
         if (!lock_entity)
             g_last_id = spawned;
@@ -848,7 +887,7 @@ bool process_keys(
 
     if (pressed("hide_ui", wParam))
     {
-        hidegui = !hidegui;
+        options["hide_gui"] = !options["hide_gui"];
     }
     else if (pressed("tool_entity", wParam))
     {
@@ -920,16 +959,16 @@ bool process_keys(
     }
     else if (pressed("toggle_godmode", wParam))
     {
-        god = !god;
-        godmode(god);
+        options["god"] = !options["god"];
+        godmode(options["god"]);
     }
     else if (pressed("toggle_mouse", wParam))
     {
-        clickevents = !clickevents;
+        options["click_events"] = !options["click_events"];
     }
     else if (pressed("toggle_snap", wParam))
     {
-        snap_to_grid = !snap_to_grid;
+        options["snap_to_grid"] = !options["snap_to_grid"];
     }
     else if (pressed("toggle_pause", wParam))
     {
@@ -950,19 +989,19 @@ bool process_keys(
     }
     else if (pressed("teleport_left", wParam))
     {
-        teleport(-3, 0, false, 0, 0, snap_to_grid);
+        teleport(-3, 0, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("teleport_right", wParam))
     {
-        teleport(3, 0, false, 0, 0, snap_to_grid);
+        teleport(3, 0, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("teleport_up", wParam))
     {
-        teleport(0, 3, false, 0, 0, snap_to_grid);
+        teleport(0, 3, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("teleport_down", wParam))
     {
-        teleport(0, -3, false, 0, 0, snap_to_grid);
+        teleport(0, -3, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -970,7 +1009,7 @@ bool process_keys(
     }
     else if (pressed("teleport", wParam))
     {
-        teleport(g_x, g_y, false, 0, 0, snap_to_grid);
+        teleport(g_x, g_y, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("coordinate_left", wParam))
     {
@@ -1455,7 +1494,7 @@ void set_vel(ImVec2 pos)
 
 void render_clickhandler()
 {
-    if (clickevents)
+    if (options["click_events"])
     {
         ImGuiIO &io = ImGui::GetIO();
         ImGui::SetNextWindowSize(io.DisplaySize);
@@ -1505,7 +1544,7 @@ void render_clickhandler()
         {
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            teleport(g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1514,7 +1553,7 @@ void render_clickhandler()
         else if (released("mouse_teleport") && ImGui::IsWindowFocused())
         {
             set_pos(startpos);
-            teleport(g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            teleport(g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1569,7 +1608,7 @@ void render_clickhandler()
             g_held_entity->flags &= ~(1 << 4);
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1581,9 +1620,9 @@ void render_clickhandler()
             throw_held = false;
             io.MouseDrawCursor = true;
             g_held_entity->flags &= ~(1 << 4);
-            if (snap_to_grid)
+            if (options["snap_to_grid"])
             {
-                move_entity(g_held_id, g_x, g_y, true, 0, 0, snap_to_grid);
+                move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             }
             g_x = 0;
             g_y = 0;
@@ -1594,7 +1633,7 @@ void render_clickhandler()
         else if (released("mouse_clone"))
         {
             set_pos(ImGui::GetMousePos());
-            spawn_entity(426, g_x, g_y, true, 0, 0, snap_to_grid);
+            spawn_entity(426, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1605,7 +1644,7 @@ void render_clickhandler()
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
             set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y + 200));
-            spawn_entity(380, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(380, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1615,7 +1654,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(687, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(687, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1625,7 +1664,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(630, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(630, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1635,7 +1674,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1645,15 +1684,15 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x - 0.2, g_y, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x + 0.2, g_y, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x, g_y - 0.3, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x, g_y + 0.3, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x + 0.15, g_y + 0.2, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x - 0.15, g_y + 0.2, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x + 0.15, g_y - 0.2, true, g_vx, g_vy, snap_to_grid);
-            spawn_entity(631, g_x - 0.15, g_y - 0.2, true, g_vx, g_vy, snap_to_grid);
+            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"] );
+            spawn_entity(631, g_x - 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(631, g_x + 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(631, g_x, g_y - 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(631, g_x, g_y + 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(631, g_x + 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(631, g_x - 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(631, g_x + 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(631, g_x - 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -1698,12 +1737,12 @@ void render_clickhandler()
 
 void render_options()
 {
-    ImGui::Checkbox("Mouse controls##clickevents", &clickevents);
-    if (ImGui::Checkbox("God Mode##Godmode", &god))
+    ImGui::Checkbox("Mouse controls##clickevents", &options["click_events"]);
+    if (ImGui::Checkbox("God Mode##Godmode", &options["god"]))
     {
-        godmode(god);
+        godmode(options["god"]);
     }
-    ImGui::Checkbox("Snap to grid##Snap", &snap_to_grid);
+    ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
     if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
     {
         if (paused)
@@ -2370,7 +2409,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     float lastwidth = 0;
     float lastheight = 0;
     float toolwidth = 0.128 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
-    if (!hidegui)
+    if (!options["hide_gui"])
     {
         if (reset_windows_vertical)
         {
