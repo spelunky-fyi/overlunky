@@ -18,7 +18,7 @@
 #include <codecvt>
 #include <map>
 #include <iomanip>
-#include <vector>
+#include <array>
 
 const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
@@ -111,12 +111,12 @@ std::map<std::string, int> keys{
     //{ "", 0x },
 };
 
-std::vector<float> randomRGB()
+std::array<float,3> randomRGB()
 {
-    std::vector<float> rgb;
-    rgb.push_back(rand() % 255);
-    rgb.push_back(rand() % 255);
-    rgb.push_back(rand() % 255);
+    std::array<float,3> rgb;
+    rgb[0] = rand() % 255;
+    rgb[1] = rand() % 255;
+    rgb[2] = rand() % 255;
     return rgb;
 }
 
@@ -200,9 +200,7 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_min = 0, u64_max
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-std::vector<float> guiRGB;
-guiRGB = randomRGB();
-
+std::array<float,3> guiRGB;
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
     float U = cos(hue * 3.14159265 / 180);
@@ -282,14 +280,14 @@ void load_gui_color(std::string file)
                     ImVec4 *colors = ImGui::GetStyle().Colors;
                     for (int i = 0; i < ImGuiCol_COUNT; i++)
                     {
-                        colors[i] = ImVec4(red / 255, green / 255, blue / 255, 1.0f);
+                        colors[i] = hue_shift(ImVec4(red / 255, green / 255, blue / 255, 1.0f),0);
                     }
                 }
             }
         }
         data.close();
     }
-    save_gui_color(file);
+    // save_gui_color(file);
 }
 
 bool process_keys(
@@ -1068,13 +1066,13 @@ bool process_keys(
     {
         ImGui::SaveIniSettingsToDisk(inifile);
         save_hotkeys(cfgfile);
-        save_gui_color(cfgfile);
+        // save_gui_color(cfgfile);
     }
     else if (pressed("load_settings", wParam))
     {
         ImGui::LoadIniSettingsFromDisk(inifile);
         load_hotkeys(cfgfile);
-        load_gui_color(cfgfile);
+        // load_gui_color(cfgfile);
     }
     else if (pressed("tool_metrics", wParam))
     {
@@ -2334,7 +2332,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         {
             font = io.Fonts->AddFontDefault();
         }
-        load_gui_color(cfgfile);
+        // load_gui_color(cfgfile);
         load_hotkeys(cfgfile);
         windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
         windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
@@ -2609,7 +2607,7 @@ bool init_hooks(size_t _ptr)
     {
         THROW("DirectX 11 is not initialized yet.");
     }
-
+    // guiRGB = randomRGB();
     oPresent = ptr;
     ptr = hkPresent;
     return true;
