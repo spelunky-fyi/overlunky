@@ -200,7 +200,13 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_min = 0, u64_max
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-std::array<float,3> guiRGB;
+// std::array<float,3> guiRGB;
+void save_options() {
+
+}
+void load_options() {
+    
+}
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
     float U = cos(hue * 3.14159265 / 180);
