@@ -110,13 +110,7 @@ std::map<std::string, int> keys{
     {"mouse_destroy_unsafe", 0x605},
     //{ "", 0x },
 };
-std::map<std::string,bool> options = 
-{
-    {"click_events", false},
-    {"god", false},
-    {"snap_to_grid", false},
-    {"hide_gui", false}
-};
+
 /*
 std::array<float, 3> randomRGB()
 {
@@ -208,17 +202,34 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_min = 0, u64_max
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
+std::map<std::string, bool> options =
+    {
+        {"click_events", false},
+        {"god", false},
+        {"snap_to_grid", false},
+        {"hide_gui", false}
+    };
+
 // std::array<float,3> guiRGB;
 void save_options(std::string file)
 {
-    std::ofstream writeData (file, std::ofstream::app);
+    std::ofstream writeData(file, std::ofstream::app);
     writeData << "# Default Values for Options\n"
-    << "# These need to be either 'true' or 'false'.\n"
-    << "All of these options are false by default.\n";
+              << "# These need to be either 't' (true) or 'f' (false).\n"
+              << "# All of these options are 'f' by default.\n";
+    bool option_enabled = false;
     for (const auto &kv : options)
     {
-        writeData << kv.first << " = " << kv.second << std::endl;
+        if (kv.second)
+        {
+            writeData << kv.first << " = t" << std::endl;
+        }
+        else
+        {
+            writeData << kv.first << " = f" << std::endl;
+        }
     }
+    writeData.close();
 }
 void load_options(std::string file)
 {
@@ -226,22 +237,30 @@ void load_options(std::string file)
     if (!data.fail())
     {
         std::string line;
-        char option [32];
-        std::string val;
+        char option[32];
+        char val;
         while (getline(data, line))
         {
-            if (std::sscanf(line.c_str(),"%s = %s",&option,&val)) 
+            if (line[0] != '#')
             {
-                if (val == "true") 
+                if (std::sscanf(line.c_str(), "%s = %c", &option, &val))
                 {
-                    options[option] = true;
-                } 
-                else
-                {
-                    options[option] = false;
+                    std::string optionname (option);
+                    if (options.find(optionname) != options.end()) 
+                    {
+                        if (val == 't')
+                        {
+                            options[optionname] = true;
+                        }
+                        else
+                        {
+                            options[optionname] = false;
+                        }
+                    }
                 }
             }
         }
+        data.close();
     }
     save_options(file);
 }
@@ -435,7 +454,7 @@ void load_hotkeys(std::string file)
         int inival;
         while (std::getline(data, line))
         {
-            if ((line[0] != '#') && !(line.find("GuiColor")))
+            if (line[0] != '#')
             {
                 if (sscanf(line.c_str(), "%s = %i", inikey, &inival))
                 {
@@ -1111,12 +1130,14 @@ bool process_keys(
     {
         ImGui::SaveIniSettingsToDisk(inifile);
         save_hotkeys(cfgfile);
+        save_options(cfgfile);
         // save_gui_color(cfgfile);
     }
     else if (pressed("load_settings", wParam))
     {
         ImGui::LoadIniSettingsFromDisk(inifile);
         load_hotkeys(cfgfile);
+        load_options(cfgfile);
         // load_gui_color(cfgfile);
     }
     else if (pressed("tool_metrics", wParam))
@@ -1684,7 +1705,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"] );
+            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             spawn_entity(631, g_x - 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             spawn_entity(631, g_x + 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             spawn_entity(631, g_x, g_y - 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
@@ -2379,6 +2400,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         }
         // load_gui_color(cfgfile);
         load_hotkeys(cfgfile);
+        load_options(cfgfile);
         windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
         windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
         windows["tool_camera"] = "Camera (" + key_string(keys["tool_camera"]) + ")";
