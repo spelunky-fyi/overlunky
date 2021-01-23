@@ -208,14 +208,8 @@ void save_options(std::string file)
               << "[options]\n";
     for (const auto &kv : options)
     {
-        if (kv.second)
-        {
-            writeData << kv.first << " = true" << std::endl;
-        }
-        else
-        {
-            writeData << kv.first << " = false" << std::endl;
-        }
+
+            writeData << kv.first << " = " << kv.second << std::endl;
     }
     writeData.close();
 }
