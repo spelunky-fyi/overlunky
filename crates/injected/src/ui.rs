@@ -207,7 +207,7 @@ pub unsafe fn create_box(items: &Vec<EntityItem>) {
 
 // TODO: expose this to RPC
 pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) -> u32 {
-    let state = State::new();
+    let state = State::get();
 
     match state.items().player(0) {
         Some(player) => {
@@ -227,7 +227,7 @@ pub unsafe fn spawn_entity(id: usize, x: f32, y: f32, s: bool, vx: f32, vy: f32,
 }
 
 pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
-    let state = State::new();
+    let state = State::get();
 
     match state.items().player(0) {
         Some(player) => {
@@ -248,7 +248,7 @@ pub unsafe fn spawn_door(x: f32, y: f32, l: u8, w: u8, f: u8, t: u8) {
 }
 
 pub unsafe fn spawn_backdoor(x: f32, y: f32) {
-    let state = State::new();
+    let state = State::get();
 
     match state.items().player(0) {
         Some(player) => {
@@ -278,7 +278,7 @@ pub unsafe fn spawn_backdoor(x: f32, y: f32) {
 }
 
 pub unsafe fn teleport(x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) {
-    let state = State::new();
+    let state = State::get();
 
     match state.items().player(0) {
         Some(player) => {
@@ -290,15 +290,15 @@ pub unsafe fn teleport(x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) {
 }
 
 pub unsafe fn godmode(g: bool) {
-    State::new().godmode(g);
+    State::get().godmode(g);
 }
 
 pub unsafe fn zoom(level: f32) {
-    State::new().zoom(level);
+    State::get().zoom(level);
 }
 
 pub unsafe fn list_items() {
-    let state = State::new();
+    let state = State::get();
     match state.items().player(0) {
         Some(player) => {
             for item in state.layer(player.layer()).items() {
@@ -315,10 +315,11 @@ pub unsafe fn list_items() {
 }
 
 pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) -> u32 {
-    let state = State::new();
+    let state = State::get();
     if s {
         let (rx, ry) = state.click_position(x, y);
-        x = rx; y = ry;
+        x = rx;
+        y = ry;
     }
     log::debug!("Items at {:?}:", (x, y));
     match state.items().player(0) {
@@ -327,7 +328,7 @@ pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) 
             for item in state.layer(player.layer()).items() {
                 let (ix, iy) = item.position();
                 let flags = item._type().search_flags;
-                let distance = ((x-ix).powi(2) + (y-iy).powi(2)).sqrt();
+                let distance = ((x - ix).powi(2) + (y - iy).powi(2)).sqrt();
                 if mask & flags > 0 && distance < r {
                     log::debug!(
                         "Item: {}, type: {:x}, position: {:?}, distance: {}, {:x?}",
@@ -345,16 +346,16 @@ pub unsafe fn get_entity_at(mut x: f32, mut y: f32, s: bool, r: f32, mask: u32) 
                 let picked = found.first().unwrap();
                 let entity = picked.2;
                 log::debug!("{:#x?}", entity);
-                return picked.0
+                return picked.0;
             }
             0
         }
-        None => 0
+        None => 0,
     }
 }
 
 pub unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32, snap: bool) {
-    let state = State::new();
+    let state = State::get();
     match state.items().player(0) {
         Some(player) => {
             for item in state.layer(player.layer()).items() {
@@ -369,14 +370,14 @@ pub unsafe fn move_entity(id: u32, x: f32, y: f32, s: bool, vx: f32, vy: f32, sn
 
 pub unsafe fn get_entity_flags(id: u32) -> u32 {
     if id == 0 {
-        return 0
+        return 0;
     }
-    let state = State::new();
+    let state = State::get();
     match state.items().player(0) {
         Some(player) => {
             for item in state.layer(player.layer()).items() {
                 if item.unique_id() == id {
-                    return item.flags()
+                    return item.flags();
                 }
             }
         }
@@ -387,9 +388,9 @@ pub unsafe fn get_entity_flags(id: u32) -> u32 {
 
 pub unsafe fn set_entity_flags(id: u32, flags: u32) {
     if id == 0 {
-        return
+        return;
     }
-    let state = State::new();
+    let state = State::get();
     match state.items().player(0) {
         Some(player) => {
             for item in state.layer(player.layer()).items() {
@@ -403,22 +404,22 @@ pub unsafe fn set_entity_flags(id: u32, flags: u32) {
 }
 
 pub unsafe fn get_hud_flags() -> u8 {
-    let state = State::new();
+    let state = State::get();
     state.flags()
 }
 
 pub unsafe fn set_hud_flags(flags: u8) {
-    let state = State::new();
+    let state = State::get();
     state.set_flags(flags);
 }
 
 pub unsafe fn set_pause(pause: u8) {
-    let state = State::new();
+    let state = State::get();
     state.set_pause(pause);
 }
 
 pub unsafe fn player_status() {
-    let state = State::new();
+    let state = State::get();
     match state.items().player(0) {
         Some(player) => {
             let status = player.status();
@@ -432,47 +433,39 @@ pub unsafe fn player_status() {
 
 pub unsafe fn get_entity_ptr(id: u32) -> usize {
     if id == 0 {
-        return 0
+        return 0;
     }
-    let state = State::new();
+    let state = State::get();
     match state.items().player(0) {
-        Some(player) => {
-            for item in state.layer(player.layer()).items() {
-                if item.unique_id() == id {
-                    return item.ptr()
-                }
-            }
-        }
-        None => {}
+        Some(player) => match state.find(id) {
+            Some(p) => p.ptr(),
+            None => 0,
+        },
+        None => 0,
     }
-    0
 }
 
 unsafe fn get_entity_type(id: u32) -> i32 {
     if id == 0 {
-        return 0
+        return 0;
     }
-    let state = State::new();
+    let state = State::get();
     match state.items().player(0) {
-        Some(player) => {
-            for item in state.layer(player.layer()).items() {
-                if item.unique_id() == id {
-                    return item._type().id
-                }
-            }
-        }
-        None => {}
+        Some(player) => match state.find(id) {
+            Some(p) => p._type().id,
+            None => 0,
+        },
+        None => 0,
     }
-    0
 }
 
 pub unsafe fn get_state_ptr() -> usize {
-    let state = State::new();
+    let state = State::get();
     state.ptr()
 }
 
 pub unsafe fn get_players() {
-    let state = State::new();
+    let state = State::get();
     let mut found = Vec::new();
     for i in 0..4 {
         match state.items().player(i) {

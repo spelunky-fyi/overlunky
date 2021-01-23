@@ -93,7 +93,7 @@ unsafe extern "C" fn run(pid: u32) {
     }
     log::debug!("Game injected! Press Ctrl+C to detach this window from the process.");
     let memory = Memory::get();
-    let state = State::new();
+    let state = State::get();
     loop {
         let entities = list_entities();
         if entities.len() >= 850 {
