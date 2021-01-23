@@ -1,4 +1,5 @@
 #define NOMINMAX
+#include "inih/cpp/INIReader.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "imgui/examples/imgui_impl_win32.h"
@@ -111,17 +112,6 @@ std::map<std::string, int> keys{
     //{ "", 0x },
 };
 
-/*
-std::array<float, 3> randomRGB()
-{
-    std::array<float, 3> rgb;
-    rgb[0] = rand() % 255;
-    rgb[1] = rand() % 255;
-    rgb[2] = rand() % 255;
-    return rgb;
-}
-*/
-
 std::map<std::string, std::string> windows;
 
 IDXGISwapChain *pSwapChain;
@@ -207,60 +197,37 @@ std::map<std::string, bool> options =
         {"click_events", false},
         {"god", false},
         {"snap_to_grid", false},
-        {"hide_gui", false}
-    };
+        {"hide_gui", false}};
 
-// std::array<float,3> guiRGB;
 void save_options(std::string file)
 {
     std::ofstream writeData(file, std::ofstream::app);
     writeData << "# Default Values for Options\n"
-              << "# These need to be either 't' (true) or 'f' (false).\n"
-              << "# All of these options are 'f' by default.\n";
-    bool option_enabled = false;
+              << "# These need to be either true or false.\n"
+              << "# All of these options are false by default.\n"
+              << "[options]\n";
     for (const auto &kv : options)
     {
         if (kv.second)
         {
-            writeData << kv.first << " = t" << std::endl;
+            writeData << kv.first << " = true" << std::endl;
         }
         else
         {
-            writeData << kv.first << " = f" << std::endl;
+            writeData << kv.first << " = false" << std::endl;
         }
     }
     writeData.close();
 }
 void load_options(std::string file)
 {
-    std::ifstream data(file);
-    if (!data.fail())
+    INIReader reader (file);
+    if (reader.ParseError() == 0)
     {
-        std::string line;
-        char option[32];
-        char val;
-        while (getline(data, line))
+        for (const auto &kv : options)
         {
-            if (line[0] != '#')
-            {
-                if (std::sscanf(line.c_str(), "%s = %c", &option, &val))
-                {
-                    std::string optionname (option);
-                    if (options.find(optionname) != options.end()) 
-                    {
-                        if (val == 't')
-                        {
-                            options[optionname] = true;
-                        }
-                        else
-                        {
-                            options[optionname] = false;
-                        }
-                    }
-                }
-            }
+            options[kv.first] = reader.GetBoolean("options",kv.first,false);    
         }
-        data.close();
     }
     save_options(file);
 }
@@ -303,57 +270,6 @@ void set_colors()
     style.PopupBorderSize = 0;
 }
 
-/* void save_gui_color(std::string file)
-{
-    std::ofstream writeData(file, std::ofstream::app);
-    writeData << "# Miscellaneous settings" << std::endl
-              << std::endl
-              << "# Enter 3 values below, in standard RGB format." << std::endl
-              << "GuiBG = " << guiRGB[0] << ", " << guiRGB[1] << ", " << guiRGB[2] << std::endl;
-    writeData.close();
-}
-
-void load_gui_color(std::string file)
-{
-    std::ifstream data(file);
-    if (!data.fail())
-    {
-        std::string line;
-        while (std::getline(data, line))
-        {
-            if (line[0] != '#')
-            {
-                int red, green, blue;
-                if (sscanf(line.c_str(), "GuiBG = %i, %i, %i", &red, &green, &blue))
-                {
-
-                    guiRGB[0] = red;
-                    guiRGB[1] = green;
-                    guiRGB[2] = blue;
-                    for (int i = 0; i < 2; i++)
-                    {
-                        if (guiRGB[i] < 0)
-                        {
-                            guiRGB[i] = 0;
-                        }
-                        else if (guiRGB[i] > 255)
-                        {
-                            guiRGB[i] = 255;
-                        }
-                    }
-                    ImVec4 *colors = ImGui::GetStyle().Colors;
-                    for (int i = 0; i < ImGuiCol_COUNT; i++)
-                    {
-                        colors[i] = hue_shift(ImVec4(red / 255, green / 255, blue / 255, 1.0f), 0);
-                    }
-                }
-            }
-        }
-        data.close();
-    }
-    // save_gui_color(file);
-}
-*/
 bool process_keys(
     _In_ int nCode,
     _In_ WPARAM wParam,
@@ -436,7 +352,8 @@ void save_hotkeys(std::string file)
               << "# Set to 0x0 to disable key" << std::endl
               << "# Example: G is 0x47, so Ctrl+G is 0x147, 0x402 is Mouse2 etc" << std::endl
               << "# Get more hex keycodes from https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes" << std::endl
-              << "# If you mess this file up, you can just delete it and run overlunky to get the defaults back" << std::endl;
+              << "# If you mess this file up, you can just delete it and run overlunky to get the defaults back" << std::endl
+              << "[hotkeys]" << std::endl;
     for (const auto &kv : keys)
     {
         writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# " << key_string(keys[kv.first]) << std::endl;
@@ -446,27 +363,13 @@ void save_hotkeys(std::string file)
 
 void load_hotkeys(std::string file)
 {
-    std::ifstream data(file);
-    if (!data.fail())
+    INIReader reader (file);
+    if (reader.ParseError() == 0)
     {
-        std::string line;
-        char inikey[32];
-        int inival;
-        while (std::getline(data, line))
+        for (const auto &kv : keys)
         {
-            if (line[0] != '#')
-            {
-                if (sscanf(line.c_str(), "%s = %i", inikey, &inival))
-                {
-                    std::string keyname(inikey);
-                    if (keys.find(keyname) != keys.end())
-                    {
-                        keys[keyname] = inival;
-                    }
-                }
-            }
+            keys[kv.first] = reader.GetInteger("hotkeys",kv.first,kv.second);    
         }
-        data.close();
     }
     save_hotkeys(file);
 }
@@ -2674,7 +2577,6 @@ bool init_hooks(size_t _ptr)
     {
         THROW("DirectX 11 is not initialized yet.");
     }
-    // guiRGB = randomRGB();
     oPresent = ptr;
     ptr = hkPresent;
     return true;
