@@ -524,15 +524,6 @@ EntityMemory *entity_ptr(int uid)
 
 bool update_players()
 {
-    if (g_players.size() > 0)
-    {
-        if (g_players.at(0)->uid != cache_player)
-        {
-            get_players();
-            return true;
-        }
-        return false;
-    }
     get_players();
     return true;
 }
