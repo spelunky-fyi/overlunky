@@ -12,10 +12,10 @@ You are strongly discouraged from using any modding tools in your actual online 
 ## Installation and usage
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
-Check the generated `Spelunky 2/hotkeys.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
+Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
 
 ## Features
-Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `hotkeys.ini` for cool beans.
+Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans.
   - **Enter**: Run active tool
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
@@ -44,11 +44,11 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + See and change a lot of variables of the selected entity
   - **F5**: Game state
       + See and change a lot of variables from the game state
+      + **Ctrl+P**: Toggle game engine pause
   - **F9**: Options
       + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
       + **Ctrl+G**: Toggle god mode
       + **Ctrl+S**: Toggle snap to grid
-      + **Ctrl+P**: Toggle game engine pause
       + **Ctrl+Shift+P**: Toggle pausing allowed (disables focus loss pause)
       + **Ctrl+K**: Toggle disabling game keyboard input when typing
       + **Ctrl+Shift+R**: Toggle stacking of windows horizontally
@@ -72,7 +72,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - If you're missing some overlay windows:
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
   - If you mess up your keyboard shortcuts:
-    + Delete `Spelunky 2/hotkeys.ini` to reset shortcut keys.
+    + Delete `Spelunky 2/overlunky.ini` to reset shortcut keys.
   - If keyboard input no longer works in game after using the tools:
     + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing` option enabled, it doesn't work in fullscreen.
     + Restart the game after changing graphics modes.

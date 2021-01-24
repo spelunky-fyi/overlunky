@@ -1,3 +1,7 @@
 [submodule "crates/injected/imgui"]
 	path = crates/injected/imgui
 	url = https://github.com/ocornut/imgui
+	
+[submodule "crates/injected/toml11"]
+	path = crates/injected/toml11
+	url = https://github.com/ToruNiina/toml11
