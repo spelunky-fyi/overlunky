@@ -46,7 +46,8 @@ void HID_UnregisterDevice(USHORT usage)
     RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
 }
 
-std::map<std::string, int> keys{
+std::map<std::string, int> keys
+{
     {"enter", 0x0d},
     {"escape", 0x1b},
     {"move_left", 0x25},
@@ -60,7 +61,7 @@ std::map<std::string, int> keys{
     {"toggle_snap", 0x153},
     {"toggle_pause", 0x150},
     {"toggle_disable_input", 0x14b},
-    {"toggle_allow_pause", 0x350},
+    {"toggle_disable_pause", 0x350},
     {"tool_entity", 0x70},
     {"tool_door", 0x71},
     {"tool_camera", 0x72},
@@ -157,7 +158,7 @@ std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<EntityMemory *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false;
 EntityMemory *g_entity = 0;
 EntityMemory *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -193,11 +194,16 @@ const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a 
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
 std::map<std::string, bool> options =
-    {
-        {"click_events", false},
-        {"god", false},
-        {"snap_to_grid", false},
-    };
+{
+    {"mouse_control", false},
+    {"god_mode", false},
+    {"snap_to_grid", false},
+    {"stack_horizontally", false},
+    {"stack_vertically", false},
+    {"disable_pause", false},
+    {"disable_input", true},
+};
+
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
     float U = cos(hue * 3.14159265 / 180);
@@ -206,7 +212,7 @@ ImVec4 hue_shift(ImVec4 in, float hue)
         (.299 + .701 * U + .168 * W) * in.x + (.587 - .587 * U + .330 * W) * in.y + (.114 - .114 * U - .497 * W) * in.z,
         (.299 - .299 * U - .328 * W) * in.x + (.587 + .413 * U + .035 * W) * in.y + (.114 - .114 * U + .292 * W) * in.z,
         (.299 - .3 * U + 1.25 * W) * in.x + (.587 - .588 * U - 1.05 * W) * in.y + (.114 + .886 * U - .203 * W) * in.z,
-        ((float)rand() / RAND_MAX) * 0.5 + 0.5);
+        in.w); //((float)rand() / RAND_MAX) * 0.5 + 0.5);
     return out;
 }
 void set_colors()
@@ -220,7 +226,6 @@ void set_colors()
         colors[i] = new_color;
     }
     ImGuiStyle &style = ImGui::GetStyle();
-    style.Alpha = ((float)rand() / RAND_MAX) * 0.4 + 0.5;
     style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     style.Colors[ImGuiCol_TitleBg] = style.Colors[ImGuiCol_WindowBg];
     style.Colors[ImGuiCol_ScrollbarBg] = style.Colors[ImGuiCol_WindowBg];
@@ -327,13 +332,15 @@ void save_config(std::string file)
         writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# " << key_string(keys[kv.first]) << std::endl;
     }
 
-    writeData << "\n[options]\n";
+    writeData << "\n[options] # 0 or 1 unless stated otherwise (default state of options)\n";
     for (const auto &kv : options)
     {
         writeData << kv.first << " = " << std::dec << kv.second << std::endl;
     }
 
-    writeData << "hue = " << (int)g_hue << std::endl;
+    writeData << "hue = " << (int)g_hue << " # integer, 0 - 360 (hue shift from the default blue)" << std::endl;
+    ImGuiStyle &style = ImGui::GetStyle();
+    writeData << "alpha = " << std::setprecision(3) << style.Alpha << " # float, 0.0 - 1.0 (global alpha of all tools)" << std::endl;
     writeData.close();
 }
 
@@ -374,11 +381,14 @@ void load_config(std::string file)
     }
     for (const auto &kv : options) 
     {
-        options[kv.first] = (bool)toml::find_or<int>(opts, kv.first, 0);
+        options[kv.first] = (bool)toml::find_or<int>(opts, kv.first, (int)kv.second);
     }
     g_hue = (float)toml::find_or<int>(opts, "hue", 0);
-    save_config(file);
+    ImGuiStyle &style = ImGui::GetStyle();
+    style.Alpha = (float)toml::find_or<float>(opts, "alpha", 0.75);
     set_colors();
+    godmode(options["god_mode"]);
+    save_config(file);
 }
 HWND FindTopWindow(DWORD pid)
 {
@@ -677,7 +687,7 @@ void force_hud_flags()
 {
     if (g_state == 0)
         return;
-    if (hud_allow_pause)
+    if (!options["disable_pause"])
         g_state->hud_flags |= 1U << 19;
     else
         g_state->hud_flags &= ~(1U << 19);
@@ -887,12 +897,12 @@ bool process_keys(
     }
     else if (pressed("toggle_godmode", wParam))
     {
-        options["god"] = !options["god"];
-        godmode(options["god"]);
+        options["god_mode"] = !options["god_mode"];
+        godmode(options["god_mode"]);
     }
     else if (pressed("toggle_mouse", wParam))
     {
-        options["click_events"] = !options["click_events"];
+        options["mouse_control"] = !options["mouse_control"];
     }
     else if (pressed("toggle_snap", wParam))
     {
@@ -906,14 +916,14 @@ bool process_keys(
         else
             g_state->pause = 0;
     }
-    else if (pressed("toggle_allow_pause", wParam))
+    else if (pressed("toggle_disable_pause", wParam))
     {
-        hud_allow_pause = !hud_allow_pause;
+        options["disable_pause"] = !options["disable_pause"];
         force_hud_flags();
     }
     else if (pressed("toggle_disable_input", wParam))
     {
-        disable_input = !disable_input;
+        options["disable_input"] = !options["disable_input"];
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -1025,15 +1035,15 @@ bool process_keys(
     }
     else if (pressed("reset_windows", wParam))
     {
-        reset_windows = !reset_windows;
-        if (reset_windows)
-            reset_windows_vertical = false;
+        options["stack_horizontally"] = !options["stack_horizontally"];
+        if (options["stack_horizontally"])
+            options["stack_vertically"] = false;
     }
     else if (pressed("reset_windows_vertical", wParam))
     {
-        reset_windows_vertical = !reset_windows_vertical;
-        if (reset_windows_vertical)
-            reset_windows = false;
+        options["stack_vertically"] = !options["stack_vertically"];
+        if (options["stack_vertically"])
+            options["stack_horizontally"] = false;
     }
     else if (pressed("save_settings", wParam))
     {
@@ -1424,7 +1434,7 @@ void set_vel(ImVec2 pos)
 
 void render_clickhandler()
 {
-    if (options["click_events"])
+    if (options["mouse_control"])
     {
         ImGuiIO &io = ImGui::GetIO();
         ImGui::SetNextWindowSize(io.DisplaySize);
@@ -1667,31 +1677,24 @@ void render_clickhandler()
 
 void render_options()
 {
-    ImGui::Checkbox("Mouse controls##clickevents", &options["click_events"]);
-    if (ImGui::Checkbox("God Mode##Godmode", &options["god"]))
+    ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
+    if (ImGui::Checkbox("God Mode##Godmode", &options["god_mode"]))
     {
-        godmode(options["god"]);
+        godmode(options["god_mode"]);
     }
     ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
-    if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
-    {
-        if (paused)
-            set_pause(0x20);
-        else
-            set_pause(0);
-    }
-    if (ImGui::Checkbox("Allow pause menu (on lost focus)", &hud_allow_pause))
+    if (ImGui::Checkbox("Allow pause menu (on lost focus)", &options["disable_pause"]))
     {
         force_hud_flags();
     }
-    ImGui::Checkbox("Disable game keys when typing##Typing", &disable_input);
-    if (ImGui::Checkbox("Stack windows horizontally", &reset_windows))
+    ImGui::Checkbox("Disable game keys when typing##Typing", &options["disable_input"]);
+    if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
     {
-        reset_windows_vertical = false;
+        options["stack_vertically"] = false;
     }
-    if (ImGui::Checkbox("Stack windows vertically", &reset_windows_vertical))
+    if (ImGui::Checkbox("Stack windows vertically", &options["stack_vertically"]))
     {
-        reset_windows = false;
+        options["stack_horizontally"] = false;
     }
 }
 
@@ -2133,6 +2136,13 @@ void render_game_props()
         if (g_state->pause)
             gamestate += "Pause ";
         ImGui::LabelText("Game state", gamestate.data());
+        if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
+        {
+            if (paused)
+                g_state->pause = 0x20;
+            else
+                g_state->pause = 0;
+        }
     }
     if (ImGui::CollapsingHeader("Timer"))
     {
@@ -2323,6 +2333,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if(change_colors)
     {
         g_hue = ((float) rand() / RAND_MAX)*360;
+        ImGuiStyle &style = ImGui::GetStyle();
+        style.Alpha = ((float)rand() / RAND_MAX) * 0.4 + 0.5;
         change_colors = false;
         set_colors();
     }
@@ -2338,7 +2350,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .1f), "OL");
     ImGui::End();
     int win_condition = ImGuiCond_FirstUseEver;
-    if (reset_windows || reset_windows_vertical)
+    if (options["stack_horizontally"] || options["stack_vertically"])
     {
         win_condition = ImGuiCond_Always;
     }
@@ -2347,7 +2359,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     float toolwidth = 0.128 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
-        if (reset_windows_vertical)
+        if (options["stack_vertically"])
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_options"].c_str());
@@ -2472,22 +2484,22 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
     ImGui::Render();
 
-    /*if(reset_windows)
+    /*if(options["stack_horizontally"])
     {
-        reset_windows = false;
-        reset_windows_vertical = false;
+        options["stack_horizontally"] = false;
+        options["stack_vertically"] = false;
         ImGui::SaveIniSettingsToDisk(inifile);
     }*/
 
     if (!file_written)
         write_file();
 
-    if (disable_input && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("tool_debug")))
+    if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("tool_debug")))
     {
         HID_RegisterDevice(window, HID_KEYBOARD);
         capture_last = true;
     }
-    else if (disable_input && capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
+    else if (options["disable_input"] && capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
     {
         capture_last = false;
         register_keys = true;
