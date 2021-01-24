@@ -391,7 +391,6 @@ void load_config(std::string file)
     ImGuiStyle &style = ImGui::GetStyle();
     style.Alpha = (float)toml::find_or<float>(opts, "alpha", 0.75);
     ImGui::GetIO().FontGlobalScale = (float)toml::find_or<float>(opts, "scale", 1.0);
-    set_colors();
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -1059,6 +1058,7 @@ bool process_keys(
     {
         ImGui::LoadIniSettingsFromDisk(inifile);
         load_config(cfgfile);
+        set_colors();
     }
     else if(pressed("set_colors", wParam))
     {
@@ -2323,6 +2323,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             font = io.Fonts->AddFontDefault();
         }
         load_config(cfgfile);
+        set_colors();
         windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
         windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
         windows["tool_camera"] = "Camera (" + key_string(keys["tool_camera"]) + ")";

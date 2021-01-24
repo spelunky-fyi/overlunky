@@ -16,7 +16,6 @@ Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut 
 
 ## Features
 Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans.
-  - **Enter**: Run active tool
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
       + **Tab**: Add selected itemid to list
@@ -56,6 +55,8 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **F11**: Hide overlay
   - **Ctrl+Shift+U**: Change UI color
   - **Ctrl+Shift+I**: ImGui internal metrics and settings
+  - **Ctrl+Shift+S**: Save options, hotkeys and UI colors
+  - **Ctrl+Shift+L**: Load options, hotkeys and UI colors
   - **Enter**: Run active tool
   - **Escape**: Return focus to game from an input
 
