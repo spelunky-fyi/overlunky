@@ -179,7 +179,7 @@ const char *button_flags[] = {"Jp", "Wp", "Bm", "Rp", "Rn", "Dr"};
 const char *direction_flags[] = {"Left", "Down", "Up", "Right"};
 
 const char *inifile = "imgui.ini";
-const std::string cfgfile = "overlunky.toml";
+const char *cfgfile = "overlunky.toml";
 
 const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
@@ -213,15 +213,7 @@ void save_options(std::string file)
 }
 void load_options(std::string file)
 {
-    toml::value data;
-    try
-    {
-        data = toml::parse("overlunky.toml");
-    }
-    catch (std::exception e)
-    {
-        std::cout << "Error, continuing\n";
-    }
+    auto data = toml::parse(file);
     for (const auto &kv : options) 
     {
         bool value = toml::get<bool>(toml::find(data, "options", kv.first));
@@ -363,7 +355,7 @@ void save_hotkeys(std::string file)
 
 void load_hotkeys(std::string file)
 {
-    toml::value data;
+    auto data = toml::parse(file);
     for (const auto &kv : keys)
     {
         keys[kv.first] = toml::get<int>(toml::find(data, "hotkeys", kv.first));
