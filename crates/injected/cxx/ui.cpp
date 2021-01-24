@@ -157,7 +157,7 @@ std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<EntityMemory *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false;
 EntityMemory *g_entity = 0;
 EntityMemory *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -179,7 +179,7 @@ const char *button_flags[] = {"Jp", "Wp", "Bm", "Rp", "Rn", "Dr"};
 const char *direction_flags[] = {"Left", "Down", "Up", "Right"};
 
 const char *inifile = "imgui.ini";
-const std::string cfgfile = "overlunky.toml";
+const std::string cfgfile = "overlunky.ini";
 
 const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
@@ -198,39 +198,6 @@ std::map<std::string, bool> options =
         {"god", false},
         {"snap_to_grid", false},
     };
-void save_options(std::string file)
-{
-    std::ofstream writeData(file, std::ofstream::app);
-    writeData << "# Default Values for Options\n"
-              << "# These need to be either true or false.\n"
-              << "# All of these options are false by default.\n"
-              << "[options]\n";
-    for (const auto &kv : options)
-    {
-        writeData << kv.first << " = " << kv.second << std::endl;
-    }
-    writeData.close();
-}
-void load_options(std::string file)
-{
-    toml::value data;
-    try
-    {
-        data = toml::parse("overlunky.toml");
-    }
-    catch (std::exception e)
-    {
-        std::cout << "Error, continuing\n";
-    }
-    for (const auto &kv : options) 
-    {
-        bool value = toml::get<bool>(toml::find(data, "options", kv.first));
-        std::cout << "Current: " << kv.first << ": " << options[kv.first] << std::endl;
-            options[kv.first] = value;
-            std::cout << "New: " << kv.first << ": " << options[kv.first] << std::endl;
-    }
-    save_options(file);
-}
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
     float U = cos(hue * 3.14159265 / 180);
@@ -244,6 +211,7 @@ ImVec4 hue_shift(ImVec4 in, float hue)
 }
 void set_colors()
 {
+    ImGui::StyleColorsDark();
     ImVec4 *colors = ImGui::GetStyle().Colors;
     for (int i = 0; i < ImGuiCol_COUNT; i++)
     {
@@ -341,7 +309,7 @@ std::string key_string(int keycode)
     return name;
 }
 
-void save_hotkeys(std::string file)
+void save_config(std::string file)
 {
     std::ofstream writeData(file);
     writeData << "# Overlunky hotkeys" << std::endl
@@ -358,19 +326,60 @@ void save_hotkeys(std::string file)
     {
         writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# " << key_string(keys[kv.first]) << std::endl;
     }
+
+    writeData << "\n[options]\n";
+    for (const auto &kv : options)
+    {
+        writeData << kv.first << " = " << std::dec << kv.second << std::endl;
+    }
+
+    writeData << "hue = " << (int)g_hue << std::endl;
     writeData.close();
 }
 
-void load_hotkeys(std::string file)
+void load_config(std::string file)
 {
     toml::value data;
-    for (const auto &kv : keys)
-    {
-        keys[kv.first] = toml::get<int>(toml::find(data, "hotkeys", kv.first));
+    try {
+        data = toml::parse(cfgfile);
     }
-    save_hotkeys(file);
-}
+    catch (std::exception)
+    {
+        save_config(file);
+        return;
+    }
 
+    toml::value hotkeys;
+    try {
+        hotkeys = toml::find(data, "hotkeys");
+    }
+    catch (std::exception)
+    {
+        save_config(file);
+        return;
+    }
+    for (const auto &kv : keys) 
+    {
+        keys[kv.first] = toml::find_or<toml::integer>(hotkeys, kv.first, kv.second);
+    }
+
+    toml::value opts;
+    try {
+        opts = toml::find(data, "options");
+    }
+    catch (std::exception)
+    {
+        save_config(file);
+        return;
+    }
+    for (const auto &kv : options) 
+    {
+        options[kv.first] = (bool)toml::find_or<int>(opts, kv.first, 0);
+    }
+    g_hue = (float)toml::find_or<int>(opts, "hue", 0);
+    save_config(file);
+    set_colors();
+}
 HWND FindTopWindow(DWORD pid)
 {
     std::pair<HWND, DWORD> params = {0, pid};
@@ -1029,16 +1038,16 @@ bool process_keys(
     else if (pressed("save_settings", wParam))
     {
         ImGui::SaveIniSettingsToDisk(inifile);
-        save_hotkeys(cfgfile);
-        save_options(cfgfile);
-        // save_gui_color(cfgfile);
+        save_config(cfgfile);
     }
     else if (pressed("load_settings", wParam))
     {
         ImGui::LoadIniSettingsFromDisk(inifile);
-        load_hotkeys(cfgfile);
-        load_options(cfgfile);
-        // load_gui_color(cfgfile);
+        load_config(cfgfile);
+    }
+    else if(pressed("set_colors", wParam))
+    {
+        change_colors = true;
     }
     else if (pressed("tool_metrics", wParam))
     {
@@ -2298,9 +2307,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         {
             font = io.Fonts->AddFontDefault();
         }
-        // load_gui_color(cfgfile);
-        load_hotkeys(cfgfile);
-        load_options(cfgfile);
+        load_config(cfgfile);
         windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
         windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
         windows["tool_camera"] = "Camera (" + key_string(keys["tool_camera"]) + ")";
@@ -2311,6 +2318,13 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["entities"] = "##Entities";
         g_state = (struct StateMemory *)get_state_ptr();
         g_state_addr = reinterpret_cast<uintptr_t>(g_state);
+    }
+
+    if(change_colors)
+    {
+        g_hue = ((float) rand() / RAND_MAX)*360;
+        change_colors = false;
+        set_colors();
     }
 
     ImGui_ImplDX11_NewFrame();
@@ -2331,7 +2345,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     float lastwidth = 0;
     float lastheight = 0;
     float toolwidth = 0.128 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
-    if (!options["hide_gui"])
+    if (!hide_ui)
     {
         if (reset_windows_vertical)
         {
