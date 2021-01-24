@@ -1,5 +1,7 @@
 // Build C++ bridge
 fn main() {
+    use git_version::git_version;
+    const GIT_VERSION: &str = git_version!();
     let cxx = [
         "cxx/entity.cpp",
         "cxx/ui.cpp",
@@ -22,6 +24,7 @@ fn main() {
         // https://github.com/ocornut/imgui/issues/2716
         .define("IMGUI_IMPL_WIN32_DISABLE_GAMEPAD", "1")
         .define("IMGUI_IMPL_WIN32_DISABLE_LINKING_XINPUT", "1")
+        .define("GIT_VERSION", GIT_VERSION)
         .compile("cxxbridge");
 
     for bridge in &bridges {

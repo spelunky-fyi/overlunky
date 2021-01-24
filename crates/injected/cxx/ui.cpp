@@ -19,6 +19,9 @@
 #include <map>
 #include <iomanip>
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 const USHORT HID_MOUSE    = 2;
 const USHORT HID_KEYBOARD = 6;
 
@@ -2090,12 +2093,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    render_clickhandler();
-    ImGui::SetNextWindowSize({10, 10});
-    ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y - 30});
+    ImGui::SetNextWindowSize({-1, 20});
     ImGui::Begin("Overlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .1f), "OL");
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), "Overlunky");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), TOSTRING(GIT_VERSION));
+    ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x/2-ImGui::GetWindowWidth()/2, ImGui::GetIO().DisplaySize.y-30}, ImGuiCond_Always);
     ImGui::End();
+
+    render_clickhandler();
+
     int win_condition = ImGuiCond_FirstUseEver;
     if(reset_windows || reset_windows_vertical)
     {
