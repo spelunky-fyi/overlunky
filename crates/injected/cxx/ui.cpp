@@ -540,7 +540,7 @@ EntityMemory *entity_ptr(int uid)
 
 bool update_players()
 {
-    if (g_players.size() > 0)
+    /*if (g_players.size() > 0)
     {
         if (g_players.at(0)->uid != cache_player)
         {
@@ -548,7 +548,7 @@ bool update_players()
             return true;
         }
         return false;
-    }
+    }*/
     get_players();
     return true;
 }
@@ -1678,12 +1678,12 @@ void render_clickhandler()
 void render_options()
 {
     ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
-    if (ImGui::Checkbox("God Mode##Godmode", &options["god_mode"]))
+    if (ImGui::Checkbox("God mode##Godmode", &options["god_mode"]))
     {
         godmode(options["god_mode"]);
     }
     ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
-    if (ImGui::Checkbox("Allow pause menu (on lost focus)", &options["disable_pause"]))
+    if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
     {
         force_hud_flags();
     }
