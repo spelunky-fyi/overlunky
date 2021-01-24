@@ -343,7 +343,8 @@ void save_config(std::string file)
 
     writeData << "hue = " << (int)g_hue << " # integer, 0 - 360 (hue shift from the default blue)" << std::endl;
     ImGuiStyle &style = ImGui::GetStyle();
-    writeData << "alpha = " << std::setprecision(3) << style.Alpha << " # float, 0.0 - 1.0 (global alpha of all tools)" << std::endl;
+    writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0 (global alpha)" << std::endl;
+    writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0 (global scale)" << std::endl;
     writeData.close();
 }
 
@@ -389,6 +390,7 @@ void load_config(std::string file)
     g_hue = (float)toml::find_or<int>(opts, "hue", 0);
     ImGuiStyle &style = ImGui::GetStyle();
     style.Alpha = (float)toml::find_or<float>(opts, "alpha", 0.75);
+    ImGui::GetIO().FontGlobalScale = (float)toml::find_or<float>(opts, "scale", 1.0);
     set_colors();
     godmode(options["god_mode"]);
     save_config(file);
