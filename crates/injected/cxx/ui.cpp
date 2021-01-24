@@ -1,5 +1,5 @@
 #define NOMINMAX
-#include "inih/cpp/INIReader.h"
+#include "toml11/toml.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "imgui/examples/imgui_impl_win32.h"
@@ -157,7 +157,7 @@ std::vector<CXXEntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<EntityMemory *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, disable_input = true, capture_last = false, register_keys = false, reset_windows = false, reset_windows_vertical = false, show_app_metrics = false, hud_allow_pause = true, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false;
 EntityMemory *g_entity = 0;
 EntityMemory *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -179,7 +179,7 @@ const char *button_flags[] = {"Jp", "Wp", "Bm", "Rp", "Rn", "Dr"};
 const char *direction_flags[] = {"Left", "Down", "Up", "Right"};
 
 const char *inifile = "imgui.ini";
-const std::string cfgfile = "overlunky.ini";
+const std::string cfgfile = "overlunky.toml";
 
 const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
@@ -197,8 +197,7 @@ std::map<std::string, bool> options =
         {"click_events", false},
         {"god", false},
         {"snap_to_grid", false},
-        {"hide_gui", false}};
-
+    };
 void save_options(std::string file)
 {
     std::ofstream writeData(file, std::ofstream::app);
@@ -208,20 +207,27 @@ void save_options(std::string file)
               << "[options]\n";
     for (const auto &kv : options)
     {
-
-            writeData << kv.first << " = " << kv.second << std::endl;
+        writeData << kv.first << " = " << kv.second << std::endl;
     }
     writeData.close();
 }
 void load_options(std::string file)
 {
-    INIReader reader (file);
-    if (reader.ParseError() == 0)
+    toml::value data;
+    try
     {
-        for (const auto &kv : options)
-        {
-            options[kv.first] = reader.GetBoolean("options",kv.first,false);    
-        }
+        data = toml::parse("overlunky.toml");
+    }
+    catch (std::exception e)
+    {
+        std::cout << "Error, continuing\n";
+    }
+    for (const auto &kv : options) 
+    {
+        bool value = toml::get<bool>(toml::find(data, "options", kv.first));
+        std::cout << "Current: " << kv.first << ": " << options[kv.first] << std::endl;
+            options[kv.first] = value;
+            std::cout << "New: " << kv.first << ": " << options[kv.first] << std::endl;
     }
     save_options(file);
 }
@@ -357,13 +363,10 @@ void save_hotkeys(std::string file)
 
 void load_hotkeys(std::string file)
 {
-    INIReader reader (file);
-    if (reader.ParseError() == 0)
+    toml::value data;
+    for (const auto &kv : keys)
     {
-        for (const auto &kv : keys)
-        {
-            keys[kv.first] = reader.GetInteger("hotkeys",kv.first,kv.second);    
-        }
+        keys[kv.first] = toml::get<int>(toml::find(data, "hotkeys", kv.first));
     }
     save_hotkeys(file);
 }
@@ -803,7 +806,7 @@ bool process_keys(
 
     if (pressed("hide_ui", wParam))
     {
-        options["hide_gui"] = !options["hide_gui"];
+        hide_ui = !hide_ui;
     }
     else if (pressed("tool_entity", wParam))
     {

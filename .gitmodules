@@ -2,6 +2,6 @@
 	path = crates/injected/imgui
 	url = https://github.com/ocornut/imgui
 	
-[submodule "crates/injected/inih"]
-	path = crates/injected/inih
-	url = https://github.com/Blandinium/inih
+[submodule "crates/injected/toml11"]
+	path = crates/injected/toml11
+	url = https://github.com/ToruNiina/toml11
