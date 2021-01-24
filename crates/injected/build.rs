@@ -8,9 +8,7 @@ fn main() {
         "imgui/imgui.cpp",
         "imgui/imgui_demo.cpp",
         "imgui/imgui_draw.cpp",
-        "imgui/imgui_widgets.cpp",
-        "inih/ini.c",
-        "inih/cpp/INIReader.cpp"
+        "imgui/imgui_widgets.cpp"
     ];
     let headers = ["cxx/entity.hpp", "cxx/ui.hpp"];
     let bridges = ["src/db.rs", "src/ui.rs"];
