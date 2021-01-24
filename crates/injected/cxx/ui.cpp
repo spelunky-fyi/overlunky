@@ -226,8 +226,8 @@ void load_options(std::string file)
     {
         bool value = toml::get<bool>(toml::find(data, "options", kv.first));
         std::cout << "Current: " << kv.first << ": " << options[kv.first] << std::endl;
-            options[kv.first] = value;
-            std::cout << "New: " << kv.first << ": " << options[kv.first] << std::endl;
+        options[kv.first] = value;
+        std::cout << "New: " << kv.first << ": " << options[kv.first] << std::endl;
     }
     save_options(file);
 }
