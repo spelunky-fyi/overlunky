@@ -1,0 +1,39 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Make build dir",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "mkdir -Force build"
+        },
+        {
+            "label": "CMake Debug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
+            "command": "cmake ..; cmake --build . --config Debug --target ALL_BUILD -- /maxcpucount:14",
+        },
+        {
+            "label": "CMake Release",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
+            "command": "cmake ..; cmake --build . --config Release --target ALL_BUILD -- /maxcpucount:14",
+        },
+        {
+            "label": "Build Release",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Make build dir", "CMake Release"]
+        },
+        {
+            "label": "Build Debug",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Make build dir", "CMake Debug"]
+        }
+    ]
+}

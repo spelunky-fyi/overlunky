@@ -3,3 +3,6 @@
 .vscode
 /cmake-build-debug/
 /cmake-build-relwithdebinfo/
+build
+out
+.vs

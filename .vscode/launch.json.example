@@ -6,55 +6,38 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Overlunky (Debug)",
-            "cargo": {
-                "args": [
-                    "build"
-                ],
-                "filter": {
-                    "name": "main",
-                    "kind": "bin",
-                }
-            },
+            "name": "Overlunky (Release)",
+            "program": "${workspaceRoot}/build/bin/Release/injector.exe",
             "args": [],
-            "cwd": "${workspaceFolder}",
-            "env": { "RUST_LOG": "debug" }
+            "env": { "RUST_LOG": "debug" },
+            "preLaunchTask": "Build Release"
         },
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Overlunky (Release)",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--release"
-                ],
-                "filter": {
-                    "name": "main",
-                    "kind": "bin"
-                }
-            },
+            "name": "Overlunky (Debug)",
+            "program": "${workspaceRoot}/build/bin/Debug/injector.exe",
             "args": [],
-            "cwd": "${workspaceFolder}",
-            "env": { "RUST_LOG": "debug" }
+            "env": { "RUST_LOG": "debug" },
+            "preLaunchTask": "Build Debug"
         },
         {
             "type": "lldb",
             "request": "launch",
             "name": "Spelunky 2",
-            "program": "C:/Program Files (x86)/Steam/SteamApps/common/Spelunky 2/Spel2.exe",
-            "cwd": "C:/Program Files (x86)/Steam/SteamApps/common/Spelunky 2",
+            "program": "D:/Games/Spelunky 2/Spel2.exe",
+            "cwd": "D:/Games/Spelunky 2",
             "env": { "RUST_LOG": "debug" }
         }
     ],
     "compounds": [
         {
-            "name": "Spelunky 2 + Overlunky (Debug)",
-            "configurations": ["Spelunky 2", "Overlunky (Debug)"]
-        },
-        {
             "name": "Spelunky 2 + Overlunky (Release)",
             "configurations": ["Spelunky 2", "Overlunky (Release)"]
+        },
+        {
+            "name": "Spelunky 2 + Overlunky (Debug)",
+            "configurations": ["Spelunky 2", "Overlunky (Debug)"]
         }
     ]
 }
