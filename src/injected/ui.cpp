@@ -250,7 +250,7 @@ std::string key_string(int keycode)
     CHAR szName[128];
     int result = 0;
     std::string name;
-    if (keycode & 0xff == 0)
+    if ((keycode & 0xff) == 0)
     {
         name = "Disabled";
     }
