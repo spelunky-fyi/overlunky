@@ -20,21 +20,12 @@ jobs:
         shell: bash
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ./target
-          key: windows-$${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Install Rust
-        run: |
-          rustup default nightly
-          rustup update --no-self-update
-
       - name: Build
-        run: cargo build --release
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release --target ALL_BUILD
 
       - name: Get the version
         id: get_version
@@ -55,8 +46,8 @@ jobs:
       - name: Create artifacts
         run: |
           mkdir Overlunky
-          move target\release\injected.dll Overlunky\injected.dll
-          move target\release\main.exe Overlunky\Overlunky.exe
+          move build\bin\Release\injected.dll Overlunky\injected.dll
+          move build\bin\Release\injector.exe Overlunky\Overlunky.exe
           move README.md Overlunky\README.txt
           7z a Overlunky_${{ steps.get_version.outputs.VERSION }}.zip Overlunky\Overlunky.exe Overlunky\injected.dll Overlunky\README.txt
 
