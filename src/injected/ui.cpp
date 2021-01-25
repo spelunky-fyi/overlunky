@@ -74,11 +74,11 @@ std::map<std::string, int> keys
     {"tool_options", 0x78},
     {"tool_debug", 0x37b},
     {"tool_metrics", 0x349},
+    {"tool_style", 0x355},
     {"reset_windows", 0x352},
     {"reset_windows_vertical", 0x356},
     {"save_settings", 0x353},
     {"load_settings", 0x34c},
-    {"set_colors", 0x355},
     {"spawn_entity", 0x10d},
     {"spawn_layer_door", 0x20d},
     {"spawn_warp_door", 0x30d},
@@ -141,7 +141,7 @@ struct EntityCache
 
 static ImFont *font, *bigfont;
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0, g_sat = 0, g_val = 0;
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
@@ -206,7 +206,7 @@ ImVec4 hue_shift(ImVec4 in, float hue)
         in.w); //((float)rand() / RAND_MAX) * 0.5 + 0.5);
     return out;
 }
-void set_colors()
+/*void set_colors()
 {
     ImGui::StyleColorsDark();
     ImVec4 *colors = ImGui::GetStyle().Colors;
@@ -223,6 +223,67 @@ void set_colors()
     style.Colors[ImGuiCol_ScrollbarGrab] = style.Colors[ImGuiCol_FrameBg];
     style.Colors[ImGuiCol_ScrollbarGrabHovered] = style.Colors[ImGuiCol_FrameBgHovered];
     style.Colors[ImGuiCol_ScrollbarGrabActive] = style.Colors[ImGuiCol_FrameBgActive];
+    style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0, 0, 0, 0);
+    style.WindowPadding = ImVec2(4, 4);
+    style.WindowRounding = 0;
+    style.FrameRounding = 0;
+    style.PopupRounding = 0;
+    style.GrabRounding = 0;
+    style.WindowBorderSize = 0;
+    style.FrameBorderSize = 0;
+    style.PopupBorderSize = 0;
+}*/
+
+void set_colors()
+{
+    float col_main_sat = g_sat;
+    float col_main_val = g_val;
+    float col_area_sat = g_sat*0.77;
+    float col_area_val = g_val*0.60;
+    float col_back_sat = g_sat*0.33;
+    float col_back_val = g_val*0.20;
+
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    ImVec4 col_text = ImColor::HSV(g_hue, 15.f/255.f, 245.f/255.f);
+    ImVec4 col_main = ImColor::HSV(g_hue, col_main_sat, col_main_val);
+    ImVec4 col_back = ImColor::HSV(g_hue, col_back_sat, col_back_val);
+    ImVec4 col_area = ImColor::HSV(g_hue, col_area_sat, col_area_val);
+
+    style.Colors[ImGuiCol_Text]                  = ImVec4(col_text.x, col_text.y, col_text.z, 1.00f);
+    style.Colors[ImGuiCol_TextDisabled]          = ImVec4(col_text.x, col_text.y, col_text.z, 0.58f);
+    style.Colors[ImGuiCol_WindowBg]              = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
+    style.Colors[ImGuiCol_Border]                = ImVec4(col_text.x, col_text.y, col_text.z, 0.30f);
+    style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    style.Colors[ImGuiCol_FrameBg]               = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
+    style.Colors[ImGuiCol_FrameBgHovered]        = ImVec4(col_main.x, col_main.y, col_main.z, 0.68f);
+    style.Colors[ImGuiCol_FrameBgActive]         = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_TitleBg]               = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
+    style.Colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
+    style.Colors[ImGuiCol_TitleBgActive]         = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    style.Colors[ImGuiCol_MenuBarBg]             = ImVec4(col_area.x, col_area.y, col_area.z, 0.57f);
+    style.Colors[ImGuiCol_ScrollbarBg]           = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(col_main.x, col_main.y, col_main.z, 0.31f);
+    style.Colors[ImGuiCol_ScrollbarGrabHovered]  = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    style.Colors[ImGuiCol_ScrollbarGrabActive]   = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_CheckMark]             = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
+    style.Colors[ImGuiCol_SliderGrab]            = ImVec4(col_main.x, col_main.y, col_main.z, 0.24f);
+    style.Colors[ImGuiCol_SliderGrabActive]      = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_Button]                = ImVec4(col_main.x, col_main.y, col_main.z, 0.44f);
+    style.Colors[ImGuiCol_ButtonHovered]         = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
+    style.Colors[ImGuiCol_ButtonActive]          = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_Header]                = ImVec4(col_main.x, col_main.y, col_main.z, 0.76f);
+    style.Colors[ImGuiCol_HeaderHovered]         = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
+    style.Colors[ImGuiCol_HeaderActive]          = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_ResizeGrip]            = ImVec4(col_main.x, col_main.y, col_main.z, 0.20f);
+    style.Colors[ImGuiCol_ResizeGripHovered]     = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    style.Colors[ImGuiCol_ResizeGripActive]      = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_PlotLines]             = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
+    style.Colors[ImGuiCol_PlotLinesHovered]      = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_PlotHistogram]         = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
+    style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
+    style.Colors[ImGuiCol_ModalWindowDarkening]  = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
     style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0, 0, 0, 0);
     style.WindowPadding = ImVec2(4, 4);
     style.WindowRounding = 0;
@@ -250,7 +311,7 @@ std::string key_string(int keycode)
     CHAR szName[128];
     int result = 0;
     std::string name;
-    if ((keycode & 0xff) == 0)
+    if (keycode & 0xff == 0)
     {
         name = "Disabled";
     }
@@ -329,10 +390,12 @@ void save_config(std::string file)
         writeData << kv.first << " = " << std::dec << kv.second << std::endl;
     }
 
-    writeData << "hue = " << (int)g_hue << " # integer, 0 - 360 (hue shift from the default blue)" << std::endl;
     ImGuiStyle &style = ImGui::GetStyle();
-    writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0 (global alpha)" << std::endl;
-    writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0 (global scale)" << std::endl;
+    writeData << "hue = " << std::fixed << std::setprecision(2) << g_hue << " # float, 0.0 - 1.0" << std::endl;
+    writeData << "saturation = " << std::fixed << std::setprecision(2) << g_sat << " # float, 0.0 - 1.0" << std::endl;
+    writeData << "lightness = " << std::fixed << std::setprecision(2) << g_val << " # float, 0.0 - 1.0" << std::endl;
+    writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
+    writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
     writeData.close();
 }
 
@@ -375,10 +438,12 @@ void load_config(std::string file)
     {
         options[kv.first] = (bool)toml::find_or<int>(opts, kv.first, (int)kv.second);
     }
-    g_hue = (float)toml::find_or<int>(opts, "hue", 0);
     ImGuiStyle &style = ImGui::GetStyle();
-    style.Alpha = (float)toml::find_or<float>(opts, "alpha", 0.75);
-    ImGui::GetIO().FontGlobalScale = (float)toml::find_or<float>(opts, "scale", 1.0);
+    g_hue = toml::find_or<float>(opts, "hue", 0.63);
+    g_sat = toml::find_or<float>(opts, "saturation", 0.66);
+    g_val = toml::find_or<float>(opts, "lightness", 0.66);
+    style.Alpha = toml::find_or<float>(opts, "alpha", 0.66);
+    ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0);
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -504,6 +569,7 @@ void save_search()
 
 int entity_type(int uid)
 {
+    return (int)get_entity_type(uid);
     if (entity_cache.find(uid) == entity_cache.end())
     {
         EntityCache newcache = {(struct Entity *)get_entity_ptr(uid), (int)get_entity_type(uid)};
@@ -518,6 +584,7 @@ int entity_type(int uid)
 
 Entity *entity_ptr(int uid)
 {
+    return (struct Entity *)get_entity_ptr(uid);
     if (entity_cache.find(uid) == entity_cache.end())
     {
         EntityCache newcache = {(struct Entity *)get_entity_ptr(uid), (int)get_entity_type(uid)};
@@ -1048,9 +1115,9 @@ bool process_keys(
         load_config(cfgfile);
         set_colors();
     }
-    else if(pressed("set_colors", wParam))
+    else if(pressed("tool_style", wParam))
     {
-        change_colors = true;
+        change_colors = !change_colors;
     }
     else if (pressed("tool_metrics", wParam))
     {
@@ -1881,7 +1948,20 @@ void render_entity_props()
     if (g_entity == 0)
         return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    render_uid(g_entity->uid, "general");
+    render_uid(g_entity->uid, "EntityGeneral"); /*ImGui::SameLine();
+    if (ImGui::Button("Void##DeleteEntity"))
+    {
+        if (g_entity->overlay != 0)
+        {
+            EntityMemory *mount = (struct EntityMemory *)g_entity->overlay;
+            if (mount->holding_uid == g_entity->uid)
+            {
+                mount->holding_uid = -1;
+            }
+        }
+        g_entity->overlay = 0;
+        g_entity->y -= 1000.0;
+    }*/
     if (ImGui::CollapsingHeader("State"))
     {
         render_state("Current state", g_entity->state);
@@ -1890,23 +1970,47 @@ void render_entity_props()
         if (g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
-            render_uid(g_entity->standing_on_uid, "state");
+            render_uid(g_entity->standing_on_uid, "StateStanding");
         }
         if (g_entity->holding_uid != -1)
         {
-            ImGui::Text("Holding:");
-            render_uid(g_entity->holding_uid, "state");
+            ImGui::Text("Holding:"); /*ImGui::SameLine();
+            if (ImGui::Button("Drop##DropHolding"))
+            {
+                EntityMemory *holding = (struct EntityMemory *)get_entity_ptr(g_entity->holding_uid);
+                holding->x = g_entity->x;
+                holding->y = g_entity->y;
+                holding->overlay = 0;
+                g_entity->holding_uid = -1;
+            }*/
+            render_uid(g_entity->holding_uid, "StateHolding");
         }
         Entity *overlay = (Entity *)g_entity->overlay;
         if (!IsBadReadPtr(overlay, 0x178))
         {
-            ImGui::Text("Riding:");
-            render_uid(overlay->uid, "state");
+            ImGui::Text("Riding:"); /*ImGui::SameLine();
+            if (ImGui::Button("Unmount##UnmountRiding"))
+            {
+                EntityMemory *mount = (struct EntityMemory *)g_entity->overlay;
+                if (mount->holding_uid == g_entity->uid)
+                {
+                    mount->holding_uid = -1;
+                }
+                g_entity->x = mount->x;
+                g_entity->y = mount->y;
+                g_entity->overlay = 0;
+            }*/
+            render_uid(overlay->uid, "StateRiding");
         }
         if (g_entity->last_owner_uid != -1)
         {
-            ImGui::Text("Owner / Attacker:");
-            render_uid(g_entity->last_owner_uid, "state");
+            ImGui::Text("Owner / Attacker:"); /*ImGui::SameLine();
+            if (ImGui::Button("Remove##RemoveOwner"))
+            {
+                g_entity->owner_uid = -1;
+                g_entity->last_owner_uid = -1;
+            }*/
+            render_uid(g_entity->last_owner_uid, "StateOwner");
         }
     }
     if (ImGui::CollapsingHeader("Position"))
@@ -1935,7 +2039,7 @@ void render_entity_props()
             int *pitems = (int *)g_entity->items_ptr;
             for (int i = 0; i < g_entity->items_count; i++)
             {
-                render_uid(pitems[i], "items");
+                render_uid(pitems[i], "EntityItems");
             }
         }
     }
@@ -2219,6 +2323,36 @@ void render_game_props()
     ImGui::PopItemWidth();
 }
 
+void render_style_editor()
+{
+    ImGuiStyle &style = ImGui::GetStyle();
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01, 0.0, 1.0);
+    ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01, 0.0, 1.0);
+    ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01, 0.0, 1.0);
+    ImGui::DragFloat("Alpha##StyleAlpha", &style.Alpha, 0.01, 0.2, 1.0);
+    ImGui::DragFloat("Scale##StyleScale", &io.FontGlobalScale, 0.01, 0.2, 2.0);
+    if(ImGui::Button("Randomize##StyleRandomize"))
+    {
+        ImGuiStyle &style = ImGui::GetStyle();
+        g_hue = (float) rand() / RAND_MAX;
+        g_sat = (float) rand() / RAND_MAX;
+        g_val = (float) rand() / RAND_MAX;
+        style.Alpha = (float) rand() / RAND_MAX * 0.5 + 0.4;
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Save##StyleSave"))
+    {
+        save_config(cfgfile);
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Load##StyleLoad"))
+    {
+        load_config(cfgfile);
+    }
+    set_colors();
+}
+
 void create_render_target()
 {
     ID3D11Texture2D *pBackBuffer;
@@ -2310,7 +2444,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         {
             font = io.Fonts->AddFontDefault();
         }
-//        load_config(cfgfile);
+        load_config(cfgfile);
         set_colors();
         windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
         windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
@@ -2319,18 +2453,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_game_properties"] = "Game state (" + key_string(keys["tool_game_properties"]) + ")";
         windows["tool_options"] = "Options (" + key_string(keys["tool_options"]) + ")";
         windows["tool_debug"] = "Debug (" + key_string(keys["tool_debug"]) + ")";
+        windows["tool_style"] = "Style (" + key_string(keys["tool_style"]) + ")";
         windows["entities"] = "##Entities";
         g_state = (struct StateMemory *)get_state_ptr();
         g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-    }
-
-    if(change_colors)
-    {
-        g_hue = ((float) rand() / RAND_MAX)*360;
-        ImGuiStyle &style = ImGui::GetStyle();
-        style.Alpha = ((float)rand() / RAND_MAX) * 0.4 + 0.5;
-        change_colors = false;
-        set_colors();
     }
 
     ImGui_ImplDX11_NewFrame();
@@ -2470,6 +2596,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             render_debug();
             ImGui::End();
         }
+
+        if (change_colors)
+        {
+            ImGui::Begin(windows["tool_style"].c_str());
+            ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
+            render_style_editor();
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x/2 - ImGui::GetWindowWidth()/2, ImGui::GetIO().DisplaySize.y/2 - ImGui::GetWindowHeight()/2});
+            ImGui::End();
+        }
     }
 
     if (show_app_metrics)
@@ -2522,7 +2657,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     force_hud_flags();
     force_time();
     update_players();
-    update_entity_cache();
+    //update_entity_cache();
 
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
