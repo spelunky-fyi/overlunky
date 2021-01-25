@@ -90,4 +90,4 @@ cd build
 cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
-You can also try the scripts in `.vscode` with VSCode. The binaries will be in `build/bin/Release/`. To enable debug logging, `set RUST_LOG=debug` in *the game environment*, e.g. where you run Spel2.exe.
+The binaries will be in `build/bin/Release/`. To enable debug logging, `set RUST_LOG=debug` in *the game environment*, e.g. where you run Spel2.exe. You can also try the scripts in `.vscode` with VSCode.
