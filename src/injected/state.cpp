@@ -20,6 +20,18 @@ size_t get_zoom() {
     }
 }
 
+size_t get_zoom_shop() {
+    ONCE(size_t) {
+        auto memory = Memory::get();
+        auto addr_zoom = memory.after_bundle;
+        for (int _ = 0; _ < 2; _++) {
+            addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
+            DEBUG("0x%x", addr_zoom);
+        }
+        return res = memory.at_exe(addr_zoom) + 10;
+    }
+}
+
 size_t get_damage() {
     ONCE(size_t) {
         // TODO: get vtable of character and calculate the offset
@@ -88,6 +100,7 @@ State &State::get() {
         auto addr_insta = get_insta();
         //log::debug!("0x{:x}, insta: 0x{:x}", addr_damage damage; addr_insta);
         auto addr_zoom = get_zoom();
+        auto addr_zoom_shop = get_zoom_shop();
         STATE = State{
                 location,
                 off_items,
@@ -95,6 +108,7 @@ State &State::get() {
                 addr_damage,
                 addr_insta,
                 addr_zoom,
+                addr_zoom_shop,
         };
         INIT = true;
     }

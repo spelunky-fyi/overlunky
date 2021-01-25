@@ -6,6 +6,7 @@
 class Layer;
 
 size_t get_zoom();
+size_t get_zoom_shop();
 
 struct State {
     size_t location;
@@ -14,6 +15,7 @@ struct State {
     size_t addr_damage;
     size_t addr_insta;
     size_t addr_zoom;
+    size_t addr_zoom_shop;
 
     static State &get();
 
@@ -80,6 +82,7 @@ struct State {
             }
         }
         write_mem_prot(addr_zoom, to_le_bytes(level), true);
+        write_mem_prot(addr_zoom_shop, to_le_bytes(level), true);
     }
 
     std::pair<float, float> click_position(float x, float y);
@@ -103,4 +106,3 @@ struct State {
         return state_find_item(ptr(), id);
     }
 };
-
