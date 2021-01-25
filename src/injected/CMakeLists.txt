@@ -14,12 +14,18 @@ add_library(injected SHARED
         search.h
         ui.cpp
         ui.hpp
-        imgui/examples/imgui_impl_dx11.cpp
-        imgui/examples/imgui_impl_win32.cpp
+        imgui/imconfig.h
         imgui/imgui.cpp
-        imgui/imgui_demo.cpp
-        imgui/imgui_draw.cpp
+        imgui/imgui.h
+        imgui/imgui_internal.h
+        imgui/backends/imgui_impl_dx11.cpp
+        imgui/backends/imgui_impl_dx11.h
+        imgui/backends/imgui_impl_win32.cpp
+        imgui/backends/imgui_impl_win32.h
         imgui/imgui_widgets.cpp
+        imgui/imgui_draw.cpp
+        imgui/imgui_tables.cpp
+        imgui/imgui_demo.cpp
         toml11/toml.hpp
         ../injector/cxx/logger.h
         rpc.cpp

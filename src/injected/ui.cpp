@@ -1,9 +1,9 @@
 #define NOMINMAX
-#include <toml.hpp>
+#include "toml11/toml.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
-#include "imgui/examples/imgui_impl_win32.h"
-#include "imgui/examples/imgui_impl_dx11.h"
+#include "imgui/backends/imgui_impl_win32.h"
+#include "imgui/backends/imgui_impl_dx11.h"
 #include "entity.hpp"
 #include <d3d11.h>
 #include "ui.hpp"
@@ -283,7 +283,6 @@ void set_colors()
     style.Colors[ImGuiCol_PlotHistogram]         = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
     style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
     style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
-    style.Colors[ImGuiCol_ModalWindowDarkening]  = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
     style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0, 0, 0, 0);
     style.WindowPadding = ImVec2(4, 4);
     style.WindowRounding = 0;
@@ -2015,10 +2014,10 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Position"))
     {
-        ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2, 1.0, 5, 0);
-        ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0, 5, 0);
-        ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0, 5, 0);
-        ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0, 5, 0);
+        ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2, 1.0);
+        ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0);
+        ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0);
+        ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0);
     }
     if (ImGui::CollapsingHeader("Stats"))
     {
