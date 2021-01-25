@@ -21,3 +21,7 @@ path = "src/main.rs"
 log = "0.4.11"
 env_logger = "0.8.1"
 tempfile = "3.1.0"
+cxx = "*"
+
+[build-dependencies]
+cxx-build = "*"

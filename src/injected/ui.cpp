@@ -1,15 +1,16 @@
 #define NOMINMAX
-#include "toml11/toml.hpp"
+#include <toml.hpp>
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "imgui/examples/imgui_impl_win32.h"
 #include "imgui/examples/imgui_impl_dx11.h"
+#include "entity.hpp"
 #include <d3d11.h>
 #include "ui.hpp"
-#include "injected-dll/src/ui.rs.h"
+#include "rpc.hpp"
 #include <Windows.h>
 #include <Shlwapi.h>
-#include <Shlobj.h>
+#include <ShlObj.h>
 #include <algorithm>
 #include <sstream>
 #include <string>
@@ -132,22 +133,9 @@ using PresentPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *pSwapChain, UINT
 PresentPtr oPresent;
 
 // Global state
-struct CXXEntityItem
-{
-    std::string name;
-    uint16_t id;
-
-    CXXEntityItem(std::string name, uint16_t id) : name(name), id(id) {}
-
-    bool operator<(const CXXEntityItem &item) const
-    {
-        return id < item.id;
-    }
-};
-
 struct EntityCache
 {
-    EntityMemory *entity;
+    Entity *entity;
     int type;
 };
 
@@ -157,13 +145,13 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0;
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
-std::vector<CXXEntityItem> g_items;
+std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
-std::vector<EntityMemory *> g_players;
+std::vector<Entity *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false;
-EntityMemory *g_entity = 0;
-EntityMemory *g_held_entity = 0;
+Entity *g_entity = 0;
+Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
 StateMemory *g_state = 0;
 std::map<int, std::string> entity_names;
@@ -518,7 +506,7 @@ int entity_type(int uid)
 {
     if (entity_cache.find(uid) == entity_cache.end())
     {
-        EntityCache newcache = {(struct EntityMemory *)get_entity_ptr(uid), (int)get_entity_type(uid)};
+        EntityCache newcache = {(struct Entity *)get_entity_ptr(uid), (int)get_entity_type(uid)};
         if (newcache.type != 0)
         {
             entity_cache[uid] = newcache;
@@ -528,11 +516,11 @@ int entity_type(int uid)
     return entity_cache.at(uid).type;
 }
 
-EntityMemory *entity_ptr(int uid)
+Entity *entity_ptr(int uid)
 {
     if (entity_cache.find(uid) == entity_cache.end())
     {
-        EntityCache newcache = {(struct EntityMemory *)get_entity_ptr(uid), (int)get_entity_type(uid)};
+        EntityCache newcache = {(struct Entity *)get_entity_ptr(uid), (int)get_entity_type(uid)};
         if (newcache.entity != 0)
         {
             entity_cache[uid] = newcache;
@@ -1909,7 +1897,7 @@ void render_entity_props()
             ImGui::Text("Holding:");
             render_uid(g_entity->holding_uid, "state");
         }
-        EntityMemory *overlay = (EntityMemory *)g_entity->overlay;
+        Entity *overlay = (Entity *)g_entity->overlay;
         if (!IsBadReadPtr(overlay, 0x178))
         {
             ImGui::Text("Riding:");
@@ -2322,7 +2310,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         {
             font = io.Fonts->AddFontDefault();
         }
-        load_config(cfgfile);
+//        load_config(cfgfile);
         set_colors();
         windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
         windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
@@ -2539,18 +2527,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
-void create_box(rust::Vec<rust::String> names, rust::Vec<uint16_t> ids)
+void create_box(std::vector<EntityItem> items)
 {
-    std::vector<CXXEntityItem> new_items;
-    new_items.emplace_back("ENT_TYPE_Select entity to spawn:", 0); // :D
-    if (names.size())
-    {
-        new_items.reserve(names.size());
-        for (int i = 0; i < names.size(); i++)
-        {
-            new_items.emplace_back(std::string(names[i].data(), names[i].size()), ids[i]);
-        }
-    }
+    std::vector<EntityItem> new_items(items);
+    new_items.emplace(new_items.begin(), "ENT_TYPE_Select entity to spawn:", 0); // :D
 
     std::sort(new_items.begin(), new_items.end());
 
@@ -2570,12 +2550,12 @@ void create_box(rust::Vec<rust::String> names, rust::Vec<uint16_t> ids)
     }
 }
 
-void set_players(rust::Vec<uintptr_t> ids)
+void set_players(std::vector<uintptr_t> ids)
 {
-    std::vector<EntityMemory *> new_items;
+    std::vector<Entity *> new_items;
     for (int i = 0; i < ids.size(); i++)
     {
-        new_items.push_back((EntityMemory *)ids[i]);
+        new_items.push_back((Entity *)ids[i]);
     }
     g_players = new_items;
 }

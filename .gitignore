@@ -1,3 +1,5 @@
 /target
 .idea
 .vscode
+/cmake-build-debug/
+/cmake-build-relwithdebinfo/

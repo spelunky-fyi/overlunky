@@ -6,7 +6,7 @@ edition = "2018"
 
 [lib]
 name = "injected"
-path = "src/lib.rs"
+path = "main.rs"
 crate-type = ["cdylib"]
 
 [dependencies]

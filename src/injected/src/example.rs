@@ -1,7 +1,7 @@
 // A small module with PoC codes
 use crate::models::{Mount, State};
 
-unsafe fn spawn_caveman_with_turkey() {
+pub unsafe fn spawn_caveman_with_turkey() {
     let state = State::get();
     let player = state.items().player(0).unwrap();
     let position = player.position();
@@ -14,7 +14,7 @@ unsafe fn spawn_caveman_with_turkey() {
     turkey.tame(true);
 }
 
-unsafe fn player_status() {
+pub unsafe fn player_status() {
     let state = State::get();
     let player = state.items().player(0).unwrap();
     let status = player.status();
@@ -24,7 +24,7 @@ unsafe fn player_status() {
     return;
 }
 
-unsafe fn list_items() {
+pub unsafe fn list_items() {
     let state = State::get();
     for item in state.layer(0).items() {
         log::debug!(
