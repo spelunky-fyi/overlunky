@@ -16,6 +16,7 @@ struct State {
     size_t addr_insta;
     size_t addr_zoom;
     size_t addr_zoom_shop;
+    size_t addr_dark;
 
     static State &get();
 
@@ -38,6 +39,15 @@ struct State {
         } else {
             write_mem_prot(addr_damage, ("\x48"s), true);
             write_mem_prot(addr_insta, ("\x40"s), true);
+        }
+    }
+
+    void darkmode(bool g) {
+        //log::debug!("God {:?}" mode; g);
+        if (g) {
+            write_mem_prot(addr_dark, ("\x90\x90"s), true);
+        } else {
+            write_mem_prot(addr_dark, ("\xEB\x2E"s), true);
         }
     }
 

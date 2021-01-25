@@ -8,6 +8,16 @@ size_t function_start(size_t off) {
     return off;
 }
 
+size_t get_dark() {
+    ONCE(size_t) {
+        auto memory = Memory::get();
+        auto addr_dark = memory.after_bundle;
+        addr_dark = find_inst(memory.exe(), "\x44\xC5\x80\xA0\x0E\x0A\x00\x00\xFD"s, memory.after_bundle);
+        DEBUG("0x%x", addr_dark);
+        return res = memory.at_exe(addr_dark) + 9;
+    }
+}
+
 size_t get_zoom() {
     ONCE(size_t) {
         auto memory = Memory::get();
@@ -101,6 +111,7 @@ State &State::get() {
         //log::debug!("0x{:x}, insta: 0x{:x}", addr_damage damage; addr_insta);
         auto addr_zoom = get_zoom();
         auto addr_zoom_shop = get_zoom_shop();
+        auto addr_dark = get_dark();
         STATE = State{
                 location,
                 off_items,
@@ -109,6 +120,7 @@ State &State::get() {
                 addr_insta,
                 addr_zoom,
                 addr_zoom_shop,
+                addr_dark,
         };
         INIT = true;
     }

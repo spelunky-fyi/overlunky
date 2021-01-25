@@ -149,7 +149,7 @@ std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Entity *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false, dark_mode = false;;
 Entity *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -1764,7 +1764,10 @@ void render_debug()
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X");
     ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X");
-    render_int("Cached entities", entity_cache.size());
+    if(ImGui::Checkbox("Dark mode##ToggleDarkMode", &dark_mode))
+    {
+        darkmode(dark_mode);
+    }
     ImGui::PopItemWidth();
 }
 
