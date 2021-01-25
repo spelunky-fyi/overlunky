@@ -66,14 +66,15 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
   - If your game crashes when actually trying to use the tools:
     + See previous section.
-    + Some entities just crash the game, try to avoid them next time. [A nonexhaustive list of glitchy entities](https://gist.github.com/DekeAvell/935f414c715da1f08162deb140975fa8/).
+    + Some entities just crash the game, try to avoid them next time.
   - If your game crashes and you're using **Modlunky2 or Playlunky**:
     + While we try to keep all the modding tools compatible, some things may break sometimes.
     + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
   - If you're missing some overlay windows:
+    + Try resetting window positions. (See hotkeys above.)
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
-  - If you mess up your keyboard shortcuts:
-    + Delete `Spelunky 2/overlunky.ini` to reset shortcut keys.
+  - If you mess up your keyboard shortcuts or UI:
+    + Delete `Spelunky 2/overlunky.ini`.
   - If keyboard input no longer works in game after using the tools:
     + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing` option enabled, it doesn't work in fullscreen.
     + Restart the game after changing graphics modes.
@@ -81,12 +82,12 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
     + If nothing else works, disable the `Disable game keys when typing` option and try Alt+Tabbing to restore input.
     
 ## Development
-If you'd rather build it yourself or help with development, clone the repository, get some Rust and C++ build tools and run this to get started:
+If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
 ```bash
 cd overlunky
-rustup toolchain install nightly
-rustup default nightly
-git submodule update --init --recursive
-cargo build
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release --target ALL_BUILD
 ```
-The debug build will be in `target/debug/`. To enable debug logging, `set RUST_LOG=debug` in *the game environment*, e.g. where you run Spel2.exe.
+You can also try the scripts in `.vscode` with VSCode. The build will be in `Overlunky/build/bin/Release/`. To enable debug logging, `set RUST_LOG=debug` in *the game environment*, e.g. where you run Spel2.exe.
