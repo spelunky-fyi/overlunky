@@ -182,7 +182,7 @@ const ImU16 u16_zero = 0, u16_one = 1, u16_min = 0, u16_max = 65535;
 const ImS32 s32_zero = 0, s32_one = 1, s32_min = INT_MIN / 2, s32_max = INT_MAX / 2, s32_hi_a = INT_MAX / 2 - 100, s32_hi_b = INT_MAX / 2;
 const ImU32 u32_zero = 0, u32_one = 1, u32_min = 0, u32_max = UINT_MAX / 2, u32_hi_a = UINT_MAX / 2 - 100, u32_hi_b = UINT_MAX / 2;
 const ImS64 s64_zero = 0, s64_one = 1, s64_min = LLONG_MIN / 2, s64_max = LLONG_MAX / 2, s64_hi_a = LLONG_MAX / 2 - 100, s64_hi_b = LLONG_MAX / 2;
-const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_min = 0, u64_max = ULLONG_MAX / 2, u64_hi_a = ULLONG_MAX / 2 - 100, u64_hi_b = ULLONG_MAX / 2;
+const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_charmin = 194, u64_charmax = 216, u64_min = 0, u64_max = ULLONG_MAX / 2, u64_hi_a = ULLONG_MAX / 2 - 100, u64_hi_b = ULLONG_MAX / 2;
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
@@ -1489,6 +1489,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
             render_hitbox(get_entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
         }
     }
+    if(ent->type && ((ent->type->id >= 538 && ent->type->id <= 555) || ent->type->id == 648)) return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
     std::pair<float, float> boxa = screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxb = screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
@@ -2107,9 +2108,14 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Container"))
     {
-        if (g_entity->inside > 0 && g_entity->inside <= 1000)
+        if (g_entity_type == 435) // coffin
         {
-            ImGui::InputScalar("##Spawns", ImGuiDataType_U64, &g_entity->inside, &u64_min, &u64_thousand, "%d");
+            ImGui::SliderInt("##CoffinSpawns", (int *)&g_entity->inside, 194, 216);
+            if (g_entity->inside == 214) g_entity->inside = 215;
+            ImGui::SameLine();
+            ImGui::Text(entity_names[g_entity->inside].data());
+        } else {
+            ImGui::InputInt("##EntitySpawns", (int*)&g_entity->inside, 1, 10);
             if (g_entity->inside > 0)
             {
                 ImGui::SameLine();

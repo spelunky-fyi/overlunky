@@ -243,7 +243,8 @@ public:
     int32_t i11c;
     int32_t i120;
     int32_t i124;
-    size_t inside;
+    uint32_t inside;
+    uint32_t i12c;
     uint32_t has_backpack;
     int32_t i134;
     size_t inventory_ptr;
