@@ -1481,7 +1481,7 @@ ImVec2 screenify(ImVec2 pos)
 
 void render_hitbox()
 {
-    if (IsBadWritePtr(g_entity, 0x178)) return;
+    if (!update_entity()) return;
     std::pair<float, float> pos = screen_position(g_entity->position().first, g_entity->position().second);
     std::pair<float, float> boxa = screen_position(g_entity->position().first - g_entity->hitboxx + g_entity->offsetx, g_entity->position().second - g_entity->hitboxy + g_entity->offsety);
     std::pair<float, float> boxb = screen_position(g_entity->position().first + g_entity->hitboxx + g_entity->offsetx, g_entity->position().second - g_entity->hitboxy + g_entity->offsety);

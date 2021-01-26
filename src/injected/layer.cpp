@@ -50,7 +50,7 @@ Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx, float
             rx = round(rx);
             ry = round(ry);
         }
-        auto addr = load_item(this, id, x, y);
+        auto addr = load_item(this, id, rx, ry);
         if (abs(vx) + abs(vy) > 0.04) {
             write_mem(addr + 0x100, to_le_bytes(vx));
             write_mem(addr + 0x104, to_le_bytes(vy));

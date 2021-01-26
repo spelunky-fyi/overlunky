@@ -135,27 +135,30 @@ size_t State::ptr() {
 
 std::pair<float, float> State::click_position(float x, float y) {
     uint8_t screen = read_u8(ptr() + 0x10);
-    float cz;
+    float cz = read_f32(get_zoom());
     switch (screen) {
         case 11:
             cz = 13.5;
+            break;
         case 13:
             cz = 13.5;
-        case 14:
+            break;
+        case 16:
             cz = 13.5;
+            break;
         default:
-            cz = read_f32(get_zoom());
+            break;
     };
     auto cx = read_f32(get_camera());
     auto cy = read_f32(get_camera() + 4);
     auto rx = cx + ZF * cz * x;
-    auto ry = cy + (ZF/16*9) * cz * y;
+    auto ry = cy + (ZF/16.0*9.0) * cz * y;
     return {rx, ry};
 }
 
 std::pair<float, float> State::screen_position(float x, float y) {
     uint8_t screen = read_u8(ptr() + 0x10);
-    float cz;
+    float cz = read_f32(get_zoom());
     switch (screen) {
         case 11:
             cz = 13.5;
@@ -163,17 +166,16 @@ std::pair<float, float> State::screen_position(float x, float y) {
         case 13:
             cz = 13.5;
             break;
-        case 14:
+        case 16:
             cz = 13.5;
             break;
         default:
-            cz = read_f32(get_zoom());
             break;
     };
     auto cx = read_f32(get_camera());
     auto cy = read_f32(get_camera() + 4);
     auto rx = (x - cx) / cz / ZF;
-    auto ry = (y - cy) / cz / (ZF/16*9);
+    auto ry = (y - cy) / cz / (ZF/16.0*9.0);
     return {rx, ry};
 }
 
