@@ -1481,6 +1481,14 @@ ImVec2 screenify(ImVec2 pos)
 
 void render_hitbox(Entity* ent, bool cross, ImColor color)
 {
+    if (ent->items_count > 0)
+    {
+        int *pitems = (int *)ent->items_ptr;
+        for (int i = 0; i < ent->items_count; i++)
+        {
+            render_hitbox(get_entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
+        }
+    }
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
     std::pair<float, float> boxa = screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxb = screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
@@ -1501,14 +1509,6 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     draw_list->AddLine(sboxb, sboxc, color, 2);
     draw_list->AddLine(sboxc, sboxd, color, 2);
     draw_list->AddLine(sboxd, sboxa, color, 2);
-    if (ent->items_count > 0)
-    {
-        int *pitems = (int *)ent->items_ptr;
-        for (int i = 0; i < ent->items_count; i++)
-        {
-            render_hitbox(get_entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 200));
-        }
-    }
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -1553,13 +1553,13 @@ void render_clickhandler()
         ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
         if(draw_entity_box && update_entity())
         {
-            render_hitbox(g_entity, true, ImColor(255, 0, 255, 200));
+            render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
         }
         if(draw_entity_box)
         {
             for (auto player : g_players)
             {
-                render_hitbox(player, false, ImColor(0, 255, 255, 200));
+                render_hitbox(player, false, ImColor(255, 0, 255, 200));
             }
         }
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
