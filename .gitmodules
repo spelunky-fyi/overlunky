@@ -1,6 +1,6 @@
-[submodule "src/injected/imgui"]
-	path = src/injected/imgui
+[submodule "src/imgui"]
+	path = src/imgui
 	url = https://github.com/ocornut/imgui
-[submodule "src/injected/toml11"]
-	path = src/injected/toml11
+[submodule "src/toml11"]
+	path = src/toml11
 	url = https://github.com/ToruNiina/toml11
