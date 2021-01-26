@@ -1479,26 +1479,36 @@ ImVec2 screenify(ImVec2 pos)
     return screened;
 }
 
-void render_hitbox()
+void render_hitbox(Entity* ent, bool cross, ImColor color)
 {
-    if (!update_entity()) return;
-    std::pair<float, float> pos = screen_position(g_entity->position().first, g_entity->position().second);
-    std::pair<float, float> boxa = screen_position(g_entity->position().first - g_entity->hitboxx + g_entity->offsetx, g_entity->position().second - g_entity->hitboxy + g_entity->offsety);
-    std::pair<float, float> boxb = screen_position(g_entity->position().first + g_entity->hitboxx + g_entity->offsetx, g_entity->position().second - g_entity->hitboxy + g_entity->offsety);
-    std::pair<float, float> boxc = screen_position(g_entity->position().first + g_entity->hitboxx + g_entity->offsetx, g_entity->position().second + g_entity->hitboxy + g_entity->offsety);
-    std::pair<float, float> boxd = screen_position(g_entity->position().first - g_entity->hitboxx + g_entity->offsetx, g_entity->position().second + g_entity->hitboxy + g_entity->offsety);
+    std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
+    std::pair<float, float> boxa = screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
+    std::pair<float, float> boxb = screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
+    std::pair<float, float> boxc = screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second + ent->hitboxy + ent->offsety);
+    std::pair<float, float> boxd = screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second + ent->hitboxy + ent->offsety);
     ImVec2 spos = screenify({pos.first, pos.second});
     ImVec2 sboxa = screenify({boxa.first, boxa.second});
     ImVec2 sboxb = screenify({boxb.first, boxb.second});
     ImVec2 sboxc = screenify({boxc.first, boxc.second});
     ImVec2 sboxd = screenify({boxd.first, boxd.second});
     auto *draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
-    draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
-    draw_list->AddLine(sboxa, sboxb, ImColor(255, 0, 255, 200), 2);
-    draw_list->AddLine(sboxb, sboxc, ImColor(255, 0, 255, 200), 2);
-    draw_list->AddLine(sboxc, sboxd, ImColor(255, 0, 255, 200), 2);
-    draw_list->AddLine(sboxd, sboxa, ImColor(255, 0, 255, 200), 2);
+    if (cross)
+    {
+        draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
+    }
+    draw_list->AddLine(sboxa, sboxb, color, 2);
+    draw_list->AddLine(sboxb, sboxc, color, 2);
+    draw_list->AddLine(sboxc, sboxd, color, 2);
+    draw_list->AddLine(sboxd, sboxa, color, 2);
+    if (ent->items_count > 0)
+    {
+        int *pitems = (int *)ent->items_ptr;
+        for (int i = 0; i < ent->items_count; i++)
+        {
+            render_hitbox(get_entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 200));
+        }
+    }
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -1541,7 +1551,17 @@ void render_clickhandler()
         ImGui::SetNextWindowSize(io.DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
         ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-        if(draw_entity_box) render_hitbox();
+        if(draw_entity_box && update_entity())
+        {
+            render_hitbox(g_entity, true, ImColor(255, 0, 255, 200));
+        }
+        if(draw_entity_box)
+        {
+            for (auto player : g_players)
+            {
+                render_hitbox(player, false, ImColor(0, 255, 255, 200));
+            }
+        }
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
@@ -1973,6 +1993,7 @@ void render_entity_props()
 {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     ImGui::Checkbox("Lock to player one", &lock_player);
+    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &draw_entity_box);
     if (lock_player)
     {
         if (!g_players.empty())
@@ -2060,7 +2081,6 @@ void render_entity_props()
         ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0);
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0);
-        ImGui::Checkbox("Draw hitbox##DrawEntityBox", &draw_entity_box);
     }
     if (ImGui::CollapsingHeader("Stats"))
     {
