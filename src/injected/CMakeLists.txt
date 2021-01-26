@@ -8,3 +8,12 @@ target_link_libraries(injected
         imgui
         toml11::toml11
         Shlwapi)
+
+execute_process(
+        COMMAND git describe --always --dirty=-modified
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+target_compile_definitions(injected PRIVATE
+        "GIT_VERSION=${GIT_VERSION}")
