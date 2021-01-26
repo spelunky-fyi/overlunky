@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(injected)
+project(overlunky)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../bin)
@@ -12,5 +12,8 @@ execute_process(
 )
 add_definitions("-DGIT_VERSION=${GIT_VERSION}")
 
-add_subdirectory(src/injector)
-add_subdirectory(src/injected)
+add_subdirectory(src)
+
+if (MSVC)
+  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT injector)
+endif()

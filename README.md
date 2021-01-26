@@ -1,4 +1,5 @@
 # Overlunky
+![Continuous Integration](https://github.com/spelunky-fyi/overlunky/workflows/Continuous%20Integration/badge.svg)
 
 An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the Spelunky Community Discord.
 
@@ -85,6 +86,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
 If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
 ```bash
 cd overlunky
+git submodule update --init --recursive
 mkdir build
 cd build
 cmake ..

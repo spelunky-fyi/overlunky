@@ -1,13 +1,11 @@
 #define NOMINMAX
-#include "toml11/toml.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
-#include "imgui/backends/imgui_impl_win32.h"
-#include "imgui/backends/imgui_impl_dx11.h"
-#include "entity.hpp"
+
+#include <toml.hpp>
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <backends/imgui_impl_win32.h>
+#include <backends/imgui_impl_dx11.h>
 #include <d3d11.h>
-#include "ui.hpp"
-#include "rpc.hpp"
 #include <Windows.h>
 #include <Shlwapi.h>
 #include <ShlObj.h>
@@ -21,6 +19,10 @@
 #include <map>
 #include <iomanip>
 #include <array>
+
+#include "entity.hpp"
+#include "ui.hpp"
+#include "rpc.hpp"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)

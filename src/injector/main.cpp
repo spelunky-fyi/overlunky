@@ -5,6 +5,9 @@
 #include <chrono>
 #include <thread>
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
@@ -24,6 +27,8 @@ int main()
     {
         PANIC("DLL not found! %s", path.string().data());
     }
+
+    INFO("Overlunky version: " TOSTRING(GIT_VERSION));
 
     {
         INFO("Searching for Spel2.exe process...");
