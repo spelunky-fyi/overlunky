@@ -21,3 +21,5 @@ Entity *get_entity_ptr(uint32_t id);
 int32_t get_entity_type(uint32_t id);
 size_t get_state_ptr();
 void get_players();
+std::pair<float, float> screen_position(float x, float y);
+float get_zoom_level();

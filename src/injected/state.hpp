@@ -3,6 +3,8 @@
 #include "thread_utils.h"
 #include "items.h"
 
+const float ZF = 0.737;
+
 class Layer;
 
 size_t get_zoom();
@@ -96,6 +98,8 @@ struct State {
     }
 
     std::pair<float, float> click_position(float x, float y);
+    std::pair<float, float> screen_position(float x, float y);
+    float get_zoom_level();
 
     uint8_t flags() {
         return read_u8(ptr() + 0xa0e);

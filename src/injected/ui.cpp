@@ -149,7 +149,7 @@ std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Entity *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false, dark_mode = false;;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false;
 Entity *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -1453,10 +1453,50 @@ void render_cross()
 {
     ImGuiIO &io = ImGui::GetIO();
     ImVec2 res = io.DisplaySize;
-    ImVec2 pos = ImGui::GetMousePos();
     auto *draw_list = ImGui::GetWindowDrawList();
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y - 9), ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
+}
+
+ImVec2 screenify(ImVec2 pos)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    ImVec2 bar = {0.0, 0.0};
+    if (res.x / res.y > 1.78)
+    {
+        bar.x = (res.x - res.y / 9 * 16) / 2;
+        res.x = res.y / 9 * 16;
+    }
+    else if (res.x / res.y < 1.77)
+    {
+        bar.y = (res.y - res.x / 16 * 9) / 2;
+        res.y = res.x / 16 * 9;
+    }
+    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (pos.y / (1.0 / (res.y / 2)) + res.y / 2 + bar.y));
+    return screened;
+}
+
+void render_hitbox()
+{
+    if (IsBadWritePtr(g_entity, 0x178)) return;
+    std::pair<float, float> pos = screen_position(g_entity->position().first, g_entity->position().second);
+    std::pair<float, float> boxa = screen_position(g_entity->position().first - g_entity->hitboxx + g_entity->offsetx, g_entity->position().second - g_entity->hitboxy + g_entity->offsety);
+    std::pair<float, float> boxb = screen_position(g_entity->position().first + g_entity->hitboxx + g_entity->offsetx, g_entity->position().second - g_entity->hitboxy + g_entity->offsety);
+    std::pair<float, float> boxc = screen_position(g_entity->position().first + g_entity->hitboxx + g_entity->offsetx, g_entity->position().second + g_entity->hitboxy + g_entity->offsety);
+    std::pair<float, float> boxd = screen_position(g_entity->position().first - g_entity->hitboxx + g_entity->offsetx, g_entity->position().second + g_entity->hitboxy + g_entity->offsety);
+    ImVec2 spos = screenify({pos.first, pos.second});
+    ImVec2 sboxa = screenify({boxa.first, boxa.second});
+    ImVec2 sboxb = screenify({boxb.first, boxb.second});
+    ImVec2 sboxc = screenify({boxc.first, boxc.second});
+    ImVec2 sboxd = screenify({boxd.first, boxd.second});
+    auto *draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
+    draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
+    draw_list->AddLine(sboxa, sboxb, ImColor(255, 0, 255, 200), 2);
+    draw_list->AddLine(sboxb, sboxc, ImColor(255, 0, 255, 200), 2);
+    draw_list->AddLine(sboxc, sboxd, ImColor(255, 0, 255, 200), 2);
+    draw_list->AddLine(sboxd, sboxa, ImColor(255, 0, 255, 200), 2);
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -1499,6 +1539,7 @@ void render_clickhandler()
         ImGui::SetNextWindowSize(io.DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
         ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+        if(draw_entity_box) render_hitbox();
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
@@ -1764,10 +1805,6 @@ void render_debug()
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X");
     ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X");
-    if(ImGui::Checkbox("Dark mode##ToggleDarkMode", &dark_mode))
-    {
-        darkmode(dark_mode);
-    }
     ImGui::PopItemWidth();
 }
 
@@ -2021,6 +2058,7 @@ void render_entity_props()
         ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0);
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0);
+        ImGui::Checkbox("Draw hitbox##DrawEntityBox", &draw_entity_box);
     }
     if (ImGui::CollapsingHeader("Stats"))
     {
@@ -2293,7 +2331,10 @@ void render_game_props()
         ImGui::DragScalar("To Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
         ImGui::Text(theme_name(g_state->theme_next));
-        //ImGui::Checkbox("Force dark level##darklevel", &hud_dark_level);
+        if(ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
+        {
+            darkmode(dark_mode);
+        }
     }
     if (ImGui::CollapsingHeader("Street cred"))
     {

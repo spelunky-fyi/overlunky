@@ -98,10 +98,14 @@ void darkmode(bool g)
     State::get().darkmode(g);
 }
 
-
 void zoom(float level)
 {
     State::get().zoom(level);
+}
+
+float get_zoom_level()
+{
+    return State::get().get_zoom_level();
 }
 
 void list_items()
@@ -171,8 +175,7 @@ void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool
     for (auto &item : state.layer(player->layer())
                           ->items())
     {
-        if (item
-                ->uid == id)
+        if (item->uid == id)
         {
             item->teleport(x, y, s, vx, vy, snap);
         }
@@ -300,4 +303,8 @@ void get_players()
         if(player) found.push_back((uintptr_t)player);
     }
     set_players(found);
+}
+
+std::pair<float, float> screen_position(float x, float y) {
+    return State::get().screen_position(x, y);
 }
