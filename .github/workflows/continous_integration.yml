@@ -13,12 +13,12 @@ jobs:
     strategy:
       matrix:
         build_type: [Debug, Release]
-        toolset: [v142, ClangCL]
+        toolset_name: [MSVC, Clang]
         include:
-          - toolset: v142
-            tooset_name: MSVC
-          - toolset: ClangCL
-            tooset_name: clang-cl
+          - toolset_name: MSVC
+            toolset: v142
+          - toolset_name: Clang
+            toolset: ClangCL
 
     steps:
       - uses: actions/checkout@v2
