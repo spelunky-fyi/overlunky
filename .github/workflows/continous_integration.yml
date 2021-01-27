@@ -8,11 +8,17 @@ on:
 
 jobs:
   build:
-    name: Continuous Integration ${{ matrix.build_type }}
+    name: Continuous Integration ${{ matrix.build_type }} ${{ matrix.toolset_name }}
     runs-on: windows-latest
     strategy:
       matrix:
         build_type: [Debug, Release]
+        toolset: [v142, ClangCL]
+        include:
+          - toolset: v142
+            tooset_name: MSVC
+          - toolset: ClangCL
+            tooset_name: clang-cl
 
     steps:
       - uses: actions/checkout@v2
@@ -24,9 +30,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake .. -A x64 -T ${{ matrix.toolset }}
 
       - name: Build
         run: |
           cd build
-          cmake --build . --config ${{matrix.build_type}} --target ALL_BUILD
+          cmake --build . --config ${{ matrix.build_type }} --target ALL_BUILD

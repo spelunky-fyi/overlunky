@@ -2792,7 +2792,7 @@ PresentPtr &vtable_find(T *obj, int index)
 {
     void ***ptr = reinterpret_cast<void ***>(obj);
     if (!ptr[0])
-        return *reinterpret_cast<PresentPtr *>(nullptr);
+        return *static_cast<PresentPtr *>(nullptr);
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
