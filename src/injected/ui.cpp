@@ -151,7 +151,7 @@ std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Entity *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false;
 Entity *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -1479,6 +1479,44 @@ ImVec2 screenify(ImVec2 pos)
     return screened;
 }
 
+void render_grid(ImColor color = ImColor(255, 255, 255, 50))
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    auto *draw_list = ImGui::GetWindowDrawList();
+    for(int x = -1; x < 96; x++)
+    {
+        std::pair<float, float> gridline = screen_position((float)x+0.5, 0);
+        if(abs(gridline.first) <= 1.0) {
+            ImVec2 grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, 2);
+        }
+    }
+    for(int y = -1; y < 128; y++)
+    {
+        std::pair<float, float> gridline = screen_position(0, (float)y+0.5);
+        if(abs(gridline.second) <= 1.0) {
+            ImVec2 grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, 2);
+        }
+    }
+    get_players();
+    for (auto player : g_players)
+    {
+        std::pair<float, float> gridline = screen_position(round(player->position().first-0.5)+0.5, round(player->position().second)-0.5);
+        ImVec2 grids = screenify({gridline.first, gridline.second});
+        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
+        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
+    }
+    if(update_entity())
+    {
+        std::pair<float, float> gridline = screen_position(round(g_entity->position().first-0.5)+0.5, round(g_entity->position().second)-0.5);
+        ImVec2 grids = screenify({gridline.first, gridline.second});
+        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
+    }
+}
+
 void render_hitbox(Entity* ent, bool cross, ImColor color)
 {
     if (ent->items_count > 0)
@@ -1547,24 +1585,28 @@ void set_vel(ImVec2 pos)
 
 void render_clickhandler()
 {
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui::SetNextWindowSize(io.DisplaySize);
+    ImGui::SetNextWindowPos({0, 0});
+    ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+    if(draw_grid)
+    {
+        render_grid();
+    }
+    if(draw_entity_box && update_entity())
+    {
+        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
+    }
+    if(draw_entity_box)
+    {
+        get_players();
+        for (auto player : g_players)
+        {
+            render_hitbox(player, false, ImColor(255, 0, 255, 200));
+        }
+    }
     if (options["mouse_control"])
     {
-        ImGuiIO &io = ImGui::GetIO();
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::SetNextWindowPos({0, 0});
-        ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-        if(draw_entity_box && update_entity())
-        {
-            render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
-        }
-        if(draw_entity_box)
-        {
-            get_players();
-            for (auto player : g_players)
-            {
-                render_hitbox(player, false, ImColor(255, 0, 255, 200));
-            }
-        }
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
@@ -1796,8 +1838,8 @@ void render_clickhandler()
         {
             io.MouseDrawCursor = true;
         }
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void render_options()
@@ -1997,6 +2039,7 @@ void render_entity_props()
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     ImGui::Checkbox("Lock to player one", &lock_player);
     ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &draw_entity_box);
+    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &draw_grid);
     if (lock_player)
     {
         if (!g_players.empty())
