@@ -151,7 +151,7 @@ std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Entity *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false;
 Entity *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -1091,7 +1091,7 @@ bool process_keys(
     }
     else if (pressed("tool_debug", wParam))
     {
-        hidedebug = !hidedebug;
+        show_debug = !show_debug;
     }
     else if (pressed("reset_windows", wParam))
     {
@@ -2385,7 +2385,7 @@ void render_game_props()
         ImGui::DragScalar("NPC kills##NPCKills", ImGuiDataType_U8, (char *)&g_state->kills_npc, 0.5f, &u8_zero, &u8_max);
         ImGui::DragScalar("Kali favor##PorFavor", ImGuiDataType_S8, (char *)&g_state->kali_favor, 0.5f, &s8_min, &s8_max);
         ImGui::DragScalar("Kali status##KaliStatus", ImGuiDataType_S8, (char *)&g_state->kali_status, 0.5f, &s8_min, &s8_max);
-        ImGui::DragScalar("Altars destroyed##KaliAltars", ImGuiDataType_U8, (char *)&g_state->kali_altars_destroyed, 0.5f, &u8_min, &u8_max);
+        ImGui::DragScalar("Altars destroyed##KaliAltars", ImGuiDataType_S8, (char *)&g_state->kali_altars_destroyed, 0.5f, &s8_min, &s8_max);
     }
     if (ImGui::CollapsingHeader("Players"))
     {
@@ -2673,18 +2673,18 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::End();
         }
 
-        if (!hidedebug)
+        if (show_debug)
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
-            ImGui::Begin(windows["tool_debug"].c_str());
+            ImGui::Begin(windows["tool_debug"].c_str(), &show_debug);
             render_debug();
             ImGui::End();
         }
 
         if (change_colors)
         {
-            ImGui::Begin(windows["tool_style"].c_str());
+            ImGui::Begin(windows["tool_style"].c_str(), &change_colors);
             ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
             render_style_editor();
             ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x/2 - ImGui::GetWindowWidth()/2, ImGui::GetIO().DisplaySize.y/2 - ImGui::GetWindowHeight()/2});

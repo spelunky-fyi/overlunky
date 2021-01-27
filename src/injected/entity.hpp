@@ -52,7 +52,7 @@ struct StateMemory {
     uint32_t h;
     int8_t kali_favor;
     int8_t kali_status;
-    uint8_t kali_altars_destroyed;
+    int8_t kali_altars_destroyed;
     uint8_t b4f;
     int32_t i50;
     int32_t i54;
