@@ -151,7 +151,7 @@ std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Entity *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false;
 Entity *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -2258,25 +2258,11 @@ void force_time()
     {
         g_state->time_total = g_total_time;
     }
-    if (freeze_pause && g_pause_time == -1)
-    {
-        g_pause_time = g_state->time_pause;
-    }
-    else if (!freeze_pause)
-    {
-        g_pause_time = -1;
-    }
-    else if (g_pause_time >= 0)
-    {
-        g_state->time_pause = g_pause_time;
-    }
 }
 
 void render_timer()
 {
     int frames = g_state->time_total;
-    if (g_state->screen != 13)
-        frames += g_state->time_pause;
     time_t secs = frames / 60;
     char time[10];
     std::strftime(time, sizeof(time), "%H:%M:%S", std::gmtime(&secs));
@@ -2330,7 +2316,6 @@ void render_game_props()
         std::string lasttime = format_time(g_state->time_last_level);
         std::string leveltime = format_time(g_state->time_level);
         std::string totaltime = format_time(g_state->time_total);
-        std::string pausetime = format_time(g_state->time_pause);
         ImGui::Text("Frz");
         ImGui::Checkbox("##FreezeLast", &freeze_last);
         ImGui::SameLine();
@@ -2352,13 +2337,6 @@ void render_game_props()
         {
             g_total_time = parse_time(totaltime);
             g_state->time_total = g_total_time;
-        }
-        ImGui::Checkbox("##FreezePause", &freeze_pause);
-        ImGui::SameLine();
-        if (InputString("Pause##PauseTime", &pausetime))
-        {
-            g_pause_time = parse_time(pausetime);
-            g_state->time_pause = g_pause_time;
         }
     }
     if (ImGui::CollapsingHeader("Level"))

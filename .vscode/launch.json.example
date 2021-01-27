@@ -1,7 +1,7 @@
 // Install codelldb in VSCode, select the Spelunky + Overlunky configuration in the Run tab and press F5.
 // Directly runs the game and overlunky with lldb attached to the game, so breakpoints in the dll work (both the rust and the cpp code).
 {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "configurations": [
         {
             "type": "lldb",
