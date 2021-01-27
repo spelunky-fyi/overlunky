@@ -1489,7 +1489,8 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
             render_hitbox(get_entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
         }
     }
-    if(ent->type && ((ent->type->id >= 538 && ent->type->id <= 555) || ent->type->id == 648)) return; // powerups
+    const int type = get_entity_type(ent->uid);
+    if(!type || ((type >= 538 && type <= 555) || type == 648)) return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
     std::pair<float, float> boxa = screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxb = screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
@@ -1826,8 +1827,8 @@ void render_debug()
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
-    ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X");
-    ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X");
+    ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X", ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
+    ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X", ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
     ImGui::PopItemWidth();
 }
 
@@ -2106,21 +2107,34 @@ void render_entity_props()
             }
         }
     }
-    if (ImGui::CollapsingHeader("Container"))
+    if (ImGui::CollapsingHeader("Special attributes"))
     {
-        if (g_entity_type == 435) // coffin
+        if (g_entity_type == 435)
         {
+            ImGui::Text("Character in coffin:");
             ImGui::SliderInt("##CoffinSpawns", (int *)&g_entity->inside, 194, 216);
             if (g_entity->inside == 214) g_entity->inside = 215;
             ImGui::SameLine();
             ImGui::Text(entity_names[g_entity->inside].data());
-        } else {
+            ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&g_entity->i12c, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
+        }
+        else if (g_entity_type == 402)
+        {
+            ImGui::Text("Item in crate:");
             ImGui::InputInt("##EntitySpawns", (int*)&g_entity->inside, 1, 10);
             if (g_entity->inside > 0)
             {
                 ImGui::SameLine();
                 ImGui::Text(entity_names[g_entity->inside].data());
             }
+        }
+        else if (g_entity_type == 575)
+        {
+            ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity->inside, 1, 255);
+        }
+        else
+        {
+            ImGui::InputScalar("Unknown data##UnknownSpecialAttribute", ImGuiDataType_U64, (size_t *)&g_entity->inside, 0, 0, "%p", ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
         }
     }
     if (ImGui::CollapsingHeader("Style"))
