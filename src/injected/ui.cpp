@@ -145,7 +145,7 @@ static ImFont *font, *bigfont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0, g_sat = 0, g_val = 0;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0;
+int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0, g_force_width = 0, g_force_height = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
@@ -1559,6 +1559,7 @@ void render_clickhandler()
         }
         if(draw_entity_box)
         {
+            get_players();
             for (auto player : g_players)
             {
                 render_hitbox(player, false, ImColor(255, 0, 255, 200));
@@ -2362,7 +2363,7 @@ void render_game_props()
     }
     if (ImGui::CollapsingHeader("Level"))
     {
-        ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char *)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
+        ImGui::InputInt2("Level size##LevelSize", (int*)&g_state->w, ImGuiInputTextFlags_ReadOnly);
         ImGui::DragScalar("World##Worldnumber", ImGuiDataType_U8, (char *)&g_state->world, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Level##Levelnumber", ImGuiDataType_U8, (char *)&g_state->level, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Theme ##Themenumber", ImGuiDataType_U8, (char *)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
@@ -2373,6 +2374,7 @@ void render_game_props()
         ImGui::DragScalar("To Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
         ImGui::Text(theme_name(g_state->theme_next));
+        ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char *)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
         if(ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
         {
             darkmode(dark_mode);
