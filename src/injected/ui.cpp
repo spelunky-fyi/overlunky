@@ -1031,7 +1031,7 @@ bool process_keys(
     }
     else if (pressed("spawn_warp_door", wParam))
     {
-        spawn_door(0.0, 0.0, g_world, g_level, 1, g_to + 1);
+        spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
     }
     else if (pressed("move_up", wParam) && active("tool_entity"))
     {
@@ -1073,7 +1073,7 @@ bool process_keys(
     }
     else if (pressed("enter", wParam) && active("tool_door"))
     {
-        spawn_door(0.0, 0.0, g_world, g_level, 1, g_to + 1);
+        spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
     }
     else if (pressed("move_up", wParam) && active("tool_camera"))
     {
@@ -1374,7 +1374,7 @@ void render_narnia()
     render_themes();
     if (ImGui::Button("Warp door"))
     {
-        spawn_door(g_x, g_y, g_world, g_level, 1, g_to + 1);
+        spawn_door(g_x, g_y, g_level, g_world, 1, g_to + 1);
     }
     ImGui::SameLine();
     if (ImGui::Button("Layer door"))
@@ -1948,7 +1948,7 @@ void render_screen(const char *label, int state)
         ImGui::LabelText(label, "4 Main menu");
     else if (state == 5)
         ImGui::LabelText(label, "5 Options");
-    else if (state == 8)
+    else if (state == 7)
         ImGui::LabelText(label, "7 Leaderboards");
     else if (state == 8)
         ImGui::LabelText(label, "8 Seed input");
