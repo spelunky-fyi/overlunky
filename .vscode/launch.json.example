@@ -9,7 +9,6 @@
             "name": "Overlunky (Release)",
             "program": "${workspaceRoot}/build/bin/Release/injector.exe",
             "args": [],
-            "env": { "RUST_LOG": "debug" },
             "preLaunchTask": "Build Release"
         },
         {
@@ -18,17 +17,23 @@
             "name": "Overlunky (Debug)",
             "program": "${workspaceRoot}/build/bin/Debug/injector.exe",
             "args": [],
-            "env": { "RUST_LOG": "debug" },
             "preLaunchTask": "Build Debug"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Overlunky (RelWithDebInfo)",
+            "program": "${workspaceRoot}/build/bin/RelWithDebInfo/injector.exe",
+            "args": [],
+            "preLaunchTask": "Build RelWithDebInfo"
         },
         {
             "type": "lldb",
             "request": "launch",
             "name": "Spelunky 2",
             "program": "D:/Games/Spelunky 2/Spel2.exe",
-            "cwd": "D:/Games/Spelunky 2",
-            "env": { "RUST_LOG": "debug" }
-        }
+            "cwd": "D:/Games/Spelunky 2"
+        },
     ],
     "compounds": [
         {
@@ -38,6 +43,10 @@
         {
             "name": "Spelunky 2 + Overlunky (Debug)",
             "configurations": ["Spelunky 2", "Overlunky (Debug)"]
+        },
+        {
+            "name": "Spelunky 2 + Overlunky (RelWithDebInfo)",
+            "configurations": ["Spelunky 2", "Overlunky (RelWithDebInfo)"]
         }
     ]
 }
