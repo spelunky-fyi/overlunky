@@ -29,6 +29,11 @@
 sol::state lua;
 static char script[102400];
 std::string scriptresult;
+struct LuaState
+{
+    Entity *player;
+};
+LuaState luastate = { 0 };
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -1588,8 +1593,16 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
 
 void render_script()
 {
+    get_players();
+    if (g_players.empty()) return;
+    if (g_state == 0) return;
 	try {
 		auto result = lua.safe_script(script);
+        sol::function onFrame = lua["onFrame"];
+        sol::function onLevel = lua["onLevel"];
+        if(onFrame) onFrame();
+        if(onLevel && g_state->screen == 12 && luastate.player != g_players.at(0)) onLevel();
+        luastate.player = g_players.at(0);
         scriptresult = "OK";
 	}
 	catch( const sol::error& e ) {
@@ -2781,7 +2794,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if (!file_written)
         write_file();
 
-    if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("tool_debug")))
+    if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard)
     {
         HID_RegisterDevice(window, HID_KEYBOARD);
         capture_last = true;
@@ -2865,15 +2878,21 @@ PresentPtr &vtable_find(T *obj, int index)
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
-bool init_hooks(size_t _ptr)
+void init_script()
 {
     lua.set_function("beep", [] {
+        update_players();
         for (auto player : g_players)
         {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
     });
+    lua["spawn_entity"] = spawn_entity;
+}
 
+bool init_hooks(size_t _ptr)
+{
+    init_script();
     pSwapChain = reinterpret_cast<IDXGISwapChain *>(_ptr);
     PresentPtr &ptr = vtable_find(pSwapChain, 8);
     DWORD oldProtect;
