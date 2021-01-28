@@ -29,11 +29,11 @@
 sol::state lua;
 static char script[102400];
 std::string scriptresult;
-struct LuaState
+struct ScriptState
 {
     Entity *player;
 };
-LuaState luastate = { 0 };
+ScriptState scriptstate = { 0 };
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -1601,8 +1601,8 @@ void render_script()
         sol::function onFrame = lua["onFrame"];
         sol::function onLevel = lua["onLevel"];
         if(onFrame) onFrame();
-        if(onLevel && g_state->screen == 12 && luastate.player != g_players.at(0)) onLevel();
-        luastate.player = g_players.at(0);
+        if(onLevel && g_state->screen == 12 && scriptstate.player != g_players.at(0)) onLevel();
+        scriptstate.player = g_players.at(0);
         scriptresult = "OK";
 	}
 	catch( const sol::error& e ) {
