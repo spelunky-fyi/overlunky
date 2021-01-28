@@ -24,7 +24,11 @@
 #include "ui.hpp"
 #include "rpc.hpp"
 
+#define SOL_ALL_SAFETIES_ON 1
 #include <sol/sol.hpp>
+sol::state lua;
+static char script[102400];
+std::string scriptresult;
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -367,6 +371,11 @@ std::string key_string(int keycode)
         name = "Ctrl+" + name;
     }
     return name;
+}
+
+bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags = 0)
+{
+    return ImGui::InputText(label, (char *)str->c_str(), 9, flags);
 }
 
 void save_config(std::string file)
@@ -1577,6 +1586,17 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     draw_list->AddLine(sboxd, sboxa, color, 2);
 }
 
+void render_script()
+{
+	try {
+		auto result = lua.safe_script(script);
+        scriptresult = "OK";
+	}
+	catch( const sol::error& e ) {
+		scriptresult = e.what();
+	}
+}
+
 ImVec2 normalize(ImVec2 pos)
 {
     ImGuiIO &io = ImGui::GetIO();
@@ -1631,6 +1651,7 @@ void render_clickhandler()
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
     }
+    render_script();
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
@@ -1898,6 +1919,10 @@ void render_debug()
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X", ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
     ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X", ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
+    ImGui::PopItemWidth();
+    ImGui::PushItemWidth(-1);
+    ImGui::InputTextMultiline("##LuaScript", script, sizeof(script), {-1, 300});
+    InputString("##LuaResult", &scriptresult, ImGuiInputTextFlags_ReadOnly);
     ImGui::PopItemWidth();
 }
 
@@ -2280,11 +2305,6 @@ int parse_time(std::string time)
     std::stringstream ss(time);
     ss >> std::get_time(&tm, "%H:%M:%S");
     return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
-}
-
-bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags = 0)
-{
-    return ImGui::InputText(label, (char *)str->c_str(), 9, flags);
 }
 
 void force_time()
@@ -2845,7 +2865,6 @@ PresentPtr &vtable_find(T *obj, int index)
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
-sol::state lua;
 bool init_hooks(size_t _ptr)
 {
     lua.set_function("beep", [] {
