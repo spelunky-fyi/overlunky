@@ -91,30 +91,32 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
             x = round(x);
             y = round(y);
         }
-        auto px = topmost->pointer() + 0x40;
-        auto py = topmost->pointer() + 0x44;
-//log::debug!("Teleporting to {}, {}", x, y);
-        write_mem(px, to_le_bytes(x));
-        write_mem(py, to_le_bytes(y));
-    } else {
-// screen coordinates -1..1
-//log::debug!("Teleporting to screen {}, {}", x, y);
-        auto state = State::get();
-        auto[x, y] = state.click_position(dx, dy);
-        if (snap && abs(vx) + abs(vy) <= 0.04) {
-            x = round(x);
-            y = round(y);
-        }
-//log::debug!("Teleporting to {}, {}", x, y);
         topmost->x = x;
         topmost->y = y;
     }
-// set velocity
+    else
+    {
+        // screen coordinates -1..1
+        //log::debug!("Teleporting to screen {}, {}", x, y);
+        auto state = State::get();
+        auto [x, y] = state.click_position(dx, dy);
+        if (snap && abs(vx) + abs(vy) <= 0.04)
+        {
+            x = round(x);
+            y = round(y);
+        }
+        //log::debug!("Teleporting to {}, {}", x, y);
+        topmost->x = x;
+        topmost->y = y;
+    }
+    // set velocity
     if (topmost
-                ->type
-                ->search_flags < 0x80) {
-        write_mem(topmost->pointer() + 0x100, to_le_bytes(vx));
-        write_mem(topmost->pointer() + 0x104, to_le_bytes(vy));
+            ->type
+            ->search_flags < 0x80)
+    {
+        auto player = (Player *)topmost;
+        player->velocityx = vx;
+        player->velocityy = vy;
     }
     return;
 }

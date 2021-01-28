@@ -171,9 +171,9 @@ uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
-std::vector<Entity *> g_players;
+std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false;
-Entity *g_entity = 0;
+Movable *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
 StateMemory *g_state = 0;
@@ -442,7 +442,7 @@ void load_config(std::string file)
     try {
         data = toml::parse(cfgfile);
     }
-    catch (std::exception)
+    catch (std::exception &)
     {
         save_config(file);
         return;
@@ -452,7 +452,7 @@ void load_config(std::string file)
     try {
         hotkeys = toml::find(data, "hotkeys");
     }
-    catch (std::exception)
+    catch (std::exception &)
     {
         save_config(file);
         return;
@@ -466,7 +466,7 @@ void load_config(std::string file)
     try {
         opts = toml::find(data, "options");
     }
-    catch (std::exception)
+    catch (std::exception &)
     {
         save_config(file);
         return;
@@ -743,26 +743,26 @@ bool update_entity()
     if (g_last_id != 0)
     {
         g_entity_type = entity_type(g_last_id);
-        g_entity = entity_ptr(g_last_id);
+        g_entity = (Movable *)entity_ptr(g_last_id);
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if (IsBadWritePtr(g_entity, 0x178))
-            g_entity = 0;
-        if (g_entity != 0)
+            g_entity = nullptr;
+        if (g_entity)
         {
             g_inventory = (struct Inventory *)g_entity->inventory_ptr;
             if (IsBadWritePtr(g_inventory, 0x1428))
-                g_inventory = 0;
+                g_inventory = nullptr;
             return true;
         }
         else
         {
-            g_inventory = 0;
+            g_inventory = nullptr;
         }
     }
     else
     {
-        g_entity = 0;
-        g_inventory = 0;
+        g_entity = nullptr;
+        g_inventory = nullptr;
         g_entity_addr = 0;
     }
     return false;
@@ -2162,15 +2162,15 @@ void render_entity_props()
     render_uid(g_entity->uid, "EntityGeneral"); ImGui::SameLine();
     if (ImGui::Button("Void##DeleteEntity"))
     {
-        if (g_entity->overlay != 0)
+        if (g_entity->overlay)
         {
-            Entity *mount = (struct Entity *)g_entity->overlay;
+            Movable *mount = (Movable *)g_entity->overlay;
             if (mount->holding_uid == g_entity->uid)
             {
                 mount->holding_uid = -1;
             }
         }
-        g_entity->overlay = 0;
+        g_entity->overlay = nullptr;
         g_entity->y -= 1000.0;
     }
     if (ImGui::CollapsingHeader("State"))
@@ -2196,13 +2196,13 @@ void render_entity_props()
             }
             render_uid(g_entity->holding_uid, "StateHolding");
         }
-        Entity *overlay = (Entity *)g_entity->overlay;
+        auto *overlay = (Entity *)g_entity->overlay;
         if (!IsBadReadPtr(overlay, 0x178))
         {
             ImGui::Text("Riding:"); ImGui::SameLine();
             if (ImGui::Button("Unmount##UnmountRiding"))
             {
-                Entity *mount = (struct Entity *)g_entity->overlay;
+                auto *mount = (Movable *)g_entity->overlay;
                 if (mount->holding_uid == g_entity->uid)
                 {
                     mount->holding_uid = -1;
@@ -2907,14 +2907,9 @@ void create_box(std::vector<EntityItem> items)
     }
 }
 
-void set_players(std::vector<uintptr_t> ids)
+void set_players(std::vector<Player *> ids)
 {
-    std::vector<Entity *> new_items;
-    for (int i = 0; i < ids.size(); i++)
-    {
-        new_items.push_back((Entity *)ids[i]);
-    }
-    g_players = new_items;
+    g_players = ids;
 }
 
 #define THROW(fmt, ...)                               \
