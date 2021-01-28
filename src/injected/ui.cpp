@@ -24,6 +24,8 @@
 #include "ui.hpp"
 #include "rpc.hpp"
 
+#include <sol/sol.hpp>
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
@@ -2843,8 +2845,16 @@ PresentPtr &vtable_find(T *obj, int index)
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
+sol::state lua;
 bool init_hooks(size_t _ptr)
 {
+    lua.set_function("beep", [] {
+        for (auto player : g_players)
+        {
+            render_hitbox(player, false, ImColor(255, 0, 255, 200));
+        }
+    });
+
     pSwapChain = reinterpret_cast<IDXGISwapChain *>(_ptr);
     PresentPtr &ptr = vtable_find(pSwapChain, 8);
     DWORD oldProtect;

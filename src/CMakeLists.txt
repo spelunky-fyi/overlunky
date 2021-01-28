@@ -15,8 +15,12 @@ set(imgui_sources
 add_library(imgui STATIC ${imgui_sources})
 target_include_directories(imgui PUBLIC imgui)
 
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}${CMAKE_CURRENT_SOURCE_DIR}/lua;")
+find_package(Lua REQUIRED)
+
 option(toml11_BUILD_TEST OFF)
 add_subdirectory(toml11)
+add_subdirectory(sol2)
 
 add_subdirectory(shared)
 add_subdirectory(injected)
