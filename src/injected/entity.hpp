@@ -100,8 +100,8 @@ using EntityDestroy = void (*)(Entity *);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
 
 struct EntityDB {
-    size_t create_func;
-    size_t destroy_func;
+    EntityCreate create_func;
+    EntityDestroy destroy_func;
     int32_t field_10;
 /* Entity id (ENT_...) */
     int32_t id;
@@ -212,54 +212,6 @@ public:
     size_t pa0;
     int32_t ia8;
     int32_t iac;
-    size_t pb0;
-    int32_t ib8;
-    int32_t ibc;
-    size_t anim_func;
-    int32_t ic8;
-    int32_t icc;
-    float movex;
-    float movey;
-    uint32_t buttons;
-    uint32_t stand_counter;
-    float fe0;
-    int32_t ie4;
-    uint32_t owner_uid;
-    uint32_t last_owner_uid;
-    size_t animation_func;
-    uint32_t idle_counter;
-    uint32_t standing_on_uid;
-    float velocityx;
-    float velocityy;
-    uint32_t holding_uid;
-    uint8_t state;
-    uint8_t last_state;
-    uint8_t move_state;
-    uint8_t health;
-    int32_t i110;
-    uint32_t some_state;
-    int32_t i118;
-    int32_t i11c;
-    int32_t i120;
-    int32_t i124;
-    uint32_t inside;
-    uint32_t i12c;
-    uint32_t has_backpack;
-    int32_t i134;
-    size_t inventory_ptr;
-    size_t p140;
-    int32_t i148;
-    int32_t i14c;
-    size_t i150;
-    size_t p158;
-    size_t p160;
-    int32_t i168;
-    int32_t i16c;
-    uint32_t jump_flags;
-    uint8_t some_timer;
-    uint8_t can_use;
-    uint8_t b176;
-    uint8_t b177;
 
     size_t pointer() {
         return (size_t)
@@ -297,28 +249,83 @@ public:
     std::pair<float, float> position_self() const;
 };
 
-class Mount : public Entity {
-    void carry(Entity *rider);
+struct Inventory {
+    uint32_t money;
+    uint8_t bombs;
+    uint8_t ropes;
+    uint8_t b06;
+    uint8_t b07;
+    uint8_t pad08[0x141c]; // specific treasure and killed monsters here, boring
+    uint32_t kills_level;
+    uint32_t kills_total;
+};
+
+class Movable: public Entity {
+public:
+    size_t pb0;
+    int32_t ib8;
+    int32_t ibc;
+    size_t anim_func;
+    int32_t ic8;
+    int32_t icc;
+    float movex;
+    float movey;
+    uint32_t buttons;
+    uint32_t stand_counter;
+    float fe0;
+    int32_t ie4;
+    uint32_t owner_uid;
+    uint32_t last_owner_uid;
+    size_t animation_func;
+    uint32_t idle_counter;
+    uint32_t standing_on_uid;
+    float velocityx;
+    float velocityy;
+    uint32_t holding_uid;
+    uint8_t state;
+    uint8_t last_state;
+    uint8_t move_state;
+    uint8_t health;
+    int32_t i110;
+    uint32_t some_state;
+    int32_t i118;
+    int32_t i11c;
+    int32_t i120;
+    int32_t i124;
+    uint32_t inside;
+    uint32_t i12c;
+    uint32_t has_backpack;
+    int32_t i134;
+    Inventory* inventory_ptr;
+    size_t p140;
+    int32_t i148;
+    int32_t i14c;
+};
+
+class Player : public Movable {
+public:
+    size_t i150;
+    size_t p158;
+    size_t p160;
+    int32_t i168;
+    int32_t i16c;
+    uint32_t jump_flags;
+    uint8_t some_timer;
+    uint8_t can_use;
+    uint8_t b176;
+    uint8_t b177;
+};
+
+class Mount : public Movable {
+public:
+    void carry(Movable *rider);
 
     void tame(bool value);
 };
 
-using Carry = void (*)(size_t, size_t);
+using Carry = void (*)(Entity *, Entity *);
 
 Carry get_carry();
-
-class Player : public Entity {
-    struct PlayerStatus {
-        uint32_t what;
-        uint8_t bomb;
-        uint8_t rope;
-    };
-
-public:
-    PlayerStatus *status() {
-        return (PlayerStatus *) read_u64(pointer() + 0x138);
-    }
-};
 
 class Door : public Entity {
 public:

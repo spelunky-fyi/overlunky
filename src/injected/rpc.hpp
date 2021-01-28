@@ -16,7 +16,6 @@ void set_entity_flags(uint32_t id, uint32_t flags);
 void set_hud_flags(uint8_t flags);
 uint8_t get_hud_flags();
 void set_pause(uint8_t pause);
-void player_status();
 Entity *get_entity_ptr(uint32_t id);
 int32_t get_entity_type(uint32_t id);
 size_t get_state_ptr();

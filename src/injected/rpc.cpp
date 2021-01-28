@@ -244,18 +244,6 @@ void set_pause(uint8_t pause)
     state.set_pause(pause);
 }
 
-void player_status()
-{
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    auto status = player->status();
-    DEBUG("Player {:?}", status, status->rope, status->bomb);
-    status->rope = (99);
-    status->bomb = (99);
-}
-
 Entity *get_entity_ptr(uint32_t id)
 {
     if (id == 0)
@@ -296,11 +284,11 @@ size_t get_state_ptr()
 void get_players()
 {
     auto state = State::get();
-    std::vector<uintptr_t> found;
+    std::vector<Player *> found;
     for (int i = 0; i < 4; i++)
     {
         auto player = state.items()->player(i);
-        if(player) found.push_back((uintptr_t)player);
+        if(player) found.push_back(player);
     }
     set_players(found);
 }
