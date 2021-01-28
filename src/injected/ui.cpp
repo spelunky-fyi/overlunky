@@ -397,6 +397,15 @@ void save_config(std::string file)
     writeData << "lightness = " << std::fixed << std::setprecision(2) << g_val << " # float, 0.0 - 1.0" << std::endl;
     writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
+
+    writeData << "kits = [";
+    for (int i = 0; i < saved_entities.size(); i++)
+    {
+        writeData << std::endl << "  \"" << saved_entities[i] << "\"";
+        if (i < saved_entities.size()-1) writeData << ",";
+    }
+    if (!saved_entities.empty()) writeData << std::endl;
+    writeData << "]" << std::endl;
     writeData.close();
 }
 
@@ -445,6 +454,7 @@ void load_config(std::string file)
     g_val = toml::find_or<float>(opts, "lightness", 0.66);
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0);
+    saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -566,6 +576,7 @@ void save_search()
 {
     std::string search(text);
     saved_entities.push_back(search);
+    save_config(cfgfile);
 }
 
 int entity_type(int uid)
@@ -629,11 +640,11 @@ bool update_entity_cache()
     return false;
 }
 
-void spawn_entities(bool s)
+void spawn_entities(bool s, std::string list = "")
 {
     std::string search(text);
     const auto pos = search.find_first_of(" ");
-    if (pos == std::string::npos && g_filtered_count > 0)
+    if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
         if (g_current_item == 0 && g_filtered_count == g_items.size())
             return;
@@ -644,6 +655,7 @@ void spawn_entities(bool s)
     else
     {
         std::string texts(text);
+        if (list != "") texts = list;
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
@@ -1313,7 +1325,17 @@ void render_input()
         }
         if (search.empty())
             search = i;
+
         ImGui::PushID(2 * n);
+        if (ImGui::Button("X"))
+        {
+            saved_entities.erase(saved_entities.begin() + n);
+            save_config(cfgfile);
+        }
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(4 * n);
         if (ImGui::Button("Load"))
         {
             strcpy(text, i.data());
@@ -1322,12 +1344,14 @@ void render_input()
         }
         ImGui::SameLine();
         ImGui::PopID();
-        ImGui::PushID(4 * n);
-        if (ImGui::Button("X"))
+
+        ImGui::PushID(8 * n);
+        if (ImGui::Button("Spawn"))
         {
-            saved_entities.erase(saved_entities.begin() + n);
+            spawn_entities(false, i);
         }
         ImGui::PopID();
+
         ImGui::PopID();
         ImGui::SameLine();
         ImGui::TextWrapped(search.data());
@@ -2056,12 +2080,12 @@ void render_entity_props()
     if (g_entity == 0)
         return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    render_uid(g_entity->uid, "EntityGeneral"); /*ImGui::SameLine();
+    render_uid(g_entity->uid, "EntityGeneral"); ImGui::SameLine();
     if (ImGui::Button("Void##DeleteEntity"))
     {
         if (g_entity->overlay != 0)
         {
-            EntityMemory *mount = (struct EntityMemory *)g_entity->overlay;
+            Entity *mount = (struct Entity *)g_entity->overlay;
             if (mount->holding_uid == g_entity->uid)
             {
                 mount->holding_uid = -1;
@@ -2069,7 +2093,7 @@ void render_entity_props()
         }
         g_entity->overlay = 0;
         g_entity->y -= 1000.0;
-    }*/
+    }
     if (ImGui::CollapsingHeader("State"))
     {
         render_state("Current state", g_entity->state);
@@ -2082,24 +2106,24 @@ void render_entity_props()
         }
         if (g_entity->holding_uid != -1)
         {
-            ImGui::Text("Holding:"); /*ImGui::SameLine();
+            ImGui::Text("Holding:"); ImGui::SameLine();
             if (ImGui::Button("Drop##DropHolding"))
             {
-                EntityMemory *holding = (struct EntityMemory *)get_entity_ptr(g_entity->holding_uid);
+                Entity *holding = (struct Entity *)get_entity_ptr(g_entity->holding_uid);
                 holding->x = g_entity->x;
                 holding->y = g_entity->y;
                 holding->overlay = 0;
                 g_entity->holding_uid = -1;
-            }*/
+            }
             render_uid(g_entity->holding_uid, "StateHolding");
         }
         Entity *overlay = (Entity *)g_entity->overlay;
         if (!IsBadReadPtr(overlay, 0x178))
         {
-            ImGui::Text("Riding:"); /*ImGui::SameLine();
+            ImGui::Text("Riding:"); ImGui::SameLine();
             if (ImGui::Button("Unmount##UnmountRiding"))
             {
-                EntityMemory *mount = (struct EntityMemory *)g_entity->overlay;
+                Entity *mount = (struct Entity *)g_entity->overlay;
                 if (mount->holding_uid == g_entity->uid)
                 {
                     mount->holding_uid = -1;
@@ -2107,17 +2131,17 @@ void render_entity_props()
                 g_entity->x = mount->x;
                 g_entity->y = mount->y;
                 g_entity->overlay = 0;
-            }*/
+            }
             render_uid(overlay->uid, "StateRiding");
         }
         if (g_entity->last_owner_uid != -1)
         {
-            ImGui::Text("Owner / Attacker:"); /*ImGui::SameLine();
+            ImGui::Text("Owner / Attacker:"); ImGui::SameLine();
             if (ImGui::Button("Remove##RemoveOwner"))
             {
                 g_entity->owner_uid = -1;
                 g_entity->last_owner_uid = -1;
-            }*/
+            }
             render_uid(g_entity->last_owner_uid, "StateOwner");
         }
     }
