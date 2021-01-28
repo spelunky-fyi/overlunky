@@ -2186,9 +2186,9 @@ void render_entity_props()
             ImGui::Text(entity_names[g_entity->inside].data());
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&g_entity->i12c, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
-        else if (g_entity_type == 402)
+        else if (g_entity_type == 402 || g_entity_type == 422 || g_entity_type == 423 || g_entity_type == 475)
         {
-            ImGui::Text("Item in crate:");
+            ImGui::Text("Item in container:");
             ImGui::InputInt("##EntitySpawns", (int*)&g_entity->inside, 1, 10);
             if (g_entity->inside > 0)
             {
