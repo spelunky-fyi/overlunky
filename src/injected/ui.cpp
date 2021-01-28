@@ -145,13 +145,13 @@ static ImFont *font, *bigfont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0, g_sat = 0, g_val = 0;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0;
+int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0, g_force_width = 0, g_force_height = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Entity *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, hidedebug = true, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, freeze_pause = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false;
 Entity *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -397,6 +397,15 @@ void save_config(std::string file)
     writeData << "lightness = " << std::fixed << std::setprecision(2) << g_val << " # float, 0.0 - 1.0" << std::endl;
     writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
+
+    writeData << "kits = [";
+    for (int i = 0; i < saved_entities.size(); i++)
+    {
+        writeData << std::endl << "  \"" << saved_entities[i] << "\"";
+        if (i < saved_entities.size()-1) writeData << ",";
+    }
+    if (!saved_entities.empty()) writeData << std::endl;
+    writeData << "]" << std::endl;
     writeData.close();
 }
 
@@ -445,6 +454,7 @@ void load_config(std::string file)
     g_val = toml::find_or<float>(opts, "lightness", 0.66);
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0);
+    saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -566,6 +576,7 @@ void save_search()
 {
     std::string search(text);
     saved_entities.push_back(search);
+    save_config(cfgfile);
 }
 
 int entity_type(int uid)
@@ -629,11 +640,11 @@ bool update_entity_cache()
     return false;
 }
 
-void spawn_entities(bool s)
+void spawn_entities(bool s, std::string list = "")
 {
     std::string search(text);
     const auto pos = search.find_first_of(" ");
-    if (pos == std::string::npos && g_filtered_count > 0)
+    if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
         if (g_current_item == 0 && g_filtered_count == g_items.size())
             return;
@@ -644,6 +655,7 @@ void spawn_entities(bool s)
     else
     {
         std::string texts(text);
+        if (list != "") texts = list;
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
@@ -1031,7 +1043,7 @@ bool process_keys(
     }
     else if (pressed("spawn_warp_door", wParam))
     {
-        spawn_door(0.0, 0.0, g_world, g_level, 1, g_to + 1);
+        spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
     }
     else if (pressed("move_up", wParam) && active("tool_entity"))
     {
@@ -1073,7 +1085,7 @@ bool process_keys(
     }
     else if (pressed("enter", wParam) && active("tool_door"))
     {
-        spawn_door(0.0, 0.0, g_world, g_level, 1, g_to + 1);
+        spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
     }
     else if (pressed("move_up", wParam) && active("tool_camera"))
     {
@@ -1091,7 +1103,7 @@ bool process_keys(
     }
     else if (pressed("tool_debug", wParam))
     {
-        hidedebug = !hidedebug;
+        show_debug = !show_debug;
     }
     else if (pressed("reset_windows", wParam))
     {
@@ -1313,7 +1325,17 @@ void render_input()
         }
         if (search.empty())
             search = i;
+
         ImGui::PushID(2 * n);
+        if (ImGui::Button("X"))
+        {
+            saved_entities.erase(saved_entities.begin() + n);
+            save_config(cfgfile);
+        }
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(4 * n);
         if (ImGui::Button("Load"))
         {
             strcpy(text, i.data());
@@ -1322,12 +1344,14 @@ void render_input()
         }
         ImGui::SameLine();
         ImGui::PopID();
-        ImGui::PushID(4 * n);
-        if (ImGui::Button("X"))
+
+        ImGui::PushID(8 * n);
+        if (ImGui::Button("Spawn"))
         {
-            saved_entities.erase(saved_entities.begin() + n);
+            spawn_entities(false, i);
         }
         ImGui::PopID();
+
         ImGui::PopID();
         ImGui::SameLine();
         ImGui::TextWrapped(search.data());
@@ -1374,7 +1398,7 @@ void render_narnia()
     render_themes();
     if (ImGui::Button("Warp door"))
     {
-        spawn_door(g_x, g_y, g_world, g_level, 1, g_to + 1);
+        spawn_door(g_x, g_y, g_level, g_world, 1, g_to + 1);
     }
     ImGui::SameLine();
     if (ImGui::Button("Layer door"))
@@ -1479,6 +1503,44 @@ ImVec2 screenify(ImVec2 pos)
     return screened;
 }
 
+void render_grid(ImColor color = ImColor(255, 255, 255, 50))
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    auto *draw_list = ImGui::GetWindowDrawList();
+    for(int x = -1; x < 96; x++)
+    {
+        std::pair<float, float> gridline = screen_position((float)x+0.5, 0);
+        if(abs(gridline.first) <= 1.0) {
+            ImVec2 grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, 2);
+        }
+    }
+    for(int y = -1; y < 128; y++)
+    {
+        std::pair<float, float> gridline = screen_position(0, (float)y+0.5);
+        if(abs(gridline.second) <= 1.0) {
+            ImVec2 grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, 2);
+        }
+    }
+    get_players();
+    for (auto player : g_players)
+    {
+        std::pair<float, float> gridline = screen_position(round(player->position().first-0.5)+0.5, round(player->position().second)-0.5);
+        ImVec2 grids = screenify({gridline.first, gridline.second});
+        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
+        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
+    }
+    if(update_entity())
+    {
+        std::pair<float, float> gridline = screen_position(round(g_entity->position().first-0.5)+0.5, round(g_entity->position().second)-0.5);
+        ImVec2 grids = screenify({gridline.first, gridline.second});
+        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
+    }
+}
+
 void render_hitbox(Entity* ent, bool cross, ImColor color)
 {
     if (ent->items_count > 0)
@@ -1547,23 +1609,28 @@ void set_vel(ImVec2 pos)
 
 void render_clickhandler()
 {
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui::SetNextWindowSize(io.DisplaySize);
+    ImGui::SetNextWindowPos({0, 0});
+    ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+    if(draw_grid)
+    {
+        render_grid();
+    }
+    if(draw_entity_box && update_entity())
+    {
+        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
+    }
+    if(draw_entity_box)
+    {
+        get_players();
+        for (auto player : g_players)
+        {
+            render_hitbox(player, false, ImColor(255, 0, 255, 200));
+        }
+    }
     if (options["mouse_control"])
     {
-        ImGuiIO &io = ImGui::GetIO();
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::SetNextWindowPos({0, 0});
-        ImGui::Begin("Clickhandler", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-        if(draw_entity_box && update_entity())
-        {
-            render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
-        }
-        if(draw_entity_box)
-        {
-            for (auto player : g_players)
-            {
-                render_hitbox(player, false, ImColor(255, 0, 255, 200));
-            }
-        }
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
@@ -1795,8 +1862,8 @@ void render_clickhandler()
         {
             io.MouseDrawCursor = true;
         }
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void render_options()
@@ -1947,7 +2014,7 @@ void render_screen(const char *label, int state)
         ImGui::LabelText(label, "4 Main menu");
     else if (state == 5)
         ImGui::LabelText(label, "5 Options");
-    else if (state == 8)
+    else if (state == 7)
         ImGui::LabelText(label, "7 Leaderboards");
     else if (state == 8)
         ImGui::LabelText(label, "8 Seed input");
@@ -1996,6 +2063,7 @@ void render_entity_props()
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     ImGui::Checkbox("Lock to player one", &lock_player);
     ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &draw_entity_box);
+    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &draw_grid);
     if (lock_player)
     {
         if (!g_players.empty())
@@ -2012,12 +2080,12 @@ void render_entity_props()
     if (g_entity == 0)
         return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    render_uid(g_entity->uid, "EntityGeneral"); /*ImGui::SameLine();
+    render_uid(g_entity->uid, "EntityGeneral"); ImGui::SameLine();
     if (ImGui::Button("Void##DeleteEntity"))
     {
         if (g_entity->overlay != 0)
         {
-            EntityMemory *mount = (struct EntityMemory *)g_entity->overlay;
+            Entity *mount = (struct Entity *)g_entity->overlay;
             if (mount->holding_uid == g_entity->uid)
             {
                 mount->holding_uid = -1;
@@ -2025,7 +2093,7 @@ void render_entity_props()
         }
         g_entity->overlay = 0;
         g_entity->y -= 1000.0;
-    }*/
+    }
     if (ImGui::CollapsingHeader("State"))
     {
         render_state("Current state", g_entity->state);
@@ -2038,24 +2106,24 @@ void render_entity_props()
         }
         if (g_entity->holding_uid != -1)
         {
-            ImGui::Text("Holding:"); /*ImGui::SameLine();
+            ImGui::Text("Holding:"); ImGui::SameLine();
             if (ImGui::Button("Drop##DropHolding"))
             {
-                EntityMemory *holding = (struct EntityMemory *)get_entity_ptr(g_entity->holding_uid);
+                Entity *holding = (struct Entity *)get_entity_ptr(g_entity->holding_uid);
                 holding->x = g_entity->x;
                 holding->y = g_entity->y;
                 holding->overlay = 0;
                 g_entity->holding_uid = -1;
-            }*/
+            }
             render_uid(g_entity->holding_uid, "StateHolding");
         }
         Entity *overlay = (Entity *)g_entity->overlay;
         if (!IsBadReadPtr(overlay, 0x178))
         {
-            ImGui::Text("Riding:"); /*ImGui::SameLine();
+            ImGui::Text("Riding:"); ImGui::SameLine();
             if (ImGui::Button("Unmount##UnmountRiding"))
             {
-                EntityMemory *mount = (struct EntityMemory *)g_entity->overlay;
+                Entity *mount = (struct Entity *)g_entity->overlay;
                 if (mount->holding_uid == g_entity->uid)
                 {
                     mount->holding_uid = -1;
@@ -2063,17 +2131,17 @@ void render_entity_props()
                 g_entity->x = mount->x;
                 g_entity->y = mount->y;
                 g_entity->overlay = 0;
-            }*/
+            }
             render_uid(overlay->uid, "StateRiding");
         }
         if (g_entity->last_owner_uid != -1)
         {
-            ImGui::Text("Owner / Attacker:"); /*ImGui::SameLine();
+            ImGui::Text("Owner / Attacker:"); ImGui::SameLine();
             if (ImGui::Button("Remove##RemoveOwner"))
             {
                 g_entity->owner_uid = -1;
                 g_entity->last_owner_uid = -1;
-            }*/
+            }
             render_uid(g_entity->last_owner_uid, "StateOwner");
         }
     }
@@ -2118,9 +2186,9 @@ void render_entity_props()
             ImGui::Text(entity_names[g_entity->inside].data());
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&g_entity->i12c, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
-        else if (g_entity_type == 402)
+        else if (g_entity_type == 402 || g_entity_type == 422 || g_entity_type == 423 || g_entity_type == 475)
         {
-            ImGui::Text("Item in crate:");
+            ImGui::Text("Item in container:");
             ImGui::InputInt("##EntitySpawns", (int*)&g_entity->inside, 1, 10);
             if (g_entity->inside > 0)
             {
@@ -2257,25 +2325,11 @@ void force_time()
     {
         g_state->time_total = g_total_time;
     }
-    if (freeze_pause && g_pause_time == -1)
-    {
-        g_pause_time = g_state->time_pause;
-    }
-    else if (!freeze_pause)
-    {
-        g_pause_time = -1;
-    }
-    else if (g_pause_time >= 0)
-    {
-        g_state->time_pause = g_pause_time;
-    }
 }
 
 void render_timer()
 {
     int frames = g_state->time_total;
-    if (g_state->screen != 13)
-        frames += g_state->time_pause;
     time_t secs = frames / 60;
     char time[10];
     std::strftime(time, sizeof(time), "%H:%M:%S", std::gmtime(&secs));
@@ -2329,7 +2383,6 @@ void render_game_props()
         std::string lasttime = format_time(g_state->time_last_level);
         std::string leveltime = format_time(g_state->time_level);
         std::string totaltime = format_time(g_state->time_total);
-        std::string pausetime = format_time(g_state->time_pause);
         ImGui::Text("Frz");
         ImGui::Checkbox("##FreezeLast", &freeze_last);
         ImGui::SameLine();
@@ -2352,17 +2405,10 @@ void render_game_props()
             g_total_time = parse_time(totaltime);
             g_state->time_total = g_total_time;
         }
-        ImGui::Checkbox("##FreezePause", &freeze_pause);
-        ImGui::SameLine();
-        if (InputString("Pause##PauseTime", &pausetime))
-        {
-            g_pause_time = parse_time(pausetime);
-            g_state->time_pause = g_pause_time;
-        }
     }
     if (ImGui::CollapsingHeader("Level"))
     {
-        ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char *)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
+        ImGui::InputInt2("Level size##LevelSize", (int*)&g_state->w, ImGuiInputTextFlags_ReadOnly);
         ImGui::DragScalar("World##Worldnumber", ImGuiDataType_U8, (char *)&g_state->world, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Level##Levelnumber", ImGuiDataType_U8, (char *)&g_state->level, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Theme ##Themenumber", ImGuiDataType_U8, (char *)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
@@ -2373,6 +2419,7 @@ void render_game_props()
         ImGui::DragScalar("To Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
         ImGui::Text(theme_name(g_state->theme_next));
+        ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char *)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
         if(ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
         {
             darkmode(dark_mode);
@@ -2385,7 +2432,7 @@ void render_game_props()
         ImGui::DragScalar("NPC kills##NPCKills", ImGuiDataType_U8, (char *)&g_state->kills_npc, 0.5f, &u8_zero, &u8_max);
         ImGui::DragScalar("Kali favor##PorFavor", ImGuiDataType_S8, (char *)&g_state->kali_favor, 0.5f, &s8_min, &s8_max);
         ImGui::DragScalar("Kali status##KaliStatus", ImGuiDataType_S8, (char *)&g_state->kali_status, 0.5f, &s8_min, &s8_max);
-        ImGui::DragScalar("Altars destroyed##KaliAltars", ImGuiDataType_U8, (char *)&g_state->kali_altars_destroyed, 0.5f, &u8_min, &u8_max);
+        ImGui::DragScalar("Altars destroyed##KaliAltars", ImGuiDataType_S8, (char *)&g_state->kali_altars_destroyed, 0.5f, &s8_min, &s8_max);
     }
     if (ImGui::CollapsingHeader("Players"))
     {
@@ -2673,18 +2720,18 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::End();
         }
 
-        if (!hidedebug)
+        if (show_debug)
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
-            ImGui::Begin(windows["tool_debug"].c_str());
+            ImGui::Begin(windows["tool_debug"].c_str(), &show_debug);
             render_debug();
             ImGui::End();
         }
 
         if (change_colors)
         {
-            ImGui::Begin(windows["tool_style"].c_str());
+            ImGui::Begin(windows["tool_style"].c_str(), &change_colors);
             ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
             render_style_editor();
             ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x/2 - ImGui::GetWindowWidth()/2, ImGui::GetIO().DisplaySize.y/2 - ImGui::GetWindowHeight()/2});

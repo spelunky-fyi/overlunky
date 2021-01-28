@@ -48,11 +48,12 @@ struct StateMemory {
     int32_t i38;
     int32_t i3c;
     int32_t i40;
+    int32_t i44;
     uint32_t w;
     uint32_t h;
     int8_t kali_favor;
     int8_t kali_status;
-    uint8_t kali_altars_destroyed;
+    int8_t kali_altars_destroyed;
     uint8_t b4f;
     int32_t i50;
     int32_t i54;
@@ -75,15 +76,14 @@ struct StateMemory {
     uint8_t b7d;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t pad80[0x96c]; //0x9ec-0x80
+    uint8_t pad84[0x968]; //0x9ec-0x80
     uint32_t journal_flags;
     int32_t i9f0;
     int32_t i9f4;
     uint32_t time_last_level;
     uint32_t time_level;
-    uint32_t time_pause;
+    int32_t ia00;
     int32_t ia04;
-    int32_t ia08;
     uint32_t hud_flags;
 };
 

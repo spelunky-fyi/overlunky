@@ -61,7 +61,7 @@ struct State {
         //write_mem_prot(memory.at_exe(addr_zoom + 6), to_le_bytes(level), true);
         //addr_zoom = memory.after_bundle;
 
-        auto roomx_addr = ptr() + 0x44;
+        auto roomx_addr = ptr() + 0x48;
         uint8_t roomx = read_u8(roomx_addr);
         if (level == 0.0) {
             switch (roomx) {

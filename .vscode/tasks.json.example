@@ -10,6 +10,14 @@
             "command": "mkdir -Force build"
         },
         {
+            "label": "CMake Release",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
+            "command": "cmake ..; cmake --build . --config Release --target ALL_BUILD -- /maxcpucount:14",
+        },
+        {
             "label": "CMake Debug",
             "type": "shell",
             "options": {
@@ -18,12 +26,12 @@
             "command": "cmake ..; cmake --build . --config Debug --target ALL_BUILD -- /maxcpucount:14",
         },
         {
-            "label": "CMake Release",
+            "label": "CMake RelWithDebInfo",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceRoot}/build"
             },
-            "command": "cmake ..; cmake --build . --config Release --target ALL_BUILD -- /maxcpucount:14",
+            "command": "cmake ..; cmake --build . --config RelWithDebInfo --target ALL_BUILD -- /maxcpucount:14",
         },
         {
             "label": "Build Release",
@@ -34,6 +42,11 @@
             "label": "Build Debug",
             "dependsOrder": "sequence",
             "dependsOn": ["Make build dir", "CMake Debug"]
+        },
+        {
+            "label": "Build RelWithDebInfo",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Make build dir", "CMake RelWithDebInfo"]
         }
     ]
 }
