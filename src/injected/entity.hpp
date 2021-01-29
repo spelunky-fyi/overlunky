@@ -69,14 +69,13 @@ struct StateMemory {
     uint8_t theme_next;
     uint8_t b72;
     uint8_t b73;
-    int32_t i74;
     uint16_t shoppie_aggro;
     uint16_t merchant_aggro;
     uint8_t b7c;
     uint8_t b7d;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t pad84[0x968]; //0x9ec-0x80
+    uint8_t pad84[0x96c];
     uint32_t journal_flags;
     int32_t i9f0;
     int32_t i9f4;

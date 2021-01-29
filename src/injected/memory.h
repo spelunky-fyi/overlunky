@@ -83,5 +83,5 @@ decode_call(size_t off) {
     return off + (*(int32_t *) (&memory.exe()[off + 1])) + 5;
 }
 
-#define ONCE(type) static bool once = false; static type res; if(once) return res; else if(once=true)
+#define ONCE(type) static bool once = false; static type res; if(once) return res; once=true;
 

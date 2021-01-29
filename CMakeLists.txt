@@ -11,6 +11,7 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 add_definitions("-DGIT_VERSION=${GIT_VERSION}")
+add_definitions("-D_ITERATOR_DEBUG_LEVEL=0")
 
 add_subdirectory(src)
 

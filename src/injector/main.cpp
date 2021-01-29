@@ -54,6 +54,6 @@ int main()
         call(
             proc,
             find_function(proc, path.string(), "run"),
-            (LPVOID)GetCurrentProcessId());
+            (LPVOID)(uint64_t)GetCurrentProcessId());
     }
 }
