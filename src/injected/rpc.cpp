@@ -3,7 +3,7 @@
 #include "ui.hpp"
 
 // TODO: expose this to RPC
-uint32_t spawn_entity(size_t id, float x, float y, bool s, float vx, float vy, bool snap)
+uint32_t spawn_entity(size_t id, float x = 0.0f, float y = 0.0f, bool s = false, float vx = 0.0f, float vy = 0.0f, bool snap = false)
 {
     auto state = State::get();
     // crate::example::spawn_caveman_with_turkey();

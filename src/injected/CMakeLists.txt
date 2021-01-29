@@ -7,4 +7,8 @@ target_link_libraries(injected
         shared
         imgui
         toml11::toml11
+        sol2::sol2
+        ${LUA_LIBRARY}
         Shlwapi)
+target_include_directories(injected PRIVATE
+        ${LUA_INCLUDE_DIR})

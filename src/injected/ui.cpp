@@ -24,6 +24,17 @@
 #include "ui.hpp"
 #include "rpc.hpp"
 
+#define SOL_ALL_SAFETIES_ON 1
+#include <sol/sol.hpp>
+sol::state lua;
+static char script[102400];
+std::string scriptresult;
+struct ScriptState
+{
+    Entity *player;
+};
+ScriptState scriptstate = { 0 };
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
@@ -67,6 +78,7 @@ std::map<std::string, int> keys
     {"toggle_snap", 0x153},
     {"toggle_pause", 0x150},
     {"toggle_disable_input", 0x14b},
+    {"toggle_disable_input_alt", 0x34b},
     {"toggle_disable_pause", 0x350},
     {"tool_entity", 0x70},
     {"tool_door", 0x71},
@@ -145,13 +157,13 @@ static ImFont *font, *bigfont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0, g_sat = 0, g_val = 0;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0, g_force_width = 0, g_force_height = 0;
+int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0, g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0, g_force_width = 0, g_force_height = 0, register_keys = 0, register_keys_alt = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Entity *> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, register_keys = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false, file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false, show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false;
 Entity *g_entity = 0;
 Entity *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -195,6 +207,7 @@ std::map<std::string, bool> options =
     {"stack_vertically", false},
     {"disable_pause", false},
     {"disable_input", true},
+    {"disable_input_alt", false},
 };
 
 ImVec4 hue_shift(ImVec4 in, float hue)
@@ -365,6 +378,11 @@ std::string key_string(int keycode)
         name = "Ctrl+" + name;
     }
     return name;
+}
+
+bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags = 0)
+{
+    return ImGui::InputText(label, (char *)str->c_str(), 9, flags);
 }
 
 void save_config(std::string file)
@@ -759,9 +777,9 @@ void force_hud_flags()
 {
     if (g_state == 0)
         return;
-    if (!options["disable_pause"])
+    if (!options["disable_pause"] && !ImGui::GetIO().WantCaptureKeyboard && !register_keys_alt)
         g_state->hud_flags |= 1U << 19;
-    else
+    else if (!ImGui::GetIO().WantCaptureKeyboard)
         g_state->hud_flags &= ~(1U << 19);
     if (hud_dark_level)
         g_state->hud_flags |= 1U << 17;
@@ -996,6 +1014,10 @@ bool process_keys(
     else if (pressed("toggle_disable_input", wParam))
     {
         options["disable_input"] = !options["disable_input"];
+    }
+    else if (pressed("toggle_disable_input_alt", wParam))
+    {
+        options["disable_input_alt"] = !options["disable_input_alt"];
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -1575,6 +1597,25 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     draw_list->AddLine(sboxd, sboxa, color, 2);
 }
 
+void render_script()
+{
+    get_players();
+    if (g_players.empty()) return;
+    if (g_state == 0) return;
+	try {
+		auto result = lua.safe_script(script);
+        sol::function onFrame = lua["onFrame"];
+        sol::function onLevel = lua["onLevel"];
+        if(onFrame) onFrame();
+        if(onLevel && g_state->screen == 12 && scriptstate.player != g_players.at(0)) onLevel();
+        scriptstate.player = g_players.at(0);
+        scriptresult = "OK";
+	}
+	catch( const sol::error& e ) {
+		scriptresult = e.what();
+	}
+}
+
 ImVec2 normalize(ImVec2 pos)
 {
     ImGuiIO &io = ImGui::GetIO();
@@ -1629,6 +1670,7 @@ void render_clickhandler()
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
     }
+    render_script();
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
@@ -1878,7 +1920,8 @@ void render_options()
     {
         force_hud_flags();
     }
-    ImGui::Checkbox("Disable game keys when typing##Typing", &options["disable_input"]);
+    ImGui::Checkbox("Disable input when typing (hook rawinput)##DisableInputRaw", &options["disable_input"]);
+    ImGui::Checkbox("Disable input when typing (alternative mode)##DisableInputFlags", &options["disable_input_alt"]);
     if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
     {
         options["stack_vertically"] = false;
@@ -1896,6 +1939,11 @@ void render_debug()
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Level flags##HudFlagsDebug", ImGuiDataType_U32, &g_state->hud_flags, 0, 0, "%08X", ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
     ImGui::InputScalar("Journal flags##JournalFlagsDebug", ImGuiDataType_U32, &g_state->journal_flags, 0, 0, "%08X", ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
+    ImGui::PopItemWidth();
+    ImGui::PushItemWidth(-1);
+    ImGui::Text("Scripting playground:");
+    ImGui::InputTextMultiline("##LuaScript", script, sizeof(script), {-1, 300});
+    InputString("##LuaResult", &scriptresult, ImGuiInputTextFlags_ReadOnly);
     ImGui::PopItemWidth();
 }
 
@@ -2278,11 +2326,6 @@ int parse_time(std::string time)
     std::stringstream ss(time);
     ss >> std::get_time(&tm, "%H:%M:%S");
     return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
-}
-
-bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags = 0)
-{
-    return ImGui::InputText(label, (char *)str->c_str(), 9, flags);
 }
 
 void force_time()
@@ -2759,28 +2802,44 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     if (!file_written)
         write_file();
 
-    if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard && (active("tool_entity") || active("tool_door") || active("tool_camera") || active("tool_entity_properties") || active("tool_game_properties") || active("tool_debug")))
+    if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard)
     {
         HID_RegisterDevice(window, HID_KEYBOARD);
         capture_last = true;
     }
-    else if (options["disable_input"] && capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
+    else if (capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
     {
         capture_last = false;
-        register_keys = true;
+        register_keys = ImGui::GetFrameCount()+10;
     }
-    else if (register_keys)
+    else if (register_keys && ImGui::GetFrameCount() > register_keys)
     {
-        register_keys = false;
+        register_keys = 0;
         gamewindow = FindTopWindow(GetCurrentProcessId());
         HID_RegisterDevice(gamewindow, HID_KEYBOARD);
     }
-    /*if(!(active("tool_entity") || active("tool_door") || active("tool_camera")))
+
+    if (options["disable_input_alt"] && ImGui::GetIO().WantCaptureKeyboard)
     {
-        ImGuiIO &io = ImGui::GetIO();
-        io.WantCaptureKeyboard = false;
-        io.NavActive = false;
-    }*/
+        get_players();
+        for (auto player : g_players)
+        {
+            player->more_flags |= 1U << 15;
+        }
+        if(g_state != 0)
+            g_state->hud_flags &= ~(1U << 19);
+        register_keys_alt = ImGui::GetFrameCount()+ImGui::GetIO().Framerate/10;
+    }
+    else if (!ImGui::GetIO().WantCaptureKeyboard && register_keys_alt && ImGui::GetFrameCount() > register_keys_alt)
+    {
+        register_keys_alt = 0;
+        for (auto player : g_players)
+        {
+            player->more_flags &= ~(1U << 15);
+        }
+        if(g_state != 0 && !options["disable_pause"])
+            g_state->hud_flags |= 1U << 19;
+    }
 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -2839,12 +2898,25 @@ PresentPtr &vtable_find(T *obj, int index)
 {
     void ***ptr = reinterpret_cast<void ***>(obj);
     if (!ptr[0])
-        return *reinterpret_cast<PresentPtr *>(nullptr);
+        return *static_cast<PresentPtr *>(nullptr);
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
+}
+
+void init_script()
+{
+    lua.set_function("beep", [] {
+        update_players();
+        for (auto player : g_players)
+        {
+            render_hitbox(player, false, ImColor(255, 0, 255, 200));
+        }
+    });
+    lua["spawn_entity"] = spawn_entity;
 }
 
 bool init_hooks(size_t _ptr)
 {
+    init_script();
     pSwapChain = reinterpret_cast<IDXGISwapChain *>(_ptr);
     PresentPtr &ptr = vtable_find(pSwapChain, 8);
     DWORD oldProtect;
