@@ -2795,7 +2795,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         write_file();
 
     if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard)
-    {
+    { // TODO: Add alternative disable input mode (set player and pause flags)
         HID_RegisterDevice(window, HID_KEYBOARD);
         capture_last = true;
     }
