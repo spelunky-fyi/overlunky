@@ -4,3 +4,6 @@
 [submodule "src/toml11"]
 	path = src/toml11
 	url = https://github.com/ToruNiina/toml11
+[submodule "src/sol2"]
+	path = src/sol2
+	url = https://github.com/ThePhD/sol2
