@@ -75,7 +75,7 @@ struct StateMemory {
     uint8_t b7d;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t pad84[0x970];
+    uint8_t pad84[0x96c];
     uint32_t journal_flags;
     int32_t i9f0;
     int32_t i9f4;
