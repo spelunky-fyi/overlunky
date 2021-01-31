@@ -12,6 +12,8 @@
 
 using namespace std::chrono_literals;
 
+inline constexpr bool enable_console{false};
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
                     DWORD fdwReason,     // reason for calling function
                     LPVOID lpReserved)   // reserved
@@ -33,7 +35,7 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type) {
 }
 
 void attach_stdout(DWORD pid) {
-    if (false) {
+    if constexpr (enable_console) {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
     }
@@ -41,9 +43,9 @@ void attach_stdout(DWORD pid) {
 
 extern "C" __declspec(dllexport) void run(DWORD pid) {
     attach_stdout(pid);
-    FILE *fp = fopen("spelunky.log", "w");
+    FILE *fp = fopen("spelunky.log", "a");
     if (!fp) {
-        PANIC("%d", errno);
+        PANIC("{}", errno);
     }
     {
         fputs("Overlunky loaded\n", fp);
@@ -55,20 +57,20 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
     while (true) {
         auto entities = list_entities();
         if (entities.size() >= 850) {
-            DEBUG("Found {:?} entities, that's enough", entities.size());
+            DEBUG("Found {} entities, that's enough", entities.size());
             std::this_thread::sleep_for(100ms);
             create_box(entities);
-            DEBUG("Added {:?} entities", entities.size());
+            DEBUG("Added {} entities", entities.size());
             break;
         } else if (entities.size() > 0) {
-            DEBUG("Found {:?} entities", entities.size());
+            DEBUG("Found {} entities", entities.size());
         }
         std::this_thread::sleep_for(100ms);
     }
 
     auto api = RenderAPI::get();
     init_hooks(api.swap_chain());
-    if (false) {
+    if constexpr (enable_console) {
         {
             DEBUG("Enter entity #IDs to spawn, one per line >");
             std::string line;

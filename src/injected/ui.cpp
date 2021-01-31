@@ -2833,7 +2833,7 @@ bool init_hooks(size_t _ptr) {
     if (!VirtualProtect(reinterpret_cast<LPVOID>(
                             reinterpret_cast<uintptr_t>(&ptr) & ~0xFFF),
                         0x1000, PAGE_READWRITE, &oldProtect)) {
-        PANIC("VirtualProtect error: 0x%lx\n", GetLastError());
+        PANIC("VirtualProtect error: {:#x}\n", GetLastError());
     }
 
     if (!ptr) {

@@ -78,7 +78,7 @@ void list_items() {
     auto player = state.items()->player(0);
     if (player == nullptr) return;
     for (auto &item : state.layer(player->layer())->items()) {
-        DEBUG("Item {} {:x}, {:?}", item->uid, item->type->search_flags,
+        DEBUG("Item {} {:x}, {}", item->uid, item->type->search_flags,
               item->position_self());
     }
 }
@@ -90,7 +90,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask) {
         x = rx;
         y = ry;
     }
-    DEBUG("Items at {:?}:", (x, y));
+    DEBUG("Items at {}:", (x, y));
     auto player = state.items()->player(0);
     if (player == nullptr) return 0;
     std::vector<std::tuple<int, float, Entity *>> found;
@@ -99,7 +99,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask) {
         auto flags = item->type->search_flags;
         float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
         if ((mask & flags) > 0 && distance < r) {
-            DEBUG("Item {}, {:x} type, {:?} position, {} distance, {:x?}",
+            DEBUG("Item {}, {:x} type, {} position, {} distance, {:x?}",
                   item->uid, item->type->search_flags, item->position_self(),
                   distance, item->pointer());
             found.push_back({item->uid, distance, item});
@@ -111,7 +111,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask) {
         });
         auto picked = found[0];
         auto entity = std::get<2>(picked);
-        DEBUG("{:#x?}", entity);
+        DEBUG("{:#x?}", (void *)entity);
         return std::get<0>(picked);
     }
     return 0;
@@ -178,7 +178,7 @@ void player_status() {
     auto player = state.items()->player(0);
     if (player == nullptr) return;
     auto status = player->inventory_ptr;
-    DEBUG("Player {:?}", status, status->ropes, status->bombs);
+    DEBUG("Player {}", (void *)status, status->ropes, status->bombs);
     status->ropes = (99);
     status->bombs = (99);
 }

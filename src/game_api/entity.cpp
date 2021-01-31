@@ -132,13 +132,13 @@ std::pair<float, float> Entity::position_self() const {
 
 void Door::set_target(uint8_t w, uint8_t l, uint8_t f, uint8_t t) {
     uint8_t array[5] = {1, l, f, w, t};
-    DEBUG("Making door go to {:?}", array);
+    DEBUG("Making door go to {}", array);
     write_mem(pointer() + 0xc1, std::string((char *)array, sizeof(array)));
 }
 
 void Mount::carry(Movable *rider) {
     auto carry = (get_carry());
-    INFO("0x%x", read_u8(rider->pointer() + 0x10e));
+    INFO("{:#x}", read_u8(rider->pointer() + 0x10e));
     write_mem(rider->pointer() + 0x10e, "\x11");
     return carry(this, rider);
 }
