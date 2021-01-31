@@ -12,6 +12,8 @@
 
 using namespace std::chrono_literals;
 
+inline constexpr bool enable_console{false};
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
                     DWORD fdwReason,     // reason for calling function
                     LPVOID lpReserved)   // reserved
@@ -33,8 +35,10 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type) {
 }
 
 void attach_stdout(DWORD pid) {
-    if (false) {
-        AttachConsole(pid);
+    if constexpr (enable_console) {
+        if (!AttachConsole(pid)) {
+            AllocConsole();
+        }
         SetConsoleCtrlHandler(ctrl_handler, 1);
     }
 }
@@ -68,7 +72,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
 
     auto api = RenderAPI::get();
     init_hooks(api.swap_chain());
-    if (false) {
+    if constexpr (enable_console) {
         {
             DEBUG("Enter entity #IDs to spawn, one per line >");
             std::string line;
