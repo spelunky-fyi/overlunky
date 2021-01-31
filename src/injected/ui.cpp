@@ -1530,8 +1530,10 @@ void render_script() {
             // multiple times.
             g_luaCallbacks.clear();
             auto result = lua.safe_script(script);
+            scriptresult = "OK";
         } catch (const sol::error &e) {
             scriptresult = e.what();
+            return;
         }
     }
     try {
@@ -1553,7 +1555,6 @@ void render_script() {
         }
 
         scriptstate.player = g_players.at(0);
-        scriptresult = "OK";
     } catch (const sol::error &e) {
         scriptresult = e.what();
     }
@@ -2528,8 +2529,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval,
         windows["tool_style"] =
             "Style (" + key_string(keys["tool_style"]) + ")";
         windows["entities"] = "##Entities";
-        g_state = (struct StateMemory *)get_state_ptr();
-        g_state_addr = reinterpret_cast<uintptr_t>(g_state);
     }
 
     ImGui_ImplDX11_NewFrame();
@@ -2801,6 +2800,9 @@ PresentPtr &vtable_find(T *obj, int index) {
 }
 
 void init_script() {
+    g_state = (struct StateMemory *)get_state_ptr();
+    g_state_addr = reinterpret_cast<uintptr_t>(g_state);
+
     lua.open_libraries(sol::lib::math);
     lua.set_function("beep", [] {
         update_players();
@@ -2817,6 +2819,7 @@ void init_script() {
         g_luaCallbacks.push_back(luaCb);
     });
     lua["spawn_entity"] = spawn_entity;
+    lua["shopAggro"] = &g_state->shoppie_aggro;
 
     lua.create_named_table("ENT_TYPE");
     for (int i = 1; i < g_items.size(); i++) {
