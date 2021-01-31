@@ -6,13 +6,10 @@
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 #include <d3d11.h>
-#include <Windows.h>
 #include <Shlwapi.h>
 #include <ShlObj.h>
 #include <algorithm>
-#include <sstream>
 #include <string>
-#include <iostream>
 #include <fstream>
 #include <locale>
 #include <codecvt>
@@ -22,13 +19,15 @@
 #include <chrono>
 
 #include "entity.hpp"
-#include "ui.hpp"
+#include "state.hpp"
 #include "rpc.hpp"
+#include "ui.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol/sol.hpp>
 sol::state lua;
 static char script[102400];
+bool script_changed;
 std::string scriptresult;
 bool scriptchanged = false;
 struct ScriptState
@@ -73,72 +72,72 @@ void HID_UnregisterDevice(USHORT usage)
 }
 
 std::map<std::string, int> keys
-{
-    {"enter", 0x0d},
-    {"escape", 0x1b},
-    {"move_left", 0x25},
-    {"move_up", 0x26},
-    {"move_right", 0x27},
-    {"move_down", 0x28},
-    {"move_pageup", 0x21},
-    {"move_pagedown", 0x22},
-    {"toggle_mouse", 0x14d},
-    {"toggle_godmode", 0x147},
-    {"toggle_snap", 0x153},
-    {"toggle_pause", 0x150},
-    {"toggle_disable_input", 0x14b},
-    {"toggle_disable_input_alt", 0x34b},
-    {"toggle_disable_pause", 0x350},
-    {"tool_entity", 0x70},
-    {"tool_door", 0x71},
-    {"tool_camera", 0x72},
-    {"tool_entity_properties", 0x73},
-    {"tool_game_properties", 0x74},
-    {"tool_options", 0x78},
-    {"tool_debug", 0x37b},
-    {"tool_metrics", 0x349},
-    {"tool_style", 0x355},
-    {"reset_windows", 0x352},
-    {"reset_windows_vertical", 0x356},
-    {"save_settings", 0x353},
-    {"load_settings", 0x34c},
-    {"spawn_entity", 0x10d},
-    {"spawn_layer_door", 0x20d},
-    {"spawn_warp_door", 0x30d},
-    {"hide_ui", 0x7a},
-    {"zoom_in", 0x1bc},
-    {"zoom_out", 0x1be},
-    {"zoom_default", 0x132},
-    {"zoom_3x", 0x133},
-    {"zoom_4x", 0x134},
-    {"zoom_5x", 0x135},
-    {"zoom_auto", 0x130},
-    {"teleport", 0x320},
-    {"teleport_left", 0x325},
-    {"teleport_up", 0x326},
-    {"teleport_right", 0x327},
-    {"teleport_down", 0x328},
-    {"coordinate_left", 0x125},
-    {"coordinate_up", 0x126},
-    {"coordinate_right", 0x127},
-    {"coordinate_down", 0x128},
-    {"mouse_spawn", 0x401},
-    {"mouse_spawn_throw", 0x401},
-    {"mouse_teleport", 0x402},
-    {"mouse_teleport_throw", 0x402},
-    {"mouse_grab", 0x403},
-    {"mouse_grab_unsafe", 0x603},
-    {"mouse_grab_throw", 0x503},
-    {"mouse_zap", 0x404},
-    {"mouse_blast", 0x504},
-    {"mouse_boom", 0x0},
-    {"mouse_big_boom", 0x604},
-    {"mouse_nuke", 0x704},
-    {"mouse_clone", 0x505},
-    {"mouse_destroy", 0x405},
-    {"mouse_destroy_unsafe", 0x605},
-    //{ "", 0x },
-};
+        {
+                {"enter", 0x0d},
+                {"escape", 0x1b},
+                {"move_left", 0x25},
+                {"move_up", 0x26},
+                {"move_right", 0x27},
+                {"move_down", 0x28},
+                {"move_pageup", 0x21},
+                {"move_pagedown", 0x22},
+                {"toggle_mouse", 0x14d},
+                {"toggle_godmode", 0x147},
+                {"toggle_snap", 0x153},
+                {"toggle_pause", 0x150},
+                {"toggle_disable_input", 0x14b},
+                {"toggle_disable_input_alt", 0x34b},
+                {"toggle_disable_pause", 0x350},
+                {"tool_entity", 0x70},
+                {"tool_door", 0x71},
+                {"tool_camera", 0x72},
+                {"tool_entity_properties", 0x73},
+                {"tool_game_properties", 0x74},
+                {"tool_options", 0x78},
+                {"tool_debug", 0x37b},
+                {"tool_metrics", 0x349},
+                {"tool_style", 0x355},
+                {"reset_windows", 0x352},
+                {"reset_windows_vertical", 0x356},
+                {"save_settings", 0x353},
+                {"load_settings", 0x34c},
+                {"spawn_entity", 0x10d},
+                {"spawn_layer_door", 0x20d},
+                {"spawn_warp_door", 0x30d},
+                {"hide_ui", 0x7a},
+                {"zoom_in", 0x1bc},
+                {"zoom_out", 0x1be},
+                {"zoom_default", 0x132},
+                {"zoom_3x", 0x133},
+                {"zoom_4x", 0x134},
+                {"zoom_5x", 0x135},
+                {"zoom_auto", 0x130},
+                {"teleport", 0x320},
+                {"teleport_left", 0x325},
+                {"teleport_up", 0x326},
+                {"teleport_right", 0x327},
+                {"teleport_down", 0x328},
+                {"coordinate_left", 0x125},
+                {"coordinate_up", 0x126},
+                {"coordinate_right", 0x127},
+                {"coordinate_down", 0x128},
+                {"mouse_spawn", 0x401},
+                {"mouse_spawn_throw", 0x401},
+                {"mouse_teleport", 0x402},
+                {"mouse_teleport_throw", 0x402},
+                {"mouse_grab", 0x403},
+                {"mouse_grab_unsafe", 0x603},
+                {"mouse_grab_throw", 0x503},
+                {"mouse_zap", 0x404},
+                {"mouse_blast", 0x504},
+                {"mouse_boom", 0x0},
+                {"mouse_big_boom", 0x604},
+                {"mouse_nuke", 0x704},
+                {"mouse_clone", 0x505},
+                {"mouse_destroy", 0x405},
+                {"mouse_destroy_unsafe", 0x605},
+                //{ "", 0x },
+        };
 
 std::map<std::string, std::string> windows;
 
@@ -208,26 +207,26 @@ const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a 
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
 std::map<std::string, bool> options =
-{
-    {"mouse_control", false},
-    {"god_mode", false},
-    {"snap_to_grid", false},
-    {"stack_horizontally", false},
-    {"stack_vertically", false},
-    {"disable_pause", false},
-    {"disable_input", true},
-    {"disable_input_alt", false},
-};
+        {
+                {"mouse_control", false},
+                {"god_mode", false},
+                {"snap_to_grid", false},
+                {"stack_horizontally", false},
+                {"stack_vertically", false},
+                {"disable_pause", false},
+                {"disable_input", true},
+                {"disable_input_alt", false},
+        };
 
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
     float U = cos(hue * 3.14159265 / 180);
     float W = sin(hue * 3.14159265 / 180);
     ImVec4 out = ImVec4(
-        (.299 + .701 * U + .168 * W) * in.x + (.587 - .587 * U + .330 * W) * in.y + (.114 - .114 * U - .497 * W) * in.z,
-        (.299 - .299 * U - .328 * W) * in.x + (.587 + .413 * U + .035 * W) * in.y + (.114 - .114 * U + .292 * W) * in.z,
-        (.299 - .3 * U + 1.25 * W) * in.x + (.587 - .588 * U - 1.05 * W) * in.y + (.114 + .886 * U - .203 * W) * in.z,
-        in.w); //((float)rand() / RAND_MAX) * 0.5 + 0.5);
+            (.299 + .701 * U + .168 * W) * in.x + (.587 - .587 * U + .330 * W) * in.y + (.114 - .114 * U - .497 * W) * in.z,
+            (.299 - .299 * U - .328 * W) * in.x + (.587 + .413 * U + .035 * W) * in.y + (.114 - .114 * U + .292 * W) * in.z,
+            (.299 - .3 * U + 1.25 * W) * in.x + (.587 - .588 * U - 1.05 * W) * in.y + (.114 + .886 * U - .203 * W) * in.z,
+            in.w); //((float)rand() / RAND_MAX) * 0.5 + 0.5);
     return out;
 }
 /*void set_colors()
@@ -319,14 +318,14 @@ void set_colors()
 }
 
 bool process_keys(
-    _In_ int nCode,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam);
+        _In_ int nCode,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam);
 
 bool process_resizing(
-    _In_ int nCode,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam);
+        _In_ int nCode,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam);
 
 std::string key_string(int keycode)
 {
@@ -343,26 +342,26 @@ std::string key_string(int keycode)
         UINT scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
         switch (virtualKey)
         {
-        case VK_LEFT:
-        case VK_UP:
-        case VK_RIGHT:
-        case VK_DOWN:
-        case VK_RCONTROL:
-        case VK_RMENU:
-        case VK_LWIN:
-        case VK_RWIN:
-        case VK_APPS:
-        case VK_PRIOR:
-        case VK_NEXT:
-        case VK_END:
-        case VK_HOME:
-        case VK_INSERT:
-        case VK_DELETE:
-        case VK_DIVIDE:
-        case VK_NUMLOCK:
-            scanCode |= KF_EXTENDED;
-        default:
-            result = GetKeyNameTextA(scanCode << 16, szName, 128);
+            case VK_LEFT:
+            case VK_UP:
+            case VK_RIGHT:
+            case VK_DOWN:
+            case VK_RCONTROL:
+            case VK_RMENU:
+            case VK_LWIN:
+            case VK_RWIN:
+            case VK_APPS:
+            case VK_PRIOR:
+            case VK_NEXT:
+            case VK_END:
+            case VK_HOME:
+            case VK_INSERT:
+            case VK_DELETE:
+            case VK_DIVIDE:
+            case VK_NUMLOCK:
+                scanCode |= KF_EXTENDED;
+            default:
+                result = GetKeyNameTextA(scanCode << 16, szName, 128);
         }
         if (result == 0)
         {
@@ -457,7 +456,7 @@ void load_config(std::string file)
         save_config(file);
         return;
     }
-    for (const auto &kv : keys) 
+    for (const auto &kv : keys)
     {
         keys[kv.first] = toml::find_or<toml::integer>(hotkeys, kv.first, kv.second);
     }
@@ -471,7 +470,7 @@ void load_config(std::string file)
         save_config(file);
         return;
     }
-    for (const auto &kv : options) 
+    for (const auto &kv : options)
     {
         options[kv.first] = (bool)toml::find_or<int>(opts, kv.first, (int)kv.second);
     }
@@ -491,20 +490,20 @@ HWND FindTopWindow(DWORD pid)
 
     // Enumerate the windows using a lambda to process each window
     BOOL bResult = EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
-        auto pParams = (std::pair<HWND, DWORD> *)(lParam);
+                                   auto pParams = (std::pair<HWND, DWORD> *)(lParam);
 
-        DWORD processId;
-        if (GetWindowThreadProcessId(hwnd, &processId) && processId == pParams->second && hwnd != window)
-        {
-            // Stop enumerating
-            SetLastError(-1);
-            pParams->first = hwnd;
-            return FALSE;
-        }
+                                   DWORD processId;
+                                   if (GetWindowThreadProcessId(hwnd, &processId) && processId == pParams->second && hwnd != window)
+                                   {
+                                       // Stop enumerating
+                                       SetLastError(-1);
+                                       pParams->first = hwnd;
+                                       return FALSE;
+                                   }
 
-        // Continue enumerating
-        return TRUE;
-    },
+                                   // Continue enumerating
+                                   return TRUE;
+                               },
                                (LPARAM)&params);
 
     if (!bResult && GetLastError() == -1 && params.first)
@@ -534,24 +533,6 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
     {
         return CallWindowProc(orig_wndproc, window, message, wParam, lParam);
     }
-}
-
-LRESULT CALLBACK msg_hook(
-    _In_ int nCode,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam)
-{
-    auto msg = (MSG *)(lParam);
-
-    if (msg->hwnd != window)
-        return 0;
-
-    if (process_keys(msg->message, msg->wParam, msg->lParam))
-        return 0;
-    if (process_resizing(msg->message, msg->wParam, msg->lParam))
-        return 0;
-
-    return ImGui_ImplWin32_WndProcHandler(msg->hwnd, msg->message, msg->wParam, msg->lParam);
 }
 
 bool toggle(std::string tool)
@@ -638,15 +619,6 @@ Entity *entity_ptr(int uid)
 
 bool update_players()
 {
-    /*if (g_players.size() > 0)
-    {
-        if (g_players.at(0)->uid != cache_player)
-        {
-            get_players();
-            return true;
-        }
-        return false;
-    }*/
     get_players();
     return true;
 }
@@ -797,9 +769,9 @@ void force_hud_flags()
 }
 
 LRESULT CALLBACK window_hook(
-    _In_ int nCode,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam)
+        _In_ int nCode,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam)
 {
     auto msg = (CWPSTRUCT *)(lParam);
     if (msg->hwnd != window)
@@ -911,9 +883,9 @@ bool released(std::string keyname)
 }
 
 bool process_keys(
-    _In_ int nCode,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam)
+        _In_ int nCode,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam)
 {
     if (nCode != WM_KEYDOWN)
     {
@@ -1184,15 +1156,12 @@ bool process_keys(
 
 void init_imgui()
 {
-
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
     io.MouseDrawCursor = true;
     ImGui_ImplWin32_Init(window);
     ImGui_ImplDX11_Init(pDevice, pContext);
-
-    freopen("CONOUT$", "w", stdout);
 
     /*if (!SetWindowsHookExA(WH_GETMESSAGE, msg_hook, 0, GetCurrentThreadId()))
     {
@@ -1641,10 +1610,10 @@ void render_script()
 
         scriptstate.player = g_players.at(0);
         scriptresult = "OK";
-	}
-	catch( const sol::error& e ) {
-		scriptresult = e.what();
-	}
+    }
+    catch( const sol::error& e ) {
+        scriptresult = e.what();
+    }
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -2583,24 +2552,24 @@ bool process_resizing(_In_ int nCode,
     static bool on_titlebar = false;
     switch (nCode)
     {
-    case WM_NCLBUTTONDOWN:
-        return on_titlebar = true;
-    case WM_LBUTTONUP:
-        if (on_titlebar && GetCapture() == window)
-        {
-            on_titlebar = false;
-            return true;
-        }
-        break;
-    case WM_SIZE:
-        // When display mode is changed
-        if (pDevice != NULL && wParam != SIZE_MINIMIZED)
-        {
-            cleanup_render_target();
-            pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-            create_render_target();
-        }
-        break;
+        case WM_NCLBUTTONDOWN:
+            return on_titlebar = true;
+        case WM_LBUTTONUP:
+            if (on_titlebar && GetCapture() == window)
+            {
+                on_titlebar = false;
+                return true;
+            }
+            break;
+        case WM_SIZE:
+            // When display mode is changed
+            if (pDevice != NULL && wParam != SIZE_MINIMIZED)
+            {
+                cleanup_render_target();
+                pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
+                create_render_target();
+            }
+            break;
     }
     return false;
 }
@@ -2964,13 +2933,14 @@ bool init_hooks(size_t _ptr)
     DWORD oldProtect;
     if (!VirtualProtect(
             reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(&ptr) & ~0xFFF),
-            0x1000, PAGE_READWRITE, &oldProtect))
-        THROW("VirtualProtect error: 0x%x\n", GetLastError());
-
-    if (!ptr)
-    {
-        THROW("DirectX 11 is not initialized yet.");
+            0x1000, PAGE_READWRITE, &oldProtect)) {
+        PANIC("VirtualProtect error: 0x%lx\n", GetLastError());
     }
+
+    if (!ptr) {
+        PANIC("DirectX 11 is not initialized yet.");
+    }
+
     oPresent = ptr;
     ptr = hkPresent;
     return true;

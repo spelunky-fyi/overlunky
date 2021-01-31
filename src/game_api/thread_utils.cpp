@@ -1,7 +1,7 @@
-#include "thread_utils.h"
+#include "thread_utils.hpp"
 #include <Windows.h>
 #include <TlHelp32.h>
-#include "memory.h"
+#include "memory.hpp"
 
 HANDLE get_main_thread() {
     ONCE(HANDLE) {

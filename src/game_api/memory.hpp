@@ -1,6 +1,6 @@
 #pragma once
 
-#include "search.h"
+#include "search.hpp"
 #include <unordered_map>
 using namespace std::string_literals;
 
@@ -83,5 +83,5 @@ decode_call(size_t off) {
     return off + (*(int32_t *) (&memory.exe()[off + 1])) + 5;
 }
 
-#define ONCE(type) static bool once = false; static type res; if(once) return res; once=true;
+#define ONCE(type) static bool once = false; static type res; if(once) return res; once=true; if(false); else
 

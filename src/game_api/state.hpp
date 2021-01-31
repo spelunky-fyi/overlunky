@@ -1,14 +1,11 @@
-#include "memory.h"
-#include "layer.h"
-#include "thread_utils.h"
-#include "items.h"
+#include "memory.hpp"
+#include "layer.hpp"
+#include "thread_utils.hpp"
+#include "items.hpp"
 
 const float ZF = 0.737;
 
 class Layer;
-
-size_t get_zoom();
-size_t get_zoom_shop();
 
 struct State {
     size_t location;
@@ -119,4 +116,61 @@ struct State {
         // TODO: rename::find
         return state_find_item(ptr(), id);
     }
+};
+
+struct StateMemory {
+    size_t p00;
+    uint32_t screen_last;
+    uint32_t screen;
+    uint32_t screen_next;
+    int32_t i14;
+    size_t p18;
+    int32_t i20;
+    int32_t i24;
+    int32_t i28;
+    int32_t i2c;
+    uint8_t ingame;
+    uint8_t playing;
+    uint8_t pause;
+    uint8_t b33;
+    int32_t i34;
+    int32_t i38;
+    int32_t i3c;
+    int32_t i40;
+    int32_t i44;
+    uint32_t w;
+    uint32_t h;
+    int8_t kali_favor;
+    int8_t kali_status;
+    int8_t kali_altars_destroyed;
+    uint8_t b4f;
+    int32_t i50;
+    int32_t i54;
+    int32_t i58;
+    uint32_t feedcode;
+    uint32_t time_total;
+    uint8_t world;
+    uint8_t world_next;
+    uint8_t level;
+    uint8_t level_next;
+    size_t leveldata;
+    uint8_t theme;
+    uint8_t theme_next;
+    uint8_t b72;
+    uint8_t b73;
+    uint16_t shoppie_aggro;
+    uint16_t merchant_aggro;
+    uint8_t b7c;
+    uint8_t b7d;
+    uint8_t kills_npc;
+    uint8_t level_count;
+    uint8_t pad84[0x96c];
+    uint32_t journal_flags;
+    int32_t i9f0;
+    int32_t i9f4;
+    uint32_t time_last_level;
+    uint32_t time_level;
+    int32_t ia00;
+    int32_t ia04;
+    uint32_t hud_flags;
 };

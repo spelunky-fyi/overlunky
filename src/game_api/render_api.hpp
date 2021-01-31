@@ -1,16 +1,16 @@
-struct API {
+#include "memory.hpp"
+
+struct RenderAPI {
     const size_t *api;
     size_t swap_chain_off;
 
-    static size_t find_api(Memory memory);
+    static RenderAPI get();
 
-    static API get(Memory memory);
-
-    size_t renderer() {
+    size_t renderer() const {
         return read_u64(*api + 0x10);
     }
 
-    size_t swap_chain() {
+    size_t swap_chain() const {
         return read_u64(renderer() + swap_chain_off);
     }
 };

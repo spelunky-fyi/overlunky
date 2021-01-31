@@ -1,6 +1,6 @@
 #include "entity.hpp"
 #include "state.hpp"
-#include "ui.hpp"
+#include "../injected/ui.hpp"
 
 // TODO: expose this to RPC
 uint32_t spawn_entity(size_t id, float x = 0.0f, float y = 0.0f, bool s = false, float vx = 0.0f, float vy = 0.0f, bool snap = false)
@@ -244,6 +244,18 @@ void set_pause(uint8_t pause)
     state.set_pause(pause);
 }
 
+void player_status()
+{
+    auto state = State::get();
+    auto player = state.items()->player(0);
+    if (player == nullptr)
+        return;
+    auto status = player->inventory_ptr;
+    DEBUG("Player {:?}", status, status->ropes, status->bombs);
+    status->ropes = (99);
+    status->bombs = (99);
+}
+
 Entity *get_entity_ptr(uint32_t id)
 {
     if (id == 0)
@@ -285,10 +297,10 @@ void get_players()
 {
     auto state = State::get();
     std::vector<Player *> found;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < MAX_PLAYERS; i++)
     {
         auto player = state.items()->player(i);
-        if(player) found.push_back(player);
+        if(player) found.push_back((Player *)player);
     }
     set_players(found);
 }

@@ -18,6 +18,6 @@ struct Layer {
 
     Entity *spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t f, uint8_t t);
 
-    std::vector<Entity *> items();
+    std::vector<Entity *> items() const;
 };
 

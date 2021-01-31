@@ -1,5 +1,4 @@
-#include "layer.h"
-#include "entity.hpp"
+#include "layer.hpp"
 #include "state.hpp"
 
 struct Layer;
@@ -88,7 +87,7 @@ Entity *Layer::spawn_door(float x, float y, uint8_t l, uint8_t w, uint8_t f, uin
     return door;
 }
 
-std::vector<Entity *> Layer::items() {
+std::vector<Entity *> Layer::items() const {
     std::vector<Entity *> res(items_.size);
     Entity **ptr = items_.begin;
     std::copy(ptr, ptr + res.size(), &res[0]);

@@ -7,7 +7,7 @@
 #include <iostream>
 #include "logger.h"
 #include "ui.hpp"
-#include "api.h"
+#include "render_api.hpp"
 
 using namespace std::chrono_literals;
 
@@ -51,7 +51,6 @@ void run(DWORD pid) {
         fclose(fp);
     }
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
-    auto memory = Memory::get();
     auto state = State::get();
     while (true) {
         auto entities = list_entities();
@@ -67,7 +66,7 @@ void run(DWORD pid) {
         std::this_thread::sleep_for(100ms);
     }
 
-    auto api = API::get(memory);
+    auto api = RenderAPI::get();
     init_hooks(api.swap_chain());
     if (false) {
         {
