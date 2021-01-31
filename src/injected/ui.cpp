@@ -2800,6 +2800,11 @@ PresentPtr &vtable_find(T *obj, int index) {
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
+void spawn_door_lua(float x, float y, uint8_t l, uint8_t w, uint8_t f, uint8_t t)
+{
+    spawn_door(x, y, l, w, 1, t + 1);
+}
+
 void init_script() {
     lua.open_libraries(sol::lib::math);
     lua.set_function("beep", [] {
@@ -2816,13 +2821,33 @@ void init_script() {
         };
         g_luaCallbacks.push_back(luaCb);
     });
+    
     lua["spawn_entity"] = spawn_entity;
+    lua["spawn_door"] = spawn_door_lua;
 
     lua.create_named_table("ENT_TYPE");
     for (int i = 1; i < g_items.size(); i++) {
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
         lua["ENT_TYPE"][name] = g_items[i].id;
     }
+    lua.create_named_table("THEME");
+    lua["THEME"]["DWELLING"] = 0;
+    lua["THEME"]["JUNGLE"] = 1;
+    lua["THEME"]["VOLCANA"] = 2;
+    lua["THEME"]["OLMEC"] = 3;
+    lua["THEME"]["TIDE_POOL"] = 4;
+    lua["THEME"]["TEMPLE"] = 5;
+    lua["THEME"]["ICE_CAVES"] = 6;
+    lua["THEME"]["NEO_BABYLON"] = 7;
+    lua["THEME"]["SUNKEN_CITY"] = 8;
+    lua["THEME"]["COSMIC_OCEAN"] = 9;
+    lua["THEME"]["CITY_OF_GOLD"] = 10;
+    lua["THEME"]["DUAT"] = 11;
+    lua["THEME"]["ABZU"] = 12;
+    lua["THEME"]["TIAMAT"] = 13;
+    lua["THEME"]["EGGPLANT_WORLD"] = 14;
+    lua["THEME"]["HUNDUN"] = 15;
+    lua["THEME"]["BASE_CAMP"] = 16;
 }
 
 bool init_hooks(size_t _ptr) {
