@@ -1,9 +1,10 @@
 #pragma once
 
-#include <unordered_map>
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
+
 #include "memory.hpp"
 
 enum RepeatType : uint8_t {
@@ -22,8 +23,7 @@ struct Animation {
 
 struct Rect {
     int masks;
-    float up_minus_down, side,
-            up_plus_down;
+    float up_minus_down, side, up_plus_down;
     uint8_t field_10;
     uint8_t field_11;
     uint16_t field_12;
@@ -46,7 +46,7 @@ struct EntityDB {
     EntityCreate create_func;
     EntityDestroy destroy_func;
     int32_t field_10;
-/* Entity id (ENT_...) */
+    /* Entity id (ENT_...) */
     int32_t id;
     uint32_t search_flags;
     float width;
@@ -69,7 +69,7 @@ struct EntityDB {
     float sprint_factor;
     float jump;
 
-/* ??? */
+    /* ??? */
     float _a;
     float _b;
     float _c;
@@ -99,11 +99,8 @@ struct EntityItem {
     std::string name;
     uint16_t id;
 
-    EntityItem(const std::string& name_, uint64_t id_): name(name_), id(id_) {}
-    bool operator<(const EntityItem &item) const
-    {
-        return id < item.id;
-    }
+    EntityItem(const std::string &name_, uint64_t id_) : name(name_), id(id_) {}
+    bool operator<(const EntityItem &item) const { return id < item.id; }
 };
 
 std::vector<EntityItem> list_entities(size_t map_ptr);
@@ -112,13 +109,13 @@ size_t to_id(size_t map_ptr, std::string id);
 
 Entity *state_find_item(size_t state_ptr, uint32_t unique_id);
 
-template<typename T>
+template <typename T>
 std::string to_le_bytes(T fmt) {
-    return std::string((char *) &fmt, sizeof(T));
+    return std::string((char *)&fmt, sizeof(T));
 }
 
 class Entity {
-public:
+   public:
     size_t __vftable;
     EntityDB *type;
     Entity *overlay;
@@ -156,15 +153,11 @@ public:
     int32_t ia8;
     int32_t iac;
 
-    size_t pointer() {
-        return (size_t)
-                this;
-    }
+    size_t pointer() { return (size_t)this; }
 
     std::pair<float, float> position();
 
-    void teleport(float dx, float dy, bool s, float vx, float vy,
-                  bool snap);
+    void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
 
     Entity *topmost() {
         auto cur = this;
@@ -185,9 +178,7 @@ public:
         return topmost;
     }
 
-    uint8_t layer() {
-        return read_u8(pointer() + 0x98);
-    }
+    uint8_t layer() { return read_u8(pointer() + 0x98); }
 
     std::pair<float, float> position_self() const;
 };
@@ -198,13 +189,14 @@ struct Inventory {
     uint8_t ropes;
     uint8_t b06;
     uint8_t b07;
-    uint8_t pad08[0x141c]; // specific treasure and killed monsters here, boring
+    uint8_t
+        pad08[0x141c];  // specific treasure and killed monsters here, boring
     uint32_t kills_level;
     uint32_t kills_total;
 };
 
-class Movable: public Entity {
-public:
+class Movable : public Entity {
+   public:
     size_t pb0;
     int32_t ib8;
     int32_t ibc;
@@ -239,14 +231,14 @@ public:
     uint32_t i12c;
     uint32_t has_backpack;
     int32_t i134;
-    Inventory* inventory_ptr;
+    Inventory *inventory_ptr;
     size_t p140;
     int32_t i148;
     int32_t i14c;
 };
 
 class Player : public Movable {
-public:
+   public:
     size_t i150;
     size_t p158;
     size_t p160;
@@ -260,7 +252,7 @@ public:
 };
 
 class Mount : public Movable {
-public:
+   public:
     void carry(Movable *rider);
 
     void tame(bool value);
@@ -271,7 +263,7 @@ using Carry = void (*)(Entity *, Entity *);
 Carry get_carry();
 
 class Door : public Entity {
-public:
+   public:
     void set_target(uint8_t w, uint8_t l, uint8_t f, uint8_t t);
 };
 

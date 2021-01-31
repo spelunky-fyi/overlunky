@@ -1,4 +1,5 @@
 #include "layer.hpp"
+
 #include "state.hpp"
 
 struct Layer;
@@ -14,7 +15,7 @@ LoadItem get_load_item() {
         off = find_inst(exe, needle, off + 5);
         off = find_inst(exe, "\xE8"s, off + 5);
 
-        return res = (LoadItem) memory.at_exe(decode_call(off));
+        return res = (LoadItem)memory.at_exe(decode_call(off));
     }
 }
 
@@ -23,16 +24,15 @@ using LoadItemOver = Entity *(*)(Layer *, size_t, Entity *, float, float, bool);
 LoadItemOver get_load_item_over() {
     ONCE(LoadItemOver) {
         auto memory = Memory::get();
-        auto off = find_inst(
-                memory.exe(),
-                "\xBA\xB5\x00\x00\x00\xC6\x44"s,
-                memory.after_bundle);
+        auto off = find_inst(memory.exe(), "\xBA\xB5\x00\x00\x00\xC6\x44"s,
+                             memory.after_bundle);
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
-        return res = (LoadItemOver) memory.at_exe(decode_call(off));
+        return res = (LoadItemOver)memory.at_exe(decode_call(off));
     }
 }
 
-Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx, float vy, bool snap) {
+Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx,
+                            float vy, bool snap) {
     auto load_item = (get_load_item());
     if (!s) {
         if (snap) {
@@ -41,10 +41,10 @@ Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx, float
         }
         auto addr = load_item(this, id, x, y);
         DEBUG("Spawned {:x?}", addr);
-        return (Entity *) (addr);
+        return (Entity *)(addr);
     } else {
         auto state = State::get();
-        auto[rx, ry] = state.click_position(x, y);
+        auto [rx, ry] = state.click_position(x, y);
         if (snap && abs(vx) + abs(vy) <= 0.04) {
             rx = round(rx);
             ry = round(ry);
@@ -55,18 +55,18 @@ Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx, float
             write_mem(addr + 0x104, to_le_bytes(vy));
         }
         DEBUG("Spawned {:x?}", addr);
-        return (Entity *) (addr);
+        return (Entity *)(addr);
     }
 }
 
 Entity *Layer::spawn_entity_over(size_t id, Entity *overlay, float x, float y) {
-    auto load_item_over =
-            (get_load_item_over());
+    auto load_item_over = (get_load_item_over());
 
     return load_item_over(this, id, overlay, x, y, true);
 }
 
-Entity *Layer::spawn_door(float x, float y, uint8_t l, uint8_t w, uint8_t f, uint8_t t) {
+Entity *Layer::spawn_door(float x, float y, uint8_t l, uint8_t w, uint8_t f,
+                          uint8_t t) {
     uint8_t screen = read_u8(State::get().ptr() + 0x10);
     Entity *door;
     switch (screen) {

@@ -1,6 +1,6 @@
 #pragma once
-#include "logger.h"
 #include "entity.hpp"
+#include "logger.h"
 
 struct Layer {
     size_t __vftable;
@@ -11,13 +11,13 @@ struct Layer {
         int size;
     } items_;
 
-    Entity *spawn_entity(size_t id, float x, float y, bool s, float vx, float vy,
-                         bool snap);
+    Entity *spawn_entity(size_t id, float x, float y, bool s, float vx,
+                         float vy, bool snap);
 
     Entity *spawn_entity_over(size_t id, Entity *overlay, float x, float y);
 
-    Entity *spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t f, uint8_t t);
+    Entity *spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t f,
+                       uint8_t t);
 
     std::vector<Entity *> items() const;
 };
-

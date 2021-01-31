@@ -1,20 +1,20 @@
 #include <Windows.h>
-#include "memory.h"
-#include "state.hpp"
 
 #include <chrono>
-#include <thread>
 #include <iostream>
+#include <thread>
+
 #include "logger.h"
-#include "ui.hpp"
+#include "memory.h"
 #include "render_api.hpp"
+#include "state.hpp"
+#include "ui.hpp"
 
 using namespace std::chrono_literals;
 
-BOOL WINAPI DllMain(
-        HINSTANCE hinstDLL,  // handle to DLL module
-        DWORD fdwReason,     // reason for calling function
-        LPVOID lpReserved )  // reserved
+BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
+                    DWORD fdwReason,     // reason for calling function
+                    LPVOID lpReserved)   // reserved
 {
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
@@ -39,8 +39,7 @@ void attach_stdout(DWORD pid) {
     }
 }
 
-extern "C" __declspec(dllexport)
-void run(DWORD pid) {
+extern "C" __declspec(dllexport) void run(DWORD pid) {
     attach_stdout(pid);
     FILE *fp = fopen("spelunky.log", "w");
     if (!fp) {
@@ -50,7 +49,8 @@ void run(DWORD pid) {
         fputs("Overlunky loaded\n", fp);
         fclose(fp);
     }
-    DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
+    DEBUG(
+        "Game injected! Press Ctrl+C to detach this window from the process.");
     auto state = State::get();
     while (true) {
         auto entities = list_entities();
@@ -73,18 +73,21 @@ void run(DWORD pid) {
             DEBUG("Enter entity #IDs to spawn, one per line >");
             std::string line;
             std::getline(std::cin, line);
-            if (int id = atoi(line.data()))
-            {
-                // This is RAII-style implementation for suspending the main thread, for preventing race conditions.
+            if (int id = atoi(line.data())) {
+                // This is RAII-style implementation for suspending the main
+                // thread, for preventing race conditions.
                 CriticalSection lock;
 
                 auto player = state.items()->player(0);
                 if (!player) {
-                    INFO("Player not initialized yet. Select a character first!");
+                    INFO(
+                        "Player not initialized yet. Select a character "
+                        "first!");
                 } else {
-                    auto[x, y] = player->position();
+                    auto [x, y] = player->position();
                     auto layer = player->layer();
-                    state.layer(layer)->spawn_entity(id, x, y, false, 0.0, 0.0, false);
+                    state.layer(layer)->spawn_entity(id, x, y, false, 0.0, 0.0,
+                                                     false);
                 }
             }
         }

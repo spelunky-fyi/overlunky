@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <winternl.h>
+
 #include <cstdint>
 
 HANDLE get_main_thread();
@@ -25,8 +26,5 @@ struct CriticalSection {
         SuspendThread(thread);
     }
 
-    ~CriticalSection() {
-        ResumeThread(thread);
-    }
+    ~CriticalSection() { ResumeThread(thread); }
 };
-

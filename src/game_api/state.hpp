@@ -1,7 +1,7 @@
-#include "memory.hpp"
-#include "layer.hpp"
-#include "thread_utils.hpp"
 #include "items.hpp"
+#include "layer.hpp"
+#include "memory.hpp"
+#include "thread_utils.hpp"
 
 const float ZF = 0.737;
 
@@ -22,16 +22,16 @@ struct State {
     size_t ptr();
 
     Layer *layer(uint8_t index) {
-        return (Layer *) (read_u64(ptr() + off_layers + index * 8));
+        return (Layer *)(read_u64(ptr() + off_layers + index * 8));
     }
 
     Items *items() {
         auto pointer = read_u64(ptr() + off_items);
-        return (Items *) (pointer);
+        return (Items *)(pointer);
     }
 
     void godmode(bool g) {
-        //log::debug!("God {:?}" mode; g);
+        // log::debug!("God {:?}" mode; g);
         if (g) {
             write_mem_prot(addr_damage, ("\xC3"s), true);
             write_mem_prot(addr_insta, ("\xC3"s), true);
@@ -42,7 +42,7 @@ struct State {
     }
 
     void darkmode(bool g) {
-        //log::debug!("God {:?}" mode; g);
+        // log::debug!("God {:?}" mode; g);
         if (g) {
             write_mem_prot(addr_dark, ("\x90\x90"s), true);
         } else {
@@ -54,9 +54,9 @@ struct State {
         auto memory = Memory::get();
 
         // This technically sets camp zoom but not interactively :(
-        //auto addr_zoom = find_inst(memory.exe(), &hex!("C7 80 E8 04 08 00"), memory.after_bundle);
-        //write_mem_prot(memory.at_exe(addr_zoom + 6), to_le_bytes(level), true);
-        //addr_zoom = memory.after_bundle;
+        // auto addr_zoom = find_inst(memory.exe(), &hex!("C7 80 E8 04 08 00"),
+        // memory.after_bundle); write_mem_prot(memory.at_exe(addr_zoom + 6),
+        // to_le_bytes(level), true); addr_zoom = memory.after_bundle;
 
         auto roomx_addr = ptr() + 0x48;
         uint8_t roomx = read_u8(roomx_addr);
@@ -98,18 +98,11 @@ struct State {
     std::pair<float, float> screen_position(float x, float y);
     float get_zoom_level();
 
-    uint8_t flags() {
-        return read_u8(ptr() + 0xa0e);
-    }
+    uint8_t flags() { return read_u8(ptr() + 0xa0e); }
 
-    void
-    set_flags(uint8_t f) {
-        write_mem(ptr() + 0xa0e, to_le_bytes(f));
-    }
+    void set_flags(uint8_t f) { write_mem(ptr() + 0xa0e, to_le_bytes(f)); }
 
-    void set_pause(uint8_t p) {
-        write_mem(ptr() + 0x32, to_le_bytes(p));
-    }
+    void set_pause(uint8_t p) { write_mem(ptr() + 0x32, to_le_bytes(p)); }
 
     Entity *find(uint32_t id) {
         // Find item by unique id

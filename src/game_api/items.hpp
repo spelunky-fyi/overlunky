@@ -7,4 +7,3 @@ struct Items {
     Player *players[MAX_PLAYERS];
     Player *player(size_t index);
 };
-
