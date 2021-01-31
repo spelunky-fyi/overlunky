@@ -3,14 +3,14 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 
-#define COMMON_FORMATTER(name, format, ...)        \
-    fmt::print("[" name "] " format, __VA_ARGS__);
+#define COMMON_FORMATTER(name, format, ...) \
+    fmt::print("[" name "] " format "\n", __VA_ARGS__);
 
 #define PANIC(format, ...)                              \
     do {                                                \
         COMMON_FORMATTER("error", format, __VA_ARGS__); \
         std::exit(-1);                                  \
-    } while(false)
+    } while (false)
 
 #define DEBUG(format, ...)                              \
     do {                                                \
