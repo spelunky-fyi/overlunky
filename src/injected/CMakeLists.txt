@@ -5,10 +5,11 @@ add_library(injected SHARED
         ${injected_headers})
 target_link_libraries(injected
         shared
+        game_api
         imgui
         toml11::toml11
         sol2::sol2
-        ${LUA_LIBRARY}
+        ${LUA_LIBRARIES}
         Shlwapi)
 target_include_directories(injected PRIVATE
-        ${LUA_INCLUDE_DIR})
+        ${LUA_INCLUDE_DIRS})

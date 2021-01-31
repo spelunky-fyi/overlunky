@@ -15,8 +15,11 @@ set(imgui_sources
 add_library(imgui STATIC ${imgui_sources})
 target_include_directories(imgui PUBLIC imgui)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}${CMAKE_CURRENT_SOURCE_DIR}/lua;")
-find_package(Lua REQUIRED)
+set(BUILD_LUA_AS_DLL OFF)
+set(SOL2_LUA_VERSION "5.4")
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/sol2/cmake/Modules")
+find_package(LuaBuild REQUIRED COMPONENTS ${SOL2_LUA_VERSION})
 
 option(toml11_BUILD_TEST OFF)
 add_subdirectory(toml11)
@@ -25,3 +28,4 @@ add_subdirectory(sol2)
 add_subdirectory(shared)
 add_subdirectory(injected)
 add_subdirectory(injector)
+add_subdirectory(game_api)
