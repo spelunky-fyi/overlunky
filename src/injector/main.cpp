@@ -31,9 +31,9 @@ int main(int argc, char** argv) {
     INFO("Overlunky version: " TOSTRING(GIT_VERSION));
 
     Process game_proc = [&cmd_line_parser]() {
-        std::string_view spel2_exe_path = GetCmdLineParam<std::string_view>(
+        std::string_view spel2_exe_dir = GetCmdLineParam<std::string_view>(
             cmd_line_parser, "launch_game", "");
-        if (spel2_exe_path.empty() || !fs::exists(spel2_exe_path)) {
+        if (spel2_exe_dir.empty() || !fs::exists(spel2_exe_dir)) {
             INFO("Searching for Spel2.exe process...");
             bool started = true;
             Process proc;
@@ -57,13 +57,10 @@ int main(int argc, char** argv) {
             INFO(
                 "Game path was passed on cmd line, launching game directly...");
 
-            char spel2_cmd_line[MAX_PATH];
-            sprintf_s(spel2_cmd_line, "%.*s",
-                      static_cast<int>(spel2_exe_path.size()),
-                      spel2_exe_path.data());
+            const std::string spel2_dir{spel2_exe_dir};
 
-            const std::string spel2_dir =
-                fs::path(spel2_exe_path).parent_path().string();
+            char spel2_cmd_line[MAX_PATH];
+            sprintf_s(spel2_cmd_line, "%s/Spel2.exe", spel2_dir.c_str());
 
             STARTUPINFO si{};
             si.cb = sizeof(si);
@@ -84,6 +81,8 @@ int main(int argc, char** argv) {
                 return proc;
             }
         }
+
+        return Process{};
     }();
 
     inject_dll(game_proc, overlunky_path.string());

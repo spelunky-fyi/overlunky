@@ -31,7 +31,7 @@ size_t find_base(Process proc, std::string name) {
         if (name.find(item.name) != std::string::npos) return item.addr;
     }
 
-    PANIC("Cannot find library in the target process: {}", name.data());
+    PANIC("Cannot find library in the target process: {}", name);
 }
 
 LPVOID alloc(Process proc, size_t size) {
@@ -40,7 +40,7 @@ LPVOID alloc(Process proc, size_t size) {
     if (res == NULL) {
         PANIC("Allocation failed: {:#x}", GetLastError());
     }
-    DEBUG("Allocated memory: {:#x}", res);
+    DEBUG("Allocated memory: {}", res);
     return res;
 }
 
@@ -78,7 +78,7 @@ LPTHREAD_START_ROUTINE find_function(const Process &proc,
 }
 
 void call(const Process &proc, LPTHREAD_START_ROUTINE addr, LPVOID args) {
-    DEBUG("Calling: {:#x}", (void*)addr);
+    DEBUG("Calling: {}", (void*)addr);
     auto handle =
         CreateRemoteThread(proc.handle, nullptr, 0, addr, args, 0, nullptr);
     WaitForSingleObject(handle, INFINITE);
@@ -86,7 +86,7 @@ void call(const Process &proc, LPTHREAD_START_ROUTINE addr, LPVOID args) {
 
 void inject_dll(const Process &proc, const std::string &name) {
     auto str = alloc_str(proc, name);
-    DEBUG("Injecting DLL into process... {}", name.data());
+    DEBUG("Injecting DLL into process... {}", name);
     call(proc, find_function(proc, "KERNEL32.DLL", "LoadLibraryA"), str);
 }
 
