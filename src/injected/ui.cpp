@@ -19,6 +19,7 @@
 #include <map>
 #include <iomanip>
 #include <array>
+#include <chrono>
 
 #include "entity.hpp"
 #include "ui.hpp"
@@ -29,11 +30,19 @@
 sol::state lua;
 static char script[102400];
 std::string scriptresult;
+bool scriptchanged = false;
 struct ScriptState
 {
     Entity *player;
 };
 ScriptState scriptstate = { 0 };
+
+struct LuaIntervalCallback {
+    sol::function func;
+    std::chrono::duration<unsigned int, std::milli> interval;
+    std::chrono::time_point<std::chrono::system_clock> lastRan;
+};
+std::vector<LuaIntervalCallback> g_luaCallbacks;
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -1602,12 +1611,34 @@ void render_script()
     get_players();
     if (g_players.empty()) return;
     if (g_state == 0) return;
+    if (scriptchanged) {
+        // Compile & Evaluate the script if the script is changed
+        try {
+            // Clear all callbacks on script reload to avoid running them multiple times.
+            g_luaCallbacks.clear();
+            auto result = lua.safe_script(script);
+        }
+        catch( const sol::error& e ) {
+            scriptresult = e.what();
+        }
+    }
 	try {
-		auto result = lua.safe_script(script);
         sol::function onFrame = lua["onFrame"];
         sol::function onLevel = lua["onLevel"];
         if(onFrame) onFrame();
         if(onLevel && g_state->screen == 12 && scriptstate.player != g_players.at(0)) onLevel();
+        auto now = std::chrono::system_clock::now();
+
+        for (int i = 0; i < g_luaCallbacks.size(); i++)
+        {
+            auto cb = &g_luaCallbacks[i];
+
+            if (now > cb->lastRan + cb->interval) {
+                cb->func();
+                cb->lastRan = now;
+            }
+        }
+
         scriptstate.player = g_players.at(0);
         scriptresult = "OK";
 	}
@@ -1942,7 +1973,7 @@ void render_debug()
     ImGui::PopItemWidth();
     ImGui::PushItemWidth(-1);
     ImGui::Text("Scripting playground:");
-    ImGui::InputTextMultiline("##LuaScript", script, sizeof(script), {-1, 300});
+    scriptchanged = ImGui::InputTextMultiline("##LuaScript", script, sizeof(script), {-1, 300});
     InputString("##LuaResult", &scriptresult, ImGuiInputTextFlags_ReadOnly);
     ImGui::PopItemWidth();
 }
@@ -2904,14 +2935,30 @@ PresentPtr &vtable_find(T *obj, int index)
 
 void init_script()
 {
-    lua.set_function("beep", [] {
+    lua.open_libraries(sol::lib::math);
+    lua.set_function("beep", []{
         update_players();
         for (auto player : g_players)
         {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
     });
+    lua.set_function("setinterval", [](sol::function cb, int ms) {
+        auto luaCb = LuaIntervalCallback {
+            cb,
+            std::chrono::duration<unsigned int, std::milli>(ms),
+            std::chrono::system_clock::time_point::min(),
+        };
+        g_luaCallbacks.push_back(luaCb);
+    });
     lua["spawn_entity"] = spawn_entity;
+
+    lua.create_named_table("ENT_TYPE");
+    for (int i = 1; i < g_items.size(); i++)
+    {
+        auto name = g_items[i].name.substr(9, g_items[i].name.size());
+        lua["ENT_TYPE"][name] = g_items[i].id;
+    }
 }
 
 bool init_hooks(size_t _ptr)
