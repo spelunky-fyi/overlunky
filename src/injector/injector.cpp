@@ -3,6 +3,7 @@
 #include <Psapi.h>
 #include <TlHelp32.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 
@@ -25,10 +26,18 @@ std::vector<MemoryMap> memory_map(const Process &proc) {
     return result;
 }
 
+std::string to_lower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+        [](unsigned char c){ return std::tolower(c); }
+    );
+    return s;
+}
+
 size_t find_base(Process proc, std::string name) {
     auto map = memory_map(proc);
+    name = to_lower(name);
     for (auto &&item : map) {
-        if (name.find(item.name) != std::string::npos) return item.addr;
+        if (name.find(to_lower(item.name)) != std::string::npos) return item.addr;
     }
 
     PANIC("Cannot find library in the target process: %s", name.data());
