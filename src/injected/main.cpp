@@ -36,9 +36,7 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type) {
 
 void attach_stdout(DWORD pid) {
     if constexpr (enable_console) {
-        if (!AttachConsole(pid)) {
-            AllocConsole();
-        }
+        AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
     }
 }
