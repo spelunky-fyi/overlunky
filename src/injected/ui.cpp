@@ -2800,29 +2800,58 @@ PresentPtr &vtable_find(T *obj, int index) {
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
-void init_script() {
-    lua.open_libraries(sol::lib::math);
+void init_script()
+{
+    g_state = (struct StateMemory *)get_state_ptr();
+    g_state_addr = reinterpret_cast(g_state);
+    lua.open_libraries(sol::lib::base, sol::lib::math);
     lua.set_function("beep", [] {
         update_players();
-        for (auto player : g_players) {
+        for (auto player : g_players)
+        {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
     });
     lua.set_function("setinterval", [](sol::function cb, int ms) {
-        auto luaCb = LuaIntervalCallback{
+        auto luaCb = LuaIntervalCallback {
             cb,
-            std::chrono::duration<unsigned int, std::milli>(ms),
+            std::chrono::duration(ms),
             std::chrono::system_clock::time_point::min(),
         };
         g_luaCallbacks.push_back(luaCb);
     });
-    lua["spawn_entity"] = spawn_entity;
 
+    lua["spawn_entity"] = spawn_entity;
+    lua["spawn_door"] = spawn_door_lua;
+    lua.new_usertype("StateMemory", "shoppie_aggro",
+                              &StateMemory::shoppie_aggro);
+    lua.new_usertype("StateMemory", "tun_aggro",
+                              &StateMemory::merchant_aggro);
+    lua["state"] = g_state;
     lua.create_named_table("ENT_TYPE");
-    for (int i = 1; i < g_items.size(); i++) {
+    for (int i = 1; i < g_items.size(); i++)
+    {
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
         lua["ENT_TYPE"][name] = g_items[i].id;
     }
+    lua.create_named_table("THEME");
+    lua["THEME"]["DWELLING"] = 0;
+    lua["THEME"]["JUNGLE"] = 1;
+    lua["THEME"]["VOLCANA"] = 2;
+    lua["THEME"]["OLMEC"] = 3;
+    lua["THEME"]["TIDE_POOL"] = 4;
+    lua["THEME"]["TEMPLE"] = 5;
+    lua["THEME"]["ICE_CAVES"] = 6;
+    lua["THEME"]["NEO_BABYLON"] = 7;
+    lua["THEME"]["SUNKEN_CITY"] = 8;
+    lua["THEME"]["COSMIC_OCEAN"] = 9;
+    lua["THEME"]["CITY_OF_GOLD"] = 10;
+    lua["THEME"]["DUAT"] = 11;
+    lua["THEME"]["ABZU"] = 12;
+    lua["THEME"]["TIAMAT"] = 13;
+    lua["THEME"]["EGGPLANT_WORLD"] = 14;
+    lua["THEME"]["HUNDUN"] = 15;
+    lua["THEME"]["BASE_CAMP"] = 16;
 }
 
 bool init_hooks(size_t _ptr) {
