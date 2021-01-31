@@ -15,7 +15,7 @@ size_t get_dark() {
         addr_dark =
             find_inst(memory.exe(), "\x44\xC5\x80\xA0\x0E\x0A\x00\x00\xFD"s,
                       memory.after_bundle);
-        DEBUG("0x%x", addr_dark);
+        DEBUG("{:#x}", addr_dark);
         return res = memory.at_exe(addr_dark) + 9;
     }
 }
@@ -26,8 +26,8 @@ size_t get_zoom() {
         auto addr_zoom = memory.after_bundle;
         for (int _ = 0; _ < 3; _++) {
             addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s,
-                                  addr_zoom + 1);
-            DEBUG("0x%x", addr_zoom);
+                addr_zoom + 1);
+            DEBUG("{:#x}", addr_zoom);
         }
         return res = memory.at_exe(addr_zoom) + 10;
     }
@@ -39,8 +39,8 @@ size_t get_zoom_shop() {
         auto addr_zoom = memory.after_bundle;
         for (int _ = 0; _ < 2; _++) {
             addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s,
-                                  addr_zoom + 1);
-            DEBUG("0x%x", addr_zoom);
+                addr_zoom + 1);
+            DEBUG("{:#x}", addr_zoom);
         }
         return res = memory.at_exe(addr_zoom) + 10;
     }

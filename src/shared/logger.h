@@ -1,22 +1,22 @@
 #pragma once
-#include <stdlib.h>
 
-#include <cstdarg>
-#include <cstdio>
+#include <fmt/format.h>
+#include <fmt/ranges.h>
 
-#define COMMON_FORMATTER(name)      \
-    va_list args;                   \
-    va_start(args, format);         \
-    fputs("[" name "] ", stderr);   \
-    vfprintf(stderr, format, args); \
-    fputs("\n", stderr);            \
-    va_end(args)
+#define COMMON_FORMATTER(name, format, ...)        \
+    fmt::print("[" name "] " format, __VA_ARGS__);
 
-[[noreturn]] static void PANIC(const char *format, ...) {
-    COMMON_FORMATTER("error");
-    exit(-1);
-}
+#define PANIC(format, ...)                              \
+    do {                                                \
+        COMMON_FORMATTER("error", format, __VA_ARGS__); \
+        std::exit(-1);                                  \
+    } while(false)
 
-static void DEBUG(const char *format, ...) { COMMON_FORMATTER("debug"); }
-
-static void INFO(const char *format, ...) { COMMON_FORMATTER("info"); }
+#define DEBUG(format, ...)                              \
+    do {                                                \
+        COMMON_FORMATTER("debug", format, __VA_ARGS__); \
+    } while (false)
+#define INFO(format, ...)                              \
+    do {                                               \
+        COMMON_FORMATTER("info", format, __VA_ARGS__); \
+    } while (false)

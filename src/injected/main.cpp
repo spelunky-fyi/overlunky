@@ -47,7 +47,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
     attach_stdout(pid);
     FILE *fp = fopen("spelunky.log", "a");
     if (!fp) {
-        PANIC("%d", errno);
+        PANIC("{}", errno);
     }
     {
         fputs("Overlunky loaded\n", fp);
@@ -59,13 +59,13 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
     while (true) {
         auto entities = list_entities();
         if (entities.size() >= 850) {
-            DEBUG("Found {:?} entities, that's enough", entities.size());
+            DEBUG("Found {} entities, that's enough", entities.size());
             std::this_thread::sleep_for(100ms);
             create_box(entities);
-            DEBUG("Added {:?} entities", entities.size());
+            DEBUG("Added {} entities", entities.size());
             break;
         } else if (entities.size() > 0) {
-            DEBUG("Found {:?} entities", entities.size());
+            DEBUG("Found {} entities", entities.size());
         }
         std::this_thread::sleep_for(100ms);
     }

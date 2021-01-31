@@ -7,3 +7,6 @@
 [submodule "src/sol2"]
 	path = src/sol2
 	url = https://github.com/ThePhD/sol2
+[submodule "src/fmt"]
+	path = src/fmt
+	url = https://github.com/fmtlib/fmt.git

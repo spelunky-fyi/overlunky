@@ -31,16 +31,16 @@ size_t find_base(Process proc, std::string name) {
         if (name.find(item.name) != std::string::npos) return item.addr;
     }
 
-    PANIC("Cannot find library in the target process: %s", name.data());
+    PANIC("Cannot find library in the target process: {}", name.data());
 }
 
 LPVOID alloc(Process proc, size_t size) {
     auto res = VirtualAllocEx(proc.handle, nullptr, (size + 0xFFF) & ~0xFFF,
                               MEM_COMMIT, 0x40);
     if (res == NULL) {
-        PANIC("Allocation failed: 0x%X", GetLastError());
+        PANIC("Allocation failed: {:#x}", GetLastError());
     }
-    DEBUG("Allocated memory: 0x%x", res);
+    DEBUG("Allocated memory: {:#x}", res);
     return res;
 }
 
@@ -60,7 +60,7 @@ LPTHREAD_START_ROUTINE find_function(const Process &proc,
     auto library_ptr = (size_t)LoadLibraryA(library.data());
 
     if (library_ptr == 0) {
-        PANIC("Cannot find the address of the library in current process: %s",
+        PANIC("Cannot find the address of the library in current process: {}",
               library.data());
     }
 
@@ -68,8 +68,8 @@ LPTHREAD_START_ROUTINE find_function(const Process &proc,
 
     if (addr == 0) {
         PANIC(
-            "Cannot find the address of the function in current process: %s :: "
-            "%s",
+            "Cannot find the address of the function in current process: {} :: "
+            "{}",
             library.data(), function.data());
     }
 
@@ -78,7 +78,7 @@ LPTHREAD_START_ROUTINE find_function(const Process &proc,
 }
 
 void call(const Process &proc, LPTHREAD_START_ROUTINE addr, LPVOID args) {
-    DEBUG("Calling: 0x%x", addr);
+    DEBUG("Calling: {:#x}", (void*)addr);
     auto handle =
         CreateRemoteThread(proc.handle, nullptr, 0, addr, args, 0, nullptr);
     WaitForSingleObject(handle, INFINITE);
@@ -86,7 +86,7 @@ void call(const Process &proc, LPTHREAD_START_ROUTINE addr, LPVOID args) {
 
 void inject_dll(const Process &proc, const std::string &name) {
     auto str = alloc_str(proc, name);
-    DEBUG("Injecting DLL into process... %s", name.data());
+    DEBUG("Injecting DLL into process... {}", name.data());
     call(proc, find_function(proc, "KERNEL32.DLL", "LoadLibraryA"), str);
 }
 

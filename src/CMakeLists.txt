@@ -24,6 +24,8 @@ find_package(LuaBuild REQUIRED COMPONENTS ${SOL2_LUA_VERSION})
 option(toml11_BUILD_TEST OFF)
 add_subdirectory(toml11)
 add_subdirectory(sol2)
+set(FMT_MASTER_PROJECT OFF)
+add_subdirectory(fmt)
 
 add_subdirectory(shared)
 add_subdirectory(injected)

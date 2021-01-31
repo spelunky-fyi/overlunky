@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     auto overlunky_path = get_dll_path();
 
     if (!fs::exists(overlunky_path)) {
-        PANIC("DLL not found! %s", overlunky_path.string().data());
+        PANIC("DLL not found! {}", overlunky_path.string().data());
     }
 
     INFO("Overlunky version: " TOSTRING(GIT_VERSION));
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
                 started = false;
                 std::this_thread::sleep_for(1s);
             };
-            INFO("Found Spel2.exe PID: %d", proc.info.pid);
+            INFO("Found Spel2.exe PID: {}", proc.info.pid);
             if (!started) {
                 INFO(
                     "Game was just started, waiting a few seconds for it to "
