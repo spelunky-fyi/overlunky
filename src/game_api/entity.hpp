@@ -262,6 +262,15 @@ using Carry = void (*)(Entity *, Entity *);
 
 Carry get_carry();
 
+struct Target {
+    uint8_t b00;
+    uint8_t enabled;
+    uint8_t level;
+    uint8_t from;
+    uint8_t world;
+    uint8_t theme;
+};
+
 class Door : public Entity {
    public:
     void set_target(uint8_t w, uint8_t l, uint8_t f, uint8_t t);
