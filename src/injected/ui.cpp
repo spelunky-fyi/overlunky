@@ -1047,7 +1047,8 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam) {
     } else if (pressed("spawn_entity", wParam)) {
         spawn_entities(false);
     } else if (pressed("spawn_warp_door", wParam)) {
-        spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
+        int spawned = spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
+        if (!lock_entity) g_last_id = spawned;
     } else if (pressed("move_up", wParam) && active("tool_entity")) {
         g_current_item =
             std::min(std::max(g_current_item - 1, 0), g_filtered_count - 1);
@@ -1081,7 +1082,8 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam) {
     } else if (pressed("move_down", wParam) && active("tool_door")) {
         g_to = std::min(std::max(g_to + 1, 0), 15);
     } else if (pressed("enter", wParam) && active("tool_door")) {
-        spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
+        int spawned = spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
+        if (!lock_entity) g_last_id = spawned;
     } else if (pressed("move_up", wParam) && active("tool_camera")) {
         g_zoom -= 1.0;
         set_zoom();
@@ -1326,7 +1328,8 @@ void render_narnia() {
     }
     render_themes();
     if (ImGui::Button("Warp door")) {
-        spawn_door(g_x, g_y, g_level, g_world, 1, g_to + 1);
+        int spawned = spawn_door(g_x, g_y, g_level, g_world, 1, g_to + 1);
+        if (!lock_entity) g_last_id = spawned;
     }
     ImGui::SameLine();
     if (ImGui::Button("Layer door")) {
@@ -2041,6 +2044,11 @@ void render_screen(const char *label, int state) {
     }
 }
 
+const char *theme_name(int theme) {
+    if (theme < 1 || theme > 17) return "Crash City";
+    return themes_short[theme - 1];
+}
+
 void render_entity_props() {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     ImGui::Checkbox("Lock to player one", &lock_player);
@@ -2177,12 +2185,18 @@ void render_entity_props() {
             ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity->inside,
                              1, 255);
         } else if (g_entity_type >= 22 && g_entity_type <= 36) {
+            Target *target = reinterpret_cast<Target*>(&g_entity->anim_func);
             ImGui::Text("Door target:");
-            ImGui::InputScalar("Enabled##DoorEnabled", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->enabled, &u8_one, &u8_one);
-            ImGui::InputScalar("World##DoorWorld", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->world, &u8_one, &u8_one);
-            ImGui::InputScalar("Level##DoorLevel", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->level, &u8_one, &u8_one);
-            ImGui::InputScalar("Theme##DoorTheme", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->theme, &u8_one, &u8_one);
-            ImGui::InputScalar("From##DoorFrom", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->from, &u8_one, &u8_one);
+            ImGui::Checkbox("Enabled##DoorEnabled", (bool *)&target->enabled);
+            ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8,
+                            &target->world, 0.5f, &u8_one, &u8_max);
+            ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8,
+                            &target->level, 0.5f, &u8_one, &u8_max);
+            ImGui::DragScalar("Theme##DoorThemenumber", ImGuiDataType_U8,
+                            &target->theme, 0.2f, &u8_one,
+                            &u8_seventeen);
+            ImGui::SameLine();
+            ImGui::Text(theme_name(target->theme));
         } else {
             ImGui::InputScalar("Unknown data##UnknownSpecialAttribute",
                                ImGuiDataType_U64, (size_t *)&g_entity->inside,
@@ -2236,11 +2250,6 @@ void render_entity_props() {
         }
     }
     ImGui::PopItemWidth();
-}
-
-const char *theme_name(int theme) {
-    if (theme < 1 || theme > 17) return "Crash City";
-    return themes_short[theme - 1];
 }
 
 std::string format_time(int frames) {

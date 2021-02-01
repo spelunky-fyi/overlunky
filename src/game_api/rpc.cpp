@@ -25,18 +25,18 @@ uint32_t spawn_entity(size_t id, float x = 0.0f, float y = 0.0f, bool s = false,
     }
 }
 
-void spawn_door(float x, float y, uint8_t l, uint8_t w, uint8_t f, uint8_t t) {
+uint32_t spawn_door(float x, float y, uint8_t l, uint8_t w, uint8_t f, uint8_t t) {
     auto state = State::get();
 
     auto player = state.items()->player(0);
-    if (player == nullptr) return;
+    if (player == nullptr) return 0;
     auto [_x, _y] = player->position();
     DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-    state.layer(player->layer())->spawn_door(x + _x, y + _y, l, w, f, t);
     state.layer(player->layer())
         ->spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
     state.layer(player->layer())
         ->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
+    return state.layer(player->layer())->spawn_door(x + _x, y + _y, l, w, f, t)->uid;
 }
 
 void spawn_backdoor(float x, float y) {

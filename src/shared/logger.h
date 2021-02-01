@@ -4,7 +4,7 @@
 #include <fmt/ranges.h>
 
 #define COMMON_FORMATTER(name, format, ...) \
-    fmt::print("[" name "] " format "\n", __VA_ARGS__);
+    //fmt::print("[" name "] " format "\n", __VA_ARGS__);
 
 #define PANIC(format, ...)                              \
     do {                                                \
