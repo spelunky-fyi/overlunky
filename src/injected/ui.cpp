@@ -2815,33 +2815,65 @@ PresentPtr &vtable_find(T *obj, int index) {
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
-void init_script() {
+void spawn_door_lua(float x, float y, uint8_t l, uint8_t w, uint8_t t)
+{
+    spawn_door(x, y, l, w, 1, t + 1);
+}
+
+void init_script()
+{
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-
     lua.open_libraries(sol::lib::math);
     lua.set_function("beep", [] {
         update_players();
-        for (auto player : g_players) {
+        for (auto player : g_players)
+        {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
     });
     lua.set_function("setinterval", [](sol::function cb, int ms) {
-        auto luaCb = LuaIntervalCallback{
+        auto luaCb = LuaIntervalCallback {
             cb,
             std::chrono::duration<unsigned int, std::milli>(ms),
             std::chrono::system_clock::time_point::min(),
         };
         g_luaCallbacks.push_back(luaCb);
     });
-    lua["spawn_entity"] = spawn_entity;
-    lua["shopAggro"] = &g_state->shoppie_aggro;
 
+    lua["spawn_entity"] = spawn_entity;
+    lua["print"] = printf;
+    lua["spawn_door"] = spawn_door_lua;
+    lua.new_usertype<StateMemory>("StateMemory", "shoppie_aggro",
+                              &StateMemory::shoppie_aggro);
+    lua.new_usertype<StateMemory>("StateMemory", "tun_aggro",
+                              &StateMemory::merchant_aggro);
+    lua["state"] = g_state;
     lua.create_named_table("ENT_TYPE");
-    for (int i = 1; i < g_items.size(); i++) {
+    for (int i = 1; i < g_items.size(); i++)
+    {
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
         lua["ENT_TYPE"][name] = g_items[i].id;
     }
+    lua.new_enum("THEME",
+        "DWELLING", 0,
+        "JUNGLE", 1,
+        "VOLCANA", 2,
+        "OLMEC", 3,
+        "TIDE_POOL", 4,
+        "TEMPLE", 5,
+        "ICE_CAVES", 6,
+        "NEO_BABYLON", 7,
+        "SUNKEN_CITY", 8,
+        "COSMIC_OCEAN", 9,
+        "CITY_OF_GOLD", 10,
+        "DUAT", 11,
+        "ABZU", 12,
+        "TIAMAT", 13,
+        "EGGPLANT_WORLD", 14,
+        "HUNDUN", 15,
+        "BASE_CAMP", 16
+    );
 }
 
 bool init_hooks(size_t _ptr) {
