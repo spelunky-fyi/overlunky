@@ -2839,24 +2839,25 @@ void init_script()
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
         lua["ENT_TYPE"][name] = g_items[i].id;
     }
-    lua.create_named_table("THEME");
-    lua["THEME"]["DWELLING"] = 0;
-    lua["THEME"]["JUNGLE"] = 1;
-    lua["THEME"]["VOLCANA"] = 2;
-    lua["THEME"]["OLMEC"] = 3;
-    lua["THEME"]["TIDE_POOL"] = 4;
-    lua["THEME"]["TEMPLE"] = 5;
-    lua["THEME"]["ICE_CAVES"] = 6;
-    lua["THEME"]["NEO_BABYLON"] = 7;
-    lua["THEME"]["SUNKEN_CITY"] = 8;
-    lua["THEME"]["COSMIC_OCEAN"] = 9;
-    lua["THEME"]["CITY_OF_GOLD"] = 10;
-    lua["THEME"]["DUAT"] = 11;
-    lua["THEME"]["ABZU"] = 12;
-    lua["THEME"]["TIAMAT"] = 13;
-    lua["THEME"]["EGGPLANT_WORLD"] = 14;
-    lua["THEME"]["HUNDUN"] = 15;
-    lua["THEME"]["BASE_CAMP"] = 16;
+    lua.new_enum("THEME",
+        "DWELLING", 0,
+        "JUNGLE", 1,
+        "VOLCANA", 2,
+        "OLMEC", 3,
+        "TIDE_POOL", 4,
+        "TEMPLE", 5,
+        "ICE_CAVES", 6,
+        "NEO_BABYLON", 7,
+        "SUNKEN_CITY", 8,
+        "COSMIC_OCEAN", 9,
+        "CITY_OF_GOLD", 10,
+        "DUAT", 11,
+        "ABZU", 12,
+        "TIAMAT", 13,
+        "EGGPLANT_WORLD", 14,
+        "HUNDUN", 15,
+        "BASE_CAMP", 16
+    );
 }
 
 bool init_hooks(size_t _ptr) {
