@@ -44,9 +44,6 @@ struct LuaIntervalCallback {
 };
 std::vector<LuaIntervalCallback> g_luaCallbacks;
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-
 const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
 

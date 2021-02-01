@@ -6,9 +6,6 @@
 #include "injector.h"
 #include "logger.h"
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
