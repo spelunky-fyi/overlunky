@@ -2799,7 +2799,7 @@ PresentPtr &vtable_find(T *obj, int index) {
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
-void spawn_door_lua(float x, float y, uint8_t l, uint8_t w, uint8_t f, uint8_t t)
+void spawn_door_lua(float x, float y, uint8_t l, uint8_t w, uint8_t t)
 {
     spawn_door(x, y, l, w, 1, t + 1);
 }
