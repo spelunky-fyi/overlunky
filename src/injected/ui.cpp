@@ -2176,6 +2176,13 @@ void render_entity_props() {
         } else if (g_entity_type == 575) {
             ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity->inside,
                              1, 255);
+        } else if (g_entity_type >= 22 && g_entity_type <= 36) {
+            ImGui::Text("Door target:");
+            ImGui::InputScalar("Enabled##DoorEnabled", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->enabled, &u8_one, &u8_one);
+            ImGui::InputScalar("World##DoorWorld", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->world, &u8_one, &u8_one);
+            ImGui::InputScalar("Level##DoorLevel", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->level, &u8_one, &u8_one);
+            ImGui::InputScalar("Theme##DoorTheme", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->theme, &u8_one, &u8_one);
+            ImGui::InputScalar("From##DoorFrom", ImGuiDataType_U8, &((Target *)(g_entity->anim_func))->from, &u8_one, &u8_one);
         } else {
             ImGui::InputScalar("Unknown data##UnknownSpecialAttribute",
                                ImGuiDataType_U64, (size_t *)&g_entity->inside,
