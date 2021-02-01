@@ -2808,7 +2808,7 @@ void init_script()
 {
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-    lua.open_libraries(sol::lib::base, sol::lib::math);
+    lua.open_libraries(sol::lib::math);
     lua.set_function("beep", [] {
         update_players();
         for (auto player : g_players)
@@ -2826,6 +2826,7 @@ void init_script()
     });
 
     lua["spawn_entity"] = spawn_entity;
+    lua["print"] = printf;
     lua["spawn_door"] = spawn_door_lua;
     lua.new_usertype<StateMemory>("StateMemory", "shoppie_aggro",
                               &StateMemory::shoppie_aggro);
