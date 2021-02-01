@@ -161,8 +161,8 @@ struct EntityCache {
 
 static ImFont *font, *bigfont;
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0, g_sat = 0,
-      g_val = 0;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0.63,
+      g_sat = 0.66, g_val = 0.66;
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0,
     g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
