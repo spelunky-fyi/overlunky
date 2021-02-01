@@ -3,7 +3,7 @@
 
 uint32_t spawn_entity(size_t id, float x, float y, bool s, float vx, float vy,
                       bool snap);
-uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t f, uint8_t t);
+uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 void spawn_backdoor(float x, float y);
 void teleport(float x, float y, bool s, float vx, float vy, bool snap);
 void godmode(bool g);

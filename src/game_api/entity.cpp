@@ -130,8 +130,8 @@ std::pair<float, float> Entity::position_self() const {
     return std::pair<float, float>(x, y);
 }
 
-void Door::set_target(uint8_t w, uint8_t l, uint8_t f, uint8_t t) {
-    uint8_t array[5] = {1, l, f, w, t};
+void Door::set_target(uint8_t w, uint8_t l, uint8_t t) {
+    uint8_t array[5] = {1, l, 1, w, t};
     DEBUG("Making door go to {}", array);
     write_mem(pointer() + 0xc1, std::string((char *)array, sizeof(array)));
 }

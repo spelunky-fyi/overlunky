@@ -1047,7 +1047,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam) {
     } else if (pressed("spawn_entity", wParam)) {
         spawn_entities(false);
     } else if (pressed("spawn_warp_door", wParam)) {
-        int spawned = spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
+        int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
         if (!lock_entity) g_last_id = spawned;
     } else if (pressed("move_up", wParam) && active("tool_entity")) {
         g_current_item =
@@ -1082,7 +1082,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam) {
     } else if (pressed("move_down", wParam) && active("tool_door")) {
         g_to = std::min(std::max(g_to + 1, 0), 15);
     } else if (pressed("enter", wParam) && active("tool_door")) {
-        int spawned = spawn_door(0.0, 0.0, g_level, g_world, 1, g_to + 1);
+        int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
         if (!lock_entity) g_last_id = spawned;
     } else if (pressed("move_up", wParam) && active("tool_camera")) {
         g_zoom -= 1.0;
@@ -1328,7 +1328,7 @@ void render_narnia() {
     }
     render_themes();
     if (ImGui::Button("Warp door")) {
-        int spawned = spawn_door(g_x, g_y, g_level, g_world, 1, g_to + 1);
+        int spawned = spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
         if (!lock_entity) g_last_id = spawned;
     }
     ImGui::SameLine();
@@ -2815,11 +2815,6 @@ PresentPtr &vtable_find(T *obj, int index) {
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
-void spawn_door_lua(float x, float y, uint8_t l, uint8_t w, uint8_t t)
-{
-    spawn_door(x, y, l, w, 1, t + 1);
-}
-
 void init_script()
 {
     g_state = (struct StateMemory *)get_state_ptr();
@@ -2843,7 +2838,7 @@ void init_script()
 
     lua["spawn_entity"] = spawn_entity;
     lua["print"] = printf;
-    lua["spawn_door"] = spawn_door_lua;
+    lua["spawn_door"] = spawn_door;
     lua.new_usertype<StateMemory>("StateMemory", "shoppie_aggro",
                               &StateMemory::shoppie_aggro);
     lua.new_usertype<StateMemory>("StateMemory", "tun_aggro",
@@ -2856,23 +2851,23 @@ void init_script()
         lua["ENT_TYPE"][name] = g_items[i].id;
     }
     lua.new_enum("THEME",
-        "DWELLING", 0,
-        "JUNGLE", 1,
-        "VOLCANA", 2,
-        "OLMEC", 3,
-        "TIDE_POOL", 4,
-        "TEMPLE", 5,
-        "ICE_CAVES", 6,
-        "NEO_BABYLON", 7,
-        "SUNKEN_CITY", 8,
-        "COSMIC_OCEAN", 9,
-        "CITY_OF_GOLD", 10,
-        "DUAT", 11,
-        "ABZU", 12,
-        "TIAMAT", 13,
-        "EGGPLANT_WORLD", 14,
-        "HUNDUN", 15,
-        "BASE_CAMP", 16
+        "DWELLING", 1,
+        "JUNGLE", 2,
+        "VOLCANA", 3,
+        "OLMEC", 4,
+        "TIDE_POOL", 5,
+        "TEMPLE", 6,
+        "ICE_CAVES", 7,
+        "NEO_BABYLON", 8,
+        "SUNKEN_CITY", 9,
+        "COSMIC_OCEAN", 10,
+        "CITY_OF_GOLD", 11,
+        "DUAT", 12,
+        "ABZU", 13,
+        "TIAMAT", 14,
+        "EGGPLANT_WORLD", 15,
+        "HUNDUN", 16,
+        "BASE_CAMP", 17
     );
 }
 

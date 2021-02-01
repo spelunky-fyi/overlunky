@@ -16,8 +16,7 @@ struct Layer {
 
     Entity *spawn_entity_over(size_t id, Entity *overlay, float x, float y);
 
-    Entity *spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t f,
-                       uint8_t t);
+    Entity *spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 
     std::vector<Entity *> items() const;
 };

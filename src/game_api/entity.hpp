@@ -273,7 +273,7 @@ struct Target {
 
 class Door : public Entity {
    public:
-    void set_target(uint8_t w, uint8_t l, uint8_t f, uint8_t t);
+    void set_target(uint8_t w, uint8_t l, uint8_t t);
 };
 
 std::vector<EntityItem> list_entities();

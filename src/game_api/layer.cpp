@@ -65,8 +65,7 @@ Entity *Layer::spawn_entity_over(size_t id, Entity *overlay, float x, float y) {
     return load_item_over(this, id, overlay, x, y, true);
 }
 
-Entity *Layer::spawn_door(float x, float y, uint8_t l, uint8_t w, uint8_t f,
-                          uint8_t t) {
+Entity *Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) {
     uint8_t screen = read_u8(State::get().ptr() + 0x10);
     Entity *door;
     switch (screen) {
@@ -83,7 +82,7 @@ Entity *Layer::spawn_door(float x, float y, uint8_t l, uint8_t w, uint8_t f,
         default:
             return nullptr;
     };
-    static_cast<Door *>(door)->set_target(w, l, f, t);
+    static_cast<Door *>(door)->set_target(w, l, t);
     return door;
 }
 
