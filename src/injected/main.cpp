@@ -38,6 +38,10 @@ void attach_stdout(DWORD pid) {
     if constexpr (enable_console) {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
+
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+        freopen("CONIN$", "r", stdin);
     }
 }
 

@@ -40,7 +40,7 @@ Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx,
             y = round(y);
         }
         auto addr = load_item(this, id, x, y);
-        DEBUG("Spawned {:x?}", addr);
+        DEBUG("Spawned {:x}", addr);
         return (Entity *)(addr);
     } else {
         auto state = State::get();
@@ -54,7 +54,7 @@ Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx,
             write_mem(addr + 0x100, to_le_bytes(vx));
             write_mem(addr + 0x104, to_le_bytes(vy));
         }
-        DEBUG("Spawned {:x?}", addr);
+        DEBUG("Spawned {:x}", addr);
         return (Entity *)(addr);
     }
 }

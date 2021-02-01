@@ -99,7 +99,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask) {
         auto flags = item->type->search_flags;
         float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
         if ((mask & flags) > 0 && distance < r) {
-            DEBUG("Item {}, {:x} type, {} position, {} distance, {:x?}",
+            DEBUG("Item {}, {:x} type, {} position, {} distance, {:x}",
                   item->uid, item->type->search_flags, item->position_self(),
                   distance, item->pointer());
             found.push_back({item->uid, distance, item});
@@ -111,7 +111,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask) {
         });
         auto picked = found[0];
         auto entity = std::get<2>(picked);
-        DEBUG("{:#x?}", (void *)entity);
+        DEBUG("{:#x}", (void *)entity);
         return std::get<0>(picked);
     }
     return 0;
