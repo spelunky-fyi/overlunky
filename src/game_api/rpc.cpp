@@ -111,7 +111,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask) {
         });
         auto picked = found[0];
         auto entity = std::get<2>(picked);
-        DEBUG("{:#x}", (void *)entity);
+        DEBUG("{}", (void *)entity);
         return std::get<0>(picked);
     }
     return 0;
