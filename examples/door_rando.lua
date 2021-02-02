@@ -4,7 +4,7 @@ max = 100
 theme = {1,2,3,5,6,7,8,9,10,11}
 function on_transition()
   print("Transition to "..tostring(state.world_next).."-"..tostring(state.level_next))
-  state.world_next = 1
+  state.world_next = max
   state.level_next = (state.level_count-1)%4+1
   if math.random(100) == 1 and state.level_count < max-5 then
     state.theme_next = THEME.EGGPLANT_WORLD
@@ -27,5 +27,6 @@ function on_transition()
   print("Going to level "..tostring(state.level_count).."/"..tostring(max)..": "..tostring(state.world_next).."-"..tostring(state.level_next).." theme "..tostring(state.theme_next))
 end
 function on_level()
-  state.level = max-state.level_count
+  state.world = max
+  state.level = state.level_count+1
 end
