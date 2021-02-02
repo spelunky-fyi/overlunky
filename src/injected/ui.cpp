@@ -1,5 +1,6 @@
 #define NOMINMAX
 
+#include "logger.h"
 #include "ui.hpp"
 
 #include <ShlObj.h>
@@ -34,8 +35,9 @@ std::string scriptresult;
 bool scriptchanged = false;
 struct ScriptState {
     Entity *player;
+    uint32_t screen;
 };
-ScriptState scriptstate = {0};
+ScriptState scriptstate = { 0, 0 };
 
 struct LuaIntervalCallback {
     sol::function func;
@@ -1521,8 +1523,8 @@ void render_hitbox(Entity *ent, bool cross, ImColor color) {
 
 void render_script() {
     get_players();
-    if (g_players.empty()) return;
     if (g_state == 0) return;
+    if (!g_state->ingame) return;
     if (scriptchanged) {
         // Compile & Evaluate the script if the script is changed
         try {
@@ -1537,12 +1539,22 @@ void render_script() {
         }
     }
     try {
-        sol::function onFrame = lua["onFrame"];
-        sol::function onLevel = lua["onLevel"];
-        if (onFrame) onFrame();
-        if (onLevel && g_state->screen == 12 &&
-            scriptstate.player != g_players.at(0))
-            onLevel();
+        sol::function onframe = lua["on_frame"];
+        sol::function onlevel = lua["on_level"];
+        sol::function ontransition = lua["on_transition"];
+        if (onframe)
+        {
+            onframe();
+        }
+        if (onlevel && g_state->screen == 12 && !g_players.empty() && scriptstate.player != g_players.at(0))
+        {
+            onlevel();
+        }
+        if (ontransition && g_state->screen == 13 && scriptstate.screen != 13)
+        {
+            ontransition();
+        }
+
         auto now = std::chrono::system_clock::now();
 
         for (int i = 0; i < g_luaCallbacks.size(); i++) {
@@ -1554,7 +1566,8 @@ void render_script() {
             }
         }
 
-        scriptstate.player = g_players.at(0);
+        if(!g_players.empty()) scriptstate.player = g_players.at(0);
+        if(g_state != 0) scriptstate.screen = g_state->screen;
     } catch (const sol::error &e) {
         scriptresult = e.what();
     }
@@ -1887,6 +1900,8 @@ void render_debug() {
                                               sizeof(script), {-1, 300});
     InputString("##LuaResult", &scriptresult, ImGuiInputTextFlags_ReadOnly);
     ImGui::PopItemWidth();
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    ImGui::PopItemWidth();
 }
 
 bool SliderByte(const char *label, char *value, char min = 0, char max = 0,
@@ -2014,6 +2029,8 @@ void render_screen(const char *label, int state) {
         ImGui::LabelText(label, "13 Level transition");
     else if (state == 14)
         ImGui::LabelText(label, "14 Death");
+    else if (state == 15)
+        ImGui::LabelText(label, "15 Spaceship");
     else if (state == 16)
         ImGui::LabelText(label, "16 Ending");
     else if (state == 17)
@@ -2382,12 +2399,15 @@ void render_game_props() {
         }
     }
     if (ImGui::CollapsingHeader("Street cred")) {
-        ImGui::DragScalar("Shoppie aggro##ShoppieAggro", ImGuiDataType_U16,
-                          (wchar_t *)&g_state->shoppie_aggro, 0.5f, &u16_min,
-                          &u16_max, "%d");
-        ImGui::DragScalar("Tun aggro##ShoppieAggro", ImGuiDataType_U16,
-                          (wchar_t *)&g_state->merchant_aggro, 0.5f, &u16_min,
-                          &u16_max, "%d");
+        ImGui::DragScalar("Shoppie aggro##ShoppieAggro", ImGuiDataType_U8,
+                          &g_state->shoppie_aggro, 0.5f, &u8_min,
+                          &u8_max, "%d");
+        ImGui::DragScalar("Shoppie aggro levels##ShoppieAggroLevels", ImGuiDataType_U8,
+                          &g_state->shoppie_aggro_levels, 0.5f, &u8_min,
+                          &u8_max, "%d");
+        ImGui::DragScalar("Tun aggro##MerchantAggro", ImGuiDataType_U8,
+                          &g_state->merchant_aggro, 0.5f, &u8_min,
+                          &u8_max, "%d");
         ImGui::DragScalar("NPC kills##NPCKills", ImGuiDataType_U8,
                           (char *)&g_state->kills_npc, 0.5f, &u8_zero, &u8_max);
         ImGui::DragScalar("Kali favor##PorFavor", ImGuiDataType_S8,
@@ -2816,6 +2836,8 @@ void init_script()
 {
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
+    DEBUG("Level: 0x{:x}", offsetof(StateMemory, level));
+    DEBUG("Theme: 0x{:x}", offsetof(StateMemory, theme));
     lua.open_libraries(sol::lib::math, sol::lib::base);
     lua.set_function("setinterval", [](sol::function cb, int ms) {
         auto luaCb = LuaIntervalCallback {
@@ -2828,11 +2850,34 @@ void init_script()
     lua["spawn_entity"] = spawn_entity;
     lua["spawn_door"] = spawn_door;
     lua.new_usertype<StateMemory>("StateMemory",
+        "screen_last", &StateMemory::screen_last,
+        "screen", &StateMemory::screen,
+        "screen_next", &StateMemory::screen_next,
+        "ingame", &StateMemory::ingame,
+        "playing", &StateMemory::playing,
+        "pause", &StateMemory::pause,
+        "w", &StateMemory::w,
+        "h", &StateMemory::h,
+        "kali_favor", &StateMemory::kali_favor,
+        "kali_status", &StateMemory::kali_status,
+        "kali_altars_destroyed", &StateMemory::kali_altars_destroyed,
+        "feedcode", &StateMemory::feedcode,
+        "time_total", &StateMemory::time_total,
         "world", &StateMemory::world,
+        "world_next", &StateMemory::world_next,
         "level", &StateMemory::level,
+        "level_next", &StateMemory::level_next,
+        "theme", &StateMemory::theme,
+        "theme_next", &StateMemory::theme_next,
         "shoppie_aggro", &StateMemory::shoppie_aggro,
+        "shoppie_aggro_levels", &StateMemory::shoppie_aggro_levels,
         "merchant_aggro", &StateMemory::merchant_aggro,
-        "time_level", &StateMemory::time_level
+        "kills_npc", &StateMemory::kills_npc,
+        "level_count", &StateMemory::level_count,
+        "journal_flags", &StateMemory::journal_flags,
+        "time_last_level", &StateMemory::time_last_level,
+        "time_level", &StateMemory::time_level,
+        "hud_flags", &StateMemory::hud_flags
     );
     lua["state"] = g_state;
     lua.create_named_table("ENT_TYPE");
