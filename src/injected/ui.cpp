@@ -2816,14 +2816,7 @@ void init_script()
 {
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-    lua.open_libraries(sol::lib::math);
-    lua.set_function("beep", [] {
-        update_players();
-        for (auto player : g_players)
-        {
-            render_hitbox(player, false, ImColor(255, 0, 255, 200));
-        }
-    });
+    lua.open_libraries(sol::lib::math, sol::lib::base);
     lua.set_function("setinterval", [](sol::function cb, int ms) {
         auto luaCb = LuaIntervalCallback {
             cb,
@@ -2832,14 +2825,15 @@ void init_script()
         };
         g_luaCallbacks.push_back(luaCb);
     });
-
     lua["spawn_entity"] = spawn_entity;
-    lua["print"] = printf;
     lua["spawn_door"] = spawn_door;
-    lua.new_usertype<StateMemory>("StateMemory", "shoppie_aggro",
-                              &StateMemory::shoppie_aggro);
-    lua.new_usertype<StateMemory>("StateMemory", "tun_aggro",
-                              &StateMemory::merchant_aggro);
+    lua.new_usertype<StateMemory>("StateMemory",
+        "world", &StateMemory::world,
+        "level", &StateMemory::level,
+        "shoppie_aggro", &StateMemory::shoppie_aggro,
+        "merchant_aggro", &StateMemory::merchant_aggro,
+        "time_level", &StateMemory::time_level
+    );
     lua["state"] = g_state;
     lua.create_named_table("ENT_TYPE");
     for (int i = 1; i < g_items.size(); i++)
