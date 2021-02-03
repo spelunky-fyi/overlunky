@@ -1,5 +1,6 @@
 -- door randomizer
 -- plays random level themes and ends with a boss rush
+-- this one sets the next level during transition
 max = 100
 theme = {1,2,3,5,6,7,8,9,10,11}
 function on_transition()
@@ -29,4 +30,10 @@ end
 function on_level()
   state.world = max
   state.level = state.level_count+1
+end
+function on_death()
+  print("Died in "..tostring(state.world).."-"..tostring(state.level))
+  state.world = 1
+  state.level = 1
+  state.theme = 1
 end

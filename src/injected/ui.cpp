@@ -1720,20 +1720,25 @@ void render_script()
     }
     try
     {
-        sol::function onframe = lua["on_frame"];
-        sol::function onlevel = lua["on_level"];
-        sol::function ontransition = lua["on_transition"];
-        if (onframe)
+        sol::function on_frame = lua["on_frame"];
+        sol::function on_level = lua["on_level"];
+        sol::function on_transition = lua["on_transition"];
+        sol::function on_death = lua["on_death"];
+        if (on_frame)
         {
-            onframe();
+            on_frame();
         }
-        if (onlevel && g_state->screen == 12 && !g_players.empty() && scriptstate.player != g_players.at(0))
+        if (on_level && g_state->screen == 12 && !g_players.empty() && scriptstate.player != g_players.at(0))
         {
-            onlevel();
+            on_level();
         }
-        if (ontransition && g_state->screen == 13 && scriptstate.screen != 13)
+        if (on_transition && g_state->screen == 13 && scriptstate.screen != 13)
         {
-            ontransition();
+            on_transition();
+        }
+        if (on_death && g_state->screen == 14 && scriptstate.screen != 14)
+        {
+            on_death();
         }
 
         auto now = std::chrono::system_clock::now();
@@ -1807,17 +1812,21 @@ void render_clickhandler()
     {
         render_grid();
     }
-    if (draw_entity_box && update_entity())
-    {
-        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
-    }
     if (draw_entity_box)
     {
+        for (auto test : get_entities_by(0, 255, -1))
+        {
+            render_hitbox(get_entity_ptr(test), false, ImColor(0, 255, 255, 150));
+        }
         get_players();
         for (auto player : g_players)
         {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
+    }
+    if (draw_entity_box && update_entity())
+    {
+        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
     }
     render_script();
     if (options["mouse_control"])
@@ -3099,6 +3108,13 @@ void init_script()
     });
     lua["spawn_entity"] = spawn_entity;
     lua["spawn_door"] = spawn_door;
+    lua["set_target"] = set_target;
+    lua["get_entities"] = get_entities;
+    lua["get_entities_by"] = get_entities_by;
+    lua["get_entities_by_type"] = get_entities_by_type;
+    lua["get_entities_by_mask"] = get_entities_by_mask;
+    lua["get_entities_by_layer"] = get_entities_by_layer;
+    lua["get_entities_at"] = get_entities_at;
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",

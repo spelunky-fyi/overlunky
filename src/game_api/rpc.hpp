@@ -1,8 +1,7 @@
 #include <cstdint>
 #include <vector>
 
-uint32_t spawn_entity(size_t id, float x, float y, bool s, float vx, float vy,
-                      bool snap);
+uint32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap);
 uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 void spawn_backdoor(float x, float y);
 void teleport(float x, float y, bool s, float vx, float vy, bool snap);
@@ -11,8 +10,7 @@ void darkmode(bool g);
 void zoom(float level);
 void list_items();
 uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask);
-void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy,
-                 bool snap);
+void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap);
 uint32_t get_entity_flags(uint32_t id);
 void set_entity_flags(uint32_t id, uint32_t flags);
 void set_hud_flags(uint8_t flags);
@@ -25,3 +23,10 @@ size_t get_state_ptr();
 void get_players();
 std::pair<float, float> screen_position(float x, float y);
 float get_zoom_level();
+std::vector<uint32_t> get_entities();
+std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer);
+std::vector<uint32_t> get_entities_by_type(uint32_t type);
+std::vector<uint32_t> get_entities_by_mask(uint32_t mask);
+std::vector<uint32_t> get_entities_by_layer(int layer);
+std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, int layer, float x, float y, float r);
+void set_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t);
