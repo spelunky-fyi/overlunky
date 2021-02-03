@@ -1,3 +1,13 @@
-BasedOnStyle: Google
-IndentWidth: 4
 Language: Cpp
+Standard: c++17
+Cpp11BracedListStyle: true
+IndentWidth: 4
+BreakBeforeBraces: Allman
+AlignAfterOpenBracket: AlwaysBreak
+ColumnLimit: 150
+BinPackArguments: false
+BinPackParameters: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowAllArgumentsOnNextLine: true
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
