@@ -3109,6 +3109,7 @@ void init_script()
     lua["spawn_entity"] = spawn_entity;
     lua["spawn_door"] = spawn_door;
     lua["set_target"] = set_target;
+    lua["set_contents"] = set_contents;
     lua["get_entities"] = get_entities;
     lua["get_entities_by"] = get_entities_by;
     lua["get_entities_by_type"] = get_entities_by_type;

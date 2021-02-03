@@ -437,3 +437,19 @@ void set_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t)
         return;
     static_cast<Door *>(door)->set_target(w, l, t);
 }
+
+void set_contents(uint32_t id, uint32_t item)
+{
+    auto state = State::get();
+    auto player = state.items()->player(0);
+    if (player == nullptr)
+        return;
+    Entity *container = get_entity_ptr(id);
+    if (container == nullptr)
+        return;
+    int type = container->type->id;
+    if (type != 402 && type != 422 && type != 423 && type != 475)
+        return;
+    static_cast<Movable *>(container)->inside = item;
+    DEBUG("Set {} to {}", id, item);
+}
