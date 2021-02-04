@@ -48,6 +48,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **F9**: Options
       + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
       + **Ctrl+G**: Toggle god mode
+      + **Ctrl+F**: Toggle noclip / fly
       + **Ctrl+S**: Toggle snap to grid
       + **Ctrl+Shift+P**: Toggle pausing allowed (disables focus loss pause)
       + **Ctrl+K**: Toggle disabling game keyboard input when typing

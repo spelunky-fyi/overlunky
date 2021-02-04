@@ -35,7 +35,7 @@ std::string scriptresult;
 bool scriptchanged = false;
 struct ScriptState
 {
-    Entity *player;
+    Player *player;
     uint32_t screen;
 };
 ScriptState scriptstate = {0, 0};
@@ -84,6 +84,7 @@ std::map<std::string, int> keys{
     {"move_pagedown", 0x22},
     {"toggle_mouse", 0x14d},
     {"toggle_godmode", 0x147},
+    {"toggle_noclip", 0x146},
     {"toggle_snap", 0x153},
     {"toggle_pause", 0x150},
     {"toggle_disable_input", 0x14b},
@@ -158,7 +159,7 @@ PresentPtr oPresent;
 // Global state
 struct EntityCache
 {
-    Entity *entity;
+    Movable *entity;
     int type;
 };
 
@@ -177,9 +178,10 @@ std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
      show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
-     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false;
+     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false, enable_noclip
+ = false;
 Movable *g_entity = 0;
-Entity *g_held_entity = 0;
+Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
 StateMemory *g_state = 0;
 std::map<int, std::string> entity_names;
@@ -233,7 +235,7 @@ const char *entity_flags[] = {
     "7: Throwable/Knockbackable",
     "8: ",
     "9: ",
-    "10: ",
+    "10: No gravity",
     "11: ",
     "12: ",
     "13: Collides walls",
@@ -703,31 +705,11 @@ void save_search()
 int entity_type(int uid)
 {
     return (int)get_entity_type(uid);
-    if (entity_cache.find(uid) == entity_cache.end())
-    {
-        EntityCache newcache = {(struct Entity *)get_entity_ptr(uid), (int)get_entity_type(uid)};
-        if (newcache.type != 0)
-        {
-            entity_cache[uid] = newcache;
-        }
-        return newcache.type;
-    }
-    return entity_cache.at(uid).type;
 }
 
-Entity *entity_ptr(int uid)
+Movable *entity_ptr(int uid)
 {
-    return (struct Entity *)get_entity_ptr(uid);
-    if (entity_cache.find(uid) == entity_cache.end())
-    {
-        EntityCache newcache = {(struct Entity *)get_entity_ptr(uid), (int)get_entity_type(uid)};
-        if (newcache.entity != 0)
-        {
-            entity_cache[uid] = newcache;
-        }
-        return newcache.entity;
-    }
-    return entity_cache.at(uid).entity;
+    return (Movable*)get_entity_ptr(uid);
 }
 
 bool update_players()
@@ -830,7 +812,7 @@ bool update_entity()
     if (g_last_id != 0)
     {
         g_entity_type = entity_type(g_last_id);
-        g_entity = (Movable *)entity_ptr(g_last_id);
+        g_entity = entity_ptr(g_last_id);
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if (IsBadWritePtr(g_entity, 0x178))
             g_entity = nullptr;
@@ -881,6 +863,24 @@ void force_hud_flags()
         g_state->hud_flags |= 1U << 17;
     else
         g_state->hud_flags &= ~(1U << 17);
+}
+
+void force_noclip()
+{
+    get_players();
+    if (enable_noclip) {
+        for (auto player : g_players) {
+            player->standing_on_uid = -1;
+            player->flags |= 1U << 9;
+            player->flags |= 1U << 4;
+            if (player->movey < 0)
+                player->velocityy = -0.145;
+            else if (player->movey > 0)
+                player->velocityy = 0.145;
+            else
+                player->velocityy = 0;
+        }
+    }
 }
 
 LRESULT CALLBACK window_hook(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
@@ -1079,6 +1079,19 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
         options["god_mode"] = !options["god_mode"];
         godmode(options["god_mode"]);
+    }
+    else if (pressed("toggle_noclip", wParam))
+    {
+        enable_noclip = !enable_noclip;
+        if (!enable_noclip)
+        {
+            get_players();
+            for (auto player : g_players)
+            {
+                player->flags &= ~(1U << 9);
+                player->flags &= ~(1U << 4);
+            }
+        }
     }
     else if (pressed("toggle_mouse", wParam))
     {
@@ -1655,17 +1668,17 @@ void render_grid(ImColor color = ImColor(255, 255, 255, 50))
     }
 }
 
-void render_hitbox(Entity *ent, bool cross, ImColor color)
+void render_hitbox(Movable *ent, bool cross, ImColor color)
 {
     if (ent->items_count > 0)
     {
         int *pitems = (int *)ent->items_ptr;
         for (int i = 0; i < ent->items_count; i++)
         {
-            render_hitbox(get_entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
+            render_hitbox(entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
         }
     }
-    const int type = get_entity_type(ent->uid);
+    const int type = entity_type(ent->uid);
     if (!type || ((type >= 538 && type <= 555) || type == 648))
         return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
@@ -1814,7 +1827,7 @@ void render_clickhandler()
     {
         for (auto test : get_entities_by(0, 255, -1))
         {
-            render_hitbox(get_entity_ptr(test), false, ImColor(0, 255, 255, 150));
+            render_hitbox(entity_ptr(test), false, ImColor(0, 255, 255, 150));
         }
         get_players();
         for (auto player : g_players)
@@ -1926,6 +1939,7 @@ void render_clickhandler()
             set_pos(startpos);
             if (ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1) || ImGui::IsMouseDragging(keys["mouse_grab_unsafe"] & 0xff - 1))
             {
+                g_held_entity->standing_on_uid = -1;
                 g_held_entity->flags |= 1U << 4;
                 move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
@@ -2070,6 +2084,18 @@ void render_options()
     if (ImGui::Checkbox("God mode##Godmode", &options["god_mode"]))
     {
         godmode(options["god_mode"]);
+    }
+    if (ImGui::Checkbox("Noclip##Noclip", &enable_noclip))
+    {
+        get_players();
+        for (auto player : g_players)
+        {
+            if(!enable_noclip)
+            {
+                player->flags &= ~(1U << 9);
+                player->flags &= ~(1U << 4);
+            }
+        }
     }
     ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
@@ -2340,7 +2366,7 @@ void render_entity_props()
             ImGui::SameLine();
             if (ImGui::Button("Drop##DropHolding"))
             {
-                Entity *holding = (struct Entity *)get_entity_ptr(g_entity->holding_uid);
+                Movable *holding = entity_ptr(g_entity->holding_uid);
                 holding->x = g_entity->x;
                 holding->y = g_entity->y;
                 holding->overlay = 0;
@@ -2348,7 +2374,7 @@ void render_entity_props()
             }
             render_uid(g_entity->holding_uid, "StateHolding");
         }
-        auto *overlay = (Entity *)g_entity->overlay;
+        auto *overlay = (Movable *)g_entity->overlay;
         if (!IsBadReadPtr(overlay, 0x178))
         {
             ImGui::Text("Riding:");
@@ -3037,11 +3063,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
+    update_players();
     force_zoom();
     force_hud_flags();
     force_time();
-    update_players();
-    // update_entity_cache();
+    force_noclip();
 
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
