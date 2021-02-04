@@ -178,8 +178,8 @@ std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
      show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
-     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false, enable_noclip
- = false;
+     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false,
+     enable_noclip = false;
 Movable *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -709,7 +709,7 @@ int entity_type(int uid)
 
 Movable *entity_ptr(int uid)
 {
-    return (Movable*)get_entity_ptr(uid);
+    return (Movable *)get_entity_ptr(uid);
 }
 
 bool update_players()
@@ -868,8 +868,10 @@ void force_hud_flags()
 void force_noclip()
 {
     get_players();
-    if (enable_noclip) {
-        for (auto player : g_players) {
+    if (enable_noclip)
+    {
+        for (auto player : g_players)
+        {
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
             player->flags |= 1U << 4;
@@ -2118,6 +2120,8 @@ void render_options()
     {
         options["stack_horizontally"] = false;
     }
+    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &draw_entity_box);
+    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &draw_grid);
 }
 
 void render_debug()
@@ -2323,8 +2327,6 @@ void render_entity_props()
 {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     ImGui::Checkbox("Lock to player one", &lock_player);
-    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &draw_entity_box);
-    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &draw_grid);
     if (lock_player)
     {
         if (!g_players.empty())
@@ -2439,6 +2441,18 @@ void render_entity_props()
                 render_uid(pitems[i], "EntityItems");
             }
         }
+    }
+    if (ImGui::CollapsingHeader("Global attributes") && g_entity->type)
+    {
+        ImGui::DragScalar("Damage##GlobalDamage", ImGuiDataType_U8, (char *)&g_entity->type->damage, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Health##GlobalLife", ImGuiDataType_U8, (char *)&g_entity->type->life, 0.5f, &u8_one, &u8_max);
+        ImGui::DragFloat("Friction##GlobalFriction", &g_entity->type->friction, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Elasticity##GlobalElasticity", &g_entity->type->elasticity, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Weight##GlobalWeight", &g_entity->type->weight, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Acceleration##GlobalAcceleration", &g_entity->type->acceleration, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Max speed##GlobalMaxSpeed", &g_entity->type->max_speed, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &g_entity->type->sprint_factor, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Jump height##GlobalJumpHeight", &g_entity->type->jump, 0.1f, 0.0f, 10.0f);
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {
