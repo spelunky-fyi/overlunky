@@ -2446,13 +2446,13 @@ void render_entity_props()
     {
         ImGui::DragScalar("Damage##GlobalDamage", ImGuiDataType_U8, (char *)&g_entity->type->damage, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Health##GlobalLife", ImGuiDataType_U8, (char *)&g_entity->type->life, 0.5f, &u8_one, &u8_max);
-        ImGui::DragFloat("Friction##GlobalFriction", &g_entity->type->friction, 0.1f, 0.0f, 10.0f);
-        ImGui::DragFloat("Elasticity##GlobalElasticity", &g_entity->type->elasticity, 0.1f, 0.0f, 10.0f);
-        ImGui::DragFloat("Weight##GlobalWeight", &g_entity->type->weight, 0.1f, 0.0f, 10.0f);
-        ImGui::DragFloat("Acceleration##GlobalAcceleration", &g_entity->type->acceleration, 0.1f, 0.0f, 10.0f);
-        ImGui::DragFloat("Max speed##GlobalMaxSpeed", &g_entity->type->max_speed, 0.1f, 0.0f, 10.0f);
-        ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &g_entity->type->sprint_factor, 0.1f, 0.0f, 10.0f);
-        ImGui::DragFloat("Jump height##GlobalJumpHeight", &g_entity->type->jump, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Friction##GlobalFriction", &g_entity->type->friction, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Elasticity##GlobalElasticity", &g_entity->type->elasticity, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Weight##GlobalWeight", &g_entity->type->weight, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Acceleration##GlobalAcceleration", &g_entity->type->acceleration, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Max speed##GlobalMaxSpeed", &g_entity->type->max_speed, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &g_entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Jump power##GlobalJumpPower", &g_entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {
