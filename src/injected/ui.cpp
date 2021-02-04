@@ -47,6 +47,7 @@ struct LuaIntervalCallback
     std::chrono::time_point<std::chrono::system_clock> lastRan;
 };
 std::vector<LuaIntervalCallback> g_luaCallbacks;
+std::vector<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> lua_messages;
 
 const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
@@ -1811,6 +1812,36 @@ void set_vel(ImVec2 pos)
     g_vy = 2 * (g_vy - g_y) * 0.5625;
 }
 
+void add_message(std::string message)
+{
+    lua_messages.push_back({message, std::chrono::system_clock::now()});
+}
+
+void render_messages()
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui::SetNextWindowSize({io.DisplaySize.x, -1});
+    ImGui::Begin(
+        "Messages",
+        NULL,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+    using namespace std::chrono_literals;
+    ImGui::PushFont(bigfont);
+    for (auto message : lua_messages)
+    {
+        auto now = std::chrono::system_clock::now();
+        if(now - 5s > message.second)
+            continue;
+        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.second).count() / 5000.0f;
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), message.first.data());
+    }
+    ImGui::PopFont();
+    ImGui::SetWindowPos({500, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
+    ImGui::End();
+}
+
 void render_clickhandler()
 {
     ImGuiIO &io = ImGui::GetIO();
@@ -2078,6 +2109,7 @@ void render_clickhandler()
             io.MouseDrawCursor = true;
         }
     }
+
     ImGui::End();
 }
 
@@ -2891,6 +2923,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
+    render_messages();
     render_clickhandler();
 
     int win_condition = ImGuiCond_FirstUseEver;
@@ -3150,6 +3183,7 @@ void init_script()
         };
         g_luaCallbacks.push_back(luaCb);
     });
+    lua["message"] = add_message;
     lua["spawn_entity"] = spawn_entity;
     lua["spawn_door"] = spawn_door;
     lua["set_target"] = set_target;

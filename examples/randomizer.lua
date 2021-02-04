@@ -18,6 +18,7 @@ if nexttheme == THEME.COSMIC_OCEAN then
 end
 nextworld = world[nexttheme]
 function on_level()
+  message("Started level "..tostring(state.level_count+1).."/"..tostring(max)..".")
   pots = get_entities_by_type(ENT_TYPE.ITEM_POT);
   for i,v in ipairs(pots) do
     item = items[math.random(#items)]
@@ -82,3 +83,10 @@ function on_frame()
   state.level_next = nextlevel;
   state.theme_next = nexttheme;
 end
+function on_transition()
+  message("Level "..tostring(state.level_count).."/"..tostring(max).." completed!")
+end
+function on_death()
+  message("Died in level "..tostring(state.level_count+1).."/"..tostring(max)..".")
+end
+message("Spelunky 2 Door+Pot Randomizer initialized!")
