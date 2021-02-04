@@ -1,6 +1,6 @@
 -- door randomizer
 -- plays random level themes and ends with a boss rush
--- this one sets the next level during transition
+-- this one sets the next level during transition, and is kinda crap
 max = 100
 theme = {1,2,3,5,6,7,8,9,10,11}
 function on_transition()

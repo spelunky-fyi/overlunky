@@ -1699,8 +1699,6 @@ void render_script()
     get_players();
     if (g_state == 0)
         return;
-    if (!g_state->ingame)
-        return;
     if (scriptchanged)
     {
         // Compile & Evaluate the script if the script is changed

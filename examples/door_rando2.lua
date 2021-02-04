@@ -1,6 +1,6 @@
 -- door randomizer
 -- plays random level themes and ends with a boss rush
--- this one changes the actual target of exit doors
+-- this one changes the actual target of exit doors, it's better but already outdated
 max = 100
 theme = {1,2,3,5,6,7,8,9,10,11}
 world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
