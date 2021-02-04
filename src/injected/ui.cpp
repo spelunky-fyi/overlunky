@@ -173,6 +173,7 @@ ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
     g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0,
     g_force_width = 0, g_force_height = 0, register_keys = 0, register_keys_alt = 0;
+uint32_t g_held_flags = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
@@ -1972,6 +1973,7 @@ void render_clickhandler()
             }
             g_held_id = get_entity_at(g_x, g_y, true, 1, mask);
             g_held_entity = entity_ptr(g_held_id);
+            g_held_flags = g_held_entity->flags;
             if (g_held_id && (float)rand() / RAND_MAX > 0.99)
             {
                 g_held_id = spawn_entity(372, g_x, g_y, true, 0, 0, false);
@@ -2001,6 +2003,7 @@ void render_clickhandler()
             {
                 g_held_entity->standing_on_uid = -1;
                 g_held_entity->flags |= 1U << 4;
+                g_held_entity->flags |= 1U << 9;
                 move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
         }
@@ -2008,7 +2011,7 @@ void render_clickhandler()
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            g_held_entity->flags &= ~(1 << 4);
+            g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
             move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
@@ -2022,7 +2025,7 @@ void render_clickhandler()
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            g_held_entity->flags &= ~(1 << 4);
+            g_held_entity->flags = g_held_flags;
             if (options["snap_to_grid"])
             {
                 move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);

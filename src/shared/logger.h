@@ -9,11 +9,7 @@
 #define COMMON_FORMATTER(name, format, ...)                 \
     try {                                                   \
         fmt::print("[" name "] " format "\n", __VA_ARGS__); \
-    } catch (fmt::format_error & e) {                       \
-        puts("Formatting exception:" format);               \
-        puts(__FILE__ " at " TOSTRING(__LINE__));           \
-        puts(e.what());                                     \
-    }
+    } catch (...) {} // shit don't work
 
 #define PANIC(format, ...)                              \
     do {                                                \
@@ -25,6 +21,7 @@
     do {                                                \
         COMMON_FORMATTER("debug", format, __VA_ARGS__); \
     } while (false)
+
 #define INFO(format, ...)                              \
     do {                                               \
         COMMON_FORMATTER("info", format, __VA_ARGS__); \
