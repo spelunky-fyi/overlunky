@@ -48,10 +48,7 @@ void attach_stdout(DWORD pid) {
 extern "C" __declspec(dllexport) void run(DWORD pid) {
     attach_stdout(pid);
     FILE *fp = fopen("spelunky.log", "a");
-    if (!fp) {
-        PANIC("{}", errno);
-    }
-    {
+    if (fp) {
         fputs("Overlunky loaded\n", fp);
         fclose(fp);
     }

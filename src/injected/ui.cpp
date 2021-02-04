@@ -1973,12 +1973,8 @@ void render_clickhandler()
             }
             g_held_id = get_entity_at(g_x, g_y, true, 1, mask);
             g_held_entity = entity_ptr(g_held_id);
-            g_held_flags = g_held_entity->flags;
-            if (g_held_id && (float)rand() / RAND_MAX > 0.99)
-            {
-                g_held_id = spawn_entity(372, g_x, g_y, true, 0, 0, false);
-                g_held_entity = entity_ptr(g_held_id);
-            }
+            if(g_held_entity)
+                g_held_flags = g_held_entity->flags;
             if (!lock_entity)
                 g_last_id = g_held_id;
         }
@@ -2001,9 +1997,12 @@ void render_clickhandler()
             set_pos(startpos);
             if (ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1) || ImGui::IsMouseDragging(keys["mouse_grab_unsafe"] & 0xff - 1))
             {
-                g_held_entity->standing_on_uid = -1;
-                g_held_entity->flags |= 1U << 4;
-                g_held_entity->flags |= 1U << 9;
+                if (g_held_entity)
+                {
+                    g_held_entity->standing_on_uid = -1;
+                    g_held_entity->flags |= 1U << 4;
+                    g_held_entity->flags |= 1U << 9;
+                }
                 move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
         }
@@ -2011,7 +2010,8 @@ void render_clickhandler()
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            g_held_entity->flags = g_held_flags;
+            if (g_held_entity) 
+                g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
             move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
@@ -2025,7 +2025,8 @@ void render_clickhandler()
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            g_held_entity->flags = g_held_flags;
+            if (g_held_entity)
+                g_held_entity->flags = g_held_flags;
             if (options["snap_to_grid"])
             {
                 move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
