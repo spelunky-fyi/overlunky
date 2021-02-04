@@ -98,9 +98,9 @@ struct State {
     std::pair<float, float> screen_position(float x, float y);
     float get_zoom_level();
 
-    uint8_t flags() { return read_u8(ptr() + 0xa0e); }
+    uint8_t flags() { return read_u32(ptr() + 0xa0e); }
 
-    void set_flags(uint8_t f) { write_mem(ptr() + 0xa0e, to_le_bytes(f)); }
+    void set_flags(uint32_t f) { write_mem(ptr() + 0xa0e, to_le_bytes(f)); }
 
     void set_pause(uint8_t p) { write_mem(ptr() + 0x32, to_le_bytes(p)); }
 

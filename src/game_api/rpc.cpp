@@ -159,49 +159,52 @@ void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool
 uint32_t get_entity_flags(uint32_t id)
 {
     if (id == 0)
-    {
         return 0;
-    }
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return 0;
-    for (auto &item : state.layer(player->layer())->items())
-    {
-        if (item->uid == id)
-        {
-            return item->flags;
-        }
-    }
+    auto ent = state.find(id);
+    if(ent)
+        return ent->flags;
     return 0;
 }
 
 void set_entity_flags(uint32_t id, uint32_t flags)
 {
     if (id == 0)
-    {
         return;
-    }
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    for (auto &item : state.layer(player->layer())->items())
-    {
-        if (item->uid == id)
-        {
-            item->flags = flags;
-        }
-    }
+    auto ent = state.find(id);
+    if (ent)
+        ent->flags = flags;
 }
 
-uint8_t get_hud_flags()
+uint32_t get_entity_flags2(uint32_t id)
+{
+    if (id == 0)
+        return 0;
+    auto state = State::get();
+    auto ent = state.find(id);
+    if (ent)
+        return ent->more_flags;
+    return 0;
+}
+
+void set_entity_flags2(uint32_t id, uint32_t flags)
+{
+    if (id == 0)
+        return;
+    auto state = State::get();
+    auto ent = state.find(id);
+    if (ent)
+        ent->more_flags = flags;
+}
+
+uint32_t get_hud_flags()
 {
     auto state = State::get();
     return state.flags();
 }
 
-void set_hud_flags(uint8_t flags)
+void set_hud_flags(uint32_t flags)
 {
     auto state = State::get();
     state.set_flags(flags);
