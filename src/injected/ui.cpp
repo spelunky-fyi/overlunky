@@ -91,6 +91,8 @@ std::map<std::string, int> keys{
     {"toggle_disable_input", 0x14b},
     {"toggle_disable_input_alt", 0x34b},
     {"toggle_disable_pause", 0x350},
+    {"toggle_grid", 0x347},
+    {"toggle_hitboxes", 0x348},
     {"tool_entity", 0x70},
     {"tool_door", 0x71},
     {"tool_camera", 0x72},
@@ -179,8 +181,7 @@ std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
      show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
-     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, draw_entity_box = false, draw_grid = false,
-     enable_noclip = false;
+     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false;
 Movable *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -354,12 +355,15 @@ const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi
 std::map<std::string, bool> options = {
     {"mouse_control", false},
     {"god_mode", false},
+    {"noclip", false},
     {"snap_to_grid", false},
     {"stack_horizontally", false},
     {"stack_vertically", false},
     {"disable_pause", false},
     {"disable_input", true},
-    {"disable_input_alt", false}};
+    {"disable_input_alt", false},
+    {"draw_grid", false},
+    {"draw_hitboxes", false}};
 
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
@@ -882,7 +886,7 @@ void force_hud_flags()
 void force_noclip()
 {
     get_players();
-    if (enable_noclip)
+    if (options["noclip"])
     {
         for (auto player : g_players)
         {
@@ -1094,11 +1098,11 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     }
     else if (pressed("toggle_noclip", wParam))
     {
-        enable_noclip = !enable_noclip;
+        options["noclip"] = !options["noclip"];
         get_players();
         for (auto player : g_players)
         {
-            if (enable_noclip)
+            if (options["noclip"])
             {
                 player->type->max_speed = 0.3;
             }
@@ -1109,6 +1113,14 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
                 player->type->max_speed = 0.0725;
             }
         }
+    }
+    else if (pressed("toggle_hitboxes", wParam))
+    {
+        options["draw_hitboxes"] = !options["draw_hitboxes"];
+    }
+    else if (pressed("toggle_grid", wParam))
+    {
+        options["draw_grid"] = !options["draw_grid"];
     }
     else if (pressed("toggle_mouse", wParam))
     {
@@ -1867,11 +1879,11 @@ void render_clickhandler()
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-    if (draw_grid)
+    if (options["draw_grid"])
     {
         render_grid();
     }
-    if (draw_entity_box)
+    if (options["draw_hitboxes"])
     {
         for (auto test : get_entities_by(0, 255, -1))
         {
@@ -1883,7 +1895,7 @@ void render_clickhandler()
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
     }
-    if (draw_entity_box && update_entity())
+    if (options["draw_hitboxes"] && update_entity())
     {
         render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
     }
@@ -2134,12 +2146,12 @@ void render_options()
     {
         godmode(options["god_mode"]);
     }
-    if (ImGui::Checkbox("Noclip##Noclip", &enable_noclip))
+    if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {
         get_players();
         for (auto player : g_players)
         {
-            if (enable_noclip)
+            if (options["noclip"])
             {
                 player->type->max_speed = 0.4;
             }
@@ -2166,8 +2178,8 @@ void render_options()
     {
         options["stack_horizontally"] = false;
     }
-    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &draw_entity_box);
-    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &draw_grid);
+    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
+    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
 }
 
 void render_debug()
