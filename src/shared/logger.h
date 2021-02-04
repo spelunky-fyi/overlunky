@@ -6,10 +6,20 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-#define COMMON_FORMATTER(name, format, ...)                 \
-    try {                                                   \
-        fmt::print("[" name "] " format "\n", __VA_ARGS__); \
-    } catch (...) {} // shit don't work
+#define COMMON_FORMATTER(name, format, ...)                                                                                                          \
+    try                                                                                                                                              \
+    {                                                                                                                                                \
+        fmt::print("[" name "] " format "\n", __VA_ARGS__);                                                                                          \
+    }                                                                                                                                                \
+    catch (fmt::format_error & e)                                                                                                                    \
+    {                                                                                                                                                \
+        puts("Formatting exception:" format);                                                                                                        \
+        puts(__FILE__ " at " TOSTRING(__LINE__));                                                                                                    \
+        puts(e.what());                                                                                                                              \
+    }                                                                                                                                                \
+    catch (...)                                                                                                                                      \
+    {                                                                                                                                                \
+    }
 
 #define PANIC(format, ...)                              \
     do {                                                \
