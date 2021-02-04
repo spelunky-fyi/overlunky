@@ -12,7 +12,7 @@
 
 using namespace std::chrono_literals;
 
-inline constexpr bool enable_console{true};
+inline constexpr bool enable_console{false};
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
                     DWORD fdwReason,     // reason for calling function

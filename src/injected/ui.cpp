@@ -433,6 +433,19 @@ void set_colors()
     style.PopupBorderSize = 0;
 }
 
+void load_script(std::string file)
+{
+    std::ifstream data(file);
+    std::ostringstream buf;
+    if (!data.fail())
+    {
+        buf << data.rdbuf();
+        strcpy(script, buf.str().data());
+        scriptchanged = true;
+        data.close();
+    }
+}
+
 bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam);
 
 bool process_resizing(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam);
@@ -1718,6 +1731,7 @@ void render_script()
         return;
     if (scriptchanged)
     {
+        scriptchanged = false;
         // Compile & Evaluate the script if the script is changed
         try
         {
@@ -1820,7 +1834,7 @@ void add_message(std::string message)
 void render_messages()
 {
     ImGuiIO &io = ImGui::GetIO();
-    ImGui::SetNextWindowSize({io.DisplaySize.x, -1});
+    ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
         "Messages",
         NULL,
@@ -1838,7 +1852,7 @@ void render_messages()
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), message.first.data());
     }
     ImGui::PopFont();
-    ImGui::SetWindowPos({500, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
+    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
     ImGui::End();
 }
 
@@ -2180,7 +2194,14 @@ void render_debug()
     ImGui::PopItemWidth();
     ImGui::PushItemWidth(-1);
     ImGui::Text("Scripting playground:");
-    scriptchanged = ImGui::InputTextMultiline("##LuaScript", script, sizeof(script), {-1, 300});
+    if(ImGui::Button("Load overlunky.lua"))
+    {
+        load_script("overlunky.lua");
+    }
+    if(ImGui::InputTextMultiline("##LuaScript", script, sizeof(script), {-1, 300}))
+    {
+        scriptchanged = true;
+    }
     InputString("##LuaResult", &scriptresult, ImGuiInputTextFlags_ReadOnly);
     ImGui::PopItemWidth();
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
@@ -3172,8 +3193,6 @@ void init_script()
 {
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-    DEBUG("Level: 0x{:x}", offsetof(StateMemory, level));
-    DEBUG("Theme: 0x{:x}", offsetof(StateMemory, theme));
     lua.open_libraries(sol::lib::math, sol::lib::base);
     lua.set_function("setinterval", [](sol::function cb, int ms) {
         auto luaCb = LuaIntervalCallback{

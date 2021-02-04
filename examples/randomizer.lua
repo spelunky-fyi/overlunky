@@ -89,4 +89,4 @@ end
 function on_death()
   message("Died in level "..tostring(state.level_count+1).."/"..tostring(max)..".")
 end
-message("Spelunky 2 Door+Pot Randomizer initialized!")
+message("Spelunky 2 Door+Pot Randomizer WIP initialized!")
