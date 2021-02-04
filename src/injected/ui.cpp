@@ -873,12 +873,8 @@ void force_noclip()
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
             player->flags |= 1U << 4;
-            if (player->movey < 0)
-                player->velocityy = -0.145;
-            else if (player->movey > 0)
-                player->velocityy = 0.145;
-            else
-                player->velocityy = 0;
+            player->velocityx = player->movex * player->type->max_speed;
+            player->velocityy = player->movey * player->type->max_speed;
         }
     }
 }
@@ -1083,13 +1079,18 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     else if (pressed("toggle_noclip", wParam))
     {
         enable_noclip = !enable_noclip;
-        if (!enable_noclip)
+        get_players();
+        for (auto player : g_players)
         {
-            get_players();
-            for (auto player : g_players)
+            if (enable_noclip)
+            {
+                player->type->max_speed = 0.3;
+            }
+            else
             {
                 player->flags &= ~(1U << 9);
                 player->flags &= ~(1U << 4);
+                player->type->max_speed = 0.0725;
             }
         }
     }
@@ -2090,10 +2091,15 @@ void render_options()
         get_players();
         for (auto player : g_players)
         {
-            if(!enable_noclip)
+            if (enable_noclip)
+            {
+                player->type->max_speed = 0.4;
+            }
+            else
             {
                 player->flags &= ~(1U << 9);
                 player->flags &= ~(1U << 4);
+                player->type->max_speed = 0.0725;
             }
         }
     }
