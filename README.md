@@ -31,7 +31,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
-      + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can just paste in.
+      + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can `Save` for later use with a single click.
   - **F2**: Spawn doors to many places
       + **Shift+Enter**: Spawn back layer door
       + **Ctrl+Shift+Enter**: Spawn warp door
@@ -46,14 +46,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + See and change a lot of variables from the game state
       + **Ctrl+P**: Toggle game engine pause
   - **F9**: Options
-      + **Ctrl+M**: Toggle mouse controls (spawn/teleport)
-      + **Ctrl+G**: Toggle god mode
-      + **Ctrl+F**: Toggle noclip / fly
-      + **Ctrl+S**: Toggle snap to grid
-      + **Ctrl+Shift+P**: Toggle pausing allowed (disables focus loss pause)
-      + **Ctrl+K**: Toggle disabling game keyboard input when typing
-      + **Ctrl+Shift+R**: Toggle stacking of windows horizontally
-      + **Ctrl+Shift+V**: Toggle stacking of windows vertically
+      + Lots of options. **Check the ini for hotkeys, I'm tired of updating this.**
   - **F11**: Hide overlay
   - **Ctrl+Shift+U**: Change UI color
   - **Ctrl+Shift+I**: ImGui internal metrics and settings
@@ -78,10 +71,12 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - If you mess up your keyboard shortcuts or UI:
     + Delete `Spelunky 2/overlunky.ini`.
   - If keyboard input no longer works in game after using the tools:
-    + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing` option enabled, it doesn't work in fullscreen.
+    + Try switching to the `alternative disable input mode` in options, save options and restart the game.
+    + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing (rawinput)` option enabled, it doesn't work in fullscreen.
     + Restart the game after changing graphics modes.
     + Try Alt+Tabbing to restore input.
-    + If nothing else works, disable the `Disable game keys when typing` option and try Alt+Tabbing to restore input.
+    + Magically learn to play with a gamepad instead.
+    + If nothing else works, disable the `Disable game keys when typing` options and suffer.
     
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
@@ -93,4 +88,4 @@ cd build
 cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
-The binaries will be in `build/bin/Release/`. To enable debug logging, `set RUST_LOG=debug` in *the game environment*, e.g. where you run Spel2.exe. You can also try the scripts in `.vscode` with VSCode.
+The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode.
