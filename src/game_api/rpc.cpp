@@ -502,3 +502,8 @@ void set_contents(uint32_t id, uint32_t item)
     static_cast<Movable *>(container)->inside = item;
     DEBUG("Set {} to {}", id, item);
 }
+
+void entity_remove_item(uint32_t entity, uint32_t item)
+{
+    
+}

@@ -1667,8 +1667,10 @@ ImVec2 screenify(ImVec2 pos)
     return screened;
 }
 
-void render_grid(ImColor color = ImColor(255, 255, 255, 50))
+void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
+    if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
+        return;
     ImGuiIO &io = ImGui::GetIO();
     ImVec2 res = io.DisplaySize;
     auto *draw_list = ImGui::GetWindowDrawList();
@@ -1677,8 +1679,20 @@ void render_grid(ImColor color = ImColor(255, 255, 255, 50))
         std::pair<float, float> gridline = screen_position((float)x + 0.5, 0);
         if (abs(gridline.first) <= 1.0)
         {
+            int width = 2;
+            ImColor color = gridcolor;
             ImVec2 grids = screenify({gridline.first, gridline.second});
-            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, 2);
+            if ((x % 10)-2 == 0)
+            {
+                width = 4;
+                color = ImColor(gridcolor.Value.x, gridcolor.Value.y, gridcolor.Value.z, 0.7f);
+            }
+            else
+            {
+                width = 2;
+                color = ImColor(gridcolor.Value.x, gridcolor.Value.y, gridcolor.Value.z, 0.2f);
+            }
+            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, width);
         }
     }
     for (int y = -1; y < 128; y++)
@@ -1686,8 +1700,20 @@ void render_grid(ImColor color = ImColor(255, 255, 255, 50))
         std::pair<float, float> gridline = screen_position(0, (float)y + 0.5);
         if (abs(gridline.second) <= 1.0)
         {
+            int width = 2;
+            ImColor color = gridcolor;
             ImVec2 grids = screenify({gridline.first, gridline.second});
-            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, 2);
+            if ((y % 8) - 2 == 0)
+            {
+                width = 4;
+                color = ImColor(color.Value.x, color.Value.y, color.Value.z, 0.7f);
+            }
+            else
+            {
+                width = 2;
+                color = ImColor(color.Value.x, color.Value.y, color.Value.z, 0.2f);
+            }
+            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, width);
         }
     }
     get_players();
@@ -2269,7 +2295,7 @@ bool DragByte(const char *label, char *value, float speed = 1.0f, char min = 0, 
     return ImGui::DragScalar(label, ImGuiDataType_U8, value, speed, &min, &max, format);
 }
 
-void render_uid(int uid, const char *section)
+void render_uid(int uid, const char *section, bool rembtn = false)
 {
     char uidc[10];
     itoa(uid, uidc, 10);
@@ -2285,11 +2311,19 @@ void render_uid(int uid, const char *section)
         g_last_id = uid;
         update_entity();
     }
-    ImGui::PopID();
     ImGui::SameLine();
     ImGui::Text(typec);
     ImGui::SameLine();
     ImGui::Text(pname);
+    if (rembtn)
+    {
+        ImGui::SameLine();
+        ImGui::PushID(uid);
+        if (ImGui::Button("X(!)"))
+            g_entity->remove_item(uid);
+        ImGui::PopID();
+    }
+    ImGui::PopID();
 }
 
 void render_state(const char *label, int state)
@@ -2451,7 +2485,7 @@ void render_entity_props()
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(g_entity->uid, "EntityGeneral");
     ImGui::SameLine();
-    if (ImGui::Button("Void##DeleteEntity"))
+    if (ImGui::Button("Void(!)##DeleteEntity"))
     {
         if (g_entity->overlay)
         {
@@ -2478,7 +2512,7 @@ void render_entity_props()
         {
             ImGui::Text("Holding:");
             ImGui::SameLine();
-            if (ImGui::Button("Drop##DropHolding"))
+            if (ImGui::Button("Drop(!)##DropHolding"))
             {
                 Movable *holding = entity_ptr(g_entity->holding_uid);
                 holding->x = g_entity->x;
@@ -2544,7 +2578,7 @@ void render_entity_props()
             int *pitems = (int *)g_entity->items_ptr;
             for (int i = 0; i < g_entity->items_count; i++)
             {
-                render_uid(pitems[i], "EntityItems");
+                render_uid(pitems[i], "EntityItems", true);
             }
         }
     }

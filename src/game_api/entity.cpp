@@ -73,10 +73,10 @@ Carry get_carry() {
 
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy,
                       bool snap) {
-    // e.g. topmost == turkey if riding turkey. player has relative coordinate
-    // to turkey.
+    if (overlay)
+        overlay->remove_item(uid);
+    overlay = NULL;
     auto topmost = topmost_mount();
-    topmost->overlay = NULL;
     auto [x, y] = topmost->position();
     if (!s) {
         // player relative coordinates
@@ -110,12 +110,13 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy,
     return;
 }
 
-void Entity::teleport_abs(float x, float y, float vx, float vy)
+void Entity::teleport_abs(float dx, float dy, float vx, float vy)
 {
-    auto topmost = topmost_mount();
-    topmost->overlay = NULL;
-    topmost->x = x;
-    topmost->y = y;
+    if (overlay)
+        overlay->remove_item(uid);
+    overlay = NULL;
+    x = dx;
+    y = dy;
 }
 
 std::pair<float, float> Entity::position() {
@@ -136,6 +137,32 @@ std::pair<float, float> Entity::position() {
 
 std::pair<float, float> Entity::position_self() const {
     return std::pair<float, float>(x, y);
+}
+
+void Entity::remove_item(uint32_t id)
+{
+    DEBUG("Remove item {}", id);
+    DEBUG("Items ptr: {}", items_ptr);
+    uint32_t *item = reinterpret_cast<uint32_t*>(items_ptr);
+    bool found = false;
+    for (int i = 0; i < items_count; ++i)
+    {
+        DEBUG("Item: {}", item[i]);
+        if (item[i] == id)
+        {
+            DEBUG("Found item");
+            auto state = State::get();
+            auto itemptr = state_find_item(state.ptr(), id);
+            itemptr->overlay = NULL;
+            itemptr->x += position().first;
+            itemptr->y += position().second;
+            found = true;
+        }
+        if (found && i < items_count-1)
+            item[i] = item[i + 1];
+    }
+    if (found)
+        items_count--;
 }
 
 void Door::set_target(uint8_t w, uint8_t l, uint8_t t) {

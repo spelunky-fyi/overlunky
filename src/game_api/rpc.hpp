@@ -38,3 +38,4 @@ std::vector<uint32_t> get_entities_by_layer(int layer);
 std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, int layer, float x, float y, float r);
 void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t);
 void set_contents(uint32_t id, uint32_t item);
+void entity_remove_item(uint32_t entity, uint32_t item);

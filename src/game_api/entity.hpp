@@ -158,7 +158,7 @@ class Entity {
     std::pair<float, float> position();
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
-    void teleport_abs(float x, float y, float vx, float vy);
+    void teleport_abs(float dx, float dy, float vx, float vy);
 
     Entity *topmost() {
         auto cur = this;
@@ -182,6 +182,8 @@ class Entity {
     uint8_t layer() { return read_u8(pointer() + 0x98); }
 
     std::pair<float, float> position_self() const;
+
+    void remove_item(uint32_t id);
 };
 
 struct Inventory {
