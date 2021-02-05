@@ -3257,6 +3257,7 @@ std::tuple<float, float, int> lua_get_position(uint32_t id)
     Entity *ent = get_entity_ptr(id);
     if(ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
+    return {0, 0, 0};
 }
 
 void init_script()
