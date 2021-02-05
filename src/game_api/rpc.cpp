@@ -2,12 +2,9 @@
 #include "entity.hpp"
 #include "state.hpp"
 
-// TODO: expose this to RPC
-uint32_t spawn_entity(uint32_t id, float x = 0.0f, float y = 0.0f, bool s = false, float vx = 0.0f, float vy = 0.0f, bool snap = false)
+uint32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();
-    // crate::example::spawn_caveman_with_turkey();
-    // return 0;
 
     auto player = state.items()->player(0);
     if (player == nullptr)
@@ -25,6 +22,24 @@ uint32_t spawn_entity(uint32_t id, float x = 0.0f, float y = 0.0f, bool s = fals
     }
 }
 
+uint32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, float vy)
+{
+    auto state = State::get();
+    if (layer == 0 || layer == 1)
+    {
+        return state.layer(layer)->spawn_entity(id, x, y, false, vx, vy, false)->uid;
+    }
+    else
+    {
+        auto player = state.items()->player(0);
+        if (player == nullptr)
+            return 0;
+        auto [_x, _y] = player->position();
+        DEBUG("Spawning {} on {}, {}", id, x + _x, y + _y);
+        return state.layer(player->layer())->spawn_entity(id, x + _x, y + _y, false, vx, vy, false)->uid;
+    }
+}
+
 uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();
@@ -37,6 +52,24 @@ uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     state.layer(player->layer())->spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
     state.layer(player->layer())->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
     return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
+}
+
+uint32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t)
+{
+    auto state = State::get();
+    if (layer == 0 || layer == 1)
+    {
+        return state.layer(layer)->spawn_door(x, y, w, l, t)->uid;
+    }
+    else
+    {
+        auto player = state.items()->player(0);
+        if (player == nullptr)
+            return 0;
+        auto [_x, _y] = player->position();
+        DEBUG("Spawning door on {}, {}", x + _x, y + _y);
+        return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
+    }
 }
 
 void spawn_backdoor(float x, float y)
@@ -54,6 +87,14 @@ void spawn_backdoor(float x, float y)
     state.layer(1)->spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
     state.layer(0)->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
     state.layer(1)->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
+}
+
+void spawn_backdoor_abs(float x, float y)
+{
+    auto state = State::get();
+    DEBUG("Spawning backdoor on {}, {}", x, y);
+    state.layer(0)->spawn_entity(26, x, y, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(26, x, y, false, 0.0, 0.0, true);
 }
 
 void teleport(float x, float y, bool s, float vx, float vy, bool snap)
@@ -147,6 +188,14 @@ void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool
     auto ent = state.find(id);
     if (ent)
         ent->teleport(x, y, s, vx, vy, snap);
+}
+
+void move_entity_abs(uint32_t id, float x, float y, float vx, float vy)
+{
+    auto state = State::get();
+    auto ent = state.find(id);
+    if (ent)
+        ent->teleport_abs(x, y, vx, vy);
 }
 
 uint32_t get_entity_flags(uint32_t id)

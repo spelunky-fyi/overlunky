@@ -158,6 +158,7 @@ class Entity {
     std::pair<float, float> position();
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
+    void teleport_abs(float x, float y, float vx, float vy);
 
     Entity *topmost() {
         auto cur = this;

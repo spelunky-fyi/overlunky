@@ -4,6 +4,9 @@
 uint32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap);
 uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 void spawn_backdoor(float x, float y);
+uint32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, float vy);
+uint32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t);
+void spawn_backdoor_abs(float x, float y);
 void teleport(float x, float y, bool s, float vx, float vy, bool snap);
 void godmode(bool g);
 void darkmode(bool g);
@@ -11,6 +14,7 @@ void zoom(float level);
 void list_items();
 uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask);
 void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap);
+void move_entity_abs(uint32_t id, float x, float y, float vx, float vy);
 uint32_t get_entity_flags(uint32_t id);
 void set_entity_flags(uint32_t id, uint32_t flags);
 uint32_t get_entity_flags2(uint32_t id);

@@ -110,6 +110,14 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy,
     return;
 }
 
+void Entity::teleport_abs(float x, float y, float vx, float vy)
+{
+    auto topmost = topmost_mount();
+    topmost->overlay = NULL;
+    topmost->x = x;
+    topmost->y = y;
+}
+
 std::pair<float, float> Entity::position() {
     // Return the resolved position
     // overlay exists if player is riding something / etc

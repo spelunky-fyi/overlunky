@@ -3247,6 +3247,18 @@ std::vector<Movable*> lua_get_players()
     return std::vector<Movable*>(g_players.begin(), g_players.end());
 }
 
+Movable* lua_get_entity(uint32_t id)
+{
+    return (Movable *)get_entity_ptr(id);
+}
+
+std::tuple<float, float, int> lua_get_position(uint32_t id)
+{
+    Entity *ent = get_entity_ptr(id);
+    if(ent)
+        return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
+}
+
 void init_script()
 {
     g_state = (struct StateMemory *)get_state_ptr();
@@ -3263,17 +3275,17 @@ void init_script()
     lua["options"] = lua.create_named_table("options");
     lua["register_option_int"] = lua_register_option_int;
     lua["message"] = add_message;
-    lua["spawn_entity"] = spawn_entity;
-    lua["spawn_door"] = spawn_door;
-    lua["spawn_backdoor"] = spawn_backdoor;
-    lua["teleport"] = teleport;
+    lua["spawn_entity"] = spawn_entity_abs;
+    lua["spawn_door"] = spawn_door_abs;
+    lua["spawn_backdoor"] = spawn_backdoor_abs;
     lua["godmode"] = godmode;
     lua["darkmode"] = darkmode;
     lua["zoom"] = zoom;
     lua["set_pause"] = set_pause;
-    lua["move_entity"] = move_entity;
+    lua["move_entity"] = move_entity_abs;
     lua["set_door_target"] = set_door_target;
     lua["set_contents"] = set_contents;
+    lua["get_entity"] = lua_get_entity;
     lua["get_entities"] = get_entities;
     lua["get_entities_by"] = get_entities_by;
     lua["get_entities_by_type"] = get_entities_by_type;
@@ -3290,7 +3302,8 @@ void init_script()
     lua["get_entity_type"] = get_entity_type;
     lua["get_zoom_level"] = get_zoom_level;
     lua["screen_position"] = screen_position;
-    lua["players"] = lua_get_players();
+    lua["get_players"] = lua_get_players;
+    lua["get_position"] = lua_get_position;
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",
@@ -3303,7 +3316,7 @@ void init_script()
         &Inventory::kills_level,
         "kills_total",
         &Inventory::kills_total);
-    lua.new_usertype<Movable>(
+    sol::usertype<Movable> ent_type = lua.new_usertype<Movable>(
         "Movable",
         "type",
         &Entity::type,
@@ -3323,16 +3336,12 @@ void init_script()
         &Entity::w,
         "h",
         &Entity::h,
-        "position",
-        &Entity::position,
         "teleport",
         &Entity::teleport,
         "topmost",
         &Entity::topmost,
         "topmost_mount",
         &Entity::topmost_mount,
-        "layer",
-        &Entity::layer,
         "movex",
         &Movable::movex,
         "movey",
