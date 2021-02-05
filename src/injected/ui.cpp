@@ -2260,39 +2260,39 @@ void render_uid(int uid, const char *section)
 void render_state(const char *label, int state)
 {
     if (state == 0)
-        ImGui::LabelText(label, "Flailing");
+        ImGui::LabelText(label, "0 Flailing");
     else if (state == 1)
-        ImGui::LabelText(label, "Standing");
+        ImGui::LabelText(label, "1 Standing");
     else if (state == 2)
-        ImGui::LabelText(label, "Sitting");
+        ImGui::LabelText(label, "2 Sitting");
     else if (state == 4)
-        ImGui::LabelText(label, "Hanging");
+        ImGui::LabelText(label, "4 Hanging");
     else if (state == 5)
-        ImGui::LabelText(label, "Ducking");
+        ImGui::LabelText(label, "5 Ducking");
     else if (state == 6)
-        ImGui::LabelText(label, "Climbing");
+        ImGui::LabelText(label, "6 Climbing");
     else if (state == 7)
-        ImGui::LabelText(label, "Pushing");
+        ImGui::LabelText(label, "7 Pushing");
     else if (state == 8)
-        ImGui::LabelText(label, "Jumping");
+        ImGui::LabelText(label, "8 Jumping");
     else if (state == 9)
-        ImGui::LabelText(label, "Falling");
+        ImGui::LabelText(label, "9 Falling");
     else if (state == 10)
-        ImGui::LabelText(label, "Dropping");
+        ImGui::LabelText(label, "10 Dropping");
     else if (state == 12)
-        ImGui::LabelText(label, "Attacking");
+        ImGui::LabelText(label, "12 Attacking");
     else if (state == 17)
-        ImGui::LabelText(label, "Throwing");
+        ImGui::LabelText(label, "17 Throwing");
     else if (state == 18)
-        ImGui::LabelText(label, "Stunned");
+        ImGui::LabelText(label, "18 Stunned");
     else if (state == 19)
-        ImGui::LabelText(label, "Entering");
+        ImGui::LabelText(label, "19 Entering");
     else if (state == 20)
-        ImGui::LabelText(label, "Loading");
+        ImGui::LabelText(label, "20 Loading");
     else if (state == 21)
-        ImGui::LabelText(label, "Exiting");
+        ImGui::LabelText(label, "21 Exiting");
     else if (state == 22)
-        ImGui::LabelText(label, "Dying");
+        ImGui::LabelText(label, "22 Dying");
     else
     {
         char statec[10];
@@ -2309,6 +2309,8 @@ void render_ai(const char *label, int state)
         ImGui::LabelText(label, "1 Walking");
     else if (state == 2)
         ImGui::LabelText(label, "2 Jumping");
+    else if (state == 4)
+        ImGui::LabelText(label, "4 Dead");
     else if (state == 5)
         ImGui::LabelText(label, "5 Jumping");
     else if (state == 6)
@@ -3205,11 +3207,16 @@ template <typename T> PresentPtr &vtable_find(T *obj, int index)
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
+std::vector<Movable*> lua_get_players()
+{
+    return std::vector<Movable*>(g_players.begin(), g_players.end());
+}
+
 void init_script()
 {
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-    lua.open_libraries(sol::lib::math, sol::lib::base);
+    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
     lua.set_function("setinterval", [](sol::function cb, int ms) {
         auto luaCb = LuaIntervalCallback{
             cb,
@@ -3221,7 +3228,14 @@ void init_script()
     lua["message"] = add_message;
     lua["spawn_entity"] = spawn_entity;
     lua["spawn_door"] = spawn_door;
-    lua["set_target"] = set_target;
+    lua["spawn_backdoor"] = spawn_backdoor;
+    lua["teleport"] = teleport;
+    lua["godmode"] = godmode;
+    lua["darkmode"] = darkmode;
+    lua["zoom"] = zoom;
+    lua["set_pause"] = set_pause;
+    lua["move_entity"] = move_entity;
+    lua["set_door_target"] = set_door_target;
     lua["set_contents"] = set_contents;
     lua["get_entities"] = get_entities;
     lua["get_entities_by"] = get_entities_by;
@@ -3229,10 +3243,17 @@ void init_script()
     lua["get_entities_by_mask"] = get_entities_by_mask;
     lua["get_entities_by_layer"] = get_entities_by_layer;
     lua["get_entities_at"] = get_entities_at;
-    lua["get_entitity_flags"] = get_entity_flags;
-    lua["set_entitity_flags"] = set_entity_flags;
-    lua["get_entitity_flags2"] = get_entity_flags2;
-    lua["set_entitity_flags2"] = set_entity_flags2;
+    lua["get_entity_flags"] = get_entity_flags;
+    lua["set_entity_flags"] = set_entity_flags;
+    lua["get_entity_flags2"] = get_entity_flags2;
+    lua["set_entity_flags2"] = set_entity_flags2;
+    lua["get_entity_ai_state"] = get_entity_ai_state;
+    lua["get_hud_flags"] = get_hud_flags;
+    lua["set_hud_flags"] = set_hud_flags;
+    lua["get_entity_type"] = get_entity_type;
+    lua["get_zoom_level"] = get_zoom_level;
+    lua["screen_position"] = screen_position;
+    lua["players"] = lua_get_players();
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",

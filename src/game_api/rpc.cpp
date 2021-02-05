@@ -144,16 +144,9 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
 void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    for (auto &item : state.layer(player->layer())->items())
-    {
-        if (item->uid == id)
-        {
-            item->teleport(x, y, s, vx, vy, snap);
-        }
-    }
+    auto ent = state.find(id);
+    if (ent)
+        ent->teleport(x, y, s, vx, vy, snap);
 }
 
 uint32_t get_entity_flags(uint32_t id)
@@ -198,6 +191,17 @@ void set_entity_flags2(uint32_t id, uint32_t flags)
         ent->more_flags = flags;
 }
 
+int get_entity_ai_state(uint32_t id)
+{
+    if (id == 0)
+        return 0;
+    auto state = State::get();
+    auto ent = (Movable*)state.find(id);
+    if (ent)
+        return ent->move_state;
+    return 0;
+}
+
 uint32_t get_hud_flags()
 {
     auto state = State::get();
@@ -235,9 +239,6 @@ Entity *get_entity_ptr(uint32_t id)
         return nullptr;
     }
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return nullptr;
     auto p = state.find(id);
     return p;
 }
@@ -249,11 +250,7 @@ int32_t get_entity_type(uint32_t id)
         return 0;
     }
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return 0;
     auto p = state.find(id);
-
     if (!p)
         return 0;
     return p->type->id;
@@ -429,7 +426,7 @@ std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, int layer, f
     return found;
 }
 
-void set_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t)
+void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();
     auto player = state.items()->player(0);
