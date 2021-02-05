@@ -49,6 +49,15 @@ struct LuaIntervalCallback
 std::vector<LuaIntervalCallback> g_luaCallbacks;
 std::vector<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> lua_messages;
 
+struct ScriptOption
+{
+    std::string desc;
+    std::variant<int, float, std::string> value;
+    std::variant<int, float> min;
+    std::variant<int, float> max;
+};
+std::map<std::string, ScriptOption> script_options;
+
 const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
 
@@ -1751,6 +1760,7 @@ void render_script()
             // Clear all callbacks on script reload to avoid running them
             // multiple times.
             g_luaCallbacks.clear();
+            script_options.clear();
             auto result = lua.safe_script(script);
             scriptresult = "OK";
         }
@@ -1842,6 +1852,30 @@ void set_vel(ImVec2 pos)
 void add_message(std::string message)
 {
     lua_messages.push_back({message, std::chrono::system_clock::now()});
+}
+
+void lua_register_option_int(std::string name, std::string desc, int value, int min, int max)
+{
+    script_options[name] = {desc, value, min, max};
+    lua["options"][name] = value;
+}
+
+void render_script_options()
+{
+    for (auto &option : script_options)
+    {
+        if(int *val = std::get_if<int>(&option.second.value))
+        {
+            int min = std::get<int>(option.second.min);
+            int max = std::get<int>(option.second.max);
+            if (ImGui::DragInt(option.second.desc.data(), val, 0.5f, min, max))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val;
+            }
+        }
+        
+    }
 }
 
 void render_messages()
@@ -2221,6 +2255,7 @@ void render_debug()
     InputString("##LuaResult", &scriptresult, ImGuiInputTextFlags_ReadOnly);
     ImGui::PopItemWidth();
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    render_script_options();
     ImGui::PopItemWidth();
 }
 
@@ -3225,6 +3260,8 @@ void init_script()
         };
         g_luaCallbacks.push_back(luaCb);
     });
+    lua["options"] = lua.create_named_table("options");
+    lua["register_option_int"] = lua_register_option_int;
     lua["message"] = add_message;
     lua["spawn_entity"] = spawn_entity;
     lua["spawn_door"] = spawn_door;
