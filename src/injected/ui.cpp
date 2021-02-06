@@ -43,10 +43,15 @@ ScriptState scriptstate = {0, 0};
 struct LuaIntervalCallback
 {
     sol::function func;
-    std::chrono::duration<unsigned int, std::milli> interval;
-    std::chrono::time_point<std::chrono::system_clock> lastRan;
+    int interval;
+    int lastRan;
 };
-std::vector<LuaIntervalCallback> g_luaCallbacks;
+struct LuaTimeoutCallback
+{
+    sol::function func;
+    int timeout;
+};
+std::vector<std::variant<LuaIntervalCallback, LuaTimeoutCallback>> g_luaCallbacks;
 std::vector<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> lua_messages;
 
 struct ScriptOption
@@ -1807,29 +1812,48 @@ void render_script()
         {
             on_frame();
         }
-        if (on_level && g_state->screen == 12 && !g_players.empty() && scriptstate.player != g_players.at(0))
+        if (g_state->screen == 12 && !g_players.empty() && scriptstate.player != g_players.at(0))
         {
-            on_level();
+            if (on_level)
+                on_level();
         }
-        if (on_transition && g_state->screen == 13 && scriptstate.screen != 13)
+        if (g_state->screen == 13 && scriptstate.screen != 13)
         {
-            on_transition();
+            g_luaCallbacks.clear();
+            if (on_transition)
+                on_transition();
         }
-        if (on_death && g_state->screen == 14 && scriptstate.screen != 14)
+        if (g_state->screen == 14 && scriptstate.screen != 14)
         {
-            on_death();
+            g_luaCallbacks.clear();
+            if (on_death)
+                on_death();
         }
 
-        auto now = std::chrono::system_clock::now();
+        auto now = g_state->time_level;
 
-        for (int i = 0; i < g_luaCallbacks.size(); i++)
+        for (int i = 0; i < g_luaCallbacks.size();)
         {
-            auto cb = &g_luaCallbacks[i];
-
-            if (now > cb->lastRan + cb->interval)
+            if (auto cb = std::get_if<LuaIntervalCallback>(&g_luaCallbacks[i]))
             {
-                cb->func();
-                cb->lastRan = now;
+                if (now >= cb->lastRan + cb->interval)
+                {
+                    cb->func();
+                    cb->lastRan = now;
+                }
+                ++i;
+            }
+            if (auto cb = std::get_if<LuaTimeoutCallback>(&g_luaCallbacks[i]))
+            {
+                if (now >= cb->timeout)
+                {
+                    cb->func();
+                    g_luaCallbacks.erase(g_luaCallbacks.begin() + i);
+                }
+                else
+                {
+                    ++i;
+                }
             }
         }
 
@@ -3313,11 +3337,15 @@ void init_script()
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
-    lua.set_function("setinterval", [](sol::function cb, int ms) {
-        auto luaCb = LuaIntervalCallback{
+    lua.set_function("set_interval", [](sol::function cb, int frames) {
+        auto luaCb = LuaIntervalCallback { cb, frames, -1 };
+        g_luaCallbacks.push_back(luaCb);
+    });
+    lua.set_function("set_timeout", [](sol::function cb, int frames) {
+        int now = g_state->time_level;
+        auto luaCb = LuaTimeoutCallback {
             cb,
-            std::chrono::duration<unsigned int, std::milli>(ms),
-            std::chrono::system_clock::time_point::min(),
+            now + frames,
         };
         g_luaCallbacks.push_back(luaCb);
     });
