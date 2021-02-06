@@ -12,8 +12,6 @@
 
 using namespace std::chrono_literals;
 
-inline constexpr bool enable_console{true};
-
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
                     DWORD fdwReason,     // reason for calling function
                     LPVOID lpReserved)   // reserved
@@ -35,7 +33,8 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type) {
 }
 
 void attach_stdout(DWORD pid) {
-    if constexpr (enable_console) {
+    if (std::getenv("OL_DEBUG"))
+    {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
 
@@ -52,8 +51,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
         fputs("Overlunky loaded\n", fp);
         fclose(fp);
     }
-    DEBUG(
-        "Game injected! Press Ctrl+C to detach this window from the process.");
+    DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
     auto state = State::get();
     while (true) {
         auto entities = list_entities();
@@ -71,28 +69,13 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
 
     auto api = RenderAPI::get();
     init_hooks(api.swap_chain());
-    if constexpr (enable_console) {
+    do {
+        DEBUG("Running in debug mode.");
+        std::string line;
+        std::getline(std::cin, line);
+        if (std::cin.fail() || std::cin.eof())
         {
-            DEBUG("Enter entity #IDs to spawn, one per line >");
-            std::string line;
-            std::getline(std::cin, line);
-            if (int id = atoi(line.data())) {
-                // This is RAII-style implementation for suspending the main
-                // thread, for preventing race conditions.
-                CriticalSection lock;
-
-                auto player = state.items()->player(0);
-                if (!player) {
-                    INFO(
-                        "Player not initialized yet. Select a character "
-                        "first!");
-                } else {
-                    auto [x, y] = player->position();
-                    auto layer = player->layer();
-                    state.layer(layer)->spawn_entity(id, x, y, false, 0.0, 0.0,
-                                                     false);
-                }
-            }
+            std::cin.clear();
         }
-    }
+    } while (true);
 }
