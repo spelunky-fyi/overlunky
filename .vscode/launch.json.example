@@ -7,32 +7,48 @@
             "type": "lldb",
             "request": "launch",
             "name": "Overlunky (Release)",
-            "program": "${workspaceRoot}/build/bin/Release/injector.exe",
-            "args": [],
-            "preLaunchTask": "Build Release"
+            "program": "${workspaceRoot}/build/bin/Debug/injector.exe",
+            "cwd": "${workspaceRoot}/build/bin/Release/",
+            "preLaunchTask": "Build Release",
         },
         {
             "type": "lldb",
             "request": "launch",
             "name": "Overlunky (Debug)",
             "program": "${workspaceRoot}/build/bin/Debug/injector.exe",
-            "args": [],
-            "preLaunchTask": "Build Debug"
+            "cwd": "${workspaceRoot}/build/bin/Debug/",
+            "env": {
+                "OL_DEBUG": "1"
+            },
+            "preLaunchTask": "Build Debug",
         },
         {
             "type": "lldb",
             "request": "launch",
             "name": "Overlunky (RelWithDebInfo)",
             "program": "${workspaceRoot}/build/bin/RelWithDebInfo/injector.exe",
-            "args": [],
-            "preLaunchTask": "Build RelWithDebInfo"
+            "cwd": "${workspaceRoot}/build/bin/RelWithDebInfo/",
+            "env": {
+                "OL_DEBUG": "1"
+            },
+            "preLaunchTask": "Build RelWithDebInfo",
         },
         {
             "type": "lldb",
             "request": "launch",
             "name": "Spelunky 2",
             "program": "D:/Games/Spelunky 2/Spel2.exe",
-            "cwd": "D:/Games/Spelunky 2"
+            "cwd": "D:/Games/Spelunky 2",
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Spelunky 2 (Debug)",
+            "program": "D:/Games/Spelunky 2/Spel2.exe",
+            "cwd": "D:/Games/Spelunky 2",
+            "env": {
+                "OL_DEBUG": "1"
+            },
         },
     ],
     "compounds": [
@@ -41,12 +57,12 @@
             "configurations": ["Spelunky 2", "Overlunky (Release)"]
         },
         {
-            "name": "Spelunky 2 + Overlunky (Debug)",
-            "configurations": ["Spelunky 2", "Overlunky (Debug)"]
+            "name": "Spelunky 2 (Debug) + Overlunky (Debug)",
+            "configurations": ["Spelunky 2 (Debug)", "Overlunky (Debug)"]
         },
         {
-            "name": "Spelunky 2 + Overlunky (RelWithDebInfo)",
-            "configurations": ["Spelunky 2", "Overlunky (RelWithDebInfo)"]
+            "name": "Spelunky 2 (Debug) + Overlunky (RelWithDebInfo)",
+            "configurations": ["Spelunky 2 (Debug)", "Overlunky (RelWithDebInfo)"]
         }
     ]
 }

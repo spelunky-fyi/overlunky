@@ -88,4 +88,4 @@ cd build
 cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
-The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode.
+The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console.
