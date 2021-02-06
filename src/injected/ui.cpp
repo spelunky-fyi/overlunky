@@ -271,7 +271,7 @@ const char *entity_flags[] = {
     "31: ",
     "32: "};
 const char *more_flags[] = {"1: ",  "2: ",  "3: ",  "4: ",  "5: ",  "6: ",         "7: ",  "8: ",
-                            "9: ",  "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: ", "16: Disable input",
+                            "9: ",  "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: Cursed effect", "16: Disable input",
                             "17: ", "18: ", "19: ", "20: ", "21: ", "22: ",        "23: ", "24: ",
                             "25: ", "26: ", "27: ", "28: ", "29: ", "30: ",        "31: ", "32: "};
 const char *hud_flags[] = {
@@ -844,7 +844,7 @@ bool update_entity()
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if (IsBadWritePtr(g_entity, 0x178))
             g_entity = nullptr;
-        if (g_entity)
+        if (g_entity && (g_entity_type >= 194 && g_entity_type <= 213))
         {
             g_inventory = (struct Inventory *)g_entity->inventory_ptr;
             if (IsBadWritePtr(g_inventory, 0x1428))
@@ -854,6 +854,7 @@ bool update_entity()
         else
         {
             g_inventory = nullptr;
+            return true;
         }
     }
     else
@@ -3337,7 +3338,11 @@ void init_script()
     lua["get_entity"] = lua_get_entity;
     lua["get_entities"] = get_entities;
     lua["get_entities_by"] = get_entities_by;
-    lua["get_entities_by_type"] = get_entities_by_type;
+    lua["get_entities_by_type"] = [](sol::variadic_args va) {
+        auto get_func = sol::resolve<std::vector<uint32_t>(std::vector<uint32_t>)>(get_entities_by_type);
+        auto args = std::vector<uint32_t>(va.begin(), va.end());
+        return get_func(args);
+    };
     lua["get_entities_by_mask"] = get_entities_by_mask;
     lua["get_entities_by_layer"] = get_entities_by_layer;
     lua["get_entities_at"] = get_entities_at;

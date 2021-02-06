@@ -1,3 +1,4 @@
+#include <cstdarg>
 #include "../injected/ui.hpp"
 #include "entity.hpp"
 #include "state.hpp"
@@ -364,7 +365,57 @@ std::vector<uint32_t> get_entities_by_layer(int layer)
     return found;
 }
 
-std::vector<uint32_t> get_entities_by_type(uint32_t type)
+std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types)
+{
+    auto state = State::get();
+    auto player = state.items()->player(0);
+    if (!player)
+        return {};
+    std::vector<uint32_t> found;
+    for (auto &item : state.layer(0)->items())
+    {
+        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
+        {
+            found.push_back(item->uid);
+        }
+    }
+    for (auto &item : state.layer(1)->items())
+    {
+        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
+        {
+            found.push_back(item->uid);
+        }
+    }
+    return found;
+}
+
+template<typename... Args>
+std::vector<uint32_t> get_entities_by_type(Args... args)
+{
+    std::vector<uint32_t> types = {args...};
+    auto state = State::get();
+    auto player = state.items()->player(0);
+    if (!player)
+        return {};
+    std::vector<uint32_t> found;
+    for (auto &item : state.layer(0)->items())
+    {
+        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
+        {
+            found.push_back(item->uid);
+        }
+    }
+    for (auto &item : state.layer(1)->items())
+    {
+        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
+        {
+            found.push_back(item->uid);
+        }
+    }
+    return found;
+}
+
+/*std::vector<uint32_t> get_entities_by_type(uint32_t type)
 {
     auto state = State::get();
     auto player = state.items()->player(0);
@@ -386,7 +437,7 @@ std::vector<uint32_t> get_entities_by_type(uint32_t type)
         }
     }
     return found;
-}
+}*/
 
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
 {

@@ -32,7 +32,9 @@ std::pair<float, float> screen_position(float x, float y);
 float get_zoom_level();
 std::vector<uint32_t> get_entities();
 std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer);
-std::vector<uint32_t> get_entities_by_type(uint32_t type);
+template <typename... Args>
+std::vector<uint32_t> get_entities_by_type(Args... args);
+std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types);
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask);
 std::vector<uint32_t> get_entities_by_layer(int layer);
 std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, int layer, float x, float y, float r);
