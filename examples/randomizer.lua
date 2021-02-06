@@ -17,7 +17,7 @@ register_option_int("max_ropes", "Max starting ropes", 20, 4, 99)
 register_option_bool("lock_exit", "Lock exit in Dwelling", true)
 register_option_bool("seismic", "Weird seismic activity", true)
 
-items = {220,221,222,223,224,225,227,228,229,230,231,232,233,234,237,238,239,240,242,243,244,245,246,247,248,249,250,251,252,253,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,283,284,286,287,288,289,290,295,296,297,298,300,301,302,303,304,305,306,307,308,309,310,311,312,317,318,319,320,321,322,323,326,327,328,331,332,333,334,336,337,338,339,340,341,347,348,356,357,358,365,366,371,372,373,374,377,395,396,399,400,401,402,409,416,422,428,429,435,436,439,440,442,444,448,453,456,457,462,469,475,476,477,478,479,480,481,482,490,491,492,493,494,495,496,497,498,499,500,501,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,592,593,596,604,610,630,631,884,885,886,887,888,890}
+items = {220,221,222,223,224,225,227,228,229,230,231,232,233,234,237,238,239,240,242,243,244,245,246,247,248,249,250,251,252,253,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,283,284,286,287,288,289,290,295,296,297,298,300,301,302,303,304,305,306,307,308,309,310,311,312,317,318,319,320,321,322,323,331,332,333,334,336,337,338,339,340,341,347,348,356,357,358,365,366,371,372,373,374,377,395,396,399,400,401,402,409,416,422,428,429,435,436,439,440,442,444,448,453,456,457,462,469,475,476,477,478,479,480,481,482,490,491,492,493,494,495,496,497,498,499,500,501,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,592,593,596,604,610,630,631,884,885,886,887,888,890}
 tools = {374,422,509,510,511,512,513,514,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,585}
 theme = {1,2,3,5,6,7,8,9,10,11}
 bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
@@ -57,6 +57,8 @@ function init_run()
   nextlevel = math.random(4)
   if nexttheme == THEME.COSMIC_OCEAN then
     nextlevel = math.random(5,97)
+  elseif nexttheme == THEME.ICE_CAVES then
+    nextlevel = 1
   end
   nextworld = world[nexttheme]
   you_win = false
@@ -125,6 +127,8 @@ function random_level()
     nextlevel = math.random(4)
     if nexttheme == THEME.COSMIC_OCEAN then
       nextlevel = math.random(5, 97)
+    elseif nexttheme == THEME.ICE_CAVES then
+      nextlevel = 1
     end
   end
   nextworld = world[nexttheme]
@@ -181,6 +185,16 @@ function random_doors()
       end
     end
   end
+end
+
+function throw_rock(id)
+  if options.seismic then
+    entity = get_entity(id)
+    if entity == 0 then return end
+    entity.velocityx = math.random()-0.5
+    entity.velocityy = math.random()-0.5
+  end
+  set_timeout(function() throw_rock(id) end, math.random(5*60, 10*60))
 end
 
 function on_level()
@@ -241,8 +255,23 @@ function on_level()
 
   -- spawn duat skip door
   if state.theme == THEME.DUAT then
-    spawn_door(x, y, 0, nextworld, nextlevel, nexttheme)
-    spawn_entity(ENT_TYPE.BG_DOOR, x, y, 0, 0, 0)
+    spawn_door(17, 106, 0, nextworld, nextlevel, nexttheme)
+    spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
+  end
+
+  -- kill all the pets, sorry
+  if exit_locked then
+    pets = get_entities_by_type(ENT_TYPE.MONS_PET_DOG, ENT_TYPE.MONS_PET_CAT, ENT_TYPE.MONS_PET_HAMSTER)
+    for i,pet in ipairs(pets) do
+      move_entity(pet, 0, 0, 0, 0)
+      print("Killed pet, sorry!")
+    end
+  end
+
+  -- throw some rocks
+  rocks = get_entities_by_type(ENT_TYPE.ITEM_ROCK)
+  for i,v in ipairs(rocks) do
+    set_timeout(throw_rock(v), math.random(5*60, 10*60))
   end
 
   -- set door targets
@@ -272,7 +301,7 @@ function on_frame()
     tiamats = get_entities_by_type(ENT_TYPE.MONS_TIAMAT)
     if tiamats[1] then
       flags = get_entity_flags(tiamats[1])
-      if (flags & (1 << 28)) > 0 then -- this tiamat is dead
+      if testflag(flags, 29) then -- this tiamat is dead
         remove_boss(THEME.TIAMAT)
       end
     end
@@ -325,16 +354,5 @@ function on_death()
   message("I eventually died in level "..tostring(state.level_count+1)..". Bosses remaining: "..(#bosses_left-(#bosses-options.bosses)))
   exit_locked = false
 end
-
-setinterval(function()
-  if options.seismic then
-    rocks = get_entities_by_type(ENT_TYPE.ITEM_ROCK)
-    for i,v in ipairs(rocks) do
-      entity = get_entity(v)
-      entity.velocityx = math.random()*2-1
-      entity.velocityy = math.random()*2-1
-    end
-  end
-end, 5000)
 
 message("Spelunky 2 Door+Pot Randomizer WIP initialized!")
