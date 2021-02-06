@@ -23,6 +23,16 @@ theme = {1,2,3,5,6,7,8,9,10,11}
 bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
 bosses_left = {}
 world = {1,2,2,3,4,4,5,6,7,7,4,4,4,6,7,7,1}
+critters = {}
+critters[THEME.DWELLING] = ENT_TYPE.MONS_CRITTERDUNGBEETLE
+critters[THEME.JUNGLE] = ENT_TYPE.MONS_CRITTERBUTTERFLY
+critters[THEME.VOLCANA] = ENT_TYPE.MONS_CRITTERSNAIL
+critters[THEME.TIDE_POOL] = ENT_TYPE.MONS_CRITTERCRAB
+critters[THEME.TEMPLE] = ENT_TYPE.MONS_CRITTERLOCUST
+critters[THEME.ICE_CAVES] = ENT_TYPE.MONS_CRITTERPENGUIN
+critters[THEME.NEO_BABYLON] = ENT_TYPE.MONS_CRITTERDRONE
+critters[THEME.SUNKEN_CITY] = ENT_TYPE.MONS_CRITTERSLIME
+critters[THEME.CITY_OF_GOLD] = ENT_TYPE.MONS_CRITTERLOCUST
 
 bosses_left = {}
 normal_levels = 0
@@ -51,14 +61,24 @@ function init_run()
   nextworld = world[nexttheme]
   you_win = false
   boss_level = false
-  exit_locked = false
   hidden_block = 0
+  exit_locked = false
+  doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
+  for i,v in ipairs(doors) do
+    door = get_entity(v)
+    door.flags = setflag(door.flags, 20)
+    door.flags = clrflag(door.flags, 22)
+  end
   players = get_players()
   for i,player in ipairs(players) do
     player.health = math.random(4, options.max_health)
     player.inventory.bombs = math.random(4, options.max_bombs)
     player.inventory.ropes = math.random(4, options.max_ropes)
   end
+  -- debug
+  nextworld = 1
+  nextlevel = 1
+  nexttheme = 1
 end
 init_run()
 
@@ -149,10 +169,15 @@ function random_doors()
     for i,v in ipairs(doors) do
       print("Setting door "..tostring(v))
       set_door_target(v, nextworld, nextlevel, nexttheme)
+      x, y, layer = get_position(v)
       if boss_level then
-        x, y, layer = get_position(v)
         spawn_entity(ENT_TYPE.ITEM_LITWALLTORCH, x-0.7, y+0.5, layer, 0, 0)
         spawn_entity(ENT_TYPE.ITEM_LITWALLTORCH, x+0.7, y+0.5, layer, 0, 0)
+      elseif state.theme ~= THEME.COSMIC_OCEAN and nexttheme == THEME.COSMIC_OCEAN then
+        spawn_entity(ENT_TYPE.ITEM_FLOATING_ORB, x, y+0.3, layer, 0, 0)
+      elseif critters[nexttheme] ~= nil then
+        spawn_entity(critters[nexttheme], x-1, y, layer, 0, 0)
+        spawn_entity(critters[nexttheme], x+1, y, layer, 0, 0)
       end
     end
   end
@@ -214,6 +239,12 @@ function on_level()
   -- lock exit and hide key somewhere
   lock_exit()
 
+  -- spawn duat skip door
+  if state.theme == THEME.DUAT then
+    spawn_door(x, y, 0, nextworld, nextlevel, nexttheme)
+    spawn_entity(ENT_TYPE.BG_DOOR, x, y, 0, 0, 0)
+  end
+
   -- set door targets
   random_doors()
 end
@@ -241,8 +272,19 @@ function on_frame()
     tiamats = get_entities_by_type(ENT_TYPE.MONS_TIAMAT)
     if tiamats[1] then
       flags = get_entity_flags(tiamats[1])
-      if (flags & (1 << 28)) > 0 then -- this tiamat is dead?
+      if (flags & (1 << 28)) > 0 then -- this tiamat is dead
         remove_boss(THEME.TIAMAT)
+      end
+    end
+  end
+
+  -- check for dead hundun
+  if state.world == 7 and state.level == 4 then
+    hunduns = get_entities_by_type(ENT_TYPE.MONS_HUNDUN)
+    if hunduns[1] then
+      ai = get_entity_ai_state(hunduns[1])
+      if ai == 4 then -- this hundun is just chillin on the floor
+        remove_boss(THEME.HUNDUN)
       end
     end
   end
@@ -252,12 +294,6 @@ function on_frame()
     block = get_entity(hidden_block)
     if block == nil then
       exit_locked = false
-      doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
-      for i,v in ipairs(doors) do
-        door = get_entity(v)
-        door.flags = setflag(door.flags, 20)
-        door.flags = clrflag(door.flags, 22)
-      end
       spawn_entity(ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, hidden_x, hidden_y, 0, 0, 0)
       hidden_block = 0
       hidden_x = 0
@@ -271,14 +307,17 @@ function on_frame()
         door.flags = setflag(door.flags, 22)
       end
     end
+  else
+    doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
+    for i,v in ipairs(doors) do
+      door = get_entity(v)
+      door.flags = setflag(door.flags, 20)
+      door.flags = clrflag(door.flags, 22)
+    end
   end
 end
 
 function on_transition()
-  -- check for dead hundun
-  if state.world == 7 and state.level == 4 then
-    remove_boss(THEME.HUNDUN)
-  end
   exit_locked = false
 end
 
