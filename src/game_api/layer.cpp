@@ -83,6 +83,7 @@ Entity *Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) {
             return nullptr;
     };
     static_cast<Door *>(door)->set_target(w, l, t);
+    spawn_entity(871, round(x), round(y - 1.0), false, 0.0, 0.0, true);
     return door;
 }
 

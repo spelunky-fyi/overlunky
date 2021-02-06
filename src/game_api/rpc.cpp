@@ -49,7 +49,6 @@ uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
         return 0;
     auto [_x, _y] = player->position();
     DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-    state.layer(player->layer())->spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
     state.layer(player->layer())->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
     return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
 }
@@ -83,8 +82,8 @@ void spawn_backdoor(float x, float y)
     DEBUG("Spawning backdoor on {}, {}", x + _x, y + _y);
     state.layer(0)->spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, true);
     state.layer(1)->spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, true);
-    state.layer(0)->spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
-    state.layer(1)->spawn_entity(37, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
+    state.layer(0)->spawn_entity(871, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(871, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
     state.layer(0)->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
     state.layer(1)->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
 }
@@ -95,6 +94,8 @@ void spawn_backdoor_abs(float x, float y)
     DEBUG("Spawning backdoor on {}, {}", x, y);
     state.layer(0)->spawn_entity(26, x, y, false, 0.0, 0.0, true);
     state.layer(1)->spawn_entity(26, x, y, false, 0.0, 0.0, true);
+    state.layer(0)->spawn_entity(871, x, y - 1.0, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(871, x, y - 1.0, false, 0.0, 0.0, true);
 }
 
 void teleport(float x, float y, bool s, float vx, float vy, bool snap)
@@ -503,7 +504,10 @@ void set_contents(uint32_t id, uint32_t item)
     DEBUG("Set {} to {}", id, item);
 }
 
-void entity_remove_item(uint32_t entity, uint32_t item)
+void entity_remove_item(uint32_t id, uint32_t item)
 {
-    
+    Entity *entity = get_entity_ptr(id);
+    if (entity == nullptr)
+        return;
+    entity->remove_item(item);
 }

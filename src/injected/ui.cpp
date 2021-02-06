@@ -52,7 +52,7 @@ std::vector<std::pair<std::string, std::chrono::time_point<std::chrono::system_c
 struct ScriptOption
 {
     std::string desc;
-    std::variant<int, float, std::string> value;
+    std::variant<int, float, std::string, bool> value;
     std::variant<int, float> min;
     std::variant<int, float> max;
 };
@@ -249,7 +249,7 @@ const char *entity_flags[] = {
     "9: ",
     "10: No gravity",
     "11: ",
-    "12: ",
+    "12: Stunnable",
     "13: Collides walls",
     "14: ",
     "15: Can be stomped",
@@ -257,9 +257,9 @@ const char *entity_flags[] = {
     "17: Facing left",
     "18: Pickupable",
     "19: ",
-    "20: Interactable",
+    "20: Enable button prompt",
     "21: ",
-    "22: ",
+    "22: Locked",
     "23: ",
     "24: ",
     "25: Passes through player",
@@ -1886,6 +1886,12 @@ void lua_register_option_int(std::string name, std::string desc, int value, int 
     lua["options"][name] = value;
 }
 
+void lua_register_option_bool(std::string name, std::string desc, bool value)
+{
+    script_options[name] = {desc, value, 0, 0};
+    lua["options"][name] = value;
+}
+
 void render_script_options()
 {
     for (auto &option : script_options)
@@ -1900,7 +1906,14 @@ void render_script_options()
                 lua["options"][option.first] = *val;
             }
         }
-        
+        else if (bool *val = std::get_if<bool>(&option.second.value))
+        {
+            if (ImGui::Checkbox(option.second.desc.data(), val))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val;
+            }
+        }
     }
 }
 
@@ -3309,6 +3322,7 @@ void init_script()
     });
     lua["options"] = lua.create_named_table("options");
     lua["register_option_int"] = lua_register_option_int;
+    lua["register_option_bool"] = lua_register_option_bool;
     lua["message"] = add_message;
     lua["spawn_entity"] = spawn_entity_abs;
     lua["spawn_door"] = spawn_door_abs;
@@ -3339,6 +3353,7 @@ void init_script()
     lua["screen_position"] = screen_position;
     lua["get_players"] = lua_get_players;
     lua["get_position"] = lua_get_position;
+    lua["remove_entity_item"] = entity_remove_item;
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",
@@ -3413,7 +3428,7 @@ void init_script()
         &Movable::inside,
         "has_backpack",
         &Movable::has_backpack,
-        "inventory_ptr",
+        "inventory",
         &Movable::inventory_ptr);
     lua.new_usertype<StateMemory>(
         "StateMemory",
