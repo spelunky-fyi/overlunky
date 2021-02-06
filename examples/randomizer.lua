@@ -29,8 +29,8 @@ normal_levels = 0
 nextworld = 1
 nextlevel = 1
 nexttheme = 1
-you_win = 0
-boss_level = 0
+you_win = false
+boss_level = false
 exit_locked = false
 hidden_block = 0
 hidden_x = 0
@@ -49,8 +49,8 @@ function init_run()
     nextlevel = math.random(5,97)
   end
   nextworld = world[nexttheme]
-  you_win = 0
-  boss_level = 0
+  you_win = false
+  boss_level = false
   exit_locked = false
   hidden_block = 0
   players = get_players()
@@ -79,7 +79,7 @@ function random_level()
 
   -- pick a boss level from the remaining
   elseif #bosses_left > #bosses-options.bosses and normal_levels >= options.min_levels and math.random(options.max_levels) < normal_levels then
-    boss_level = 1
+    boss_level = true
     normal_levels = 0
     nexttheme = bosses_left[math.random(#bosses_left)]
     nextlevel = 4
@@ -89,17 +89,17 @@ function random_level()
 
   -- all bosses killed, go to 7-98
   elseif #bosses_left <= #bosses-options.bosses and normal_levels >= options.min_levels and math.random(options.max_levels) < normal_levels then
-    boss_level = 0
+    boss_level = false
     nexttheme = THEME.COSMIC_OCEAN
     nextlevel = 98
     nextworld = 7
-    you_win = 1
+    you_win = true
     message("Lets get out of here!")
     return
 
   -- pick a regular level
   else
-    boss_level = 0
+    boss_level = false
     normal_levels = normal_levels+1
     nexttheme = theme[math.random(#theme)]
     nextlevel = math.random(4)
@@ -144,11 +144,12 @@ end
 function random_doors()
   if state.level < 98 then
     print("Going to level "..tostring(state.level_count)..": "..tostring(nextworld).."-"..tostring(nextlevel).." theme "..tostring(nexttheme))
+    message("DEBUG: Going to "..tostring(nextworld).."-"..tostring(nextlevel).." theme "..tostring(nexttheme))
     doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
     for i,v in ipairs(doors) do
       print("Setting door "..tostring(v))
       set_door_target(v, nextworld, nextlevel, nexttheme)
-      if boss_level == 1 then
+      if boss_level then
         x, y, layer = get_position(v)
         spawn_entity(ENT_TYPE.ITEM_LITWALLTORCH, x-0.7, y+0.5, layer, 0, 0)
         spawn_entity(ENT_TYPE.ITEM_LITWALLTORCH, x+0.7, y+0.5, layer, 0, 0)
@@ -162,6 +163,8 @@ function on_level()
   if state.level_count == 0 then
     init_run()
   end
+
+  exit_locked = false
 
   -- randomize pots
   pots = get_entities_by_type(ENT_TYPE.ITEM_POT)
@@ -216,7 +219,7 @@ function on_level()
 end
 
 function on_frame()
-  if you_win == 0 then
+  if not you_win then
     state.world_next = nextworld
     state.level_next = nextlevel
     state.theme_next = nexttheme
@@ -248,12 +251,12 @@ function on_frame()
   if exit_locked then
     block = get_entity(hidden_block)
     if block == nil then
+      exit_locked = false
       doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
       for i,v in ipairs(doors) do
         door = get_entity(v)
         door.flags = setflag(door.flags, 20)
         door.flags = clrflag(door.flags, 22)
-        exit_locked = false
       end
       spawn_entity(ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, hidden_x, hidden_y, 0, 0, 0)
       hidden_block = 0
@@ -276,10 +279,12 @@ function on_transition()
   if state.world == 7 and state.level == 4 then
     remove_boss(THEME.HUNDUN)
   end
+  exit_locked = false
 end
 
 function on_death()
   message("I eventually died in level "..tostring(state.level_count+1)..". Bosses remaining: "..(#bosses_left-(#bosses-options.bosses)))
+  exit_locked = false
 end
 
 setinterval(function()
