@@ -1793,6 +1793,13 @@ void render_script()
             // multiple times.
             g_luaCallbacks.clear();
             script_options.clear();
+            lua["on_frame"] = sol::lua_nil;
+            lua["on_camp"] = sol::lua_nil;
+            lua["on_level"] = sol::lua_nil;
+            lua["on_transition"] = sol::lua_nil;
+            lua["on_death"] = sol::lua_nil;
+            lua["on_win"] = sol::lua_nil;
+            lua["on_screen"] = sol::lua_nil;
             auto result = lua.safe_script(script);
             scriptresult = "OK";
         }
@@ -1804,30 +1811,47 @@ void render_script()
     }
     try
     {
-        sol::function on_frame = lua["on_frame"];
-        sol::function on_level = lua["on_level"];
-        sol::function on_transition = lua["on_transition"];
-        sol::function on_death = lua["on_death"];
+        sol::optional<sol::function> on_frame = lua["on_frame"];
+        sol::optional<sol::function> on_camp = lua["on_camp"];
+        sol::optional<sol::function> on_level = lua["on_level"];
+        sol::optional<sol::function> on_transition = lua["on_transition"];
+        sol::optional<sol::function> on_death = lua["on_death"];
+        sol::optional<sol::function> on_win = lua["on_win"];
+        sol::optional<sol::function> on_screen = lua["on_screen"];
+        if (g_state->screen != scriptstate.screen || (!g_players.empty() && scriptstate.player != g_players.at(0)))
+        {
+            g_luaCallbacks.clear();
+            if (on_screen)
+                on_screen.value()();
+        }
         if (on_frame)
         {
-            on_frame();
+            on_frame.value()();
+        }
+        if (g_state->screen == 11 && scriptstate.screen != 11)
+        {
+            if (on_camp)
+                on_camp.value()();
         }
         if (g_state->screen == 12 && !g_players.empty() && scriptstate.player != g_players.at(0))
         {
             if (on_level)
-                on_level();
+                on_level.value()();
         }
         if (g_state->screen == 13 && scriptstate.screen != 13)
         {
-            g_luaCallbacks.clear();
             if (on_transition)
-                on_transition();
+                on_transition.value()();
         }
         if (g_state->screen == 14 && scriptstate.screen != 14)
         {
-            g_luaCallbacks.clear();
             if (on_death)
-                on_death();
+                on_death.value()();
+        }
+        if ((g_state->screen == 16 && scriptstate.screen != 16) || (g_state->screen == 19 && scriptstate.screen != 19))
+        {
+            if (on_win)
+                on_win.value()();
         }
 
         auto now = g_state->time_level;

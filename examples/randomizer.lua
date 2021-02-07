@@ -65,22 +65,12 @@ function init_run()
   boss_level = false
   hidden_block = 0
   exit_locked = false
-  doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
-  for i,v in ipairs(doors) do
-    door = get_entity(v)
-    door.flags = setflag(door.flags, 20)
-    door.flags = clrflag(door.flags, 22)
-  end
   players = get_players()
   for i,player in ipairs(players) do
     player.health = math.random(4, options.max_health)
     player.inventory.bombs = math.random(4, options.max_bombs)
     player.inventory.ropes = math.random(4, options.max_ropes)
   end
-  -- debug
-  nextworld = 1
-  nextlevel = 1
-  nexttheme = 1
 end
 init_run()
 
@@ -139,7 +129,7 @@ function lock_exit()
   if state.theme ~= THEME.DWELLING then return end
 
   -- pick a random ground block
-  floors = get_entities_by(ENT_TYPE.FLOOR_GENERIC, 0, 0)
+  floors = get_entities_by(ENT_TYPE.FLOOR_GENERIC, 0, 0) -- type, mask, layer
   if #floors == 0 then return end
   hidden_block = floors[math.random(math.ceil(#floors/4), #floors)]
   x, y, l = get_position(hidden_block)
@@ -276,6 +266,7 @@ function on_level()
 
   -- set door targets
   random_doors()
+
 end
 
 function on_frame()
@@ -331,17 +322,15 @@ function on_frame()
     else
       doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
       for i,v in ipairs(doors) do
-        door = get_entity(v)
-        door.flags = clrflag(door.flags, 20)
-        door.flags = setflag(door.flags, 22)
+        x, y, l = get_position(v)
+        lock_door_at(x, y)
       end
     end
   else
     doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
     for i,v in ipairs(doors) do
-      door = get_entity(v)
-      door.flags = setflag(door.flags, 20)
-      door.flags = clrflag(door.flags, 22)
+      x, y, l = get_position(v)
+      unlock_door_at(x, y)
     end
   end
 end
