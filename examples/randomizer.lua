@@ -180,7 +180,8 @@ end
 function throw_rock(id)
   if options.seismic then
     entity = get_entity(id)
-    if entity == 0 then return end
+    if entity == nil then return end
+    if entity.type.id ~= ENT_TYPE.ITEM_ROCK then return end
     entity.velocityx = math.random()-0.5
     entity.velocityy = math.random()-0.5
   end
