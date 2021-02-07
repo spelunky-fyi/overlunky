@@ -1,4 +1,5 @@
 add_library(injected SHARED
+        script.cpp script.hpp
         ui.cpp ui.hpp
         main.cpp)
 target_link_libraries(injected

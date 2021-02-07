@@ -1,3 +1,5 @@
+#pragma once
+
 #include "items.hpp"
 #include "layer.hpp"
 #include "memory.hpp"

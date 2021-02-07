@@ -313,7 +313,7 @@ size_t get_state_ptr()
     return state.ptr();
 }
 
-void get_players()
+std::vector<Player *> get_players()
 {
     auto state = State::get();
     std::vector<Player *> found;
@@ -323,7 +323,7 @@ void get_players()
         if (player)
             found.push_back((Player *)player);
     }
-    set_players(found);
+    return found;
 }
 
 std::pair<float, float> screen_position(float x, float y)
@@ -571,13 +571,40 @@ uint32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
     return state.layer(layer)->spawn_entity_over(id, overlay, x, y)->uid;
 }
 
-bool entity_has_item(uint32_t id, uint32_t item) // TODO
+bool entity_has_item_uid(uint32_t id, uint32_t item)
 {
+    Entity *entity = get_entity_ptr(id);
+    if (entity == nullptr)
+        return false;
+    if (entity->items_count > 0)
+    {
+        int *pitems = (int *)entity->items_ptr;
+        for (int i = 0; i < entity->items_count; i++)
+        {
+            if (pitems[i] == item)
+                return true;
+        }
+    }
     return false;
 };
 
-bool entity_has_item_type(uint32_t id, uint32_t type) // TODO
+bool entity_has_item_type(uint32_t id, uint32_t type)
 {
+    Entity *entity = get_entity_ptr(id);
+    if (entity == nullptr)
+        return false;
+    if (entity->items_count > 0)
+    {
+        int *pitems = (int *)entity->items_ptr;
+        for (int i = 0; i < entity->items_count; i++)
+        {
+            Entity *item = get_entity_ptr(pitems[i]);
+            if (item == nullptr)
+                continue;
+            if (item->type->id == type)
+                return true;
+        }
+    }
     return false;
 };
 

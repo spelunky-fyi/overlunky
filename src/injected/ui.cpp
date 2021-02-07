@@ -25,43 +25,9 @@
 #include "logger.h"
 #include "rpc.hpp"
 #include "state.hpp"
+#include "script.hpp"
 
-#define SOL_ALL_SAFETIES_ON 1
-#include <sol/sol.hpp>
-sol::state lua;
-static char script[102400];
-bool script_changed;
-std::string scriptresult;
-bool scriptchanged = false;
-struct ScriptState
-{
-    Player *player;
-    uint32_t screen;
-};
-ScriptState scriptstate = {0, 0};
-
-struct LuaIntervalCallback
-{
-    sol::function func;
-    int interval;
-    int lastRan;
-};
-struct LuaTimeoutCallback
-{
-    sol::function func;
-    int timeout;
-};
-std::vector<std::variant<LuaIntervalCallback, LuaTimeoutCallback>> g_luaCallbacks;
-std::vector<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> lua_messages;
-
-struct ScriptOption
-{
-    std::string desc;
-    std::variant<int, float, std::string, bool> value;
-    std::variant<int, float> min;
-    std::variant<int, float> max;
-};
-std::map<std::string, ScriptOption> script_options;
+std::vector<Script *> g_scripts;
 
 const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
@@ -459,8 +425,8 @@ void load_script(std::string file)
     if (!data.fail())
     {
         buf << data.rdbuf();
-        strcpy(script, buf.str().data());
-        scriptchanged = true;
+        Script *script = new Script(buf.str(), file);
+        g_scripts.push_back(script);
         data.close();
     }
 }
@@ -533,6 +499,12 @@ std::string key_string(int keycode)
 bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags = 0)
 {
     return ImGui::InputText(label, (char *)str->c_str(), 9, flags);
+}
+
+bool InputStringMultiline(
+    const char *label, std::string *str, const ImVec2 &size, ImGuiInputTextFlags flags = 0)
+{
+    return ImGui::InputTextMultiline(label, (char *)str->c_str(), str->capacity() + 1, size, flags);
 }
 
 void save_config(std::string file)
@@ -747,7 +719,7 @@ Movable *entity_ptr(int uid)
 
 bool update_players()
 {
-    get_players();
+    g_players = get_players();
     return true;
 }
 
@@ -901,7 +873,7 @@ void force_hud_flags()
 
 void force_noclip()
 {
-    get_players();
+    g_players = get_players();
     if (options["noclip"])
     {
         for (auto player : g_players)
@@ -1115,7 +1087,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     else if (pressed("toggle_noclip", wParam))
     {
         options["noclip"] = !options["noclip"];
-        get_players();
+        g_players = get_players();
         for (auto player : g_players)
         {
             if (options["noclip"])
@@ -1722,7 +1694,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, width);
         }
     }
-    get_players();
+    g_players = get_players();
     for (auto player : g_players)
     {
         std::pair<float, float> gridline = screen_position(round(player->position().first - 0.5) + 0.5, round(player->position().second) - 0.5);
@@ -1778,122 +1750,9 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
     draw_list->AddLine(sboxd, sboxa, color, 2);
 }
 
-void render_script()
+void render_script(Script *script)
 {
-    get_players();
-    if (g_state == 0)
-        return;
-    if (scriptchanged)
-    {
-        scriptchanged = false;
-        // Compile & Evaluate the script if the script is changed
-        try
-        {
-            // Clear all callbacks on script reload to avoid running them
-            // multiple times.
-            g_luaCallbacks.clear();
-            script_options.clear();
-            lua["on_frame"] = sol::lua_nil;
-            lua["on_camp"] = sol::lua_nil;
-            lua["on_level"] = sol::lua_nil;
-            lua["on_transition"] = sol::lua_nil;
-            lua["on_death"] = sol::lua_nil;
-            lua["on_win"] = sol::lua_nil;
-            lua["on_screen"] = sol::lua_nil;
-            auto result = lua.safe_script(script);
-            scriptresult = "OK";
-        }
-        catch (const sol::error &e)
-        {
-            scriptresult = e.what();
-            return;
-        }
-    }
-    try
-    {
-        sol::optional<sol::function> on_frame = lua["on_frame"];
-        sol::optional<sol::function> on_camp = lua["on_camp"];
-        sol::optional<sol::function> on_level = lua["on_level"];
-        sol::optional<sol::function> on_transition = lua["on_transition"];
-        sol::optional<sol::function> on_death = lua["on_death"];
-        sol::optional<sol::function> on_win = lua["on_win"];
-        sol::optional<sol::function> on_screen = lua["on_screen"];
-        if (g_state->screen != scriptstate.screen || (!g_players.empty() && scriptstate.player != g_players.at(0)))
-        {
-            g_luaCallbacks.clear();
-            if (on_screen)
-                on_screen.value()();
-        }
-        if (on_frame)
-        {
-            on_frame.value()();
-        }
-        if (g_state->screen == 11 && scriptstate.screen != 11)
-        {
-            if (on_camp)
-                on_camp.value()();
-        }
-        if (g_state->screen == 12 && !g_players.empty() && scriptstate.player != g_players.at(0))
-        {
-            if (on_level)
-                on_level.value()();
-        }
-        if (g_state->screen == 13 && scriptstate.screen != 13)
-        {
-            if (on_transition)
-                on_transition.value()();
-        }
-        if (g_state->screen == 14 && scriptstate.screen != 14)
-        {
-            if (on_death)
-                on_death.value()();
-        }
-        if ((g_state->screen == 16 && scriptstate.screen != 16) || (g_state->screen == 19 && scriptstate.screen != 19))
-        {
-            if (on_win)
-                on_win.value()();
-        }
-
-        auto now = g_state->time_level;
-
-        for (int i = 0; i < g_luaCallbacks.size();)
-        {
-            if (auto cb = std::get_if<LuaIntervalCallback>(&g_luaCallbacks[i]))
-            {
-                if (now >= cb->lastRan + cb->interval)
-                {
-                    cb->func();
-                    cb->lastRan = now;
-                }
-                ++i;
-            }
-            else if (auto cb = std::get_if<LuaTimeoutCallback>(&g_luaCallbacks[i]))
-            {
-                if (now >= cb->timeout)
-                {
-                    cb->func();
-                    g_luaCallbacks.erase(g_luaCallbacks.begin() + i);
-                }
-                else
-                {
-                    ++i;
-                }
-            }
-            else
-            {
-                ++i;
-            }
-        }
-
-        if (!g_players.empty())
-            scriptstate.player = g_players.at(0);
-        if (g_state != 0)
-            scriptstate.screen = g_state->screen;
-    }
-    catch (const sol::error &e)
-    {
-        scriptresult = e.what();
-    }
+    script->run();
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -1928,26 +1787,9 @@ void set_vel(ImVec2 pos)
     g_vy = 2 * (g_vy - g_y) * 0.5625;
 }
 
-void add_message(std::string message)
+void render_script_options(Script *script)
 {
-    lua_messages.push_back({message, std::chrono::system_clock::now()});
-}
-
-void lua_register_option_int(std::string name, std::string desc, int value, int min, int max)
-{
-    script_options[name] = {desc, value, min, max};
-    lua["options"][name] = value;
-}
-
-void lua_register_option_bool(std::string name, std::string desc, bool value)
-{
-    script_options[name] = {desc, value, 0, 0};
-    lua["options"][name] = value;
-}
-
-void render_script_options()
-{
-    for (auto &option : script_options)
+    for (auto &option : script->options)
     {
         if(int *val = std::get_if<int>(&option.second.value))
         {
@@ -1956,7 +1798,7 @@ void render_script_options()
             if (ImGui::DragInt(option.second.desc.data(), val, 0.5f, min, max))
             {
                 option.second.value = *val;
-                lua["options"][option.first] = *val;
+                script->lua["options"][option.first] = *val;
             }
         }
         else if (bool *val = std::get_if<bool>(&option.second.value))
@@ -1964,13 +1806,13 @@ void render_script_options()
             if (ImGui::Checkbox(option.second.desc.data(), val))
             {
                 option.second.value = *val;
-                lua["options"][option.first] = *val;
+                script->lua["options"][option.first] = *val;
             }
         }
     }
 }
 
-void render_messages()
+void render_messages(Script *script)
 {
     ImGuiIO &io = ImGui::GetIO();
     ImGui::SetNextWindowSize({-1, -1});
@@ -1982,12 +1824,16 @@ void render_messages()
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     using namespace std::chrono_literals;
     ImGui::PushFont(bigfont);
-    for (auto message : lua_messages)
+    for (auto message : script->messages)
     {
         auto now = std::chrono::system_clock::now();
         if(now - 5s > message.second)
             continue;
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.second).count() / 5000.0f;
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), script->file.data());
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), ":");
+        ImGui::SameLine();
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), message.first.data());
     }
     ImGui::PopFont();
@@ -2016,7 +1862,7 @@ void render_clickhandler()
         {
             render_hitbox(entity_ptr(test), false, ImColor(0, 255, 255, 150));
         }
-        get_players();
+        g_players = get_players();
         for (auto player : g_players)
         {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
@@ -2026,7 +1872,10 @@ void render_clickhandler()
     {
         render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
     }
-    render_script();
+    for (auto script : g_scripts)
+    {
+        render_script(script);
+    }
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
@@ -2278,7 +2127,7 @@ void render_options()
     }
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {
-        get_players();
+        g_players = get_players();
         for (auto player : g_players)
         {
             if (options["noclip"])
@@ -2340,14 +2189,36 @@ void render_debug()
     {
         load_script("overlunky.lua");
     }
-    if(ImGui::InputTextMultiline("##LuaScript", script, sizeof(script), {-1, 300}))
+    if (ImGui::Button("Create new script"))
     {
-        scriptchanged = true;
+        Script *script = new Script("function on_screen() message('Hello from new script') end", "foobar.lua");
+        g_scripts.push_back(script);
     }
-    InputString("##LuaResult", &scriptresult, ImGuiInputTextFlags_ReadOnly);
-    ImGui::PopItemWidth();
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    render_script_options();
+    int num = 0;
+    for (auto script : g_scripts)
+    {
+        ImGui::PushID(num);
+        ImGui::Text(script->file.data());
+        ImGui::SameLine();
+        if (script->enabled && ImGui::Button("Disable##DisableScript"))
+        {
+            script->enabled = false;
+        }
+        else if (!script->enabled && ImGui::Button("Enable##EnableScript"))
+        {
+            script->enabled = true;
+        }
+        if(ImGui::InputTextMultiline("##LuaScript", script->code, sizeof(script->code), {-1, 300}))
+        {
+            script->changed = true;
+        }
+        InputString("##LuaResult", &script->result, ImGuiInputTextFlags_ReadOnly);
+        ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+        render_script_options(script);
+        ImGui::PopItemWidth();
+        ImGui::PopID();
+        ++num;
+    }
     ImGui::PopItemWidth();
 }
 
@@ -3098,7 +2969,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
-    render_messages();
+    for (auto script : g_scripts)
+    {
+        render_messages(script);
+    }
     render_clickhandler();
 
     int win_condition = ImGuiCond_FirstUseEver;
@@ -3268,7 +3142,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
     if (options["disable_input_alt"] && ImGui::GetIO().WantCaptureKeyboard)
     {
-        get_players();
+        g_players = get_players();
         for (auto player : g_players)
         {
             player->more_flags |= 1U << 15;
@@ -3323,11 +3197,6 @@ void create_box(std::vector<EntityItem> items)
     }
 }
 
-void set_players(std::vector<Player *> ids)
-{
-    g_players = ids;
-}
-
 #define THROW(fmt, ...)                                                                                                                              \
     {                                                                                                                                                \
         char buf[0x1000];                                                                                                                            \
@@ -3343,296 +3212,11 @@ template <typename T> PresentPtr &vtable_find(T *obj, int index)
     return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
 }
 
-std::vector<Movable*> lua_get_players()
-{
-    return std::vector<Movable*>(g_players.begin(), g_players.end());
-}
-
-Movable* lua_get_entity(uint32_t id)
-{
-    return (Movable *)get_entity_ptr(id);
-}
-
-std::tuple<float, float, int> lua_get_position(uint32_t id)
-{
-    Entity *ent = get_entity_ptr(id);
-    if(ent)
-        return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
-    return {0.0f, 0.0f, 0};
-}
-
-void init_script()
+bool init_hooks(size_t _ptr)
 {
     g_state = (struct StateMemory *)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
-    lua.set_function("set_interval", [](sol::function cb, int frames) {
-        auto luaCb = LuaIntervalCallback { cb, frames, -1 };
-        g_luaCallbacks.push_back(luaCb);
-    });
-    lua.set_function("set_timeout", [](sol::function cb, int frames) {
-        int now = g_state->time_level;
-        auto luaCb = LuaTimeoutCallback {
-            cb,
-            now + frames,
-        };
-        g_luaCallbacks.push_back(luaCb);
-    });
-    lua["options"] = lua.create_named_table("options");
-    lua["register_option_int"] = lua_register_option_int;
-    lua["register_option_bool"] = lua_register_option_bool;
-    lua["message"] = add_message;
-    lua["spawn_entity"] = spawn_entity_abs;
-    lua["spawn_door"] = spawn_door_abs;
-    lua["spawn_backdoor"] = spawn_backdoor_abs;
-    lua["godmode"] = godmode;
-    lua["darkmode"] = darkmode;
-    lua["zoom"] = zoom;
-    lua["set_pause"] = set_pause;
-    lua["move_entity"] = move_entity_abs;
-    lua["set_door_target"] = set_door_target;
-    lua["set_contents"] = set_contents;
-    lua["get_entity"] = lua_get_entity;
-    lua["get_entities"] = get_entities;
-    lua["get_entities_by"] = get_entities_by;
-    lua["get_entities_by_type"] = [](sol::variadic_args va) {
-        auto get_func = sol::resolve<std::vector<uint32_t>(std::vector<uint32_t>)>(get_entities_by_type);
-        auto args = std::vector<uint32_t>(va.begin(), va.end());
-        return get_func(args);
-    };
-    lua["get_entities_by_mask"] = get_entities_by_mask;
-    lua["get_entities_by_layer"] = get_entities_by_layer;
-    lua["get_entities_at"] = get_entities_at;
-    lua["get_entity_flags"] = get_entity_flags;
-    lua["set_entity_flags"] = set_entity_flags;
-    lua["get_entity_flags2"] = get_entity_flags2;
-    lua["set_entity_flags2"] = set_entity_flags2;
-    lua["get_entity_ai_state"] = get_entity_ai_state;
-    lua["get_hud_flags"] = get_hud_flags;
-    lua["set_hud_flags"] = set_hud_flags;
-    lua["get_entity_type"] = get_entity_type;
-    lua["get_zoom_level"] = get_zoom_level;
-    lua["screen_position"] = screen_position;
-    lua["get_players"] = lua_get_players;
-    lua["get_position"] = lua_get_position;
-    lua["entity_remove_item"] = entity_remove_item;
-    lua["spawn_entity_over"] = spawn_entity_over;
-    lua["entity_has_item"] = entity_has_item;
-    lua["entity_has_item_type"] = entity_has_item_type;
-    lua["lock_door_at"] = lock_door_at;
-    lua["unlock_door_at"] = unlock_door_at;
-    lua.new_usertype<Inventory>(
-        "Inventory",
-        "money",
-        &Inventory::money,
-        "bombs",
-        &Inventory::bombs,
-        "ropes",
-        &Inventory::ropes,
-        "kills_level",
-        &Inventory::kills_level,
-        "kills_total",
-        &Inventory::kills_total);
-    lua.new_usertype<EntityDB>(
-        "EntityDB",
-        "id",
-        &EntityDB::id,
-        "search_flags",
-        &EntityDB::search_flags,
-        "width",
-        &EntityDB::width,
-        "height",
-        &EntityDB::height,
-        "friction",
-        &EntityDB::friction,
-        "elasticity",
-        &EntityDB::elasticity,
-        "weight",
-        &EntityDB::weight,
-        "acceleration",
-        &EntityDB::acceleration,
-        "max_speed",
-        &EntityDB::max_speed,
-        "sprint_factor",
-        &EntityDB::sprint_factor,
-        "jump",
-        &EntityDB::jump,
-        "damage",
-        &EntityDB::damage,
-        "life",
-        &EntityDB::life);
-    lua.new_usertype<Movable>(
-        "Movable",
-        "type",
-        &Entity::type,
-        "overlay",
-        &Entity::overlay,
-        "flags",
-        &Entity::flags,
-        "more_flags",
-        &Entity::more_flags,
-        "uid",
-        &Entity::uid,
-        "animation",
-        &Entity::animation,
-        "x",
-        &Entity::x,
-        "y",
-        &Entity::y,
-        "w",
-        &Entity::w,
-        "h",
-        &Entity::h,
-        "teleport",
-        &Entity::teleport,
-        "topmost",
-        &Entity::topmost,
-        "topmost_mount",
-        &Entity::topmost_mount,
-        "movex",
-        &Movable::movex,
-        "movey",
-        &Movable::movey,
-        "buttons",
-        &Movable::buttons,
-        "stand_counter",
-        &Movable::stand_counter,
-        "owner_uid",
-        &Movable::owner_uid,
-        "last_owner_uid",
-        &Movable::last_owner_uid,
-        "idle_counter",
-        &Movable::idle_counter,
-        "standing_on_uid",
-        &Movable::standing_on_uid,
-        "velocityx",
-        &Movable::velocityx,
-        "velocityy",
-        &Movable::velocityy,
-        "holding_uid",
-        &Movable::holding_uid,
-        "state",
-        &Movable::state,
-        "last_state",
-        &Movable::last_state,
-        "move_state",
-        &Movable::move_state,
-        "health",
-        &Movable::health,
-        "some_state",
-        &Movable::some_state,
-        "inside",
-        &Movable::inside,
-        "has_backpack",
-        &Movable::has_backpack,
-        "inventory",
-        &Movable::inventory_ptr);
-    lua.new_usertype<StateMemory>(
-        "StateMemory",
-        "screen_last",
-        &StateMemory::screen_last,
-        "screen",
-        &StateMemory::screen,
-        "screen_next",
-        &StateMemory::screen_next,
-        "ingame",
-        &StateMemory::ingame,
-        "playing",
-        &StateMemory::playing,
-        "pause",
-        &StateMemory::pause,
-        "w",
-        &StateMemory::w,
-        "h",
-        &StateMemory::h,
-        "kali_favor",
-        &StateMemory::kali_favor,
-        "kali_status",
-        &StateMemory::kali_status,
-        "kali_altars_destroyed",
-        &StateMemory::kali_altars_destroyed,
-        "feedcode",
-        &StateMemory::feedcode,
-        "time_total",
-        &StateMemory::time_total,
-        "world",
-        &StateMemory::world,
-        "world_next",
-        &StateMemory::world_next,
-        "level",
-        &StateMemory::level,
-        "level_next",
-        &StateMemory::level_next,
-        "theme",
-        &StateMemory::theme,
-        "theme_next",
-        &StateMemory::theme_next,
-        "shoppie_aggro",
-        &StateMemory::shoppie_aggro,
-        "shoppie_aggro_levels",
-        &StateMemory::shoppie_aggro_levels,
-        "merchant_aggro",
-        &StateMemory::merchant_aggro,
-        "kills_npc",
-        &StateMemory::kills_npc,
-        "level_count",
-        &StateMemory::level_count,
-        "journal_flags",
-        &StateMemory::journal_flags,
-        "time_last_level",
-        &StateMemory::time_last_level,
-        "time_level",
-        &StateMemory::time_level,
-        "hud_flags",
-        &StateMemory::hud_flags);
-    lua["state"] = g_state;
-    lua.create_named_table("ENT_TYPE");
-    for (int i = 1; i < g_items.size(); i++)
-    {
-        auto name = g_items[i].name.substr(9, g_items[i].name.size());
-        lua["ENT_TYPE"][name] = g_items[i].id;
-    }
-    lua.new_enum(
-        "THEME",
-        "DWELLING",
-        1,
-        "JUNGLE",
-        2,
-        "VOLCANA",
-        3,
-        "OLMEC",
-        4,
-        "TIDE_POOL",
-        5,
-        "TEMPLE",
-        6,
-        "ICE_CAVES",
-        7,
-        "NEO_BABYLON",
-        8,
-        "SUNKEN_CITY",
-        9,
-        "COSMIC_OCEAN",
-        10,
-        "CITY_OF_GOLD",
-        11,
-        "DUAT",
-        12,
-        "ABZU",
-        13,
-        "TIAMAT",
-        14,
-        "EGGPLANT_WORLD",
-        15,
-        "HUNDUN",
-        16,
-        "BASE_CAMP",
-        17);
-}
 
-bool init_hooks(size_t _ptr)
-{
-    init_script();
     pSwapChain = reinterpret_cast<IDXGISwapChain *>(_ptr);
     PresentPtr &ptr = vtable_find(pSwapChain, 8);
     DWORD oldProtect;

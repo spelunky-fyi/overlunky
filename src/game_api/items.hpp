@@ -1,3 +1,5 @@
+#pragma once
+
 #include "entity.hpp"
 
 #define MAX_PLAYERS 4
