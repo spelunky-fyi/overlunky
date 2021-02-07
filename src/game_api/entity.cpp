@@ -62,7 +62,7 @@ Entity *state_find_item(size_t state_ptr, uint32_t unique_id) {
 Carry get_carry() {
     ONCE(Carry) {
         auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xBA\xE1\x00\x00\x00\x49\x8B\xCD"s,
+        auto off = find_inst(memory.exe(), "\xBA\xE1\x00\x00\x00\x49\x8B\xCD"s, // TODO broken
                              memory.after_bundle);
         off = find_inst(memory.exe(), "\xE8"s, off + 1);
         off = find_inst(memory.exe(), "\xE8"s, off + 1);
@@ -141,16 +141,12 @@ std::pair<float, float> Entity::position_self() const {
 
 void Entity::remove_item(uint32_t id)
 {
-    DEBUG("Remove item {}", id);
-    DEBUG("Items ptr: {}", items_ptr);
     uint32_t *item = reinterpret_cast<uint32_t*>(items_ptr);
     bool found = false;
     for (int i = 0; i < items_count; ++i)
     {
-        DEBUG("Item: {}", item[i]);
         if (item[i] == id)
         {
-            DEBUG("Found item");
             auto state = State::get();
             auto itemptr = state_find_item(state.ptr(), id);
             itemptr->overlay = NULL;
@@ -167,7 +163,7 @@ void Entity::remove_item(uint32_t id)
 
 void Door::set_target(uint8_t w, uint8_t l, uint8_t t) {
     uint8_t array[5] = {1, l, 1, w, t};
-    DEBUG("Making door go to {}", array);
+    DEBUG("Making door go to {}-{}, {}", w, l, t);
     write_mem(pointer() + 0xc1, std::string((char *)array, sizeof(array)));
 }
 
@@ -181,4 +177,9 @@ void Mount::carry(Movable *rider) {
 void Mount::tame(bool value) {
     write_mem(pointer() + 0x149, to_le_bytes(value));
     flags = flags | 0x20000;
+}
+
+void Entity::destroy()
+{
+    // TODO
 }

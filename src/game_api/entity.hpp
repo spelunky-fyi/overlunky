@@ -180,10 +180,9 @@ class Entity {
     }
 
     uint8_t layer() { return read_u8(pointer() + 0x98); }
-
     std::pair<float, float> position_self() const;
-
     void remove_item(uint32_t id);
+    void destroy();
 };
 
 struct Inventory {

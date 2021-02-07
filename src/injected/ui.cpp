@@ -276,7 +276,7 @@ const char *entity_flags[] = {
     "31: ",
     "32: "};
 const char *more_flags[] = {"1: ",  "2: ",  "3: ",  "4: ",  "5: ",  "6: ",         "7: ",  "8: ",
-                            "9: ",  "10: ", "11: ", "12: ", "13: ", "14: Falling", "15: Cursed effect", "16: Disable input",
+                            "9: ",  "10: ", "11: Swimming", "12: ", "13: ", "14: Falling", "15: Cursed effect", "16: Disable input",
                             "17: ", "18: ", "19: ", "20: ", "21: ", "22: ",        "23: ", "24: ",
                             "25: ", "26: ", "27: ", "28: ", "29: ", "30: ",        "31: ", "32: "};
 const char *hud_flags[] = {
@@ -1843,7 +1843,7 @@ void render_script()
                 }
                 ++i;
             }
-            if (auto cb = std::get_if<LuaTimeoutCallback>(&g_luaCallbacks[i]))
+            else if (auto cb = std::get_if<LuaTimeoutCallback>(&g_luaCallbacks[i]))
             {
                 if (now >= cb->timeout)
                 {
@@ -1854,6 +1854,10 @@ void render_script()
                 {
                     ++i;
                 }
+            }
+            else
+            {
+                ++i;
             }
         }
 
@@ -2631,6 +2635,7 @@ void render_entity_props()
         ImGui::DragFloat("Max speed##GlobalMaxSpeed", &g_entity->type->max_speed, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &g_entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Jump power##GlobalJumpPower", &g_entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &g_entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {
@@ -2658,7 +2663,7 @@ void render_entity_props()
         {
             ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity->inside, 1, 255);
         }
-        else if (g_entity_type >= 22 && g_entity_type <= 36)
+        else if (g_entity_type == 23 || g_entity_type == 25 || g_entity_type == 31 || g_entity_type == 36)
         {
             Target *target = reinterpret_cast<Target *>(&g_entity->anim_func);
             ImGui::Text("Door target:");
@@ -2672,7 +2677,7 @@ void render_entity_props()
         else
         {
             ImGui::InputScalar(
-                "Unknown data##UnknownSpecialAttribute",
+                "Data##UnknownSpecialAttribute",
                 ImGuiDataType_U64,
                 (size_t *)&g_entity->inside,
                 0,
@@ -3329,7 +3334,7 @@ std::tuple<float, float, int> lua_get_position(uint32_t id)
     Entity *ent = get_entity_ptr(id);
     if(ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
-    return {0, 0, 0};
+    return {0.0f, 0.0f, 0};
 }
 
 void init_script()
@@ -3386,7 +3391,12 @@ void init_script()
     lua["screen_position"] = screen_position;
     lua["get_players"] = lua_get_players;
     lua["get_position"] = lua_get_position;
-    lua["remove_entity_item"] = entity_remove_item;
+    lua["entity_remove_item"] = entity_remove_item;
+    lua["spawn_entity_over"] = spawn_entity_over;
+    lua["entity_has_item"] = entity_has_item;
+    lua["entity_has_item_type"] = entity_has_item_type;
+    lua["lock_door_at"] = lock_door_at;
+    lua["unlock_door_at"] = unlock_door_at;
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",
@@ -3411,6 +3421,8 @@ void init_script()
         &Entity::more_flags,
         "uid",
         &Entity::uid,
+        "animation",
+        &Entity::animation,
         "x",
         &Entity::x,
         "y",

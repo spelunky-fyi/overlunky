@@ -161,7 +161,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
         float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
-        if ((mask & flags) > 0 && distance < r)
+        if (((mask & flags) > 0 || mask == 0) && distance < r)
         {
             DEBUG(
                 "Item {}, {:x} type, {} position, {} distance, {:x}",
@@ -511,15 +511,12 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
 std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, int layer, float x, float y, float r)
 {
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (!player)
-        return {};
     std::vector<uint32_t> found;
     for (auto &item : state.layer(layer)->items())
     {
         auto [ix, iy] = item->position();
         float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
-        if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == type || type == 0) && distance < r)
+        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == type || type == 0) && distance < r)
         {
             found.push_back(item->uid);
         }
@@ -561,4 +558,61 @@ void entity_remove_item(uint32_t id, uint32_t item)
     if (entity == nullptr)
         return;
     entity->remove_item(item);
+}
+
+uint32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
+{
+    return 0; // TODO broken
+    auto state = State::get();
+    Entity *overlay = get_entity_ptr(over);
+    if (overlay == nullptr)
+        return 0;
+    int layer = overlay->layer();
+    return state.layer(layer)->spawn_entity_over(id, overlay, x, y)->uid;
+}
+
+bool entity_has_item(uint32_t id, uint32_t item) // TODO
+{
+    return false;
+};
+
+bool entity_has_item_type(uint32_t id, uint32_t type) // TODO
+{
+    return false;
+};
+
+void lock_door_at(float x, float y)
+{
+    std::vector<uint32_t> items = get_entities_at(0, 0, 0, x, y, 1);
+    for (auto id : items)
+    {
+        Entity *door = get_entity_ptr(id);
+        if (door->type->id >= 22 && door->type->id <= 36)
+        {
+            door->flags &= ~(1U << 19);
+            door->flags |= 1U << 21;
+        }
+        else if (door->type->id == 773 || door->type->id == 778 || door->type->id == 780)
+        {
+            door->animation &= ~1U;
+        }
+    }
+}
+
+void unlock_door_at(float x, float y)
+{
+    std::vector<uint32_t> items = get_entities_at(0, 0, 0, x, y, 1);
+    for (auto id : items)
+    {
+        Entity *door = get_entity_ptr(id);
+        if (door->type->id >= 22 && door->type->id <= 36)
+        {
+            door->flags |= 1U << 19;
+            door->flags &= ~(1U << 21);
+        }
+        else if (door->type->id == 773 || door->type->id == 778 || door->type->id == 780)
+        {
+            door->animation |= 1U;
+        }
+    }
 }

@@ -41,3 +41,8 @@ std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, int layer, f
 void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t);
 void set_contents(uint32_t id, uint32_t item);
 void entity_remove_item(uint32_t id, uint32_t item);
+uint32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y);
+bool entity_has_item(uint32_t id, uint32_t item);
+bool entity_has_item_type(uint32_t id, uint32_t type);
+void lock_door_at(float x, float y);
+void unlock_door_at(float x, float y);
