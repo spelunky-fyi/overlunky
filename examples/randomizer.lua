@@ -5,8 +5,12 @@
 -- random actually useful items in crates
 -- random coffins
 -- random player stats
--- weird seismic activity
 -- dwelling requires some actual spelunking to unlock the exit
+
+meta.name = "Randomizer"
+meta.version = "0.1"
+meta.description = "Random exit doors, pot/crate/coffin contents, player stats, boss order and other cool stuff!"
+meta.author = "Dregu"
 
 register_option_int("min_levels", "Min normal levels before boss", 3, 1, 100)
 register_option_int("max_levels", "Max normal levels before boss", 8, 1, 100)
@@ -15,7 +19,7 @@ register_option_int("max_health", "Max starting health", 20, 4, 99)
 register_option_int("max_bombs", "Max starting bombs", 20, 4, 99)
 register_option_int("max_ropes", "Max starting ropes", 20, 4, 99)
 register_option_bool("lock_exit", "Lock exit in Dwelling", true)
-register_option_bool("seismic", "Weird seismic activity", true)
+--register_option_bool("seismic", "Weird seismic activity", true)
 
 items = {220,221,222,223,224,225,227,228,229,230,231,232,233,234,237,238,239,240,242,243,244,245,246,247,248,249,250,251,252,253,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,283,284,286,287,288,289,290,295,296,297,298,300,301,302,303,304,305,306,307,308,309,310,311,312,317,318,319,320,321,322,323,331,332,333,334,336,337,338,339,340,341,347,348,356,357,358,365,366,371,372,373,374,377,395,396,399,400,401,402,409,416,422,428,429,435,436,439,440,442,444,448,453,456,457,462,469,475,476,477,478,479,480,481,482,490,491,492,493,494,495,496,497,498,499,500,501,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,592,593,596,604,610,630,631,884,885,886,887,888,890}
 tools = {374,422,509,510,511,512,513,514,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,585}
@@ -65,12 +69,15 @@ function init_run()
   boss_level = false
   hidden_block = 0
   exit_locked = false
-  players = get_players()
   for i,player in ipairs(players) do
     player.health = math.random(4, options.max_health)
     player.inventory.bombs = math.random(4, options.max_bombs)
     player.inventory.ropes = math.random(4, options.max_ropes)
   end
+  -- debug
+  nextworld = 1
+  nextlevel = math.random(4)
+  nexttheme = 1
 end
 init_run()
 
@@ -137,13 +144,19 @@ function lock_exit()
   hidden_y = y
   exit_locked = true
 
+  message("The exit is locked! Find the skeleton key to unlock it!")
+
   -- put fake blackmarket door there to find with udjat
   spawn_entity(ENT_TYPE.LOGICAL_BLACKMARKET_DOOR, x, y, 0, 0, 0)
 
   -- give some tools to help find it
-  players = get_players()
   x, y, layer = get_position(players[1].uid)
-  spawn_entity(ENT_TYPE.ITEM_PICKUP_UDJATEYE, x+1, y, layer, 0, 0)
+  goldkeys = get_entities_by_type(ENT_TYPE.ITEM_LOCKEDCHEST_KEY)
+  if #goldkeys == 0 then
+    spawn_entity(ENT_TYPE.ITEM_PICKUP_UDJATEYE, x+1, y, layer, 0, 0)
+  else
+    message("Looks like you have to find the udjat eye too :D")
+  end
   spawn_entity(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, x-1, y, layer, 0, 0)
   spawn_entity(ENT_TYPE.ITEM_MATTOCK, x, y, layer, 0, 0)
   doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
@@ -152,7 +165,6 @@ function lock_exit()
     spawn_entity(ENT_TYPE.ITEM_PICKUP_CLOVER, x+1, y, layer, 0, 0)
   end
 
-  message("The exit is locked! Find the key to unlock it!")
 end
 
 function random_doors()
@@ -231,8 +243,7 @@ function on_level()
     remove_boss(THEME.DUAT)
   end
 
-  -- give turkey and udjat
-  players = get_players()
+  -- give turkey
   x, y, layer = get_position(players[1].uid)
   if state.level_count > 0 then
     spawn_entity(ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, x, y+1, layer, 0, 0)
@@ -260,10 +271,10 @@ function on_level()
   end
 
   -- throw some rocks
-  rocks = get_entities_by_type(ENT_TYPE.ITEM_ROCK)
+  --[[rocks = get_entities_by_type(ENT_TYPE.ITEM_ROCK)
   for i,v in ipairs(rocks) do
     set_timeout(throw_rock(v), math.random(5*60, 10*60))
-  end
+  end]]--
 
   -- set door targets
   random_doors()
@@ -312,6 +323,13 @@ function on_frame()
 
   -- unlock exit if hidden block found
   if exit_locked then
+    for i,player in ipairs(players) do
+      skeletonkey = entity_has_item_type(player.uid, ENT_TYPE.ITEM_POWERUP_SKELETON_KEY) -- not PICKUP!
+      if skeletonkey then
+        exit_locked = false
+        message("Exit unlocked!")
+      end
+    end
     block = get_entity(hidden_block)
     if block == nil then
       exit_locked = false
@@ -319,7 +337,6 @@ function on_frame()
       hidden_block = 0
       hidden_x = 0
       hidden_y = 0
-      message("Exit unlocked!")
     else
       doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
       for i,v in ipairs(doors) do

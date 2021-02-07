@@ -43,6 +43,15 @@ struct ScriptOption
     std::variant<int, float> max;
 };
 
+struct ScriptMeta
+{
+    std::string file;
+    std::string name;
+    std::string version;
+    std::string description;
+    std::string author;
+};
+
 std::vector<Movable *> lua_get_players();
 Movable *lua_get_entity(uint32_t id);
 std::tuple<float, float, int> lua_get_position(uint32_t id);
@@ -50,14 +59,13 @@ std::tuple<float, float, int> lua_get_position(uint32_t id);
 class Script
 {
   public:
-    std::string file;
-
     sol::state lua;
     char code[204800];
     std::string result = "";
     ScriptState state = {0, 0};
     bool changed = false;
     bool enabled = true;
+    ScriptMeta meta = {"", "", "", "", ""};
 
     std::map<std::string, ScriptOption> options;
     std::vector<std::variant<LuaIntervalCallback, LuaTimeoutCallback>> callbacks;
@@ -73,7 +81,6 @@ class Script
     void add_message(std::string message);
     void register_option_int(std::string name, std::string desc, int value, int min, int max);
     void register_option_bool(std::string name, std::string desc, bool value);
-    std::string get_name();
 
     bool run();
 };

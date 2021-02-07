@@ -24,8 +24,8 @@
 #include "entity.hpp"
 #include "logger.h"
 #include "rpc.hpp"
-#include "state.hpp"
 #include "script.hpp"
+#include "state.hpp"
 
 std::vector<Script *> g_scripts;
 
@@ -82,6 +82,7 @@ std::map<std::string, int> keys{
     {"tool_debug", 0x37b},
     {"tool_metrics", 0x349},
     {"tool_style", 0x355},
+    {"tool_script", 0x77},
     {"reset_windows", 0x352},
     {"reset_windows_vertical", 0x356},
     {"save_settings", 0x353},
@@ -241,10 +242,39 @@ const char *entity_flags[] = {
     "30: ",
     "31: ",
     "32: "};
-const char *more_flags[] = {"1: ",  "2: ",  "3: ",  "4: ",  "5: ",  "6: ",         "7: ",  "8: ",
-                            "9: ",  "10: ", "11: Swimming", "12: ", "13: ", "14: Falling", "15: Cursed effect", "16: Disable input",
-                            "17: ", "18: ", "19: ", "20: ", "21: ", "22: ",        "23: ", "24: ",
-                            "25: ", "26: ", "27: ", "28: ", "29: ", "30: ",        "31: ", "32: "};
+const char *more_flags[] = {
+    "1: ",
+    "2: ",
+    "3: ",
+    "4: ",
+    "5: ",
+    "6: ",
+    "7: ",
+    "8: ",
+    "9: ",
+    "10: ",
+    "11: Swimming",
+    "12: ",
+    "13: ",
+    "14: Falling",
+    "15: Cursed effect",
+    "16: Disable input",
+    "17: ",
+    "18: ",
+    "19: ",
+    "20: ",
+    "21: ",
+    "22: ",
+    "23: ",
+    "24: ",
+    "25: ",
+    "26: ",
+    "27: ",
+    "28: ",
+    "29: ",
+    "30: ",
+    "31: ",
+    "32: "};
 const char *hud_flags[] = {
     "1: ",
     "2: ",
@@ -501,8 +531,7 @@ bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags 
     return ImGui::InputText(label, (char *)str->c_str(), 9, flags);
 }
 
-bool InputStringMultiline(
-    const char *label, std::string *str, const ImVec2 &size, ImGuiInputTextFlags flags = 0)
+bool InputStringMultiline(const char *label, std::string *str, const ImVec2 &size, ImGuiInputTextFlags flags = 0)
 {
     return ImGui::InputTextMultiline(label, (char *)str->c_str(), str->capacity() + 1, size, flags);
 }
@@ -1251,6 +1280,10 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
         show_debug = !show_debug;
     }
+    else if (pressed("tool_script", wParam))
+    {
+        toggle("tool_script");
+    }
     else if (pressed("reset_windows", wParam))
     {
         options["stack_horizontally"] = !options["stack_horizontally"];
@@ -1660,7 +1693,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             int width = 2;
             ImColor color = gridcolor;
             ImVec2 grids = screenify({gridline.first, gridline.second});
-            if ((x % 10)-2 == 0)
+            if ((x % 10) - 2 == 0)
             {
                 width = 4;
                 color = ImColor(gridcolor.Value.x, gridcolor.Value.y, gridcolor.Value.z, 0.7f);
@@ -1791,7 +1824,7 @@ void render_script_options(Script *script)
 {
     for (auto &option : script->options)
     {
-        if(int *val = std::get_if<int>(&option.second.value))
+        if (int *val = std::get_if<int>(&option.second.value))
         {
             int min = std::get<int>(option.second.min);
             int max = std::get<int>(option.second.max);
@@ -1827,14 +1860,10 @@ void render_messages(Script *script)
     for (auto message : script->messages)
     {
         auto now = std::chrono::system_clock::now();
-        if(now - 5s > message.second)
+        if (now - 5s > message.second)
             continue;
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.second).count() / 5000.0f;
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), script->file.data());
-        ImGui::SameLine();
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), ":");
-        ImGui::SameLine();
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), message.first.data());
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->meta.name.data(), message.first.data());
     }
     ImGui::PopFont();
     ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
@@ -1948,7 +1977,7 @@ void render_clickhandler()
             }
             g_held_id = get_entity_at(g_x, g_y, true, 1, mask);
             g_held_entity = entity_ptr(g_held_id);
-            if(g_held_entity)
+            if (g_held_entity)
                 g_held_flags = g_held_entity->flags;
             if (!lock_entity)
                 g_last_id = g_held_id;
@@ -1985,7 +2014,7 @@ void render_clickhandler()
         {
             throw_held = false;
             io.MouseDrawCursor = true;
-            if (g_held_entity) 
+            if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
@@ -2183,9 +2212,12 @@ void render_debug()
         "%08X",
         ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
     ImGui::PopItemWidth();
+}
+
+void render_scripts()
+{
     ImGui::PushItemWidth(-1);
-    ImGui::Text("Scripting playground:");
-    if(ImGui::Button("Load overlunky.lua"))
+    if (ImGui::Button("Load overlunky.lua"))
     {
         load_script("overlunky.lua");
     }
@@ -2194,30 +2226,45 @@ void render_debug()
         Script *script = new Script("function on_screen() message('Hello from new script') end", "foobar.lua");
         g_scripts.push_back(script);
     }
-    int num = 0;
-    for (auto script : g_scripts)
+    for (int i = 0; i < g_scripts.size();)
     {
-        ImGui::PushID(num);
-        ImGui::Text(script->file.data());
-        ImGui::SameLine();
-        if (script->enabled && ImGui::Button("Disable##DisableScript"))
+        ImGui::PushID(i);
+        Script *script = g_scripts[i];
+        if(ImGui::CollapsingHeader(script->meta.file.data(), ImGuiTreeNodeFlags_DefaultOpen))
         {
-            script->enabled = false;
+            ImGui::Text("%s %s by %s", script->meta.name.data(), script->meta.version.data(), script->meta.author.data());
+            ImGui::TextWrapped(script->meta.description.data());
+            if (script->enabled && ImGui::Button("Disable##DisableScript"))
+            {
+                script->enabled = false;
+            }
+            else if (!script->enabled && ImGui::Button("Enable##EnableScript"))
+            {
+                script->enabled = true;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Unload##UnloadScript"))
+            {
+                g_scripts.erase(g_scripts.begin() + i);
+            }
+            else
+            {
+                ++i;
+            }
+            ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+            render_script_options(script);
+            ImGui::PopItemWidth();
+            if (ImGui::InputTextMultiline("##LuaScript", script->code, sizeof(script->code), {-1, 300}))
+            {
+                script->changed = true;
+            }
+            InputString("##LuaResult", &script->result, ImGuiInputTextFlags_ReadOnly);
         }
-        else if (!script->enabled && ImGui::Button("Enable##EnableScript"))
+        else
         {
-            script->enabled = true;
+            ++i;
         }
-        if(ImGui::InputTextMultiline("##LuaScript", script->code, sizeof(script->code), {-1, 300}))
-        {
-            script->changed = true;
-        }
-        InputString("##LuaResult", &script->result, ImGuiInputTextFlags_ReadOnly);
-        ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-        render_script_options(script);
-        ImGui::PopItemWidth();
         ImGui::PopID();
-        ++num;
     }
     ImGui::PopItemWidth();
 }
@@ -2949,6 +2996,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_options"] = "Options (" + key_string(keys["tool_options"]) + ")";
         windows["tool_debug"] = "Debug (" + key_string(keys["tool_debug"]) + ")";
         windows["tool_style"] = "Style (" + key_string(keys["tool_style"]) + ")";
+        windows["tool_script"] = "Scripts (" + key_string(keys["tool_script"]) + ")";
         windows["entities"] = "##Entities";
     }
 
@@ -3090,10 +3138,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::End();
         }
 
+        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
+        ImGui::Begin(windows["tool_script"].c_str());
+        render_scripts();
+        ImGui::End();
+
         if (show_debug)
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
             ImGui::Begin(windows["tool_debug"].c_str(), &show_debug);
             render_debug();
             ImGui::End();
@@ -3108,6 +3162,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
                 {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2});
             ImGui::End();
         }
+
     }
 
     if (show_app_metrics)

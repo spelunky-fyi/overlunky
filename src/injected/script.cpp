@@ -7,12 +7,18 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
 
-Script::Script(std::string script, std::string file) : file(file)
+Script::Script(std::string script, std::string file)
 {
     strcpy(code, script.data());
+    meta.file = file;
+
     g_state = (struct StateMemory *)get_state_ptr();
     g_items = list_entities();
+    g_players = get_players();
+
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
+
+    lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
     lua["message"] = [this](std::string message)
     {
         messages.push_back({message, std::chrono::system_clock::now()});
@@ -31,6 +37,7 @@ Script::Script(std::string script, std::string file) : file(file)
         };
         callbacks.push_back(luaCb);
     };
+    lua["meta"] = lua.create_named_table("meta");
     lua["options"] = lua.create_named_table("options");
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max)
     {
@@ -41,8 +48,6 @@ Script::Script(std::string script, std::string file) : file(file)
         options[name] = {desc, value, 0, 0};
         lua["options"][name] = value;
     };
-    g_players = get_players();
-    lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
     lua["spawn_entity"] = spawn_entity_abs;
     lua["spawn_door"] = spawn_door_abs;
     lua["spawn_backdoor"] = spawn_backdoor_abs;
@@ -323,6 +328,15 @@ bool Script::run()
     }
     try
     {
+        sol::optional<std::string> meta_name = lua["meta"]["name"];
+        sol::optional<std::string> meta_version = lua["meta"]["version"];
+        sol::optional<std::string> meta_description = lua["meta"]["description"];
+        sol::optional<std::string> meta_author = lua["meta"]["author"];
+        meta.name = meta_name.value_or(meta.file);
+        meta.version = meta_version.value_or("0.1");
+        meta.description = meta_description.value_or(meta.file);
+        meta.author = meta_author.value_or("You");
+
         sol::optional<sol::function> on_frame = lua["on_frame"];
         sol::optional<sol::function> on_camp = lua["on_camp"];
         sol::optional<sol::function> on_level = lua["on_level"];
@@ -423,12 +437,4 @@ std::tuple<float, float, int> lua_get_position(uint32_t id)
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
     return {0.0f, 0.0f, 0};
-}
-
-std::string Script::get_name()
-{
-    sol::optional<std::string> name = lua["name"];
-    if (name)
-        return lua["name"];
-    return "";
 }
