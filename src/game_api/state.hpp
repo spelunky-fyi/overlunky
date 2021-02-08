@@ -106,6 +106,10 @@ struct State {
 
     void set_pause(uint8_t p) { write_mem(ptr() + 0x32, to_le_bytes(p)); }
 
+    uint32_t get_frame_count() {
+        return read_u32(ptr() - 0xd0);
+    }
+
     Entity *find(uint32_t id) {
         // Find item by unique id
         // TODO: rename::find

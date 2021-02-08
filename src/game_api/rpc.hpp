@@ -46,3 +46,4 @@ bool entity_has_item_uid(uint32_t id, uint32_t item);
 bool entity_has_item_type(uint32_t id, uint32_t type);
 void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
+uint32_t get_frame_count();

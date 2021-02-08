@@ -45,7 +45,7 @@ Script::Script(std::string script, std::string file)
     };
     lua["set_global_timeout"] = [this](sol::function cb, int frames)
     {
-        int now = g_state->time_level;
+        int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         global_timers[cbcount] = luaCb;
         return cbcount++;
@@ -105,6 +105,7 @@ Script::Script(std::string script, std::string file)
     lua["entity_has_item_type"] = entity_has_item_type;
     lua["lock_door_at"] = lock_door_at;
     lua["unlock_door_at"] = unlock_door_at;
+    lua["get_frame_count"] = get_frame_count;
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",
@@ -419,8 +420,6 @@ bool Script::run()
         if (g_state->screen != state.screen || (!g_players.empty() && state.player != g_players.at(0)))
         {
             level_timers.clear();
-            if (g_state->screen < 12)
-                global_timers.clear();
             if (on_screen)
                 on_screen.value()();
         }
@@ -437,7 +436,6 @@ bool Script::run()
         {
             if(g_state->level_count == 0)
             {
-                global_timers.clear();
                 if (on_start)
                     on_start.value()();
             }
@@ -478,7 +476,7 @@ bool Script::run()
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
-            auto now = g_state->time_total; // TODO: maybe this needs global frame counter instead
+            auto now = get_frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now >= cb->lastRan + cb->interval)
@@ -508,7 +506,7 @@ bool Script::run()
 
         for (auto it = callbacks.begin(); it != callbacks.end();)
         {
-            auto now = g_state->time_total;
+            auto now = get_frame_count();
             if (auto cb = std::get_if<ScreenCallback>(&it->second))
             {
                 if (g_state->screen == cb->screen && g_state->screen != state.screen) // game screens
