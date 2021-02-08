@@ -88,6 +88,7 @@ std::map<std::string, int> keys{
     {"reset_windows", 0x352},
     {"reset_windows_vertical", 0x356},
     {"tabbed_interface", 0x354},
+    {"detach_tab", 0x344},
     {"save_settings", 0x353},
     {"load_settings", 0x34c},
     {"spawn_entity", 0x10d},
@@ -163,6 +164,7 @@ std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<std::string> tab_order;
+std::vector<std::string> detached_tabs;
 bool tab_opened[12] = {true, true, true, true, true, true, true, false, false, false, false, false};
 std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
@@ -459,6 +461,7 @@ void set_colors()
     style.FrameRounding = 0;
     style.PopupRounding = 0;
     style.GrabRounding = 0;
+    style.TabRounding = 0;
     style.WindowBorderSize = 0;
     style.FrameBorderSize = 0;
     style.PopupBorderSize = 0;
@@ -729,9 +732,16 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
     }
 }
 
+bool detached(std::string window)
+{
+    if(std::find(detached_tabs.begin(), detached_tabs.end(), window) != detached_tabs.end())
+        return true;
+    return false;
+}
+
 bool toggle(std::string tool)
 {
-    if (!options["tabbed_interface"])
+    if (!options["tabbed_interface"] || detached(tool))
     {
         const char *name = windows[tool].c_str();
         ImGuiContext &g = *GImGui;
@@ -773,7 +783,7 @@ bool active(std::string window)
 {
     ImGuiContext &g = *GImGui;
     ImGuiWindow *current = g.NavWindow;
-    if (!options["tabbed_interface"])
+    if (!options["tabbed_interface"] || detached(window))
     {
         return current == ImGui::FindWindowByName(windows[window].c_str());
     }
@@ -783,12 +793,25 @@ bool active(std::string window)
     }
 }
 
+void detach(std::string window)
+{
+    if(std::find(detached_tabs.begin(), detached_tabs.end(), window) == detached_tabs.end())
+        detached_tabs.push_back(window);
+}
+
 bool visible(std::string window)
 {
-    ImGuiWindow *win = ImGui::FindWindowByName(windows[window].c_str());
-    if (win != NULL)
-        return !win->Collapsed;
-    return false;
+    if (!options["tabbed_interface"] || detached(window))
+    {
+        ImGuiWindow *win = ImGui::FindWindowByName(windows[window].c_str());
+        if (win != NULL)
+            return !win->Collapsed;
+        return false;
+    }
+    else
+    {
+        return active_tab == window;
+    }
 }
 
 void escape()
@@ -1383,6 +1406,10 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
             options["stack_horizontally"] = false;
             options["stack_vertically"] = false;
         }
+    }
+    else if (pressed("detach_tab", wParam))
+    {
+        detach(active_tab);
     }
     else if (pressed("save_settings", wParam))
     {
@@ -3264,7 +3291,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
                         activate_tab = "";
                         active_tab = "";
                     }
-                    if (ImGui::BeginTabItem(windows[tab].data(), &tab_opened[tabnum], flags))
+                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab].data(), &tab_opened[tabnum], flags))
                     {
                         active_tab = tab;
                         render_tool(tab);
@@ -3292,6 +3319,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
                 }
             }
             ImGui::End();
+
+            for (auto tab : detached_tabs)
+            {
+                ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
+                ImGui::Begin(windows[tab].data());
+                render_tool(tab);
+                ImGui::SetWindowPos(
+                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, ImGuiCond_Once);
+                ImGui::End();
+            }
         }
         else if (options["stack_vertically"])
         {
