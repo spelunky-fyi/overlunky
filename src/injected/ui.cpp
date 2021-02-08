@@ -14,13 +14,13 @@
 #include <array>
 #include <chrono>
 #include <codecvt>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <locale>
 #include <map>
 #include <string>
 #include <toml.hpp>
-#include <filesystem>
 
 #include "entity.hpp"
 #include "logger.h"
@@ -87,6 +87,7 @@ std::map<std::string, int> keys{
     {"tool_script", 0x77},
     {"reset_windows", 0x352},
     {"reset_windows_vertical", 0x356},
+    {"tabbed_interface", 0x354},
     {"save_settings", 0x353},
     {"load_settings", 0x34c},
     {"spawn_entity", 0x10d},
@@ -161,6 +162,8 @@ uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
+std::vector<std::string> tab_order;
+bool tab_opened[12] = {true, true, true, true, true, true, true, false, false, false, false, false};
 std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
@@ -173,6 +176,7 @@ StateMemory *g_state = 0;
 std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
+std::string active_tab = "", activate_tab = "";
 
 static char text[500];
 const char *themes[] = {
@@ -367,7 +371,7 @@ const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a 
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
 std::map<std::string, bool> options = {
-    {"mouse_control", false},
+    {"mouse_control", true},
     {"god_mode", false},
     {"noclip", false},
     {"snap_to_grid", false},
@@ -377,7 +381,8 @@ std::map<std::string, bool> options = {
     {"disable_input", true},
     {"disable_input_alt", false},
     {"draw_grid", false},
-    {"draw_hitboxes", false}};
+    {"draw_hitboxes", false},
+    {"tabbed_interface", true}};
 
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
@@ -441,6 +446,14 @@ void set_colors()
     style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
     style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
     style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0, 0, 0, 0);
+    style.Colors[ImGuiCol_Separator] = ImVec4(col_main.x, col_main.y, col_main.z, 0.50f);
+    style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    style.Colors[ImGuiCol_SeparatorActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_Tab] = ImVec4(col_back.x, col_back.y, col_back.z, 0.86f);
+    style.Colors[ImGuiCol_TabHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    style.Colors[ImGuiCol_TabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
+    style.Colors[ImGuiCol_TabUnfocused] = ImVec4(col_area.x, col_area.y, col_area.z, 0.60f);
+    style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(col_area.x, col_area.y, col_area.z, 0.80f);
     style.WindowPadding = ImVec2(4, 4);
     style.WindowRounding = 0;
     style.FrameRounding = 0;
@@ -585,6 +598,17 @@ void save_config(std::string file)
     if (!saved_entities.empty())
         writeData << std::endl;
     writeData << "]" << std::endl;
+
+    writeData << "tabs = [";
+    for (int i = 0; i < tab_order.size(); i++)
+    {
+        writeData << std::endl << "  \"" << tab_order[i] << "\"";
+        if (i < tab_order.size() - 1)
+            writeData << ",";
+    }
+    if (!tab_order.empty())
+        writeData << std::endl;
+    writeData << "]" << std::endl;
     writeData.close();
 }
 
@@ -637,9 +661,22 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0);
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
+    tab_order = toml::find_or<std::vector<std::string>>(
+        opts,
+        "tabs",
+        {"tool_entity",
+         "tool_door",
+         "tool_camera",
+         "tool_entity_properties",
+         "tool_game_properties",
+         "tool_script",
+         "tool_options",
+         "tool_style",
+         "tool_debug"});
     godmode(options["god_mode"]);
     save_config(file);
 }
+
 HWND FindTopWindow(DWORD pid)
 {
     std::pair<HWND, DWORD> params = {0, pid};
@@ -694,32 +731,56 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
 
 bool toggle(std::string tool)
 {
-    const char *name = windows[tool].c_str();
-    ImGuiContext &g = *GImGui;
-    ImGuiWindow *current = g.NavWindow;
-    ImGuiWindow *win = ImGui::FindWindowByName(name);
-    if (win != NULL)
+    if (!options["tabbed_interface"])
     {
-        if (win->Collapsed || win != current)
+        const char *name = windows[tool].c_str();
+        ImGuiContext &g = *GImGui;
+        ImGuiWindow *current = g.NavWindow;
+        ImGuiWindow *win = ImGui::FindWindowByName(name);
+        if (win != NULL)
         {
-            win->Collapsed = false;
-            ImGui::FocusWindow(win);
-            return true;
+            if (win->Collapsed || win != current)
+            {
+                win->Collapsed = false;
+                ImGui::FocusWindow(win);
+                return true;
+            }
+            else
+            {
+                win->Collapsed = true;
+                ImGui::FocusWindow(NULL);
+            }
         }
-        else
-        {
-            win->Collapsed = true;
-            ImGui::FocusWindow(NULL);
-        }
+        return false;
     }
-    return false;
+    else
+    {
+        int tabnum = 0;
+        for (auto tab : tab_order)
+        {
+            if (tab_order.at(tabnum) == tool)
+            {
+                tab_opened[tabnum] = true;
+                activate_tab = tool;
+            }
+            ++tabnum;
+        }
+        return true;
+    }
 }
 
 bool active(std::string window)
 {
     ImGuiContext &g = *GImGui;
     ImGuiWindow *current = g.NavWindow;
-    return current == ImGui::FindWindowByName(windows[window].c_str());
+    if (!options["tabbed_interface"])
+    {
+        return current == ImGui::FindWindowByName(windows[window].c_str());
+    }
+    else
+    {
+        return current == ImGui::FindWindowByName("Overlunky") && active_tab == window;
+    }
 }
 
 bool visible(std::string window)
@@ -1040,7 +1101,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
         return false;
     }
 
-    if(ImGui::GetIO().WantCaptureKeyboard && active("tool_script"))
+    if (ImGui::GetIO().WantCaptureKeyboard && active("tool_script"))
         return false;
 
     int repeat = (lParam >> 30) & 1U;
@@ -1287,7 +1348,10 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     }
     else if (pressed("tool_debug", wParam))
     {
-        show_debug = !show_debug;
+        if(!options["tabbed_interface"])
+            show_debug = !show_debug;
+        else
+            toggle("tool_debug");
     }
     else if (pressed("tool_script", wParam))
     {
@@ -1297,13 +1361,28 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
         options["stack_horizontally"] = !options["stack_horizontally"];
         if (options["stack_horizontally"])
+        {
             options["stack_vertically"] = false;
+            options["tabbed_interface"] = false;
+        }
     }
     else if (pressed("reset_windows_vertical", wParam))
     {
         options["stack_vertically"] = !options["stack_vertically"];
         if (options["stack_vertically"])
+        {
             options["stack_horizontally"] = false;
+            options["tabbed_interface"] = false;
+        }
+    }
+    else if (pressed("tabbed_interface", wParam))
+    {
+        options["tabbed_interface"] = !options["tabbed_interface"];
+        if (options["tabbed_interface"])
+        {
+            options["stack_horizontally"] = false;
+            options["stack_vertically"] = false;
+        }
     }
     else if (pressed("save_settings", wParam))
     {
@@ -1318,7 +1397,10 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     }
     else if (pressed("tool_style", wParam))
     {
-        change_colors = !change_colors;
+        if(!options["tabbed_interface"])
+            change_colors = !change_colors;
+        else
+            toggle("tool_style");
     }
     else if (pressed("tool_metrics", wParam))
     {
@@ -1897,9 +1979,7 @@ void render_messages()
     ImGuiIO &io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
 
-    std::sort(queue.begin(), queue.end(), [](Message a, Message b) {
-        return std::get<2>(a) < std::get<2>(b);
-    });
+    std::sort(queue.begin(), queue.end(), [](Message a, Message b) { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
@@ -1909,18 +1989,18 @@ void render_messages()
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
-
     const float fontsize = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
-    int logsize = std::min(30, (int)((io.DisplaySize.y-300)/fontsize));
+    int logsize = std::min(30, (int)((io.DisplaySize.y - 300) / fontsize));
     if (queue.size() > logsize)
     {
         std::vector<Message> newqueue(queue.end() - logsize, queue.end());
         queue = newqueue;
     }
 
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size()*fontsize - 20});
-    for (auto message : queue) {
+    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * fontsize - 20});
+    for (auto message : queue)
+    {
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 10000.0f;
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
     }
@@ -2239,10 +2319,17 @@ void render_options()
     if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
     {
         options["stack_vertically"] = false;
+        options["tabbed_interface"] = false;
     }
     if (ImGui::Checkbox("Stack windows vertically", &options["stack_vertically"]))
     {
         options["stack_horizontally"] = false;
+        options["tabbed_interface"] = false;
+    }
+    if (ImGui::Checkbox("Tabbed single window", &options["tabbed_interface"]))
+    {
+        options["stack_horizontally"] = false;
+        options["stack_vertically"] = false;
     }
     ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
     ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
@@ -2277,7 +2364,7 @@ void refresh_script_files()
     g_script_files.clear();
     if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
-        for (const auto & file : std::filesystem::directory_iterator(scriptpath))
+        for (const auto &file : std::filesystem::directory_iterator(scriptpath))
         {
             g_script_files.push_back(file.path());
         }
@@ -2297,7 +2384,7 @@ void render_script_files()
         }
         ImGui::PopID();
     }
-    if(g_script_files.size() == 0)
+    if (g_script_files.size() == 0)
     {
         ImGui::TextWrapped("No scripts found. Put .lua files in Spelunky 2\\%s\\", scriptpath.data());
     }
@@ -2307,7 +2394,11 @@ void render_script_files()
     }
     if (ImGui::Button("Create new quick script"))
     {
-        Script *script = new Script("meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) end\nend, 60)", "Script");
+        Script *script = new Script(
+            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
+            "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
+            "end\nend, 60)",
+            "Script");
         g_scripts.push_back(script);
     }
     ImGui::PopID();
@@ -2322,7 +2413,7 @@ void render_scripts()
         Script *script = g_scripts[i];
         char name[255];
         sprintf(name, "%s (%s)", script->meta.name.data(), script->meta.file.data());
-        if(ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Text("%s %s by %s", script->meta.name.data(), script->meta.version.data(), script->meta.author.data());
             ImGui::TextWrapped(script->meta.description.data());
@@ -2358,7 +2449,7 @@ void render_scripts()
         }
         ImGui::PopID();
     }
-    if(ImGui::CollapsingHeader("Load new script##LoadScriptFile"))
+    if (ImGui::CollapsingHeader("Load new script##LoadScriptFile"))
     {
         render_script_files();
     }
@@ -2993,6 +3084,13 @@ void render_style_editor()
     set_colors();
 }
 
+void render_spawner()
+{
+    ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
+    render_input();
+    render_list();
+}
+
 void create_render_target()
 {
     ID3D11Texture2D *pBackBuffer;
@@ -3035,6 +3133,28 @@ bool process_resizing(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
         break;
     }
     return false;
+}
+
+void render_tool(std::string tool)
+{
+    if (tool == "tool_entity")
+        render_spawner();
+    else if (tool == "tool_door")
+        render_narnia();
+    else if (tool == "tool_camera")
+        render_camera();
+    else if (tool == "tool_entity_properties")
+        render_entity_props();
+    else if (tool == "tool_game_properties")
+        render_game_props();
+    else if (tool == "tool_script")
+        render_scripts();
+    else if (tool == "tool_options")
+        render_options();
+    else if (tool == "tool_style")
+        render_style_editor();
+    else if (tool == "tool_debug")
+        render_debug();
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags)
@@ -3085,16 +3205,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         load_config(cfgfile);
         refresh_script_files();
         set_colors();
-        windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
-        windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
+        windows["tool_entity"] = "Spawner (" + key_string(keys["tool_entity"]) + ")";
+        windows["tool_door"] = "Door (" + key_string(keys["tool_door"]) + ")";
         windows["tool_camera"] = "Camera (" + key_string(keys["tool_camera"]) + ")";
-        windows["tool_entity_properties"] = "Entity properties (" + key_string(keys["tool_entity_properties"]) + ")";
-        windows["tool_game_properties"] = "Game state (" + key_string(keys["tool_game_properties"]) + ")";
+        windows["tool_entity_properties"] = "Entity (" + key_string(keys["tool_entity_properties"]) + ")";
+        windows["tool_game_properties"] = "Game (" + key_string(keys["tool_game_properties"]) + ")";
         windows["tool_options"] = "Options (" + key_string(keys["tool_options"]) + ")";
         windows["tool_debug"] = "Debug (" + key_string(keys["tool_debug"]) + ")";
         windows["tool_style"] = "Style (" + key_string(keys["tool_style"]) + ")";
         windows["tool_script"] = "Scripts (" + key_string(keys["tool_script"]) + ")";
-        windows["entities"] = "##Entities";
     }
 
     ImGui_ImplDX11_NewFrame();
@@ -3114,10 +3233,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
-    /*for (auto script : g_scripts)
-    {
-        render_messages(script);
-    }*/
     render_messages();
     render_clickhandler();
 
@@ -3131,7 +3246,37 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     float toolwidth = 0.128 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
-        if (options["stack_vertically"])
+        if (options["tabbed_interface"])
+        {
+            ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
+            ImGui::Begin("Overlunky", NULL);
+            if (ImGui::BeginTabBar("##TabBar"))
+            {
+                ImGuiTabItemFlags flags = 0;
+                int tabnum = 0;
+                for (auto tab : tab_order)
+                {
+                    flags = 0;
+                    if (activate_tab == tab)
+                    {
+                        flags = ImGuiTabItemFlags_SetSelected;
+                        activate_tab = "";
+                        active_tab = "";
+                    }
+                    if (ImGui::BeginTabItem(windows[tab].data(), &tab_opened[tabnum], flags))
+                    {
+                        active_tab = tab;
+                        render_tool(tab);
+                        ImGui::EndTabItem();
+                    }
+                    ++tabnum;
+                }
+                ImGui::EndTabBar();
+            }
+            ImGui::End();
+        }
+        else if (options["stack_vertically"])
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_options"].c_str());
@@ -3159,9 +3304,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
             ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
             ImGui::Begin(windows["tool_entity"].c_str());
-            ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
-            render_input();
-            render_list();
+            render_spawner();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::SetWindowPos({0, 0}, win_condition);
@@ -3188,9 +3331,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
             ImGui::SetNextWindowPos({0, 0}, win_condition);
             ImGui::Begin(windows["tool_entity"].c_str());
-            ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
-            render_input();
-            render_list();
+            render_spawner();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
@@ -3234,15 +3375,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             lastwidth = ImGui::GetWindowWidth();
             lastheight = ImGui::GetWindowHeight();
             ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
+            ImGui::Begin(windows["tool_script"].c_str());
+            render_scripts();
+            ImGui::End();
         }
 
-        ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-        ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
-        ImGui::Begin(windows["tool_script"].c_str());
-        render_scripts();
-        ImGui::End();
-
-        if (show_debug)
+        if (show_debug && !options["tabbed_interface"])
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
@@ -3251,7 +3392,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::End();
         }
 
-        if (change_colors)
+        if (change_colors && !options["tabbed_interface"])
         {
             ImGui::Begin(windows["tool_style"].c_str(), &change_colors);
             ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
@@ -3260,7 +3401,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
                 {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2});
             ImGui::End();
         }
-
     }
 
     if (show_app_metrics)
