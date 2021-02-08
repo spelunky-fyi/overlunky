@@ -67,6 +67,8 @@ std::vector<Movable *> lua_get_players();
 Movable *lua_get_entity(uint32_t id);
 std::tuple<float, float, int> lua_get_position(uint32_t id);
 
+using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
+
 class Script
 {
   public:
@@ -81,8 +83,9 @@ class Script
 
     std::map<std::string, ScriptOption> options;
     std::deque<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> messages;
-    std::map<int, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> level_callbacks;
-    std::map<int, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> global_callbacks;
+    std::map<int, Callback> level_timers;
+    std::map<int, Callback> global_timers;
+    std::map<int, Callback> callbacks;
     std::vector<int> clear_callbacks;
 
     StateMemory *g_state = nullptr;

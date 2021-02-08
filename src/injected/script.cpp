@@ -26,20 +26,33 @@ Script::Script(std::string script, std::string file)
     };
     lua["set_interval"] = [this](sol::function cb, int frames)
     {
-        IntervalCallback luaCb = IntervalCallback{cb, frames, -1};
-        level_callbacks[cbcount] = luaCb;
+        auto luaCb = IntervalCallback{cb, frames, -1};
+        level_timers[cbcount] = luaCb;
         return cbcount++;
     };
     lua["set_timeout"] = [this](sol::function cb, int frames)
     {
         int now = g_state->time_level;
-        ScreenCallback luaCb = ScreenCallback{cb, now + frames};
-        level_callbacks[cbcount] = luaCb;
+        auto luaCb = TimeoutCallback{cb, now + frames};
+        level_timers[cbcount] = luaCb;
+        return cbcount++;
+    };
+    lua["set_global_interval"] = [this](sol::function cb, int frames)
+    {
+        auto luaCb = IntervalCallback{cb, frames, -1};
+        global_timers[cbcount] = luaCb;
+        return cbcount++;
+    };
+    lua["set_global_timeout"] = [this](sol::function cb, int frames)
+    {
+        int now = g_state->time_level;
+        auto luaCb = TimeoutCallback{cb, now + frames};
+        global_timers[cbcount] = luaCb;
         return cbcount++;
     };
     lua["set_callback"] = [this](sol::function cb, int screen) {
-        ScreenCallback luaCb = ScreenCallback{cb, screen, -1};
-        global_callbacks[cbcount] = luaCb;
+        auto luaCb = ScreenCallback{cb, screen, -1};
+        callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     lua["clear_callback"] = [this](int id) { clear_callbacks.push_back(id); };
@@ -344,7 +357,9 @@ Script::Script(std::string script, std::string file)
         "FRAME",
         100,
         "SCREEN",
-        101);
+        101,
+        "START",
+        102);
 }
 
 bool Script::run()
@@ -359,11 +374,13 @@ bool Script::run()
         {
             // Clear all callbacks on script reload to avoid running them
             // multiple times.
-            level_callbacks.clear();
-            global_callbacks.clear();
+            level_timers.clear();
+            global_timers.clear();
+            callbacks.clear();
             options.clear();
             lua["on_frame"] = sol::lua_nil;
             lua["on_camp"] = sol::lua_nil;
+            lua["on_start"] = sol::lua_nil;
             lua["on_level"] = sol::lua_nil;
             lua["on_transition"] = sol::lua_nil;
             lua["on_death"] = sol::lua_nil;
@@ -380,7 +397,6 @@ bool Script::run()
     }
     try
     {
-        
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
@@ -393,6 +409,7 @@ bool Script::run()
         sol::optional<sol::function> on_frame = lua["on_frame"];
         sol::optional<sol::function> on_camp = lua["on_camp"];
         sol::optional<sol::function> on_level = lua["on_level"];
+        sol::optional<sol::function> on_start = lua["on_start"];
         sol::optional<sol::function> on_transition = lua["on_transition"];
         sol::optional<sol::function> on_death = lua["on_death"];
         sol::optional<sol::function> on_win = lua["on_win"];
@@ -401,7 +418,9 @@ bool Script::run()
         lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
         if (g_state->screen != state.screen || (!g_players.empty() && state.player != g_players.at(0)))
         {
-            level_callbacks.clear();
+            level_timers.clear();
+            if (g_state->screen < 12)
+                global_timers.clear();
             if (on_screen)
                 on_screen.value()();
         }
@@ -416,6 +435,12 @@ bool Script::run()
         }
         if (g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
         {
+            if(g_state->level_count == 0)
+            {
+                global_timers.clear();
+                if (on_start)
+                    on_start.value()();
+            }
             if (on_level)
                 on_level.value()();
         }
@@ -437,17 +462,21 @@ bool Script::run()
 
         for (auto id : clear_callbacks)
         {
-            auto it = level_callbacks.find(id);
-            if (it != level_callbacks.end())
-                level_callbacks.erase(id);
+            auto it = level_timers.find(id);
+            if (it != level_timers.end())
+                level_timers.erase(id);
 
-            it = global_callbacks.find(id);
-            if (it != global_callbacks.end())
-                global_callbacks.erase(id);
+            auto it2 = global_timers.find(id);
+            if (it2 != global_timers.end())
+                global_timers.erase(id);
+
+            auto it3 = callbacks.find(id);
+            if (it3 != callbacks.end())
+                callbacks.erase(id);
         }
         clear_callbacks.clear();
 
-        for (auto it = global_callbacks.begin(); it != global_callbacks.end();)
+        for (auto it = global_timers.begin(); it != global_timers.end();)
         {
             auto now = g_state->time_total; // TODO: maybe this needs global frame counter instead
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
@@ -464,21 +493,30 @@ bool Script::run()
                 if (now >= cb->timeout)
                 {
                     cb->func();
-                    it = level_callbacks.erase(it);
+                    it = global_timers.erase(it);
                 }
                 else
                 {
                     ++it;
                 }
             }
-            else if (auto cb = std::get_if<ScreenCallback>(&it->second))
+            else
+            {
+                ++it;
+            }
+        }
+
+        for (auto it = callbacks.begin(); it != callbacks.end();)
+        {
+            auto now = g_state->time_total;
+            if (auto cb = std::get_if<ScreenCallback>(&it->second))
             {
                 if (g_state->screen == cb->screen && g_state->screen != state.screen) // game screens
                 {
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0)) // run ON.LEVEL on reset too
+                else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0)) // run ON.LEVEL on instant restart too
                 {
                     cb->func();
                     cb->lastRan = now;
@@ -493,6 +531,11 @@ bool Script::run()
                     cb->func();
                     cb->lastRan = now;
                 }
+                else if (cb->screen == 102 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() && state.player != g_players.at(0)) // ON.START
+                {
+                    cb->func();
+                    cb->lastRan = now;
+                }
                 ++it;
             }
             else
@@ -501,7 +544,7 @@ bool Script::run()
             }
         }
 
-        for (auto it = level_callbacks.begin(); it != level_callbacks.end();)
+        for (auto it = level_timers.begin(); it != level_timers.end();)
         {
             auto now = g_state->time_level;
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
@@ -518,7 +561,7 @@ bool Script::run()
                 if (now >= cb->timeout)
                 {
                     cb->func();
-                    it = level_callbacks.erase(it);
+                    it = level_timers.erase(it);
                 }
                 else
                 {
