@@ -2326,7 +2326,7 @@ void render_options()
         options["stack_horizontally"] = false;
         options["tabbed_interface"] = false;
     }
-    if (ImGui::Checkbox("Tabbed single window", &options["tabbed_interface"]))
+    if (ImGui::Checkbox("Single tabbed window", &options["tabbed_interface"]))
     {
         options["stack_horizontally"] = false;
         options["stack_vertically"] = false;
