@@ -3274,6 +3274,23 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
                 }
                 ImGui::EndTabBar();
             }
+            int tabnum = 0;
+            for (int i = 0; i < sizeof(tab_opened); ++i)
+            {
+                if (tab_opened[i])
+                    ++tabnum;
+            }
+            if (tabnum == 0)
+            {
+                ImGui::TextWrapped("Looks like you closed all your tabs. You can use the F-keys to open closed tabs or click here:");
+                if(ImGui::Button("Restore default tabs"))
+                {
+                    for (int i = 0; i < 8; ++i)
+                    {
+                        tab_opened[i] = true;
+                    }
+                }
+            }
             ImGui::End();
         }
         else if (options["stack_vertically"])
