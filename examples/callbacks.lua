@@ -8,6 +8,7 @@ frame2 = 1
 id = -1
 id2 = -1
 id3 = -1
+count = 0
 
 set_callback(function() message("ON.CAMP") end, ON.CAMP)
 set_callback(function()
@@ -36,8 +37,13 @@ end, ON.FRAME)
 set_callback(function()
   id = set_global_interval(function()
     message("global interval "..tostring(id))
+    count = count + 1
+    if count > 5 then
+      message("this has run for long enough!")
+      clear_callback(id)
+    end
   end, 180)
-end, ON.START)
+end, ON.CAMP)
 set_callback(function()
   id = set_interval(function()
     message("level interval "..tostring(id2))
@@ -52,12 +58,7 @@ function on_level()
   message("on_level")
   set_timeout(timeout, 60)
 end
-function on_start()
-  message("on_start")
-  set_global_timeout(function()
-    message("hello it's me global_timeout from the past")
-  end, 1200)
-end
+function on_start() message("on_start") end
 function on_transition() message("on_transition") end
 function on_death() message("on_death") end
 function on_win() message("on_win") end
@@ -68,3 +69,7 @@ function on_frame()
     message("on_frame "..tostring(state.time_total))
   end
 end
+
+set_global_timeout(function()
+  message("you loaded the script two seconds ago didn't you")
+end, 120)
