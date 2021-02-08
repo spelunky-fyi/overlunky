@@ -19,9 +19,10 @@ Script::Script(std::string script, std::string file)
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
 
     lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
-    lua["message"] = [this](std::string message)
-    {
+    lua["message"] = [this](std::string message) {
         messages.push_back({message, std::chrono::system_clock::now()});
+        if(messages.size() > 20)
+            messages.pop_front();
     };
     lua["set_interval"] = [this](sol::function cb, int frames)
     {
@@ -32,26 +33,16 @@ Script::Script(std::string script, std::string file)
     lua["set_timeout"] = [this](sol::function cb, int frames)
     {
         int now = g_state->time_level;
-        auto luaCb = TimeoutCallback{
-            cb,
-            now + frames,
-        };
+        auto luaCb = TimeoutCallback{cb, now + frames};
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     lua["set_callback"] = [this](sol::function cb, int screen) {
-        auto luaCb = ScreenCallback{
-            cb,
-            screen
-        };
+        auto luaCb = ScreenCallback{cb, screen, -1};
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
-    lua["clear_callback"] = [this](size_t id) {
-        auto it = callbacks.find(id);
-        if (it != callbacks.end())
-            callbacks.erase(it);
-    };
+    lua["clear_callback"] = [this](int id) { clear_callbacks.push_back(id); };
     lua["meta"] = lua.create_named_table("meta");
     lua["options"] = lua.create_named_table("options");
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max)
@@ -349,8 +340,9 @@ Script::Script(std::string script, std::string file)
         "CONSTELLATION",
         19,
         "RECAP",
-        20);
-    changed = true;
+        20,
+        "FRAME",
+        100);
 }
 
 bool Script::run()
@@ -392,9 +384,9 @@ bool Script::run()
         sol::optional<std::string> meta_description = lua["meta"]["description"];
         sol::optional<std::string> meta_author = lua["meta"]["author"];
         meta.name = meta_name.value_or(meta.file);
-        meta.version = meta_version.value_or("0.1");
-        meta.description = meta_description.value_or(meta.file);
-        meta.author = meta_author.value_or("You");
+        meta.version = meta_version.value_or("");
+        meta.description = meta_description.value_or("");
+        meta.author = meta_author.value_or("Anonymous");
 
         sol::optional<sol::function> on_frame = lua["on_frame"];
         sol::optional<sol::function> on_camp = lua["on_camp"];
@@ -441,6 +433,14 @@ bool Script::run()
                 on_win.value()();
         }
 
+        for (auto id : clear_callbacks)
+        {
+            auto it = callbacks.find(id);
+            if (it != callbacks.end())
+                callbacks.erase(id);
+        }
+        clear_callbacks.clear();
+
         for (auto it = callbacks.begin(); it != callbacks.end();)
         {
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
@@ -466,13 +466,15 @@ bool Script::run()
             }
             else if (auto cb = std::get_if<ScreenCallback>(&it->second))
             {
-                if (g_state->screen == cb->screen && g_state->screen != state.screen)
+                if (g_state->screen == cb->screen && cb->lastRan < now) // game screens
                 {
                     cb->func();
+                    cb->lastRan = now;
                 }
-                else if (g_state->screen == 12 && cb->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
+                else if (cb->screen == 100) // ON.FRAME
                 {
                     cb->func();
+                    cb->lastRan = now;
                 }
                 ++it;
             }

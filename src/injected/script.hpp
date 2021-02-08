@@ -7,6 +7,7 @@
 #include <locale>
 #include <map>
 #include <string>
+#include <deque>
 
 #include "entity.hpp"
 #include "logger.h"
@@ -33,6 +34,7 @@ struct ScreenCallback
 {
     sol::function func;
     int screen;
+    int lastRan;
 };
 
 struct ScriptState
@@ -70,14 +72,15 @@ class Script
     char code[204800];
     std::string result = "";
     ScriptState state = {nullptr, 0, 0};
-    bool changed = false;
+    bool changed = true;
     bool enabled = true;
     ScriptMeta meta = {"", "", "", "", ""};
     int cbcount = 0;
 
     std::map<std::string, ScriptOption> options;
-    std::map<size_t, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> callbacks;
-    std::vector<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> messages;
+    std::deque<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> messages;
+    std::map<int, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> callbacks;
+    std::vector<int> clear_callbacks;
 
     StateMemory *g_state = nullptr;
     std::vector<EntityItem> g_items;

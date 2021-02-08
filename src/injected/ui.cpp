@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <toml.hpp>
+#include <filesystem>
 
 #include "entity.hpp"
 #include "logger.h"
@@ -28,6 +29,7 @@
 #include "state.hpp"
 
 std::vector<Script *> g_scripts;
+std::vector<std::filesystem::path> g_script_files;
 
 const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
@@ -350,6 +352,7 @@ const char *direction_flags[] = {"Left", "Down", "Up", "Right"};
 
 const char *inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
+const std::string scriptpath = "Overlunky\\Scripts";
 
 const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
@@ -455,6 +458,9 @@ void load_script(std::string file)
     if (!data.fail())
     {
         buf << data.rdbuf();
+        size_t slash = file.find_last_of("/\\");
+        if (slash != std::string::npos)
+            file = file.substr(slash + 1);
         Script *script = new Script(buf.str(), file);
         g_scripts.push_back(script);
         data.close();
@@ -1847,6 +1853,7 @@ void render_script_options(Script *script)
 
 void render_messages(Script *script)
 {
+    auto now = std::chrono::system_clock::now();
     ImGuiIO &io = ImGui::GetIO();
     ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
@@ -1859,14 +1866,62 @@ void render_messages(Script *script)
     ImGui::PushFont(bigfont);
     for (auto message : script->messages)
     {
-        auto now = std::chrono::system_clock::now();
-        if (now - 5s > message.second)
+        if (now - 10s > message.second)
             continue;
-        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.second).count() / 5000.0f;
+        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.second).count() / 10000.0f;
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->meta.name.data(), message.first.data());
     }
     ImGui::PopFont();
     ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
+    ImGui::End();
+}
+
+void render_messages()
+{
+    using namespace std::chrono_literals;
+    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>>;
+    auto now = std::chrono::system_clock::now();
+    std::vector<Message> queue;
+    for (auto script : g_scripts)
+    {
+        for (auto message : script->messages)
+        {
+            if (now - 10s > message.second)
+                continue;
+            queue.push_back(std::make_tuple(script->meta.name, message.first, message.second));
+        }
+    }
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui::PushFont(bigfont);
+
+    std::sort(queue.begin(), queue.end(), [](Message a, Message b) {
+        return std::get<2>(a) < std::get<2>(b);
+    });
+
+    ImGui::SetNextWindowSize({-1, -1});
+    ImGui::Begin(
+        "Messages",
+        NULL,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+
+
+    const float fontsize = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
+
+    int logsize = std::min(30, (int)((io.DisplaySize.y-300)/fontsize));
+    if (queue.size() > logsize)
+    {
+        std::vector<Message> newqueue(queue.end() - logsize, queue.end());
+        queue = newqueue;
+    }
+
+    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size()*fontsize - 20});
+    for (auto message : queue) {
+        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 10000.0f;
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
+    }
+    ImGui::PopFont();
     ImGui::End();
 }
 
@@ -2214,18 +2269,50 @@ void render_debug()
     ImGui::PopItemWidth();
 }
 
+void refresh_script_files()
+{
+    g_script_files.clear();
+    if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    {
+        for (const auto & file : std::filesystem::directory_iterator(scriptpath))
+        {
+            g_script_files.push_back(file.path());
+        }
+    }
+}
+
+void render_script_files()
+{
+    ImGui::PushID("files");
+    int num = 0;
+    for (auto file : g_script_files)
+    {
+        ImGui::PushID(num++);
+        if (ImGui::Button(file.filename().string().data()))
+        {
+            load_script(file.string().data());
+        }
+        ImGui::PopID();
+    }
+    if(g_script_files.size() == 0)
+    {
+        ImGui::TextWrapped("No scripts found. Put .lua files in Spelunky 2\\%s\\", scriptpath.data());
+    }
+    if (ImGui::Button("Refresh##RefreshScripts"))
+    {
+        refresh_script_files();
+    }
+    if (ImGui::Button("Create new quick script"))
+    {
+        Script *script = new Script("meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) end\nend, 60)", "Script");
+        g_scripts.push_back(script);
+    }
+    ImGui::PopID();
+}
+
 void render_scripts()
 {
     ImGui::PushItemWidth(-1);
-    if (ImGui::Button("Load overlunky.lua"))
-    {
-        load_script("overlunky.lua");
-    }
-    if (ImGui::Button("Create new script"))
-    {
-        Script *script = new Script("function on_screen() message('Hello from new script') end", "foobar.lua");
-        g_scripts.push_back(script);
-    }
     for (int i = 0; i < g_scripts.size();)
     {
         ImGui::PushID(i);
@@ -2265,6 +2352,10 @@ void render_scripts()
             ++i;
         }
         ImGui::PopID();
+    }
+    if(ImGui::CollapsingHeader("Load new script##LoadScriptFile"))
+    {
+        render_script_files();
     }
     ImGui::PopItemWidth();
 }
@@ -2987,6 +3078,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             font = io.Fonts->AddFontDefault();
         }
         load_config(cfgfile);
+        refresh_script_files();
         set_colors();
         windows["tool_entity"] = "Entity spawner (" + key_string(keys["tool_entity"]) + ")";
         windows["tool_door"] = "Door to anywhere (" + key_string(keys["tool_door"]) + ")";
@@ -3017,10 +3109,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
-    for (auto script : g_scripts)
+    /*for (auto script : g_scripts)
     {
         render_messages(script);
-    }
+    }*/
+    render_messages();
     render_clickhandler();
 
     int win_condition = ImGuiCond_FirstUseEver;
