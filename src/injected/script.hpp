@@ -16,23 +16,30 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
 
-struct LuaIntervalCallback
+struct IntervalCallback
 {
     sol::function func;
     int interval;
     int lastRan;
 };
 
-struct LuaTimeoutCallback
+struct TimeoutCallback
 {
     sol::function func;
     int timeout;
+};
+
+struct ScreenCallback
+{
+    sol::function func;
+    int screen;
 };
 
 struct ScriptState
 {
     Player *player;
     uint32_t screen;
+    uint32_t time_level;
 };
 
 struct ScriptOption
@@ -62,13 +69,14 @@ class Script
     sol::state lua;
     char code[204800];
     std::string result = "";
-    ScriptState state = {0, 0};
+    ScriptState state = {nullptr, 0, 0};
     bool changed = false;
     bool enabled = true;
     ScriptMeta meta = {"", "", "", "", ""};
+    int cbcount = 0;
 
     std::map<std::string, ScriptOption> options;
-    std::vector<std::variant<LuaIntervalCallback, LuaTimeoutCallback>> callbacks;
+    std::map<size_t, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> callbacks;
     std::vector<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> messages;
 
     StateMemory *g_state = nullptr;

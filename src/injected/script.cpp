@@ -25,17 +25,32 @@ Script::Script(std::string script, std::string file)
     };
     lua["set_interval"] = [this](sol::function cb, int frames)
     {
-        auto luaCb = LuaIntervalCallback{cb, frames, -1};
-        callbacks.push_back(luaCb);
+        auto luaCb = IntervalCallback{cb, frames, -1};
+        callbacks[cbcount] = luaCb;
+        return cbcount++;
     };
     lua["set_timeout"] = [this](sol::function cb, int frames)
     {
         int now = g_state->time_level;
-        auto luaCb = LuaTimeoutCallback{
+        auto luaCb = TimeoutCallback{
             cb,
             now + frames,
         };
-        callbacks.push_back(luaCb);
+        callbacks[cbcount] = luaCb;
+        return cbcount++;
+    };
+    lua["set_callback"] = [this](sol::function cb, int screen) {
+        auto luaCb = ScreenCallback{
+            cb,
+            screen
+        };
+        callbacks[cbcount] = luaCb;
+        return cbcount++;
+    };
+    lua["clear_callback"] = [this](size_t id) {
+        auto it = callbacks.find(id);
+        if (it != callbacks.end())
+            callbacks.erase(it);
     };
     lua["meta"] = lua.create_named_table("meta");
     lua["options"] = lua.create_named_table("options");
@@ -293,6 +308,48 @@ Script::Script(std::string script, std::string file)
         16,
         "BASE_CAMP",
         17);
+    lua.new_enum(
+        "ON",
+        "LOGO",
+        0,
+        "INTRO",
+        1,
+        "PROLOGUE",
+        2,
+        "TITLE",
+        3,
+        "MENU",
+        4,
+        "OPTIONS",
+        5,
+        "LEADERBOARD",
+        7,
+        "SEED_INPUT",
+        8,
+        "CHARACTER_SELECT",
+        9,
+        "TEAM_SELECT",
+        10,
+        "CAMP",
+        11,
+        "LEVEL",
+        12,
+        "TRANSITION",
+        13,
+        "DEATH",
+        14,
+        "SPACESHIP",
+        15,
+        "WIN",
+        16,
+        "CREDITS",
+        17,
+        "SCORES",
+        18,
+        "CONSTELLATION",
+        19,
+        "RECAP",
+        20);
     changed = true;
 }
 
@@ -328,6 +385,8 @@ bool Script::run()
     }
     try
     {
+        auto now = g_state->time_level;
+
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
@@ -352,7 +411,7 @@ bool Script::run()
             if (on_screen)
                 on_screen.value()();
         }
-        if (on_frame)
+        if (on_frame && g_state->time_level != state.time_level)
         {
             on_frame.value()();
         }
@@ -382,41 +441,51 @@ bool Script::run()
                 on_win.value()();
         }
 
-        auto now = g_state->time_level;
-
-        for (int i = 0; i < callbacks.size();)
+        for (auto it = callbacks.begin(); it != callbacks.end();)
         {
-            if (auto cb = std::get_if<LuaIntervalCallback>(&callbacks[i]))
+            if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now >= cb->lastRan + cb->interval)
                 {
                     cb->func();
                     cb->lastRan = now;
                 }
-                ++i;
+                ++it;
             }
-            else if (auto cb = std::get_if<LuaTimeoutCallback>(&callbacks[i]))
+            else if (auto cb = std::get_if<TimeoutCallback>(&it->second))
             {
                 if (now >= cb->timeout)
                 {
                     cb->func();
-                    callbacks.erase(callbacks.begin() + i);
+                    it = callbacks.erase(it);
                 }
                 else
                 {
-                    ++i;
+                    ++it;
                 }
+            }
+            else if (auto cb = std::get_if<ScreenCallback>(&it->second))
+            {
+                if (g_state->screen == cb->screen && g_state->screen != state.screen)
+                {
+                    cb->func();
+                }
+                else if (g_state->screen == 12 && cb->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
+                {
+                    cb->func();
+                }
+                ++it;
             }
             else
             {
-                ++i;
+                ++it;
             }
         }
 
         if (!g_players.empty())
             state.player = g_players.at(0);
-        if (g_state != 0)
-            state.screen = g_state->screen;
+        state.screen = g_state->screen;
+        state.time_level = now;
     }
     catch (const sol::error &e)
     {
