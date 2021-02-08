@@ -936,7 +936,7 @@ LRESULT CALLBACK window_hook(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lPa
 
 bool pressed(std::string keyname, int wParam)
 {
-    if (keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
     }
@@ -955,7 +955,7 @@ bool pressed(std::string keyname, int wParam)
 bool clicked(std::string keyname)
 {
     int wParam = 0x400;
-    if (keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
     }
@@ -982,7 +982,7 @@ bool clicked(std::string keyname)
 bool held(std::string keyname)
 {
     int wParam = 0x400;
-    if (keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
     }
@@ -1009,7 +1009,7 @@ bool held(std::string keyname)
 bool released(std::string keyname)
 {
     int wParam = 0x400;
-    if (keys.find(keyname) == keys.end() || keys[keyname] & 0xff == 0)
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
     }
@@ -1039,6 +1039,9 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
         return false;
     }
+
+    if(ImGui::GetIO().WantCaptureKeyboard && active("tool_script"))
+        return false;
 
     int repeat = (lParam >> 30) & 1U;
 
@@ -2317,7 +2320,9 @@ void render_scripts()
     {
         ImGui::PushID(i);
         Script *script = g_scripts[i];
-        if(ImGui::CollapsingHeader(script->meta.file.data(), ImGuiTreeNodeFlags_DefaultOpen))
+        char name[255];
+        sprintf(name, "%s (%s)", script->meta.name.data(), script->meta.file.data());
+        if(ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Text("%s %s by %s", script->meta.name.data(), script->meta.version.data(), script->meta.author.data());
             ImGui::TextWrapped(script->meta.description.data());

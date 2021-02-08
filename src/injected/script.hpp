@@ -42,6 +42,8 @@ struct ScriptState
     Player *player;
     uint32_t screen;
     uint32_t time_level;
+    uint32_t time_total;
+    uint32_t frame; // TODO: global frame counter
 };
 
 struct ScriptOption
@@ -71,7 +73,7 @@ class Script
     sol::state lua;
     char code[204800];
     std::string result = "";
-    ScriptState state = {nullptr, 0, 0};
+    ScriptState state = {nullptr, 0, 0, 0, 0};
     bool changed = true;
     bool enabled = true;
     ScriptMeta meta = {"", "", "", "", ""};
@@ -79,7 +81,8 @@ class Script
 
     std::map<std::string, ScriptOption> options;
     std::deque<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> messages;
-    std::map<int, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> callbacks;
+    std::map<int, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> level_callbacks;
+    std::map<int, std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>> global_callbacks;
     std::vector<int> clear_callbacks;
 
     StateMemory *g_state = nullptr;

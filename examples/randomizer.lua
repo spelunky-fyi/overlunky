@@ -1,12 +1,3 @@
--- spelunky 2 randomizer
--- this is actually pretty good!
--- endless random level themes until you've killed all the bosses
--- random items in pots
--- random actually useful items in crates
--- random coffins
--- random player stats
--- dwelling requires some actual spelunking to unlock the exit
-
 meta.name = "Randomizer"
 meta.version = "0.1"
 meta.description = "Random exit doors, pot/crate/coffin contents, player stats, boss order and other cool stuff!"
@@ -19,14 +10,14 @@ register_option_int("max_health", "Max starting health", 20, 4, 99)
 register_option_int("max_bombs", "Max starting bombs", 20, 4, 99)
 register_option_int("max_ropes", "Max starting ropes", 20, 4, 99)
 register_option_bool("lock_exit", "Lock exit in Dwelling", true)
---register_option_bool("seismic", "Weird seismic activity", true)
+--register_option_bool("seismic", "Weird seismic activity", true) -- this crashy, api bad
 
 items = {220,221,222,223,224,225,227,228,229,230,231,232,233,234,237,238,239,240,242,243,244,245,246,247,248,249,250,251,252,253,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,283,284,286,287,288,289,290,295,296,297,298,300,301,302,303,304,305,306,307,308,309,310,311,312,317,318,319,320,321,322,323,331,332,333,334,336,337,338,339,340,341,347,348,356,357,358,365,366,371,372,373,374,377,395,396,399,400,401,402,409,416,422,428,429,435,436,439,440,442,444,448,453,456,457,462,469,475,476,477,478,479,480,481,482,490,491,492,493,494,495,496,497,498,499,500,501,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,592,593,596,604,610,630,631,884,885,886,887,888,890}
 tools = {374,422,509,510,511,512,513,514,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,585}
 theme = {1,2,3,5,6,7,8,9,10,11}
 bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
 bosses_left = {}
-world = {1,2,2,3,4,4,5,6,7,7,4,4,4,6,7,7,1}
+world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
 critters = {}
 critters[THEME.DWELLING] = ENT_TYPE.MONS_CRITTERDUNGBEETLE
 critters[THEME.JUNGLE] = ENT_TYPE.MONS_CRITTERBUTTERFLY
@@ -107,11 +98,11 @@ function random_level()
     end
 
   -- all bosses killed, go to 7-98
-  elseif #bosses_left <= #bosses-options.bosses and normal_levels >= options.min_levels and math.random(options.max_levels) < normal_levels then
+  elseif #bosses_left <= #bosses-options.bosses and normal_levels >= options.min_levels and math.random(options.max_levels) < normal_levels and (state.theme == THEME.DWELLING or state.theme == THEME.VOLCANA or state.theme == THEME.TEMPLE or state.theme == THEME.SUNKEN_CITY or state.theme == THEME.CITY_OF_GOLD) then
     boss_level = false
     nexttheme = THEME.COSMIC_OCEAN
     nextlevel = 98
-    nextworld = 7
+    nextworld = 42
     you_win = true
     message("Lets get out of here!")
     return
@@ -129,6 +120,9 @@ function random_level()
     end
   end
   nextworld = world[nexttheme]
+  if nexttheme == THEME.COSMIC_OCEAN then
+    nextworld = 42
+  end
 end
 
 function lock_exit()
@@ -202,6 +196,7 @@ end
 
 function on_level()
   message("Level "..tostring(state.level_count+1)..". Bosses remaining: "..(#bosses_left-(#bosses-options.bosses)))
+  state.world = world[state.theme]
   if state.level_count == 0 then
     init_run()
   end
