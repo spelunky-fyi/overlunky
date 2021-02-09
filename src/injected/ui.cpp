@@ -30,6 +30,7 @@
 
 std::vector<Script *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
+std::vector<std::string> g_script_autorun;
 
 const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
@@ -615,6 +616,18 @@ void save_config(std::string file)
     if (!tab_order.empty())
         writeData << std::endl;
     writeData << "]" << std::endl;
+
+    writeData << "autorun = [";
+    for (int i = 0; i < g_script_autorun.size(); i++)
+    {
+        writeData << std::endl << "  \"" << g_script_autorun[i] << "\"";
+        if (i < g_script_autorun.size() - 1)
+            writeData << ",";
+    }
+    if (!g_script_autorun.empty())
+        writeData << std::endl;
+    writeData << "]" << std::endl;
+
     writeData.close();
 }
 
@@ -679,6 +692,7 @@ void load_config(std::string file)
          "tool_options",
          "tool_style",
          "tool_debug"});
+    g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun", {});
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -766,6 +780,8 @@ bool toggle(std::string tool)
     }
     else
     {
+        ImGuiWindow *win = ImGui::FindWindowByName("Overlunky");
+        win->Collapsed = false;
         for (auto window : windows)
         {
             if (window.first == tool)
@@ -2403,6 +2419,18 @@ void refresh_script_files()
     }
 }
 
+void autorun_scripts()
+{
+    for (auto file : g_script_autorun)
+    {
+        std::string script = scriptpath + "\\" + file;
+        if (std::filesystem::exists(script) && std::filesystem::is_regular_file(script))
+        {
+            load_script(script);
+        }
+    }
+}
+
 void render_script_files()
 {
     ImGui::PushID("files");
@@ -3236,6 +3264,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         }
         load_config(cfgfile);
         refresh_script_files();
+        autorun_scripts();
         set_colors();
         windows["tool_entity"] = new Window({"Spawner (" + key_string(keys["tool_entity"]) + ")", false, true});
         windows["tool_door"] = new Window({"Door (" + key_string(keys["tool_door"]) + ")", false, true});

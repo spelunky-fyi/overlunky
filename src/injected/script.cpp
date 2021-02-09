@@ -83,14 +83,23 @@ Script::Script(std::string script, std::string file)
         lua["options"][name] = value;
     };
     lua["spawn_entity"] = spawn_entity_abs;
+    lua["spawn"] = spawn_entity_abs;
     lua["spawn_door"] = spawn_door_abs;
-    lua["spawn_backdoor"] = spawn_backdoor_abs;
-    lua["godmode"] = godmode;
-    lua["darkmode"] = darkmode;
+    lua["door"] = spawn_door_abs;
+    lua["spawn_layer_door"] = spawn_backdoor_abs;
+    lua["layer_door"] = spawn_backdoor_abs;
+    lua["god"] = godmode;
+    lua["force_dark_level"] = darkmode;
     lua["zoom"] = zoom;
-    lua["set_pause"] = set_pause;
+    lua["pause"] = [this](bool p) {
+        if (p)
+            set_pause(0x20);
+        else
+            set_pause(0);
+    };
     lua["move_entity"] = move_entity_abs;
     lua["set_door_target"] = set_door_target;
+    lua["set_door"] = set_door_target;
     lua["set_contents"] = set_contents;
     lua["get_entity"] = get_entity;
     lua["get_type"] = get_type;
@@ -121,7 +130,7 @@ Script::Script(std::string script, std::string file)
     lua["entity_has_item_type"] = entity_has_item_type;
     lua["lock_door_at"] = lock_door_at;
     lua["unlock_door_at"] = unlock_door_at;
-    lua["get_frame_count"] = get_frame_count;
+    lua["get_frame"] = get_frame_count;
     lua["carry"] = carry;
     lua.new_usertype<Color>(
         "Color",
@@ -191,12 +200,10 @@ Script::Script(std::string script, std::string file)
         &Entity::x,
         "y",
         &Entity::y,
-        "w",
+        "width",
         &Entity::w,
-        "h",
+        "height",
         &Entity::h,
-        "teleport",
-        &Entity::teleport,
         "topmost",
         &Entity::topmost,
         "topmost_mount",
@@ -263,9 +270,9 @@ Script::Script(std::string script, std::string file)
         &StateMemory::playing,
         "pause",
         &StateMemory::pause,
-        "w",
+        "width",
         &StateMemory::w,
-        "h",
+        "height",
         &StateMemory::h,
         "kali_favor",
         &StateMemory::kali_favor,
@@ -273,8 +280,6 @@ Script::Script(std::string script, std::string file)
         &StateMemory::kali_status,
         "kali_altars_destroyed",
         &StateMemory::kali_altars_destroyed,
-        "feedcode",
-        &StateMemory::feedcode,
         "time_total",
         &StateMemory::time_total,
         "world",
@@ -291,7 +296,7 @@ Script::Script(std::string script, std::string file)
         &StateMemory::theme_next,
         "shoppie_aggro",
         &StateMemory::shoppie_aggro,
-        "shoppie_aggro_levels",
+        "shoppie_aggro_next",
         &StateMemory::shoppie_aggro_levels,
         "merchant_aggro",
         &StateMemory::merchant_aggro,

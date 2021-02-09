@@ -34,6 +34,8 @@ normal_levels = 0
 nextworld = 1
 nextlevel = 1
 nexttheme = 1
+reallevel = 1
+realtheme = 1
 you_win = false
 boss_level = false
 exit_locked = false
@@ -44,42 +46,6 @@ hidden_y = 0
 function setflag(v, b) return v | (1 << b-1) end
 function clrflag(v, b) return v & ~(1 << b-1) end
 function testflag(v, b) return (v & (1 << b-1)) > 0 end
-
-function init_run()
-  bosses_left = {table.unpack(bosses)}
-  normal_levels = 0
-  nexttheme = theme[math.random(#theme)]
-  nextlevel = math.random(4)
-  if nexttheme == THEME.COSMIC_OCEAN then
-    nextlevel = math.random(5,97)
-  elseif nexttheme == THEME.ICE_CAVES then
-    nextlevel = 1
-  end
-  nextworld = world[nexttheme]
-  you_win = false
-  boss_level = false
-  hidden_block = 0
-  exit_locked = false
-  for i,player in ipairs(players) do
-    player.health = math.random(4, options.max_health)
-    player.inventory.bombs = math.random(4, options.max_bombs)
-    player.inventory.ropes = math.random(4, options.max_ropes)
-  end
-  --[[ debug
-  nextworld = 1
-  nextlevel = math.random(4)
-  nexttheme = 1]]--
-end
-init_run()
-
-function remove_boss(boss)
-  for k,v in ipairs(bosses_left) do
-    if v == boss then
-      table.remove(bosses_left, k)
-      toast("Boss defeated!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
-    end
-  end
-end
 
 function random_level()
   -- rare eggplant world
@@ -102,9 +68,8 @@ function random_level()
     boss_level = false
     nexttheme = THEME.COSMIC_OCEAN
     nextlevel = 98
-    nextworld = 42
     you_win = true
-    toast("Lets get out of here!")
+    --toast("Lets get out of here!")
     return
 
   -- pick a regular level
@@ -119,9 +84,46 @@ function random_level()
       nextlevel = 1
     end
   end
-  nextworld = world[nexttheme]
+  nextworld = state.world
+  reallevel = nextlevel
+  nextlevel = 1
   if nexttheme == THEME.COSMIC_OCEAN then
-    nextworld = 42
+    nextlevel = 5
+  end
+  realtheme = nexttheme
+  if state.theme ~= THEME.OLMEC then
+    nexttheme = state.theme
+  else
+    nexttheme = 1
+  end
+  state.theme_next = nexttheme
+  state.world_next = nextworld
+  state.level_next = nextlevel
+end
+
+function init_run()
+  message("DEBUG: Started new run")
+  bosses_left = {table.unpack(bosses)}
+  normal_levels = 0
+  you_win = false
+  boss_level = false
+  hidden_block = 0
+  exit_locked = false
+  for i,player in ipairs(players) do
+    player.health = math.random(4, options.max_health)
+    player.inventory.bombs = math.random(4, options.max_bombs)
+    player.inventory.ropes = math.random(4, options.max_ropes)
+  end
+  random_level()
+end
+init_run()
+
+function remove_boss(boss)
+  for k,v in ipairs(bosses_left) do
+    if v == boss then
+      table.remove(bosses_left, k)
+      toast("Boss defeated!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
+    end
   end
 end
 
@@ -167,8 +169,8 @@ end
 
 function random_doors()
   if state.level < 98 then
-    print("Going to level "..tostring(state.level_count)..": "..tostring(nextworld).."-"..tostring(nextlevel).." theme "..tostring(nexttheme))
-    message("DEBUG: Going to "..tostring(nextworld).."-"..tostring(nextlevel).." theme "..tostring(nexttheme))
+    print("Setting doors to "..tostring(state.level_count)..": "..tostring(nextworld).."-"..tostring(nextlevel).." theme "..tostring(nexttheme))
+    print("Actually going to "..tostring(state.level_count)..": "..tostring(world[realtheme]).."-"..tostring(reallevel).." theme "..tostring(realtheme))
     doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
     for i,v in ipairs(doors) do
       print("Setting door "..tostring(v))
@@ -177,11 +179,11 @@ function random_doors()
       if boss_level then
         spawn_entity(ENT_TYPE.ITEM_LITWALLTORCH, x-0.7, y+0.5, layer, 0, 0)
         spawn_entity(ENT_TYPE.ITEM_LITWALLTORCH, x+0.7, y+0.5, layer, 0, 0)
-      elseif state.theme ~= THEME.COSMIC_OCEAN and nexttheme == THEME.COSMIC_OCEAN then
+      elseif state.theme ~= THEME.COSMIC_OCEAN and realtheme == THEME.COSMIC_OCEAN then
         spawn_entity(ENT_TYPE.ITEM_FLOATING_ORB, x, y+0.3, layer, 0, 0)
-      elseif critters[nexttheme] ~= nil then
-        spawn_entity(critters[nexttheme], x-1, y, layer, 0, 0)
-        spawn_entity(critters[nexttheme], x+1, y, layer, 0, 0)
+      elseif critters[realtheme] ~= nil then
+        spawn_entity(critters[realtheme], x-1, y, layer, 0, 0)
+        spawn_entity(critters[realtheme], x+1, y, layer, 0, 0)
       end
     end
   end
@@ -291,10 +293,11 @@ end
 
 function on_guiframe()
   -- force level even when engine isn't running
-  if not you_win then
-    state.world_next = nextworld
-    state.level_next = nextlevel
-    state.theme_next = nexttheme
+  if state.ingame == 1 and state.playing == 0 and state.pause > 0 and not you_win then
+    random_level()
+    state.level_next = reallevel
+    state.theme_next = realtheme
+    state.world_next = world[state.theme_next]
   end
 end
 
@@ -364,9 +367,18 @@ function on_frame()
 end
 
 function on_transition()
+  state.theme_next = realtheme
+  state.world_next = world[state.theme_next]
+  state.level_next = reallevel
+  level = math.random(4)
+  if state.theme_next == THEME.COSMIC_OCEAN then
+    level = math.random(5,97)
+  elseif state.theme_next == THEME.ICE_CAVES then
+    level = 1
+  end
+  state.level_next = level
   exit_locked = false
   toast("Level "..tostring(state.level_count).." completed!")
-
 end
 
 function on_death()
