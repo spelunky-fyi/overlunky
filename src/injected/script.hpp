@@ -43,7 +43,7 @@ struct ScriptState
     uint32_t screen;
     uint32_t time_level;
     uint32_t time_total;
-    uint32_t frame; // TODO: global frame counter
+    uint32_t frame;
 };
 
 struct ScriptOption

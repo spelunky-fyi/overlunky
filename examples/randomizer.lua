@@ -65,10 +65,10 @@ function init_run()
     player.inventory.bombs = math.random(4, options.max_bombs)
     player.inventory.ropes = math.random(4, options.max_ropes)
   end
-  -- debug
+  --[[ debug
   nextworld = 1
   nextlevel = math.random(4)
-  nexttheme = 1
+  nexttheme = 1]]--
 end
 init_run()
 
@@ -276,13 +276,16 @@ function on_level()
 
 end
 
-function on_frame()
+function on_guiframe()
+  -- force level even when engine isn't running
   if not you_win then
     state.world_next = nextworld
     state.level_next = nextlevel
     state.theme_next = nexttheme
   end
+end
 
+function on_frame()
   -- check for dead olmec
   if state.world == 3 and state.level == 1 then
     olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)

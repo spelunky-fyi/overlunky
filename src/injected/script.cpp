@@ -355,12 +355,14 @@ Script::Script(std::string script, std::string file)
         19,
         "RECAP",
         20,
-        "FRAME",
+        "GUIFRAME",
         100,
-        "SCREEN",
+        "FRAME",
         101,
+        "SCREEN",
+        102,
         "START",
-        102);
+        103);
 }
 
 bool Script::run()
@@ -379,6 +381,7 @@ bool Script::run()
             global_timers.clear();
             callbacks.clear();
             options.clear();
+            lua["on_guiframe"] = sol::lua_nil;
             lua["on_frame"] = sol::lua_nil;
             lua["on_camp"] = sol::lua_nil;
             lua["on_start"] = sol::lua_nil;
@@ -407,6 +410,7 @@ bool Script::run()
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
 
+        sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
         sol::optional<sol::function> on_frame = lua["on_frame"];
         sol::optional<sol::function> on_camp = lua["on_camp"];
         sol::optional<sol::function> on_level = lua["on_level"];
@@ -423,7 +427,11 @@ bool Script::run()
             if (on_screen)
                 on_screen.value()();
         }
-        if (on_frame && g_state->time_level != state.time_level)
+        if (on_guiframe)
+        {
+            on_guiframe.value()();
+        }
+        if (on_frame && get_frame_count() != state.frame)
         {
             on_frame.value()();
         }
@@ -519,17 +527,22 @@ bool Script::run()
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 100) // ON.FRAME
+                else if (cb->screen == 100) // ON.GUIFRAME
                 {
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 101 && g_state->screen != state.screen) // ON.SCREEN
+                else if (cb->screen == 101 && get_frame_count() != state.frame) // ON.FRAME
                 {
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 102 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() && state.player != g_players.at(0)) // ON.START
+                else if (cb->screen == 102 && g_state->screen != state.screen) // ON.SCREEN
+                {
+                    cb->func();
+                    cb->lastRan = now;
+                }
+                else if (cb->screen == 103 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() && state.player != g_players.at(0)) // ON.START
                 {
                     cb->func();
                     cb->lastRan = now;
@@ -577,6 +590,7 @@ bool Script::run()
         state.screen = g_state->screen;
         state.time_level = g_state->time_level;
         state.time_total = g_state->time_total;
+        state.frame = get_frame_count();
     }
     catch (const sol::error &e)
     {
