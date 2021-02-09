@@ -1867,6 +1867,8 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 
 void render_hitbox(Movable *ent, bool cross, ImColor color)
 {
+    if(IsBadReadPtr(ent, 0x178))
+        return;
     if (ent->items_count > 0)
     {
         int *pitems = (int *)ent->items_ptr;
