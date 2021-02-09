@@ -63,9 +63,8 @@ struct ScriptMeta
     std::string author;
 };
 
-std::vector<Movable *> lua_get_players();
-Movable *lua_get_entity(uint32_t id);
-std::tuple<float, float, int> lua_get_position(uint32_t id);
+Movable *get_entity(uint32_t id);
+std::tuple<float, float, int> get_position(uint32_t id);
 
 using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 

@@ -92,7 +92,8 @@ Script::Script(std::string script, std::string file)
     lua["move_entity"] = move_entity_abs;
     lua["set_door_target"] = set_door_target;
     lua["set_contents"] = set_contents;
-    lua["get_entity"] = lua_get_entity;
+    lua["get_entity"] = get_entity;
+    lua["get_type"] = get_type;
     lua["get_entities"] = get_entities;
     lua["get_entities_by"] = get_entities_by;
     lua["get_entities_by_type"] = [](sol::variadic_args va) {
@@ -113,7 +114,7 @@ Script::Script(std::string script, std::string file)
     lua["get_entity_type"] = get_entity_type;
     lua["get_zoom_level"] = get_zoom_level;
     lua["screen_position"] = screen_position;
-    lua["get_position"] = lua_get_position;
+    lua["get_position"] = get_position;
     lua["entity_remove_item"] = entity_remove_item;
     lua["spawn_entity_over"] = spawn_entity_over;
     lua["entity_has_item_uid"] = entity_has_item_uid;
@@ -636,12 +637,12 @@ bool Script::run()
     return true;
 }
 
-Movable *lua_get_entity(uint32_t id)
+Movable *get_entity(uint32_t id)
 {
     return (Movable *)get_entity_ptr(id);
 }
 
-std::tuple<float, float, int> lua_get_position(uint32_t id)
+std::tuple<float, float, int> get_position(uint32_t id)
 {
     Entity *ent = get_entity_ptr(id);
     if (ent)

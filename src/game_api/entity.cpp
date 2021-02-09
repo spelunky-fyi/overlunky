@@ -45,6 +45,24 @@ std::vector<EntityItem> list_entities() {
     return result;
 }
 
+EntityDB *get_type(uint32_t id) {
+    size_t map_ptr = *(size_t *)entities_ptr();
+    // Special case: map_ptr might be 0 if it's not initialized.
+    // This only occurs in list_entities; for others, do not check the pointer
+    // to see if this assumption works.
+    if (!map_ptr) return nullptr;
+
+    auto map = reinterpret_cast<EntityMap *>(map_ptr + NAME_TO_INDEX);
+
+    std::vector<EntityItem> result;
+    for (const auto &kv : *map) {
+        auto entities = reinterpret_cast<EntityDB *>(map_ptr);
+        return &entities[kv.second];
+    }
+
+    return nullptr;
+}
+
 size_t to_id(size_t map_ptr, std::string name) {
     auto map = reinterpret_cast<EntityMap *>(map_ptr + NAME_TO_INDEX);
     auto it = map->find(std::string(name.data(), name.size()));
