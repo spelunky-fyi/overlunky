@@ -24,8 +24,9 @@ using LoadItemOver = Entity *(*)(Layer *, size_t, Entity *, float, float, bool);
 LoadItemOver get_load_item_over() {
     ONCE(LoadItemOver) {
         auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xBA\xB5\x00\x00\x00\xC6\x44"s,
+        auto off = find_inst(memory.exe(), "\xBA\x51\x00\x00\x00\x48\x8B"s,
                              memory.after_bundle);
+        off = find_inst(memory.exe(), "\xE8"s, off + 5);
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
         return res = (LoadItemOver)memory.at_exe(decode_call(off));
     }
