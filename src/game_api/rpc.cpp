@@ -562,7 +562,6 @@ void entity_remove_item(uint32_t id, uint32_t item)
 
 uint32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
 {
-    return 0; // TODO broken
     auto state = State::get();
     Entity *overlay = get_entity_ptr(over);
     if (overlay == nullptr)
@@ -648,4 +647,13 @@ uint32_t get_frame_count()
 {
     auto state = State::get();
     return state.get_frame_count();
+}
+
+void carry(uint32_t id, uint32_t item)
+{
+    Mount *mount = (Mount *)get_entity_ptr(id);
+    Movable *rider = (Movable *)get_entity_ptr(item);
+    if (mount == nullptr || rider == nullptr)
+        return;
+    mount->carry(rider);
 }

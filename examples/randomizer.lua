@@ -104,7 +104,7 @@ function random_level()
     nextlevel = 98
     nextworld = 42
     you_win = true
-    message("Lets get out of here!")
+    toast("Lets get out of here!")
     return
 
   -- pick a regular level
@@ -127,7 +127,13 @@ end
 
 function lock_exit()
   if not options.lock_exit then return end
+  if state.level_count == 0 then return end
   if state.theme ~= THEME.DWELLING then return end
+
+  for i,player in ipairs(players) do
+    skeletonkey = entity_has_item_type(player.uid, ENT_TYPE.ITEM_POWERUP_SKELETON_KEY)
+    if skeletonkey then return end
+  end
 
   -- pick a random ground block
   floors = get_entities_by(ENT_TYPE.FLOOR_GENERIC, 0, 0) -- type, mask, layer
@@ -138,7 +144,7 @@ function lock_exit()
   hidden_y = y
   exit_locked = true
 
-  message("The exit is locked! Find the skeleton key to unlock it!")
+  toast("Oh no the exit is blocked!\nWe need a skeleton key!")
 
   -- put fake blackmarket door there to find with udjat
   spawn_entity(ENT_TYPE.LOGICAL_BLACKMARKET_DOOR, x, y, 0, 0, 0)
@@ -148,8 +154,6 @@ function lock_exit()
   goldkeys = get_entities_by_type(ENT_TYPE.ITEM_LOCKEDCHEST_KEY)
   if #goldkeys == 0 then
     spawn_entity(ENT_TYPE.ITEM_PICKUP_UDJATEYE, x+1, y, layer, 0, 0)
-  else
-    message("Looks like you have to find the udjat eye too :D")
   end
   spawn_entity(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, x-1, y, layer, 0, 0)
   spawn_entity(ENT_TYPE.ITEM_MATTOCK, x, y, layer, 0, 0)
@@ -332,7 +336,6 @@ function on_frame()
       skeletonkey = entity_has_item_type(player.uid, ENT_TYPE.ITEM_POWERUP_SKELETON_KEY) -- not PICKUP!
       if skeletonkey then
         exit_locked = false
-        message("Exit unlocked!")
       end
     end
     block = get_entity(hidden_block)

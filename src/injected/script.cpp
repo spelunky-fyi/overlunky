@@ -121,6 +121,7 @@ Script::Script(std::string script, std::string file)
     lua["lock_door_at"] = lock_door_at;
     lua["unlock_door_at"] = unlock_door_at;
     lua["get_frame_count"] = get_frame_count;
+    lua["carry"] = carry;
     lua.new_usertype<Color>(
         "Color",
         "r",
