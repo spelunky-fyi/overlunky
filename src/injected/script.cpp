@@ -7,6 +7,18 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
 
+using Toast = void (*)(void *, wchar_t *);
+Toast get_toast()
+{
+    ONCE(Toast)
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x49\x8B\x0C\x3F\xB8\x60\x01\x00\x00"s, memory.after_bundle);
+        off = function_start(memory.at_exe(off));
+        return res = (Toast)off;
+    }
+}
+
 Script::Script(std::string script, std::string file)
 {
     strcpy(code, script.data());
@@ -58,8 +70,11 @@ Script::Script(std::string script, std::string file)
     lua["clear_callback"] = [this](int id) { clear_callbacks.push_back(id); };
     lua["meta"] = lua.create_named_table("meta");
     lua["options"] = lua.create_named_table("options");
-    lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max)
-    {
+    lua["toast"] = [this](std::wstring message) {
+        auto toast = get_toast();
+        toast(NULL, message.data());
+    };
+    lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
         options[name] = {desc, value, min, max};
         lua["options"][name] = value;
     };

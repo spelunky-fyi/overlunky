@@ -1,13 +1,5 @@
 #include "state.hpp"
 
-size_t function_start(size_t off) {
-    off &= ~0xf;
-    while (read_u8(off - 1) != 0xcc) {
-        off -= 0x10;
-    }
-    return off;
-}
-
 size_t get_dark() {
     ONCE(size_t) {
         auto memory = Memory::get();

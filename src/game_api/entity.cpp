@@ -59,12 +59,17 @@ Entity *state_find_item(size_t state_ptr, uint32_t unique_id) {
     return it->second;
 }
 
-Carry get_carry() {
-    ONCE(Carry) {
+Carry get_carry()
+{
+    ONCE(Carry)
+    {
         auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xBA\xE1\x00\x00\x00\x49\x8B\xCD"s, // TODO broken
-                             memory.after_bundle);
-        off = find_inst(memory.exe(), "\xE8"s, off + 1);
+        size_t off = memory.after_bundle;
+        do
+        {
+            // call load_item; if(rax + 0x10e != 0x0B) { ... }
+            off = find_inst(memory.exe(), "\x80\xB8\x0E\x01\x00\x00\x0B"s, off + 1);
+        } while (read_u8(memory.at_exe(off - 5)) != 0xE8);
         off = find_inst(memory.exe(), "\xE8"s, off + 1);
 
         return res = (Carry)memory.at_exe(decode_call(off));

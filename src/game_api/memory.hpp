@@ -36,6 +36,14 @@ DEFINE_ACCESSOR(u32, uint32_t);
 DEFINE_ACCESSOR(u64, uint64_t);
 
 DEFINE_ACCESSOR(f32, float);
+
+size_t function_start(size_t off) {
+    off &= ~0xf;
+    while (read_u8(off - 1) != 0xcc) {
+        off -= 0x10;
+    }
+    return off;
+}
 };  // namespace
 
 struct Memory {
