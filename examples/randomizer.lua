@@ -169,8 +169,8 @@ end
 
 function random_doors()
   if state.level < 98 then
-    print("Setting doors to "..tostring(state.level_count)..": "..tostring(nextworld).."-"..tostring(nextlevel).." theme "..tostring(nexttheme))
-    print("Actually going to "..tostring(state.level_count)..": "..tostring(world[realtheme]).."-"..tostring(reallevel).." theme "..tostring(realtheme))
+    message("DEBUG: Setting doors to "..tostring(state.level_count)..": "..tostring(nextworld).."-"..tostring(nextlevel).." theme "..tostring(nexttheme))
+    message("DEBUG: Actually going to "..tostring(state.level_count)..": "..tostring(world[realtheme]).."-"..tostring(reallevel).." theme "..tostring(realtheme))
     doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
     for i,v in ipairs(doors) do
       print("Setting door "..tostring(v))
@@ -201,12 +201,11 @@ function throw_rock(id)
 end
 
 function on_level()
+  exit_locked = false
   state.world = world[state.theme]
   if state.level_count == 0 then
     init_run()
   end
-
-  exit_locked = false
 
   -- randomize pots
   pots = get_entities_by_type(ENT_TYPE.ITEM_POT)
@@ -289,12 +288,30 @@ function on_level()
   -- set door targets
   random_doors()
 
+  pet_interval = set_interval(function()
+    if #players == 0 then return end
+    x, y, l = get_position(players[1].uid)
+    cats = get_entities_at(ENT_TYPE.MONS_PET_CAT, 0, x, y, l, 2)
+    if #cats > 0 then
+      say(cats[1], "I hate Mondays.", 0, true)
+      clear_callback(pet_interval)
+    end
+    dogs = get_entities_at(ENT_TYPE.MONS_PET_DOG, 0, x, y, l, 2)
+    if #dogs > 0 then
+      say(dogs[1], "Living in the caves is ruff.", 0, true)
+      clear_callback(pet_interval)
+    end
+    hamsters = get_entities_at(ENT_TYPE.MONS_PET_HAMSTER, 0, x, y, l, 2)
+    if #hamsters > 0 then
+      say(hamsters[1], "Do you ever feel like you're just living the same day over and over again?", 0, true)
+      clear_callback(pet_interval)
+    end
+  end, 60)
 end
 
 function on_guiframe()
   -- force level even when engine isn't running
-  if state.ingame == 1 and state.playing == 0 and state.pause > 0 and not you_win then
-    random_level()
+  if not you_win and (state.pause == 3 or (state.pause == 2 and state.level_count == 0)) then
     state.level_next = reallevel
     state.theme_next = realtheme
     state.world_next = world[state.theme_next]
@@ -305,9 +322,8 @@ function on_frame()
   -- check for dead olmec
   if state.world == 3 and state.level == 1 then
     olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
-    if olmecs[1] then
-      flags = get_entity_flags2(olmecs[1])
-      if (flags & (1 << 10)) > 0 then -- this olmec is dead?
+    if #olmecs > 0 then
+      if testflag(olmecs[1].more_flags, 11) then -- this olmec is swimming
         remove_boss(THEME.OLMEC)
       end
     end
@@ -316,9 +332,8 @@ function on_frame()
   -- check for dead tiamat
   if state.world == 6 and state.level == 4 then
     tiamats = get_entities_by_type(ENT_TYPE.MONS_TIAMAT)
-    if tiamats[1] then
-      flags = get_entity_flags(tiamats[1])
-      if testflag(flags, 29) then -- this tiamat is dead
+    if #tiamats > 0 then
+      if testflag(tiamats[1].flags, 29) then -- this tiamat is dead
         remove_boss(THEME.TIAMAT)
       end
     end
@@ -327,9 +342,8 @@ function on_frame()
   -- check for dead hundun
   if state.world == 7 and state.level == 4 then
     hunduns = get_entities_by_type(ENT_TYPE.MONS_HUNDUN)
-    if hunduns[1] then
-      ai = get_entity_ai_state(hunduns[1])
-      if ai == 4 then -- this hundun is just chillin on the floor
+    if #hunduns > 0 then
+      if get_entity_ai_state(hunduns[1]) == 4 then -- this hundun is just chillin on the floor
         remove_boss(THEME.HUNDUN)
       end
     end
@@ -385,5 +399,25 @@ function on_death()
   message("I eventually died in level "..tostring(state.level_count+1)..". Bosses remaining: "..(#bosses_left-(#bosses-options.bosses)))
   exit_locked = false
 end
+
+pet_interval = set_interval(function()
+  if #players == 0 then return end
+  x, y, l = get_position(players[1].uid)
+  cats = get_entities_at(ENT_TYPE.MONS_PET_CAT, 0, x, y, l, 2)
+  if #cats > 0 then
+    say(cats[1], "I hate Mondays.", 0, true)
+    clear_callback(pet_interval)
+  end
+  dogs = get_entities_at(ENT_TYPE.MONS_PET_DOG, 0, x, y, l, 2)
+  if #dogs > 0 then
+    say(dogs[1], "Living in the caves is ruff.", 0, true)
+    clear_callback(pet_interval)
+  end
+  hamsters = get_entities_at(ENT_TYPE.MONS_PET_HAMSTER, 0, x, y, l, 2)
+  if #hamsters > 0 then
+    say(hamsters[1], "Do you ever feel like you're just living the same day over and over again?", 0, true)
+    clear_callback(pet_interval)
+  end
+end, 60)
 
 message("Spelunky 2 Door+Pot Randomizer WIP initialized!")

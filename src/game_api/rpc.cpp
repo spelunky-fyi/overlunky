@@ -508,7 +508,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
     return found;
 }
 
-std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, int layer, float x, float y, float r)
+std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, float y, int layer, float r)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
@@ -609,7 +609,7 @@ bool entity_has_item_type(uint32_t id, uint32_t type)
 
 void lock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at(0, 0, 0, x, y, 1);
+    std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
     for (auto id : items)
     {
         Entity *door = get_entity_ptr(id);
@@ -627,7 +627,7 @@ void lock_door_at(float x, float y)
 
 void unlock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at(0, 0, 0, x, y, 1);
+    std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
     for (auto id : items)
     {
         Entity *door = get_entity_ptr(id);
