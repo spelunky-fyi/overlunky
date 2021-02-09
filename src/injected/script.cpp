@@ -308,7 +308,7 @@ Script::Script(std::string script, std::string file)
         &StateMemory::hud_flags);
     lua["state"] = g_state;
     lua.create_named_table("ENT_TYPE");
-    for (int i = 1; i < g_items.size(); i++)
+    for (int i = 0; i < g_items.size(); i++)
     {
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
         lua["ENT_TYPE"][name] = g_items[i].id;
