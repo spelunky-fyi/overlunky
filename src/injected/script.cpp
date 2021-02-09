@@ -19,6 +19,16 @@ Toast get_toast()
     }
 }
 
+using Say = void (*)(void *, Entity *, wchar_t *, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);
+Say get_say() {
+    ONCE(Say) {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x4A\x8B\x0C\x2F\xB8\x60\x01\x00\x00"s, memory.after_bundle);
+        off = function_start(memory.at_exe(off));
+        return res = (Say)off;
+    }
+}
+
 Script::Script(std::string script, std::string file)
 {
     strcpy(code, script.data());
@@ -73,6 +83,13 @@ Script::Script(std::string script, std::string file)
     lua["toast"] = [this](std::wstring message) {
         auto toast = get_toast();
         toast(NULL, message.data());
+    };
+    lua["say"] = [this](uint32_t entity_id, std::wstring message, int unk_type, bool top) {
+        auto say = get_say();
+        auto entity = get_entity_ptr(entity_id);
+        if(entity == nullptr)
+            return;
+        say(NULL, entity, message.data(), unk_type, top);
     };
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
         options[name] = {desc, value, min, max};
