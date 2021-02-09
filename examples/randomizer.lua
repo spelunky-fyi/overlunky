@@ -230,6 +230,13 @@ function on_level()
     set_contents(v, item)
   end
 
+  -- invisible traps?!
+  springs = get_entities_by_type(ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE)
+  for i,v in ipairs(springs) do
+    spring = get_entity(v)
+    spring.color.a = math.random()*0.5
+  end
+
   -- check for dead bosses
   if (state.journal_flags & (1 << 15)) > 0 then
     remove_boss(THEME.ABZU)

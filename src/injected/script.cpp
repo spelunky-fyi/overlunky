@@ -106,6 +106,16 @@ Script::Script(std::string script, std::string file)
     lua["lock_door_at"] = lock_door_at;
     lua["unlock_door_at"] = unlock_door_at;
     lua["get_frame_count"] = get_frame_count;
+    lua.new_usertype<Color>(
+        "Color",
+        "r",
+        &Color::r,
+        "g",
+        &Color::g,
+        "b",
+        &Color::b,
+        "a",
+        &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",
@@ -211,7 +221,9 @@ Script::Script(std::string script, std::string file)
         "has_backpack",
         &Movable::has_backpack,
         "inventory",
-        &Movable::inventory_ptr);
+        &Movable::inventory_ptr,
+        "color",
+        &Movable::color);
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
