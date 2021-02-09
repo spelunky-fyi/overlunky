@@ -76,7 +76,7 @@ function remove_boss(boss)
   for k,v in ipairs(bosses_left) do
     if v == boss then
       table.remove(bosses_left, k)
-      message("Boss defeated! Bosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
+      toast("Boss defeated!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
     end
   end
 end
@@ -199,7 +199,6 @@ function throw_rock(id)
 end
 
 function on_level()
-  message("Level "..tostring(state.level_count+1)..". Bosses remaining: "..(#bosses_left-(#bosses-options.bosses)))
   state.world = world[state.theme]
   if state.level_count == 0 then
     init_run()
@@ -235,10 +234,13 @@ function on_level()
   end
 
   -- invisible traps?!
-  springs = get_entities_by_type(ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE)
-  for i,v in ipairs(springs) do
+  traps = get_entities_by_type(ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE)
+  for i,v in ipairs(traps) do
     spring = get_entity(v)
     spring.color.a = math.random()*0.5
+  end
+  if #traps > 0 then
+    toast("Oh no the traps are invisible!?")
   end
 
   -- check for dead bosses
@@ -363,6 +365,8 @@ end
 
 function on_transition()
   exit_locked = false
+  toast("Level "..tostring(state.level_count).." completed!")
+
 end
 
 function on_death()

@@ -239,7 +239,15 @@ Script::Script(std::string script, std::string file)
         "inventory",
         &Movable::inventory_ptr,
         "color",
-        &Movable::color);
+        &Movable::color,
+        "hitboxx",
+        &Movable::hitboxx,
+        "hitboxy",
+        &Movable::hitboxy,
+        "offsetx",
+        &Movable::offsetx,
+        "offsety",
+        &Movable::offsety);
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
