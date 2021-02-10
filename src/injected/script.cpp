@@ -149,16 +149,19 @@ Script::Script(std::string script, std::string file)
     lua["unlock_door_at"] = unlock_door_at;
     lua["get_frame"] = get_frame_count;
     lua["carry"] = carry;
-    lua.new_usertype<Color>(
-        "Color",
-        "r",
-        &Color::r,
-        "g",
-        &Color::g,
-        "b",
-        &Color::b,
-        "a",
-        &Color::a);
+    lua["distance"] = [this](uint32_t a, uint32_t b) {
+        Entity *ea = get_entity_ptr(a);
+        Entity *eb = get_entity_ptr(b);
+        if(ea == nullptr || eb == nullptr)
+            return -1.0f;
+        else
+            return sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
+    };
+    lua["setflag"] = [](uint32_t v, int b) { return v | (1U << (b - 1)); };
+    lua["clrflag"] = [](uint32_t v, int b) { return v & ~(1U << (b - 1)); };
+    lua["testflag"] = [](uint32_t v, int b) { return (v & (1U << (b - 1))) > 0; };
+
+    lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",
@@ -490,7 +493,7 @@ bool Script::run()
         {
             on_guiframe.value()();
         }
-        if (on_frame && get_frame_count() != state.frame)
+        if (on_frame && g_state->time_level != state.time_level)
         {
             on_frame.value()();
         }
@@ -591,7 +594,7 @@ bool Script::run()
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 101 && get_frame_count() != state.frame) // ON.FRAME
+                else if (cb->screen == 101 && g_state->time_level != state.time_level) // ON.FRAME
                 {
                     cb->func();
                     cb->lastRan = now;

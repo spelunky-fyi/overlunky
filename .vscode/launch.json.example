@@ -7,7 +7,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Overlunky (Release)",
-            "program": "${workspaceRoot}/build/bin/Debug/injector.exe",
+            "program": "${workspaceRoot}/build/bin/Release/injector.exe",
             "cwd": "${workspaceRoot}/build/bin/Release/",
             "preLaunchTask": "Build Release",
         },

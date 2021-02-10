@@ -169,7 +169,6 @@ uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
-std::vector<std::string> tab_order;
 std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
@@ -183,6 +182,16 @@ std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
 std::string active_tab = "", activate_tab = "";
+std::vector<std::string> tab_order = {
+    "tool_entity",
+    "tool_door",
+    "tool_camera",
+    "tool_entity_properties",
+    "tool_game_properties",
+    "tool_script",
+    "tool_options",
+    "tool_style",
+    "tool_debug"};
 
 static char text[500];
 const char *themes[] = {
@@ -362,7 +371,7 @@ const char *direction_flags[] = {"Left", "Down", "Up", "Right"};
 
 const char *inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
-const std::string scriptpath = "Overlunky\\Scripts";
+std::string scriptpath = "Overlunky/Scripts";
 
 const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
@@ -606,18 +615,7 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
-    writeData << "tabs = [";
-    for (int i = 0; i < tab_order.size(); i++)
-    {
-        writeData << std::endl << "  \"" << tab_order[i] << "\"";
-        if (i < tab_order.size() - 1)
-            writeData << ",";
-    }
-    if (!tab_order.empty())
-        writeData << std::endl;
-    writeData << "]" << std::endl;
-
-    writeData << "autorun = [";
+    writeData << "autorun_scripts = [";
     for (int i = 0; i < g_script_autorun.size(); i++)
     {
         writeData << std::endl << "  \"" << g_script_autorun[i] << "\"";
@@ -627,6 +625,8 @@ void save_config(std::string file)
     if (!g_script_autorun.empty())
         writeData << std::endl;
     writeData << "]" << std::endl;
+
+    writeData << "script_dir = \"" << scriptpath << "\"" << std::endl;
 
     writeData.close();
 }
@@ -680,19 +680,8 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0);
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
-    tab_order = toml::find_or<std::vector<std::string>>(
-        opts,
-        "tabs",
-        {"tool_entity",
-         "tool_door",
-         "tool_camera",
-         "tool_entity_properties",
-         "tool_game_properties",
-         "tool_script",
-         "tool_options",
-         "tool_style",
-         "tool_debug"});
-    g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun", {});
+    g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
+    scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -2423,7 +2412,7 @@ void autorun_scripts()
 {
     for (auto file : g_script_autorun)
     {
-        std::string script = scriptpath + "\\" + file;
+        std::string script = scriptpath + "/" + file;
         if (std::filesystem::exists(script) && std::filesystem::is_regular_file(script))
         {
             load_script(script);
@@ -2446,7 +2435,7 @@ void render_script_files()
     }
     if (g_script_files.size() == 0)
     {
-        ImGui::TextWrapped("No scripts found. Put .lua files in Spelunky 2\\%s\\", scriptpath.data());
+        ImGui::TextWrapped("No scripts found. Put .lua files in %s", scriptpath.data());
     }
     if (ImGui::Button("Refresh##RefreshScripts"))
     {

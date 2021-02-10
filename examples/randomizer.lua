@@ -1,6 +1,6 @@
-meta.name = "Randomizer"
-meta.version = "0.1"
-meta.description = "Random exit doors, pot/crate/coffin contents, player stats, boss order and other cool stuff!"
+meta.name = "Crashy Randomizer"
+meta.version = "WIP"
+meta.description = "Random exit doors, pot/crate/coffin contents, player stats, boss order and other cool stuff! (This is not very stable, so I'm cutting it into smaller scripts that should be less prone to crashing... Don't use this.)"
 meta.author = "Dregu"
 
 register_option_int("min_levels", "Min normal levels before boss", 3, 1, 100)
@@ -14,7 +14,8 @@ register_option_bool("lock_exit", "Lock exit in Dwelling", true)
 
 items = {220,221,222,223,224,225,227,228,229,230,231,232,233,234,237,238,239,240,242,243,244,245,246,247,248,249,250,251,252,253,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,283,284,286,287,288,289,290,295,296,297,298,300,301,302,303,304,305,306,307,308,309,310,311,312,317,318,319,320,321,322,323,331,332,333,334,336,337,338,339,340,341,347,348,356,357,358,365,366,371,372,373,374,377,395,396,399,400,401,402,409,416,422,428,429,435,436,439,440,442,444,448,453,456,457,462,469,475,476,477,478,479,480,481,482,490,491,492,493,494,495,496,497,498,499,500,501,506,507,508,509,510,511,512,513,514,515,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,592,593,596,604,610,630,631,884,885,886,887,888,890}
 tools = {374,422,509,510,511,512,513,514,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,534,536,557,558,560,563,565,567,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,585}
-theme = {1,2,3,5,6,7,8,9,10,11}
+--theme = {1,2,3,5,6,7,8,9,10,11} -- ice caves keeps crashing
+theme = {1,2,3,5,6,8,9,10,11}
 bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
 bosses_left = {}
 world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
@@ -42,10 +43,6 @@ exit_locked = false
 hidden_block = 0
 hidden_x = 0
 hidden_y = 0
-
-function setflag(v, b) return v | (1 << b-1) end
-function clrflag(v, b) return v & ~(1 << b-1) end
-function testflag(v, b) return (v & (1 << b-1)) > 0 end
 
 function random_level()
   -- rare eggplant world
@@ -187,6 +184,8 @@ function random_doors()
       end
     end
   end
+  -- debug exit
+  door(players[1].x, players[1].y, 0, nextworld, nextlevel, nexttheme)
 end
 
 function throw_rock(id)
@@ -237,8 +236,8 @@ function on_level()
   -- invisible traps?!
   traps = get_entities_by_type(ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE)
   for i,v in ipairs(traps) do
-    spring = get_entity(v)
-    spring.color.a = math.random()*0.5
+    trap = get_entity(v)
+    trap.color.a = math.random()*0.5
   end
   if #traps > 0 then
     toast("Oh no the traps are invisible!?")
@@ -399,25 +398,5 @@ function on_death()
   message("I eventually died in level "..tostring(state.level_count+1)..". Bosses remaining: "..(#bosses_left-(#bosses-options.bosses)))
   exit_locked = false
 end
-
-pet_interval = set_interval(function()
-  if #players == 0 then return end
-  x, y, l = get_position(players[1].uid)
-  cats = get_entities_at(ENT_TYPE.MONS_PET_CAT, 0, x, y, l, 2)
-  if #cats > 0 then
-    say(cats[1], "I hate Mondays.", 0, true)
-    clear_callback(pet_interval)
-  end
-  dogs = get_entities_at(ENT_TYPE.MONS_PET_DOG, 0, x, y, l, 2)
-  if #dogs > 0 then
-    say(dogs[1], "Living in the caves is ruff.", 0, true)
-    clear_callback(pet_interval)
-  end
-  hamsters = get_entities_at(ENT_TYPE.MONS_PET_HAMSTER, 0, x, y, l, 2)
-  if #hamsters > 0 then
-    say(hamsters[1], "Do you ever feel like you're just living the same day over and over again?", 0, true)
-    clear_callback(pet_interval)
-  end
-end, 60)
 
 message("Spelunky 2 Door+Pot Randomizer WIP initialized!")
