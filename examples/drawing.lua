@@ -33,7 +33,7 @@ set_callback(function()
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
         e = get_entity(v)
-        sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy-0.2)
+        sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if e.health > 0 then
             draw_text(sx, sy, tostring(v).."\n"..tostring(e.health).." HP", rgba(255, 255, 255, 255))
         end
