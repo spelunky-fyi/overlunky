@@ -1785,25 +1785,6 @@ void render_cross()
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
 }
 
-ImVec2 screenify(ImVec2 pos)
-{
-    ImGuiIO &io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
-    ImVec2 bar = {0.0, 0.0};
-    if (res.x / res.y > 1.78)
-    {
-        bar.x = (res.x - res.y / 9 * 16) / 2;
-        res.x = res.y / 9 * 16;
-    }
-    else if (res.x / res.y < 1.77)
-    {
-        bar.y = (res.y - res.x / 16 * 9) / 2;
-        res.y = res.x / 16 * 9;
-    }
-    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (pos.y / (1.0 / (res.y / 2)) + res.y / 2 + bar.y));
-    return screened;
-}
-
 void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
     if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
@@ -1913,7 +1894,8 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
 
 void render_script(Script *script)
 {
-    script->run();
+    auto *draw_list = ImGui::GetBackgroundDrawList();
+    script->run(draw_list);
 }
 
 ImVec2 normalize(ImVec2 pos)

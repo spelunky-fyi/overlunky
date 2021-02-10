@@ -14,8 +14,12 @@
 #include "rpc.hpp"
 #include "state.hpp"
 
+#include "imgui.h"
+
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
+
+ImVec2 screenify(ImVec2 pos);
 
 struct IntervalCallback
 {
@@ -79,6 +83,7 @@ class Script
     bool enabled = true;
     ScriptMeta meta = {"", "", "", "", ""};
     int cbcount = 0;
+    ImDrawList *drawlist;
 
     std::map<std::string, ScriptOption> options;
     std::deque<std::pair<std::string, std::chrono::time_point<std::chrono::system_clock>>> messages;
@@ -98,5 +103,5 @@ class Script
     void register_option_int(std::string name, std::string desc, int value, int min, int max);
     void register_option_bool(std::string name, std::string desc, bool value);
 
-    bool run();
+    bool run(ImDrawList *dl);
 };

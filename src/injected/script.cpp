@@ -161,6 +161,19 @@ Script::Script(std::string script, std::string file)
     lua["clrflag"] = [](uint32_t v, int b) { return v & ~(1U << (b - 1)); };
     lua["testflag"] = [](uint32_t v, int b) { return (v & (1U << (b - 1))) > 0; };
 
+    lua["color"] = [](int r, int g, int b, int a) {
+        return (unsigned int)(r << 24) + (g << 16) + (b << 8) + (a);
+    };
+    lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
+        ImVec2 a = screenify({x1, y1});
+        ImVec2 b = screenify({x2, y2});
+        drawlist->AddLine(a, b, color, thickness);
+    };
+    lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
+        ImVec2 a = screenify({x, y});
+        drawlist->AddCircle(a, radius, color, 0, thickness);
+    };
+
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",
@@ -427,7 +440,7 @@ Script::Script(std::string script, std::string file)
         103);
 }
 
-bool Script::run()
+bool Script::run(ImDrawList *dl)
 {
     if (!enabled)
         return true;
@@ -463,6 +476,7 @@ bool Script::run()
     }
     try
     {
+        drawlist = dl;
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
@@ -673,4 +687,23 @@ std::tuple<float, float, int> get_position(uint32_t id)
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
     return {0.0f, 0.0f, 0};
+}
+
+ImVec2 screenify(ImVec2 pos)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    ImVec2 bar = {0.0, 0.0};
+    if (res.x / res.y > 1.78)
+    {
+        bar.x = (res.x - res.y / 9 * 16) / 2;
+        res.x = res.y / 9 * 16;
+    }
+    else if (res.x / res.y < 1.77)
+    {
+        bar.y = (res.y - res.x / 16 * 9) / 2;
+        res.y = res.x / 16 * 9;
+    }
+    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (pos.y / (1.0 / (res.y / 2)) + res.y / 2 + bar.y));
+    return screened;
 }
