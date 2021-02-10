@@ -29,6 +29,7 @@ int get_entity_ai_state(uint32_t id);
 size_t get_state_ptr();
 std::vector<Player *> get_players();
 std::pair<float, float> screen_position(float x, float y);
+float screen_distance(float x);
 float get_zoom_level();
 std::vector<uint32_t> get_entities();
 std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer);

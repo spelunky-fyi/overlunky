@@ -140,6 +140,7 @@ Script::Script(std::string script, std::string file)
     lua["get_entity_type"] = get_entity_type;
     lua["get_zoom_level"] = get_zoom_level;
     lua["screen_position"] = screen_position;
+    lua["screen_distance"] = screen_distance;
     lua["get_position"] = get_position;
     lua["entity_remove_item"] = entity_remove_item;
     lua["spawn_entity_over"] = spawn_entity_over;
@@ -161,17 +162,26 @@ Script::Script(std::string script, std::string file)
     lua["clrflag"] = [](uint32_t v, int b) { return v & ~(1U << (b - 1)); };
     lua["testflag"] = [](uint32_t v, int b) { return (v & (1U << (b - 1))) > 0; };
 
-    lua["color"] = [](int r, int g, int b, int a) {
-        return (unsigned int)(r << 24) + (g << 16) + (b << 8) + (a);
+    lua["rgba"] = [](int r, int g, int b, int a) {
+        return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r);
     };
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
         drawlist->AddLine(a, b, color, thickness);
     };
+    lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color) {
+        ImVec2 a = screenify({x1, y1});
+        ImVec2 b = screenify({x2, y2});
+        drawlist->AddRect(a, b, color, rounding, 15, thickness);
+    };
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
         ImVec2 a = screenify({x, y});
-        drawlist->AddCircle(a, radius, color, 0, thickness);
+        drawlist->AddCircle(a, screenify(radius), color, 0, thickness);
+    };
+    lua["draw_text"] = [this](float x, float y, std::string text, ImU32 color) {
+        ImVec2 a = screenify({x, y});
+        drawlist->AddText(a, color, text.data());
     };
 
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
@@ -687,6 +697,13 @@ std::tuple<float, float, int> get_position(uint32_t id)
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
     return {0.0f, 0.0f, 0};
+}
+
+float screenify(float dis)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    return dis / (1.0 / (res.x / 2));
 }
 
 ImVec2 screenify(ImVec2 pos)

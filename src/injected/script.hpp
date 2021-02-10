@@ -20,6 +20,7 @@
 #include "sol/sol.hpp"
 
 ImVec2 screenify(ImVec2 pos);
+float screenify(float dis);
 
 struct IntervalCallback
 {

@@ -331,6 +331,13 @@ std::pair<float, float> screen_position(float x, float y)
     return State::get().screen_position(x, y);
 }
 
+float screen_distance(float x)
+{
+    auto a = State::get().screen_position(0, 0);
+    auto b = State::get().screen_position(x, 0);
+    return b.first - a.first;
+}
+
 std::vector<uint32_t> get_entities()
 {
     auto state = State::get();
