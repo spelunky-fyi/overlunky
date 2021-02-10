@@ -155,7 +155,7 @@ Script::Script(std::string script, std::string file)
         if(ea == nullptr || eb == nullptr)
             return -1.0f;
         else
-            return sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
+            return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
     };
     lua["setflag"] = [](uint32_t v, int b) { return v | (1U << (b - 1)); };
     lua["clrflag"] = [](uint32_t v, int b) { return v & ~(1U << (b - 1)); };
