@@ -571,6 +571,30 @@ bool InputStringMultiline(const char *label, std::string *str, const ImVec2 &siz
     return ImGui::InputTextMultiline(label, (char *)str->c_str(), str->capacity() + 1, size, flags);
 }
 
+void refresh_script_files()
+{
+    g_script_files.clear();
+    if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    {
+        for (const auto &file : std::filesystem::directory_iterator(scriptpath))
+        {
+            g_script_files.push_back(file.path());
+        }
+    }
+}
+
+void autorun_scripts()
+{
+    for (auto file : g_script_autorun)
+    {
+        std::string script = scriptpath + "/" + file;
+        if (std::filesystem::exists(script) && std::filesystem::is_regular_file(script))
+        {
+            load_script(script);
+        }
+    }
+}
+
 void save_config(std::string file)
 {
     std::ofstream writeData(file);
@@ -627,8 +651,8 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
-    writeData << "# Directory where the scripts are loaded from. You can use relative or absolute paths." << std::endl
-              << "# Relative paths are relative to the game directory. Use forward slashes." << std::endl;
+    writeData << "# Directory where the scripts are loaded from. You can use relative or absolute path." << std::endl
+              << "# A relative path is relative to the game directory. Use forward / slashes." << std::endl;
     writeData << "script_dir = \"" << scriptpath << "\"" << std::endl;
 
     writeData.close();
@@ -1431,6 +1455,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
         ImGui::LoadIniSettingsFromDisk(inifile);
         load_config(cfgfile);
+        refresh_script_files();
         set_colors();
     }
     else if (pressed("tool_style", wParam))
@@ -2381,30 +2406,6 @@ void render_debug()
     ImGui::PopItemWidth();
 }
 
-void refresh_script_files()
-{
-    g_script_files.clear();
-    if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
-    {
-        for (const auto &file : std::filesystem::directory_iterator(scriptpath))
-        {
-            g_script_files.push_back(file.path());
-        }
-    }
-}
-
-void autorun_scripts()
-{
-    for (auto file : g_script_autorun)
-    {
-        std::string script = scriptpath + "/" + file;
-        if (std::filesystem::exists(script) && std::filesystem::is_regular_file(script))
-        {
-            load_script(script);
-        }
-    }
-}
-
 void render_script_files()
 {
     ImGui::PushID("files");
@@ -2420,7 +2421,9 @@ void render_script_files()
     }
     if (g_script_files.size() == 0)
     {
-        ImGui::TextWrapped("No scripts found. Put .lua files in %s", scriptpath.data());
+        std::filesystem::path path = scriptpath;
+        std::string abspath = std::filesystem::absolute(path).string();
+        ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.data());
     }
     if (ImGui::Button("Refresh##RefreshScripts"))
     {
@@ -3119,6 +3122,7 @@ void render_style_editor()
     if (ImGui::Button("Load##StyleLoad"))
     {
         load_config(cfgfile);
+        refresh_script_files();
     }
     set_colors();
 }
