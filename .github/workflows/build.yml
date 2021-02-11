@@ -49,6 +49,7 @@ jobs:
           move build\bin\Release\injected.dll Overlunky\injected.dll
           move build\bin\Release\injector.exe Overlunky\Overlunky.exe
           move README.md Overlunky\README.txt
+          move examples Overlunky\Scripts
           7z a Overlunky_${{ steps.get_version.outputs.VERSION }}.zip Overlunky\Overlunky.exe Overlunky\injected.dll Overlunky\README.txt
 
       - name: Upload artifacts

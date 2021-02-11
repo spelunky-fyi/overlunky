@@ -1,3 +1,8 @@
+meta.name = "Talking pets example"
+meta.version = "WIP"
+meta.description = "Gives pets some oneliners with say()"
+meta.author = "Dregu"
+
 set_callback(function()
     pet_interval = set_interval(function()
         if #players == 0 then return end

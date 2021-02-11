@@ -1,3 +1,8 @@
+meta.name = "Drawing example"
+meta.version = "WIP"
+meta.description = "Draws some shapes and text."
+meta.author = "Dregu"
+
 -- r/uselessredcircle
 set_callback(function()
     if #players < 1 then return end

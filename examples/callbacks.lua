@@ -1,5 +1,5 @@
 meta.name = 'Callback test'
-meta.version = '1.2.3'
+meta.version = 'WIP'
 meta.description = 'Tests callbacks.'
 meta.author = 'Dregu'
 
