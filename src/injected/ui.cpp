@@ -2480,7 +2480,7 @@ void render_scripts()
         }
         ImGui::PopID();
     }
-    if (ImGui::CollapsingHeader("Load new script##LoadScriptFile"))
+    if (ImGui::CollapsingHeader("Load new script##LoadScriptFile"), ImGuiTreeNodeFlags_DefaultOpen)
     {
         render_script_files();
     }

@@ -556,7 +556,6 @@ void set_contents(uint32_t id, uint32_t item)
     if (type != 435 && type != 402 && type != 422 && type != 423 && type != 475)
         return;
     static_cast<Movable *>(container)->inside = item;
-    DEBUG("Set {} to {}", id, item);
 }
 
 void entity_remove_item(uint32_t id, uint32_t item)

@@ -39,3 +39,21 @@ set_callback(function()
         end
     end
 end, ON.GUIFRAME)
+
+-- door finder
+set_callback(function()
+    if #players < 1 then return end
+    px, py, pl = get_position(players[1].uid)
+    ents = get_entities_by_type(ENT_TYPE.LOGICAL_DOOR)
+    for i,v in ipairs(ents) do
+        x, y, l = get_position(v)
+        e = get_entity(v)
+        sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
+        if l ==pl  then
+            draw_text(sx, sy, tostring(v), rgba(255, 255, 255, 255))
+        end
+    sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
+    sx2, sy2 = screen_position(x+e.hitboxx+e.offsetx, y-e.hitboxy+e.offsety) -- bottom right
+    draw_rect(sx, sy, sx2, sy2, 2, 10, rgba(255, 0, 255, 255))
+    end
+end, ON.GUIFRAME)
