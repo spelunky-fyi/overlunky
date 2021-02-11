@@ -45,6 +45,8 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **F5**: Game state
       + See and change a lot of variables from the game state
       + **Ctrl+P**: Toggle game engine pause
+  - **F8**: Scripts
+      + You can load, edit and set options for Lua scripts here
   - **F9**: Options
       + Lots of options. **Check the ini for hotkeys, I'm tired of updating this.**
   - **F11**: Hide overlay
@@ -52,8 +54,12 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Ctrl+Shift+I**: ImGui internal metrics and settings
   - **Ctrl+Shift+S**: Save options, hotkeys and UI colors
   - **Ctrl+Shift+L**: Load options, hotkeys and UI colors
+  - **Ctrl+Shift+D**: Detach active tab in tabbed interface
   - **Enter**: Run active tool
   - **Escape**: Return focus to game from an input
+
+### Scripts
+Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. Also there's no documentation, but a few examples. Everything you really need is in `script.cpp` and `rpc.hpp` though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini.
 
 ## Troubleshooting
   - If your game crashes when launching Overlunky or it just closes and you don't ever see the overlay in game:

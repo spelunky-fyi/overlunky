@@ -2437,6 +2437,11 @@ void render_script_files()
 
 void render_scripts()
 {
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextColored(
+        ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
+        "Note: The Lua API is unstable, not ready and it WILL change, probably a lot. You can play around with it, but don't be surprised if none of your scripts work next week.");
+    ImGui::PopTextWrapPos();
     ImGui::PushItemWidth(-1);
     for (int i = 0; i < g_scripts.size();)
     {
