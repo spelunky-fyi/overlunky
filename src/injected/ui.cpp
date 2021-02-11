@@ -3374,7 +3374,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetWindowPos({0, 0}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 2}, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::Begin(windows["tool_entity_properties"]->name.c_str());
             render_entity_props();
             lastwidth += ImGui::GetWindowWidth();
@@ -3382,12 +3382,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 2}, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::Begin(windows["tool_game_properties"]->name.c_str());
             render_game_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 2}, win_condition);
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::Begin(windows["tool_script"]->name.c_str());
+            render_scripts();
+            lastwidth += ImGui::GetWindowWidth();
+            lastheight += ImGui::GetWindowHeight();
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2*ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::End();
         }
         else
