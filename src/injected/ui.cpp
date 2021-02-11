@@ -615,6 +615,7 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
+    writeData << "# Script filenames to load automatically on start. Example: autorun_scripts = [\"foo.lua\", \"bar.lua\"]" << std::endl;
     writeData << "autorun_scripts = [";
     for (int i = 0; i < g_script_autorun.size(); i++)
     {
@@ -626,6 +627,8 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
+    writeData << "# Directory where the scripts are loaded from. You can use relative or absolute paths." << std::endl
+              << "# Relative paths are relative to the game directory. Use forward slashes." << std::endl;
     writeData << "script_dir = \"" << scriptpath << "\"" << std::endl;
 
     writeData.close();
