@@ -1,5 +1,14 @@
 # Overlunky Lua API
-Everything here is still changing, don't be sad if your scripts break next week! This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).
+- Everything here is still changing, don't be sad if your scripts break next week!
+- This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).
+- This doc is for the HEAD version. If you're using an exe release from the past, you might find some things here don't work.
+- You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md).
+## Lua libraries
+The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.3/manual.html#6).
+### `math`
+### `base`
+### `string`
+### `table`
 ## Global variables
 These variables are always there to use.
 ### `state`
@@ -149,7 +158,17 @@ Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore t
 ### `get_entities_by_type`
 #### Params: `int, int...`
 #### Returns: `array<int>`
-Get uids of entities matching id. Accepts any number of id's.
+Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
+You can even pass a table! Example:
+```
+types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
+function on_level()
+    uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
+    -- is not the same thing as this, but also works
+    uids2 = get_entities_by_type(types)
+    message(tostring(#uids).." == "..tostring(#uids2))
+end
+```
 ### `get_entities_by_mask`
 #### Params: `int mask`
 #### Returns: `array<int>`

@@ -6,6 +6,7 @@ rpc = []
 events = []
 funcs = []
 types = []
+lualibs = []
 enums = [{'name': 'ENT_TYPE', 'vars': [{'name': 'FLOOR_BORDERTILE', 'type': '1'}, {'name': '', 'type': '...blah blah read your entities.txt...'}, {'name': 'LIQUID_STAGNANT_LAVA', 'type': '898'}]}]
 replace = {
     'uint8_t': 'int',
@@ -134,8 +135,27 @@ for file in api_files:
             vars.append({ 'name': var[0], 'type': var[1] })
         enums.append({'name': name, 'vars': vars})
 
+for file in api_files:
+    data = open(file, 'r').read()
+    data = data.replace('\n', '')
+    data = re.sub(r' ', '', data)
+    m = re.search(r'open_libraries\s*\(([^\)]*)\)', data);
+    if m:
+        libs = m.group(1).split(',')
+        for lib in libs:
+            lualibs.append(lib.replace('sol::lib::', ''))
+
 print('# Overlunky Lua API')
-print('Everything here is still changing, don\'t be sad if your scripts break next week! This doc doesn\'t have a lot of examples, that\'s why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).')
+print('- Everything here is still changing, don\'t be sad if your scripts break next week!')
+print('- This doc doesn\'t have a lot of examples, that\'s why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).')
+print('- This doc is for the HEAD version. If you\'re using an exe release from the past, you might find some things here don\'t work.')
+print('- You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md).')
+
+print('## Lua libraries')
+print('The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.3/manual.html#6).')
+for lib in lualibs:
+    print('### `'+lib+'`')
+
 print('## Global variables')
 print("""These variables are always there to use.""")
 for lf in funcs:

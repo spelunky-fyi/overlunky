@@ -172,11 +172,32 @@ Script::Script(std::string script, std::string file)
     /// Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
     /// Returns: `array<int>`
-    /// Get uids of entities matching id. Accepts any number of id's.
+    /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
+    /// You can even pass a table! Example:
+    /// ```
+    /// types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
+    /// function on_level()
+    ///     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
+    ///     -- is not the same thing as this, but also works
+    ///     uids2 = get_entities_by_type(types)
+    ///     message(tostring(#uids).." == "..tostring(#uids2))
+    /// end
+    /// ```
     lua["get_entities_by_type"] = [](sol::variadic_args va) {
-        auto get_func = sol::resolve<std::vector<uint32_t>(std::vector<uint32_t>)>(get_entities_by_type);
-        auto args = std::vector<uint32_t>(va.begin(), va.end());
-        return get_func(args);
+        sol::type type = va.get_type();
+        if (type == sol::type::number)
+        {
+            auto args = std::vector<uint32_t>(va.begin(), va.end());
+            auto get_func = sol::resolve<std::vector<uint32_t>(std::vector<uint32_t>)>(get_entities_by_type);
+            return get_func(args);
+        }
+        else if (type == sol::type::table)
+        {
+            auto args = va.get<std::vector<uint32_t>>(0);
+            auto get_func = sol::resolve<std::vector<uint32_t>(std::vector<uint32_t>)>(get_entities_by_type);
+            return get_func(args);
+        }
+        return std::vector<uint32_t>({});
     };
     /// Get uids of entities by some search_flags
     lua["get_entities_by_mask"] = get_entities_by_mask;
