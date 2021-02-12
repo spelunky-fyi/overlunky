@@ -73,12 +73,14 @@ for file in api_files:
     data = open(file, 'r').read().split('\n')
     for line in data:
         line = line.replace('*', '')
-        c = re.search(r'/// ?(.*)$', line)
-        if c:
-            comment.append(c.group(1))
         m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\];', line)
         if m:
             events.append({'name': m.group(1), 'comment': comment})
+        else:
+            comment = []
+        c = re.search(r'/// ?(.*)$', line)
+        if c:
+            comment.append(c.group(1))
         else:
             comment = []
 
@@ -132,6 +134,8 @@ for file in api_files:
             vars.append({ 'name': var[0], 'type': var[1] })
         enums.append({'name': name, 'vars': vars})
 
+print('# Overlunky Lua API')
+print('Everything here is still changing, don\'t be sad if your scripts break next week! This doc doesn\'t have a lot of examples, that\'s why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).')
 print('## Global variables')
 print("""These variables are always there to use.""")
 for lf in funcs:
@@ -154,7 +158,7 @@ for lf in events:
             print(com)
 
 print('## Functions')
-print('Note: The game functions like `spawn` use level coordinates that you can get with `get_position`. Draw functions use normalized screen coordinates from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.')
+print('Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.')
 for lf in funcs:
     if len(rpcfunc(lf['cpp'])):
         for af in rpcfunc(lf['cpp']):

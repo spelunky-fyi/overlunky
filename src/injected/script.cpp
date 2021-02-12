@@ -165,7 +165,7 @@ Script::Script(std::string script, std::string file)
     lua["set_contents"] = set_contents;
     /// Get the [Movable](#movable) entity behind an uid
     lua["get_entity"] = get_entity;
-    /// Get the EntityDB behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in Entity to actually edit these.
+    /// Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in [Movable](#movable) to actually edit these.
     lua["get_type"] = get_type;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
@@ -581,14 +581,23 @@ bool Script::run(ImDrawList *dl)
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
 
+        /// Runs on every screen frame. You need this to use draw functions.
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
+        /// Runs on every game engine frame.
         sol::optional<sol::function> on_frame = lua["on_frame"];
+        /// Runs on entering the camp.
         sol::optional<sol::function> on_camp = lua["on_camp"];
+        /// Runs on the start of every level.
         sol::optional<sol::function> on_level = lua["on_level"];
+        /// Runs on the start of first level.
         sol::optional<sol::function> on_start = lua["on_start"];
+        /// Runs on the start of level transition.
         sol::optional<sol::function> on_transition = lua["on_transition"];
+        /// Runs on the death screen.
         sol::optional<sol::function> on_death = lua["on_death"];
+        /// Runs on any ending cutscene.
         sol::optional<sol::function> on_win = lua["on_win"];
+        /// Runs on any [screen change](#on).
         sol::optional<sol::function> on_screen = lua["on_screen"];
         g_players = get_players();
         lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());

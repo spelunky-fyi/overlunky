@@ -1,3 +1,5 @@
+# Overlunky Lua API
+Everything here is still changing, don't be sad if your scripts break next week! This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).
 ## Global variables
 These variables are always there to use.
 ### `state`
@@ -26,16 +28,25 @@ function on_level()
 end
 ```
 ### `on_guiframe`
+Runs on every screen frame. You need this to use draw functions.
 ### `on_frame`
+Runs on every game engine frame.
 ### `on_camp`
+Runs on entering the camp.
 ### `on_level`
+Runs on the start of every level.
 ### `on_start`
+Runs on the start of first level.
 ### `on_transition`
+Runs on the start of level transition.
 ### `on_death`
+Runs on the death screen.
 ### `on_win`
+Runs on any ending cutscene.
 ### `on_screen`
+Runs on any [screen change](#on).
 ## Functions
-Note: The game functions like `spawn` use level coordinates that you can get with `get_position`. Draw functions use normalized screen coordinates from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
+Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### `message`
 #### Params: `string message`
 Print a log message on screen.
@@ -127,7 +138,7 @@ Get the [Movable](#movable) entity behind an uid
 ### `get_type`
 #### Params: `int id`
 #### Returns: `EntityDB`
-Get the EntityDB behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in Entity to actually edit these.
+Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in [Movable](#movable) to actually edit these.
 ### `get_entities`
 #### Returns: `array<int>`
 Get uids of all entities currently loaded
