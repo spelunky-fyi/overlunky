@@ -40,18 +40,32 @@ Script::Script(std::string script, std::string file)
 
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
 
+    /// A bunch of [game state](#statememory) variables
+    /// Example:
+    /// ```
+    /// if state.time_level > 300 and state.theme == THEME.DWELLING then
+    ///     toast("Congratilations for lasting 10 seconds in Dwelling")
+    /// end
+    /// ```
+    lua["state"] = g_state;
+    /// An array of [Movables](#movable) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
+    /// Print a log message on screen.
     lua["message"] = [this](std::string message) {
         messages.push_back({message, std::chrono::system_clock::now()});
         if(messages.size() > 20)
             messages.pop_front();
     };
+    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Add per level callback function to be called every `frames` game frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames)
     {
         auto luaCb = IntervalCallback{cb, frames, -1};
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
+    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Add per level callback function to be called after `frames` frames. Timer is paused on pause and cleared on level transition.
     lua["set_timeout"] = [this](sol::function cb, int frames)
     {
         int now = g_state->time_level;
@@ -59,12 +73,16 @@ Script::Script(std::string script, std::string file)
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
+    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Add global callback function to be called every `frames` frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [this](sol::function cb, int frames)
     {
         auto luaCb = IntervalCallback{cb, frames, -1};
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
+    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Add global callback function to be called after `frames` frames. This timer is never paused or cleared.
     lua["set_global_timeout"] = [this](sol::function cb, int frames)
     {
         int now = get_frame_count();
@@ -72,18 +90,29 @@ Script::Script(std::string script, std::string file)
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
+    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Add global callback function to be called on an [event](#on).
     lua["set_callback"] = [this](sol::function cb, int screen) {
         auto luaCb = ScreenCallback{cb, screen, -1};
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
+    /// Clear previously added callback `id`
     lua["clear_callback"] = [this](int id) { clear_callbacks.push_back(id); };
+    /// Table of strings where you should set some script metadata shown in the UI.
+    /// - `meta.name` Script name
+    /// - `meta.version` Version
+    /// - `meta.description` Short description of the script
+    /// - `meta.author` Your name
     lua["meta"] = lua.create_named_table("meta");
+    /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
+    /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message) {
         auto toast = get_toast();
         toast(NULL, message.data());
     };
+    /// Show a message coming from an entity
     lua["say"] = [this](uint32_t entity_id, std::wstring message, int unk_type, bool top) {
         auto say = get_say();
         auto entity = get_entity_ptr(entity_id);
@@ -91,65 +120,111 @@ Script::Script(std::string script, std::string file)
             return;
         say(NULL, entity, message.data(), unk_type, top);
     };
+    /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
         options[name] = {desc, value, min, max};
         lua["options"][name] = value;
     };
+    /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_bool"] = [this](std::string name, std::string desc, bool value) {
         options[name] = {desc, value, 0, 0};
         lua["options"][name] = value;
     };
+    /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     lua["spawn_entity"] = spawn_entity_abs;
+    /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
+    /// Spawn a door to another world, level and theme and return the uid of spawned entity.
     lua["spawn_door"] = spawn_door_abs;
+    /// Short for [spawn_door](#spawn_door).
     lua["door"] = spawn_door_abs;
+    /// Spawn a door to backlayer
     lua["spawn_layer_door"] = spawn_backdoor_abs;
+    /// Short for [spawn_layer_door](#spawn_layer_door).
     lua["layer_door"] = spawn_backdoor_abs;
+    /// Enable/disable godmode
     lua["god"] = godmode;
+    /// Try to force next levels to be dark
     lua["force_dark_level"] = darkmode;
+    /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
+    /// Enable/disable game engine pause
     lua["pause"] = [this](bool p) {
         if (p)
             set_pause(0x20);
         else
             set_pause(0);
     };
+    /// Teleport entity to coordinates with optional velocity
     lua["move_entity"] = move_entity_abs;
+    /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
     lua["set_door_target"] = set_door_target;
+    /// Short for [set_door_target](#set_door_target).
     lua["set_door"] = set_door_target;
+    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
     lua["set_contents"] = set_contents;
+    /// Get the [Movable](#movable) entity behind an uid
     lua["get_entity"] = get_entity;
+    /// Get the EntityDB behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in Entity to actually edit these.
     lua["get_type"] = get_type;
+    /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
+    /// Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
+    /// Returns: `array<int>`
+    /// Get uids of entities matching id. Accepts any number of id's.
     lua["get_entities_by_type"] = [](sol::variadic_args va) {
         auto get_func = sol::resolve<std::vector<uint32_t>(std::vector<uint32_t>)>(get_entities_by_type);
         auto args = std::vector<uint32_t>(va.begin(), va.end());
         return get_func(args);
     };
+    /// Get uids of entities by some search_flags
     lua["get_entities_by_mask"] = get_entities_by_mask;
+    /// Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
     lua["get_entities_by_layer"] = get_entities_by_layer;
+    /// Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
+    /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
+    /// Set the `flags` field from entity by uid
     lua["set_entity_flags"] = set_entity_flags;
+    /// Get the `more_flags` field from entity by uid
     lua["get_entity_flags2"] = get_entity_flags2;
+    /// Set the `more_flags` field from entity by uid
     lua["set_entity_flags2"] = set_entity_flags2;
+    /// Get the `move_state` field from entity by uid
     lua["get_entity_ai_state"] = get_entity_ai_state;
+    /// Get `state.flags`
     lua["get_hud_flags"] = get_hud_flags;
+    /// Set `state.flags`
     lua["set_hud_flags"] = set_hud_flags;
+    /// Get the ENT_TYPE... for entity by uid
     lua["get_entity_type"] = get_entity_type;
+    /// Get the current set zoom level
     lua["get_zoom_level"] = get_zoom_level;
+    /// Translate an entity position to screen position to be used in drawing functions
     lua["screen_position"] = screen_position;
+    /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
+    /// Get position `x, y, layer` of entity by uid
     lua["get_position"] = get_position;
+    /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
+    /// Spawn an entity by `id` attached to some other entity `over`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
+    /// Check if the entity `id` has some specific `item` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
+    /// Check if the entity `id` has some ENT_TYPE `type` in their inventory
     lua["entity_has_item_type"] = entity_has_item_type;
+    /// Try to lock the exit at coordinates
     lua["lock_door_at"] = lock_door_at;
+    /// Try to unlock the exit at coordinates
     lua["unlock_door_at"] = unlock_door_at;
+    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
     lua["get_frame"] = get_frame_count;
+    /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
+    /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
         Entity *ea = get_entity_ptr(a);
         Entity *eb = get_entity_ptr(b);
@@ -158,27 +233,38 @@ Script::Script(std::string script, std::string file)
         else
             return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
     };
-    lua["setflag"] = [](uint32_t v, int b) { return v | (1U << (b - 1)); };
-    lua["clrflag"] = [](uint32_t v, int b) { return v & ~(1U << (b - 1)); };
-    lua["testflag"] = [](uint32_t v, int b) { return (v & (1U << (b - 1))) > 0; };
+    /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+    lua["set_flag"] = [](uint32_t flags, int bit) { return flags | (1U << (bit - 1)); };
+    lua["setflag"] = lua["set_flag"];
+    /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+    lua["clr_flag"] = [](uint32_t flags, int bit) { return flags & ~(1U << (bit - 1)); };
+    lua["clrflag"] = lua["clr_flag"];
+    /// Returns true if a bit is set in the flags
+    lua["test_flag"] = [](uint32_t flags, int bit) { return (flags & (1U << (bit - 1))) > 0; };
+    lua["testflag"] = lua["test_flag"];
 
+    /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) {
         return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r);
     };
+    /// Draws a line on screen
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
         drawlist->AddLine(a, b, color, thickness);
     };
+    /// Draws rectangle on screen from top-left to bottom-right.
     lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color) {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
         drawlist->AddRect(a, b, color, rounding, 15, thickness);
     };
+    /// Draws a circle on screen
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
         ImVec2 a = screenify({x, y});
         drawlist->AddCircle(a, screenify(radius), color, 0, thickness);
     };
+    /// Draws text on screen
     lua["draw_text"] = [this](float x, float y, std::string text, ImU32 color) {
         ImVec2 a = screenify({x, y});
         drawlist->AddText(a, color, text.data());
@@ -355,7 +441,6 @@ Script::Script(std::string script, std::string file)
         &StateMemory::time_level,
         "hud_flags",
         &StateMemory::hud_flags);
-    lua["state"] = g_state;
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
