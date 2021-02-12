@@ -345,6 +345,7 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `hitboxy` &Movable::hitboxy
 - `offsetx` &Movable::offsetx
 - `offsety` &Movable::offsety
+- `airtime` &Movable::airtime
 ### StateMemory
 - `screen_last` &StateMemory::screen_last
 - `screen` &StateMemory::screen
