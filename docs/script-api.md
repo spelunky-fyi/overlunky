@@ -204,7 +204,7 @@ Translate a distance of `x` tiles to screen distance to be be used in drawing fu
 ### `get_position`
 #### Params: `int id`
 #### Returns: `tuple<float, float, int>`
-Get position `x, y, layer` of entity by uid
+Get position `x, y, layer` of entity by uid. Use this, don't use `Movable.x/y` because those are sometimes just the offset to the entity you're standing on.
 ### `entity_remove_item`
 #### Params: `int id, int item`
 Remove item by uid from entity
@@ -411,3 +411,7 @@ end, ON.LEVEL)
 - `FRAME` 101
 - `SCREEN` 102
 - `START` 103
+### LAYER
+- `FRONT` 0
+- `BACK` 1
+- `CURRENT` -1

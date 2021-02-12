@@ -206,7 +206,7 @@ Script::Script(std::string script, std::string file)
     lua["screen_position"] = screen_position;
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
-    /// Get position `x, y, layer` of entity by uid
+    /// Get position `x, y, layer` of entity by uid. Use this, don't use `Movable.x/y` because those are sometimes just the offset to the entity you're standing on.
     lua["get_position"] = get_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
@@ -533,6 +533,14 @@ Script::Script(std::string script, std::string file)
         102,
         "START",
         103);
+    lua.new_enum(
+        "LAYER",
+        "FRONT",
+        0,
+        "BACK",
+        1,
+        "CURRENT",
+        -1);
 }
 
 bool Script::run(ImDrawList *dl)
