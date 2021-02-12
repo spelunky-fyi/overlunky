@@ -230,7 +230,10 @@ class Movable : public Entity {
     int32_t i118;
     int32_t i11c;
     int32_t i120;
-    int32_t i124;
+    uint8_t b124;
+    uint8_t airtime;
+    uint8_t b126;
+    uint8_t b127;
     uint32_t inside;
     uint32_t i12c;
     uint32_t has_backpack;

@@ -2771,6 +2771,18 @@ void render_entity_props()
         ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0);
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0);
+        SliderByte("Airtime##EntityAirtime", (char *)&g_entity->airtime, 0, 98);
+        uint8_t falldamage = 0;
+        if(g_entity->airtime >= 98)
+            falldamage = 4;
+        else if(g_entity->airtime >= 78)
+            falldamage = 3;
+        else if(g_entity->airtime >= 58)
+            falldamage = 2;
+        else if(g_entity->airtime >= 38)
+            falldamage = 1;
+        const char *damagenum[] = {"0", "1", "2", "4", "99"};
+        SliderByte("Fall damage##EntityFallDamage", (char *)&falldamage, 0, 4, damagenum[falldamage]);
     }
     if (ImGui::CollapsingHeader("Stats"))
     {

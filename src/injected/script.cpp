@@ -405,7 +405,9 @@ Script::Script(std::string script, std::string file)
         "offsetx",
         &Movable::offsetx,
         "offsety",
-        &Movable::offsety);
+        &Movable::offsety,
+        "airtime",
+        &Movable::airtime);
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
