@@ -7,13 +7,15 @@
 
 #include "memory.hpp"
 
-enum RepeatType : uint8_t {
+enum RepeatType : uint8_t
+{
     NoRepeat,
     Linear,
     BackAndForth,
 };
 
-struct Animation {
+struct Animation
+{
     int32_t texture;
     int32_t count;
     int32_t interval;
@@ -21,7 +23,8 @@ struct Animation {
     RepeatType repeat;
 };
 
-struct Rect {
+struct Rect
+{
     int masks;
     float up_minus_down, side, up_plus_down;
     uint8_t field_10;
@@ -29,7 +32,8 @@ struct Rect {
     uint16_t field_12;
 };
 
-struct Color {
+struct Color
+{
     float r;
     float g;
     float b;
@@ -42,7 +46,8 @@ using EntityCreate = Entity *(*)();
 using EntityDestroy = void (*)(Entity *);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
 
-struct EntityDB {
+struct EntityDB
+{
     EntityCreate create_func;
     EntityDestroy destroy_func;
     int32_t field_10;
@@ -95,12 +100,18 @@ struct EntityDB {
     uint8_t init;
 };
 
-struct EntityItem {
+struct EntityItem
+{
     std::string name;
     uint16_t id;
 
-    EntityItem(const std::string &name_, uint64_t id_) : name(name_), id(id_) {}
-    bool operator<(const EntityItem &item) const { return id < item.id; }
+    EntityItem(const std::string &name_, uint64_t id_) : name(name_), id(id_)
+    {
+    }
+    bool operator<(const EntityItem &item) const
+    {
+        return id < item.id;
+    }
 };
 
 std::vector<EntityItem> list_entities(size_t map_ptr);
@@ -111,14 +122,14 @@ size_t to_id(size_t map_ptr, std::string id);
 
 Entity *state_find_item(size_t state_ptr, uint32_t unique_id);
 
-template <typename T>
-std::string to_le_bytes(T fmt) {
+template <typename T> std::string to_le_bytes(T fmt)
+{
     return std::string((char *)&fmt, sizeof(T));
 }
 
-class Entity {
-   public:
-    size_t __vftable;
+class Entity
+{
+  public:
     EntityDB *type;
     Entity *overlay;
     size_t some_items_func;
@@ -151,59 +162,105 @@ class Entity {
     uint8_t b9a;
     uint8_t b9b;
     uint32_t i9c;
-    size_t pa0;
-    int32_t ia8;
-    int32_t iac;
 
-    size_t pointer() { return (size_t)this; }
+    size_t pointer()
+    {
+        return (size_t)this;
+    }
 
     std::pair<float, float> position();
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
 
-    Entity *topmost() {
+    Entity *topmost()
+    {
         auto cur = this;
-        while (cur->overlay) {
+        while (cur->overlay)
+        {
             cur = cur->overlay;
         }
         return cur;
     }
 
-    Entity *topmost_mount() {
+    Entity *topmost_mount()
+    {
         auto topmost = this;
-        while (auto cur = topmost->overlay) {
-            if (cur->type->search_flags < 0x40) {
+        while (auto cur = topmost->overlay)
+        {
+            if (cur->type->search_flags < 0x40)
+            {
                 topmost = cur;
-            } else
+            }
+            else
                 break;
         }
         return topmost;
     }
 
-    uint8_t layer() { return read_u8(pointer() + 0x98); }
+    uint8_t layer()
+    {
+        return read_u8(pointer() + 0x98);
+    }
     std::pair<float, float> position_self() const;
     void remove_item(uint32_t id);
     void destroy();
+
+    virtual ~Entity() = default;
+    virtual void v0() = 0;
+    virtual void v1() = 0;
+    virtual void v2(Entity *) = 0;
+    virtual void v3() = 0;
+    virtual void v4(void *) = 0;
+    virtual void hiredhand_description(char *) = 0;
+    virtual void v6() = 0;
+    virtual void v7() = 0;
+    virtual void v8() = 0;
+    virtual void v9() = 0;
+    virtual void v10() = 0;
+    virtual void v11() = 0;
+    virtual void v12() = 0;
+    virtual void v13() = 0;
+    virtual void v14() = 0;
+    virtual void v15() = 0;
+    virtual void v16() = 0;
+    virtual void v17() = 0;
+    virtual void v18() = 0;
+    virtual void v19() = 0;
+    virtual void v20() = 0;
+    virtual void v21() = 0;
+    virtual void v22() = 0;
+    virtual void v23() = 0;
+    virtual void v24() = 0;
+    virtual void v25() = 0;
+    virtual void v26() = 0;
+    virtual void v27() = 0;
+    virtual void v28() = 0;
+    virtual void v29() = 0;
+    virtual void v30() = 0;
+    virtual void v31() = 0;
+    virtual void v32() = 0;
+    virtual void v33() = 0;
+    virtual void v34() = 0;
 };
 
-struct Inventory {
+struct Inventory
+{
     uint32_t money;
     uint8_t bombs;
     uint8_t ropes;
     uint8_t b06;
     uint8_t b07;
-    uint8_t
-        pad08[0x141c];  // specific treasure and killed monsters here, boring
+    uint8_t pad08[0x141c]; // specific treasure and killed monsters here, boring
     uint32_t kills_level;
     uint32_t kills_total;
 };
 
-class Movable : public Entity {
-   public:
-    size_t pb0;
-    int32_t ib8;
-    int32_t ibc;
+class Movable : public Entity
+{
+  public:
+    std::map<int64_t, int64_t> pa0;
+    std::map<int, int> pb0;
     size_t anim_func;
     int32_t ic8;
     int32_t icc;
@@ -234,18 +291,21 @@ class Movable : public Entity {
     uint8_t airtime;
     uint8_t b126;
     uint8_t b127;
-    uint32_t inside;
-    uint32_t i12c;
-    uint32_t has_backpack;
-    int32_t i134;
+};
+
+class Monster : public Movable
+{
+  public:
+    std::map<int64_t, int64_t> inside;
+};
+
+class Player : public Monster
+{
+  public:
     Inventory *inventory_ptr;
     size_t p140;
     int32_t i148;
     int32_t i14c;
-};
-
-class Player : public Movable {
-   public:
     size_t i150;
     size_t p158;
     size_t p160;
@@ -258,8 +318,22 @@ class Player : public Movable {
     uint8_t b177;
 };
 
-class Mount : public Movable {
-   public:
+class Container : public Movable
+{
+  public:
+    int32_t inside;
+    int32_t timer;
+};
+
+class Mattock : public Movable
+{
+  public:
+    int32_t remaining;
+};
+
+class Mount : public Monster
+{
+  public:
     void carry(Movable *rider);
 
     void tame(bool value);
@@ -269,7 +343,8 @@ using Carry = void (*)(Entity *, Entity *);
 
 Carry get_carry();
 
-struct Target {
+struct Target
+{
     uint8_t b00;
     uint8_t enabled;
     uint8_t level;
@@ -278,8 +353,9 @@ struct Target {
     uint8_t theme;
 };
 
-class Door : public Entity {
-   public:
+class Door : public Entity
+{
+  public:
     void set_target(uint8_t w, uint8_t l, uint8_t t);
 };
 

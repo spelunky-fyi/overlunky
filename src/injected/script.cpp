@@ -20,8 +20,10 @@ Toast get_toast()
 }
 
 using Say = void (*)(void *, Entity *, wchar_t *, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);
-Say get_say() {
-    ONCE(Say) {
+Say get_say()
+{
+    ONCE(Say)
+    {
         auto memory = Memory::get();
         auto off = find_inst(memory.exe(), "\x4A\x8B\x0C\x2F\xB8\x60\x01\x00\x00"s, memory.after_bundle);
         off = function_start(memory.at_exe(off));
@@ -53,21 +55,19 @@ Script::Script(std::string script, std::string file)
     /// Print a log message on screen.
     lua["message"] = [this](std::string message) {
         messages.push_back({message, std::chrono::system_clock::now()});
-        if(messages.size() > 20)
+        if (messages.size() > 20)
             messages.pop_front();
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` game frames. Timer is paused on pause and cleared on level transition.
-    lua["set_interval"] = [this](sol::function cb, int frames)
-    {
+    lua["set_interval"] = [this](sol::function cb, int frames) {
         auto luaCb = IntervalCallback{cb, frames, -1};
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called after `frames` frames. Timer is paused on pause and cleared on level transition.
-    lua["set_timeout"] = [this](sol::function cb, int frames)
-    {
+    lua["set_timeout"] = [this](sol::function cb, int frames) {
         int now = g_state->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
         level_timers[cbcount] = luaCb;
@@ -75,16 +75,14 @@ Script::Script(std::string script, std::string file)
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called every `frames` frames. This timer is never paused or cleared.
-    lua["set_global_interval"] = [this](sol::function cb, int frames)
-    {
+    lua["set_global_interval"] = [this](sol::function cb, int frames) {
         auto luaCb = IntervalCallback{cb, frames, -1};
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called after `frames` frames. This timer is never paused or cleared.
-    lua["set_global_timeout"] = [this](sol::function cb, int frames)
-    {
+    lua["set_global_timeout"] = [this](sol::function cb, int frames) {
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         global_timers[cbcount] = luaCb;
@@ -116,7 +114,7 @@ Script::Script(std::string script, std::string file)
     lua["say"] = [this](uint32_t entity_id, std::wstring message, int unk_type, bool top) {
         auto say = get_say();
         auto entity = get_entity_ptr(entity_id);
-        if(entity == nullptr)
+        if (entity == nullptr)
             return;
         say(NULL, entity, message.data(), unk_type, top);
     };
@@ -165,7 +163,8 @@ Script::Script(std::string script, std::string file)
     lua["set_contents"] = set_contents;
     /// Get the [Movable](#movable) entity behind an uid
     lua["get_entity"] = get_entity;
-    /// Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in [Movable](#movable) to actually edit these.
+    /// Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in
+    /// [Movable](#movable) to actually edit these.
     lua["get_type"] = get_type;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
@@ -227,7 +226,8 @@ Script::Script(std::string script, std::string file)
     lua["screen_position"] = screen_position;
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
-    /// Get position `x, y, layer` of entity by uid. Use this, don't use `Movable.x/y` because those are sometimes just the offset to the entity you're standing on.
+    /// Get position `x, y, layer` of entity by uid. Use this, don't use `Movable.x/y` because those are sometimes just the offset to the entity
+    /// you're standing on.
     lua["get_position"] = get_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
@@ -249,7 +249,7 @@ Script::Script(std::string script, std::string file)
     lua["distance"] = [this](uint32_t a, uint32_t b) {
         Entity *ea = get_entity_ptr(a);
         Entity *eb = get_entity_ptr(b);
-        if(ea == nullptr || eb == nullptr)
+        if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
             return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
@@ -265,9 +265,7 @@ Script::Script(std::string script, std::string file)
     lua["testflag"] = lua["test_flag"];
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
-    lua["rgba"] = [](int r, int g, int b, int a) {
-        return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r);
-    };
+    lua["rgba"] = [](int r, int g, int b, int a) { return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r); };
     /// Draws a line on screen
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
         ImVec2 a = screenify({x1, y1});
@@ -390,12 +388,6 @@ Script::Script(std::string script, std::string file)
         &Movable::health,
         "some_state",
         &Movable::some_state,
-        "inside",
-        &Movable::inside,
-        "has_backpack",
-        &Movable::has_backpack,
-        "inventory",
-        &Movable::inventory_ptr,
         "color",
         &Movable::color,
         "hitboxx",
@@ -408,6 +400,8 @@ Script::Script(std::string script, std::string file)
         &Movable::offsety,
         "airtime",
         &Movable::airtime);
+    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr);
+    lua.new_usertype<Container>("Container", "inside", &Container::inside);
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -556,14 +550,7 @@ Script::Script(std::string script, std::string file)
         102,
         "START",
         103);
-    lua.new_enum(
-        "LAYER",
-        "FRONT",
-        0,
-        "BACK",
-        1,
-        "CURRENT",
-        -1);
+    lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "CURRENT", -1);
 }
 
 bool Script::run(ImDrawList *dl)
@@ -653,7 +640,7 @@ bool Script::run(ImDrawList *dl)
         }
         if (g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
         {
-            if(g_state->level_count == 0)
+            if (g_state->level_count == 0)
             {
                 if (on_start)
                     on_start.value()();
@@ -733,7 +720,8 @@ bool Script::run(ImDrawList *dl)
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0)) // run ON.LEVEL on instant restart too
+                else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0)) // run ON.LEVEL on
+                                                                                                                             // instant restart too
                 {
                     cb->func();
                     cb->lastRan = now;
@@ -753,7 +741,9 @@ bool Script::run(ImDrawList *dl)
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 103 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() && state.player != g_players.at(0)) // ON.START
+                else if (
+                    cb->screen == 103 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() &&
+                    state.player != g_players.at(0)) // ON.START
                 {
                     cb->func();
                     cb->lastRan = now;

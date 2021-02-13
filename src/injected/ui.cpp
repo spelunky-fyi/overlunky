@@ -130,12 +130,13 @@ std::map<std::string, int> keys{
     //{ "", 0x },
 };
 
-struct Window{
+struct Window
+{
     std::string name;
     bool detached;
     bool open;
 };
-std::map<std::string, Window*> windows;
+std::map<std::string, Window *> windows;
 
 IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
@@ -174,7 +175,7 @@ bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, 
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
      show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
      freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false;
-Movable *g_entity = 0;
+Player *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
 StateMemory *g_state = 0;
@@ -971,7 +972,7 @@ bool update_entity()
     if (g_last_id != 0)
     {
         g_entity_type = entity_type(g_last_id);
-        g_entity = entity_ptr(g_last_id);
+        g_entity = (Player *)entity_ptr(g_last_id);
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if (IsBadWritePtr(g_entity, 0x178))
             g_entity = nullptr;
@@ -1406,7 +1407,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     }
     else if (pressed("tool_debug", wParam))
     {
-        if(!options["tabbed_interface"])
+        if (!options["tabbed_interface"])
             show_debug = !show_debug;
         else
             toggle("tool_debug");
@@ -1460,7 +1461,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     }
     else if (pressed("tool_style", wParam))
     {
-        if(!options["tabbed_interface"])
+        if (!options["tabbed_interface"])
             change_colors = !change_colors;
         else
             toggle("tool_style");
@@ -1881,7 +1882,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 
 void render_hitbox(Movable *ent, bool cross, ImColor color)
 {
-    if(IsBadReadPtr(ent, 0x178))
+    if (IsBadReadPtr(ent, 0x178))
         return;
     if (ent->items_count > 0)
     {
@@ -2446,7 +2447,8 @@ void render_scripts()
     ImGui::PushTextWrapPos(0.0f);
     ImGui::TextColored(
         ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
-        "Note: The Lua API is unstable, not ready and it WILL change, probably a lot. You can play around with it, but don't be surprised if none of your scripts work next week.");
+        "Note: The Lua API is unstable, not ready and it WILL change, probably a lot. You can play around with it, but don't be surprised if none of "
+        "your scripts work next week.");
     ImGui::PopTextWrapPos();
     ImGui::PushItemWidth(-1);
     for (int i = 0; i < g_scripts.size();)
@@ -2773,13 +2775,13 @@ void render_entity_props()
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0);
         SliderByte("Airtime##EntityAirtime", (char *)&g_entity->airtime, 0, 98);
         uint8_t falldamage = 0;
-        if(g_entity->airtime >= 98)
+        if (g_entity->airtime >= 98)
             falldamage = 4;
-        else if(g_entity->airtime >= 78)
+        else if (g_entity->airtime >= 78)
             falldamage = 3;
-        else if(g_entity->airtime >= 58)
+        else if (g_entity->airtime >= 58)
             falldamage = 2;
-        else if(g_entity->airtime >= 38)
+        else if (g_entity->airtime >= 38)
             falldamage = 1;
         const char *damagenum[] = {"0", "1", "2", "4", "99"};
         SliderByte("Fall damage##EntityFallDamage", (char *)&falldamage, 0, 4, damagenum[falldamage]);
@@ -2824,27 +2826,29 @@ void render_entity_props()
     {
         if (g_entity_type == 435)
         {
+            auto coffin = (Container *)g_entity;
             ImGui::Text("Character in coffin:");
-            ImGui::SliderInt("##CoffinSpawns", (int *)&g_entity->inside, 194, 216);
-            if (g_entity->inside == 214)
-                g_entity->inside = 215;
+            ImGui::SliderInt("##CoffinSpawns", (int *)&coffin->inside, 194, 216);
+            if (coffin->inside == 214)
+                coffin->inside = 215;
             ImGui::SameLine();
-            ImGui::Text(entity_names[g_entity->inside].data());
-            ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&g_entity->i12c, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
+            ImGui::Text(entity_names[coffin->inside].data());
+            ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
         else if (g_entity_type == 402 || g_entity_type == 422 || g_entity_type == 423 || g_entity_type == 475)
         {
+            auto container = (Container *)g_entity;
             ImGui::Text("Item in container:");
-            ImGui::InputInt("##EntitySpawns", (int *)&g_entity->inside, 1, 10);
-            if (g_entity->inside > 0)
+            ImGui::InputInt("##EntitySpawns", (int *)&container->inside, 1, 10);
+            if (container->inside > 0)
             {
                 ImGui::SameLine();
-                ImGui::Text(entity_names[g_entity->inside].data());
+                ImGui::Text(entity_names[container->inside].data());
             }
         }
         else if (g_entity_type == 575)
         {
-            ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity->inside, 1, 255);
+            ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity[1], 1, 255);
         }
         else if (g_entity_type == 23 || g_entity_type == 25 || g_entity_type == 31 || g_entity_type == 36)
         {
@@ -3305,7 +3309,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         if (options["tabbed_interface"])
         {
             ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y/2}, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y / 2}, ImGuiCond_FirstUseEver);
             ImGui::Begin("Overlunky", NULL);
             if (ImGui::BeginTabBar("##TabBar"))
             {
@@ -3337,7 +3341,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             if (tabnum == 0)
             {
                 ImGui::TextWrapped("Looks like you closed all your tabs. You can use the F-keys to open closed tabs or click here:");
-                if(ImGui::Button("Restore tabs"))
+                if (ImGui::Button("Restore tabs"))
                 {
                     for (auto window : windows)
                     {
@@ -3349,13 +3353,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
             for (auto tab : windows)
             {
-                if(!tab.second->detached)
+                if (!tab.second->detached)
                     continue;
                 ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
                 ImGui::Begin(tab.second->name.data(), &tab.second->detached);
                 render_tool(tab.first);
                 ImGui::SetWindowPos(
-                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, ImGuiCond_Once);
+                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
+                    ImGuiCond_Once);
                 ImGui::End();
             }
         }
@@ -3414,7 +3419,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             render_scripts();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2*ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::End();
         }
         else
