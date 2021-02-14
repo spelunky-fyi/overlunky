@@ -2512,12 +2512,12 @@ bool DragByte(const char *label, char *value, float speed = 1.0f, char min = 0, 
 
 void render_uid(int uid, const char *section, bool rembtn = false)
 {
-    char uidc[10];
+    char uidc[32];
     itoa(uid, uidc, 10);
     int ptype = entity_type(uid);
     if (ptype == 648 || ptype == 0)
         return;
-    char typec[10];
+    char typec[32];
     itoa(ptype, typec, 10);
     const char *pname = entity_names[ptype].data();
     ImGui::PushID(section);
