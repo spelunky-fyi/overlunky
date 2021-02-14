@@ -68,8 +68,7 @@ struct StateMemory
     uint32_t time_level;
     int32_t ia00;
     int32_t ia04;
-    uint32_t hud_flags;
-    int16_t pad, flags;
+    int32_t hud_flags;
 
     char pada10[0x12b0 - 0xa10];
     Items *items;
@@ -178,14 +177,14 @@ struct State
     std::pair<float, float> screen_position(float x, float y);
     float get_zoom_level();
 
-    uint8_t flags()
+    uint32_t flags()
     {
-        return ptr()->flags;
+        return ptr()->hud_flags;
     }
 
     void set_flags(uint32_t f)
     {
-        ptr()->flags = f;
+        ptr()->hud_flags = f;
     }
 
     void set_pause(uint8_t p)
