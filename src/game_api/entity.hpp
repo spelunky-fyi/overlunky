@@ -127,15 +127,25 @@ template <typename T> std::string to_le_bytes(T fmt)
     return std::string((char *)&fmt, sizeof(T));
 }
 
+class Vector
+{
+  public:
+    uint32_t *heap;
+    uint32_t *begin;
+    uint32_t size, count;
+
+    bool empty()
+    {
+        return !!size;
+    }
+};
+
 class Entity
 {
   public:
     EntityDB *type;
     Entity *overlay;
-    size_t some_items_func;
-    size_t items_ptr;
-    uint32_t items_size;
-    uint32_t items_count;
+    Vector items;
     uint32_t flags;
     uint32_t more_flags;
     uint32_t uid;
@@ -206,9 +216,14 @@ class Entity
     void remove_item(uint32_t id);
     void destroy();
 
+    template <typename T> T *as()
+    {
+        return static_cast<T *>(this);
+    }
+
     virtual ~Entity() = default;
-    virtual void v0() = 0;
-    virtual void v1() = 0;
+    virtual void created() = 0;
+    virtual void kill(bool, Entity *frm) = 0;
     virtual void v2(Entity *) = 0;
     virtual void v3() = 0;
     virtual void v4(void *) = 0;
@@ -217,16 +232,16 @@ class Entity
     virtual void v7() = 0;
     virtual void v8() = 0;
     virtual void v9() = 0;
-    virtual void v10() = 0;
+    virtual bool v10() = 0;
     virtual void v11() = 0;
     virtual void v12() = 0;
-    virtual void v13() = 0;
-    virtual void v14() = 0;
-    virtual void v15() = 0;
+    virtual void set_invisible(bool) = 0;
+    virtual void v14(bool) = 0;
+    virtual void v15(uint8_t a, uint8_t b) = 0;
     virtual void v16() = 0;
-    virtual void v17() = 0;
+    virtual float friction() = 0;
     virtual void v18() = 0;
-    virtual void v19() = 0;
+    virtual void remove_item_ptr(Entity *) = 0;
     virtual void v20() = 0;
     virtual void v21() = 0;
     virtual void v22() = 0;
@@ -241,7 +256,8 @@ class Entity
     virtual void v31() = 0;
     virtual void v32() = 0;
     virtual void v33() = 0;
-    virtual void v34() = 0;
+    virtual void apply_db() = 0;
+    virtual void v35() = 0;
 };
 
 struct Inventory

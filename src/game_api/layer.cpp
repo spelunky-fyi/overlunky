@@ -67,7 +67,7 @@ Entity *Layer::spawn_entity_over(size_t id, Entity *overlay, float x, float y) {
 }
 
 Entity *Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) {
-    uint8_t screen = read_u8(State::get().ptr() + 0x10);
+    uint8_t screen = State::get().ptr()->screen_next;
     Entity *door;
     switch (screen) {
         case 11: {

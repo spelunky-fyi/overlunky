@@ -1,3 +1,4 @@
+#include "state.hpp"
 #include <cstdint>
 #include <vector>
 
@@ -26,7 +27,7 @@ void player_status();
 Entity *get_entity_ptr(uint32_t id);
 int32_t get_entity_type(uint32_t id);
 int get_entity_ai_state(uint32_t id);
-size_t get_state_ptr();
+StateMemory *get_state_ptr();
 std::vector<Player *> get_players();
 std::pair<float, float> screen_position(float x, float y);
 float screen_distance(float x);

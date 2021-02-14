@@ -1884,10 +1884,10 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
 {
     if (IsBadReadPtr(ent, 0x178))
         return;
-    if (ent->items_count > 0)
+    if (!ent->items.empty())
     {
-        int *pitems = (int *)ent->items_ptr;
-        for (int i = 0; i < ent->items_count; i++)
+        int *pitems = (int *)ent->items.begin;
+        for (int i = 0; i < ent->items.count; i++)
         {
             render_hitbox(entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
         }
@@ -2800,10 +2800,10 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Items"))
     {
-        if (g_entity->items_count > 0)
+        if (g_entity->items.count > 0)
         {
-            int *pitems = (int *)g_entity->items_ptr;
-            for (int i = 0; i < g_entity->items_count; i++)
+            int *pitems = (int *)g_entity->items.begin;
+            for (int i = 0; i < g_entity->items.count; i++)
             {
                 render_uid(pitems[i], "EntityItems", true);
             }

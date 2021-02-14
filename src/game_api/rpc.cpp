@@ -307,7 +307,7 @@ int32_t get_entity_type(uint32_t id)
     return p->type->id;
 }
 
-size_t get_state_ptr()
+StateMemory *get_state_ptr()
 {
     auto state = State::get();
     return state.ptr();
@@ -555,7 +555,7 @@ void set_contents(uint32_t id, uint32_t item)
     int type = container->type->id;
     if (type != 435 && type != 402 && type != 422 && type != 423 && type != 475)
         return;
-    static_cast<Container *>(container)->inside = item;
+    container->as<Container>()->inside = item;
 }
 
 void entity_remove_item(uint32_t id, uint32_t item)
@@ -581,10 +581,10 @@ bool entity_has_item_uid(uint32_t id, uint32_t item)
     Entity *entity = get_entity_ptr(id);
     if (entity == nullptr)
         return false;
-    if (entity->items_count > 0)
+    if (entity->items.count > 0)
     {
-        int *pitems = (int *)entity->items_ptr;
-        for (int i = 0; i < entity->items_count; i++)
+        int *pitems = (int *)entity->items.begin;
+        for (int i = 0; i < entity->items.count; i++)
         {
             if (pitems[i] == item)
                 return true;
@@ -598,10 +598,10 @@ bool entity_has_item_type(uint32_t id, uint32_t type)
     Entity *entity = get_entity_ptr(id);
     if (entity == nullptr)
         return false;
-    if (entity->items_count > 0)
+    if (!entity->items.empty())
     {
-        int *pitems = (int *)entity->items_ptr;
-        for (int i = 0; i < entity->items_count; i++)
+        int *pitems = (int *)entity->items.begin;
+        for (int i = 0; i < entity->items.count; i++)
         {
             Entity *item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
@@ -657,8 +657,8 @@ uint32_t get_frame_count()
 
 void carry(uint32_t id, uint32_t item)
 {
-    Mount *mount = (Mount *)get_entity_ptr(id);
-    Movable *rider = (Movable *)get_entity_ptr(item);
+    auto mount = get_entity_ptr(id)->as<Mount>();
+    auto rider = get_entity_ptr(item)->as<Player>();
     if (mount == nullptr || rider == nullptr)
         return;
     mount->carry(rider);
