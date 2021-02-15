@@ -316,7 +316,7 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `jump` &EntityDB::jump
 - `damage` &EntityDB::damage
 - `life` &EntityDB::life
-### Movable
+### Entity
 - `type` &Entity::type
 - `overlay` &Entity::overlay
 - `flags` &Entity::flags
@@ -329,6 +329,7 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `height` &Entity::h
 - `topmost` &Entity::topmost
 - `topmost_mount` &Entity::topmost_mount
+### Movable
 - `movex` &Movable::movex
 - `movey` &Movable::movey
 - `buttons` &Movable::buttons

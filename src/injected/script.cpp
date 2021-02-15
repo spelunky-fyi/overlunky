@@ -334,8 +334,9 @@ Script::Script(std::string script, std::string file)
         &EntityDB::damage,
         "life",
         &EntityDB::life);
-    lua.new_usertype<Movable>(
-        "Movable",
+
+    lua.new_usertype<Entity>(
+        "Entity",
         "type",
         &Entity::type,
         "overlay",
@@ -360,6 +361,18 @@ Script::Script(std::string script, std::string file)
         &Entity::topmost,
         "topmost_mount",
         &Entity::topmost_mount,
+
+    // Converter
+#define _(T) "as" #T, &Entity::as<T>
+        _(Movable),
+        _(Door),
+        _(Container),
+        _(Mattock),
+        _(Mount)
+#undef _
+    );
+    lua.new_usertype<Movable>(
+        "Movable",
         "movex",
         &Movable::movex,
         "movey",
@@ -404,8 +417,8 @@ Script::Script(std::string script, std::string file)
         &Movable::offsety,
         "airtime",
         &Movable::airtime);
-    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Movable>());
-    lua.new_usertype<Container>("Container", "inside", &Container::inside, sol::base_classes, sol::bases<Movable>());
+    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Container>("Container", "inside", &Container::inside, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
