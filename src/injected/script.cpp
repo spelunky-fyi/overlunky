@@ -618,7 +618,7 @@ bool Script::run(ImDrawList *dl)
         /// Runs on any [screen change](#on).
         sol::optional<sol::function> on_screen = lua["on_screen"];
         g_players = get_players();
-        lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
+        lua["players"] = std::vector<Player *>(g_players.begin(), g_players.end());
         if (g_state->screen != state.screen || (!g_players.empty() && state.player != g_players.at(0)))
         {
             level_timers.clear();
