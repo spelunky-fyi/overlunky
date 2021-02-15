@@ -101,7 +101,6 @@ State &State::get()
         write_mem_prot(memory.at_exe(off_send), "\x31\xC0\x31\xD2\x90\x90"s, true);
         auto addr_damage = get_damage();
         auto addr_insta = get_insta();
-        // log::debug!("0x{:x}, insta: 0x{:x}", addr_damage damage; addr_insta);
         auto addr_zoom = get_zoom();
         auto addr_zoom_shop = get_zoom_shop();
         auto addr_dark = get_dark();
@@ -139,7 +138,7 @@ template <typename T> class OnHeapPointer
     }
 };
 
-StateMemory *State::ptr()
+StateMemory *State::ptr() const
 {
     OnHeapPointer<StateMemory> p(read_u64(location));
     // log::debug!("{:x?}" State; p);

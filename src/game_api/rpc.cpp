@@ -247,7 +247,7 @@ int get_entity_ai_state(uint32_t id)
     if (id == 0)
         return 0;
     auto state = State::get();
-    auto ent = (Movable*)state.find(id);
+    auto ent = state.find(id)->as<Movable>();
     if (ent)
         return ent->move_state;
     return 0;

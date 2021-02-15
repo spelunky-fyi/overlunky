@@ -221,7 +221,7 @@ class Entity
         return static_cast<T *>(this);
     }
 
-    virtual ~Entity() = default;
+    virtual ~Entity() = 0;
     virtual void created() = 0;
     virtual void kill(bool, Entity *frm) = 0;
     virtual void v2(Entity *) = 0;
@@ -272,92 +272,7 @@ struct Inventory
     uint32_t kills_total;
 };
 
-class Movable : public Entity
-{
-  public:
-    std::map<int64_t, int64_t> pa0;
-    std::map<int, int> pb0;
-    size_t anim_func;
-    int32_t ic8;
-    int32_t icc;
-    float movex;
-    float movey;
-    uint32_t buttons;
-    uint32_t stand_counter;
-    float fe0;
-    int32_t ie4;
-    uint32_t owner_uid;
-    uint32_t last_owner_uid;
-    size_t animation_func;
-    uint32_t idle_counter;
-    uint32_t standing_on_uid;
-    float velocityx;
-    float velocityy;
-    uint32_t holding_uid;
-    uint8_t state;
-    uint8_t last_state;
-    uint8_t move_state;
-    uint8_t health;
-    int32_t i110;
-    uint32_t some_state;
-    int32_t i118;
-    int32_t i11c;
-    int32_t i120;
-    uint8_t b124;
-    uint8_t airtime;
-    uint8_t b126;
-    uint8_t b127;
-};
-
-class Monster : public Movable
-{
-  public:
-    std::map<int64_t, int64_t> inside;
-};
-
-class Player : public Monster
-{
-  public:
-    Inventory *inventory_ptr;
-    size_t p140;
-    int32_t i148;
-    int32_t i14c;
-    size_t i150;
-    size_t p158;
-    size_t p160;
-    int32_t i168;
-    int32_t i16c;
-    uint32_t jump_flags;
-    uint8_t some_timer;
-    uint8_t can_use;
-    uint8_t b176;
-    uint8_t b177;
-};
-
-class Container : public Movable
-{
-  public:
-    int32_t inside;
-    int32_t timer;
-};
-
-class Mattock : public Movable
-{
-  public:
-    int32_t remaining;
-};
-
-class Mount : public Monster
-{
-  public:
-    void carry(Movable *rider);
-
-    void tame(bool value);
-};
-
-using Carry = void (*)(Entity *, Entity *);
-
-Carry get_carry();
+#include "movable.hpp"
 
 struct Target
 {

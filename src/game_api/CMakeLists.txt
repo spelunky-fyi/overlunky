@@ -14,6 +14,7 @@ add_library(game_api STATIC
         search.hpp
         memory.hpp
         thread_utils.cpp
-        thread_utils.hpp)
+        thread_utils.hpp
+        movable.hpp)
 target_include_directories(game_api PUBLIC .)
 target_link_libraries(game_api shared)

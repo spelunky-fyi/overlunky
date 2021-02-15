@@ -88,7 +88,7 @@ struct State
 
     static State &get();
 
-    StateMemory *ptr();
+    StateMemory *ptr() const;
 
     Layer *layer(uint8_t index)
     {

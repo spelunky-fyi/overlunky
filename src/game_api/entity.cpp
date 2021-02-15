@@ -69,6 +69,8 @@ size_t to_id(size_t map_ptr, std::string name)
     return it != map->end() ? it->second : -1;
 }
 
+using Carry = void (*)(Entity *, Entity *);
+
 Carry get_carry()
 {
     ONCE(Carry)
