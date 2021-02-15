@@ -663,3 +663,17 @@ void carry(uint32_t id, uint32_t item)
         return;
     mount->carry(rider);
 }
+
+void kill_entity(uint32_t id)
+{
+    Entity *ent = get_entity_ptr(id);
+    if(ent != nullptr)
+        ent->kill(true, nullptr);
+}
+
+void apply_entity_db(uint32_t id)
+{
+    Entity *ent = get_entity_ptr(id);
+    if(ent != nullptr)
+        ent->apply_db();
+}

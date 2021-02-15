@@ -147,7 +147,8 @@ Get the [Movable](#movable) entity behind an uid
 ### `get_type`
 #### Params: `int id`
 #### Returns: `EntityDB`
-Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in [Movable](#movable) to actually edit these.
+Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in
+[Movable](#movable) to actually edit these.
 ### `get_entities`
 #### Returns: `array<int>`
 Get uids of all entities currently loaded
@@ -223,7 +224,8 @@ Translate a distance of `x` tiles to screen distance to be be used in drawing fu
 ### `get_position`
 #### Params: `int id`
 #### Returns: `tuple<float, float, int>`
-Get position `x, y, layer` of entity by uid. Use this, don't use `Movable.x/y` because those are sometimes just the offset to the entity you're standing on.
+Get position `x, y, layer` of entity by uid. Use this, don't use `Movable.x/y` because those are sometimes just the offset to the entity
+you're standing on.
 ### `entity_remove_item`
 #### Params: `int id, int item`
 Remove item by uid from entity
@@ -239,6 +241,12 @@ Check if the entity `id` has some specific `item` by uid in their inventory
 #### Params: `int id, int type`
 #### Returns: `bool`
 Check if the entity `id` has some ENT_TYPE `type` in their inventory
+### `kill_entity`
+#### Params: `int id`
+Kills an entity by uid.
+### `apply_entity_db`
+#### Params: `int id`
+Apply changes made in [get_type](#get_type)() to entity instance by uid.
 ### `lock_door_at`
 #### Params: `float x, float y`
 Try to lock the exit at coordinates
@@ -337,15 +345,16 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `move_state` &Movable::move_state
 - `health` &Movable::health
 - `some_state` &Movable::some_state
-- `inside` &Movable::inside
-- `has_backpack` &Movable::has_backpack
-- `inventory` &Movable::inventory_ptr
 - `color` &Movable::color
 - `hitboxx` &Movable::hitboxx
 - `hitboxy` &Movable::hitboxy
 - `offsetx` &Movable::offsetx
 - `offsety` &Movable::offsety
 - `airtime` &Movable::airtime
+### Player
+- `inventory` &Player::inventory_ptr
+### Container
+- `inside` &Container::inside
 ### StateMemory
 - `screen_last` &StateMemory::screen_last
 - `screen` &StateMemory::screen

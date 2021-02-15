@@ -237,6 +237,10 @@ Script::Script(std::string script, std::string file)
     lua["entity_has_item_uid"] = entity_has_item_uid;
     /// Check if the entity `id` has some ENT_TYPE `type` in their inventory
     lua["entity_has_item_type"] = entity_has_item_type;
+    /// Kills an entity by uid.
+    lua["kill_entity"] = kill_entity;
+    /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
+    lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates
     lua["lock_door_at"] = lock_door_at;
     /// Try to unlock the exit at coordinates
@@ -400,8 +404,8 @@ Script::Script(std::string script, std::string file)
         &Movable::offsety,
         "airtime",
         &Movable::airtime);
-    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr);
-    lua.new_usertype<Container>("Container", "inside", &Container::inside);
+    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Movable>());
+    lua.new_usertype<Container>("Container", "inside", &Container::inside, sol::base_classes, sol::bases<Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",

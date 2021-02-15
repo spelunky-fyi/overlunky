@@ -2700,7 +2700,7 @@ void render_entity_props()
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(g_entity->uid, "EntityGeneral");
     ImGui::SameLine();
-    if (ImGui::Button("Void(!)##DeleteEntity"))
+    if (ImGui::Button("Void(!)##VoidEntity"))
     {
         if (g_entity->overlay)
         {
@@ -2712,6 +2712,11 @@ void render_entity_props()
         }
         g_entity->overlay = nullptr;
         g_entity->y -= 1000.0;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Kill(!)##KillEntity"))
+    {
+        g_entity->kill(true, nullptr);
     }
     if (ImGui::CollapsingHeader("State"))
     {

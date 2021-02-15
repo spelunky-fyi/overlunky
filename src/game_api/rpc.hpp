@@ -50,3 +50,5 @@ void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
 uint32_t get_frame_count();
 void carry(uint32_t mount, uint32_t rider);
+void kill_entity(uint32_t id);
+void apply_entity_db(uint32_t id);
