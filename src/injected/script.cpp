@@ -363,12 +363,12 @@ Script::Script(std::string script, std::string file)
         &Entity::topmost_mount,
 
     // Converter
-#define _(T) "as" #T, &Entity::as<T>
-        _(Movable),
-        _(Door),
-        _(Container),
-        _(Mattock),
-        _(Mount)
+#define _(t, T) "as_" #t, &Entity::as<T>
+        _(movable, Movable),
+        _(door, Door),
+        _(container, Container),
+        _(mattock, Mattock),
+        _(mount, Mount)
 #undef _
     );
     lua.new_usertype<Movable>(
