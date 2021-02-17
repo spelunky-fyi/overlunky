@@ -142,13 +142,12 @@ Short for [set_door_target](#set_door_target).
 Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
 ### `get_entity`
 #### Params: `int id`
-#### Returns: `Movable`
-Get the [Movable](#movable) entity behind an uid
+#### Returns: `Entity`
+Get the [Entity](#entity) behind an uid
 ### `get_type`
 #### Params: `int id`
 #### Returns: `EntityDB`
-Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in
-[Movable](#movable) to actually edit these.
+Get the [EntityDB](#entitydb) behind an uid.
 ### `get_entities`
 #### Returns: `array<int>`
 Get uids of all entities currently loaded
@@ -329,6 +328,11 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `height` &Entity::h
 - `topmost` &Entity::topmost
 - `topmost_mount` &Entity::topmost_mount
+- `as_movable` &Entity::as<Movable>
+- `as_door` &Entity::as<Door>
+- `as_container` &Entity::as<Container>
+- `as_mattock` &Entity::as<Mattock>
+- `as_mount` &Entity::as<Mount>
 ### Movable
 - `movex` &Movable::movex
 - `movey` &Movable::movey
