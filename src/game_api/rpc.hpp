@@ -29,6 +29,7 @@ int32_t get_entity_type(uint32_t id);
 int get_entity_ai_state(uint32_t id);
 StateMemory *get_state_ptr();
 std::vector<Player *> get_players();
+std::pair<float, float> click_position(float x, float y);
 std::pair<float, float> screen_position(float x, float y);
 float screen_distance(float x);
 float get_zoom_level();

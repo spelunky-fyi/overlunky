@@ -2082,6 +2082,15 @@ void render_clickhandler()
         {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
+        if (ImGui::IsMousePosValid())
+        {
+            ImVec2 mpos = normalize(io.MousePos);
+            std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
+            ImDrawList *dl = ImGui::GetBackgroundDrawList();
+            char buf[32];
+            sprintf(buf, "%0.2f, %0.2f", cpos.first, cpos.second);
+            dl->AddText(ImVec2(io.MousePos.x+16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
+        }
     }
     if (options["draw_hitboxes"] && update_entity())
     {

@@ -326,6 +326,11 @@ std::vector<Player *> get_players()
     return found;
 }
 
+std::pair<float, float> click_position(float x, float y)
+{
+    return State::get().click_position(x, y);
+}
+
 std::pair<float, float> screen_position(float x, float y)
 {
     return State::get().screen_position(x, y);
