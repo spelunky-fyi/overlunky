@@ -161,10 +161,9 @@ Script::Script(std::string script, std::string file)
     lua["set_door"] = set_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
     lua["set_contents"] = set_contents;
-    /// Get the [Movable](#movable) entity behind an uid
-    lua["get_entity"] = get_entity;
-    /// Get the [EntityDB](#entitydb) behind an uid. This is kinda read only, the changes don't really show up in game. Use the `type` field in
-    /// [Movable](#movable) to actually edit these.
+    /// Get the [Entity](#entity) behind an uid
+    lua["get_entity"] = get_entity_ptr;
+    /// Get the [EntityDB](#entitydb) behind an uid.
     lua["get_type"] = get_type;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
@@ -361,16 +360,16 @@ Script::Script(std::string script, std::string file)
         &Entity::topmost,
         "topmost_mount",
         &Entity::topmost_mount,
-
-    // Converter
-#define _(t, T) "as_" #t, &Entity::as<T>
-        _(movable, Movable),
-        _(door, Door),
-        _(container, Container),
-        _(mattock, Mattock),
-        _(mount, Mount)
-#undef _
-    );
+        "as_movable",
+        &Entity::as<Movable>,
+        "as_door",
+        &Entity::as<Door>,
+        "as_container",
+        &Entity::as<Container>,
+        "as_mattock",
+        &Entity::as<Mattock>,
+        "as_mount",
+        &Entity::as<Mount>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -416,7 +415,8 @@ Script::Script(std::string script, std::string file)
         "offsety",
         &Movable::offsety,
         "airtime",
-        &Movable::airtime);
+        &Movable::airtime,
+        sol::base_classes, sol::bases<Entity>());
     lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Container>("Container", "inside", &Container::inside, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(

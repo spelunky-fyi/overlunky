@@ -195,7 +195,7 @@ end
 function on_guiframe()
   -- force level even when engine isn't running
   if state.level < 98 and (state.pause == 3 or (state.pause == 2 and state.level_count == 0)) then
-    random_level()
+    --random_level()
     state.theme_next = realtheme
     state.world_next = world[state.theme_next]
     state.level_next = reallevel

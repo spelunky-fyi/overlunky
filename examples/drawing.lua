@@ -37,7 +37,7 @@ set_callback(function()
     ents = get_entities_at(0, 255, x, y, l, 30)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v)
+        e = get_entity(v):as_movable()
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if e.health > 0 then
             draw_text(sx, sy, tostring(v).."\n"..tostring(e.health).." HP", rgba(255, 255, 255, 255))
@@ -52,9 +52,9 @@ set_callback(function()
     ents = get_entities_by_type(ENT_TYPE.LOGICAL_DOOR)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v)
+        e = get_entity(v):as_movable()
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
-        if l ==pl  then
+        if l == pl then
             draw_text(sx, sy, tostring(v), rgba(255, 255, 255, 255))
         end
     sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
