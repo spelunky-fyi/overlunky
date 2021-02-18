@@ -20,15 +20,34 @@ reallevel = 1
 realtheme = 1
 boss_level = false
 dead = false
+critters_spawned = true
+
+critters = {}
+critters[THEME.DWELLING] = ENT_TYPE.MONS_CRITTERDUNGBEETLE
+critters[THEME.JUNGLE] = ENT_TYPE.MONS_CRITTERBUTTERFLY
+critters[THEME.VOLCANA] = ENT_TYPE.MONS_CRITTERSNAIL
+critters[THEME.TIDE_POOL] = ENT_TYPE.MONS_CRITTERCRAB
+critters[THEME.TEMPLE] = ENT_TYPE.MONS_CRITTERLOCUST
+critters[THEME.ICE_CAVES] = ENT_TYPE.MONS_CRITTERPENGUIN
+critters[THEME.NEO_BABYLON] = ENT_TYPE.MONS_CRITTERDRONE
+critters[THEME.SUNKEN_CITY] = ENT_TYPE.MONS_CRITTERSLIME
+critters[THEME.CITY_OF_GOLD] = ENT_TYPE.MONS_CRITTERLOCUST
 
 function set_doors()
-  if #players > 0 and (state.theme == THEME.TIAMAT or state.theme == THEME.HUNDUN) then
+  if #players > 0 then
     px, py, pl = get_position(players[1].uid)
-    doors = get_entities_at(ENT_TYPE.FLOOR_DOOR_EXIT, 0, px, py, pl, 10)
+    doors = get_entities_at(ENT_TYPE.FLOOR_DOOR_EXIT, 0, px, py, pl, 15)
     for i,v in ipairs(doors) do
-      set_door_target(v, nextworld, nextlevel, nexttheme)
       x, y, layer = get_position(v)
-      unlock_door_at(x, y);
+      if state.theme == THEME.TIAMAT or state.theme == THEME.HUNDUN then
+        set_door_target(v, nextworld, nextlevel, nexttheme)
+        unlock_door_at(x, y)
+      end
+      if not critters_spawned and critters[realtheme] ~= nil then
+        spawn(critters[realtheme], x-0.4, y, layer, 0, 0)
+        spawn(critters[realtheme], x+0.4, y, layer, 0, 0)
+        critters_spawned = true
+      end
     end
   end
 end
@@ -156,6 +175,7 @@ end
 
 set_callback(function()
   message("Level")
+  critters_spawned = false
   dead = false
   if state.level_count == 0 then
     init_run()
