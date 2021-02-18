@@ -15,7 +15,7 @@ struct StateMemory
     uint32_t screen_last;
     uint32_t screen;
     uint32_t screen_next;
-    int32_t i14;
+    uint32_t loading;
     size_t p18;
     int32_t i20;
     int32_t i24;
@@ -26,7 +26,7 @@ struct StateMemory
     uint8_t pause;
     uint8_t b33;
     int32_t i34;
-    int32_t i38;
+    uint32_t reset;
     int32_t i3c;
     int32_t i40;
     int32_t i44;

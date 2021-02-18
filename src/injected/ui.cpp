@@ -174,7 +174,7 @@ std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
      show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
-     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false;
+     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false;
 Player *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -2459,6 +2459,7 @@ void render_scripts()
         "Note: The Lua API is unstable, not ready and it WILL change, probably a lot. You can play around with it, but don't be surprised if none of "
         "your scripts work next week.");
     ImGui::PopTextWrapPos();
+    ImGui::Checkbox("Hide script messages##HideScriptMessages", &hide_script_messages);
     ImGui::PushItemWidth(-1);
     for (int i = 0; i < g_scripts.size();)
     {
@@ -3307,7 +3308,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
-    render_messages();
+    if (!hide_script_messages)
+        render_messages();
     render_clickhandler();
 
     int win_condition = ImGuiCond_FirstUseEver;

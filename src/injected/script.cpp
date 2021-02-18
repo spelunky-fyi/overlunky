@@ -474,7 +474,11 @@ Script::Script(std::string script, std::string file)
         "time_level",
         &StateMemory::time_level,
         "hud_flags",
-        &StateMemory::hud_flags);
+        &StateMemory::hud_flags,
+        "loading",
+        &StateMemory::loading,
+        "reset",
+        &StateMemory::reset);
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
@@ -566,7 +570,11 @@ Script::Script(std::string script, std::string file)
         "SCREEN",
         102,
         "START",
-        103);
+        103,
+        "LOADING",
+        104,
+        "RESET",
+        105);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "CURRENT", -1);
 }
 
@@ -737,9 +745,8 @@ bool Script::run(ImDrawList *dl)
                     cb->func();
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0)) // run ON.LEVEL on
-                                                                                                                             // instant restart too
-                {
+                else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
+                { // run ON.LEVEL on instant restart too
                     cb->func();
                     cb->lastRan = now;
                 }
@@ -761,6 +768,18 @@ bool Script::run(ImDrawList *dl)
                 else if (
                     cb->screen == 103 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() &&
                     state.player != g_players.at(0)) // ON.START
+                {
+                    cb->func();
+                    cb->lastRan = now;
+                }
+                else if (
+                    cb->screen == 104 && g_state->loading > 0 && g_state->loading != state.loading) // ON.LOADING
+                {
+                    cb->func();
+                    cb->lastRan = now;
+                }
+                else if (
+                    cb->screen == 105 && (g_state->reset & 1) > 0 && (g_state->reset & 1) != state.reset) // ON.RESET
                 {
                     cb->func();
                     cb->lastRan = now;
@@ -809,6 +828,8 @@ bool Script::run(ImDrawList *dl)
         state.time_level = g_state->time_level;
         state.time_total = g_state->time_total;
         state.frame = get_frame_count();
+        state.loading = g_state->loading;
+        state.reset = (g_state->reset & 1);
     }
     catch (const sol::error &e)
     {

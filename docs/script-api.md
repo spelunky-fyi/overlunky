@@ -388,6 +388,8 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `time_last_level` &StateMemory::time_last_level
 - `time_level` &StateMemory::time_level
 - `hud_flags` &StateMemory::hud_flags
+- `loading` &StateMemory::loading
+- `reset` &StateMemory::reset
 ## Enums
 Enums are like numbers but in text that's easier to remember. Example:
 ```
@@ -445,6 +447,8 @@ end, ON.LEVEL)
 - `FRAME` 101
 - `SCREEN` 102
 - `START` 103
+- `LOADING` 104
+- `RESET` 105
 ### LAYER
 - `FRONT` 0
 - `BACK` 1

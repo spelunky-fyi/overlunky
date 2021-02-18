@@ -19,6 +19,7 @@ nexttheme = 1
 reallevel = 1
 realtheme = 1
 boss_level = false
+dead = false
 
 function set_doors()
   if #players > 0 and (state.theme == THEME.TIAMAT or state.theme == THEME.HUNDUN) then
@@ -153,11 +154,9 @@ function duat_door()
   spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
 end
 
-function on_camp()
-  init_run()
-end
-
-function on_level()
+set_callback(function()
+  message("Level")
+  dead = false
   if state.level_count == 0 then
     init_run()
   end
@@ -181,23 +180,43 @@ function on_level()
     dead_kingu()
     dead_osiris()
   end, 15)
-end
+end, ON.LEVEL)
 
-function on_transition()
+set_callback(function()
+  message("Transition")
+  toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
   if state.level < 98 then
-    toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
+    message("Transition - Setting next level")
     state.theme_next = realtheme
     state.world_next = world[state.theme_next]
     state.level_next = reallevel
   end
-end
+end, ON.TRANSITION)
 
-function on_guiframe()
-  -- force level even when engine isn't running
-  if state.level < 98 and (state.pause == 3 or (state.pause == 2 and state.level_count == 0)) then
-    --random_level()
+set_callback(function()
+  message("Loading")
+  if dead == true and state.level < 98 then
+    message("Loading - Setting next level")
     state.theme_next = realtheme
     state.world_next = world[state.theme_next]
     state.level_next = reallevel
   end
-end
+end, ON.LOADING)
+
+set_callback(function()
+  message("Reset - Init, state.reset == "..tostring(state.reset))
+  init_run()
+  dead = true
+end, ON.RESET)
+
+set_callback(function()
+  message("Camp - Init")
+  init_run()
+  dead = true
+end, ON.CAMP)
+
+set_callback(function()
+  message("Death - Init")
+  init_run()
+  dead = true
+end, ON.DEATH)
