@@ -40,6 +40,15 @@ Script::Script(std::string script, std::string file)
     g_items = list_entities();
     g_players = get_players();
 
+    if (!g_players.empty())
+        state.player = g_players.at(0);
+    state.screen = g_state->screen;
+    state.time_level = g_state->time_level;
+    state.time_total = g_state->time_total;
+    state.frame = get_frame_count();
+    state.loading = g_state->loading;
+    state.reset = (g_state->reset & 1);
+
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
 
     /// A bunch of [game state](#statememory) variables

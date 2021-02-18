@@ -17,9 +17,8 @@ function init_run()
     player.inventory.ropes = math.random(4, options.max_ropes)
   end
 end
-init_run()
 
-function on_level()
+set_callback(function()
   if state.level_count == 0 then
     init_run()
   end
@@ -51,4 +50,4 @@ function on_level()
       set_contents(v, item)
     end
   end, 15)
-end
+end, ON.LEVEL)
