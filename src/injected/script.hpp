@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <deque>
+#include <regex>
 
 #include "entity.hpp"
 #include "logger.h"
@@ -68,10 +69,12 @@ struct ScriptMeta
     std::string version;
     std::string description;
     std::string author;
+    std::string id;
 };
 
 Movable *get_entity(uint32_t id);
 std::tuple<float, float, int> get_position(uint32_t id);
+std::string sanitize(std::string data);
 
 using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 
@@ -94,17 +97,20 @@ class Script
     std::map<int, Callback> global_timers;
     std::map<int, Callback> callbacks;
     std::vector<int> clear_callbacks;
+    std::vector<std::string> requires;
 
     StateMemory *g_state = nullptr;
     std::vector<EntityItem> g_items;
     std::vector<Player *> g_players;
 
-    Script(std::string script, std::string file);
+
+    Script(std::string script, std::string file, bool enable = true);
     ~Script();
 
     void add_message(std::string message);
     void register_option_int(std::string name, std::string desc, int value, int min, int max);
     void register_option_bool(std::string name, std::string desc, bool value);
+    std::string script_id();
 
     bool run(ImDrawList *dl);
 };

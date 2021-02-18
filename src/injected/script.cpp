@@ -31,12 +31,13 @@ Say get_say()
     }
 }
 
-Script::Script(std::string script, std::string file)
+Script::Script(std::string script, std::string file, bool enable)
 {
     strcpy(code, script.data());
     meta.file = file;
+    enabled = enable;
 
-    g_state = (struct StateMemory *)get_state_ptr();
+    g_state = get_state_ptr();
     g_items = list_entities();
     g_players = get_players();
 
@@ -50,6 +51,42 @@ Script::Script(std::string script, std::string file)
     state.reset = (g_state->reset & 1);
 
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
+
+    /// Table of strings where you should set some script metadata shown in the UI.
+    /// - `meta.name` Script name
+    /// - `meta.version` Version
+    /// - `meta.description` Short description of the script
+    /// - `meta.author` Your name
+    lua["meta"] = lua.create_named_table("meta");
+
+    try
+    {
+        std::string metacode = "";
+        std::stringstream metass(script);
+        std::regex reg("(meta\\.[a-z]+\\s*=)");
+        for (std::string line; std::getline(metass, line); )
+        {
+            if (std::regex_search(line, reg))
+            {
+                metacode += line + "\n";
+            }
+        }
+        auto lua_result = lua.safe_script(metacode.data());
+        sol::optional<std::string> meta_name = lua["meta"]["name"];
+        sol::optional<std::string> meta_version = lua["meta"]["version"];
+        sol::optional<std::string> meta_description = lua["meta"]["description"];
+        sol::optional<std::string> meta_author = lua["meta"]["author"];
+        meta.name = meta_name.value_or(meta.file);
+        meta.version = meta_version.value_or("");
+        meta.description = meta_description.value_or("");
+        meta.author = meta_author.value_or("Anonymous");
+        meta.id = script_id();
+        result = "Got metadata";
+    }
+    catch (const sol::error &e)
+    {
+        result = e.what();
+    }
 
     /// A bunch of [game state](#statememory) variables
     /// Example:
@@ -106,14 +143,10 @@ Script::Script(std::string script, std::string file)
     };
     /// Clear previously added callback `id`
     lua["clear_callback"] = [this](int id) { clear_callbacks.push_back(id); };
-    /// Table of strings where you should set some script metadata shown in the UI.
-    /// - `meta.name` Script name
-    /// - `meta.version` Version
-    /// - `meta.description` Short description of the script
-    /// - `meta.author` Your name
-    lua["meta"] = lua.create_named_table("meta");
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
+    /// Load another script by id "author/name"
+    lua["require"] = [this](std::string id) { requires.push_back(sanitize(id)); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message) {
         auto toast = get_toast();
@@ -603,6 +636,7 @@ bool Script::run(ImDrawList *dl)
             global_timers.clear();
             callbacks.clear();
             options.clear();
+            requires.clear();
             lua["on_guiframe"] = sol::lua_nil;
             lua["on_frame"] = sol::lua_nil;
             lua["on_camp"] = sol::lua_nil;
@@ -628,10 +662,12 @@ bool Script::run(ImDrawList *dl)
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
         sol::optional<std::string> meta_author = lua["meta"]["author"];
+        sol::optional<std::string> meta_id = lua["meta"]["id"];
         meta.name = meta_name.value_or(meta.file);
         meta.version = meta_version.value_or("");
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
+        meta.id = script_id();
 
         /// Runs on every screen frame. You need this to use draw functions.
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
@@ -885,4 +921,18 @@ ImVec2 screenify(ImVec2 pos)
     }
     ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (pos.y / (1.0 / (res.y / 2)) + res.y / 2 + bar.y));
     return screened;
+}
+
+std::string sanitize(std::string data)
+{
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
+    std::regex reg("[^a-z/]*");
+    data = std::regex_replace(data, reg, "");
+    return data;
+}
+
+std::string Script::script_id()
+{
+    std::string newid = sanitize(meta.author) + "/" + sanitize(meta.name);
+    return newid;
 }

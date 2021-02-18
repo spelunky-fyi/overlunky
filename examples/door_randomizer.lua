@@ -31,7 +31,7 @@ critters[THEME.TEMPLE] = ENT_TYPE.MONS_CRITTERLOCUST
 critters[THEME.ICE_CAVES] = ENT_TYPE.MONS_CRITTERPENGUIN
 critters[THEME.NEO_BABYLON] = ENT_TYPE.MONS_CRITTERDRONE
 critters[THEME.SUNKEN_CITY] = ENT_TYPE.MONS_CRITTERSLIME
-critters[THEME.CITY_OF_GOLD] = ENT_TYPE.MONS_CRITTERLOCUST
+critters[THEME.CITY_OF_GOLD] = ENT_TYPE.MONS_SCARAB
 for i,v in ipairs(bosses) do
   critters[v] = ENT_TYPE.ITEM_LITWALLTORCH
 end
@@ -112,7 +112,6 @@ function init_run()
   boss_level = false
   random_level()
 end
-init_run()
 
 function remove_boss(boss)
   for k,v in ipairs(bosses_left) do

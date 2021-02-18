@@ -28,7 +28,7 @@
 #include "script.hpp"
 #include "state.hpp"
 
-std::vector<Script *> g_scripts;
+std::map<std::string, Script *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
@@ -481,7 +481,7 @@ void set_colors()
     style.PopupBorderSize = 0;
 }
 
-void load_script(std::string file)
+void load_script(std::string file, bool enable = true)
 {
     std::ifstream data(file);
     std::ostringstream buf;
@@ -491,8 +491,8 @@ void load_script(std::string file)
         size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
             file = file.substr(slash + 1);
-        Script *script = new Script(buf.str(), file);
-        g_scripts.push_back(script);
+        Script *script = new Script(buf.str(), file, enable);
+        g_scripts[script->meta.id] = script;
         data.close();
     }
 }
@@ -582,6 +582,31 @@ void refresh_script_files()
             g_script_files.push_back(file.path());
         }
     }
+    for (auto file : g_script_files)
+    {
+        load_script(file.string().data(), false);
+    }
+}
+
+void require_scripts()
+{
+    for (auto it : g_scripts)
+    {
+        Script *script = it.second;
+        if (!script->enabled)
+            continue;
+        for (auto req : script->requires)
+        {
+            auto reqit = g_scripts.find(req);
+            if (reqit != g_scripts.end())
+            {
+                if(!reqit->second->enabled)
+                    reqit->second->changed = true;
+                reqit->second->enabled = true;
+            }
+        }
+        script->requires.clear();
+    }
 }
 
 void autorun_scripts()
@@ -591,7 +616,7 @@ void autorun_scripts()
         std::string script = scriptpath + "/" + file;
         if (std::filesystem::exists(script) && std::filesystem::is_regular_file(script))
         {
-            load_script(script);
+            load_script(script, true);
         }
     }
 }
@@ -1925,8 +1950,20 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
 
 void render_script(Script *script)
 {
+    if (!script->enabled) return;
     auto *draw_list = ImGui::GetBackgroundDrawList();
     script->run(draw_list);
+    for (auto req : script->requires)
+    {
+        auto reqit = g_scripts.find(req);
+        if (reqit != g_scripts.end())
+        {
+            if(!reqit->second->enabled)
+                reqit->second->changed = true;
+            reqit->second->enabled = true;
+        }
+    }
+    script->requires.clear();
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -2019,11 +2056,11 @@ void render_messages()
     std::vector<Message> queue;
     for (auto script : g_scripts)
     {
-        for (auto message : script->messages)
+        for (auto message : script.second->messages)
         {
             if (now - 10s > message.second)
                 continue;
-            queue.push_back(std::make_tuple(script->meta.name, message.first, message.second));
+            queue.push_back(std::make_tuple(script.second->meta.name, message.first, message.second));
         }
     }
     ImGuiIO &io = ImGui::GetIO();
@@ -2100,8 +2137,9 @@ void render_clickhandler()
     }
     for (auto script : g_scripts)
     {
-        render_script(script);
+        render_script(script.second);
     }
+    //require_scripts();
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
@@ -2427,7 +2465,7 @@ void render_script_files()
         ImGui::PushID(num++);
         if (ImGui::Button(file.filename().string().data()))
         {
-            load_script(file.string().data());
+            load_script(file.string().data(), true);
         }
         ImGui::PopID();
     }
@@ -2447,8 +2485,8 @@ void render_script_files()
             "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
-            "Script");
-        g_scripts.push_back(script);
+            "Script", true);
+        g_scripts[script->meta.id] = script;
     }
     ImGui::PopID();
 }
@@ -2463,15 +2501,28 @@ void render_scripts()
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Hide script messages##HideScriptMessages", &hide_script_messages);
     ImGui::PushItemWidth(-1);
-    for (int i = 0; i < g_scripts.size();)
+    int i = 0;
+    std::vector<std::string> unload_scripts;
+    ImVec4 origcolor = ImGui::GetStyle().Colors[ImGuiCol_Header];
+    float gray = (origcolor.x + origcolor.y + origcolor.z) / 3.0f;
+    ImVec4 disabledcolor = ImVec4(gray, gray, gray, 0.5f);
+    for (auto it : g_scripts)
     {
         ImGui::PushID(i);
-        Script *script = g_scripts[i];
+        Script *script = it.second;
         char name[255];
         sprintf(name, "%s (%s)", script->meta.name.data(), script->meta.file.data());
-        if (ImGui::CollapsingHeader(name, ImGuiTreeNodeFlags_DefaultOpen))
+        if (!script->enabled)
         {
-            ImGui::Text("%s %s by %s", script->meta.name.data(), script->meta.version.data(), script->meta.author.data());
+            ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Header, origcolor);
+        }
+        if (ImGui::CollapsingHeader(name))
+        {
+            ImGui::Text("%s %s by %s (%s)", script->meta.name.data(), script->meta.version.data(), script->meta.author.data(), script->meta.id.data());
             ImGui::TextWrapped(script->meta.description.data());
             if (script->enabled && ImGui::Button("Disable##DisableScript"))
             {
@@ -2480,11 +2531,12 @@ void render_scripts()
             else if (!script->enabled && ImGui::Button("Enable##EnableScript"))
             {
                 script->enabled = true;
+                script->changed = true;
             }
             ImGui::SameLine();
             if (ImGui::Button("Unload##UnloadScript"))
             {
-                g_scripts.erase(g_scripts.begin() + i);
+                unload_scripts.push_back(script->meta.id);
             }
             else
             {
@@ -2503,9 +2555,16 @@ void render_scripts()
         {
             ++i;
         }
+        ImGui::PopStyleColor();
         ImGui::PopID();
     }
-    if (ImGui::CollapsingHeader("Load new script##LoadScriptFile"), ImGuiTreeNodeFlags_DefaultOpen)
+    for (auto id : unload_scripts)
+    {
+        auto it = g_scripts.find(id);
+        if (it != g_scripts.end())
+            g_scripts.erase(id);
+    }
+    if (ImGui::CollapsingHeader("Load new script##LoadScriptFile"))
     {
         render_script_files();
     }
