@@ -32,6 +32,9 @@ critters[THEME.ICE_CAVES] = ENT_TYPE.MONS_CRITTERPENGUIN
 critters[THEME.NEO_BABYLON] = ENT_TYPE.MONS_CRITTERDRONE
 critters[THEME.SUNKEN_CITY] = ENT_TYPE.MONS_CRITTERSLIME
 critters[THEME.CITY_OF_GOLD] = ENT_TYPE.MONS_CRITTERLOCUST
+for i,v in ipairs(bosses) do
+  critters[v] = ENT_TYPE.ITEM_LITWALLTORCH
+end
 
 function set_doors()
   if #players > 0 then
@@ -44,8 +47,8 @@ function set_doors()
         unlock_door_at(x, y)
       end
       if not critters_spawned and critters[realtheme] ~= nil then
-        spawn(critters[realtheme], x-0.4, y, layer, 0, 0)
-        spawn(critters[realtheme], x+0.4, y, layer, 0, 0)
+        spawn(critters[realtheme], x-0.7, y+0.5, layer, 0, 0)
+        spawn(critters[realtheme], x+0.7, y+0.5, layer, 0, 0)
         critters_spawned = true
       end
     end
@@ -99,6 +102,7 @@ function random_level()
   else
     nexttheme = 1
   end
+  message("Going to "..tostring(nextworld).."-"..tostring(reallevel)..", theme "..tostring(realtheme))
 end
 
 function init_run()
