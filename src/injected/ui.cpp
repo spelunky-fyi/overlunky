@@ -1035,6 +1035,7 @@ void force_noclip()
         {
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
+            player->flags &= ~(1U << 10);
             player->flags |= 1U << 4;
             player->velocityx = player->movex * player->type->max_speed;
             player->velocityy = player->movey * player->type->max_speed;
@@ -1255,6 +1256,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
             else
             {
                 player->flags &= ~(1U << 9);
+                player->flags |= 1U << 10;
                 player->flags &= ~(1U << 4);
                 player->type->max_speed = 0.0725;
             }
