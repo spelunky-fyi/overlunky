@@ -999,11 +999,17 @@ bool update_entity()
         g_entity_type = entity_type(g_last_id);
         g_entity = (Player *)entity_ptr(g_last_id);
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
-        if (IsBadWritePtr(g_entity, 0x178))
-            g_entity = nullptr;
-        if (g_entity && (g_entity_type >= 194 && g_entity_type <= 213))
+        if (g_entity == nullptr || IsBadWritePtr(g_entity, 0x178))
         {
-            g_inventory = (struct Inventory *)g_entity->inventory_ptr;
+            g_entity = nullptr;
+            g_entity_type = 0;
+            g_entity_addr = 0;
+            g_inventory = nullptr;
+            return false;
+        }
+        if (g_entity != nullptr && (g_entity_type >= 194 && g_entity_type <= 213))
+        {
+            g_inventory = g_entity->inventory_ptr;
             if (IsBadWritePtr(g_inventory, 0x1428))
                 g_inventory = nullptr;
             return true;
@@ -1017,10 +1023,27 @@ bool update_entity()
     else
     {
         g_entity = nullptr;
+        g_entity_type = 0;
         g_inventory = nullptr;
         g_entity_addr = 0;
     }
     return false;
+}
+
+void fix_co_coordinates(std::pair<float, float> &cpos)
+{
+    float maxx = g_state->w * 10.0f + 2.5f;
+    float minx = 2.5f;
+    float maxy = 122.5f;
+    float miny = 122.5f - g_state->h * 8.0f;
+    if (cpos.first > maxx)
+        cpos.first -= g_state->w * 10.0f;
+    else if (cpos.first < minx)
+        cpos.first += g_state->w * 10.0f;
+    if (cpos.second > maxy)
+        cpos.second -= g_state->h * 8.0f;
+    else if (cpos.second < miny)
+        cpos.second += g_state->h * 8.0f;
 }
 
 void set_zoom()
@@ -1064,6 +1087,13 @@ void force_noclip()
             player->flags |= 1U << 4;
             player->velocityx = player->movex * player->type->max_speed;
             player->velocityy = player->movey * player->type->max_speed;
+            if (g_state->theme == 10)
+            {
+                auto cpos = player->position();
+                fix_co_coordinates(cpos);
+                if (cpos.first != player->position().first || cpos.second != player->position().second)
+                    move_entity_abs(player->uid, cpos.first, cpos.second, player->velocityx, player->velocityy);
+            }
         }
     }
 }
@@ -2184,9 +2214,15 @@ void render_clickhandler()
         }
         else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
         {
+            if(g_players.empty())
+                return;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            teleport(g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            ImVec2 mpos = normalize(io.MousePos);
+            std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
+            if (g_state->theme == 10)
+                fix_co_coordinates(cpos);
+            move_entity_abs(g_players.at(0)->uid, cpos.first, cpos.second, g_vx, g_vy);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2194,8 +2230,14 @@ void render_clickhandler()
         }
         else if (released("mouse_teleport") && ImGui::IsWindowFocused())
         {
+            if(g_players.empty())
+                return;
             set_pos(startpos);
-            teleport(g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            ImVec2 mpos = normalize(io.MousePos);
+            std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
+            if (g_state->theme == 10)
+                fix_co_coordinates(cpos);
+            move_entity_abs(g_players.at(0)->uid, cpos.first, cpos.second, g_vx, g_vy);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2356,8 +2398,16 @@ void render_clickhandler()
             g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_id > 0)
             {
-                // lets just sweep this under the rug for now :D
-                move_entity(g_held_id, 0, -1000, false, 0, 0, true);
+                // move movables to void because they like to explode and drop stuff, but actually destroy blocks and such
+                Entity *to_kill = get_entity_ptr(g_held_id);
+                if (to_kill->type->search_flags < 0x80)
+                {
+                    move_entity(g_held_id, 0, -1000, false, 0, 0, true);
+                }
+                else
+                {
+                    to_kill->kill(true, nullptr);
+                }
             }
             g_x = 0;
             g_y = 0;

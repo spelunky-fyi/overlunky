@@ -302,7 +302,7 @@ int32_t get_entity_type(uint32_t id)
     }
     auto state = State::get();
     auto p = state.find(id);
-    if (!p)
+    if (p == nullptr)
         return 0;
     return p->type->id;
 }
