@@ -171,10 +171,24 @@ Script::Script(std::string script, std::string file, bool enable)
         lua["options"][name] = value;
     };
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
+    /// Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
+    /// Example:
+    /// ```
+    /// -- spawn megajelly using absolute coordinates
+    /// set_callback(function()
+    ///     x, y, layer = get_position(players[1].uid)
+    ///     spawn_entity(ENT_TYPE.MONS_MEGAJELLYFISH, x, y+3, layer, 0, 0)
+    /// end, ON.LEVEL)
+    /// -- spawn clover using player-relative coordinates
+    /// set_callback(function()
+    ///     spawn(ENT_TYPE.ITEM_PICKUP_CLOVER, 0, 1, LAYER.PLAYER1, 0, 0)
+    /// end, ON.LEVEL)
+    /// ```
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
     /// Spawn a door to another world, level and theme and return the uid of spawned entity.
+    /// Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
     lua["spawn_door"] = spawn_door_abs;
     /// Short for [spawn_door](#spawn_door).
     lua["door"] = spawn_door_abs;
@@ -617,7 +631,7 @@ Script::Script(std::string script, std::string file, bool enable)
         104,
         "RESET",
         105);
-    lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "CURRENT", -1);
+    lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
 }
 
 bool Script::run(ImDrawList *dl)
