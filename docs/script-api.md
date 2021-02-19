@@ -11,6 +11,12 @@ The following Lua libraries and their functions are available. You can read more
 ### `table`
 ## Global variables
 These variables are always there to use.
+### `meta`
+Table of strings where you should set some script metadata shown in the UI.
+- `meta.name` Script name
+- `meta.version` Version
+- `meta.description` Short description of the script
+- `meta.author` Your name
 ### `state`
 A bunch of [game state](#statememory) variables
 Example:
@@ -21,12 +27,6 @@ end
 ```
 ### `players`
 An array of [Movables](#movable) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
-### `meta`
-Table of strings where you should set some script metadata shown in the UI.
-- `meta.name` Script name
-- `meta.version` Version
-- `meta.description` Short description of the script
-- `meta.author` Your name
 ### `options`
 Table of options set in the UI, added with the [register_option_functions](#register_option_int).
 ## Event functions
@@ -82,6 +82,9 @@ Add global callback function to be called on an [event](#on).
 ### `clear_callback`
 #### Params: `int id`
 Clear previously added callback `id`
+### `require`
+#### Params: `string id`
+Load another script by id "author/name"
 ### `toast`
 #### Params: `string message`
 Show a message that looks like a level feeling.
