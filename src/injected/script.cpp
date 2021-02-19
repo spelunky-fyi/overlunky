@@ -91,12 +91,12 @@ Script::Script(std::string script, std::string file, bool enable)
     /// A bunch of [game state](#statememory) variables
     /// Example:
     /// ```
-    /// if state.time_level > 300 and state.theme == THEME.DWELLING then
-    ///     toast("Congratilations for lasting 10 seconds in Dwelling")
+    /// if state.time_level > 300 and state.theme == [THEME.DWELLING](#theme) then
+    ///     toast("Congratulations for lasting 5 seconds in Dwelling")
     /// end
     /// ```
     lua["state"] = g_state;
-    /// An array of [Movables](#movable) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
+    /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
     /// Print a log message on screen.
     lua["message"] = [this](std::string message) {
@@ -171,7 +171,7 @@ Script::Script(std::string script, std::string file, bool enable)
         lua["options"][name] = value;
     };
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
-    /// Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
+    /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     /// Example:
     /// ```
     /// -- spawn megajelly using absolute coordinates
@@ -281,8 +281,8 @@ Script::Script(std::string script, std::string file, bool enable)
     lua["screen_position"] = screen_position;
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
-    /// Get position `x, y, layer` of entity by uid. Use this, don't use `Movable.x/y` because those are sometimes just the offset to the entity
-    /// you're standing on.
+    /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
+    /// you're standing on, not real level coordinates.
     lua["get_position"] = get_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
