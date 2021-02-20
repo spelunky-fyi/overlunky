@@ -351,6 +351,7 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `as_mattock` &Entity::as<Mattock>
 - `as_mount` &Entity::as<Mount>
 ### Movable
+Derived from [`Entity`](#entity)
 - `movex` &Movable::movex
 - `movey` &Movable::movey
 - `buttons` &Movable::buttons
@@ -374,8 +375,10 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `offsety` &Movable::offsety
 - `airtime` &Movable::airtime
 ### Player
+Derived from [`Entity`](#entity) [`Movable`](#movable)
 - `inventory` &Player::inventory_ptr
 ### Container
+Derived from [`Entity`](#entity) [`Movable`](#movable)
 - `inside` &Container::inside
 ### StateMemory
 - `screen_last` &StateMemory::screen_last

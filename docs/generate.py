@@ -109,6 +109,10 @@ for file in api_files:
     for type in m:
         name = type[0]
         attr = type[1]
+        base = ""
+        bm = re.search(r'sol::bases<([^\]]*)>', attr);
+        if bm:
+            base = bm.group(1)
         attr = attr.replace('",', ',')
         attr = attr.split('"')
         vars = []
@@ -116,7 +120,7 @@ for file in api_files:
             if not var: continue
             var = var.split(',')
             vars.append({ 'name': var[0], 'type': var[1] })
-        types.append({'name': name, 'vars': vars})
+        types.append({'name': name, 'vars': vars, 'base': base})
 
 for file in api_files:
     data = open(file, 'r').read()
@@ -197,7 +201,13 @@ for lf in funcs:
 print('## Types')
 print('Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [.hpp files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They\'re mostly just ints and floats.')
 for type in types:
-    print('### '+type['name'])
+    print('### ' + type['name'])
+    if type['base']:
+        print('Derived from', end='')
+        bases = type['base'].split(',')
+        for base in bases:
+            print(' [`' + base + '`](#' + base.lower() + ')', end='')
+        print()
     for var in type['vars']:
         print('- `'+var['name']+'` '+var['type'])
 
