@@ -173,7 +173,7 @@ std::vector<std::string> saved_entities;
 std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
-     show_app_metrics = false, hud_dark_level = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
+     show_app_metrics = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
      freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false;
 Player *g_entity = 0;
 Movable *g_held_entity = 0;
@@ -1068,10 +1068,6 @@ void force_hud_flags()
         g_state->hud_flags |= 1U << 19;
     else if (!ImGui::GetIO().WantCaptureKeyboard)
         g_state->hud_flags &= ~(1U << 19);
-    if (hud_dark_level)
-        g_state->hud_flags |= 1U << 17;
-    else
-        g_state->hud_flags &= ~(1U << 17);
 }
 
 void force_noclip()
