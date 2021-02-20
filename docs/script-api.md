@@ -306,19 +306,31 @@ Draws a circle on screen
 #### Params: `float x, float y, string text, int color`
 Draws text on screen
 ## Types
-Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [.hpp files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats.
-### Color
+Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [.hpp files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
+```
+-- This doesn't make any sense, as you could just access the variables directly from players[]
+-- It's just a weird example OK!
+ids = get_entities_by_mask(1) -- I think this just covers CHARs
+for i,id in ipairs(ids) do
+    e = get_entity(id):as_player() -- cast Entity to Player to access inventory
+    e.health = 99
+    e.inventory.bombs = 99
+    e.inventory.ropes = 99
+    e.type.jump = 0.36
+end
+```
+### `Color`
 - `r` &Color::r
 - `g` &Color::g
 - `b` &Color::b
 - `a` &Color::a
-### Inventory
+### `Inventory`
 - `money` &Inventory::money
 - `bombs` &Inventory::bombs
 - `ropes` &Inventory::ropes
 - `kills_level` &Inventory::kills_level
 - `kills_total` &Inventory::kills_total
-### EntityDB
+### `EntityDB`
 - `id` &EntityDB::id
 - `search_flags` &EntityDB::search_flags
 - `width` &EntityDB::width
@@ -332,7 +344,7 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `jump` &EntityDB::jump
 - `damage` &EntityDB::damage
 - `life` &EntityDB::life
-### Entity
+### `Entity`
 - `type` &Entity::type
 - `overlay` &Entity::overlay
 - `flags` &Entity::flags
@@ -345,12 +357,13 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 - `height` &Entity::h
 - `topmost` &Entity::topmost
 - `topmost_mount` &Entity::topmost_mount
-- `as_movable` &Entity::as<Movable>
-- `as_door` &Entity::as<Door>
-- `as_container` &Entity::as<Container>
-- `as_mattock` &Entity::as<Mattock>
-- `as_mount` &Entity::as<Mount>
-### Movable
+- `as_movable` &Entity::as&lt;Movable&gt;
+- `as_door` &Entity::as&lt;Door&gt;
+- `as_container` &Entity::as&lt;Container&gt;
+- `as_mattock` &Entity::as&lt;Mattock&gt;
+- `as_mount` &Entity::as&lt;Mount&gt;
+- `as_player` &Entity::as&lt;Player&gt;
+### `Movable`
 Derived from [`Entity`](#entity)
 - `movex` &Movable::movex
 - `movey` &Movable::movey
@@ -374,13 +387,13 @@ Derived from [`Entity`](#entity)
 - `offsetx` &Movable::offsetx
 - `offsety` &Movable::offsety
 - `airtime` &Movable::airtime
-### Player
+### `Player`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - `inventory` &Player::inventory_ptr
-### Container
+### `Container`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - `inside` &Container::inside
-### StateMemory
+### `StateMemory`
 - `screen_last` &StateMemory::screen_last
 - `screen` &StateMemory::screen
 - `screen_next` &StateMemory::screen_next

@@ -199,9 +199,21 @@ for lf in funcs:
             print(('#### ' if com.startswith('Returns:') else '')+com)
 
 print('## Types')
-print('Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [.hpp files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They\'re mostly just ints and floats.')
+print('Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [.hpp files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They\'re mostly just ints and floats. Example:')
+print("""```
+-- This doesn't make any sense, as you could just access the variables directly from players[]
+-- It's just a weird example OK!
+ids = get_entities_by_mask(1) -- I think this just covers CHARs
+for i,id in ipairs(ids) do
+    e = get_entity(id):as_player() -- cast Entity to Player to access inventory
+    e.health = 99
+    e.inventory.bombs = 99
+    e.inventory.ropes = 99
+    e.type.jump = 0.36
+end
+```""")
 for type in types:
-    print('### ' + type['name'])
+    print('### `' + type['name'] + '`')
     if type['base']:
         print('Derived from', end='')
         bases = type['base'].split(',')
@@ -209,7 +221,7 @@ for type in types:
             print(' [`' + base + '`](#' + base.lower() + ')', end='')
         print()
     for var in type['vars']:
-        print('- `'+var['name']+'` '+var['type'])
+        print('- `'+var['name']+'` '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
 
 print('## Enums')
 print('Enums are like numbers but in text that\'s easier to remember. Example:')

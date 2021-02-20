@@ -425,7 +425,9 @@ Script::Script(std::string script, std::string file, bool enable)
         "as_mattock",
         &Entity::as<Mattock>,
         "as_mount",
-        &Entity::as<Mount>);
+        &Entity::as<Mount>,
+        "as_player",
+        &Entity::as<Player>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
