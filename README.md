@@ -11,7 +11,9 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, ruining or corrupting your savefile and cheating while using online features. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://mr_goldberg.gitlab.io/goldberg_emulator/) in the game directory. (Just replace steam_api64.dll with the one in the zip and that copy of the game can't talk to Steam no more!) If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to BlitWorks.
 
 ## Installation and usage
-**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract anywhere. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
+**[YouTube video](https://youtu.be/gm0VUvnBAcQ) for kids who can't read good and who wanna learn to do other stuff good too.**
+
+**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
 Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
 
