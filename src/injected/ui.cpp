@@ -183,6 +183,7 @@ std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
 auto mouse_moved = std::chrono::system_clock::now();
+ImVec2 mouse_last_pos = ImVec2(0, 0);
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {
     "tool_entity",
@@ -1092,6 +1093,22 @@ void force_noclip()
                     move_entity_abs(player->uid, cpos.first, cpos.second, player->velocityx, player->velocityy);
             }
         }
+    }
+}
+
+void mouse_activity()
+{
+    using namespace std::chrono_literals;
+    auto &io = ImGui::GetIO();
+    if (io.MousePos.x != mouse_last_pos.x || io.MousePos.y != mouse_last_pos.y)
+    {
+        mouse_moved = std::chrono::system_clock::now();
+        io.MouseDrawCursor = true;
+        mouse_last_pos = io.MousePos;
+    }
+    else if (mouse_moved + 2s < std::chrono::system_clock::now())
+    {
+        io.MouseDrawCursor = false;
     }
 }
 
@@ -2430,7 +2447,8 @@ void render_clickhandler()
                 buttons += i;
             }
         }
-        if (buttons == 0)
+        using namespace std::chrono_literals;
+        if (buttons == 0 && mouse_moved + 2s > std::chrono::system_clock::now())
         {
             io.MouseDrawCursor = true;
         }
@@ -3693,6 +3711,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     force_hud_flags();
     force_time();
     force_noclip();
+    mouse_activity();
 
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
