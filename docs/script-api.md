@@ -94,6 +94,9 @@ Show a message coming from an entity
 ### `register_option_int`
 #### Params: `string name, string desc, int value, int min, int max`
 Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default.
+### `register_option_float`
+#### Params: `string name, string desc, float value, float min, float max`
+Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default.
 ### `register_option_bool`
 #### Params: `string name, string desc, bool value`
 Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
@@ -275,6 +278,9 @@ Get the current global frame count since the game was started. You can use this 
 ### `carry`
 #### Params: `int mount, int rider`
 Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
+### `flip_entity`
+#### Params: `int id`
+Flip entity around by uid. All new entities face right by default.
 ### `distance`
 #### Params: `int a, int b`
 Calculate the tile distance of two entities by uid
