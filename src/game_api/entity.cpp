@@ -140,6 +140,12 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
     overlay = NULL;
     x = dx;
     y = dy;
+    if (type->search_flags < 0x80)
+    {
+        auto player = (Player *)pointer();
+        player->velocityx = vx;
+        player->velocityy = vy;
+    }
 }
 
 std::pair<float, float> Entity::position()

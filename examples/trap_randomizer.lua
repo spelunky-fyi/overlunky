@@ -5,10 +5,10 @@ meta.author = "Dregu"
 
 register_option_float("add_traps", "% of traps to add", 4, 0, 20)
 
-floor_from = {43, 46, 85, 89, 604}
+floor_from = {43, 46, 85, 89}
 floor_to = {43, 46, 89, 596, 604}
-floor_item = {73, 439, 469, 596}
-generic_from = {43, 46, 604}
+floor_item = {73, 439, 469, 596, 604}
+generic_from = {43, 46}
 generic_to = {43, 46, 604, 596}
 wall_from = {40, 41, 43, 45}
 wall_to = {40, 41, 43, 45, 46}
@@ -24,7 +24,7 @@ set_callback(function()
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = generic_to[math.random(#generic_to)]
-            bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
+            bottom = get_entities_at(0, 0x180, x, y-1.5, l, 0.6)
             if e.type.id ~= newid and replaced[v] ~= true and (#bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
@@ -37,7 +37,7 @@ set_callback(function()
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = floor_to[math.random(#floor_to)]
-            bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
+            bottom = get_entities_at(0, 0x180, x, y-1.5, l, 0.6)
             if e.type.id ~= newid and replaced[v] ~= true and (#bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
@@ -62,7 +62,7 @@ set_callback(function()
         end
 
         --replace ceiling traps
-        if state.theme ~= THEME.CITY_OF_GOLD then -- these textures are glitched
+        if state.theme ~= THEME.CITY_OF_GOLD and state.theme ~= THEME.ICE_CAVES and state.theme ~= THEME.TIAMAT then -- these textures are glitched
             for i,v in ipairs(get_entities_by_type(ceiling_from)) do
                 x, y, l = get_position(v)
                 e = get_entity(v)
@@ -82,7 +82,7 @@ set_callback(function()
             x, y, l = get_position(v)
             if math.random() < options.add_traps/100.0 then
                 top = get_entities_at(0, 0x180, x, y+1, l, 0.1)
-                bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
+                bottom = get_entities_at(0, 0x180, x, y-1.5, l, 0.6)
                 left = get_entities_at(0, 0x180, x-1, y, l, 0.1)
                 right = get_entities_at(0, 0x180, x+1, y, l, 0.1)
                 lava = get_entities_at(ENT_TYPE.LIQUID_LAVA, 0, x, y, l, 2.0)
@@ -104,7 +104,7 @@ set_callback(function()
                             spawn(newid, x, y+0.9, l, 0, 0)
                         end
                     end
-                elseif #bottom == 0 and state.theme ~= THEME.CITY_OF_GOLD then -- replace with ceiling trap
+                elseif #bottom == 0 and (state.theme ~= THEME.CITY_OF_GOLD and state.theme ~= THEME.ICE_CAVES and state.theme ~= THEME.TIAMAT) then -- replace with ceiling trap
                     kill_entity(v)
                     newid = ceiling_to[math.random(#ceiling_to)]
                     spawn(newid, x, y, l, 0, 0)

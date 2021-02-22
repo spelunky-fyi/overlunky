@@ -182,6 +182,7 @@ StateMemory *g_state = 0;
 std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
+auto mouse_moved = std::chrono::system_clock::now();
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {
     "tool_entity",
@@ -2224,7 +2225,7 @@ void render_clickhandler()
                 return;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            ImVec2 mpos = normalize(io.MousePos);
+            ImVec2 mpos = normalize(startpos);
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
@@ -2293,7 +2294,7 @@ void render_clickhandler()
                 move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
         }
-        if (released("mouse_grab_throw") && g_held_id > 0 && g_entity != 0)
+        if (released("mouse_grab_throw") && g_held_id > 0 && g_held_entity != 0)
         {
             throw_held = false;
             io.MouseDrawCursor = true;
