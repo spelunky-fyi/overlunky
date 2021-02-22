@@ -80,7 +80,7 @@ set_callback(function()
         -- replace a % of floor with new traps
         for i,v in ipairs(get_entities_by_type(floortypes)) do
             x, y, l = get_position(v)
-            if l == LAYER.FRONT and math.random() < options.add_traps/100.0 then
+            if math.random() < options.add_traps/100.0 then
                 top = get_entities_at(0, 0x180, x, y+1, l, 0.1)
                 bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
                 left = get_entities_at(0, 0x180, x-1, y, l, 0.1)
