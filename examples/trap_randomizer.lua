@@ -5,28 +5,27 @@ meta.author = "Dregu"
 
 register_option_float("add_traps", "% of traps to add", 4, 0, 20)
 
-floor_from = {43, 46, 85, 89, 596, 604}
+floor_from = {43, 46, 85, 89, 604}
 floor_to = {43, 46, 89, 596, 604}
 floor_item = {73, 439, 469, 596}
 generic_from = {43, 46, 604}
-generic_to = {43, 46, 604}
+generic_to = {43, 46, 604, 596}
 wall_from = {40, 41, 43, 45}
 wall_to = {40, 41, 43, 45, 46}
 ceiling_from = {60, 80, 461}
 ceiling_to = {46, 60, 80}
 floortypes = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE}
-replaced = {}
 
 set_callback(function()
-    replaced = {}
     set_timeout(function()
+        replaced = {}
         -- replace generic tile traps
         for i,v in ipairs(get_entities_by_type(generic_from)) do
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = generic_to[math.random(#generic_to)]
             bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
-            if e.type.id ~= newid and not replaced[v] and (bottom > 0 or newid ~= 596) then
+            if e.type.id ~= newid and replaced[v] ~= true and (#bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
                 replaced[v] = true
@@ -39,7 +38,7 @@ set_callback(function()
             e = get_entity(v)
             newid = floor_to[math.random(#floor_to)]
             bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
-            if e.type.id ~= newid and not replaced[v] and (bottom > 0 or newid ~= 596) then
+            if e.type.id ~= newid and replaced[v] ~= true and (#bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
                 replaced[v] = true
@@ -52,10 +51,10 @@ set_callback(function()
             e = get_entity(v)
             facing_left = test_flag(e.flags, 17)
             newid = wall_to[math.random(#wall_to)]
-            if e.type.id ~= newid and not replaced[v] then
+            if e.type.id ~= newid and replaced[v] ~= true then
                 kill_entity(v)
                 newe = spawn(newid, x, y, l, 0, 0)
-                if facing_left then
+                if facing_left and newid ~= ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP then
                     flip_entity(newe)
                 end
                 replaced[v] = true
@@ -68,7 +67,7 @@ set_callback(function()
                 x, y, l = get_position(v)
                 e = get_entity(v)
                 newid = ceiling_to[math.random(#ceiling_to)]
-                if e.type.id ~= newid and not replaced[v] then
+                if e.type.id ~= newid and replaced[v] ~= true then
                     kill_entity(v)
                     spawn(newid, x, y, l, 0, 0)
                     replaced[v] = true
@@ -117,17 +116,19 @@ set_callback(function()
                     kill_entity(v)
                     newid = wall_to[math.random(#wall_to)]
                     newe = spawn(newid, x, y, l, 0, 0)
-                    flip_entity(newe)
+                    if newid ~= ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP then
+                        flip_entity(newe)
+                    end
                 elseif #left == 0 and #right == 0 then -- make random wall trap
                     kill_entity(v)
                     newid = wall_to[math.random(#wall_to)]
                     newe = spawn(newid, x, y, l, 0, 0)
-                    if math.random() < 0.5 then
+                    if math.random() < 0.5 and newid ~= ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP then
                         flip_entity(newe)
                     end
                 else -- make generic tile trap
                     newid = generic_to[math.random(#generic_to)]
-                    if newid ~= 596 or #lava == 0 then
+                    if newid ~= 596 or (#lava == 0 and #bottom > 0) then
                         kill_entity(v)
                         spawn(newid, x, y, l, 0, 0)
                     end
