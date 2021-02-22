@@ -15,8 +15,10 @@ wall_to = {40, 41, 43, 45, 46}
 ceiling_from = {60, 80, 461}
 ceiling_to = {46, 60, 80}
 floortypes = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON}
+replaced = {}
 
 set_callback(function()
+    replaced = {}
     set_timeout(function()
         -- replace generic tile traps
         for i,v in ipairs(get_entities_by_type(generic_from)) do
@@ -26,6 +28,7 @@ set_callback(function()
             if e.type.id ~= newid then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
+                replaced[v] = true
             end
         end
 
@@ -34,9 +37,10 @@ set_callback(function()
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = floor_to[math.random(#floor_to)]
-            if e.type.id ~= newid then
+            if e.type.id ~= newid and not replaced[v] then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
+                replaced[v] = true
             end
         end
 
@@ -46,12 +50,13 @@ set_callback(function()
             e = get_entity(v)
             facing_left = test_flag(e.flags, 17)
             newid = wall_to[math.random(#wall_to)]
-            if e.type.id ~= newid then
+            if e.type.id ~= newid and not replaced[v] then
                 kill_entity(v)
                 newe = spawn(newid, x, y, l, 0, 0)
                 if facing_left then
                     flip_entity(newe)
                 end
+                replaced[v] = true
             end
         end
 
@@ -60,9 +65,10 @@ set_callback(function()
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = ceiling_to[math.random(#ceiling_to)]
-            if e.type.id ~= newid then
+            if e.type.id ~= newid and not replaced[v] then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
+                replaced[v] = true
             end
         end
     end, 5)
