@@ -64,27 +64,33 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
 Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini.
 
 ## Troubleshooting
-  - If your game crashes when launching Overlunky or it just closes and you don't ever see the overlay in game:
+  - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
-  - If your game crashes when actually trying to use the tools:
+  - If your game **crashes** when actually trying to use the tools:
     + See previous section.
     + Some entities just crash the game, try to avoid them next time.
-  - If your game crashes and you're using **Modlunky2 or Playlunky**:
+  - If your game **crashes** and you're using **Modlunky2 or Playlunky**:
     + While we try to keep all the modding tools compatible, some things may break sometimes.
     + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
-  - If you're missing some overlay windows:
+  - If you're **missing** some overlay **windows**:
     + Try resetting window positions. (See hotkeys above.)
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
-  - If you mess up your keyboard shortcuts or UI:
+  - If you mess up your **keyboard shortcuts** or UI:
     + Delete `Spelunky 2/overlunky.ini`.
-  - If keyboard input no longer works in game after using the tools:
+  - If **keyboard input** no longer works in game after using the tools:
     + Try switching to the `alternative disable input mode` in options, save options and restart the game.
     + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing (rawinput)` option enabled, it doesn't work in fullscreen.
     + Restart the game after changing graphics modes.
     + Try Alt+Tabbing to restore input.
     + Magically learn to play with a gamepad instead.
     + If nothing else works, disable the `Disable game keys when typing` options and suffer.
+  - If you don't see the **Scripts tab**
+    + Did you even open it? The [keyboard shortcuts](#features) are right there.
+  - If you **don't have scripts** in the Scripts tab
+    + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).
+  - If you can't **hide script messages**
+    + Still can't read can you... Just look at the Scripts tab, there are buttons and stuff.
     
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
