@@ -12,10 +12,11 @@ function move_or_kill(v)
     e = get_entity(v):as_movable()
     if e.health == 0 then return end
     if state.theme == THEME.COSMIC_OCEAN then
-        message("Killing "..tostring(v).." "..tostring(e.type.id))
+        --message("Killing "..tostring(v).." "..tostring(e.type.id))
+        move_entity(v, 20, 120-((state.height)*8)+4, 0, 0)
         kill_entity(v)
     else
-        message("Moving "..tostring(v).." "..tostring(e.type.id))
+        --message("Moving "..tostring(v).." "..tostring(e.type.id))
         move_entity(v, 20, 120-((state.height+1)*8), 0, 0)
     end
 end
@@ -40,3 +41,5 @@ set_callback(function()
         end
     end
 end, ON.LEVEL)
+
+message("Initialized")

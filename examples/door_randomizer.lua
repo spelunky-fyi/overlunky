@@ -102,11 +102,11 @@ function random_level()
   else
     nexttheme = 1
   end
-  message("Going to "..tostring(nextworld).."-"..tostring(reallevel)..", theme "..tostring(realtheme))
+  --message("Going to "..tostring(nextworld).."-"..tostring(reallevel)..", theme "..tostring(realtheme))
 end
 
 function init_run()
-  message("Started new run")
+  --message("Started new run")
   bosses_left = {table.unpack(bosses)}
   normal_levels = 0
   boss_level = false
@@ -177,7 +177,7 @@ function duat_door()
 end
 
 set_callback(function()
-  message("Level")
+  --message("Level")
   critters_spawned = false
   dead = false
   if state.level_count == 0 then
@@ -206,10 +206,10 @@ set_callback(function()
 end, ON.LEVEL)
 
 set_callback(function()
-  message("Transition")
+  --message("Transition")
   toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
   if state.level < 98 then
-    message("Transition - Setting next level")
+    --message("Transition - Setting next level")
     state.theme_next = realtheme
     state.world_next = world[state.theme_next]
     state.level_next = reallevel
@@ -217,9 +217,9 @@ set_callback(function()
 end, ON.TRANSITION)
 
 set_callback(function()
-  message("Loading")
+  --message("Loading")
   if dead == true and state.level < 98 then
-    message("Loading - Setting next level")
+    --message("Loading - Setting next level")
     state.theme_next = realtheme
     state.world_next = world[state.theme_next]
     state.level_next = reallevel
@@ -227,19 +227,22 @@ set_callback(function()
 end, ON.LOADING)
 
 set_callback(function()
-  message("Reset - Init, state.reset == "..tostring(state.reset))
+  --message("Reset - Init, state.reset == "..tostring(state.reset))
   init_run()
   dead = true
 end, ON.RESET)
 
 set_callback(function()
-  message("Camp - Init")
+  --message("Camp - Init")
   init_run()
   dead = true
 end, ON.CAMP)
 
 set_callback(function()
-  message("Death - Init")
+  --message("Death - Init")
+  toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.bosses)))
   init_run()
   dead = true
 end, ON.DEATH)
+
+message("Initialized")

@@ -51,3 +51,5 @@ set_callback(function()
     end
   end, 15)
 end, ON.LEVEL)
+
+message("Initialized")

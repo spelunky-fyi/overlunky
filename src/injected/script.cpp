@@ -310,7 +310,7 @@ Script::Script(std::string script, std::string file, bool enable)
     /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
     /// Flip entity around by uid. All new entities face right by default.
-    lua["flip"] = flip_entity;
+    lua["flip_entity"] = flip_entity;
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
         Entity *ea = get_entity_ptr(a);
