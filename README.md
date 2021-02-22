@@ -13,7 +13,7 @@ You are strongly discouraged from using any modding tools in your actual online 
 ## Installation and usage
 **[YouTube tutorial](https://youtu.be/Zzba4cV9f2c) for kids who can't read good and who wanna learn to do other stuff good too.**
 
-**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder. Run the program, leave it running and then start your game, or the other way around! Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
+**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder. Run the program, leave it running and then start your game, or the other way around! Check the [keyboard shortcuts](#features) and [troubleshooting](#troubleshooting) before asking dumb questions. Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
 Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
 
@@ -79,14 +79,24 @@ Lua scripting is buggy and unfinished and the **API will change**, so don't go a
   - If you mess up your **keyboard shortcuts** or UI:
     + Delete `Spelunky 2/overlunky.ini`.
   - If **keyboard input** no longer works in game after using the tools:
-    + Try switching to the `alternative disable input mode` in options, save options and restart the game.
+    + Try switching to the `alternative disable input mode` in options, save options and restart the game. Don't use them both at the same time, unless that works for you.
     + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing (rawinput)` option enabled, it doesn't work in fullscreen.
     + Restart the game after changing graphics modes.
     + Try Alt+Tabbing to restore input.
     + Magically learn to play with a gamepad instead.
     + If nothing else works, disable the `Disable game keys when typing` options and suffer.
   - If your UI is all black or you want to change the color
-    - Change the color then. The [keyboard shortcuts](#features) are right there.
+    + Change the color then. The [keyboard shortcuts](#features) are right there.
+  - If stuff just don't work and you're running **Windows 7** or a machine not designed to play games
+    + You're on your own here. We don't test on or make this for ancient software/hardware.
+  - If you have problems with **OBS**
+    + Game capture seems to interfere with the disable input features, so try fiddling with those if you have problems.
+    + Game capture in windowed/borderless is probably still your best bet.
+    + Apparently some people are getting lag, crashes or a completely black UI, but I can't fix problems I don't have.
+    + Check previous question.
+  - If you're running **Linux**
+    + The game and OL should run fine with the latest Wine if you install DXVK.
+    + You're on your own if you're using Steam/Proton.
   - If you don't see the **Scripts tab**
     + Did you even open it? The [keyboard shortcuts](#features) are right there.
   - If you **don't have scripts** in the Scripts tab
