@@ -3,6 +3,17 @@
 #include "entity.hpp"
 #include "state.hpp"
 
+uint32_t setflag(uint32_t flags, int bit) { return flags | (1U << (bit - 1)); }
+uint32_t clrflag(uint32_t flags, int bit) { return flags & ~(1U << (bit - 1)); }
+bool testflag(uint32_t flags, int bit) { return (flags & (1U << (bit - 1))) > 0; }
+uint32_t flipflag(uint32_t flags, int bit)
+{
+    if (testflag(flags, bit))
+        return clrflag(flags, bit);
+    else
+        return setflag(flags, bit);
+}
+
 uint32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();
@@ -683,4 +694,21 @@ void apply_entity_db(uint32_t id)
     Entity *ent = get_entity_ptr(id);
     if(ent != nullptr)
         ent->apply_db();
+}
+
+void flip_entity(uint32_t id)
+{
+    Entity *ent = get_entity_ptr(id);
+    if(ent == nullptr)
+        return;
+    ent->flags = flipflag(ent->flags, 17);
+    if (ent->items.count > 0)
+    {
+        int *items = (int *)ent->items.begin;
+        for (int i = 0; i < ent->items.count; i++)
+        {
+            Entity *item = get_entity_ptr(items[i]);
+            item->flags = flipflag(item->flags, 17);
+        }
+    }
 }

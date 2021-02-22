@@ -2038,6 +2038,16 @@ void render_script_options(Script *script)
                 script->lua["options"][option.first] = *val;
             }
         }
+        else if (float *val = std::get_if<float>(&option.second.value))
+        {
+            float min = std::get<float>(option.second.min);
+            float max = std::get<float>(option.second.max);
+            if (ImGui::DragFloat(option.second.desc.data(), val, 0.05f, min, max))
+            {
+                option.second.value = *val;
+                script->lua["options"][option.first] = *val;
+            }
+        }
         else if (bool *val = std::get_if<bool>(&option.second.value))
         {
             if (ImGui::Checkbox(option.second.desc.data(), val))

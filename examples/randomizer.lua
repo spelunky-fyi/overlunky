@@ -7,3 +7,4 @@ meta.author = "Dregu"
 require("dregu/doorrandomizer")
 require("Dregu/Pot Randomizer")
 require("dre gu/enemy_Randomizer")
+require("dregu/traprandomizer")

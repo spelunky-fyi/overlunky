@@ -109,6 +109,7 @@ class Script
 
     void add_message(std::string message);
     void register_option_int(std::string name, std::string desc, int value, int min, int max);
+    void register_option_float(std::string name, std::string desc, float value, float min, float max);
     void register_option_bool(std::string name, std::string desc, bool value);
     std::string script_id();
 

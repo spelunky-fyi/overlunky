@@ -53,3 +53,4 @@ uint32_t get_frame_count();
 void carry(uint32_t mount, uint32_t rider);
 void kill_entity(uint32_t id);
 void apply_entity_db(uint32_t id);
+void flip_entity(uint32_t id);

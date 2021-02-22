@@ -165,6 +165,11 @@ Script::Script(std::string script, std::string file, bool enable)
         options[name] = {desc, value, min, max};
         lua["options"][name] = value;
     };
+    /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default.
+    lua["register_option_float"] = [this](std::string name, std::string desc, float value, float min, float max) {
+        options[name] = {desc, value, min, max};
+        lua["options"][name] = value;
+    };
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_bool"] = [this](std::string name, std::string desc, bool value) {
         options[name] = {desc, value, 0, 0};
@@ -304,6 +309,8 @@ Script::Script(std::string script, std::string file, bool enable)
     lua["get_frame"] = get_frame_count;
     /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
+    /// Flip entity around by uid. All new entities face right by default.
+    lua["flip"] = flip_entity;
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
         Entity *ea = get_entity_ptr(a);
