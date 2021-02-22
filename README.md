@@ -85,6 +85,8 @@ Lua scripting is buggy and unfinished and the **API will change**, so don't go a
     + Try Alt+Tabbing to restore input.
     + Magically learn to play with a gamepad instead.
     + If nothing else works, disable the `Disable game keys when typing` options and suffer.
+  - If your UI is all black or you want to change the color
+    - Change the color then. The [keyboard shortcuts](#features) are right there.
   - If you don't see the **Scripts tab**
     + Did you even open it? The [keyboard shortcuts](#features) are right there.
   - If you **don't have scripts** in the Scripts tab
