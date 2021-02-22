@@ -25,7 +25,8 @@ set_callback(function()
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = generic_to[math.random(#generic_to)]
-            if e.type.id ~= newid then
+            bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
+            if e.type.id ~= newid and not replaced[v] and (bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
                 replaced[v] = true
@@ -37,7 +38,8 @@ set_callback(function()
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = floor_to[math.random(#floor_to)]
-            if e.type.id ~= newid and not replaced[v] then
+            bottom = get_entities_at(0, 0x180, x, y-1, l, 0.1)
+            if e.type.id ~= newid and not replaced[v] and (bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
                 replaced[v] = true
@@ -61,14 +63,16 @@ set_callback(function()
         end
 
         --replace ceiling traps
-        for i,v in ipairs(get_entities_by_type(ceiling_from)) do
-            x, y, l = get_position(v)
-            e = get_entity(v)
-            newid = ceiling_to[math.random(#ceiling_to)]
-            if e.type.id ~= newid and not replaced[v] then
-                kill_entity(v)
-                spawn(newid, x, y, l, 0, 0)
-                replaced[v] = true
+        if state.theme ~= THEME.CITY_OF_GOLD then -- these textures are glitched
+            for i,v in ipairs(get_entities_by_type(ceiling_from)) do
+                x, y, l = get_position(v)
+                e = get_entity(v)
+                newid = ceiling_to[math.random(#ceiling_to)]
+                if e.type.id ~= newid and not replaced[v] then
+                    kill_entity(v)
+                    spawn(newid, x, y, l, 0, 0)
+                    replaced[v] = true
+                end
             end
         end
     end, 5)
@@ -83,9 +87,9 @@ set_callback(function()
                 left = get_entities_at(0, 0x180, x-1, y, l, 0.1)
                 right = get_entities_at(0, 0x180, x+1, y, l, 0.1)
                 lava = get_entities_at(ENT_TYPE.LIQUID_LAVA, 0, x, y, l, 2.0)
-                shop = get_entities_at(ENT_TYPE.MONS_SHOPKEEPER, 0, x, y, l, 8.0)
+                shop = get_entities_at(ENT_TYPE.MONS_SHOPKEEPER, 0, x, y, l, 10.0)
                 merch = get_entities_at(ENT_TYPE.MONS_MERCHANT, 0, x, y, l, 8.0)
-                plr = get_entities_at(0, 1, x, y, l, 6.0)
+                plr = get_entities_at(0, 1, x, y, l, 4.0)
 
                 if #shop ~= 0 or #merch ~= 0 or #plr ~= 0 then goto continue end -- don't put traps around shops or entrance
                 if #top == 0 then
@@ -101,7 +105,7 @@ set_callback(function()
                             spawn(newid, x, y+0.9, l, 0, 0)
                         end
                     end
-                elseif #bottom == 0 then -- replace with ceiling trap
+                elseif #bottom == 0 and state.theme ~= THEME.CITY_OF_GOLD then -- replace with ceiling trap
                     kill_entity(v)
                     newid = ceiling_to[math.random(#ceiling_to)]
                     spawn(newid, x, y, l, 0, 0)
