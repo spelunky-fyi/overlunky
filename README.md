@@ -103,7 +103,10 @@ Lua scripting is buggy and unfinished and the **API will change**, so don't go a
     + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).
   - If you can't **hide script messages**
     + Still can't read can you... Just look at the Scripts tab, there are buttons and stuff.
-    
+
+## Work Hardly In Progress
+[WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. Use at your own discretion.
+
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
 ```bash
