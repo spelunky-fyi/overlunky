@@ -90,7 +90,7 @@ end
 set_callback(function()
     set_timeout(function()
         to = 0
-        if state.theme == THEME.SUNKEN_CITY or state.theme == THEME.HUNDUN or state.theme == THEME.EGGPLANT_WORLD then
+        if state.theme == THEME.SUNKEN_CITY or state.theme == THEME.HUNDUN or state.theme == THEME.EGGPLANT_WORLD or state.theme == THEME.DUAT then
             for i,v in rpairs(get_entities_by_type(floortypes)) do
                 if math.random() < options.add_traps/100.0 then
                     set_timeout(function()

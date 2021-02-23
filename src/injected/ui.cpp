@@ -3474,7 +3474,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, true});
         windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", false, false});
         windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", false, false});
-        windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, false});
+        windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
     }
 
     ImGui_ImplDX11_NewFrame();
