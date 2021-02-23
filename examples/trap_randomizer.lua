@@ -5,7 +5,7 @@ meta.author = "Dregu"
 
 register_option_float("add_traps", "% of traps to add", 5, 0, 20)
 
-floor_to = {43, 46, 89, 604}
+floor_to = {43, 46, 89, 604, 610}
 floor_item = {73, 439, 469, 596, 604}
 generic_to = {43, 46, 604}
 wall_to = {40, 41, 43, 45, 46}
