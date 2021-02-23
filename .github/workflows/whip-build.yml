@@ -1,0 +1,44 @@
+name: Builds
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release --target ALL_BUILD
+
+      - name: Create artifacts
+        run: |
+          mkdir Overlunky
+          move build\bin\Release\injected.dll Overlunky\injected.dll
+          move build\bin\Release\injector.exe Overlunky\Overlunky.exe
+          move README.md Overlunky\README.txt
+          move examples Overlunky\Scripts
+          7z a Overlunky_WHIP.zip Overlunky\
+
+      - name: Create WHIP release
+        uses: marvinpinto/action-automatic-releases@v1.1.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "whip"
+          prerelease: true
+          title: "WHIP Build"
+          files: |
+            Overlunky_WHIP.zip
