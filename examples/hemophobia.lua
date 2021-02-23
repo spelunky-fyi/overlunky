@@ -6,6 +6,9 @@ meta.author = "Dregu"
 health = {4, 4, 4, 4}
 
 set_callback(function()
+    for i,player in ipairs(players) do
+        health[i] = player.health
+    end
     set_interval(function()
         for i,player in ipairs(players) do
             if (player.inventory.kills_total > 0 or player.health < health[i]) and player.health > 0 then
