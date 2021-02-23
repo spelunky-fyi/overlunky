@@ -83,11 +83,16 @@ function random_level()
     boss_level = false
     normal_levels = normal_levels+1
     nexttheme = theme[math.random(#theme)]
-    nextlevel = math.random(4)
-    if nexttheme == THEME.COSMIC_OCEAN then
+    if nexttheme == THEME.NEO_BABYLON then
+      nextlevel = math.random(3)
+    elseif nexttheme == THEME.CITY_OF_GOLD then
+      nextlevel = 3
+    elseif nexttheme == THEME.COSMIC_OCEAN then
       nextlevel = math.random(5, 97)
     elseif nexttheme == THEME.ICE_CAVES then
       nextlevel = 1
+    else
+      nextlevel = math.random(4)
     end
   end
   nextworld = state.world
@@ -185,7 +190,7 @@ set_callback(function()
   end
 
   if state.theme == THEME.DUAT then
-    duat_door()
+    set_timeout(duat_door, 60)
   end
 
   random_level()

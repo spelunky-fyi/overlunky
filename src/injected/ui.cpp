@@ -376,7 +376,7 @@ const char *quest_flags[] = {
     "7: ",
     "8: ",
     "9: ",
-    "10: ",
+    "10: Waddler aggroed",
     "11: ",
     "12: ",
     "13: ",

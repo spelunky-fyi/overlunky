@@ -304,6 +304,8 @@ Entity *get_entity_ptr(uint32_t id)
     }
     auto state = State::get();
     auto p = state.find(id);
+    if (IsBadWritePtr(p, 0x178))
+        return nullptr;
     return p;
 }
 
@@ -315,7 +317,7 @@ int32_t get_entity_type(uint32_t id)
     }
     auto state = State::get();
     auto p = state.find(id);
-    if (p == nullptr)
+    if (p == nullptr || IsBadWritePtr(p, 0x178))
         return 0;
     return p->type->id;
 }

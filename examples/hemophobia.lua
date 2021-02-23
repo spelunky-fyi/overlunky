@@ -4,6 +4,9 @@ meta.description = "One could call this a true pacifist mode. No, it doesn't hel
 meta.author = "Dregu"
 
 health = {4, 4, 4, 4}
+for i,player in ipairs(players) do
+    health[i] = player.health
+end
 
 set_callback(function()
     for i,player in ipairs(players) do

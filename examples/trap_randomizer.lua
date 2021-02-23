@@ -5,12 +5,12 @@ meta.author = "Dregu"
 
 register_option_float("add_traps", "% of traps to add", 4, 0, 20)
 
-floor_from = {43, 46, 85, 89}
-floor_to = {43, 46, 89, 596, 604}
+floor_from = {89}
+floor_to = {43, 46, 89, 604}
 floor_item = {73, 439, 469, 596, 604}
 generic_from = {43, 46}
-generic_to = {43, 46, 604, 596}
-wall_from = {40, 41, 43, 45}
+generic_to = {43, 46, 604}
+wall_from = {40, 41, 45}
 wall_to = {40, 41, 43, 45, 46}
 ceiling_from = {60, 80, 461}
 ceiling_to = {46, 60}
@@ -19,12 +19,17 @@ floortypes = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOO
 set_callback(function()
     set_timeout(function()
         replaced = {}
+        traps_generic = get_entities_by_type(generic_from)
+        traps_floor = get_entities_by_type(floor_from)
+        traps_wall = get_entities_by_type(wall_from)
+        traps_ceiling = get_entities_by_type(ceiling_from)
+
         -- replace generic tile traps
-        for i,v in ipairs(get_entities_by_type(generic_from)) do
+        for i,v in ipairs(traps_generic) do
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = generic_to[math.random(#generic_to)]
-            bottom = get_entities_at(0, 0x180, x, y-1.5, l, 0.6)
+            bottom = get_entities_at(0, 0x180, x, y-1.0, l, 0.1)
             if e.type.id ~= newid and replaced[v] ~= true and (#bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
@@ -33,11 +38,11 @@ set_callback(function()
         end
 
         -- replace floor tile traps
-        for i,v in ipairs(get_entities_by_type(floor_from)) do
+        for i,v in ipairs(traps_floor) do
             x, y, l = get_position(v)
             e = get_entity(v)
             newid = floor_to[math.random(#floor_to)]
-            bottom = get_entities_at(0, 0x180, x, y-1.5, l, 0.6)
+            bottom = get_entities_at(0, 0x180, x, y-1.0, l, 0.1)
             if e.type.id ~= newid and replaced[v] ~= true and (#bottom > 0 or newid ~= 596) then
                 kill_entity(v)
                 spawn(newid, x, y, l, 0, 0)
@@ -46,7 +51,8 @@ set_callback(function()
         end
 
         --replace wall traps
-        for i,v in ipairs(get_entities_by_type(wall_from)) do
+        traps = get_entities_by_type(wall_from)
+        for i,v in ipairs(traps_wall) do
             x, y, l = get_position(v)
             e = get_entity(v)
             facing_left = test_flag(e.flags, 17)
@@ -62,8 +68,8 @@ set_callback(function()
         end
 
         --replace ceiling traps
-        if state.theme ~= THEME.CITY_OF_GOLD and state.theme ~= THEME.ICE_CAVES and state.theme ~= THEME.TIAMAT then -- these textures are glitched
-            for i,v in ipairs(get_entities_by_type(ceiling_from)) do
+        if state.theme ~= THEME.CITY_OF_GOLD and state.theme ~= THEME.ICE_CAVES and state.theme ~= THEME.TIAMAT then
+            for i,v in ipairs(traps_ceiling) do
                 x, y, l = get_position(v)
                 e = get_entity(v)
                 newid = ceiling_to[math.random(#ceiling_to)]
@@ -78,7 +84,8 @@ set_callback(function()
 
     set_timeout(function()
         -- replace a % of floor with new traps
-        for i,v in ipairs(get_entities_by_type(floortypes)) do
+        floors = get_entities_by_type(floortypes)
+        for i,v in ipairs(floors) do
             x, y, l = get_position(v)
             if math.random() < options.add_traps/100.0 then
                 top = get_entities_at(0, 0x180, x, y+1, l, 0.1)
@@ -89,9 +96,10 @@ set_callback(function()
                 shop = get_entities_at(ENT_TYPE.MONS_SHOPKEEPER, 0, x, y, l, 10.0)
                 merch = get_entities_at(ENT_TYPE.MONS_MERCHANT, 0, x, y, l, 8.0)
                 tusk = get_entities_at(ENT_TYPE.MONS_MADAMETUSK, 0, x, y, l, 8.0)
+                altar = get_entities_at(ENT_TYPE.FLOOR_ALTAR, 0, x, y, l, 3.0)
                 plr = get_entities_at(0, 1, x, y, l, 4.0)
 
-                if #shop ~= 0 or #merch ~= 0 or #tusk ~= 0 or #plr ~= 0 then goto continue end -- don't put traps around shops or entrance
+                if #shop ~= 0 or #merch ~= 0 or #tusk ~= 0 or #altar ~= 0 or #plr ~= 0 then goto continue end -- don't put traps around shops, entrance or altars
                 if #top == 0 then
                     if math.random() < 0.5 and #bottom > 0 then -- replace with floor tile trap
                         newid = floor_to[math.random(#floor_to)]
