@@ -15,6 +15,10 @@ jobs:
           fetch-depth: 1
           submodules: true
 
+      - name: Get tags for release notes
+        shell: bash
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
       - name: Build
         run: |
           mkdir build
