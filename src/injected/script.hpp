@@ -52,6 +52,7 @@ struct ScriptState
     uint32_t frame;
     uint32_t loading;
     uint32_t reset;
+    uint32_t quest_flags;
 };
 
 struct ScriptOption
@@ -84,7 +85,7 @@ class Script
     sol::state lua;
     char code[204800];
     std::string result = "";
-    ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0};
+    ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
     bool changed = true;
     bool enabled = true;
     ScriptMeta meta = {"", "", "", "", ""};

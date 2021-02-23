@@ -365,6 +365,41 @@ const char *journal_flags[] = {
     "30: ",
     "31: ",
     "32: "};
+
+const char *quest_flags[] = {
+    "1: Reset",
+    "2: Dark level spawned in world",
+    "3: Vault spawned in world",
+    "4: ",
+    "5: Shop spawned",
+    "6: ",
+    "7: ",
+    "8: ",
+    "9: ",
+    "10: ",
+    "11: ",
+    "12: ",
+    "13: ",
+    "14: ",
+    "15: ",
+    "16: ",
+    "17: Udjat eye spawned",
+    "18: Black market spawned",
+    "19: Drill spawned",
+    "20: ",
+    "21: ",
+    "22: ",
+    "23: ",
+    "24: ",
+    "25: Moon challenge spawned",
+    "26: Star challenge spawned",
+    "27: Sun challenge spawned",
+    "28: ",
+    "29: ",
+    "30: ",
+    "31: ",
+    "32: "};
+
 /*const char *empty_flags[] = {
     "1: ",  "2: ",  "3: ",  "4: ",  "5: ",  "6: ",  "7: ",  "8: ",  "9: ",  "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ",
     "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: "};*/
@@ -2528,6 +2563,14 @@ void render_debug()
         0,
         "%08X",
         ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
+    ImGui::InputScalar(
+        "Quest flags##QuestFlagsDebug",
+        ImGuiDataType_U32,
+        &g_state->quest_flags,
+        0,
+        0,
+        "%08X",
+        ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
     ImGui::PopItemWidth();
 }
 
@@ -3251,6 +3294,13 @@ void render_game_props()
         for (int i = 0; i < 32; i++)
         {
             ImGui::CheckboxFlags(hud_flags[i], &g_state->hud_flags, pow(2, i));
+        }
+    }
+    if (ImGui::CollapsingHeader("Quest flags"))
+    {
+        for (int i = 0; i < 32; i++)
+        {
+            ImGui::CheckboxFlags(quest_flags[i], &g_state->quest_flags, pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Journal flags"))

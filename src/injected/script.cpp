@@ -48,7 +48,8 @@ Script::Script(std::string script, std::string file, bool enable)
     state.time_total = g_state->time_total;
     state.frame = get_frame_count();
     state.loading = g_state->loading;
-    state.reset = (g_state->reset & 1);
+    state.reset = (g_state->quest_flags & 1);
+    state.quest_flags = g_state->quest_flags;
 
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
 
@@ -434,7 +435,9 @@ Script::Script(std::string script, std::string file, bool enable)
         "as_mount",
         &Entity::as<Mount>,
         "as_player",
-        &Entity::as<Player>);
+        &Entity::as<Player>,
+        "as_monster",
+        &Entity::as<Monster>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -482,7 +485,9 @@ Script::Script(std::string script, std::string file, bool enable)
         "airtime",
         &Movable::airtime,
         sol::base_classes, sol::bases<Entity>());
-    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Container>("Container", "inside", &Container::inside, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
@@ -542,8 +547,8 @@ Script::Script(std::string script, std::string file, bool enable)
         &StateMemory::hud_flags,
         "loading",
         &StateMemory::loading,
-        "reset",
-        &StateMemory::reset);
+        "quest_flags",
+        &StateMemory::quest_flags);
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
@@ -847,7 +852,7 @@ bool Script::run(ImDrawList *dl)
                     cb->lastRan = now;
                 }
                 else if (
-                    cb->screen == 105 && (g_state->reset & 1) > 0 && (g_state->reset & 1) != state.reset) // ON.RESET
+                    cb->screen == 105 && (g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset) // ON.RESET
                 {
                     cb->func();
                     cb->lastRan = now;
@@ -897,7 +902,8 @@ bool Script::run(ImDrawList *dl)
         state.time_total = g_state->time_total;
         state.frame = get_frame_count();
         state.loading = g_state->loading;
-        state.reset = (g_state->reset & 1);
+        state.reset = (g_state->quest_flags & 1);
+        state.quest_flags = g_state->quest_flags;
     }
     catch (const sol::error &e)
     {

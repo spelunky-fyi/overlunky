@@ -213,6 +213,7 @@ set_callback(function()
     state.theme_next = realtheme
     state.world_next = world[state.theme_next]
     state.level_next = reallevel
+    state.quest_flags = 0
   end
 end, ON.TRANSITION)
 

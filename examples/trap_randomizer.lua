@@ -13,7 +13,7 @@ generic_to = {43, 46, 604, 596}
 wall_from = {40, 41, 43, 45}
 wall_to = {40, 41, 43, 45, 46}
 ceiling_from = {60, 80, 461}
-ceiling_to = {46, 60, 80}
+ceiling_to = {46, 60}
 floortypes = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE}
 
 set_callback(function()
@@ -67,7 +67,7 @@ set_callback(function()
                 x, y, l = get_position(v)
                 e = get_entity(v)
                 newid = ceiling_to[math.random(#ceiling_to)]
-                if e.type.id ~= newid and replaced[v] ~= true then
+                if e.type.id ~= newid and replaced[v] ~= true and math.random() < 0.5 then
                     kill_entity(v)
                     spawn(newid, x, y, l, 0, 0)
                     replaced[v] = true
@@ -88,9 +88,10 @@ set_callback(function()
                 lava = get_entities_at(ENT_TYPE.LIQUID_LAVA, 0, x, y, l, 2.0)
                 shop = get_entities_at(ENT_TYPE.MONS_SHOPKEEPER, 0, x, y, l, 10.0)
                 merch = get_entities_at(ENT_TYPE.MONS_MERCHANT, 0, x, y, l, 8.0)
+                tusk = get_entities_at(ENT_TYPE.MONS_MADAMETUSK, 0, x, y, l, 8.0)
                 plr = get_entities_at(0, 1, x, y, l, 4.0)
 
-                if #shop ~= 0 or #merch ~= 0 or #plr ~= 0 then goto continue end -- don't put traps around shops or entrance
+                if #shop ~= 0 or #merch ~= 0 or #tusk ~= 0 or #plr ~= 0 then goto continue end -- don't put traps around shops or entrance
                 if #top == 0 then
                     if math.random() < 0.5 and #bottom > 0 then -- replace with floor tile trap
                         newid = floor_to[math.random(#floor_to)]

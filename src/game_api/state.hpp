@@ -26,7 +26,7 @@ struct StateMemory
     uint8_t pause;
     uint8_t b33;
     int32_t i34;
-    uint32_t reset;
+    uint32_t quest_flags;
     int32_t i3c;
     int32_t i40;
     int32_t i44;
