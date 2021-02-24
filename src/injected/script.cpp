@@ -64,12 +64,23 @@ Script::Script(std::string script, std::string file, bool enable)
     {
         std::string metacode = "";
         std::stringstream metass(script);
-        std::regex reg("(meta\\.[a-z]+\\s*=)");
+        std::regex reg("(\\bmeta\\.[a-z]+\\s*=)");
+        std::regex regstart("(\\bmeta\\s*=)");
+        std::regex regend("(\\})");
+        bool getmeta = false;
         for (std::string line; std::getline(metass, line); )
         {
-            if (std::regex_search(line, reg))
+            if (std::regex_search(line, regstart))
+            {
+                getmeta = true;
+            }
+            if (std::regex_search(line, reg) || getmeta)
             {
                 metacode += line + "\n";
+            }
+            if (std::regex_search(line, regend))
+            {
+                getmeta = false;
             }
         }
         auto lua_result = lua.safe_script(metacode.data());
