@@ -26,9 +26,12 @@ end
 
 function replace_enemy(id, from)
     x, y, l = get_position(id)
-    if x == 0 or (l == LAYER.BACK and state.theme ~= THEME.ICE_CAVES) then return end
+    if x == 0 or (l == LAYER.BACK and state.theme ~= THEME.ICE_CAVES and state.theme ~= THEME.OLMEC) then return end
     move_or_kill(id)
     newid = from[math.random(#from)]
+    if l == LAYER.BACK and state.theme == THEME.OLMEC then
+        newid = ENT_TYPE.MONS_CAVEMAN_BOSS
+    end
     new = spawn(newid, x, y, l, 0, 0)
     if newid > 880 then
         create_rider(new, newid, x, y, l)
