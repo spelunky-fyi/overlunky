@@ -42,7 +42,7 @@ function replace_trap(v)
             end
         else -- spawn floor item on top
             newid = floor_item[math.random(#floor_item)]
-            if newid ~= 596 or #lava == 0 then
+            if #lava == 0 then
                 spawn(newid, x, y+0.9, l, 0, 0)
             end
         end
