@@ -573,7 +573,7 @@ void set_contents(uint32_t id, uint32_t item)
     if (container == nullptr)
         return;
     int type = container->type->id;
-    if (type != 435 && type != 402 && type != 422 && type != 423 && type != 475)
+    if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") && type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
         return;
     container->as<Container>()->inside = item;
 }
@@ -639,12 +639,12 @@ void lock_door_at(float x, float y)
     for (auto id : items)
     {
         Entity *door = get_entity_ptr(id);
-        if (door->type->id >= 22 && door->type->id <= 36)
+        if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
             door->flags &= ~(1U << 19);
             door->flags |= 1U << 21;
         }
-        else if (door->type->id == 773 || door->type->id == 778 || door->type->id == 780)
+        else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
             door->animation &= ~1U;
         }
@@ -657,12 +657,12 @@ void unlock_door_at(float x, float y)
     for (auto id : items)
     {
         Entity *door = get_entity_ptr(id);
-        if (door->type->id >= 22 && door->type->id <= 36)
+        if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
             door->flags |= 1U << 19;
             door->flags &= ~(1U << 21);
         }
-        else if (door->type->id == 773 || door->type->id == 778 || door->type->id == 780)
+        else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
             door->animation |= 1U;
         }
