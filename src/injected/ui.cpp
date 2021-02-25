@@ -3023,8 +3023,8 @@ void render_entity_props()
             auto coffin = (Container *)g_entity;
             ImGui::Text("Character in coffin:");
             ImGui::SliderInt("##CoffinSpawns", (int *)&coffin->inside, to_id("ENT_TYPE_CHAR_ANA_SPELUNKY"), to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"));
-            if (coffin->inside == 214)
-                coffin->inside++;
+            if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY")+1)
+                coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
             ImGui::Text(entity_names[coffin->inside].data());
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
