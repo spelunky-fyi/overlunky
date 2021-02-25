@@ -6,7 +6,7 @@ size_t get_dark()
     {
         auto memory = Memory::get();
         auto addr_dark = memory.after_bundle;
-        addr_dark = find_inst(memory.exe(), "\x44\xC5\x80\xA0\x0E\x0A\x00\x00\xFD"s, memory.after_bundle);
+        addr_dark = find_inst(memory.exe(), "\x44\xC5\x80\xA0\x12\x0A\x00\x00\xFD"s, memory.after_bundle);
         DEBUG("addr_dark: {}", addr_dark);
         return res = memory.at_exe(addr_dark) + 9;
     }
@@ -96,7 +96,9 @@ State &State::get()
         // Global state pointer
         auto exe = memory.exe();
         auto start = memory.after_bundle;
-        auto location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B\x05"s, find_inst(exe, "\x32\x01\x74"s, start) - 0x100)));
+        auto location = find_inst(exe, "\x49\x0F\x44\xC0"s, start);
+        location = find_inst(exe, "\x49\x0F\x44\xC0"s, location + 1);
+        location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 0x10)));
         auto off_send = find_inst(exe, "\x45\x8D\x41\x50"s, start) + 12;
         write_mem_prot(memory.at_exe(off_send), "\x31\xC0\x31\xD2\x90\x90"s, true);
         auto addr_damage = get_damage();

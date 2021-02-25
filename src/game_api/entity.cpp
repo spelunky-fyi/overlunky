@@ -7,10 +7,18 @@
 #include "state.hpp"
 
 // Items::entity_map = EntityMap;
-const int NAME_TO_INDEX = 0x387c8;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
 class Entity;
+
+size_t entities_offset()
+{
+    ONCE(size_t)
+    {
+        auto mem = Memory::get();
+        return res = decode_imm(mem.exe(), find_inst(mem.exe(), "\x48\x8D\x8B"s, find_inst(mem.exe(), "\x29\x5C\x8F\x3D"s, mem.after_bundle)));
+    }
+}
 
 size_t entities_ptr()
 {
@@ -21,13 +29,14 @@ size_t entities_ptr()
 std::vector<EntityItem> list_entities()
 {
     size_t map_ptr = *(size_t *)entities_ptr();
+    size_t off = entities_offset();
     // Special case: map_ptr might be 0 if it's not initialized.
     // This only occurs in list_entities; for others, do not check the pointer
     // to see if this assumption works.
     if (!map_ptr)
         return {};
 
-    auto map = reinterpret_cast<EntityMap *>(map_ptr + NAME_TO_INDEX);
+    auto map = reinterpret_cast<EntityMap *>(map_ptr + off);
 
     std::vector<EntityItem> result;
     for (const auto &kv : *map)
@@ -50,7 +59,7 @@ EntityDB *get_type(uint32_t id)
     if (!map_ptr)
         return nullptr;
 
-    auto map = reinterpret_cast<EntityMap *>(map_ptr + NAME_TO_INDEX);
+    auto map = reinterpret_cast<EntityMap *>(map_ptr + entities_offset());
 
     std::vector<EntityItem> result;
     for (const auto &kv : *map)
@@ -64,7 +73,7 @@ EntityDB *get_type(uint32_t id)
 
 size_t to_id(size_t map_ptr, std::string name)
 {
-    auto map = reinterpret_cast<EntityMap *>(map_ptr + NAME_TO_INDEX);
+    auto map = reinterpret_cast<EntityMap *>(map_ptr + entities_offset());
     auto it = map->find(std::string(name.data(), name.size()));
     return it != map->end() ? it->second : -1;
 }
