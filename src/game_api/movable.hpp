@@ -11,7 +11,7 @@ class Movable : public Entity
     uint32_t buttons;
     uint32_t stand_counter;
     float fe0;
-    int32_t ie4;
+    int32_t price;
     uint32_t owner_uid;
     uint32_t last_owner_uid;
     size_t animation_func;
