@@ -22,7 +22,7 @@ to = 0
 
 function replace_trap(v)
     x, y, l = get_position(v)
-    if l == LAYER.BACK and state.theme ~= THEME.ICE_CAVES then
+    if l == LAYER.BACK and state.theme ~= THEME.ICE_CAVES and not (state.theme == THEME.NEO_BABYLON and state.level == 2) then
         return false
     end
 
