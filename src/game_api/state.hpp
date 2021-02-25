@@ -70,7 +70,7 @@ struct StateMemory
     int32_t ia04;
     int32_t hud_flags;
 
-    char pada14[0x12b0 - 0xa0c];
+    char pada14[0x12b0 - 0xa14];
     Items *items;
     void *pad12b8;
     Layer *layers[2];
