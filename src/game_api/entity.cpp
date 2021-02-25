@@ -71,9 +71,13 @@ EntityDB *get_type(uint32_t id)
     return nullptr;
 }
 
-size_t to_id(size_t map_ptr, std::string name)
+size_t to_id(std::string name)
 {
-    auto map = reinterpret_cast<EntityMap *>(map_ptr + entities_offset());
+    size_t map_ptr = *(size_t *)entities_ptr();
+    size_t off = entities_offset();
+    if (!map_ptr)
+        return 0;
+    auto map = reinterpret_cast<EntityMap *>(map_ptr + off);
     auto it = map->find(std::string(name.data(), name.size()));
     return it != map->end() ? it->second : -1;
 }

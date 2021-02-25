@@ -62,7 +62,7 @@ uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
         return 0;
     auto [_x, _y] = player->position();
     DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-    state.layer(player->layer())->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
+    state.layer(player->layer())->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
     return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
 }
 
@@ -94,22 +94,22 @@ void spawn_backdoor(float x, float y)
         return;
     auto [_x, _y] = player->position();
     DEBUG("Spawning backdoor on {}, {}", x + _x, y + _y);
-    state.layer(0)->spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, true);
-    state.layer(1)->spawn_entity(26, x + _x, y + _y, false, 0.0, 0.0, true);
-    state.layer(0)->spawn_entity(871, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
-    state.layer(1)->spawn_entity(871, x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
-    state.layer(0)->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
-    state.layer(1)->spawn_entity(775, x + _x, y + _y, false, 0.0, 0.0, true);
+    state.layer(0)->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
+    state.layer(0)->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
+    state.layer(0)->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
 }
 
 void spawn_backdoor_abs(float x, float y)
 {
     auto state = State::get();
     DEBUG("Spawning backdoor on {}, {}", x, y);
-    state.layer(0)->spawn_entity(26, x, y, false, 0.0, 0.0, true);
-    state.layer(1)->spawn_entity(26, x, y, false, 0.0, 0.0, true);
-    state.layer(0)->spawn_entity(871, x, y - 1.0, false, 0.0, 0.0, true);
-    state.layer(1)->spawn_entity(871, x, y - 1.0, false, 0.0, 0.0, true);
+    state.layer(0)->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
+    state.layer(0)->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
+    state.layer(1)->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
 }
 
 void teleport(float x, float y, bool s, float vx, float vy, bool snap)

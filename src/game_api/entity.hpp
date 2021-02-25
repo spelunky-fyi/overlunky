@@ -118,7 +118,7 @@ std::vector<EntityItem> list_entities(size_t map_ptr);
 
 EntityDB *get_type(uint32_t id);
 
-size_t to_id(size_t map_ptr, std::string id);
+size_t to_id(std::string id);
 
 Entity *state_find_item(size_t state_ptr, uint32_t unique_id);
 

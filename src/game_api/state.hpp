@@ -60,7 +60,7 @@ struct StateMemory
     uint8_t b7d;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t pad84[0x96c];
+    uint8_t pad84[0x970];
     uint32_t journal_flags;
     int32_t i9f0;
     int32_t i9f4;
@@ -70,7 +70,7 @@ struct StateMemory
     int32_t ia04;
     int32_t hud_flags;
 
-    char pada10[0x12b0 - 0xa10];
+    char pada14[0x12b0 - 0xa0c];
     Items *items;
     void *pad12b8;
     Layer *layers[2];

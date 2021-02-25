@@ -321,7 +321,7 @@ const char *hud_flags[] = {
     "19: ",
     "20: Allow pause",
     "21: Hide hud, transition",
-    "22: Hide hud, ?",
+    "22: Hide hud, camp",
     "23: Have clover",
     "24: ",
     "25: ",
@@ -3018,18 +3018,18 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {
-        if (g_entity_type == 435)
+        if (g_entity_type == to_id("ENT_TYPE_ITEM_COFFIN"))
         {
             auto coffin = (Container *)g_entity;
             ImGui::Text("Character in coffin:");
-            ImGui::SliderInt("##CoffinSpawns", (int *)&coffin->inside, 194, 216);
+            ImGui::SliderInt("##CoffinSpawns", (int *)&coffin->inside, to_id("ENT_TYPE_CHAR_ANA_SPELUNKY"), to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"));
             if (coffin->inside == 214)
-                coffin->inside = 215;
+                coffin->inside++;
             ImGui::SameLine();
             ImGui::Text(entity_names[coffin->inside].data());
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
-        else if (g_entity_type == 402 || g_entity_type == 422 || g_entity_type == 423 || g_entity_type == 475)
+        else if (g_entity_type == to_id("ENT_TYPE_ITEM_CRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT"))
         {
             auto container = (Container *)g_entity;
             ImGui::Text("Item in container:");
@@ -3040,11 +3040,11 @@ void render_entity_props()
                 ImGui::Text(entity_names[container->inside].data());
             }
         }
-        else if (g_entity_type == 575)
+        else if (g_entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
         {
             ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity[1], 1, 255);
         }
-        else if (g_entity_type == 23 || g_entity_type == 25 || g_entity_type == 31 || g_entity_type == 36)
+        else if (g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
             Target *target = reinterpret_cast<Target *>(&g_entity->anim_func);
             ImGui::Text("Door target:");
