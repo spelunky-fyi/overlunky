@@ -1582,7 +1582,7 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     }
     else if (pressed("move_down", wParam) && (float)rand() / RAND_MAX > 0.99 && !repeat)
     {
-        spawn_entity(372, 0, -0.5, false, 0, 0, false);
+        spawn_entity(to_id("ENT_TYPE_ITEM_BROKEN_ARROW"), 0, -0.5, false, 0, 0, false);
     }
     else
     {
@@ -2380,7 +2380,7 @@ void render_clickhandler()
         else if (released("mouse_clone"))
         {
             set_pos(ImGui::GetMousePos());
-            spawn_entity(426, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_ITEM_CLONEGUNSHOT"), g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2391,7 +2391,7 @@ void render_clickhandler()
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
             set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y + 200));
-            spawn_entity(380, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2401,7 +2401,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(687, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_ALIENBLAST"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2411,7 +2411,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(630, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_EXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2421,7 +2421,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2431,15 +2431,15 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(631, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x - 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x + 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x, g_y - 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x, g_y + 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x + 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x - 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x + 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(631, g_x - 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y - 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y + 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
