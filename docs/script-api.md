@@ -369,6 +369,7 @@ end
 - `as_mattock` &Entity::as&lt;Mattock&gt;
 - `as_mount` &Entity::as&lt;Mount&gt;
 - `as_player` &Entity::as&lt;Player&gt;
+- `as_monster` &Entity::as&lt;Monster&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - `movex` &Movable::movex
@@ -393,9 +394,16 @@ Derived from [`Entity`](#entity)
 - `offsetx` &Movable::offsetx
 - `offsety` &Movable::offsety
 - `airtime` &Movable::airtime
-### `Player`
+### `Monster`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
+- `sol::base_classes` sol::bases&lt;Entity
+### `Player`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - `inventory` &Player::inventory_ptr
+### `Mount`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+- `carry` &Mount::carry
+- `tame` &Mount::tame
 ### `Container`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - `inside` &Container::inside
@@ -428,7 +436,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - `time_level` &StateMemory::time_level
 - `hud_flags` &StateMemory::hud_flags
 - `loading` &StateMemory::loading
-- `reset` &StateMemory::reset
+- `quest_flags` &StateMemory::quest_flags
 ## Enums
 Enums are like numbers but in text that's easier to remember. Example:
 ```
