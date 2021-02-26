@@ -36,6 +36,19 @@ big_to = {ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_LAVAMANDER, ENT_TYPE.MONS_MU
           ENT_TYPE.MONS_GIANTFISH, ENT_TYPE.MONS_YETIKING, ENT_TYPE.MONS_YETIQUEEN, ENT_TYPE.MONS_ALIENQUEEN,
           ENT_TYPE.MONS_LAMASSU, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY, ENT_TYPE.MONS_CRABMAN,
           ENT_TYPE.MOUNT_MECH}
+olmec_ammo = {ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_BOMB,
+              ENT_TYPE.ITEM_PASTEBOMB, ENT_TYPE.ITEM_EGGPLANT, ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_PUNISHBALL,
+              ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_LAVAPOT}
+done = {}
+
+function replaced(id)
+    for i, v in ipairs(done) do
+        if v == id then
+            return true
+        end
+    end
+    return false
+end
 
 function move_or_kill(v)
     e = get_entity(v):as_movable()
@@ -73,7 +86,19 @@ function replace_enemy(id, from)
     end
 end
 
+function replace_projectile(id, from)
+    x, y, l = get_position(id)
+    ent = get_entity(id):as_movable()
+    vx = ent.velocityx
+    vy = ent.velocityy
+    move_entity(id, 0, 0, 0, 0)
+    new = from[math.random(#from)]
+    newid = spawn(new, x, y, l, vx, vy)
+    done[#done + 1] = newid
+end
+
 set_callback(function()
+    done = {}
     set_timeout(function()
         mons_small = get_entities_by_type(small_from)
         mons_big = get_entities_by_type(big_from)
@@ -92,6 +117,30 @@ set_callback(function()
             to = to + 1
         end
     end, 5)
+
+    if state.theme == THEME.OLMEC then
+        set_interval(function()
+            ufos = get_entities_by_type(ENT_TYPE.MONS_UFO)
+            for i, v in ipairs(ufos) do
+                replace_enemy(v, small_to)
+            end
+            ox = 0
+            oy = 0
+            olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
+            for i, v in ipairs(olmecs) do
+                ox, oy, l = get_position(v)
+            end
+            bombs = get_entities_by_type(ENT_TYPE.ITEM_BOMB)
+            for i, v in ipairs(bombs) do
+                x, y, l = get_position(v)
+                ent = get_entity(v):as_movable()
+                if math.abs(y - oy) < 1 and math.abs(x - ox) < 2.5 and not replaced(v) then
+                    replace_projectile(v, olmec_ammo)
+                end
+                done[#done + 1] = v
+            end
+        end, 1)
+    end
 end, ON.LEVEL)
 
 message("Initialized")
