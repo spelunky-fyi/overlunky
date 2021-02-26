@@ -122,7 +122,10 @@ set_callback(function()
         set_interval(function()
             ufos = get_entities_by_type(ENT_TYPE.MONS_UFO)
             for i, v in ipairs(ufos) do
-                replace_enemy(v, small_to)
+                if not replaced(v) then
+                    replace_enemy(v, small_to)
+                end
+                done[#done + 1] = v
             end
             ox = 0
             oy = 0
