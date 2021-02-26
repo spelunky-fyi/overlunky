@@ -43,6 +43,10 @@ Entity *Layer::spawn_entity(size_t id, float x, float y, bool s, float vx,
             y = round(y);
         }
         auto addr = load_item(this, id, x, y);
+        if (abs(vx) + abs(vy) > 0.01) {
+            write_mem(addr + 0x100, to_le_bytes(vx));
+            write_mem(addr + 0x104, to_le_bytes(vy));
+        }
         DEBUG("Spawned {:x}", addr);
         return (Entity *)(addr);
     } else {
