@@ -125,6 +125,14 @@ set_callback(function()
                 end
             end
         end
+        -- apep in a snaptrap crashes :(
+        if state.theme == THEME.DUAT then
+            set_interval(function()
+                for i, v in ipairs(get_entities_by_type(ENT_TYPE.ITEM_SNAP_TRAP)) do
+                    kill_entity(v)
+                end
+            end, 1)
+        end
     end, 10)
 end, ON.LEVEL)
 
