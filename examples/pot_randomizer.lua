@@ -74,6 +74,16 @@ tools = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_
          ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR,
          ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW,
          ENT_TYPE.ITEM_METAL_SHIELD}
+done = {}
+
+function replaced(id)
+    for i, v in ipairs(done) do
+        if v == id then
+            return true
+        end
+    end
+    return false
+end
 
 function init_run()
     for i, player in ipairs(players) do
@@ -84,6 +94,7 @@ function init_run()
 end
 
 set_callback(function()
+    done = {}
     if state.level_count == 0 then
         init_run()
     end
@@ -96,25 +107,37 @@ set_callback(function()
         -- randomize pots
         pots = get_entities_at(ENT_TYPE.ITEM_POT, 0, x, y, l, 10)
         for i, v in ipairs(pots) do
-            item = items[math.random(#items)]
-            set_contents(v, item)
+            if not replaced(v) then
+                item = items[math.random(#items)]
+                e = get_entity(v):as_container()
+                e.inside = item
+            end
+            done[#done + 1] = v
         end
 
         -- randomize crates
         crates = get_entities_at(ENT_TYPE.ITEM_CRATE, 0, x, y, l, 10)
         for i, v in ipairs(crates) do
-            item = tools[math.random(#tools)]
-            set_contents(v, item)
+            if not replaced(v) then
+                item = tools[math.random(#tools)]
+                e = get_entity(v):as_container()
+                e.inside = item
+            end
+            done[#done + 1] = v
         end
 
         -- randomize coffins
         coffins = get_entities_at(ENT_TYPE.ITEM_COFFIN, 0, x, y, l, 10)
         for i, v in ipairs(coffins) do
-            item = math.random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
-            if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
-                item = ENT_TYPE.CHAR_HIREDHAND
+            if not replaced(v) then
+                item = math.random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
+                if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
+                    item = ENT_TYPE.CHAR_HIREDHAND
+                end
+                e = get_entity(v):as_container()
+                e.inside = item
             end
-            set_contents(v, item)
+            done[#done + 1] = v
         end
     end, 30)
 end, ON.LEVEL)
