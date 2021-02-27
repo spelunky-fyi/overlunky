@@ -144,6 +144,16 @@ set_callback(function()
             end
         end, 1)
     end
+
+    set_interval(function()
+        ufos = get_entities_by_type(ENT_TYPE.MONS_REDSKELETON)
+        for i, v in ipairs(ufos) do
+            if not replaced(v) then
+                replace_enemy(v, small_to)
+            end
+            done[#done + 1] = v
+        end
+    end, 1)
 end, ON.LEVEL)
 
 message("Initialized")
