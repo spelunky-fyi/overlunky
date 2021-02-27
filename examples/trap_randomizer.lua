@@ -12,7 +12,8 @@ floor_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_
 generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 wall_to = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP,
            ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP}
-ceiling_to = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING}
+ceiling_to = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR,
+              ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
 floortypes = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG,
               ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE,
               ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP,
@@ -22,9 +23,14 @@ to = 0
 
 function replace_trap(v)
     x, y, l = get_position(v)
-    if l == LAYER.BACK and state.theme ~= THEME.ICE_CAVES and not (state.theme == THEME.NEO_BABYLON and state.level == 2) then
+    -- don't mess up most backlayers, that just annoys npcs
+    if l == LAYER.BACK and state.theme ~= THEME.ICE_CAVES and
+        not (state.theme == THEME.NEO_BABYLON and state.level == 2) then
         return false
     end
+    if l == LAYER.BACK and state.theme == THEME.ICE_CAVES and (y > 90 or y < 60) then
+        return false
+    end 
 
     top = get_entities_at(0, 0x180, x, y + 1, l, 0.1)
     bottom = get_entities_at(0, 0x180, x, y - 1.5, l, 0.6)
