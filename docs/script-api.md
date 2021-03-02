@@ -1,7 +1,7 @@
 # Overlunky Lua API
 - Everything here is still changing, don't be sad if your scripts break next week!
 - This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).
-- This doc is for the HEAD version. If you're using an exe release from the past, you might find some things here don't work.
+- This doc is up to date for the [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip). If you're using an official release from the past, you might find some things here don't work.
 - You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md).
 ## Lua libraries
 The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.3/manual.html#6).
@@ -407,6 +407,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 ### `Container`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - `inside` &Container::inside
+- `timer` &Container::timer
 ### `StateMemory`
 - `screen_last` &StateMemory::screen_last
 - `screen` &StateMemory::screen
