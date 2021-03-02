@@ -252,8 +252,7 @@ function recalculate()
                 tx = math.floor(x - xmin + 1)
                 ty = math.floor(ymin - y + 1)
                 cost = 200
-                type = ent.type.id
-                if type == ENT_TYPE.FLOOR_PIPE or type == ENT_TYPE.ACTIVEFLOOR_FALLING_PLATFORM or type == ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK or type == ENT_TYPE.ACTIVEFLOOR_ELEVATOR or type == ENT_TYPE.ACTIVEFLOOR_REGENERATINGBLOCK or type == ENT_TYPE.ACTIVEFLOOR_BONEBLOCK then
+                if ent.type.id == ENT_TYPE.FLOOR_PIPE or ent.type.search_flags == 0x80 then
                     cost = 5
                 end
                 if tx >= 1 and tx <= #board[1] and ty >= 1 and ty <= #board then
