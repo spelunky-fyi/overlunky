@@ -62,3 +62,11 @@ set_callback(function()
     draw_rect(sx, sy, sx2, sy2, 2, 10, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)
+
+-- level boundaries
+set_callback(function()
+    xmin, ymin, xmax, ymax = get_bounds()
+    sx, sy = screen_position(xmin, ymin) -- top left
+    sx2, sy2 = screen_position(xmax, ymax) -- bottom right
+    draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+end, ON.GUIFRAME)

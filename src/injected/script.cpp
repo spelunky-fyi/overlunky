@@ -332,6 +332,28 @@ Script::Script(std::string script, std::string file, bool enable)
         else
             return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
     };
+    /// Returns: `float`, `float`, `float`, `float`
+    /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be inside these boundaries.
+    /// The order is: top left x, top left y, bottom right x, bottom right y
+    /// Example:
+    /// ```
+    /// -- Draw the level boundaries
+    /// set_callback(function()
+    ///     xmin, ymin, xmax, ymax = get_bounds()
+    ///     sx, sy = screen_position(xmin, ymin) -- top left
+    ///     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
+    ///     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+    /// end, ON.GUIFRAME)
+    /// ```
+    lua["get_bounds"] = [this]() {
+        return std::make_tuple(
+            2.5f,
+            122.5f,
+            g_state->w * 10.0f + 2.5f,
+            122.5f - g_state->h * 8.0f
+        );
+    };
+
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["set_flag"] = [](uint32_t flags, int bit) { return flags | (1U << (bit - 1)); };
     lua["setflag"] = lua["set_flag"];
