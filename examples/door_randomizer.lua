@@ -43,7 +43,7 @@ function set_doors()
         for i,v in ipairs(doors) do
             x, y, layer = get_position(v)
             if state.theme == THEME.TIAMAT or state.theme == THEME.HUNDUN then
-                set_door_target(v, nextworld, nextlevel, nexttheme)
+                --set_door_target(v, nextworld, nextlevel, nexttheme) --crashes?
                 unlock_door_at(x, y)
             end
             if not critters_spawned and critters[realtheme] ~= nil then
@@ -208,6 +208,15 @@ set_callback(function()
         dead_kingu()
         dead_osiris()
     end, 15)
+
+    if state.theme == THEME.TIAMAT or state.theme == THEME.HUNDUN then
+        doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
+        for i,v in ipairs(doors) do
+            x, y, l = get_position(v)
+            move_entity(v, 70, y, 0, 0)
+            door(x, y, l, state.world, state.level, state.theme)
+        end
+    end
 end, ON.LEVEL)
 
 set_callback(function()

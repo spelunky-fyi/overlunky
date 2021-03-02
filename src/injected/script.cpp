@@ -499,7 +499,7 @@ Script::Script(std::string script, std::string file, bool enable)
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
-    lua.new_usertype<Container>("Container", "inside", &Container::inside, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Container>("Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
