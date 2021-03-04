@@ -716,7 +716,7 @@ bool Script::run(ImDrawList *dl)
     try
     {
         lua_sethook(lua.lua_state(), NULL, 0, 0);
-        lua_sethook(lua.lua_state(), &infinite_loop, LUA_MASKCOUNT, 100000);
+        lua_sethook(lua.lua_state(), &infinite_loop, LUA_MASKCOUNT, 100000000);
         drawlist = dl;
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
