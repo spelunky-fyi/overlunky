@@ -31,6 +31,10 @@ Say get_say()
     }
 }
 
+void infinite_loop(lua_State* argst, lua_Debug * argdb) {
+    luaL_error(argst, "Reached the script execution amount.");
+};
+
 Script::Script(std::string script, std::string file, bool enable)
 {
     strcpy(code, script.data());
@@ -711,6 +715,8 @@ bool Script::run(ImDrawList *dl)
     }
     try
     {
+        lua_sethook(lua.lua_state(), NULL, 0, 0);
+        lua_sethook(lua.lua_state(), &infinite_loop, LUA_MASKCOUNT, 100000);
         drawlist = dl;
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];

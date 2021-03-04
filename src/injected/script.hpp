@@ -76,6 +76,7 @@ struct ScriptMeta
 Movable *get_entity(uint32_t id);
 std::tuple<float, float, int> get_position(uint32_t id);
 std::string sanitize(std::string data);
+void infinite_loop(lua_State *argst, lua_Debug *argdb);
 
 using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 
@@ -83,6 +84,7 @@ class Script
 {
   public:
     sol::state lua;
+
     char code[204800];
     std::string result = "";
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
