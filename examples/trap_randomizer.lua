@@ -3,7 +3,7 @@ meta.version = "WIP"
 meta.description = "Add more traps, change default wall traps and put snap traps in unexpected places."
 meta.author = "Dregu"
 
-register_option_float("add_traps", "% of traps to add", 5, 0, 20)
+register_option_float("add_traps", "% of traps to add", 4, 0, 20)
 
 floor_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD,
             ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}

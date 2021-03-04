@@ -4,7 +4,7 @@ meta.description = "Random exit doors and boss order. Beat all the bosses and be
 meta.author = "Dregu"
 
 register_option_int("min_levels", "Min normal levels before boss", 3, 1, 100)
-register_option_int("max_levels", "Max normal levels before boss", 8, 1, 100)
+register_option_int("max_levels", "Max normal levels before boss", 6, 1, 100)
 register_option_int("bosses", "Bosses to defeat to trigger ending", 5, 1, 5)
 register_option_bool("xiit", "Spawn exit on entrance (for debugging)", false)
 

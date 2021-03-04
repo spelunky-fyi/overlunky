@@ -39,6 +39,9 @@ big_to = {ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_LAVAMANDER, ENT_TYPE.MONS_MU
 olmec_ammo = {ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_BOMB,
               ENT_TYPE.ITEM_PASTEBOMB, ENT_TYPE.ITEM_EGGPLANT, ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_PUNISHBALL,
               ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.MONS_MAGMAMAN, ENT_TYPE.ACTIVEFLOOR_POWDERKEG}
+kingu_ammo = {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS,
+              ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_LEPRECHAUN,
+              ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_MONKEY, ENT_TYPE.MONS_PROTOSHOPKEEPER}
 done = {}
 
 function replaced(id)
@@ -97,6 +100,20 @@ function replace_projectile(id, from)
     done[#done + 1] = newid
 end
 
+function replace_kingu(id, from)
+    x, y, l = get_position(id)
+    ent = get_entity(id):as_movable()
+    vx = ent.velocityx
+    vy = ent.velocityy
+    -- move_entity(id, 0, 0, 0, 0)
+    new = from[math.random(#from)]
+    newid = spawn(new, x + math.random() * 4 - 2, y, l, vx, vy)
+    newent = get_entity(newid):as_movable()
+    newent.velocityx = math.random() * 0.2 - 0.1
+    newent.velocityy = math.random() * 0.25
+    done[#done + 1] = newid
+end
+
 set_callback(function()
     done = {}
     set_timeout(function()
@@ -139,6 +156,18 @@ set_callback(function()
                 ent = get_entity(v):as_movable()
                 if math.abs(y - oy) < 1 and math.abs(x - ox) < 2.5 and not replaced(v) then
                     replace_projectile(v, olmec_ammo)
+                end
+                done[#done + 1] = v
+            end
+        end, 1)
+    end
+
+    if state.theme == THEME.ABZU then
+        set_interval(function()
+            ufos = get_entities_by_type(ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS)
+            for i, v in ipairs(ufos) do
+                if not replaced(v) then
+                    replace_kingu(v, kingu_ammo)
                 end
                 done[#done + 1] = v
             end
