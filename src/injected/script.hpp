@@ -104,7 +104,6 @@ class Script
     std::vector<EntityItem> g_items;
     std::vector<Player *> g_players;
 
-
     Script(std::string script, std::string file, bool enable = true);
     ~Script();
 
@@ -113,6 +112,7 @@ class Script
     void register_option_float(std::string name, std::string desc, float value, float min, float max);
     void register_option_bool(std::string name, std::string desc, bool value);
     std::string script_id();
+    bool handle_function(sol::function func);
 
     bool run(ImDrawList *dl);
 };

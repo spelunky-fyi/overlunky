@@ -68,7 +68,7 @@ Script::Script(std::string script, std::string file, bool enable)
         std::regex regstart("(\\bmeta\\s*=)");
         std::regex regend("(\\})");
         bool getmeta = false;
-        for (std::string line; std::getline(metass, line); )
+        for (std::string line; std::getline(metass, line);)
         {
             if (std::regex_search(line, regstart))
             {
@@ -333,9 +333,8 @@ Script::Script(std::string script, std::string file, bool enable)
             return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
     };
     /// Returns: `float`, `float`, `float`, `float`
-    /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be inside these boundaries.
-    /// The order is: top left x, top left y, bottom right x, bottom right y
-    /// Example:
+    /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
+    /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
     /// ```
     /// -- Draw the level boundaries
     /// set_callback(function()
@@ -345,14 +344,7 @@ Script::Script(std::string script, std::string file, bool enable)
     ///     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
     /// end, ON.GUIFRAME)
     /// ```
-    lua["get_bounds"] = [this]() {
-        return std::make_tuple(
-            2.5f,
-            122.5f,
-            g_state->w * 10.0f + 2.5f,
-            122.5f - g_state->h * 8.0f
-        );
-    };
+    lua["get_bounds"] = [this]() { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["set_flag"] = [](uint32_t flags, int bit) { return flags | (1U << (bit - 1)); };
@@ -517,11 +509,13 @@ Script::Script(std::string script, std::string file, bool enable)
         &Movable::offsety,
         "airtime",
         &Movable::airtime,
-        sol::base_classes, sol::bases<Entity>());
+        sol::base_classes,
+        sol::bases<Entity>());
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
-    lua.new_usertype<Container>("Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Container>(
+        "Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -708,7 +702,6 @@ bool Script::run(ImDrawList *dl)
             lua["on_win"] = sol::lua_nil;
             lua["on_screen"] = sol::lua_nil;
             auto lua_result = lua.safe_script(code);
-            result = "OK";
         }
         catch (const sol::error &e)
         {
@@ -818,7 +811,7 @@ bool Script::run(ImDrawList *dl)
             {
                 if (now >= cb->lastRan + cb->interval)
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 ++it;
@@ -827,7 +820,7 @@ bool Script::run(ImDrawList *dl)
             {
                 if (now >= cb->timeout)
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     it = global_timers.erase(it);
                 }
                 else
@@ -848,46 +841,44 @@ bool Script::run(ImDrawList *dl)
             {
                 if (g_state->screen == cb->screen && g_state->screen != state.screen) // game screens
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
                 { // run ON.LEVEL on instant restart too
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 else if (cb->screen == 100) // ON.GUIFRAME
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 else if (cb->screen == 101 && g_state->time_level != state.time_level) // ON.FRAME
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 else if (cb->screen == 102 && g_state->screen != state.screen) // ON.SCREEN
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 else if (
                     cb->screen == 103 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() &&
                     state.player != g_players.at(0)) // ON.START
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (
-                    cb->screen == 104 && g_state->loading > 0 && g_state->loading != state.loading) // ON.LOADING
+                else if (cb->screen == 104 && g_state->loading > 0 && g_state->loading != state.loading) // ON.LOADING
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (
-                    cb->screen == 105 && (g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset) // ON.RESET
+                else if (cb->screen == 105 && (g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset) // ON.RESET
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 ++it;
@@ -905,7 +896,7 @@ bool Script::run(ImDrawList *dl)
             {
                 if (now >= cb->lastRan + cb->interval)
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     cb->lastRan = now;
                 }
                 ++it;
@@ -914,7 +905,7 @@ bool Script::run(ImDrawList *dl)
             {
                 if (now >= cb->timeout)
                 {
-                    cb->func();
+                    handle_function(cb->func);
                     it = level_timers.erase(it);
                 }
                 else
@@ -987,7 +978,7 @@ ImVec2 screenify(ImVec2 pos)
 
 std::string sanitize(std::string data)
 {
-    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return std::tolower(c); });
     std::regex reg("[^a-z/]*");
     data = std::regex_replace(data, reg, "");
     return data;
@@ -997,4 +988,16 @@ std::string Script::script_id()
 {
     std::string newid = sanitize(meta.author) + "/" + sanitize(meta.name);
     return newid;
+}
+
+bool Script::handle_function(sol::function func)
+{
+    auto lua_result = func();
+    if (!lua_result.valid())
+    {
+        sol::error e = lua_result;
+        result = e.what();
+        return false;
+    }
+    return true;
 }
