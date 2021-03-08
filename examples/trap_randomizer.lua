@@ -20,6 +20,7 @@ floortypes = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOO
               ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD,
               ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_STICKYTRAP_CEILING}
 to = 0
+generator_spawned = false
 
 function replace_trap(v)
     x, y, l = get_position(v)
@@ -64,6 +65,12 @@ function replace_trap(v)
         (state.theme ~= THEME.CITY_OF_GOLD and state.theme ~= THEME.ICE_CAVES and state.theme ~= THEME.TIAMAT) then -- replace with ceiling trap
         kill_entity(v)
         newid = ceiling_to[math.random(#ceiling_to)]
+        if newid == ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR then
+            if generator_spawned then
+                newid = generic_to[math.random(#generic_to)]
+            end
+            generator_spawned = true
+        end
         spawn(newid, x, y, l, 0, 0)
     elseif #left > 0 and #right == 0 then -- make right facing wall trap
         kill_entity(v)
@@ -127,6 +134,7 @@ set_callback(function()
         end
         -- apep in a snaptrap crashes :(
         if state.theme == THEME.DUAT then
+            spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 35, 0, 0, 0)
             set_interval(function()
                 for i, v in ipairs(get_entities_by_type(ENT_TYPE.ITEM_SNAP_TRAP)) do
                     kill_entity(v)
@@ -134,6 +142,7 @@ set_callback(function()
             end, 1)
         end
     end, 10)
+    generator_spawned = false
 end, ON.LEVEL)
 
 message("Initialized")
