@@ -100,7 +100,9 @@ Lua scripting is buggy and unfinished and the **API will change**, so don't go a
     + Check previous question.
   - If you're running **Linux**
     + The game and OL should run fine with the latest Wine if you install DXVK.
-    + You're on your own if you're using Steam/Proton.
+    + Also works with Proton 5.13 if you first start the game on Steam and then run `STEAM_COMPAT_DATA_PATH=~/.steam/steam/steamapps/compatdata/418530 WINEPREFIX=~/.steam/steam/steamapps/compatdata/418530/pfx ~/.steam/root/steamapps/common/Proton\ 5.13/proton run ~/.steam/steam/steamapps/common/Spelunky\ 2/Overlunky/Overlunky.exe` adjusting the paths for your setup.
+    + Put the Segoe UI ttf files to your wineprefixes Windows/Fonts to show the ui correctly.
+    + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If you don't see the **Scripts tab**
     + Did you even open it? The [keyboard shortcuts](#features) are right there.
   - If you **don't have scripts** in the Scripts tab
