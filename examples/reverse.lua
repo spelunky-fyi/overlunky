@@ -60,6 +60,14 @@ function give_udjat()
     end
 end
 
+function teleport_mount(ent, x, y)
+    if ent.overlay ~= nil then
+        move_entity(ent.overlay.uid, x, y, 0, 0)
+    else
+        move_entity(ent.uid, x, y, 0, 0)
+    end
+end
+
 set_callback(function()
     if state.level == 98 then return end
 
@@ -77,7 +85,7 @@ set_callback(function()
             x, y, l = get_position(layerdoors[1])
         end
         for i,player in ipairs(players) do
-            move_entity(player.uid, x, y, 0, 0)
+            teleport_mount(player, x, y)
         end
         for i,v in ipairs(exits) do
             x, y, l = get_position(v)
