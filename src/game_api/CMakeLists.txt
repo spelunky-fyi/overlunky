@@ -15,6 +15,8 @@ add_library(game_api STATIC
         memory.hpp
         thread_utils.cpp
         thread_utils.hpp
-        movable.hpp)
+        movable.hpp
+        window_api.cpp
+        window_api.hpp)
 target_include_directories(game_api PUBLIC .)
-target_link_libraries(game_api shared)
+target_link_libraries(game_api shared imgui)

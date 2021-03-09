@@ -4,15 +4,13 @@
 
 #include <ShlObj.h>
 #include <Shlwapi.h>
-#include <backends/imgui_impl_dx11.h>
-#include <backends/imgui_impl_win32.h>
-#include <d3d11.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <charconv>
 #include <codecvt>
 #include <filesystem>
 #include <fstream>
@@ -27,6 +25,7 @@
 #include "rpc.hpp"
 #include "script.hpp"
 #include "state.hpp"
+#include "window_api.hpp"
 
 std::map<std::string, Script *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -43,10 +42,10 @@ bool HID_RegisterDevice(HWND hTarget, USHORT usage)
     hid.dwFlags = RIDEV_DEVNOTIFY | RIDEV_INPUTSINK;
     hid.hwndTarget = hTarget;
 
-    return !!RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
+    return RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
 }
 
-void HID_UnregisterDevice(USHORT usage)
+bool HID_UnregisterDevice(USHORT usage)
 {
     RAWINPUTDEVICE hid;
     hid.usUsagePage = 1;
@@ -54,7 +53,7 @@ void HID_UnregisterDevice(USHORT usage)
     hid.dwFlags = RIDEV_REMOVE;
     hid.hwndTarget = NULL;
 
-    RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
+    return RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
 }
 
 std::map<std::string, int> keys{
@@ -137,19 +136,6 @@ struct Window
     bool open;
 };
 std::map<std::string, Window *> windows;
-
-IDXGISwapChain *pSwapChain;
-ID3D11Device *pDevice;
-ID3D11DeviceContext *pContext;
-ID3D11RenderTargetView *mainRenderTargetView;
-HWND window;
-HWND gamewindow;
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-WNDPROC orig_wndproc = nullptr;
-
-using PresentPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags);
-PresentPtr oPresent;
 
 // Global state
 struct EntityCache
@@ -534,10 +520,6 @@ void load_script(std::string file, bool enable = true)
     }
 }
 
-bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam);
-
-bool process_resizing(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam);
-
 std::string key_string(int keycode)
 {
     UCHAR virtualKey = keycode & 0xff;
@@ -776,58 +758,6 @@ void load_config(std::string file)
     save_config(file);
 }
 
-HWND FindTopWindow(DWORD pid)
-{
-    std::pair<HWND, DWORD> params = {0, pid};
-
-    // Enumerate the windows using a lambda to process each window
-    BOOL bResult = EnumWindows(
-        [](HWND hwnd, LPARAM lParam) -> BOOL {
-            auto pParams = (std::pair<HWND, DWORD> *)(lParam);
-
-            DWORD processId;
-            if (GetWindowThreadProcessId(hwnd, &processId) && processId == pParams->second && hwnd != window)
-            {
-                // Stop enumerating
-                SetLastError(-1);
-                pParams->first = hwnd;
-                return FALSE;
-            }
-
-            // Continue enumerating
-            return TRUE;
-        },
-        (LPARAM)&params);
-
-    if (!bResult && GetLastError() == -1 && params.first)
-    {
-        return params.first;
-    }
-
-    return 0;
-}
-
-LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    if (process_resizing(message, wParam, lParam))
-    {
-        gamewindow = FindTopWindow(GetCurrentProcessId());
-        return CallWindowProc(orig_wndproc, window, message, wParam, lParam);
-    }
-    if (!process_keys(message, wParam, lParam))
-    {
-        ImGui_ImplWin32_WndProcHandler(window, message, wParam, lParam);
-    }
-    if (ImGui::GetIO().WantCaptureKeyboard && message == WM_KEYDOWN)
-    {
-        return 0;
-    }
-    else
-    {
-        return CallWindowProc(orig_wndproc, window, message, wParam, lParam);
-    }
-}
-
 bool detached(std::string window)
 {
     return windows[window]->detached;
@@ -976,7 +906,7 @@ void spawn_entities(bool s, std::string list = "")
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
-        int spawned;
+        int spawned{ -1 };
         while (textss >> id)
         {
             spawned = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
@@ -1149,18 +1079,6 @@ void mouse_activity()
     }
 }
 
-LRESULT CALLBACK window_hook(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
-{
-    auto msg = (CWPSTRUCT *)(lParam);
-    if (msg->hwnd != window)
-        return 0;
-
-    if (process_resizing(msg->message, msg->wParam, msg->lParam))
-        return 0;
-
-    return 0;
-}
-
 bool pressed(std::string keyname, int wParam)
 {
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1260,7 +1178,7 @@ bool released(std::string keyname)
     return wParam == keycode;
 }
 
-bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
+bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode != WM_KEYDOWN)
     {
@@ -1593,26 +1511,6 @@ bool process_keys(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
     return true;
 }
 
-void init_imgui()
-{
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
-    io.MouseDrawCursor = true;
-    ImGui_ImplWin32_Init(window);
-    ImGui_ImplDX11_Init(pDevice, pContext);
-
-    /*if (!SetWindowsHookExA(WH_GETMESSAGE, msg_hook, 0, GetCurrentThreadId()))
-    {
-        printf("Message hook error: 0x%x\n", GetLastError());
-    }
-    if (!SetWindowsHookExA(WH_CALLWNDPROC, window_hook, 0,
-    GetCurrentThreadId()))
-    {
-        printf("WndProc hook error: 0x%x\n", GetLastError());
-    }*/
-}
-
 std::string last_word(std::string str)
 {
     while (!str.empty() && std::isspace(str.back()))
@@ -1627,13 +1525,7 @@ void update_filter(const char *s)
     std::string search(s);
     std::string last = last_word(search);
     int searchid = 0;
-    try
-    {
-        searchid = stoi(last);
-    }
-    catch (const std::exception &err)
-    {
-    }
+    auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
     for (int i = 0; i < g_items.size(); i++)
     {
         if (s[0] == '\0' || std::isspace(search.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
@@ -3358,50 +3250,6 @@ void render_spawner()
     render_list();
 }
 
-void create_render_target()
-{
-    ID3D11Texture2D *pBackBuffer;
-    pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&pBackBuffer);
-    pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
-    pBackBuffer->Release();
-}
-
-void cleanup_render_target()
-{
-    if (mainRenderTargetView)
-    {
-        mainRenderTargetView->Release();
-        mainRenderTargetView = NULL;
-    }
-}
-
-bool process_resizing(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam)
-{
-    static bool on_titlebar = false;
-    switch (nCode)
-    {
-    case WM_NCLBUTTONDOWN:
-        return on_titlebar = true;
-    case WM_LBUTTONUP:
-        if (on_titlebar && GetCapture() == window)
-        {
-            on_titlebar = false;
-            return true;
-        }
-        break;
-    case WM_SIZE:
-        // When display mode is changed
-        if (pDevice != NULL && wParam != SIZE_MINIMIZED)
-        {
-            cleanup_render_target();
-            pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-            create_render_target();
-        }
-        break;
-    }
-    return false;
-}
-
 void render_tool(std::string tool)
 {
     if (tool == "tool_entity")
@@ -3424,81 +3272,57 @@ void render_tool(std::string tool)
         render_debug();
 }
 
-HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags)
-{
-    static bool init = false;
-    // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
-
-    if (!init)
+void imgui_init() {
+    ImGuiIO& io = ImGui::GetIO();
+    io.FontAllowUserScaling = true;
+    PWSTR fontdir;
+    if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
     {
-        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void **)&pDevice)))
-        {
-            pDevice->GetImmediateContext(&pContext);
-            DXGI_SWAP_CHAIN_DESC sd;
-            pSwapChain->GetDesc(&sd);
-            window = sd.OutputWindow;
-            gamewindow = window;
-            orig_wndproc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(window, GWLP_WNDPROC, LONG_PTR(hkWndProc)));
-            create_render_target();
-            init_imgui();
-            init = true;
-        }
-        else
-        {
-            return oPresent(pSwapChain, SyncInterval, Flags);
-        }
-        ImGuiIO &io = ImGui::GetIO();
-        io.FontAllowUserScaling = true;
-        PWSTR fontdir;
-        if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
-        {
-            using cvt_type = std::codecvt_utf8<wchar_t>;
-            std::wstring_convert<cvt_type, wchar_t> cvt;
+        using cvt_type = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<cvt_type, wchar_t> cvt;
 
-            std::string fontpath(cvt.to_bytes(fontdir) + "\\segoeuib.ttf");
-            if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
-            {
-                font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 18.0f);
-                bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 32.0f);
-            }
-
-            CoTaskMemFree(fontdir);
+        std::string fontpath(cvt.to_bytes(fontdir) + "\\segoeuib.ttf");
+        if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+        {
+            font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 18.0f);
+            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 32.0f);
         }
 
-        if (!font)
-        {
-            font = io.Fonts->AddFontDefault();
-        }
-        load_config(cfgfile);
-        refresh_script_files();
-        autorun_scripts();
-        set_colors();
-        windows["tool_entity"] = new Window({"Spawner (" + key_string(keys["tool_entity"]) + ")", false, true});
-        windows["tool_door"] = new Window({"Door (" + key_string(keys["tool_door"]) + ")", false, true});
-        windows["tool_camera"] = new Window({"Camera (" + key_string(keys["tool_camera"]) + ")", false, true});
-        windows["tool_entity_properties"] = new Window({"Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true});
-        windows["tool_game_properties"] = new Window({"Game (" + key_string(keys["tool_game_properties"]) + ")", false, true});
-        windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, true});
-        windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", false, false});
-        windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", false, false});
-        windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
+        CoTaskMemFree(fontdir);
     }
 
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
+    if (!font)
+    {
+        font = io.Fonts->AddFontDefault();
+    }
+    load_config(cfgfile);
+    refresh_script_files();
+    autorun_scripts();
+    set_colors();
+    windows["tool_entity"] = new Window({ "Spawner (" + key_string(keys["tool_entity"]) + ")", false, true });
+    windows["tool_door"] = new Window({ "Door (" + key_string(keys["tool_door"]) + ")", false, true });
+    windows["tool_camera"] = new Window({ "Camera (" + key_string(keys["tool_camera"]) + ")", false, true });
+    windows["tool_entity_properties"] = new Window({ "Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true });
+    windows["tool_game_properties"] = new Window({ "Game (" + key_string(keys["tool_game_properties"]) + ")", false, true });
+    windows["tool_options"] = new Window({ "Options (" + key_string(keys["tool_options"]) + ")", false, true });
+    windows["tool_debug"] = new Window({ "Debug (" + key_string(keys["tool_debug"]) + ")", false, false });
+    windows["tool_style"] = new Window({ "Style (" + key_string(keys["tool_style"]) + ")", false, false });
+    windows["tool_script"] = new Window({ "Scripts (" + key_string(keys["tool_script"]) + ")", false, true });
+}
 
-    ImGui::SetNextWindowSize({-1, 20});
+void imgui_draw()
+{
+    ImGui::SetNextWindowSize({ -1, 20 });
     ImGui::Begin(
         "Overlay",
         NULL,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+        ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
+        ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), "Overlunky");
     ImGui::SameLine();
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), TOSTRING(GIT_VERSION));
-    ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
+    ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30 }, ImGuiCond_Always);
     ImGui::End();
 
     if (!hide_script_messages)
@@ -3517,8 +3341,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     {
         if (options["tabbed_interface"])
         {
-            ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y / 2}, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos({ 0, 0 }, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize({ 600, ImGui::GetIO().DisplaySize.y / 2 }, ImGuiCond_FirstUseEver);
             ImGui::Begin("Overlunky", NULL);
             if (ImGui::BeginTabBar("##TabBar"))
             {
@@ -3564,125 +3388,125 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
             {
                 if (!tab.second->detached)
                     continue;
-                ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
+                ImGui::SetNextWindowSize({ toolwidth, toolwidth }, ImGuiCond_Once);
                 ImGui::Begin(tab.second->name.data(), &tab.second->detached);
                 render_tool(tab.first);
                 ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
+                    { ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2 },
                     ImGuiCond_Once);
                 ImGui::End();
             }
         }
         else if (options["stack_vertically"])
         {
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
             ImGui::Begin(windows["tool_options"]->name.c_str());
             render_options();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+            ImGui::SetWindowPos({ 0, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
             ImGui::Begin(windows["tool_camera"]->name.c_str());
             render_camera();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+            ImGui::SetWindowPos({ 0, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
             ImGui::Begin(windows["tool_door"]->name.c_str());
             render_narnia();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+            ImGui::SetWindowPos({ 0, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
             ImGui::Begin(windows["tool_entity"]->name.c_str());
             render_spawner();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, 0}, win_condition);
+            ImGui::SetWindowPos({ 0, 0 }, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
             ImGui::Begin(windows["tool_entity_properties"]->name.c_str());
             render_entity_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
+            ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, 0 }, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
             ImGui::Begin(windows["tool_game_properties"]->name.c_str());
             render_game_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
             ImGui::Begin(windows["tool_script"]->name.c_str());
             render_scripts();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+            ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
             ImGui::End();
         }
         else
         {
-            ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
-            ImGui::SetNextWindowPos({0, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, toolwidth }, win_condition);
+            ImGui::SetNextWindowPos({ 0, 0 }, win_condition);
             ImGui::Begin(windows["tool_entity"]->name.c_str());
             render_spawner();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
             ImGui::Begin(windows["tool_door"]->name.c_str());
             render_narnia();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
             ImGui::Begin(windows["tool_camera"]->name.c_str());
             render_camera();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
             ImGui::Begin(windows["tool_entity_properties"]->name.c_str());
             render_entity_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
             ImGui::Begin(windows["tool_game_properties"]->name.c_str());
             render_game_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, 0 }, win_condition);
             ImGui::Begin(windows["tool_options"]->name.c_str());
             render_options();
             lastwidth = ImGui::GetWindowWidth();
             lastheight = ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0 }, win_condition);
             ImGui::Begin(windows["tool_script"]->name.c_str());
             render_scripts();
             ImGui::End();
@@ -3690,8 +3514,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
 
         if (show_debug && !options["tabbed_interface"])
         {
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0 }, win_condition);
             ImGui::Begin(windows["tool_debug"]->name.c_str(), &show_debug);
             render_debug();
             ImGui::End();
@@ -3700,10 +3524,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         if (change_colors && !options["tabbed_interface"])
         {
             ImGui::Begin(windows["tool_style"]->name.c_str(), &change_colors);
-            ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
+            ImGui::SetWindowSize({ -1, -1 }, ImGuiCond_Always);
             render_style_editor();
             ImGui::SetWindowPos(
-                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2});
+                { ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2 });
             ImGui::End();
         }
     }
@@ -3715,15 +3539,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         ImGui::ShowStyleEditor();
         ImGui::End();
     }
+}
 
-    ImGui::Render();
-
+void imgui_post_draw()
+{
     if (!file_written)
         write_file();
 
     if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard)
     {
-        HID_RegisterDevice(window, HID_KEYBOARD);
+        HID_RegisterDevice(get_window(), HID_KEYBOARD);
         capture_last = true;
     }
     else if (capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
@@ -3734,8 +3559,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
     else if (register_keys && ImGui::GetFrameCount() > register_keys)
     {
         register_keys = 0;
-        gamewindow = FindTopWindow(GetCurrentProcessId());
-        HID_RegisterDevice(gamewindow, HID_KEYBOARD);
+        HID_UnregisterDevice(HID_KEYBOARD);
     }
 
     if (options["disable_input_alt"] && ImGui::GetIO().WantCaptureKeyboard)
@@ -3759,18 +3583,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT 
         if (g_state != 0 && !options["disable_pause"])
             g_state->hud_flags |= 1U << 19;
     }
+}
 
-    pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
+void post_draw()
+{
     update_players();
     force_zoom();
     force_hud_flags();
     force_time();
     force_noclip();
     mouse_activity();
-
-    return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
 void create_box(std::vector<EntityItem> items)
@@ -3796,40 +3618,14 @@ void create_box(std::vector<EntityItem> items)
     }
 }
 
-#define THROW(fmt, ...)                                                                                                                              \
-    {                                                                                                                                                \
-        char buf[0x1000];                                                                                                                            \
-        snprintf(buf, sizeof(buf), fmt, __VA_ARGS__);                                                                                                \
-        throw std::runtime_error(strdup(buf));                                                                                                       \
-    }
-
-template <typename T> PresentPtr &vtable_find(T *obj, int index)
+void init_ui()
 {
-    void ***ptr = reinterpret_cast<void ***>(obj);
-    if (!ptr[0])
-        return *static_cast<PresentPtr *>(nullptr);
-    return *reinterpret_cast<PresentPtr *>(&ptr[0][index]);
-}
-
-bool init_hooks(size_t _ptr)
-{
-    g_state = (struct StateMemory *)get_state_ptr();
+    g_state = (struct StateMemory*)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
 
-    pSwapChain = reinterpret_cast<IDXGISwapChain *>(_ptr);
-    PresentPtr &ptr = vtable_find(pSwapChain, 8);
-    DWORD oldProtect;
-    if (!VirtualProtect(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(&ptr) & ~0xFFF), 0x1000, PAGE_READWRITE, &oldProtect))
-    {
-        PANIC("VirtualProtect error: {:#x}\n", GetLastError());
-    }
-
-    if (!ptr)
-    {
-        PANIC("DirectX 11 is not initialized yet.");
-    }
-
-    oPresent = ptr;
-    ptr = hkPresent;
-    return true;
+    register_on_input(&process_keys);
+    register_imgui_init(&imgui_init);
+    register_imgui_draw(&imgui_draw);
+    register_imgui_post_draw(&imgui_post_draw);
+    register_post_draw(&post_draw);
 }
