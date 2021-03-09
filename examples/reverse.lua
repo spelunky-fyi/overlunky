@@ -62,10 +62,12 @@ end
 
 set_callback(function()
     if state.level == 98 then return end
+    
     timeout = 1
     if state.theme == THEME.ICE_CAVES then -- stupid ice caves crashes sometimes when you try fiddling with stuff immediately
         timeout = 15
     end
+
     set_timeout(function()
         exits = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
         entrances = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_ENTRANCE)
@@ -95,6 +97,7 @@ set_callback(function()
             unlock_door_at(x, y)
         end
     end, timeout)
+
     if state.theme == THEME.HUNDUN then
         elev = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
         for i,v in ipairs(elev) do
@@ -105,9 +108,16 @@ set_callback(function()
     if state.theme == THEME.OLMEC then
         set_interval(olmec_exit, 15)
     end
+
     if state.theme == THEME.VOLCANA then
         set_timeout(give_udjat, 15)
     end
+
+    god(true)
+    set_timeout(function()
+        god(false)
+    end, 60)
+
 end, ON.LEVEL)
 
 set_callback(function()
