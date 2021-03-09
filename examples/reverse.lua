@@ -3,7 +3,7 @@ meta.version = 'WIP'
 meta.description = 'A really weird and maybe impossible game where you start on top of Hundun and have to get back to 1-1 to become one with the Cosmos. Hey, that rhymes!'
 meta.author = 'Dregu'
 
-register_option_bool('goodies', 'Get some goodies at start, climbing is hard.', true)
+register_option_bool('goodies', 'Get some goodies at start, climbing is hard.', false)
 
 dest = {}
 dest[74] = { 7, 3, THEME.SUNKEN_CITY }
