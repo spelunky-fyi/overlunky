@@ -3,6 +3,8 @@ meta.version = 'WIP'
 meta.description = 'A really weird and maybe impossible game where you start on top of Hundun and have to get back to 1-1 to become one with the Cosmos. Hey, that rhymes!'
 meta.author = 'Dregu'
 
+register_option_bool('goodies', 'Get some goodies at start, climbing is hard.', true)
+
 dest = {}
 dest[74] = { 7, 3, THEME.SUNKEN_CITY }
 dest[73] = { 7, 2, THEME.SUNKEN_CITY }
@@ -48,26 +50,32 @@ end
 
 set_callback(function()
     if state.level == 98 then return end
-    exits = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
-    entrances = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_ENTRANCE)
-    x, y, l = get_position(exits[1])
-    for i,player in ipairs(players) do
-        move_entity(player.uid, x, y, 0, 0)
+    timeout = 1
+    if state.theme == THEME.ICE_CAVES then -- stupid ice caves crashes sometimes when you try fiddling with stuff immediately
+        timeout = 15
     end
-    for i,v in ipairs(exits) do
-        x, y, l = get_position(v)
-        move_entity(v, x+100, y, 0, 0)
-        lock_door_at(x, y)
-    end
-    to = 10*state.world+state.level
-    nextworld = dest[to][1]
-    nextlevel = dest[to][2]
-    nexttheme = dest[to][3]
-    for i,v in ipairs(entrances) do
-        x, y, l = get_position(v)
-        door(x, y, l, nextworld, nextlevel, nexttheme)
-        unlock_door_at(x, y)
-    end
+    set_timeout(function()
+        exits = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
+        entrances = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_ENTRANCE)
+        x, y, l = get_position(exits[1])
+        for i,player in ipairs(players) do
+            move_entity(player.uid, x, y, 0, 0)
+        end
+        for i,v in ipairs(exits) do
+            x, y, l = get_position(v)
+            move_entity(v, x+100, y, 0, 0)
+            lock_door_at(x, y)
+        end
+        to = 10*state.world+state.level
+        nextworld = dest[to][1]
+        nextlevel = dest[to][2]
+        nexttheme = dest[to][3]
+        for i,v in ipairs(entrances) do
+            x, y, l = get_position(v)
+            door(x, y, l, nextworld, nextlevel, nexttheme)
+            unlock_door_at(x, y)
+        end
+    end, timeout)
     if state.theme == THEME.HUNDUN then
         elev = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
         for i,v in ipairs(elev) do
@@ -89,9 +97,11 @@ set_callback(function()
 end, ON.LOADING)
 
 set_callback(function()
-    spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, -1, 0, LAYER.PLAYER1, 0, 0)
-    spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, 0, 0, LAYER.PLAYER1, 0, 0)
-    spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, 1, 0, LAYER.PLAYER1, 0, 0)
+    if options.goodies then
+        spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, 0, 0, LAYER.PLAYER1, 0, 0)
+        spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, 0, 0, LAYER.PLAYER1, 0, 0)
+        spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, 0, 0, LAYER.PLAYER1, 0, 0)
+    end
 end, ON.START)
 
 set_callback(init, ON.CAMP)
