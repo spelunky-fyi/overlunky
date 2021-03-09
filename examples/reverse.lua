@@ -62,7 +62,7 @@ end
 
 set_callback(function()
     if state.level == 98 then return end
-    
+
     timeout = 1
     if state.theme == THEME.ICE_CAVES then -- stupid ice caves crashes sometimes when you try fiddling with stuff immediately
         timeout = 15
@@ -113,10 +113,10 @@ set_callback(function()
         set_timeout(give_udjat, 15)
     end
 
-    god(true)
+    players[1].flags = set_flag(players[1].flags, 6)
     set_timeout(function()
-        god(false)
-    end, 60)
+        players[1].flags = clr_flag(players[1].flags, 6)
+    end, 45)
 
 end, ON.LEVEL)
 
