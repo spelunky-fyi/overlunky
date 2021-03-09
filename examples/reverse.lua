@@ -52,6 +52,14 @@ function olmec_exit()
     end
 end
 
+function give_udjat()
+    sockets = get_entities_by_type(ENT_TYPE.ITEM_UDJAT_SOCKET)
+    if #sockets > 0 then
+        x, y, l = get_position(sockets[1])
+        spawn(ENT_TYPE.ITEM_PICKUP_UDJATEYE, x, y, l, 0, 0)
+    end
+end
+
 set_callback(function()
     if state.level == 98 then return end
     timeout = 1
@@ -96,6 +104,9 @@ set_callback(function()
 
     if state.theme == THEME.OLMEC then
         set_interval(olmec_exit, 15)
+    end
+    if state.theme == THEME.VOLCANA then
+        set_timeout(give_udjat, 15)
     end
 end, ON.LEVEL)
 
