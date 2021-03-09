@@ -61,7 +61,11 @@ set_callback(function()
     set_timeout(function()
         exits = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
         entrances = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_ENTRANCE)
+        layerdoors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_LAYER)
         x, y, l = get_position(exits[1])
+        if state.theme == THEME.TIAMAT then
+            x, y, l = get_position(layerdoors[1])
+        end
         for i,player in ipairs(players) do
             move_entity(player.uid, x, y, 0, 0)
         end
