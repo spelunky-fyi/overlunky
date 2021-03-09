@@ -32,19 +32,23 @@ dest[11] = { 7, 98, THEME.COSMIC_OCEAN }
 nextworld = 7
 nextlevel = 4
 nexttheme = THEME.HUNDUN
+volcana = false
 
 function init()
     nextworld = 7
     nextlevel = 4
     nexttheme = THEME.HUNDUN
+    volcana = false
 end
 
 function olmec_exit()
     x, y, l = get_position(players[1].uid)
     if y > 100 then
         nexttheme = THEME.VOLCANA
+        volcana = true
     else
         nexttheme = THEME.JUNGLE
+        volcana = false
     end
 end
 
@@ -70,6 +74,9 @@ set_callback(function()
         nextworld = dest[to][1]
         nextlevel = dest[to][2]
         nexttheme = dest[to][3]
+        if volcana == true and nexttheme == THEME.JUNGLE then
+            nexttheme = THEME.VOLCANA
+        end
         for i,v in ipairs(entrances) do
             x, y, l = get_position(v)
             door(x, y, l, nextworld, nextlevel, nexttheme)
