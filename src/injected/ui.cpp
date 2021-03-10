@@ -3559,7 +3559,37 @@ void imgui_post_draw()
     else if (register_keys && ImGui::GetFrameCount() > register_keys)
     {
         register_keys = 0;
-        HID_UnregisterDevice(HID_KEYBOARD);
+        auto find_top_level_window = [](DWORD pid) -> HWND
+        {
+            std::pair<HWND, DWORD> params = { 0, pid };
+
+            // Enumerate the windows using a lambda to process each window
+            BOOL bResult = EnumWindows(
+                [](HWND hwnd, LPARAM lParam) -> BOOL {
+                auto pParams = (std::pair<HWND, DWORD>*)(lParam);
+
+                DWORD processId;
+                if (GetWindowThreadProcessId(hwnd, &processId) && processId == pParams->second && hwnd != get_window())
+                {
+                    // Stop enumerating
+                    SetLastError(-1);
+                    pParams->first = hwnd;
+                    return FALSE;
+                }
+
+                // Continue enumerating
+                return TRUE;
+            },
+                (LPARAM)&params);
+
+            if (!bResult && GetLastError() == -1 && params.first)
+            {
+                return params.first;
+            }
+
+            return nullptr;
+        };
+        HID_RegisterDevice(find_top_level_window(GetCurrentProcessId()), HID_KEYBOARD);
     }
 
     if (options["disable_input_alt"] && ImGui::GetIO().WantCaptureKeyboard)

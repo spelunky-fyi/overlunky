@@ -34,10 +34,16 @@ PostDrawCallback g_PostDrawCallback{ nullptr };
 LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     bool consumed_input = g_OnInputCallback ? g_OnInputCallback(message, wParam, lParam) : false;
-    if (!consumed_input) {
-        ImGui_ImplWin32_WndProcHandler(window, message, wParam, lParam);
+    if (!consumed_input)
+    {
+        LRESULT imgui_result = ImGui_ImplWin32_WndProcHandler(window, message, wParam, lParam);
+        if (imgui_result != 0)
+        {
+            return imgui_result;
+        }
     }
-    if (ImGui::GetIO().WantCaptureKeyboard && message == WM_KEYDOWN) {
+    if (ImGui::GetIO().WantCaptureKeyboard && message == WM_KEYDOWN)
+    {
         return DefWindowProc(window, message, wParam, lParam);
     }
     return CallWindowProc(g_OrigWndProc, window, message, wParam, lParam);
