@@ -9,29 +9,29 @@
 #include "logger.h"
 #include "state.hpp"
 
-IDXGISwapChain* g_SwapChain{ nullptr };
-ID3D11Device* g_Device{ nullptr };
-ID3D11DeviceContext* g_Context{ nullptr };
-ID3D11RenderTargetView* g_MainRenderTargetView{ nullptr };
-HWND g_Window{ nullptr };
+IDXGISwapChain *g_SwapChain{nullptr};
+ID3D11Device *g_Device{nullptr};
+ID3D11DeviceContext *g_Context{nullptr};
+ID3D11RenderTargetView *g_MainRenderTargetView{nullptr};
+HWND g_Window{nullptr};
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-WNDPROC g_OrigWndProc{ nullptr };
+WNDPROC g_OrigWndProc{nullptr};
 
-using PresentPtr = HRESULT(STDMETHODCALLTYPE*) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
-PresentPtr g_OrigSwapChainPresent{ nullptr };
+using PresentPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags);
+PresentPtr g_OrigSwapChainPresent{nullptr};
 
-using ResizeBuffersPtr = HRESULT(STDMETHODCALLTYPE*) (IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
-ResizeBuffersPtr g_OrigSwapChainResizeBuffers{ nullptr };
+using ResizeBuffersPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *, UINT, UINT, UINT, DXGI_FORMAT, UINT);
+ResizeBuffersPtr g_OrigSwapChainResizeBuffers{nullptr};
 
-OnInputCallback g_OnInputCallback{ nullptr };
-ImguiInitCallback g_ImguiInitCallback{ nullptr };
-ImguiDrawCallback g_ImguiDrawCallback{ nullptr };
-PreDrawCallback g_PreDrawCallback{ nullptr };
-PostDrawCallback g_PostDrawCallback{ nullptr };
+OnInputCallback g_OnInputCallback{nullptr};
+ImguiInitCallback g_ImguiInitCallback{nullptr};
+ImguiDrawCallback g_ImguiDrawCallback{nullptr};
+PreDrawCallback g_PreDrawCallback{nullptr};
+PostDrawCallback g_PostDrawCallback{nullptr};
 
 constexpr USHORT g_HidKeyboard = 6;
-HWND g_LastRegisteredRawInputWindow{ nullptr };
+HWND g_LastRegisteredRawInputWindow{nullptr};
 
 HWND HID_GetRegisteredDeviceWindow(USHORT usage)
 {
@@ -113,7 +113,6 @@ void create_render_target()
     g_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&pBackBuffer);
     assert(pBackBuffer != nullptr);
     g_Device->CreateRenderTargetView(pBackBuffer, NULL, &g_MainRenderTargetView);
-    g_Context->OMSetRenderTargets(1, &g_MainRenderTargetView, NULL);
     pBackBuffer->Release();
 }
 
@@ -163,6 +162,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterva
     }
 
     ImGui::Render();
+    g_Context->OMSetRenderTargets(1, &g_MainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     {
@@ -176,7 +176,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterva
         }
         else if (g_LastRegisteredRawInputWindow != nullptr)
         {
-            static std::uint32_t s_RecoverRawInputFrame{ 0 };
+            static std::uint32_t s_RecoverRawInputFrame{0};
             if (s_RecoverRawInputFrame == 0)
             {
                 s_RecoverRawInputFrame = ImGui::GetFrameCount() + 10;
@@ -197,25 +197,26 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterva
     return g_OrigSwapChainPresent(pSwapChain, SyncInterval, Flags);
 }
 
-HRESULT STDMETHODCALLTYPE hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
+HRESULT STDMETHODCALLTYPE
+hkResizeBuffers(IDXGISwapChain *pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+{
     cleanup_render_target();
     const HRESULT result = g_OrigSwapChainResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
     create_render_target();
     return result;
 }
 
-template<class FunT, typename T>
-FunT& vtable_find(T* obj, int index)
+template <class FunT, typename T> FunT &vtable_find(T *obj, int index)
 {
-    void*** ptr = reinterpret_cast<void***>(obj);
+    void ***ptr = reinterpret_cast<void ***>(obj);
     if (!ptr[0])
-        return *static_cast<FunT*>(nullptr);
-    return *reinterpret_cast<FunT*>(&ptr[0][index]);
+        return *static_cast<FunT *>(nullptr);
+    return *reinterpret_cast<FunT *>(&ptr[0][index]);
 }
 
-template<class FunT>
-void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index) {
-    FunT& vtable_ptr = vtable_find<FunT>(g_SwapChain, vtable_index);
+template <class FunT> void hook_virtual_function(FunT hook_fun, FunT &orig_fun, int vtable_index)
+{
+    FunT &vtable_ptr = vtable_find<FunT>(g_SwapChain, vtable_index);
 
     DWORD oldProtect;
     if (!VirtualProtect(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(&vtable_ptr) & ~0xFFF), 0x1000, PAGE_READWRITE, &oldProtect))
@@ -232,7 +233,7 @@ void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index) {
     vtable_ptr = hook_fun;
 };
 
-bool init_hooks(void* swap_chain_ptr)
+bool init_hooks(void *swap_chain_ptr)
 {
     g_SwapChain = reinterpret_cast<IDXGISwapChain *>(swap_chain_ptr);
 
