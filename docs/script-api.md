@@ -21,7 +21,7 @@ Table of strings where you should set some script metadata shown in the UI.
 A bunch of [game state](#statememory) variables
 Example:
 ```
-if state.time_level > 300 and state.theme == [THEME.DWELLING](#theme) then
+if state.time_level > 300 and state.theme == THEME.DWELLING then
     toast("Congratulations for lasting 5 seconds in Dwelling")
 end
 ```
@@ -324,13 +324,16 @@ Converts a color to int to be used in drawing functions. Use values from `0..255
 Draws a line on screen
 ### `draw_rect`
 #### Params: `float x1, float y1, float x2, float y2, float thickness, float rounding, int color`
-Draws rectangle on screen from top-left to bottom-right.
+Draws a rectangle on screen from top-left to bottom-right.
 ### `draw_rect_filled`
 #### Params: `float x1, float y1, float x2, float y2, float rounding, int color`
-Draws rectangle on screen from top-left to bottom-right.
+Draws a filled rectangle on screen from top-left to bottom-right.
 ### `draw_circle`
 #### Params: `float x, float y, float radius, float thickness, int color`
 Draws a circle on screen
+### `draw_circle_filled`
+#### Params: `float x, float y, float radius, int color`
+Draws a filled circle on screen
 ### `draw_text`
 #### Params: `float x, float y, string text, int color`
 Draws text on screen
