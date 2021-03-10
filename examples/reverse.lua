@@ -72,7 +72,7 @@ end
 set_callback(function()
     if state.level == 98 then return end
 
-    timeout = 1
+    timeout = 10
     if state.theme == THEME.ICE_CAVES then -- stupid ice caves crashes sometimes when you try fiddling with stuff immediately
         timeout = 15
     end
