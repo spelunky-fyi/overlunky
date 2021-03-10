@@ -150,6 +150,7 @@ end, ON.START)
 
 set_callback(function()
     if state.screen ~= 12 then return end
+    if state.level == 98 then return end
     if state.time_level < 30 then
         draw_rect_filled(-1, 1, 1, -1, 0, rgba(0, 0, 0, 255))
     elseif state.time_level <= 45 then
