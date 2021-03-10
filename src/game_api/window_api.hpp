@@ -9,7 +9,6 @@ bool init_hooks(void* swap_chain_ptr);
 using OnInputCallback = bool(*)(UINT, WPARAM, LPARAM);
 using ImguiInitCallback = void(*)();
 using ImguiDrawCallback = void(*)();
-using ImguiPostDrawCallback = void(*)();
 using PreDrawCallback = void(*)();
 using PostDrawCallback = void(*)();
 
@@ -21,7 +20,6 @@ enum WndProcResult : LRESULT {
 void register_on_input(OnInputCallback on_input);
 void register_imgui_init(ImguiInitCallback imgui_init);
 void register_imgui_draw(ImguiDrawCallback imgui_draw);
-void register_imgui_post_draw(ImguiPostDrawCallback imgui_post_draw);
 void register_pre_draw(PreDrawCallback pre_draw);
 void register_post_draw(PostDrawCallback post_draw);
 

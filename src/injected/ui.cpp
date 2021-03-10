@@ -31,50 +31,6 @@ std::map<std::string, Script *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
-const USHORT HID_KEYBOARD = 6;
-HWND g_LastRegisteredRawInputWindow{ nullptr };
-
-HWND HID_GetRegisteredDeviceWindow(USHORT usage)
-{
-    constexpr UINT max_raw_devices = 3;
-    RAWINPUTDEVICE raw_devices[max_raw_devices];
-    UINT num_raw_devices = max_raw_devices;
-    UINT num_registered_raw_devices = GetRegisteredRawInputDevices(raw_devices, &num_raw_devices, sizeof(RAWINPUTDEVICE));
-    if (num_registered_raw_devices > 0)
-    {
-        for (UINT i = 0; i < num_registered_raw_devices; i++)
-        {
-            if (raw_devices[i].usUsage == usage)
-            {
-                return raw_devices[i].hwndTarget;
-            }
-        }
-    }
-    return nullptr;
-}
-
-bool HID_RegisterDevice(HWND hTarget, USHORT usage)
-{
-    RAWINPUTDEVICE hid;
-    hid.usUsagePage = 1;
-    hid.usUsage = usage;
-    hid.dwFlags = RIDEV_DEVNOTIFY | RIDEV_INPUTSINK;
-    hid.hwndTarget = hTarget;
-
-    return RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
-}
-
-bool HID_UnregisterDevice(USHORT usage)
-{
-    RAWINPUTDEVICE hid;
-    hid.usUsagePage = 1;
-    hid.usUsage = usage;
-    hid.dwFlags = RIDEV_REMOVE;
-    hid.hwndTarget = NULL;
-
-    return RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
-}
-
 std::map<std::string, int> keys{
     {"enter", 0x0d},
     {"escape", 0x1b},
@@ -89,8 +45,6 @@ std::map<std::string, int> keys{
     {"toggle_noclip", 0x146},
     {"toggle_snap", 0x153},
     {"toggle_pause", 0x150},
-    {"toggle_disable_input", 0x14b},
-    {"toggle_disable_input_alt", 0x34b},
     {"toggle_disable_pause", 0x350},
     {"toggle_grid", 0x347},
     {"toggle_hitboxes", 0x348},
@@ -169,7 +123,7 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0.63, g_sat =
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
     g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0,
-    g_force_width = 0, g_force_height = 0, register_keys = 0, register_keys_alt = 0;
+    g_force_width = 0, g_force_height = 0;
 uint32_t g_held_flags = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
@@ -177,7 +131,7 @@ std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
-     file_written = false, show_debug = false, throw_held = false, paused = false, capture_last_alt = false,
+     file_written = false, show_debug = false, throw_held = false, paused = false,
      show_app_metrics = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
      freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false;
 Player *g_entity = 0;
@@ -436,8 +390,6 @@ std::map<std::string, bool> options = {
     {"stack_horizontally", false},
     {"stack_vertically", false},
     {"disable_pause", false},
-    {"disable_input", true},
-    {"disable_input_alt", false},
     {"draw_grid", false},
     {"draw_hitboxes", false},
     {"tabbed_interface", true}};
@@ -1050,7 +1002,7 @@ void force_hud_flags()
 {
     if (g_state == 0)
         return;
-    if (!options["disable_pause"] && !ImGui::GetIO().WantCaptureKeyboard && !register_keys_alt)
+    if (!options["disable_pause"] && !ImGui::GetIO().WantCaptureKeyboard)
         g_state->hud_flags |= 1U << 19;
     else if (!ImGui::GetIO().WantCaptureKeyboard)
         g_state->hud_flags &= ~(1U << 19);
@@ -1333,14 +1285,6 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         options["disable_pause"] = !options["disable_pause"];
         force_hud_flags();
-    }
-    else if (pressed("toggle_disable_input", wParam))
-    {
-        options["disable_input"] = !options["disable_input"];
-    }
-    else if (pressed("toggle_disable_input_alt", wParam))
-    {
-        options["disable_input_alt"] = !options["disable_input_alt"];
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -2439,8 +2383,6 @@ void render_options()
     {
         force_hud_flags();
     }
-    ImGui::Checkbox("Disable input when typing (hook rawinput)##DisableInputRaw", &options["disable_input"]);
-    ImGui::Checkbox("Disable input when typing (alternative mode)##DisableInputFlags", &options["disable_input_alt"]);
     if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
     {
         options["stack_vertically"] = false;
@@ -3560,60 +3502,10 @@ void imgui_draw()
     }
 }
 
-void imgui_post_draw()
+void post_draw()
 {
     if (!file_written)
         write_file();
-
-    if (options["disable_input"]) {
-        if (ImGui::GetIO().WantCaptureKeyboard)
-        {
-            if (HWND window = HID_GetRegisteredDeviceWindow(HID_KEYBOARD))
-            {
-                g_LastRegisteredRawInputWindow = window;
-                HID_UnregisterDevice(HID_KEYBOARD);
-            }
-        }
-        else if (register_keys == 0)
-        {
-            register_keys = ImGui::GetFrameCount() + 10;
-        }
-        else if (ImGui::GetFrameCount() > register_keys) {
-            HID_RegisterDevice(g_LastRegisteredRawInputWindow, HID_KEYBOARD);
-            g_LastRegisteredRawInputWindow = nullptr;
-        }
-    }
-    else if (g_LastRegisteredRawInputWindow != nullptr)
-    {
-        HID_RegisterDevice(g_LastRegisteredRawInputWindow, HID_KEYBOARD);
-        g_LastRegisteredRawInputWindow = nullptr;
-    }
-
-    if (options["disable_input_alt"] && ImGui::GetIO().WantCaptureKeyboard)
-    {
-        g_players = get_players();
-        for (auto player : g_players)
-        {
-            player->more_flags |= 1U << 15;
-        }
-        if (g_state != 0)
-            g_state->hud_flags &= ~(1U << 19);
-        register_keys_alt = ImGui::GetFrameCount() + ImGui::GetIO().Framerate / 10;
-    }
-    else if (!ImGui::GetIO().WantCaptureKeyboard && register_keys_alt && ImGui::GetFrameCount() > register_keys_alt)
-    {
-        register_keys_alt = 0;
-        for (auto player : g_players)
-        {
-            player->more_flags &= ~(1U << 15);
-        }
-        if (g_state != 0 && !options["disable_pause"])
-            g_state->hud_flags |= 1U << 19;
-    }
-}
-
-void post_draw()
-{
     update_players();
     force_zoom();
     force_hud_flags();
@@ -3653,6 +3545,5 @@ void init_ui()
     register_on_input(&process_keys);
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
-    register_imgui_post_draw(&imgui_post_draw);
     register_post_draw(&post_draw);
 }

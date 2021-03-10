@@ -27,9 +27,52 @@ ResizeBuffersPtr g_OrigSwapChainResizeBuffers{ nullptr };
 OnInputCallback g_OnInputCallback{ nullptr };
 ImguiInitCallback g_ImguiInitCallback{ nullptr };
 ImguiDrawCallback g_ImguiDrawCallback{ nullptr };
-ImguiPostDrawCallback g_ImguiPostDrawCallback{ nullptr };
 PreDrawCallback g_PreDrawCallback{ nullptr };
 PostDrawCallback g_PostDrawCallback{ nullptr };
+
+constexpr USHORT g_HidKeyboard = 6;
+HWND g_LastRegisteredRawInputWindow{ nullptr };
+
+HWND HID_GetRegisteredDeviceWindow(USHORT usage)
+{
+    constexpr UINT max_raw_devices = 3;
+    RAWINPUTDEVICE raw_devices[max_raw_devices];
+    UINT num_raw_devices = max_raw_devices;
+    UINT num_registered_raw_devices = GetRegisteredRawInputDevices(raw_devices, &num_raw_devices, sizeof(RAWINPUTDEVICE));
+    if (num_registered_raw_devices > 0)
+    {
+        for (UINT i = 0; i < num_registered_raw_devices; i++)
+        {
+            if (raw_devices[i].usUsage == usage)
+            {
+                return raw_devices[i].hwndTarget;
+            }
+        }
+    }
+    return nullptr;
+}
+
+bool HID_RegisterDevice(HWND hTarget, USHORT usage)
+{
+    RAWINPUTDEVICE hid;
+    hid.usUsagePage = 1;
+    hid.usUsage = usage;
+    hid.dwFlags = RIDEV_DEVNOTIFY | RIDEV_INPUTSINK;
+    hid.hwndTarget = hTarget;
+
+    return RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
+}
+
+bool HID_UnregisterDevice(USHORT usage)
+{
+    RAWINPUTDEVICE hid;
+    hid.usUsagePage = 1;
+    hid.usUsage = usage;
+    hid.dwFlags = RIDEV_REMOVE;
+    hid.hwndTarget = NULL;
+
+    return RegisterRawInputDevices(&hid, 1, sizeof(RAWINPUTDEVICE));
+}
 
 LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -120,13 +163,31 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterva
     }
 
     ImGui::Render();
-
-    if (g_ImguiPostDrawCallback)
-    {
-        g_ImguiPostDrawCallback();
-    }
-
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+    {
+        if (ImGui::GetIO().WantCaptureKeyboard)
+        {
+            if (HWND window = HID_GetRegisteredDeviceWindow(g_HidKeyboard))
+            {
+                g_LastRegisteredRawInputWindow = window;
+                HID_UnregisterDevice(g_HidKeyboard);
+            }
+        }
+        else if (g_LastRegisteredRawInputWindow != nullptr)
+        {
+            static std::uint32_t s_RecoverRawInputFrame{ 0 };
+            if (s_RecoverRawInputFrame == 0)
+            {
+                s_RecoverRawInputFrame = ImGui::GetFrameCount() + 10;
+            }
+            else if (ImGui::GetFrameCount() > s_RecoverRawInputFrame)
+            {
+                HID_RegisterDevice(g_LastRegisteredRawInputWindow, g_HidKeyboard);
+                g_LastRegisteredRawInputWindow = nullptr;
+            }
+        }
+    }
 
     if (g_PostDrawCallback)
     {
@@ -194,10 +255,6 @@ void register_imgui_init(ImguiInitCallback imgui_init)
 void register_imgui_draw(ImguiDrawCallback imgui_draw)
 {
     g_ImguiDrawCallback = imgui_draw;
-}
-void register_imgui_post_draw(ImguiPostDrawCallback imgui_post_draw)
-{
-    g_ImguiPostDrawCallback = imgui_post_draw;
 }
 void register_pre_draw(PreDrawCallback pre_draw)
 {
