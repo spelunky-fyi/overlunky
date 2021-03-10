@@ -991,7 +991,7 @@ ImVec2 screenify(ImVec2 pos)
         bar.y = (res.y - res.x / 16 * 9) / 2;
         res.y = res.x / 16 * 9;
     }
-    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (pos.y / (1.0 / (res.y / 2)) + res.y / 2 + bar.y));
+    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (res.y/2*pos.y) - res.y/2 + bar.y);
     return screened;
 }
 

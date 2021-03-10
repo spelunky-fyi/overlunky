@@ -149,7 +149,7 @@ StateMemory *State::ptr() const
 
 std::pair<float, float> State::click_position(float x, float y)
 {
-    uint8_t screen = ptr()->screen_next;
+    uint8_t screen = ptr()->screen;
     float cz = read_f32(get_zoom());
     if (screen < 12 || screen == 13 || screen > 14)
         cz = 13.5;
@@ -162,7 +162,7 @@ std::pair<float, float> State::click_position(float x, float y)
 
 std::pair<float, float> State::screen_position(float x, float y)
 {
-    uint8_t screen = ptr()->screen_next;
+    uint8_t screen = ptr()->screen;
     float cz = read_f32(get_zoom());
     if (screen < 12 || screen == 13 || screen > 14)
         cz = 13.5;
