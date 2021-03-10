@@ -152,9 +152,10 @@ set_callback(function()
     if state.screen ~= 12 then return end
     if state.level == 98 then return end
     if state.time_level < 30 then
-        draw_rect_filled(-1, 1, 1, -1, 0, rgba(0, 0, 0, 255))
-    elseif state.time_level <= 45 then
-        draw_rect_filled(-1, 1, 1, -1, 0, rgba(0, 0, 0, math.floor(255*(45-state.time_level)/45)))
+        draw_rect_filled(-1, 1, 1, -1, 0, rgba(0, 0, 0, 245))
+    elseif state.time_level <= 40 then
+        alpha = 245 - math.floor((state.time_level - 30) / 10 * 245)
+        draw_rect_filled(-1, 1, 1, -1, 0, rgba(0, 0, 0, alpha))
     end
 end, ON.GUIFRAME)
 
