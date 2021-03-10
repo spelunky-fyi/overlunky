@@ -177,3 +177,16 @@ float State::get_zoom_level()
 {
     return read_f32(get_zoom());
 }
+
+std::pair<float, float> State::get_camera_position()
+{
+    float cx = read_f32(get_camera());
+    float cy = read_f32(get_camera() + 4);
+    return {cx, cy};
+}
+
+void State::set_camera_position(float cx, float cy)
+{
+    write_mem_prot(get_camera(), to_le_bytes(cx), true);
+    write_mem_prot(get_camera() + 4, to_le_bytes(cy), true);
+}

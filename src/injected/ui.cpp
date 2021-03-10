@@ -1124,8 +1124,10 @@ void force_noclip()
             {
                 auto cpos = player->position();
                 fix_co_coordinates(cpos);
-                if (cpos.first != player->position().first || cpos.second != player->position().second)
+                if (cpos.first != player->position().first || cpos.second != player->position().second) {
                     move_entity_abs(player->uid, cpos.first, cpos.second, player->velocityx, player->velocityy);
+                    set_camera_position(cpos.first, cpos.second);
+                }
             }
         }
     }
@@ -2214,10 +2216,14 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(io.MousePos);
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
+            std::pair<float, float> campos = get_camera_position();
             ImDrawList *dl = ImGui::GetBackgroundDrawList();
             char buf[32];
-            sprintf(buf, "%0.2f, %0.2f", cpos.first, cpos.second);
+            sprintf(buf, "Cursor: %0.2f, %0.2f", cpos.first, cpos.second);
+            char buf2[32];
+            sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
             dl->AddText(ImVec2(io.MousePos.x+16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
+            dl->AddText(ImVec2(io.MousePos.x+16, io.MousePos.y+16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
         }
     }
     if (options["draw_hitboxes"] && update_entity())
@@ -2282,6 +2288,7 @@ void render_clickhandler()
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             move_entity_abs(g_players.at(0)->uid, cpos.first, cpos.second, g_vx, g_vy);
+            set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
             g_vx = 0;

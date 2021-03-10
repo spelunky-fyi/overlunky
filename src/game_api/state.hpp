@@ -205,4 +205,7 @@ struct State
             return nullptr;
         return it->second;
     }
+
+    std::pair<float, float> get_camera_position();
+    void set_camera_position(float cx, float cy);
 };

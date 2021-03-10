@@ -286,9 +286,8 @@ Flip entity around by uid. All new entities face right by default.
 Calculate the tile distance of two entities by uid
 ### `get_bounds`
 #### Returns: `float`, `float`, `float`, `float`
-Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be inside these boundaries.
-The order is: top left x, top left y, bottom right x, bottom right y
-Example:
+Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
+inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
 ```
 -- Draw the level boundaries
 set_callback(function()
@@ -298,6 +297,13 @@ set_callback(function()
     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
 end, ON.GUIFRAME)
 ```
+### `get_camera_position`
+#### Returns: `pair<float, float>`
+Gets the current camera position in the level
+### `set_camera_position`
+#### Params: `float cx, float cy`
+Sets the current camera position in the level.
+Note: The camera will still try to follow the player and this doesn't actually work at all.
 ### `set_flag`
 #### Params: `int flags, int bit`
 Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.

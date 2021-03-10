@@ -66,6 +66,7 @@ function teleport_mount(ent, x, y)
     else
         move_entity(ent.uid, x, y, 0, 0)
     end
+    --set_camera_position(x, y)
 end
 
 set_callback(function()

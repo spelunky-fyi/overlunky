@@ -349,6 +349,11 @@ Script::Script(std::string script, std::string file, bool enable)
     /// end, ON.GUIFRAME)
     /// ```
     lua["get_bounds"] = [this]() { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
+    /// Gets the current camera position in the level
+    lua["get_camera_position"] = get_camera_position;
+    /// Sets the current camera position in the level.
+    /// Note: The camera will still try to follow the player and this doesn't actually work at all.
+    lua["set_camera_position"] = set_camera_position;
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["set_flag"] = [](uint32_t flags, int bit) { return flags | (1U << (bit - 1)); };
