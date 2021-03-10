@@ -107,7 +107,7 @@ set_callback(function()
             door(x, y, l, nextworld, nextlevel, nexttheme)
             unlock_door_at(x, y)
         end
-        
+
         if state.theme == THEME.HUNDUN then
             elev = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
             for i,v in ipairs(elev) do
@@ -128,7 +128,7 @@ set_callback(function()
     players[1].more_flags = set_flag(players[1].more_flags, 16)
     set_timeout(function()
         players[1].flags = clr_flag(players[1].flags, 6)
-    end, 90)
+    end, 120)
 
 end, ON.LEVEL)
 
@@ -147,6 +147,15 @@ set_callback(function()
         spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, 0, 0, LAYER.PLAYER1, 0, 0)
     end
 end, ON.START)
+
+set_callback(function()
+    if state.screen ~= 12 then return end
+    if state.time_level < 30 then
+        draw_rect_filled(-1, 1, 1, -1, 0, rgba(0, 0, 0, 255))
+    elseif state.time_level <= 45 then
+        draw_rect_filled(-1, 1, 1, -1, 0, rgba(0, 0, 0, math.floor(255*(45-state.time_level)/45)))
+    end
+end, ON.GUIFRAME)
 
 set_callback(init, ON.CAMP)
 set_callback(init, ON.RESET)

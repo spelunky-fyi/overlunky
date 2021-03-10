@@ -379,6 +379,12 @@ Script::Script(std::string script, std::string file, bool enable)
         ImVec2 b = screenify({x2, y2});
         drawlist->AddRect(a, b, color, rounding, 15, thickness);
     };
+    /// Draws rectangle on screen from top-left to bottom-right.
+    lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color) {
+        ImVec2 a = screenify({x1, y1});
+        ImVec2 b = screenify({x2, y2});
+        drawlist->AddRectFilled(a, b, color, rounding, 15);
+    };
     /// Draws a circle on screen
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
         ImVec2 a = screenify({x, y});

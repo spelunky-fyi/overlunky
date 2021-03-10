@@ -325,6 +325,9 @@ Draws a line on screen
 ### `draw_rect`
 #### Params: `float x1, float y1, float x2, float y2, float thickness, float rounding, int color`
 Draws rectangle on screen from top-left to bottom-right.
+### `draw_rect_filled`
+#### Params: `float x1, float y1, float x2, float y2, float rounding, int color`
+Draws rectangle on screen from top-left to bottom-right.
 ### `draw_circle`
 #### Params: `float x, float y, float radius, float thickness, int color`
 Draws a circle on screen
