@@ -9,6 +9,7 @@
 #include "render_api.hpp"
 #include "state.hpp"
 #include "ui.hpp"
+#include "window_api.hpp"
 
 using namespace std::chrono_literals;
 
@@ -52,7 +53,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
         fclose(fp);
     }
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
-    auto state = State::get();
+
     while (true) {
         auto entities = list_entities();
         if (entities.size() >= 850) {
@@ -68,9 +69,10 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
     }
 
     auto api = RenderAPI::get();
-    init_hooks(api.swap_chain());
+    init_ui();
+    init_hooks((void*)api.swap_chain());
+    DEBUG("Running in debug mode.");
     do {
-        DEBUG("Running in debug mode.");
         std::string line;
         std::getline(std::cin, line);
         if (std::cin.fail() || std::cin.eof())
