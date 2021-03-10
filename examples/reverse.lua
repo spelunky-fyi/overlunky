@@ -66,16 +66,17 @@ function teleport_mount(ent, x, y)
     else
         move_entity(ent.uid, x, y, 0, 0)
     end
+    ent.more_flags = clr_flag(ent.more_flags, 16)
     --set_camera_position(x, y)
 end
 
 set_callback(function()
     if state.level == 98 then return end
 
-    timeout = 10
-    if state.theme == THEME.ICE_CAVES then -- stupid ice caves crashes sometimes when you try fiddling with stuff immediately
+    timeout = 15
+    --[[if state.theme == THEME.ICE_CAVES then -- stupid ice caves crashes sometimes when you try fiddling with stuff immediately
         timeout = 15
-    end
+    end]]--
 
     set_timeout(function()
         exits = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
@@ -106,14 +107,14 @@ set_callback(function()
             door(x, y, l, nextworld, nextlevel, nexttheme)
             unlock_door_at(x, y)
         end
-    end, timeout)
-
-    if state.theme == THEME.HUNDUN then
-        elev = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
-        for i,v in ipairs(elev) do
-            kill_entity(v)
+        
+        if state.theme == THEME.HUNDUN then
+            elev = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
+            for i,v in ipairs(elev) do
+                kill_entity(v)
+            end
         end
-    end
+    end, timeout)
 
     if state.theme == THEME.OLMEC then
         set_interval(olmec_exit, 15)
@@ -124,9 +125,10 @@ set_callback(function()
     end
 
     players[1].flags = set_flag(players[1].flags, 6)
+    players[1].more_flags = set_flag(players[1].more_flags, 16)
     set_timeout(function()
         players[1].flags = clr_flag(players[1].flags, 6)
-    end, 60)
+    end, 90)
 
 end, ON.LEVEL)
 
