@@ -84,6 +84,7 @@ set_callback(function()
         x, y, l = get_position(exits[1])
         if state.theme == THEME.TIAMAT then
             x, y, l = get_position(layerdoors[1])
+            kill_entity(layerdoors[1])
         end
         for i,player in ipairs(players) do
             teleport_mount(player, x, y)
@@ -125,7 +126,7 @@ set_callback(function()
     players[1].flags = set_flag(players[1].flags, 6)
     set_timeout(function()
         players[1].flags = clr_flag(players[1].flags, 6)
-    end, 45)
+    end, 60)
 
 end, ON.LEVEL)
 
