@@ -31,8 +31,27 @@ std::map<std::string, Script *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
-const USHORT HID_MOUSE = 2;
 const USHORT HID_KEYBOARD = 6;
+HWND g_LastRegisteredRawInputWindow{ nullptr };
+
+HWND HID_GetRegisteredDeviceWindow(USHORT usage)
+{
+    constexpr UINT max_raw_devices = 3;
+    RAWINPUTDEVICE raw_devices[max_raw_devices];
+    UINT num_raw_devices = max_raw_devices;
+    UINT num_registered_raw_devices = GetRegisteredRawInputDevices(raw_devices, &num_raw_devices, sizeof(RAWINPUTDEVICE));
+    if (num_registered_raw_devices > 0)
+    {
+        for (UINT i = 0; i < num_registered_raw_devices; i++)
+        {
+            if (raw_devices[i].usUsage == usage)
+            {
+                return raw_devices[i].hwndTarget;
+            }
+        }
+    }
+    return nullptr;
+}
 
 bool HID_RegisterDevice(HWND hTarget, USHORT usage)
 {
@@ -158,7 +177,7 @@ std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
-     file_written = false, show_debug = false, throw_held = false, paused = false, capture_last = false, capture_last_alt = false,
+     file_written = false, show_debug = false, throw_held = false, paused = false, capture_last_alt = false,
      show_app_metrics = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
      freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false;
 Player *g_entity = 0;
@@ -3546,50 +3565,28 @@ void imgui_post_draw()
     if (!file_written)
         write_file();
 
-    if (options["disable_input"] && capture_last == false && ImGui::GetIO().WantCaptureKeyboard)
-    {
-        HID_RegisterDevice(get_window(), HID_KEYBOARD);
-        capture_last = true;
-    }
-    else if (capture_last == true && !ImGui::GetIO().WantCaptureKeyboard)
-    {
-        capture_last = false;
-        register_keys = ImGui::GetFrameCount() + 10;
-    }
-    else if (register_keys && ImGui::GetFrameCount() > register_keys)
-    {
-        register_keys = 0;
-        auto find_top_level_window = [](DWORD pid) -> HWND
+    if (options["disable_input"]) {
+        if (ImGui::GetIO().WantCaptureKeyboard)
         {
-            std::pair<HWND, DWORD> params = { 0, pid };
-
-            // Enumerate the windows using a lambda to process each window
-            BOOL bResult = EnumWindows(
-                [](HWND hwnd, LPARAM lParam) -> BOOL {
-                auto pParams = (std::pair<HWND, DWORD>*)(lParam);
-
-                DWORD processId;
-                if (GetWindowThreadProcessId(hwnd, &processId) && processId == pParams->second && hwnd != get_window())
-                {
-                    // Stop enumerating
-                    SetLastError(-1);
-                    pParams->first = hwnd;
-                    return FALSE;
-                }
-
-                // Continue enumerating
-                return TRUE;
-            },
-                (LPARAM)&params);
-
-            if (!bResult && GetLastError() == -1 && params.first)
+            if (HWND window = HID_GetRegisteredDeviceWindow(HID_KEYBOARD))
             {
-                return params.first;
+                g_LastRegisteredRawInputWindow = window;
+                HID_UnregisterDevice(HID_KEYBOARD);
             }
-
-            return nullptr;
-        };
-        HID_RegisterDevice(find_top_level_window(GetCurrentProcessId()), HID_KEYBOARD);
+        }
+        else if (register_keys == 0)
+        {
+            register_keys = ImGui::GetFrameCount() + 10;
+        }
+        else if (ImGui::GetFrameCount() > register_keys) {
+            HID_RegisterDevice(g_LastRegisteredRawInputWindow, HID_KEYBOARD);
+            g_LastRegisteredRawInputWindow = nullptr;
+        }
+    }
+    else if (g_LastRegisteredRawInputWindow != nullptr)
+    {
+        HID_RegisterDevice(g_LastRegisteredRawInputWindow, HID_KEYBOARD);
+        g_LastRegisteredRawInputWindow = nullptr;
     }
 
     if (options["disable_input_alt"] && ImGui::GetIO().WantCaptureKeyboard)
