@@ -7,7 +7,7 @@
 
 const float ZF = 0.737;
 
-class Layer;
+struct Layer;
 
 struct StateMemory
 {

@@ -1,5 +1,4 @@
 add_library(injected SHARED
-        script.cpp script.hpp
         ui.cpp ui.hpp
         main.cpp)
 target_link_libraries(injected
@@ -7,12 +6,10 @@ target_link_libraries(injected
         game_api
         imgui
         toml11::toml11
-        sol2::sol2
-        ${LUA_LIBRARIES}
         Shlwapi)
 target_include_directories(injected PRIVATE
         ${LUA_INCLUDE_DIRS})
 
 if (MSVC)
-        add_definitions(/bigobj)
+        target_compile_options(injected PRIVATE /bigobj)
 endif()

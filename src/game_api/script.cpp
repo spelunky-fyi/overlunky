@@ -4,8 +4,51 @@
 #include "rpc.hpp"
 #include "state.hpp"
 
+#include <regex>
+#include <algorithm>
+#include <array>
+#include <codecvt>
+#include <fstream>
+#include <iomanip>
+#include <locale>
+#include <map>
+
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
+
+struct IntervalCallback
+{
+    sol::function func;
+    int interval;
+    int lastRan;
+};
+
+struct TimeoutCallback
+{
+    sol::function func;
+    int timeout;
+};
+
+struct ScreenCallback
+{
+    sol::function func;
+    int screen;
+    int lastRan;
+};
+
+struct ScriptState
+{
+    Player* player;
+    uint32_t screen;
+    uint32_t time_level;
+    uint32_t time_total;
+    uint32_t frame;
+    uint32_t loading;
+    uint32_t reset;
+    uint32_t quest_flags;
+};
+
+using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 
 using Toast = void (*)(void *, wchar_t *);
 Toast get_toast()
@@ -35,10 +78,93 @@ void infinite_loop(lua_State* argst, lua_Debug * argdb) {
     luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
 };
 
-Script::Script(std::string script, std::string file, bool enable)
+Movable* get_entity(uint32_t id)
+{
+    return (Movable*)get_entity_ptr(id);
+}
+
+std::tuple<float, float, int> get_position(uint32_t id)
+{
+    Entity* ent = get_entity_ptr(id);
+    if (ent)
+        return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
+    return { 0.0f, 0.0f, 0 };
+}
+
+float screenify(float dis)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    return dis / (1.0 / (res.x / 2));
+}
+
+ImVec2 screenify(ImVec2 pos)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    ImVec2 bar = { 0.0, 0.0 };
+    if (res.x / res.y > 1.78)
+    {
+        bar.x = (res.x - res.y / 9 * 16) / 2;
+        res.x = res.y / 9 * 16;
+    }
+    else if (res.x / res.y < 1.77)
+    {
+        bar.y = (res.y - res.x / 16 * 9) / 2;
+        res.y = res.x / 16 * 9;
+    }
+    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (res.y / 2 * pos.y) - res.y / 2 + bar.y);
+    return screened;
+}
+
+std::string sanitize(std::string data)
+{
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::regex reg("[^a-z/]*");
+    data = std::regex_replace(data, reg, "");
+    return data;
+}
+
+class Script::ScriptImpl
+{
+public:
+    sol::state lua;
+
+    char code[204800];
+    std::string result = "";
+    ScriptState state = { nullptr, 0, 0, 0, 0, 0, 0, 0 };
+    bool changed = true;
+    bool enabled = true;
+    ScriptMeta meta = { "", "", "", "", "" };
+    int cbcount = 0;
+    ImDrawList* drawlist;
+
+    std::map<std::string, ScriptOption> options;
+    std::deque<ScriptMessage> messages;
+    std::map<int, Callback> level_timers;
+    std::map<int, Callback> global_timers;
+    std::map<int, Callback> callbacks;
+    std::vector<int> clear_callbacks;
+    std::vector<std::string> requires;
+
+    StateMemory* g_state = nullptr;
+    std::vector<EntityItem> g_items;
+    std::vector<Player*> g_players;
+
+    ScriptImpl(std::string script, std::string file, bool enable = true);
+    ~ScriptImpl() = default;
+
+    std::string script_id();
+    bool handle_function(sol::function func);
+
+    bool run(ImDrawList* dl);
+    void render_options();
+};
+
+Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable)
 {
     strcpy(code, script.data());
-    meta.file = file;
+    meta.file = std::move(file);
     enabled = enable;
 
     g_state = get_state_ptr();
@@ -695,7 +821,7 @@ Script::Script(std::string script, std::string file, bool enable)
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
 }
 
-bool Script::run(ImDrawList *dl)
+bool Script::ScriptImpl::run(ImDrawList *dl)
 {
     if (!enabled)
         return true;
@@ -961,60 +1087,13 @@ bool Script::run(ImDrawList *dl)
     return true;
 }
 
-Movable *get_entity(uint32_t id)
-{
-    return (Movable *)get_entity_ptr(id);
-}
-
-std::tuple<float, float, int> get_position(uint32_t id)
-{
-    Entity *ent = get_entity_ptr(id);
-    if (ent)
-        return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
-    return {0.0f, 0.0f, 0};
-}
-
-float screenify(float dis)
-{
-    ImGuiIO &io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
-    return dis / (1.0 / (res.x / 2));
-}
-
-ImVec2 screenify(ImVec2 pos)
-{
-    ImGuiIO &io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
-    ImVec2 bar = {0.0, 0.0};
-    if (res.x / res.y > 1.78)
-    {
-        bar.x = (res.x - res.y / 9 * 16) / 2;
-        res.x = res.y / 9 * 16;
-    }
-    else if (res.x / res.y < 1.77)
-    {
-        bar.y = (res.y - res.x / 16 * 9) / 2;
-        res.y = res.x / 16 * 9;
-    }
-    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (res.y/2*pos.y) - res.y/2 + bar.y);
-    return screened;
-}
-
-std::string sanitize(std::string data)
-{
-    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return std::tolower(c); });
-    std::regex reg("[^a-z/]*");
-    data = std::regex_replace(data, reg, "");
-    return data;
-}
-
-std::string Script::script_id()
+std::string Script::ScriptImpl::script_id()
 {
     std::string newid = sanitize(meta.author) + "/" + sanitize(meta.name);
     return newid;
 }
 
-bool Script::handle_function(sol::function func)
+bool Script::ScriptImpl::handle_function(sol::function func)
 {
     auto lua_result = func();
     if (!lua_result.valid())
@@ -1024,4 +1103,121 @@ bool Script::handle_function(sol::function func)
         return false;
     }
     return true;
+}
+
+void Script::ScriptImpl::render_options()
+{
+    for (auto& option : options)
+    {
+        if (int* val = std::get_if<int>(&option.second.value))
+        {
+            int min = std::get<int>(option.second.min);
+            int max = std::get<int>(option.second.max);
+            if (ImGui::DragInt(option.second.desc.data(), val, 0.5f, min, max))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val;
+            }
+        }
+        else if (float* val = std::get_if<float>(&option.second.value))
+        {
+            float min = std::get<float>(option.second.min);
+            float max = std::get<float>(option.second.max);
+            if (ImGui::DragFloat(option.second.desc.data(), val, 0.05f, min, max))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val;
+            }
+        }
+        else if (bool* val = std::get_if<bool>(&option.second.value))
+        {
+            if (ImGui::Checkbox(option.second.desc.data(), val))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val;
+            }
+        }
+    }
+}
+
+
+Script::Script(std::string script, std::string file, bool enable)
+    : m_Impl{ new ScriptImpl(std::move(script), std::move(file), enable) }
+{
+}
+Script::~Script() = default; // Has to be in the source file
+
+std::deque<ScriptMessage>& Script::get_messages()
+{
+    return m_Impl->messages;
+}
+std::vector<std::string> Script::consume_requires()
+{
+    return std::move(m_Impl->requires);
+}
+
+const std::string& Script::get_id() const
+{
+    return m_Impl->meta.id;
+}
+const std::string& Script::get_name() const
+{
+    return m_Impl->meta.name;
+}
+const std::string& Script::get_description() const
+{
+    return m_Impl->meta.description;
+}
+const std::string& Script::get_author() const
+{
+    return m_Impl->meta.author;
+}
+const std::string& Script::get_file() const
+{
+    return m_Impl->meta.file;
+}
+const std::string& Script::get_version() const
+{
+    return m_Impl->meta.version;
+}
+
+char* Script::get_code() const
+{
+    return m_Impl->code;
+}
+std::size_t Script::get_code_size() const
+{
+    return sizeof(m_Impl->code);
+}
+
+std::string& Script::get_result()
+{
+    return m_Impl->result;
+}
+
+bool Script::is_enabled() const
+{
+    return m_Impl->enabled;
+}
+void Script::set_enabled(bool enabled)
+{
+    m_Impl->enabled = enabled;
+}
+
+bool Script::is_changed() const
+{
+    return m_Impl->changed;
+}
+void Script::set_changed(bool changed)
+{
+    m_Impl->changed = changed;
+}
+
+bool Script::run(ImDrawList* dl)
+{
+    return m_Impl->run(dl);
+}
+void Script::render_options()
+{
+    m_Impl->render_options();
 }
