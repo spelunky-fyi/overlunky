@@ -1847,12 +1847,16 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
 {
     if (IsBadReadPtr(ent, 0x178))
         return;
-    if (!ent->items.empty())
+    if (ent->items.count > 0)
     {
         int *pitems = (int *)ent->items.begin;
         for (int i = 0; i < ent->items.count; i++)
         {
-            render_hitbox(entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
+            int type = entity_type(pitems[i]);
+            if (type == 0)
+                continue;
+            if (entity_names[type].find("FX") == std::string::npos)
+                render_hitbox(entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
         }
     }
     const int type = entity_type(ent->uid);
@@ -2058,9 +2062,21 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto test : get_entities_by(0, 255, -1))
+        for (auto entity : get_entities_by(0, 255, -1))
         {
-            render_hitbox(entity_ptr(test), false, ImColor(0, 255, 255, 150));
+            int type = entity_type(entity);
+            if (type == 0)
+                continue;
+            if (entity_names[type].find("FX") == std::string::npos)
+                render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
+        }
+        for (auto entity : get_entities_by(0, 0x100, -1))
+        {
+            int type = entity_type(entity);
+            if (type == 0)
+                continue;
+            if (entity_names[type].find("TRAP") != std::string::npos)
+                render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
         }
         g_players = get_players();
         for (auto player : g_players)
@@ -2564,7 +2580,7 @@ void render_uid(int uid, const char *section, bool rembtn = false)
     char uidc[32];
     itoa(uid, uidc, 10);
     int ptype = entity_type(uid);
-    if (ptype == 648 || ptype == 0)
+    if (ptype == 0)
         return;
     char typec[32];
     itoa(ptype, typec, 10);
