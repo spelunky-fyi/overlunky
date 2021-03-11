@@ -27,3 +27,7 @@ target_link_libraries(game_api PRIVATE
         shared
         sol2::sol2
         ${LUA_LIBRARIES})
+
+if (MSVC)
+        target_compile_options(game_api PRIVATE /bigobj)
+endif()

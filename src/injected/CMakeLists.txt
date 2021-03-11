@@ -11,5 +11,5 @@ target_include_directories(injected PRIVATE
         ${LUA_INCLUDE_DIRS})
 
 if (MSVC)
-        add_definitions(/bigobj)
+        target_compile_options(injected PRIVATE /bigobj)
 endif()
