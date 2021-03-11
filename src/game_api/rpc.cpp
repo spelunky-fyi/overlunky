@@ -618,7 +618,7 @@ bool entity_has_item_type(uint32_t id, uint32_t type)
     Entity *entity = get_entity_ptr(id);
     if (entity == nullptr)
         return false;
-    if (!entity->items.empty())
+    if (entity->items.count > 0)
     {
         int *pitems = (int *)entity->items.begin;
         for (int i = 0; i < entity->items.count; i++)
