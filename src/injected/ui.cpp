@@ -486,7 +486,7 @@ void load_script(std::string file, bool enable = true)
         if (slash != std::string::npos)
             file = file.substr(slash + 1);
         Script *script = new Script(buf.str(), file, enable);
-        g_scripts[script->meta.id] = script;
+        g_scripts[script->get_id()] = script;
         data.close();
     }
 }
@@ -583,19 +583,18 @@ void require_scripts()
     for (auto it : g_scripts)
     {
         Script *script = it.second;
-        if (!script->enabled)
+        if (!script->is_enabled())
             continue;
-        for (auto req : script->requires)
+        for (auto req : script->consume_requires())
         {
             auto reqit = g_scripts.find(req);
             if (reqit != g_scripts.end())
             {
-                if(!reqit->second->enabled)
-                    reqit->second->changed = true;
-                reqit->second->enabled = true;
+                if(!reqit->second->is_enabled())
+                    reqit->second->set_changed(true);
+                reqit->second->set_enabled(true);
             }
         }
-        script->requires.clear();
     }
 }
 
@@ -1886,20 +1885,19 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
 
 void render_script(Script *script)
 {
-    if (!script->enabled) return;
+    if (!script->is_enabled()) return;
     auto *draw_list = ImGui::GetBackgroundDrawList();
     script->run(draw_list);
-    for (auto req : script->requires)
+    for (auto req : script->consume_requires())
     {
         auto reqit = g_scripts.find(req);
         if (reqit != g_scripts.end())
         {
-            if(!reqit->second->enabled)
-                reqit->second->changed = true;
-            reqit->second->enabled = true;
+            if(!reqit->second->is_enabled())
+                reqit->second->set_changed(true);
+            reqit->second->set_enabled(true);
         }
     }
-    script->requires.clear();
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -1934,41 +1932,6 @@ void set_vel(ImVec2 pos)
     g_vy = 2 * (g_vy - g_y) * 0.5625;
 }
 
-void render_script_options(Script *script)
-{
-    for (auto &option : script->options)
-    {
-        if (int *val = std::get_if<int>(&option.second.value))
-        {
-            int min = std::get<int>(option.second.min);
-            int max = std::get<int>(option.second.max);
-            if (ImGui::DragInt(option.second.desc.data(), val, 0.5f, min, max))
-            {
-                option.second.value = *val;
-                script->lua["options"][option.first] = *val;
-            }
-        }
-        else if (float *val = std::get_if<float>(&option.second.value))
-        {
-            float min = std::get<float>(option.second.min);
-            float max = std::get<float>(option.second.max);
-            if (ImGui::DragFloat(option.second.desc.data(), val, 0.05f, min, max))
-            {
-                option.second.value = *val;
-                script->lua["options"][option.first] = *val;
-            }
-        }
-        else if (bool *val = std::get_if<bool>(&option.second.value))
-        {
-            if (ImGui::Checkbox(option.second.desc.data(), val))
-            {
-                option.second.value = *val;
-                script->lua["options"][option.first] = *val;
-            }
-        }
-    }
-}
-
 void render_messages(Script *script)
 {
     auto now = std::chrono::system_clock::now();
@@ -1982,12 +1945,12 @@ void render_messages(Script *script)
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     using namespace std::chrono_literals;
     ImGui::PushFont(bigfont);
-    for (auto message : script->messages)
+    for (auto message : script->get_messages())
     {
-        if (now - 10s > message.second)
+        if (now - 10s > message.time)
             continue;
-        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.second).count() / 10000.0f;
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->meta.name.data(), message.first.data());
+        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.time).count() / 10000.0f;
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->get_name(), message.message.data());
     }
     ImGui::PopFont();
     ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
@@ -2002,11 +1965,11 @@ void render_messages()
     std::vector<Message> queue;
     for (auto script : g_scripts)
     {
-        for (auto message : script.second->messages)
+        for (auto message : script.second->get_messages())
         {
-            if (now - 10s > message.second)
+            if (now - 10s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script.second->meta.name, message.first, message.second));
+            queue.push_back(std::make_tuple(script.second->get_name(), message.message, message.time));
         }
     }
     ImGuiIO &io = ImGui::GetIO();
@@ -2464,7 +2427,7 @@ void render_script_files()
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
             "Script", true);
-        g_scripts[script->meta.id] = script;
+        g_scripts[script->get_id()] = script;
     }
     ImGui::PopID();
 }
@@ -2489,8 +2452,8 @@ void render_scripts()
         ImGui::PushID(i);
         Script *script = it.second;
         char name[255];
-        sprintf(name, "%s (%s)", script->meta.name.data(), script->meta.file.data());
-        if (!script->enabled)
+        sprintf(name, "%s (%s)", script->get_name().c_str(), script->get_file().c_str());
+        if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
         }
@@ -2500,34 +2463,34 @@ void render_scripts()
         }
         if (ImGui::CollapsingHeader(name))
         {
-            ImGui::Text("%s %s by %s (%s)", script->meta.name.data(), script->meta.version.data(), script->meta.author.data(), script->meta.id.data());
-            ImGui::TextWrapped(script->meta.description.data());
-            if (script->enabled && ImGui::Button("Disable##DisableScript"))
+            ImGui::Text("%s %s by %s (%s)", script->get_name(), script->get_version().c_str(), script->get_author().c_str(), script->get_id().c_str());
+            ImGui::TextWrapped(script->get_description().c_str());
+            if (script->is_enabled() && ImGui::Button("Disable##DisableScript"))
             {
-                script->enabled = false;
+                script->set_enabled(false);
             }
-            else if (!script->enabled && ImGui::Button("Enable##EnableScript"))
+            else if (!script->is_enabled() && ImGui::Button("Enable##EnableScript"))
             {
-                script->enabled = true;
-                script->changed = true;
+                script->set_enabled(true);
+                script->set_changed(true);
             }
             ImGui::SameLine();
             if (ImGui::Button("Unload##UnloadScript"))
             {
-                unload_scripts.push_back(script->meta.id);
+                unload_scripts.push_back(script->get_id());
             }
             else
             {
                 ++i;
             }
             ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-            render_script_options(script);
+            script->render_options();
             ImGui::PopItemWidth();
-            if (ImGui::InputTextMultiline("##LuaScript", script->code, sizeof(script->code), {-1, 300}))
+            if (ImGui::InputTextMultiline("##LuaScript", script->get_code(), script->get_code_size(), {-1, 300}))
             {
-                script->changed = true;
+                script->set_changed(true);
             }
-            InputString("##LuaResult", &script->result, ImGuiInputTextFlags_ReadOnly);
+            InputString("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
         }
         else
         {
