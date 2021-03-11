@@ -1950,7 +1950,7 @@ void render_messages(Script *script)
         if (now - 10s > message.time)
             continue;
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.time).count() / 10000.0f;
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->get_name(), message.message.data());
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->get_name().c_str(), message.message.c_str());
     }
     ImGui::PopFont();
     ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
@@ -2463,7 +2463,7 @@ void render_scripts()
         }
         if (ImGui::CollapsingHeader(name))
         {
-            ImGui::Text("%s %s by %s (%s)", script->get_name(), script->get_version().c_str(), script->get_author().c_str(), script->get_id().c_str());
+            ImGui::Text("%s %s by %s (%s)", script->get_name().c_str(), script->get_version().c_str(), script->get_author().c_str(), script->get_id().c_str());
             ImGui::TextWrapped(script->get_description().c_str());
             if (script->is_enabled() && ImGui::Button("Disable##DisableScript"))
             {
