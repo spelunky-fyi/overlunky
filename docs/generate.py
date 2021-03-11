@@ -1,7 +1,7 @@
 import re
 
-header_files = ['../src/game_api/rpc.hpp', '../src/injected/script.hpp', '../src/game_api/entity.hpp']
-api_files = ['../src/injected/script.cpp']
+header_files = ['../src/game_api/rpc.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
+api_files = ['../src/game_api/script.cpp']
 rpc = []
 events = []
 funcs = []
@@ -199,7 +199,7 @@ for lf in funcs:
             print(('#### ' if com.startswith('Returns:') else '')+com)
 
 print('## Types')
-print('Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [.hpp files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They\'re mostly just ints and floats. Example:')
+print('Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They\'re mostly just ints and floats. Example:')
 print("""```
 -- This doesn't make any sense, as you could just access the variables directly from players[]
 -- It's just a weird example OK!

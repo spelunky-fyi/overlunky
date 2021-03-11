@@ -241,8 +241,6 @@ Translate an entity position to screen position to be used in drawing functions
 #### Returns: `float`
 Translate a distance of `x` tiles to screen distance to be be used in drawing functions
 ### `get_position`
-#### Params: `int id`
-#### Returns: `tuple<float, float, int>`
 Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
 you're standing on, not real level coordinates.
 ### `entity_remove_item`
@@ -338,7 +336,7 @@ Draws a filled circle on screen
 #### Params: `float x, float y, string text, int color`
 Draws text on screen
 ## Types
-Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [.hpp files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
+Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
 ```
 -- This doesn't make any sense, as you could just access the variables directly from players[]
 -- It's just a weird example OK!
