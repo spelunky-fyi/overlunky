@@ -71,31 +71,27 @@ Lua scripting is buggy and unfinished and the **API will change**, so don't go a
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
+    + Try the WHIP build, it might have already fixed the problem.
   - If your game **crashes** when actually trying to use the tools:
     + See previous section.
     + Some entities just crash the game, try to avoid them next time.
+    + Some scripts just crash the game too, the api is not very safe.
   - If your game **crashes** and you're using **Modlunky2 or Playlunky**:
     + While we try to keep all the modding tools compatible, some things may break sometimes.
     + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
-  - If you're **missing** some overlay **windows**:
+  - If you're **missing** some overlay **windows** or tabs:
     + Try resetting window positions. (See hotkeys above.)
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
+    + Maybe the overlay is just really tiny? You can resize it.
   - If you mess up your **keyboard shortcuts** or UI:
     + Delete `Spelunky 2/overlunky.ini`.
   - If **keyboard input** no longer works in game after using the tools:
-    + Try switching to the `alternative disable input mode` in options, save options and restart the game. Don't use them both at the same time, unless that works for you.
-    + Make sure you're using **borderless / windowed** mode with the `Disable game keys when typing (rawinput)` option enabled, it doesn't work in fullscreen.
-    + Restart the game after changing graphics modes.
-    + Try Alt+Tabbing to restore input.
-    + Magically learn to play with a gamepad instead.
-    + If nothing else works, disable the `Disable game keys when typing` options and suffer.
+    + This shouldn't be a problem anymore in 0.4.8+. File an issue if this still happens.
   - If your UI is all black or you want to change the color
     + Change the color then. The [keyboard shortcuts](#features) are right there.
   - If stuff just don't work and you're running **Windows 7** or a machine not designed to play games
     + You're on your own here. We don't test on or make this for ancient software/hardware.
   - If you have problems with **OBS**
-    + Game capture seems to interfere with the disable input features, so try fiddling with those if you have problems.
-    + Game capture in windowed/borderless is probably still your best bet.
     + Apparently some people are getting lag, crashes or a completely black UI, but I can't fix problems I don't have.
     + Check previous question.
   - If you're running **Linux**
@@ -103,12 +99,8 @@ Lua scripting is buggy and unfinished and the **API will change**, so don't go a
     + Also works with Proton 5.13 if you first start the game on Steam and then run `STEAM_COMPAT_DATA_PATH=~/.steam/steam/steamapps/compatdata/418530 WINEPREFIX=~/.steam/steam/steamapps/compatdata/418530/pfx ~/.steam/root/steamapps/common/Proton\ 5.13/proton run ~/.steam/steam/steamapps/common/Spelunky\ 2/Overlunky/Overlunky.exe` adjusting the paths for your setup.
     + Put the Segoe UI ttf files to your wineprefixes Windows/Fonts to show the ui correctly.
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
-  - If you don't see the **Scripts tab**
-    + Did you even open it? The [keyboard shortcuts](#features) are right there.
   - If you **don't have scripts** in the Scripts tab
     + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).
-  - If you can't **hide script messages**
-    + Still can't read can you... Just look at the Scripts tab, there are buttons and stuff.
 
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
