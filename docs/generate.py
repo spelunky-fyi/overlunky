@@ -152,6 +152,7 @@ for file in api_files:
 print('# Overlunky Lua API')
 print('- Everything here is still changing, don\'t be sad if your scripts break next week!')
 print('- This doc doesn\'t have a lot of examples, that\'s why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).')
+print('- This doc and the examples are written for a person who already knows [how to program in Lua](http://lua-users.org/wiki/TutorialDirectory).')
 print('- This doc is up to date for the [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip). If you\'re using an official release from the past, you might find some things here don\'t work.')
 print('- You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md).')
 
