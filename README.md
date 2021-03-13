@@ -92,8 +92,8 @@ Lua scripting is buggy and unfinished and the **API will change**, so don't go a
   - If stuff just don't work and you're running **Windows 7** or a machine not designed to play games
     + You're on your own here. We don't test on or make this for ancient software/hardware.
   - If you have problems with **OBS**
-    + Apparently some people are getting lag, crashes or a completely black UI, but I can't fix problems I don't have.
-    + Check previous question.
+    + Use *Game Capture* and disable *Allow Transparency* if Overlunky looks weird/black.
+    + If you have lag or crashes, check previous question.
   - If you're running **Linux**
     + The game and OL should run fine with the latest Wine if you install DXVK.
     + Also works with Proton 5.13 if you first start the game on Steam and then run `STEAM_COMPAT_DATA_PATH=~/.steam/steam/steamapps/compatdata/418530 WINEPREFIX=~/.steam/steam/steamapps/compatdata/418530/pfx ~/.steam/root/steamapps/common/Proton\ 5.13/proton run ~/.steam/steam/steamapps/common/Spelunky\ 2/Overlunky/Overlunky.exe` adjusting the paths for your setup.
