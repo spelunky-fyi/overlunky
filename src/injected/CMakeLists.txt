@@ -3,7 +3,7 @@ add_library(injected SHARED
         main.cpp)
 target_link_libraries(injected
         shared
-        game_api
+        spel2_api
         imgui
         toml11::toml11
         Shlwapi)

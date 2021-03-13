@@ -1,13 +1,11 @@
 #include <cstdint>
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
 #include <Windows.h>
 
 bool init_hooks(void* swap_chain_ptr);
 
 using OnInputCallback = bool(*)(UINT, WPARAM, LPARAM);
-using ImguiInitCallback = void(*)();
+using ImguiInitCallback = void(*)(struct ImGuiContext*);
 using ImguiDrawCallback = void(*)();
 using PreDrawCallback = void(*)();
 using PostDrawCallback = void(*)();

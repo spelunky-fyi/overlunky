@@ -3212,7 +3212,7 @@ void render_tool(std::string tool)
         render_debug();
 }
 
-void imgui_init() {
+void imgui_init(ImGuiContext*) {
     ImGuiIO& io = ImGui::GetIO();
     io.FontAllowUserScaling = true;
     PWSTR fontdir;
