@@ -115,7 +115,7 @@ class Player : public Monster
 class Container : public Movable
 {
   public:
-    int32_t inside;
+    int64_t inside;
     int32_t timer;
 };
 
