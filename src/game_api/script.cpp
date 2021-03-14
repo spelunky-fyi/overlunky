@@ -125,7 +125,7 @@ std::string sanitize(std::string data)
     return data;
 }
 
-class Script::ScriptImpl
+class SpelunkyScript::ScriptImpl
 {
 public:
     sol::state lua;
@@ -161,7 +161,7 @@ public:
     void render_options();
 };
 
-Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable)
+SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable)
 {
     strcpy(code, script.data());
     meta.file = std::move(file);
@@ -225,7 +225,7 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
         meta.id = script_id();
         result = "Got metadata";
     }
-    catch (const sol::error &e)
+    catch (const sol::error& e)
     {
         result = e.what();
     }
@@ -239,17 +239,17 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
     /// ```
     lua["state"] = g_state;
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
-    lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
+    lua["players"] = std::vector<Movable*>(g_players.begin(), g_players.end());
     /// Print a log message on screen.
     lua["message"] = [this](std::string message) {
-        messages.push_back({message, std::chrono::system_clock::now()});
+        messages.push_back({ message, std::chrono::system_clock::now() });
         if (messages.size() > 20)
             messages.pop_front();
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` game frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames) {
-        auto luaCb = IntervalCallback{cb, frames, -1};
+        auto luaCb = IntervalCallback{ cb, frames, -1 };
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
@@ -257,14 +257,14 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
     /// Add per level callback function to be called after `frames` frames. Timer is paused on pause and cleared on level transition.
     lua["set_timeout"] = [this](sol::function cb, int frames) {
         int now = g_state->time_level;
-        auto luaCb = TimeoutCallback{cb, now + frames};
+        auto luaCb = TimeoutCallback{ cb, now + frames };
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called every `frames` frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [this](sol::function cb, int frames) {
-        auto luaCb = IntervalCallback{cb, frames, -1};
+        auto luaCb = IntervalCallback{ cb, frames, -1 };
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
@@ -272,14 +272,14 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
     /// Add global callback function to be called after `frames` frames. This timer is never paused or cleared.
     lua["set_global_timeout"] = [this](sol::function cb, int frames) {
         int now = get_frame_count();
-        auto luaCb = TimeoutCallback{cb, now + frames};
+        auto luaCb = TimeoutCallback{ cb, now + frames };
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called on an [event](#on).
     lua["set_callback"] = [this](sol::function cb, int screen) {
-        auto luaCb = ScreenCallback{cb, screen, -1};
+        auto luaCb = ScreenCallback{ cb, screen, -1 };
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
@@ -304,17 +304,17 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
-        options[name] = {desc, value, min, max};
+        options[name] = { desc, value, min, max };
         lua["options"][name] = value;
     };
     /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_float"] = [this](std::string name, std::string desc, float value, float min, float max) {
-        options[name] = {desc, value, min, max};
+        options[name] = { desc, value, min, max };
         lua["options"][name] = value;
     };
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_bool"] = [this](std::string name, std::string desc, bool value) {
-        options[name] = {desc, value, 0, 0};
+        options[name] = { desc, value, 0, 0 };
         lua["options"][name] = value;
     };
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
@@ -455,8 +455,8 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
     lua["flip_entity"] = flip_entity;
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
-        Entity *ea = get_entity_ptr(a);
-        Entity *eb = get_entity_ptr(b);
+        Entity* ea = get_entity_ptr(a);
+        Entity* eb = get_entity_ptr(b);
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
@@ -495,35 +495,35 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
     lua["rgba"] = [](int r, int g, int b, int a) { return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r); };
     /// Draws a line on screen
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
-        ImVec2 a = screenify({x1, y1});
-        ImVec2 b = screenify({x2, y2});
+        ImVec2 a = screenify({ x1, y1 });
+        ImVec2 b = screenify({ x2, y2 });
         drawlist->AddLine(a, b, color, thickness);
     };
     /// Draws a rectangle on screen from top-left to bottom-right.
     lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color) {
-        ImVec2 a = screenify({x1, y1});
-        ImVec2 b = screenify({x2, y2});
+        ImVec2 a = screenify({ x1, y1 });
+        ImVec2 b = screenify({ x2, y2 });
         drawlist->AddRect(a, b, color, rounding, 15, thickness);
     };
     /// Draws a filled rectangle on screen from top-left to bottom-right.
     lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color) {
-        ImVec2 a = screenify({x1, y1});
-        ImVec2 b = screenify({x2, y2});
+        ImVec2 a = screenify({ x1, y1 });
+        ImVec2 b = screenify({ x2, y2 });
         drawlist->AddRectFilled(a, b, color, rounding, 15);
     };
     /// Draws a circle on screen
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
-        ImVec2 a = screenify({x, y});
+        ImVec2 a = screenify({ x, y });
         drawlist->AddCircle(a, screenify(radius), color, 0, thickness);
     };
     /// Draws a filled circle on screen
     lua["draw_circle_filled"] = [this](float x, float y, float radius, ImU32 color) {
-        ImVec2 a = screenify({x, y});
+        ImVec2 a = screenify({ x, y });
         drawlist->AddCircleFilled(a, screenify(radius), color, 0);
     };
     /// Draws text on screen
     lua["draw_text"] = [this](float x, float y, std::string text, ImU32 color) {
-        ImVec2 a = screenify({x, y});
+        ImVec2 a = screenify({ x, y });
         drawlist->AddText(a, color, text.data());
     };
 
@@ -821,7 +821,7 @@ Script::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
 }
 
-bool Script::ScriptImpl::run(ImDrawList *dl)
+bool SpelunkyScript::ScriptImpl::run(ImDrawList* dl)
 {
     if (!enabled)
         return true;
@@ -851,7 +851,7 @@ bool Script::ScriptImpl::run(ImDrawList *dl)
             auto lua_result = lua.safe_script(code);
             result = "OK";
         }
-        catch (const sol::error &e)
+        catch (const sol::error& e)
         {
             result = e.what();
             return false;
@@ -892,7 +892,7 @@ bool Script::ScriptImpl::run(ImDrawList *dl)
         /// Runs on any [screen change](#on).
         sol::optional<sol::function> on_screen = lua["on_screen"];
         g_players = get_players();
-        lua["players"] = std::vector<Player *>(g_players.begin(), g_players.end());
+        lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
         if (g_state->screen != state.screen || (!g_players.empty() && state.player != g_players.at(0)))
         {
             level_timers.clear();
@@ -1079,7 +1079,7 @@ bool Script::ScriptImpl::run(ImDrawList *dl)
         state.reset = (g_state->quest_flags & 1);
         state.quest_flags = g_state->quest_flags;
     }
-    catch (const sol::error &e)
+    catch (const sol::error& e)
     {
         result = e.what();
         return false;
@@ -1087,13 +1087,13 @@ bool Script::ScriptImpl::run(ImDrawList *dl)
     return true;
 }
 
-std::string Script::ScriptImpl::script_id()
+std::string SpelunkyScript::ScriptImpl::script_id()
 {
     std::string newid = sanitize(meta.author) + "/" + sanitize(meta.name);
     return newid;
 }
 
-bool Script::ScriptImpl::handle_function(sol::function func)
+bool SpelunkyScript::ScriptImpl::handle_function(sol::function func)
 {
     auto lua_result = func();
     if (!lua_result.valid())
@@ -1105,7 +1105,7 @@ bool Script::ScriptImpl::handle_function(sol::function func)
     return true;
 }
 
-void Script::ScriptImpl::render_options()
+void SpelunkyScript::ScriptImpl::render_options()
 {
     for (auto& option : options)
     {
@@ -1141,83 +1141,83 @@ void Script::ScriptImpl::render_options()
 }
 
 
-Script::Script(std::string script, std::string file, bool enable)
+SpelunkyScript::SpelunkyScript(std::string script, std::string file, bool enable)
     : m_Impl{ new ScriptImpl(std::move(script), std::move(file), enable) }
 {
 }
-Script::~Script() = default; // Has to be in the source file
+SpelunkyScript::~SpelunkyScript() = default; // Has to be in the source file
 
-std::deque<ScriptMessage>& Script::get_messages()
+std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 {
     return m_Impl->messages;
 }
-std::vector<std::string> Script::consume_requires()
+std::vector<std::string> SpelunkyScript::consume_requires()
 {
     return std::move(m_Impl->requires);
 }
 
-const std::string& Script::get_id() const
+const std::string& SpelunkyScript::get_id() const
 {
     return m_Impl->meta.id;
 }
-const std::string& Script::get_name() const
+const std::string& SpelunkyScript::get_name() const
 {
     return m_Impl->meta.name;
 }
-const std::string& Script::get_description() const
+const std::string& SpelunkyScript::get_description() const
 {
     return m_Impl->meta.description;
 }
-const std::string& Script::get_author() const
+const std::string& SpelunkyScript::get_author() const
 {
     return m_Impl->meta.author;
 }
-const std::string& Script::get_file() const
+const std::string& SpelunkyScript::get_file() const
 {
     return m_Impl->meta.file;
 }
-const std::string& Script::get_version() const
+const std::string& SpelunkyScript::get_version() const
 {
     return m_Impl->meta.version;
 }
 
-char* Script::get_code() const
+char* SpelunkyScript::get_code() const
 {
     return m_Impl->code;
 }
-std::size_t Script::get_code_size() const
+std::size_t SpelunkyScript::get_code_size() const
 {
     return sizeof(m_Impl->code);
 }
 
-std::string& Script::get_result()
+std::string& SpelunkyScript::get_result()
 {
     return m_Impl->result;
 }
 
-bool Script::is_enabled() const
+bool SpelunkyScript::is_enabled() const
 {
     return m_Impl->enabled;
 }
-void Script::set_enabled(bool enabled)
+void SpelunkyScript::set_enabled(bool enabled)
 {
     m_Impl->enabled = enabled;
 }
 
-bool Script::is_changed() const
+bool SpelunkyScript::is_changed() const
 {
     return m_Impl->changed;
 }
-void Script::set_changed(bool changed)
+void SpelunkyScript::set_changed(bool changed)
 {
     m_Impl->changed = changed;
 }
 
-bool Script::run(ImDrawList* dl)
+bool SpelunkyScript::run(ImDrawList * dl)
 {
     return m_Impl->run(dl);
 }
-void Script::render_options()
+void SpelunkyScript::render_options()
 {
     m_Impl->render_options();
 }

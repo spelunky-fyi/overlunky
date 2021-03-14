@@ -36,11 +36,11 @@ struct ScriptMessage
     std::chrono::time_point<std::chrono::system_clock> time;
 };
 
-class Script
+class SpelunkyScript
 {
 public:
-    Script(std::string script, std::string file, bool enable = true);
-    ~Script();
+    SpelunkyScript(std::string script, std::string file, bool enable = true);
+    ~SpelunkyScript();
 
     std::deque<ScriptMessage>& get_messages();
     std::vector<std::string> consume_requires();
