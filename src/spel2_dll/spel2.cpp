@@ -1,6 +1,7 @@
 #include "spel2.h"
 
 #include "window_api.hpp"
+#include "script.hpp"
 
 #include <imgui.h>
 
@@ -28,4 +29,61 @@ void RegisterPreDrawFunc(PreDrawFunc pre_draw)
 void RegisterPostDrawFunc(PostDrawFunc post_draw)
 {
     register_post_draw(post_draw);
+}
+
+SpelunkyScript* CreateScript(const char* file_path, bool enabled)
+{
+	FILE* file{ nullptr };
+	auto error = fopen_s(&file, file_path, "rb");
+	if (error == 0 && file != nullptr) {
+		struct CloseFileOnScopeExit {
+			~CloseFileOnScopeExit() { fclose(File); }
+			FILE* File;
+		};
+		auto close_file = CloseFileOnScopeExit{ file };
+
+		fseek(file, 0, SEEK_END);
+		const std::size_t file_size = ftell(file);
+		fseek(file, 0, SEEK_SET);
+
+		std::string code(file_size + 1, '\0');
+
+		const auto size_read = fread(code.data(), 1, file_size, file);
+		if (size_read != file_size) {
+			return nullptr;
+		}
+
+		return new SpelunkyScript(std::move(code), file_path, enabled);
+	}
+    return nullptr;
+}
+void FreeScript(SpelunkyScript* script)
+{
+    delete script;
+}
+
+bool SpelunkyScipt_IsEnabled(SpelunkyScript* script)
+{
+	return script->is_enabled();
+}
+void SpelunkyScipt_SetEnabled(SpelunkyScript* script, bool enabled)
+{
+	script->set_enabled(enabled);
+}
+
+void SpelunkyScript_Update(SpelunkyScript* script)
+{
+	script->run();
+}
+void SpelunkyScript_Draw(SpelunkyScript* script, struct ImDrawList* draw_list)
+{
+	script->draw(draw_list);
+}
+void SpelunkyScript_DrawOptions(SpelunkyScript* script)
+{
+	script->render_options();
+}
+const char* SpelunkyScript_GetResult(SpelunkyScript* script)
+{
+	return script->get_result().c_str();
 }
