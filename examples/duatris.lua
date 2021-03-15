@@ -43,7 +43,12 @@ local keystate = {
     DOWN = false
 }
 
-local down_start = 0
+local keystart = {
+    LEFT = 0,
+    RIGHT = 0,
+    UP = 0,
+    DOWN = 0
+}
 local down_sent = false
 
 local orig_shapes = {{{0, 1, 0}, {1, 1, 1}}, {{0, 1, 1}, {1, 1, 0}}, {{1, 1, 0}, {0, 1, 1}}, {{1, 1, 1, 1}},
@@ -144,25 +149,41 @@ function get_button()
     if players[1].movex == 0 then
         keystate.LEFT = false
         keystate.RIGHT = false
+        keystart.LEFT = 0
+        keystart.RIGHT = 0
     end
     if players[1].movey == 0 then
         keystate.UP = false
         keystate.DOWN = false
+        keystart.UP = 0
+        keystart.DOWN = 0
         down_sent = false
     end
     if not keystate.LEFT and players[1].movex < 0 then
         keystate.LEFT = true
+        keystart.LEFT = get_frame()
         return keys.LEFT
     elseif not keystate.RIGHT and players[1].movex > 0 then
         keystate.RIGHT = true
+        keystart.RIGHT = get_frame()
         return keys.RIGHT
     elseif not keystate.UP and players[1].movey > 0 then
         keystate.UP = true
+        keystart.UP = get_frame()
         return keys.UP
     elseif not keystate.DOWN and players[1].movey < 0 then
         keystate.DOWN = true
-        down_start = get_frame()
-    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= down_start + 15 then
+        keystart.DOWN = get_frame()
+    elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 then
+        keystart.LEFT = get_frame()-10
+        return keys.LEFT
+    elseif keystate.RIGHT and players[1].movex > 0 and get_frame() >= keystart.RIGHT + 15 then
+        keystart.RIGHT = get_frame()-10
+        return keys.RIGHT
+    elseif keystate.UP and players[1].movey > 0 and get_frame() >= keystart.UP + 15 then
+        keystart.UP = get_frame()-10
+        return keys.UP
+    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= keystart.DOWN + 15 then
         down_sent = true
         return keys.DOWN
     end
