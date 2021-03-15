@@ -135,6 +135,7 @@ function init()
 end
 
 function get_button()
+    if #players < 1 then return nil end
     if players[1].movex == 0 then
         keystate.LEFT = false
         keystate.RIGHT = false
