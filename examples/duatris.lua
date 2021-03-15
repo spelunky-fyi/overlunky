@@ -1,6 +1,6 @@
 meta.name = 'Duatris'
 meta.version = 'WIP'
-meta.description = 'How about a nice game of Duatris? Use directions to move, hold down to drop. Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
+meta.description = 'How about a nice game of Duatris? Use directions to move, hold down to drop. Hold door button to stay still. Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
 register_option_int('baserate', 'Base fall rate (frames)', 60, 1, 180)
@@ -25,9 +25,11 @@ small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER,
             ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_GRUB, ENT_TYPE.MONS_JUMPDOG, ENT_TYPE.MONS_SCARAB,
             ENT_TYPE.MONS_LEPRECHAUN}
 
-generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
+generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
+              ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG}
 
-loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PRESENT}
+loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_PICKUP_PLAYERBAG,
+           ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_PASTE}
 
 local keys = {
     LEFT = 1,
@@ -84,6 +86,7 @@ function init()
     shapes = {}
     moving_piece = {}
     crates = {}
+    players[1].type.max_speed = 0.0725
 
     -- Set up the shapes table.
     for s_index, s in ipairs(orig_shapes) do
@@ -145,7 +148,14 @@ function init()
 end
 
 function get_button()
-    if #players < 1 then return nil end
+    if #players < 1 then
+        return nil
+    end
+    if test_flag(players[1].buttons, 6) and players[1].standing_on_uid > 0 then
+        players[1].type.max_speed = 0
+    else
+        players[1].type.max_speed = 0.0725
+    end
     if players[1].movex == 0 then
         keystate.LEFT = false
         keystate.RIGHT = false
@@ -175,13 +185,13 @@ function get_button()
         keystate.DOWN = true
         keystart.DOWN = get_frame()
     elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 then
-        keystart.LEFT = get_frame()-10
+        keystart.LEFT = get_frame() - 10
         return keys.LEFT
     elseif keystate.RIGHT and players[1].movex > 0 and get_frame() >= keystart.RIGHT + 15 then
-        keystart.RIGHT = get_frame()-10
+        keystart.RIGHT = get_frame() - 10
         return keys.RIGHT
     elseif keystate.UP and players[1].movey > 0 and get_frame() >= keystart.UP + 15 then
-        keystart.UP = get_frame()-10
+        keystart.UP = get_frame() - 10
         return keys.UP
     elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= keystart.DOWN + 15 then
         down_sent = true
@@ -267,7 +277,7 @@ function update_moving_piece(fall, next_piece)
     py = math.max(math.floor(124 - cy) - 12, 1)
     moving_piece = {
         shape = math.random(#shapes),
-        rot_num = 1,
+        rot_num = math.random(1, 4),
         x = px,
         y = py
     }
@@ -438,8 +448,7 @@ function clear_stage()
         spawn(ENT_TYPE.ITEM_PICKUP_SPIKESHOES, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, x, y, l, 0, 0)
     end
-    -- cy = y - 3.5
-    -- spawn(ENT_TYPE.MONS_APEP_HEAD, -1, cy, LAYER.FRONT, 0, 0)
+    spawn(ENT_TYPE.ITEM_PICKUP_BOMBBAG, x, y, l, 0, 0) -- get bombs anyway so you don't get stuck
     cy = y + 4.5
     n = 1
     clearint = set_interval(function()
@@ -469,13 +478,13 @@ function clear_stage()
                 return
             end
             for ci = 1, options.crates, 1 do
-                h = math.floor(124 - board_size.y / (options.crates+1) * ci)
+                h = math.floor(124 - board_size.y / (options.crates + 1) * ci)
                 if ply > h and not crates[h] then
                     crates[h] = true
                     xmin, ymin, xmax, ymax = get_bounds()
                     rx = math.random(math.floor(xmin), math.floor(xmax))
                     id = loot_to[math.random(#loot_to)]
-                    spawn(id, rx, 107, LAYER.FRONT, math.random()-0.5, 0)
+                    spawn(id, rx, 107, LAYER.FRONT, math.random() - 0.5, 0)
                 end
             end
         end, ON.FRAME)
