@@ -1,5 +1,6 @@
 #include "script.hpp"
 #include "entity.hpp"
+#include "draw_queue.hpp"
 #include "logger.h"
 #include "rpc.hpp"
 #include "state.hpp"
@@ -137,7 +138,6 @@ public:
     bool enabled = true;
     ScriptMeta meta = { "", "", "", "", "" };
     int cbcount = 0;
-    ImDrawList* drawlist;
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
@@ -145,7 +145,8 @@ public:
     std::map<int, Callback> global_timers;
     std::map<int, Callback> callbacks;
     std::vector<int> clear_callbacks;
-    std::vector<std::string> requires;
+    std::vector<std::string> required_scripts;
+    DrawQueue draw_queue;
 
     StateMemory* g_state = nullptr;
     std::vector<EntityItem> g_items;
@@ -157,7 +158,8 @@ public:
     std::string script_id();
     bool handle_function(sol::function func);
 
-    bool run(ImDrawList* dl);
+    bool run();
+    void draw(ImDrawList* dl);
     void render_options();
 };
 
@@ -288,7 +290,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
-    lua["require"] = [this](std::string id) { requires.push_back(sanitize(id)); };
+    lua["require"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message) {
         auto toast = get_toast();
@@ -497,34 +499,34 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        drawlist->AddLine(a, b, color, thickness);
+        draw_queue.queue_line(a, b, thickness, color);
     };
     /// Draws a rectangle on screen from top-left to bottom-right.
     lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        drawlist->AddRect(a, b, color, rounding, 15, thickness);
+        draw_queue.queue_rect(a, b, thickness, rounding, color);
     };
     /// Draws a filled rectangle on screen from top-left to bottom-right.
     lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        drawlist->AddRectFilled(a, b, color, rounding, 15);
+        draw_queue.queue_rect_filled(a, b, color, rounding);
     };
     /// Draws a circle on screen
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        drawlist->AddCircle(a, screenify(radius), color, 0, thickness);
+        draw_queue.queue_circle(a, screenify(radius), thickness, color);
     };
     /// Draws a filled circle on screen
     lua["draw_circle_filled"] = [this](float x, float y, float radius, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        drawlist->AddCircleFilled(a, screenify(radius), color, 0);
+        draw_queue.queue_circle_filled(a, screenify(radius), color);
     };
     /// Draws text on screen
     lua["draw_text"] = [this](float x, float y, std::string text, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        drawlist->AddText(a, color, text.data());
+        draw_queue.queue_text(a, std::move(text), color);
     };
 
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
@@ -821,7 +823,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
 }
 
-bool SpelunkyScript::ScriptImpl::run(ImDrawList* dl)
+bool SpelunkyScript::ScriptImpl::run()
 {
     if (!enabled)
         return true;
@@ -838,7 +840,7 @@ bool SpelunkyScript::ScriptImpl::run(ImDrawList* dl)
             global_timers.clear();
             callbacks.clear();
             options.clear();
-            requires.clear();
+            required_scripts.clear();
             lua["on_guiframe"] = sol::lua_nil;
             lua["on_frame"] = sol::lua_nil;
             lua["on_camp"] = sol::lua_nil;
@@ -861,7 +863,6 @@ bool SpelunkyScript::ScriptImpl::run(ImDrawList* dl)
     {
         lua_sethook(lua.lua_state(), NULL, 0, 0);
         lua_sethook(lua.lua_state(), &infinite_loop, LUA_MASKCOUNT, 1000000000);
-        drawlist = dl;
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
@@ -1087,6 +1088,12 @@ bool SpelunkyScript::ScriptImpl::run(ImDrawList* dl)
     return true;
 }
 
+void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
+{
+    draw_queue.draw(dl);
+    draw_queue.clear();
+}
+
 std::string SpelunkyScript::ScriptImpl::script_id()
 {
     std::string newid = sanitize(meta.author) + "/" + sanitize(meta.name);
@@ -1153,7 +1160,7 @@ std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 }
 std::vector<std::string> SpelunkyScript::consume_requires()
 {
-    return std::move(m_Impl->requires);
+    return std::move(m_Impl->required_scripts);
 }
 
 const std::string& SpelunkyScript::get_id() const
@@ -1213,9 +1220,13 @@ void SpelunkyScript::set_changed(bool changed)
     m_Impl->changed = changed;
 }
 
-bool SpelunkyScript::run(ImDrawList * dl)
+bool SpelunkyScript::run()
 {
-    return m_Impl->run(dl);
+    return m_Impl->run();
+}
+void SpelunkyScript::draw(ImDrawList* dl)
+{
+    m_Impl->draw(dl);
 }
 void SpelunkyScript::render_options()
 {

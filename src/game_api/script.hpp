@@ -63,7 +63,8 @@ public:
     bool is_changed() const;
     void set_changed(bool changed);
 
-    bool run(ImDrawList *dl);
+    bool run();
+    void draw(ImDrawList *dl);
     void render_options();
 
 private:

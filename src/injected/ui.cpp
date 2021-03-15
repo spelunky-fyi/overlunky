@@ -1,5 +1,3 @@
-#define NOMINMAX
-
 #include "ui.hpp"
 
 #include <ShlObj.h>
@@ -1887,11 +1885,9 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
     draw_list->AddLine(sboxd, sboxa, color, 2);
 }
 
-void render_script(SpelunkyScript *script)
+void fix_script_requires(SpelunkyScript* script)
 {
     if (!script->is_enabled()) return;
-    auto *draw_list = ImGui::GetBackgroundDrawList();
-    script->run(draw_list);
     for (auto req : script->consume_requires())
     {
         auto reqit = g_scripts.find(req);
@@ -1902,6 +1898,18 @@ void render_script(SpelunkyScript *script)
             reqit->second->set_enabled(true);
         }
     }
+}
+
+void update_script(SpelunkyScript* script)
+{
+    if (!script->is_enabled()) return;
+    script->run();
+}
+
+void render_script(SpelunkyScript *script, ImDrawList* draw_list)
+{
+    if (!script->is_enabled()) return;
+    script->draw(draw_list);
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -2066,7 +2074,13 @@ void render_clickhandler()
     }
     for (auto script : g_scripts)
     {
-        render_script(script.second);
+        fix_script_requires(script.second);
+    }
+    auto* draw_list = ImGui::GetBackgroundDrawList();
+    for (auto script : g_scripts)
+    {
+        update_script(script.second);
+        render_script(script.second, draw_list);
     }
     //require_scripts();
     if (options["mouse_control"])

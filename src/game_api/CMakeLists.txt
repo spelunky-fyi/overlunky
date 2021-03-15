@@ -19,7 +19,9 @@ add_library(spel2_api STATIC
         window_api.cpp
         window_api.hpp
         script.cpp
-        script.hpp)
+        script.hpp
+        draw_queue.cpp
+        draw_queue.hpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
         imgui)
