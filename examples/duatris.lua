@@ -3,11 +3,12 @@ meta.version = 'WIP'
 meta.description = 'How about a nice game of Duatris? Use directions to move, hold down to drop. Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
+register_option_int('baserate', 'Base fall rate (frames)', 60, 1, 180)
+register_option_int('crates', 'Spawn lootboxes', 8, 0, 30)
 register_option_bool('enemies', 'Spawn enemies on blocks', true)
 register_option_int('enemychance', "Enemy chance (percent)", 50, 1, 100)
 register_option_bool('traps', 'Spawn traps on blocks', true)
 register_option_int('trapschance', "Trap chance (percent)", 10, 1, 100)
-register_option_int('baserate', 'Base fall rate (frames)', 60, 1, 180)
 register_option_bool('wgoodies', 'Get some goodies at start (for cheating)', false)
 register_option_bool('whole', 'Draw whole stage (for debugging)', false)
 
@@ -25,6 +26,8 @@ small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER,
             ENT_TYPE.MONS_LEPRECHAUN}
 
 generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
+
+loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PRESENT}
 
 local keys = {
     LEFT = 1,
@@ -68,12 +71,14 @@ local moving_piece = {} -- Keys will be: shape, rot_num, x, y.
 
 local guicall = -1
 local framecall = -1
+local crates = {}
 
 function init()
     game_state = 'playing'
     board = {}
     shapes = {}
     moving_piece = {}
+    crates = {}
 
     -- Set up the shapes table.
     for s_index, s in ipairs(orig_shapes) do
@@ -441,6 +446,16 @@ function clear_stage()
             if ply > 107 then
                 game_over()
                 return
+            end
+            for ci = 1, options.crates, 1 do
+                h = math.floor(124 - board_size.y / (options.crates+1) * ci)
+                if ply > h and not crates[h] then
+                    crates[h] = true
+                    xmin, ymin, xmax, ymax = get_bounds()
+                    rx = math.random(math.floor(xmin), math.floor(xmax))
+                    id = loot_to[math.random(#loot_to)]
+                    spawn(id, rx, 107, LAYER.FRONT, math.random()-0.5, 0)
+                end
             end
         end, ON.FRAME)
     end, 3 * 60)
