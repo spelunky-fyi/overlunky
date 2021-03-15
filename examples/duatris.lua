@@ -5,6 +5,7 @@ meta.author = 'Dregu'
 
 register_option_int('baserate', 'Base fall rate (frames)', 60, 1, 180)
 register_option_int('crates', 'Spawn lootboxes', 8, 0, 30)
+register_option_bool('door', 'Only move pieces when holding door button', true)
 register_option_bool('enemies', 'Spawn enemies on blocks', true)
 register_option_int('enemychance', "Enemy chance (percent)", 50, 1, 100)
 register_option_bool('traps', 'Spawn traps on blocks', true)
@@ -169,31 +170,31 @@ function get_button()
         keystart.DOWN = 0
         down_sent = false
     end
-    if not keystate.LEFT and players[1].movex < 0 then
+    if not keystate.LEFT and players[1].movex < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.LEFT = true
         keystart.LEFT = get_frame()
         return keys.LEFT
-    elseif not keystate.RIGHT and players[1].movex > 0 then
+    elseif not keystate.RIGHT and players[1].movex > 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.RIGHT = true
         keystart.RIGHT = get_frame()
         return keys.RIGHT
-    elseif not keystate.UP and players[1].movey > 0 then
+    elseif not keystate.UP and players[1].movey > 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.UP = true
         keystart.UP = get_frame()
         return keys.UP
-    elseif not keystate.DOWN and players[1].movey < 0 then
+    elseif not keystate.DOWN and players[1].movey < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.DOWN = true
         keystart.DOWN = get_frame()
-    elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 then
+    elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.LEFT = get_frame() - 10
         return keys.LEFT
-    elseif keystate.RIGHT and players[1].movex > 0 and get_frame() >= keystart.RIGHT + 15 then
+    elseif keystate.RIGHT and players[1].movex > 0 and get_frame() >= keystart.RIGHT + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.RIGHT = get_frame() - 10
         return keys.RIGHT
-    elseif keystate.UP and players[1].movey > 0 and get_frame() >= keystart.UP + 15 then
+    elseif keystate.UP and players[1].movey > 0 and get_frame() >= keystart.UP + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.UP = get_frame() - 10
         return keys.UP
-    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= keystart.DOWN + 15 then
+    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= keystart.DOWN + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
         down_sent = true
         return keys.DOWN
     end
