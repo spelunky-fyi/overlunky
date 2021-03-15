@@ -27,10 +27,10 @@ small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER,
             ENT_TYPE.MONS_LEPRECHAUN}
 
 generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
-              ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG}
+              ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.FLOOR_QUICKSAND}
 
 loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_PICKUP_PLAYERBAG,
-           ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_PASTE}
+           ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PRESENT}
 
 local keys = {
     LEFT = 1,
@@ -297,7 +297,6 @@ function lock_and_update_moving_piece(fall, next_piece)
     level_to_board(false)
     call_fn_for_xy_in_piece(moving_piece, function(x, y, c)
         board[x][y] = moving_piece.shape -- Lock the moving piece in place.
-        
         gx = x + 2
         gy = 124 - y
         id = colors[moving_piece.shape][2]
@@ -479,13 +478,14 @@ function clear_stage()
                 return
             end
             for ci = 1, options.crates, 1 do
-                h = math.floor(124 - board_size.y / (options.crates + 1) * ci)
+                h = math.floor(104 - (board_size.y - 20) / (options.crates + 1) * ci)
                 if ply > h and not crates[h] then
                     crates[h] = true
                     xmin, ymin, xmax, ymax = get_bounds()
                     rx = math.random(math.floor(xmin), math.floor(xmax))
                     id = loot_to[math.random(#loot_to)]
                     spawn(id, rx, 107, LAYER.FRONT, math.random() - 0.5, 0)
+                    toast('FREE LOOT!')
                 end
             end
         end, ON.FRAME)
