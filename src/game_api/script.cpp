@@ -131,7 +131,12 @@ class SpelunkyScript::ScriptImpl
 public:
     sol::state lua;
 
+#ifdef SPEL2_EDITABLE_SCRIPTS
     char code[204800];
+#else
+    std::string code_storage;
+    const char* code;
+#endif
     std::string result = "";
     ScriptState state = { nullptr, 0, 0, 0, 0, 0, 0, 0 };
     bool changed = true;
@@ -165,7 +170,12 @@ public:
 
 SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable)
 {
+#ifdef SPEL2_EDITABLE_SCRIPTS
     strcpy(code, script.data());
+#else
+    code_storage = std::move(script);
+    code = code_storage.c_str();
+#endif
     meta.file = std::move(file);
     enabled = enable;
 
@@ -1188,6 +1198,7 @@ const std::string& SpelunkyScript::get_version() const
     return m_Impl->meta.version;
 }
 
+#ifdef SPEL2_EDITABLE_SCRIPTS
 char* SpelunkyScript::get_code() const
 {
     return m_Impl->code;
@@ -1196,6 +1207,7 @@ std::size_t SpelunkyScript::get_code_size() const
 {
     return sizeof(m_Impl->code);
 }
+#endif
 
 std::string& SpelunkyScript::get_result()
 {

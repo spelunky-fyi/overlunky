@@ -52,8 +52,10 @@ public:
     const std::string& get_file() const;
     const std::string& get_version() const;
 
+#ifdef SPEL2_EDITABLE_SCRIPTS
     char* get_code() const;
     std::size_t get_code_size() const;
+#endif
 
     std::string& get_result(); // Thanks for non-const imgui
 

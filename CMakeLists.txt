@@ -16,10 +16,13 @@ execute_process(
   OUTPUT_VARIABLE GIT_VERSION
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-add_definitions("-DGIT_VERSION=${GIT_VERSION}")
-add_definitions("-D_ITERATOR_DEBUG_LEVEL=0")
-add_definitions("-DNOMINMAX")
-add_definitions("-DWIN32_LEAN_AND_MEAN")
+add_compile_definitions(GIT_VERSION=${GIT_VERSION})
+add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
+add_compile_definitions(NOMINMAX)
+add_compile_definitions(WIN32_LEAN_AND_MEAN)
+if(BUILD_OVERLUNKY)
+  add_compile_definitions(SPEL2_EDITABLE_SCRIPTS)
+endif()
 
 add_subdirectory(src)
 
