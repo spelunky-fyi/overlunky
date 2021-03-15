@@ -16,7 +16,7 @@ class Movable : public Entity
     int32_t last_owner_uid;
     size_t animation_func;
     uint32_t idle_counter;
-    uint32_t standing_on_uid;
+    int32_t standing_on_uid;
     float velocityx;
     float velocityy;
     uint32_t holding_uid;
