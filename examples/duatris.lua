@@ -339,7 +339,7 @@ function update_moving_piece(fall, next_piece)
             moving_blocks[#moving_blocks + 1] = newid
         end)
         if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-            gx = moving_piece.x + 3 + math.random(0, #shapes[moving_piece.shape][moving_piece.rot_num])
+            gx = moving_piece.x + 2 + math.random(1, #shapes[moving_piece.shape][moving_piece.rot_num])
             gy = 124 - moving_piece.y + 1
             spawnid = tiny_to[math.random(#tiny_to)]
             spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
@@ -399,7 +399,7 @@ function lock_and_update_moving_piece(fall, next_piece)
     end)
     moving_blocks = {}
     if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-        gx = moving_piece.x + 4 + math.random(-1, 1)
+        gx = moving_piece.x + 2 + math.random(1, #shapes[moving_piece.shape][moving_piece.rot_num])
         gy = 124 - moving_piece.y + 1
         spawnid = small_to[math.random(#small_to)]
         spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
@@ -486,7 +486,7 @@ function draw_moving(x, y, color)
     sx, sy = screen_position(x + 2 - 0.5, 124 - y + 0.5)
     sx2, sy2 = screen_position(x + 2 + 0.5, 124 - y - 0.5)
     if sy < -1 then
-        sy = 0.995
+        sy = -0.995
     end
     if sy > 1 then
         sy = 0.995
