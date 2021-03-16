@@ -27,7 +27,7 @@ small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER,
             ENT_TYPE.MONS_LEPRECHAUN}
 
 generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
-              ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.FLOOR_QUICKSAND}
+              ENT_TYPE.FLOOR_QUICKSAND}
 
 loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_PICKUP_PLAYERBAG,
            ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PRESENT}
@@ -58,10 +58,9 @@ local orig_shapes = {{{0, 1, 0}, {1, 1, 1}}, {{0, 1, 1}, {1, 1, 0}}, {{1, 1, 0},
                      {{1, 1}, {1, 1}}, {{1, 0, 0}, {1, 1, 1}}, {{0, 0, 1}, {1, 1, 1}}}
 local shapes = {}
 
-local colors = {{rgba(255, 255, 255, 200), ENT_TYPE.FLOORSTYLED_STONE},
-                {rgba(0, 0, 255, 200), ENT_TYPE.FLOORSTYLED_DUAT}, {rgba(0, 255, 255, 200), ENT_TYPE.FLOOR_SURFACE},
-                {rgba(0, 255, 0, 200), ENT_TYPE.FLOOR_JUNGLE}, {rgba(255, 0, 255, 200), ENT_TYPE.FLOORSTYLED_BABYLON},
-                {rgba(255, 0, 0, 200), ENT_TYPE.FLOORSTYLED_VLAD}, {rgba(255, 255, 0, 200), ENT_TYPE.FLOORSTYLED_COG}}
+--local colors = {{255, 255, 255}, {128, 128, 255}, {80, 255, 255}, {80, 255, 80}, {255, 80, 255}, {255, 80, 80}, {255, 255, 80}}
+local colors = {{255, 80, 255}, {128, 255, 128}, {255, 80, 80}, {80, 255, 255}, {255, 255, 80}, {128, 128, 255}, {255, 160, 40}}
+local color_alpha = 180
 
 local game_state = 'playing'
 
@@ -76,6 +75,7 @@ local val = {
 } -- Shorthand to avoid magic numbers.
 
 local moving_piece = {} -- Keys will be: shape, rot_num, x, y.
+local moving_blocks = {-1, -1, -1, -1} -- store uids
 
 local guicall = -1
 local framecall = -1
@@ -86,6 +86,7 @@ function init()
     board = {}
     shapes = {}
     moving_piece = {}
+    moving_blocks = {}
     crates = {}
     players[1].type.max_speed = 0.0725
 
@@ -134,6 +135,21 @@ function init()
         x = px,
         y = py
     }
+    call_fn_for_xy_in_piece(moving_piece, function(x, y, c)
+        gx = x + 2
+        gy = 124 - y
+        id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
+        newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
+        ent = get_entity(newid):as_movable()
+        newflags = set_flag(ent.flags, 10) -- disable gravity
+        newflags = set_flag(newflags, 6) -- disable damage
+        newflags = clr_flag(newflags, 13) -- disable push
+        ent.flags = newflags
+        ent.color.r = colors[moving_piece.shape][1] / 255
+        ent.color.g = colors[moving_piece.shape][2] / 255
+        ent.color.b = colors[moving_piece.shape][3] / 255
+        moving_blocks[#moving_blocks + 1] = newid
+    end)
 
     -- Use a table so functions can edit its value without having to return it.
     next_piece = {
@@ -185,16 +201,20 @@ function get_button()
     elseif not keystate.DOWN and players[1].movey < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.DOWN = true
         keystart.DOWN = get_frame()
-    elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
+    elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 and
+        (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.LEFT = get_frame() - 10
         return keys.LEFT
-    elseif keystate.RIGHT and players[1].movex > 0 and get_frame() >= keystart.RIGHT + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
+    elseif keystate.RIGHT and players[1].movex > 0 and get_frame() >= keystart.RIGHT + 15 and
+        (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.RIGHT = get_frame() - 10
         return keys.RIGHT
-    elseif keystate.UP and players[1].movey > 0 and get_frame() >= keystart.UP + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
+    elseif keystate.UP and players[1].movey > 0 and get_frame() >= keystart.UP + 15 and
+        (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.UP = get_frame() - 10
         return keys.UP
-    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= keystart.DOWN + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
+    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= keystart.DOWN + 15 and
+        (not options.door or test_flag(players[1].buttons, 6)) then
         down_sent = true
         return keys.DOWN
     end
@@ -271,11 +291,12 @@ function call_fn_for_xy_in_piece(piece, callback, param)
 end
 
 function update_moving_piece(fall, next_piece)
+    level_to_board(false)
     -- Bring in the waiting next piece and set up a new next piece.
     cx, cy = get_camera_position()
     x, y, l = get_position(players[1].uid)
     px = math.max(math.floor(x - 4), 1)
-    py = math.max(math.floor(124 - cy) - 12, 1)
+    py = math.max(math.floor(124 - cy) - 10, 1)
     moving_piece = {
         shape = math.random(#shapes),
         rot_num = math.random(1, 4),
@@ -288,28 +309,66 @@ function update_moving_piece(fall, next_piece)
         spawn(ENT_TYPE.FX_POWEREDEXPLOSION, ex, ey, LAYER.FRONT, 0, 0)
         set_timeout(function()
             update_moving_piece(fall, next_piece)
-        end, 45)
+        end, options.baserate)
+    else
+        call_fn_for_xy_in_piece(moving_piece, function(x, y, c)
+            gx = x + 2
+            gy = 124 - y
+            id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
+            newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
+            ent = get_entity(newid):as_movable()
+            newflags = set_flag(ent.flags, 10) -- disable gravity
+            newflags = set_flag(newflags, 6) -- disable damage
+            newflags = clr_flag(newflags, 13) -- disable push
+            ent.flags = newflags
+            ent.color.r = colors[moving_piece.shape][1] / 255
+            ent.color.g = colors[moving_piece.shape][2] / 255
+            ent.color.b = colors[moving_piece.shape][3] / 255
+            moving_blocks[#moving_blocks + 1] = newid
+        end)
     end
     next_piece.shape = math.random(#shapes)
 end
 
+function replace_with_trap(blockid)
+    set_timeout(function()
+        x, y, l = get_position(blockid)
+        if x > 0 then
+            ent = get_entity(blockid):as_movable()
+            r = ent.color.r
+            g = ent.color.g
+            b = ent.color.b
+            trapid = generic_to[math.random(#generic_to)]
+            kill_entity(blockid)
+            newid = spawn(trapid, x, y, l, 0, 0)
+            trap = get_entity(newid):as_movable()
+            trap.color.r = r
+            trap.color.g = g
+            trap.color.b = b
+        end
+    end, 1)
+end
+
 function lock_and_update_moving_piece(fall, next_piece)
     level_to_board(false)
+    block_i = 1
     call_fn_for_xy_in_piece(moving_piece, function(x, y, c)
         board[x][y] = moving_piece.shape -- Lock the moving piece in place.
         gx = x + 2
         gy = 124 - y
-        --id = colors[moving_piece.shape][2]
-        id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
-        --[[if options.traps and math.random() - state.level_count / 30 < options.trapschance / 100 then
-            id = generic_to[math.random(#generic_to)]
-        end]]
-        newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
-        ent = get_entity(newid)
-        newflags = set_flag(ent.flags, 10) -- disables gravity
-        newflags = clr_flag(newflags, 13) -- disables push
-        ent.flags = newflags
+        if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
+            move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
+            ent = get_entity(moving_blocks[block_i])
+            if ent then
+                ent.flags = clr_flag(ent.flags, 6) -- enable damage
+            end
+            if options.traps and math.random() - state.level_count / 30 < options.trapschance / 100 then
+                replace_with_trap(moving_blocks[block_i])
+            end
+        end
+        block_i = block_i + 1
     end)
+    moving_blocks = {}
     if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
         gx = moving_piece.x + 4 + math.random(-1, 1)
         gy = 124 - moving_piece.y + 1
@@ -377,9 +436,10 @@ function level_to_board(all)
 end
 
 function draw_point(x, y, color)
-    draw_color = colors[moving_piece.shape][1]
+    draw_color = rgba(colors[moving_piece.shape][1], colors[moving_piece.shape][2], colors[moving_piece.shape][3],
+                     color_alpha)
     if color then
-        draw_color = colors[color][1]
+        draw_color = rgba(colors[color][1], colors[color][2], colors[color][3], color_alpha)
     end
     xmin, ymin, xmax, ymax = get_bounds()
     sx, sy = screen_position(x + 2 - 0.5, 124 - y + 0.5)
@@ -388,9 +448,10 @@ function draw_point(x, y, color)
 end
 
 function draw_moving(x, y, color)
-    draw_color = colors[moving_piece.shape][1]
+    draw_color = rgba(colors[moving_piece.shape][1], colors[moving_piece.shape][2], colors[moving_piece.shape][3],
+                     color_alpha)
     if color then
-        draw_color = colors[color][1]
+        draw_color = rgba(colors[color][1], colors[color][2], colors[color][3], color_alpha)
     end
     xmin, ymin, xmax, ymax = get_bounds()
     sx, sy = screen_position(x + 2 - 0.5, 124 - y + 0.5)
@@ -407,7 +468,11 @@ function draw_moving(x, y, color)
     if sy2 > 1 then
         sy2 = 0.99
     end
-    draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
+    -- draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
+    if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
+        move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
+    end
+    block_i = block_i + 1
 end
 
 function draw_screen()
@@ -424,13 +489,13 @@ function draw_screen()
             end
         end
     end
-
+    block_i = 1
     call_fn_for_xy_in_piece(moving_piece, draw_moving, moving_piece.shape)
 
     -- draw finishline
     sx, sy = screen_position(2.5, 107)
     sx2, sy2 = screen_position(32.5, 107)
-    draw_line(sx, sy, sx2, sy2, 4, colors[6][1])
+    draw_line(sx, sy, sx2, sy2, 4, rgba(255, 255, 255, color_alpha))
 end
 
 function game_over()
