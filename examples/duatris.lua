@@ -1,6 +1,6 @@
 meta.name = 'Duatris'
 meta.version = 'WIP'
-meta.description = 'How about a nice game of Duatris? Use directions to move, hold down to drop. Hold door button to stay still. Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
+meta.description = 'How about a nice game of Duatris? Hold door button to stay still and control the pieces. Use directions to move pieces, hold down to drop. Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
 register_option_int('baserate', 'Base fall rate (frames)', 60, 1, 180)
@@ -36,7 +36,8 @@ local keys = {
     LEFT = 1,
     RIGHT = 2,
     UP = 3,
-    DOWN = 4
+    DOWN = 4,
+    DROP = 5
 }
 
 local keystate = {
@@ -52,7 +53,7 @@ local keystart = {
     UP = 0,
     DOWN = 0
 }
-local down_sent = false
+local drop_sent = false
 
 local orig_shapes = {{{0, 1, 0}, {1, 1, 1}}, {{0, 1, 1}, {1, 1, 0}}, {{1, 1, 0}, {0, 1, 1}}, {{1, 1, 1, 1}},
                      {{1, 1}, {1, 1}}, {{1, 0, 0}, {1, 1, 1}}, {{0, 0, 1}, {1, 1, 1}}}
@@ -164,7 +165,7 @@ function init()
     return fall, next_piece
 end
 
-function get_button()
+function get_button(fall)
     if #players < 1 then
         return nil
     end
@@ -184,7 +185,7 @@ function get_button()
         keystate.DOWN = false
         --keystart.UP = 0
         --keystart.DOWN = 0
-        down_sent = false
+        drop_sent = false
     end
     if not keystate.LEFT and players[1].movex < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.LEFT = true
@@ -201,6 +202,8 @@ function get_button()
     elseif not keystate.DOWN and players[1].movey < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.DOWN = true
         keystart.DOWN = get_frame()
+        fall.last_at = state.time_level
+        return keys.DOWN
     elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 and
         (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.LEFT = get_frame() - 10
@@ -213,16 +216,16 @@ function get_button()
         (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.UP = get_frame() - 10
         return keys.UP
-    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() > keystart.DOWN + 15 and
+    elseif keystate.DOWN and players[1].movey < 0 and not drop_sent and get_frame() > keystart.DOWN + 15 and
         (not options.door or test_flag(players[1].buttons, 6)) then
-        down_sent = true
-        return keys.DOWN
+        drop_sent = true
+        return keys.DROP
     end
     return nil
 end
 
 function handle_input(fall, next_piece)
-    local key = get_button()
+    local key = get_button(fall)
     if key == nil then
         return
     end
@@ -240,6 +243,9 @@ function handle_input(fall, next_piece)
         [keys.RIGHT] = {
             x = moving_piece.x + 1
         },
+        [keys.DOWN] = {
+            y = moving_piece.y + 1
+        },
         [keys.UP] = {
             rot_num = new_rot_num
         }
@@ -249,7 +255,7 @@ function handle_input(fall, next_piece)
     end
 
     -- Handle the down arrow.
-    if key == keys.DOWN then
+    if key == keys.DROP then
         while set_moving_piece_if_valid({
             y = moving_piece.y + 1
         }) do
