@@ -412,6 +412,8 @@ Derived from [`Entity`](#entity)
 - `last_state` &Movable::last_state
 - `move_state` &Movable::move_state
 - `health` &Movable::health
+- `stun_timer` &Movable::stun_timer
+- `stun_state` &Movable::stun_state
 - `some_state` &Movable::some_state
 - `color` &Movable::color
 - `hitboxx` &Movable::hitboxx
