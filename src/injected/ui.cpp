@@ -1026,7 +1026,8 @@ void force_noclip()
                 fix_co_coordinates(cpos);
                 if (cpos.first != player->position().first || cpos.second != player->position().second) {
                     move_entity_abs(player->uid, cpos.first, cpos.second, player->velocityx, player->velocityy);
-                    set_camera_position(cpos.first, cpos.second);
+                    //this just glitches the shaders, doesn't work
+                    //set_camera_position(cpos.first, cpos.second);
                 }
             }
         }
@@ -2122,7 +2123,7 @@ void render_clickhandler()
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             move_entity_abs(g_players.at(0)->uid, cpos.first, cpos.second, g_vx, g_vy);
-            set_camera_position(cpos.first, cpos.second);
+            //set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
             g_vx = 0;

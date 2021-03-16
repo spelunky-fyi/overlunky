@@ -299,11 +299,16 @@ function lock_and_update_moving_piece(fall, next_piece)
         board[x][y] = moving_piece.shape -- Lock the moving piece in place.
         gx = x + 2
         gy = 124 - y
-        id = colors[moving_piece.shape][2]
-        if options.traps and math.random() - state.level_count / 30 < options.trapschance / 100 then
+        --id = colors[moving_piece.shape][2]
+        id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
+        --[[if options.traps and math.random() - state.level_count / 30 < options.trapschance / 100 then
             id = generic_to[math.random(#generic_to)]
-        end
-        spawn(id, gx, gy, LAYER.FRONT, 0, 0)
+        end]]
+        newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
+        ent = get_entity(newid)
+        newflags = set_flag(ent.flags, 10) -- disables gravity
+        newflags = clr_flag(newflags, 13) -- disables push
+        ent.flags = newflags
     end)
     if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
         gx = moving_piece.x + 4 + math.random(-1, 1)
