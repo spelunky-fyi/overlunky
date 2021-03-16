@@ -371,7 +371,7 @@ function set_moving_piece_if_valid(piece)
     end
     local is_valid = true
     call_fn_for_xy_in_piece(piece, function(x, y)
-        ents = get_entities_at(0, 0x180, x+2, 124-y, LAYER.FRONT, 0.7)
+        ents = get_entities_at(0, 0x180, x+2, 124-y, LAYER.FRONT, 0.65)
         if #ents > 0 then
             local is_moving = false
             for i,v in ipairs(ents) do
