@@ -66,8 +66,35 @@ local keystart = {
 }
 local drop_sent = false
 
-local orig_shapes = {{{0, 1, 0}, {1, 1, 1}}, {{0, 1, 1}, {1, 1, 0}}, {{1, 1, 0}, {0, 1, 1}}, {{1, 1, 1, 1}},
-                     {{1, 1}, {1, 1}}, {{1, 0, 0}, {1, 1, 1}}, {{0, 0, 1}, {1, 1, 1}}}
+local orig_shapes = {
+    {{0, 1, 0},
+     {1, 1, 1},
+     {0, 0, 0}},
+
+    {{0, 1, 1},
+     {1, 1, 0},
+     {0, 0, 0}},
+
+    {{1, 1, 0},
+     {0, 1, 1},
+     {0, 0, 0}},
+
+    {{0, 0, 0, 0},
+     {1, 1, 1, 1},
+     {0, 0, 0, 0},
+     {0, 0, 0, 0}},
+
+    {{1, 1},
+     {1, 1}},
+
+    {{1, 0, 0},
+     {1, 1, 1},
+     {0, 0, 0}},
+
+    {{0, 0, 1},
+     {1, 1, 1},
+     {0, 0, 0}}
+}
 local shapes = {}
 
 -- local colors = {{255, 255, 255}, {128, 128, 255}, {80, 255, 255}, {80, 255, 80}, {255, 80, 255}, {255, 80, 80}, {255, 255, 80}}
@@ -366,6 +393,16 @@ function call_fn_for_xy_in_piece(piece, callback, param)
     end
 end
 
+function random_offset(piece)
+    minoff = 40
+    maxoff = 0
+    call_fn_for_xy_in_piece(piece, function(x, y, c)
+        if x > maxoff then maxoff = x end
+        if x < minoff then minoff = x end
+    end)
+    return math.random(minoff, maxoff) + 2
+end
+
 function update_moving_piece(fall, next_piece)
     level_to_board(false)
     -- Bring in the waiting next piece and set up a new next piece.
@@ -404,7 +441,7 @@ function update_moving_piece(fall, next_piece)
             moving_blocks[#moving_blocks + 1] = newid
         end)
         if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-            gx = moving_piece.x + 2 + math.random(1, #shapes[moving_piece.shape][moving_piece.rot_num])
+            gx = random_offset(moving_piece)
             gy = 124 - moving_piece.y
             spawnid = tiny_to[math.random(#tiny_to)]
             spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
@@ -465,7 +502,7 @@ function lock_and_update_moving_piece(fall, next_piece)
     end)
     moving_blocks = {}
     if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-        gx = moving_piece.x + 2 + math.random(1, #shapes[moving_piece.shape][moving_piece.rot_num])
+        gx = random_offset(moving_piece)
         gy = 124 - moving_piece.y
         spawnid = small_to[math.random(#small_to)]
         spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
