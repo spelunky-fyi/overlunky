@@ -24,7 +24,8 @@ class Movable : public Entity
     uint8_t last_state;
     uint8_t move_state;
     uint8_t health;
-    int32_t i110;
+    uint16_t stun_timer;
+    uint16_t stun_state;
     uint32_t some_state;
     int32_t i118;
     int32_t i11c;
