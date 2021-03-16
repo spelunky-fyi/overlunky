@@ -99,7 +99,7 @@ local shapes = {}
 
 -- local colors = {{255, 255, 255}, {128, 128, 255}, {80, 255, 255}, {80, 255, 80}, {255, 80, 255}, {255, 80, 80}, {255, 255, 80}}
 local colors = {{255, 80, 255}, {128, 255, 128}, {255, 80, 80}, {80, 255, 255}, {255, 255, 80}, {128, 128, 255},
-                {255, 160, 40}}
+                {255, 160, 40}, {255, 255, 255}}
 local color_alpha = 66
 
 local game_state = 'playing'
@@ -162,7 +162,6 @@ function init()
             board[x][y] = val.empty
             if x == 0 or x == border.x or y == border.y then
                 board[x][y] = val.border -- This is a border cell.
-               
             end
         end
     end
@@ -372,6 +371,23 @@ function set_moving_piece_if_valid(piece)
     end
     local is_valid = true
     call_fn_for_xy_in_piece(piece, function(x, y)
+        ents = get_entities_at(0, 0x180, x+2, 124-y, LAYER.FRONT, 0.5)
+        if #ents > 0 then
+            local is_moving = false
+            for i,v in ipairs(ents) do
+                for j,w in ipairs(moving_blocks) do
+                    if v == w then
+                        is_moving = true
+                    end
+                end
+            end
+            if not is_moving then
+                is_valid = false
+                if board[x] and board[x][y] then
+                    board[x][y] = 8
+                end
+            end
+        end
         if board[x] and board[x][y] ~= val.empty then
             is_valid = false
         end
@@ -551,7 +567,7 @@ function level_to_board(all)
                 gy = 124 - y
                 block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
                 if #block > 0 then
-                    board[x][y] = 1
+                    board[x][y] = 8
                 end
             end
         end
@@ -567,6 +583,23 @@ function level_to_board(all)
                     if #block == 0 then
                         board[nx][ny] = 0
                     end
+                --[[elseif board[nx][ny] == 0 then
+                    gx = nx + 2
+                    gy = 124 - ny
+                    block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                    if #block == 0 then
+                        is_moving = false
+                        for i,v in ipairs(block) do
+                            for j,w in ipairs(moving_blocks) do
+                                if w == v then
+                                    is_moving = true
+                                end
+                            end
+                        end
+                        if not is_moving then
+                            board[nx][ny] = 1
+                        end
+                    end]]
                 end
             end
         end
