@@ -1,6 +1,6 @@
 meta.name = 'Duatris'
 meta.version = 'WIP'
-meta.description = 'How about a nice game of Duatris? Hold door button to stay still and control the pieces. Use directions to move pieces, hold down to drop. Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
+meta.description = 'How about a nice game of Duatris? Hold door button to stay still and control the pieces with D-pad. Hold down to drop, tap down to move down. While your piece is hilighted, you can still move it. After that, it will spawn traps, so watch out! Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
 register_option_int('baserate', 'Base fall rate (frames)', 60, 1, 180)
@@ -61,7 +61,7 @@ local shapes = {}
 
 --local colors = {{255, 255, 255}, {128, 128, 255}, {80, 255, 255}, {80, 255, 80}, {255, 80, 255}, {255, 80, 80}, {255, 255, 80}}
 local colors = {{255, 80, 255}, {128, 255, 128}, {255, 80, 80}, {80, 255, 255}, {255, 255, 80}, {128, 128, 255}, {255, 160, 40}}
-local color_alpha = 180
+local color_alpha = 66
 
 local game_state = 'playing'
 
@@ -149,6 +149,7 @@ function init()
         ent.color.r = colors[moving_piece.shape][1] / 255
         ent.color.g = colors[moving_piece.shape][2] / 255
         ent.color.b = colors[moving_piece.shape][3] / 255
+        --ent.color.a = 0.85
         moving_blocks[#moving_blocks + 1] = newid
     end)
 
@@ -330,6 +331,7 @@ function update_moving_piece(fall, next_piece)
             ent.color.r = colors[moving_piece.shape][1] / 255
             ent.color.g = colors[moving_piece.shape][2] / 255
             ent.color.b = colors[moving_piece.shape][3] / 255
+            --ent.color.a = 0.85
             moving_blocks[#moving_blocks + 1] = newid
         end)
     end
@@ -364,9 +366,10 @@ function lock_and_update_moving_piece(fall, next_piece)
         gy = 124 - y
         if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
             move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
-            ent = get_entity(moving_blocks[block_i])
+            ent = get_entity(moving_blocks[block_i]):as_movable()
             if ent then
                 ent.flags = clr_flag(ent.flags, 6) -- enable damage
+                --ent.color.a = 1
             end
             if options.traps and math.random() - state.level_count / 30 < options.trapschance / 100 then
                 replace_with_trap(moving_blocks[block_i])
@@ -463,18 +466,19 @@ function draw_moving(x, y, color)
     sx, sy = screen_position(x + 2 - 0.5, 124 - y + 0.5)
     sx2, sy2 = screen_position(x + 2 + 0.5, 124 - y - 0.5)
     if sy < -1 then
-        sy = -0.99
+        sy = 0.995
     end
     if sy > 1 then
-        sy = 0.99
+        sy = 0.995
     end
     if sy2 < -1 then
-        sy2 = -0.99
+        sy2 = -0.995
     end
     if sy2 > 1 then
         sy2 = 0.99
     end
-    -- draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
+    --draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
+    draw_rect_filled(sx, sy, sx2, sy2, 0, rgba(255, 255, 255, 40))
     if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
         move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
     end
