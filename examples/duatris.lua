@@ -421,6 +421,11 @@ function update_moving_piece(fall, next_piece)
     if not set_moving_piece_if_valid(moving_piece) then
         ex = moving_piece.x + 4 + math.random(-1, 1)
         ey = 124 - moving_piece.y - 2 + math.random(-1, 1)
+        trash = get_entities_at(0, 0x180, ex, ey, LAYER.FRONT, 8)
+        for i,v in ipairs(trash) do
+            ent = get_entity(v):as_movable()
+            ent.flags = clr_flag(ent.flags, 6)
+        end
         spawn(ENT_TYPE.FX_POWEREDEXPLOSION, ex, ey, LAYER.FRONT, 0, 0)
         set_timeout(function()
             update_moving_piece(fall, next_piece)
