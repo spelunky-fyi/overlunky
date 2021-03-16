@@ -13,6 +13,8 @@ register_option_int('trapschance', "Trap chance (percent)", 10, 1, 100)
 register_option_bool('wgoodies', 'Get some goodies at start (for cheating)', false)
 register_option_bool('whole', 'Draw whole stage (for debugging)', false)
 
+tiny_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.ITEM_LANDMINE}
+
 small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_BAT,
             ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
             ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_MANTRAP, ENT_TYPE.MONS_TIKIMAN, ENT_TYPE.MONS_WITCHDOCTOR,
@@ -24,10 +26,10 @@ small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER,
             ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER, ENT_TYPE.MONS_OLMITE_HELMET,
             ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_AMMIT,
             ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_GRUB, ENT_TYPE.MONS_JUMPDOG, ENT_TYPE.MONS_SCARAB,
-            ENT_TYPE.MONS_LEPRECHAUN}
+            ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY, ENT_TYPE.MONS_CRABMAN, ENT_TYPE.ITEM_LANDMINE}
 
 generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
-              ENT_TYPE.FLOOR_QUICKSAND}
+              ENT_TYPE.FLOOR_QUICKSAND, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG}
 
 loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_PICKUP_PLAYERBAG,
            ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PRESENT}
@@ -203,7 +205,6 @@ function get_button(fall)
     elseif not keystate.DOWN and players[1].movey < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.DOWN = true
         keystart.DOWN = get_frame()
-        fall.last_at = state.time_level
         return keys.DOWN
     elseif keystate.LEFT and players[1].movex < 0 and get_frame() >= keystart.LEFT + 15 and
         (not options.door or test_flag(players[1].buttons, 6)) then
@@ -252,7 +253,10 @@ function handle_input(fall, next_piece)
         }
     }
     if moves[key] then
-        set_moving_piece_if_valid(moves[key])
+        local was_valid = set_moving_piece_if_valid(moves[key])
+        if key == keys.DOWN and was_valid then
+            fall.last_at = state.time_level
+        end
     end
 
     -- Handle the down arrow.
@@ -334,6 +338,12 @@ function update_moving_piece(fall, next_piece)
             --ent.color.a = 0.85
             moving_blocks[#moving_blocks + 1] = newid
         end)
+        if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
+            gx = moving_piece.x + 3 + math.random(0, #shapes[moving_piece.shape][moving_piece.rot_num])
+            gy = 124 - moving_piece.y + 1
+            spawnid = tiny_to[math.random(#tiny_to)]
+            spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
+        end
     end
     next_piece.shape = math.random(#shapes)
 end
@@ -350,9 +360,19 @@ function replace_with_trap(blockid)
             kill_entity(blockid)
             newid = spawn(trapid, x, y, l, 0, 0)
             trap = get_entity(newid):as_movable()
-            trap.color.r = r
-            trap.color.g = g
-            trap.color.b = b
+            if trapid == ENT_TYPE.ACTIVEFLOOR_POWDERKEG then
+                trap.color.r = 0.6
+                trap.color.g = 0
+                trap.color.b = 0
+            elseif trapid == ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK then
+                trap.color.r = 1
+                trap.color.g = 1
+                trap.color.b = 1
+            else
+                trap.color.r = r
+                trap.color.g = g
+                trap.color.b = b
+            end
         end
     end, 1)
 end
