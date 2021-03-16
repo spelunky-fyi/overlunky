@@ -176,14 +176,14 @@ function get_button()
     if players[1].movex == 0 then
         keystate.LEFT = false
         keystate.RIGHT = false
-        keystart.LEFT = 0
-        keystart.RIGHT = 0
+        --keystart.LEFT = 0
+        --keystart.RIGHT = 0
     end
     if players[1].movey == 0 then
         keystate.UP = false
         keystate.DOWN = false
-        keystart.UP = 0
-        keystart.DOWN = 0
+        --keystart.UP = 0
+        --keystart.DOWN = 0
         down_sent = false
     end
     if not keystate.LEFT and players[1].movex < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
@@ -213,7 +213,7 @@ function get_button()
         (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.UP = get_frame() - 10
         return keys.UP
-    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() >= keystart.DOWN + 15 and
+    elseif keystate.DOWN and players[1].movey < 0 and not down_sent and get_frame() > keystart.DOWN + 15 and
         (not options.door or test_flag(players[1].buttons, 6)) then
         down_sent = true
         return keys.DOWN
@@ -296,7 +296,7 @@ function update_moving_piece(fall, next_piece)
     cx, cy = get_camera_position()
     x, y, l = get_position(players[1].uid)
     px = math.max(math.floor(x - 4), 1)
-    py = math.max(math.floor(124 - cy) - 10, 1)
+    py = math.max(math.floor(124 - cy) - 12, 1)
     moving_piece = {
         shape = math.random(#shapes),
         rot_num = math.random(1, 4),
@@ -510,15 +510,17 @@ function clear_stage()
     clear_callback(framecall)
     x, y, l = get_position(players[1].uid)
     if options.wgoodies then
-        spawn(ENT_TYPE.ITEM_VLADS_CAPE, x, y, l, 0, 0)
+        spawn(ENT_TYPE.ITEM_CAPE, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_PASTE, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_PLAYERBAG, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_SPIKESHOES, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, x, y, l, 0, 0)
+        spawn(ENT_TYPE.ITEM_PICKUP_ROYALJELLY, x, y, l, 0, 0)
+    else
+        spawn(ENT_TYPE.ITEM_PICKUP_BOMBBAG, x, y, l, 0, 0) -- get bombs anyway so you don't get stuck
     end
-    spawn(ENT_TYPE.ITEM_PICKUP_BOMBBAG, x, y, l, 0, 0) -- get bombs anyway so you don't get stuck
     cy = y + 4.5
     n = 1
     clearint = set_interval(function()
