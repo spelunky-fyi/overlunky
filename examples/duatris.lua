@@ -396,11 +396,13 @@ end
 function random_offset(piece)
     minoff = 40
     maxoff = 0
+    maxy = 120
     call_fn_for_xy_in_piece(piece, function(x, y, c)
         if x > maxoff then maxoff = x end
         if x < minoff then minoff = x end
+        if y < maxy then maxy = y end
     end)
-    return math.random(minoff, maxoff) + 2
+    return math.random(minoff, maxoff) + 2, 124 - maxy + 1
 end
 
 function update_moving_piece(fall, next_piece)
@@ -441,8 +443,7 @@ function update_moving_piece(fall, next_piece)
             moving_blocks[#moving_blocks + 1] = newid
         end)
         if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-            gx = random_offset(moving_piece)
-            gy = 124 - moving_piece.y
+            gx, gy = random_offset(moving_piece)
             spawnid = tiny_to[math.random(#tiny_to)]
             spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
         end
@@ -502,8 +503,7 @@ function lock_and_update_moving_piece(fall, next_piece)
     end)
     moving_blocks = {}
     if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-        gx = random_offset(moving_piece)
-        gy = 124 - moving_piece.y
+        gx, gy = random_offset(moving_piece)
         spawnid = small_to[math.random(#small_to)]
         spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
         spawn(ENT_TYPE.FX_TELEPORTSHADOW, gx, gy, LAYER.FRONT, 0, 0)
