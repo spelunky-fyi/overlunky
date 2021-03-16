@@ -4,7 +4,8 @@ add_executable(injector
     cmd_line.h
     injector.cpp
     injector.h)
-target_link_libraries(injector SHARED)
+target_link_libraries(injector
+    shared)
 add_dependencies(injector injected)
 
 # --------------------------------------------------
