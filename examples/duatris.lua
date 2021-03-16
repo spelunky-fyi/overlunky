@@ -1,6 +1,6 @@
 meta.name = 'Duatris'
 meta.version = 'WIP'
-meta.description = 'How about a nice game of Duatris? Hold DOOR button to stay still and control the pieces with D-PAD. Rotate with UP or ROPE. While your piece is hilighted, you can move it. After the lock delay, it will spawn traps and foes, so watch out! Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
+meta.description = 'How about a nice game of Duatris? Hold DOOR button to stay still and control the pieces with D-PAD. Rotate with UP or ROPE/BOMB. While your piece is hilighted, you can move it. After the lock delay, it will spawn traps and foes, so watch out! Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
 register_option_int('baserate', 'Base fall rate (frames)', 50, 1, 180)
@@ -41,9 +41,10 @@ loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TY
 local keys = {
     LEFT = 1,
     RIGHT = 2,
-    UP = 3,
-    DOWN = 4,
-    DROP = 5
+    ROTL = 3,
+    ROTR = 4,
+    DOWN = 5,
+    DROP = 6
 }
 
 local keystate = {
@@ -51,7 +52,8 @@ local keystate = {
     RIGHT = false,
     UP = false,
     DOWN = false,
-    ROPE = false
+    ROPE = false,
+    BOMB = false
 }
 
 local keystart = {
@@ -59,7 +61,8 @@ local keystart = {
     RIGHT = 0,
     UP = 0,
     DOWN = 0,
-    ROPE = 0
+    ROPE = 0,
+    BOMB = 0
 }
 local drop_sent = false
 
@@ -91,6 +94,7 @@ local guicall = -1
 local framecall = -1
 local crates = {}
 local ropes = -1
+local bombs = -1
 
 function init()
     game_state = 'playing'
@@ -99,8 +103,8 @@ function init()
     moving_piece = {}
     moving_blocks = {}
     crates = {}
-    players[1].type.max_speed = 0.0725
     ropes = -1
+    bombs = -1
 
     -- Set up the shapes table.
     for s_index, s in ipairs(orig_shapes) do
@@ -185,7 +189,11 @@ function get_button(fall)
         if ropes == -1 then
             ropes = players[1].inventory.ropes
         end
+        if bombs == -1 then
+            bombs = players[1].inventory.bombs
+        end
         players[1].inventory.ropes = 0
+        players[1].inventory.bombs = 0
         if players[1].standing_on_uid > 0 then
             players[1].type.max_speed = 0
         end
@@ -194,7 +202,11 @@ function get_button(fall)
         if ropes >= 0 then
             players[1].inventory.ropes = ropes
         end
+        if bombs >= 0 then
+            players[1].inventory.bombs = bombs
+        end
         ropes = -1
+        bombs = -1
     end
     if players[1].movex == 0 and players[1].movey == 0 then
         keystate.LEFT = false
@@ -202,6 +214,9 @@ function get_button(fall)
         keystate.UP = false
         keystate.DOWN = false
         drop_sent = false
+    end
+    if not test_flag(players[1].buttons, 3) then
+        keystate.BOMB = false
     end
     if not test_flag(players[1].buttons, 4) then
         keystate.ROPE = false
@@ -218,7 +233,7 @@ function get_button(fall)
         keystate.UP = true
         keystart.UP = get_frame()
         if not options.drop2 then
-            return keys.UP
+            return keys.ROTR
         end
     elseif not keystate.DOWN and players[1].movey < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.DOWN = true
@@ -237,7 +252,7 @@ function get_button(fall)
         if not options.drop2 then
             if get_frame() >= keystart.UP + 15 then
                 keystart.UP = get_frame() - 10
-                return keys.UP
+                return keys.ROTR
             end
         elseif not drop_sent then
             drop_sent = true
@@ -254,10 +269,17 @@ function get_button(fall)
     elseif not keystate.ROPE and test_flag(players[1].buttons, 4) and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.ROPE = true
         keystart.ROPE = get_frame()
-        return keys.UP
+        return keys.ROTL
     elseif keystate.ROPE and test_flag(players[1].buttons, 4) and get_frame() >= keystart.ROPE + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.ROPE = get_frame() - 10
-        return keys.UP
+        return keys.ROTL
+    elseif not keystate.BOMB and test_flag(players[1].buttons, 3) and (not options.door or test_flag(players[1].buttons, 6)) then
+        keystate.BOMB = true
+        keystart.BOMB = get_frame()
+        return keys.ROTR
+    elseif keystate.BOMB and test_flag(players[1].buttons, 3) and get_frame() >= keystart.BOMB + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
+        keystart.BOMB = get_frame() - 10
+        return keys.ROTR
     end
     return nil
 end
@@ -273,7 +295,11 @@ function handle_input(fall, next_piece)
     end -- Arrow keys only work if playing.
 
     -- Handle the left, right, or up arrows.
-    local new_rot_num = (moving_piece.rot_num % 4) + 1 -- Map 1->2->3->4->1.
+    local new_rot_numr = (moving_piece.rot_num % 4) + 1 -- Map 1->2->3->4->1.
+    local new_rot_numl = moving_piece.rot_num - 1
+    if new_rot_numl < 1 then
+        new_rot_numl = 4
+    end
     local moves = {
         [keys.LEFT] = {
             x = moving_piece.x - 1
@@ -284,8 +310,11 @@ function handle_input(fall, next_piece)
         [keys.DOWN] = {
             y = moving_piece.y + 1
         },
-        [keys.UP] = {
-            rot_num = new_rot_num
+        [keys.ROTL] = {
+            rot_num = new_rot_numl
+        },
+        [keys.ROTR] = {
+            rot_num = new_rot_numr
         }
     }
     if moves[key] then
@@ -397,7 +426,7 @@ function replace_with_trap(blockid)
             newid = spawn(trapid, x, y, l, 0, 0)
             trap = get_entity(newid):as_movable()
             if trapid == ENT_TYPE.ACTIVEFLOOR_POWDERKEG then
-                trap.color.r = 0.6
+                trap.color.r = 0.5
                 trap.color.g = 0
                 trap.color.b = 0
             elseif trapid == ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK then
@@ -536,7 +565,7 @@ function draw_moving(x, y, color)
         sy2 = 0.99
     end
     -- draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
-    draw_rect_filled(sx, sy, sx2, sy2, 0, rgba(255, 255, 255, 40))
+    draw_rect_filled(sx, sy, sx2, sy2, 0, rgba(255, 255, 255, 55))
     if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
         move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
     end
@@ -577,6 +606,7 @@ function clear_stage()
     clear_callback(guicall)
     clear_callback(framecall)
     x, y, l = get_position(players[1].uid)
+    players[1].type.max_speed = 0.0725
     if options.wgoodies then
         spawn(ENT_TYPE.ITEM_CAPE, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_PASTE, x, y, l, 0, 0)
