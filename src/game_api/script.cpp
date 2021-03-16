@@ -171,7 +171,7 @@ public:
 SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable)
 {
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    strcpy(code, script.data());
+    strcpy(code, script.c_str());
 #else
     code_storage = std::move(script);
     code = code_storage.c_str();
@@ -1212,6 +1212,17 @@ std::size_t SpelunkyScript::get_code_size() const
     return sizeof(m_Impl->code);
 }
 #endif
+
+void SpelunkyScript::update_code(std::string code)
+{
+#ifdef SPEL2_EDITABLE_SCRIPTS
+    strcpy(m_Impl->code, code.c_str());
+#else
+    m_Impl->code_storage = std::move(code);
+    m_Impl->code = m_Impl->code_storage.c_str();
+#endif
+    m_Impl->changed = true;
+}
 
 std::string& SpelunkyScript::get_result()
 {

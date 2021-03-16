@@ -31,7 +31,7 @@ void RegisterPostDrawFunc(PostDrawFunc post_draw)
     register_post_draw(post_draw);
 }
 
-SpelunkyScript* CreateScript(const char* file_path, bool enabled)
+std::string read_whole_file(const char* file_path)
 {
 	FILE* file{ nullptr };
 	auto error = fopen_s(&file, file_path, "rb");
@@ -53,6 +53,16 @@ SpelunkyScript* CreateScript(const char* file_path, bool enabled)
 			return nullptr;
 		}
 
+		return code;
+	}
+	return {};
+}
+
+SpelunkyScript* CreateScript(const char* file_path, bool enabled)
+{
+	std::string code = read_whole_file(file_path);
+	if (!code.empty())
+	{
 		return new SpelunkyScript(std::move(code), file_path, enabled);
 	}
     return nullptr;
@@ -60,6 +70,15 @@ SpelunkyScript* CreateScript(const char* file_path, bool enabled)
 void FreeScript(SpelunkyScript* script)
 {
     delete script;
+}
+
+void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char *file_path)
+{
+	std::string code = read_whole_file(file_path);
+	if (!code.empty())
+	{
+		script->update_code(std::move(code));
+	}
 }
 
 bool SpelunkyScipt_IsEnabled(SpelunkyScript* script)

@@ -57,6 +57,8 @@ public:
     std::size_t get_code_size() const;
 #endif
 
+    void update_code(std::string code);
+
     std::string& get_result(); // Thanks for non-const imgui
 
     bool is_enabled() const;

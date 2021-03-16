@@ -21,6 +21,8 @@ void RegisterPostDrawFunc(PostDrawFunc post_draw);
 SpelunkyScript* CreateScript(const char *file_path, bool enabled);
 void FreeScript(SpelunkyScript* script);
 
+void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char *file_path);
+
 bool SpelunkyScipt_IsEnabled(SpelunkyScript* script);
 void SpelunkyScipt_SetEnabled(SpelunkyScript* script, bool enabled);
 
