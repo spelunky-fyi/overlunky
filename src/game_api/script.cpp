@@ -1125,6 +1125,10 @@ bool SpelunkyScript::ScriptImpl::handle_function(sol::function func)
     {
         sol::error e = lua_result;
         result = e.what();
+        messages.push_back({ result, std::chrono::system_clock::now() });
+        DEBUG("{}", result);
+        if (messages.size() > 20)
+            messages.pop_front();
         return false;
     }
     return true;
