@@ -2,6 +2,7 @@
 #include "../injected/ui.hpp"
 #include "entity.hpp"
 #include "state.hpp"
+#include "logger.h"
 
 uint32_t setflag(uint32_t flags, int bit) { return flags | (1U << (bit - 1)); }
 uint32_t clrflag(uint32_t flags, int bit) { return flags & ~(1U << (bit - 1)); }

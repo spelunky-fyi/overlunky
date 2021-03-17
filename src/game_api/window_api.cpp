@@ -94,7 +94,7 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
 
 void init_imgui()
 {
-    ImGui::CreateContext();
+    ImGuiContext* imgui_context = ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
     io.MouseDrawCursor = true;
@@ -103,7 +103,7 @@ void init_imgui()
 
     if (g_ImguiInitCallback)
     {
-        g_ImguiInitCallback();
+        g_ImguiInitCallback(imgui_context);
     }
 }
 

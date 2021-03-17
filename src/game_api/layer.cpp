@@ -1,6 +1,7 @@
 #include "layer.hpp"
 
 #include "state.hpp"
+#include "logger.h"
 
 struct Layer;
 using LoadItem = size_t (*)(Layer *, size_t, float, float);

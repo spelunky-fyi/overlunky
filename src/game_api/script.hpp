@@ -36,11 +36,11 @@ struct ScriptMessage
     std::chrono::time_point<std::chrono::system_clock> time;
 };
 
-class Script
+class SpelunkyScript
 {
 public:
-    Script(std::string script, std::string file, bool enable = true);
-    ~Script();
+    SpelunkyScript(std::string script, std::string file, bool enable = true);
+    ~SpelunkyScript();
 
     std::deque<ScriptMessage>& get_messages();
     std::vector<std::string> consume_requires();
@@ -52,8 +52,12 @@ public:
     const std::string& get_file() const;
     const std::string& get_version() const;
 
+#ifdef SPEL2_EDITABLE_SCRIPTS
     char* get_code() const;
     std::size_t get_code_size() const;
+#endif
+
+    void update_code(std::string code);
 
     std::string& get_result(); // Thanks for non-const imgui
 
@@ -63,7 +67,8 @@ public:
     bool is_changed() const;
     void set_changed(bool changed);
 
-    bool run(ImDrawList *dl);
+    bool run();
+    void draw(ImDrawList *dl);
     void render_options();
 
 private:

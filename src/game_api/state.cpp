@@ -1,4 +1,5 @@
 #include "state.hpp"
+#include "logger.h"
 
 size_t get_dark()
 {

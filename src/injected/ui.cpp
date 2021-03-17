@@ -1,5 +1,3 @@
-#define NOMINMAX
-
 #include "ui.hpp"
 
 #include <ShlObj.h>
@@ -27,7 +25,7 @@
 #include "state.hpp"
 #include "window_api.hpp"
 
-std::map<std::string, Script *> g_scripts;
+std::map<std::string, SpelunkyScript *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
@@ -485,7 +483,7 @@ void load_script(std::string file, bool enable = true)
         size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
             file = file.substr(slash + 1);
-        Script *script = new Script(buf.str(), file, enable);
+        SpelunkyScript *script = new SpelunkyScript(buf.str(), file, enable);
         g_scripts[script->get_id()] = script;
         data.close();
     }
@@ -582,7 +580,7 @@ void require_scripts()
 {
     for (auto it : g_scripts)
     {
-        Script *script = it.second;
+        SpelunkyScript *script = it.second;
         if (!script->is_enabled())
             continue;
         for (auto req : script->consume_requires())
@@ -1888,11 +1886,9 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
     draw_list->AddLine(sboxd, sboxa, color, 2);
 }
 
-void render_script(Script *script)
+void fix_script_requires(SpelunkyScript* script)
 {
     if (!script->is_enabled()) return;
-    auto *draw_list = ImGui::GetBackgroundDrawList();
-    script->run(draw_list);
     for (auto req : script->consume_requires())
     {
         auto reqit = g_scripts.find(req);
@@ -1903,6 +1899,18 @@ void render_script(Script *script)
             reqit->second->set_enabled(true);
         }
     }
+}
+
+void update_script(SpelunkyScript* script)
+{
+    if (!script->is_enabled()) return;
+    script->run();
+}
+
+void render_script(SpelunkyScript *script, ImDrawList* draw_list)
+{
+    if (!script->is_enabled()) return;
+    script->draw(draw_list);
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -1937,7 +1945,7 @@ void set_vel(ImVec2 pos)
     g_vy = 2 * (g_vy - g_y) * 0.5625;
 }
 
-void render_messages(Script *script)
+void render_messages(SpelunkyScript *script)
 {
     auto now = std::chrono::system_clock::now();
     ImGuiIO &io = ImGui::GetIO();
@@ -2067,7 +2075,13 @@ void render_clickhandler()
     }
     for (auto script : g_scripts)
     {
-        render_script(script.second);
+        fix_script_requires(script.second);
+    }
+    auto* draw_list = ImGui::GetBackgroundDrawList();
+    for (auto script : g_scripts)
+    {
+        update_script(script.second);
+        render_script(script.second, draw_list);
     }
     //require_scripts();
     if (options["mouse_control"])
@@ -2439,7 +2453,7 @@ void render_script_files()
     }
     if (ImGui::Button("Create new quick script"))
     {
-        Script *script = new Script(
+        SpelunkyScript *script = new SpelunkyScript(
             "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
@@ -2467,7 +2481,7 @@ void render_scripts()
     for (auto it : g_scripts)
     {
         ImGui::PushID(i);
-        Script *script = it.second;
+        SpelunkyScript *script = it.second;
         char name[255];
         sprintf(name, "%s (%s)", script->get_name().c_str(), script->get_file().c_str());
         if (!script->is_enabled())
@@ -3213,7 +3227,7 @@ void render_tool(std::string tool)
         render_debug();
 }
 
-void imgui_init() {
+void imgui_init(ImGuiContext*) {
     ImGuiIO& io = ImGui::GetIO();
     io.FontAllowUserScaling = true;
     PWSTR fontdir;

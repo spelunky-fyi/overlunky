@@ -1,10 +1,11 @@
-file(GLOB_RECURSE injector_sources CONFIGURE_DEPENDS "*.cpp")
-file(GLOB_RECURSE injector_headers CONFIGURE_DEPENDS "*.h" "*.hpp" "*.inl")
 add_executable(injector
-    ${injector_sources}
-    ${injector_headers})
+    main.cpp
+    cmd_line.cpp
+    cmd_line.h
+    injector.cpp
+    injector.h)
 target_link_libraries(injector
-        shared)
+    shared)
 add_dependencies(injector injected)
 
 # --------------------------------------------------
