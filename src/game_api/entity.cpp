@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "state.hpp"
+#include "logger.h"
 
 // Items::entity_map = EntityMap;
 using EntityMap = std::unordered_map<std::string, uint16_t>;

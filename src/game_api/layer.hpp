@@ -1,6 +1,5 @@
 #pragma once
 #include "entity.hpp"
-#include "logger.h"
 
 struct Layer {
     size_t __vftable;
