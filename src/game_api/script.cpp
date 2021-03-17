@@ -185,6 +185,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
 
     if (!g_players.empty())
         state.player = g_players.at(0);
+    else
+        state.player = nullptr;
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
@@ -927,7 +929,7 @@ bool SpelunkyScript::ScriptImpl::run()
             if (on_camp)
                 on_camp.value()();
         }
-        if (g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
+        if (g_state->screen == 12 && g_state->screen_last != 5 && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
         {
             if (g_state->level_count == 0)
             {
@@ -1004,12 +1006,12 @@ bool SpelunkyScript::ScriptImpl::run()
             auto now = get_frame_count();
             if (auto cb = std::get_if<ScreenCallback>(&it->second))
             {
-                if (g_state->screen == cb->screen && g_state->screen != state.screen) // game screens
+                if (g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 12 && g_state->screen == 12 && !g_players.empty() && state.player != g_players.at(0))
+                else if (cb->screen == 12 && g_state->screen == 12 && g_state->screen_last != 5 && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
                 { // run ON.LEVEL on instant restart too
                     handle_function(cb->func);
                     cb->lastRan = now;
@@ -1086,6 +1088,8 @@ bool SpelunkyScript::ScriptImpl::run()
 
         if (!g_players.empty())
             state.player = g_players.at(0);
+        else
+            state.player = nullptr;
         state.screen = g_state->screen;
         state.time_level = g_state->time_level;
         state.time_total = g_state->time_total;
