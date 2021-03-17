@@ -673,7 +673,18 @@ end
 function game_over()
     game_state = 'over'
     clear_callback(guicall)
-    clear_callback(framecall)
+    --clear_callback(framecall)
+    if #players > 0 then
+        players[1].type.max_speed = 0.0725
+        if bombs > 0 then
+            players[1].inventory.bombs = bombs
+            bombs = -1
+        end
+        if ropes > 0 then
+            players[1].inventory.ropes = ropes
+            ropes = -1
+        end
+    end
 end
 
 function clear_stage()
@@ -692,7 +703,9 @@ function clear_stage()
         spawn(ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_ROYALJELLY, x, y, l, 0, 0)
     else
-        spawn(ENT_TYPE.ITEM_PICKUP_BOMBBAG, x, y, l, 0, 0) -- get bombs anyway so you don't get stuck
+        if players[1].inventory.bombs < 4 then
+            players[1].inventory.bombs = 4 -- get bombs on all levels so you don't get stuck
+        end
     end
     cy = y + 4.5
     n = 1
@@ -715,12 +728,11 @@ function clear_stage()
         framecall = set_callback(function()
             if #players < 1 then
                 game_over()
-                return
-            end
-            plx, ply, pll = get_position(players[1].uid)
-            if ply > 107 then
-                game_over()
-                return
+            else
+                plx, ply, pll = get_position(players[1].uid)
+                if ply > 107 then
+                    game_over()
+                end
             end
             for ci = 1, options.crates, 1 do
                 h = math.floor(104 - (board_size.y - 20) / (options.crates + 1) * ci)
@@ -731,6 +743,13 @@ function clear_stage()
                     id = loot_to[math.random(#loot_to)]
                     spawn(id, rx, 107, LAYER.FRONT, math.random() - 0.5, 0)
                     toast('FREE LOOT!')
+                end
+            end
+            crush = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP)
+            for i,v in ipairs(crush) do
+                x, y, l = get_position(v)
+                if y > 108 and x > 15 and x < 20 then
+                    spawn(ENT_TYPE.FX_EXPLOSION, x, y, l, 0, 0)
                 end
             end
         end, ON.FRAME)
