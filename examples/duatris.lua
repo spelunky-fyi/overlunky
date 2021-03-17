@@ -506,12 +506,14 @@ function lock_and_update_moving_piece(fall, next_piece)
     block_i = 1
     call_fn_for_xy_in_piece(moving_piece, function(x, y, c)
         board[x][y] = moving_piece.shape -- Lock the moving piece in place.
-        
         gx = x + 2
         gy = 124 - y
-        if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
+        ent = get_entity(moving_blocks[block_i])
+        if moving_blocks[block_i] and moving_blocks[block_i] > -1 and ent ~= nil then
             move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
-            ent = get_entity(moving_blocks[block_i]):as_movable()
+            ent = get_entity(moving_blocks[block_i])
+            if ent == nil then return end
+            ent = ent:as_movable()
             if ent then
                 ent.flags = clr_flag(ent.flags, 6) -- enable damage
                 -- ent.color.a = 1
@@ -693,6 +695,7 @@ function clear_stage()
     clear_callback(framecall)
     x, y, l = get_position(players[1].uid)
     players[1].type.max_speed = 0.0725
+    players[1].flags = set_flag(players[1].flags, 6)
     if options.wgoodies then
         spawn(ENT_TYPE.ITEM_CAPE, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_PASTE, x, y, l, 0, 0)
@@ -719,6 +722,9 @@ function clear_stage()
     end, 1)
     set_timeout(function()
         fall, next_piece = init()
+        set_timeout(function()
+            players[1].flags = clr_flag(players[1].flags, 6)
+        end, 3*60)
         level_to_board(true)
         guicall = set_callback(function()
             handle_input(fall, next_piece)
