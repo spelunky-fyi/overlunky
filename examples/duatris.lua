@@ -1,11 +1,13 @@
 meta.name = 'Duatris'
 meta.version = 'WIP'
-meta.description = 'How about a nice game of Duatris? Hold door button to stay still and control the pieces with D-pad. Hold down to drop, tap down to move down. While your piece is hilighted, you can still move it. After that, it will spawn traps, so watch out! Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
+meta.description = 'How about a nice game of Duatris? Hold DOOR button to stay still and control the pieces with D-PAD. Rotate with UP or ROPE/BOMB. While your piece is hilighted, you can move it. After the lock delay, it will spawn traps and foes, so watch out! Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
-register_option_int('baserate', 'Base fall rate (frames)', 60, 1, 180)
+register_option_int('baserate', 'Base fall rate (frames)', 50, 1, 180)
 register_option_int('crates', 'Spawn lootboxes', 8, 0, 30)
-register_option_bool('door', 'Only move pieces when holding door button', true)
+register_option_bool('door', 'Only move pieces when holding DOOR button', true)
+register_option_bool('drop', 'Hard drop with DOWN instead of moving faster', false)
+register_option_bool('drop2', 'Hard drop with UP instead of rotating', false)
 register_option_bool('enemies', 'Spawn enemies on blocks', true)
 register_option_int('enemychance', "Enemy chance (percent)", 50, 1, 100)
 register_option_bool('traps', 'Spawn traps on blocks', true)
@@ -13,7 +15,8 @@ register_option_int('trapschance', "Trap chance (percent)", 10, 1, 100)
 register_option_bool('wgoodies', 'Get some goodies at start (for cheating)', false)
 register_option_bool('whole', 'Draw whole stage (for debugging)', false)
 
-tiny_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.ITEM_LANDMINE}
+tiny_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_OLMITE_NAKED,
+           ENT_TYPE.ITEM_LANDMINE}
 
 small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_BAT,
             ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
@@ -26,7 +29,8 @@ small_to = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER,
             ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER, ENT_TYPE.MONS_OLMITE_HELMET,
             ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_AMMIT,
             ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_GRUB, ENT_TYPE.MONS_JUMPDOG, ENT_TYPE.MONS_SCARAB,
-            ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY, ENT_TYPE.MONS_CRABMAN, ENT_TYPE.ITEM_LANDMINE}
+            ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY,
+            ENT_TYPE.MONS_CRABMAN, ENT_TYPE.ITEM_LANDMINE}
 
 generic_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
               ENT_TYPE.FLOOR_QUICKSAND, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG}
@@ -37,32 +41,65 @@ loot_to = {ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CRATE, ENT_TY
 local keys = {
     LEFT = 1,
     RIGHT = 2,
-    UP = 3,
-    DOWN = 4,
-    DROP = 5
+    ROTL = 3,
+    ROTR = 4,
+    DOWN = 5,
+    DROP = 6
 }
 
 local keystate = {
     LEFT = false,
     RIGHT = false,
     UP = false,
-    DOWN = false
+    DOWN = false,
+    ROPE = false,
+    BOMB = false
 }
 
 local keystart = {
     LEFT = 0,
     RIGHT = 0,
     UP = 0,
-    DOWN = 0
+    DOWN = 0,
+    ROPE = 0,
+    BOMB = 0
 }
 local drop_sent = false
 
-local orig_shapes = {{{0, 1, 0}, {1, 1, 1}}, {{0, 1, 1}, {1, 1, 0}}, {{1, 1, 0}, {0, 1, 1}}, {{1, 1, 1, 1}},
-                     {{1, 1}, {1, 1}}, {{1, 0, 0}, {1, 1, 1}}, {{0, 0, 1}, {1, 1, 1}}}
+local orig_shapes = {
+    {{0, 1, 0},
+     {1, 1, 1},
+     {0, 0, 0}},
+
+    {{0, 1, 1},
+     {1, 1, 0},
+     {0, 0, 0}},
+
+    {{1, 1, 0},
+     {0, 1, 1},
+     {0, 0, 0}},
+
+    {{0, 0, 0, 0},
+     {1, 1, 1, 1},
+     {0, 0, 0, 0},
+     {0, 0, 0, 0}},
+
+    {{1, 1},
+     {1, 1}},
+
+    {{1, 0, 0},
+     {1, 1, 1},
+     {0, 0, 0}},
+
+    {{0, 0, 1},
+     {1, 1, 1},
+     {0, 0, 0}}
+}
 local shapes = {}
 
---local colors = {{255, 255, 255}, {128, 128, 255}, {80, 255, 255}, {80, 255, 80}, {255, 80, 255}, {255, 80, 80}, {255, 255, 80}}
-local colors = {{255, 80, 255}, {128, 255, 128}, {255, 80, 80}, {80, 255, 255}, {255, 255, 80}, {128, 128, 255}, {255, 160, 40}}
+-- local colors = {{255, 255, 255}, {128, 128, 255}, {80, 255, 255}, {80, 255, 80}, {255, 80, 255}, {255, 80, 80}, {255, 255, 80}}
+local colors = {{255, 80, 255}, {128, 255, 128}, {255, 80, 80}, {80, 255, 255}, {255, 255, 80}, {128, 128, 255},
+                {255, 160, 40}, {255, 255, 255}}
 local color_alpha = 66
 
 local game_state = 'playing'
@@ -83,6 +120,8 @@ local moving_blocks = {-1, -1, -1, -1} -- store uids
 local guicall = -1
 local framecall = -1
 local crates = {}
+local ropes = -1
+local bombs = -1
 
 function init()
     game_state = 'playing'
@@ -91,7 +130,8 @@ function init()
     moving_piece = {}
     moving_blocks = {}
     crates = {}
-    players[1].type.max_speed = 0.0725
+    ropes = -1
+    bombs = -1
 
     -- Set up the shapes table.
     for s_index, s in ipairs(orig_shapes) do
@@ -122,7 +162,6 @@ function init()
             board[x][y] = val.empty
             if x == 0 or x == border.x or y == border.y then
                 board[x][y] = val.border -- This is a border cell.
-               
             end
         end
     end
@@ -151,7 +190,7 @@ function init()
         ent.color.r = colors[moving_piece.shape][1] / 255
         ent.color.g = colors[moving_piece.shape][2] / 255
         ent.color.b = colors[moving_piece.shape][3] / 255
-        --ent.color.a = 0.85
+        -- ent.color.a = 0.85
         moving_blocks[#moving_blocks + 1] = newid
     end)
 
@@ -172,23 +211,41 @@ function get_button(fall)
     if #players < 1 then
         return nil
     end
-    if test_flag(players[1].buttons, 6) and players[1].standing_on_uid > 0 then
-        players[1].type.max_speed = 0
+    if test_flag(players[1].buttons, 6) then
+        if ropes == -1 then
+            ropes = players[1].inventory.ropes
+        end
+        if bombs == -1 then
+            bombs = players[1].inventory.bombs
+        end
+        players[1].inventory.ropes = 0
+        players[1].inventory.bombs = 0
+        if players[1].standing_on_uid > 0 then
+            players[1].type.max_speed = 0
+        end
     else
         players[1].type.max_speed = 0.0725
+        if ropes >= 0 then
+            players[1].inventory.ropes = ropes
+        end
+        if bombs >= 0 then
+            players[1].inventory.bombs = bombs
+        end
+        ropes = -1
+        bombs = -1
     end
-    if players[1].movex == 0 then
+    if players[1].movex == 0 and players[1].movey == 0 then
         keystate.LEFT = false
         keystate.RIGHT = false
-        --keystart.LEFT = 0
-        --keystart.RIGHT = 0
-    end
-    if players[1].movey == 0 then
         keystate.UP = false
         keystate.DOWN = false
-        --keystart.UP = 0
-        --keystart.DOWN = 0
         drop_sent = false
+    end
+    if not test_flag(players[1].buttons, 3) then
+        keystate.BOMB = false
+    end
+    if not test_flag(players[1].buttons, 4) then
+        keystate.ROPE = false
     end
     if not keystate.LEFT and players[1].movex < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.LEFT = true
@@ -201,7 +258,9 @@ function get_button(fall)
     elseif not keystate.UP and players[1].movey > 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.UP = true
         keystart.UP = get_frame()
-        return keys.UP
+        if not options.drop2 then
+            return keys.ROTR
+        end
     elseif not keystate.DOWN and players[1].movey < 0 and (not options.door or test_flag(players[1].buttons, 6)) then
         keystate.DOWN = true
         keystart.DOWN = get_frame()
@@ -214,14 +273,39 @@ function get_button(fall)
         (not options.door or test_flag(players[1].buttons, 6)) then
         keystart.RIGHT = get_frame() - 10
         return keys.RIGHT
-    elseif keystate.UP and players[1].movey > 0 and get_frame() >= keystart.UP + 15 and
+    elseif keystate.UP and players[1].movey > 0 and
         (not options.door or test_flag(players[1].buttons, 6)) then
-        keystart.UP = get_frame() - 10
-        return keys.UP
-    elseif keystate.DOWN and players[1].movey < 0 and not drop_sent and get_frame() > keystart.DOWN + 15 and
-        (not options.door or test_flag(players[1].buttons, 6)) then
+        if not options.drop2 then
+            if get_frame() >= keystart.UP + 15 then
+                keystart.UP = get_frame() - 10
+                return keys.ROTR
+            end
+        elseif not drop_sent then
+            drop_sent = true
+            return keys.DROP
+        end
+    elseif not options.drop and keystate.DOWN and players[1].movey < 0 and not drop_sent and get_frame() > keystart.DOWN +
+        15 and (not options.door or test_flag(players[1].buttons, 6)) then
+        keystart.DOWN = get_frame() - 10
+        return keys.DOWN
+    elseif options.drop and keystate.DOWN and players[1].movey < 0 and not drop_sent and get_frame() > keystart.DOWN +
+        15 and (not options.door or test_flag(players[1].buttons, 6)) then
         drop_sent = true
         return keys.DROP
+    elseif not keystate.ROPE and test_flag(players[1].buttons, 4) and (not options.door or test_flag(players[1].buttons, 6)) then
+        keystate.ROPE = true
+        keystart.ROPE = get_frame()
+        return keys.ROTL
+    elseif keystate.ROPE and test_flag(players[1].buttons, 4) and get_frame() >= keystart.ROPE + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
+        keystart.ROPE = get_frame() - 10
+        return keys.ROTL
+    elseif not keystate.BOMB and test_flag(players[1].buttons, 3) and (not options.door or test_flag(players[1].buttons, 6)) then
+        keystate.BOMB = true
+        keystart.BOMB = get_frame()
+        return keys.ROTR
+    elseif keystate.BOMB and test_flag(players[1].buttons, 3) and get_frame() >= keystart.BOMB + 15 and (not options.door or test_flag(players[1].buttons, 6)) then
+        keystart.BOMB = get_frame() - 10
+        return keys.ROTR
     end
     return nil
 end
@@ -237,7 +321,11 @@ function handle_input(fall, next_piece)
     end -- Arrow keys only work if playing.
 
     -- Handle the left, right, or up arrows.
-    local new_rot_num = (moving_piece.rot_num % 4) + 1 -- Map 1->2->3->4->1.
+    local new_rot_numr = (moving_piece.rot_num % 4) + 1 -- Map 1->2->3->4->1.
+    local new_rot_numl = moving_piece.rot_num - 1
+    if new_rot_numl < 1 then
+        new_rot_numl = 4
+    end
     local moves = {
         [keys.LEFT] = {
             x = moving_piece.x - 1
@@ -248,8 +336,11 @@ function handle_input(fall, next_piece)
         [keys.DOWN] = {
             y = moving_piece.y + 1
         },
-        [keys.UP] = {
-            rot_num = new_rot_num
+        [keys.ROTL] = {
+            rot_num = new_rot_numl
+        },
+        [keys.ROTR] = {
+            rot_num = new_rot_numr
         }
     }
     if moves[key] then
@@ -280,6 +371,23 @@ function set_moving_piece_if_valid(piece)
     end
     local is_valid = true
     call_fn_for_xy_in_piece(piece, function(x, y)
+        ents = get_entities_at(0, 0x180, x+2, 124-y, LAYER.FRONT, 0.65)
+        if #ents > 0 then
+            local is_moving = false
+            for i,v in ipairs(ents) do
+                for j,w in ipairs(moving_blocks) do
+                    if v == w then
+                        is_moving = true
+                    end
+                end
+            end
+            if not is_moving then
+                is_valid = false
+                if board[x] and board[x][y] then
+                    board[x][y] = 8
+                end
+            end
+        end
         if board[x] and board[x][y] ~= val.empty then
             is_valid = false
         end
@@ -301,6 +409,18 @@ function call_fn_for_xy_in_piece(piece, callback, param)
     end
 end
 
+function random_offset(piece)
+    minoff = 40
+    maxoff = 0
+    maxy = 120
+    call_fn_for_xy_in_piece(piece, function(x, y, c)
+        if x > maxoff then maxoff = x end
+        if x < minoff then minoff = x end
+        if y < maxy then maxy = y end
+    end)
+    return math.random(minoff, maxoff) + 2, 124 - maxy + 1
+end
+
 function update_moving_piece(fall, next_piece)
     level_to_board(false)
     -- Bring in the waiting next piece and set up a new next piece.
@@ -317,6 +437,11 @@ function update_moving_piece(fall, next_piece)
     if not set_moving_piece_if_valid(moving_piece) then
         ex = moving_piece.x + 4 + math.random(-1, 1)
         ey = 124 - moving_piece.y - 2 + math.random(-1, 1)
+        trash = get_entities_at(0, 0x180, ex, ey, LAYER.FRONT, 8)
+        for i,v in ipairs(trash) do
+            ent = get_entity(v):as_movable()
+            ent.flags = clr_flag(ent.flags, 6)
+        end
         spawn(ENT_TYPE.FX_POWEREDEXPLOSION, ex, ey, LAYER.FRONT, 0, 0)
         set_timeout(function()
             update_moving_piece(fall, next_piece)
@@ -335,12 +460,11 @@ function update_moving_piece(fall, next_piece)
             ent.color.r = colors[moving_piece.shape][1] / 255
             ent.color.g = colors[moving_piece.shape][2] / 255
             ent.color.b = colors[moving_piece.shape][3] / 255
-            --ent.color.a = 0.85
+            -- ent.color.a = 0.85
             moving_blocks[#moving_blocks + 1] = newid
         end)
         if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-            gx = moving_piece.x + 2 + math.random(1, #shapes[moving_piece.shape][moving_piece.rot_num])
-            gy = 124 - moving_piece.y + 1
+            gx, gy = random_offset(moving_piece)
             spawnid = tiny_to[math.random(#tiny_to)]
             spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
         end
@@ -361,7 +485,7 @@ function replace_with_trap(blockid)
             newid = spawn(trapid, x, y, l, 0, 0)
             trap = get_entity(newid):as_movable()
             if trapid == ENT_TYPE.ACTIVEFLOOR_POWDERKEG then
-                trap.color.r = 0.6
+                trap.color.r = 0.5
                 trap.color.g = 0
                 trap.color.b = 0
             elseif trapid == ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK then
@@ -382,6 +506,7 @@ function lock_and_update_moving_piece(fall, next_piece)
     block_i = 1
     call_fn_for_xy_in_piece(moving_piece, function(x, y, c)
         board[x][y] = moving_piece.shape -- Lock the moving piece in place.
+        
         gx = x + 2
         gy = 124 - y
         if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
@@ -389,7 +514,7 @@ function lock_and_update_moving_piece(fall, next_piece)
             ent = get_entity(moving_blocks[block_i]):as_movable()
             if ent then
                 ent.flags = clr_flag(ent.flags, 6) -- enable damage
-                --ent.color.a = 1
+                -- ent.color.a = 1
             end
             if options.traps and math.random() - state.level_count / 30 < options.trapschance / 100 then
                 replace_with_trap(moving_blocks[block_i])
@@ -399,10 +524,10 @@ function lock_and_update_moving_piece(fall, next_piece)
     end)
     moving_blocks = {}
     if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
-        gx = moving_piece.x + 2 + math.random(1, #shapes[moving_piece.shape][moving_piece.rot_num])
-        gy = 124 - moving_piece.y + 1
+        gx, gy = random_offset(moving_piece)
         spawnid = small_to[math.random(#small_to)]
         spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
+        spawn(ENT_TYPE.FX_TELEPORTSHADOW, gx, gy, LAYER.FRONT, 0, 0)
     end
     set_timeout(function()
         level_to_board(false)
@@ -442,7 +567,7 @@ function level_to_board(all)
                 gy = 124 - y
                 block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
                 if #block > 0 then
-                    board[x][y] = 1
+                    board[x][y] = 8
                 end
             end
         end
@@ -458,6 +583,23 @@ function level_to_board(all)
                     if #block == 0 then
                         board[nx][ny] = 0
                     end
+                --[[elseif board[nx][ny] == 0 then
+                    gx = nx + 2
+                    gy = 124 - ny
+                    block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                    if #block == 0 then
+                        is_moving = false
+                        for i,v in ipairs(block) do
+                            for j,w in ipairs(moving_blocks) do
+                                if w == v then
+                                    is_moving = true
+                                end
+                            end
+                        end
+                        if not is_moving then
+                            board[nx][ny] = 1
+                        end
+                    end]]
                 end
             end
         end
@@ -497,8 +639,8 @@ function draw_moving(x, y, color)
     if sy2 > 1 then
         sy2 = 0.99
     end
-    --draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
-    draw_rect_filled(sx, sy, sx2, sy2, 0, rgba(255, 255, 255, 40))
+    -- draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
+    draw_rect_filled(sx, sy, sx2, sy2, 0, rgba(255, 255, 255, 55))
     if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
         move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
     end
@@ -539,6 +681,7 @@ function clear_stage()
     clear_callback(guicall)
     clear_callback(framecall)
     x, y, l = get_position(players[1].uid)
+    players[1].type.max_speed = 0.0725
     if options.wgoodies then
         spawn(ENT_TYPE.ITEM_CAPE, x, y, l, 0, 0)
         spawn(ENT_TYPE.ITEM_PICKUP_PASTE, x, y, l, 0, 0)
