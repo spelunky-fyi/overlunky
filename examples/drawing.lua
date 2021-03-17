@@ -70,3 +70,10 @@ set_callback(function()
     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
 end, ON.GUIFRAME)
+
+-- random shapes
+set_callback(function()
+    draw_rect_filled(-0.6, -0.6, -0.8, -0.8, 0, rgba(255, 0, 0, 80))
+    draw_rect(-0.8, -0.8, -0.6, -0.6, 2, 0, rgba(255, 255, 255, 255))
+    draw_circle_filled(-0.7, -0.7, 0.1, rgba(255, 0, 0, 128))
+end, ON.GUIFRAME)

@@ -523,7 +523,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        draw_queue.queue_rect_filled(a, b, color, rounding);
+        draw_queue.queue_rect_filled(a, b, rounding, color);
     };
     /// Draws a circle on screen
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
