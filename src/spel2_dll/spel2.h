@@ -30,3 +30,34 @@ void SpelunkyScript_Update(SpelunkyScript* script);
 void SpelunkyScript_Draw(SpelunkyScript* script, struct ImDrawList *draw_list);
 void SpelunkyScript_DrawOptions(SpelunkyScript* script);
 const char* SpelunkyScript_GetResult(SpelunkyScript* script);
+
+enum class SpelunkyScreen {
+	Logo = 0,
+	Intro = 1,
+	Prologue = 2,
+	Title = 3,
+	Menu = 4,
+	Options = 5,
+	Leaderboard = 7,
+	SeedInput = 8,
+	CharacterSelect = 9,
+	TeamSelect = 10,
+	Camp = 11,
+	Level = 12,
+	Transition = 13,
+	Death = 14,
+	Sapceship = 16,
+	Win = 16,
+	Credits = 17,
+	Scores = 18,
+	Constellation = 19,
+	Recap = 20,
+
+	GuiFrame = 100,
+	Frame = 101,
+	Screen = 102,
+	Start = 103,
+	Loading = 104,
+	Reset = 105
+};
+SpelunkyScreen SpelunkyState_GetScreen();

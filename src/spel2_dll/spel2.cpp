@@ -2,8 +2,7 @@
 
 #include "window_api.hpp"
 #include "script.hpp"
-
-#include <imgui.h>
+#include "state.hpp"
 
 void InitSwapChainHooks(IDXGISwapChain* swap_chain)
 {
@@ -105,4 +104,14 @@ void SpelunkyScript_DrawOptions(SpelunkyScript* script)
 const char* SpelunkyScript_GetResult(SpelunkyScript* script)
 {
 	return script->get_result().c_str();
+}
+
+StateMemory& get_state() {
+	static StateMemory* state = State::get().ptr();
+	return *state;
+}
+
+SpelunkyScreen SpelunkyState_GetScreen()
+{
+	return static_cast<SpelunkyScreen>(get_state().screen);
 }
