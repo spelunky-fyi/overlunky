@@ -51,13 +51,6 @@ enum class SpelunkyScreen {
 	Credits = 17,
 	Scores = 18,
 	Constellation = 19,
-	Recap = 20,
-
-	GuiFrame = 100,
-	Frame = 101,
-	Screen = 102,
-	Start = 103,
-	Loading = 104,
-	Reset = 105
+	Recap = 20
 };
 SpelunkyScreen SpelunkyState_GetScreen();
