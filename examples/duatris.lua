@@ -478,6 +478,9 @@ function update_moving_piece(fall, next_piece)
         if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
             gx, gy = random_offset(moving_piece)
             spawnid = tiny_to[math.random(#tiny_to)]
+            if math.random() < 0.33 then
+                spawnid = loot_to[math.random(#loot_to)]
+            end
             spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
         end
     end
@@ -514,6 +517,43 @@ function replace_with_trap(blockid)
     end, 1)
 end
 
+function check_lines()
+    for line_y = 1, board_size.y do
+        local is_full_line = true
+        local tiles = 0
+        for x = 1, board_size.x do
+            if board[x][line_y] == val.empty then
+                is_full_line = false
+            else
+                tiles = tiles + 1
+            end
+        end
+        if is_full_line then
+            local really_full = true
+            for x = 1, board_size.x do
+                ent = get_entities_at(0, 0x180, x+2, 124-line_y, LAYER.FRONT, 0.5)
+                if #ent == 0 then
+                    board[x][line_y] = val.empty
+                    really_full = false
+                end
+            end
+            if really_full then
+                for x = 1, board_size.x do
+                    board[x][line_y] = val.empty
+                end
+                local apep_x = -1
+                if math.random() < 0.5 then apep_x = 36 end
+                apepid = spawn(ENT_TYPE.MONS_APEP_HEAD, apep_x, 124-line_y, LAYER.FRONT, 0, 0)
+                ent = get_entity(apepid):as_movable()
+                ent.hitboxy = 0.1
+                prize = loot_to[math.random(#loot_to)]
+                spawn(prize, math.random()*0.2-0.1, 0, LAYER.PLAYER1, 0, 0)
+                toast('The gods bestow a gift upon you!')
+            end
+        end
+    end
+end
+
 function lock_and_update_moving_piece(fall, next_piece)
     level_to_board(false)
     block_i = 1
@@ -545,6 +585,7 @@ function lock_and_update_moving_piece(fall, next_piece)
         spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
         spawn(ENT_TYPE.FX_TELEPORTSHADOW, gx, gy, LAYER.FRONT, 0, 0)
     end
+    check_lines()
     set_timeout(function()
         level_to_board(false)
     end, 5)
@@ -760,6 +801,7 @@ function clear_stage()
             players[1].flags = clr_flag(players[1].flags, 6)
         end, 3*60)
         level_to_board(true)
+        check_lines()
         guicall = set_callback(function()
             handle_input(fall, next_piece)
             lower_piece_at_right_time(fall, next_piece)
