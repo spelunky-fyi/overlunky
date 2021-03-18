@@ -508,6 +508,7 @@ function lock_and_update_moving_piece(fall, next_piece)
         board[x][y] = moving_piece.shape -- Lock the moving piece in place.
         gx = x + 2
         gy = 124 - y
+        if moving_blocks[block_i] == nil then return end
         ent = get_entity(moving_blocks[block_i])
         if moving_blocks[block_i] and moving_blocks[block_i] > -1 and ent ~= nil then
             move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
