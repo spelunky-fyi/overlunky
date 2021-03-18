@@ -242,6 +242,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     catch (const sol::error& e)
     {
         result = e.what();
+        messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
+        DEBUG("{}", result);
+        if (messages.size() > 20)
+            messages.pop_front();
     }
 
     /// A bunch of [game state](#statememory) variables
@@ -256,7 +260,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["players"] = std::vector<Movable*>(g_players.begin(), g_players.end());
     /// Print a log message on screen.
     lua["message"] = [this](std::string message) {
-        messages.push_back({ message, std::chrono::system_clock::now() });
+        messages.push_back({ message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f) });
         if (messages.size() > 20)
             messages.pop_front();
     };
@@ -872,6 +876,10 @@ bool SpelunkyScript::ScriptImpl::run()
         catch (const sol::error& e)
         {
             result = e.what();
+            messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
+            DEBUG("{}", result);
+            if (messages.size() > 20)
+                messages.pop_front();
             return false;
         }
     }
@@ -1125,7 +1133,7 @@ bool SpelunkyScript::ScriptImpl::handle_function(sol::function func)
     {
         sol::error e = lua_result;
         result = e.what();
-        messages.push_back({ result, std::chrono::system_clock::now() });
+        messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
         DEBUG("{}", result);
         if (messages.size() > 20)
             messages.pop_front();

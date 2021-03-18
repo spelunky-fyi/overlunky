@@ -34,6 +34,7 @@ struct ScriptMessage
 {
     std::string message;
     std::chrono::time_point<std::chrono::system_clock> time;
+    ImVec4 color;
 };
 
 class SpelunkyScript

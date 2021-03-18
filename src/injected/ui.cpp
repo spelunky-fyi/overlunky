@@ -1336,28 +1336,28 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("move_up", wParam) && active("tool_entity"))
     {
-        g_current_item = std::min(std::max(g_current_item - 1, 0), g_filtered_count - 1);
+        g_current_item = (std::min)((std::max)(g_current_item - 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_down", wParam) && active("tool_entity"))
     {
-        g_current_item = std::min(std::max(g_current_item + 1, 0), g_filtered_count - 1);
+        g_current_item = (std::min)((std::max)(g_current_item + 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_pageup", wParam) && active("tool_entity"))
     {
         ImGuiContext &g = *GImGui;
         ImGuiWindow *current = g.NavWindow;
-        int page = std::max((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = std::min(std::max(g_current_item - page, 0), g_filtered_count - 1);
+        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = (std::min)((std::max)(g_current_item - page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_pagedown", wParam) && active("tool_entity"))
     {
         ImGuiContext &g = *GImGui;
         ImGuiWindow *current = g.NavWindow;
-        int page = std::max((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = std::min(std::max(g_current_item + page, 0), g_filtered_count - 1);
+        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = (std::min)((std::max)(g_current_item + page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("enter", wParam) && active("tool_entity"))
@@ -1366,11 +1366,11 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("move_up", wParam) && active("tool_door"))
     {
-        g_to = std::min(std::max(g_to - 1, 0), 15);
+        g_to = (std::min)((std::max)(g_to - 1, 0), 15);
     }
     else if (pressed("move_down", wParam) && active("tool_door"))
     {
-        g_to = std::min(std::max(g_to + 1, 0), 15);
+        g_to = (std::min)((std::max)(g_to + 1, 0), 15);
     }
     else if (pressed("enter", wParam) && active("tool_door"))
     {
@@ -1963,7 +1963,8 @@ void render_messages(SpelunkyScript *script)
         if (now - 10s > message.time)
             continue;
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.time).count() / 10000.0f;
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->get_name().c_str(), message.message.c_str());
+        message.color.w = alpha;
+        ImGui::TextColored(message.color, "[%s] %s", script->get_name().c_str(), message.message.c_str());
     }
     ImGui::PopFont();
     ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
@@ -1973,7 +1974,7 @@ void render_messages(SpelunkyScript *script)
 void render_messages()
 {
     using namespace std::chrono_literals;
-    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>>;
+    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     auto now = std::chrono::system_clock::now();
     std::vector<Message> queue;
     for (auto script : g_scripts)
@@ -1982,7 +1983,7 @@ void render_messages()
         {
             if (now - 10s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script.second->get_name(), message.message, message.time));
+            queue.push_back(std::make_tuple(script.second->get_name(), message.message, message.time, message.color));
         }
     }
     ImGuiIO &io = ImGui::GetIO();
@@ -2000,7 +2001,7 @@ void render_messages()
 
     const float fontsize = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
-    int logsize = std::min(30, (int)((io.DisplaySize.y - 300) / fontsize));
+    int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / fontsize));
     if (queue.size() > logsize)
     {
         std::vector<Message> newqueue(queue.end() - logsize, queue.end());
@@ -2011,7 +2012,9 @@ void render_messages()
     for (auto message : queue)
     {
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 10000.0f;
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
+        ImVec4 color = std::get<3>(message);
+        color.w = alpha;
+        ImGui::TextColored(color, "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
     }
     ImGui::PopFont();
     ImGui::End();
