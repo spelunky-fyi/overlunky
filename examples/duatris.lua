@@ -123,6 +123,8 @@ local crates = {}
 local ropes = -1
 local bombs = -1
 
+local last_loot = 0
+
 function init()
     game_state = 'playing'
     board = {}
@@ -132,6 +134,7 @@ function init()
     crates = {}
     ropes = -1
     bombs = -1
+    last_loot = 0
 
     -- Set up the shapes table.
     for s_index, s in ipairs(orig_shapes) do
@@ -434,6 +437,10 @@ function random_offset(piece)
 end
 
 function update_moving_piece(fall, next_piece)
+    if #players < 1 then
+        game_over()
+        return
+    end
     level_to_board(false)
     -- Bring in the waiting next piece and set up a new next piece.
     cx, cy = get_camera_position()
@@ -478,7 +485,8 @@ function update_moving_piece(fall, next_piece)
         if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
             gx, gy = random_offset(moving_piece)
             spawnid = tiny_to[math.random(#tiny_to)]
-            if math.random() < 0.33 then
+            if math.random() < 0.1 and state.time_level > last_loot + 60*15 then
+                last_loot = state.time_level
                 spawnid = loot_to[math.random(#loot_to)]
             end
             spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
