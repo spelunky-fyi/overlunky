@@ -173,7 +173,7 @@ function init()
     py = math.max(math.floor(124 - cy) - 12, 1)
     moving_piece = {
         shape = math.random(#shapes),
-        rot_num = 1,
+        rot_num = math.random(1, 4),
         x = px,
         y = py
     }
@@ -196,7 +196,8 @@ function init()
 
     -- Use a table so functions can edit its value without having to return it.
     next_piece = {
-        shape = math.random(#shapes)
+        shape = math.random(#shapes),
+        rot_num = math.random(1, 4)
     }
 
     -- fall.interval is the number of seconds between downward piece movements.
@@ -409,6 +410,17 @@ function call_fn_for_xy_in_piece(piece, callback, param)
     end
 end
 
+function call_fn_for_xy_in_next(piece, callback, param)
+    local s = shapes[piece.shape][piece.rot_num]
+    for x, row in ipairs(s) do
+        for y, val in ipairs(row) do
+            if val == 1 then
+                callback(x, y, param)
+            end
+        end
+    end
+end
+
 function random_offset(piece)
     minoff = 40
     maxoff = 0
@@ -426,11 +438,11 @@ function update_moving_piece(fall, next_piece)
     -- Bring in the waiting next piece and set up a new next piece.
     cx, cy = get_camera_position()
     x, y, l = get_position(players[1].uid)
-    px = math.max(math.floor(x - 4), 1)
+    px = math.min(math.max(math.floor(x - 4), 1), 26)
     py = math.max(math.floor(124 - cy) - 12, 1)
     moving_piece = {
-        shape = math.random(#shapes),
-        rot_num = math.random(1, 4),
+        shape = next_piece.shape,
+        rot_num = next_piece.rot_num,
         x = px,
         y = py
     }
@@ -470,6 +482,7 @@ function update_moving_piece(fall, next_piece)
         end
     end
     next_piece.shape = math.random(#shapes)
+    next_piece.rot_num = math.random(1, 4)
 end
 
 function replace_with_trap(blockid)
@@ -650,6 +663,21 @@ function draw_moving(x, y, color)
     block_i = block_i + 1
 end
 
+function draw_next(x, y, color)
+    draw_color = rgba(colors[moving_piece.shape][1], colors[moving_piece.shape][2], colors[moving_piece.shape][3],
+                     color_alpha)
+    if color then
+        draw_color = rgba(colors[color][1], colors[color][2], colors[color][3], color_alpha)
+    end
+    width = screen_distance(0.6)
+    height = width/9*16
+    sx = -0.7 + x * width
+    sy = 0.95 - y * height
+    sx2 = sx+width
+    sy2 = sy+height
+    draw_rect_filled(sx, sy, sx2, sy2, 0, draw_color)
+end
+
 function draw_screen()
     if game_state ~= 'playing' or state.pause > 0 then
         return
@@ -666,6 +694,7 @@ function draw_screen()
     end
     block_i = 1
     call_fn_for_xy_in_piece(moving_piece, draw_moving, moving_piece.shape)
+    call_fn_for_xy_in_next(next_piece, draw_next, next_piece.shape)
 
     -- draw finishline
     sx, sy = screen_position(2.5, 107)
@@ -710,6 +739,10 @@ function clear_stage()
         if players[1].inventory.bombs < 4 then
             players[1].inventory.bombs = 4 -- get bombs on all levels so you don't get stuck
         end
+    end
+    doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_ENTRANCE)
+    if #doors > 0 then
+        kill_entity(doors[1])
     end
     cy = y + 4.5
     n = 1
