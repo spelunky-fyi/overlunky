@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 using OnInputFunc = bool(*)(std::uint32_t, std::uint64_t, std::int64_t);
@@ -30,6 +31,13 @@ void SpelunkyScript_Update(SpelunkyScript* script);
 void SpelunkyScript_Draw(SpelunkyScript* script, struct ImDrawList *draw_list);
 void SpelunkyScript_DrawOptions(SpelunkyScript* script);
 const char* SpelunkyScript_GetResult(SpelunkyScript* script);
+
+struct SpelunkyScriptMessage {
+	const char* Message{ nullptr };
+	std::size_t TimeMilliSecond{ 0 };
+};
+std::size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script);
+SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::size_t message_idx);
 
 enum class SpelunkyScreen {
 	Logo = 0,
