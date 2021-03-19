@@ -75,6 +75,7 @@ std::map<std::string, int> keys{
     {"spawn_kit_9", 0x239},
     {"spawn_layer_door", 0x20d},
     {"spawn_warp_door", 0x30d},
+    {"warp", 0x357},
     {"hide_ui", 0x7a},
     {"zoom_in", 0x1bc},
     {"zoom_out", 0x1be},
@@ -1383,6 +1384,10 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
         if (!lock_entity)
             g_last_id = spawned;
     }
+    else if (pressed("warp", wParam))
+    {
+        warp(g_world, g_level, g_to + 1);
+    }
     else if (pressed("move_up", wParam) && active("tool_entity"))
     {
         g_current_item = (std::min)((std::max)(g_current_item - 1, 0), g_filtered_count - 1);
@@ -1735,6 +1740,7 @@ void render_narnia()
     if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
     if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
     render_themes();
+    ImGui::PopItemWidth();
     if (ImGui::Button("Warp door##SpawnWarpDoor"))
     {
         int spawned = spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
@@ -1751,7 +1757,6 @@ void render_narnia()
     {
         warp(g_world, g_level, g_to + 1);
     }
-    ImGui::PopItemWidth();
 
     ImGui::Text("Dwelling");
     ImGui::SameLine(100.0f);

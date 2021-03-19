@@ -39,9 +39,10 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can `Save` for later use with a single click.
-  - **F2**: Spawn doors to many places
+  - **F2**: Warp and make doors to many places
       + **Shift+Enter**: Spawn back layer door
       + **Ctrl+Shift+Enter**: Spawn warp door
+      + **Ctrl+Shift+W**: Warp to set level
   - **F3**: Camera controls
       + **Ctrl+,**: Zoom in
       + **Ctrl+.**: Zoom out

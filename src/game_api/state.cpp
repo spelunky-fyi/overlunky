@@ -194,7 +194,7 @@ void State::set_camera_position(float cx, float cy)
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
 {
-    if (ptr()->screen < 12) //TODO: init game properly, (starting level, give bombs)
+    if (ptr()->screen != 12) //TODO: init game properly, so it doesn't crash after death (starting level, give bombs...)
         return;
     auto memory = Memory::get();
     typedef void w_func(struct StateMemory*, int);
@@ -210,7 +210,7 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
 
 void State::set_seed(uint32_t seed)
 {
-    if (ptr()->screen < 12) //TODO
+    if (ptr()->screen != 12) //TODO
         return;
     auto memory = Memory::get();
     typedef void sgs_func(uint32_t dummy, uint32_t seed);
