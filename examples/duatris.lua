@@ -773,6 +773,13 @@ function game_over()
             ropes = -1
         end
     end
+    for i,v in ipairs(moving_blocks) do
+        ent = get_entity(v)
+        if ent then
+            ent = ent:as_movable()
+            ent.flags = clr_flag(ent.flags, 6) -- enable damage
+        end
+    end
 end
 
 function clear_stage()
@@ -847,6 +854,14 @@ function clear_stage()
                 x, y, l = get_position(v)
                 if y > 108 and x > 15 and x < 20 then
                     spawn(ENT_TYPE.FX_EXPLOSION, x, y, l, 0, 0)
+                end
+            end
+            osiris = get_entities_by_type(ENT_TYPE.MONS_OSIRIS_HEAD)
+            for i,v in ipairs(osiris) do
+                x, y, l = get_position(v)
+                blocks = get_entities_at(0, 0x180, x, y, l, 3)
+                for j,w in ipairs(blocks) do
+                    kill_entity(w)
                 end
             end
         end, ON.FRAME)
