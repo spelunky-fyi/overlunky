@@ -140,22 +140,28 @@ Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coor
 Short for [spawn_door](#spawn_door).
 ### [`spawn_layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_layer_door)
 #### Params: `float x, float y`
-Spawn a door to backlayer
+Spawn a door to backlayer.
 ### [`layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_door)
 #### Params: `float x, float y`
 Short for [spawn_layer_door](#spawn_layer_door).
+### [`warp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=warp)
+#### Params: `int w, int l, int t`
+Warp to a level immediately.
+### [`set_seed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_seed)
+#### Params: `int seed`
+Set seed in seeded.
 ### [`god`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=god)
 #### Params: `bool g`
-Enable/disable godmode
+Enable/disable godmode.
 ### [`force_dark_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_dark_level)
 #### Params: `bool g`
-Try to force next levels to be dark
+Try to force next levels to be dark.
 ### [`zoom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoom)
 #### Params: `float level`
 Set the zoom level used in levels and shops. 13.5 is the default.
 ### [`pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause)
 #### Params: `bool p`
-Enable/disable game engine pause
+Enable/disable game engine pause.
 ### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
 #### Params: `int id, float x, float y, float vx, float vy`
 Teleport entity to coordinates with optional velocity
