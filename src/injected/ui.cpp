@@ -132,7 +132,7 @@ std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false,
      show_app_metrics = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
-     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false;
+     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false, load_script_dir = true, load_packs_dir = false;
 Player *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -485,7 +485,7 @@ void load_script(std::string file, bool enable = true)
         if (slash != std::string::npos)
             file = file.substr(slash + 1);*/
         SpelunkyScript *script = new SpelunkyScript(buf.str(), file, enable);
-        g_scripts[script->get_id()] = script;
+        g_scripts[script->get_file()] = script;
         data.close();
     }
 }
@@ -565,7 +565,7 @@ void refresh_script_files()
 {
     std::regex luareg("\\.lua$");
     g_script_files.clear();
-    if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         for (const auto &file : std::filesystem::recursive_directory_iterator(scriptpath))
         {
@@ -575,7 +575,7 @@ void refresh_script_files()
             }
         }
     }
-    if (std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    if (load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         for (const auto &file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
         {
@@ -588,26 +588,6 @@ void refresh_script_files()
     for (auto file : g_script_files)
     {
         load_script(file.string().data(), false);
-    }
-}
-
-void require_scripts()
-{
-    for (auto it : g_scripts)
-    {
-        SpelunkyScript *script = it.second;
-        if (!script->is_enabled())
-            continue;
-        for (auto req : script->consume_requires())
-        {
-            auto reqit = g_scripts.find(req);
-            if (reqit != g_scripts.end())
-            {
-                if(!reqit->second->is_enabled())
-                    reqit->second->set_changed(true);
-                reqit->second->set_enabled(true);
-            }
-        }
     }
 }
 
@@ -1906,12 +1886,15 @@ void fix_script_requires(SpelunkyScript* script)
     if (!script->is_enabled()) return;
     for (auto req : script->consume_requires())
     {
-        auto reqit = g_scripts.find(req);
-        if (reqit != g_scripts.end())
+        for (auto it2 : g_scripts)
         {
-            if(!reqit->second->is_enabled())
-                reqit->second->set_changed(true);
-            reqit->second->set_enabled(true);
+            SpelunkyScript *script2 = it2.second;
+            if (script2->get_id() == req)
+            {
+                if(!script2->is_enabled())
+                    script2->set_changed(true);
+                script2->set_enabled(true);
+            }
         }
     }
 }
@@ -2101,7 +2084,6 @@ void render_clickhandler()
         update_script(script.second);
         render_script(script.second, draw_list);
     }
-    //require_scripts();
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
@@ -2446,6 +2428,18 @@ void render_debug()
     ImGui::PopItemWidth();
 }
 
+std::string gen_random(const int len) {
+    std::string tmp_s;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    tmp_s.reserve(len);
+    for (int i = 0; i < len; ++i) 
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    return tmp_s;
+}
+
 void render_script_files()
 {
     ImGui::PushID("files");
@@ -2453,7 +2447,8 @@ void render_script_files()
     for (auto file : g_script_files)
     {
         ImGui::PushID(num++);
-        if (ImGui::Button(file.filename().string().data()))
+        std::string buttstr = file.parent_path().filename().string() + "/" + file.filename().string();
+        if (ImGui::Button(buttstr.data()))
         {
             load_script(file.string().data(), true);
         }
@@ -2462,7 +2457,7 @@ void render_script_files()
     if (g_script_files.size() == 0)
     {
         std::filesystem::path path = scriptpath;
-        std::string abspath = "Spelunky 2/"+scriptpath;
+        std::string abspath = scriptpath;
         if (std::filesystem::exists(abspath) && std::filesystem::is_directory(abspath))
         {
             abspath = std::filesystem::absolute(path).string();
@@ -2475,12 +2470,13 @@ void render_script_files()
     }
     if (ImGui::Button("Create new quick script"))
     {
+        std::string name = gen_random(16);
         SpelunkyScript *script = new SpelunkyScript(
             "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
-            "Script", true);
-        g_scripts[script->get_id()] = script;
+            name, true);
+        g_scripts[name] = script;
     }
     ImGui::PopID();
 }
@@ -2494,6 +2490,10 @@ void render_scripts()
         "your scripts work next week.");
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Hide script messages##HideScriptMessages", &hide_script_messages);
+    if(ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
+        refresh_script_files();
+    if(ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
+        refresh_script_files();
     ImGui::PushItemWidth(-1);
     int i = 0;
     std::vector<std::string> unload_scripts;
@@ -2534,7 +2534,7 @@ void render_scripts()
             ImGui::SameLine();
             if (ImGui::Button("Unload##UnloadScript"))
             {
-                unload_scripts.push_back(script->get_id());
+                unload_scripts.push_back(script->get_file());
             }
             ImGui::SameLine();
             if (ImGui::Button("Reload##ReloadScript"))
