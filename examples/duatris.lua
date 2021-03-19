@@ -432,11 +432,10 @@ function random_offset(piece)
     call_fn_for_xy_in_piece(piece, function(x, y, c)
         if x > maxoff then maxoff = x end
         if x < minoff then minoff = x end
-        if not y_at[x] then y_at[x] = y end
-        if y > y_at[x] then y_at[x] = y end
+        if not y_at[x] or y < y_at[x] then y_at[x] = y end
     end)
     local xoff = math.random(minoff, maxoff)
-    return xoff + 2, 124 - y_at[xoff] + 2
+    return xoff + 2, 124 - y_at[xoff] + 1
 end
 
 function update_moving_piece(fall, next_piece)
