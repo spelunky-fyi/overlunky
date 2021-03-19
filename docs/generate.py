@@ -45,7 +45,7 @@ def replace_all(text, dic):
 def print_af(lf, af):
     ret = replace_all(af['return'], replace)
     param = replace_all(af['param'], replace)
-    print('### `'+lf['name']+'`')
+    print('### [`'+lf['name']+'`](/spelunky-fyi/overlunky/search?l=Lua&q='+lf['name']+')')
     if param: print('#### Params: `'+param+'`')
     if ret: print('#### Returns: `'+ret+'`')
     for com in lf['comment']:
@@ -165,7 +165,7 @@ print('## Global variables')
 print("""These variables are always there to use.""")
 for lf in funcs:
     if lf['name'] in ['players', 'state', 'options', 'meta']:
-        print('### `'+lf['name']+'`')
+        print('### [`'+lf['name']+'`](/spelunky-fyi/overlunky/search?l=Lua&q='+lf['name']+')')
         for com in lf['comment']:
             print(com)
 
@@ -178,7 +178,7 @@ end
 ```""")
 for lf in events:
     if lf['name'].startswith('on_'):
-        print('### `'+lf['name']+'`')
+        print('### [`'+lf['name']+'`](/spelunky-fyi/overlunky/search?l=Lua&q='+lf['name']+')')
         for com in lf['comment']:
             print(com)
 
@@ -194,7 +194,7 @@ for lf in funcs:
         if m:
             param = m.group(1)
             param = replace_all(param, replace)
-        print('### `'+lf['name']+'`')
+        print('### [`'+lf['name']+'`](/spelunky-fyi/overlunky/search?l=Lua&q='+lf['name']+')')
         if param: print('#### Params: `'+param+'`')
         for com in lf['comment']:
             print(('#### ' if com.startswith('Returns:') else '')+com)
@@ -222,7 +222,7 @@ for type in types:
             print(' [`' + base + '`](#' + base.lower() + ')', end='')
         print()
     for var in type['vars']:
-        print('- `'+var['name']+'` '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
+        print('- [`'+var['name']+'`](/spelunky-fyi/overlunky/search?l=Lua&q='+var['name']+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
 
 print('## Enums')
 print('Enums are like numbers but in text that\'s easier to remember. Example:')
@@ -237,5 +237,5 @@ end, ON.LEVEL)
 for type in enums:
     print('### '+type['name'])
     for var in type['vars']:
-        if var['name']: print('- `'+var['name']+'` '+var['type'])
+        if var['name']: print('- [`'+var['name']+'`](/spelunky-fyi/overlunky/search?l=Lua&q='+type['name']+'.'+var['name']+') ' + var['type'])
         else: print('- '+var['type'])
