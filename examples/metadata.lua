@@ -17,4 +17,10 @@ meta = {
 
 message("Don't print this before I hit Enable")
 
-meta.description = "You can put these after your real code too, but don't be an idiot."
+-- super dumb multiline
+meta.description = [[You can put these after your real code too, but don't be an idiot.
+This is a multiline string.
+Third line is the charm!]]..
+  " Really pushing the limits here by combining these..."  -- lol
+
+message("Please don't print this either")

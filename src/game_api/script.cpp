@@ -245,19 +245,30 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     {
         std::string metacode = "";
         std::stringstream metass(script);
-        std::regex reg("(\\bmeta\\.[a-z]+\\s*=)");
-        std::regex regstart("(\\bmeta\\s*=)");
+        std::regex reg("(^\\s*meta\\.[a-z]+\\s*=)");
+        std::regex regstart("(^\\s*meta\\s*=)");
         std::regex regend("(\\})");
+        std::regex multistart("\\[\\[|\\.\\.\\s*($|--)|\\bmeta\\.[a-z]+\\s*=\\s*($|--)");
+        std::regex multiend("\\]\\]\\s*($|--)|[\"']\\s*($|--)");
         bool getmeta = false;
+        bool getmulti = false;
         for (std::string line; std::getline(metass, line);)
         {
             if (std::regex_search(line, regstart))
             {
                 getmeta = true;
             }
-            if (std::regex_search(line, reg) || getmeta)
+            if (std::regex_search(line, reg) && std::regex_search(line, multistart))
+            {
+                getmulti = true;
+            }
+            if (std::regex_search(line, reg) || getmeta || getmulti)
             {
                 metacode += line + "\n";
+            }
+            if (std::regex_search(line, multiend))
+            {
+                getmulti = false;
             }
             if (std::regex_search(line, regend))
             {
@@ -377,7 +388,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         options[name] = { desc, value, 0, 0, "" };
         lua["options"][name] = value;
     };
-    /// Add a combobox option that the user can change in the UI. Read with `options.name`. Separate `opts` with `\0`. Returns the index of the selection as int.
+    /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`.
     lua["register_option_combo"] = [this](std::string name, std::string desc, std::string opts) {
         options[name] = { desc, 0, 0, 0, opts };
         lua["options"][name] = 1;
