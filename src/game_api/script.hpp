@@ -18,6 +18,7 @@ struct ScriptOption
     std::variant<int, float, std::string, bool> value;
     std::variant<int, float> min;
     std::variant<int, float> max;
+    std::string opts;
 };
 
 struct ScriptMeta

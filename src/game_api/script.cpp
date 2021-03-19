@@ -126,6 +126,43 @@ std::string sanitize(std::string data)
     return data;
 }
 
+struct InputTextCallback_UserData
+{
+    std::string*            Str;
+    ImGuiInputTextCallback  ChainCallback;
+    void*                   ChainCallbackUserData;
+};
+
+static int InputTextCallback(ImGuiInputTextCallbackData* data)
+{
+    InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+    {
+        std::string* str = user_data->Str;
+        IM_ASSERT(data->Buf == str->c_str());
+        str->resize(data->BufTextLen);
+        data->Buf = (char*)str->c_str();
+    }
+    else if (user_data->ChainCallback)
+    {
+        data->UserData = user_data->ChainCallbackUserData;
+        return user_data->ChainCallback(data);
+    }
+    return 0;
+}
+
+bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+{
+    IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+    flags |= ImGuiInputTextFlags_CallbackResize;
+
+    InputTextCallback_UserData cb_user_data;
+    cb_user_data.Str = str;
+    cb_user_data.ChainCallback = callback;
+    cb_user_data.ChainCallbackUserData = user_data;
+    return ImGui::InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+}
+
 class SpelunkyScript::ScriptImpl
 {
 public:
@@ -320,20 +357,30 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
             return;
         say(NULL, entity, message.data(), unk_type, top);
     };
-    /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default.
+    /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
-        options[name] = { desc, value, min, max };
+        options[name] = { desc, value, min, max, "" };
         lua["options"][name] = value;
     };
-    /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default.
+    /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
     lua["register_option_float"] = [this](std::string name, std::string desc, float value, float min, float max) {
-        options[name] = { desc, value, min, max };
+        options[name] = { desc, value, min, max, "" };
         lua["options"][name] = value;
     };
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_bool"] = [this](std::string name, std::string desc, bool value) {
-        options[name] = { desc, value, 0, 0 };
+        options[name] = { desc, value, 0, 0, "" };
         lua["options"][name] = value;
+    };
+    /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
+    lua["register_option_string"] = [this](std::string name, std::string desc, std::string value) {
+        options[name] = { desc, value, 0, 0, "" };
+        lua["options"][name] = value;
+    };
+    /// Add a combobox option that the user can change in the UI. Read with `options.name`, `value` is the default. Separate list options with `\\0`. Return the index of the selection as int.
+    lua["register_option_combo"] = [this](std::string name, std::string desc, std::string opts) {
+        options[name] = { desc, 0, 0, 0, opts };
+        lua["options"][name] = 1;
     };
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
@@ -1144,9 +1191,18 @@ bool SpelunkyScript::ScriptImpl::handle_function(sol::function func)
 
 void SpelunkyScript::ScriptImpl::render_options()
 {
+    ImGui::PushID(meta.id.data());
     for (auto& option : options)
     {
-        if (int* val = std::get_if<int>(&option.second.value))
+        if (option.second.opts != "") {
+            int *val = std::get_if<int>(&option.second.value);
+            if (ImGui::Combo(option.second.desc.data(), val, (char *)option.second.opts.c_str()))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val+1;
+            }
+        }
+        else if (int* val = std::get_if<int>(&option.second.value))
         {
             int min = std::get<int>(option.second.min);
             int max = std::get<int>(option.second.max);
@@ -1174,7 +1230,16 @@ void SpelunkyScript::ScriptImpl::render_options()
                 lua["options"][option.first] = *val;
             }
         }
+        else if (std::string* val = std::get_if<std::string>(&option.second.value))
+        {
+            if (InputString(option.second.desc.data(), val, 0, nullptr, nullptr))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val;
+            }
+        }
     }
+    ImGui::PopID();
 }
 
 

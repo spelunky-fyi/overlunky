@@ -1,5 +1,5 @@
 meta.name = 'Duatris'
-meta.version = '1.1'
+meta.version = '1.2'
 meta.description = 'How about a nice game of Duatris? Hold DOOR button to stay still and control the pieces with D-PAD. Rotate with UP or ROPE/BOMB. While your piece is hilighted, you can move it. After the lock delay, it will spawn traps and foes, so watch out! Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
