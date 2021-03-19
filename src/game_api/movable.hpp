@@ -130,7 +130,7 @@ class Gun : public Movable
     int32_t in_chamber;
 };
 
-class Block : public Movable
+class Crushtrap : public Movable
 {
   public:
     float dirx;
