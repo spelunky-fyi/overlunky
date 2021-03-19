@@ -16,6 +16,7 @@
 #include <locale>
 #include <map>
 #include <string>
+#include <regex>
 #include <toml.hpp>
 
 #include "entity.hpp"
@@ -480,9 +481,9 @@ void load_script(std::string file, bool enable = true)
     if (!data.fail())
     {
         buf << data.rdbuf();
-        size_t slash = file.find_last_of("/\\");
+        /*size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
-            file = file.substr(slash + 1);
+            file = file.substr(slash + 1);*/
         SpelunkyScript *script = new SpelunkyScript(buf.str(), file, enable);
         g_scripts[script->get_id()] = script;
         data.close();
@@ -562,12 +563,26 @@ bool InputStringMultiline(const char *label, std::string *str, const ImVec2 &siz
 
 void refresh_script_files()
 {
+    std::regex luareg("\\.lua$");
     g_script_files.clear();
     if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
-        for (const auto &file : std::filesystem::directory_iterator(scriptpath))
+        for (const auto &file : std::filesystem::recursive_directory_iterator(scriptpath))
         {
-            g_script_files.push_back(file.path());
+            if (std::regex_search(file.path().string(), luareg))
+            {
+                g_script_files.push_back(file.path());
+            }
+        }
+    }
+    if (std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    {
+        for (const auto &file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
+        {
+            if (file.path().filename().string() == "main.lua")
+            {
+                g_script_files.push_back(file.path());
+            }
         }
     }
     for (auto file : g_script_files)
@@ -2447,7 +2462,11 @@ void render_script_files()
     if (g_script_files.size() == 0)
     {
         std::filesystem::path path = scriptpath;
-        std::string abspath = std::filesystem::absolute(path).string();
+        std::string abspath = "Spelunky 2/"+scriptpath;
+        if (std::filesystem::exists(abspath) && std::filesystem::is_directory(abspath))
+        {
+            abspath = std::filesystem::absolute(path).string();
+        }
         ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.data());
     }
     if (ImGui::Button("Refresh##RefreshScripts"))
@@ -2486,7 +2505,11 @@ void render_scripts()
         ImGui::PushID(i);
         SpelunkyScript *script = it.second;
         char name[255];
-        sprintf(name, "%s (%s)", script->get_name().c_str(), script->get_file().c_str());
+        std::string filename;
+        size_t slash = script->get_file().find_last_of("/\\");
+        if (slash != std::string::npos)
+            filename = script->get_file().substr(slash + 1);
+        sprintf(name, "%s (%s)", script->get_name().c_str(), filename.c_str());
         if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
@@ -2512,6 +2535,11 @@ void render_scripts()
             if (ImGui::Button("Unload##UnloadScript"))
             {
                 unload_scripts.push_back(script->get_id());
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Reload##ReloadScript"))
+            {
+                load_script(script->get_file(), script->is_enabled());
             }
             else
             {

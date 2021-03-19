@@ -65,7 +65,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Escape**: Return focus to game from an input
 
 ### Scripts
-Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini.
+Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Also searches for main.lua files under `Mods/Packs`.
 
 ## Troubleshooting
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
