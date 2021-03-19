@@ -1735,18 +1735,152 @@ void render_narnia()
     if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
     if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
     render_themes();
-    if (ImGui::Button("Warp door"))
+    if (ImGui::Button("Warp door##SpawnWarpDoor"))
     {
         int spawned = spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
         if (!lock_entity)
             g_last_id = spawned;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Layer door"))
+    if (ImGui::Button("Layer door##SpawnLayerDoor"))
     {
         spawn_backdoor(g_x, g_y);
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Warp##InstantWarp"))
+    {
+        warp(g_world, g_level, g_to + 1);
+    }
     ImGui::PopItemWidth();
+
+    ImGui::Text("Dwelling");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("1-1##Warp1-1"))
+        warp(1, 1, 1);
+    ImGui::SameLine();
+    if (ImGui::Button("1-2##Warp1-2"))
+        warp(1, 2, 1);
+    ImGui::SameLine();
+    if (ImGui::Button("1-3##Warp1-3"))
+        warp(1, 3, 1);
+    ImGui::SameLine();
+    if (ImGui::Button("1-4##Warp1-4"))
+        warp(1, 4, 1);
+
+    ImGui::Text("Jungle");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("2-1##WarpJ2-1"))
+        warp(2, 1, 2);
+    ImGui::SameLine();
+    if (ImGui::Button("2-2##WarpJ2-2"))
+        warp(2, 2, 2);
+    ImGui::SameLine();
+    if (ImGui::Button("2-3##WarpJ2-3"))
+        warp(2, 3, 2);
+    ImGui::SameLine();
+    if (ImGui::Button("2-4##WarpJ2-4"))
+        warp(2, 4, 2);
+
+    ImGui::Text("Volcana");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("2-1##WarpV2-1"))
+        warp(2, 1, 3);
+    ImGui::SameLine();
+    if (ImGui::Button("2-2##WarpV2-2"))
+        warp(2, 2, 3);
+    ImGui::SameLine();
+    if (ImGui::Button("2-3##WarpV2-3"))
+        warp(2, 3, 3);
+    ImGui::SameLine();
+    if (ImGui::Button("2-4##WarpV2-4"))
+        warp(2, 4, 3);
+
+    ImGui::Text("Olmec");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("3-1##Warp3-1"))
+        warp(3, 1, 4);
+
+    ImGui::Text("Tide Pool");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("4-1##WarpP4-1"))
+        warp(4, 1, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-2##WarpP4-2"))
+        warp(4, 2, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-3##WarpP4-3"))
+        warp(4, 3, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-4##WarpP4-4"))
+        warp(4, 4, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("Abzu##WarpAbzu"))
+        warp(4, 4, 13);
+
+    ImGui::Text("Temple");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("4-1##WarpT4-1"))
+        warp(4, 1, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-2##WarpT4-2"))
+        warp(4, 2, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-3##WarpT4-3"))
+        warp(4, 3, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-4##WarpT4-4"))
+        warp(4, 4, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("CoG##WarpCoG"))
+        warp(4, 3, 11);
+    ImGui::SameLine();
+    if (ImGui::Button("Duat##WarpDuat"))
+        warp(4, 4, 12);
+
+    ImGui::Text("Ice Caves");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("5-1##Warp5-1"))
+        warp(5, 1, 7);
+
+    ImGui::Text("Neo Babylon");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("6-1##Warp6-1"))
+        warp(6, 1, 8);
+    ImGui::SameLine();
+    if (ImGui::Button("6-2##Warp6-2"))
+        warp(6, 2, 8);
+    ImGui::SameLine();
+    if (ImGui::Button("6-3##Warp6-3"))
+        warp(6, 3, 8);
+    ImGui::SameLine();
+    if (ImGui::Button("Tiamat##WarpTiamat"))
+        warp(6, 4, 14);
+
+    ImGui::Text("Sunken City");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("7-1##Warp7-1"))
+        warp(7, 1, 9);
+    ImGui::SameLine();
+    if (ImGui::Button("7-2##Warp7-2"))
+        warp(7, 2, 9);
+    ImGui::SameLine();
+    if (ImGui::Button("7-3##Warp7-3"))
+        warp(7, 3, 9);
+    ImGui::SameLine();
+    if (ImGui::Button("Hundun##WarpHundun"))
+        warp(7, 4, 16);
+    ImGui::SameLine();
+    if (ImGui::Button("EW##WarpEW"))
+        warp(7, 2, 15);
+
+    ImGui::Text("Cosmic Ocean");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("7-5##Warp7-5"))
+        warp(7, 5, 10);
+    ImGui::SameLine();
+    if (ImGui::Button("7-98##Warp7-98"))
+        warp(7, 98, 10);
+
 }
 
 void render_camera()
@@ -3341,7 +3475,7 @@ void imgui_init(ImGuiContext*) {
     autorun_scripts();
     set_colors();
     windows["tool_entity"] = new Window({ "Spawner (" + key_string(keys["tool_entity"]) + ")", false, true });
-    windows["tool_door"] = new Window({ "Door (" + key_string(keys["tool_door"]) + ")", false, true });
+    windows["tool_door"] = new Window({ "Warp (" + key_string(keys["tool_door"]) + ")", false, true });
     windows["tool_camera"] = new Window({ "Camera (" + key_string(keys["tool_camera"]) + ")", false, true });
     windows["tool_entity_properties"] = new Window({ "Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true });
     windows["tool_game_properties"] = new Window({ "Game (" + key_string(keys["tool_game_properties"]) + ")", false, true });

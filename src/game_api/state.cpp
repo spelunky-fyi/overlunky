@@ -191,3 +191,30 @@ void State::set_camera_position(float cx, float cy)
     write_mem_prot(get_camera(), to_le_bytes(cx), true);
     write_mem_prot(get_camera() + 4, to_le_bytes(cy), true);
 }
+
+void State::warp(uint8_t w, uint8_t l, uint8_t t)
+{
+    if (ptr()->screen < 12) //TODO: init game properly, (starting level, give bombs)
+        return;
+    auto memory = Memory::get();
+    typedef void w_func(struct StateMemory*, int);
+    static w_func* warpfunc = (w_func*)(memory.at_exe(0x221A7080)); //TODO: patterns, thanks zappatic though!
+    ptr()->world = w;
+    ptr()->world_next = w;
+    ptr()->level = l;
+    ptr()->level_next = l;
+    ptr()->theme = t;
+    ptr()->theme_next = t;
+    warpfunc(ptr(), 0);
+}
+
+void State::set_seed(uint32_t seed)
+{
+    if (ptr()->screen < 12) //TODO
+        return;
+    auto memory = Memory::get();
+    typedef void sgs_func(uint32_t dummy, uint32_t seed);
+    static sgs_func* sgs = (sgs_func*)(memory.at_exe(0x221301C0)); //TODO
+    ptr()->screen_last = 0x0E;
+    sgs(0, seed);
+}

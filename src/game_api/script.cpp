@@ -415,17 +415,21 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["spawn_door"] = spawn_door_abs;
     /// Short for [spawn_door](#spawn_door).
     lua["door"] = spawn_door_abs;
-    /// Spawn a door to backlayer
+    /// Spawn a door to backlayer.
     lua["spawn_layer_door"] = spawn_backdoor_abs;
     /// Short for [spawn_layer_door](#spawn_layer_door).
     lua["layer_door"] = spawn_backdoor_abs;
-    /// Enable/disable godmode
+    /// Warp to a level immediately.
+    lua["warp"] = warp;
+    /// Set seed in seeded.
+    lua["set_seed"] = set_seed;
+    /// Enable/disable godmode.
     lua["god"] = godmode;
-    /// Try to force next levels to be dark
+    /// Try to force next levels to be dark.
     lua["force_dark_level"] = darkmode;
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
-    /// Enable/disable game engine pause
+    /// Enable/disable game engine pause.
     lua["pause"] = [this](bool p) {
         if (p)
             set_pause(0x20);
@@ -529,6 +533,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["carry"] = carry;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
+
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
         Entity* ea = get_entity_ptr(a);

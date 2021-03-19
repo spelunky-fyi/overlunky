@@ -56,3 +56,5 @@ void apply_entity_db(uint32_t id);
 void flip_entity(uint32_t id);
 std::pair<float, float> get_camera_position();
 void set_camera_position(float cx, float cy);
+void warp(uint8_t w, uint8_t l, uint8_t t);
+void set_seed(uint32_t seed);
