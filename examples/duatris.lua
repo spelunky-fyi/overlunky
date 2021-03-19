@@ -436,7 +436,7 @@ function random_offset(piece)
         if y > y_at[x] then y_at[x] = y end
     end)
     local xoff = math.random(minoff, maxoff)
-    return xoff + 2, 124 - y_at[xoff] + 1
+    return xoff + 2, 124 - y_at[xoff] + 2
 end
 
 function update_moving_piece(fall, next_piece)
