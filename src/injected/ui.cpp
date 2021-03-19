@@ -64,6 +64,15 @@ std::map<std::string, int> keys{
     {"save_settings", 0x353},
     {"load_settings", 0x34c},
     {"spawn_entity", 0x10d},
+    {"spawn_kit_1", 0x231},
+    {"spawn_kit_2", 0x232},
+    {"spawn_kit_3", 0x233},
+    {"spawn_kit_4", 0x234},
+    {"spawn_kit_5", 0x235},
+    {"spawn_kit_6", 0x236},
+    {"spawn_kit_7", 0x237},
+    {"spawn_kit_8", 0x238},
+    {"spawn_kit_9", 0x239},
     {"spawn_layer_door", 0x20d},
     {"spawn_warp_door", 0x30d},
     {"hide_ui", 0x7a},
@@ -1323,6 +1332,51 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         spawn_entities(false);
     }
+    else if (pressed("spawn_kit_1", wParam))
+    {
+        if (saved_entities.size() > 0)
+            spawn_entities(false, saved_entities.at(0));
+    }
+    else if (pressed("spawn_kit_2", wParam))
+    {
+        if (saved_entities.size() > 1)
+            spawn_entities(false, saved_entities.at(1));
+    }
+    else if (pressed("spawn_kit_3", wParam))
+    {
+        if (saved_entities.size() > 2)
+            spawn_entities(false, saved_entities.at(2));
+    }
+    else if (pressed("spawn_kit_4", wParam))
+    {
+        if (saved_entities.size() > 3)
+            spawn_entities(false, saved_entities.at(3));
+    }
+    else if (pressed("spawn_kit_5", wParam))
+    {
+        if (saved_entities.size() > 4)
+            spawn_entities(false, saved_entities.at(4));
+    }
+    else if (pressed("spawn_kit_6", wParam))
+    {
+        if (saved_entities.size() > 5)
+            spawn_entities(false, saved_entities.at(6));
+    }
+    else if (pressed("spawn_kit_7", wParam))
+    {
+        if (saved_entities.size() > 6)
+            spawn_entities(false, saved_entities.at(6));
+    }
+    else if (pressed("spawn_kit_8", wParam))
+    {
+        if (saved_entities.size() > 7)
+            spawn_entities(false, saved_entities.at(8));
+    }
+    else if (pressed("spawn_kit_9", wParam))
+    {
+        if (saved_entities.size() > 8)
+            spawn_entities(false, saved_entities.at(8));
+    }
     else if (pressed("spawn_warp_door", wParam))
     {
         int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
@@ -1639,7 +1693,8 @@ void render_input()
             spawn_entities(false, i);
         }
         ImGui::PopID();
-
+        ImGui::SameLine();
+        ImGui::Text("%d:", n + 1);
         ImGui::PopID();
         ImGui::SameLine();
         ImGui::TextWrapped(search.data());
