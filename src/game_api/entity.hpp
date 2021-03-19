@@ -148,8 +148,11 @@ class Entity
     Vector items;
     uint32_t flags;
     uint32_t more_flags;
-    uint32_t uid;
-    uint32_t animation;
+    int32_t uid;
+    uint8_t animation_frame;
+    uint8_t b3d;
+    uint8_t b3e;
+    uint8_t b3f;
     float x;
     float y;
     float w;

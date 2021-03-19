@@ -662,8 +662,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &Entity::more_flags,
         "uid",
         &Entity::uid,
-        "animation",
-        &Entity::animation,
+        "animation_frame",
+        &Entity::animation_frame,
         "x",
         &Entity::x,
         "y",
@@ -689,7 +689,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         "as_player",
         &Entity::as<Player>,
         "as_monster",
-        &Entity::as<Monster>);
+        &Entity::as<Monster>,
+        "as_gun",
+        &Entity::as<Gun>,
+        "as_block",
+        &Entity::as<Block>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -747,6 +751,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Container>(
         "Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Gun>("Gun", 
+        "cooldown",
+        &Gun::cooldown,
+        "shots",
+        &Gun::shots,
+        "shots2",
+        &Gun::shots2,
+        "in_chamber",
+        &Gun::in_chamber,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+    lua.new_usertype<Block>("Block",
+        "dirx",
+        &Block::dirx,
+        "diry",
+        &Block::diry,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",

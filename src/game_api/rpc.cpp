@@ -647,7 +647,7 @@ void lock_door_at(float x, float y)
         }
         else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
-            door->animation &= ~1U;
+            door->animation_frame &= ~1U;
         }
     }
 }
@@ -665,7 +665,7 @@ void unlock_door_at(float x, float y)
         }
         else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
-            door->animation |= 1U;
+            door->animation_frame |= 1U;
         }
     }
 }

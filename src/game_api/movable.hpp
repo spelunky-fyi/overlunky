@@ -19,7 +19,7 @@ class Movable : public Entity
     int32_t standing_on_uid;
     float velocityx;
     float velocityy;
-    uint32_t holding_uid;
+    int32_t holding_uid;
     uint8_t state;
     uint8_t last_state;
     uint8_t move_state;
@@ -118,6 +118,23 @@ class Container : public Movable
   public:
     int32_t inside;
     int32_t timer;
+};
+
+class Gun : public Movable
+{
+  public:
+    uint8_t cooldown;
+    uint8_t shots;
+    uint8_t shots2;
+    uint8_t b12b;
+    int32_t in_chamber;
+};
+
+class Block : public Movable
+{
+  public:
+    float dirx;
+    float diry;
 };
 
 class Mattock : public Movable
