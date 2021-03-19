@@ -105,6 +105,23 @@ const char* SpelunkyScript_GetResult(SpelunkyScript* script)
 {
 	return script->get_result().c_str();
 }
+std::size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script)
+{
+	return script->get_messages().size();
+}
+SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::size_t message_idx)
+{
+	const auto& messages = script->get_messages();
+	if (message_idx < messages.size())
+	{
+		const auto& message = messages[message_idx];
+		return SpelunkyScriptMessage{
+			message.message.c_str(),
+			static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(message.time.time_since_epoch()).count())
+		};
+	}
+	return SpelunkyScriptMessage{};
+}
 
 StateMemory& get_state() {
 	static StateMemory* state = State::get().ptr();
