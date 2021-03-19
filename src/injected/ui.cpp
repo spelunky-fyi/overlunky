@@ -1820,16 +1820,16 @@ void render_narnia()
     ImGui::Text("Temple");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("4-1##WarpT4-1"))
-        warp(4, 1, 5);
+        warp(4, 1, 6);
     ImGui::SameLine();
     if (ImGui::Button("4-2##WarpT4-2"))
-        warp(4, 2, 5);
+        warp(4, 2, 6);
     ImGui::SameLine();
     if (ImGui::Button("4-3##WarpT4-3"))
-        warp(4, 3, 5);
+        warp(4, 3, 6);
     ImGui::SameLine();
     if (ImGui::Button("4-4##WarpT4-4"))
-        warp(4, 4, 5);
+        warp(4, 4, 6);
     ImGui::SameLine();
     if (ImGui::Button("CoG##WarpCoG"))
         warp(4, 3, 11);
