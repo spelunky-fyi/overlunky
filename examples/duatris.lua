@@ -1,5 +1,5 @@
 meta.name = 'Duatris'
-meta.version = '1.2'
+meta.version = '1.3'
 meta.description = 'How about a nice game of Duatris? Hold DOOR button to stay still and control the pieces with D-PAD. Rotate with UP or ROPE/BOMB. While your piece is hilighted, you can move it. After the lock delay, it will spawn traps and foes, so watch out! Reach the finish line to stop spawning tetrominos and kill Osiris to... start all over again, faster!'
 meta.author = 'Dregu'
 
@@ -124,6 +124,7 @@ local ropes = -1
 local bombs = -1
 
 local last_loot = 0
+local give_gift = false
 
 function init()
     game_state = 'playing'
@@ -427,13 +428,15 @@ end
 function random_offset(piece)
     minoff = 40
     maxoff = 0
-    maxy = 120
+    y_at = {}
     call_fn_for_xy_in_piece(piece, function(x, y, c)
         if x > maxoff then maxoff = x end
         if x < minoff then minoff = x end
-        if y < maxy then maxy = y end
+        if not y_at[x] then y_at[x] = y end
+        if y > y_at[x] then y_at[x] = y end
     end)
-    return math.random(minoff, maxoff) + 2, 124 - maxy + 1
+    local xoff = math.random(minoff, maxoff)
+    return xoff + 2, 124 - y_at[xoff] + 1
 end
 
 function update_moving_piece(fall, next_piece)
@@ -482,10 +485,15 @@ function update_moving_piece(fall, next_piece)
             -- ent.color.a = 0.85
             moving_blocks[#moving_blocks + 1] = newid
         end)
-        if options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
+        if give_gift then
+            give_gift = false
+            spawnid = loot_to[math.random(#loot_to)]
+            gx, gy = random_offset(moving_piece)
+            spawn(spawnid, gx, gy, LAYER.FRONT, 0, 0)
+        elseif options.enemies and math.random() - state.level_count / 10 < options.enemychance / 100 then
             gx, gy = random_offset(moving_piece)
             spawnid = tiny_to[math.random(#tiny_to)]
-            if math.random() < 0.1 and state.time_level > last_loot + 60*15 then
+            if math.random() < 0.07 and state.time_level > last_loot + 60*15 then
                 last_loot = state.time_level
                 spawnid = loot_to[math.random(#loot_to)]
             end
@@ -554,8 +562,7 @@ function check_lines()
                 apepid = spawn(ENT_TYPE.MONS_APEP_HEAD, apep_x, 124-line_y, LAYER.FRONT, 0, 0)
                 ent = get_entity(apepid):as_movable()
                 ent.hitboxy = 0.1
-                prize = loot_to[math.random(#loot_to)]
-                spawn(prize, math.random()*0.2-0.1, 0, LAYER.PLAYER1, 0, 0)
+                give_gift = true
                 toast('The gods bestow a gift upon you!')
             end
         end
