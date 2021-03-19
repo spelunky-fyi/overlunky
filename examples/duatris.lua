@@ -834,7 +834,10 @@ function clear_stage()
             else
                 plx, ply, pll = get_position(players[1].uid)
                 if ply > 107 then
-                    game_over()
+                    game_state = 'paused'
+                    --game_over()
+                elseif ply < 107 then
+                    game_state = 'playing'
                 end
             end
             for ci = 1, options.crates, 1 do
@@ -858,7 +861,7 @@ function clear_stage()
             osiris = get_entities_by_type(ENT_TYPE.MONS_OSIRIS_HEAD)
             for i,v in ipairs(osiris) do
                 x, y, l = get_position(v)
-                blocks = get_entities_at(0, 0x180, x, y, l, 3)
+                blocks = get_entities_at(0, 0x180, x, y, l, 2.4)
                 for j,w in ipairs(blocks) do
                     kill_entity(w)
                 end
