@@ -394,7 +394,7 @@ end
 - [`flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) &Entity::flags
 - [`more_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) &Entity::more_flags
 - [`uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) &Entity::uid
-- [`animation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation) &Entity::animation
+- [`animation_frame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) &Entity::animation_frame
 - [`x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &Entity::x
 - [`y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &Entity::y
 - [`width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &Entity::w
@@ -408,6 +408,8 @@ end
 - [`as_mount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_mount) &Entity::as&lt;Mount&gt;
 - [`as_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_player) &Entity::as&lt;Player&gt;
 - [`as_monster`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_monster) &Entity::as&lt;Monster&gt;
+- [`as_gun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_gun) &Entity::as&lt;Gun&gt;
+- [`as_block`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_block) &Entity::as&lt;Block&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -448,6 +450,16 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
 - [`timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Container::timer
+### `Gun`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooldown) &Gun::cooldown
+- [`shots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots) &Gun::shots
+- [`shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
+- [`in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
+### `Block`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Block::dirx
+- [`diry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diry) &Block::diry
 ### `StateMemory`
 - [`screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
