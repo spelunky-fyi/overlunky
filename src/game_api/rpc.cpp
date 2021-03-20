@@ -555,13 +555,19 @@ std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, flo
 void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
     Entity *door = get_entity_ptr(id);
     if (door == nullptr)
         return;
     static_cast<Door *>(door)->set_target(w, l, t);
+}
+
+std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t id)
+{
+    auto state = State::get();
+    Entity *door = get_entity_ptr(id);
+    if (door == nullptr)
+        return std::make_tuple(0, 0, 0);
+    return static_cast<Door *>(door)->get_target();
 }
 
 void set_contents(uint32_t id, uint32_t item)

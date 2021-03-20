@@ -38,7 +38,10 @@ struct StateMemory
     uint8_t b4f;
     int32_t i50;
     int32_t i54;
-    int32_t i58;
+    uint8_t world_start;
+    uint8_t level_start;
+    uint8_t theme_start;
+    uint8_t b5f;
     uint32_t seed;
     uint32_t time_total;
     uint8_t world;

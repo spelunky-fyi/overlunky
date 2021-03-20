@@ -1729,6 +1729,13 @@ void render_input()
     }
 }
 
+const char *theme_name(int theme)
+{
+    if (theme < 1 || theme > 17)
+        return "Crash City";
+    return themes_short[theme - 1];
+}
+
 void render_narnia()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
@@ -1756,6 +1763,124 @@ void render_narnia()
     if (ImGui::Button("Warp##InstantWarp"))
     {
         warp(g_world, g_level, g_to + 1);
+    }
+    ImGui::Text("Instant warp to level:");
+    std::vector<uint32_t> doortypes;
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
+    auto doors = get_entities_by_type(doortypes);
+    ImGui::Text("Next level");
+    ImGui::SameLine(100.0f);
+    int n = 0;
+    for (auto doorid : doors)
+    {
+        Movable *doorent = (Movable *)get_entity_ptr(doorid);
+        Target *target = reinterpret_cast<Target *>(&doorent->anim_func);
+        if (!target->enabled)
+            continue;
+        char buf[64];
+        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+        if (n > 0)
+            ImGui::SameLine();
+        if (ImGui::Button(buf))
+        {
+            warp(target->world, target->level, target->theme);
+        }
+        n++;
+    }
+
+    if (g_state->theme == 11)
+    {
+        Target *target = new Target;
+        target->world = 4;
+        target->level = 4;
+        target->theme = 12;
+        char buf[64];
+        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+        if (n == 0)
+            ImGui::SameLine(100.0f);
+        else
+            ImGui::SameLine();
+        if (ImGui::Button(buf))
+        {
+            warp(target->world, target->level, target->theme);
+        }
+        n++;
+    }
+
+    Target *target = new Target;
+    target->world = 0;
+    int tnum = g_state->world * 100 + g_state->level;
+    switch(tnum)
+    {
+        case 104:
+        case 301:
+            break;
+        case 501:
+            target->world = 6;
+            target->level = 1;
+            target->theme = 8;
+            break;
+        case 204:
+            target->world = 3;
+            target->level = 1;
+            target->theme = 4;
+            break;
+        case 404:
+            target->world = 5;
+            target->level = 1;
+            target->theme = 7;
+            break;
+        case 603:
+            target->world = 6;
+            target->level = 4;
+            target->theme = 14;
+            break;
+        case 604:
+            target->world = 7;
+            target->level = 1;
+            target->theme = 9;
+            break;
+        case 702:
+            target->world = 7;
+            target->level = 3;
+            target->theme = 9;
+            break;
+        case 703:
+            target->world = 7;
+            target->level = 4;
+            target->theme = 16;
+            break;
+        case 704:
+            target->world = 7;
+            target->level = 5;
+            target->theme = 10;
+            break;
+        default:
+            target->world = g_state->world;
+            target->level = g_state->level + 1;
+            target->theme = g_state->theme;
+            break;
+    }
+    if (g_state->theme == 17)
+    {
+        target->world = 1;
+        target->level = 1;
+        target->theme = 1;
+    }
+    if (target->world > 0)
+    {
+        char buf[64];
+        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+        if (n == 0)
+            ImGui::SameLine(100.0f);
+        else
+            ImGui::SameLine();
+        if (ImGui::Button(buf))
+        {
+            warp(target->world, target->level, target->theme);
+        }
     }
 
     ImGui::Text("Dwelling");
@@ -1885,7 +2010,6 @@ void render_narnia()
     ImGui::SameLine();
     if (ImGui::Button("7-98##Warp7-98"))
         warp(7, 98, 10);
-
 }
 
 void render_camera()
@@ -2939,13 +3063,6 @@ void render_screen(const char *label, int state)
     }
 }
 
-const char *theme_name(int theme)
-{
-    if (theme < 1 || theme > 17)
-        return "Crash City";
-    return themes_short[theme - 1];
-}
-
 void render_entity_props()
 {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -3343,11 +3460,16 @@ void render_game_props()
         ImGui::DragScalar("Theme ##Themenumber", ImGuiDataType_U8, (char *)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
         ImGui::Text(theme_name(g_state->theme));
-        ImGui::DragScalar("To World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_next, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("To Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_next, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("To Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::DragScalar("Next World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_next, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Next Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_next, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Next Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
         ImGui::Text(theme_name(g_state->theme_next));
+        ImGui::DragScalar("Start World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_start, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Start Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_start, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Start Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_start, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::SameLine();
+        ImGui::Text(theme_name(g_state->theme_start));
         ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char *)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
         if (ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
         {

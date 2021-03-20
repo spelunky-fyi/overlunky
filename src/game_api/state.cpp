@@ -194,7 +194,7 @@ void State::set_camera_position(float cx, float cy)
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
 {
-    if (ptr()->screen != 12)
+    if (ptr()->screen < 11 || ptr()->screen > 13)
         return;
     ptr()->world = w;
     ptr()->world_next = w;
@@ -202,6 +202,16 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     ptr()->level_next = l;
     ptr()->theme = t;
     ptr()->theme_next = t;
+    if (ptr()->world_start < 1 || ptr()->level_start < 1 || ptr()->theme_start < 1)
+    {
+        ptr()->world_start = w;
+        ptr()->level_start = l;
+        ptr()->theme_start = t;
+        ptr()->quest_flags = 1;
+    }
+    ptr()->screen = 12;
+    ptr()->screen_next = 12;
+    ptr()->screen_last = 12;
     ptr()->loading = 1;
 }
 

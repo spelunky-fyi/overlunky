@@ -445,6 +445,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).
     lua["set_door"] = set_door_target;
+    /// Get door target `world`, `level`, `theme`
+    lua["get_door_target"] = get_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid
@@ -804,14 +806,20 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &StateMemory::world,
         "world_next",
         &StateMemory::world_next,
+        "world_start",
+        &StateMemory::world_start,
         "level",
         &StateMemory::level,
         "level_next",
         &StateMemory::level_next,
+        "level_start",
+        &StateMemory::level_start,
         "theme",
         &StateMemory::theme,
         "theme_next",
         &StateMemory::theme_next,
+        "theme_start",
+        &StateMemory::theme_start,
         "shoppie_aggro",
         &StateMemory::shoppie_aggro,
         "shoppie_aggro_next",
