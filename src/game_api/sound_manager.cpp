@@ -9,15 +9,43 @@
 // Y tho Windows  T.T
 #undef PlaySound
 
+CustomSound::CustomSound(const CustomSound& rhs)
+{
+	m_FmodSound = rhs.m_FmodSound;
+	m_SoundManager = rhs.m_SoundManager;
+	if (m_SoundManager != nullptr)
+	{
+		m_SoundManager->acquire_sound(rhs.m_FmodSound);
+	}
+}
+CustomSound::CustomSound(CustomSound&& rhs) noexcept
+{
+	std::swap(m_FmodSound, rhs.m_FmodSound);
+	std::swap(m_SoundManager, rhs.m_SoundManager);
+}
+CustomSound::CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager)
+	: m_FmodSound{ fmod_sound }
+	, m_SoundManager{ sound_manager }
+{}
+CustomSound::~CustomSound()
+{
+	if (m_SoundManager != nullptr)
+	{
+		m_SoundManager->release_sound(m_FmodSound);
+	}
+}
+
+
 void CustomSound::play()
 {
-	sound_manager->play_sound(*this);
+	m_SoundManager->play_sound(m_FmodSound);
 }
 
 struct SoundManager::Sound {
 	std::uint32_t ref_count;
-	std::string path;
 	DecodedAudioBuffer buffer;
+	std::string path;
+	bool loop;
 	FMOD::Sound* fmod_sound{ nullptr };
 };
 
@@ -63,21 +91,42 @@ SoundManager::~SoundManager()
 	}
 }
 
-CustomSound SoundManager::get_sound(const char* path)
+CustomSound SoundManager::get_sound(std::string path, bool loop)
 {
-	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [path](const Sound& sound) { return sound.path == path; });
+	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [&path, loop](const Sound& sound) {
+		return sound.path == path
+			&& sound.loop == loop;
+	});
 	if (it != m_SoundStorage.end())
 	{
 		it->ref_count++;
 		return CustomSound{ it->fmod_sound, this };
 	}
 
+	DecodedAudioBuffer buffer;
+	try {
+		buffer = m_DecodeFunction(path.c_str());
+	}
+	catch (std::exception& except) {
+		DEBUG("Failed loading audio file {}\n{}", path, except.what());
+		return CustomSound{ nullptr, nullptr };
+	}
+
 	Sound new_sound;
 	new_sound.ref_count = 1;
-	new_sound.path = path;
-	new_sound.buffer = m_DecodeFunction(path);
+	new_sound.buffer = std::move(buffer);
+	new_sound.path = std::move(path);
+	new_sound.loop = loop;
 
-	FMOD::FMOD_MODE mode = (FMOD::FMOD_MODE)(FMOD::MODE_CREATESAMPLE | FMOD::MODE_OPENMEMORY_POINT | FMOD::MODE_OPENRAW | FMOD::MODE_LOOP_OFF | FMOD::MODE_IGNORETAGS);
+	FMOD::FMOD_MODE mode = (FMOD::FMOD_MODE)(FMOD::MODE_CREATESAMPLE | FMOD::MODE_OPENMEMORY_POINT | FMOD::MODE_OPENRAW | FMOD::MODE_IGNORETAGS);
+	if (loop)
+	{
+		mode = (FMOD::FMOD_MODE)(mode | FMOD::MODE_LOOP_NORMAL);
+	}
+	else
+	{
+		mode = (FMOD::FMOD_MODE)(mode | FMOD::MODE_LOOP_OFF);
+	}
 
 	FMOD::CREATESOUNDEXINFO create_sound_exinfo{};
 	create_sound_exinfo.cbsize = sizeof(create_sound_exinfo);
@@ -111,9 +160,24 @@ CustomSound SoundManager::get_sound(const char* path)
 	m_SoundStorage.push_back(std::move(new_sound));
 	return CustomSound{ m_SoundStorage.back().fmod_sound, this };
 }
-void SoundManager::release_sound(CustomSound sound)
+CustomSound SoundManager::get_sound(const char* path, bool loop)
 {
-	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [fmod_sound = sound.fmod_sound](const Sound& sound) { return sound.fmod_sound == fmod_sound; });
+	return get_sound(std::string{ path }, loop);
+}
+void SoundManager::acquire_sound(FMOD::Sound* fmod_sound)
+{
+	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [fmod_sound](const Sound& sound) { return sound.fmod_sound == fmod_sound; });
+	if (it == m_SoundStorage.end())
+	{
+		DEBUG("Trying to acquire sound that does not exist...");
+		return;
+	}
+
+	it->ref_count++;
+}
+void SoundManager::release_sound(FMOD::Sound* fmod_sound)
+{
+	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [fmod_sound](const Sound& sound) { return sound.fmod_sound == fmod_sound; });
 	if (it == m_SoundStorage.end())
 	{
 		DEBUG("Trying to release sound that does not exist...");
@@ -131,8 +195,8 @@ void SoundManager::release_sound(CustomSound sound)
 		it->ref_count--;
 	}
 }
-void SoundManager::play_sound(CustomSound sound)
+void SoundManager::play_sound(FMOD::Sound* fmod_sound)
 {
 	// TODO: Get back channel for more control
-	m_PlaySound(m_FmodSystem, sound.fmod_sound, nullptr, false, nullptr);
+	m_PlaySound(m_FmodSystem, fmod_sound, nullptr, false, nullptr);
 }

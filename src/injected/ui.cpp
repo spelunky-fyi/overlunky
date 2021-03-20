@@ -499,7 +499,7 @@ void load_script(std::string file, bool enable = true)
         /*size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
             file = file.substr(slash + 1);*/
-        SpelunkyScript *script = new SpelunkyScript(buf.str(), file, enable);
+        SpelunkyScript *script = new SpelunkyScript(buf.str(), file, g_SoundManager, enable);
         g_scripts[script->get_file()] = script;
         data.close();
     }
@@ -2425,11 +2425,6 @@ void render_clickhandler()
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
-        static auto sound = g_SoundManager->get_sound("ghost_death.wav");
-        if (clicked("mouse_spawn_throw")) {
-            sound.play();
-        }
-
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
         {
             io.MouseDrawCursor = false;
@@ -2817,7 +2812,7 @@ void render_script_files()
             "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
-            name, true);
+            name, g_SoundManager, true);
         g_scripts[name] = script;
     }
     ImGui::PopID();

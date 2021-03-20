@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "rpc.hpp"
 #include "state.hpp"
+#include "sound_manager.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -180,6 +181,7 @@ public:
     bool changed = true;
     bool enabled = true;
     ScriptMeta meta = { "", "", "", "", "" };
+    std::filesystem::path script_folder;
     int cbcount = 0;
 
     std::map<std::string, ScriptOption> options;
@@ -195,7 +197,9 @@ public:
     std::vector<EntityItem> g_items;
     std::vector<Player*> g_players;
 
-    ScriptImpl(std::string script, std::string file, bool enable = true);
+    SoundManager* sound_manager;
+
+    ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
     ~ScriptImpl() = default;
 
     std::string script_id();
@@ -206,8 +210,10 @@ public:
     void render_options();
 };
 
-SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable)
+SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
 {
+    sound_manager = sound_mgr;
+
 #ifdef SPEL2_EDITABLE_SCRIPTS
     strcpy(code, script.c_str());
 #else
@@ -217,6 +223,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     meta.file = std::move(file);
     meta.path = std::filesystem::path(meta.file).parent_path().string();
     meta.filename = std::filesystem::path(meta.file).filename().string();
+
+    script_folder = std::filesystem::path(meta.file).parent_path();
+
     enabled = enable;
 
     g_state = get_state_ptr();
@@ -613,6 +622,16 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         draw_queue.queue_text(a, std::move(text), color);
     };
 
+    /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
+    lua["create_sound"] = [this](std::string path, bool loop) -> sol::optional<CustomSound> {
+        CustomSound sound = sound_manager->get_sound((script_folder / path).string(), loop);
+        if (sound)
+        {
+            return sound;
+        }
+        return sol::nullopt;
+    };
+
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",
@@ -842,6 +861,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &StateMemory::loading,
         "quest_flags",
         &StateMemory::quest_flags);
+    lua.new_usertype<CustomSound>(
+        "CustomSound",
+        "play",
+        &CustomSound::play);
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
@@ -1296,8 +1319,8 @@ void SpelunkyScript::ScriptImpl::render_options()
 }
 
 
-SpelunkyScript::SpelunkyScript(std::string script, std::string file, bool enable)
-    : m_Impl{ new ScriptImpl(std::move(script), std::move(file), enable) }
+SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
+    : m_Impl{ new ScriptImpl(std::move(script), std::move(file), sound_manager, enable) }
 {
 }
 SpelunkyScript::~SpelunkyScript() = default; // Has to be in the source file
