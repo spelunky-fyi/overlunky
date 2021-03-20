@@ -6,4 +6,7 @@ meta.author = "Dregu"
 foo = require "testlib.mod"
 bar = require "anothermod"
 foo.hello()
-bar.hello()
+
+set_callback(function()
+    bar.hello()
+end, ON.LEVEL)
