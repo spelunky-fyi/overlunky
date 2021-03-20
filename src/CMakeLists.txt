@@ -40,6 +40,10 @@ endif()
 
 if(BUILD_OVERLUNKY)
         # --------------------------------------------------
+        # nyquist
+        add_subdirectory(libnyquist)
+
+        # --------------------------------------------------
         # toml11
         option(toml11_BUILD_TEST OFF)
         add_subdirectory(toml11)

@@ -24,6 +24,11 @@
 #include "script.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
+#include "sound_manager.hpp"
+
+#include "decode_audio_file.hpp"
+
+SoundManager* g_SoundManager{ nullptr };
 
 std::map<std::string, SpelunkyScript *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -2088,6 +2093,11 @@ void render_clickhandler()
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
+        static auto sound = g_SoundManager->get_sound("ghost_death.wav");
+        if (clicked("mouse_spawn_throw")) {
+            sound.play();
+        }
+
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
         {
             io.MouseDrawCursor = false;
@@ -3533,6 +3543,8 @@ void create_box(std::vector<EntityItem> items)
 
 void init_ui()
 {
+    g_SoundManager = new SoundManager(&LoadAudioFile);
+
     g_state = (struct StateMemory*)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
 
