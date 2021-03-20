@@ -1,6 +1,6 @@
 meta.name = 'Reverse game'
 meta.version = 'WIP'
-meta.description = 'A really weird and maybe impossible game where you start on top of Hundun and have to get back to 1-1 to become one with the Cosmos. Hey, that rhymes!'
+meta.description = 'A really weird and maybe impossible game where you start on top of Hundun and have to get back to 1-1. Hey, that rhymes!'
 meta.author = 'Dregu'
 
 register_option_bool('goodies', 'Get some goodies at start, climbing is hard.', false)
