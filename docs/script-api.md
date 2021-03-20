@@ -27,7 +27,7 @@ Table of strings where you should set some script metadata shown in the UI.
 ### [`state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state)
 A bunch of [game state](#statememory) variables
 Example:
-```
+```lua
 if state.time_level > 300 and state.theme == THEME.DWELLING then
     toast("Congratulations for lasting 5 seconds in Dwelling")
 end
@@ -38,7 +38,7 @@ An array of [Player](#player) of the current players. Pro tip: You need `players
 Table of options set in the UI, added with the [register_option_functions](#register_option_int).
 ## Event functions
 Define these in your script to be called on an event. For example:
-```
+```lua
 function on_level()
     toast("Welcome to the level")
 end
@@ -119,7 +119,7 @@ Add a combobox option that the user can change in the UI. Read the int index of 
 Spawn an entity in position with some velocity and return the uid of spawned entity.
 Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
 Example:
-```
+```lua
 -- spawn megajelly using absolute coordinates
 set_callback(function()
     x, y, layer = get_position(players[1].uid)
@@ -199,7 +199,7 @@ Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore t
 #### Returns: `array<int>`
 Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
 You can even pass a table! Example:
-```
+```lua
 types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
 function on_level()
     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
@@ -305,7 +305,7 @@ Calculate the tile distance of two entities by uid
 #### Returns: `float`, `float`, `float`, `float`
 Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
 inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
-```
+```lua
 -- Draw the level boundaries
 set_callback(function()
     xmin, ymin, xmax, ymax = get_bounds()
@@ -356,7 +356,7 @@ Draws a filled circle on screen
 Draws text on screen
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
-```
+```lua
 -- This doesn't make any sense, as you could just access the variables directly from players[]
 -- It's just a weird example OK!
 ids = get_entities_by_mask(1) -- I think this just covers CHARs
@@ -497,7 +497,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`quest_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) &StateMemory::quest_flags
 ## Enums
 Enums are like numbers but in text that's easier to remember. Example:
-```
+```lua
 set_callback(function()
     if state.theme == THEME.COSMIC_OCEAN then
         x, y, l = get_position(players[1].uid)

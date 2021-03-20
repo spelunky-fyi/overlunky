@@ -177,7 +177,7 @@ for lf in funcs:
 
 print('## Event functions')
 print("""Define these in your script to be called on an event. For example:
-```
+```lua
 function on_level()
     toast("Welcome to the level")
 end
@@ -207,7 +207,7 @@ for lf in funcs:
 
 print('## Types')
 print('Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They\'re mostly just ints and floats. Example:')
-print("""```
+print("""```lua
 -- This doesn't make any sense, as you could just access the variables directly from players[]
 -- It's just a weird example OK!
 ids = get_entities_by_mask(1) -- I think this just covers CHARs
@@ -232,7 +232,7 @@ for type in types:
 
 print('## Enums')
 print('Enums are like numbers but in text that\'s easier to remember. Example:')
-print("""```
+print("""```lua
 set_callback(function()
     if state.theme == THEME.COSMIC_OCEAN then
         x, y, l = get_position(players[1].uid)

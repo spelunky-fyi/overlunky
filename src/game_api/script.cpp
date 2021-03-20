@@ -301,7 +301,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
 
     /// A bunch of [game state](#statememory) variables
     /// Example:
-    /// ```
+    /// ```lua
     /// if state.time_level > 300 and state.theme == THEME.DWELLING then
     ///     toast("Congratulations for lasting 5 seconds in Dwelling")
     /// end
@@ -399,7 +399,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     /// Example:
-    /// ```
+    /// ```lua
     /// -- spawn megajelly using absolute coordinates
     /// set_callback(function()
     ///     x, y, layer = get_position(players[1].uid)
@@ -458,7 +458,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Returns: `array<int>`
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
     /// You can even pass a table! Example:
-    /// ```
+    /// ```lua
     /// types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
     /// function on_level()
     ///     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
@@ -549,7 +549,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Returns: `float`, `float`, `float`, `float`
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
     /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
-    /// ```
+    /// ```lua
     /// -- Draw the level boundaries
     /// set_callback(function()
     ///     xmin, ymin, xmax, ymax = get_bounds()
