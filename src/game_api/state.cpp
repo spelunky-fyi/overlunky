@@ -196,11 +196,8 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
 {
     if (ptr()->screen < 11 || ptr()->screen > 13)
         return;
-    ptr()->world = w;
     ptr()->world_next = w;
-    ptr()->level = l;
     ptr()->level_next = l;
-    ptr()->theme = t;
     ptr()->theme_next = t;
     if (ptr()->world_start < 1 || ptr()->level_start < 1 || ptr()->theme_start < 1)
     {
