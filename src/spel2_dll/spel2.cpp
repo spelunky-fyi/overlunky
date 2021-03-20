@@ -3,10 +3,27 @@
 #include "window_api.hpp"
 #include "script.hpp"
 #include "state.hpp"
+#include "sound_manager.hpp"
+
+SoundManager* g_SoundManager{ nullptr };
 
 void InitSwapChainHooks(IDXGISwapChain* swap_chain)
 {
 	init_hooks(swap_chain);
+}
+void InitSoundManager(Spelunky_DecodeAudioFile* decode_function)
+{
+	static Spelunky_DecodeAudioFile* local_decode_function = decode_function;
+	g_SoundManager = new SoundManager([](const char* file_path) {
+		Spelunky_DecodedAudioBuffer buffer = local_decode_function(file_path);
+		return DecodedAudioBuffer{
+			buffer.num_channels,
+			buffer.frequency,
+			static_cast<SoundFormat>(buffer.format),
+			std::unique_ptr<const std::byte[]>{ reinterpret_cast<const std::byte*>(buffer.data) },
+			buffer.data_size
+		};
+	});
 }
 
 void RegisterOnInputFunc(OnInputFunc on_input)
