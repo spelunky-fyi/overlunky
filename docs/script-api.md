@@ -6,11 +6,12 @@
 - You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md).
 - Click on the names of things to search for examples on how to use that function or variable.
 ## Lua libraries
-The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.3/manual.html#6).
+The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6).
 ### `math`
 ### `base`
 ### `string`
 ### `table`
+### `package`
 ## Global variables
 These variables are always there to use.
 ### [`meta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=meta)

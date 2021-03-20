@@ -158,7 +158,7 @@ print('- You can find changes to and earlier versions of this doc [here](https:/
 print('- Click on the names of things to search for examples on how to use that function or variable.')
 
 print('## Lua libraries')
-print('The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.3/manual.html#6).')
+print('The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6).')
 for lib in lualibs:
     print('### `'+lib+'`')
 
