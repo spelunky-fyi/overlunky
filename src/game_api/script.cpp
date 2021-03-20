@@ -796,6 +796,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &StateMemory::kali_status,
         "kali_altars_destroyed",
         &StateMemory::kali_altars_destroyed,
+        "seed",
+        &StateMemory::seed,
         "time_total",
         &StateMemory::time_total,
         "world",

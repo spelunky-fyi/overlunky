@@ -194,18 +194,15 @@ void State::set_camera_position(float cx, float cy)
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
 {
-    if (ptr()->screen != 12) //TODO: init game properly, so it doesn't crash after death (starting level, give bombs...)
+    if (ptr()->screen != 12)
         return;
-    auto memory = Memory::get();
-    typedef void w_func(struct StateMemory*, int);
-    static w_func* warpfunc = (w_func*)(memory.at_exe(0x221A7080)); //TODO: patterns, thanks zappatic though!
     ptr()->world = w;
     ptr()->world_next = w;
     ptr()->level = l;
     ptr()->level_next = l;
     ptr()->theme = t;
     ptr()->theme_next = t;
-    warpfunc(ptr(), 0);
+    ptr()->loading = 1;
 }
 
 void State::set_seed(uint32_t seed)

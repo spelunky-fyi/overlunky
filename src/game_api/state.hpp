@@ -39,7 +39,7 @@ struct StateMemory
     int32_t i50;
     int32_t i54;
     int32_t i58;
-    uint32_t feedcode;
+    uint32_t seed;
     uint32_t time_total;
     uint8_t world;
     uint8_t world_next;
