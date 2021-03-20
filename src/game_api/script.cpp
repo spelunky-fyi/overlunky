@@ -235,7 +235,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;
 
-    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::package);
+    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
