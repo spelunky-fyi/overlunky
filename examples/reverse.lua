@@ -1,6 +1,6 @@
 meta.name = 'Reverse game'
 meta.version = 'WIP'
-meta.description = 'A really weird and maybe impossible game where you start on top of Hundun and have to get back to 1-1 to become one with the Cosmos. Hey, that rhymes!'
+meta.description = 'A really weird and maybe impossible game where you start on top of Hundun and have to get back to 1-1. Hey, that rhymes!'
 meta.author = 'Dregu'
 
 register_option_bool('goodies', 'Get some goodies at start, climbing is hard.', false)
@@ -29,7 +29,7 @@ dest[21] = { 1, 4, THEME.DWELLING }
 dest[14] = { 1, 3, THEME.DWELLING }
 dest[13] = { 1, 2, THEME.DWELLING }
 dest[12] = { 1, 1, THEME.DWELLING }
-dest[11] = { 7, 98, THEME.COSMIC_OCEAN }
+dest[11] = { 1, 1, THEME.BASE_CAMP }
 
 function init()
     nextworld = 7
@@ -88,7 +88,7 @@ function unlock_entrance()
         bgs = get_entities_at(ENT_TYPE.BG_DOOR, 0, vx, vy, vl, 2)
         if #bgs > 0 then
             ent = get_entity(bgs[1])
-            ent.animation = set_flag(ent.animation, 1)
+            ent.animation_frame = set_flag(ent.animation_frame, 1)
         end
     end
     shipdoors = get_entities_at(ENT_TYPE.FX_EGGSHIP_DOOR, 0, x, y, l, 20)
@@ -200,7 +200,7 @@ set_callback(function()
                 if state.theme == THEME.DUAT then
                     bg = spawn(ENT_TYPE.BG_DOOR, sx, sy, sl, 0, 0)
                     ent = get_entity(bg)
-                    bg.animation = set_flag(bg.animation, 1)
+                    bg.animation_frame = set_flag(bg.animation_frame, 1)
                 end
             end
 
@@ -246,6 +246,9 @@ set_callback(function()
         state.theme_next = nexttheme
         state.world_next = nextworld
         state.level_next = nextlevel
+    end
+    if state.theme_next == 17 then
+        state.screen_next = 11
     end
 end, ON.LOADING)
 

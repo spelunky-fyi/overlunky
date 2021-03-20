@@ -1753,6 +1753,11 @@ void render_narnia()
     if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
     render_themes();
     ImGui::PopItemWidth();
+    if (ImGui::Button("Instant warp##InstantWarp"))
+    {
+        warp(g_world, g_level, g_to + 1);
+    }
+    ImGui::SameLine();
     if (ImGui::Button("Warp door##SpawnWarpDoor"))
     {
         int spawned = spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
@@ -1763,11 +1768,6 @@ void render_narnia()
     if (ImGui::Button("Layer door##SpawnLayerDoor"))
     {
         spawn_backdoor(g_x, g_y);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Warp##InstantWarp"))
-    {
-        warp(g_world, g_level, g_to + 1);
     }
     ImGui::Text("Instant warp to level:");
     std::vector<uint32_t> doortypes;
