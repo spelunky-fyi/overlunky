@@ -78,7 +78,7 @@ EntityDB *get_type(uint32_t id)
     return nullptr;
 }
 
-size_t to_id(std::string name)
+int32_t to_id(std::string name)
 {
     size_t map_ptr = *(size_t *)entities_ptr();
     size_t off = entities_offset();
@@ -202,6 +202,14 @@ void Door::set_target(uint8_t w, uint8_t l, uint8_t t)
     uint8_t array[5] = {1, l, 1, w, t};
     DEBUG("Making door go to {}-{}, {}", w, l, t);
     write_mem(pointer() + 0xc1, std::string((char *)array, sizeof(array)));
+}
+
+std::tuple<uint8_t, uint8_t, uint8_t> Door::get_target()
+{
+    uint8_t l = read_u8(pointer() + 0xc2);
+    uint8_t w = read_u8(pointer() + 0xc4);
+    uint8_t t = read_u8(pointer() + 0xc5);
+    return std::make_tuple(w, l, t);
 }
 
 void Mount::carry(Movable *rider)

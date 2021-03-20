@@ -16,6 +16,7 @@
 #include <locale>
 #include <map>
 #include <string>
+#include <regex>
 #include <toml.hpp>
 
 #include "entity.hpp"
@@ -68,8 +69,18 @@ std::map<std::string, int> keys{
     {"save_settings", 0x353},
     {"load_settings", 0x34c},
     {"spawn_entity", 0x10d},
+    {"spawn_kit_1", 0x231},
+    {"spawn_kit_2", 0x232},
+    {"spawn_kit_3", 0x233},
+    {"spawn_kit_4", 0x234},
+    {"spawn_kit_5", 0x235},
+    {"spawn_kit_6", 0x236},
+    {"spawn_kit_7", 0x237},
+    {"spawn_kit_8", 0x238},
+    {"spawn_kit_9", 0x239},
     {"spawn_layer_door", 0x20d},
     {"spawn_warp_door", 0x30d},
+    {"warp", 0x357},
     {"hide_ui", 0x7a},
     {"zoom_in", 0x1bc},
     {"zoom_out", 0x1be},
@@ -136,7 +147,7 @@ std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      file_written = false, show_debug = false, throw_held = false, paused = false,
      show_app_metrics = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
-     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false;
+     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false, load_script_dir = true, load_packs_dir = false;
 Player *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -485,11 +496,11 @@ void load_script(std::string file, bool enable = true)
     if (!data.fail())
     {
         buf << data.rdbuf();
-        size_t slash = file.find_last_of("/\\");
+        /*size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
-            file = file.substr(slash + 1);
+            file = file.substr(slash + 1);*/
         SpelunkyScript *script = new SpelunkyScript(buf.str(), file, enable);
-        g_scripts[script->get_id()] = script;
+        g_scripts[script->get_file()] = script;
         data.close();
     }
 }
@@ -567,37 +578,31 @@ bool InputStringMultiline(const char *label, std::string *str, const ImVec2 &siz
 
 void refresh_script_files()
 {
+    std::regex luareg("\\.lua$");
     g_script_files.clear();
-    if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
-        for (const auto &file : std::filesystem::directory_iterator(scriptpath))
+        for (const auto &file : std::filesystem::recursive_directory_iterator(scriptpath))
         {
-            g_script_files.push_back(file.path());
+            if (std::regex_search(file.path().string(), luareg))
+            {
+                g_script_files.push_back(file.path());
+            }
+        }
+    }
+    if (load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    {
+        for (const auto &file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
+        {
+            if (file.path().filename().string() == "main.lua")
+            {
+                g_script_files.push_back(file.path());
+            }
         }
     }
     for (auto file : g_script_files)
     {
         load_script(file.string().data(), false);
-    }
-}
-
-void require_scripts()
-{
-    for (auto it : g_scripts)
-    {
-        SpelunkyScript *script = it.second;
-        if (!script->is_enabled())
-            continue;
-        for (auto req : script->consume_requires())
-        {
-            auto reqit = g_scripts.find(req);
-            if (reqit != g_scripts.end())
-            {
-                if(!reqit->second->is_enabled())
-                    reqit->second->set_changed(true);
-                reqit->second->set_enabled(true);
-            }
-        }
     }
 }
 
@@ -1333,36 +1338,85 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         spawn_entities(false);
     }
+    else if (pressed("spawn_kit_1", wParam))
+    {
+        if (saved_entities.size() > 0)
+            spawn_entities(false, saved_entities.at(0));
+    }
+    else if (pressed("spawn_kit_2", wParam))
+    {
+        if (saved_entities.size() > 1)
+            spawn_entities(false, saved_entities.at(1));
+    }
+    else if (pressed("spawn_kit_3", wParam))
+    {
+        if (saved_entities.size() > 2)
+            spawn_entities(false, saved_entities.at(2));
+    }
+    else if (pressed("spawn_kit_4", wParam))
+    {
+        if (saved_entities.size() > 3)
+            spawn_entities(false, saved_entities.at(3));
+    }
+    else if (pressed("spawn_kit_5", wParam))
+    {
+        if (saved_entities.size() > 4)
+            spawn_entities(false, saved_entities.at(4));
+    }
+    else if (pressed("spawn_kit_6", wParam))
+    {
+        if (saved_entities.size() > 5)
+            spawn_entities(false, saved_entities.at(6));
+    }
+    else if (pressed("spawn_kit_7", wParam))
+    {
+        if (saved_entities.size() > 6)
+            spawn_entities(false, saved_entities.at(6));
+    }
+    else if (pressed("spawn_kit_8", wParam))
+    {
+        if (saved_entities.size() > 7)
+            spawn_entities(false, saved_entities.at(8));
+    }
+    else if (pressed("spawn_kit_9", wParam))
+    {
+        if (saved_entities.size() > 8)
+            spawn_entities(false, saved_entities.at(8));
+    }
     else if (pressed("spawn_warp_door", wParam))
     {
         int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
         if (!lock_entity)
             g_last_id = spawned;
     }
+    else if (pressed("warp", wParam))
+    {
+        warp(g_world, g_level, g_to + 1);
+    }
     else if (pressed("move_up", wParam) && active("tool_entity"))
     {
-        g_current_item = std::min(std::max(g_current_item - 1, 0), g_filtered_count - 1);
+        g_current_item = (std::min)((std::max)(g_current_item - 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_down", wParam) && active("tool_entity"))
     {
-        g_current_item = std::min(std::max(g_current_item + 1, 0), g_filtered_count - 1);
+        g_current_item = (std::min)((std::max)(g_current_item + 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_pageup", wParam) && active("tool_entity"))
     {
         ImGuiContext &g = *GImGui;
         ImGuiWindow *current = g.NavWindow;
-        int page = std::max((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = std::min(std::max(g_current_item - page, 0), g_filtered_count - 1);
+        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = (std::min)((std::max)(g_current_item - page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_pagedown", wParam) && active("tool_entity"))
     {
         ImGuiContext &g = *GImGui;
         ImGuiWindow *current = g.NavWindow;
-        int page = std::max((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = std::min(std::max(g_current_item + page, 0), g_filtered_count - 1);
+        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = (std::min)((std::max)(g_current_item + page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("enter", wParam) && active("tool_entity"))
@@ -1371,11 +1425,11 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("move_up", wParam) && active("tool_door"))
     {
-        g_to = std::min(std::max(g_to - 1, 0), 15);
+        g_to = (std::min)((std::max)(g_to - 1, 0), 15);
     }
     else if (pressed("move_down", wParam) && active("tool_door"))
     {
-        g_to = std::min(std::max(g_to + 1, 0), 15);
+        g_to = (std::min)((std::max)(g_to + 1, 0), 15);
     }
     else if (pressed("enter", wParam) && active("tool_door"))
     {
@@ -1649,7 +1703,8 @@ void render_input()
             spawn_entities(false, i);
         }
         ImGui::PopID();
-
+        ImGui::SameLine();
+        ImGui::Text("%d:", n + 1);
         ImGui::PopID();
         ImGui::SameLine();
         ImGui::TextWrapped(search.data());
@@ -1679,6 +1734,13 @@ void render_input()
     }
 }
 
+const char *theme_name(int theme)
+{
+    if (theme < 1 || theme > 17)
+        return "Crash City";
+    return themes_short[theme - 1];
+}
+
 void render_narnia()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
@@ -1690,18 +1752,283 @@ void render_narnia()
     if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
     if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
     render_themes();
-    if (ImGui::Button("Warp door"))
+    ImGui::PopItemWidth();
+    if (ImGui::Button("Warp door##SpawnWarpDoor"))
     {
         int spawned = spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
         if (!lock_entity)
             g_last_id = spawned;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Layer door"))
+    if (ImGui::Button("Layer door##SpawnLayerDoor"))
     {
         spawn_backdoor(g_x, g_y);
     }
-    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    if (ImGui::Button("Warp##InstantWarp"))
+    {
+        warp(g_world, g_level, g_to + 1);
+    }
+    ImGui::Text("Instant warp to level:");
+    std::vector<uint32_t> doortypes;
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
+    auto doors = get_entities_by_type(doortypes);
+    ImGui::Text("Next level");
+    ImGui::SameLine(100.0f);
+    int n = 0;
+    for (auto doorid : doors)
+    {
+        Movable *doorent = (Movable *)get_entity_ptr(doorid);
+        Target *target = reinterpret_cast<Target *>(&doorent->anim_func);
+        if (!target->enabled)
+            continue;
+        char buf[64];
+        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+        if (n > 0)
+            ImGui::SameLine();
+        if (ImGui::Button(buf))
+        {
+            warp(target->world, target->level, target->theme);
+        }
+        n++;
+    }
+
+    if (g_state->theme == 11)
+    {
+        Target *target = new Target;
+        target->world = 4;
+        target->level = 4;
+        target->theme = 12;
+        char buf[64];
+        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+        if (n == 0)
+            ImGui::SameLine(100.0f);
+        else
+            ImGui::SameLine();
+        if (ImGui::Button(buf))
+        {
+            warp(target->world, target->level, target->theme);
+        }
+        n++;
+    }
+
+    Target *target = new Target;
+    target->world = 0;
+    int tnum = g_state->world * 100 + g_state->level;
+    switch(tnum)
+    {
+        case 104:
+        case 301:
+            break;
+        case 501:
+            target->world = 6;
+            target->level = 1;
+            target->theme = 8;
+            break;
+        case 204:
+            target->world = 3;
+            target->level = 1;
+            target->theme = 4;
+            break;
+        case 403:
+            if (g_state->theme == 11)
+            {
+                target->world = 4;
+                target->level = 4;
+                target->theme = 6;
+            }
+            else
+            {
+                target->world = 4;
+                target->level = 4;
+                target->theme = 5;
+            }
+            break;
+        case 404:
+            target->world = 5;
+            target->level = 1;
+            target->theme = 7;
+            break;
+        case 603:
+            target->world = 6;
+            target->level = 4;
+            target->theme = 14;
+            break;
+        case 604:
+            target->world = 7;
+            target->level = 1;
+            target->theme = 9;
+            break;
+        case 702:
+            target->world = 7;
+            target->level = 3;
+            target->theme = 9;
+            break;
+        case 703:
+            target->world = 7;
+            target->level = 4;
+            target->theme = 16;
+            break;
+        case 704:
+            target->world = 8;
+            target->level = 5;
+            target->theme = 10;
+            break;
+        default:
+            target->world = g_state->world;
+            target->level = g_state->level + 1;
+            target->theme = g_state->theme;
+            break;
+    }
+    if (g_state->theme == 17)
+    {
+        target->world = 1;
+        target->level = 1;
+        target->theme = 1;
+    }
+    if (target->world > 0)
+    {
+        char buf[64];
+        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+        if (n == 0)
+            ImGui::SameLine(100.0f);
+        else
+            ImGui::SameLine();
+        if (ImGui::Button(buf))
+        {
+            warp(target->world, target->level, target->theme);
+        }
+    }
+
+    ImGui::Text("Dwelling");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("1-1##Warp1-1"))
+        warp(1, 1, 1);
+    ImGui::SameLine();
+    if (ImGui::Button("1-2##Warp1-2"))
+        warp(1, 2, 1);
+    ImGui::SameLine();
+    if (ImGui::Button("1-3##Warp1-3"))
+        warp(1, 3, 1);
+    ImGui::SameLine();
+    if (ImGui::Button("1-4##Warp1-4"))
+        warp(1, 4, 1);
+
+    ImGui::Text("Jungle");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("2-1##WarpJ2-1"))
+        warp(2, 1, 2);
+    ImGui::SameLine();
+    if (ImGui::Button("2-2##WarpJ2-2"))
+        warp(2, 2, 2);
+    ImGui::SameLine();
+    if (ImGui::Button("2-3##WarpJ2-3"))
+        warp(2, 3, 2);
+    ImGui::SameLine();
+    if (ImGui::Button("2-4##WarpJ2-4"))
+        warp(2, 4, 2);
+
+    ImGui::Text("Volcana");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("2-1##WarpV2-1"))
+        warp(2, 1, 3);
+    ImGui::SameLine();
+    if (ImGui::Button("2-2##WarpV2-2"))
+        warp(2, 2, 3);
+    ImGui::SameLine();
+    if (ImGui::Button("2-3##WarpV2-3"))
+        warp(2, 3, 3);
+    ImGui::SameLine();
+    if (ImGui::Button("2-4##WarpV2-4"))
+        warp(2, 4, 3);
+
+    ImGui::Text("Olmec");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("3-1##Warp3-1"))
+        warp(3, 1, 4);
+
+    ImGui::Text("Tide Pool");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("4-1##WarpP4-1"))
+        warp(4, 1, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-2##WarpP4-2"))
+        warp(4, 2, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-3##WarpP4-3"))
+        warp(4, 3, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("4-4##WarpP4-4"))
+        warp(4, 4, 5);
+    ImGui::SameLine();
+    if (ImGui::Button("Abzu##WarpAbzu"))
+        warp(4, 4, 13);
+
+    ImGui::Text("Temple");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("4-1##WarpT4-1"))
+        warp(4, 1, 6);
+    ImGui::SameLine();
+    if (ImGui::Button("4-2##WarpT4-2"))
+        warp(4, 2, 6);
+    ImGui::SameLine();
+    if (ImGui::Button("4-3##WarpT4-3"))
+        warp(4, 3, 6);
+    ImGui::SameLine();
+    if (ImGui::Button("4-4##WarpT4-4"))
+        warp(4, 4, 6);
+    ImGui::SameLine();
+    if (ImGui::Button("CoG##WarpCoG"))
+        warp(4, 3, 11);
+    ImGui::SameLine();
+    if (ImGui::Button("Duat##WarpDuat"))
+        warp(4, 4, 12);
+
+    ImGui::Text("Ice Caves");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("5-1##Warp5-1"))
+        warp(5, 1, 7);
+
+    ImGui::Text("Neo Babylon");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("6-1##Warp6-1"))
+        warp(6, 1, 8);
+    ImGui::SameLine();
+    if (ImGui::Button("6-2##Warp6-2"))
+        warp(6, 2, 8);
+    ImGui::SameLine();
+    if (ImGui::Button("6-3##Warp6-3"))
+        warp(6, 3, 8);
+    ImGui::SameLine();
+    if (ImGui::Button("Tiamat##WarpTiamat"))
+        warp(6, 4, 14);
+
+    ImGui::Text("Sunken City");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("7-1##Warp7-1"))
+        warp(7, 1, 9);
+    ImGui::SameLine();
+    if (ImGui::Button("7-2##Warp7-2"))
+        warp(7, 2, 9);
+    ImGui::SameLine();
+    if (ImGui::Button("7-3##Warp7-3"))
+        warp(7, 3, 9);
+    ImGui::SameLine();
+    if (ImGui::Button("Hundun##WarpHundun"))
+        warp(7, 4, 16);
+    ImGui::SameLine();
+    if (ImGui::Button("EW##WarpEW"))
+        warp(7, 2, 15);
+
+    ImGui::Text("Cosmic Ocean");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("7-5##Warp7-5"))
+        warp(8, 5, 10);
+    ImGui::SameLine();
+    if (ImGui::Button("7-98##Warp7-98"))
+        warp(8, 98, 10);
 }
 
 void render_camera()
@@ -1896,12 +2223,15 @@ void fix_script_requires(SpelunkyScript* script)
     if (!script->is_enabled()) return;
     for (auto req : script->consume_requires())
     {
-        auto reqit = g_scripts.find(req);
-        if (reqit != g_scripts.end())
+        for (auto it2 : g_scripts)
         {
-            if(!reqit->second->is_enabled())
-                reqit->second->set_changed(true);
-            reqit->second->set_enabled(true);
+            SpelunkyScript *script2 = it2.second;
+            if (script2->get_id() == req)
+            {
+                if(!script2->is_enabled())
+                    script2->set_changed(true);
+                script2->set_enabled(true);
+            }
         }
     }
 }
@@ -1968,7 +2298,8 @@ void render_messages(SpelunkyScript *script)
         if (now - 10s > message.time)
             continue;
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.time).count() / 10000.0f;
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", script->get_name().c_str(), message.message.c_str());
+        message.color.w = alpha;
+        ImGui::TextColored(message.color, "[%s] %s", script->get_name().c_str(), message.message.c_str());
     }
     ImGui::PopFont();
     ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
@@ -1978,7 +2309,7 @@ void render_messages(SpelunkyScript *script)
 void render_messages()
 {
     using namespace std::chrono_literals;
-    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>>;
+    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     auto now = std::chrono::system_clock::now();
     std::vector<Message> queue;
     for (auto script : g_scripts)
@@ -1987,7 +2318,7 @@ void render_messages()
         {
             if (now - 10s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script.second->get_name(), message.message, message.time));
+            queue.push_back(std::make_tuple(script.second->get_name(), message.message, message.time, message.color));
         }
     }
     ImGuiIO &io = ImGui::GetIO();
@@ -2005,7 +2336,7 @@ void render_messages()
 
     const float fontsize = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
-    int logsize = std::min(30, (int)((io.DisplaySize.y - 300) / fontsize));
+    int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / fontsize));
     if (queue.size() > logsize)
     {
         std::vector<Message> newqueue(queue.end() - logsize, queue.end());
@@ -2016,7 +2347,9 @@ void render_messages()
     for (auto message : queue)
     {
         const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 10000.0f;
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, alpha), "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
+        ImVec4 color = std::get<3>(message);
+        color.w = alpha;
+        ImGui::TextColored(color, "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
     }
     ImGui::PopFont();
     ImGui::End();
@@ -2088,7 +2421,6 @@ void render_clickhandler()
         update_script(script.second);
         render_script(script.second, draw_list);
     }
-    //require_scripts();
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
@@ -2438,6 +2770,18 @@ void render_debug()
     ImGui::PopItemWidth();
 }
 
+std::string gen_random(const int len) {
+    std::string tmp_s;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    tmp_s.reserve(len);
+    for (int i = 0; i < len; ++i) 
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    return tmp_s;
+}
+
 void render_script_files()
 {
     ImGui::PushID("files");
@@ -2445,7 +2789,8 @@ void render_script_files()
     for (auto file : g_script_files)
     {
         ImGui::PushID(num++);
-        if (ImGui::Button(file.filename().string().data()))
+        std::string buttstr = file.parent_path().filename().string() + "/" + file.filename().string();
+        if (ImGui::Button(buttstr.data()))
         {
             load_script(file.string().data(), true);
         }
@@ -2454,7 +2799,11 @@ void render_script_files()
     if (g_script_files.size() == 0)
     {
         std::filesystem::path path = scriptpath;
-        std::string abspath = std::filesystem::absolute(path).string();
+        std::string abspath = scriptpath;
+        if (std::filesystem::exists(abspath) && std::filesystem::is_directory(abspath))
+        {
+            abspath = std::filesystem::absolute(path).string();
+        }
         ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.data());
     }
     if (ImGui::Button("Refresh##RefreshScripts"))
@@ -2463,12 +2812,13 @@ void render_script_files()
     }
     if (ImGui::Button("Create new quick script"))
     {
+        std::string name = gen_random(16);
         SpelunkyScript *script = new SpelunkyScript(
             "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
-            "Script", true);
-        g_scripts[script->get_id()] = script;
+            name, true);
+        g_scripts[name] = script;
     }
     ImGui::PopID();
 }
@@ -2482,6 +2832,10 @@ void render_scripts()
         "your scripts work next week.");
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Hide script messages##HideScriptMessages", &hide_script_messages);
+    if(ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
+        refresh_script_files();
+    if(ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
+        refresh_script_files();
     ImGui::PushItemWidth(-1);
     int i = 0;
     std::vector<std::string> unload_scripts;
@@ -2493,7 +2847,11 @@ void render_scripts()
         ImGui::PushID(i);
         SpelunkyScript *script = it.second;
         char name[255];
-        sprintf(name, "%s (%s)", script->get_name().c_str(), script->get_file().c_str());
+        std::string filename;
+        size_t slash = script->get_file().find_last_of("/\\");
+        if (slash != std::string::npos)
+            filename = script->get_file().substr(slash + 1);
+        sprintf(name, "%s (%s)", script->get_name().c_str(), filename.c_str());
         if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
@@ -2518,7 +2876,12 @@ void render_scripts()
             ImGui::SameLine();
             if (ImGui::Button("Unload##UnloadScript"))
             {
-                unload_scripts.push_back(script->get_id());
+                unload_scripts.push_back(script->get_file());
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Reload##ReloadScript"))
+            {
+                load_script(script->get_file(), script->is_enabled());
             }
             else
             {
@@ -2722,13 +3085,6 @@ void render_screen(const char *label, int state)
         itoa(state, statec, 10);
         ImGui::LabelText(label, statec);
     }
-}
-
-const char *theme_name(int theme)
-{
-    if (theme < 1 || theme > 17)
-        return "Crash City";
-    return themes_short[theme - 1];
 }
 
 void render_entity_props()
@@ -3128,11 +3484,16 @@ void render_game_props()
         ImGui::DragScalar("Theme ##Themenumber", ImGuiDataType_U8, (char *)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
         ImGui::Text(theme_name(g_state->theme));
-        ImGui::DragScalar("To World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_next, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("To Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_next, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("To Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::DragScalar("Next World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_next, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Next Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_next, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Next Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
         ImGui::Text(theme_name(g_state->theme_next));
+        ImGui::DragScalar("Start World##Worldnext", ImGuiDataType_U8, (char *)&g_state->world_start, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Start Level##Levelnext", ImGuiDataType_U8, (char *)&g_state->level_start, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Start Theme##Themenext", ImGuiDataType_U8, (char *)&g_state->theme_start, 0.2f, &u8_one, &u8_seventeen);
+        ImGui::SameLine();
+        ImGui::Text(theme_name(g_state->theme_start));
         ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char *)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
         if (ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
         {
@@ -3265,7 +3626,7 @@ void imgui_init(ImGuiContext*) {
     autorun_scripts();
     set_colors();
     windows["tool_entity"] = new Window({ "Spawner (" + key_string(keys["tool_entity"]) + ")", false, true });
-    windows["tool_door"] = new Window({ "Door (" + key_string(keys["tool_door"]) + ")", false, true });
+    windows["tool_door"] = new Window({ "Warp (" + key_string(keys["tool_door"]) + ")", false, true });
     windows["tool_camera"] = new Window({ "Camera (" + key_string(keys["tool_camera"]) + ")", false, true });
     windows["tool_entity_properties"] = new Window({ "Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true });
     windows["tool_game_properties"] = new Window({ "Game (" + key_string(keys["tool_game_properties"]) + ")", false, true });

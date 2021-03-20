@@ -118,7 +118,7 @@ std::vector<EntityItem> list_entities(size_t map_ptr);
 
 EntityDB *get_type(uint32_t id);
 
-size_t to_id(std::string id);
+int32_t to_id(std::string id);
 
 Entity *state_find_item(size_t state_ptr, uint32_t unique_id);
 
@@ -148,8 +148,11 @@ class Entity
     Vector items;
     uint32_t flags;
     uint32_t more_flags;
-    uint32_t uid;
-    uint32_t animation;
+    int32_t uid;
+    uint8_t animation_frame;
+    uint8_t b3d;
+    uint8_t b3e;
+    uint8_t b3f;
     float x;
     float y;
     float w;
@@ -288,6 +291,7 @@ class Door : public Entity
 {
   public:
     void set_target(uint8_t w, uint8_t l, uint8_t t);
+    std::tuple<uint8_t, uint8_t, uint8_t> get_target();
 };
 
 std::vector<EntityItem> list_entities();

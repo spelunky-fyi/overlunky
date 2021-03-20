@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <locale>
 #include <map>
+#include <filesystem>
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
@@ -126,6 +127,43 @@ std::string sanitize(std::string data)
     return data;
 }
 
+struct InputTextCallback_UserData
+{
+    std::string*            Str;
+    ImGuiInputTextCallback  ChainCallback;
+    void*                   ChainCallbackUserData;
+};
+
+static int InputTextCallback(ImGuiInputTextCallbackData* data)
+{
+    InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+    {
+        std::string* str = user_data->Str;
+        IM_ASSERT(data->Buf == str->c_str());
+        str->resize(data->BufTextLen);
+        data->Buf = (char*)str->c_str();
+    }
+    else if (user_data->ChainCallback)
+    {
+        data->UserData = user_data->ChainCallbackUserData;
+        return user_data->ChainCallback(data);
+    }
+    return 0;
+}
+
+bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+{
+    IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+    flags |= ImGuiInputTextFlags_CallbackResize;
+
+    InputTextCallback_UserData cb_user_data;
+    cb_user_data.Str = str;
+    cb_user_data.ChainCallback = callback;
+    cb_user_data.ChainCallbackUserData = user_data;
+    return ImGui::InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+}
+
 class SpelunkyScript::ScriptImpl
 {
 public:
@@ -177,6 +215,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     code = code_storage.c_str();
 #endif
     meta.file = std::move(file);
+    meta.path = std::filesystem::path(meta.file).parent_path().string();
+    meta.filename = std::filesystem::path(meta.file).filename().string();
     enabled = enable;
 
     g_state = get_state_ptr();
@@ -195,7 +235,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;
 
-    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
+    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
@@ -208,19 +248,30 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     {
         std::string metacode = "";
         std::stringstream metass(script);
-        std::regex reg("(\\bmeta\\.[a-z]+\\s*=)");
-        std::regex regstart("(\\bmeta\\s*=)");
+        std::regex reg("(^\\s*meta\\.[a-z]+\\s*=)");
+        std::regex regstart("(^\\s*meta\\s*=)");
         std::regex regend("(\\})");
+        std::regex multistart("\\[\\[|\\.\\.\\s*($|--)|\\bmeta\\.[a-z]+\\s*=\\s*($|--)");
+        std::regex multiend("\\]\\]\\s*($|--)|[\"']\\s*($|--)");
         bool getmeta = false;
+        bool getmulti = false;
         for (std::string line; std::getline(metass, line);)
         {
             if (std::regex_search(line, regstart))
             {
                 getmeta = true;
             }
-            if (std::regex_search(line, reg) || getmeta)
+            if (std::regex_search(line, reg) && std::regex_search(line, multistart))
+            {
+                getmulti = true;
+            }
+            if (std::regex_search(line, reg) || getmeta || getmulti)
             {
                 metacode += line + "\n";
+            }
+            if (std::regex_search(line, multiend))
+            {
+                getmulti = false;
             }
             if (std::regex_search(line, regend))
             {
@@ -232,7 +283,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
         sol::optional<std::string> meta_author = lua["meta"]["author"];
-        meta.name = meta_name.value_or(meta.file);
+        meta.name = meta_name.value_or(meta.filename);
         meta.version = meta_version.value_or("");
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
@@ -242,11 +293,15 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     catch (const sol::error& e)
     {
         result = e.what();
+        messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
+        DEBUG("{}", result);
+        if (messages.size() > 20)
+            messages.pop_front();
     }
 
     /// A bunch of [game state](#statememory) variables
     /// Example:
-    /// ```
+    /// ```lua
     /// if state.time_level > 300 and state.theme == THEME.DWELLING then
     ///     toast("Congratulations for lasting 5 seconds in Dwelling")
     /// end
@@ -256,7 +311,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["players"] = std::vector<Movable*>(g_players.begin(), g_players.end());
     /// Print a log message on screen.
     lua["message"] = [this](std::string message) {
-        messages.push_back({ message, std::chrono::system_clock::now() });
+        messages.push_back({ message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f) });
         if (messages.size() > 20)
             messages.pop_front();
     };
@@ -302,7 +357,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
-    lua["require"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
+    lua["load_script"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message) {
         auto toast = get_toast();
@@ -316,25 +371,35 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
             return;
         say(NULL, entity, message.data(), unk_type, top);
     };
-    /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default.
+    /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
-        options[name] = { desc, value, min, max };
+        options[name] = { desc, value, min, max, "" };
         lua["options"][name] = value;
     };
-    /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default.
+    /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
     lua["register_option_float"] = [this](std::string name, std::string desc, float value, float min, float max) {
-        options[name] = { desc, value, min, max };
+        options[name] = { desc, value, min, max, "" };
         lua["options"][name] = value;
     };
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_bool"] = [this](std::string name, std::string desc, bool value) {
-        options[name] = { desc, value, 0, 0 };
+        options[name] = { desc, value, 0, 0, "" };
         lua["options"][name] = value;
+    };
+    /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
+    lua["register_option_string"] = [this](std::string name, std::string desc, std::string value) {
+        options[name] = { desc, value, 0, 0, "" };
+        lua["options"][name] = value;
+    };
+    /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`.
+    lua["register_option_combo"] = [this](std::string name, std::string desc, std::string opts) {
+        options[name] = { desc, 0, 0, 0, opts };
+        lua["options"][name] = 1;
     };
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     /// Example:
-    /// ```
+    /// ```lua
     /// -- spawn megajelly using absolute coordinates
     /// set_callback(function()
     ///     x, y, layer = get_position(players[1].uid)
@@ -353,17 +418,21 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["spawn_door"] = spawn_door_abs;
     /// Short for [spawn_door](#spawn_door).
     lua["door"] = spawn_door_abs;
-    /// Spawn a door to backlayer
+    /// Spawn a door to backlayer.
     lua["spawn_layer_door"] = spawn_backdoor_abs;
     /// Short for [spawn_layer_door](#spawn_layer_door).
     lua["layer_door"] = spawn_backdoor_abs;
-    /// Enable/disable godmode
+    /// Warp to a level immediately.
+    lua["warp"] = warp;
+    /// Set seed in seeded.
+    lua["set_seed"] = set_seed;
+    /// Enable/disable godmode.
     lua["god"] = godmode;
-    /// Try to force next levels to be dark
+    /// Try to force next levels to be dark.
     lua["force_dark_level"] = darkmode;
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
-    /// Enable/disable game engine pause
+    /// Enable/disable game engine pause.
     lua["pause"] = [this](bool p) {
         if (p)
             set_pause(0x20);
@@ -376,6 +445,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).
     lua["set_door"] = set_door_target;
+    /// Get door target `world`, `level`, `theme`
+    lua["get_door_target"] = get_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid
@@ -389,7 +460,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Returns: `array<int>`
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
     /// You can even pass a table! Example:
-    /// ```
+    /// ```lua
     /// types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
     /// function on_level()
     ///     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
@@ -467,6 +538,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["carry"] = carry;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
+
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
         Entity* ea = get_entity_ptr(a);
@@ -479,7 +551,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Returns: `float`, `float`, `float`, `float`
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
     /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
-    /// ```
+    /// ```lua
     /// -- Draw the level boundaries
     /// set_callback(function()
     ///     xmin, ymin, xmax, ymax = get_bounds()
@@ -595,8 +667,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &Entity::more_flags,
         "uid",
         &Entity::uid,
-        "animation",
-        &Entity::animation,
+        "animation_frame",
+        &Entity::animation_frame,
         "x",
         &Entity::x,
         "y",
@@ -622,7 +694,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         "as_player",
         &Entity::as<Player>,
         "as_monster",
-        &Entity::as<Monster>);
+        &Entity::as<Monster>,
+        "as_gun",
+        &Entity::as<Gun>,
+        "as_crushtrap",
+        &Entity::as<Crushtrap>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -680,6 +756,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Container>(
         "Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Gun>("Gun", 
+        "cooldown",
+        &Gun::cooldown,
+        "shots",
+        &Gun::shots,
+        "shots2",
+        &Gun::shots2,
+        "in_chamber",
+        &Gun::in_chamber,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+    lua.new_usertype<Crushtrap>("Crushtrap",
+        "dirx",
+        &Crushtrap::dirx,
+        "diry",
+        &Crushtrap::diry,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -704,20 +798,28 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &StateMemory::kali_status,
         "kali_altars_destroyed",
         &StateMemory::kali_altars_destroyed,
+        "seed",
+        &StateMemory::seed,
         "time_total",
         &StateMemory::time_total,
         "world",
         &StateMemory::world,
         "world_next",
         &StateMemory::world_next,
+        "world_start",
+        &StateMemory::world_start,
         "level",
         &StateMemory::level,
         "level_next",
         &StateMemory::level_next,
+        "level_start",
+        &StateMemory::level_start,
         "theme",
         &StateMemory::theme,
         "theme_next",
         &StateMemory::theme_next,
+        "theme_start",
+        &StateMemory::theme_start,
         "shoppie_aggro",
         &StateMemory::shoppie_aggro,
         "shoppie_aggro_next",
@@ -866,12 +968,18 @@ bool SpelunkyScript::ScriptImpl::run()
             lua["on_death"] = sol::lua_nil;
             lua["on_win"] = sol::lua_nil;
             lua["on_screen"] = sol::lua_nil;
+            lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
+            lua["package"]["loadlib"] = sol::lua_nil;
             auto lua_result = lua.safe_script(code);
             result = "OK";
         }
         catch (const sol::error& e)
         {
             result = e.what();
+            messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
+            DEBUG("{}", result);
+            if (messages.size() > 20)
+                messages.pop_front();
             return false;
         }
     }
@@ -1125,7 +1233,7 @@ bool SpelunkyScript::ScriptImpl::handle_function(sol::function func)
     {
         sol::error e = lua_result;
         result = e.what();
-        messages.push_back({ result, std::chrono::system_clock::now() });
+        messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
         DEBUG("{}", result);
         if (messages.size() > 20)
             messages.pop_front();
@@ -1136,9 +1244,18 @@ bool SpelunkyScript::ScriptImpl::handle_function(sol::function func)
 
 void SpelunkyScript::ScriptImpl::render_options()
 {
+    ImGui::PushID(meta.id.data());
     for (auto& option : options)
     {
-        if (int* val = std::get_if<int>(&option.second.value))
+        if (option.second.opts != "") {
+            int *val = std::get_if<int>(&option.second.value);
+            if (ImGui::Combo(option.second.desc.data(), val, (char *)option.second.opts.c_str()))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val+1;
+            }
+        }
+        else if (int* val = std::get_if<int>(&option.second.value))
         {
             int min = std::get<int>(option.second.min);
             int max = std::get<int>(option.second.max);
@@ -1166,7 +1283,16 @@ void SpelunkyScript::ScriptImpl::render_options()
                 lua["options"][option.first] = *val;
             }
         }
+        else if (std::string* val = std::get_if<std::string>(&option.second.value))
+        {
+            if (InputString(option.second.desc.data(), val, 0, nullptr, nullptr))
+            {
+                option.second.value = *val;
+                lua["options"][option.first] = *val;
+            }
+        }
     }
+    ImGui::PopID();
 }
 
 
@@ -1205,9 +1331,17 @@ const std::string& SpelunkyScript::get_file() const
 {
     return m_Impl->meta.file;
 }
+const std::string& SpelunkyScript::get_filename() const
+{
+    return m_Impl->meta.filename;
+}
 const std::string& SpelunkyScript::get_version() const
 {
     return m_Impl->meta.version;
+}
+const std::string& SpelunkyScript::get_path() const
+{
+    return m_Impl->meta.path;
 }
 
 #ifdef SPEL2_EDITABLE_SCRIPTS

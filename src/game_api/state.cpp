@@ -191,3 +191,34 @@ void State::set_camera_position(float cx, float cy)
     write_mem_prot(get_camera(), to_le_bytes(cx), true);
     write_mem_prot(get_camera() + 4, to_le_bytes(cy), true);
 }
+
+void State::warp(uint8_t w, uint8_t l, uint8_t t)
+{
+    if (ptr()->screen < 11 || ptr()->screen > 13)
+        return;
+    ptr()->world_next = w;
+    ptr()->level_next = l;
+    ptr()->theme_next = t;
+    if (ptr()->world_start < 1 || ptr()->level_start < 1 || ptr()->theme_start < 1)
+    {
+        ptr()->world_start = w;
+        ptr()->level_start = l;
+        ptr()->theme_start = t;
+        ptr()->quest_flags = 1;
+    }
+    ptr()->screen = 12;
+    ptr()->screen_next = 12;
+    ptr()->screen_last = 12;
+    ptr()->loading = 1;
+}
+
+void State::set_seed(uint32_t seed)
+{
+    if (ptr()->screen != 12) //TODO
+        return;
+    auto memory = Memory::get();
+    typedef void sgs_func(uint32_t dummy, uint32_t seed);
+    static sgs_func* sgs = (sgs_func*)(memory.at_exe(0x221301C0)); //TODO
+    ptr()->screen_last = 0x0E;
+    sgs(0, seed);
+}

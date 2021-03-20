@@ -38,8 +38,11 @@ struct StateMemory
     uint8_t b4f;
     int32_t i50;
     int32_t i54;
-    int32_t i58;
-    uint32_t feedcode;
+    uint8_t world_start;
+    uint8_t level_start;
+    uint8_t theme_start;
+    uint8_t b5f;
+    uint32_t seed;
     uint32_t time_total;
     uint8_t world;
     uint8_t world_next;
@@ -208,4 +211,6 @@ struct State
 
     std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);
+    void warp(uint8_t w, uint8_t l, uint8_t t);
+    void set_seed(uint32_t seed);
 };

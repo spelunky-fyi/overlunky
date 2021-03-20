@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include <filesystem>
 
 #include "imgui.h"
 
@@ -18,6 +19,7 @@ struct ScriptOption
     std::variant<int, float, std::string, bool> value;
     std::variant<int, float> min;
     std::variant<int, float> max;
+    std::string opts;
 };
 
 struct ScriptMeta
@@ -28,12 +30,15 @@ struct ScriptMeta
     std::string description;
     std::string author;
     std::string id;
+    std::string path;
+    std::string filename;
 };
 
 struct ScriptMessage
 {
     std::string message;
     std::chrono::time_point<std::chrono::system_clock> time;
+    ImVec4 color;
 };
 
 class SpelunkyScript
@@ -50,6 +55,8 @@ public:
     const std::string& get_description() const;
     const std::string& get_author() const;
     const std::string& get_file() const;
+    const std::string& get_filename() const;
+    const std::string& get_path() const;
     const std::string& get_version() const;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
