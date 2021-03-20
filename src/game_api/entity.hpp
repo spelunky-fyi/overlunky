@@ -165,7 +165,7 @@ class Entity
     float hitboxx;
     float hitboxy;
     uint32_t duckmask;
-    int32_t i7c;
+    float angle;
     size_t p80;
     size_t texture;
     float tilew;

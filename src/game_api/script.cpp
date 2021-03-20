@@ -677,6 +677,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &Entity::w,
         "height",
         &Entity::h,
+        "angle",
+        &Movable::angle,
         "topmost",
         &Entity::topmost,
         "topmost_mount",
