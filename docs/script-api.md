@@ -12,6 +12,10 @@ The following Lua libraries and their functions are available. You can read more
 ### `string`
 ### `table`
 ### `package`
+## Modules
+You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
+
+Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules.
 ## Global variables
 These variables are always there to use.
 ### [`meta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=meta)

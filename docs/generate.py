@@ -162,6 +162,11 @@ print('The following Lua libraries and their functions are available. You can re
 for lib in lualibs:
     print('### `'+lib+'`')
 
+print('## Modules')
+print("""You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
+
+Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules.""")
+
 print('## Global variables')
 print("""These variables are always there to use.""")
 for lf in funcs:
