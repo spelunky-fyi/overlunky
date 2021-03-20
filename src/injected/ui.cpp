@@ -1853,7 +1853,7 @@ void render_narnia()
             target->theme = 16;
             break;
         case 704:
-            target->world = 7;
+            target->world = 8;
             target->level = 5;
             target->theme = 10;
             break;
@@ -2006,10 +2006,10 @@ void render_narnia()
     ImGui::Text("Cosmic Ocean");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("7-5##Warp7-5"))
-        warp(7, 5, 10);
+        warp(8, 5, 10);
     ImGui::SameLine();
     if (ImGui::Button("7-98##Warp7-98"))
-        warp(7, 98, 10);
+        warp(8, 98, 10);
 }
 
 void render_camera()
