@@ -1827,6 +1827,20 @@ void render_narnia()
             target->level = 1;
             target->theme = 4;
             break;
+        case 403:
+            if (g_state->theme == 11)
+            {
+                target->world = 4;
+                target->level = 4;
+                target->theme = 6;
+            }
+            else
+            {
+                target->world = 4;
+                target->level = 4;
+                target->theme = 5;
+            }
+            break;
         case 404:
             target->world = 5;
             target->level = 1;
