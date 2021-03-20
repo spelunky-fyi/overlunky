@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include <filesystem>
 
 #include "imgui.h"
 
@@ -29,6 +30,8 @@ struct ScriptMeta
     std::string description;
     std::string author;
     std::string id;
+    std::string path;
+    std::string filename;
 };
 
 struct ScriptMessage
@@ -52,6 +55,8 @@ public:
     const std::string& get_description() const;
     const std::string& get_author() const;
     const std::string& get_file() const;
+    const std::string& get_filename() const;
+    const std::string& get_path() const;
     const std::string& get_version() const;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS

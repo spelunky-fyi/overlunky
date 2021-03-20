@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <locale>
 #include <map>
+#include <filesystem>
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
@@ -214,6 +215,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     code = code_storage.c_str();
 #endif
     meta.file = std::move(file);
+    meta.path = std::filesystem::path(meta.file).parent_path().string();
+    meta.filename = std::filesystem::path(meta.file).filename().string();
     enabled = enable;
 
     g_state = get_state_ptr();
@@ -232,7 +235,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;
 
-    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table);
+    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::package);
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
@@ -280,7 +283,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
         sol::optional<std::string> meta_author = lua["meta"]["author"];
-        meta.name = meta_name.value_or(meta.file);
+        meta.name = meta_name.value_or(meta.filename);
         meta.version = meta_version.value_or("");
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
@@ -955,6 +958,8 @@ bool SpelunkyScript::ScriptImpl::run()
             lua["on_death"] = sol::lua_nil;
             lua["on_win"] = sol::lua_nil;
             lua["on_screen"] = sol::lua_nil;
+            lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
+            lua["package"]["loadlib"] = sol::lua_nil;
             auto lua_result = lua.safe_script(code);
             result = "OK";
         }
@@ -1316,9 +1321,17 @@ const std::string& SpelunkyScript::get_file() const
 {
     return m_Impl->meta.file;
 }
+const std::string& SpelunkyScript::get_filename() const
+{
+    return m_Impl->meta.filename;
+}
 const std::string& SpelunkyScript::get_version() const
 {
     return m_Impl->meta.version;
+}
+const std::string& SpelunkyScript::get_path() const
+{
+    return m_Impl->meta.path;
 }
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
