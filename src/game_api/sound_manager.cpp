@@ -36,9 +36,9 @@ CustomSound::~CustomSound()
 }
 
 
-void CustomSound::play()
+void CustomSound::play(bool as_music)
 {
-	m_SoundManager->play_sound(m_FmodSound);
+	m_SoundManager->play_sound(m_FmodSound, as_music);
 }
 
 struct SoundManager::Sound {
@@ -58,14 +58,54 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		auto exe = memory.exe();
 		auto start = memory.after_bundle;
 		auto location = find_inst(exe, "\x48\x8d", find_inst(exe, "\x85\xc0\x74\x2b\x44\x8b\xc0"s, start) - 0x10);
-		auto fmod_studio_system = (FMODStudio::System**)memory.at_exe(decode_pc(exe, location));
+		auto fmod_studio_system = *(FMODStudio::System**)memory.at_exe(decode_pc(exe, location));
 
 		auto get_core_system = reinterpret_cast<FMODStudio::GetCoreSystem*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetCoreSystem"));
-		auto err = get_core_system(*fmod_studio_system, &m_FmodSystem);
-		if (err != FMOD::OK)
 		{
-			DEBUG("Could not get Fmod System, custom audio won't work...");
+			auto err = get_core_system(fmod_studio_system, &m_FmodSystem);
+			if (err != FMOD::OK)
+			{
+				DEBUG("Could not get Fmod System, custom audio won't work...");
+			}
 		}
+
+		auto flush_commands = reinterpret_cast<FMODStudio::FlushCommands*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_FlushCommands"));
+		auto get_bus = reinterpret_cast<FMODStudio::GetBus*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetBus"));
+		auto lock_channel_group = reinterpret_cast<FMODStudio::LockChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_LockChannelGroup"));
+		auto get_channel_group = reinterpret_cast<FMODStudio::GetChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_GetChannelGroup"));
+
+		auto get_channel_group_from_bus_name = [=](const char* bus_name, FMOD::ChannelGroup** channel_group) {
+			FMODStudio::Bus* bus{ nullptr };
+			auto err = get_bus(fmod_studio_system, bus_name, &bus);
+			if (err != FMOD::OK)
+			{
+				DEBUG("Could not get bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
+			}
+			else {
+				err = lock_channel_group(bus);
+				if (err != FMOD::OK)
+				{
+					DEBUG("Could not lock channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
+				}
+				else
+				{
+					err = flush_commands(fmod_studio_system);
+					if (err != FMOD::OK)
+					{
+						DEBUG("Could not flush commands after locking channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
+					}
+					else {
+						err = get_channel_group(bus, channel_group);
+						if (err != FMOD::OK)
+						{
+							DEBUG("Could not obtain channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
+						}
+					}
+				}
+			}
+		};
+		get_channel_group_from_bus_name("bus:/Master_SUM/Master_SFX", &m_SfxChannelGroup);
+		get_channel_group_from_bus_name("bus:/Master_SUM/Master_BGM", &m_MusicChannelGroup);
 	}
 	else
 	{
@@ -195,8 +235,8 @@ void SoundManager::release_sound(FMOD::Sound* fmod_sound)
 		it->ref_count--;
 	}
 }
-void SoundManager::play_sound(FMOD::Sound* fmod_sound)
+void SoundManager::play_sound(FMOD::Sound* fmod_sound, bool as_music)
 {
 	// TODO: Get back channel for more control
-	m_PlaySound(m_FmodSystem, fmod_sound, nullptr, false, nullptr);
+	m_PlaySound(m_FmodSystem, fmod_sound, as_music ? m_MusicChannelGroup : m_SfxChannelGroup, false, nullptr);
 }

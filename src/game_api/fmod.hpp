@@ -225,13 +225,20 @@ namespace FMOD {
 	using Channel = void;
 	using ChannelGroup = void;
 
-	using CreateSound = FMOD::FMOD_RESULT(FMOD::System*, const char*, FMOD::FMOD_MODE, FMOD::CREATESOUNDEXINFO*, FMOD::Sound**);
-	using ReleaseSound = FMOD::FMOD_RESULT(FMOD::Sound*);
-	using PlaySound = FMOD::FMOD_RESULT(FMOD::System*, FMOD::Sound*, FMOD::ChannelGroup*, bool, FMOD::Channel**);
+	using CreateSound = FMOD_RESULT(System*, const char*, FMOD_MODE, CREATESOUNDEXINFO*, Sound**);
+	using ReleaseSound = FMOD_RESULT(Sound*);
+	using PlaySound = FMOD_RESULT(System*, Sound*, ChannelGroup*, bool, Channel**);
 }
 
 namespace FMODStudio {
-	using System = void;
+	using namespace FMOD;
 
-	using GetCoreSystem = FMOD::FMOD_RESULT(System*, FMOD::System**);
+	using System = void;
+	using Bus = void;
+
+	using GetCoreSystem = FMOD_RESULT(System*, FMOD::System**);
+	using FlushCommands = FMOD_RESULT(System*);
+	using GetBus = FMOD_RESULT(System*, const char*, Bus**);
+	using LockChannelGroup = FMOD_RESULT(Bus*);
+	using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
 }

@@ -21,7 +21,7 @@ public:
 
     operator bool() { return m_SoundManager != nullptr; }
 
-    void play();
+    void play(bool as_music);
     
 private:
     CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager);
@@ -45,7 +45,7 @@ public:
     CustomSound get_sound(const char* path, bool loop);
     void acquire_sound(FMOD::Sound* fmod_sound);
     void release_sound(FMOD::Sound* fmod_sound);
-    void play_sound(FMOD::Sound* fmod_sound);
+    void play_sound(FMOD::Sound* fmod_sound, bool as_music);
 
 private:
     DecodeAudioFile* m_DecodeFunction{ nullptr };
@@ -55,6 +55,9 @@ private:
     FMOD::CreateSound* m_CreateSound{ nullptr };
     FMOD::ReleaseSound* m_ReleaseSound{ nullptr };
     FMOD::PlaySound* m_PlaySound{ nullptr };
+
+    FMOD::ChannelGroup* m_SfxChannelGroup{ nullptr };
+    FMOD::ChannelGroup* m_MusicChannelGroup{ nullptr };
 
     struct Sound;
     std::vector<Sound> m_SoundStorage;
