@@ -354,7 +354,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
-    lua["require"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
+    lua["load_script"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message) {
         auto toast = get_toast();

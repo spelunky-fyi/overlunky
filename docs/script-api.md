@@ -84,7 +84,7 @@ Add global callback function to be called on an [event](#on).
 ### [`clear_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
 #### Params: `int id`
 Clear previously added callback `id`
-### [`require`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=require)
+### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 #### Params: `string id`
 Load another script by id "author/name"
 ### [`toast`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast)
@@ -409,7 +409,7 @@ end
 - [`as_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_player) &Entity::as&lt;Player&gt;
 - [`as_monster`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_monster) &Entity::as&lt;Monster&gt;
 - [`as_gun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_gun) &Entity::as&lt;Gun&gt;
-- [`as_block`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_block) &Entity::as&lt;Block&gt;
+- [`as_crushtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_crushtrap) &Entity::as&lt;Crushtrap&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -456,10 +456,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`shots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots) &Gun::shots
 - [`shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
 - [`in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
-### `Block`
+### `Crushtrap`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Block::dirx
-- [`diry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diry) &Block::diry
+- [`dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
+- [`diry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diry) &Crushtrap::diry
 ### `StateMemory`
 - [`screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
