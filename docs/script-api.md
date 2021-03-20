@@ -11,6 +11,7 @@ The following Lua libraries and their functions are available. You can read more
 ### `base`
 ### `string`
 ### `table`
+### `coroutine`
 ### `package`
 ## Modules
 You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
