@@ -43,6 +43,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Shift+Enter**: Spawn back layer door
       + **Ctrl+Shift+Enter**: Spawn warp door
       + **Ctrl+Shift+W**: Warp to set level
+      + Note: Apparently instant warping makes your whip hitbox all weird, because why the hell not.
   - **F3**: Camera controls
       + **Ctrl+,**: Zoom in
       + **Ctrl+.**: Zoom out
