@@ -79,7 +79,7 @@ SpelunkyScript* CreateScript(const char* file_path, bool enabled)
 	std::string code = read_whole_file(file_path);
 	if (!code.empty())
 	{
-		return new SpelunkyScript(std::move(code), file_path, enabled);
+		return new SpelunkyScript(std::move(code), file_path, g_SoundManager, enabled);
 	}
     return nullptr;
 }
