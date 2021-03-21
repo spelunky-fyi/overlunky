@@ -519,10 +519,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     lua["set_entity_flags2"] = set_entity_flags2;
     /// Get the `move_state` field from entity by uid
     lua["get_entity_ai_state"] = get_entity_ai_state;
-    /// Get `state.flags`
-    lua["get_hud_flags"] = get_hud_flags;
-    /// Set `state.flags`
-    lua["set_hud_flags"] = set_hud_flags;
+    /// Get `state.level_flags`
+    lua["get_level_flags"] = get_hud_flags;
+    /// Set `state.level_flags`
+    lua["set_level_flags"] = set_hud_flags;
     /// Get the ENT_TYPE... for entity by uid
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
@@ -888,7 +888,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &StateMemory::time_last_level,
         "time_level",
         &StateMemory::time_level,
-        "hud_flags",
+        "level_flags",
         &StateMemory::hud_flags,
         "loading",
         &StateMemory::loading,
