@@ -243,12 +243,12 @@ Set the `more_flags` field from entity by uid
 #### Params: `int id`
 #### Returns: `int`
 Get the `move_state` field from entity by uid
-### [`get_hud_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hud_flags)
+### [`get_level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_flags)
 #### Returns: `int`
-Get `state.flags`
-### [`set_hud_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_hud_flags)
+Get `state.level_flags`
+### [`set_level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_flags)
 #### Params: `int flags`
-Set `state.flags`
+Set `state.level_flags`
 ### [`get_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_type)
 #### Params: `int id`
 #### Returns: `int`
@@ -520,7 +520,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`journal_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_flags) &StateMemory::journal_flags
 - [`time_last_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) &StateMemory::time_last_level
 - [`time_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) &StateMemory::time_level
-- [`hud_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hud_flags) &StateMemory::hud_flags
+- [`level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_flags) &StateMemory::hud_flags
 - [`loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) &StateMemory::loading
 - [`quest_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) &StateMemory::quest_flags
 ## Enums
