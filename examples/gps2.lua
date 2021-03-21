@@ -1,6 +1,6 @@
 meta.name = "GPS2"
 meta.version = "WIP"
-meta.description = "Draws a path to the exit using Yonaba/Jumper. It runs almost fast enough to not lag your game, but is really just an example on real modules..."
+meta.description = "Draws a path to the exit using https://github.com/Yonaba/Jumper (which I didn't include here, get it yourself). It runs almost fast enough to not lag your game, but is really just an example on real modules..."
 meta.author = "Dregu"
 
 local Grid = require "jumper.grid"
