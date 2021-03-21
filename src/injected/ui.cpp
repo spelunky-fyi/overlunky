@@ -126,7 +126,7 @@ struct EntityCache
     int type;
 };
 
-static ImFont *font, *bigfont;
+static ImFont *font, *bigfont, *hugefont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0.63, g_sat = 0.66, g_val = 0.66;
 ImVec2 startpos;
@@ -2243,24 +2243,6 @@ void render_script(SpelunkyScript *script, ImDrawList* draw_list)
     script->draw(draw_list);
 }
 
-ImVec2 normalize(ImVec2 pos)
-{
-    ImGuiIO &io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
-    if (res.x / res.y > 1.78)
-    {
-        pos.x -= (res.x - res.y / 9 * 16) / 2;
-        res.x = res.y / 9 * 16;
-    }
-    else if (res.x / res.y < 1.77)
-    {
-        pos.y -= (res.y - res.x / 16 * 9) / 2;
-        res.y = res.x / 16 * 9;
-    }
-    ImVec2 normal = ImVec2((pos.x - res.x / 2) * (1.0 / (res.x / 2)), -(pos.y - res.y / 2) * (1.0 / (res.y / 2)));
-    return normal;
-}
-
 void set_pos(ImVec2 pos)
 {
     g_x = normalize(pos).x;
@@ -3601,7 +3583,8 @@ void imgui_init(ImGuiContext*) {
         if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
         {
             font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 18.0f);
-            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 32.0f);
+            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 36.0f);
+            hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 72.0f);
         }
 
         CoTaskMemFree(fontdir);

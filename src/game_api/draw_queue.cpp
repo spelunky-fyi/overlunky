@@ -82,10 +82,20 @@ void DrawQueue::queue_circle_filled(ImVec2 center, float radius, ImU32 color)
         draw_list->AddCircleFilled(center, radius, color, 0);
     });
 }
-void DrawQueue::queue_text(ImVec2 start, std::string text, ImU32 color)
+void DrawQueue::queue_text(ImVec2 start, float size, std::string text, ImU32 color)
 {
     m_Queue.emplace_back([=, text = std::move(text)](ImDrawList* draw_list) {
-        draw_list->AddText(start, color, text.c_str());
+        ImGuiIO &io = ImGui::GetIO();
+        ImFont *font = io.Fonts->Fonts.back();
+        for (auto pickfont : io.Fonts->Fonts)
+        {
+            if (floor(size) <= floor(pickfont->FontSize))
+            {
+                font = pickfont;
+                break;
+            }
+        }
+        draw_list->AddText(font, size, start, color, text.c_str());
     });
 }
 

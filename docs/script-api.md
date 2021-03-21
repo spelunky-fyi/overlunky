@@ -357,8 +357,26 @@ Draws a circle on screen
 #### Params: `float x, float y, float radius, int color`
 Draws a filled circle on screen
 ### [`draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
-#### Params: `float x, float y, string text, int color`
-Draws text on screen
+#### Params: `float x, float y, float size, string text, int color`
+Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
+### [`draw_text_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size)
+#### Params: `float size, string text`
+#### Returns: `w`, `h` in screen distance.
+Calculate the bounding box of text, so you can center it etc.
+Example:
+```lua
+function on_guiframe()
+    -- get a random color
+    color = math.random(0, 0xffffffff)
+    -- zoom the font size based on frame
+    size = (get_frame() % 199)+1
+    text = 'Awesome!'
+    -- calculate size of text
+    w, h = draw_text_size(size, text)
+    -- draw to the center of screen
+    draw_text(0-w/2, 0-h/2, size, text, color)
+end
+```
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
 ```lua
@@ -409,6 +427,7 @@ end
 - [`y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &Entity::y
 - [`width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &Entity::w
 - [`height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &Entity::h
+- [`angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Movable::angle
 - [`topmost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) &Entity::topmost
 - [`topmost_mount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) &Entity::topmost_mount
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
