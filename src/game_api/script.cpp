@@ -409,7 +409,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         options[name] = { desc, value, 0, 0, "" };
         lua["options"][name] = value;
     };
-    /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`.
+    /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
     lua["register_option_combo"] = [this](std::string name, std::string desc, std::string opts) {
         options[name] = { desc, 0, 0, 0, opts };
         lua["options"][name] = 1;
