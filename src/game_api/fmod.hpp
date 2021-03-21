@@ -1,14 +1,13 @@
 #pragma once
 
-#define FMOD_CHECK_CALL(x) [&]() { \
-	auto err = (x); \
+#define FMOD_CHECK_CALL(x) [](auto err) { \
 	if (err != FMOD::OK) \
 	{ \
 		DEBUG("{}: {}", #x, FMOD::ErrStr(err)); \
 		return false; \
 	} \
 	return true; \
-}()
+}((x))
 
 namespace FMOD {
 	enum FMOD_RESULT {
