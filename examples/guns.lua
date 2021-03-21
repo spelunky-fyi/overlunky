@@ -16,7 +16,7 @@ set_callback(function()
                 ENT_TYPE.ITEM_CLONEGUN or gun.type.id == ENT_TYPE.ITEM_PLASMACANNON then
 
                 -- print the gun variables on screen
-                draw_text(-0.67, 0.87,
+                draw_text(-0.67, 0.87, 24,
                     "Gun cooldown:" .. tostring(gun.cooldown) .. ", shots:" .. tostring(gun.shots) .. ", shots2:" ..
                         tostring(gun.shots2) .. ", chamber:" .. tostring(gun.in_chamber) .. " frame:" ..
                         tostring(gun.animation_frame), rgba(255, 0, 255, 255))
