@@ -577,7 +577,7 @@ void refresh_script_files()
     g_script_files.clear();
     if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
-        for (const auto &file : std::filesystem::recursive_directory_iterator(scriptpath))
+        for (const auto &file : std::filesystem::directory_iterator(scriptpath))
         {
             if (std::regex_search(file.path().string(), luareg))
             {
