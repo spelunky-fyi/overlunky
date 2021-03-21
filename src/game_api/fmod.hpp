@@ -346,6 +346,7 @@ namespace FMOD {
 
 	using ChannelControlCallback = FMOD_RESULT(ChannelControl*, ChannelControlType, ChannelControlCallbackType, void*, void*);
 
+	using ChannelIsPlaying = FMOD_RESULT(Channel*, bool*);
 	using ChannelStop = FMOD_RESULT(Channel*);
 	using ChannelSetPaused = FMOD_RESULT(Channel*, bool);
 	using ChannelSetMute = FMOD_RESULT(Channel*, bool);

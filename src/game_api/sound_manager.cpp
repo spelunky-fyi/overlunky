@@ -3,12 +3,47 @@
 #include "logger.h"
 #include "memory.hpp"
 
+#include <mutex>
 #include <string>
 
 #include <Windows.h>
-// Y tho Windows  T.T
-#undef PlaySound
 
+#define SOL_ALL_SAFETIES_ON 1
+#include <sol/function.hpp>
+
+
+struct ChannelControlCollbackData
+{
+	ChannelControlCollbackData(const ChannelControlCollbackData&) = delete;
+	ChannelControlCollbackData& operator=(const ChannelControlCollbackData&) = delete;
+	ChannelControlCollbackData(ChannelControlCollbackData&&) = default;
+	ChannelControlCollbackData& operator=(ChannelControlCollbackData&&) = default;
+
+	FMOD::Channel* channel{ nullptr };
+	SoundCallbackFunction callback;
+};
+std::mutex s_CallbacksMutex;
+std::vector<ChannelControlCollbackData> s_Callbacks;
+FMOD::FMOD_RESULT ChannelControlCallback(FMOD::ChannelControl* channel_control, FMOD::ChannelControlType channel_control_type,
+	FMOD::ChannelControlCallbackType channel_control_callback_type, void* calback_data_1, void* calback_data_2)
+{
+	if (channel_control_type == FMOD::ChannelControlType::Channel && channel_control_callback_type == FMOD::ChannelControlCallbackType::End)
+	{
+		FMOD::Channel* channel = reinterpret_cast<FMOD::Channel*>(channel_control);
+
+		std::lock_guard lock{ s_CallbacksMutex };
+		auto it = std::find_if(s_Callbacks.begin(), s_Callbacks.end(),
+			[channel](const ChannelControlCollbackData& callback) {
+			return callback.channel == channel;
+		});
+		if (it != s_Callbacks.end()) {
+			it->callback();
+			s_Callbacks.erase(it);
+		}
+	}
+	// TODO: Cleanup old channels?
+	return FMOD::OK;
+}
 
 CustomSound::CustomSound(const CustomSound& rhs)
 {
@@ -56,6 +91,10 @@ PlayingSound::PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_mana
 {
 }
 
+bool PlayingSound::is_playing()
+{
+	return m_SoundManager->is_playing(*this);
+}
 bool PlayingSound::stop()
 {
 	return m_SoundManager->stop(*this);
@@ -83,6 +122,10 @@ bool PlayingSound::set_volume(float volume)
 bool PlayingSound::set_looping(LoopMode loop_mode)
 {
 	return m_SoundManager->set_looping(*this, loop_mode);
+}
+bool PlayingSound::set_callback(SoundCallbackFunction&& callback)
+{
+	return m_SoundManager->set_callback(*this, std::move(callback));
 }
 
 
@@ -162,6 +205,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		m_ReleaseSound = reinterpret_cast<FMOD::ReleaseSound*>(GetProcAddress(fmod, "FMOD_Sound_Release"));
 		m_PlaySound = reinterpret_cast<FMOD::PlaySound*>(GetProcAddress(fmod, "FMOD_System_PlaySound"));
 
+		m_ChannelIsPlaying = reinterpret_cast<FMOD::ChannelIsPlaying*>(GetProcAddress(fmod, "FMOD_Channel_IsPlaying"));
 		m_ChannelStop = reinterpret_cast<FMOD::ChannelStop*>(GetProcAddress(fmod, "FMOD_Channel_Stop"));
 		m_ChannelSetPaused = reinterpret_cast<FMOD::ChannelSetPaused*>(GetProcAddress(fmod, "FMOD_Channel_SetPaused"));
 		m_ChannelSetMute = reinterpret_cast<FMOD::ChannelSetMute*>(GetProcAddress(fmod, "FMOD_Channel_SetMute"));
@@ -287,6 +331,11 @@ PlayingSound SoundManager::play_sound(FMOD::Sound* fmod_sound, bool paused, bool
 	return PlayingSound{ channel, this };
 }
 
+bool SoundManager::is_playing(PlayingSound playing_sound)
+{
+	bool is_playing{ false };
+	return FMOD_CHECK_CALL(m_ChannelIsPlaying(playing_sound.m_FmodChannel, &is_playing)) && is_playing;
+}
 bool SoundManager::stop(PlayingSound playing_sound)
 {
 	return FMOD_CHECK_CALL(m_ChannelStop(playing_sound.m_FmodChannel));
@@ -324,6 +373,16 @@ bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
 		case LoopMode::Bidirectional:
 			return FMOD_CHECK_CALL(m_ChannelSetMode(playing_sound.m_FmodChannel, FMOD::MODE_LOOP_BIDI));
 		}
+	}
+	return false;
+}
+bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback)
+{
+	std::lock_guard lock{ s_CallbacksMutex };
+	if (FMOD_CHECK_CALL(m_ChannelSetCallback(playing_sound.m_FmodChannel, &ChannelControlCallback)))
+	{
+		s_Callbacks.push_back(ChannelControlCollbackData{ playing_sound.m_FmodChannel, std::move(callback) });
+		return true;
 	}
 	return false;
 }

@@ -861,6 +861,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &StateMemory::loading,
         "quest_flags",
         &StateMemory::quest_flags);
+    /// Handle to a loaded sound, can be used to play the sound and receive a PlayingSound for more control
+    /// It is up to you to not release this as long as any sounds returned by CustomSound:play() are still playing
     lua.new_usertype<CustomSound>(
         "CustomSound",
         "play",
@@ -868,10 +870,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
             static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
             static_cast<PlayingSound(CustomSound::*)(bool, SoundType)>(&CustomSound::play)));
+    /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
+    /// You can just discard this handle if you do not need extended control anymore
     lua.new_usertype<PlayingSound>(
         "PlayingSound",
-        "set_looping",
-        &PlayingSound::set_looping,
+        "is_playing",
+        &PlayingSound::is_playing,
         "stop",
         &PlayingSound::stop,
         "set_pause",
@@ -885,7 +889,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "set_volume",
         &PlayingSound::set_volume,
         "set_looping",
-        &PlayingSound::set_looping);
+        &PlayingSound::set_looping,
+        "set_callback",
+        &PlayingSound::set_callback);
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
@@ -983,8 +989,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "RESET",
         105);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    /// Third parameter to CustomSound:play(), specifies which group the sound will be played in and thus how the player controls its volume
     lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
-    lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 3);
+    /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
+    lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
 }
 
 bool SpelunkyScript::ScriptImpl::run()

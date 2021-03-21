@@ -5,7 +5,7 @@ meta.author = 'Malacath-92'
 
 message('Loaded sound test mod...')
 
--- If you wanna test music place your own file next to this script
+-- If you want to test music, place your own file next to this script
 --[[
 test_music = create_sound('music.mp3')
 if test_music ~= nil then
@@ -40,15 +40,27 @@ set_callback(function()
                 message('Low volume...')
                 playing_sound:set_volume(0.25)
             elseif count == 5 then
+                message('Negative volume...')
+                playing_sound:set_volume(-1.0)
+            elseif count == 6 then
                 message('Muted...')
                 playing_sound:set_mute(true)
+            elseif count == 7 then
+                message('With callback...')
+                playing_sound:set_callback(function() message("Sound ended...") end)
+            elseif count == 8 then
+                message('With looping...')
+                playing_sound:set_looping(SOUND_LOOP_MODE.LOOP)
+                set_timeout(function()
+                    message('Destroying sound...')
+                    playing_sound:stop()
+                    test_sound = nil
+                end, 60 * 5)
             end
             playing_sound:set_pause(false)
     
             count = count + 1
-            if count > 5 then
-                message('Destroying sound...')
-                test_sound = nil
+            if count > 8 then
                 clear_callback(interval_id)
             end
         end, 60 * 5)

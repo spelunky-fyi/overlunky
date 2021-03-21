@@ -1,16 +1,27 @@
 #pragma once
 
-#include <functional>
 #include <string>
 #include <vector>
 
 #include "fmod.hpp"
 #include "audio_buffer.hpp"
 
+namespace sol {
+    template<bool b>
+    class basic_reference;
+    using reference = basic_reference<false>;
+    template<typename T, bool, typename H>
+    class basic_protected_function;
+    using safe_function = basic_protected_function<reference, false, reference>;
+    using protected_function = safe_function;
+    using function = protected_function;
+}
+
+
 class SoundManager;
 class PlayingSound;
 
-using SoundCallbackFunction = std::function<void()>;
+using SoundCallbackFunction = sol::function;
 
 enum class LoopMode {
     Off,
@@ -57,6 +68,7 @@ public:
     PlayingSound& operator=(PlayingSound&& rhs) noexcept = default;
     ~PlayingSound() = default;
 
+    bool is_playing();
     bool stop();
     bool set_pause(bool pause);
     bool set_mute(bool mute);
@@ -64,7 +76,7 @@ public:
     bool set_pan(float pan);
     bool set_volume(float volume);
     bool set_looping(LoopMode loop_mode);
-    //bool set_callback(SoundCallbackFunction callback);
+    bool set_callback(SoundCallbackFunction&& callback);
 
 private:
     PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager);
@@ -90,6 +102,7 @@ public:
     void release_sound(FMOD::Sound* fmod_sound);
     PlayingSound play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music);
 
+    bool is_playing(PlayingSound playing_sound);
     bool stop(PlayingSound playing_sound);
     bool set_pause(PlayingSound playing_sound, bool pause);
     bool set_mute(PlayingSound playing_sound, bool mute);
@@ -97,7 +110,7 @@ public:
     bool set_pan(PlayingSound playing_sound, float pan);
     bool set_volume(PlayingSound playing_sound, float volume);
     bool set_looping(PlayingSound playing_sound, LoopMode loop_mode);
-    //bool set_callback(PlayingSound playing_sound, SoundCallbackFunction callback);
+    bool set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback);
 
 private:
     DecodeAudioFile* m_DecodeFunction{ nullptr };
@@ -108,6 +121,7 @@ private:
     FMOD::ReleaseSound* m_ReleaseSound{ nullptr };
     FMOD::PlaySound* m_PlaySound{ nullptr };
 
+    FMOD::ChannelIsPlaying* m_ChannelIsPlaying{ nullptr };
     FMOD::ChannelStop* m_ChannelStop{ nullptr };
     FMOD::ChannelSetPaused* m_ChannelSetPaused{ nullptr };
     FMOD::ChannelSetMute* m_ChannelSetMute{ nullptr };
