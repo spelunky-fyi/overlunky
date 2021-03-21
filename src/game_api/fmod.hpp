@@ -1,5 +1,15 @@
 #pragma once
 
+#define FMOD_CHECK_CALL(x) [&]() { \
+	auto err = (x); \
+	if (err != FMOD::OK) \
+	{ \
+		DEBUG("{}: {}", #x, FMOD::ErrStr(err)); \
+		return false; \
+	} \
+	return true; \
+}()
+
 namespace FMOD {
 	enum FMOD_RESULT {
 		OK,
@@ -85,6 +95,99 @@ namespace FMOD {
 		ERR_RECORD_DISCONNECTED,
 		ERR_TOOMANYSAMPLES
 	};
+
+	inline const char* ErrStr(FMOD_RESULT err)
+	{
+#define ERR_CASE(err_enum) case err_enum: return #err_enum
+		switch (err)
+		{
+			ERR_CASE(OK);
+			ERR_CASE(ERR_BADCOMMAND);
+			ERR_CASE(ERR_CHANNEL_ALLOC);
+			ERR_CASE(ERR_CHANNEL_STOLEN);
+			ERR_CASE(ERR_DMA);
+			ERR_CASE(ERR_DSP_CONNECTION);
+			ERR_CASE(ERR_DSP_DONTPROCESS);
+			ERR_CASE(ERR_DSP_FORMAT);
+			ERR_CASE(ERR_DSP_INUSE);
+			ERR_CASE(ERR_DSP_NOTFOUND);
+			ERR_CASE(ERR_DSP_RESERVED);
+			ERR_CASE(ERR_DSP_SILENCE);
+			ERR_CASE(ERR_DSP_TYPE);
+			ERR_CASE(ERR_FILE_BAD);
+			ERR_CASE(ERR_FILE_COULDNOTSEEK);
+			ERR_CASE(ERR_FILE_DISKEJECTED);
+			ERR_CASE(ERR_FILE_EOF);
+			ERR_CASE(ERR_FILE_ENDOFDATA);
+			ERR_CASE(ERR_FILE_NOTFOUND);
+			ERR_CASE(ERR_FORMAT);
+			ERR_CASE(ERR_HEADER_MISMATCH);
+			ERR_CASE(ERR_HTTP);
+			ERR_CASE(ERR_HTTP_ACCESS);
+			ERR_CASE(ERR_HTTP_PROXY_AUTH);
+			ERR_CASE(ERR_HTTP_SERVER_ERROR);
+			ERR_CASE(ERR_HTTP_TIMEOUT);
+			ERR_CASE(ERR_INITIALIZATION);
+			ERR_CASE(ERR_INITIALIZED);
+			ERR_CASE(ERR_INTERNAL);
+			ERR_CASE(ERR_INVALID_FLOAT);
+			ERR_CASE(ERR_INVALID_HANDLE);
+			ERR_CASE(ERR_INVALID_PARAM);
+			ERR_CASE(ERR_INVALID_POSITION);
+			ERR_CASE(ERR_INVALID_SPEAKER);
+			ERR_CASE(ERR_INVALID_SYNCPOINT);
+			ERR_CASE(ERR_INVALID_THREAD);
+			ERR_CASE(ERR_INVALID_VECTOR);
+			ERR_CASE(ERR_MAXAUDIBLE);
+			ERR_CASE(ERR_MEMORY);
+			ERR_CASE(ERR_MEMORY_CANTPOINT);
+			ERR_CASE(ERR_NEEDS3D);
+			ERR_CASE(ERR_NEEDSHARDWARE);
+			ERR_CASE(ERR_NET_CONNECT);
+			ERR_CASE(ERR_NET_SOCKET_ERROR);
+			ERR_CASE(ERR_NET_URL);
+			ERR_CASE(ERR_NET_WOULD_BLOCK);
+			ERR_CASE(ERR_NOTREADY);
+			ERR_CASE(ERR_OUTPUT_ALLOCATED);
+			ERR_CASE(ERR_OUTPUT_CREATEBUFFER);
+			ERR_CASE(ERR_OUTPUT_DRIVERCALL);
+			ERR_CASE(ERR_OUTPUT_FORMAT);
+			ERR_CASE(ERR_OUTPUT_INIT);
+			ERR_CASE(ERR_OUTPUT_NODRIVERS);
+			ERR_CASE(ERR_PLUGIN);
+			ERR_CASE(ERR_PLUGIN_MISSING);
+			ERR_CASE(ERR_PLUGIN_RESOURCE);
+			ERR_CASE(ERR_PLUGIN_VERSION);
+			ERR_CASE(ERR_RECORD);
+			ERR_CASE(ERR_REVERB_CHANNELGROUP);
+			ERR_CASE(ERR_REVERB_INSTANCE);
+			ERR_CASE(ERR_SUBSOUNDS);
+			ERR_CASE(ERR_SUBSOUND_ALLOCATED);
+			ERR_CASE(ERR_SUBSOUND_CANTMOVE);
+			ERR_CASE(ERR_TAGNOTFOUND);
+			ERR_CASE(ERR_TOOMANYCHANNELS);
+			ERR_CASE(ERR_TRUNCATED);
+			ERR_CASE(ERR_UNIMPLEMENTED);
+			ERR_CASE(ERR_UNINITIALIZED);
+			ERR_CASE(ERR_UNSUPPORTED);
+			ERR_CASE(ERR_VERSION);
+			ERR_CASE(ERR_EVENT_ALREADY_LOADED);
+			ERR_CASE(ERR_EVENT_LIVEUPDATE_BUSY);
+			ERR_CASE(ERR_EVENT_LIVEUPDATE_MISMATCH);
+			ERR_CASE(ERR_EVENT_LIVEUPDATE_TIMEOUT);
+			ERR_CASE(ERR_EVENT_NOTFOUND);
+			ERR_CASE(ERR_STUDIO_UNINITIALIZED);
+			ERR_CASE(ERR_STUDIO_NOT_LOADED);
+			ERR_CASE(ERR_INVALID_STRING);
+			ERR_CASE(ERR_ALREADY_LOCKED);
+			ERR_CASE(ERR_NOT_LOCKED);
+			ERR_CASE(ERR_RECORD_DISCONNECTED);
+			ERR_CASE(ERR_TOOMANYSAMPLES);
+		}
+#undef ERR_CASE
+		return "UNKNONW";
+	}
+
 	enum FMOD_MODE : std::uint32_t
 	{
 		MODE_DEFAULT = 0x00000000,
@@ -219,15 +322,42 @@ namespace FMOD {
 		std::intptr_t            fsbguid;
 	};
 
+	enum class ChannelControlType {
+		Channel,
+		ChannelGroup
+	};
+	enum class ChannelControlCallbackType {
+		End,
+		VirtualVoice,
+		SyncPoint,
+		Occlusion
+	};
+
 	using System = void;
 	using Bank = void;
 	using Sound = void;
 	using Channel = void;
 	using ChannelGroup = void;
+	using ChannelControl = void; // Either a Channel or a ChannelGroup
 
 	using CreateSound = FMOD_RESULT(System*, const char*, FMOD_MODE, CREATESOUNDEXINFO*, Sound**);
 	using ReleaseSound = FMOD_RESULT(Sound*);
 	using PlaySound = FMOD_RESULT(System*, Sound*, ChannelGroup*, bool, Channel**);
+
+	using ChannelControlCallback = FMOD_RESULT(ChannelControl*, ChannelControlType, ChannelControlCallbackType, void*, void*);
+
+	using ChannelStop = FMOD_RESULT(Channel*);
+	using ChannelSetPaused = FMOD_RESULT(Channel*, bool);
+	using ChannelSetMute = FMOD_RESULT(Channel*, bool);
+	using ChannelSetPitch = FMOD_RESULT(Channel*, float);
+	using ChannelSetPan = FMOD_RESULT(Channel*, float);
+	using ChannelSetVolume = FMOD_RESULT(Channel*, float);
+	using ChannelSetFrequency = FMOD_RESULT(Channel*, float);
+	using ChannelSetMode = FMOD_RESULT(Channel*, FMOD_MODE);
+	using ChannelSetCallback = FMOD_RESULT(Channel*, ChannelControlCallback*);
+	using ChannelSetUserData = FMOD_RESULT(Channel*, void*);
+	using ChannelGetUserData = FMOD_RESULT(Channel*, void**);
+	using ChannelGetChannelGroup = FMOD_RESULT(Channel*, ChannelGroup**);
 }
 
 namespace FMODStudio {
