@@ -113,7 +113,7 @@ Add a boolean option that the user can change in the UI. Read with `options.name
 Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
 ### [`register_option_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_combo)
 #### Params: `string name, string desc, string opts`
-Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`.
+Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 #### Params: `int id, float x, float y, int layer, float vx, float vy`
 #### Returns: `int`
@@ -243,12 +243,12 @@ Set the `more_flags` field from entity by uid
 #### Params: `int id`
 #### Returns: `int`
 Get the `move_state` field from entity by uid
-### [`get_hud_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hud_flags)
+### [`get_level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_flags)
 #### Returns: `int`
-Get `state.flags`
-### [`set_hud_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_hud_flags)
+Get `state.level_flags`
+### [`set_level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_flags)
 #### Params: `int flags`
-Set `state.flags`
+Set `state.level_flags`
 ### [`get_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_type)
 #### Params: `int id`
 #### Returns: `int`
@@ -357,8 +357,26 @@ Draws a circle on screen
 #### Params: `float x, float y, float radius, int color`
 Draws a filled circle on screen
 ### [`draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
-#### Params: `float x, float y, string text, int color`
-Draws text on screen
+#### Params: `float x, float y, float size, string text, int color`
+Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
+### [`draw_text_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size)
+#### Params: `float size, string text`
+#### Returns: `w`, `h` in screen distance.
+Calculate the bounding box of text, so you can center it etc.
+Example:
+```lua
+function on_guiframe()
+    -- get a random color
+    color = math.random(0, 0xffffffff)
+    -- zoom the font size based on frame
+    size = (get_frame() % 199)+1
+    text = 'Awesome!'
+    -- calculate size of text
+    w, h = draw_text_size(size, text)
+    -- draw to the center of screen
+    draw_text(0-w/2, 0-h/2, size, text, color)
+end
+```
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
 ```lua
@@ -409,6 +427,7 @@ end
 - [`y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &Entity::y
 - [`width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &Entity::w
 - [`height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &Entity::h
+- [`angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Movable::angle
 - [`topmost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) &Entity::topmost
 - [`topmost_mount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) &Entity::topmost_mount
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
@@ -501,7 +520,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`journal_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_flags) &StateMemory::journal_flags
 - [`time_last_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) &StateMemory::time_last_level
 - [`time_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) &StateMemory::time_level
-- [`hud_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hud_flags) &StateMemory::hud_flags
+- [`level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_flags) &StateMemory::hud_flags
 - [`loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) &StateMemory::loading
 - [`quest_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) &StateMemory::quest_flags
 ## Enums

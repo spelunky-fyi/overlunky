@@ -11,12 +11,12 @@ register_option_float('b', 'Float B', 0.5, 0, 1.5)
 register_option_bool('c', 'Checkbox C', false)
 register_option_string('d', 'String D', '')
 
--- use a null character separated list, first one is default
-register_option_combo('e', 'Choice E', 'Red\0Green\0Blue')
+-- use a null character \0 separated list, with a double \0\0 at the end
+register_option_combo('e', 'Choice E', 'Red\0Green\0Blue\0\0')
 
 -- you can use a table to initialize this too, that way you can easily reference the string later with the index
 colors = {'Bulbasaur', 'Charmander', 'Squirtle'}
-register_option_combo('f', 'Choice F', table.concat(colors, '\0'))
+register_option_combo('f', 'Choice F', table.concat(colors, '\0')..'\0\0')
 
 -- just print these out real quick
 set_callback(function()

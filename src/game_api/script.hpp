@@ -12,6 +12,7 @@
 
 ImVec2 screenify(ImVec2 pos);
 float screenify(float dis);
+ImVec2 normalize(ImVec2 pos);
 
 struct ScriptOption
 {

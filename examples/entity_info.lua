@@ -25,7 +25,7 @@ set_callback(function()
                 c = " ("..names[e.inside]..")"
             end
             if not string.match(names[e.type.id], "FX") then
-                draw_text(sx, sy,
+                draw_text(sx, sy, 0,
                     tostring(v).."\n"..
                     names[e.type.id]..c.."\n"..
                     tostring(e.health).." HP\n"..
@@ -42,7 +42,7 @@ set_callback(function()
             ex, ey, el = get_position(v)
             sx, sy = screen_position(ex-e.hitboxx, ey-e.hitboxy+e.offsety)
             dist = distance(players[1].uid, v)
-            draw_text(sx, sy,
+            draw_text(sx, sy, 0,
                 tostring(v).."\n"..
                 names[e.type.id].."\n"..
                 "D: "..string.format("%.3f", dist), rgba(255, 255, 255, 255))
@@ -60,7 +60,7 @@ set_callback(function()
         e = get_entity(v):as_movable()
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if l == pl then
-            draw_text(sx, sy, tostring(v), rgba(255, 255, 255, 255))
+            draw_text(sx, sy, 0, tostring(v), rgba(255, 255, 255, 255))
         end
     sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
     sx2, sy2 = screen_position(x+e.hitboxx+e.offsetx, y-e.hitboxy+e.offsety) -- bottom right

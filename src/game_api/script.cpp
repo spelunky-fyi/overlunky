@@ -120,6 +120,24 @@ ImVec2 screenify(ImVec2 pos)
     return screened;
 }
 
+ImVec2 normalize(ImVec2 pos)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 res = io.DisplaySize;
+    if (res.x / res.y > 1.78)
+    {
+        pos.x -= (res.x - res.y / 9 * 16) / 2;
+        res.x = res.y / 9 * 16;
+    }
+    else if (res.x / res.y < 1.77)
+    {
+        pos.y -= (res.y - res.x / 16 * 9) / 2;
+        res.y = res.x / 16 * 9;
+    }
+    ImVec2 normal = ImVec2((pos.x - res.x / 2) * (1.0 / (res.x / 2)), -(pos.y - res.y / 2) * (1.0 / (res.y / 2)));
+    return normal;
+}
+
 std::string sanitize(std::string data)
 {
     std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return std::tolower(c); });
@@ -400,7 +418,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         options[name] = { desc, value, 0, 0, "" };
         lua["options"][name] = value;
     };
-    /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`.
+    /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
     lua["register_option_combo"] = [this](std::string name, std::string desc, std::string opts) {
         options[name] = { desc, 0, 0, 0, opts };
         lua["options"][name] = 1;
@@ -510,10 +528,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_entity_flags2"] = set_entity_flags2;
     /// Get the `move_state` field from entity by uid
     lua["get_entity_ai_state"] = get_entity_ai_state;
-    /// Get `state.flags`
-    lua["get_hud_flags"] = get_hud_flags;
-    /// Set `state.flags`
-    lua["set_hud_flags"] = set_hud_flags;
+    /// Get `state.level_flags`
+    lua["get_level_flags"] = get_hud_flags;
+    /// Set `state.level_flags`
+    lua["set_level_flags"] = set_hud_flags;
     /// Get the ENT_TYPE... for entity by uid
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
@@ -616,10 +634,42 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         ImVec2 a = screenify({ x, y });
         draw_queue.queue_circle_filled(a, screenify(radius), color);
     };
-    /// Draws text on screen
-    lua["draw_text"] = [this](float x, float y, std::string text, ImU32 color) {
+    /// Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
+    lua["draw_text"] = [this](float x, float y, float size, std::string text, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        draw_queue.queue_text(a, std::move(text), color);
+        draw_queue.queue_text(a, size, std::move(text), color);
+    };
+    /// Returns: `w`, `h` in screen distance.
+    /// Calculate the bounding box of text, so you can center it etc.
+    /// Example:
+    /// ```lua
+    /// function on_guiframe()
+    ///     -- get a random color
+    ///     color = math.random(0, 0xffffffff)
+    ///     -- zoom the font size based on frame
+    ///     size = (get_frame() % 199)+1
+    ///     text = 'Awesome!'
+    ///     -- calculate size of text
+    ///     w, h = draw_text_size(size, text)
+    ///     -- draw to the center of screen
+    ///     draw_text(0-w/2, 0-h/2, size, text, color)
+    /// end
+    /// ```
+    lua["draw_text_size"] = [this](float size, std::string text) {
+        ImGuiIO &io = ImGui::GetIO();
+        ImFont *font = io.Fonts->Fonts.back();
+        for (auto pickfont : io.Fonts->Fonts)
+        {
+            if (floor(size) <= floor(pickfont->FontSize))
+            {
+                font = pickfont;
+                break;
+            }
+        }
+        ImVec2 textsize = font->CalcTextSizeA(size, 9999.0, 9999.0, text.c_str());
+        auto a = normalize(ImVec2(0, 0));
+        auto b = normalize(textsize);
+        return std::make_pair(b.x - a.x, b.y - a.y);
     };
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -696,6 +746,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::w,
         "height",
         &Entity::h,
+        "angle",
+        &Movable::angle,
         "topmost",
         &Entity::topmost,
         "topmost_mount",
@@ -855,7 +907,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &StateMemory::time_last_level,
         "time_level",
         &StateMemory::time_level,
-        "hud_flags",
+        "level_flags",
         &StateMemory::hud_flags,
         "loading",
         &StateMemory::loading,

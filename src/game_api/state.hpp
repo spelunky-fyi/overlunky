@@ -18,8 +18,8 @@ struct StateMemory
     uint32_t loading;
     size_t p18;
     int32_t i20;
-    int32_t i24;
-    int32_t i28;
+    uint32_t fadeout;
+    uint32_t fadein;
     int32_t i2c;
     uint8_t ingame;
     uint8_t playing;

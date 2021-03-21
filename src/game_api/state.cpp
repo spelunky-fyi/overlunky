@@ -214,6 +214,8 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     {
         ptr()->screen_next = 11;
     }
+    ptr()->fadeout = 5;
+    ptr()->fadein = 5;
     ptr()->loading = 1;
 }
 
