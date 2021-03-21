@@ -1,13 +1,13 @@
 meta.name = "GPS2"
 meta.version = "WIP"
-meta.description = "Draws a path to the exit using https://github.com/Yonaba/Jumper (which I didn't include here, get it yourself). It runs almost fast enough to not lag your game, but is really just an example on real modules..."
+meta.description = "Draws a path to the exit using different pathfinding algorithms from https://github.com/Yonaba/Jumper (which I didn't include here, get it yourself.) It runs almost fast enough to not lag your game at all, but is really just an example on real modules..."
 meta.author = "Dregu"
 
 local Grid = require "jumper.grid"
 local Pathfinder = require "jumper.pathfinder"
 local finders = Pathfinder:getFinders()
 
-register_option_combo('finder', 'Finder algorithm to use', table.concat(finders, '\0'))
+register_option_combo("finder", "Finder algorithm to use", table.concat(finders, "\0").."\0\0")
 
 local grid = nil
 local finder = nil
@@ -69,7 +69,7 @@ set_callback(function()
     co = coroutine.create(recalculate)
     set_interval(function()
         coroutine.resume(co)
-    end, 30)
+    end, 15)
 end, ON.LEVEL)
 
 set_callback(function()
