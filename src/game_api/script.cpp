@@ -623,8 +623,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
-    lua["create_sound"] = [this](std::string path, bool loop) -> sol::optional<CustomSound> {
-        CustomSound sound = sound_manager->get_sound((script_folder / path).string(), loop);
+    lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound> {
+        CustomSound sound = sound_manager->get_sound((script_folder / path).string());
         if (sound)
         {
             return sound;
@@ -864,7 +864,28 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_usertype<CustomSound>(
         "CustomSound",
         "play",
-        &CustomSound::play);
+        sol::overload(
+            static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
+            static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
+            static_cast<PlayingSound(CustomSound::*)(bool, SoundType)>(&CustomSound::play)));
+    lua.new_usertype<PlayingSound>(
+        "PlayingSound",
+        "set_looping",
+        &PlayingSound::set_looping,
+        "stop",
+        &PlayingSound::stop,
+        "set_pause",
+        &PlayingSound::set_pause,
+        "set_mute",
+        &PlayingSound::set_mute,
+        "set_pitch",
+        &PlayingSound::set_pitch,
+        "set_pan",
+        &PlayingSound::set_pan,
+        "set_volume",
+        &PlayingSound::set_volume,
+        "set_looping",
+        &PlayingSound::set_looping);
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
@@ -962,6 +983,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "RESET",
         105);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
+    lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 3);
 }
 
 bool SpelunkyScript::ScriptImpl::run()

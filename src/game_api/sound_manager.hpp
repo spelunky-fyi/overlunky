@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -7,26 +8,68 @@
 #include "audio_buffer.hpp"
 
 class SoundManager;
+class PlayingSound;
 
-struct CustomSound
+using SoundCallbackFunction = std::function<void()>;
+
+enum class LoopMode {
+    Off,
+    Loop,
+    Bidirectional
+};
+
+enum class SoundType {
+    Sfx,
+    Music
+};
+
+class CustomSound
 {
     friend class SoundManager;
 
 public:
     CustomSound(const CustomSound& rhs);
     CustomSound(CustomSound&& rhs) noexcept;
-    CustomSound operator=(const CustomSound& rhs) = delete;
-    CustomSound operator=(CustomSound&& rhs) = delete;
+    CustomSound& operator=(const CustomSound& rhs) = delete;
+    CustomSound& operator=(CustomSound&& rhs) = delete;
     ~CustomSound();
 
     operator bool() { return m_SoundManager != nullptr; }
 
-    void play(bool as_music);
-    
+    PlayingSound play();
+    PlayingSound play(bool paused);
+    PlayingSound play(bool paused, SoundType sound_type);
+
 private:
     CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager);
 
     FMOD::Sound* m_FmodSound{ nullptr };
+    SoundManager* m_SoundManager{ nullptr };
+};
+
+class PlayingSound {
+    friend class SoundManager;
+
+public:
+    PlayingSound(const PlayingSound& rhs) = default;
+    PlayingSound(PlayingSound&& rhs) noexcept = default;
+    PlayingSound& operator=(const PlayingSound& rhs) = default;
+    PlayingSound& operator=(PlayingSound&& rhs) noexcept = default;
+    ~PlayingSound() = default;
+
+    bool stop();
+    bool set_pause(bool pause);
+    bool set_mute(bool mute);
+    bool set_pitch(float pitch);
+    bool set_pan(float pan);
+    bool set_volume(float volume);
+    bool set_looping(LoopMode loop_mode);
+    //bool set_callback(SoundCallbackFunction callback);
+
+private:
+    PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager);
+
+    FMOD::Channel* m_FmodChannel{ nullptr };
     SoundManager* m_SoundManager{ nullptr };
 };
 
@@ -41,11 +84,20 @@ public:
     SoundManager& operator=(const SoundManager&) = delete;
     SoundManager& operator=(SoundManager&&) = delete;
 
-    CustomSound get_sound(std::string path, bool loop);
-    CustomSound get_sound(const char* path, bool loop);
+    CustomSound get_sound(std::string path);
+    CustomSound get_sound(const char* path);
     void acquire_sound(FMOD::Sound* fmod_sound);
     void release_sound(FMOD::Sound* fmod_sound);
-    void play_sound(FMOD::Sound* fmod_sound, bool as_music);
+    PlayingSound play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music);
+
+    bool stop(PlayingSound playing_sound);
+    bool set_pause(PlayingSound playing_sound, bool pause);
+    bool set_mute(PlayingSound playing_sound, bool mute);
+    bool set_pitch(PlayingSound playing_sound, float pitch);
+    bool set_pan(PlayingSound playing_sound, float pan);
+    bool set_volume(PlayingSound playing_sound, float volume);
+    bool set_looping(PlayingSound playing_sound, LoopMode loop_mode);
+    //bool set_callback(PlayingSound playing_sound, SoundCallbackFunction callback);
 
 private:
     DecodeAudioFile* m_DecodeFunction{ nullptr };
@@ -55,6 +107,17 @@ private:
     FMOD::CreateSound* m_CreateSound{ nullptr };
     FMOD::ReleaseSound* m_ReleaseSound{ nullptr };
     FMOD::PlaySound* m_PlaySound{ nullptr };
+
+    FMOD::ChannelStop* m_ChannelStop{ nullptr };
+    FMOD::ChannelSetPaused* m_ChannelSetPaused{ nullptr };
+    FMOD::ChannelSetMute* m_ChannelSetMute{ nullptr };
+    FMOD::ChannelSetPitch* m_ChannelSetPitch{ nullptr };
+    FMOD::ChannelSetPan* m_ChannelSetPan{ nullptr };
+    FMOD::ChannelSetVolume* m_ChannelSetVolume{ nullptr };
+    FMOD::ChannelSetMode* m_ChannelSetMode{ nullptr };
+    FMOD::ChannelSetCallback* m_ChannelSetCallback{ nullptr };
+    FMOD::ChannelSetUserData* m_ChannelSetUserData{ nullptr };
+    FMOD::ChannelGetUserData* m_ChannelGetUserData{ nullptr };
 
     FMOD::ChannelGroup* m_SfxChannelGroup{ nullptr };
     FMOD::ChannelGroup* m_MusicChannelGroup{ nullptr };

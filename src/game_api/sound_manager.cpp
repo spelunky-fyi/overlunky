@@ -9,6 +9,7 @@
 // Y tho Windows  T.T
 #undef PlaySound
 
+
 CustomSound::CustomSound(const CustomSound& rhs)
 {
 	m_FmodSound = rhs.m_FmodSound;
@@ -35,17 +36,60 @@ CustomSound::~CustomSound()
 	}
 }
 
-
-void CustomSound::play(bool as_music)
+PlayingSound CustomSound::play()
 {
-	m_SoundManager->play_sound(m_FmodSound, as_music);
+	return play(false, SoundType::Sfx);
 }
+PlayingSound CustomSound::play(bool paused)
+{
+	return play(paused, SoundType::Sfx);
+}
+PlayingSound CustomSound::play(bool paused, SoundType sound_type)
+{
+	return m_SoundManager->play_sound(m_FmodSound, paused, sound_type == SoundType::Music);
+}
+
+
+PlayingSound::PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager)
+	: m_FmodChannel{ fmod_channel }
+	, m_SoundManager{ sound_manager }
+{
+}
+
+bool PlayingSound::stop()
+{
+	return m_SoundManager->stop(*this);
+}
+bool PlayingSound::set_pause(bool pause)
+{
+	return m_SoundManager->set_pause(*this, pause);
+}
+bool PlayingSound::set_mute(bool mute)
+{
+	return m_SoundManager->set_mute(*this, mute);
+}
+bool PlayingSound::set_pitch(float pitch)
+{
+	return m_SoundManager->set_pitch(*this, pitch);
+}
+bool PlayingSound::set_pan(float pan)
+{
+	return m_SoundManager->set_pan(*this, pan);
+}
+bool PlayingSound::set_volume(float volume)
+{
+	return m_SoundManager->set_volume(*this, volume);
+}
+bool PlayingSound::set_looping(LoopMode loop_mode)
+{
+	return m_SoundManager->set_looping(*this, loop_mode);
+}
+
 
 struct SoundManager::Sound {
 	std::uint32_t ref_count;
 	DecodedAudioBuffer buffer;
 	std::string path;
-	bool loop;
 	FMOD::Sound* fmod_sound{ nullptr };
 };
 
@@ -117,6 +161,17 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		m_CreateSound = reinterpret_cast<FMOD::CreateSound*>(GetProcAddress(fmod, "FMOD_System_CreateSound"));
 		m_ReleaseSound = reinterpret_cast<FMOD::ReleaseSound*>(GetProcAddress(fmod, "FMOD_Sound_Release"));
 		m_PlaySound = reinterpret_cast<FMOD::PlaySound*>(GetProcAddress(fmod, "FMOD_System_PlaySound"));
+
+		m_ChannelStop = reinterpret_cast<FMOD::ChannelStop*>(GetProcAddress(fmod, "FMOD_Channel_Stop"));
+		m_ChannelSetPaused = reinterpret_cast<FMOD::ChannelSetPaused*>(GetProcAddress(fmod, "FMOD_Channel_SetPaused"));
+		m_ChannelSetMute = reinterpret_cast<FMOD::ChannelSetMute*>(GetProcAddress(fmod, "FMOD_Channel_SetMute"));
+		m_ChannelSetPitch = reinterpret_cast<FMOD::ChannelSetPitch*>(GetProcAddress(fmod, "FMOD_Channel_SetPitch"));
+		m_ChannelSetPan = reinterpret_cast<FMOD::ChannelSetPan*>(GetProcAddress(fmod, "FMOD_Channel_SetPan"));
+		m_ChannelSetVolume = reinterpret_cast<FMOD::ChannelSetVolume*>(GetProcAddress(fmod, "FMOD_Channel_SetVolume"));
+		m_ChannelSetMode = reinterpret_cast<FMOD::ChannelSetMode*>(GetProcAddress(fmod, "FMOD_Channel_SetMode"));
+		m_ChannelSetCallback = reinterpret_cast<FMOD::ChannelSetCallback*>(GetProcAddress(fmod, "FMOD_Channel_SetCallback"));
+		m_ChannelSetUserData = reinterpret_cast<FMOD::ChannelSetUserData*>(GetProcAddress(fmod, "FMOD_Channel_SetUserData"));
+		m_ChannelGetUserData = reinterpret_cast<FMOD::ChannelGetUserData*>(GetProcAddress(fmod, "FMOD_Channel_GetUserData"));
 	}
 	else
 	{
@@ -131,11 +186,10 @@ SoundManager::~SoundManager()
 	}
 }
 
-CustomSound SoundManager::get_sound(std::string path, bool loop)
+CustomSound SoundManager::get_sound(std::string path)
 {
-	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [&path, loop](const Sound& sound) {
-		return sound.path == path
-			&& sound.loop == loop;
+	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [&path](const Sound& sound) {
+		return sound.path == path;
 	});
 	if (it != m_SoundStorage.end())
 	{
@@ -156,17 +210,8 @@ CustomSound SoundManager::get_sound(std::string path, bool loop)
 	new_sound.ref_count = 1;
 	new_sound.buffer = std::move(buffer);
 	new_sound.path = std::move(path);
-	new_sound.loop = loop;
 
-	FMOD::FMOD_MODE mode = (FMOD::FMOD_MODE)(FMOD::MODE_CREATESAMPLE | FMOD::MODE_OPENMEMORY_POINT | FMOD::MODE_OPENRAW | FMOD::MODE_IGNORETAGS);
-	if (loop)
-	{
-		mode = (FMOD::FMOD_MODE)(mode | FMOD::MODE_LOOP_NORMAL);
-	}
-	else
-	{
-		mode = (FMOD::FMOD_MODE)(mode | FMOD::MODE_LOOP_OFF);
-	}
+	FMOD::FMOD_MODE mode = (FMOD::FMOD_MODE)(FMOD::MODE_CREATESAMPLE | FMOD::MODE_OPENMEMORY_POINT | FMOD::MODE_OPENRAW | FMOD::MODE_IGNORETAGS | FMOD::MODE_LOOP_OFF);
 
 	FMOD::CREATESOUNDEXINFO create_sound_exinfo{};
 	create_sound_exinfo.cbsize = sizeof(create_sound_exinfo);
@@ -200,9 +245,9 @@ CustomSound SoundManager::get_sound(std::string path, bool loop)
 	m_SoundStorage.push_back(std::move(new_sound));
 	return CustomSound{ m_SoundStorage.back().fmod_sound, this };
 }
-CustomSound SoundManager::get_sound(const char* path, bool loop)
+CustomSound SoundManager::get_sound(const char* path)
 {
-	return get_sound(std::string{ path }, loop);
+	return get_sound(std::string{ path });
 }
 void SoundManager::acquire_sound(FMOD::Sound* fmod_sound)
 {
@@ -235,8 +280,50 @@ void SoundManager::release_sound(FMOD::Sound* fmod_sound)
 		it->ref_count--;
 	}
 }
-void SoundManager::play_sound(FMOD::Sound* fmod_sound, bool as_music)
+PlayingSound SoundManager::play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music)
 {
-	// TODO: Get back channel for more control
-	m_PlaySound(m_FmodSystem, fmod_sound, as_music ? m_MusicChannelGroup : m_SfxChannelGroup, false, nullptr);
+	FMOD::Channel* channel{ nullptr };
+	m_PlaySound(m_FmodSystem, fmod_sound, as_music ? m_MusicChannelGroup : m_SfxChannelGroup, paused, &channel);
+	return PlayingSound{ channel, this };
+}
+
+bool SoundManager::stop(PlayingSound playing_sound)
+{
+	return FMOD_CHECK_CALL(m_ChannelStop(playing_sound.m_FmodChannel));
+}
+bool SoundManager::set_pause(PlayingSound playing_sound, bool pause)
+{
+	return FMOD_CHECK_CALL(m_ChannelSetPaused(playing_sound.m_FmodChannel, pause));
+}
+bool SoundManager::set_mute(PlayingSound playing_sound, bool mute)
+{
+	return FMOD_CHECK_CALL(m_ChannelSetMute(playing_sound.m_FmodChannel, mute));
+}
+bool SoundManager::set_pitch(PlayingSound playing_sound, float pitch)
+{
+	return FMOD_CHECK_CALL(m_ChannelSetPitch(playing_sound.m_FmodChannel, pitch));
+}
+bool SoundManager::set_pan(PlayingSound playing_sound, float pan)
+{
+	return FMOD_CHECK_CALL(m_ChannelSetPan(playing_sound.m_FmodChannel, pan));
+}
+bool SoundManager::set_volume(PlayingSound playing_sound, float volume)
+{
+	return FMOD_CHECK_CALL(m_ChannelSetVolume(playing_sound.m_FmodChannel, std::clamp(volume, -1.0f, 1.0f)));
+}
+bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
+{
+	if (m_ChannelSetMode)
+	{
+		switch (loop_mode)
+		{
+		case LoopMode::Off:
+			return FMOD_CHECK_CALL(m_ChannelSetMode(playing_sound.m_FmodChannel, FMOD::MODE_LOOP_OFF));
+		case LoopMode::Loop:
+			return FMOD_CHECK_CALL(m_ChannelSetMode(playing_sound.m_FmodChannel, FMOD::MODE_LOOP_NORMAL));
+		case LoopMode::Bidirectional:
+			return FMOD_CHECK_CALL(m_ChannelSetMode(playing_sound.m_FmodChannel, FMOD::MODE_LOOP_BIDI));
+		}
+	}
+	return false;
 }
