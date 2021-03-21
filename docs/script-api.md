@@ -113,7 +113,7 @@ Add a boolean option that the user can change in the UI. Read with `options.name
 Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
 ### [`register_option_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_combo)
 #### Params: `string name, string desc, string opts`
-Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`.
+Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 #### Params: `int id, float x, float y, int layer, float vx, float vy`
 #### Returns: `int`
