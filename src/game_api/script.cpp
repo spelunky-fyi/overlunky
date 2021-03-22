@@ -923,6 +923,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "CustomSound",
         "play",
         play);
+    /* CustomSound
+    PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
+    */
     /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
     /// You can just discard this handle if you do not need extended control anymore
     lua.new_usertype<PlayingSound>(
@@ -945,6 +948,17 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &PlayingSound::set_looping,
         "set_callback",
         &PlayingSound::set_callback);
+    /* PlayingSound
+    bool is_playing()
+    bool stop()
+    bool set_pause(bool pause)
+    bool set_mute(bool mute)
+    bool set_pitch(float pitch)
+    bool set_pan(float pan)
+    bool set_volume(float volume)
+    bool set_looping(SOUND_LOOP_MODE looping)
+    bool set_callback(function callback)
+    */
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
