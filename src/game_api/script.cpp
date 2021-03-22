@@ -334,14 +334,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
             messages.pop_front();
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add per level callback function to be called every `frames` game frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames) {
         auto luaCb = IntervalCallback{ cb, frames, -1 };
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add per level callback function to be called after `frames` frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_timeout"] = [this](sol::function cb, int frames) {
         int now = g_state->time_level;
         auto luaCb = TimeoutCallback{ cb, now + frames };
@@ -349,14 +349,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called every `frames` frames. This timer is never paused or cleared.
+    /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [this](sol::function cb, int frames) {
         auto luaCb = IntervalCallback{ cb, frames, -1 };
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called after `frames` frames. This timer is never paused or cleared.
+    /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_timeout"] = [this](sol::function cb, int frames) {
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{ cb, now + frames };
@@ -991,6 +991,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         "RESET",
         105);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.new_enum("CONST", "ENGINE_FPS", 60);
 }
 
 bool SpelunkyScript::ScriptImpl::run()
