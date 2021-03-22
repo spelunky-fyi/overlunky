@@ -25,6 +25,11 @@
 #include "script.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
+#include "sound_manager.hpp"
+
+#include "decode_audio_file.hpp"
+
+SoundManager* g_SoundManager{ nullptr };
 
 std::map<std::string, SpelunkyScript *> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -494,7 +499,7 @@ void load_script(std::string file, bool enable = true)
         /*size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
             file = file.substr(slash + 1);*/
-        SpelunkyScript *script = new SpelunkyScript(buf.str(), file, enable);
+        SpelunkyScript *script = new SpelunkyScript(buf.str(), file, g_SoundManager, enable);
         g_scripts[script->get_file()] = script;
         data.close();
     }
@@ -2789,7 +2794,7 @@ void render_script_files()
             "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
-            name, true);
+            name, g_SoundManager, true);
         g_scripts[name] = script;
     }
     ImGui::PopID();
@@ -3877,6 +3882,8 @@ void create_box(std::vector<EntityItem> items)
 
 void init_ui()
 {
+    g_SoundManager = new SoundManager(&LoadAudioFile);
+
     g_state = (struct StateMemory*)get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
 

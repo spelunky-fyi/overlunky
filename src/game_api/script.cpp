@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "rpc.hpp"
 #include "state.hpp"
+#include "sound_manager.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -198,6 +199,7 @@ public:
     bool changed = true;
     bool enabled = true;
     ScriptMeta meta = { "", "", "", "", "" };
+    std::filesystem::path script_folder;
     int cbcount = 0;
 
     std::map<std::string, ScriptOption> options;
@@ -214,7 +216,9 @@ public:
     std::vector<EntityItem> g_items;
     std::vector<Player*> g_players;
 
-    ScriptImpl(std::string script, std::string file, bool enable = true);
+    SoundManager* sound_manager;
+
+    ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
     ~ScriptImpl() = default;
 
     std::string script_id();
@@ -225,8 +229,10 @@ public:
     void render_options();
 };
 
-SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, bool enable)
+SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
 {
+    sound_manager = sound_mgr;
+
 #ifdef SPEL2_EDITABLE_SCRIPTS
     strcpy(code, script.c_str());
 #else
@@ -236,6 +242,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
     meta.file = std::move(file);
     meta.path = std::filesystem::path(meta.file).parent_path().string();
     meta.filename = std::filesystem::path(meta.file).filename().string();
+
+    script_folder = std::filesystem::path(meta.file).parent_path();
+
     enabled = enable;
 
     g_state = get_state_ptr();
@@ -664,6 +673,16 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         return std::make_pair(b.x - a.x, b.y - a.y);
     };
 
+    /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
+    lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound> {
+        CustomSound sound = sound_manager->get_sound((script_folder / path).string());
+        if (sound)
+        {
+            return sound;
+        }
+        return sol::nullopt;
+    };
+
     /// Steal input from a Player or HH.
     lua["steal_input"] = [this](int uid) {
         if (script_input.find(uid) != script_input.end())
@@ -943,6 +962,52 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         &StateMemory::loading,
         "quest_flags",
         &StateMemory::quest_flags);
+    auto play = sol::overload(
+        static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
+        static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
+        static_cast<PlayingSound(CustomSound::*)(bool, SoundType)>(&CustomSound::play));
+    /// Handle to a loaded sound, can be used to play the sound and receive a PlayingSound for more control
+    /// It is up to you to not release this as long as any sounds returned by CustomSound:play() are still playing
+    lua.new_usertype<CustomSound>(
+        "CustomSound",
+        "play",
+        play);
+    /* CustomSound
+    PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
+    */
+    /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
+    /// You can just discard this handle if you do not need extended control anymore
+    lua.new_usertype<PlayingSound>(
+        "PlayingSound",
+        "is_playing",
+        &PlayingSound::is_playing,
+        "stop",
+        &PlayingSound::stop,
+        "set_pause",
+        &PlayingSound::set_pause,
+        "set_mute",
+        &PlayingSound::set_mute,
+        "set_pitch",
+        &PlayingSound::set_pitch,
+        "set_pan",
+        &PlayingSound::set_pan,
+        "set_volume",
+        &PlayingSound::set_volume,
+        "set_looping",
+        &PlayingSound::set_looping,
+        "set_callback",
+        &PlayingSound::set_callback);
+    /* PlayingSound
+    bool is_playing()
+    bool stop()
+    bool set_pause(bool pause)
+    bool set_mute(bool mute)
+    bool set_pitch(float pitch)
+    bool set_pan(float pan)
+    bool set_volume(float volume)
+    bool set_looping(SOUND_LOOP_MODE looping)
+    bool set_callback(function callback)
+    */
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
@@ -1040,6 +1105,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, boo
         "RESET",
         105);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    /// Third parameter to CustomSound:play(), specifies which group the sound will be played in and thus how the player controls its volume
+    lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
+    /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
+    lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
     lua.new_enum("CONST", "ENGINE_FPS", 60);
 }
 
@@ -1399,8 +1468,8 @@ void SpelunkyScript::ScriptImpl::render_options()
 }
 
 
-SpelunkyScript::SpelunkyScript(std::string script, std::string file, bool enable)
-    : m_Impl{ new ScriptImpl(std::move(script), std::move(file), enable) }
+SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
+    : m_Impl{ new ScriptImpl(std::move(script), std::move(file), sound_manager, enable) }
 {
 }
 SpelunkyScript::~SpelunkyScript() = default; // Has to be in the source file

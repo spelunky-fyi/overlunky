@@ -40,6 +40,11 @@ endif()
 
 if(BUILD_OVERLUNKY)
         # --------------------------------------------------
+        # nyquist
+        option(BUILD_EXAMPLE "Build example application" OFF)
+        add_subdirectory(libnyquist)
+
+        # --------------------------------------------------
         # toml11
         option(toml11_BUILD_TEST OFF)
         add_subdirectory(toml11)

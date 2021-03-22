@@ -21,7 +21,11 @@ add_library(spel2_api STATIC
         script.cpp
         script.hpp
         draw_queue.cpp
-        draw_queue.hpp)
+        draw_queue.hpp
+        sound_manager.cpp
+        sound_manager.hpp
+        fmod.hpp
+        audio_buffer.hpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
         imgui)

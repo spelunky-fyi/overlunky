@@ -105,12 +105,12 @@ for file in api_files:
     data = open(file, 'r').read()
     data = data.replace('\n', '')
     data = re.sub(r' ', '', data)
-    m = re.findall(r'new_usertype\<.*?\>\s*\(\s*"([^"]*)",([^\)]*)', data);
+    m = re.findall(r'new_usertype\<.*?\>\s*\(\s*"([^"]*)",([^\)]*)', data)
     for type in m:
         name = type[0]
         attr = type[1]
         base = ""
-        bm = re.search(r'sol::bases<([^\]]*)>', attr);
+        bm = re.search(r'sol::bases<([^\]]*)>', attr)
         if bm:
             base = bm.group(1)
         attr = attr.replace('",', ',')
@@ -121,12 +121,26 @@ for file in api_files:
             var = var.split(',')
             vars.append({ 'name': var[0], 'type': var[1] })
         types.append({'name': name, 'vars': vars, 'base': base})
+    data = open(file, 'r').read()
+    data = data.replace('\n', ' ')
+    m = re.findall(r'/\*(.*?)\*/', data)
+    for extended_type_info in m:
+        extended_type_info = extended_type_info.strip()
+        type = extended_type_info[:extended_type_info.find(' ')]
+        type_to_mod = next((item for item in types if item['name'] == type), dict())
+        if type_to_mod:
+            sub_matches = re.findall(r'([^\s]*?)\s*([^\s]*)(\(.*?\))', extended_type_info.strip())
+            for sub_match in sub_matches:
+                var_name = sub_match[1]
+                var_to_mod = next((item for item in type_to_mod['vars'] if item['name'] == var_name), dict())
+                if var_to_mod:
+                    var_to_mod['signature'] = sub_match[0] + ' ' + var_name + sub_match[2]
 
 for file in api_files:
     data = open(file, 'r').read()
     data = data.replace('\n', '')
     data = re.sub(r' ', '', data)
-    m = re.findall(r'new_enum\s*\(\s*"([^"]*)",([^\)]*)', data);
+    m = re.findall(r'new_enum\s*\(\s*"([^"]*)",([^\)]*)', data)
     for type in m:
         name = type[0]
         attr = type[1]
@@ -143,7 +157,7 @@ for file in api_files:
     data = open(file, 'r').read()
     data = data.replace('\n', '')
     data = re.sub(r' ', '', data)
-    m = re.search(r'open_libraries\s*\(([^\)]*)\)', data);
+    m = re.search(r'open_libraries\s*\(([^\)]*)\)', data)
     if m:
         libs = m.group(1).split(',')
         for lib in libs:
@@ -228,7 +242,11 @@ for type in types:
             print(' [`' + base + '`](#' + base.lower() + ')', end='')
         print()
     for var in type['vars']:
-        print('- [`'+var['name']+'`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+var['name']+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
+        search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+var['name']
+        if 'signature' in var:
+            print('- [`'+var['signature']+'`]('+search_link+')')
+        else:
+            print('- [`'+var['name']+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
 
 print('## Enums')
 print('Enums are like numbers but in text that\'s easier to remember. Example:')

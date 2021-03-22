@@ -96,7 +96,6 @@ void init_imgui()
 {
     ImGuiContext* imgui_context = ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
-    io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
     io.MouseDrawCursor = true;
     ImGui_ImplWin32_Init(g_Window);
     ImGui_ImplDX11_Init(g_Device, g_Context);

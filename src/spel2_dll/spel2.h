@@ -3,6 +3,26 @@
 #include <cstddef>
 #include <cstdint>
 
+enum class Spelunky_SoundFormat {
+	PCM_8,
+	PCM_16,
+	PCM_24,
+	PCM_32,
+	PCM_64,
+	PCM_FLOAT,
+	PCM_DOUBLE
+};
+
+struct Spelunky_DecodedAudioBuffer {
+	std::int32_t num_channels;
+	std::int32_t frequency;
+	Spelunky_SoundFormat format;
+	const char* data;
+	std::size_t data_size;
+};
+
+using Spelunky_DecodeAudioFile = Spelunky_DecodedAudioBuffer(const char* file_path);
+
 using OnInputFunc = bool(*)(std::uint32_t, std::uint64_t, std::int64_t);
 using ImguiInitFunc = void(*)(struct ImGuiContext*);
 using ImguiDrawFunc = void(*)();
@@ -12,6 +32,10 @@ using PostDrawFunc = void(*)();
 class SpelunkyScript;
 
 void InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
+void InitSoundManager(Spelunky_DecodeAudioFile* decode_function);
+
+bool GetShowCursor();
+void SetShowCursor(bool show_cursor);
 
 void RegisterOnInputFunc(OnInputFunc on_input);
 void RegisterImguiInitFunc(ImguiInitFunc imgui_init);
