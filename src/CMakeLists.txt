@@ -41,6 +41,7 @@ endif()
 if(BUILD_OVERLUNKY)
         # --------------------------------------------------
         # nyquist
+        option(BUILD_EXAMPLE "Build example application" OFF)
         add_subdirectory(libnyquist)
 
         # --------------------------------------------------
