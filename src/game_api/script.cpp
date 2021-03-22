@@ -913,15 +913,16 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &StateMemory::loading,
         "quest_flags",
         &StateMemory::quest_flags);
+    auto play = sol::overload(
+        static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
+        static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
+        static_cast<PlayingSound(CustomSound::*)(bool, SoundType)>(&CustomSound::play));
     /// Handle to a loaded sound, can be used to play the sound and receive a PlayingSound for more control
     /// It is up to you to not release this as long as any sounds returned by CustomSound:play() are still playing
     lua.new_usertype<CustomSound>(
         "CustomSound",
         "play",
-        sol::overload(
-            static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
-            static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
-            static_cast<PlayingSound(CustomSound::*)(bool, SoundType)>(&CustomSound::play)));
+        play);
     /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
     /// You can just discard this handle if you do not need extended control anymore
     lua.new_usertype<PlayingSound>(
