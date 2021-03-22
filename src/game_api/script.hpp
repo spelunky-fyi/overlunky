@@ -42,6 +42,14 @@ struct ScriptMessage
     ImVec4 color;
 };
 
+struct ScriptInput
+{
+    uint16_t next;
+    uint16_t current;
+    size_t orig_input;
+    size_t orig_ai;
+};
+
 class SpelunkyScript
 {
 public:
