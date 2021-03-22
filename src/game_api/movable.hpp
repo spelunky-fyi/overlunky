@@ -101,8 +101,8 @@ class Player : public Monster
     size_t p140;
     int32_t i148;
     int32_t i14c;
-    size_t i150;
-    size_t p158;
+    size_t ai_func;
+    size_t input_ptr;
     size_t p160;
     int32_t i168;
     int32_t i16c;

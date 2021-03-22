@@ -210,6 +210,7 @@ public:
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
     DrawQueue draw_queue;
+    std::map<int, ScriptInput *> script_input;
 
     StateMemory* g_state = nullptr;
     std::vector<EntityItem> g_items;
@@ -343,14 +344,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             messages.pop_front();
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add per level callback function to be called every `frames` game frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames) {
         auto luaCb = IntervalCallback{ cb, frames, -1 };
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add per level callback function to be called after `frames` frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_timeout"] = [this](sol::function cb, int frames) {
         int now = g_state->time_level;
         auto luaCb = TimeoutCallback{ cb, now + frames };
@@ -358,14 +359,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called every `frames` frames. This timer is never paused or cleared.
+    /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [this](sol::function cb, int frames) {
         auto luaCb = IntervalCallback{ cb, frames, -1 };
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called after `frames` frames. This timer is never paused or cleared.
+    /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_timeout"] = [this](sol::function cb, int frames) {
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{ cb, now + frames };
@@ -682,6 +683,59 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return sol::nullopt;
     };
 
+    /// Steal input from a Player or HH.
+    lua["steal_input"] = [this](int uid) {
+        if (script_input.find(uid) != script_input.end())
+            return;
+        Player *player = get_entity_ptr(uid)->as<Player>();
+        if (player == nullptr)
+            return;
+        ScriptInput *newinput = new ScriptInput();
+        newinput->next = 0;
+        newinput->current = 0;
+        newinput->orig_input = player->input_ptr;
+        newinput->orig_ai = player->ai_func;
+        player->input_ptr = reinterpret_cast<size_t>(newinput);
+        player->ai_func = 0;
+        script_input[uid] = newinput;
+        DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
+    };
+
+    /// Return input
+    lua["return_input"] = [this](int uid) {
+        if (script_input.find(uid) == script_input.end())
+            return;
+        Player *player = get_entity_ptr(uid)->as<Player>();
+        if (player == nullptr)
+            return;
+        DEBUG("Return input: {:x} -> {:x}", player->input_ptr, script_input[uid]->orig_input);
+        player->input_ptr = script_input[uid]->orig_input;
+        player->ai_func = script_input[uid]->orig_ai;
+        script_input.erase(uid);
+    };
+
+    /// Send input
+    lua["send_input"] = [this](int uid, uint16_t buttons) {
+        if (script_input.find(uid) != script_input.end())
+        {
+            script_input[uid]->current = buttons;
+            script_input[uid]->next = buttons;
+        }
+    };
+
+    /// Read input
+    lua["read_input"] = [this](int uid) {
+        Player *player = get_entity_ptr(uid)->as<Player>();
+        if (player == nullptr)
+            return (uint16_t)0;
+        ScriptInput *readinput = reinterpret_cast<ScriptInput *>(player->input_ptr);
+        if (!IsBadReadPtr(readinput, 20))
+        {
+            return readinput->next;
+        }
+        return (uint16_t)0;
+    };
+
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",
@@ -827,7 +881,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Container>(
         "Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
-    lua.new_usertype<Gun>("Gun", 
+    lua.new_usertype<Gun>(
+        "Gun",
         "cooldown",
         &Gun::cooldown,
         "shots",
@@ -838,13 +893,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Gun::in_chamber,
         sol::base_classes,
         sol::bases<Entity, Movable>());
-    lua.new_usertype<Crushtrap>("Crushtrap",
-        "dirx",
-        &Crushtrap::dirx,
-        "diry",
-        &Crushtrap::diry,
-        sol::base_classes,
-        sol::bases<Entity, Movable>());
+    lua.new_usertype<Crushtrap>("Crushtrap", "dirx", &Crushtrap::dirx, "diry", &Crushtrap::diry, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -1060,6 +1109,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
     /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
     lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
+    lua.new_enum("CONST", "ENGINE_FPS", 60);
 }
 
 bool SpelunkyScript::ScriptImpl::run()
@@ -1139,9 +1189,10 @@ bool SpelunkyScript::ScriptImpl::run()
         sol::optional<sol::function> on_screen = lua["on_screen"];
         g_players = get_players();
         lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
-        if (g_state->screen != state.screen || (!g_players.empty() && state.player != g_players.at(0)))
+        if (g_state->screen != state.screen && g_state->screen_last != 5)
         {
             level_timers.clear();
+            script_input.clear();
             if (on_screen)
                 on_screen.value()();
         }

@@ -69,7 +69,7 @@ set_callback(function()
     co = coroutine.create(recalculate)
     set_interval(function()
         coroutine.resume(co)
-    end, 15)
+    end, CONST.ENGINE_FPS/4)
 end, ON.LEVEL)
 
 set_callback(function()
