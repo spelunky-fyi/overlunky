@@ -70,19 +70,19 @@ Print a log message on screen.
 ### [`set_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_interval)
 #### Params: `function cb, int frames`
 #### Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-Add per level callback function to be called every `frames` game frames. Timer is paused on pause and cleared on level transition.
+Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
 ### [`set_timeout`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_timeout)
 #### Params: `function cb, int frames`
 #### Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-Add per level callback function to be called after `frames` frames. Timer is paused on pause and cleared on level transition.
+Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
 ### [`set_global_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_interval)
 #### Params: `function cb, int frames`
 #### Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-Add global callback function to be called every `frames` frames. This timer is never paused or cleared.
+Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
 ### [`set_global_timeout`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_timeout)
 #### Params: `function cb, int frames`
 #### Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
-Add global callback function to be called after `frames` frames. This timer is never paused or cleared.
+Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
 ### [`set_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback)
 #### Params: `function cb, int screen`
 #### Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
@@ -377,6 +377,18 @@ function on_guiframe()
     draw_text(0-w/2, 0-h/2, size, text, color)
 end
 ```
+### [`steal_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
+#### Params: `int uid`
+Steal input from a Player or HH.
+### [`return_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
+#### Params: `int uid`
+Return input
+### [`send_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
+#### Params: `int uid, int buttons`
+Send input
+### [`read_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
+#### Params: `int uid`
+Read input
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
 ```lua
@@ -590,3 +602,5 @@ end, ON.LEVEL)
 - [`PLAYER2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.PLAYER2) -2
 - [`PLAYER3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.PLAYER3) -3
 - [`PLAYER4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.PLAYER4) -4
+### CONST
+- [`ENGINE_FPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ENGINE_FPS) 60
