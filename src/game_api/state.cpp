@@ -221,6 +221,7 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
 
 void State::set_seed(uint32_t seed)
 {
+    return; //TODO: offset broke in 1.20.4a
     if (ptr()->screen != 12) //TODO
         return;
     auto memory = Memory::get();
