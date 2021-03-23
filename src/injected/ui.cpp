@@ -346,7 +346,7 @@ const char *quest_flags[] = {
     "4: ",
     "5: Shop spawned",
     "6: ",
-    "7: ",
+    "7: Seeded mode",
     "8: ",
     "9: ",
     "10: Waddler aggroed",

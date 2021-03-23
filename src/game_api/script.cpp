@@ -452,7 +452,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["layer_door"] = spawn_backdoor_abs;
     /// Warp to a level immediately.
     lua["warp"] = warp;
-    /// Set seed in seeded.
+    /// Set seed and reset run.
     lua["set_seed"] = set_seed;
     /// Enable/disable godmode.
     lua["god"] = godmode;
