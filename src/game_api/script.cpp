@@ -961,7 +961,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "loading",
         &StateMemory::loading,
         "quest_flags",
-        &StateMemory::quest_flags);
+        &StateMemory::quest_flags,
+        "fadeout",
+        &StateMemory::fadeout,
+        "fadein",
+        &StateMemory::fadein);
     auto play = sol::overload(
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
