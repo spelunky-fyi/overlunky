@@ -1544,10 +1544,10 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         escape();
     }
-    else if (pressed("move_down", wParam) && (float)rand() / RAND_MAX > 0.99 && !repeat)
+    /*else if (pressed("move_down", wParam) && (float)rand() / RAND_MAX > 0.99 && !repeat)
     {
         spawn_entity(to_id("ENT_TYPE_ITEM_BROKEN_ARROW"), 0, -0.5, false, 0, 0, false);
-    }
+    }*/
     else
     {
         return false;

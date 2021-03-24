@@ -3,6 +3,8 @@ meta.version = "WIP"
 meta.description = "Simple test for TASing a seeded run. It does desync, I don't think the game is fully deterministic or there's something wrong."
 meta.author = "Dregu"
 
+local seed = 0
+
 register_option_combo('mode', 'Mode', 'Record\0Playback\0\0')
 register_option_bool('pause', 'Start levels paused (when recording)', true)
 register_option_bool('pskip', 'Skip level transitions automatically', true)
@@ -10,16 +12,41 @@ register_option_bool('pskip', 'Skip level transitions automatically', true)
 --[[register_option_button('rslevel', 'Restart level', function()
     warp(state.world, state.level, state.theme)
 end)]]
+register_option_string('seed', 'Seed (empty=random)', '')
+register_option_button('zrestart', 'Instant restart', function()
+    if options.seed ~= '' then
+        seed = tonumber(options.seed, 16)
+    else
+        seed = math.random(0, 0xffffffff)
+    end
+    --[[state.world_start = 3
+    state.theme_start = 4
+    state.world_next = 3
+    state.theme_next = 4
+    state.seed = 0x123
+    state.quest_flags = 1
+    state.loading = 1]]
+
+    set_seed(seed)
+end)
 
 local frames = {}
 local stopped = true
 local stolen = false
-
-set_seed(math.random(0, 0xffffffff))
+local cutcb = -1
 
 set_callback(function()
     if options.mode == 1 and options.pause then -- record
-        state.pause = 0x20
+        if state.pause == 0 then
+            state.pause = 0x20
+        else
+            cutcb = set_callback(function() -- wait for a cutscene to end. still desyncs on olmec
+                if state.pause == 0 then
+                    clear_callback(cutcb)
+                    state.pause = 0x20
+                end
+            end, ON.GUIFRAME)
+        end
     elseif options.mode == 2 then -- playback
         steal_input(players[1].uid)
         stopped = false
@@ -40,7 +67,7 @@ set_callback(function()
         if input and stolen then
             message('Sending '..string.format('%04x', input)..' '..state.time_level..'/'..#frames[state.level_count])
             send_input(players[1].uid, input)
-        elseif state.time_level > #frames[state.level_count] then
+        elseif stolen and state.time_level > #frames[state.level_count] then
             message('Stopped')
             return_input(players[1].uid)
             stolen = false
