@@ -12,7 +12,9 @@ local stolen = false
 set_seed(math.random(0, 0xffffffff))
 
 set_callback(function()
-    if options.mode == 2 then -- playback
+    if options.mode == 1 then -- record
+        state.pause = 0x20
+    elseif options.mode == 2 then -- playback
         steal_input(players[1].uid)
         stopped = false
         stolen = true
@@ -25,8 +27,8 @@ set_callback(function()
         frames[state.level_count] = {}
     end
     if options.mode == 1 then -- record
-        frames[state.level_count][state.time_level] = read_input(players[1].uid)
-        message('Recording '..string.format('%04x', frames[state.level_count][state.time_level])..' '..#frames[state.level_count])
+        frames[state.level_count][state.time_level-1] = read_input(players[1].uid)
+        message('Recording '..string.format('%04x', frames[state.level_count][state.time_level-1])..' '..#frames[state.level_count])
     elseif options.mode == 2 and not stopped then -- playback
         local input = frames[state.level_count][state.time_level]
         if input and stolen then
@@ -39,7 +41,7 @@ set_callback(function()
             stopped = true
         end
     end
-end, ON.GUIFRAME)
+end, ON.FRAME)
 
 set_callback(function()
     if options.mode == 2 then -- auto skip transitions
