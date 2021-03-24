@@ -19,6 +19,16 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
 
+struct ScriptOption
+{
+    std::string desc;
+    std::variant<uint64_t, int, float, std::string, bool> value;
+    std::variant<int, float> min;
+    std::variant<int, float> max;
+    std::string opts;
+    sol::function cb;
+};
+
 struct IntervalCallback
 {
     sol::function func;
@@ -401,28 +411,33 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
     lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
-        options[name] = { desc, value, min, max, "" };
+        options[name] = { desc, value, min, max, "", sol::nil };
         lua["options"][name] = value;
     };
     /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
     lua["register_option_float"] = [this](std::string name, std::string desc, float value, float min, float max) {
-        options[name] = { desc, value, min, max, "" };
+        options[name] = { desc, value, min, max, "", sol::nil };
         lua["options"][name] = value;
     };
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_bool"] = [this](std::string name, std::string desc, bool value) {
-        options[name] = { desc, value, 0, 0, "" };
+        options[name] = { desc, value, 0, 0, "", sol::nil };
         lua["options"][name] = value;
     };
     /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
     lua["register_option_string"] = [this](std::string name, std::string desc, std::string value) {
-        options[name] = { desc, value, 0, 0, "" };
+        options[name] = { desc, value, 0, 0, "", sol::nil };
         lua["options"][name] = value;
     };
     /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
     lua["register_option_combo"] = [this](std::string name, std::string desc, std::string opts) {
-        options[name] = { desc, 0, 0, 0, opts };
+        options[name] = { desc, 0, 0, 0, opts, sol::nil };
         lua["options"][name] = 1;
+    };
+    /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
+    lua["register_option_button"] = [this](std::string name, std::string desc, sol::function callback) {
+        options[name] = { desc, 0, 0, 0, "", callback };
+        lua["options"][name] = -1;
     };
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
@@ -562,6 +577,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["unlock_door_at"] = unlock_door_at;
     /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
     lua["get_frame"] = get_frame_count;
+    /// Get the current timestamp in milliseconds since the Unix Epoch.
+    lua["get_ms"] = []() {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    };
     /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
     /// Flip entity around by uid. All new entities face right by default.
@@ -700,7 +719,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         script_input[uid] = newinput;
         DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
     };
-
     /// Return input
     lua["return_input"] = [this](int uid) {
         if (script_input.find(uid) == script_input.end())
@@ -713,7 +731,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         player->ai_func = script_input[uid]->orig_ai;
         script_input.erase(uid);
     };
-
     /// Send input
     lua["send_input"] = [this](int uid, uint16_t buttons) {
         if (script_input.find(uid) != script_input.end())
@@ -722,7 +739,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             script_input[uid]->next = buttons;
         }
     };
-
     /// Read input
     lua["read_input"] = [this](int uid) {
         Player *player = get_entity_ptr(uid)->as<Player>();
@@ -1437,7 +1453,20 @@ void SpelunkyScript::ScriptImpl::render_options()
     ImGui::PushID(meta.id.data());
     for (auto& option : options)
     {
-        if (option.second.opts != "") {
+        // TODO: this check is getting ridiculous, just add proper types to distinguish options
+        if (option.second.cb != sol::nil)
+        {
+            uint64_t *val = std::get_if<uint64_t>(&option.second.value);
+            if (ImGui::Button(option.second.desc.c_str()))
+            {
+                uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                option.second.value = now;
+                lua["options"][option.first] = now;
+                handle_function(option.second.cb);
+            }
+        }
+        else if (option.second.opts != "")
+        {
             int *val = std::get_if<int>(&option.second.value);
             if (ImGui::Combo(option.second.desc.data(), val, (char *)option.second.opts.c_str()))
             {
