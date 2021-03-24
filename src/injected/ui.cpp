@@ -3052,10 +3052,12 @@ void render_screen(const char *label, int state)
         ImGui::LabelText(label, "25 Arena intro");
     else if (state == 26)
         ImGui::LabelText(label, "26 Arena match");
+    else if (state == 27)
+        ImGui::LabelText(label, "27 Arena scores");
     else if (state == 28)
         ImGui::LabelText(label, "28 Loading online");
     else if (state == 29)
-        ImGui::LabelText(label, "28 Lobby");
+        ImGui::LabelText(label, "29 Lobby");
     else
     {
         char statec[10];
