@@ -4,6 +4,12 @@ meta.description = "Simple test for TASing a seeded run. It does desync, I don't
 meta.author = "Dregu"
 
 register_option_combo('mode', 'Mode', 'Record\0Playback\0\0')
+register_option_bool('pause', 'Start levels paused (when recording)', true)
+register_option_bool('pskip', 'Skip level transitions automatically', true)
+-- this probably needs a way to save and load the prng state to work
+--[[register_option_button('rslevel', 'Restart level', function()
+    warp(state.world, state.level, state.theme)
+end)]]
 
 local frames = {}
 local stopped = true
@@ -12,7 +18,7 @@ local stolen = false
 set_seed(math.random(0, 0xffffffff))
 
 set_callback(function()
-    if options.mode == 1 then -- record
+    if options.mode == 1 and options.pause then -- record
         state.pause = 0x20
     elseif options.mode == 2 then -- playback
         steal_input(players[1].uid)
@@ -44,7 +50,7 @@ set_callback(function()
 end, ON.FRAME)
 
 set_callback(function()
-    if options.mode == 2 then -- auto skip transitions
+    if options.pskip then -- auto skip transitions
         warp(state.world_next, state.level_next, state.theme_next)
     end
 end, ON.TRANSITION)
