@@ -18,7 +18,12 @@ register_option_combo('e', 'Choice E', 'Red\0Green\0Blue\0\0')
 colors = {'Bulbasaur', 'Charmander', 'Squirtle'}
 register_option_combo('f', 'Choice F', table.concat(colors, '\0')..'\0\0')
 
+-- a button needs a callback function
+register_option_button('g', 'Button G', function()
+    message('Button was clicked at '..tostring(options.g))
+end)
+
 -- just print these out real quick
 set_callback(function()
-    message('Options: A:'..tostring(options.a)..', B:'..tostring(options.b)..', C:'..tostring(options.c)..', D:'..tostring(options.d)..', E:'..tostring(options.e)..', F:'..colors[options.f])
+    message('Options: A:'..tostring(options.a)..', B:'..tostring(options.b)..', C:'..tostring(options.c)..', D:'..tostring(options.d)..', E:'..tostring(options.e)..', F:'..colors[options.f]..', G:'..tostring(options.g))
 end, ON.FRAME)
