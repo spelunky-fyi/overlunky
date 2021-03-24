@@ -52,7 +52,8 @@ std::map<std::string, int> keys{
     {"toggle_disable_pause", 0x350},
     {"toggle_grid", 0x347},
     {"toggle_hitboxes", 0x348},
-    {"frame_advance", 0x53},
+    {"frame_advance", 0x20},
+    {"frame_advance_alt", 0x220},
     {"tool_entity", 0x70},
     {"tool_door", 0x71},
     {"tool_camera", 0x72},
@@ -1294,13 +1295,18 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("toggle_pause", wParam))
     {
         g_pause_at = -1;
-        paused = !paused;
-        if (paused)
+        if (g_state->pause == 0)
+        {
             g_state->pause = 0x20;
+            paused = true;
+        }
         else
+        {
             g_state->pause = 0;
+            paused = false;
+        }
     }
-    else if (pressed("frame_advance", wParam))
+    else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
         if (g_state->pause == 0x20) {
             g_pause_at = get_frame_count()+1;
