@@ -48,10 +48,11 @@ std::map<std::string, int> keys{
     {"toggle_godmode", 0x147},
     {"toggle_noclip", 0x146},
     {"toggle_snap", 0x153},
-    {"toggle_pause", 0x150},
+    {"toggle_pause", 0x120},
     {"toggle_disable_pause", 0x350},
     {"toggle_grid", 0x347},
     {"toggle_hitboxes", 0x348},
+    {"frame_advance", 0x53},
     {"tool_entity", 0x70},
     {"tool_door", 0x71},
     {"tool_camera", 0x72},
@@ -137,7 +138,7 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0.63, g_sat =
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
     g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0,
-    g_force_width = 0, g_force_height = 0;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1;
 uint32_t g_held_flags = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
@@ -1058,6 +1059,15 @@ void mouse_activity()
     }
 }
 
+void frame_advance()
+{
+    if (g_state->pause == 0 && g_pause_at != -1 && g_pause_at <= get_frame_count())
+    {
+        g_state->pause = 0x20;
+        g_pause_at = -1;
+    }
+}
+
 bool pressed(std::string keyname, int wParam)
 {
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1283,11 +1293,19 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("toggle_pause", wParam))
     {
+        g_pause_at = -1;
         paused = !paused;
         if (paused)
             g_state->pause = 0x20;
         else
             g_state->pause = 0;
+    }
+    else if (pressed("frame_advance", wParam))
+    {
+        if (g_state->pause == 0x20) {
+            g_pause_at = get_frame_count()+1;
+            g_state->pause = 0;
+        }
     }
     else if (pressed("toggle_disable_pause", wParam))
     {
@@ -3857,6 +3875,7 @@ void post_draw()
     force_time();
     force_noclip();
     mouse_activity();
+    frame_advance();
 }
 
 void create_box(std::vector<EntityItem> items)

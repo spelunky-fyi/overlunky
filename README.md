@@ -52,7 +52,8 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + See and change a lot of variables of the selected entity
   - **F5**: Game state
       + See and change a lot of variables from the game state
-      + **Ctrl+P**: Toggle game engine pause
+      + **Ctrl+Space**: Toggle game engine pause
+      + **S**: Advance frame when engine is paused
   - **F8**: Scripts
       + You can load, edit and set options for Lua scripts here
   - **F9**: Options
