@@ -2427,6 +2427,16 @@ void render_clickhandler()
         update_script(script.second);
         render_script(script.second, draw_list);
     }
+    if (g_state->screen == 29)
+    {
+        ImDrawList *dl = ImGui::GetBackgroundDrawList();
+        const char *warningtext = " Overlunky does\nnot work online!";
+        ImVec2 warningsize = hugefont->CalcTextSizeA(144.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, warningtext);
+        dl->AddText(hugefont, 144.0, ImVec2(io.DisplaySize.x/2-warningsize.x/2, io.DisplaySize.y/2-warningsize.y/2), ImColor(1.0f, 1.0f, 1.0f, 0.8f), warningtext);
+        const char *subtext = "And probably never will. I thought the README was clear on this...";
+        ImVec2 subsize = font->CalcTextSizeA(18.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, subtext);
+        dl->AddText(font, 18.0, ImVec2(io.DisplaySize.x/2-subsize.x/2, io.DisplaySize.y/2+warningsize.y/2+20), ImColor(1.0f, 1.0f, 1.0f, 0.8f), subtext);
+    }
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);

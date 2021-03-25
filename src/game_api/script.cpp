@@ -717,7 +717,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         player->input_ptr = reinterpret_cast<size_t>(newinput);
         player->ai_func = 0;
         script_input[uid] = newinput;
-        DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
+        //DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
     };
     /// Return input
     lua["return_input"] = [this](int uid) {
@@ -726,7 +726,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         Player *player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return;
-        DEBUG("Return input: {:x} -> {:x}", player->input_ptr, script_input[uid]->orig_input);
+        //DEBUG("Return input: {:x} -> {:x}", player->input_ptr, script_input[uid]->orig_input);
         player->input_ptr = script_input[uid]->orig_input;
         player->ai_func = script_input[uid]->orig_ai;
         script_input.erase(uid);

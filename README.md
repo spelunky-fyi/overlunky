@@ -19,6 +19,8 @@ You are strongly discouraged from using any modding tools in your actual online 
 
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder. Run the program, leave it running and then start your game, or the other way around! Check the [keyboard shortcuts](#features) and [troubleshooting](#troubleshooting) before asking dumb questions. Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
+**Overlunky does NOT work online!** I thought the disclaimer was clear on this... Now I'm not going to stop you from trying, but you'll just find yourself in a world of desync and crashes.
+
 Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
 
 ## Features
@@ -68,7 +70,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Escape**: Return focus to game from an input
 
 ### Scripts
-Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Also searches for main.lua files under `Mods/Packs`.
+Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`.
+
+**Scripts don't work online either!** While technically they can work, yours truly has no interest in making any online features. If you want an online rando, make and test it yourself. Or use Parsec.
 
 ## Troubleshooting
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
