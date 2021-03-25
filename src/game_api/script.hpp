@@ -14,15 +14,6 @@ ImVec2 screenify(ImVec2 pos);
 float screenify(float dis);
 ImVec2 normalize(ImVec2 pos);
 
-struct ScriptOption
-{
-    std::string desc;
-    std::variant<int, float, std::string, bool> value;
-    std::variant<int, float> min;
-    std::variant<int, float> max;
-    std::string opts;
-};
-
 struct ScriptMeta
 {
     std::string file;

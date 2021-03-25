@@ -5,9 +5,9 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.3c-green)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.4d-green)
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.3c-green)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.4d-green)
 
 [WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. They are mainly to keep up with the ever changing scripting api and usually contain bugfixes for that. Use at your own discretion, but if you want the latest scripts, get this.
 
@@ -18,6 +18,8 @@ You are strongly discouraged from using any modding tools in your actual online 
 **[YouTube tutorial](https://youtu.be/Zzba4cV9f2c) for kids who can't read good and who wanna learn to do other stuff good too.**
 
 **[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder. Run the program, leave it running and then start your game, or the other way around! Check the [keyboard shortcuts](#features) and [troubleshooting](#troubleshooting) before asking dumb questions. Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
+
+**Overlunky does NOT work online!** I thought the disclaimer was clear on this... Now I'm not going to stop you from trying, but you'll just find yourself in a world of desync and crashes.
 
 Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
 
@@ -52,7 +54,8 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + See and change a lot of variables of the selected entity
   - **F5**: Game state
       + See and change a lot of variables from the game state
-      + **Ctrl+P**: Toggle game engine pause
+      + **Ctrl+Space**: Toggle game engine pause
+      + **(Shift+)Space**: Advance frame when engine is paused
   - **F8**: Scripts
       + You can load, edit and set options for Lua scripts here
   - **F9**: Options
@@ -67,7 +70,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Escape**: Return focus to game from an input
 
 ### Scripts
-Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Also searches for main.lua files under `Mods/Packs`.
+Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`.
+
+**Scripts don't work online either!** While technically they can work, yours truly has no interest in making any online features. If you want an online rando, make and test it yourself. Or use Parsec.
 
 ## Troubleshooting
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:

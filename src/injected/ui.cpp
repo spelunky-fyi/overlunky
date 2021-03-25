@@ -48,10 +48,12 @@ std::map<std::string, int> keys{
     {"toggle_godmode", 0x147},
     {"toggle_noclip", 0x146},
     {"toggle_snap", 0x153},
-    {"toggle_pause", 0x150},
+    {"toggle_pause", 0x120},
     {"toggle_disable_pause", 0x350},
     {"toggle_grid", 0x347},
     {"toggle_hitboxes", 0x348},
+    {"frame_advance", 0x20},
+    {"frame_advance_alt", 0x220},
     {"tool_entity", 0x70},
     {"tool_door", 0x71},
     {"tool_camera", 0x72},
@@ -137,7 +139,7 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0.63, g_sat =
 ImVec2 startpos;
 int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
     g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0,
-    g_force_width = 0, g_force_height = 0;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1;
 uint32_t g_held_flags = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0;
 std::vector<EntityItem> g_items;
@@ -346,7 +348,7 @@ const char *quest_flags[] = {
     "4: ",
     "5: Shop spawned",
     "6: ",
-    "7: ",
+    "7: Seeded mode",
     "8: ",
     "9: ",
     "10: Waddler aggroed",
@@ -578,7 +580,8 @@ bool InputStringMultiline(const char *label, std::string *str, const ImVec2 &siz
 
 void refresh_script_files()
 {
-    std::regex luareg("\\.lua$");
+    std::regex luareg("\\.lua$", std::regex_constants::icase);
+    std::regex mainluareg("^main\\.lua$", std::regex_constants::icase);
     g_script_files.clear();
     if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
@@ -594,7 +597,7 @@ void refresh_script_files()
     {
         for (const auto &file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
         {
-            if (file.path().filename().string() == "main.lua")
+            if (std::regex_search(file.path().filename().string(), mainluareg))
             {
                 g_script_files.push_back(file.path());
             }
@@ -1058,6 +1061,15 @@ void mouse_activity()
     }
 }
 
+void frame_advance()
+{
+    if (g_state->pause == 0 && g_pause_at != -1 && g_pause_at <= get_frame_count())
+    {
+        g_state->pause = 0x20;
+        g_pause_at = -1;
+    }
+}
+
 bool pressed(std::string keyname, int wParam)
 {
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1283,11 +1295,24 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("toggle_pause", wParam))
     {
-        paused = !paused;
-        if (paused)
+        g_pause_at = -1;
+        if (g_state->pause == 0)
+        {
             g_state->pause = 0x20;
+            paused = true;
+        }
         else
+        {
             g_state->pause = 0;
+            paused = false;
+        }
+    }
+    else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
+    {
+        if (g_state->pause == 0x20) {
+            g_pause_at = get_frame_count()+1;
+            g_state->pause = 0;
+        }
     }
     else if (pressed("toggle_disable_pause", wParam))
     {
@@ -1520,10 +1545,10 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         escape();
     }
-    else if (pressed("move_down", wParam) && (float)rand() / RAND_MAX > 0.99 && !repeat)
+    /*else if (pressed("move_down", wParam) && (float)rand() / RAND_MAX > 0.99 && !repeat)
     {
         spawn_entity(to_id("ENT_TYPE_ITEM_BROKEN_ARROW"), 0, -0.5, false, 0, 0, false);
-    }
+    }*/
     else
     {
         return false;
@@ -2403,6 +2428,16 @@ void render_clickhandler()
         update_script(script.second);
         render_script(script.second, draw_list);
     }
+    if (g_state->screen == 29)
+    {
+        ImDrawList *dl = ImGui::GetBackgroundDrawList();
+        const char *warningtext = " Overlunky does\nnot work online!";
+        ImVec2 warningsize = hugefont->CalcTextSizeA(144.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, warningtext);
+        dl->AddText(hugefont, 144.0, ImVec2(io.DisplaySize.x/2-warningsize.x/2, io.DisplaySize.y/2-warningsize.y/2), ImColor(1.0f, 1.0f, 1.0f, 0.8f), warningtext);
+        const char *subtext = "And probably never will. I thought the README was clear on this...";
+        ImVec2 subsize = font->CalcTextSizeA(18.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, subtext);
+        dl->AddText(font, 18.0, ImVec2(io.DisplaySize.x/2-subsize.x/2, io.DisplaySize.y/2+warningsize.y/2+20), ImColor(1.0f, 1.0f, 1.0f, 0.8f), subtext);
+    }
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
@@ -3052,10 +3087,12 @@ void render_screen(const char *label, int state)
         ImGui::LabelText(label, "25 Arena intro");
     else if (state == 26)
         ImGui::LabelText(label, "26 Arena match");
+    else if (state == 27)
+        ImGui::LabelText(label, "27 Arena scores");
     else if (state == 28)
         ImGui::LabelText(label, "28 Loading online");
     else if (state == 29)
-        ImGui::LabelText(label, "28 Lobby");
+        ImGui::LabelText(label, "29 Lobby");
     else
     {
         char statec[10];
@@ -3855,6 +3892,7 @@ void post_draw()
     force_time();
     force_noclip();
     mouse_activity();
+    frame_advance();
 }
 
 void create_box(std::vector<EntityItem> items)
