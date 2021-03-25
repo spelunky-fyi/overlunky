@@ -581,7 +581,7 @@ bool InputStringMultiline(const char *label, std::string *str, const ImVec2 &siz
 void refresh_script_files()
 {
     std::regex luareg("\\.lua$", std::regex_constants::icase);
-    std::regex mainluareg("main\\.lua$", std::regex_constants::icase);
+    std::regex mainluareg("^main\\.lua$", std::regex_constants::icase);
     g_script_files.clear();
     if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
