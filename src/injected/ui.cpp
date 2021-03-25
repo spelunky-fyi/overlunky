@@ -2900,6 +2900,7 @@ void render_scripts()
                 ++i;
             }
             ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+            ImGui::Separator();
             script->render_options();
             ImGui::PopItemWidth();
             if (ImGui::InputTextMultiline("##LuaScript", script->get_code(), script->get_code_size(), {-1, 300}))

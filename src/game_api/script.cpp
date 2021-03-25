@@ -752,6 +752,114 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return (uint16_t)0;
     };
 
+    /// Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to autosize in center.
+    /// **Important: Keep all your labels unique!** If you need inputs with the same label, add ##SomeUniqueLabel after the text, or use pushid to give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
+    /// The window api is probably evolving still, this is just the first draft. Felt cute, might delete later!
+    lua["window"] = [this](std::string title, float x, float y, float w, float h, bool movable, sol::function callback) {
+        bool win_open = true;
+        ImGui::PushID("scriptwindow");
+        ImGuiCond cond = (movable ? ImGuiCond_Appearing : ImGuiCond_Always);
+        ImGuiCond flag = (movable ? 0 : ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+        if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
+        {
+            ImGui::SetNextWindowSize(ImVec2(400, -1), cond);
+        }
+        else
+        {
+            ImVec2 spos = screenify(ImVec2(x, y));
+            ImVec2 ssa = screenify(ImVec2(w, h));
+            ImVec2 ssb = screenify(ImVec2(0, 0));
+            ImVec2 ssize = ImVec2(ssa.x - ssb.x, ssb.y - ssa.y);
+            ImGui::SetNextWindowPos(spos, cond);
+            ImGui::SetNextWindowSize(ssize, cond);
+        }
+        ImGui::Begin(title.c_str(), &win_open, flag);
+        ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
+        handle_function(callback);
+        ImGui::PopItemWidth();
+        if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
+        {
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
+                ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, cond);
+        }
+        ImGui::End();
+        ImGui::PopID();
+        return win_open;
+    };
+    /// Add some text to window, automatically wrapped
+    lua["win_text"] = [](std::string text) { ImGui::TextWrapped(text.c_str()); };
+    /// Add a separator line to window
+    lua["win_separator"] = []() { ImGui::Separator(); };
+    /// Add next thing on the same line. This is same as `win_sameline(0, -1)`
+    lua["win_inline"] = []() { ImGui::SameLine(); };
+    /// Add next thing on the same line, with an offset
+    lua["win_sameline"] = [](float offset, float spacing) { ImGui::SameLine(offset, spacing); };
+    /// Returns: `boolean`
+    /// Add a button
+    lua["win_button"] = [](std::string text) {
+        if (ImGui::Button(text.c_str())) {
+            return true;
+        }
+        return false;
+    };
+    /// Returns: `string`
+    /// Add a text field
+    lua["win_input_text"] = [](std::string label, std::string value) {
+        InputString(label.c_str(), &value, 0, nullptr, nullptr);
+        return value;
+    };
+    /// Returns: `int`
+    /// Add an integer field
+    lua["win_input_int"] = [](std::string label, int value) {
+        ImGui::InputInt(label.c_str(), &value);
+        return value;
+    };
+    /// Returns: `float`
+    /// Add a float field
+    lua["win_input_float"] = [](std::string label, float value) {
+        ImGui::InputFloat(label.c_str(), &value);
+        return value;
+    };
+    /// Returns: `int`
+    /// Add an integer slider
+    lua["win_slider_int"] = [](std::string label, int value, int min, int max) {
+        ImGui::SliderInt(label.c_str(), &value, min, max);
+        return value;
+    };
+    /// Returns: `int`
+    /// Add an integer dragfield
+    lua["win_drag_int"] = [](std::string label, int value, int min, int max) {
+        ImGui::DragInt(label.c_str(), &value, 0.5f, min, max);
+        return value;
+    };
+    /// Returns: `float`
+    /// Add an float slider
+    lua["win_slider_float"] = [](std::string label, float value, float min, float max) {
+        ImGui::SliderFloat(label.c_str(), &value, min, max);
+        return value;
+    };
+    /// Returns: `float`
+    /// Add an float dragfield
+    lua["win_drag_float"] = [](std::string label, float value, float min, float max) {
+        ImGui::DragFloat(label.c_str(), &value, 0.5f, min, max);
+        return value;
+    };
+    /// Returns: `boolean`
+    lua["win_check"] = [](std::string label, bool value) {
+        ImGui::Checkbox(label.c_str(), &value);
+        return value;
+    };
+    /// Returns: `int`
+    lua["win_combo"] = [](std::string label, int selected, std::string opts) {
+        int reals = selected - 1;
+        ImGui::Combo(label.c_str(), &reals, opts.c_str());
+        return reals + 1;
+    };
+    /// Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+    lua["win_pushid"] = [](int id) { ImGui::PushID(id); };
+    /// Pop unique identifier from the stack. Put after the input.
+    lua["win_popid"] = []() { ImGui::PopID(); };
+
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",

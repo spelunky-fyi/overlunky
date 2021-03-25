@@ -397,6 +397,64 @@ Send input
 ### [`read_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
 #### Params: `int uid`
 Read input
+### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
+#### Params: `string title, float x, float y, float w, float h, bool movable, function callback`
+Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to autosize in center.
+Important: Keep all your labels unique! If you need inputs with the same label, add ##SomeUniqueLabel after the text, or use pushid to give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
+The window api is probably evolving still, this is just the first draft. Felt cute, might delete later!
+### [`win_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
+#### Params: `string text`
+Add some text to window, automatically wrapped
+### [`win_separator`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator)
+Add a separator line to window
+### [`win_inline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline)
+Add next thing on the same line. This is same as `win_sameline(0, -1)`
+### [`win_sameline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline)
+#### Params: `float offset, float spacing`
+Add next thing on the same line, with an offset
+### [`win_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button)
+#### Params: `string text`
+#### Returns: `boolean`
+Add a button
+### [`win_input_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text)
+#### Params: `string label, string value`
+#### Returns: `string`
+Add a text field
+### [`win_input_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int)
+#### Params: `string label, int value`
+#### Returns: `int`
+Add an integer field
+### [`win_input_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float)
+#### Params: `string label, float value`
+#### Returns: `float`
+Add a float field
+### [`win_slider_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int)
+#### Params: `string label, int value, int min, int max`
+#### Returns: `int`
+Add an integer slider
+### [`win_drag_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int)
+#### Params: `string label, int value, int min, int max`
+#### Returns: `int`
+Add an integer dragfield
+### [`win_slider_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float)
+#### Params: `string label, float value, float min, float max`
+#### Returns: `float`
+Add an float slider
+### [`win_drag_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float)
+#### Params: `string label, float value, float min, float max`
+#### Returns: `float`
+Add an float dragfield
+### [`win_check`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check)
+#### Params: `string label, bool value`
+#### Returns: `boolean`
+### [`win_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo)
+#### Params: `string label, int selected, string opts`
+#### Returns: `int`
+### [`win_pushid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid)
+#### Params: `int id`
+Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+### [`win_popid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid)
+Pop unique identifier from the stack. Put after the input.
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
 ```lua
