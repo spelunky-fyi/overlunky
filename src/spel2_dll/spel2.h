@@ -83,6 +83,7 @@ enum class SpelunkyScreen {
 	Credits = 17,
 	Scores = 18,
 	Constellation = 19,
-	Recap = 20
+	Recap = 20,
+	Online = 29
 };
 SpelunkyScreen SpelunkyState_GetScreen();
