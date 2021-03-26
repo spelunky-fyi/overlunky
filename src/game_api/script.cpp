@@ -1311,8 +1311,6 @@ bool SpelunkyScript::ScriptImpl::run()
         meta.author = meta_author.value_or("Anonymous");
         meta.id = script_id();
 
-        /// Runs on every screen frame. You need this to use draw functions.
-        sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
         /// Runs on every game engine frame.
         sol::optional<sol::function> on_frame = lua["on_frame"];
         /// Runs on entering the camp.
@@ -1337,10 +1335,6 @@ bool SpelunkyScript::ScriptImpl::run()
             script_input.clear();
             if (on_screen)
                 on_screen.value()();
-        }
-        if (on_guiframe)
-        {
-            on_guiframe.value()();
         }
         if (on_frame && g_state->time_level != state.time_level)
         {
@@ -1423,10 +1417,10 @@ bool SpelunkyScript::ScriptImpl::run()
             }
         }
 
-        for (auto it = callbacks.begin(); it != callbacks.end();)
+        for (auto& [id, callback] : callbacks)
         {
             auto now = get_frame_count();
-            if (auto cb = std::get_if<ScreenCallback>(&it->second))
+            if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
                 if (g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
                 {
@@ -1435,11 +1429,6 @@ bool SpelunkyScript::ScriptImpl::run()
                 }
                 else if (cb->screen == 12 && g_state->screen == 12 && g_state->screen_last != 5 && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
                 { // run ON.LEVEL on instant restart too
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 100) // ON.GUIFRAME
-                {
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
@@ -1470,11 +1459,6 @@ bool SpelunkyScript::ScriptImpl::run()
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                ++it;
-            }
-            else
-            {
-                ++it;
             }
         }
 
@@ -1530,6 +1514,32 @@ bool SpelunkyScript::ScriptImpl::run()
 
 void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
 {
+    try {
+        /// Runs on every screen frame. You need this to use draw functions.
+        sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
+
+        if (on_guiframe)
+        {
+            on_guiframe.value()();
+        }
+
+        for (auto& [id, callback] : callbacks)
+        {
+            auto now = get_frame_count();
+            if (auto* cb = std::get_if<ScreenCallback>(&callback))
+            {
+                if (cb->screen == 100) // ON.GUIFRAME
+                {
+                    handle_function(cb->func);
+                    cb->lastRan = now;
+                }
+            }
+        }
+    }
+    catch (const sol::error& e)
+    {
+        result = e.what();
+    }
     draw_queue.draw(dl);
     draw_queue.clear();
 }
