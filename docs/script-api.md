@@ -44,8 +44,6 @@ function on_level()
     toast("Welcome to the level")
 end
 ```
-### [`on_guiframe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_guiframe)
-Runs on every screen frame. You need this to use draw functions.
 ### [`on_frame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_frame)
 Runs on every game engine frame.
 ### [`on_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_camp)
@@ -62,6 +60,8 @@ Runs on the death screen.
 Runs on any ending cutscene.
 ### [`on_screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_screen)
 Runs on any [screen change](#on).
+### [`on_guiframe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_guiframe)
+Runs on every screen frame. You need this to use draw functions.
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### [`message`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=message)
@@ -399,8 +399,8 @@ Send input
 Read input
 ### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
 #### Params: `string title, float x, float y, float w, float h, bool movable, function callback`
-Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to autosize in center.
-Important: Keep all your labels unique! If you need inputs with the same label, add ##SomeUniqueLabel after the text, or use pushid to give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
+Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to autosize in center. Use just a `##Label` as title to hide titlebar.
+Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
 The window api is probably evolving still, this is just the first draft. Felt cute, might delete later!
 ### [`win_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
 #### Params: `string text`

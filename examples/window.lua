@@ -34,8 +34,8 @@ set_callback(function()
     end
     if widgetopen then
         -- create a new window and test most of the widgets
-        -- we'll put this one top center and movable
-        widgetopen = window('Test script window widget thing', -0.2, 1, 0.4, 0.5, true, function()
+        -- we'll put this one top center and make it movable, with no titlebar
+        widgetopen = window('##TestWindow', -0.2, 1, 0.4, 0.5, true, function()
             -- open another window from this window
             if win_button('Open seed dialog') then
                 widgetopen2 = true
