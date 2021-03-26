@@ -1,6 +1,5 @@
 #include "script.hpp"
 #include "entity.hpp"
-#include "draw_queue.hpp"
 #include "logger.h"
 #include "rpc.hpp"
 #include "state.hpp"
@@ -219,8 +218,9 @@ public:
     std::map<int, Callback> callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
-    DrawQueue draw_queue;
     std::map<int, ScriptInput *> script_input;
+
+    ImDrawList* draw_list{ nullptr };
 
     StateMemory* g_state = nullptr;
     std::vector<EntityItem> g_items;
@@ -630,34 +630,46 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        draw_queue.queue_line(a, b, thickness, color);
+        draw_list->AddLine(a, b, color, thickness);
     };
     /// Draws a rectangle on screen from top-left to bottom-right.
     lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        draw_queue.queue_rect(a, b, thickness, rounding, color);
+        draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
     };
     /// Draws a filled rectangle on screen from top-left to bottom-right.
     lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        draw_queue.queue_rect_filled(a, b, rounding, color);
+        draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
     };
     /// Draws a circle on screen
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        draw_queue.queue_circle(a, screenify(radius), thickness, color);
+        float r = screenify(radius);
+        draw_list->AddCircle(a, r, color, 0, thickness);
     };
     /// Draws a filled circle on screen
     lua["draw_circle_filled"] = [this](float x, float y, float radius, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        draw_queue.queue_circle_filled(a, screenify(radius), color);
+        float r = screenify(radius);
+        draw_list->AddCircleFilled(a, r, color, 0);
     };
     /// Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
     lua["draw_text"] = [this](float x, float y, float size, std::string text, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        draw_queue.queue_text(a, size, std::move(text), color);
+        ImGuiIO& io = ImGui::GetIO();
+        ImFont* font = io.Fonts->Fonts.back();
+        for (auto pickfont : io.Fonts->Fonts)
+        {
+            if (floor(size) <= floor(pickfont->FontSize))
+            {
+                font = pickfont;
+                break;
+            }
+        }
+        draw_list->AddText(font, size, a, color, text.c_str());
     };
     /// Returns: `w`, `h` in screen distance.
     /// Calculate the bounding box of text, so you can center it etc.
@@ -1514,6 +1526,7 @@ bool SpelunkyScript::ScriptImpl::run()
 
 void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
 {
+    draw_list = dl;
     try {
         /// Runs on every screen frame. You need this to use draw functions.
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
@@ -1540,8 +1553,7 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
     {
         result = e.what();
     }
-    draw_queue.draw(dl);
-    draw_queue.clear();
+    draw_list = nullptr;
 }
 
 std::string SpelunkyScript::ScriptImpl::script_id()
