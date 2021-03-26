@@ -20,8 +20,6 @@ add_library(spel2_api STATIC
         window_api.hpp
         script.cpp
         script.hpp
-        draw_queue.cpp
-        draw_queue.hpp
         sound_manager.cpp
         sound_manager.hpp
         fmod.hpp

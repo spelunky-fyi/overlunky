@@ -1,6 +1,5 @@
 #include "script.hpp"
 #include "entity.hpp"
-#include "draw_queue.hpp"
 #include "logger.h"
 #include "rpc.hpp"
 #include "state.hpp"
@@ -219,8 +218,9 @@ public:
     std::map<int, Callback> callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
-    DrawQueue draw_queue;
     std::map<int, ScriptInput *> script_input;
+
+    ImDrawList* draw_list{ nullptr };
 
     StateMemory* g_state = nullptr;
     std::vector<EntityItem> g_items;
@@ -630,34 +630,46 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        draw_queue.queue_line(a, b, thickness, color);
+        draw_list->AddLine(a, b, color, thickness);
     };
     /// Draws a rectangle on screen from top-left to bottom-right.
     lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        draw_queue.queue_rect(a, b, thickness, rounding, color);
+        draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
     };
     /// Draws a filled rectangle on screen from top-left to bottom-right.
     lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color) {
         ImVec2 a = screenify({ x1, y1 });
         ImVec2 b = screenify({ x2, y2 });
-        draw_queue.queue_rect_filled(a, b, rounding, color);
+        draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
     };
     /// Draws a circle on screen
     lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        draw_queue.queue_circle(a, screenify(radius), thickness, color);
+        float r = screenify(radius);
+        draw_list->AddCircle(a, r, color, 0, thickness);
     };
     /// Draws a filled circle on screen
     lua["draw_circle_filled"] = [this](float x, float y, float radius, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        draw_queue.queue_circle_filled(a, screenify(radius), color);
+        float r = screenify(radius);
+        draw_list->AddCircleFilled(a, r, color, 0);
     };
     /// Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
     lua["draw_text"] = [this](float x, float y, float size, std::string text, ImU32 color) {
         ImVec2 a = screenify({ x, y });
-        draw_queue.queue_text(a, size, std::move(text), color);
+        ImGuiIO& io = ImGui::GetIO();
+        ImFont* font = io.Fonts->Fonts.back();
+        for (auto pickfont : io.Fonts->Fonts)
+        {
+            if (floor(size) <= floor(pickfont->FontSize))
+            {
+                font = pickfont;
+                break;
+            }
+        }
+        draw_list->AddText(font, size, a, color, text.c_str());
     };
     /// Returns: `w`, `h` in screen distance.
     /// Calculate the bounding box of text, so you can center it etc.
@@ -1311,8 +1323,6 @@ bool SpelunkyScript::ScriptImpl::run()
         meta.author = meta_author.value_or("Anonymous");
         meta.id = script_id();
 
-        /// Runs on every screen frame. You need this to use draw functions.
-        sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
         /// Runs on every game engine frame.
         sol::optional<sol::function> on_frame = lua["on_frame"];
         /// Runs on entering the camp.
@@ -1337,10 +1347,6 @@ bool SpelunkyScript::ScriptImpl::run()
             script_input.clear();
             if (on_screen)
                 on_screen.value()();
-        }
-        if (on_guiframe)
-        {
-            on_guiframe.value()();
         }
         if (on_frame && g_state->time_level != state.time_level)
         {
@@ -1423,10 +1429,10 @@ bool SpelunkyScript::ScriptImpl::run()
             }
         }
 
-        for (auto it = callbacks.begin(); it != callbacks.end();)
+        for (auto& [id, callback] : callbacks)
         {
             auto now = get_frame_count();
-            if (auto cb = std::get_if<ScreenCallback>(&it->second))
+            if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
                 if (g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
                 {
@@ -1435,11 +1441,6 @@ bool SpelunkyScript::ScriptImpl::run()
                 }
                 else if (cb->screen == 12 && g_state->screen == 12 && g_state->screen_last != 5 && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
                 { // run ON.LEVEL on instant restart too
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 100) // ON.GUIFRAME
-                {
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
@@ -1470,11 +1471,6 @@ bool SpelunkyScript::ScriptImpl::run()
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                ++it;
-            }
-            else
-            {
-                ++it;
             }
         }
 
@@ -1530,8 +1526,34 @@ bool SpelunkyScript::ScriptImpl::run()
 
 void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
 {
-    draw_queue.draw(dl);
-    draw_queue.clear();
+    draw_list = dl;
+    try {
+        /// Runs on every screen frame. You need this to use draw functions.
+        sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
+
+        if (on_guiframe)
+        {
+            on_guiframe.value()();
+        }
+
+        for (auto& [id, callback] : callbacks)
+        {
+            auto now = get_frame_count();
+            if (auto* cb = std::get_if<ScreenCallback>(&callback))
+            {
+                if (cb->screen == 100) // ON.GUIFRAME
+                {
+                    handle_function(cb->func);
+                    cb->lastRan = now;
+                }
+            }
+        }
+    }
+    catch (const sol::error& e)
+    {
+        result = e.what();
+    }
+    draw_list = nullptr;
 }
 
 std::string SpelunkyScript::ScriptImpl::script_id()
