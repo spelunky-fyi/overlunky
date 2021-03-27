@@ -4,6 +4,7 @@
 #include "layer.hpp"
 #include "memory.hpp"
 #include "thread_utils.hpp"
+#include "savedata.hpp"
 
 const float ZF = 0.737;
 
@@ -88,6 +89,7 @@ struct State
     size_t addr_zoom;
     size_t addr_zoom_shop;
     size_t addr_dark;
+    size_t addr_savedata;
 
     static State &get();
 
@@ -213,4 +215,5 @@ struct State
     void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
+    SaveData *savedata();
 };

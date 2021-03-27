@@ -87,6 +87,14 @@ size_t get_camera()
     }
 }
 
+size_t get_savedata()
+{
+    ONCE(size_t)
+    {
+        return heap_base()+0x21a2d0; //TODO?
+    }
+}
+
 State &State::get()
 {
     static State STATE;
@@ -107,6 +115,7 @@ State &State::get()
         auto addr_zoom = get_zoom();
         auto addr_zoom_shop = get_zoom_shop();
         auto addr_dark = get_dark();
+        auto addr_savedata = get_savedata();
         STATE = State{
             location,
             addr_damage,
@@ -114,6 +123,7 @@ State &State::get()
             addr_zoom,
             addr_zoom_shop,
             addr_dark,
+            addr_savedata
         };
         INIT = true;
     }
@@ -235,4 +245,9 @@ void State::set_seed(uint32_t seed)
     ptr()->fadeout = 5;
     ptr()->fadein = 5;
     ptr()->loading = 1;
+}
+
+SaveData *State::savedata()
+{
+    return reinterpret_cast<SaveData *>(addr_savedata);
 }

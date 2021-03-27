@@ -26,6 +26,8 @@
 #include "state.hpp"
 #include "window_api.hpp"
 #include "sound_manager.hpp"
+#include "savedata.hpp"
+#include "flags.hpp"
 
 #include "decode_audio_file.hpp"
 
@@ -64,6 +66,7 @@ std::map<std::string, int> keys{
     {"tool_metrics", 0x349},
     {"tool_style", 0x355},
     {"tool_script", 0x77},
+    {"tool_save", 0x75},
     {"reset_windows", 0x352},
     {"reset_windows_vertical", 0x356},
     {"tabbed_interface", 0x354},
@@ -141,7 +144,7 @@ int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_le
     g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1;
 uint32_t g_held_flags = 0;
-uintptr_t g_entity_addr = 0, g_state_addr = 0;
+uintptr_t g_entity_addr = 0, g_state_addr = 0, g_save_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
@@ -154,6 +157,7 @@ Player *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
 StateMemory *g_state = 0;
+SaveData *g_save = 0;
 std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
@@ -166,221 +170,13 @@ std::vector<std::string> tab_order = {
     "tool_camera",
     "tool_entity_properties",
     "tool_game_properties",
+    "tool_save",
     "tool_script",
     "tool_options",
     "tool_style",
     "tool_debug"};
 
 static char text[500];
-const char *themes[] = {
-    "1: Dwelling",
-    "2: Jungle",
-    "2: Volcana",
-    "3: Olmec",
-    "4: Tide Pool",
-    "4: Temple",
-    "5: Ice Caves",
-    "6: Neo Babylon",
-    "7: Sunken City",
-    "8: Cosmic Ocean",
-    "4: City of Gold",
-    "4: Duat",
-    "4: Abzu",
-    "6: Tiamat",
-    "7: Eggplant World",
-    "7: Hundun",
-    "0: Base camp"};
-const char *themes_short[] = {
-    "Dwelling",
-    "Jungle",
-    "Volcana",
-    "Olmec",
-    "Tide Pool",
-    "Temple",
-    "Ice Caves",
-    "Neo Babylon",
-    "Sunken City",
-    "Cosmic Ocean",
-    "City of Gold",
-    "Duat",
-    "Abzu",
-    "Tiamat",
-    "Eggplant World",
-    "Hundun",
-    "Base camp"};
-const char *entity_flags[] = {
-    "1: Invisible",
-    "2: ",
-    "3: Solid (wall)",
-    "4: Passes through objects",
-    "5: Passes through everything",
-    "6: Take no damage",
-    "7: Throwable/Knockbackable",
-    "8: ",
-    "9: Climbable?",
-    "10: No gravity",
-    "11: Interact with water?",
-    "12: Stunnable",
-    "13: Collides walls",
-    "14: Interact with semisolids?",
-    "15: Can be stomped",
-    "16: Power stomps?",
-    "17: Facing left",
-    "18: Pickupable",
-    "19: Usable item?",
-    "20: Enable button prompt",
-    "21: Interact with webs?",
-    "22: Locked",
-    "23: Shop item?",
-    "24: ",
-    "25: Passes through player",
-    "26: ",
-    "27: ",
-    "28: Pause AI and physics",
-    "29: Dead",
-    "30: ",
-    "31: ",
-    "32: Has backitem?"};
-const char *more_flags[] = {
-    "1: ",
-    "2: ",
-    "3: ",
-    "4: ",
-    "5: ",
-    "6: ",
-    "7: ",
-    "8: ",
-    "9: ",
-    "10: ",
-    "11: Swimming",
-    "12: ",
-    "13: ",
-    "14: Falling",
-    "15: Cursed effect",
-    "16: Disable input",
-    "17: ",
-    "18: ",
-    "19: ",
-    "20: ",
-    "21: ",
-    "22: ",
-    "23: ",
-    "24: ",
-    "25: ",
-    "26: ",
-    "27: ",
-    "28: ",
-    "29: ",
-    "30: ",
-    "31: ",
-    "32: "};
-const char *hud_flags[] = {
-    "1: ",
-    "2: ",
-    "3: ",
-    "4: ",
-    "5: Level has Tun/shop?",
-    "6: Tun killed?",
-    "7: Ghost pot level?",
-    "8: ",
-    "9: ",
-    "10: Angry shopkeeper",
-    "11: Angry Tun",
-    "12: ",
-    "13: ",
-    "14: Angry Yang",
-    "15: Angry Tusk",
-    "16: Angry Waddler",
-    "17: Shop level?",
-    "18: Dark level (draw halo)",
-    "19: ",
-    "20: Allow pause",
-    "21: Hide hud, transition",
-    "22: Hide hud, camp",
-    "23: Have clover",
-    "24: ",
-    "25: ",
-    "26: ",
-    "27: ",
-    "28: ",
-    "29: ",
-    "30: ",
-    "31: ",
-    "32: "};
-const char *journal_flags[] = {
-    "1: I was a pacifist",
-    "2: I was a vegan",
-    "3: I was a vegetarian",
-    "4: I was a petty criminal",
-    "5: I was a wanted criminal",
-    "6: I was a crime lord",
-    "7: I was a king",
-    "8: I was a queen",
-    "9: I was a fool",
-    "10: I was an eggplant",
-    "11: I didn't care for treasure",
-    "12: I liked pets",
-    "13: I loved pets",
-    "14: I took damage",
-    "15: I survived death once",
-    "16: I slayed Kingu",
-    "17: I slayed Osiris",
-    "18: I defeated Tiamat",
-    "19: I defeated Hundun",
-    "20: I became one with the Cosmos",
-    "21: I eventually died",
-    "22: ",
-    "23: ",
-    "24: ",
-    "25: ",
-    "26: ",
-    "27: ",
-    "28: ",
-    "29: ",
-    "30: ",
-    "31: ",
-    "32: "};
-
-const char *quest_flags[] = {
-    "1: Reset",
-    "2: Dark level spawned in world",
-    "3: Vault spawned in world",
-    "4: ",
-    "5: Shop spawned",
-    "6: ",
-    "7: Seeded mode",
-    "8: ",
-    "9: ",
-    "10: Waddler aggroed",
-    "11: ",
-    "12: ",
-    "13: ",
-    "14: ",
-    "15: ",
-    "16: ",
-    "17: Udjat eye spawned",
-    "18: Black market spawned",
-    "19: Drill spawned",
-    "20: ",
-    "21: ",
-    "22: ",
-    "23: ",
-    "24: ",
-    "25: Moon challenge spawned",
-    "26: Star challenge spawned",
-    "27: Sun challenge spawned",
-    "28: ",
-    "29: ",
-    "30: ",
-    "31: ",
-    "32: "};
-
-/*const char *empty_flags[] = {
-    "1: ",  "2: ",  "3: ",  "4: ",  "5: ",  "6: ",  "7: ",  "8: ",  "9: ",  "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ",
-    "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: "};*/
-
-const char *button_flags[] = {"Jp", "Wp", "Bm", "Rp", "Rn", "Dr"};
-const char *direction_flags[] = {"Left", "Down", "Up", "Right"};
 
 const char *inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
@@ -576,6 +372,16 @@ bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags 
 bool InputStringMultiline(const char *label, std::string *str, const ImVec2 &size, ImGuiInputTextFlags flags = 0)
 {
     return ImGui::InputTextMultiline(label, (char *)str->c_str(), str->capacity() + 1, size, flags);
+}
+
+bool SliderByte(const char *label, char *value, char min = 0, char max = 0, const char *format = "%lld")
+{
+    return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
+}
+
+bool DragByte(const char *label, char *value, float speed = 1.0f, char min = 0, char max = 0, const char *format = "%lld")
+{
+    return ImGui::DragScalar(label, ImGuiDataType_U8, value, speed, &min, &max, format);
 }
 
 void refresh_script_files()
@@ -1486,6 +1292,10 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("tool_script", wParam))
     {
         toggle("tool_script");
+    }
+    else if (pressed("tool_save", wParam))
+    {
+        toggle("tool_save");
     }
     else if (pressed("reset_windows", wParam))
     {
@@ -2755,6 +2565,7 @@ void render_debug()
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputScalar("Save##SavePointer", ImGuiDataType_U64, &g_save_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar(
         "Level flags##HudFlagsDebug",
         ImGuiDataType_U32,
@@ -2929,14 +2740,145 @@ void render_scripts()
     ImGui::PopItemWidth();
 }
 
-bool SliderByte(const char *label, char *value, char min = 0, char max = 0, const char *format = "%lld")
+void render_savegame()
 {
-    return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
-}
+    ImGui::PushID("Journal");
+    if (ImGui::CollapsingHeader("Journal"))
+    {
+        ImGui::Indent(16.0f);
+        ImGui::PushID("Places");
+        if (ImGui::CollapsingHeader("Places"))
+        {
+            for (int i = 0; i < 16; ++i)
+            {
+                ImGui::PushID(i);
+                ImGui::Checkbox(places_flags[i], &g_save->places[i]);
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopID();
+        ImGui::PushID("People");
+        if (ImGui::CollapsingHeader("People"))
+        {
+            ImGui::Text("");
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+            ImGui::Text("Killed");
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+            ImGui::Text("By");
+            for (int i = 0; i < 38; ++i)
+            {
+                ImGui::PushID(i);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245);
+                ImGui::Checkbox(people_flags[i], &g_save->people[i]);
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+                ImGui::PushID("killed");
+                ImGui::DragInt("", &g_save->people_killed[i], 0.5f, 0, INT_MAX);
+                ImGui::PopID();
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+                ImGui::PushID("killed_by");
+                ImGui::DragInt("", &g_save->people_killed_by[i], 0.5f, 0, INT_MAX);
+                ImGui::PopID();
+                ImGui::PopItemWidth();
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopID();
+        ImGui::PushID("Bestiary");
+        if (ImGui::CollapsingHeader("Bestiary"))
+        {
+            ImGui::Text("");
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+            ImGui::Text("Killed");
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+            ImGui::Text("By");
+            for (int i = 0; i < 78; ++i)
+            {
+                ImGui::PushID(i);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245);
+                ImGui::Checkbox(bestiary_flags[i], &g_save->bestiary[i]);
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+                ImGui::PushID("killed");
+                ImGui::DragInt("", &g_save->bestiary_killed[i], 0.5f, 0, INT_MAX);
+                ImGui::PopID();
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+                ImGui::PushID("killed_by");
+                ImGui::DragInt("", &g_save->bestiary_killed_by[i], 0.5f, 0, INT_MAX);
+                ImGui::PopID();
+                ImGui::PopItemWidth();
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopID();
+        ImGui::PushID("Items");
+        if (ImGui::CollapsingHeader("Items"))
+        {
+            for (int i = 0; i < 54; ++i)
+            {
+                ImGui::PushID(i);
+                ImGui::Checkbox(items_flags[i], &g_save->items[i]);
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopID();
+        ImGui::PushID("Traps");
+        if (ImGui::CollapsingHeader("Traps"))
+        {
+            for (int i = 0; i < 24; ++i)
+            {
+                ImGui::PushID(i);
+                ImGui::Checkbox(traps_flags[i], &g_save->traps[i]);
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopID();
+        ImGui::Unindent(16.0f);
+    }
+    ImGui::PopID();
 
-bool DragByte(const char *label, char *value, float speed = 1.0f, char min = 0, char max = 0, const char *format = "%lld")
-{
-    return ImGui::DragScalar(label, ImGuiDataType_U8, value, speed, &min, &max, format);
+    ImGui::PushID("Characters");
+    if (ImGui::CollapsingHeader("Characters"))
+    {
+        for (int i = 0; i < 20; ++i)
+        {
+            ImGui::PushID(i);
+            ImGui::CheckboxFlags(people_flags[i], &g_save->characters, pow(2, i));
+            ImGui::PopID();
+        }
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("Shortcuts");
+    if (ImGui::CollapsingHeader("Shortcuts"))
+    {
+        int current = g_save->shortcuts;
+        for (int i = 0; i < 11; ++i)
+        {
+            ImGui::PushID(i);
+            ImGui::RadioButton(shortcut_flags[i], &current, i);
+            ImGui::PopID();
+        }
+        if (g_save->shortcuts != current)
+            g_save->shortcuts = current;
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("Profile");
+    if (ImGui::CollapsingHeader("Profile"))
+    {
+        ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5);
+        ImGui::DragInt("Plays", &g_save->plays);
+        ImGui::DragInt("Deaths", &g_save->deaths);
+        ImGui::DragInt("Normal wins", &g_save->wins_normal);
+        ImGui::DragInt("Hard wins", &g_save->wins_hard);
+        ImGui::DragInt("Special wins", &g_save->wins_special);
+        ImGui::DragScalar("Total score", ImGuiDataType_S64, &g_save->score_total, 1000.0f, &s64_zero, &s64_max);
+        ImGui::DragInt("Top score", &g_save->score_top, 1000.0f, 0, INT_MAX);
+        SliderByte("Deepest area", (char *)&g_save->deepest_area, 1, 8);
+        SliderByte("Deepest level", (char *)&g_save->deepest_level, 1, 99);
+        ImGui::PopItemWidth();
+    }
+    ImGui::PopID();
+    ImGui::TextWrapped("To be continued...");
 }
 
 void render_uid(int uid, const char *section, bool rembtn = false)
@@ -3611,6 +3553,8 @@ void render_tool(std::string tool)
         render_style_editor();
     else if (tool == "tool_debug")
         render_debug();
+    else if (tool == "tool_save")
+        render_savegame();
 }
 
 void imgui_init(ImGuiContext*) {
@@ -3650,6 +3594,7 @@ void imgui_init(ImGuiContext*) {
     windows["tool_debug"] = new Window({ "Debug (" + key_string(keys["tool_debug"]) + ")", false, false });
     windows["tool_style"] = new Window({ "Style (" + key_string(keys["tool_style"]) + ")", false, false });
     windows["tool_script"] = new Window({ "Scripts (" + key_string(keys["tool_script"]) + ")", false, true });
+    windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
 }
 
 void imgui_draw()
@@ -3923,8 +3868,10 @@ void init_ui()
 {
     g_SoundManager = new SoundManager(&LoadAudioFile);
 
-    g_state = (struct StateMemory*)get_state_ptr();
+    g_state = get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
+    g_save = savedata();
+    g_save_addr = reinterpret_cast<uintptr_t>(g_save);
 
     register_on_input(&process_keys);
     register_imgui_init(&imgui_init);

@@ -56,6 +56,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + See and change a lot of variables from the game state
       + **Ctrl+Space**: Toggle game engine pause
       + **(Shift+)Space**: Advance frame when engine is paused
+  - **F6**: Save editor
+      + Edit your save data.
+      + Note: Doesn't automatically save to file, you need to let the game trigger a save for that.
   - **F8**: Scripts
       + You can load, edit and set options for Lua scripts here
   - **F9**: Options

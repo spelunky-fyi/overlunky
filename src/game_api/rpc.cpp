@@ -745,3 +745,9 @@ void set_seed(uint32_t seed)
     auto state = State::get();
     state.set_seed(seed);
 }
+
+SaveData* savedata()
+{
+    auto state = State::get();
+    return state.savedata();
+}

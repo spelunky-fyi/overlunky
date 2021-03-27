@@ -4,6 +4,7 @@
 #include "rpc.hpp"
 #include "state.hpp"
 #include "sound_manager.hpp"
+#include "savedata.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -225,6 +226,7 @@ public:
     StateMemory* g_state = nullptr;
     std::vector<EntityItem> g_items;
     std::vector<Player*> g_players;
+    SaveData* g_save = nullptr;
 
     SoundManager* sound_manager;
 
@@ -260,6 +262,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     g_state = get_state_ptr();
     g_items = list_entities();
     g_players = get_players();
+    g_save = savedata();
 
     if (!g_players.empty())
         state.player = g_players.at(0);
@@ -347,6 +350,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["state"] = g_state;
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Movable*>(g_players.begin(), g_players.end());
+    /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
+    lua["savegame"] = g_save;
+
     /// Print a log message on screen.
     lua["message"] = [this](std::string message) {
         messages.push_back({ message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f) });
@@ -1152,6 +1158,56 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     bool set_looping(SOUND_LOOP_MODE looping)
     bool set_callback(function callback)
     */
+
+    #define table_of(T, name) sol::property([this]() { \
+        return sol::as_table_ref(std::vector<T>(g_save->name, g_save->name + sizeof g_save->name / sizeof g_save->name[0])); \
+    })
+
+    lua.new_usertype<SaveData>(
+        "SaveData",
+        "places",
+        table_of(bool, places),
+        "bestiary",
+        table_of(bool, bestiary),
+        "people",
+        table_of(bool, people),
+        "items",
+        table_of(bool, items),
+        "traps",
+        table_of(bool, traps),
+        "last_daily",
+        sol::readonly(&SaveData::last_daily),
+        "characters",
+        sol::readonly(&SaveData::characters),
+        "shortcuts",
+        sol::readonly(&SaveData::shortcuts),
+        "bestiary_killed",
+        table_of(int, bestiary_killed),
+        "bestiary_killed_by",
+        table_of(int, bestiary_killed_by),
+        "people_killed",
+        table_of(int, people_killed),
+        "people_killed_by",
+        table_of(int, people_killed_by),
+        "plays",
+        sol::readonly(&SaveData::plays),
+        "deaths",
+        sol::readonly(&SaveData::deaths),
+        "wins_normal",
+        sol::readonly(&SaveData::wins_normal),
+        "wins_hard",
+        sol::readonly(&SaveData::wins_hard),
+        "wins_special",
+        sol::readonly(&SaveData::wins_special),
+        "score_total",
+        sol::readonly(&SaveData::score_total),
+        "score_top",
+        sol::readonly(&SaveData::score_top),
+        "deepest_area",
+        sol::readonly(&SaveData::deepest_area),
+        "deepest_level",
+        sol::readonly(&SaveData::deepest_level));
+
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {

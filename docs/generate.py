@@ -105,7 +105,7 @@ for file in api_files:
     data = open(file, 'r').read()
     data = data.replace('\n', '')
     data = re.sub(r' ', '', data)
-    m = re.findall(r'new_usertype\<.*?\>\s*\(\s*"([^"]*)",([^\)]*)', data)
+    m = re.findall(r'new_usertype\<.*?\>\s*\(\s*"([^"]*)",(.*?)\);', data)
     for type in m:
         name = type[0]
         attr = type[1]
@@ -119,6 +119,8 @@ for file in api_files:
         for var in attr:
             if not var: continue
             var = var.split(',')
+            if 'table_of' in var[1]:
+                var[1] = var[1].replace('table_of(', '')+'[]'
             vars.append({ 'name': var[0], 'type': var[1] })
         types.append({'name': name, 'vars': vars, 'base': base})
     data = open(file, 'r').read()
@@ -184,7 +186,7 @@ Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples 
 print('## Global variables')
 print("""These variables are always there to use.""")
 for lf in funcs:
-    if lf['name'] in ['players', 'state', 'options', 'meta']:
+    if lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']:
         print('### [`'+lf['name']+'`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+lf['name']+')')
         for com in lf['comment']:
             print(com)
@@ -208,7 +210,7 @@ for lf in funcs:
     if len(rpcfunc(lf['cpp'])):
         for af in rpcfunc(lf['cpp']):
             print_af(lf, af)
-    elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'options', 'meta']):
+    elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']):
         m = re.search(r'\(([^\{]*)\)', lf['cpp'])
         param = ''
         if m:

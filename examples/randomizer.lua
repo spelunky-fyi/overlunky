@@ -6,7 +6,7 @@ meta.author = "Dregu"
 register_option_bool("container",  "Container rando +++++++++++++", true)
 register_option_bool("door",       "Door rando ++++++++++++++++++", true)
 register_option_bool("enemy",      "Enemy rando +++++++++++++++++", true)
-register_option_bool("projectile", "Projectile rando ++++++++++++", true)
+register_option_bool("projectile", "Projectile rando ++++++++++++", false)
 register_option_bool("trap",       "Trap rando ++++++++++++++++++", true)
 register_option_int("add_health", "Max starting health", 20, 4, 99)
 register_option_int("add_bombs", "Max starting bombs", 20, 4, 99)
