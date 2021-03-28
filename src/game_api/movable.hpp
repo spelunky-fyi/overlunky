@@ -111,6 +111,8 @@ class Player : public Monster
     uint8_t can_use;
     uint8_t b176;
     uint8_t b177;
+
+    void set_jetpack_fuel(uint8_t fuel);
 };
 
 class Container : public Movable
@@ -149,4 +151,14 @@ class Mount : public Monster
     void carry(Movable *rider);
 
     void tame(bool value);
+};
+
+class Jetpack : public Movable
+{
+  public:
+    int32_t unknown1;
+    int32_t unknown2;
+    int32_t unknown3;
+    int32_t unknown4;
+    uint8_t fuel; // only set the fuel for an equipped jetpack (player->items)!
 };
