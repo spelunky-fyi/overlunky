@@ -237,6 +237,7 @@ void Player::set_jetpack_fuel(uint8_t fuel)
         {
             auto jetpack = get_entity_ptr(pitems[x])->as<Jetpack>();
             jetpack->fuel = fuel;
+            break;
         }
     }
 }
