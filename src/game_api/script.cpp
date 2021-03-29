@@ -969,7 +969,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "as_gun",
         &Entity::as<Gun>,
         "as_crushtrap",
-        &Entity::as<Crushtrap>);
+        &Entity::as<Crushtrap>,
+        "as_arrowtrap",
+        &Entity::as<Arrowtrap>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -1040,6 +1042,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         sol::base_classes,
         sol::bases<Entity, Movable>());
     lua.new_usertype<Crushtrap>("Crushtrap", "dirx", &Crushtrap::dirx, "diry", &Crushtrap::diry, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Arrowtrap>("Arrowtrap", "arrow_shot", &Arrowtrap::arrow_shot, "rearm", &Arrowtrap::rearm, sol::base_classes, sol::bases<Entity>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",

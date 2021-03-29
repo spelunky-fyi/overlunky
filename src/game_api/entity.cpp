@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "state.hpp"
+#include "rpc.hpp"
 #include "logger.h"
 
 // Items::entity_map = EntityMap;
@@ -223,6 +224,20 @@ void Mount::tame(bool value)
 {
     write_mem(pointer() + 0x149, to_le_bytes(value));
     flags = flags | 0x20000;
+}
+
+void Arrowtrap::rearm()
+{
+    if ( arrow_shot )
+    {
+        static auto arrow_trap_trigger_id = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER");
+        arrow_shot = false;
+        auto trigger = get_entity_ptr(spawn_entity_over(arrow_trap_trigger_id, uid, 0., 0.));
+        if ( (flags & (1 << 16)) > 0 )
+        {
+            trigger->flags |= (1 << 16);
+        }
+    }
 }
 
 void Entity::destroy()

@@ -294,4 +294,14 @@ class Door : public Entity
     std::tuple<uint8_t, uint8_t, uint8_t> get_target();
 };
 
+class Arrowtrap : public Entity
+{
+  public:
+    size_t unknown1;
+    size_t unknown2;
+    bool arrow_shot;
+    
+    void rearm();
+};
+
 std::vector<EntityItem> list_entities();
