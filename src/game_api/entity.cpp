@@ -225,6 +225,23 @@ void Mount::tame(bool value)
     flags = flags | 0x20000;
 }
 
+void Movable::poison(bool p)
+{
+    if ( p )
+    {
+        poison_tick_timer = 0x0708; // = 1800 = 30 seconds 
+    }
+    else
+    {
+        poison_tick_timer = 0xFFFF; // disables poison
+    }
+}
+
+bool Movable::is_poisoned()
+{
+    return (poison_tick_timer != 0xFFFF);
+}
+
 void Entity::destroy()
 {
     // TODO

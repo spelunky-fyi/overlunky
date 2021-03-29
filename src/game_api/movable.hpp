@@ -27,7 +27,7 @@ class Movable : public Entity
     uint16_t stun_timer;
     uint16_t stun_state;
     uint32_t some_state;
-    int32_t i118;
+    int32_t poison_tick_timer;
     int32_t i11c;
     int32_t i120;
     uint8_t b124;
@@ -86,6 +86,9 @@ class Movable : public Entity
     virtual void v84() = 0;
     virtual void v85() = 0;
     virtual void v86() = 0;
+
+    void poison(bool p);
+    bool is_poisoned();
 };
 
 class Monster : public Movable
