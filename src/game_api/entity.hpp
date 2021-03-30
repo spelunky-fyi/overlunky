@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "json.hpp"
 #include "memory.hpp"
 
 enum RepeatType : uint8_t
@@ -22,6 +23,7 @@ struct Animation
     uint8_t key;
     RepeatType repeat;
 };
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Animation, texture, count, interval, key, repeat);
 
 struct Rect
 {
@@ -31,6 +33,7 @@ struct Rect
     uint8_t field_11;
     uint16_t field_12;
 };
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Rect, masks, up_minus_down, side, up_plus_down);
 
 struct Color
 {
@@ -99,6 +102,30 @@ struct EntityDB
     float attachOffsetY;
     uint8_t init;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+    EntityDB,
+    id,
+    search_flags,
+    width,
+    height,
+    rect_collision,
+    friction,
+    elasticity,
+    weight,
+    acceleration,
+    max_speed,
+    sprint_factor,
+    jump,
+    texture,
+    technique,
+    tile_x,
+    tile_y,
+    damage,
+    life,
+    attachOffsetX,
+    attachOffsetY,
+    animations);
 
 struct EntityItem
 {
