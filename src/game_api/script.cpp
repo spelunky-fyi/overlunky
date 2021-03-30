@@ -1028,7 +1028,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         sol::bases<Entity>());
         /* Movable
             bool is_poisoned()
-            void poison(bool p)
+            void poison(int16_t frames)
         */
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable, Monster>());
