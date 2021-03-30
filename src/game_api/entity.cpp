@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "state.hpp"
 #include "logger.h"
+#include "state.hpp"
 
 // Items::entity_map = EntityMap;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
@@ -28,7 +28,8 @@ size_t entities_ptr()
     if (cache_entities_ptr == 0)
     {
         auto mem = Memory::get();
-        cache_entities_ptr = mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\x48\xB8\x02\x55\xA7\x74\x52\x9D\x51\x43"s, mem.after_bundle) - 7));
+        cache_entities_ptr =
+            mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\x48\xB8\x02\x55\xA7\x74\x52\x9D\x51\x43"s, mem.after_bundle) - 7));
     }
     return cache_entities_ptr;
 }
@@ -69,13 +70,8 @@ EntityDB *get_type(uint32_t id)
     auto map = reinterpret_cast<EntityMap *>(map_ptr + entities_offset());
 
     std::vector<EntityItem> result;
-    for (const auto &kv : *map)
-    {
-        auto entities = reinterpret_cast<EntityDB *>(map_ptr);
-        return &entities[kv.second];
-    }
-
-    return nullptr;
+    auto entities = reinterpret_cast<EntityDB *>(map_ptr);
+    return &entities[id];
 }
 
 int32_t to_id(std::string name)
