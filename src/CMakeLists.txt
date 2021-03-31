@@ -30,6 +30,11 @@ set(FMT_MASTER_PROJECT OFF)
 add_subdirectory(fmt)
 
 # --------------------------------------------------
+# json
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(json)
+
+# --------------------------------------------------
 # overlunky spel2_api
 add_subdirectory(shared)
 add_subdirectory(game_api)

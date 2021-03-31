@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "memory.hpp"
 
 enum RepeatType : uint8_t
@@ -103,29 +103,36 @@ struct EntityDB
     uint8_t init;
 };
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-    EntityDB,
-    id,
-    search_flags,
-    width,
-    height,
-    rect_collision,
-    friction,
-    elasticity,
-    weight,
-    acceleration,
-    max_speed,
-    sprint_factor,
-    jump,
-    texture,
-    technique,
-    tile_x,
-    tile_y,
-    damage,
-    life,
-    attachOffsetX,
-    attachOffsetY,
-    animations);
+inline void to_json(nlohmann::json& j, const EntityDB& ent) {
+    // Have to do this manually because otherwise it writes out animations like a mess
+    std::map<std::string, Animation> animations;
+    for (auto& [id, anim] : ent.animations) {
+        animations[std::to_string(id)] = anim;
+    }
+    j = nlohmann::json{
+        {"id", ent.id},
+        {"search_flags", ent.search_flags},
+        {"width", ent.width},
+        {"height", ent.height},
+        {"rect_collision", ent.rect_collision},
+        {"friction", ent.friction},
+        {"elasticity", ent.elasticity},
+        {"weight", ent.weight},
+        {"acceleration", ent.acceleration},
+        {"max_speed", ent.max_speed},
+        {"sprint_factor", ent.sprint_factor},
+        {"jump", ent.jump},
+        {"texture", ent.texture},
+        {"technique", ent.technique},
+        {"tile_x", ent.tile_x},
+        {"tile_y", ent.tile_y},
+        {"damage", ent.damage},
+        {"life", ent.life},
+        {"attachOffsetX", ent.attachOffsetX},
+        {"attachOffsetY", ent.attachOffsetY},
+        {"animations", animations},
+    };
+}
 
 struct EntityItem
 {

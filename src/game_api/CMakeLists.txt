@@ -26,6 +26,7 @@ add_library(spel2_api STATIC
         audio_buffer.hpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
+        nlohmann_json::nlohmann_json
         imgui)
 target_link_libraries(spel2_api PRIVATE
         shared
