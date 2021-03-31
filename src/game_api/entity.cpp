@@ -222,6 +222,20 @@ void Mount::tame(bool value)
     flags = flags | 0x20000;
 }
 
+void Arrowtrap::rearm()
+{
+    if ( arrow_shot )
+    {
+        static auto arrow_trap_trigger_id = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER");
+        arrow_shot = false;
+        auto trigger = get_entity_ptr(spawn_entity_over(arrow_trap_trigger_id, uid, 0., 0.));
+        if ( (flags & (1 << 16)) > 0 )
+        {
+            trigger->flags |= (1 << 16);
+        }
+    }
+}
+
 void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
@@ -236,6 +250,7 @@ void Player::set_jetpack_fuel(uint8_t fuel)
             break;
         }
     }
+}
 
 void Movable::poison(int16_t frames)
 {
