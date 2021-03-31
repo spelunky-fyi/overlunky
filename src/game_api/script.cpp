@@ -420,7 +420,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         seed_prng(seed);
     };
     /// Returns: `int[20]`
-    /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts ¯\_(ツ)_/¯. Example:
+    /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
     /// ```lua
     /// -- this should always print the same table D877...E555
     /// set_callback(function()

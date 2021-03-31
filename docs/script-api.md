@@ -100,7 +100,7 @@ Load another script by id "author/name"
 Seed the game prng.
 ### [`read_prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
 #### Returns: `int[20]`
-Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts ┬»\_(πâä)_/┬». Example:
+Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
 ```lua
 -- this should always print the same table D877...E555
 set_callback(function()
