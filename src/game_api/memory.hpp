@@ -35,6 +35,10 @@ DEFINE_ACCESSOR(u32, uint32_t);
 
 DEFINE_ACCESSOR(u64, uint64_t);
 
+DEFINE_ACCESSOR(i32, int32_t);
+
+DEFINE_ACCESSOR(i64, int64_t);
+
 DEFINE_ACCESSOR(f32, float);
 
 size_t function_start(size_t off) {
