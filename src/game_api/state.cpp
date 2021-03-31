@@ -88,14 +88,6 @@ size_t get_camera()
     }
 }
 
-size_t get_savedata()
-{
-    ONCE(size_t)
-    {
-        return heap_base() + 0x21a2d0; // TODO?
-    }
-}
-
 State &State::get()
 {
     static State STATE;
