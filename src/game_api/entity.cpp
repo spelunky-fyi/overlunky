@@ -236,6 +236,44 @@ void Arrowtrap::rearm()
     }
 }
 
+void Player::set_jetpack_fuel(uint8_t fuel)
+{
+    static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
+    int *pitems = (int *)items.begin;
+    for (uint8_t x = 0; x < items.count; ++x)
+    {
+        auto type = get_entity_type(pitems[x]);
+        if (type == jetpackID)
+        {
+            auto jetpack = get_entity_ptr(pitems[x])->as<Jetpack>();
+            jetpack->fuel = fuel;
+            break;
+        }
+    }
+}
+
+void Movable::poison(int16_t frames)
+{
+    static size_t offset = 0;
+    if ( offset == 0 )
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(find_inst(memory.exe(), "\xB8\x08\x07\x00\x00\x66\x89\x87\x18\x01\x00\x00"s, memory.after_bundle));
+    }
+    poison_tick_timer = frames;
+
+    if ( frames == -1 )
+    {
+        frames = 1800;
+    }
+    write_mem_prot(offset + 1, to_le_bytes(frames), true);
+}
+
+bool Movable::is_poisoned()
+{
+    return (poison_tick_timer != -1);
+}
+
 void Entity::destroy()
 {
     // TODO
