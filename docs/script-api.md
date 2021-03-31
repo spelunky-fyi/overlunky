@@ -534,6 +534,7 @@ end
 - [`as_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_player) &Entity::as&lt;Player&gt;
 - [`as_monster`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_monster) &Entity::as&lt;Monster&gt;
 - [`as_gun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_gun) &Entity::as&lt;Gun&gt;
+- [`as_bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_bomb) &Entity::as&lt;Bomb&gt;
 - [`as_crushtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_crushtrap) &Entity::as&lt;Crushtrap&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
@@ -561,6 +562,8 @@ Derived from [`Entity`](#entity)
 - [`offsetx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) &Movable::offsetx
 - [`offsety`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) &Movable::offsety
 - [`airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::airtime
+- [`bool is_poisoned()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned)
+- [`void poison(int16_t frames)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison)
 ### `Monster`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
@@ -572,6 +575,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
 - [`tame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tame) &Mount::tame
+### `Bomb`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`scale_hor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) &Bomb::scale_hor
+- [`scale_ver`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_ver) &Bomb::scale_ver
 ### `Container`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside

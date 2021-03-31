@@ -998,6 +998,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<Monster>,
         "as_gun",
         &Entity::as<Gun>,
+        "as_bomb",
+        &Entity::as<Bomb>,
         "as_crushtrap",
         &Entity::as<Crushtrap>);
     lua.new_usertype<Movable>(
@@ -1050,8 +1052,16 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::offsety,
         "airtime",
         &Movable::airtime,
+        "is_poisoned",
+        &Movable::is_poisoned,
+        "poison",
+        &Movable::poison,
         sol::base_classes,
         sol::bases<Entity>());
+        /* Movable
+            bool is_poisoned()
+            void poison(int16_t frames)
+        */
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Player>(
         "Player",
@@ -1062,6 +1072,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Bomb>("Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Container>(
         "Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Gun>(
