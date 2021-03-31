@@ -95,6 +95,22 @@ Clear previously added callback `id`
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 #### Params: `string id`
 Load another script by id "author/name"
+### [`seed_prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_prng)
+#### Params: `int64_t seed`
+Seed the game prng.
+### [`read_prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
+#### Returns: `int[20]`
+Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts ┬»\_(πâä)_/┬». Example:
+```lua
+-- this should always print the same table D877...E555
+set_callback(function()
+  seed_prng(42069)
+  local prng = read_prng()
+  for i,v in ipairs(prng) do
+    message(string.format("%08X", v))
+  end
+end, ON.LEVEL)
+```
 ### [`toast`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast)
 #### Params: `string message`
 Show a message that looks like a level feeling.

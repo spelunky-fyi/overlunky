@@ -87,6 +87,18 @@ Say get_say()
     }
 }
 
+using Prng = void (*)(int64_t seed);
+Prng get_seed_prng()
+{
+    ONCE(Prng)
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x48\x89\x5C\x24\x08\x48\x89\x74\x24\x10\x57\x48\x83\xEC\x10\x8B\xC1\x33\xFF\x48\x85\xC0\x41\xB9\x30\x01\x00\x00\x48\xBB\x99\x9A\x6A\x67\xD0\x63\x6C\x9E"s, memory.after_bundle);
+        off = function_start(memory.at_exe(off));
+        return res = (Prng)off;
+    }
+}
+
 void infinite_loop(lua_State* argst, lua_Debug * argdb) {
     luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
 };
@@ -402,6 +414,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
     lua["load_script"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
+    /// Seed the game prng.
+    lua["seed_prng"] = [this](int64_t seed) {
+        auto seed_prng = get_seed_prng();
+        seed_prng(seed);
+    };
+    /// Returns: `int[20]`
+    /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts ¯\_(ツ)_/¯. Example:
+    /// ```lua
+    /// -- this should always print the same table D877...E555
+    /// set_callback(function()
+    ///   seed_prng(42069)
+    ///   local prng = read_prng()
+    ///   for i,v in ipairs(prng) do
+    ///     message(string.format("%08X", v))
+    ///   end
+    /// end, ON.LEVEL)
+    /// ```
+    lua["read_prng"] = [this]() { return read_prng(); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message) {
         auto toast = get_toast();

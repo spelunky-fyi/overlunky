@@ -202,6 +202,16 @@ struct State
         return read_u32((size_t)ptr() - 0xd0);
     }
 
+    std::vector<int64_t> read_prng()
+    {
+        std::vector<int64_t> prng;
+        for (int i = 0; i < 20; ++i)
+        {
+            prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * i));
+        }
+        return prng;
+    }
+
     Entity *find(uint32_t unique_id)
     {
         auto &map = ptr()->instance_id_to_pointer;
