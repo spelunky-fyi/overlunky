@@ -1355,10 +1355,6 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         escape();
     }
-    /*else if (pressed("move_down", wParam) && (float)rand() / RAND_MAX > 0.99 && !repeat)
-    {
-        spawn_entity(to_id("ENT_TYPE_ITEM_BROKEN_ARROW"), 0, -0.5, false, 0, 0, false);
-    }*/
     else
     {
         return false;
@@ -3830,8 +3826,13 @@ void imgui_draw()
 
 void post_draw()
 {
-    if (!file_written)
+    if (!file_written) {
         write_file();
+        std::string name = gen_random(16);
+        SpelunkyScript *script = new SpelunkyScript("meta.name = 'Hello World'\nmeta.version = '1.4'\nmeta.description = 'This is a test script.'\nmeta.author = 'Dregu'\nset_callback(function()\nif state.screen == 12 and #players > 0 then\nif players[1].movey < 0 and not last then\nx, y, l = get_position(players[1].uid)\nes = get_entities_at(0,126,x,y-0.4,l,0.5)\nfor i,v in ipairs(es) do\ne = get_entity(v)\nif test_flag(e.flags, 18) then\ne.flags = clr_flag(e.flags, 18)\nspawn(372,0,-0.5,-1,0,0)\nend\nend\nend\nlast = players[1].movey < 0\nend\nend, ON.FRAME)",
+            name, g_SoundManager, true);
+        g_scripts[name] = script;
+    }
     update_players();
     force_zoom();
     force_hud_flags();
