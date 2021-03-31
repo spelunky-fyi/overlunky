@@ -1063,7 +1063,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             void poison(int16_t frames)
         */
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
-    lua.new_usertype<Player>("Player", "inventory", &Player::inventory_ptr, sol::base_classes, sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Player>(
+        "Player",
+        "inventory",
+        &Player::inventory_ptr,
+        "set_jetpack_fuel",
+        &Player::set_jetpack_fuel,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Bomb>("Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Container>(
