@@ -1,4 +1,5 @@
 #include "state.hpp"
+#include "game_manager.hpp"
 #include "logger.h"
 
 size_t get_dark()
@@ -91,7 +92,7 @@ size_t get_savedata()
 {
     ONCE(size_t)
     {
-        return heap_base()+0x21a2d0; //TODO?
+        return heap_base() + 0x21a2d0; // TODO?
     }
 }
 
@@ -115,41 +116,11 @@ State &State::get()
         auto addr_zoom = get_zoom();
         auto addr_zoom_shop = get_zoom_shop();
         auto addr_dark = get_dark();
-        auto addr_savedata = get_savedata();
-        STATE = State{
-            location,
-            addr_damage,
-            addr_insta,
-            addr_zoom,
-            addr_zoom_shop,
-            addr_dark,
-            addr_savedata
-        };
+        STATE = State{location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
         INIT = true;
     }
     return STATE;
 }
-
-// I found some places that use offset from heap base, so wrote this class
-template <typename T> class OnHeapPointer
-{
-    int64_t ptr_;
-
-  public:
-    explicit OnHeapPointer(size_t ptr) : ptr_(ptr)
-    {
-    }
-
-    T *decode()
-    {
-        return reinterpret_cast<T *>(ptr_ + heap_base());
-    }
-
-    T *operator->()
-    {
-        return decode();
-    }
-};
 
 StateMemory *State::ptr() const
 {
@@ -249,5 +220,6 @@ void State::set_seed(uint32_t seed)
 
 SaveData *State::savedata()
 {
-    return reinterpret_cast<SaveData *>(addr_savedata);
+    auto gm = get_game_manager();
+    return gm->tmp->savedata.decode();
 }

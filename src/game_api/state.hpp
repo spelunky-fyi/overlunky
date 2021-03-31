@@ -3,8 +3,8 @@
 #include "items.hpp"
 #include "layer.hpp"
 #include "memory.hpp"
-#include "thread_utils.hpp"
 #include "savedata.hpp"
+#include "thread_utils.hpp"
 
 const float ZF = 0.737;
 
@@ -89,7 +89,6 @@ struct State
     size_t addr_zoom;
     size_t addr_zoom_shop;
     size_t addr_dark;
-    size_t addr_savedata;
 
     static State &get();
 
