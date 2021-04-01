@@ -3,8 +3,8 @@
 #include "items.hpp"
 #include "layer.hpp"
 #include "memory.hpp"
-#include "thread_utils.hpp"
 #include "savedata.hpp"
+#include "thread_utils.hpp"
 
 const float ZF = 0.737;
 
@@ -89,7 +89,6 @@ struct State
     size_t addr_zoom;
     size_t addr_zoom_shop;
     size_t addr_dark;
-    size_t addr_savedata;
 
     static State &get();
 
@@ -200,6 +199,16 @@ struct State
     uint32_t get_frame_count()
     {
         return read_u32((size_t)ptr() - 0xd0);
+    }
+
+    std::vector<int64_t> read_prng()
+    {
+        std::vector<int64_t> prng;
+        for (int i = 0; i < 20; ++i)
+        {
+            prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * i));
+        }
+        return prng;
     }
 
     Entity *find(uint32_t unique_id)

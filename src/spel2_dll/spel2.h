@@ -63,6 +63,18 @@ struct SpelunkyScriptMessage {
 std::size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script);
 SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::size_t message_idx);
 
+struct SpelunkyScriptMeta {
+	const char* file;
+	const char* name;
+	const char* version;
+	const char* description;
+	const char* author;
+	const char* id;
+	const char* path;
+	const char* filename;
+};
+SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script);
+
 enum class SpelunkyScreen {
 	Logo = 0,
 	Intro = 1,

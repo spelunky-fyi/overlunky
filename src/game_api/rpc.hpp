@@ -60,3 +60,4 @@ void set_camera_position(float cx, float cy);
 void warp(uint8_t w, uint8_t l, uint8_t t);
 void set_seed(uint32_t seed);
 SaveData* savedata();
+std::vector<int64_t> read_prng();

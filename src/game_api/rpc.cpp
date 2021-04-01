@@ -751,3 +751,9 @@ SaveData* savedata()
     auto state = State::get();
     return state.savedata();
 }
+
+std::vector<int64_t> read_prng()
+{
+    auto state = State::get();
+    return state.read_prng();
+}

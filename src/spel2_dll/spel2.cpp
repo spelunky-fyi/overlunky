@@ -150,6 +150,20 @@ SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::siz
 	}
 	return SpelunkyScriptMessage{};
 }
+SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script)
+{
+	return {
+		script->get_file().c_str(),
+		script->get_name().c_str(),
+		script->get_version().c_str(),
+		script->get_description().c_str(),
+		script->get_author().c_str(),
+		script->get_id().c_str(),
+		script->get_path().c_str(),
+		script->get_filename().c_str()
+	};
+}
+
 
 StateMemory& get_state() {
 	static StateMemory* state = State::get().ptr();

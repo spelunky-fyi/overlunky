@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "logger.h"
+#include "rpc.hpp"
 #include "state.hpp"
 
 // Items::entity_map = EntityMap;
@@ -219,6 +220,58 @@ void Mount::tame(bool value)
 {
     write_mem(pointer() + 0x149, to_le_bytes(value));
     flags = flags | 0x20000;
+}
+
+void Arrowtrap::rearm()
+{
+    if ( arrow_shot )
+    {
+        static auto arrow_trap_trigger_id = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER");
+        arrow_shot = false;
+        auto trigger = get_entity_ptr(spawn_entity_over(arrow_trap_trigger_id, uid, 0., 0.));
+        if ( (flags & (1 << 16)) > 0 )
+        {
+            trigger->flags |= (1 << 16);
+        }
+    }
+}
+
+void Player::set_jetpack_fuel(uint8_t fuel)
+{
+    static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
+    int *pitems = (int *)items.begin;
+    for (uint8_t x = 0; x < items.count; ++x)
+    {
+        auto type = get_entity_type(pitems[x]);
+        if (type == jetpackID)
+        {
+            auto jetpack = get_entity_ptr(pitems[x])->as<Jetpack>();
+            jetpack->fuel = fuel;
+            break;
+        }
+    }
+}
+
+void Movable::poison(int16_t frames)
+{
+    static size_t offset = 0;
+    if ( offset == 0 )
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(find_inst(memory.exe(), "\xB8\x08\x07\x00\x00\x66\x89\x87\x18\x01\x00\x00"s, memory.after_bundle));
+    }
+    poison_tick_timer = frames;
+
+    if ( frames == -1 )
+    {
+        frames = 1800;
+    }
+    write_mem_prot(offset + 1, to_le_bytes(frames), true);
+}
+
+bool Movable::is_poisoned()
+{
+    return (poison_tick_timer != -1);
 }
 
 void Entity::destroy()

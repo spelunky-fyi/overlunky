@@ -25,7 +25,9 @@ add_library(spel2_api STATIC
         sound_manager.cpp
         sound_manager.hpp
         fmod.hpp
-        audio_buffer.hpp)
+        audio_buffer.hpp
+        game_manager.cpp
+        game_manager.hpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
         imgui)
