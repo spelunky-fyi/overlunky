@@ -1474,7 +1474,7 @@ bool SpelunkyScript::ScriptImpl::run()
             if (on_screen)
                 on_screen.value()();
         }
-        if (on_frame && g_state->time_level != state.time_level)
+        if (on_frame && g_state->time_level != state.time_level && g_state->screen == 12)
         {
             on_frame.value()();
         }
@@ -1570,7 +1570,7 @@ bool SpelunkyScript::ScriptImpl::run()
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 101 && g_state->time_level != state.time_level) // ON.FRAME
+                else if (cb->screen == 101 && g_state->time_level != state.time_level && g_state->screen == 12) // ON.FRAME
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;

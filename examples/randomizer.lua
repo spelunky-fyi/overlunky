@@ -1,5 +1,5 @@
 meta.name = "Randomizer"
-meta.version = "1.0"
+meta.version = "1.1"
 meta.description = "The Randomizer from Overlunky in one Playlunky compatible mod."
 meta.author = "Dregu"
 
