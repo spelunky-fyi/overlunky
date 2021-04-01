@@ -1,5 +1,5 @@
-module = {}
-cbs = {}
+local module = {}
+door_cbs = {}
 
 theme = {1,2,3,5,6,7,8,9,10,11}
 bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
@@ -180,7 +180,7 @@ function module.start()
     register_option_int("door_bosses", "Bosses to defeat to trigger ending", 5, 1, 5)
     register_option_bool("door_xiit", "Spawn exit on entrance (for debugging)", false)
 
-    cbs[#cbs+1] = set_callback(function()
+    door_cbs[#door_cbs+1] = set_callback(function()
         --message("Level")
         critters_spawned = false
         dead = false
@@ -218,7 +218,7 @@ function module.start()
         end
     end, ON.LEVEL)
 
-    cbs[#cbs+1] = set_callback(function()
+    door_cbs[#door_cbs+1] = set_callback(function()
         --message("Transition")
         toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)))
         if state.level < 98 then
@@ -230,7 +230,7 @@ function module.start()
         end
     end, ON.TRANSITION)
 
-    cbs[#cbs+1] = set_callback(function()
+    door_cbs[#door_cbs+1] = set_callback(function()
         --message("Loading")
         if dead == true and state.level < 98 then
             --message("Loading - Setting next level")
@@ -240,19 +240,19 @@ function module.start()
         end
     end, ON.LOADING)
 
-    cbs[#cbs+1] = set_callback(function()
+    door_cbs[#door_cbs+1] = set_callback(function()
         --message("Reset - Init, state.reset == "..tostring(state.reset))
         init_run()
         dead = true
     end, ON.RESET)
 
-    cbs[#cbs+1] = set_callback(function()
+    door_cbs[#door_cbs+1] = set_callback(function()
         --message("Camp - Init")
         init_run()
         dead = true
     end, ON.CAMP)
 
-    cbs[#cbs+1] = set_callback(function()
+    door_cbs[#door_cbs+1] = set_callback(function()
         --message("Death - Init")
         toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)))
         init_run()
@@ -261,10 +261,10 @@ function module.start()
 end
 
 function module.stop()
-    for i,v in ipairs(cbs) do
+    for i,v in ipairs(door_cbs) do
         clear_callback(v)
     end
-    cbs = {}
+    door_cbs = {}
 end
 
 return module

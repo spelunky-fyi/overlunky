@@ -1,5 +1,5 @@
-module = {}
-cbs = {}
+local module = {}
+enemy_cbs = {}
 
 small_from = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_BAT,
               ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
@@ -40,10 +40,10 @@ olmec_ammo = {ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM
 kingu_ammo = {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS,
               ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_LEPRECHAUN,
               ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_MONKEY, ENT_TYPE.MONS_PROTOSHOPKEEPER}
-done = {}
+enemy_done = {}
 
-function replaced(id)
-    for i, v in ipairs(done) do
+function enemy_replaced(id)
+    for i, v in pairs(enemy_done) do
         if v == id then
             return true
         end
@@ -88,33 +88,32 @@ function replace_enemy(id, from)
 end
 
 function replace_projectile(id, from)
-    x, y, l = get_position(id)
-    ent = get_entity(id):as_movable()
-    vx = ent.velocityx
-    vy = ent.velocityy
+    local x, y, l = get_position(id)
+    local ent = get_entity(id):as_movable()
+    local vx = ent.velocityx
+    local vy = ent.velocityy
     move_entity(id, 0, 0, 0, 0)
-    new = from[math.random(#from)]
-    newid = spawn(new, x, y, l, vx, vy)
-    done[#done + 1] = newid
+    local new = from[math.random(#from)]
+    local newid = spawn(new, x, y, l, vx, vy)
+    enemy_done[#enemy_done + 1] = newid
 end
 
 function replace_kingu(id, from)
-    x, y, l = get_position(id)
-    ent = get_entity(id):as_movable()
-    vx = ent.velocityx
-    vy = ent.velocityy
-    -- move_entity(id, 0, 0, 0, 0)
-    new = from[math.random(#from)]
-    newid = spawn(new, x + math.random() * 4 - 2, y, l, vx, vy)
-    newent = get_entity(newid):as_movable()
+    local x, y, l = get_position(id)
+    local ent = get_entity(id):as_movable()
+    local vx = ent.velocityx
+    local vy = ent.velocityy
+    local new = from[math.random(#from)]
+    local newid = spawn(new, x + math.random() * 4 - 2, y, l, vx, vy)
+    local newent = get_entity(newid):as_movable()
     newent.velocityx = math.random() * 0.2 - 0.1
     newent.velocityy = math.random() * 0.25
-    done[#done + 1] = newid
+    enemy_done[#enemy_done + 1] = newid
 end
 
 function module.start()
-    cbs[#cbs+1] = set_callback(function()
-        done = {}
+    enemy_cbs[#enemy_cbs+1] = set_callback(function()
+        enemy_done = {}
         set_timeout(function()
             mons_small = get_entities_by_type(small_from)
             mons_big = get_entities_by_type(big_from)
@@ -136,60 +135,60 @@ function module.start()
 
         if state.theme == THEME.OLMEC then
             set_interval(function()
-                ufos = get_entities_by_type(ENT_TYPE.MONS_UFO)
+                local ufos = get_entities_by_type(ENT_TYPE.MONS_UFO)
                 for i, v in ipairs(ufos) do
-                    if not replaced(v) then
+                    if not enemy_replaced(v) then
                         replace_enemy(v, small_to)
                     end
-                    done[#done + 1] = v
+                    enemy_done[#enemy_done + 1] = v
                 end
                 ox = 0
                 oy = 0
-                olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
+                local olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
                 for i, v in ipairs(olmecs) do
                     ox, oy, l = get_position(v)
                 end
-                bombs = get_entities_by_type(ENT_TYPE.ITEM_BOMB)
+                local bombs = get_entities_by_type(ENT_TYPE.ITEM_BOMB)
                 for i, v in ipairs(bombs) do
                     x, y, l = get_position(v)
                     ent = get_entity(v):as_movable()
-                    if math.abs(y - oy) < 1 and math.abs(x - ox) < 2.5 and not replaced(v) then
+                    if math.abs(y - oy) < 1 and math.abs(x - ox) < 2.5 and not enemy_replaced(v) then
                         replace_projectile(v, olmec_ammo)
+                        enemy_done[#enemy_done + 1] = v
                     end
-                    done[#done + 1] = v
                 end
             end, 1)
         end
 
         if state.theme == THEME.ABZU then
             set_interval(function()
-                ufos = get_entities_by_type(ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS)
-                for i, v in ipairs(ufos) do
-                    if not replaced(v) then
+                local enes = get_entities_by_type(ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS)
+                for i, v in ipairs(enes) do
+                    if not enemy_replaced(v) then
                         replace_kingu(v, kingu_ammo)
+                        enemy_done[#enemy_done + 1] = v
                     end
-                    done[#done + 1] = v
                 end
             end, 1)
         end
 
         set_interval(function()
-            ufos = get_entities_by_type(ENT_TYPE.MONS_REDSKELETON)
-            for i, v in ipairs(ufos) do
-                if not replaced(v) then
+            local skeles = get_entities_by_type(ENT_TYPE.MONS_REDSKELETON)
+            for i, v in ipairs(skeles) do
+                if not enemy_replaced(v) then
                     replace_enemy(v, small_to)
+                    enemy_done[#enemy_done + 1] = v
                 end
-                done[#done + 1] = v
             end
         end, 1)
     end, ON.LEVEL)
 end
 
 function module.stop()
-    for i,v in ipairs(cbs) do
+    for i,v in ipairs(enemy_cbs) do
         clear_callback(v)
     end
-    cbs = {}
+    enemy_cbs = {}
 end
 
 return module

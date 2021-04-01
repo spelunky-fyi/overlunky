@@ -1,5 +1,5 @@
-module = {}
-cbs = {}
+local module = {}
+pot_cbs = {}
 
 items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_GIANTSPIDER,
          ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_REDSKELETON,
@@ -68,10 +68,10 @@ tools = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_
          ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR,
          ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW,
          ENT_TYPE.ITEM_METAL_SHIELD}
-done = {}
+pot_done = {}
 
-function replaced(id)
-    for i, v in ipairs(done) do
+function pot_replaced(id)
+    for i, v in pairs(pot_done) do
         if v == id then
             return true
         end
@@ -80,8 +80,8 @@ function replaced(id)
 end
 
 function module.start()
-    cbs[#cbs+1] = set_callback(function()
-        done = {}
+    pot_cbs[#pot_cbs+1] = set_callback(function()
+        pot_done = {}
 
         set_interval(function()
             if #players < 1 then
@@ -91,29 +91,29 @@ function module.start()
             -- randomize pots
             pots = get_entities_at(ENT_TYPE.ITEM_POT, 0, x, y, l, 10)
             for i, v in ipairs(pots) do
-                if not replaced(v) then
+                if not pot_replaced(v) then
                     item = items[math.random(#items)]
                     e = get_entity(v):as_container()
                     e.inside = item
                 end
-                done[#done + 1] = v
+                pot_done[#pot_done + 1] = v
             end
 
             -- randomize crates
             crates = get_entities_at(ENT_TYPE.ITEM_CRATE, 0, x, y, l, 10)
             for i, v in ipairs(crates) do
-                if not replaced(v) then
+                if not pot_replaced(v) then
                     item = tools[math.random(#tools)]
                     e = get_entity(v):as_container()
                     e.inside = item
                 end
-                done[#done + 1] = v
+                pot_done[#pot_done + 1] = v
             end
 
             -- randomize coffins
             coffins = get_entities_at(ENT_TYPE.ITEM_COFFIN, 0, x, y, l, 10)
             for i, v in ipairs(coffins) do
-                if not replaced(v) then
+                if not pot_replaced(v) then
                     item = math.random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
                     if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
                         item = ENT_TYPE.CHAR_HIREDHAND
@@ -121,17 +121,17 @@ function module.start()
                     e = get_entity(v):as_container()
                     e.inside = item
                 end
-                done[#done + 1] = v
+                pot_done[#pot_done + 1] = v
             end
         end, 30)
     end, ON.LEVEL)
 end
 
 function module.stop()
-    for i,v in ipairs(cbs) do
+    for i,v in ipairs(pot_cbs) do
         clear_callback(v)
     end
-    cbs = {}
+    pot_cbs = {}
 end
 
 return module

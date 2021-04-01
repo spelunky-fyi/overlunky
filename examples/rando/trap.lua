@@ -1,5 +1,5 @@
-module = {}
-cbs = {}
+local module = {}
+trap_cbs = {}
 
 floor_to = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD,
             ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
@@ -108,7 +108,7 @@ end
 function module.start()
     register_option_float("trap_add_traps", "% of traps to add", 4, 0, 20)
 
-    cbs[#cbs+1] = set_callback(function()
+    trap_cbs[#trap_cbs+1] = set_callback(function()
         set_timeout(function()
             to = 0
             if state.theme == THEME.SUNKEN_CITY or state.theme == THEME.HUNDUN or state.theme == THEME.EGGPLANT_WORLD or
@@ -146,10 +146,10 @@ function module.start()
 end
 
 function module.stop()
-    for i,v in ipairs(cbs) do
+    for i,v in ipairs(trap_cbs) do
         clear_callback(v)
     end
-    cbs = {}
+    trap_cbs = {}
 end
 
 return module

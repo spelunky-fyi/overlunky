@@ -3,6 +3,8 @@ meta.version = "1.0"
 meta.description = "The Randomizer from Overlunky in one Playlunky compatible mod."
 meta.author = "Dregu"
 
+-- This is a horrible module example btw, don't take any notes.
+
 register_option_bool("container",  "Container rando +++++++++++++", true)
 register_option_bool("door",       "Door rando ++++++++++++++++++", true)
 register_option_bool("enemy",      "Enemy rando +++++++++++++++++", true)
