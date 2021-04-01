@@ -21,7 +21,7 @@ struct Texture {
 
 struct Textures {
 	std::uint32_t num_textures;
-	Texture textures[255];
+	Texture textures[];
 };
 
 Textures* get_textures();
