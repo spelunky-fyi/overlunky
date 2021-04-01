@@ -59,9 +59,9 @@ struct StateMemory
     uint8_t shoppie_aggro;
     uint8_t shoppie_aggro_levels;
     uint8_t merchant_aggro;
-    uint8_t merchant_pad;
-    uint8_t b7c;
-    uint8_t b7d;
+    uint8_t saved_dogs;
+    uint8_t saved_cats;
+    uint8_t saved_hamsters;
     uint8_t kills_npc;
     uint8_t level_count;
     uint8_t pad84[0x970];

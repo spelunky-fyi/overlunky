@@ -1170,7 +1170,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "fadeout",
         &StateMemory::fadeout,
         "fadein",
-        &StateMemory::fadein);
+        &StateMemory::fadein,
+        "saved_dogs",
+        &StateMemory::saved_dogs,
+        "saved_cats",
+        &StateMemory::saved_cats,
+        "saved_hamsters",
+        &StateMemory::saved_hamsters);
     auto play = sol::overload(
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
