@@ -44,29 +44,10 @@ void attach_stdout(DWORD pid)
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
 
-        freopen("1.json", "w", stdout);
+        freopen("CONOUT$", "w", stdout);
         freopen("CONOUT$", "w", stderr);
         freopen("CONIN$", "r", stdin);
     }
-}
-
-using namespace nlohmann;
-
-void dump()
-{
-    json entities(json::array());
-    auto items = list_entities();
-    std::sort(items.begin(), items.end(), [](EntityItem &a, EntityItem &b) -> bool { return a.id < b.id; });
-    for (auto &ent : items)
-    {
-        EntityDB *db = get_type(ent.id);
-        if (!db)
-            break;
-        json j(*db);
-        j["name"] = ent.name;
-        entities.push_back(j);
-    }
-    DEBUG("{}", entities.dump(2));
 }
 
 extern "C" __declspec(dllexport) void run(DWORD pid)
@@ -98,8 +79,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         std::this_thread::sleep_for(100ms);
     }
 
-    dump();
-    return;
     auto api = RenderAPI::get();
     init_ui();
     init_hooks((void *)api.swap_chain());
