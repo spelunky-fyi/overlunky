@@ -619,6 +619,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
+    /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
+    lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
 

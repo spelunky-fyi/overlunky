@@ -59,5 +59,6 @@ std::pair<float, float> get_camera_position();
 void set_camera_position(float cx, float cy);
 void warp(uint8_t w, uint8_t l, uint8_t t);
 void set_seed(uint32_t seed);
+void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id);
 SaveData* savedata();
 std::vector<int64_t> read_prng();
