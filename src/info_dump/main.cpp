@@ -61,7 +61,6 @@ void to_json(float_json& j, const EntityDB& ent)
 void to_json(float_json& j, const Texture& tex)
 {
     j = float_json{
-        {"id", tex.id},
         {"path", *tex.name},
         {"width", tex.width},
         {"height", tex.height},
