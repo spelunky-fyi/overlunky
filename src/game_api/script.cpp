@@ -220,7 +220,7 @@ public:
     ScriptState state = { nullptr, 0, 0, 0, 0, 0, 0, 0 };
     bool changed = true;
     bool enabled = true;
-    ScriptMeta meta = { "", "", "", "", "" };
+    ScriptMeta meta = { "", "", "", "", "", "", "", "", false };
     std::filesystem::path script_folder;
     int cbcount = 0;
 
@@ -289,6 +289,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     state.quest_flags = g_state->quest_flags;
 
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
+    if (meta.unsafe)
+    {
+        lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
+    }
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
@@ -336,10 +340,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
         sol::optional<std::string> meta_author = lua["meta"]["author"];
+        sol::optional<bool> meta_unsafe = lua["meta"]["unsafe"];
         meta.name = meta_name.value_or(meta.filename);
         meta.version = meta_version.value_or("");
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
+        meta.unsafe = meta_unsafe.value_or(false);
         meta.id = script_id();
         result = "Got metadata";
     }
@@ -1404,8 +1410,17 @@ bool SpelunkyScript::ScriptImpl::run()
             lua["on_death"] = sol::lua_nil;
             lua["on_win"] = sol::lua_nil;
             lua["on_screen"] = sol::lua_nil;
-            lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
-            lua["package"]["loadlib"] = sol::lua_nil;
+            if (meta.unsafe)
+            {
+                lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
+                lua["package"]["cpath"] = meta.path + "/?.dll;" + meta.path + "/?/init.dll";
+            }
+            else
+            {
+                lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
+                lua["package"]["cpath"] = "";
+                lua["package"]["loadlib"] = sol::lua_nil;
+            }
             auto lua_result = lua.safe_script(code);
             result = "OK";
         }

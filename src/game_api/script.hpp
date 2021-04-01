@@ -24,6 +24,7 @@ struct ScriptMeta
     std::string id;
     std::string path;
     std::string filename;
+    bool unsafe;
 };
 
 struct ScriptMessage
