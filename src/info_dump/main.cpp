@@ -13,17 +13,28 @@
 #include "memory.h"
 #include "texture.hpp"
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Animation, texture, count, interval, key, repeat);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Rect, masks, up_minus_down, side, up_plus_down);
-void to_json(nlohmann::json &j, const EntityDB &ent)
+using float_json = nlohmann::basic_json<std::map,
+    std::vector,
+    std::string,
+    bool,
+    std::int64_t,
+    std::uint64_t,
+    float>;
+#define FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)  \
+    inline void to_json(float_json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
+    inline void from_json(const float_json& nlohmann_json_j, Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__)) }
+
+FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Animation, texture, count, interval, key, repeat);
+FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Rect, masks, up_minus_down, side, up_plus_down);
+void to_json(float_json& j, const EntityDB& ent)
 {
     // Have to do this manually because otherwise it writes out animations like a mess
     std::map<std::string, Animation> animations;
-    for (auto &[id, anim] : ent.animations)
+    for (auto& [id, anim] : ent.animations)
     {
         animations[std::to_string(id)] = anim;
     }
-    j = nlohmann::json{
+    j = float_json{
         {"id", ent.id},
         {"search_flags", ent.search_flags},
         {"width", ent.width},
@@ -47,22 +58,22 @@ void to_json(nlohmann::json &j, const EntityDB &ent)
         {"animations", animations},
     };
 }
-void to_json(nlohmann::json &j, const Texture &tex)
+void to_json(float_json& j, const Texture& tex)
 {
-    j = nlohmann::json{
+    j = float_json{
         {"id", tex.id},
         {"path", *tex.name},
         {"width", tex.width},
         {"height", tex.height},
         {"num_tiles",
-         nlohmann::json{
+         float_json{
              {"width", tex.num_tiles_width},
              {"height", tex.num_tiles_height},
          }},
         {"tile_width", static_cast<std::uint32_t>(std::round(tex.tile_width_fraction * tex.width))},
         {"tile_height", static_cast<std::uint32_t>(std::round(tex.tile_height_fraction * tex.height))},
         {"offset",
-         nlohmann::json{
+         float_json{
              {"width", static_cast<std::uint32_t>(std::round(tex.offset_x_weird_math * tex.width - 0.5f))},
              {"height", static_cast<std::uint32_t>(std::round(tex.offset_y_weird_math * tex.height - 0.5f))},
          }},
@@ -97,12 +108,12 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     if (std::ofstream entities_file = std::ofstream("game_data/entities.json"))
     {
         auto items = list_entities();
-        std::sort(items.begin(), items.end(), [](EntityItem &a, EntityItem &b) -> bool { return a.id < b.id; });
+        std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool { return a.id < b.id; });
 
-        nlohmann::json entities(nlohmann::json::object());
-        for (auto &ent : items)
+        float_json entities(float_json::object());
+        for (auto& ent : items)
         {
-            EntityDB *db = get_type(ent.id);
+            EntityDB* db = get_type(ent.id);
             if (!db)
                 break;
             entities[ent.name] = *db;
@@ -114,11 +125,11 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 
     if (std::ofstream textures_file = std::ofstream("game_data/textures.json"))
     {
-        Textures *textures_ptr = get_textures();
+        Textures* textures_ptr = get_textures();
         std::sort(
-            textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture &a, Texture &b) -> bool { return a.id < b.id; });
+            textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool { return a.id < b.id; });
 
-        nlohmann::json textures(nlohmann::json::object());
+        float_json textures(float_json::object());
         for (std::size_t i = 0; i < textures_ptr->num_textures; i++)
         {
             Texture &tex = textures_ptr->textures[i];
