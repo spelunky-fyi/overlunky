@@ -1070,6 +1070,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::is_poisoned,
         "poison",
         &Movable::poison,
+        "price",
+        &Movable::price,
         sol::base_classes,
         sol::bases<Entity>());
         /* Movable
