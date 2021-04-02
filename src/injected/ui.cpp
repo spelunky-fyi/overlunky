@@ -3828,10 +3828,6 @@ void post_draw()
 {
     if (!file_written) {
         write_file();
-        std::string name = gen_random(16);
-        SpelunkyScript *script = new SpelunkyScript("meta.name = 'Hello World'\nmeta.version = '1.4'\nmeta.description = 'This is a test script.'\nmeta.author = 'Dregu'\nset_callback(function()\nif state.screen == 12 and #players > 0 then\nif players[1].movey < 0 and not last then\nx, y, l = get_position(players[1].uid)\nes = get_entities_at(0,126,x,y-0.4,l,0.5)\nfor i,v in ipairs(es) do\ne = get_entity(v)\nif test_flag(e.flags, 18) then\ne.flags = clr_flag(e.flags, 18)\nspawn(372,0,-0.5,-1,0,0)\nend\nend\nend\nlast = players[1].movey < 0\nend\nend, ON.FRAME)\nset_callback(function()\nset_interval(function()\narrowtraps = get_entities_by_type(ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP)\nfor i, trap_id in ipairs(arrowtraps) do\ntrap = get_entity(trap_id):as_arrowtrap()\ntrap:rearm()\nend\nend, 20)\nif math.random() < 0.2 then spawn(481,0,0,0,0,0) end\nend, ON.LEVEL)",
-            name, g_SoundManager, true);
-        g_scripts[name] = script;
     }
     update_players();
     force_zoom();
