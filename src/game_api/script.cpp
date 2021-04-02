@@ -1015,7 +1015,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "as_olmec",
         &Entity::as<Olmec>,
         "as_olmec_floater",
-        &Entity::as<OlmecFloater>);
+        &Entity::as<OlmecFloater>,
+        "as_cape",
+        &Entity::as<Cape>,
+        "as_vlads_cape",
+        &Entity::as<VladsCape>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -1132,6 +1136,18 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &OlmecFloater::both_floaters_broken,
         sol::base_classes,
         sol::bases<Entity, Movable>());
+    lua.new_usertype<Cape>(
+        "Cape",
+        "floating_down",
+        &VladsCape::floating_down,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+    lua.new_usertype<VladsCape>(
+        "VladsCape",
+        "can_double_jump",
+        &VladsCape::can_double_jump,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Cape>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
