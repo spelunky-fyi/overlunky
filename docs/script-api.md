@@ -540,6 +540,8 @@ end
 - [`as_bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_bomb) &Entity::as&lt;Bomb&gt;
 - [`as_crushtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_crushtrap) &Entity::as&lt;Crushtrap&gt;
 - [`as_arrowtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_arrowtrap) &Entity::as&lt;Arrowtrap&gt;
+- [`as_olmec`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec) &Entity::as&lt;Olmec&gt;
+- [`as_olmec_floater`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec_floater) &Entity::as&lt;OlmecFloater&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -601,6 +603,19 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity)
 - [`arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
 - [`rearm`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rearm) &Arrowtrap::rearm
+### `Olmec`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`attack_phase`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_phase) &Olmec::attack_phase
+- [`attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) &Olmec::attack_timer
+- [`ai_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) &Olmec::ai_timer
+- [`move_direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) &Olmec::move_direction
+- [`jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Olmec::jump_timer
+- [`phase1_amount_of_bomb_salvos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase1_amount_of_bomb_salvos) &Olmec::phase1_amount_of_bomb_salvos
+- [`unknown_attack_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_attack_state) &Olmec::unknown_attack_state
+- [`int broken_floaters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=broken_floaters)
+### `OlmecFloater`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`both_floaters_broken`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_broken) &OlmecFloater::both_floaters_broken
 ### `StateMemory`
 - [`screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
