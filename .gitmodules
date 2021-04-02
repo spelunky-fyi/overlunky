@@ -13,3 +13,6 @@
 [submodule "src/libnyquist"]
 	path = src/libnyquist
 	url = https://github.com/ddiakopoulos/libnyquist.git
+[submodule "src/json"]
+	path = src/json
+	url = https://github.com/nlohmann/json.git

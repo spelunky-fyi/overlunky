@@ -11,6 +11,8 @@ add_library(spel2_api STATIC
         rpc.hpp
         state.cpp
         state.hpp
+        texture.cpp
+        texture.hpp
         search.hpp
         memory.hpp
         thread_utils.cpp

@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake .. -DBUILD_INFO_DUMP=OFF
           cmake --build . --config Release --target ALL_BUILD
 
       - name: Get the version
