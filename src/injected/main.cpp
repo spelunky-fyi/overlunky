@@ -13,28 +13,33 @@
 
 using namespace std::chrono_literals;
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
-                    DWORD fdwReason,     // reason for calling function
-                    LPVOID lpReserved)   // reserved
+BOOL WINAPI DllMain(
+    HINSTANCE hinstDLL, // handle to DLL module
+    DWORD fdwReason,    // reason for calling function
+    LPVOID lpReserved)  // reserved
 {
-    return TRUE;  // Successful DLL_PROCESS_ATTACH.
+    return TRUE; // Successful DLL_PROCESS_ATTACH.
 }
 
-BOOL WINAPI ctrl_handler(DWORD ctrl_type) {
-    switch (ctrl_type) {
-        case CTRL_C_EVENT:
-        case CTRL_BREAK_EVENT:
-        case CTRL_CLOSE_EVENT: {
-            DEBUG("Console detached, you can now close this window.");
-            FreeConsole();
-            return TRUE;
-        }
+BOOL WINAPI ctrl_handler(DWORD ctrl_type)
+{
+    switch (ctrl_type)
+    {
+    case CTRL_C_EVENT:
+    case CTRL_BREAK_EVENT:
+    case CTRL_CLOSE_EVENT:
+    {
+        DEBUG("Console detached, you can now close this window.");
+        FreeConsole();
+        return TRUE;
+    }
     }
     return TRUE;
 }
 
-void attach_stdout(DWORD pid) {
-    if (std::getenv("OL_DEBUG"))
+void attach_stdout(DWORD pid)
+{
+    if (std::getenv("OL_DEBUG") || 1)
     {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
@@ -45,24 +50,30 @@ void attach_stdout(DWORD pid) {
     }
 }
 
-extern "C" __declspec(dllexport) void run(DWORD pid) {
+extern "C" __declspec(dllexport) void run(DWORD pid)
+{
     attach_stdout(pid);
     FILE *fp = fopen("spelunky.log", "a");
-    if (fp) {
+    if (fp)
+    {
         fputs("Overlunky loaded\n", fp);
         fclose(fp);
     }
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
-    while (true) {
+    while (true)
+    {
         auto entities = list_entities();
-        if (entities.size() >= 850) {
+        if (entities.size() >= 850)
+        {
             DEBUG("Found {} entities, that's enough", entities.size());
             std::this_thread::sleep_for(100ms);
             create_box(entities);
             DEBUG("Added {} entities", entities.size());
             break;
-        } else if (entities.size() > 0) {
+        }
+        else if (entities.size() > 0)
+        {
             DEBUG("Found {} entities", entities.size());
         }
         std::this_thread::sleep_for(100ms);
@@ -70,9 +81,10 @@ extern "C" __declspec(dllexport) void run(DWORD pid) {
 
     auto api = RenderAPI::get();
     init_ui();
-    init_hooks((void*)api.swap_chain());
+    init_hooks((void *)api.swap_chain());
     DEBUG("Running in debug mode.");
-    do {
+    do
+    {
         std::string line;
         std::getline(std::cin, line);
         if (std::cin.fail() || std::cin.eof())

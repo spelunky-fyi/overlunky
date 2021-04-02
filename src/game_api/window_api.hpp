@@ -22,3 +22,6 @@ void register_pre_draw(PreDrawCallback pre_draw);
 void register_post_draw(PostDrawCallback post_draw);
 
 HWND get_window();
+
+void show_cursor();
+void hide_cursor();

@@ -26,15 +26,13 @@ void InitSoundManager(Spelunky_DecodeAudioFile* decode_function)
 	});
 }
 
-bool GetShowCursor()
+void ShowCursor()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	return io.MouseDrawCursor;
+	show_cursor();
 }
-void SetShowCursor(bool show_cursor)
+void HideCursor()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	io.MouseDrawCursor = show_cursor;
+	hide_cursor();
 }
 
 void RegisterOnInputFunc(OnInputFunc on_input)

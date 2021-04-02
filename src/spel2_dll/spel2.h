@@ -34,8 +34,8 @@ class SpelunkyScript;
 void InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
 void InitSoundManager(Spelunky_DecodeAudioFile* decode_function);
 
-bool GetShowCursor();
-void SetShowCursor(bool show_cursor);
+void ShowCursor();
+void HideCursor();
 
 void RegisterOnInputFunc(OnInputFunc on_input);
 void RegisterImguiInitFunc(ImguiInitFunc imgui_init);

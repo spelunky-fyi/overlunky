@@ -9,17 +9,18 @@
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
-fs::path get_dll_path() {
+fs::path get_dll_path(const char* rel_path) {
     char buf[0x1000];
     GetModuleFileNameA(NULL, buf, sizeof(buf));
     fs::path path(buf);
-    return path.parent_path().concat("\\injected.dll");
+    return path.parent_path().concat(rel_path);
 }
 
 int main(int argc, char** argv) {
     CmdLineParser cmd_line_parser(argc, argv);
 
-    auto overlunky_path = get_dll_path();
+    bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
+    auto overlunky_path = get_dll_path(info_dump ? "\\info_dump.dll" : "\\injected.dll");
 
     if (!fs::exists(overlunky_path)) {
         PANIC("DLL not found! {}", overlunky_path.string().data());

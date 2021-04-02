@@ -161,8 +161,6 @@ SaveData *g_save = 0;
 std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
-auto mouse_moved = std::chrono::system_clock::now();
-ImVec2 mouse_last_pos = ImVec2(0, 0);
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {
     "tool_entity",
@@ -848,22 +846,6 @@ void force_noclip()
                 }
             }
         }
-    }
-}
-
-void mouse_activity()
-{
-    using namespace std::chrono_literals;
-    auto &io = ImGui::GetIO();
-    if (io.MousePos.x != mouse_last_pos.x || io.MousePos.y != mouse_last_pos.y)
-    {
-        mouse_moved = std::chrono::system_clock::now();
-        io.MouseDrawCursor = true;
-        mouse_last_pos = io.MousePos;
-    }
-    else if (mouse_moved + 2s < std::chrono::system_clock::now())
-    {
-        io.MouseDrawCursor = false;
     }
 }
 
@@ -2490,19 +2472,6 @@ void render_clickhandler()
             g_vy = 0;
             g_held_id = 0;
         }
-        int buttons = 0;
-        for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
-        {
-            if (ImGui::IsMouseDown(i))
-            {
-                buttons += i;
-            }
-        }
-        using namespace std::chrono_literals;
-        if (buttons == 0 && mouse_moved + 2s > std::chrono::system_clock::now())
-        {
-            io.MouseDrawCursor = true;
-        }
     }
 
     ImGui::End();
@@ -3556,6 +3525,7 @@ void render_tool(std::string tool)
 void imgui_init(ImGuiContext*) {
     ImGuiIO& io = ImGui::GetIO();
     io.FontAllowUserScaling = true;
+    show_cursor();
     PWSTR fontdir;
     if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
     {
@@ -3834,7 +3804,6 @@ void post_draw()
     force_hud_flags();
     force_time();
     force_noclip();
-    mouse_activity();
     frame_advance();
 }
 

@@ -34,6 +34,15 @@ add_subdirectory(fmt)
 add_subdirectory(shared)
 add_subdirectory(game_api)
 
+if (BUILD_INFO_DUMP)
+        # --------------------------------------------------
+        # json
+        set(JSON_BuildTests OFF CACHE INTERNAL "")
+        add_subdirectory(json)
+
+        add_subdirectory(info_dump)
+endif()
+
 if(BUILD_SPEL2_DLL)
         add_subdirectory(spel2_dll)
 endif()
