@@ -5,6 +5,7 @@
 #include "state.hpp"
 #include "sound_manager.hpp"
 #include "savedata.hpp"
+#include "window_api.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -13,6 +14,7 @@
 #include <fstream>
 #include <iomanip>
 #include <locale>
+#include <set>
 #include <map>
 #include <filesystem>
 
@@ -232,6 +234,7 @@ public:
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
     std::map<int, ScriptInput *> script_input;
+    std::set<std::string> windows;
 
     ImDrawList* draw_list{ nullptr };
 
@@ -844,6 +847,18 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         }
         ImGui::End();
         ImGui::PopID();
+
+        if (win_open && windows.count(title) == 0)
+        {
+            windows.insert(std::move(title));
+            show_cursor();
+        }
+        else if (!win_open && windows.count(title) != 0)
+        {
+            windows.erase(title);
+            hide_cursor();
+        }
+
         return win_open;
     };
     /// Add some text to window, automatically wrapped

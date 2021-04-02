@@ -6,6 +6,9 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include <atomic>
+#include <chrono>
+
 #include "logger.h"
 #include "state.hpp"
 
@@ -32,6 +35,10 @@ PostDrawCallback g_PostDrawCallback{nullptr};
 
 constexpr USHORT g_HidKeyboard = 6;
 HWND g_LastRegisteredRawInputWindow{nullptr};
+
+auto g_MouseLastActivity = std::chrono::system_clock::now();
+ImVec2 g_CursorLastPos = ImVec2(0, 0);
+std::atomic<std::int32_t> g_ShowCursor{ 0 };
 
 HWND HID_GetRegisteredDeviceWindow(USHORT usage)
 {
@@ -103,6 +110,45 @@ void init_imgui()
     if (g_ImguiInitCallback)
     {
         g_ImguiInitCallback(imgui_context);
+    }
+}
+
+void imgui_mouse_activity()
+{
+    using namespace std::chrono_literals;
+
+    auto& io = ImGui::GetIO();
+    auto now = std::chrono::system_clock::now();
+
+    if (io.MousePos.x != g_CursorLastPos.x || io.MousePos.y != g_CursorLastPos.y)
+    {
+        g_MouseLastActivity = now;
+        g_CursorLastPos = io.MousePos;
+        if (g_ShowCursor.load() > 0)
+        {
+            io.MouseDrawCursor = true;
+        }
+    }
+    else if (g_MouseLastActivity + 2s < now)
+    {
+        io.MouseDrawCursor = false;
+    }
+
+    int num_mouse_buttons_down = 0;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (ImGui::IsMouseDown(i))
+        {
+            num_mouse_buttons_down++;
+        }
+    }
+    if (num_mouse_buttons_down != 0 && g_MouseLastActivity + 2s < now && g_ShowCursor.load() > 0)
+    {
+        g_MouseLastActivity = now;
+        if (g_ShowCursor.load() > 0)
+        {
+            io.MouseDrawCursor = true;
+        }
     }
 }
 
@@ -188,6 +234,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterva
         }
     }
 
+    imgui_mouse_activity();
     if (g_PostDrawCallback)
     {
         g_PostDrawCallback();
@@ -268,4 +315,21 @@ void register_post_draw(PostDrawCallback post_draw)
 HWND get_window()
 {
     return g_Window;
+}
+
+void show_cursor()
+{
+    if (g_ShowCursor.fetch_add(1) == 0) 
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDrawCursor = true;
+    }
+}
+void hide_cursor()
+{
+    if (g_ShowCursor.fetch_sub(1) == 1)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDrawCursor = false;
+    }
 }
