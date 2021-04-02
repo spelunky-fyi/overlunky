@@ -197,3 +197,20 @@ class OlmecFloater : public Movable
   public:
     bool both_floaters_broken; // strangely, this indicates whether both are broken, not just this specific one
 };
+
+class Cape : public Movable
+{
+  public:
+    size_t unknown;
+    bool floating_down;
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
+    uint32_t floating_count; // increments whenever floating
+};
+
+class VladsCape : public Cape
+{
+  public:
+    bool can_double_jump;
+};

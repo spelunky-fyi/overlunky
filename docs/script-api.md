@@ -542,6 +542,8 @@ end
 - [`as_arrowtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_arrowtrap) &Entity::as&lt;Arrowtrap&gt;
 - [`as_olmec`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec) &Entity::as&lt;Olmec&gt;
 - [`as_olmec_floater`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec_floater) &Entity::as&lt;OlmecFloater&gt;
+- [`as_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_cape) &Entity::as&lt;Cape&gt;
+- [`as_vlads_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_vlads_cape) &Entity::as&lt;VladsCape&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -616,6 +618,12 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`both_floaters_broken`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_broken) &OlmecFloater::both_floaters_broken
+### `Cape`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`floating_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=floating_down) &VladsCape::floating_down
+### `VladsCape`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
+- [`can_double_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_double_jump) &VladsCape::can_double_jump
 ### `StateMemory`
 - [`screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
