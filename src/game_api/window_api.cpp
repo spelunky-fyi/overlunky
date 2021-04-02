@@ -6,6 +6,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include <atomic>
+
 #include "logger.h"
 #include "state.hpp"
 
@@ -32,6 +34,8 @@ PostDrawCallback g_PostDrawCallback{nullptr};
 
 constexpr USHORT g_HidKeyboard = 6;
 HWND g_LastRegisteredRawInputWindow{nullptr};
+
+std::atomic<std::int32_t> g_ShowCursor{ 0 };
 
 HWND HID_GetRegisteredDeviceWindow(USHORT usage)
 {
@@ -268,4 +272,21 @@ void register_post_draw(PostDrawCallback post_draw)
 HWND get_window()
 {
     return g_Window;
+}
+
+void show_cursor()
+{
+    if (g_ShowCursor.fetch_add(1) == 0) 
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDrawCursor = true;
+    }
+}
+void hide_cursor()
+{
+    if (g_ShowCursor.fetch_sub(1) == 1)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDrawCursor = false;
+    }
 }

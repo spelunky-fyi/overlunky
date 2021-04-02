@@ -3556,6 +3556,7 @@ void render_tool(std::string tool)
 void imgui_init(ImGuiContext*) {
     ImGuiIO& io = ImGui::GetIO();
     io.FontAllowUserScaling = true;
+    show_cursor();
     PWSTR fontdir;
     if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
     {
