@@ -292,10 +292,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     state.quest_flags = g_state->quest_flags;
 
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
-    if (meta.unsafe)
-    {
-        lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
-    }
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
@@ -1489,6 +1485,7 @@ bool SpelunkyScript::ScriptImpl::run()
             {
                 lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
                 lua["package"]["cpath"] = meta.path + "/?.dll;" + meta.path + "/?/init.dll";
+                lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
             }
             else
             {

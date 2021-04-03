@@ -202,7 +202,8 @@ std::map<std::string, bool> options = {
     {"disable_pause", false},
     {"draw_grid", false},
     {"draw_hitboxes", false},
-    {"tabbed_interface", true}};
+    {"tabbed_interface", true},
+    {"enable_unsafe_scripts", false}};
 
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
@@ -2580,7 +2581,7 @@ void render_script_files()
         std::string buttstr = file.parent_path().filename().string() + "/" + file.filename().string();
         if (ImGui::Button(buttstr.data()))
         {
-            load_script(file.string().data(), true);
+            load_script(file.string().data(), false);
         }
         ImGui::PopID();
     }
@@ -2652,38 +2653,58 @@ void render_scripts()
         {
             ImGui::Text("%s %s by %s (%s)", script->get_name().c_str(), script->get_version().c_str(), script->get_author().c_str(), script->get_id().c_str());
             ImGui::TextWrapped(script->get_description().c_str());
-            if (script->is_enabled() && ImGui::Button("Disable##DisableScript"))
+            if (!script->get_unsafe() || options["enable_unsafe_scripts"])
             {
-                script->set_enabled(false);
-            }
-            else if (!script->is_enabled() && ImGui::Button("Enable##EnableScript"))
-            {
-                script->set_enabled(true);
-                script->set_changed(true);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Unload##UnloadScript"))
-            {
-                unload_scripts.push_back(script->get_file());
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Reload##ReloadScript"))
-            {
-                load_script(script->get_file(), script->is_enabled());
+                static bool run_unsafe = false;
+                if (script->get_unsafe())
+                {
+                    ImGui::PushTextWrapPos(0.0f);
+                    ImGui::TextColored(
+                        ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
+                        "Warning: This script uses unsafe commands and it could delete your files or download viruses. Only enable this mod if you trust the author, read the whole script or made it yourself.");
+                    ImGui::PopTextWrapPos();
+                    ImGui::Checkbox("I understand the risks.", &run_unsafe);
+                }
+                if (!script->get_unsafe() || run_unsafe)
+                {
+                    if (script->is_enabled() && ImGui::Button("Disable##DisableScript"))
+                    {
+                        script->set_enabled(false);
+                    }
+                    else if (!script->is_enabled() && ImGui::Button("Enable##EnableScript"))
+                    {
+                        script->set_enabled(true);
+                        script->set_changed(true);
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Unload##UnloadScript"))
+                    {
+                        unload_scripts.push_back(script->get_file());
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Reload##ReloadScript"))
+                    {
+                        load_script(script->get_file(), script->is_enabled());
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+                    ImGui::Separator();
+                    script->render_options();
+                    ImGui::PopItemWidth();
+                    if (ImGui::InputTextMultiline("##LuaScript", script->get_code(), script->get_code_size(), {-1, 300}))
+                    {
+                        script->set_changed(true);
+                    }
+                    InputString("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
+                }
             }
             else
             {
-                ++i;
+                ImGui::TextWrapped("\nYou have not enabled running unsafe scripts. Bye.");
             }
-            ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-            ImGui::Separator();
-            script->render_options();
-            ImGui::PopItemWidth();
-            if (ImGui::InputTextMultiline("##LuaScript", script->get_code(), script->get_code_size(), {-1, 300}))
-            {
-                script->set_changed(true);
-            }
-            InputString("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
         }
         else
         {
