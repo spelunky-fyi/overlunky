@@ -82,14 +82,17 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     auto api = RenderAPI::get();
     init_ui();
     init_hooks((void *)api.swap_chain());
-    DEBUG("Running in debug mode.");
-    do
+    if (std::getenv("OL_DEBUG"))
     {
-        std::string line;
-        std::getline(std::cin, line);
-        if (std::cin.fail() || std::cin.eof())
+        DEBUG("Running in debug mode.");
+        do
         {
-            std::cin.clear();
-        }
-    } while (true);
+            std::string line;
+            std::getline(std::cin, line);
+            if (std::cin.fail() || std::cin.eof())
+            {
+                std::cin.clear();
+            }
+        } while (true);
+    }
 }
