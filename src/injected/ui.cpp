@@ -2661,7 +2661,7 @@ void render_scripts()
                     ImGui::PushTextWrapPos(0.0f);
                     ImGui::TextColored(
                         ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
-                        "Warning: This script uses unsafe commands and it could delete your files or download viruses. Only enable this mod if you trust the author, read the whole script or made it yourself.");
+                        "Warning: This script uses unsafe commands and it could delete your files or download viruses. Only enable this script if you trust the author, have read the whole script or made it yourself.");
                     ImGui::PopTextWrapPos();
                     ImGui::Checkbox("I understand the risks.", &run_unsafe);
                 }

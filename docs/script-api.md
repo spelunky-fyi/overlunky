@@ -13,6 +13,8 @@ The following Lua libraries and their functions are available. You can read more
 ### `table`
 ### `coroutine`
 ### `package`
+## Unsafe mode
+Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the ini file.
 ## Modules
 You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
 

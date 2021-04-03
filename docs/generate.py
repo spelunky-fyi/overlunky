@@ -176,7 +176,10 @@ print('- Click on the names of things to search for examples on how to use that 
 print('## Lua libraries')
 print('The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6).')
 for lib in lualibs:
-    print('### `'+lib+'`')
+    print('### `' + lib + '`')
+
+print('## Unsafe mode')
+print('Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the ini file.')
 
 print('## Modules')
 print("""You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
