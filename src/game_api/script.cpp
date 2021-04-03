@@ -307,7 +307,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     try
     {
         std::string metacode = "";
-        std::stringstream metass(script);
+        std::stringstream metass(code);
         std::regex reg("(^\\s*meta\\.[a-z]+\\s*=)");
         std::regex regstart("(^\\s*meta\\s*=)");
         std::regex regend("(\\})");
