@@ -15,13 +15,13 @@ uint32_t flipflag(uint32_t flags, int bit)
         return setflag(flags, bit);
 }
 
-uint32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
+int32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();
 
     auto player = state.items()->player(0);
     if (player == nullptr)
-        return 0;
+        return -1;
     auto [_x, _y] = player->position();
     if (!s)
     {
@@ -35,7 +35,7 @@ uint32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy,
     }
 }
 
-uint32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, float vy)
+int32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, float vy)
 {
     auto state = State::get();
     if (layer == 0 || layer == 1)
@@ -46,28 +46,28 @@ uint32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, fl
     {
         auto player = state.items()->player(abs(layer)-1);
         if (player == nullptr)
-            return 0;
+            return -1;
         auto [_x, _y] = player->position();
         DEBUG("Spawning {} on {}, {}", id, x + _x, y + _y);
         return state.layer(player->layer())->spawn_entity(id, x + _x, y + _y, false, vx, vy, false)->uid;
     }
-    return 0;
+    return -1;
 }
 
-uint32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
+int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();
 
     auto player = state.items()->player(0);
     if (player == nullptr)
-        return 0;
+        return -1;
     auto [_x, _y] = player->position();
     DEBUG("Spawning door on {}, {}", x + _x, y + _y);
     state.layer(player->layer())->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
     return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
 }
 
-uint32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t)
+int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();
     if (layer == 0 || layer == 1)
@@ -78,12 +78,12 @@ uint32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8
     {
         auto player = state.items()->player(abs(layer)-1);
         if (player == nullptr)
-            return 0;
+            return -1;
         auto [_x, _y] = player->position();
         DEBUG("Spawning door on {}, {}", x + _x, y + _y);
         return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
     }
-    return 0;
+    return -1;
 }
 
 void spawn_backdoor(float x, float y)
@@ -156,7 +156,7 @@ void list_items()
     }
 }
 
-uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
+int32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
 {
     auto state = State::get();
     if (s)
@@ -168,7 +168,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
     DEBUG("Items at {}:", (x, y));
     auto player = state.items()->player(0);
     if (player == nullptr)
-        return 0;
+        return -1;
     std::vector<std::tuple<int, float, Entity *>> found;
     for (auto &item : state.layer(player->layer())->items())
     {
@@ -195,7 +195,7 @@ uint32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
         DEBUG("{}", (void *)entity);
         return std::get<0>(picked);
     }
-    return 0;
+    return -1;
 }
 
 void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
@@ -299,10 +299,6 @@ void player_status()
 
 Entity *get_entity_ptr(uint32_t id)
 {
-    if (id == 0)
-    {
-        return nullptr;
-    }
     auto state = State::get();
     auto p = state.find(id);
     if (IsBadWritePtr(p, 0x178))
@@ -312,14 +308,10 @@ Entity *get_entity_ptr(uint32_t id)
 
 int32_t get_entity_type(uint32_t id)
 {
-    if (id == 0)
-    {
-        return 0;
-    }
     auto state = State::get();
     auto p = state.find(id);
     if (p == nullptr || IsBadWritePtr(p, 0x178))
-        return 0;
+        return -1;
     return p->type->id;
 }
 
@@ -593,12 +585,12 @@ void entity_remove_item(uint32_t id, uint32_t item)
     entity->remove_item(item);
 }
 
-uint32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
+int32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
 {
     auto state = State::get();
     Entity *overlay = get_entity_ptr(over);
     if (overlay == nullptr)
-        return 0;
+        return -1;
     int layer = overlay->layer();
     return state.layer(layer)->spawn_entity_over(id, overlay, x, y)->uid;
 }
