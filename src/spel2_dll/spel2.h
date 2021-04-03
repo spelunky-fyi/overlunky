@@ -72,6 +72,7 @@ struct SpelunkyScriptMeta {
 	const char* id;
 	const char* path;
 	const char* filename;
+	bool unsafe;
 };
 SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script);
 

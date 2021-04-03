@@ -59,6 +59,7 @@ public:
     const std::string& get_filename() const;
     const std::string& get_path() const;
     const std::string& get_version() const;
+    bool get_unsafe() const;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
     char* get_code() const;

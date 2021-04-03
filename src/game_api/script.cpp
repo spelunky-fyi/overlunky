@@ -1893,6 +1893,10 @@ const std::string& SpelunkyScript::get_path() const
 {
     return m_Impl->meta.path;
 }
+bool SpelunkyScript::get_unsafe() const
+{
+    return m_Impl->meta.unsafe;
+}
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
 char* SpelunkyScript::get_code() const
