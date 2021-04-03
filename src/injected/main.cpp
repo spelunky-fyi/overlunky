@@ -39,7 +39,7 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 
 void attach_stdout(DWORD pid)
 {
-    if (std::getenv("OL_DEBUG") || 1)
+    if (std::getenv("OL_DEBUG"))
     {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
