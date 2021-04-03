@@ -420,6 +420,7 @@ Send input
 Read input
 ### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
 #### Params: `string title, float x, float y, float w, float h, bool movable, function callback`
+#### Returns: `bool` (false if the window was closed from the X)
 Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to autosize in center. Use just a `##Label` as title to hide titlebar.
 Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
 The window api is probably evolving still, this is just the first draft. Felt cute, might delete later!
