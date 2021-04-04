@@ -757,6 +757,78 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
     write_mem_prot(offset_poison + 1, to_le_bytes(poison_item_id), true);
 }
 
+void modify_sparktraps(float angle_increment, bool clockwise, float distance)
+{
+    static size_t angle_instruction_offset = 0;
+    static size_t angle_increment_offset = 0;
+    if ( angle_instruction_offset == 0 )
+    {
+        auto memory = Memory::get();
+        std::string pattern = "\xF3\x0F\x10\x81\x50\x01\x00\x00\x48\xBE\x4B\x57\x4C\x4F\x80\x3E\x83\xD3"s;
+        angle_instruction_offset = find_inst(memory.exe(), pattern, memory.after_bundle) + 18;
+        angle_increment_offset = memory.at_exe(decode_pc(memory.exe(), angle_instruction_offset, 4));
+        angle_instruction_offset = memory.at_exe(angle_instruction_offset);
+    }
+    write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
+    if ( clockwise )
+    {
+        write_mem_prot(angle_instruction_offset + 2, {0x5C}, true);
+    }
+    else
+    {
+        write_mem_prot(angle_instruction_offset + 2, {0x58}, true);
+    }
+
+    static size_t distance_offset = 0;
+    if ( distance_offset == 0 )
+    {
+        auto state = State::get();
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+
+        std::string pattern = "\xF3\x0F\x10\x83\x50\x01\x00\x00\xF3\x0F\x59\x3D"s;
+
+        // first look up this pattern so we are in the correct function
+        auto offset = find_inst(exe, pattern, memory.after_bundle) + 8;
+
+        // dirty trick: inject the distance float between this function and the next
+        // reason is that the default float being referenced is a const with value 3.0
+        // and this value is used elsewhere (as a compiler optimization)
+        // so if we overwrite this value we crash elsewhere
+        // -> save our own float and adjust the mulss calls to reference this
+        uint8_t cc_counter = 0;
+        size_t op_counter = offset;
+        uint8_t previous_opcode = 0;
+        while (cc_counter < 4)
+        {
+            unsigned char opcode = exe[op_counter];
+            if (opcode == 0xcc && previous_opcode == 0xcc)
+            {
+                cc_counter++;
+            }
+            previous_opcode = opcode;
+            op_counter++;
+        }
+        distance_offset = memory.at_exe(op_counter);
+
+        // now overwrite the mulss instructions 4 times:
+        // mulss xmm7 -> mulss xmm0 -> mulss xmm7 -> mulss xmm0
+        std::string pattern1 = "\xF3\x0F\x59\x3D"s;
+        std::string pattern2 = "\xF3\x0F\x59\x05"s;
+        bool use_pattern1 = true;
+        auto start = offset - 20;
+        for ( auto x = 0 ; x < 4 ; ++x )
+        {
+            auto mulss_offset = find_inst(exe, use_pattern1?pattern1:pattern2, start);
+            uint32_t distance_offset_relative = op_counter - (mulss_offset + 8);
+            write_mem_prot(memory.at_exe(mulss_offset + 4), to_le_bytes(distance_offset_relative), true);
+            start = mulss_offset + 1;
+            use_pattern1 = !use_pattern1;
+        }
+    }
+    write_mem_prot(distance_offset, to_le_bytes(distance), true);
+}
+
 SaveData* savedata()
 {
     auto state = State::get();

@@ -626,6 +626,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["carry"] = carry;
     /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
+    /// Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
+    /// Parameter 1 = speed, expressed as the amount that should be added to the angle every frame
+    /// Parameter 2 = true for clockwise direction, false for counter-clockwise
+    /// Parameter 3 = distance from center - if you go above 3 the game might crash because a spark may go out of bounds!
+    /// Defaults are 0.015, clockwise (true) and 3.0
+    lua["modify_sparktraps"] = modify_sparktraps;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
 
