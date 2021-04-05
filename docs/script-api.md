@@ -329,12 +329,10 @@ Make `mount` carry `rider` on their back. Only use this with actual mounts and l
 #### Params: `int regular_item_id, int poison_item_id`
 Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
 ### [`modify_sparktraps`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_sparktraps)
-#### Params: `float angle_increment = 0.015, bool clockwise = true, float distance = 3.0`
+#### Params: `float angle_increment = 0.015, float distance = 3.0`
 Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
-Parameter 1 = speed, expressed as the amount that should be added to the angle every frame
-Parameter 2 = true for clockwise direction, false for counter-clockwise
-Parameter 3 = distance from center - if you go above 3 the game might crash because a spark may go out of bounds!
-Defaults are 0.015, clockwise (true) and 3.0
+Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
+Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 #### Params: `int id`
 Flip entity around by uid. All new entities face right by default.

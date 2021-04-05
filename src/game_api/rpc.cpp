@@ -757,7 +757,7 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
     write_mem_prot(offset_poison + 1, to_le_bytes(poison_item_id), true);
 }
 
-void modify_sparktraps(float angle_increment, bool clockwise, float distance)
+void modify_sparktraps(float angle_increment, float distance)
 {
     static size_t angle_instruction_offset = 0;
     static size_t angle_increment_offset = 0;
@@ -770,14 +770,6 @@ void modify_sparktraps(float angle_increment, bool clockwise, float distance)
         angle_instruction_offset = memory.at_exe(angle_instruction_offset);
     }
     write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
-    if ( clockwise )
-    {
-        write_mem_prot(angle_instruction_offset + 2, {0x5C}, true);
-    }
-    else
-    {
-        write_mem_prot(angle_instruction_offset + 2, {0x58}, true);
-    }
 
     static size_t distance_offset = 0;
     if ( distance_offset == 0 )
