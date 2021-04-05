@@ -757,7 +757,7 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
     write_mem_prot(offset_poison + 1, to_le_bytes(poison_item_id), true);
 }
 
-void set_blood_multiplication(uint32_t default, uint32_t vladscape)
+void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier)
 {
     size_t offset_default1 = 0;
     size_t offset_vladscape1 = 0;
@@ -776,10 +776,10 @@ void set_blood_multiplication(uint32_t default, uint32_t vladscape)
         offset_vladscape2 = memory.at_exe(offset + 2);
     }
 
-    write_mem_prot(offset_default1, to_le_bytes(default), true);
-    write_mem_prot(offset_default2, to_le_bytes(default), true);
-    write_mem_prot(offset_vladscape1, to_le_bytes(vladscape), true);
-    write_mem_prot(offset_vladscape2, to_le_bytes(vladscape), true);
+    write_mem_prot(offset_default1, to_le_bytes(default_multiplier), true);
+    write_mem_prot(offset_default2, to_le_bytes(default_multiplier), true);
+    write_mem_prot(offset_vladscape1, to_le_bytes(vladscape_multiplier), true);
+    write_mem_prot(offset_vladscape2, to_le_bytes(vladscape_multiplier), true);
 }
 
 SaveData* savedata()

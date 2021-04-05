@@ -329,7 +329,7 @@ Make `mount` carry `rider` on their back. Only use this with actual mounts and l
 #### Params: `int regular_item_id, int poison_item_id`
 Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
 ### [`set_blood_multiplication`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
-#### Params: `int default, int vladscape`
+#### Params: `int default_multiplier, int vladscape_multiplier`
 Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 #### Params: `int id`
