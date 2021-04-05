@@ -757,6 +757,68 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
     write_mem_prot(offset_poison + 1, to_le_bytes(poison_item_id), true);
 }
 
+void set_kapala_blood_threshold(uint8_t threshold)
+{
+    static size_t offset = 0;
+    if ( offset == 0 )
+    {
+        auto memory = Memory::get();
+        std::string pattern = "\xFE\x80\x28\x01\x00\x00\x80\xB8\x28\x01\x00\x00\x07"s;
+        offset = memory.at_exe(find_inst(memory.exe(), pattern, memory.after_bundle) + 12);
+    }
+    write_mem_prot(offset, to_le_bytes(threshold), true);
+}
+
+void set_kapala_hud_icon(int8_t icon_index)
+{
+    static size_t instruction_offset = 0;
+    static size_t icon_index_offset = 0;
+    static uint32_t distance = 0;
+
+    if ( instruction_offset == 0 )
+    {
+        auto state = State::get();
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+
+        std::string pattern = "\x0F\xB6\x81\x28\x01\x00\x00\x89\x02\x48\x8B\xC2"s;
+
+        instruction_offset = find_inst(exe, pattern, memory.after_bundle);
+
+        uint8_t cc_counter = 0;
+        size_t op_counter = instruction_offset;
+        uint8_t previous_opcode = 0;
+        while (cc_counter < 4)
+        {
+            unsigned char opcode = exe[op_counter];
+            if (opcode == 0xcc && previous_opcode == 0xcc)
+            {
+                cc_counter++;
+            }
+            previous_opcode = opcode;
+            op_counter++;
+        }
+        icon_index_offset = memory.at_exe(op_counter);
+        distance = op_counter - (instruction_offset + 7);
+        instruction_offset = memory.at_exe(instruction_offset);
+    }
+
+    if ( icon_index < 0 ) // reset to original
+    {
+        write_mem_prot(instruction_offset + 2, to_le_bytes(0x00012881), true);
+    }
+    else
+    {
+        write_mem_prot(instruction_offset + 2, {0x05}, true);
+        write_mem_prot(instruction_offset + 3, to_le_bytes(distance), true);
+        if ( icon_index > 6 )
+        {
+            icon_index = 6;
+        }
+        write_mem_prot(icon_index_offset, to_le_bytes(icon_index), true);
+    }
+}
+
 SaveData* savedata()
 {
     auto state = State::get();

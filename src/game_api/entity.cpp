@@ -252,6 +252,22 @@ void Player::set_jetpack_fuel(uint8_t fuel)
     }
 }
 
+uint8_t Player::kapala_blood_amount()
+{
+    static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
+    int *pitems = (int *)items.begin;
+    for (uint8_t x = 0; x < items.count; ++x)
+    {
+        auto type = get_entity_type(pitems[x]);
+        if (type == kapalaPowerupID)
+        {
+            auto kapala = get_entity_ptr(pitems[x])->as<KapalaPowerup>();
+            return kapala->amount_of_blood;
+        }
+    }
+    return 0;
+}
+
 void Movable::poison(int16_t frames)
 {
     static size_t offset = 0;

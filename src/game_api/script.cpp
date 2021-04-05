@@ -626,6 +626,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["carry"] = carry;
     /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
+    /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
+    lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
+    /// Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour). 
+    /// If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
+    lua["set_kapala_hud_icon"] = set_kapala_hud_icon;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
 
@@ -1101,6 +1106,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Player::inventory_ptr,
         "set_jetpack_fuel",
         &Player::set_jetpack_fuel,
+        "kapala_blood_amount",
+        &Player::kapala_blood_amount,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());

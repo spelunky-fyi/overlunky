@@ -117,6 +117,7 @@ class Player : public Monster
     uint8_t b177;
 
     void set_jetpack_fuel(uint8_t fuel);
+    uint8_t kapala_blood_amount();
 };
 
 class Container : public Movable
@@ -213,4 +214,10 @@ class VladsCape : public Cape
 {
   public:
     bool can_double_jump;
+};
+
+class KapalaPowerup : public Movable
+{
+  public:
+    uint8_t amount_of_blood;
 };
