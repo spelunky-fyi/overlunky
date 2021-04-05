@@ -626,6 +626,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["carry"] = carry;
     /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
+    /// Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+    lua["set_blood_multiplication"] = set_blood_multiplication;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
 
@@ -972,7 +974,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "damage",
         &EntityDB::damage,
         "life",
-        &EntityDB::life);
+        &EntityDB::life,
+        "blood_content",
+        &EntityDB::blood_content);
 
     lua.new_usertype<Entity>(
         "Entity",

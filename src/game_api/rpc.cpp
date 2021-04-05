@@ -757,6 +757,31 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
     write_mem_prot(offset_poison + 1, to_le_bytes(poison_item_id), true);
 }
 
+void set_blood_multiplication(uint32_t default, uint32_t vladscape)
+{
+    size_t offset_default1 = 0;
+    size_t offset_vladscape1 = 0;
+    size_t offset_default2 = 0;
+    size_t offset_vladscape2 = 0;
+    if ( offset_default1 == 0 )
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        std::string pattern = "\x41\xB8\x02\x00\x00\x00\x84\xC0\x75\x06\x41\xB8\x01\x00\x00\x00"s;
+        auto offset = find_inst(exe, pattern, memory.after_bundle);
+        offset_default1 = memory.at_exe(offset + 12);
+        offset_vladscape1 = memory.at_exe(offset + 2);
+        offset = find_inst(exe, pattern, offset + 1);
+        offset_default2 = memory.at_exe(offset + 12);
+        offset_vladscape2 = memory.at_exe(offset + 2);
+    }
+
+    write_mem_prot(offset_default1, to_le_bytes(default), true);
+    write_mem_prot(offset_default2, to_le_bytes(default), true);
+    write_mem_prot(offset_vladscape1, to_le_bytes(vladscape), true);
+    write_mem_prot(offset_vladscape2, to_le_bytes(vladscape), true);
+}
+
 SaveData* savedata()
 {
     auto state = State::get();

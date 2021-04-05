@@ -87,7 +87,7 @@ struct EntityDB
     uint8_t damage;
     uint8_t life;
     uint8_t field_96;
-    uint8_t field_97;
+    uint8_t blood_content;
     uint8_t field_98;
     int32_t description;
     int32_t field_a0;

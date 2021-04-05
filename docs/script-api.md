@@ -328,6 +328,9 @@ Make `mount` carry `rider` on their back. Only use this with actual mounts and l
 ### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
 #### Params: `int regular_item_id, int poison_item_id`
 Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
+### [`set_blood_multiplication`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
+#### Params: `int default, int vladscape`
+Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 #### Params: `int id`
 Flip entity around by uid. All new entities face right by default.
@@ -518,6 +521,7 @@ end
 - [`jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump) &EntityDB::jump
 - [`damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) &EntityDB::damage
 - [`life`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) &EntityDB::life
+- [`blood_content`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) &EntityDB::blood_content
 ### `Entity`
 - [`type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Entity::type
 - [`overlay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) &Entity::overlay
