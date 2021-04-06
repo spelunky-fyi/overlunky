@@ -626,10 +626,17 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["carry"] = carry;
     /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
+    /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
+    lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
+    /// Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour). 
+    /// If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
+    lua["set_kapala_hud_icon"] = set_kapala_hud_icon;
     /// Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
     /// Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
     /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
     lua["modify_sparktraps"] = modify_sparktraps;
+    /// Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+    lua["set_blood_multiplication"] = set_blood_multiplication;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
 
@@ -976,7 +983,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "damage",
         &EntityDB::damage,
         "life",
-        &EntityDB::life);
+        &EntityDB::life,
+        "blood_content",
+        &EntityDB::blood_content);
 
     lua.new_usertype<Entity>(
         "Entity",
@@ -1105,6 +1114,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Player::inventory_ptr,
         "set_jetpack_fuel",
         &Player::set_jetpack_fuel,
+        "kapala_blood_amount",
+        &Player::kapala_blood_amount,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
