@@ -335,6 +335,11 @@ Sets the amount of blood drops in the Kapala needed to trigger a health increase
 #### Params: `int8_t icon_index`
 Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour). 
 If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
+### [`modify_sparktraps`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_sparktraps)
+#### Params: `float angle_increment = 0.015, float distance = 3.0`
+Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
+Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
+Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 #### Params: `int id`
 Flip entity around by uid. All new entities face right by default.

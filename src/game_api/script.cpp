@@ -631,6 +631,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour). 
     /// If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
     lua["set_kapala_hud_icon"] = set_kapala_hud_icon;
+    /// Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
+    /// Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
+    /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
+    lua["modify_sparktraps"] = modify_sparktraps;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
 
