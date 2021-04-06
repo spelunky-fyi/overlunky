@@ -63,5 +63,6 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
 void modify_sparktraps(float angle_increment = 0.015, float distance = 3.0);
 void set_kapala_blood_threshold(uint8_t threshold);
 void set_kapala_hud_icon(int8_t icon_index);
+void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier);
 SaveData* savedata();
 std::vector<int64_t> read_prng();

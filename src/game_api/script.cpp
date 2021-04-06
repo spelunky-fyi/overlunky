@@ -635,6 +635,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
     /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
     lua["modify_sparktraps"] = modify_sparktraps;
+    /// Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+    lua["set_blood_multiplication"] = set_blood_multiplication;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
 
@@ -981,7 +983,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "damage",
         &EntityDB::damage,
         "life",
-        &EntityDB::life);
+        &EntityDB::life,
+        "blood_content",
+        &EntityDB::blood_content);
 
     lua.new_usertype<Entity>(
         "Entity",

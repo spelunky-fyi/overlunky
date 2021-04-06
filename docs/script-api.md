@@ -340,6 +340,9 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
 Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
 Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
+### [`set_blood_multiplication`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
+#### Params: `int default_multiplier, int vladscape_multiplier`
+Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 #### Params: `int id`
 Flip entity around by uid. All new entities face right by default.
@@ -530,6 +533,7 @@ end
 - [`jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump) &EntityDB::jump
 - [`damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) &EntityDB::damage
 - [`life`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) &EntityDB::life
+- [`blood_content`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) &EntityDB::blood_content
 ### `Entity`
 - [`type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Entity::type
 - [`overlay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) &Entity::overlay
