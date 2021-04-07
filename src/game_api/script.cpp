@@ -1488,7 +1488,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         0x800,
         "LOGICAL",
         0x1000,
-        "LIQUID",
+        "WATER",
+        0x2000,
+        "LAVA",
         0x4000);
     /// Third parameter to CustomSound:play(), specifies which group the sound will be played in and thus how the player controls its volume
     lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
