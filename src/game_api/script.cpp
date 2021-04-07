@@ -1462,6 +1462,34 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "RESET",
         105);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.new_enum(
+        "MASK",
+        "PLAYER",
+        0x1,
+        "MOUNT",
+        0x2,
+        "MONSTER",
+        0x4,
+        "ITEM",
+        0x8,
+        "EXPLOSION",
+        0x10,
+        "FX",
+        0x40,
+        "ACTIVEFLOOR",
+        0x80,
+        "FLOOR",
+        0x100,
+        "DECORATION",
+        0x200,
+        "BG",
+        0x400,
+        "SHADOW",
+        0x800,
+        "LOGICAL",
+        0x1000,
+        "LIQUID",
+        0x2000);
     /// Third parameter to CustomSound:play(), specifies which group the sound will be played in and thus how the player controls its volume
     lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
     /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
