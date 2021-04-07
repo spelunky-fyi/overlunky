@@ -38,7 +38,7 @@ const char *themes_short[] = {
 
 const char *entity_flags[] = {
     "1: Invisible",
-    "2: ",
+    "2: Indestructable/special floor",
     "3: Solid (wall)",
     "4: Passes through objects",
     "5: Passes through everything",
@@ -60,7 +60,7 @@ const char *entity_flags[] = {
     "21: Interact with webs?",
     "22: Locked",
     "23: Shop item?",
-    "24: ",
+    "24: Shop floor (break to aggro)",
     "25: Passes through player",
     "26: ",
     "27: ",
