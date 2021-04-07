@@ -2223,7 +2223,7 @@ void render_clickhandler()
         const char *warningtext = " Overlunky does\nnot work online!";
         ImVec2 warningsize = hugefont->CalcTextSizeA(144.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, warningtext);
         dl->AddText(hugefont, 144.0, ImVec2(io.DisplaySize.x/2-warningsize.x/2, io.DisplaySize.y/2-warningsize.y/2), ImColor(1.0f, 1.0f, 1.0f, 0.8f), warningtext);
-        const char *subtext = "And probably never will. I thought the README was clear on this...";
+        const char *subtext = "Probably... Some things might, but don't just expect a random script to work.";
         ImVec2 subsize = font->CalcTextSizeA(18.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, subtext);
         dl->AddText(font, 18.0, ImVec2(io.DisplaySize.x/2-subsize.x/2, io.DisplaySize.y/2+warningsize.y/2+20), ImColor(1.0f, 1.0f, 1.0f, 0.8f), subtext);
     }
