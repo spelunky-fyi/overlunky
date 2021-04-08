@@ -104,5 +104,6 @@ set_callback(function()
     local x = -1.025
     local y = 1.08
     draw_image(image, x, y, x+w, y-h, 0, 0, 1, 1, 0xffffffff)
-    draw_image(image, -x, y, -x-w, y-h, 0, 0, 1, 1, 0xffffffff)
+    -- this one has a color mask to make it green and transparent
+    draw_image(image, -x, y, -x-w, y-h, 0, 0, 1, 1, rgba(0, 255, 0, 40))
 end, ON.GUIFRAME)
