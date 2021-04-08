@@ -196,7 +196,7 @@ function module.start()
 
         if options.door_xiit and #players > 0 then
             x, y, l = get_position(players[1].uid)
-            door(x, y, l, nextworld, nextlevel, nexttheme)
+            spawn_door(x, y, l, nextworld, nextlevel, nexttheme)
         end
 
         set_interval(function()
@@ -213,7 +213,7 @@ function module.start()
             for i,v in ipairs(doors) do
                 x, y, l = get_position(v)
                 move_entity(v, 70, y, 0, 0)
-                door(x, y, l, state.world, state.level, state.theme)
+                spawn_door(x, y, l, state.world, state.level, state.theme)
             end
         end
     end, ON.LEVEL)

@@ -1,5 +1,5 @@
 meta.name = "Randomizer"
-meta.version = "1.1"
+meta.version = "1.2"
 meta.description = "The Randomizer from Overlunky in one Playlunky compatible mod."
 meta.author = "Dregu"
 
@@ -14,13 +14,13 @@ register_option_int("add_health", "Max starting health", 20, 4, 99)
 register_option_int("add_bombs", "Max starting bombs", 20, 4, 99)
 register_option_int("add_ropes", "Max starting ropes", 20, 4, 99)
 
-container = require "rando.container"
-door = require "rando.door"
-enemy = require "rando.enemy"
-trap = require "rando.trap"
-projectile = require "rando.projectile"
+local container = require "rando.container"
+local door = require "rando.door"
+local enemy = require "rando.enemy"
+local trap = require "rando.trap"
+local projectile = require "rando.projectile"
 
-enable = {
+local enable = {
     container = false,
     door = false,
     enemy = false,
