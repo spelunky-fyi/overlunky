@@ -245,6 +245,8 @@ public:
 
     SoundManager* sound_manager;
 
+    std::map<int, ScriptImage *> images;
+
     ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
     ~ScriptImpl() = default;
 
@@ -757,6 +759,31 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         auto b = normalize(textsize);
         return std::make_pair(b.x - a.x, b.y - a.y);
     };
+    /// Returns: `id, width, height`
+    /// Create image from file.
+    lua["create_image"] = [this](std::string path) -> std::tuple<int, int, int> {
+        ScriptImage *image = new ScriptImage;
+        image->width = 0;
+        image->height = 0;
+        image->texture = NULL;
+        if (LoadTextureFromFile((script_folder / path).string().data(), &image->texture, &image->width, &image->height))
+        {
+            int id = images.size();
+            images[id] = image;
+            return std::make_tuple(id, image->width, image->height);
+        }
+        return std::make_tuple(-1, -1, -1);
+    };
+    /// Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+    lua["draw_image"] = [this](int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, ImU32 color) {
+        if (images.find(image) == images.end())
+            return;
+        ImVec2 a = screenify({ x1, y1 });
+        ImVec2 b = screenify({ x2, y2 });
+        ImVec2 uva = ImVec2(uvx1, uvy1);
+        ImVec2 uvb = ImVec2(uvx2, uvy2);
+        draw_list->AddImage(images[image]->texture, a, b, uva, uvb, color);
+    };
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound> {
@@ -942,6 +969,16 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["win_pushid"] = [](int id) { ImGui::PushID(id); };
     /// Pop unique identifier from the stack. Put after the input.
     lua["win_popid"] = []() { ImGui::PopID(); };
+    /// Draw image to window.
+    lua["win_image"] = [this](int image, int width, int height) {
+        if (image < 0 || images.find(image) == images.end())
+            return;
+        if (width < 1)
+            width = images[image]->width;
+        if (height < 1)
+            height = images[image]->height;
+        ImGui::Image(images[image]->texture, ImVec2(width, height));
+    };
 
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(

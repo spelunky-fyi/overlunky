@@ -9,6 +9,7 @@
 #include <filesystem>
 
 #include "imgui.h"
+#include <d3d11.h>
 
 ImVec2 screenify(ImVec2 pos);
 float screenify(float dis);
@@ -40,6 +41,13 @@ struct ScriptInput
     uint16_t current;
     size_t orig_input;
     size_t orig_ai;
+};
+
+struct ScriptImage
+{
+    ID3D11ShaderResourceView *texture;
+    int width;
+    int height;
 };
 
 class SpelunkyScript

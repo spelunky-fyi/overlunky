@@ -18,6 +18,9 @@ local seedinput = ''
 local widgetopen2 = false
 local closebutton2 = false
 
+-- load image to use later
+local loadingimage = create_image('loading.png')
+
 -- add a simple button to options to open our cluttered test windows
 register_option_button('open', 'Open test window', function()
     widgetopen = true
@@ -60,6 +63,11 @@ set_callback(function()
 
             -- long text is wrapped
             win_text('Sed non justo eu orci lacinia mollis. Morbi finibus luctus massa eu gravida. Maecenas ornare tincidunt pellentesque. Aliquam vel nulla eu mauris pulvinar consequat sed vitae nisi. Nulla facilisi. Nulla venenatis mollis mauris, sed blandit nisi auctor facilisis. In tempor magna eleifend, ornare sem in, egestas massa. Donec pulvinar orci ac ligula rhoncus, a hendrerit elit interdum. Maecenas sed orci quis justo imperdiet finibus.')
+
+            -- draw the image we loaded before
+            if loadingimage > -1 then
+                win_image(loadingimage, 0, 0)
+            end
 
             -- remember to use unique labels on identical inputs
             if win_button('Test##FirstTest') then

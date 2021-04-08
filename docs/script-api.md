@@ -420,6 +420,13 @@ function on_guiframe()
     draw_text(0-w/2, 0-h/2, size, text, color)
 end
 ```
+### [`create_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
+#### Params: `string path`
+#### Returns: `id, width, height`
+Create image from file.
+### [`draw_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
+#### Params: `int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color`
+Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 #### Params: `string path`
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -494,6 +501,9 @@ Add an float dragfield
 Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 ### [`win_popid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid)
 Pop unique identifier from the stack. Put after the input.
+### [`win_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
+#### Params: `int image, int width, int height`
+Draw image to window.
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
 ```lua

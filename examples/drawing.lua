@@ -3,6 +3,9 @@ meta.version = "WIP"
 meta.description = "Draws some shapes and text."
 meta.author = "Dregu"
 
+-- load image to use later
+local image, imagewidth, imageheight = create_image('loading.png')
+
 -- r/uselessredcircle
 set_callback(function()
     if #players < 1 then return end
@@ -92,4 +95,14 @@ set_callback(function()
     draw_rect_filled(-0.6, -0.6, -0.8, -0.8, 0, rgba(255, 0, 0, 80))
     draw_rect(-0.8, -0.8, -0.6, -0.6, 2, 0, rgba(255, 255, 255, 255))
     draw_circle_filled(-0.7, -0.7, 0.1, rgba(255, 0, 0, 128))
+end, ON.GUIFRAME)
+
+-- draw some images
+set_callback(function()
+    local w = 0.2
+    local h = w/9*16
+    local x = -1.025
+    local y = 1.08
+    draw_image(image, x, y, x+w, y-h, 0, 0, 1, 1, 0xffffffff)
+    draw_image(image, -x, y, -x-w, y-h, 0, 0, 1, 1, 0xffffffff)
 end, ON.GUIFRAME)
