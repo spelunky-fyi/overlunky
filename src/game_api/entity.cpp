@@ -312,5 +312,5 @@ uint8_t Olmec::broken_floaters()
 
 void Entity::destroy()
 {
-    // TODO
+    delete this; // TODO
 }

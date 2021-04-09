@@ -612,6 +612,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["entity_has_item_type"] = entity_has_item_type;
     /// Kills an entity by uid.
     lua["kill_entity"] = kill_entity;
+    /// Pick up another entity.
+    lua["pick_up"] = pick_up;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates

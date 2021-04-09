@@ -308,6 +308,9 @@ Check if the entity `id` has some ENT_TYPE `type` in their inventory
 ### [`kill_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_entity)
 #### Params: `int id`
 Kills an entity by uid.
+### [`pick_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up)
+#### Params: `int who, int what`
+Pick up another entity.
 ### [`apply_entity_db`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_entity_db)
 #### Params: `int id`
 Apply changes made in [get_type](#get_type)() to entity instance by uid.

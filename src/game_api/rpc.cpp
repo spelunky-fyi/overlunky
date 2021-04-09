@@ -690,6 +690,13 @@ void kill_entity(uint32_t id)
         ent->kill(true, nullptr);
 }
 
+void destroy_entity(uint32_t id)
+{
+    Entity *ent = get_entity_ptr(id);
+    if(ent != nullptr)
+        ent->destroy(); // TODO
+}
+
 void apply_entity_db(uint32_t id)
 {
     Entity *ent = get_entity_ptr(id);
@@ -918,4 +925,21 @@ std::vector<int64_t> read_prng()
 {
     auto state = State::get();
     return state.read_prng();
+}
+
+void pick_up(uint32_t who, uint32_t what)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(find_inst(memory.exe(), "\x48\x89\x5c\x24\x08\x57\x48\x83\xec\x20\x4c\x8b\x5a\x08"s, memory.after_bundle));
+    }
+    Movable *ent = (Movable*)get_entity_ptr(who);
+    Movable *item = (Movable*)get_entity_ptr(what);
+    if(ent != nullptr && item != nullptr)
+    {
+        auto pick_up_func = (void(*)(Movable*, Movable*))offset;
+        pick_up_func(ent, item);
+    }
 }
