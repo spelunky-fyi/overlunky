@@ -612,7 +612,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["entity_has_item_type"] = entity_has_item_type;
     /// Kills an entity by uid.
     lua["kill_entity"] = kill_entity;
-    /// Pick up another entity.
+    /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
+    /// ```lua
+    /// -- spawn and equip a jetpack
+    /// pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
+    /// ```
     lua["pick_up"] = pick_up;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;

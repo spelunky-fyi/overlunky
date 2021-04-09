@@ -310,7 +310,11 @@ Check if the entity `id` has some ENT_TYPE `type` in their inventory
 Kills an entity by uid.
 ### [`pick_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up)
 #### Params: `int who, int what`
-Pick up another entity.
+Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
+```lua
+-- spawn and equip a jetpack
+pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
+```
 ### [`apply_entity_db`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_entity_db)
 #### Params: `int id`
 Apply changes made in [get_type](#get_type)() to entity instance by uid.
