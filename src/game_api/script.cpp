@@ -537,7 +537,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid
     lua["get_entity"] = get_entity_ptr;
-    /// Get the [EntityDB](#entitydb) behind an uid.
+    /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
     lua["get_type"] = get_type;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
@@ -1812,6 +1812,8 @@ bool SpelunkyScript::ScriptImpl::run()
 
 void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
 {
+    if (!enabled)
+        return;
     draw_list = dl;
     try {
         /// Runs on every screen frame. You need this to use draw functions.
