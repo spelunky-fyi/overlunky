@@ -53,7 +53,7 @@ struct StateMemory
     int32_t i70;
     uint8_t theme;
     uint8_t theme_next;
-    uint8_t b72;
+    uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t b73;
     int32_t i74;
     uint8_t shoppie_aggro;

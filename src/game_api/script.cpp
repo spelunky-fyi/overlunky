@@ -1299,7 +1299,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "saved_cats",
         &StateMemory::saved_cats,
         "saved_hamsters",
-        &StateMemory::saved_hamsters);
+        &StateMemory::saved_hamsters,
+        "win_state",
+        &StateMemory::win_state);
     auto play = sol::overload(
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
