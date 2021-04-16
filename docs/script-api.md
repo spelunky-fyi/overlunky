@@ -214,7 +214,7 @@ Get the [Entity](#entity) behind an uid
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 #### Params: `int id`
 #### Returns: `EntityDB`
-Get the [EntityDB](#entitydb) behind an uid.
+Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 ### [`get_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 #### Returns: `array<int>`
 Get uids of all entities currently loaded
@@ -353,6 +353,9 @@ Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, w
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 #### Params: `int id`
 Flip entity around by uid. All new entities face right by default.
+### [`set_olmec_phase_y_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_phase_y_level)
+#### Params: `int phase, float y`
+Sets the Y-level at which Olmec changes phases
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 #### Params: `int a, int b`
 Calculate the tile distance of two entities by uid

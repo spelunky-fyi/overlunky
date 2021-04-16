@@ -68,3 +68,4 @@ void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_mu
 SaveData* savedata();
 std::vector<int64_t> read_prng();
 void pick_up(uint32_t who, uint32_t what);
+void set_olmec_phase_y_level(uint8_t phase, float y);
