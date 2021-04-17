@@ -69,3 +69,4 @@ SaveData* savedata();
 std::vector<int64_t> read_prng();
 void pick_up(uint32_t who, uint32_t what);
 void set_olmec_phase_y_level(uint8_t phase, float y);
+void set_ghost_spawn_times(uint32_t normal = 10800, uint32_t cursed = 9000);

@@ -649,6 +649,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["flip_entity"] = flip_entity;
     /// Sets the Y-level at which Olmec changes phases
     lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
+    /// Determines when the ghost appears, either when the player is cursed or not
+    lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
@@ -1089,7 +1091,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "as_cape",
         &Entity::as<Cape>,
         "as_vlads_cape",
-        &Entity::as<VladsCape>);
+        &Entity::as<VladsCape>,
+        "as_ghost",
+        &Entity::as<Ghost>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -1222,6 +1226,16 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &VladsCape::can_double_jump,
         sol::base_classes,
         sol::bases<Entity, Movable, Cape>());
+    lua.new_usertype<Ghost>(
+        "Ghost",
+        "chased_target_uid",
+        &Ghost::chased_target_uid,
+        "split_timer",
+        &Ghost::split_timer,
+        "velocity_multiplier",
+        &Ghost::velocity_multiplier,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",

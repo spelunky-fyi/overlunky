@@ -221,3 +221,14 @@ class KapalaPowerup : public Movable
   public:
     uint8_t amount_of_blood;
 };
+
+class Ghost : public Monster
+{
+  public:
+    int32_t chased_target_uid;
+    uint32_t unknown;
+    uint16_t split_timer;
+    uint8_t unknown_counter;
+    uint8_t padding;
+    float velocity_multiplier;
+};
