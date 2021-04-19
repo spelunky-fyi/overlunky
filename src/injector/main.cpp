@@ -63,9 +63,26 @@ int main(int argc, char** argv) {
             STARTUPINFO si{};
             si.cb = sizeof(si);
 
+            const auto child_env = []() {
+                std::string child_env = "SteamAppId=418530";
+
+                const auto this_env = GetEnvironmentStrings();
+                auto lpszVariable = this_env;
+                while (*lpszVariable)
+                {
+                    child_env += '\0';
+                    child_env += lpszVariable;
+                    lpszVariable += strlen(lpszVariable) + 1;
+                }
+                FreeEnvironmentStrings(this_env);
+
+                child_env += '\0';
+                return child_env;
+            }();
+
             PROCESS_INFORMATION pi{};
 
-            if (CreateProcess(spel2_cmd_line, NULL, NULL, NULL, TRUE, 0, NULL,
+            if (CreateProcess(spel2_cmd_line, NULL, NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(),
                               spel2_dir.c_str(), &si, &pi)) {
                 WaitForInputIdle(pi.hProcess, 1000);
 
