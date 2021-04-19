@@ -64,7 +64,7 @@ struct EntityDB
     int32_t field_40;
     int32_t field_44;
     int64_t field_48;
-    int32_t field_50;
+    int32_t properties_flags;
     float friction;
     float elasticity;
     float weight;

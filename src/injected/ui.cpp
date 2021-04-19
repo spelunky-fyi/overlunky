@@ -3178,6 +3178,13 @@ void render_entity_props()
         ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &g_entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Jump power##GlobalJumpPower", &g_entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &g_entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        if (ImGui::CollapsingHeader("Properties flags"))
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                ImGui::CheckboxFlags(entity_type_properties_flags[i], &g_entity->type->properties_flags, pow(2, i));
+            }
+        }
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {

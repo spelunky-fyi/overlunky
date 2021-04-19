@@ -1112,7 +1112,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "blood_content",
         &EntityDB::blood_content,
         "animations",
-        &EntityDB::animations);
+        &EntityDB::animations,
+        "properties_flags",
+        &EntityDB::properties_flags);
 
     lua.new_usertype<Entity>(
         "Entity",
