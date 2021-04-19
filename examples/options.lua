@@ -23,7 +23,11 @@ register_option_button('g', 'Button G', function()
     message('Button was clicked at '..tostring(options.g))
 end)
 
+-- If you really need to you can pass a second description that is going to be wrapped and thus can be long as heck
+tests = {'Chi-Squared', 'McNemar', 'Portmanteau'}
+register_option_combo('h', 'Choice H', 'This is a really long description that is probably not necessary because I should\'ve just made the option more clear in the first place. But here we are, having to live with an option that spans probably 4or 5 lines just to explain something that most likely is too complicate for users to touch anyways.', table.concat(tests, '\0')..'\0\0')
+
 -- just print these out real quick
 set_callback(function()
-    message('Options: A:'..tostring(options.a)..', B:'..tostring(options.b)..', C:'..tostring(options.c)..', D:'..tostring(options.d)..', E:'..tostring(options.e)..', F:'..colors[options.f]..', G:'..tostring(options.g))
+    message('Options: A:'..tostring(options.a)..', B:'..tostring(options.b)..', C:'..tostring(options.c)..', D:'..tostring(options.d)..', E:'..tostring(options.e)..', F:'..colors[options.f]..', G:'..tostring(options.g)..', H:'..tostring(options.h))
 end, ON.FRAME)
