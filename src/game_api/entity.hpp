@@ -56,7 +56,7 @@ struct EntityDB
     uint32_t search_flags;
     float width;
     float height;
-    uint8_t field_24;
+    uint8_t draw_depth;
     uint8_t field_25;
     int16_t field_26;
     Rect rect_collision;

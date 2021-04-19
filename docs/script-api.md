@@ -120,23 +120,21 @@ Show a message that looks like a level feeling.
 #### Params: `int entity_id, string message, int unk_type, bool top`
 Show a message coming from an entity
 ### [`register_option_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_int)
-#### Params: `string name, string desc, int value, int min, int max`
+#### Params: `string name, string desc, string long_desc, int value, int min, int max`
 Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
 ### [`register_option_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_float)
-#### Params: `string name, string desc, float value, float min, float max`
+#### Params: `string name, string desc, string long_desc, float value, float min, float max`
 Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
 ### [`register_option_bool`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_bool)
-#### Params: `string name, string desc, bool value`
+#### Params: `string name, string desc, string long_desc, bool value`
 Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
 ### [`register_option_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_string)
-#### Params: `string name, string desc, string value`
+#### Params: `string name, string desc, string long_desc, string value`
 Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
 ### [`register_option_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_combo)
-#### Params: `string name, string desc, string opts`
+#### Params: `string name, string desc, string long_desc, string opts`
 Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
 ### [`register_option_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
-#### Params: `string name, string desc, function callback`
-Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 #### Params: `int id, float x, float y, int layer, float vx, float vy`
 #### Returns: `int`
@@ -542,11 +540,17 @@ end
 - [`ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
 - [`kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
 - [`kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
+### `Animation`
+- [`first_tile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_tile) &Animation::texture
+- [`num_tiles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=num_tiles) &Animation::count
+- [`interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=interval) &Animation::interval
+- [`repeat_mode`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=repeat_mode) &Animation::repeat
 ### `EntityDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &EntityDB::id
 - [`search_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) &EntityDB::search_flags
 - [`width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &EntityDB::width
 - [`height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &EntityDB::height
+- [`draw_depth`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) &EntityDB::draw_depth
 - [`friction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) &EntityDB::friction
 - [`elasticity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) &EntityDB::elasticity
 - [`weight`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=weight) &EntityDB::weight
@@ -557,6 +561,7 @@ end
 - [`damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) &EntityDB::damage
 - [`life`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) &EntityDB::life
 - [`blood_content`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) &EntityDB::blood_content
+- [`animations`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) &EntityDB::animations
 ### `Entity`
 - [`type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Entity::type
 - [`overlay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) &Entity::overlay
