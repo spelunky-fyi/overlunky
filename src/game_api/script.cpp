@@ -1947,9 +1947,6 @@ void SpelunkyScript::ScriptImpl::render_options()
     ImGui::PushID(meta.id.data());
     for (auto& name_option_pair : options)
     {
-        if (!name_option_pair.second.long_desc.empty()) {
-            ImGui::TextWrapped("%s", name_option_pair.second.long_desc.c_str());
-        }
         std::visit(overloaded{
             [&](IntOption& option) {
                 if (ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
@@ -1996,6 +1993,9 @@ void SpelunkyScript::ScriptImpl::render_options()
                 }
             },
         }, name_option_pair.second.option_impl);
+        if (!name_option_pair.second.long_desc.empty()) {
+            ImGui::TextWrapped("%s", name_option_pair.second.long_desc.c_str());
+        }
     }
     ImGui::PopID();
 }
