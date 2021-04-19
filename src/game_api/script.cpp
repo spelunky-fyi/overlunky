@@ -51,6 +51,7 @@ struct ButtonOption {
 struct ScriptOption
 {
     std::string desc;
+    std::string long_desc;
     std::variant<IntOption, FloatOption, BoolOption, StringOption, ComboOption, ButtonOption> option_impl;
 };
 
@@ -476,35 +477,77 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         say(NULL, entity, message.data(), unk_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
-    lua["register_option_int"] = [this](std::string name, std::string desc, int value, int min, int max) {
-        options[name] = { desc, IntOption{ value, min, max } };
-        lua["options"][name] = value;
-    };
+    // lua["register_option_int"] = [this](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
+    lua["register_option_int"] = sol::overload(
+        [this](std::string name, std::string desc, std::string long_desc, int value, int min, int max) {
+            options[name] = { desc, long_desc, IntOption{ value, min, max } };
+            lua["options"][name] = value;
+        },
+        [this](std::string name, std::string desc, int value, int min, int max) {
+            options[name] = { desc, "", IntOption{ value, min, max } };
+            lua["options"][name] = value;
+        }
+    );
     /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
-    lua["register_option_float"] = [this](std::string name, std::string desc, float value, float min, float max) {
-        options[name] = { desc, FloatOption{ value, min, max } };
-        lua["options"][name] = value;
-    };
+    // lua["register_option_float"] = [this](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
+    lua["register_option_float"] = sol::overload(
+        [this](std::string name, std::string desc, std::string long_desc, float value, float min, float max) {
+            options[name] = { desc, long_desc, FloatOption{ value, min, max } };
+            lua["options"][name] = value;
+        },
+        [this](std::string name, std::string desc, float value, float min, float max) {
+            options[name] = { desc, "", FloatOption{ value, min, max } };
+            lua["options"][name] = value;
+        }
+    );
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
-    lua["register_option_bool"] = [this](std::string name, std::string desc, bool value) {
-        options[name] = { desc, BoolOption{ value } };
-        lua["options"][name] = value;
-    };
+    // lua["register_option_bool"] = [this](std::string name, std::string desc, std::string long_desc, bool value)
+    lua["register_option_bool"] = sol::overload(
+        [this](std::string name, std::string desc, std::string long_desc, bool value) {
+            options[name] = { desc, long_desc, BoolOption{ value } };
+            lua["options"][name] = value;
+        },
+        [this](std::string name, std::string desc, bool value) {
+            options[name] = { desc, "", BoolOption{ value } };
+            lua["options"][name] = value;
+        }
+    );
     /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
-    lua["register_option_string"] = [this](std::string name, std::string desc, std::string value) {
-        options[name] = { desc, StringOption{ value } };
-        lua["options"][name] = value;
-    };
+    // lua["register_option_string"] = [this](std::string name, std::string desc, std::string long_desc, std::string value)
+    lua["register_option_string"] = sol::overload(
+        [this](std::string name, std::string desc, std::string long_desc, std::string value) {
+            options[name] = { desc, long_desc, StringOption{ value } };
+            lua["options"][name] = value;
+        },
+        [this](std::string name, std::string desc, std::string value) {
+            options[name] = { desc, "", StringOption{ value } };
+            lua["options"][name] = value;
+        }
+    );
     /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
-    lua["register_option_combo"] = [this](std::string name, std::string desc, std::string opts) {
-        options[name] = { desc, ComboOption{ 0, opts } };
-        lua["options"][name] = 1;
-    };
+    // lua["register_option_combo"] = [this](std::string name, std::string desc, std::string long_desc, std::string opts)
+    lua["register_option_combo"] = sol::overload(
+        [this](std::string name, std::string desc, std::string long_desc, std::string opts) {
+            options[name] = { desc, long_desc, ComboOption{ 0, opts } };
+            lua["options"][name] = 1;
+        },
+        [this](std::string name, std::string desc, std::string opts) {
+            options[name] = { desc, "", ComboOption{ 0, opts } };
+            lua["options"][name] = 1;
+        }
+    );
     /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
-    lua["register_option_button"] = [this](std::string name, std::string desc, sol::function callback) {
-        options[name] = { desc, ButtonOption{ callback } };
-        lua["options"][name] = -1;
-    };
+    // lua["register_option_combo"] = [this](std::string name, std::string desc, std::string long_desc, sol::function on_click)
+    lua["register_option_button"] = sol::overload(
+        [this](std::string name, std::string desc, std::string long_desc, sol::function callback) {
+            options[name] = { desc, long_desc, ButtonOption{ callback } };
+            lua["options"][name] = -1;
+        },
+        [this](std::string name, std::string desc, sol::function callback) {
+            options[name] = { desc, "", ButtonOption{ callback } };
+            lua["options"][name] = -1;
+        }
+    );
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     /// Example:
@@ -1904,6 +1947,9 @@ void SpelunkyScript::ScriptImpl::render_options()
     ImGui::PushID(meta.id.data());
     for (auto& name_option_pair : options)
     {
+        if (!name_option_pair.second.long_desc.empty()) {
+            ImGui::TextWrapped("%s", name_option_pair.second.long_desc.c_str());
+        }
         std::visit(overloaded{
             [&](IntOption& option) {
                 if (ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
