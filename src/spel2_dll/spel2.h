@@ -91,7 +91,7 @@ enum class SpelunkyScreen {
 	Level = 12,
 	Transition = 13,
 	Death = 14,
-	Sapceship = 16,
+	Spaceship = 16,
 	Win = 16,
 	Credits = 17,
 	Scores = 18,

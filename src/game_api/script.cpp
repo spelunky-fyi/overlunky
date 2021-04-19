@@ -81,6 +81,7 @@ struct ScriptState
     uint32_t screen;
     uint32_t time_level;
     uint32_t time_total;
+    uint32_t time_global;
     uint32_t frame;
     uint32_t loading;
     uint32_t reset;
@@ -312,6 +313,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
+    state.time_global = get_frame_count();
     state.frame = get_frame_count();
     state.loading = g_state->loading;
     state.reset = (g_state->quest_flags & 1);
@@ -1583,7 +1585,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "LOADING",
         104,
         "RESET",
-        105);
+        105,
+        "GAMEFRAME",
+        106);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
     lua.new_enum(
         "MASK",
@@ -1837,6 +1841,11 @@ bool SpelunkyScript::ScriptImpl::run()
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
+                else if (cb->screen == 106 && !g_state->pause && get_frame_count() != state.time_global && (g_state->screen >= 11 && g_state->screen <= 14)) // ON.GAMEFRAME
+                {
+                    handle_function(cb->func);
+                    cb->lastRan = now;
+                }
             }
         }
 
@@ -1877,6 +1886,7 @@ bool SpelunkyScript::ScriptImpl::run()
         state.screen = g_state->screen;
         state.time_level = g_state->time_level;
         state.time_total = g_state->time_total;
+        state.time_global = get_frame_count();
         state.frame = get_frame_count();
         state.loading = g_state->loading;
         state.reset = (g_state->quest_flags & 1);
