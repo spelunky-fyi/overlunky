@@ -1072,7 +1072,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "num_tiles",
         &Animation::count,
         "interval",
-        &Animation::interval);
+        &Animation::interval,
+        "repeat_mode",
+        &Animation::repeat);
     lua.new_usertype<EntityDB>(
         "EntityDB",
         "id",
@@ -1083,6 +1085,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &EntityDB::width,
         "height",
         &EntityDB::height,
+        "draw_depth",
+        &EntityDB::draw_depth,
         "friction",
         &EntityDB::friction,
         "elasticity",
