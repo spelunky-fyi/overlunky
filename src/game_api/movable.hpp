@@ -222,23 +222,24 @@ class KapalaPowerup : public Movable
     uint8_t amount_of_blood;
 };
 
-class Ghost : public Monster
+class ChasingMonster : public Monster
 {
   public:
     int32_t chased_target_uid;
-    uint32_t unknown;
+    uint32_t target_selection_timer; // when reaches zero, checks for new chase target and updates chased_target_uid
+};
+
+class Ghost : public ChasingMonster
+{
+  public:
     uint16_t split_timer;
     uint8_t unknown_counter;
     uint8_t padding;
     float velocity_multiplier;
 };
 
-class Jiangshi : public Monster
+class Jiangshi : public ChasingMonster
 {
   public:
-    int32_t chased_target_uid;
-    // unknown_timer: targeting related (RVA 0x21F92410), runs when timer = 0, shared with other targeting monsters
-    // maybe target selection in multiplayer?
-    uint32_t unknown_timer;
     uint8_t wait_timer; // wait time between jumps
 };

@@ -594,6 +594,7 @@ end
 - [`as_olmec_floater`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec_floater) &Entity::as&lt;OlmecFloater&gt;
 - [`as_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_cape) &Entity::as&lt;Cape&gt;
 - [`as_vlads_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_vlads_cape) &Entity::as&lt;VladsCape&gt;
+- [`as_chasingmonster`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_chasingmonster) &Entity::as&lt;ChasingMonster&gt;
 - [`as_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_ghost) &Entity::as&lt;Ghost&gt;
 - [`as_jiangshi`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_jiangshi) &Entity::as&lt;Jiangshi&gt;
 ### `Movable`
@@ -678,14 +679,16 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `VladsCape`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
 - [`can_double_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_double_jump) &VladsCape::can_double_jump
-### `Ghost`
+### `ChasingMonster`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Ghost::chased_target_uid
+- [`target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Ghost::target_selection_timer
+### `Ghost`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`ChasingMonster`](#chasingmonster)
 - [`split_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split_timer) &Ghost::split_timer
 - [`velocity_multiplier`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_multiplier) &Ghost::velocity_multiplier
 ### `Jiangshi`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
-- [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Jiangshi::chased_target_uid
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`ChasingMonster`](#chasingmonster)
 - [`wait_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wait_timer) &Jiangshi::wait_timer
 ### `StateMemory`
 - [`screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last

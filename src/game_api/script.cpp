@@ -1178,6 +1178,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<Cape>,
         "as_vlads_cape",
         &Entity::as<VladsCape>,
+        "as_chasingmonster",
+        &Entity::as<ChasingMonster>,
         "as_ghost",
         &Entity::as<Ghost>,
         "as_jiangshi",
@@ -1314,24 +1316,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &VladsCape::can_double_jump,
         sol::base_classes,
         sol::bases<Entity, Movable, Cape>());
-    lua.new_usertype<Ghost>(
-        "Ghost",
+    lua.new_usertype<ChasingMonster>(
+        "ChasingMonster",
         "chased_target_uid",
         &Ghost::chased_target_uid,
+        "target_selection_timer",
+        &Ghost::target_selection_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Ghost>(
+        "Ghost",
         "split_timer",
         &Ghost::split_timer,
         "velocity_multiplier",
         &Ghost::velocity_multiplier,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, Monster, ChasingMonster>());
     lua.new_usertype<Jiangshi>(
-        "Jiangshi",
-        "chased_target_uid",
-        &Jiangshi::chased_target_uid,
-        "wait_timer",
-        &Jiangshi::wait_timer,
-        sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        "Jiangshi", "wait_timer", &Jiangshi::wait_timer, sol::base_classes, sol::bases<Entity, Movable, Monster, ChasingMonster>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
