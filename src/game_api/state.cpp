@@ -44,6 +44,19 @@ size_t get_zoom_shop()
     }
 }
 
+size_t get_location()
+{
+    ONCE(size_t)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        auto start = memory.after_bundle;
+        auto location = find_inst(exe, "\x49\x0F\x44\xC0"s, start);
+        location = find_inst(exe, "\x49\x0F\x44\xC0"s, location + 1);
+        location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 0x10)));
+        return res = location;
+    }
+}
 size_t get_damage()
 {
     ONCE(size_t)
@@ -88,28 +101,61 @@ size_t get_camera()
     }
 }
 
+inline bool &get_is_init()
+{
+    static bool is_init{false};
+    return is_init;
+}
+
+void do_write_load_opt()
+{
+    auto memory = Memory::get();
+    auto exe = memory.exe();
+    auto start = memory.after_bundle;
+    auto off_send = find_inst(exe, "\x45\x8D\x41\x50"s, start) + 12;
+    write_mem_prot(memory.at_exe(off_send), "\x31\xC0\x31\xD2\x90\x90"s, true);
+}
+bool &get_write_load_opt()
+{
+    static bool allowed{true};
+    return allowed;
+}
+void State::set_write_load_opt(bool write_load_opt)
+{
+    if (get_is_init())
+    {
+        if (write_load_opt && !get_write_load_opt())
+        {
+            do_write_load_opt();
+        }
+        else if (!write_load_opt && get_write_load_opt())
+        {
+            DEBUG("Can not unwrite the load optimization...");
+        }
+    }
+    else
+    {
+        get_write_load_opt() = write_load_opt;
+    }
+}
+
 State &State::get()
 {
     static State STATE;
-    static bool INIT;
-    if (!INIT)
+    if (!get_is_init())
     {
-        auto memory = Memory::get();
-        // Global state pointer
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
-        auto location = find_inst(exe, "\x49\x0F\x44\xC0"s, start);
-        location = find_inst(exe, "\x49\x0F\x44\xC0"s, location + 1);
-        location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 0x10)));
-        auto off_send = find_inst(exe, "\x45\x8D\x41\x50"s, start) + 12;
-        write_mem_prot(memory.at_exe(off_send), "\x31\xC0\x31\xD2\x90\x90"s, true);
+        if (get_write_load_opt())
+        {
+            do_write_load_opt();
+        }
+        auto addr_location = get_location();
         auto addr_damage = get_damage();
         auto addr_insta = get_insta();
         auto addr_zoom = get_zoom();
         auto addr_zoom_shop = get_zoom_shop();
         auto addr_dark = get_dark();
-        STATE = State{location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
-        INIT = true;
+        STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
+        get_is_init() = true;
     }
     return STATE;
 }

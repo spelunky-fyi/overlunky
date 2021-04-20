@@ -31,6 +31,8 @@ using PostDrawFunc = void(*)();
 
 class SpelunkyScript;
 
+void SetWriteLoadOptimization(bool write_load_opt);
+
 void InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
 void InitSoundManager(Spelunky_DecodeAudioFile* decode_function);
 

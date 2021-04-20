@@ -7,6 +7,11 @@
 
 SoundManager* g_SoundManager{ nullptr };
 
+void SetWriteLoadOptimization(bool write_load_opt)
+{
+	State::set_write_load_opt(write_load_opt);
+}
+
 void InitSwapChainHooks(IDXGISwapChain* swap_chain)
 {
 	init_hooks(swap_chain);
