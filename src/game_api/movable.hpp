@@ -232,3 +232,13 @@ class Ghost : public Monster
     uint8_t padding;
     float velocity_multiplier;
 };
+
+class Jiangshi : public Monster
+{
+  public:
+    int32_t chased_target_uid;
+    // unknown_timer: targeting related (RVA 0x21F92410), runs when timer = 0, shared with other targeting monsters
+    // maybe target selection in multiplayer?
+    uint32_t unknown_timer;
+    uint8_t wait_timer; // wait time between jumps
+};

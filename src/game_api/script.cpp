@@ -1179,7 +1179,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "as_vlads_cape",
         &Entity::as<VladsCape>,
         "as_ghost",
-        &Entity::as<Ghost>);
+        &Entity::as<Ghost>,
+        "as_jiangshi",
+        &Entity::as<Jiangshi>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -1320,6 +1322,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Ghost::split_timer,
         "velocity_multiplier",
         &Ghost::velocity_multiplier,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Jiangshi>(
+        "Jiangshi",
+        "chased_target_uid",
+        &Jiangshi::chased_target_uid,
+        "wait_timer",
+        &Jiangshi::wait_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<StateMemory>(
