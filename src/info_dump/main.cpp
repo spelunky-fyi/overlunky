@@ -166,5 +166,32 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         textures_file.write(dump.data(), dump.size());
     }
 
+    if (std::ofstream search_flags_file = std::ofstream("game_data/search_flags.json"))
+    {
+        float_json search_flags(float_json::object());
+        for (size_t i = 31; i < 32; i--)
+        {
+            auto items = list_entities();
+            std::sort(items.begin(), items.end(), [](EntityItem &a, EntityItem &b) -> bool { return a.id < b.id; });
+
+            std::uint32_t search_flag = 1 << i;
+            std::vector<std::string> entities;
+            for (auto &ent : items)
+            {
+                EntityDB *db = get_type(ent.id);
+                if (!db)
+                    break;
+                if ((db->search_flags & search_flag) != 0)
+                {
+                    entities.push_back(ent.name);
+                }
+            }
+            search_flags[fmt::format("{}", search_flag)] = std::move(entities);
+        }
+
+        std::string dump = search_flags.dump(2);
+        search_flags_file.write(dump.data(), dump.size());
+    }
+
     std::exit(0);
 }
