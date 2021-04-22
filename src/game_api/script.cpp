@@ -1639,6 +1639,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         0x8,
         "EXPLOSION",
         0x10,
+        "ROPE",
+        0x20,
         "FX",
         0x40,
         "ACTIVEFLOOR",
