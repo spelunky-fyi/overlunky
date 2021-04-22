@@ -1178,6 +1178,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::topmost,
         "topmost_mount",
         &Entity::topmost_mount,
+        "overlaps_with",
+        &Entity::overlaps_with,
         "as_movable",
         &Entity::as<Movable>,
         "as_door",
