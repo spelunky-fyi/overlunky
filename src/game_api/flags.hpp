@@ -106,7 +106,7 @@ const char *more_flags[] = {
 
 const char *entity_type_properties_flags[] = {
     "1: Apply solid block beautification",
-    "2: Post process textures so the align?",
+    "2: Treat as FLOORSTYLED",
     "3: ",
     "4: ",
     "5: Squirts blood on damage",
@@ -139,9 +139,9 @@ const char *entity_type_properties_flags[] = {
     "32: Unused"};
 
 const char *hud_flags[] = {
-    "1: ",
+    "1: Upbeat dwelling intro music played",
     "2: ",
-    "3: ",
+    "3: Running tutorial speedrun",
     "4: ",
     "5: Level has Tun/shop?",
     "6: Tun killed?",
@@ -150,8 +150,8 @@ const char *hud_flags[] = {
     "9: ",
     "10: Angry shopkeeper",
     "11: Angry Tun",
-    "12: ",
-    "13: ",
+    "12: Angry caveman shopkeeper",
+    "13: Angry ghist shopkeeper",
     "14: Angry Yang",
     "15: Angry Tusk",
     "16: Angry Waddler",
