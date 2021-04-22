@@ -211,6 +211,26 @@ class Entity
         return topmost;
     }
 
+    bool overlaps_with(Entity* other)
+    {
+        const auto [posx, posy] = position();
+        const float top = posx + hitboxx + offsetx;
+        const float bottom = posx - hitboxx + offsetx;
+        const float left = posy + hitboxy + offsety;
+        const float right = posy - hitboxy + offsety;
+
+        const auto [other_posx, other_posy] = other->position();
+        const float other_top = other_posx + other->hitboxx + other->offsetx;
+        const float other_bottom = other_posx - other->hitboxx + other->offsetx;
+        const float other_left = other_posy + other->hitboxy + other->offsety;
+        const float other_right = other_posy - other->hitboxy + other->offsety;
+
+        return top > other_bottom
+            && bottom < other_top
+            && left > other_right
+            && right < other_left;
+    }
+
     uint8_t layer()
     {
         return read_u8(pointer() + 0x98);
