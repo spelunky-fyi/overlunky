@@ -2630,7 +2630,7 @@ void render_scripts()
     ImVec4 origcolor = ImGui::GetStyle().Colors[ImGuiCol_Header];
     float gray = (origcolor.x + origcolor.y + origcolor.z) / 3.0f;
     ImVec4 disabledcolor = ImVec4(gray, gray, gray, 0.5f);
-    for (auto& [name, script] : g_scripts)
+    for (auto& [script_name, script] : g_scripts)
     {
         ImGui::PushID(i);
         char name[255];
