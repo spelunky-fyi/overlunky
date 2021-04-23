@@ -41,6 +41,7 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types);
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask);
 std::vector<uint32_t> get_entities_by_layer(int layer);
 std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, float y, int layer, float r);
+std::vector<uint32_t> get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer);
 void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t);
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t id);
 void set_contents(uint32_t id, uint32_t item);

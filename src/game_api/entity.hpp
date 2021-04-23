@@ -211,24 +211,29 @@ class Entity
         return topmost;
     }
 
-    bool overlaps_with(Entity* other)
+    bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)
     {
         const auto [posx, posy] = position();
-        const float top = posx + hitboxx + offsetx;
-        const float bottom = posx - hitboxx + offsetx;
-        const float left = posy + hitboxy + offsety;
-        const float right = posy - hitboxy + offsety;
+        const float left = posx - hitboxx + offsetx;
+        const float right = posx + hitboxy + offsetx;
+        const float bottom = posy - hitboxy + offsety;
+        const float top = posy + hitboxy + offsety;
 
+        return left < rect_right
+            && rect_left < right
+            && bottom < rect_top
+            && rect_bottom < top;
+    }
+
+    bool overlaps_with(Entity* other)
+    {
         const auto [other_posx, other_posy] = other->position();
-        const float other_top = other_posx + other->hitboxx + other->offsetx;
-        const float other_bottom = other_posx - other->hitboxx + other->offsetx;
-        const float other_left = other_posy + other->hitboxy + other->offsety;
-        const float other_right = other_posy - other->hitboxy + other->offsety;
+        const float other_left = other_posx - other->hitboxx + other->offsetx;
+        const float other_right = other_posx + other->hitboxy + other->offsetx;
+        const float other_top = other_posy + other->hitboxy + other->offsety;
+        const float other_bottom = other_posy - other->hitboxy + other->offsety;
 
-        return top > other_bottom
-            && bottom < other_top
-            && left > other_right
-            && right < other_left;
+        return overlaps_with(other_left, other_bottom, other_right, other_top);
     }
 
     uint8_t layer()
