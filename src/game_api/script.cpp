@@ -1413,7 +1413,31 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "saved_hamsters",
         &StateMemory::saved_hamsters,
         "win_state",
-        &StateMemory::win_state);
+        &StateMemory::win_state,
+        "illumination",
+        &StateMemory::illumination);
+    lua.new_usertype<SaturationVignette>(
+        "SaturationVignette",
+        "red",
+        &SaturationVignette::red,
+        "green",
+        &SaturationVignette::green,
+        "blue",
+        &SaturationVignette::blue,
+        "vignette_aperture",
+        &SaturationVignette::vignette_aperture);
+    lua.new_usertype<Illumination>(
+        "Illumination",
+        "saturation_vignette",
+        &Illumination::saturation_vignette,
+        "brightness1",
+        &Illumination::brightness1,
+        "brightness2",
+        &Illumination::brightness2,
+        "frontlayer_global_illumination",
+        &Illumination::frontlayer_global_illumination,
+        "backlayer_global_illumination",
+        &Illumination::backlayer_global_illumination);
     auto play = sol::overload(
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
