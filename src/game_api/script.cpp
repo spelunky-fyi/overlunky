@@ -1180,7 +1180,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<VladsCape>);
     /* Entity
         bool overlaps_with(Entity other)
-        bool overlaps_with(float rect_left, float rect_top, float rect_right, float rect_bottom)
     */
     lua.new_usertype<Movable>(
         "Movable",
