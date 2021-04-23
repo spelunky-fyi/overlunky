@@ -1235,6 +1235,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::is_poisoned,
         "poison",
         &Movable::poison,
+        "is_button_pressed",
+        &Movable::is_button_pressed,
+        "is_button_held",
+        &Movable::is_button_held,
+        "is_button_released",
+        &Movable::is_button_released,
         "price",
         &Movable::price,
         sol::base_classes,
@@ -1242,6 +1248,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         /* Movable
             bool is_poisoned()
             void poison(int16_t frames)
+            bool is_button_pressed(uint32_t button)
+            bool is_button_held(uint32_t button)
+            bool is_button_released(uint32_t button)
         */
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Player>(
@@ -1600,6 +1609,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "GAMEFRAME",
         106);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.new_enum("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
     lua.new_enum(
         "MASK",
         "PLAYER",
