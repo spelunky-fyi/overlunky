@@ -651,6 +651,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
+    /// Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
+    /// list[uint32_t] get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
+    lua["get_entities_overlapping"] = get_entities_overlapping;
     /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
     /// Set the `flags` field from entity by uid
@@ -1150,6 +1153,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "animations",
         &EntityDB::animations);
 
+    auto overlaps_with = sol::overload(
+        static_cast<bool(Entity::*)(Entity*)>(&Entity::overlaps_with),
+        static_cast<bool(Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
     lua.new_usertype<Entity>(
         "Entity",
         "type",
@@ -1179,7 +1185,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "topmost_mount",
         &Entity::topmost_mount,
         "overlaps_with",
-        &Entity::overlaps_with,
+        overlaps_with,
         "as_movable",
         &Entity::as<Movable>,
         "as_door",
@@ -1210,6 +1216,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<Cape>,
         "as_vlads_cape",
         &Entity::as<VladsCape>);
+    /* Entity
+        bool overlaps_with(Entity other)
+        bool overlaps_with(float rect_left, float rect_top, float rect_right, float rect_bottom)
+    */
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
