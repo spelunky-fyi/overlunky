@@ -215,7 +215,7 @@ class Entity
     {
         const auto [posx, posy] = position();
         const float left = posx - hitboxx + offsetx;
-        const float right = posx + hitboxy + offsetx;
+        const float right = posx + hitboxx + offsetx;
         const float bottom = posy - hitboxy + offsety;
         const float top = posy + hitboxy + offsety;
 
@@ -229,7 +229,7 @@ class Entity
     {
         const auto [other_posx, other_posy] = other->position();
         const float other_left = other_posx - other->hitboxx + other->offsetx;
-        const float other_right = other_posx + other->hitboxy + other->offsetx;
+        const float other_right = other_posx + other->hitboxx + other->offsetx;
         const float other_top = other_posy + other->hitboxy + other->offsety;
         const float other_bottom = other_posy - other->hitboxy + other->offsety;
 
