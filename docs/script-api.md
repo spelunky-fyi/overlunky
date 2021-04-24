@@ -135,7 +135,7 @@ Add a string option that the user can change in the UI. Read with `options.name`
 #### Params: `string name, string desc, string long_desc, string opts`
 Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
 ### [`register_option_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
-### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
+### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity), [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
 #### Params: `int id, float x, float y, int layer, float vx, float vy`
 #### Returns: `int`
 Spawn an entity in position with some velocity and return the uid of spawned entity.
@@ -152,25 +152,14 @@ set_callback(function()
     spawn(ENT_TYPE.ITEM_PICKUP_CLOVER, 0, 1, LAYER.PLAYER1, 0, 0)
 end, ON.LEVEL)
 ```
-### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
-#### Params: `int id, float x, float y, int layer, float vx, float vy`
-#### Returns: `int`
-Short for [spawn_entity](#spawn_entity).
-### [`spawn_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door)
+### [`spawn_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door), [`door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door)
 #### Params: `float x, float y, int layer, int w, int l, int t`
 #### Returns: `int`
 Spawn a door to another world, level and theme and return the uid of spawned entity.
 Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
-### [`door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door)
-#### Params: `float x, float y, int layer, int w, int l, int t`
-#### Returns: `int`
-Short for [spawn_door](#spawn_door).
-### [`spawn_layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_layer_door)
+### [`spawn_layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_layer_door), [`layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_door)
 #### Params: `float x, float y`
 Spawn a door to backlayer.
-### [`layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_door)
-#### Params: `float x, float y`
-Short for [spawn_layer_door](#spawn_layer_door).
 ### [`warp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=warp)
 #### Params: `int w, int l, int t`
 Warp to a level immediately.
@@ -374,18 +363,15 @@ Gets the current camera position in the level
 #### Params: `float cx, float cy`
 Sets the current camera position in the level.
 Note: The camera will still try to follow the player and this doesn't actually work at all.
-### [`set_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_flag)
+### [`set_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_flag), [`setflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setflag)
 #### Params: `int flags, int bit`
 Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-### [`setflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setflag)
-### [`clr_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_flag)
+### [`clr_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_flag), [`clrflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
 #### Params: `int flags, int bit`
 Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-### [`clrflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
-### [`test_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_flag)
+### [`test_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_flag), [`testflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 #### Params: `int flags, int bit`
 Returns true if a bit is set in the flags
-### [`testflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 ### [`rgba`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rgba)
 #### Params: `int r, int g, int b, int a`
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
