@@ -874,7 +874,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
 
     /// Loads save.dat from the script's pack. If save.dat does not exist, you will get an empty string.
-    lua["load_data"] = [this](std::string path) -> std::string
+    lua["load_data"] = [this]() -> std::string
     {
         std::ifstream datafile;
         datafile.open(script_folder / "save.dat");
