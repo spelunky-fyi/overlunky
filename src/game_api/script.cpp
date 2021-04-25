@@ -873,7 +873,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return sol::nullopt;
     };
 
-    /// Loads the `save.dat` file from the script's pack. If `save.dat` does not exist, you will get an empty string.
+    /// Loads save.dat from the script's pack. If save.dat does not exist, you will get an empty string.
     lua["load_data"] = [this](std::string path) -> std::string
     {
         std::ifstream datafile;
@@ -903,6 +903,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         std::ofstream datafile;
         datafile.open(script_folder / "save.dat");
         datafile << data;
+        datafile.close();
     };
 
     /// Steal input from a Player or HH.
