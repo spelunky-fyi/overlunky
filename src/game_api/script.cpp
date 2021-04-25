@@ -867,11 +867,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return sol::nullopt;
     };
 
-    /// Loads save.dat from the script's pack. If save.dat does not exist, you will get an empty string.
+    /// Loads save_data_{meta.name}.dat from the script's pack. If save_data_{meta.name}.dat does not exist, you will get an empty string.
     lua["load_data"] = [this]() -> std::string
     {
         std::ifstream datafile;
-        datafile.open(script_folder / "save.dat");
+        datafile.open(script_folder / ("save_data_" + meta.name + ".dat"));
         if (datafile.good()) 
         {
             std::string string;
@@ -891,11 +891,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         }
     };
 
-    /// Saves `data` to the save.dat file in the script's pack.
+    /// Saves `data` to save_data_{meta.name}.dat, which is in the script's pack. If save_data_{meta.name}.dat does not exist, it will be created.
     lua["save_data"] = [this](std::string data)
     {
         std::ofstream datafile;
-        datafile.open(script_folder / "save.dat");
+        datafile.open(script_folder / ("save_data_" + meta.name + ".dat"));
         datafile << data;
         datafile.close();
     };
