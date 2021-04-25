@@ -435,6 +435,11 @@ Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 #### Params: `string path`
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
+### [`load_data`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_data)
+Loads save.dat from the script's pack. If save.dat does not exist, you will get an empty string.
+### [`save_data`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_data)
+#### Params: `string data`
+Saves `data` to the save.dat file in the script's pack.
 ### [`steal_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
 #### Params: `int uid`
 Steal input from a Player or HH.
