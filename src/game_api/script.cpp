@@ -7,6 +7,7 @@
 #include "savedata.hpp"
 #include "window_api.hpp"
 
+#include <sys/stat.h>
 #include <regex>
 #include <algorithm>
 #include <array>
@@ -166,6 +167,11 @@ ImVec2 screenify(ImVec2 pos)
     }
     ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (res.y / 2 * pos.y) - res.y / 2 + bar.y);
     return screened;
+}
+
+bool exists(const std::string& filename) {
+  struct stat buffer;   
+  return (stat (filename.c_str(), &buffer) == 0); 
 }
 
 ImVec2 normalize(ImVec2 pos)
@@ -865,6 +871,38 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             return sound;
         }
         return sol::nullopt;
+    };
+
+    /// Loads the `save.dat` file from the script's pack. If `save.dat` does not exist, you will get an empty string.
+    lua["load_data"] = [this](std::string path) -> std::string
+    {
+        std::ifstream datafile;
+        datafile.open(script_folder / "save.dat");
+        if (datafile.good()) 
+        {
+            std::string string;
+
+            datafile.seekg(0, std::ios::end);   
+            string.reserve(datafile.tellg());
+            datafile.seekg(0, std::ios::beg);
+
+            string.assign((std::istreambuf_iterator<char>(datafile)),
+                    std::istreambuf_iterator<char>());
+            datafile.close();
+            return string;
+        }
+        else
+        {
+            return "";
+        }
+    };
+
+    /// Saves `data` to the save.dat file in the script's pack.
+    lua["save_data"] = [this](std::string data)
+    {
+        std::ofstream datafile;
+        datafile.open(script_folder / "save.dat");
+        datafile << data;
     };
 
     /// Steal input from a Player or HH.
