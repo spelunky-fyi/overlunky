@@ -7,7 +7,6 @@
 #include "savedata.hpp"
 #include "window_api.hpp"
 
-#include <sys/stat.h>
 #include <regex>
 #include <algorithm>
 #include <array>
