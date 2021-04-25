@@ -168,11 +168,6 @@ ImVec2 screenify(ImVec2 pos)
     return screened;
 }
 
-bool exists(const std::string& filename) {
-  struct stat buffer;   
-  return (stat (filename.c_str(), &buffer) == 0); 
-}
-
 ImVec2 normalize(ImVec2 pos)
 {
     ImGuiIO &io = ImGui::GetIO();
