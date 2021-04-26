@@ -1112,6 +1112,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &EntityDB::life,
         "blood_content",
         &EntityDB::blood_content,
+        "texture",
+        &EntityDB::texture,
         "animations",
         &EntityDB::animations);
 
