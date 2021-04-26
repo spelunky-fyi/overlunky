@@ -1,4 +1,5 @@
 #include "script.hpp"
+#include "script_context.hpp"
 #include "entity.hpp"
 #include "logger.h"
 #include "rpc.hpp"
@@ -246,7 +247,7 @@ public:
     ScriptState state = { nullptr, 0, 0, 0, 0, 0, 0, 0 };
     bool changed = true;
     bool enabled = true;
-    ScriptMeta meta = { "", "", "", "", "", "", "", "", false };
+    ScriptMeta meta = { "", "", "", "", "", "", "", "", "", false };
     std::filesystem::path script_folder;
     int cbcount = 0;
 
@@ -275,7 +276,8 @@ public:
     ~ScriptImpl() = default;
 
     std::string script_id();
-    bool handle_function(sol::function func);
+    template<class... Args>
+    bool handle_function(sol::function func, Args&&... args);
 
     bool run();
     void draw(ImDrawList* dl);
@@ -295,6 +297,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     meta.file = std::move(file);
     meta.path = std::filesystem::path(meta.file).parent_path().string();
     meta.filename = std::filesystem::path(meta.file).filename().string();
+    meta.stem = std::filesystem::path(meta.file).stem().string();
 
     script_folder = std::filesystem::path(meta.file).parent_path();
 
@@ -1507,6 +1510,27 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "deepest_level",
         sol::readonly(&SaveData::deepest_level));
 
+    // Context received in ON.SAVE
+    // Used to save a string to some form of save_{}.dat
+    // Future calls to this will override the save
+    lua.new_usertype<SaveContext>(
+        "SaveContext",
+        "save",
+        &SaveContext::Save);
+    /* SaveContext
+    bool save(data_string)
+    */
+
+    // Context received in ON.LOAD
+    // Used to load from save_{}.dat into a string
+    lua.new_usertype<LoadContext>(
+        "LoadContext",
+        "load",
+        &LoadContext::Load);
+    /* LoadContext
+    string save()
+    */
+
     lua.create_named_table("ENT_TYPE");
     for (int i = 0; i < g_items.size(); i++)
     {
@@ -1616,7 +1640,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "LOADING",
         104,
         "RESET",
-        105);
+        105,
+        "SAVE",
+        106,
+        "LOAD",
+        107);
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
     lua.new_enum(
         "MASK",
@@ -1870,6 +1898,16 @@ bool SpelunkyScript::ScriptImpl::run()
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
+                else if (cb->screen == 106 && g_state->screen != state.screen) // ON.SAVE
+                {
+                    handle_function(cb->func, SaveContext{ meta.path, meta.stem });
+                    cb->lastRan = now;
+                }
+                else if (cb->screen == 107 && cb->lastRan < 0) // ON.LOAD
+                {
+                    handle_function(cb->func, LoadContext{ meta.path, meta.stem });
+                    cb->lastRan = now;
+                }
             }
         }
 
@@ -1963,9 +2001,10 @@ std::string SpelunkyScript::ScriptImpl::script_id()
     return newid;
 }
 
-bool SpelunkyScript::ScriptImpl::handle_function(sol::function func)
+template<class... Args>
+bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args&&... args)
 {
-    auto lua_result = func();
+    auto lua_result = func(std::forward<Args>(args)...);
     if (!lua_result.valid())
     {
         sol::error e = lua_result;
