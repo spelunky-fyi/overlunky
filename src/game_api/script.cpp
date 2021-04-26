@@ -1682,6 +1682,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
     lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
     lua.new_enum("CONST", "ENGINE_FPS", 60);
+    /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
+    lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
 }
 
 bool SpelunkyScript::ScriptImpl::run()
