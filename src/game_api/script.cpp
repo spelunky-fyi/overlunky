@@ -1415,7 +1415,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "win_state",
         &StateMemory::win_state,
         "illumination",
-        &StateMemory::illumination);
+        &StateMemory::illumination,
+        "money_total",
+        &StateMemory::money_total);
     lua.new_usertype<SaturationVignette>(
         "SaturationVignette",
         "red",

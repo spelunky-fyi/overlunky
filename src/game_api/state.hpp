@@ -72,7 +72,7 @@ struct StateMemory
     uint32_t time_last_level;
     uint32_t time_level;
     int32_t ia00;
-    int32_t ia04;
+    uint32_t money_total;
     int32_t hud_flags;
 
     char pada14[0x12b0 - 0xa14];

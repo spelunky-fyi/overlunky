@@ -731,6 +731,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`saved_hamsters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_hamsters) &StateMemory::saved_hamsters
 - [`win_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) &StateMemory::win_state
 - [`illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &StateMemory::illumination
+- [`money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_total) &StateMemory::money_total
 ### `SaturationVignette`
 - [`red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &SaturationVignette::red
 - [`green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &SaturationVignette::green
