@@ -14,7 +14,7 @@ The following Lua libraries and their functions are available. You can read more
 ### `coroutine`
 ### `package`
 ## Unsafe mode
-Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the ini file.
+Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.
 ## Modules
 You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
 
@@ -777,6 +777,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`score_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_top) sol::readonly(&SaveData::score_top)
 - [`deepest_area`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_area) sol::readonly(&SaveData::deepest_area)
 - [`deepest_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level) sol::readonly(&SaveData::deepest_level)
+### `SaveContext`
+- [`bool save(string data)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save)
+### `LoadContext`
+- [`string load()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load)
 ## Enums
 Enums are like numbers but in text that's easier to remember. Example:
 ```lua
@@ -843,6 +847,14 @@ end, ON.LEVEL)
 - [`START`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.START) 103
 - [`LOADING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOADING) 104
 - [`RESET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RESET) 105
+- [`SAVE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SAVE) 106
+\
+Params: `SaveContext save_ctx`\
+Runs at the same times as ON.SCREEN, but receives the save_ctx
+- [`LOAD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOAD) 107
+\
+Params: `LoadContext load_ctx`\
+Runs as soon as your script is loaded, including reloads, then never again
 ### LAYER
 - [`FRONT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.FRONT) 0
 - [`BACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.BACK) 1

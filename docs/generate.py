@@ -154,6 +154,29 @@ for file in api_files:
             var = var.split(',')
             vars.append({ 'name': var[0], 'type': var[1] })
         enums.append({'name': name, 'vars': vars})
+    data = open(file, 'r').read()
+    data = data.replace('\n', ' ')
+    m = re.findall(r'/\*(.*?)\*/', data)
+    for extended_enum_info in m:
+        extended_enum_info = extended_enum_info.strip()
+        enum = extended_enum_info[:extended_enum_info.find(' ')]
+        enum_to_mod = next((item for item in enums if item['name'] == enum), dict())
+        current_var_to_mod = dict()
+        if enum_to_mod:
+            sub_matches = re.findall(r'\/\/\s*([^\/\/]+)', extended_enum_info.strip())
+            collected_docs = ''
+            for sub_match in sub_matches:
+                var_name = sub_match.strip()
+                var_to_mod = next((item for item in enum_to_mod['vars'] if item['name'] == var_name), dict())
+                if var_to_mod:
+                    if current_var_to_mod:
+                        current_var_to_mod['docs'] = collected_docs
+                    current_var_to_mod = var_to_mod
+                    collected_docs = ''
+                else:
+                    collected_docs += '\\\n' + var_name
+        if current_var_to_mod:
+            current_var_to_mod['docs'] = collected_docs
 
 for file in api_files:
     data = open(file, 'r').read()
@@ -179,7 +202,7 @@ for lib in lualibs:
     print('### `' + lib + '`')
 
 print('## Unsafe mode')
-print('Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the ini file.')
+print('Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.')
 
 print('## Modules')
 print("""You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
@@ -266,5 +289,9 @@ end, ON.LEVEL)
 for type in enums:
     print('### '+type['name'])
     for var in type['vars']:
-        if var['name']: print('- [`'+var['name']+'`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+type['name']+'.'+var['name']+') ' + var['type'])
-        else: print('- '+var['type'])
+        if var['name']:
+            print('- [`'+var['name']+'`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+type['name']+'.'+var['name']+') ' + var['type'])
+        else:
+            print('- '+var['type'])
+        if 'docs' in var:
+            print(var['docs'])

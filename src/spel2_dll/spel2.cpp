@@ -2,6 +2,7 @@
 
 #include "window_api.hpp"
 #include "script.hpp"
+#include "script_context.hpp"
 #include "state.hpp"
 #include "sound_manager.hpp"
 
@@ -54,6 +55,19 @@ void RegisterPreDrawFunc(PreDrawFunc pre_draw)
 void RegisterPostDrawFunc(PostDrawFunc post_draw)
 {
     register_post_draw(post_draw);
+}
+
+void RegisterMakeSavePathFunct(Spelunky_MakeSavePathFunc make_save_path)
+{
+	static Spelunky_MakeSavePathFunc local_make_save_path_func = make_save_path;
+	register_make_save_path([](std::string_view script_path, std::string_view script_name) -> std::string {
+		char out_buffer[MAX_PATH];
+		if (local_make_save_path_func(script_path.data(), script_path.size(), script_name.data(), script_name.size(), out_buffer, MAX_PATH))
+		{
+			return out_buffer;
+		}
+		return "";
+	});
 }
 
 std::string read_whole_file(const char* file_path)
