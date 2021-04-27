@@ -957,3 +957,91 @@ void pick_up(uint32_t who, uint32_t what)
         pick_up_func(ent, item);
     }
 }
+
+void set_olmec_phase_y_level(uint8_t phase, float y)
+{
+    // Sets the Y-level Olmec changes phases. The defaults are :
+    // - phase 1 (bombs) = 99 (+1)  (the game adds 1 to the fixed value for some reason)
+    // - phase 2 (ufos) = 83
+    // Olmecs checks phases in order! The means if you want ufo's from the start
+    // you have to put both phase 1 and 2 at e.g. level 199
+    // If you want to make Olmec stay in phase 0 (stomping) all the time, you can just set
+    // the phase 1 y level to e.g. 10.
+    static size_t phase1_offset = 0;
+    static size_t phase2_offset = 0;
+    if (phase1_offset == 0)
+    {
+        auto state = State::get();
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+
+        std::string pattern_phase1 = "\xF3\x0F\x10\x15\x07\x3D\x36\x00"s;
+        std::string pattern_phase2 = "\xF3\x0F\x10\x0D\xCD\x38\x36\x00"s;
+
+        // first look up these patterns so we are in the correct function
+        auto offset1 = find_inst(exe, pattern_phase1, memory.after_bundle);
+        auto offset2 = find_inst(exe, pattern_phase2, memory.after_bundle);
+
+        // find the space inbetween this function and the next
+        uint8_t cc_counter = 0;
+        size_t op_counter = offset1;
+        uint8_t previous_opcode = 0;
+        while (cc_counter < 4)
+        {
+            unsigned char opcode = exe[op_counter];
+            if (opcode == 0xcc && previous_opcode == 0xcc)
+            {
+                cc_counter++;
+            }
+            previous_opcode = opcode;
+            op_counter++;
+        }
+
+        // here's the memory location where we save our floats
+        phase1_offset = op_counter;
+        phase2_offset = phase1_offset + 4;
+
+        // write the default values to our new floats
+        write_mem_prot(memory.at_exe(phase1_offset), to_le_bytes(99.0f), true);
+        write_mem_prot(memory.at_exe(phase2_offset), to_le_bytes(83.0f), true);
+
+        // calculate the distances between our floats and the movss instructions
+        uint32_t distance_1 = phase1_offset - (offset1 + 8);
+        uint32_t distance_2 = phase2_offset - (offset2 + 8);
+
+        // overwrite the movss instructions to load our floats
+        write_mem_prot(memory.at_exe(offset1 + 4), to_le_bytes(distance_1), true);
+        write_mem_prot(memory.at_exe(offset2 + 4), to_le_bytes(distance_2), true);
+
+        phase1_offset = memory.at_exe(phase1_offset);
+        phase2_offset = memory.at_exe(phase2_offset);
+    }
+
+    if (phase == 1)
+    {
+        write_mem_prot(phase1_offset, to_le_bytes(y), true);
+    }
+    else if (phase == 2)
+    {
+        write_mem_prot(phase2_offset, to_le_bytes(y), true);
+    }
+}
+
+void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
+{
+    static size_t normal_offset = 0;
+    static size_t cursed_offset = 0;
+    if (normal_offset == 0)
+    {
+        auto state = State::get();
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+
+        std::string pattern = "\xBA\x28\x23\x00\x00\x41\xB8\x30\x2A\x00\x00"s;
+        auto offset = find_inst(exe, pattern, memory.after_bundle);
+        normal_offset = memory.at_exe(offset + 7);
+        cursed_offset = memory.at_exe(offset + 1);
+    }
+    write_mem_prot(normal_offset, to_le_bytes(normal), true);
+    write_mem_prot(cursed_offset, to_le_bytes(cursed), true);
+}

@@ -29,6 +29,11 @@ using ImguiDrawFunc = void(*)();
 using PreDrawFunc = void(*)();
 using PostDrawFunc = void(*)();
 
+using Spelunky_MakeSavePathFunc = bool(*)(
+	const char* script_path, size_t script_path_size,
+	const char* script_name, size_t script_name_size,
+	char* out_buffer, size_t out_buffer_size);
+
 class SpelunkyScript;
 
 void SetWriteLoadOptimization(bool write_load_opt);
@@ -44,6 +49,8 @@ void RegisterImguiInitFunc(ImguiInitFunc imgui_init);
 void RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw);
 void RegisterPreDrawFunc(PreDrawFunc pre_draw);
 void RegisterPostDrawFunc(PostDrawFunc post_draw);
+
+void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
 
 SpelunkyScript* CreateScript(const char *file_path, bool enabled);
 void FreeScript(SpelunkyScript* script);

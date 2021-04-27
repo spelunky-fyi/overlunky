@@ -23,6 +23,7 @@
 #include "logger.h"
 #include "rpc.hpp"
 #include "script.hpp"
+#include "script_context.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
 #include "sound_manager.hpp"
@@ -3176,6 +3177,13 @@ void render_entity_props()
         ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &g_entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Jump power##GlobalJumpPower", &g_entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &g_entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        if (ImGui::CollapsingHeader("Properties flags"))
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                ImGui::CheckboxFlags(entity_type_properties_flags[i], &g_entity->type->properties_flags, pow(2, i));
+            }
+        }
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {
@@ -3849,6 +3857,15 @@ void create_box(std::vector<EntityItem> items)
     }
 }
 
+std::string make_save_path(std::string_view script_path, std::string_view script_name)
+{
+    std::string save_path{ script_path };
+    save_path += "/save_";
+    save_path += script_name;
+    save_path += ".dat";
+    return save_path;
+}
+
 void init_ui()
 {
     g_SoundManager = new SoundManager(&LoadAudioFile);
@@ -3862,4 +3879,6 @@ void init_ui()
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);
+
+    register_make_save_path(make_save_path);
 }
