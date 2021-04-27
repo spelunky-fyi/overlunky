@@ -18,3 +18,7 @@ set_callback(function(load_ctx)
         message("Loaded "..tostring(num_saved))
     end
 end, ON.LOAD)
+
+set_callback(function()
+    message("Could've saved but didn't, because I didn't take an arg...")
+end, ON.SAVE)

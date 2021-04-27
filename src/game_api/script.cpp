@@ -1518,7 +1518,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "save",
         &SaveContext::Save);
     /* SaveContext
-    bool save(data_string)
+    bool save(string data)
     */
 
     // Context received in ON.LOAD
@@ -1528,7 +1528,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "load",
         &LoadContext::Load);
     /* LoadContext
-    string save()
+    string load()
     */
 
     lua.create_named_table("ENT_TYPE");
@@ -1645,6 +1645,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         106,
         "LOAD",
         107);
+    /* ON
+    // SAVE
+    // Params: `SaveContext save_ctx`
+    // Runs at the same times as ON.SCREEN, but receives the save_ctx
+    // LOAD
+    // Params: `LoadContext load_ctx`
+    // Runs as soon as your script is loaded, including reloads, then never again
+    */
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
     lua.new_enum(
         "MASK",
