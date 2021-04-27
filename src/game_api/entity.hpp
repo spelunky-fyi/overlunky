@@ -57,14 +57,15 @@ struct EntityDB
     float width;
     float height;
     uint8_t draw_depth;
-    uint8_t field_25;
+    uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
     int16_t field_26;
     Rect rect_collision;
     int32_t field_3C;
     int32_t field_40;
     int32_t field_44;
-    int64_t field_48;
-    int32_t field_50;
+    int32_t default_flags;
+    int32_t default_more_flags;
+    int32_t properties_flags;
     float friction;
     float elasticity;
     float weight;
@@ -151,7 +152,7 @@ class Entity
     int32_t uid;
     uint8_t animation_frame;
     uint8_t b3d;
-    uint8_t b3e;
+    uint8_t draw_depth;
     uint8_t b3f;
     float x;
     float y;

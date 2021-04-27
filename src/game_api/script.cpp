@@ -716,6 +716,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_blood_multiplication"] = set_blood_multiplication;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
+    /// Sets the Y-level at which Olmec changes phases
+    lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
+    /// Determines when the ghost appears, either when the player is cursed or not
+    lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
@@ -1111,7 +1115,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "blood_content",
         &EntityDB::blood_content,
         "animations",
-        &EntityDB::animations);
+        &EntityDB::animations,
+        "properties_flags",
+        &EntityDB::properties_flags,
+        "default_flags",
+        &EntityDB::default_flags,
+        "default_more_flags",
+        &EntityDB::default_more_flags);
 
     lua.new_usertype<Entity>(
         "Entity",
@@ -1170,7 +1180,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "as_cape",
         &Entity::as<Cape>,
         "as_vlads_cape",
-        &Entity::as<VladsCape>);
+        &Entity::as<VladsCape>,
+        "as_chasingmonster",
+        &Entity::as<ChasingMonster>,
+        "as_ghost",
+        &Entity::as<Ghost>,
+        "as_jiangshi",
+        &Entity::as<Jiangshi>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -1303,6 +1319,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &VladsCape::can_double_jump,
         sol::base_classes,
         sol::bases<Entity, Movable, Cape>());
+    lua.new_usertype<ChasingMonster>(
+        "ChasingMonster",
+        "chased_target_uid",
+        &Ghost::chased_target_uid,
+        "target_selection_timer",
+        &Ghost::target_selection_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Ghost>(
+        "Ghost",
+        "split_timer",
+        &Ghost::split_timer,
+        "velocity_multiplier",
+        &Ghost::velocity_multiplier,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster, ChasingMonster>());
+    lua.new_usertype<Jiangshi>(
+        "Jiangshi", "wait_timer", &Jiangshi::wait_timer, sol::base_classes, sol::bases<Entity, Movable, Monster, ChasingMonster>());
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -1380,7 +1414,35 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "saved_cats",
         &StateMemory::saved_cats,
         "saved_hamsters",
-        &StateMemory::saved_hamsters);
+        &StateMemory::saved_hamsters,
+        "win_state",
+        &StateMemory::win_state,
+        "illumination",
+        &StateMemory::illumination,
+        "money_last_levels",
+        &StateMemory::money_last_levels);
+    lua.new_usertype<SaturationVignette>(
+        "SaturationVignette",
+        "red",
+        &SaturationVignette::red,
+        "green",
+        &SaturationVignette::green,
+        "blue",
+        &SaturationVignette::blue,
+        "vignette_aperture",
+        &SaturationVignette::vignette_aperture);
+    lua.new_usertype<Illumination>(
+        "Illumination",
+        "saturation_vignette",
+        &Illumination::saturation_vignette,
+        "brightness1",
+        &Illumination::brightness1,
+        "brightness2",
+        &Illumination::brightness2,
+        "frontlayer_global_illumination",
+        &Illumination::frontlayer_global_illumination,
+        "backlayer_global_illumination",
+        &Illumination::backlayer_global_illumination);
     auto play = sol::overload(
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
@@ -1656,6 +1718,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
     lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
     lua.new_enum("CONST", "ENGINE_FPS", 60);
+    /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
+    lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
 }
 
 bool SpelunkyScript::ScriptImpl::run()

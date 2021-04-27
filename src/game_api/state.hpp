@@ -9,6 +9,7 @@
 const float ZF = 0.737;
 
 struct Layer;
+struct Illumination;
 
 struct StateMemory
 {
@@ -17,7 +18,7 @@ struct StateMemory
     uint32_t screen;
     uint32_t screen_next;
     uint32_t loading;
-    size_t p18;
+    Illumination *illumination;
     int32_t i20;
     uint32_t fadeout;
     uint32_t fadein;
@@ -53,7 +54,7 @@ struct StateMemory
     int32_t i70;
     uint8_t theme;
     uint8_t theme_next;
-    uint8_t b72;
+    uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t b73;
     int32_t i74;
     uint8_t shoppie_aggro;
@@ -71,7 +72,7 @@ struct StateMemory
     uint32_t time_last_level;
     uint32_t time_level;
     int32_t ia00;
-    int32_t ia04;
+    uint32_t money_last_levels;
     int32_t hud_flags;
 
     char pada14[0x12b0 - 0xa14];
@@ -225,4 +226,32 @@ struct State
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
     SaveData *savedata();
+};
+
+struct SaturationVignette
+{
+    float red; // default = 1.0 (can go over 1.0 for oversaturation)
+    float green;
+    float blue;
+    float vignette_aperture; // default = 20000.0 ; visible aperture change in range 1.0 - 100.0
+};
+
+struct Illumination
+{
+    SaturationVignette saturation_vignette;
+    SaturationVignette saturation_vignette_other[3]; // there's three more, no idea why (multiplayer doesn't change these)
+    float brightness1;
+    float brightness2;
+    float something_min;
+    float something_max;
+    size_t unknown_empty;
+    float unknown_float;
+    float unknown_nan;
+    uint32_t unknown_timer;
+    uint8_t frontlayer_global_illumination; // 0 = on; 1 = off; 4 = white; ... higher starts to flicker
+    uint8_t unknown_illumination1;
+    uint8_t backlayer_global_illumination; // 0 = off ; 1 = on but turns front layer off
+    uint8_t unknown_illumination2;         // influences backlayer_global_illumination
+    uint32_t unknown_int1;                 // crash when changed
+    uint32_t unknown_int2;
 };
