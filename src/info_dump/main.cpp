@@ -90,6 +90,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 {
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
+
     while (true)
     {
         auto entities = list_entities();
@@ -107,13 +108,17 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         std::this_thread::sleep_for(100ms);
     }
 
+    auto items = list_entities();
+    std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool { return a.id < b.id; });
+
+    Textures* textures_ptr = get_textures();
+    std::sort(
+        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool { return a.id < b.id; });
+
     std::filesystem::create_directories("game_data");
 
     if (std::ofstream entities_file = std::ofstream("game_data/entities.json"))
     {
-        auto items = list_entities();
-        std::sort(items.begin(), items.end(), [](EntityItem &a, EntityItem &b) -> bool { return a.id < b.id; });
-
         float_json entities(float_json::object());
         for (auto &ent : items)
         {
@@ -129,9 +134,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 
     if (std::ofstream entities_file = std::ofstream("game_data/entities_texture_only.json"))
     {
-        auto items = list_entities();
-        std::sort(items.begin(), items.end(), [](EntityItem &a, EntityItem &b) -> bool { return a.id < b.id; });
-
         float_json entities(float_json::object());
         for (auto &ent : items)
         {
@@ -151,10 +153,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 
     if (std::ofstream textures_file = std::ofstream("game_data/textures.json"))
     {
-        Textures *textures_ptr = get_textures();
-        std::sort(
-            textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture &a, Texture &b) -> bool { return a.id < b.id; });
-
         float_json textures(float_json::object());
         for (std::size_t i = 0; i < textures_ptr->num_textures; i++)
         {
@@ -164,6 +162,30 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 
         std::string dump = textures.dump(2);
         textures_file.write(dump.data(), dump.size());
+    }
+
+    if (std::ofstream search_flags_file = std::ofstream("game_data/search_flags.json"))
+    {
+        float_json search_flags(float_json::object());
+        for (size_t i = 31; i < 32; i--)
+        {
+            std::uint32_t search_flag = 1 << i;
+            std::vector<std::string> entities;
+            for (auto &ent : items)
+            {
+                EntityDB *db = get_type(ent.id);
+                if (!db)
+                    break;
+                if ((db->search_flags & search_flag) != 0)
+                {
+                    entities.push_back(ent.name);
+                }
+            }
+            search_flags[fmt::format("{}", search_flag)] = std::move(entities);
+        }
+
+        std::string dump = search_flags.dump(2);
+        search_flags_file.write(dump.data(), dump.size());
     }
 
     std::exit(0);

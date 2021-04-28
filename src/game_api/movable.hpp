@@ -90,6 +90,10 @@ class Movable : public Entity
 
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
     bool is_poisoned();
+
+    bool is_button_pressed(uint32_t button);
+    bool is_button_held(uint32_t button);
+    bool is_button_released(uint32_t button);
 };
 
 class Monster : public Movable

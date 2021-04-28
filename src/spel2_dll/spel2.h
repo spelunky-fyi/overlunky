@@ -36,6 +36,8 @@ using Spelunky_MakeSavePathFunc = bool(*)(
 
 class SpelunkyScript;
 
+void SetWriteLoadOptimization(bool write_load_opt);
+
 void InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
 void InitSoundManager(Spelunky_DecodeAudioFile* decode_function);
 
@@ -48,7 +50,7 @@ void RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw);
 void RegisterPreDrawFunc(PreDrawFunc pre_draw);
 void RegisterPostDrawFunc(PostDrawFunc post_draw);
 
-void RegisterMakeSavePathFunct(Spelunky_MakeSavePathFunc make_save_path);
+void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
 
 SpelunkyScript* CreateScript(const char *file_path, bool enabled);
 void FreeScript(SpelunkyScript* script);
@@ -98,7 +100,7 @@ enum class SpelunkyScreen {
 	Level = 12,
 	Transition = 13,
 	Death = 14,
-	Sapceship = 16,
+	Spaceship = 16,
 	Win = 16,
 	Credits = 17,
 	Scores = 18,

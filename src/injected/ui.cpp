@@ -34,7 +34,7 @@
 
 SoundManager* g_SoundManager{ nullptr };
 
-std::map<std::string, SpelunkyScript *> g_scripts;
+std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
@@ -298,7 +298,7 @@ void load_script(std::string file, bool enable = true)
         if (slash != std::string::npos)
             file = file.substr(slash + 1);*/
         SpelunkyScript *script = new SpelunkyScript(buf.str(), file, g_SoundManager, enable);
-        g_scripts[script->get_file()] = script;
+        g_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{ script };
         data.close();
     }
 }
@@ -2038,9 +2038,8 @@ void fix_script_requires(SpelunkyScript* script)
     if (!script->is_enabled()) return;
     for (auto req : script->consume_requires())
     {
-        for (auto it2 : g_scripts)
+        for (auto& [name, script2] : g_scripts)
         {
-            SpelunkyScript *script2 = it2.second;
             if (script2->get_id() == req)
             {
                 if(!script2->is_enabled())
@@ -2109,13 +2108,13 @@ void render_messages()
     using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     auto now = std::chrono::system_clock::now();
     std::vector<Message> queue;
-    for (auto script : g_scripts)
+    for (auto& [name, script] : g_scripts)
     {
-        for (auto message : script.second->get_messages())
+        for (auto message : script->get_messages())
         {
             if (now - 10s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script.second->get_name(), message.message, message.time, message.color));
+            queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
         }
     }
     ImGuiIO &io = ImGui::GetIO();
@@ -2208,15 +2207,15 @@ void render_clickhandler()
     {
         render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
     }
-    for (auto script : g_scripts)
+    for (auto& [name, script] : g_scripts)
     {
-        fix_script_requires(script.second);
+        fix_script_requires(script.get());
     }
     auto* draw_list = ImGui::GetBackgroundDrawList();
-    for (auto script : g_scripts)
+    for (auto& [name, script] : g_scripts)
     {
-        update_script(script.second);
-        render_script(script.second, draw_list);
+        update_script(script.get());
+        render_script(script.get(), draw_list);
     }
     if (g_state->screen == 29)
     {
@@ -2608,7 +2607,7 @@ void render_script_files()
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
             name, g_SoundManager, true);
-        g_scripts[name] = script;
+        g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
     }
     ImGui::PopID();
 }
@@ -2632,10 +2631,9 @@ void render_scripts()
     ImVec4 origcolor = ImGui::GetStyle().Colors[ImGuiCol_Header];
     float gray = (origcolor.x + origcolor.y + origcolor.z) / 3.0f;
     ImVec4 disabledcolor = ImVec4(gray, gray, gray, 0.5f);
-    for (auto it : g_scripts)
+    for (auto& [script_name, script] : g_scripts)
     {
         ImGui::PushID(i);
-        SpelunkyScript *script = it.second;
         char name[255];
         std::string filename;
         size_t slash = script->get_file().find_last_of("/\\");

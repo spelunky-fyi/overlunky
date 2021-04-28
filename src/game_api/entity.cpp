@@ -290,6 +290,22 @@ bool Movable::is_poisoned()
     return (poison_tick_timer != -1);
 }
 
+bool Movable::is_button_pressed(uint32_t button)
+{
+    return (buttons & button) != 0
+        && (buttons & (button << 8)) == 0;
+}
+bool Movable::is_button_held(uint32_t button)
+{
+    return (buttons & button) != 0
+        && (buttons & (button << 8)) != 0;
+}
+bool Movable::is_button_released(uint32_t button)
+{
+    return (buttons & button) == 0
+        && (buttons & (button << 8)) != 0;
+}
+
 uint8_t Olmec::broken_floaters()
 {
     static auto olmec_floater_id = to_id("ENT_TYPE_FX_OLMECPART_FLOATER");

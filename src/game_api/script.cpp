@@ -82,6 +82,7 @@ struct ScriptState
     uint32_t screen;
     uint32_t time_level;
     uint32_t time_total;
+    uint32_t time_global;
     uint32_t frame;
     uint32_t loading;
     uint32_t reset;
@@ -315,6 +316,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
+    state.time_global = get_frame_count();
     state.frame = get_frame_count();
     state.loading = g_state->loading;
     state.reset = (g_state->quest_flags & 1);
@@ -646,6 +648,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
+    /// Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
+    /// list[uint32_t] get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
+    lua["get_entities_overlapping"] = get_entities_overlapping;
     /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
     /// Set the `flags` field from entity by uid
@@ -1114,6 +1119,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &EntityDB::life,
         "blood_content",
         &EntityDB::blood_content,
+        "texture",
+        &EntityDB::texture,
         "animations",
         &EntityDB::animations,
         "properties_flags",
@@ -1123,6 +1130,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "default_more_flags",
         &EntityDB::default_more_flags);
 
+    auto overlaps_with = sol::overload(
+        static_cast<bool(Entity::*)(Entity*)>(&Entity::overlaps_with),
+        static_cast<bool(Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
     lua.new_usertype<Entity>(
         "Entity",
         "type",
@@ -1151,6 +1161,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::topmost,
         "topmost_mount",
         &Entity::topmost_mount,
+        "overlaps_with",
+        overlaps_with,
         "as_movable",
         &Entity::as<Movable>,
         "as_door",
@@ -1187,6 +1199,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<Ghost>,
         "as_jiangshi",
         &Entity::as<Jiangshi>);
+    /* Entity
+        bool overlaps_with(Entity other)
+    */
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -1241,6 +1256,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::is_poisoned,
         "poison",
         &Movable::poison,
+        "is_button_pressed",
+        &Movable::is_button_pressed,
+        "is_button_held",
+        &Movable::is_button_held,
+        "is_button_released",
+        &Movable::is_button_released,
         "price",
         &Movable::price,
         sol::base_classes,
@@ -1248,6 +1269,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         /* Movable
             bool is_poisoned()
             void poison(int16_t frames)
+            bool is_button_pressed(uint32_t button)
+            bool is_button_held(uint32_t button)
+            bool is_button_released(uint32_t button)
         */
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Player>(
@@ -1673,7 +1697,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "SAVE",
         106,
         "LOAD",
-        107);
+        107,
+        "GAMEFRAME",
+        108);
     /* ON
     // SAVE
     // Params: `SaveContext save_ctx`
@@ -1683,6 +1709,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     // Runs as soon as your script is loaded, including reloads, then never again
     */
     lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.new_enum("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
     lua.new_enum(
         "MASK",
         "PLAYER",
@@ -1695,6 +1722,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         0x8,
         "EXPLOSION",
         0x10,
+        "ROPE",
+        0x20,
         "FX",
         0x40,
         "ACTIVEFLOOR",
@@ -1947,6 +1976,10 @@ bool SpelunkyScript::ScriptImpl::run()
                     handle_function(cb->func, LoadContext{ meta.path, meta.stem });
                     cb->lastRan = now;
                 }
+                else if (cb->screen == 108 && !g_state->pause && get_frame_count() != state.time_global && (g_state->screen >= 11 && g_state->screen <= 14)) // ON.GAMEFRAME
+                {
+                    handle_function(cb->func);
+                }
             }
         }
 
@@ -1987,6 +2020,7 @@ bool SpelunkyScript::ScriptImpl::run()
         state.screen = g_state->screen;
         state.time_level = g_state->time_level;
         state.time_total = g_state->time_total;
+        state.time_global = get_frame_count();
         state.frame = get_frame_count();
         state.loading = g_state->loading;
         state.reset = (g_state->quest_flags & 1);

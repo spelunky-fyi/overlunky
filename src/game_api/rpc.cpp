@@ -544,6 +544,20 @@ std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, flo
     return found;
 }
 
+std::vector<uint32_t> get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
+{
+    auto state = State::get();
+    std::vector<uint32_t> found;
+    for (auto& item : state.layer(layer)->items())
+    {
+        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == type || type == 0) && item->overlaps_with(sx, sy, sx2, sy2))
+        {
+            found.push_back(item->uid);
+        }
+    }
+    return found;
+}
+
 void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();

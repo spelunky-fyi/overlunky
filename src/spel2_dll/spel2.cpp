@@ -8,6 +8,11 @@
 
 SoundManager* g_SoundManager{ nullptr };
 
+void SetWriteLoadOptimization(bool write_load_opt)
+{
+	State::set_write_load_opt(write_load_opt);
+}
+
 void InitSwapChainHooks(IDXGISwapChain* swap_chain)
 {
 	init_hooks(swap_chain);
@@ -57,7 +62,7 @@ void RegisterPostDrawFunc(PostDrawFunc post_draw)
     register_post_draw(post_draw);
 }
 
-void RegisterMakeSavePathFunct(Spelunky_MakeSavePathFunc make_save_path)
+void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
 {
 	static Spelunky_MakeSavePathFunc local_make_save_path_func = make_save_path;
 	register_make_save_path([](std::string_view script_path, std::string_view script_name) -> std::string {
