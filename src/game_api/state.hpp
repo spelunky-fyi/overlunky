@@ -39,7 +39,7 @@ struct StateMemory
     int8_t kali_altars_destroyed;
     uint8_t b4f;
     int32_t i50;
-    int32_t i54;
+    int32_t money_shop_total; // total $ spent at shops, persists between levels, number will be negative
     uint8_t world_start;
     uint8_t level_start;
     uint8_t theme_start;
