@@ -1,5 +1,9 @@
 import re
 
+# redirect stdout to script-api.md
+import sys
+sys.stdout = open('script-api.md', 'w')
+
 header_files = ['../src/game_api/rpc.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
 api_files = ['../src/game_api/script.cpp']
 rpc = []
@@ -295,3 +299,4 @@ for type in enums:
             print('- '+var['type'])
         if 'docs' in var:
             print(var['docs'])
+
