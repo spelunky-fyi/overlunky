@@ -468,7 +468,7 @@ const char *shortcut_flags[] = {
     "1-4: $10,000 (Unlocked)",
     "3-1: Rope",
     "3-1: Weapon",
-    "3-1: Rope (Unlocked)",
+    "3-1: Mount (Unlocked)",
     "5-1: $50,000",
     "5-1: Hired Hand",
     "5-1: Golden Key (Unlocked)"};
