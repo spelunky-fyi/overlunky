@@ -1,7 +1,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 #include "fmod.hpp"
@@ -53,14 +55,17 @@ public:
     PlayingSound play(bool paused, SoundType sound_type);
 
 private:
+    CustomSound(std::nullptr_t, std::nullptr_t) {}
     CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager);
+    CustomSound(FMODStudio::EventDescription* fmod_event, SoundManager* sound_manager);
 
-    FMOD::Sound* m_FmodSound{ nullptr };
+    std::variant<FMOD::Sound*, FMODStudio::EventDescription*, std::monostate> m_FmodHandle{};
     SoundManager* m_SoundManager{ nullptr };
 };
 
 class PlayingSound {
     friend class SoundManager;
+    friend class CustomSound;
 
 public:
     PlayingSound(const PlayingSound& rhs) = default;
@@ -80,9 +85,11 @@ public:
     bool set_callback(SoundCallbackFunction&& callback);
 
 private:
+    PlayingSound(std::nullptr_t, std::nullptr_t) {}
     PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager);
+    PlayingSound(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager);
 
-    FMOD::Channel* m_FmodChannel{ nullptr };
+    std::variant<FMOD::Channel*, FMODStudio::EventInstance*, std::monostate> m_FmodHandle{};
     SoundManager* m_SoundManager{ nullptr };
 };
 
@@ -99,9 +106,13 @@ public:
 
     CustomSound get_sound(std::string path);
     CustomSound get_sound(const char* path);
+    CustomSound get_existing_sound(std::string_view path);
     void acquire_sound(FMOD::Sound* fmod_sound);
     void release_sound(FMOD::Sound* fmod_sound);
     PlayingSound play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music);
+
+    CustomSound get_event(std::string_view event_name);
+    PlayingSound play_event(FMODStudio::EventDescription* fmod_event, bool paused, bool as_music);
 
     bool is_playing(PlayingSound playing_sound);
     bool stop(PlayingSound playing_sound);
@@ -116,7 +127,7 @@ public:
 private:
     DecodeAudioFile* m_DecodeFunction{ nullptr };
 
-    void* m_FmodSystem{ nullptr };
+    FMOD::System* m_FmodSystem{ nullptr };
 
     FMOD::CreateSound* m_CreateSound{ nullptr };
     FMOD::ReleaseSound* m_ReleaseSound{ nullptr };
@@ -134,6 +145,8 @@ private:
     FMOD::ChannelSetUserData* m_ChannelSetUserData{ nullptr };
     FMOD::ChannelGetUserData* m_ChannelGetUserData{ nullptr };
 
+    FMODStudio::EventDescriptionCreateInstance* m_EventCreateInstance{ nullptr };
+
     FMOD::ChannelGroup* m_SfxChannelGroup{ nullptr };
     FMOD::ChannelGroup* m_MusicChannelGroup{ nullptr };
 
@@ -142,7 +155,7 @@ private:
         std::string PropertyNames[38];
     };
     struct EventDescription {
-        FMOD::EventDescription* Event;
+        FMODStudio::EventDescription* Event;
         EventId Id;
         std::string Name;
         std::uint64_t _ull[46];
@@ -151,6 +164,7 @@ private:
     struct SoundData {
         const EventProperties* Properties;
         const EventMap* Events;
+        std::unordered_map<std::string_view, const EventDescription*> NameToEvent;
     };
     static_assert(sizeof(EventDescription) == 0x1a0);
     SoundData m_SoundData;

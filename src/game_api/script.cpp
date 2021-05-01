@@ -7,6 +7,7 @@
 #include "sound_manager.hpp"
 #include "savedata.hpp"
 #include "window_api.hpp"
+#include "overloaded.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -21,10 +22,6 @@
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
-
-// helper type for visitor pattern
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
 
 struct IntOption {
     int value;
@@ -871,8 +868,20 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound> {
-        CustomSound sound = sound_manager->get_sound((script_folder / path).string());
-        if (sound)
+        if (CustomSound sound = sound_manager->get_sound((script_folder / path).string()))
+        {
+            return sound;
+        }
+        return sol::nullopt;
+    };
+
+    /// Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
+    lua["get_sound"] = [this](std::string name) -> sol::optional<CustomSound> {
+        if (CustomSound event = sound_manager->get_event(name))
+        {
+            return event;
+        }
+        else if (CustomSound sound = sound_manager->get_existing_sound((script_folder / name).string()))
         {
             return sound;
         }

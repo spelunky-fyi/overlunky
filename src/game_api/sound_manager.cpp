@@ -2,6 +2,7 @@
 
 #include "logger.h"
 #include "memory.hpp"
+#include "overloaded.hpp"
 
 #include <mutex>
 #include <string>
@@ -46,28 +47,45 @@ FMOD::FMOD_RESULT ChannelControlCallback(FMOD::ChannelControl* channel_control, 
 }
 
 CustomSound::CustomSound(const CustomSound& rhs)
+	: m_FmodHandle{ rhs.m_FmodHandle }
+	, m_SoundManager{ rhs.m_SoundManager }
 {
-	m_FmodSound = rhs.m_FmodSound;
-	m_SoundManager = rhs.m_SoundManager;
 	if (m_SoundManager != nullptr)
 	{
-		m_SoundManager->acquire_sound(rhs.m_FmodSound);
+		std::visit(overloaded{
+			[this](FMOD::Sound* sound) {
+				m_SoundManager->acquire_sound(sound);
+			},
+			[](FMODStudio::EventDescription*) {},
+			[](std::monostate) {},
+		}, rhs.m_FmodHandle);
 	}
 }
 CustomSound::CustomSound(CustomSound&& rhs) noexcept
 {
-	std::swap(m_FmodSound, rhs.m_FmodSound);
+	std::swap(m_FmodHandle, rhs.m_FmodHandle);
 	std::swap(m_SoundManager, rhs.m_SoundManager);
 }
 CustomSound::CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager)
-	: m_FmodSound{ fmod_sound }
+	: m_FmodHandle{ fmod_sound }
 	, m_SoundManager{ sound_manager }
 {}
+CustomSound::CustomSound(FMODStudio::EventDescription* fmod_event, SoundManager* sound_manager)
+	: m_FmodHandle{ fmod_event }
+	, m_SoundManager{ sound_manager }
+{}
+
 CustomSound::~CustomSound()
 {
 	if (m_SoundManager != nullptr)
 	{
-		m_SoundManager->release_sound(m_FmodSound);
+		std::visit(overloaded{
+			[this](FMOD::Sound* sound) {
+				m_SoundManager->acquire_sound(sound);
+			},
+			[this](FMODStudio::EventDescription*) {},
+			[](std::monostate) {},
+		}, m_FmodHandle);
 	}
 }
 
@@ -81,12 +99,25 @@ PlayingSound CustomSound::play(bool paused)
 }
 PlayingSound CustomSound::play(bool paused, SoundType sound_type)
 {
-	return m_SoundManager->play_sound(m_FmodSound, paused, sound_type == SoundType::Music);
+	return std::visit(overloaded{
+		[=](FMOD::Sound* sound) {
+			return m_SoundManager->play_sound(sound, paused, sound_type == SoundType::Music);
+		},
+		[=](FMODStudio::EventDescription* event) {
+			return m_SoundManager->play_event(event, paused, sound_type == SoundType::Music);
+		},
+		[](std::monostate) { return PlayingSound{ nullptr, nullptr }; },
+	}, m_FmodHandle);
 }
 
 
 PlayingSound::PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager)
-	: m_FmodChannel{ fmod_channel }
+	: m_FmodHandle{ fmod_channel }
+	, m_SoundManager{ sound_manager }
+{
+}
+PlayingSound::PlayingSound(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager)
+	: m_FmodHandle{ fmod_event }
 	, m_SoundManager{ sound_manager }
 {
 }
@@ -153,6 +184,10 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 
 		auto event_map_instruction = find_inst(exe, "\x48\x8b\x08\x48\x83\xc1\x18\x48\x8d\x54\x24\x30", start) - 0xc;
 		m_SoundData.Events = (const EventMap*)memory.at_exe(decode_pc(exe, event_map_instruction));
+		for (const auto& [id, event] : *m_SoundData.Events)
+		{
+			m_SoundData.NameToEvent[event.Name] = &event;
+		}
 
 		auto get_core_system = reinterpret_cast<FMODStudio::GetCoreSystem*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetCoreSystem"));
 		{
@@ -200,6 +235,8 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		};
 		get_channel_group_from_bus_name("bus:/Master_SUM/Master_SFX", &m_SfxChannelGroup);
 		get_channel_group_from_bus_name("bus:/Master_SUM/Master_BGM", &m_MusicChannelGroup);
+
+		m_EventCreateInstance = reinterpret_cast<FMODStudio::EventDescriptionCreateInstance*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_CreateInstance"));
 	}
 	else
 	{
@@ -300,6 +337,18 @@ CustomSound SoundManager::get_sound(const char* path)
 {
 	return get_sound(std::string{ path });
 }
+CustomSound SoundManager::get_existing_sound(std::string_view path)
+{
+	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [&path](const Sound& sound) {
+		return sound.path == path;
+	});
+	if (it != m_SoundStorage.end())
+	{
+		it->ref_count++;
+		return CustomSound{ it->fmod_sound, this };
+	}
+	return CustomSound{ nullptr, nullptr };
+}
 void SoundManager::acquire_sound(FMOD::Sound* fmod_sound)
 {
 	auto it = std::find_if(m_SoundStorage.begin(), m_SoundStorage.end(), [fmod_sound](const Sound& sound) { return sound.fmod_sound == fmod_sound; });
@@ -338,58 +387,141 @@ PlayingSound SoundManager::play_sound(FMOD::Sound* fmod_sound, bool paused, bool
 	return PlayingSound{ channel, this };
 }
 
+CustomSound SoundManager::get_event(std::string_view event_name)
+{
+	auto it = m_SoundData.NameToEvent.find(event_name);
+	if (it != m_SoundData.NameToEvent.end())
+	{
+		return CustomSound{ it->second->Event, this };
+	}
+	return CustomSound{ nullptr, nullptr };
+}
+PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, bool paused, bool as_music)
+{
+	FMODStudio::EventInstance* instance{ nullptr };
+	m_EventCreateInstance(fmod_event, &instance);
+	return PlayingSound{ instance, this };
+}
+
 bool SoundManager::is_playing(PlayingSound playing_sound)
 {
-	bool is_playing{ false };
-	return FMOD_CHECK_CALL(m_ChannelIsPlaying(playing_sound.m_FmodChannel, &is_playing)) && is_playing;
+	return std::visit(overloaded{
+		[this](FMOD::Channel* channel) {
+			bool is_playing{ false };
+			return FMOD_CHECK_CALL(m_ChannelIsPlaying(channel, &is_playing)) && is_playing;
+		},
+		[this](FMODStudio::EventInstance* event) {
+			return false;
+		},
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 }
 bool SoundManager::stop(PlayingSound playing_sound)
 {
-	return FMOD_CHECK_CALL(m_ChannelStop(playing_sound.m_FmodChannel));
+	return std::visit(overloaded{
+		[this](FMOD::Channel* channel) {
+			return FMOD_CHECK_CALL(m_ChannelStop(channel));
+		},
+		[this](FMODStudio::EventInstance* event) {
+			return false;
+		},
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 }
 bool SoundManager::set_pause(PlayingSound playing_sound, bool pause)
 {
-	return FMOD_CHECK_CALL(m_ChannelSetPaused(playing_sound.m_FmodChannel, pause));
+	return std::visit(overloaded{
+		[this, pause](FMOD::Channel* channel) {
+			return FMOD_CHECK_CALL(m_ChannelSetPaused(channel, pause));
+		},
+		[this](FMODStudio::EventInstance* event) {
+			return false;
+		},
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 }
 bool SoundManager::set_mute(PlayingSound playing_sound, bool mute)
 {
-	return FMOD_CHECK_CALL(m_ChannelSetMute(playing_sound.m_FmodChannel, mute));
+	return std::visit(overloaded{
+		[this, mute](FMOD::Channel* channel) {
+			return FMOD_CHECK_CALL(m_ChannelSetMute(channel, mute));
+		},
+		[this](FMODStudio::EventInstance* event) {
+			return false;
+		},
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 }
 bool SoundManager::set_pitch(PlayingSound playing_sound, float pitch)
 {
-	return FMOD_CHECK_CALL(m_ChannelSetPitch(playing_sound.m_FmodChannel, pitch));
+	return std::visit(overloaded{
+		[this, pitch](FMOD::Channel* channel) {
+			return FMOD_CHECK_CALL(m_ChannelSetPitch(channel, pitch));
+		},
+		[this](FMODStudio::EventInstance* event) {
+			return false;
+		},
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 }
 bool SoundManager::set_pan(PlayingSound playing_sound, float pan)
 {
-	return FMOD_CHECK_CALL(m_ChannelSetPan(playing_sound.m_FmodChannel, pan));
+	return std::visit(overloaded{
+		[this, pan](FMOD::Channel* channel) {
+			bool is_playing{ false };
+			return FMOD_CHECK_CALL(m_ChannelSetPan(channel, pan));
+		},
+		[](FMODStudio::EventInstance*) { return false; },
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 }
 bool SoundManager::set_volume(PlayingSound playing_sound, float volume)
 {
-	return FMOD_CHECK_CALL(m_ChannelSetVolume(playing_sound.m_FmodChannel, std::clamp(volume, -1.0f, 1.0f)));
+	return std::visit(overloaded{
+		[this, volume](FMOD::Channel* channel) {
+			return FMOD_CHECK_CALL(m_ChannelSetVolume(channel, std::clamp(volume, -1.0f, 1.0f)));
+		},
+		[this, volume](FMODStudio::EventInstance* event) {
+			return false;
+		},
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 }
 bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
 {
-	if (m_ChannelSetMode)
-	{
-		switch (loop_mode)
-		{
-		case LoopMode::Off:
-			return FMOD_CHECK_CALL(m_ChannelSetMode(playing_sound.m_FmodChannel, FMOD::MODE_LOOP_OFF));
-		case LoopMode::Loop:
-			return FMOD_CHECK_CALL(m_ChannelSetMode(playing_sound.m_FmodChannel, FMOD::MODE_LOOP_NORMAL));
-		case LoopMode::Bidirectional:
-			return FMOD_CHECK_CALL(m_ChannelSetMode(playing_sound.m_FmodChannel, FMOD::MODE_LOOP_BIDI));
-		}
-	}
+	return std::visit(overloaded{
+		[this, loop_mode](FMOD::Channel* channel) {
+			switch (loop_mode)
+			{
+			case LoopMode::Off:
+				return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_OFF));
+			case LoopMode::Loop:
+				return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_NORMAL));
+			case LoopMode::Bidirectional:
+				return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_BIDI));
+			}
+		},
+		[this, loop_mode](FMODStudio::EventInstance* event) {
+			return false;
+		},
+		[](std::monostate) { return false; }
+	}, playing_sound.m_FmodHandle);
 	return false;
 }
 bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback)
 {
 	std::lock_guard lock{ s_CallbacksMutex };
-	if (FMOD_CHECK_CALL(m_ChannelSetCallback(playing_sound.m_FmodChannel, &ChannelControlCallback)))
+	if (FMOD::Channel** channel = std::get_if<FMOD::Channel*>(&playing_sound.m_FmodHandle))
 	{
-		s_Callbacks.push_back(ChannelControlCollbackData{ playing_sound.m_FmodChannel, std::move(callback) });
-		return true;
+		if (FMOD_CHECK_CALL(m_ChannelSetCallback(*channel, &ChannelControlCallback)))
+		{
+			s_Callbacks.push_back(ChannelControlCollbackData{ *channel, std::move(callback) });
+			return true;
+		}
+	}
+	else if (FMODStudio::EventInstance** event = std::get_if<FMODStudio::EventInstance*>(&playing_sound.m_FmodHandle))
+	{
+
 	}
 	return false;
 }

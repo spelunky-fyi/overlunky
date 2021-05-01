@@ -332,15 +332,15 @@ namespace FMOD {
 		Occlusion
 	};
 
-	using System = void;
-	using Bank = void;
-	using Sound = void;
-	using Channel = void;
-	using ChannelGroup = void;
-	using ChannelControl = void; // Either a Channel or a ChannelGroup
+	template<class tag>
+	struct tagged_void {};
 
-	using EventDescription = void;
-	using EventInstance = void;
+	using System = tagged_void<struct system_tag>;
+	using Bank = tagged_void<struct bank_tag>;
+	using Sound = tagged_void<struct sound_tag>;
+	using Channel = tagged_void<struct channel_tag>;
+	using ChannelGroup = tagged_void<struct channel_group_tag>;
+	using ChannelControl = tagged_void<struct channel_control_tag>; // Either a Channel or a ChannelGroup
 
 	using CreateSound = FMOD_RESULT(System*, const char*, FMOD_MODE, CREATESOUNDEXINFO*, Sound**);
 	using ReleaseSound = FMOD_RESULT(Sound*);
@@ -366,12 +366,17 @@ namespace FMOD {
 namespace FMODStudio {
 	using namespace FMOD;
 
-	using System = void;
-	using Bus = void;
+	using System = tagged_void<struct system_tag>;
+	using Bus = tagged_void<struct bus_tag>;
+
+	using EventDescription = tagged_void<struct event_description_tag>;
+	using EventInstance = tagged_void<struct event_instance_tag>;
 
 	using GetCoreSystem = FMOD_RESULT(System*, FMOD::System**);
 	using FlushCommands = FMOD_RESULT(System*);
 	using GetBus = FMOD_RESULT(System*, const char*, Bus**);
 	using LockChannelGroup = FMOD_RESULT(Bus*);
 	using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
+
+	using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription* event, EventInstance** isntance);
 }
