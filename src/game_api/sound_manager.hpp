@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "fmod.hpp"
@@ -135,6 +136,24 @@ private:
 
     FMOD::ChannelGroup* m_SfxChannelGroup{ nullptr };
     FMOD::ChannelGroup* m_MusicChannelGroup{ nullptr };
+
+    using EventId = std::uint32_t;
+    struct EventProperties {
+        std::string PropertyNames[38];
+    };
+    struct EventDescription {
+        FMOD::EventDescription* Event;
+        EventId Id;
+        std::string Name;
+        std::uint64_t _ull[46];
+    };
+    using EventMap = std::unordered_map<EventId, EventDescription>;
+    struct SoundData {
+        const EventProperties* Properties;
+        const EventMap* Events;
+    };
+    static_assert(sizeof(EventDescription) == 0x1a0);
+    SoundData m_SoundData;
 
     struct Sound;
     std::vector<Sound> m_SoundStorage;

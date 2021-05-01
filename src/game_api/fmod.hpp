@@ -339,6 +339,9 @@ namespace FMOD {
 	using ChannelGroup = void;
 	using ChannelControl = void; // Either a Channel or a ChannelGroup
 
+	using EventDescription = void;
+	using EventInstance = void;
+
 	using CreateSound = FMOD_RESULT(System*, const char*, FMOD_MODE, CREATESOUNDEXINFO*, Sound**);
 	using ReleaseSound = FMOD_RESULT(Sound*);
 	using PlaySound = FMOD_RESULT(System*, Sound*, ChannelGroup*, bool, Channel**);
