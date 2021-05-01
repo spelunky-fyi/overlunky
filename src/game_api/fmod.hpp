@@ -332,6 +332,8 @@ namespace FMOD {
 		Occlusion
 	};
 
+	using BOOL = int;
+
 	template<class tag>
 	struct tagged_void {};
 
@@ -348,10 +350,10 @@ namespace FMOD {
 
 	using ChannelControlCallback = FMOD_RESULT(ChannelControl*, ChannelControlType, ChannelControlCallbackType, void*, void*);
 
-	using ChannelIsPlaying = FMOD_RESULT(Channel*, bool*);
+	using ChannelIsPlaying = FMOD_RESULT(Channel*, BOOL*);
 	using ChannelStop = FMOD_RESULT(Channel*);
-	using ChannelSetPaused = FMOD_RESULT(Channel*, bool);
-	using ChannelSetMute = FMOD_RESULT(Channel*, bool);
+	using ChannelSetPaused = FMOD_RESULT(Channel*, BOOL);
+	using ChannelSetMute = FMOD_RESULT(Channel*, BOOL);
 	using ChannelSetPitch = FMOD_RESULT(Channel*, float);
 	using ChannelSetPan = FMOD_RESULT(Channel*, float);
 	using ChannelSetVolume = FMOD_RESULT(Channel*, float);
@@ -366,6 +368,40 @@ namespace FMOD {
 namespace FMODStudio {
 	using namespace FMOD;
 
+	enum StopMode {
+		AllowFadeOut,
+		Immediate
+	};
+
+	enum EventCallbackType {
+        Created = 0x00000001,
+        Destroyed = 0x00000002,
+        Starting = 0x00000004,
+        Started = 0x00000008,
+        Restarted = 0x00000010,
+        Stopped = 0x00000020,
+        StartFailed = 0x00000040,
+        CreateProgrammerSound = 0x00000080,
+        DestroyProgrammerSound = 0x00000100,
+        PluginCreated = 0x00000200,
+        PluginDestroyed = 0x00000400,
+        TimelineMarker = 0x00000800,
+        TimelineBeat = 0x00001000,
+        SoundPlayed = 0x00002000,
+        SoundStopped = 0x00004000,
+        RealToVirtal = 0x00008000,
+        VirtualToReal = 0x00010000,
+        All = 0xFFFFFFFF,
+    };
+
+	enum class PlaybackState {
+		Playing,
+		Sustaining,
+		Stopped,
+		Starting,
+		Stopping
+	};
+
 	using System = tagged_void<struct system_tag>;
 	using Bus = tagged_void<struct bus_tag>;
 
@@ -378,5 +414,23 @@ namespace FMODStudio {
 	using LockChannelGroup = FMOD_RESULT(Bus*);
 	using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
 
-	using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription* event, EventInstance** isntance);
+	using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription*, EventInstance**);
+
+	using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
+
+	using EventInstanceStart = FMOD_RESULT(EventInstance*);
+	using EventInstanceStop = FMOD_RESULT(EventInstance*, StopMode);
+	using EventInstanceGetPlaybackState = FMOD_RESULT(EventInstance*, PlaybackState*);
+	//using EventInstanceIsPlaying = FMOD_RESULT(EventInstance*, BOOL*);
+	using EventInstanceSetPaused = FMOD_RESULT(EventInstance*, BOOL);
+	using EventInstanceGetPaused = FMOD_RESULT(EventInstance*, BOOL*);
+	//using EventInstanceSetMute = FMOD_RESULT(EventInstance*, BOOL);
+	using EventInstanceSetPitch = FMOD_RESULT(EventInstance*, float);
+	//using EventInstanceSetPan = FMOD_RESULT(EventInstance*, float);
+	using EventInstanceSetVolume = FMOD_RESULT(EventInstance*, float);
+	//using EventInstanceSetFrequency = FMOD_RESULT(EventInstance*, float);
+	//using EventInstanceSetMode = FMOD_RESULT(EventInstance*, FMOD_MODE);
+	using EventInstanceSetCallback = FMOD_RESULT(EventInstance*, EventInstanceCallback*, EventCallbackType);
+	using EventInstanceSetUserData = FMOD_RESULT(EventInstance*, void*);
+	using EventInstanceGetUserData = FMOD_RESULT(EventInstance*, void**);
 }

@@ -63,6 +63,7 @@ private:
     SoundManager* m_SoundManager{ nullptr };
 };
 
+using PlayingSoundHandle = std::variant<FMOD::Channel*, FMODStudio::EventInstance*, std::monostate>;
 class PlayingSound {
     friend class SoundManager;
     friend class CustomSound;
@@ -89,7 +90,7 @@ private:
     PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager);
     PlayingSound(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager);
 
-    std::variant<FMOD::Channel*, FMODStudio::EventInstance*, std::monostate> m_FmodHandle{};
+    PlayingSoundHandle m_FmodHandle{};
     SoundManager* m_SoundManager{ nullptr };
 };
 
@@ -146,6 +147,17 @@ private:
     FMOD::ChannelGetUserData* m_ChannelGetUserData{ nullptr };
 
     FMODStudio::EventDescriptionCreateInstance* m_EventCreateInstance{ nullptr };
+
+    FMODStudio::EventInstanceStart* m_EventInstanceStart{ nullptr };
+    FMODStudio::EventInstanceStop* m_EventInstanceStop{ nullptr };
+    FMODStudio::EventInstanceGetPlaybackState* m_EventInstanceGetPlaybackState{ nullptr };
+    FMODStudio::EventInstanceSetPaused* m_EventInstanceSetPaused{ nullptr };
+    FMODStudio::EventInstanceGetPaused* m_EventInstanceGetPaused{ nullptr };
+    FMODStudio::EventInstanceSetPitch* m_EventInstanceSetPitch{ nullptr };
+    FMODStudio::EventInstanceSetVolume* m_EventInstanceSetVolume{ nullptr };
+    FMODStudio::EventInstanceSetCallback* m_EventInstanceSetCallback{ nullptr };
+    FMODStudio::EventInstanceSetUserData* m_EventInstanceSetUserData{ nullptr };
+    FMODStudio::EventInstanceGetUserData* m_EventInstanceGetUserData{ nullptr };
 
     FMOD::ChannelGroup* m_SfxChannelGroup{ nullptr };
     FMOD::ChannelGroup* m_MusicChannelGroup{ nullptr };
