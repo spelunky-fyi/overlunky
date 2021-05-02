@@ -196,7 +196,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		auto fmod_studio_system = *(FMODStudio::System**)memory.at_exe(decode_pc(exe, fmod_studio_system_instruction));
 
 		auto event_properties_instruction = find_inst(exe, "\x48\x8d\xbd\x90\x00\x00\x00\x48\x8d\x74\x24\x60", start) + 0xc;
-		m_SoundData.Properties = (const EventProperties*)memory.at_exe(decode_pc(exe, event_properties_instruction));
+		m_SoundData.Parameters = (const EventParameters*)memory.at_exe(decode_pc(exe, event_properties_instruction));
 
 		auto event_map_instruction = find_inst(exe, "\x48\x8b\x08\x48\x83\xc1\x18\x48\x8d\x54\x24\x30", start) - 0xc;
 		m_SoundData.Events = (const EventMap*)memory.at_exe(decode_pc(exe, event_map_instruction));
@@ -253,6 +253,8 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		get_channel_group_from_bus_name("bus:/Master_SUM/Master_BGM", &m_MusicChannelGroup);
 
 		m_EventCreateInstance = reinterpret_cast<FMODStudio::EventDescriptionCreateInstance*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_CreateInstance"));
+		m_EventDescriptionGetParameterDescriptionByName = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByName*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByName"));
+		m_EventDescriptionGetParameterDescriptionByID = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByID"));
 
 		m_EventInstanceStart = reinterpret_cast<FMODStudio::EventInstanceStart*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Start"));
 		m_EventInstanceStop = reinterpret_cast<FMODStudio::EventInstanceStop*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Stop"));

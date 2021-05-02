@@ -147,6 +147,8 @@ private:
     FMOD::ChannelGetUserData* m_ChannelGetUserData{ nullptr };
 
     FMODStudio::EventDescriptionCreateInstance* m_EventCreateInstance{ nullptr };
+    FMODStudio::EventDescriptionGetParameterDescriptionByID* m_EventDescriptionGetParameterDescriptionByID{ nullptr };
+    FMODStudio::EventDescriptionGetParameterDescriptionByName* m_EventDescriptionGetParameterDescriptionByName{ nullptr };
 
     FMODStudio::EventInstanceStart* m_EventInstanceStart{ nullptr };
     FMODStudio::EventInstanceStop* m_EventInstanceStop{ nullptr };
@@ -163,18 +165,23 @@ private:
     FMOD::ChannelGroup* m_MusicChannelGroup{ nullptr };
 
     using EventId = std::uint32_t;
-    struct EventProperties {
-        std::string PropertyNames[38];
+    struct EventParameters {
+        std::string ParameterNames[38];
     };
     struct EventDescription {
         FMODStudio::EventDescription* Event;
         EventId Id;
         std::string Name;
-        std::uint64_t _ull[46];
+        FMODStudio::ParameterId Parameters[38];
+        bool HasParameter[38];
+        std::uint64_t _ull0;
+        std::uint32_t _u0;
+        std::uint32_t _u1;
+        std::uint32_t _u2;
     };
     using EventMap = std::unordered_map<EventId, EventDescription>;
     struct SoundData {
-        const EventProperties* Properties;
+        const EventParameters* Parameters;
         const EventMap* Events;
         std::unordered_map<std::string_view, const EventDescription*> NameToEvent;
     };

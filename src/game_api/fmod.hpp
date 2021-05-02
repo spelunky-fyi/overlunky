@@ -402,6 +402,37 @@ namespace FMODStudio {
 		Stopping
 	};
 
+	enum class ParameterType {
+		GameControlled,
+		AutomaticDistance,
+		AutomaticEventConeAngle,
+		AutomaticEventOrientation,
+		AutomaticDirection,
+		AutomaticElevation,
+		AutomaticListenerOrientation,
+		AutomaticSpeed,
+	};
+
+	enum class ParameterFlags {
+		ReadOnly = 0x00000001,
+		Automatic = 0x00000002,
+		Global = 0x00000004,
+	};
+
+	struct ParameterId {
+		unsigned int data1;
+		unsigned int data2;
+	};
+    struct ParameterDescription {
+        const char *name;
+        ParameterId id;
+        float minimum;
+        float maximum;
+        float defaultvalue;
+        ParameterType type;
+        ParameterFlags flags;
+    };
+
 	using System = tagged_void<struct system_tag>;
 	using Bus = tagged_void<struct bus_tag>;
 
@@ -415,6 +446,8 @@ namespace FMODStudio {
 	using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
 
 	using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription*, EventInstance**);
+	using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription*, ParameterId, ParameterDescription*);
+	using EventDescriptionGetParameterDescriptionByName = FMOD_RESULT(EventDescription*, const char*, ParameterDescription*);
 
 	using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
 
