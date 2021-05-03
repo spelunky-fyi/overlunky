@@ -374,24 +374,24 @@ namespace FMODStudio {
 	};
 
 	enum EventCallbackType {
-        Created = 0x00000001,
-        Destroyed = 0x00000002,
-        Starting = 0x00000004,
-        Started = 0x00000008,
-        Restarted = 0x00000010,
-        Stopped = 0x00000020,
-        StartFailed = 0x00000040,
-        CreateProgrammerSound = 0x00000080,
-        DestroyProgrammerSound = 0x00000100,
-        PluginCreated = 0x00000200,
-        PluginDestroyed = 0x00000400,
-        TimelineMarker = 0x00000800,
-        TimelineBeat = 0x00001000,
-        SoundPlayed = 0x00002000,
-        SoundStopped = 0x00004000,
-        RealToVirtal = 0x00008000,
-        VirtualToReal = 0x00010000,
-        All = 0xFFFFFFFF,
+		Created = 0x00000001,
+		Destroyed = 0x00000002,
+		Starting = 0x00000004,
+		Started = 0x00000008,
+		Restarted = 0x00000010,
+		Stopped = 0x00000020,
+		StartFailed = 0x00000040,
+		CreateProgrammerSound = 0x00000080,
+		DestroyProgrammerSound = 0x00000100,
+		PluginCreated = 0x00000200,
+		PluginDestroyed = 0x00000400,
+		TimelineMarker = 0x00000800,
+		TimelineBeat = 0x00001000,
+		SoundPlayed = 0x00002000,
+		SoundStopped = 0x00004000,
+		RealToVirtal = 0x00008000,
+		VirtualToReal = 0x00010000,
+		All = 0xFFFFFFFF,
     };
 
 	enum class PlaybackState {
@@ -423,15 +423,15 @@ namespace FMODStudio {
 		unsigned int data1;
 		unsigned int data2;
 	};
-    struct ParameterDescription {
-        const char *name;
-        ParameterId id;
-        float minimum;
-        float maximum;
-        float defaultvalue;
-        ParameterType type;
-        ParameterFlags flags;
-    };
+	struct ParameterDescription {
+		const char *name;
+		ParameterId id;
+		float minimum;
+		float maximum;
+		float defaultvalue;
+		ParameterType type;
+		ParameterFlags flags;
+	};
 
 	using System = tagged_void<struct system_tag>;
 	using Bus = tagged_void<struct bus_tag>;
@@ -466,4 +466,7 @@ namespace FMODStudio {
 	using EventInstanceSetCallback = FMOD_RESULT(EventInstance*, EventInstanceCallback*, EventCallbackType);
 	using EventInstanceSetUserData = FMOD_RESULT(EventInstance*, void*);
 	using EventInstanceGetUserData = FMOD_RESULT(EventInstance*, void**);
+	using EventInstanceGetDescription = FMOD_RESULT(EventInstance*, EventDescription**);
+	using EventInstanceGetParameterByID = FMOD_RESULT(EventInstance*, ParameterId, float*, float*);
+	using EventInstanceSetParameterByID = FMOD_RESULT(EventInstance*, ParameterId, float, bool);
 }

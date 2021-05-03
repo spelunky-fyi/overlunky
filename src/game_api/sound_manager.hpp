@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -54,6 +56,8 @@ public:
     PlayingSound play(bool paused);
     PlayingSound play(bool paused, SoundType sound_type);
 
+    std::vector<const char*> get_parameters();
+
 private:
     CustomSound(std::nullptr_t, std::nullptr_t) {}
     CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager);
@@ -84,6 +88,10 @@ public:
     bool set_volume(float volume);
     bool set_looping(LoopMode loop_mode);
     bool set_callback(SoundCallbackFunction&& callback);
+
+    std::vector<const char*> get_parameters();
+    std::optional<float> get_parameter(std::uint32_t parameter_index);
+    bool set_parameter(std::uint32_t parameter_index, float value);
 
 private:
     PlayingSound(std::nullptr_t, std::nullptr_t) {}
@@ -125,6 +133,29 @@ public:
     bool set_looping(PlayingSound playing_sound, LoopMode loop_mode);
     bool set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback);
 
+    std::vector<const char*> get_parameters(PlayingSound playing_sound);
+    std::vector<const char*> get_parameters(FMODStudio::EventDescription* fmod_event);
+    std::optional<float> get_parameter(PlayingSound playing_sound, std::uint32_t parameter_index);
+    bool set_parameter(PlayingSound playing_sound, std::uint32_t parameter_index, float value);
+
+    template<class FunT>
+    void for_each_event_name(FunT&& fun)
+    {
+        for (const auto& [id, event] : *m_SoundData.Events)
+        {
+            fun(event.Name);
+        }
+    }
+    template<class FunT>
+    void for_each_parameter_name(FunT&& fun)
+    {
+        for (size_t i = 0; i < m_SoundData.Parameters->ParameterNames.size(); i++)
+        {
+            const auto& parameter_name = m_SoundData.Parameters->ParameterNames[i];
+            fun(parameter_name, i);
+        }
+    }
+
 private:
     DecodeAudioFile* m_DecodeFunction{ nullptr };
 
@@ -160,20 +191,23 @@ private:
     FMODStudio::EventInstanceSetCallback* m_EventInstanceSetCallback{ nullptr };
     FMODStudio::EventInstanceSetUserData* m_EventInstanceSetUserData{ nullptr };
     FMODStudio::EventInstanceGetUserData* m_EventInstanceGetUserData{ nullptr };
+    FMODStudio::EventInstanceGetDescription* m_EventInstanceGetDescription{ nullptr };
+    FMODStudio::EventInstanceGetParameterByID* m_EventInstanceGetParameterByID{ nullptr };
+    FMODStudio::EventInstanceSetParameterByID* m_EventInstanceSetParameterByID{ nullptr };
 
     FMOD::ChannelGroup* m_SfxChannelGroup{ nullptr };
     FMOD::ChannelGroup* m_MusicChannelGroup{ nullptr };
 
     using EventId = std::uint32_t;
     struct EventParameters {
-        std::string ParameterNames[38];
+        std::array<std::string, 38> ParameterNames;
     };
     struct EventDescription {
         FMODStudio::EventDescription* Event;
         EventId Id;
         std::string Name;
-        FMODStudio::ParameterId Parameters[38];
-        bool HasParameter[38];
+        std::array < FMODStudio::ParameterId, 38> Parameters;
+        std::array<bool, 38> HasParameter;
         std::uint64_t _ull0;
         std::uint32_t _u0;
         std::uint32_t _u1;
@@ -183,6 +217,7 @@ private:
     struct SoundData {
         const EventParameters* Parameters;
         const EventMap* Events;
+        std::unordered_map<const FMODStudio::EventDescription*, const EventDescription*> FmodEventToEvent;
         std::unordered_map<std::string_view, const EventDescription*> NameToEvent;
     };
     static_assert(sizeof(EventDescription) == 0x1a0);

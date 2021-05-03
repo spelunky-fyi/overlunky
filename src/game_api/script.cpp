@@ -1485,9 +1485,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_usertype<CustomSound>(
         "CustomSound",
         "play",
-        play);
+        play,
+        "get_parameters",
+        &CustomSound::get_parameters);
     /* CustomSound
     PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
+    array<string> get_parameters()
     */
     /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
     /// You can just discard this handle if you do not need extended control anymore
@@ -1510,7 +1513,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "set_looping",
         &PlayingSound::set_looping,
         "set_callback",
-        &PlayingSound::set_callback);
+        &PlayingSound::set_callback,
+        "get_parameters",
+        &PlayingSound::get_parameters,
+        "get_parameter",
+        &PlayingSound::get_parameter,
+        "set_parameter",
+        &PlayingSound::set_parameter);
     /* PlayingSound
     bool is_playing()
     bool stop()
@@ -1521,6 +1530,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     bool set_volume(float volume)
     bool set_looping(SOUND_LOOP_MODE looping)
     bool set_callback(function callback)
+    array<string> get_parameters()
+    optional<float> get_parameter(SOUND_PARAM param)
+    bool set_parameter(SOUND_PARAM param, float value)
     */
 
     #define table_of(T, name) sol::property([this]() { \
@@ -1755,6 +1767,20 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
     /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
     lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
+    /// Paramater to get_sound(), which 
+    lua.create_named_table("VANILLA_SOUND");
+    sound_manager->for_each_event_name([this](std::string event_name) {
+        std::string clean_event_name = event_name;
+        std::transform(clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
+        std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
+        lua["VANILLA_SOUND"][std::move(clean_event_name)] = std::move(event_name);
+    });
+    /// Paramater to PlayingSound:get_parameter() and PlayingSound:set_parameter()
+    lua.create_named_table("SOUND_PARAM");
+    sound_manager->for_each_parameter_name([this](std::string parameter_name, std::uint32_t id) {
+        std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
+        lua["SOUND_PARAM"][std::move( parameter_name)] = id;
+    });
     lua.new_enum("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);

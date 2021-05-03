@@ -126,6 +126,21 @@ PlayingSound CustomSound::play(bool paused, SoundType sound_type)
 	}, m_FmodHandle);
 }
 
+std::vector<const char*> CustomSound::get_parameters()
+{
+	return std::visit(overloaded{
+		[](FMOD::Sound* sound) {
+			return std::vector<const char*>{};
+		},
+		[this](FMODStudio::EventDescription* event) {
+			return m_SoundManager->get_parameters(event);
+		},
+		[](std::monostate) {
+			return std::vector<const char*>{};
+		},
+	}, m_FmodHandle);
+}
+
 
 PlayingSound::PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager)
 	: m_FmodHandle{ fmod_channel }
@@ -175,6 +190,19 @@ bool PlayingSound::set_callback(SoundCallbackFunction&& callback)
 	return m_SoundManager->set_callback(*this, std::move(callback));
 }
 
+std::vector<const char*> PlayingSound::get_parameters()
+{
+	return m_SoundManager->get_parameters(*this);
+}
+std::optional<float> PlayingSound::get_parameter(std::uint32_t parameter_index)
+{
+	return m_SoundManager->get_parameter(*this, parameter_index);
+}
+bool PlayingSound::set_parameter(std::uint32_t parameter_index, float value)
+{
+	return m_SoundManager->set_parameter(*this, parameter_index, value);
+}
+
 
 struct SoundManager::Sound {
 	std::uint32_t ref_count;
@@ -202,6 +230,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		m_SoundData.Events = (const EventMap*)memory.at_exe(decode_pc(exe, event_map_instruction));
 		for (const auto& [id, event] : *m_SoundData.Events)
 		{
+			m_SoundData.FmodEventToEvent[event.Event] = &event;
 			m_SoundData.NameToEvent[event.Name] = &event;
 		}
 
@@ -266,6 +295,9 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		m_EventInstanceSetCallback = reinterpret_cast<FMODStudio::EventInstanceSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetCallback"));
 		m_EventInstanceSetUserData = reinterpret_cast<FMODStudio::EventInstanceSetUserData*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetUserData"));
 		m_EventInstanceGetUserData = reinterpret_cast<FMODStudio::EventInstanceGetUserData*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetUserData"));
+		m_EventInstanceGetDescription = reinterpret_cast<FMODStudio::EventInstanceGetDescription*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetDescription"));
+		m_EventInstanceGetParameterByID = reinterpret_cast<FMODStudio::EventInstanceGetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetParameterByID"));
+		m_EventInstanceSetParameterByID = reinterpret_cast<FMODStudio::EventInstanceSetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByID"));
 	}
 	else
 	{
@@ -537,7 +569,7 @@ bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
 				return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_BIDI));
 			}
 		},
-		[this, loop_mode](FMODStudio::EventInstance* event) {
+		[](FMODStudio::EventInstance* event) {
 			return false;
 		},
 		[](std::monostate) { return false; }
@@ -564,4 +596,90 @@ bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunctio
 		}
 	}
 	return false;
+}
+
+std::vector<const char*> SoundManager::get_parameters(PlayingSound playing_sound)
+{
+	return std::visit(overloaded{
+		[](FMOD::Channel* channel) {
+			return std::vector<const char*>{};
+		},
+		[this](FMODStudio::EventInstance* instance) {
+			FMODStudio::EventDescription* event;
+			if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(instance, &event)))
+			{
+				return get_parameters(event);
+			}
+			return std::vector<const char*>{};
+		},
+		[](std::monostate) {
+			return std::vector<const char*>{};
+		}
+	}, playing_sound.m_FmodHandle);
+}
+std::vector<const char*> SoundManager::get_parameters(FMODStudio::EventDescription* fmod_event)
+{
+	if (const EventDescription* event = m_SoundData.FmodEventToEvent[fmod_event])
+	{
+		std::vector<const char*> parameters;
+		for (size_t i = 0; i < m_SoundData.Parameters->ParameterNames.size(); i++)
+		{
+			if (event->HasParameter[i])
+			{
+				parameters.push_back(m_SoundData.Parameters->ParameterNames[i].c_str());
+			}
+		}
+		return parameters;
+	}
+	return std::vector<const char*>{};
+}
+std::optional<float> SoundManager::get_parameter(PlayingSound playing_sound, std::uint32_t parameter_index)
+{
+	return std::visit(overloaded{
+		[](FMOD::Channel* channel) {
+			return std::optional<float>{};
+		},
+		[this, parameter_index](FMODStudio::EventInstance* instance) {
+			FMODStudio::EventDescription* event;
+			if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(instance, &event)))
+			{
+				if (const EventDescription* event_desc = m_SoundData.FmodEventToEvent[event])
+				{
+					float value;
+					if (event_desc->HasParameter[parameter_index]
+						&& FMOD_CHECK_CALL(m_EventInstanceGetParameterByID(instance, event_desc->Parameters[parameter_index], &value, nullptr)))
+					{
+						return std::optional<float>{ value };
+					}
+				}
+			}
+			return std::optional<float>{};
+		},
+		[](std::monostate) {
+			return std::optional<float>{};
+		}
+	}, playing_sound.m_FmodHandle);
+}
+bool SoundManager::set_parameter(PlayingSound playing_sound, std::uint32_t parameter_index, float value)
+{
+	return std::visit(overloaded{
+		[](FMOD::Channel* channel) {
+			return false;
+		},
+		[this, parameter_index, value](FMODStudio::EventInstance* instance) {
+			FMODStudio::EventDescription* event;
+			if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(instance, &event)))
+			{
+				if (const EventDescription* event_desc = m_SoundData.FmodEventToEvent[event])
+				{
+					return event_desc->HasParameter[parameter_index]
+						&& FMOD_CHECK_CALL(m_EventInstanceSetParameterByID(instance, event_desc->Parameters[parameter_index], value, false));
+				}
+			}
+			return false;
+		},
+		[](std::monostate) {
+			return false;
+		}
+	}, playing_sound.m_FmodHandle);
 }
