@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -11,22 +12,11 @@
 #include "fmod.hpp"
 #include "audio_buffer.hpp"
 
-namespace sol {
-    template<bool b>
-    class basic_reference;
-    using reference = basic_reference<false>;
-    template<typename T, bool, typename H>
-    class basic_protected_function;
-    using safe_function = basic_protected_function<reference, false, reference>;
-    using protected_function = safe_function;
-    using function = protected_function;
-}
-
-
 class SoundManager;
 class PlayingSound;
 
-using SoundCallbackFunction = sol::function;
+using SoundCallbackFunction = std::function<void()>;
+using EventCallbackFunction = std::function<void(PlayingSound)>;
 
 enum class LoopMode {
     Off,
@@ -88,7 +78,7 @@ public:
     bool set_pan(float pan);
     bool set_volume(float volume);
     bool set_looping(LoopMode loop_mode);
-    bool set_callback(SoundCallbackFunction&& callback);
+    bool set_callback(SoundCallbackFunction callback);
 
     std::vector<const char*> get_parameters();
     std::optional<float> get_parameter(std::uint32_t parameter_index);
@@ -132,10 +122,10 @@ public:
     bool set_pan(PlayingSound playing_sound, float pan);
     bool set_volume(PlayingSound playing_sound, float volume);
     bool set_looping(PlayingSound playing_sound, LoopMode loop_mode);
-    bool set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback);
+    bool set_callback(PlayingSound playing_sound, SoundCallbackFunction callback);
 
-    std::uint32_t set_callback(std::string_view event_name, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types);
-    std::uint32_t set_callback(FMODStudio::EventDescription* fmod_event, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types);
+    std::uint32_t set_callback(std::string_view event_name, EventCallbackFunction callback, FMODStudio::EventCallbackType types);
+    std::uint32_t set_callback(FMODStudio::EventDescription* fmod_event, EventCallbackFunction callback, FMODStudio::EventCallbackType types);
     void clear_callback(std::uint32_t id);
 
     std::vector<const char*> get_parameters(PlayingSound playing_sound);

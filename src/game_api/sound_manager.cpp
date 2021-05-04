@@ -55,7 +55,7 @@ struct EventCallbackData
 
 	struct Callback {
 		std::uint32_t id;
-		SoundCallbackFunction cb;
+		EventCallbackFunction cb;
 	};
 
 	FMODStudio::EventDescription* handle;
@@ -229,7 +229,7 @@ bool PlayingSound::set_looping(LoopMode loop_mode)
 {
 	return m_SoundManager->set_looping(*this, loop_mode);
 }
-bool PlayingSound::set_callback(SoundCallbackFunction&& callback)
+bool PlayingSound::set_callback(SoundCallbackFunction callback)
 {
 	return m_SoundManager->set_callback(*this, std::move(callback));
 }
@@ -623,7 +623,7 @@ bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
 	}, playing_sound.m_FmodHandle);
 	return false;
 }
-bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback)
+bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunction callback)
 {
 	if (FMOD::Channel** channel = std::get_if<FMOD::Channel*>(&playing_sound.m_FmodHandle))
 	{
@@ -639,7 +639,6 @@ bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunctio
 		FMODStudio::EventDescription* event;
 		if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(*instance, &event)))
 		{
-			std::lock_guard lock{ s_EventCallbacksMutex };
 			if (FMOD_CHECK_CALL(m_EventInstanceSetCallback(*instance, &EventInstanceCallback, FMODStudio::EventCallbackType::Stopped)))
 			{
 				std::lock_guard lock{ s_EventCallbacksMutex };
@@ -666,11 +665,11 @@ bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunctio
 	return false;
 }
 
-std::uint32_t SoundManager::set_callback(std::string_view event_name, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types)
+std::uint32_t SoundManager::set_callback(std::string_view event_name, EventCallbackFunction callback, FMODStudio::EventCallbackType types)
 {
 	return set_callback(m_SoundData.NameToEvent[event_name]->Event, std::move(callback), types);
 }
-std::uint32_t SoundManager::set_callback(FMODStudio::EventDescription* fmod_event, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types)
+std::uint32_t SoundManager::set_callback(FMODStudio::EventDescription* fmod_event, EventCallbackFunction callback, FMODStudio::EventCallbackType types)
 {
 	std::lock_guard lock{ s_EventCallbacksMutex };
 	auto it = std::find_if(s_EventCallbacks.begin(), s_EventCallbacks.end(),
@@ -714,7 +713,7 @@ void SoundManager::clear_callback(std::uint32_t id)
 	{
 		for (auto& [type, cbs] : it->callbacks)
 		{
-			cbs.erase(cbs.begin(), std::remove_if(cbs.begin(), cbs.end(), [id](EventCallbackData::Callback& cb) { return cb.id == id; }));
+			cbs.erase(std::remove_if(cbs.begin(), cbs.end(), [id](const EventCallbackData::Callback& cb) { return cb.id == id; }), cbs.end());
 		}
 	}
 	s_EventCallbackIdToEventDescription.erase(id);

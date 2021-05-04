@@ -18,6 +18,7 @@
 #include <locale>
 #include <set>
 #include <map>
+#include <mutex>
 #include <filesystem>
 
 #define SOL_ALL_SAFETIES_ON 1
@@ -249,6 +250,8 @@ public:
     std::filesystem::path script_folder;
     int cbcount = 0;
 
+    std::recursive_mutex gil;
+
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
     std::map<int, Callback> level_timers;
@@ -272,11 +275,14 @@ public:
     std::map<int, ScriptImage *> images;
 
     ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
-    ~ScriptImpl() = default;
+    ~ScriptImpl() { clear(); }
 
     std::string script_id();
     template<class... Args>
     bool handle_function(sol::function func, Args&&... args);
+
+    void clear();
+    bool reset();
 
     bool run();
     void draw(ImDrawList* dl);
@@ -892,7 +898,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Sets a callback for a vanilla sound which lets you hook
     // lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) {
     lua["set_vanilla_sound_callback"] = [this](std::string name, int types, sol::function cb) {
-        std::uint32_t id = sound_manager->set_callback(name, std::move(cb), static_cast<FMODStudio::EventCallbackType>(types));
+        auto safe_cb = [this, cb = std::move(cb)](PlayingSound sound) {
+            std::lock_guard gil_guard{ gil };
+            handle_function(cb, sound);
+        };
+        std::uint32_t id = sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
         vanilla_sound_callbacks.push_back(id);
         return id;
     };
@@ -1510,6 +1520,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
     array<string> get_parameters()
     */
+    auto sound_set_callback = [this](PlayingSound* sound, sol::function callback) {
+        auto safe_cb = [this, callback = std::move(callback)]() {
+            std::lock_guard gil_guard{ gil };
+            handle_function(callback);
+        };
+        sound->set_callback(std::move(safe_cb));
+    };
     /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
     /// You can just discard this handle if you do not need extended control anymore
     lua.new_usertype<PlayingSound>(
@@ -1531,7 +1548,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "set_looping",
         &PlayingSound::set_looping,
         "set_callback",
-        &PlayingSound::set_callback,
+        std::move(sound_set_callback),
         "get_parameters",
         &PlayingSound::get_parameters,
         "get_parameter",
@@ -1549,8 +1566,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     bool set_looping(SOUND_LOOP_MODE looping)
     bool set_callback(function callback)
     array<string> get_parameters()
-    optional<float> get_parameter(SOUND_PARAM param)
-    bool set_parameter(SOUND_PARAM param, float value)
+    optional<float> get_parameter(VANILLA_SOUND_PARAM param)
+    bool set_parameter(VANILLA_SOUND_PARAM param, float value)
     */
 
     #define table_of(T, name) sol::property([this]() { \
@@ -1822,14 +1839,76 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     // Params: `PlayingSound vanilla_sound`
     */
     /// Paramater to `PlayingSound:get_parameter()` and `PlayingSound:set_parameter()`
-    lua.create_named_table("SOUND_PARAM");
+    lua.create_named_table("VANILLA_SOUND_PARAM");
     sound_manager->for_each_parameter_name([this](std::string parameter_name, std::uint32_t id) {
         std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
-        lua["SOUND_PARAM"][std::move( parameter_name)] = id;
+        lua["VANILLA_SOUND_PARAM"][std::move( parameter_name)] = id;
     });
     lua.new_enum("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
+}
+
+void SpelunkyScript::ScriptImpl::clear()
+{
+    std::lock_guard gil_guard{ gil };
+
+    // Clear all callbacks on script reload to avoid running them
+    // multiple times.
+    level_timers.clear();
+    global_timers.clear();
+    callbacks.clear();
+    for (auto id : vanilla_sound_callbacks)
+    {
+        sound_manager->clear_callback(id);
+    }
+    vanilla_sound_callbacks.clear();
+    options.clear();
+    required_scripts.clear();
+    lua["on_guiframe"] = sol::lua_nil;
+    lua["on_frame"] = sol::lua_nil;
+    lua["on_camp"] = sol::lua_nil;
+    lua["on_start"] = sol::lua_nil;
+    lua["on_level"] = sol::lua_nil;
+    lua["on_transition"] = sol::lua_nil;
+    lua["on_death"] = sol::lua_nil;
+    lua["on_win"] = sol::lua_nil;
+    lua["on_screen"] = sol::lua_nil;
+    if (meta.unsafe)
+    {
+        lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
+        lua["package"]["cpath"] = meta.path + "/?.dll;" + meta.path + "/?/init.dll";
+        lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
+    }
+    else
+    {
+        lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
+        lua["package"]["cpath"] = "";
+        lua["package"]["loadlib"] = sol::lua_nil;
+    }
+}
+
+bool SpelunkyScript::ScriptImpl::reset()
+{
+    clear();
+
+    // Compile & Evaluate the script if the script is changed
+    try
+    {
+        std::lock_guard gil_guard{ gil };
+        auto lua_result = lua.safe_script(code);
+        result = "OK";
+        return true;
+    }
+    catch (const sol::error& e)
+    {
+        result = e.what();
+        messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
+        DEBUG("{}", result);
+        if (messages.size() > 20)
+            messages.pop_front();
+        return false;
+    }
 }
 
 bool SpelunkyScript::ScriptImpl::run()
@@ -1840,56 +1919,15 @@ bool SpelunkyScript::ScriptImpl::run()
     {
         result = "";
         changed = false;
-        // Compile & Evaluate the script if the script is changed
-        try
+        if (!reset())
         {
-            // Clear all callbacks on script reload to avoid running them
-            // multiple times.
-            level_timers.clear();
-            global_timers.clear();
-            callbacks.clear();
-            for (auto id : vanilla_sound_callbacks)
-            {
-                sound_manager->clear_callback(id);
-            }
-            options.clear();
-            required_scripts.clear();
-            lua["on_guiframe"] = sol::lua_nil;
-            lua["on_frame"] = sol::lua_nil;
-            lua["on_camp"] = sol::lua_nil;
-            lua["on_start"] = sol::lua_nil;
-            lua["on_level"] = sol::lua_nil;
-            lua["on_transition"] = sol::lua_nil;
-            lua["on_death"] = sol::lua_nil;
-            lua["on_win"] = sol::lua_nil;
-            lua["on_screen"] = sol::lua_nil;
-            if (meta.unsafe)
-            {
-                lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
-                lua["package"]["cpath"] = meta.path + "/?.dll;" + meta.path + "/?/init.dll";
-                lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
-            }
-            else
-            {
-                lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
-                lua["package"]["cpath"] = "";
-                lua["package"]["loadlib"] = sol::lua_nil;
-            }
-            auto lua_result = lua.safe_script(code);
-            result = "OK";
-        }
-        catch (const sol::error& e)
-        {
-            result = e.what();
-            messages.push_back({ result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f) });
-            DEBUG("{}", result);
-            if (messages.size() > 20)
-                messages.pop_front();
             return false;
         }
     }
     try
     {
+        std::lock_guard gil_guard{ gil };
+
         lua_sethook(lua.lua_state(), NULL, 0, 0);
         lua_sethook(lua.lua_state(), &infinite_loop, LUA_MASKCOUNT, 1000000000);
         sol::optional<std::string> meta_name = lua["meta"]["name"];
@@ -2125,6 +2163,8 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
         return;
     draw_list = dl;
     try {
+        std::lock_guard gil_guard{ gil };
+
         /// Runs on every screen frame. You need this to use draw functions.
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 
