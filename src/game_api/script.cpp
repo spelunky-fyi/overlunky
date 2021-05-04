@@ -254,6 +254,7 @@ public:
     std::map<int, Callback> level_timers;
     std::map<int, Callback> global_timers;
     std::map<int, Callback> callbacks;
+    std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
     std::map<int, ScriptInput *> script_input;
@@ -876,16 +877,33 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
 
     /// Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
-    lua["get_sound"] = [this](std::string name) -> sol::optional<CustomSound> {
-        if (CustomSound event = sound_manager->get_event(name))
+    lua["get_sound"] = [this](std::string path_or_vanilla_sound) -> sol::optional<CustomSound> {
+        if (CustomSound event = sound_manager->get_event(path_or_vanilla_sound))
         {
             return event;
         }
-        else if (CustomSound sound = sound_manager->get_existing_sound((script_folder / name).string()))
+        else if (CustomSound sound = sound_manager->get_existing_sound((script_folder / path_or_vanilla_sound).string()))
         {
             return sound;
         }
         return sol::nullopt;
+    };
+
+    /// Sets a callback for a vanilla sound which lets you hook
+    // lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) {
+    lua["set_vanilla_sound_callback"] = [this](std::string name, int types, sol::function cb) {
+        std::uint32_t id = sound_manager->set_callback(name, std::move(cb), static_cast<FMODStudio::EventCallbackType>(types));
+        vanilla_sound_callbacks.push_back(id);
+        return id;
+    };
+    /// Clears a previously set callback
+    lua["clear_vanilla_sound_callback"] = [this](std::uint32_t id) {
+        sound_manager->clear_callback(id);
+        auto it = std::find(vanilla_sound_callbacks.begin(), vanilla_sound_callbacks.end(), id);
+        if (it != vanilla_sound_callbacks.end())
+        {
+            vanilla_sound_callbacks.erase(it);
+        }
     };
 
     /// Steal input from a Player or HH.
@@ -1275,13 +1293,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::price,
         sol::base_classes,
         sol::bases<Entity>());
-        /* Movable
-            bool is_poisoned()
-            void poison(int16_t frames)
-            bool is_button_pressed(uint32_t button)
-            bool is_button_held(uint32_t button)
-            bool is_button_released(uint32_t button)
-        */
+    /* Movable
+        bool is_poisoned()
+        void poison(int16_t frames)
+        bool is_button_pressed(uint32_t button)
+        bool is_button_held(uint32_t button)
+        bool is_button_released(uint32_t button)
+    */
     lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Player>(
         "Player",
@@ -1480,8 +1498,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool, SoundType)>(&CustomSound::play));
-    /// Handle to a loaded sound, can be used to play the sound and receive a PlayingSound for more control
-    /// It is up to you to not release this as long as any sounds returned by CustomSound:play() are still playing
+    /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
+    /// It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
     lua.new_usertype<CustomSound>(
         "CustomSound",
         "play",
@@ -1763,11 +1781,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         0x2000,
         "LAVA",
         0x4000);
-    /// Third parameter to CustomSound:play(), specifies which group the sound will be played in and thus how the player controls its volume
+    /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
-    /// Paramater to PlayingSound:set_looping(), specifies what type of looping this sound should do
+    /// Paramater to `PlayingSound:set_looping()`, specifies what type of looping this sound should do
     lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
-    /// Paramater to get_sound(), which 
+    /// Paramater to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`
     lua.create_named_table("VANILLA_SOUND");
     sound_manager->for_each_event_name([this](std::string event_name) {
         std::string clean_event_name = event_name;
@@ -1775,7 +1793,35 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
         lua["VANILLA_SOUND"][std::move(clean_event_name)] = std::move(event_name);
     });
-    /// Paramater to PlayingSound:get_parameter() and PlayingSound:set_parameter()
+    /// Bitmask parameter to `set_vanilla_sound_callback()`
+    lua.new_enum("VANILLA_SOUND_CALLBACK_TYPE",
+        "CREATED",
+        FMODStudio::EventCallbackType::Created,
+        "DESTROYED",
+        FMODStudio::EventCallbackType::Destroyed,
+        "STARTED",
+        FMODStudio::EventCallbackType::Started,
+        "RESTARTED",
+        FMODStudio::EventCallbackType::Restarted,
+        "STOPPED",
+        FMODStudio::EventCallbackType::Stopped,
+        "START_FAILED",
+        FMODStudio::EventCallbackType::StartFailed);
+    /* VANILLA_SOUND_CALLBACK_TYPE
+    // CREATED
+    // Params: `PlayingSound vanilla_sound`
+    // DESTROYED
+    // Params: `PlayingSound vanilla_sound`
+    // STARTED
+    // Params: `PlayingSound vanilla_sound`
+    // RESTARTED
+    // Params: `PlayingSound vanilla_sound`
+    // STOPPED
+    // Params: `PlayingSound vanilla_sound`
+    // START_FAILED
+    // Params: `PlayingSound vanilla_sound`
+    */
+    /// Paramater to `PlayingSound:get_parameter()` and `PlayingSound:set_parameter()`
     lua.create_named_table("SOUND_PARAM");
     sound_manager->for_each_parameter_name([this](std::string parameter_name, std::uint32_t id) {
         std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
@@ -1802,6 +1848,10 @@ bool SpelunkyScript::ScriptImpl::run()
             level_timers.clear();
             global_timers.clear();
             callbacks.clear();
+            for (auto id : vanilla_sound_callbacks)
+            {
+                sound_manager->clear_callback(id);
+            }
             options.clear();
             required_scripts.clear();
             lua["on_guiframe"] = sol::lua_nil;

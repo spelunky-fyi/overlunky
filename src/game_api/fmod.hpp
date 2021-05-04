@@ -392,6 +392,7 @@ namespace FMODStudio {
 		RealToVirtal = 0x00008000,
 		VirtualToReal = 0x00010000,
 		All = 0xFFFFFFFF,
+		Num = 17
     };
 
 	enum class PlaybackState {
@@ -445,11 +446,12 @@ namespace FMODStudio {
 	using LockChannelGroup = FMOD_RESULT(Bus*);
 	using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
 
+	using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
+
 	using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription*, EventInstance**);
 	using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription*, ParameterId, ParameterDescription*);
 	using EventDescriptionGetParameterDescriptionByName = FMOD_RESULT(EventDescription*, const char*, ParameterDescription*);
-
-	using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
+	using EventDescriptionSetCallback = FMOD_RESULT(EventDescription*, EventInstanceCallback*, EventCallbackType);
 
 	using EventInstanceStart = FMOD_RESULT(EventInstance*);
 	using EventInstanceStop = FMOD_RESULT(EventInstance*, StopMode);

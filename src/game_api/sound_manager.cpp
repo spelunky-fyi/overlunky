@@ -20,11 +20,11 @@ struct SoundCallbackData
 	SoundCallbackData(SoundCallbackData&&) = default;
 	SoundCallbackData& operator=(SoundCallbackData&&) = default;
 
-	PlayingSoundHandle handle;
+	FMOD::Channel* handle;
 	SoundCallbackFunction callback;
 };
-std::mutex s_CallbacksMutex;
-std::vector<SoundCallbackData> s_Callbacks;
+std::mutex s_SoundCallbacksMutex;
+std::vector<SoundCallbackData> s_SoundCallbacks;
 FMOD::FMOD_RESULT ChannelControlCallback(FMOD::ChannelControl* channel_control, FMOD::ChannelControlType channel_control_type,
 	FMOD::ChannelControlCallbackType channel_control_callback_type, void* calback_data_1, void* calback_data_2)
 {
@@ -32,31 +32,75 @@ FMOD::FMOD_RESULT ChannelControlCallback(FMOD::ChannelControl* channel_control, 
 	{
 		FMOD::Channel* channel = reinterpret_cast<FMOD::Channel*>(channel_control);
 
-		std::lock_guard lock{ s_CallbacksMutex };
-		auto it = std::find_if(s_Callbacks.begin(), s_Callbacks.end(),
+		std::lock_guard lock{ s_SoundCallbacksMutex };
+		auto it = std::find_if(s_SoundCallbacks.begin(), s_SoundCallbacks.end(),
 			[channel](const SoundCallbackData& callback) {
-				return callback.handle == PlayingSoundHandle{ channel };
+				return callback.handle == channel;
 			});
-		if (it != s_Callbacks.end()) {
+		if (it != s_SoundCallbacks.end()) {
 			it->callback();
-			s_Callbacks.erase(it);
+			s_SoundCallbacks.erase(it);
 		}
 	}
 	// TODO: Cleanup old channels?
 	return FMOD::OK;
 }
-FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_type, FMODStudio::EventInstance* event, void* callback_data)
+
+struct EventCallbackData
 {
-	if (callback_type == FMODStudio::EventCallbackType::Stopped)
+	EventCallbackData(const EventCallbackData&) = delete;
+	EventCallbackData& operator=(const EventCallbackData&) = delete;
+	EventCallbackData(EventCallbackData&&) = default;
+	EventCallbackData& operator=(EventCallbackData&&) = default;
+
+	struct Callback {
+		std::uint32_t id;
+		SoundCallbackFunction cb;
+	};
+
+	FMODStudio::EventDescription* handle;
+	std::unordered_map<FMODStudio::EventCallbackType, std::vector<Callback>> callbacks;
+	std::unordered_map<FMODStudio::EventInstance*, SoundCallbackFunction> specific_callbacks;
+	SoundManager* sound_manager;
+
+	inline static FMODStudio::EventInstanceGetDescription* EventInstanceGetDescription{ nullptr };
+};
+std::mutex s_EventCallbacksMutex;
+std::uint32_t current_callback_id{ 0 };
+std::vector<EventCallbackData> s_EventCallbacks;
+std::unordered_map<std::uint32_t, FMODStudio::EventDescription*> s_EventCallbackIdToEventDescription;
+FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_type, FMODStudio::EventInstance* instance, void* callback_data)
+{
+	FMODStudio::EventDescription* event;
+	if (FMOD_CHECK_CALL(EventCallbackData::EventInstanceGetDescription(instance, &event)))
 	{
-		std::lock_guard lock{ s_CallbacksMutex };
-		auto it = std::find_if(s_Callbacks.begin(), s_Callbacks.end(),
-			[event](const SoundCallbackData& callback) {
-				return callback.handle == PlayingSoundHandle{ event };
+		std::lock_guard lock{ s_EventCallbacksMutex };
+		auto it = std::find_if(s_EventCallbacks.begin(), s_EventCallbacks.end(),
+			[event](const EventCallbackData& callback) {
+				return callback.handle == event;
 			});
-		if (it != s_Callbacks.end()) {
-			it->callback();
-			s_Callbacks.erase(it);
+		if (it != s_EventCallbacks.end()) {
+			for (auto& [type, cbs] : it->callbacks)
+			{
+				if (type & callback_type)
+				{
+					// TODO: Expose SoundStarted/SoundStopped?
+					for (auto& cb : cbs)
+					{
+						cb.cb(PlayingSound{ instance, it->sound_manager });
+					}
+				}
+			}
+
+			if (callback_type == FMODStudio::EventCallbackType::Stopped)
+			{
+				auto specific_it = it->specific_callbacks.find(instance);
+				if (specific_it != it->specific_callbacks.end())
+				{
+					specific_it->second();
+				}
+				it->specific_callbacks.erase(instance);
+			}
 		}
 	}
 	return FMOD::OK;
@@ -284,6 +328,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		m_EventCreateInstance = reinterpret_cast<FMODStudio::EventDescriptionCreateInstance*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_CreateInstance"));
 		m_EventDescriptionGetParameterDescriptionByName = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByName*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByName"));
 		m_EventDescriptionGetParameterDescriptionByID = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByID"));
+		m_EventDescriptionSetCallback = reinterpret_cast<FMODStudio::EventDescriptionSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_SetCallback"));
 
 		m_EventInstanceStart = reinterpret_cast<FMODStudio::EventInstanceStart*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Start"));
 		m_EventInstanceStop = reinterpret_cast<FMODStudio::EventInstanceStop*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Stop"));
@@ -298,6 +343,8 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 		m_EventInstanceGetDescription = reinterpret_cast<FMODStudio::EventInstanceGetDescription*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetDescription"));
 		m_EventInstanceGetParameterByID = reinterpret_cast<FMODStudio::EventInstanceGetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetParameterByID"));
 		m_EventInstanceSetParameterByID = reinterpret_cast<FMODStudio::EventInstanceSetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByID"));
+	
+		EventCallbackData::EventInstanceGetDescription = m_EventInstanceGetDescription;
 	}
 	else
 	{
@@ -578,24 +625,99 @@ bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
 }
 bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback)
 {
-	std::lock_guard lock{ s_CallbacksMutex };
 	if (FMOD::Channel** channel = std::get_if<FMOD::Channel*>(&playing_sound.m_FmodHandle))
 	{
+		std::lock_guard lock{ s_SoundCallbacksMutex };
 		if (FMOD_CHECK_CALL(m_ChannelSetCallback(*channel, &ChannelControlCallback)))
 		{
-			s_Callbacks.push_back(SoundCallbackData{ *channel, std::move(callback) });
+			s_SoundCallbacks.push_back(SoundCallbackData{ *channel, std::move(callback) });
 			return true;
 		}
 	}
-	else if (FMODStudio::EventInstance** event = std::get_if<FMODStudio::EventInstance*>(&playing_sound.m_FmodHandle))
+	else if (FMODStudio::EventInstance** instance = std::get_if<FMODStudio::EventInstance*>(&playing_sound.m_FmodHandle))
 	{
-		if (FMOD_CHECK_CALL(m_EventInstanceSetCallback(*event, &EventInstanceCallback, FMODStudio::EventCallbackType::Stopped)))
+		FMODStudio::EventDescription* event;
+		if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(*instance, &event)))
 		{
-			s_Callbacks.push_back(SoundCallbackData{ *event, std::move(callback) });
-			return true;
+			std::lock_guard lock{ s_EventCallbacksMutex };
+			if (FMOD_CHECK_CALL(m_EventInstanceSetCallback(*instance, &EventInstanceCallback, FMODStudio::EventCallbackType::Stopped)))
+			{
+				std::lock_guard lock{ s_EventCallbacksMutex };
+				auto it = std::find_if(s_EventCallbacks.begin(), s_EventCallbacks.end(),
+					[event](const EventCallbackData& callback) {
+					return callback.handle == event;
+				});
+				if (it != s_EventCallbacks.end()) {
+					it->specific_callbacks[*instance] = std::move(callback);
+				}
+				else
+				{
+					s_EventCallbacks.push_back(EventCallbackData{
+						event,
+						{},
+						{ { *instance, std::move(callback) } },
+						this
+					});
+				}
+				return true;
+			}
 		}
 	}
 	return false;
+}
+
+std::uint32_t SoundManager::set_callback(std::string_view event_name, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types)
+{
+	return set_callback(m_SoundData.NameToEvent[event_name]->Event, std::move(callback), types);
+}
+std::uint32_t SoundManager::set_callback(FMODStudio::EventDescription* fmod_event, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types)
+{
+	std::lock_guard lock{ s_EventCallbacksMutex };
+	auto it = std::find_if(s_EventCallbacks.begin(), s_EventCallbacks.end(),
+		[fmod_event](const EventCallbackData& callback) {
+			return callback.handle == fmod_event;
+		});
+	if (it == s_EventCallbacks.end())
+	{
+		s_EventCallbacks.push_back(EventCallbackData{
+			fmod_event,
+			{},
+			{},
+			this
+		});
+		it = s_EventCallbacks.end() - 1;
+		FMOD_CHECK_CALL(m_EventDescriptionSetCallback(fmod_event, &EventInstanceCallback, FMODStudio::EventCallbackType::All));
+	}
+
+	std::uint32_t callback_id = current_callback_id++;
+	for (int i = 0; i < FMODStudio::EventCallbackType::Num; i++)
+	{
+		FMODStudio::EventCallbackType flag = static_cast<FMODStudio::EventCallbackType>(1 << i);
+		if (flag & types)
+		{
+			it->callbacks[flag].push_back({ callback_id, callback });
+		}
+	}
+
+	s_EventCallbackIdToEventDescription[callback_id] = fmod_event;
+	return callback_id;
+}
+void SoundManager::clear_callback(std::uint32_t id)
+{
+	std::lock_guard lock{ s_EventCallbacksMutex };
+	FMODStudio::EventDescription* fmod_event = s_EventCallbackIdToEventDescription[id];
+	auto it = std::find_if(s_EventCallbacks.begin(), s_EventCallbacks.end(),
+		[fmod_event](const EventCallbackData& callback) {
+			return callback.handle == fmod_event;
+		});
+	if (it != s_EventCallbacks.end())
+	{
+		for (auto& [type, cbs] : it->callbacks)
+		{
+			cbs.erase(cbs.begin(), std::remove_if(cbs.begin(), cbs.end(), [id](EventCallbackData::Callback& cb) { return cb.id == id; }));
+		}
+	}
+	s_EventCallbackIdToEventDescription.erase(id);
 }
 
 std::vector<const char*> SoundManager::get_parameters(PlayingSound playing_sound)

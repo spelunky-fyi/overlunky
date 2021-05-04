@@ -71,6 +71,7 @@ using PlayingSoundHandle = std::variant<FMOD::Channel*, FMODStudio::EventInstanc
 class PlayingSound {
     friend class SoundManager;
     friend class CustomSound;
+    friend FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType, FMODStudio::EventInstance*, void*);
 
 public:
     PlayingSound(const PlayingSound& rhs) = default;
@@ -133,6 +134,10 @@ public:
     bool set_looping(PlayingSound playing_sound, LoopMode loop_mode);
     bool set_callback(PlayingSound playing_sound, SoundCallbackFunction&& callback);
 
+    std::uint32_t set_callback(std::string_view event_name, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types);
+    std::uint32_t set_callback(FMODStudio::EventDescription* fmod_event, SoundCallbackFunction&& callback, FMODStudio::EventCallbackType types);
+    void clear_callback(std::uint32_t id);
+
     std::vector<const char*> get_parameters(PlayingSound playing_sound);
     std::vector<const char*> get_parameters(FMODStudio::EventDescription* fmod_event);
     std::optional<float> get_parameter(PlayingSound playing_sound, std::uint32_t parameter_index);
@@ -180,6 +185,7 @@ private:
     FMODStudio::EventDescriptionCreateInstance* m_EventCreateInstance{ nullptr };
     FMODStudio::EventDescriptionGetParameterDescriptionByID* m_EventDescriptionGetParameterDescriptionByID{ nullptr };
     FMODStudio::EventDescriptionGetParameterDescriptionByName* m_EventDescriptionGetParameterDescriptionByName{ nullptr };
+    FMODStudio::EventDescriptionSetCallback* m_EventDescriptionSetCallback{ nullptr };
 
     FMODStudio::EventInstanceStart* m_EventInstanceStart{ nullptr };
     FMODStudio::EventInstanceStop* m_EventInstanceStop{ nullptr };
