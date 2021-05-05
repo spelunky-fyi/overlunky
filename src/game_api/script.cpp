@@ -677,6 +677,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["screen_position"] = screen_position;
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
+    /// Normalizes a screen position returned from `screen_position()`
+    lua["normalize_screen_position"] = [](float sx, float sy) {
+        auto [nsx, nsy] = screenify(ImVec2{ sx, sy });
+        return std::pair{ nsx, nsy };
+    };
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
     /// you're standing on, not real level coordinates.
     lua["get_position"] = get_position;
@@ -1521,7 +1526,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &CustomSound::get_parameters);
     /* CustomSound
     PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
-    array<string> get_parameters()
+    array<pair<VANILLA_SOUND_PARAM, string>> get_parameters()
     */
     auto sound_set_callback = [this](PlayingSound* sound, sol::function callback) {
         auto safe_cb = [this, callback = std::move(callback)]() {
@@ -1568,7 +1573,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     bool set_volume(float volume)
     bool set_looping(SOUND_LOOP_MODE looping)
     bool set_callback(function callback)
-    array<string> get_parameters()
+    array<pair<VANILLA_SOUND_PARAM, string>> get_parameters()
     optional<float> get_parameter(VANILLA_SOUND_PARAM param)
     bool set_parameter(VANILLA_SOUND_PARAM param, float value)
     */

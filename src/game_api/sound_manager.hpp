@@ -51,31 +51,31 @@ class CustomSound
     PlayingSound play(bool paused);
     PlayingSound play(bool paused, SoundType sound_type);
 
-    std::vector<const char *> get_parameters();
+    std::unordered_map<std::uint32_t, const char*> get_parameters();
 
-  private:
+private:
     CustomSound(std::nullptr_t, std::nullptr_t)
     {
     }
-    CustomSound(FMOD::Sound *fmod_sound, SoundManager *sound_manager);
-    CustomSound(FMODStudio::EventDescription *fmod_event, SoundManager *sound_manager);
+    CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager);
+    CustomSound(FMODStudio::EventDescription* fmod_event, SoundManager* sound_manager);
 
-    std::variant<FMOD::Sound *, FMODStudio::EventDescription *, std::monostate> m_FmodHandle{};
-    SoundManager *m_SoundManager{nullptr};
+    std::variant<FMOD::Sound*, FMODStudio::EventDescription*, std::monostate> m_FmodHandle{};
+    SoundManager* m_SoundManager{ nullptr };
 };
 
-using PlayingSoundHandle = std::variant<FMOD::Channel *, FMODStudio::EventInstance *, std::monostate>;
+using PlayingSoundHandle = std::variant<FMOD::Channel*, FMODStudio::EventInstance*, std::monostate>;
 class PlayingSound
 {
     friend class SoundManager;
     friend class CustomSound;
-    friend FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType, FMODStudio::EventInstance *, void *);
+    friend FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType, FMODStudio::EventInstance*, void*);
 
-  public:
-    PlayingSound(const PlayingSound &rhs) = default;
-    PlayingSound(PlayingSound &&rhs) noexcept = default;
-    PlayingSound &operator=(const PlayingSound &rhs) = default;
-    PlayingSound &operator=(PlayingSound &&rhs) noexcept = default;
+public:
+    PlayingSound(const PlayingSound& rhs) = default;
+    PlayingSound(PlayingSound&& rhs) noexcept = default;
+    PlayingSound& operator=(const PlayingSound& rhs) = default;
+    PlayingSound& operator=(PlayingSound&& rhs) noexcept = default;
     ~PlayingSound() = default;
 
     bool is_playing();
@@ -88,7 +88,7 @@ class PlayingSound
     bool set_looping(LoopMode loop_mode);
     bool set_callback(SoundCallbackFunction callback);
 
-    std::vector<const char *> get_parameters();
+    std::unordered_map<std::uint32_t, const char*> get_parameters();
     std::optional<float> get_parameter(std::uint32_t parameter_index);
     bool set_parameter(std::uint32_t parameter_index, float value);
 
@@ -138,8 +138,8 @@ class SoundManager
     std::uint32_t set_callback(FMODStudio::EventDescription *fmod_event, EventCallbackFunction callback, FMODStudio::EventCallbackType types);
     void clear_callback(std::uint32_t id);
 
-    std::vector<const char *> get_parameters(PlayingSound playing_sound);
-    std::vector<const char *> get_parameters(FMODStudio::EventDescription *fmod_event);
+    std::unordered_map<std::uint32_t, const char *> get_parameters(PlayingSound playing_sound);
+    std::unordered_map<std::uint32_t, const char *> get_parameters(FMODStudio::EventDescription *fmod_event);
     std::optional<float> get_parameter(PlayingSound playing_sound, std::uint32_t parameter_index);
     bool set_parameter(PlayingSound playing_sound, std::uint32_t parameter_index, float value);
 

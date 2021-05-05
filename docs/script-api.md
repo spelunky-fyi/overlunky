@@ -290,6 +290,9 @@ Translate an entity position to screen position to be used in drawing functions
 #### Params: `float x`
 #### Returns: `float`
 Translate a distance of `x` tiles to screen distance to be be used in drawing functions
+### [`normalize_screen_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=normalize_screen_position)
+#### Params: `float sx, float sy`
+Normalizes a screen position returned from `screen_position()`
 ### [`get_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_position)
 Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
 you're standing on, not real level coordinates.
@@ -765,7 +768,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`backlayer_global_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_global_illumination) &Illumination::backlayer_global_illumination
 ### `CustomSound`
 - [`PlayingSound play(bool start_paused, SOUND_TYPE sound_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play)
-- [`array<string> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
+- [`string>> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
 ### `PlayingSound`
 - [`bool is_playing()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_playing)
 - [`bool stop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop)
@@ -776,7 +779,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`bool set_volume(float volume)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume)
 - [`bool set_looping(SOUND_LOOP_MODE looping)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_looping)
 - [`bool set_callback(function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback)
-- [`array<string> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
+- [`string>> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
 - [`optional<float> get_parameter(VANILLA_SOUND_PARAM param)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter)
 - [`bool set_parameter(VANILLA_SOUND_PARAM param, float value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter)
 ### `SaveData`
