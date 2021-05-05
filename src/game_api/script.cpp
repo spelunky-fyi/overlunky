@@ -1643,7 +1643,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     string load()
     */
 
-    lua.create_named_table("ENT_TYPE");
+    lua.create_named_table("ENT_TYPE"
+        //, "FLOOR_BORDERTILE", 1
+        //, "", ...blah__blah__read__your__entities.txt...
+        //, "LIQUID_STAGNANT_LAVA", 898
+    );
     for (int i = 0; i < g_items.size(); i++)
     {
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
@@ -1805,8 +1809,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
     /// Paramater to `PlayingSound:set_looping()`, specifies what type of looping this sound should do
     lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
-    /// Paramater to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`
-    lua.create_named_table("VANILLA_SOUND");
+    /// Paramater to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`, 
+    lua.create_named_table("VANILLA_SOUND"
+        //, "BGM_BGM_TITLE", BGM/BGM_title
+        //, "", ...check__vanilla_sounds.txt__output__by__Overlunky...
+        //, "FX_FX_DM_BANNER", FX/FX_dm_banner
+    );
     sound_manager->for_each_event_name([this](std::string event_name) {
         std::string clean_event_name = event_name;
         std::transform(clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
@@ -1842,7 +1850,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     // Params: `PlayingSound vanilla_sound`
     */
     /// Paramater to `PlayingSound:get_parameter()` and `PlayingSound:set_parameter()`
-    lua.create_named_table("VANILLA_SOUND_PARAM");
+    lua.create_named_table("VANILLA_SOUND_PARAM"
+        //, "POS_SCREEN_X", 0
+        //, "", ...check__vanilla_sound_params.txt__output__by__Overlunky...
+        //, "CURRENT_LAYER2", 37
+    );
     sound_manager->for_each_parameter_name([this](std::string parameter_name, std::uint32_t id) {
         std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
         lua["VANILLA_SOUND_PARAM"][std::move( parameter_name)] = id;
