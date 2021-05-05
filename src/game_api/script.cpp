@@ -677,11 +677,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["screen_position"] = screen_position;
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
-    /// Normalizes a screen position returned from `screen_position()`
-    lua["normalize_screen_position"] = [](float sx, float sy) {
-        auto [nsx, nsy] = screenify(ImVec2{ sx, sy });
-        return std::pair{ nsx, nsy };
-    };
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
     /// you're standing on, not real level coordinates.
     lua["get_position"] = get_position;
