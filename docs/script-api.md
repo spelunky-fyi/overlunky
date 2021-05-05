@@ -290,9 +290,6 @@ Translate an entity position to screen position to be used in drawing functions
 #### Params: `float x`
 #### Returns: `float`
 Translate a distance of `x` tiles to screen distance to be be used in drawing functions
-### [`normalize_screen_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=normalize_screen_position)
-#### Params: `float sx, float sy`
-Normalizes a screen position returned from `screen_position()`
 ### [`get_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_position)
 Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
 you're standing on, not real level coordinates.
@@ -454,7 +451,9 @@ Loads a sound from disk relative to this script, ownership might be shared with 
 Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
 ### [`set_vanilla_sound_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_vanilla_sound_callback)
 #### Params: `VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb`
-Sets a callback for a vanilla sound which lets you hook
+Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
+Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
+If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any properties on the sound. Otherwise you may cause a deadlock.
 ### [`clear_vanilla_sound_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_vanilla_sound_callback)
 #### Params: `int id`
 Clears a previously set callback

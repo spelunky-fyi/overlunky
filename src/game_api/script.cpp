@@ -895,7 +895,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return sol::nullopt;
     };
 
-    /// Sets a callback for a vanilla sound which lets you hook
+    /// Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
+    /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
+    /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any properties on the sound. Otherwise you may cause a deadlock.
     // lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) {
     lua["set_vanilla_sound_callback"] = [this](std::string name, int types, sol::function cb) {
         auto safe_cb = [this, cb = std::move(cb)](PlayingSound sound) {
