@@ -1212,6 +1212,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::buttons,
         "stand_counter",
         &Movable::stand_counter,
+        "jump_height_multiplier",
+        &Movable::jump_height_multiplier,
         "owner_uid",
         &Movable::owner_uid,
         "last_owner_uid",
@@ -1256,6 +1258,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::is_poisoned,
         "poison",
         &Movable::poison,
+        "dark_shadow_timer",
+        &Movable::dark_shadow_timer,
+        "exit_invincibility_timer",
+        &Movable::exit_invincibility_timer,
+        "invincibility_frames_timer",
+        &Movable::invincibility_frames_timer,
+        "frozen_timer",
+        &Movable::frozen_timer,
         "is_button_pressed",
         &Movable::is_button_pressed,
         "is_button_held",
@@ -1304,6 +1314,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_usertype<Arrowtrap>("Arrowtrap", "arrow_shot", &Arrowtrap::arrow_shot, "rearm", &Arrowtrap::rearm, sol::base_classes, sol::bases<Entity>());
     lua.new_usertype<Olmec>(
         "Olmec",
+        "target_uid",
+        &Olmec::target_uid,
         "attack_phase",
         &Olmec::attack_phase,
         "attack_timer",
@@ -1328,7 +1340,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_usertype<OlmecFloater>(
         "OlmecFloater",
         "both_floaters_broken",
-        &OlmecFloater::both_floaters_broken,
+        &OlmecFloater::both_floaters_intact,
         sol::base_classes,
         sol::bases<Entity, Movable>());
     lua.new_usertype<Cape>(
