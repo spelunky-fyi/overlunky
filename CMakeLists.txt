@@ -26,6 +26,7 @@ add_compile_definitions(NOMINMAX)
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
 if(BUILD_OVERLUNKY)
   add_compile_definitions(SPEL2_EDITABLE_SCRIPTS)
+  add_compile_definitions(SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS)
 endif()
 
 add_subdirectory(src)
