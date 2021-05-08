@@ -918,11 +918,24 @@ end, ON.LEVEL)
 - [`ONLINE_LOADING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOADING) 28
 - [`ONLINE_LOBBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) 29
 - [`GUIFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GUIFRAME) 100
+\
+Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
 - [`FRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.FRAME) 101
+\
+Runs while playing the game while the player is controllable, not in the base camp or the arena mode
+- [`GAMEFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) 108
+\
+Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen
 - [`SCREEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCREEN) 102
+\
+Runs whenever state.screen changes
 - [`START`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.START) 103
+\
+Runs on the first ON.SCREEN of a run
 - [`LOADING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOADING) 104
 - [`RESET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RESET) 105
+\
+Runs when resetting a run
 - [`SAVE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SAVE) 106
 \
 Params: `SaveContext save_ctx`\
@@ -931,7 +944,6 @@ Runs at the same times as ON.SCREEN, but receives the save_ctx
 \
 Params: `LoadContext load_ctx`\
 Runs as soon as your script is loaded, including reloads, then never again
-- [`GAMEFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) 108
 ### LAYER
 - [`FRONT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.FRONT) 0
 - [`BACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.BACK) 1

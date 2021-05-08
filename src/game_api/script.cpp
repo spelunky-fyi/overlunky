@@ -25,6 +25,45 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
 
+enum class ON
+{
+    LOGO = 0,
+    INTRO = 1,
+    PROLOGUE = 2,
+    TITLE = 3,
+    MENU = 4,
+    OPTIONS = 5,
+    LEADERBOARD = 7,
+    SEED_INPUT = 8,
+    CHARACTER_SELECT = 9,
+    TEAM_SELECT = 10,
+    CAMP = 11,
+    LEVEL = 12,
+    TRANSITION = 13,
+    DEATH = 14,
+    SPACESHIP = 15,
+    WIN = 16,
+    CREDITS = 17,
+    SCORES = 18,
+    CONSTELLATION = 19,
+    RECAP = 20,
+    ARENA_MENU = 21,
+    ARENA_INTRO = 25,
+    ARENA_MATCH = 26,
+    ARENA_SCORE = 27,
+    ONLINE_LOADING = 28,
+    ONLINE_LOBBY = 29,
+    GUIFRAME = 100,
+    FRAME = 101,
+    SCREEN = 102,
+    START = 103,
+    LOADING = 104,
+    RESET = 105,
+    SAVE = 106,
+    LOAD = 107,
+    GAMEFRAME = 108
+};
+
 struct IntOption
 {
     int value;
@@ -77,7 +116,7 @@ struct TimeoutCallback
 struct ScreenCallback
 {
     sol::function func;
-    int screen;
+    ON screen;
     int lastRan;
 };
 
@@ -199,7 +238,8 @@ ImVec2 normalize(ImVec2 pos)
 
 std::string sanitize(std::string data)
 {
-    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c)
+                   { return std::tolower(c); });
     std::regex reg("[^a-z/]*");
     data = std::regex_replace(data, reg, "");
     return data;
@@ -422,21 +462,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["savegame"] = g_save;
 
     /// Print a log message on screen.
-    lua["message"] = [this](std::string message) {
+    lua["message"] = [this](std::string message)
+    {
         messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (messages.size() > 20)
             messages.pop_front();
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_interval"] = [this](sol::function cb, int frames) {
+    lua["set_interval"] = [this](sol::function cb, int frames)
+    {
         auto luaCb = IntervalCallback{cb, frames, -1};
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_timeout"] = [this](sol::function cb, int frames) {
+    lua["set_timeout"] = [this](sol::function cb, int frames)
+    {
         int now = g_state->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
         level_timers[cbcount] = luaCb;
@@ -444,14 +487,16 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_interval"] = [this](sol::function cb, int frames) {
+    lua["set_global_interval"] = [this](sol::function cb, int frames)
+    {
         auto luaCb = IntervalCallback{cb, frames, -1};
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_timeout"] = [this](sol::function cb, int frames) {
+    lua["set_global_timeout"] = [this](sol::function cb, int frames)
+    {
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         global_timers[cbcount] = luaCb;
@@ -459,19 +504,23 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called on an [event](#on).
-    lua["set_callback"] = [this](sol::function cb, int screen) {
-        auto luaCb = ScreenCallback{cb, screen, -1};
+    lua["set_callback"] = [this](sol::function cb, int screen)
+    {
+        auto luaCb = ScreenCallback{cb, (ON)screen, -1};
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     /// Clear previously added callback `id`
-    lua["clear_callback"] = [this](int id) { clear_callbacks.push_back(id); };
+    lua["clear_callback"] = [this](int id)
+    { clear_callbacks.push_back(id); };
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
-    lua["load_script"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
+    lua["load_script"] = [this](std::string id)
+    { required_scripts.push_back(sanitize(id)); };
     /// Seed the game prng.
-    lua["seed_prng"] = [this](int64_t seed) {
+    lua["seed_prng"] = [this](int64_t seed)
+    {
         auto seed_prng = get_seed_prng();
         seed_prng(seed);
     };
@@ -487,14 +536,17 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///   end
     /// end, ON.LEVEL)
     /// ```
-    lua["read_prng"] = [this]() { return read_prng(); };
+    lua["read_prng"] = [this]()
+    { return read_prng(); };
     /// Show a message that looks like a level feeling.
-    lua["toast"] = [this](std::wstring message) {
+    lua["toast"] = [this](std::wstring message)
+    {
         auto toast = get_toast();
         toast(NULL, message.data());
     };
     /// Show a message coming from an entity
-    lua["say"] = [this](uint32_t entity_id, std::wstring message, int unk_type, bool top) {
+    lua["say"] = [this](uint32_t entity_id, std::wstring message, int unk_type, bool top)
+    {
         auto say = get_say();
         auto entity = get_entity_ptr(entity_id);
         if (entity == nullptr)
@@ -505,11 +557,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// limits, you can override them in the UI with double click.
     // lua["register_option_int"] = [this](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
     lua["register_option_int"] = sol::overload(
-        [this](std::string name, std::string desc, std::string long_desc, int value, int min, int max) {
+        [this](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
+        {
             options[name] = {desc, long_desc, IntOption{value, min, max}};
             lua["options"][name] = value;
         },
-        [this](std::string name, std::string desc, int value, int min, int max) {
+        [this](std::string name, std::string desc, int value, int min, int max)
+        {
             options[name] = {desc, "", IntOption{value, min, max}};
             lua["options"][name] = value;
         });
@@ -517,33 +571,39 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// limits, you can override them in the UI with double click.
     // lua["register_option_float"] = [this](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
     lua["register_option_float"] = sol::overload(
-        [this](std::string name, std::string desc, std::string long_desc, float value, float min, float max) {
+        [this](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
+        {
             options[name] = {desc, long_desc, FloatOption{value, min, max}};
             lua["options"][name] = value;
         },
-        [this](std::string name, std::string desc, float value, float min, float max) {
+        [this](std::string name, std::string desc, float value, float min, float max)
+        {
             options[name] = {desc, "", FloatOption{value, min, max}};
             lua["options"][name] = value;
         });
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     // lua["register_option_bool"] = [this](std::string name, std::string desc, std::string long_desc, bool value)
     lua["register_option_bool"] = sol::overload(
-        [this](std::string name, std::string desc, std::string long_desc, bool value) {
+        [this](std::string name, std::string desc, std::string long_desc, bool value)
+        {
             options[name] = {desc, long_desc, BoolOption{value}};
             lua["options"][name] = value;
         },
-        [this](std::string name, std::string desc, bool value) {
+        [this](std::string name, std::string desc, bool value)
+        {
             options[name] = {desc, "", BoolOption{value}};
             lua["options"][name] = value;
         });
     /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
     // lua["register_option_string"] = [this](std::string name, std::string desc, std::string long_desc, std::string value)
     lua["register_option_string"] = sol::overload(
-        [this](std::string name, std::string desc, std::string long_desc, std::string value) {
+        [this](std::string name, std::string desc, std::string long_desc, std::string value)
+        {
             options[name] = {desc, long_desc, StringOption{value}};
             lua["options"][name] = value;
         },
-        [this](std::string name, std::string desc, std::string value) {
+        [this](std::string name, std::string desc, std::string value)
+        {
             options[name] = {desc, "", StringOption{value}};
             lua["options"][name] = value;
         });
@@ -551,22 +611,26 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// with a double `\0\0` at the end.
     // lua["register_option_combo"] = [this](std::string name, std::string desc, std::string long_desc, std::string opts)
     lua["register_option_combo"] = sol::overload(
-        [this](std::string name, std::string desc, std::string long_desc, std::string opts) {
+        [this](std::string name, std::string desc, std::string long_desc, std::string opts)
+        {
             options[name] = {desc, long_desc, ComboOption{0, opts}};
             lua["options"][name] = 1;
         },
-        [this](std::string name, std::string desc, std::string opts) {
+        [this](std::string name, std::string desc, std::string opts)
+        {
             options[name] = {desc, "", ComboOption{0, opts}};
             lua["options"][name] = 1;
         });
     /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
     // lua["register_option_combo"] = [this](std::string name, std::string desc, std::string long_desc, sol::function on_click)
     lua["register_option_button"] = sol::overload(
-        [this](std::string name, std::string desc, std::string long_desc, sol::function callback) {
+        [this](std::string name, std::string desc, std::string long_desc, sol::function callback)
+        {
             options[name] = {desc, long_desc, ButtonOption{callback}};
             lua["options"][name] = -1;
         },
-        [this](std::string name, std::string desc, sol::function callback) {
+        [this](std::string name, std::string desc, sol::function callback)
+        {
             options[name] = {desc, "", ButtonOption{callback}};
             lua["options"][name] = -1;
         });
@@ -607,7 +671,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
     /// Enable/disable game engine pause.
-    lua["pause"] = [this](bool p) {
+    lua["pause"] = [this](bool p)
+    {
         if (p)
             set_pause(0x20);
         else
@@ -643,7 +708,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///     message(tostring(#uids).." == "..tostring(#uids2))
     /// end
     /// ```
-    lua["get_entities_by_type"] = [](sol::variadic_args va) {
+    lua["get_entities_by_type"] = [](sol::variadic_args va)
+    {
         sol::type type = va.get_type();
         if (type == sol::type::number)
         {
@@ -720,7 +786,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
     lua["get_frame"] = get_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.
-    lua["get_ms"] = []() { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
+    lua["get_ms"] = []()
+    { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
     /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
     /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
@@ -746,7 +813,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_particle_type"] = get_particle_type;
 
     /// Calculate the tile distance of two entities by uid
-    lua["distance"] = [this](uint32_t a, uint32_t b) {
+    lua["distance"] = [this](uint32_t a, uint32_t b)
+    {
         Entity* ea = get_entity_ptr(a);
         Entity* eb = get_entity_ptr(b);
         if (ea == nullptr || eb == nullptr)
@@ -766,7 +834,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
     /// end, ON.GUIFRAME)
     /// ```
-    lua["get_bounds"] = [this]() { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
+    lua["get_bounds"] = [this]()
+    { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = get_camera_position;
     /// Sets the current camera position in the level.
@@ -774,49 +843,59 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_camera_position"] = set_camera_position;
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["set_flag"] = [](uint32_t flags, int bit) { return flags | (1U << (bit - 1)); };
+    lua["set_flag"] = [](uint32_t flags, int bit)
+    { return flags | (1U << (bit - 1)); };
     lua["setflag"] = lua["set_flag"];
     /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["clr_flag"] = [](uint32_t flags, int bit) { return flags & ~(1U << (bit - 1)); };
+    lua["clr_flag"] = [](uint32_t flags, int bit)
+    { return flags & ~(1U << (bit - 1)); };
     lua["clrflag"] = lua["clr_flag"];
     /// Returns true if a bit is set in the flags
-    lua["test_flag"] = [](uint32_t flags, int bit) { return (flags & (1U << (bit - 1))) > 0; };
+    lua["test_flag"] = [](uint32_t flags, int bit)
+    { return (flags & (1U << (bit - 1))) > 0; };
     lua["testflag"] = lua["test_flag"];
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
-    lua["rgba"] = [](int r, int g, int b, int a) { return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r); };
+    lua["rgba"] = [](int r, int g, int b, int a)
+    { return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r); };
     /// Draws a line on screen
-    lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color) {
+    lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color)
+    {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
         draw_list->AddLine(a, b, color, thickness);
     };
     /// Draws a rectangle on screen from top-left to bottom-right.
-    lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color) {
+    lua["draw_rect"] = [this](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color)
+    {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
         draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
     };
     /// Draws a filled rectangle on screen from top-left to bottom-right.
-    lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color) {
+    lua["draw_rect_filled"] = [this](float x1, float y1, float x2, float y2, float rounding, ImU32 color)
+    {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
         draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
     };
     /// Draws a circle on screen
-    lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color) {
+    lua["draw_circle"] = [this](float x, float y, float radius, float thickness, ImU32 color)
+    {
         ImVec2 a = screenify({x, y});
         float r = screenify(radius);
         draw_list->AddCircle(a, r, color, 0, thickness);
     };
     /// Draws a filled circle on screen
-    lua["draw_circle_filled"] = [this](float x, float y, float radius, ImU32 color) {
+    lua["draw_circle_filled"] = [this](float x, float y, float radius, ImU32 color)
+    {
         ImVec2 a = screenify({x, y});
         float r = screenify(radius);
         draw_list->AddCircleFilled(a, r, color, 0);
     };
     /// Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
-    lua["draw_text"] = [this](float x, float y, float size, std::string text, ImU32 color) {
+    lua["draw_text"] = [this](float x, float y, float size, std::string text, ImU32 color)
+    {
         ImVec2 a = screenify({x, y});
         ImGuiIO& io = ImGui::GetIO();
         ImFont* font = io.Fonts->Fonts.back();
@@ -846,7 +925,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///     draw_text(0-w/2, 0-h/2, size, text, color)
     /// end
     /// ```
-    lua["draw_text_size"] = [this](float size, std::string text) {
+    lua["draw_text_size"] = [this](float size, std::string text)
+    {
         ImGuiIO& io = ImGui::GetIO();
         ImFont* font = io.Fonts->Fonts.back();
         for (auto pickfont : io.Fonts->Fonts)
@@ -864,7 +944,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns: `id, width, height`
     /// Create image from file.
-    lua["create_image"] = [this](std::string path) -> std::tuple<int, int, int> {
+    lua["create_image"] = [this](std::string path) -> std::tuple<int, int, int>
+    {
         ScriptImage* image = new ScriptImage;
         image->width = 0;
         image->height = 0;
@@ -878,7 +959,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return std::make_tuple(-1, -1, -1);
     };
     /// Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-    lua["draw_image"] = [this](int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, ImU32 color) {
+    lua["draw_image"] = [this](int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, ImU32 color)
+    {
         if (images.find(image) == images.end())
             return;
         ImVec2 a = screenify({x1, y1});
@@ -889,10 +971,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
 
     /// Gets the resolution (width and height) of the screen
-    lua["get_window_size"] = [this]() { return std::make_tuple(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()); };
+    lua["get_window_size"] = [this]()
+    { return std::make_tuple(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()); };
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
-    lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound> {
+    lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound>
+    {
         if (CustomSound sound = sound_manager->get_sound((script_folder / path).string()))
         {
             return sound;
@@ -901,7 +985,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
 
     /// Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
-    lua["get_sound"] = [this](std::string path_or_vanilla_sound) -> sol::optional<CustomSound> {
+    lua["get_sound"] = [this](std::string path_or_vanilla_sound) -> sol::optional<CustomSound>
+    {
         if (CustomSound event = sound_manager->get_event(path_or_vanilla_sound))
         {
             return event;
@@ -918,8 +1003,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
     /// properties on the sound. Otherwise you may cause a deadlock.
     // lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) {
-    lua["set_vanilla_sound_callback"] = [this](std::string name, int types, sol::function cb) {
-        auto safe_cb = [this, cb = std::move(cb)](PlayingSound sound) {
+    lua["set_vanilla_sound_callback"] = [this](std::string name, int types, sol::function cb)
+    {
+        auto safe_cb = [this, cb = std::move(cb)](PlayingSound sound)
+        {
             std::lock_guard gil_guard{gil};
             handle_function(cb, sound);
         };
@@ -928,7 +1015,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return id;
     };
     /// Clears a previously set callback
-    lua["clear_vanilla_sound_callback"] = [this](std::uint32_t id) {
+    lua["clear_vanilla_sound_callback"] = [this](std::uint32_t id)
+    {
         sound_manager->clear_callback(id);
         auto it = std::find(vanilla_sound_callbacks.begin(), vanilla_sound_callbacks.end(), id);
         if (it != vanilla_sound_callbacks.end())
@@ -938,7 +1026,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
 
     /// Steal input from a Player or HH.
-    lua["steal_input"] = [this](int uid) {
+    lua["steal_input"] = [this](int uid)
+    {
         if (script_input.find(uid) != script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
@@ -955,7 +1044,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         // DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
     };
     /// Return input
-    lua["return_input"] = [this](int uid) {
+    lua["return_input"] = [this](int uid)
+    {
         if (script_input.find(uid) == script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
@@ -967,7 +1057,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         script_input.erase(uid);
     };
     /// Send input
-    lua["send_input"] = [this](int uid, uint16_t buttons) {
+    lua["send_input"] = [this](int uid, uint16_t buttons)
+    {
         if (script_input.find(uid) != script_input.end())
         {
             script_input[uid]->current = buttons;
@@ -975,7 +1066,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         }
     };
     /// Read input
-    lua["read_input"] = [this](int uid) {
+    lua["read_input"] = [this](int uid)
+    {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return (uint16_t)0;
@@ -994,7 +1086,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// **Important: Keep all your labels unique!** If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
     /// give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
     /// still, this is just the first draft. Felt cute, might delete later!
-    lua["window"] = [this](std::string title, float x, float y, float w, float h, bool movable, sol::function callback) {
+    lua["window"] = [this](std::string title, float x, float y, float w, float h, bool movable, sol::function callback)
+    {
         bool win_open = true;
         ImGui::PushID("scriptwindow");
         ImGuiCond cond = (movable ? ImGuiCond_Appearing : ImGuiCond_Always);
@@ -1043,16 +1136,21 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return win_open;
     };
     /// Add some text to window, automatically wrapped
-    lua["win_text"] = [](std::string text) { ImGui::TextWrapped(text.c_str()); };
+    lua["win_text"] = [](std::string text)
+    { ImGui::TextWrapped(text.c_str()); };
     /// Add a separator line to window
-    lua["win_separator"] = []() { ImGui::Separator(); };
+    lua["win_separator"] = []()
+    { ImGui::Separator(); };
     /// Add next thing on the same line. This is same as `win_sameline(0, -1)`
-    lua["win_inline"] = []() { ImGui::SameLine(); };
+    lua["win_inline"] = []()
+    { ImGui::SameLine(); };
     /// Add next thing on the same line, with an offset
-    lua["win_sameline"] = [](float offset, float spacing) { ImGui::SameLine(offset, spacing); };
+    lua["win_sameline"] = [](float offset, float spacing)
+    { ImGui::SameLine(offset, spacing); };
     /// Returns: `boolean`
     /// Add a button
-    lua["win_button"] = [](std::string text) {
+    lua["win_button"] = [](std::string text)
+    {
         if (ImGui::Button(text.c_str()))
         {
             return true;
@@ -1061,63 +1159,75 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns: `string`
     /// Add a text field
-    lua["win_input_text"] = [](std::string label, std::string value) {
+    lua["win_input_text"] = [](std::string label, std::string value)
+    {
         InputString(label.c_str(), &value, 0, nullptr, nullptr);
         return value;
     };
     /// Returns: `int`
     /// Add an integer field
-    lua["win_input_int"] = [](std::string label, int value) {
+    lua["win_input_int"] = [](std::string label, int value)
+    {
         ImGui::InputInt(label.c_str(), &value);
         return value;
     };
     /// Returns: `float`
     /// Add a float field
-    lua["win_input_float"] = [](std::string label, float value) {
+    lua["win_input_float"] = [](std::string label, float value)
+    {
         ImGui::InputFloat(label.c_str(), &value);
         return value;
     };
     /// Returns: `int`
     /// Add an integer slider
-    lua["win_slider_int"] = [](std::string label, int value, int min, int max) {
+    lua["win_slider_int"] = [](std::string label, int value, int min, int max)
+    {
         ImGui::SliderInt(label.c_str(), &value, min, max);
         return value;
     };
     /// Returns: `int`
     /// Add an integer dragfield
-    lua["win_drag_int"] = [](std::string label, int value, int min, int max) {
+    lua["win_drag_int"] = [](std::string label, int value, int min, int max)
+    {
         ImGui::DragInt(label.c_str(), &value, 0.5f, min, max);
         return value;
     };
     /// Returns: `float`
     /// Add an float slider
-    lua["win_slider_float"] = [](std::string label, float value, float min, float max) {
+    lua["win_slider_float"] = [](std::string label, float value, float min, float max)
+    {
         ImGui::SliderFloat(label.c_str(), &value, min, max);
         return value;
     };
     /// Returns: `float`
     /// Add an float dragfield
-    lua["win_drag_float"] = [](std::string label, float value, float min, float max) {
+    lua["win_drag_float"] = [](std::string label, float value, float min, float max)
+    {
         ImGui::DragFloat(label.c_str(), &value, 0.5f, min, max);
         return value;
     };
     /// Returns: `boolean`
-    lua["win_check"] = [](std::string label, bool value) {
+    lua["win_check"] = [](std::string label, bool value)
+    {
         ImGui::Checkbox(label.c_str(), &value);
         return value;
     };
     /// Returns: `int`
-    lua["win_combo"] = [](std::string label, int selected, std::string opts) {
+    lua["win_combo"] = [](std::string label, int selected, std::string opts)
+    {
         int reals = selected - 1;
         ImGui::Combo(label.c_str(), &reals, opts.c_str());
         return reals + 1;
     };
     /// Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
-    lua["win_pushid"] = [](int id) { ImGui::PushID(id); };
+    lua["win_pushid"] = [](int id)
+    { ImGui::PushID(id); };
     /// Pop unique identifier from the stack. Put after the input.
-    lua["win_popid"] = []() { ImGui::PopID(); };
+    lua["win_popid"] = []()
+    { ImGui::PopID(); };
     /// Draw image to window.
-    lua["win_image"] = [this](int image, int width, int height) {
+    lua["win_image"] = [this](int image, int width, int height)
+    {
         if (image < 0 || images.find(image) == images.end())
             return;
         if (width < 1)
@@ -1576,8 +1686,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
     array<pair<VANILLA_SOUND_PARAM, string>> get_parameters()
     */
-    auto sound_set_callback = [this](PlayingSound* sound, sol::function callback) {
-        auto safe_cb = [this, callback = std::move(callback)]() {
+    auto sound_set_callback = [this](PlayingSound* sound, sol::function callback)
+    {
+        auto safe_cb = [this, callback = std::move(callback)]()
+        {
             std::lock_guard gil_guard{gil};
             handle_function(callback);
         };
@@ -1795,6 +1907,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         100,
         "FRAME",
         101,
+        "GAMEFRAME",
+        108,
         "SCREEN",
         102,
         "START",
@@ -1806,10 +1920,20 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "SAVE",
         106,
         "LOAD",
-        107,
-        "GAMEFRAME",
-        108);
+        107);
     /* ON
+    // GUIFRAME
+    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
+    // FRAME
+    // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
+    // GAMEFRAME
+    // Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen
+    // SCREEN
+    // Runs whenever state.screen changes
+    // START
+    // Runs on the first ON.SCREEN of a run
+    // RESET
+    // Runs when resetting a run
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -1862,10 +1986,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
                            //, "FX_FX_DM_BANNER", FX/FX_dm_banner
     );
     sound_manager->for_each_event_name(
-        [this](std::string event_name) {
+        [this](std::string event_name)
+        {
             std::string clean_event_name = event_name;
             std::transform(
-                clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
+                clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
+                { return std::toupper(c); });
             std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
             lua["VANILLA_SOUND"][std::move(clean_event_name)] = std::move(event_name);
         });
@@ -1905,8 +2031,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
                            //, "CURRENT_LAYER2", 37
     );
     sound_manager->for_each_parameter_name(
-        [this](std::string parameter_name, std::uint32_t id) {
-            std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
+        [this](std::string parameter_name, std::uint32_t id)
+        {
+            std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
+                           { return std::toupper(c); });
             lua["VANILLA_SOUND_PARAM"][std::move(parameter_name)] = id;
         });
     lua.create_named_table("PARTICLEEMITTER"
@@ -2131,60 +2259,87 @@ bool SpelunkyScript::ScriptImpl::run()
             auto now = get_frame_count();
             if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
-                if (g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
+                if ((ON)g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (
-                    cb->screen == 12 && g_state->screen == 12 && g_state->screen_last != 5 && !g_players.empty() &&
-                    (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
-                { // run ON.LEVEL on instant restart too
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 101 && g_state->time_level != state.time_level && g_state->screen == 12) // ON.FRAME
+                else if (cb->screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 102 && g_state->screen != state.screen) // ON.SCREEN
+                else
                 {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (
-                    cb->screen == 103 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() &&
-                    state.player != g_players.at(0)) // ON.START
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 104 && g_state->loading > 0 && g_state->loading != state.loading) // ON.LOADING
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 105 && (g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset) // ON.RESET
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 106 && g_state->screen != state.screen) // ON.SAVE
-                {
-                    handle_function(cb->func, SaveContext{meta.path, meta.stem});
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 107 && cb->lastRan < 0) // ON.LOAD
-                {
-                    handle_function(cb->func, LoadContext{meta.path, meta.stem});
-                    cb->lastRan = now;
-                }
-                else if (
-                    cb->screen == 108 && !g_state->pause && get_frame_count() != state.time_global &&
-                    (g_state->screen >= 11 && g_state->screen <= 14)) // ON.GAMEFRAME
-                {
-                    handle_function(cb->func);
+                    switch (cb->screen)
+                    {
+                    case ON::FRAME:
+                    {
+                        if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                    }
+                    case ON::GAMEFRAME:
+                    {
+                        if (!g_state->pause && get_frame_count() != state.time_global &&
+                            ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                    }
+                    case ON::SCREEN:
+                    {
+                        if (g_state->screen != state.screen)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                    }
+                    case ON::START:
+                    {
+                        if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !g_players.empty() &&
+                            state.player != g_players.at(0))
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                    }
+                    case ON::LOADING:
+                    {
+                        if (g_state->loading > 0 && g_state->loading != state.loading)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                    }
+                    case ON::RESET:
+                    {
+                        if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                    }
+                    case ON::SAVE:
+                    {
+                        if (g_state->screen != state.screen && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
+                        {
+                            handle_function(cb->func, SaveContext{meta.path, meta.stem});
+                            cb->lastRan = now;
+                        }
+                    }
+                    case ON::LOAD:
+                    {
+                        if (cb->lastRan < 0)
+                        {
+                            handle_function(cb->func, LoadContext{meta.path, meta.stem});
+                            cb->lastRan = now;
+                        }
+                    }
+                    }
                 }
             }
         }
@@ -2262,7 +2417,7 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
             auto now = get_frame_count();
             if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
-                if (cb->screen == 100) // ON.GUIFRAME
+                if (cb->screen == ON::GUIFRAME)
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;
@@ -2309,42 +2464,48 @@ void SpelunkyScript::ScriptImpl::render_options()
     {
         std::visit(
             overloaded{
-                [&](IntOption& option) {
+                [&](IntOption& option)
+                {
                     if (ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
                     {
                         auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](FloatOption& option) {
+                [&](FloatOption& option)
+                {
                     if (ImGui::DragFloat(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
                     {
                         auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](BoolOption& option) {
+                [&](BoolOption& option)
+                {
                     if (ImGui::Checkbox(name_option_pair.second.desc.c_str(), &option.value))
                     {
                         auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](StringOption& option) {
+                [&](StringOption& option)
+                {
                     if (InputString(name_option_pair.second.desc.c_str(), &option.value, 0, nullptr, nullptr))
                     {
                         auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](ComboOption& option) {
+                [&](ComboOption& option)
+                {
                     if (ImGui::Combo(name_option_pair.second.desc.c_str(), &option.value, option.options.c_str()))
                     {
                         auto& name = name_option_pair.first;
                         lua["options"][name] = option.value + 1;
                     }
                 },
-                [&](ButtonOption& option) {
+                [&](ButtonOption& option)
+                {
                     if (ImGui::Button(name_option_pair.second.desc.c_str()))
                     {
                         uint64_t now =
