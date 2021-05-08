@@ -282,6 +282,10 @@ Get the ENT_TYPE... for entity by uid
 ### [`get_zoom_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_zoom_level)
 #### Returns: `float`
 Get the current set zoom level
+### [`game_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_position)
+#### Params: `float x, float y`
+#### Returns: `pair<float, float>`
+Get the game coordinates at the screen position (`x`, `y`)
 ### [`screen_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_position)
 #### Params: `float x, float y`
 #### Returns: `pair<float, float>`
