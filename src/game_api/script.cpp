@@ -2280,6 +2280,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func);
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     case ON::GAMEFRAME:
                     {
@@ -2289,6 +2290,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func);
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     case ON::SCREEN:
                     {
@@ -2297,6 +2299,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func);
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     case ON::START:
                     {
@@ -2306,6 +2309,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func);
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     case ON::LOADING:
                     {
@@ -2314,6 +2318,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func);
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     case ON::RESET:
                     {
@@ -2322,6 +2327,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func);
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     case ON::SAVE:
                     {
@@ -2330,6 +2336,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func, SaveContext{meta.path, meta.stem});
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     case ON::LOAD:
                     {
@@ -2338,6 +2345,7 @@ bool SpelunkyScript::ScriptImpl::run()
                             handle_function(cb->func, LoadContext{meta.path, meta.stem});
                             cb->lastRan = now;
                         }
+                        break;
                     }
                     }
                 }
