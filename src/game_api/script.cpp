@@ -673,6 +673,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
     lua["get_zoom_level"] = get_zoom_level;
+    /// Get the game coordinates at the screen position (`x`, `y`)
+    lua["game_position"] = click_position;
     /// Translate an entity position to screen position to be used in drawing functions
     lua["screen_position"] = screen_position;
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
