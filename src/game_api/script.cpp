@@ -107,7 +107,7 @@ Say get_say()
     ONCE(Say)
     {
         auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x4A\x8B\x0C\x2F\xB8\x60\x01\x00\x00"s, memory.after_bundle);
+        auto off = find_inst(memory.exe(), "\x02\x00\x41\xBC\xE0\x01\x00\x00\x49\x8B\x0C\x3C\xB8\x60\x01\x00\x00"s, memory.after_bundle);
         off = function_start(memory.at_exe(off));
         return res = (Say)off;
     }
