@@ -975,8 +975,8 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
         auto memory = Memory::get();
         auto exe = memory.exe();
 
-        std::string pattern_phase1 = "\xF3\x0F\x10\x15\x07\x3D\x36\x00"s;
-        std::string pattern_phase2 = "\xF3\x0F\x10\x0D\xCD\x38\x36\x00"s;
+        std::string pattern_phase1 = "\xF3\x0F\x10\x15\x1B\x8C\x36\x00"s;
+        std::string pattern_phase2 = "\xF3\x0F\x10\x0D\xE1\x87\x36\x00"s;
 
         // first look up these patterns so we are in the correct function
         auto offset1 = find_inst(exe, pattern_phase1, memory.after_bundle);

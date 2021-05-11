@@ -1377,13 +1377,36 @@ void update_filter(const char *s)
 
 void write_file()
 {
-    std::ofstream file;
-    file.open("entities.txt");
-    for (int i = 1; i < g_items.size(); i++)
     {
-        file << g_items[i].id << ": " << g_items[i].name.data() << std::endl;
+        std::ofstream file;
+        file.open("entities.txt");
+        for (int i = 1; i < g_items.size(); i++)
+        {
+            file << g_items[i].id << ": " << g_items[i].name.data() << std::endl;
+        }
     }
-    file.close();
+
+    {
+        std::ofstream file;
+        file.open("vanilla_sounds.txt");
+        g_SoundManager->for_each_event_name([&file](std::string event_name) {
+            std::string clean_event_name = event_name;
+            std::transform(clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
+            std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
+            file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
+        });
+    }
+
+
+    {
+        std::ofstream file;
+        file.open("vanilla_sound_params.txt");
+        g_SoundManager->for_each_parameter_name([&file](std::string parameter_name, std::uint32_t id) {
+            std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
+            file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
+        });
+    }
+
     file_written = true;
 }
 

@@ -11,7 +11,7 @@ events = []
 funcs = []
 types = []
 lualibs = []
-enums = [{'name': 'ENT_TYPE', 'vars': [{'name': 'FLOOR_BORDERTILE', 'type': '1'}, {'name': '', 'type': '...blah blah read your entities.txt...'}, {'name': 'LIQUID_STAGNANT_LAVA', 'type': '898'}]}]
+enums = []
 replace = {
     'uint8_t': 'int',
     'uint16_t': 'int',
@@ -141,6 +141,25 @@ for file in api_files:
                 var_to_mod = next((item for item in type_to_mod['vars'] if item['name'] == var_name), dict())
                 if var_to_mod:
                     var_to_mod['signature'] = sub_match[0] + ' ' + var_name + sub_match[2]
+
+for file in api_files:
+    data = open(file, 'r').read()
+    data = data.replace('\n', '')
+    data = re.sub(r' ', '', data)
+    m = re.findall(r'create_named_table\s*\(\s*"([^"]*)"\/\/,([^\)]*)', data)
+    for type in m:
+        name = type[0]
+        attr = type[1]
+        attr = attr.replace('//', '')
+        attr = attr.replace('",', ',')
+        attr = attr.split('"')
+        vars = []
+        for var in attr:
+            if not var: continue
+            var = var.split(',')
+            var[1] = var[1].replace('__', ' ')
+            vars.append({ 'name': var[0], 'type': var[1] })
+        enums.append({'name': name, 'vars': vars})
 
 for file in api_files:
     data = open(file, 'r').read()
