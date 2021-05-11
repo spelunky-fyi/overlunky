@@ -19,10 +19,10 @@ struct StateMemory
     uint32_t screen_next;
     uint32_t loading;
     Illumination *illumination;
-    int32_t i20;
+    float fadevalue; // 0.0 = all visible; 1.0 = all black
     uint32_t fadeout;
     uint32_t fadein;
-    int32_t i2c;
+    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits, ...)
     uint8_t ingame;
     uint8_t playing;
     uint8_t pause;
@@ -30,8 +30,11 @@ struct StateMemory
     int32_t i34;
     uint32_t quest_flags;
     int32_t i3c;
-    int32_t i40;
-    int32_t i44;
+    uint32_t speedrun_character; // who administers the speedrun in base camp
+    uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
+    uint8_t padding4;
+    uint8_t padding5;
+    uint8_t padding6;
     uint32_t w;
     uint32_t h;
     int8_t kali_favor;
@@ -56,7 +59,7 @@ struct StateMemory
     uint8_t theme_next;
     uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t b73;
-    int32_t i74;
+    uint32_t end_spaceship_character; // who pops out the spaceship for a tiamat/hundun win
     uint8_t shoppie_aggro;
     uint8_t shoppie_aggro_levels;
     uint8_t merchant_aggro;

@@ -8,6 +8,7 @@
 #include "savedata.hpp"
 #include "window_api.hpp"
 #include "overloaded.hpp"
+#include "particles.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -731,6 +732,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Get the [ParticleDB](#particledb) details of the specified ID
+    lua["get_particle_type"] = get_particle_type;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
@@ -1154,6 +1157,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &EntityDB::sprint_factor,
         "jump",
         &EntityDB::jump,
+        "glow_red",
+        &EntityDB::glow_red,
+        "glow_green",
+        &EntityDB::glow_green,
+        "glow_blue",
+        &EntityDB::glow_blue,
+        "glow_alpha",
+        &EntityDB::glow_alpha,
         "damage",
         &EntityDB::damage,
         "life",
@@ -1253,6 +1264,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::buttons,
         "stand_counter",
         &Movable::stand_counter,
+        "jump_height_multiplier",
+        &Movable::jump_height_multiplier,
         "owner_uid",
         &Movable::owner_uid,
         "last_owner_uid",
@@ -1297,6 +1310,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Movable::is_poisoned,
         "poison",
         &Movable::poison,
+        "dark_shadow_timer",
+        &Movable::dark_shadow_timer,
+        "exit_invincibility_timer",
+        &Movable::exit_invincibility_timer,
+        "invincibility_frames_timer",
+        &Movable::invincibility_frames_timer,
+        "frozen_timer",
+        &Movable::frozen_timer,
         "is_button_pressed",
         &Movable::is_button_pressed,
         "is_button_held",
@@ -1345,6 +1366,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_usertype<Arrowtrap>("Arrowtrap", "arrow_shot", &Arrowtrap::arrow_shot, "rearm", &Arrowtrap::rearm, sol::base_classes, sol::bases<Entity>());
     lua.new_usertype<Olmec>(
         "Olmec",
+        "target_uid",
+        &Olmec::target_uid,
         "attack_phase",
         &Olmec::attack_phase,
         "attack_timer",
@@ -1368,8 +1391,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         */
     lua.new_usertype<OlmecFloater>(
         "OlmecFloater",
-        "both_floaters_broken",
-        &OlmecFloater::both_floaters_broken,
+        "both_floaters_intact",
+        &OlmecFloater::both_floaters_intact,
         sol::base_classes,
         sol::bases<Entity, Movable>());
     lua.new_usertype<Cape>(
@@ -1470,10 +1493,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &StateMemory::loading,
         "quest_flags",
         &StateMemory::quest_flags,
+        "fadevalue",
+        &StateMemory::fadevalue,
         "fadeout",
         &StateMemory::fadeout,
         "fadein",
         &StateMemory::fadein,
+        "loading_black_screen_timer",
+        &StateMemory::loading_black_screen_timer,
         "saved_dogs",
         &StateMemory::saved_dogs,
         "saved_cats",
@@ -1511,6 +1538,29 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Illumination::frontlayer_global_illumination,
         "backlayer_global_illumination",
         &Illumination::backlayer_global_illumination);
+    lua.new_usertype<ParticleDB>(
+        "ParticleDB",
+        "id",
+        &ParticleDB::id,
+        "sheet_id",
+        &ParticleDB::sheet_id,
+        "shrink_growth_factor",
+        &ParticleDB::shrink_growth_factor,
+        "opacity",
+        &ParticleDB::opacity,
+        "hor_scattering",
+        &ParticleDB::hor_scattering,
+        "ver_scattering",
+        &ParticleDB::ver_scattering,
+        "scale_x",
+        &ParticleDB::scale_x,
+        "scale_y",
+        &ParticleDB::scale_y,
+        "hor_velocity",
+        &ParticleDB::hor_velocity,
+        "ver_velocity",
+        &ParticleDB::ver_velocity
+    );
     auto play = sol::overload(
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
@@ -1863,6 +1913,17 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
         lua["VANILLA_SOUND_PARAM"][std::move( parameter_name)] = id;
     });
+    lua.create_named_table("PARTICLEEMITTER"
+        //, "TITLE_TORCHFLAME_SMOKE", 1
+        //, "", ...check__particle_emitters.txt__output__by__Overlunky...
+        //, "MINIGAME_BROKENASTEROID_SMOKE", 219
+    );
+    for (const auto& particle : list_particles())
+    {
+        auto name = particle.name.substr(16, particle.name.size());
+        lua["PARTICLEEMITTER"][name] = particle.id;
+    }
+
     lua.new_enum("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);

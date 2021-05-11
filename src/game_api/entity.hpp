@@ -74,13 +74,10 @@ struct EntityDB
     float max_speed;
     float sprint_factor;
     float jump;
-
-    /* ??? */
-    float _a;
-    float _b;
-    float _c;
-    float _d;
-
+    float glow_red;
+    float glow_green;
+    float glow_blue;
+    float glow_alpha;
     int32_t texture;
     int32_t technique;
     int32_t tile_x;

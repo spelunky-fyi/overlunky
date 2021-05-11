@@ -10,7 +10,7 @@ class Movable : public Entity
     float movey;
     uint32_t buttons;
     uint32_t stand_counter;
-    float fe0;
+    float jump_height_multiplier;
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
@@ -28,9 +28,16 @@ class Movable : public Entity
     uint16_t stun_state;
     uint32_t some_state;
     int16_t poison_tick_timer;
-    int16_t unknown_timer;
-    int32_t i11c;
-    int32_t i120;
+    uint8_t dark_shadow_timer;
+    uint8_t exit_invincibility_timer;
+    uint8_t invincibility_frames_timer;
+    uint8_t frozen_timer;
+    uint8_t unknown_damage_counter_a;
+    uint8_t unknown_damage_counter_b;
+    uint8_t i120a;
+    uint8_t i120b;
+    uint8_t i120c;
+    uint8_t i120d;
     uint8_t b124;
     uint8_t airtime;
     uint8_t b126;
@@ -185,7 +192,7 @@ class Olmec : public Movable
 {
   public:
     size_t unknown_pointer; 
-    uint32_t unknown1; // doesn't change during attack
+    uint32_t target_uid;
     uint8_t attack_phase; // 0 = stomp ; 1 = bombs ; 2 = stomp+ufos ; 3 = in lava
     uint8_t attack_timer; // in phase 0/2: time spent looking for player ; in phase 1: time between bomb salvo
     uint8_t ai_timer; // general timer that counts down whenever olmec is active
@@ -200,7 +207,7 @@ class Olmec : public Movable
 class OlmecFloater : public Movable
 {
   public:
-    bool both_floaters_broken; // strangely, this indicates whether both are broken, not just this specific one
+    bool both_floaters_intact; // strangely, this indicates whether both are intact, not just this specific one
 };
 
 class Cape : public Movable
