@@ -1391,7 +1391,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         */
     lua.new_usertype<OlmecFloater>(
         "OlmecFloater",
-        "both_floaters_broken",
+        "both_floaters_intact",
         &OlmecFloater::both_floaters_intact,
         sol::base_classes,
         sol::bases<Entity, Movable>());
