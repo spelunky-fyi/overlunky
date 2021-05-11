@@ -29,6 +29,7 @@
 #include "sound_manager.hpp"
 #include "savedata.hpp"
 #include "flags.hpp"
+#include "particles.hpp"
 
 #include "decode_audio_file.hpp"
 
@@ -1405,6 +1406,16 @@ void write_file()
             std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
             file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
         });
+    }
+
+    {
+        std::ofstream file;
+        file.open("particle_emitters.txt");
+        auto particles = list_particles();
+        for (const auto& particle: particles)
+        {
+            file << particle.id << ": " << particle.name << "\n";
+        }
     }
 
     file_written = true;

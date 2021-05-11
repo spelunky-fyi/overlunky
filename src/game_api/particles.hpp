@@ -1,21 +1,24 @@
 #pragma once
 
-#include <cstdint>
 #include "texture.hpp"
+#include <cstdint>
+#include <string>
+#include <vector>
 
-struct ParticleDB {
-	uint32_t id;
-	int32_t unknown1;
-	uint32_t unknown2;
-	int32_t unknown3;
-	uint32_t unknown4;
-	uint32_t sheet_id; // zero based index of the sprite in the texture sheet DDS file
-    uint32_t trailing_texture_rel_id; // not sure 
-    uint32_t main_trailing_count; // not sure 
+struct ParticleDB
+{
+    uint32_t id;
+    int32_t unknown1;
+    uint32_t unknown2;
+    int32_t unknown3;
+    uint32_t unknown4;
+    uint32_t sheet_id;                // zero based index of the sprite in the texture sheet DDS file
+    uint32_t trailing_texture_rel_id; // not sure
+    uint32_t main_trailing_count;     // not sure
     uint32_t unknown8;
-    float amplitude; // not sure
+    float amplitude;            // not sure
     float shrink_growth_factor; // negative makes particles shrink over time, positive grow
-    float rotation_speed; // not sure
+    float rotation_speed;       // not sure
     float opacity;
     uint32_t unknown_mask;
     float y_scale_related; // unknown
@@ -32,7 +35,7 @@ struct ParticleDB {
     float hor_velocity;
     float ver_velocity;
     float unknown27;
-    Texture* texture;
+    Texture *texture;
     size_t unknown29; // code pointer
     size_t unknown30; // code pointer
     uint32_t flags;
@@ -49,4 +52,15 @@ struct ParticleDB {
     uint32_t unknown42;
 };
 
-ParticleDB* get_particle_type(uint32_t id);
+struct ParticleEmitter
+{
+    std::string name;
+    uint16_t id;
+
+    ParticleEmitter(const std::string &name_, uint64_t id_) : name(name_), id(id_)
+    {
+    }
+};
+
+ParticleDB *get_particle_type(uint32_t id);
+const std::vector<ParticleEmitter> &list_particles();

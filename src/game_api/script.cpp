@@ -1913,6 +1913,17 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
         lua["VANILLA_SOUND_PARAM"][std::move( parameter_name)] = id;
     });
+    lua.create_named_table("PARTICLEEMITTER"
+        //, "TITLE_TORCHFLAME_SMOKE", 1
+        //, "", ...check__particle_emitters.txt__output__by__Overlunky...
+        //, "MINIGAME_BROKENASTEROID_SMOKE", 219
+    );
+    for (const auto& particle : list_particles())
+    {
+        auto name = particle.name.substr(16, particle.name.size());
+        lua["PARTICLEEMITTER"][name] = particle.id;
+    }
+
     lua.new_enum("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
