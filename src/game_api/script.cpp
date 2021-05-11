@@ -8,6 +8,7 @@
 #include "savedata.hpp"
 #include "window_api.hpp"
 #include "overloaded.hpp"
+#include "particles.hpp"
 
 #include <regex>
 #include <algorithm>
@@ -731,6 +732,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Get the [ParticleDB](#particledb) details of the specified ID
+    lua["get_particle_type"] = get_particle_type;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b) {
@@ -1535,6 +1538,29 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Illumination::frontlayer_global_illumination,
         "backlayer_global_illumination",
         &Illumination::backlayer_global_illumination);
+    lua.new_usertype<ParticleDB>(
+        "ParticleDB",
+        "id",
+        &ParticleDB::id,
+        "sheet_id",
+        &ParticleDB::sheet_id,
+        "shrink_growth_factor",
+        &ParticleDB::shrink_growth_factor,
+        "opacity",
+        &ParticleDB::opacity,
+        "hor_scattering",
+        &ParticleDB::hor_scattering,
+        "ver_scattering",
+        &ParticleDB::ver_scattering,
+        "scale_x",
+        &ParticleDB::scale_x,
+        "scale_y",
+        &ParticleDB::scale_y,
+        "hor_velocity",
+        &ParticleDB::hor_velocity,
+        "ver_velocity",
+        &ParticleDB::ver_velocity
+    );
     auto play = sol::overload(
         static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),

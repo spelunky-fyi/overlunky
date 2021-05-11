@@ -366,6 +366,8 @@ Sets the Y-level at which Olmec changes phases
 ### [`set_ghost_spawn_times`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ghost_spawn_times)
 #### Params: `int normal = 10800, int cursed = 9000`
 Determines when the ghost appears, either when the player is cursed or not
+### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
+Get the [ParticleDB](#particledb) details of the specified ID
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 #### Params: `int a, int b`
 Calculate the tile distance of two entities by uid
@@ -781,6 +783,17 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`brightness2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brightness2) &Illumination::brightness2
 - [`frontlayer_global_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frontlayer_global_illumination) &Illumination::frontlayer_global_illumination
 - [`backlayer_global_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_global_illumination) &Illumination::backlayer_global_illumination
+### `ParticleDB`
+- [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
+- [`sheet_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sheet_id) &ParticleDB::sheet_id
+- [`shrink_growth_factor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shrink_growth_factor) &ParticleDB::shrink_growth_factor
+- [`opacity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) &ParticleDB::opacity
+- [`hor_scattering`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hor_scattering) &ParticleDB::hor_scattering
+- [`ver_scattering`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ver_scattering) &ParticleDB::ver_scattering
+- [`scale_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_x) &ParticleDB::scale_x
+- [`scale_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_y) &ParticleDB::scale_y
+- [`hor_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hor_velocity) &ParticleDB::hor_velocity
+- [`ver_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ver_velocity) &ParticleDB::ver_velocity
 ### `CustomSound`
 - [`PlayingSound play(bool start_paused, SOUND_TYPE sound_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play)
 - [`string>> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
