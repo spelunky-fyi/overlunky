@@ -8,8 +8,8 @@ struct TmpStruct
 
 struct GameManager
 {
-    void *another_state;
-    TmpStruct *tmp;
+    void* another_state;
+    TmpStruct* tmp;
 };
 
-GameManager *get_game_manager();
+GameManager* get_game_manager();

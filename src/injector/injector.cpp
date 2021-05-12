@@ -9,7 +9,7 @@
 
 #include "logger.h"
 
-std::vector<MemoryMap> memory_map(const Process &proc)
+std::vector<MemoryMap> memory_map(const Process& proc)
 {
     std::vector<MemoryMap> result;
     size_t cur = 0;
@@ -38,7 +38,7 @@ size_t find_base(Process proc, std::string name)
 {
     auto map = memory_map(proc);
     name = to_lower(name);
-    for (auto &&item : map)
+    for (auto&& item : map)
     {
         if (name.find(to_lower(item.name)) != std::string::npos)
             return item.addr;
@@ -70,7 +70,7 @@ LPVOID alloc_str(Process proc, std::string str)
     return addr;
 }
 
-LPTHREAD_START_ROUTINE find_function(const Process &proc, const std::string &library, const std::string &function)
+LPTHREAD_START_ROUTINE find_function(const Process& proc, const std::string& library, const std::string& function)
 {
     auto library_ptr = (size_t)LoadLibraryA(library.data());
 
@@ -93,14 +93,14 @@ LPTHREAD_START_ROUTINE find_function(const Process &proc, const std::string &lib
     return reinterpret_cast<LPTHREAD_START_ROUTINE>(addr - library_ptr + find_base(proc, library));
 }
 
-void call(const Process &proc, LPTHREAD_START_ROUTINE addr, LPVOID args)
+void call(const Process& proc, LPTHREAD_START_ROUTINE addr, LPVOID args)
 {
-    DEBUG("Calling: {}", (void *)addr);
+    DEBUG("Calling: {}", (void*)addr);
     auto handle = CreateRemoteThread(proc.handle, nullptr, 0, addr, args, 0, nullptr);
     WaitForSingleObject(handle, INFINITE);
 }
 
-void inject_dll(const Process &proc, const std::string &name)
+void inject_dll(const Process& proc, const std::string& name)
 {
     auto str = alloc_str(proc, name);
     DEBUG("Injecting DLL into process... {}", name);
@@ -134,7 +134,7 @@ std::vector<ProcessInfo> get_processes()
 
 std::optional<Process> find_process(std::string name)
 {
-    for (auto &proc : get_processes())
+    for (auto& proc : get_processes())
     {
         if (proc.name == name)
         {

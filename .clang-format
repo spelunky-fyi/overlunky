@@ -11,3 +11,4 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 AllowAllArgumentsOnNextLine: true
 AllowShortBlocksOnASingleLine: Always
 AllowShortFunctionsOnASingleLine: None
+PointerAlignment: Left

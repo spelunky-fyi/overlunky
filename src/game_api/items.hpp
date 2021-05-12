@@ -6,7 +6,7 @@
 
 struct Items
 {
-    void *__vftable;
-    Player *players[MAX_PLAYERS];
-    Player *player(size_t index);
+    void* __vftable;
+    Player* players[MAX_PLAYERS];
+    Player* player(size_t index);
 };

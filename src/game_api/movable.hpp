@@ -112,7 +112,7 @@ class Monster : public Movable
 class Player : public Monster
 {
   public:
-    Inventory *inventory_ptr;
+    Inventory* inventory_ptr;
     size_t p140;
     int32_t i148;
     int32_t i14c;
@@ -164,7 +164,7 @@ class Mattock : public Movable
 class Mount : public Monster
 {
   public:
-    void carry(Movable *rider);
+    void carry(Movable* rider);
 
     void tame(bool value);
 };

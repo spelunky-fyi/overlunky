@@ -1,4 +1,4 @@
-const char *themes[] = {
+const char* themes[] = {
     "1: Dwelling",
     "2: Jungle",
     "2: Volcana",
@@ -17,7 +17,7 @@ const char *themes[] = {
     "7: Hundun",
     "0: Base camp"};
 
-const char *themes_short[] = {
+const char* themes_short[] = {
     "Dwelling",
     "Jungle",
     "Volcana",
@@ -36,7 +36,7 @@ const char *themes_short[] = {
     "Hundun",
     "Base camp"};
 
-const char *entity_flags[] = {
+const char* entity_flags[] = {
     "1: Invisible",
     "2: Indestructable/special floor",
     "3: Solid (wall)",
@@ -70,7 +70,7 @@ const char *entity_flags[] = {
     "31: ",
     "32: Has backitem?"};
 
-const char *more_flags[] = {
+const char* more_flags[] = {
     "1: ",
     "2: ",
     "3: ",
@@ -104,7 +104,7 @@ const char *more_flags[] = {
     "31: ",
     "32: "};
 
-const char *entity_type_properties_flags[] = {
+const char* entity_type_properties_flags[] = {
     "1: Apply solid block beautification",
     "2: Treat as FLOORSTYLED",
     "3: ",
@@ -138,7 +138,7 @@ const char *entity_type_properties_flags[] = {
     "31: Unused",
     "32: Unused"};
 
-const char *hud_flags[] = {
+const char* hud_flags[] = {
     "1: Upbeat dwelling intro music played",
     "2: ",
     "3: Running tutorial speedrun",
@@ -172,7 +172,7 @@ const char *hud_flags[] = {
     "31: ",
     "32: "};
 
-const char *journal_flags[] = {
+const char* journal_flags[] = {
     "1: I was a pacifist",
     "2: I was a vegan",
     "3: I was a vegetarian",
@@ -206,7 +206,7 @@ const char *journal_flags[] = {
     "31: ",
     "32: "};
 
-const char *quest_flags[] = {
+const char* quest_flags[] = {
     "1: Reset",
     "2: Dark level spawned in world",
     "3: Vault spawned in world",
@@ -240,7 +240,7 @@ const char *quest_flags[] = {
     "31: ",
     "32: "};
 
-const char *places_flags[] = {
+const char* places_flags[] = {
     "Dwelling",
     "Jungle",
     "Volcana",
@@ -258,7 +258,7 @@ const char *places_flags[] = {
     "Hundun's Hideaway",
     "Cosmic Ocean"};
 
-const char *people_flags[] = {
+const char* people_flags[] = {
     "Ana Spelunky",
     "Margaret Tunnel",
     "Colin Northward",
@@ -298,7 +298,7 @@ const char *people_flags[] = {
     "Beg",
     "Eggplant King"};
 
-const char *bestiary_flags[] = {
+const char* bestiary_flags[] = {
     "Snake",
     "Spider",
     "Bat",
@@ -378,7 +378,7 @@ const char *bestiary_flags[] = {
     "Qilin",
     "Mech Rider"};
 
-const char *items_flags[] = {"Rope Pile",      "Bomb Bag",        "Bomb Box",       "Paste",
+const char* items_flags[] = {"Rope Pile",      "Bomb Bag",        "Bomb Box",       "Paste",
                              "Spectacles",     "Climbing Gloves", "Pitcher's Mitt", "Spring Shoes",
                              "Spike Shoes",    "Compass",         "Alien Compass",  "Parachute",
                              "Udjat Eye",      "Kapala",          "Hedjet",         "Crown",
@@ -393,12 +393,12 @@ const char *items_flags[] = {"Rope Pile",      "Bomb Bag",        "Bomb Box",   
                              "Curse Pot",      "Ushabti",         "Eggplant",       "Cooked Turkey",
                              "Elixir",         "Four-Leaf Clover"};
 
-const char *traps_flags[] = {"Spikes",       "Arrow Trap", "Totem Trap",       "Log Trap",    "Spear Trap",  "Thorny Vine",
+const char* traps_flags[] = {"Spikes",       "Arrow Trap", "Totem Trap",       "Log Trap",    "Spear Trap",  "Thorny Vine",
                              "Bear Trap",    "Powder Box", "Falling Platform", "Spikeball",   "Lion Trap",   "Giant Clam",
                              "Sliding Wall", "Crush Trap", "Giant Crush Trap", "Boulder",     "Spring Trap", "Landmine",
                              "Laser Trap",   "Spark Trap", "Frog Trap",        "Sticky Trap", "Bone Drop",   "Egg Sac"};
 
-const char *shortcut_flags[] = {
+const char* shortcut_flags[] = {
     "None",
     "Met Terra",
     "1-4: $2,000",
@@ -415,5 +415,5 @@ const char *shortcut_flags[] = {
     "1: ",  "2: ",  "3: ",  "4: ",  "5: ",  "6: ",  "7: ",  "8: ",  "9: ",  "10: ", "11: ", "12: ", "13: ", "14: ", "15: ", "16: ",
     "17: ", "18: ", "19: ", "20: ", "21: ", "22: ", "23: ", "24: ", "25: ", "26: ", "27: ", "28: ", "29: ", "30: ", "31: ", "32: "};*/
 
-const char *button_flags[] = {"Jp", "Wp", "Bm", "Rp", "Rn", "Dr"};
-const char *direction_flags[] = {"Left", "Down", "Up", "Right"};
+const char* button_flags[] = {"Jp", "Wp", "Bm", "Rp", "Rn", "Dr"};
+const char* direction_flags[] = {"Left", "Down", "Up", "Right"};

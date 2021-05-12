@@ -8,7 +8,7 @@
 class CmdLineParser
 {
   public:
-    CmdLineParser(int argc, char **argv);
+    CmdLineParser(int argc, char** argv);
 
     struct has_args_tag
     {
@@ -21,21 +21,21 @@ class CmdLineParser
     std::vector<std::string_view> m_CmdLine;
 };
 
-template <class T> T GetCmdLineParam(const CmdLineParser &parser, std::string_view arg, const T &default_value);
+template <class T> T GetCmdLineParam(const CmdLineParser& parser, std::string_view arg, const T& default_value);
 template <>
 inline std::vector<std::string_view>
-GetCmdLineParam<std::vector<std::string_view>>(const CmdLineParser &parser, std::string_view arg, const std::vector<std::string_view> &default_value)
+GetCmdLineParam<std::vector<std::string_view>>(const CmdLineParser& parser, std::string_view arg, const std::vector<std::string_view>& default_value)
 {
     const auto ret = parser.Get(arg, CmdLineParser::has_args);
     return ret.empty() ? default_value : ret;
 }
 template <>
-inline std::string_view GetCmdLineParam<std::string_view>(const CmdLineParser &parser, std::string_view arg, const std::string_view &default_value)
+inline std::string_view GetCmdLineParam<std::string_view>(const CmdLineParser& parser, std::string_view arg, const std::string_view& default_value)
 {
     const auto ret = parser.Get(arg, CmdLineParser::has_args);
     return ret.empty() ? default_value : ret.front();
 }
-template <> inline int GetCmdLineParam<int>(const CmdLineParser &parser, std::string_view arg, const int &default_value)
+template <> inline int GetCmdLineParam<int>(const CmdLineParser& parser, std::string_view arg, const int& default_value)
 {
     int ret;
     std::string_view param = GetCmdLineParam<std::string_view>(parser, arg, "none");
@@ -46,7 +46,7 @@ template <> inline int GetCmdLineParam<int>(const CmdLineParser &parser, std::st
     }
     return ret;
 }
-template <> inline bool GetCmdLineParam<bool>(const CmdLineParser &parser, std::string_view arg, const bool &default_value)
+template <> inline bool GetCmdLineParam<bool>(const CmdLineParser& parser, std::string_view arg, const bool& default_value)
 {
     return default_value || parser.Get(arg);
 }

@@ -19,9 +19,9 @@ void write_mem_prot(size_t addr, std::string payload, bool prot)
     auto size = round_up((addr + payload.size() - page), 0x1000);
     if (prot)
     {
-        VirtualProtect((void *)page, size, PAGE_EXECUTE_READWRITE, &old_protect);
+        VirtualProtect((void*)page, size, PAGE_EXECUTE_READWRITE, &old_protect);
     }
-    memcpy((void *)addr, payload.data(), payload.size());
+    memcpy((void*)addr, payload.data(), payload.size());
     if (prot)
     {
         VirtualProtect((LPVOID)page, size, old_protect, &old_protect);
@@ -36,7 +36,7 @@ void write_mem(size_t addr, std::string payload)
 #define DEFINE_ACCESSOR(name, type)                                                                                                                  \
     type read_##name(size_t addr)                                                                                                                    \
     {                                                                                                                                                \
-        return *(type *)(addr);                                                                                                                      \
+        return *(type*)(addr);                                                                                                                       \
     }
 
 DEFINE_ACCESSOR(u8, uint8_t);
@@ -67,7 +67,7 @@ struct Memory
     size_t exe_ptr;
     size_t after_bundle;
 
-    static Memory &get()
+    static Memory& get()
     {
         static Memory MEMORY = Memory{};
         static bool INIT = false;
@@ -93,16 +93,16 @@ struct Memory
         return exe_ptr + offset;
     }
 
-    char *exe()
+    char* exe()
     {
-        return (char *)exe_ptr;
+        return (char*)exe_ptr;
     }
 };
 
 static size_t decode_call(size_t off)
 {
     auto memory = Memory::get();
-    return off + (*(int32_t *)(&memory.exe()[off + 1])) + 5;
+    return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
 }
 
 #define ONCE(type)                                                                                                                                   \

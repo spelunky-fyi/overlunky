@@ -2,7 +2,7 @@
 
 struct RenderAPI
 {
-    const size_t *api;
+    const size_t* api;
     size_t swap_chain_off;
 
     static RenderAPI get();

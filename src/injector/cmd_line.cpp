@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-CmdLineParser::CmdLineParser(int argc, char **argv) : m_CmdLine(argv, argv + argc)
+CmdLineParser::CmdLineParser(int argc, char** argv) : m_CmdLine(argv, argv + argc)
 {
 }
 

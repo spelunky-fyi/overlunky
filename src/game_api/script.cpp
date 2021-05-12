@@ -83,7 +83,7 @@ struct ScreenCallback
 
 struct ScriptState
 {
-    Player *player;
+    Player* player;
     uint32_t screen;
     uint32_t time_level;
     uint32_t time_total;
@@ -96,7 +96,7 @@ struct ScriptState
 
 using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 
-using Toast = void (*)(void *, wchar_t *);
+using Toast = void (*)(void*, wchar_t*);
 Toast get_toast()
 {
     ONCE(Toast)
@@ -108,7 +108,7 @@ Toast get_toast()
     }
 }
 
-using Say = void (*)(void *, Entity *, wchar_t *, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);
+using Say = void (*)(void*, Entity*, wchar_t*, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);
 Say get_say()
 {
     ONCE(Say)
@@ -135,19 +135,19 @@ Prng get_seed_prng()
     }
 }
 
-void infinite_loop(lua_State *argst, lua_Debug *argdb)
+void infinite_loop(lua_State* argst, lua_Debug* argdb)
 {
     luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
 };
 
-Movable *get_entity(uint32_t id)
+Movable* get_entity(uint32_t id)
 {
-    return (Movable *)get_entity_ptr(id);
+    return (Movable*)get_entity_ptr(id);
 }
 
 std::tuple<float, float, int> get_position(uint32_t id)
 {
-    Entity *ent = get_entity_ptr(id);
+    Entity* ent = get_entity_ptr(id);
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
     return {0.0f, 0.0f, 0};
@@ -155,14 +155,14 @@ std::tuple<float, float, int> get_position(uint32_t id)
 
 float screenify(float dis)
 {
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     ImVec2 res = io.DisplaySize;
     return dis / (1.0 / (res.x / 2));
 }
 
 ImVec2 screenify(ImVec2 pos)
 {
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     ImVec2 res = io.DisplaySize;
     ImVec2 bar = {0.0, 0.0};
     if (res.x / res.y > 1.78)
@@ -181,7 +181,7 @@ ImVec2 screenify(ImVec2 pos)
 
 ImVec2 normalize(ImVec2 pos)
 {
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     ImVec2 res = io.DisplaySize;
     if (res.x / res.y > 1.78)
     {
@@ -207,20 +207,20 @@ std::string sanitize(std::string data)
 
 struct InputTextCallback_UserData
 {
-    std::string *Str;
+    std::string* Str;
     ImGuiInputTextCallback ChainCallback;
-    void *ChainCallbackUserData;
+    void* ChainCallbackUserData;
 };
 
-static int InputTextCallback(ImGuiInputTextCallbackData *data)
+static int InputTextCallback(ImGuiInputTextCallbackData* data)
 {
-    InputTextCallback_UserData *user_data = (InputTextCallback_UserData *)data->UserData;
+    InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
     if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
     {
-        std::string *str = user_data->Str;
+        std::string* str = user_data->Str;
         IM_ASSERT(data->Buf == str->c_str());
         str->resize(data->BufTextLen);
-        data->Buf = (char *)str->c_str();
+        data->Buf = (char*)str->c_str();
     }
     else if (user_data->ChainCallback)
     {
@@ -230,7 +230,7 @@ static int InputTextCallback(ImGuiInputTextCallbackData *data)
     return 0;
 }
 
-bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void *user_data)
+bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
 {
     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
     flags |= ImGuiInputTextFlags_CallbackResize;
@@ -239,7 +239,7 @@ bool InputString(const char *label, std::string *str, ImGuiInputTextFlags flags,
     cb_user_data.Str = str;
     cb_user_data.ChainCallback = callback;
     cb_user_data.ChainCallbackUserData = user_data;
-    return ImGui::InputText(label, (char *)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+    return ImGui::InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
 }
 
 class SpelunkyScript::ScriptImpl
@@ -251,7 +251,7 @@ class SpelunkyScript::ScriptImpl
     char code[204800];
 #else
     std::string code_storage;
-    const char *code;
+    const char* code;
 #endif
     std::string result = "";
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
@@ -271,38 +271,38 @@ class SpelunkyScript::ScriptImpl
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
-    std::map<int, ScriptInput *> script_input;
+    std::map<int, ScriptInput*> script_input;
     std::set<std::string> windows;
 
-    ImDrawList *draw_list{nullptr};
+    ImDrawList* draw_list{nullptr};
 
-    StateMemory *g_state = nullptr;
+    StateMemory* g_state = nullptr;
     std::vector<EntityItem> g_items;
-    std::vector<Player *> g_players;
-    SaveData *g_save = nullptr;
+    std::vector<Player*> g_players;
+    SaveData* g_save = nullptr;
 
-    SoundManager *sound_manager;
+    SoundManager* sound_manager;
 
-    std::map<int, ScriptImage *> images;
+    std::map<int, ScriptImage*> images;
 
-    ScriptImpl(std::string script, std::string file, SoundManager *sound_manager, bool enable = true);
+    ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
     ~ScriptImpl()
     {
         clear();
     }
 
     std::string script_id();
-    template <class... Args> bool handle_function(sol::function func, Args &&...args);
+    template <class... Args> bool handle_function(sol::function func, Args&&... args);
 
     void clear();
     bool reset();
 
     bool run();
-    void draw(ImDrawList *dl);
+    void draw(ImDrawList* dl);
     void render_options();
 };
 
-SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager *sound_mgr, bool enable)
+SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
 {
     sound_manager = sound_mgr;
 
@@ -396,7 +396,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         meta.id = script_id();
         result = "Got metadata";
     }
-    catch (const sol::error &e)
+    catch (const sol::error& e)
     {
         result = e.what();
         messages.push_back({result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
@@ -414,7 +414,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// ```
     lua["state"] = g_state;
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
-    lua["players"] = std::vector<Movable *>(g_players.begin(), g_players.end());
+    lua["players"] = std::vector<Movable*>(g_players.begin(), g_players.end());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = g_save;
 
@@ -769,8 +769,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t a, uint32_t b)
     {
-        Entity *ea = get_entity_ptr(a);
-        Entity *eb = get_entity_ptr(b);
+        Entity* ea = get_entity_ptr(a);
+        Entity* eb = get_entity_ptr(b);
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
@@ -846,8 +846,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["draw_text"] = [this](float x, float y, float size, std::string text, ImU32 color)
     {
         ImVec2 a = screenify({x, y});
-        ImGuiIO &io = ImGui::GetIO();
-        ImFont *font = io.Fonts->Fonts.back();
+        ImGuiIO& io = ImGui::GetIO();
+        ImFont* font = io.Fonts->Fonts.back();
         for (auto pickfont : io.Fonts->Fonts)
         {
             if (floor(size) <= floor(pickfont->FontSize))
@@ -876,8 +876,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// ```
     lua["draw_text_size"] = [this](float size, std::string text)
     {
-        ImGuiIO &io = ImGui::GetIO();
-        ImFont *font = io.Fonts->Fonts.back();
+        ImGuiIO& io = ImGui::GetIO();
+        ImFont* font = io.Fonts->Fonts.back();
         for (auto pickfont : io.Fonts->Fonts)
         {
             if (floor(size) <= floor(pickfont->FontSize))
@@ -895,7 +895,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Create image from file.
     lua["create_image"] = [this](std::string path) -> std::tuple<int, int, int>
     {
-        ScriptImage *image = new ScriptImage;
+        ScriptImage* image = new ScriptImage;
         image->width = 0;
         image->height = 0;
         image->texture = NULL;
@@ -976,10 +976,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     {
         if (script_input.find(uid) != script_input.end())
             return;
-        Player *player = get_entity_ptr(uid)->as<Player>();
+        Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return;
-        ScriptInput *newinput = new ScriptInput();
+        ScriptInput* newinput = new ScriptInput();
         newinput->next = 0;
         newinput->current = 0;
         newinput->orig_input = player->input_ptr;
@@ -994,7 +994,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     {
         if (script_input.find(uid) == script_input.end())
             return;
-        Player *player = get_entity_ptr(uid)->as<Player>();
+        Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return;
         // DEBUG("Return input: {:x} -> {:x}", player->input_ptr, script_input[uid]->orig_input);
@@ -1014,10 +1014,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Read input
     lua["read_input"] = [this](int uid)
     {
-        Player *player = get_entity_ptr(uid)->as<Player>();
+        Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return (uint16_t)0;
-        ScriptInput *readinput = reinterpret_cast<ScriptInput *>(player->input_ptr);
+        ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
         if (!IsBadReadPtr(readinput, 20))
         {
             return readinput->next;
@@ -1252,7 +1252,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &EntityDB::default_more_flags);
 
     auto overlaps_with = sol::overload(
-        static_cast<bool (Entity::*)(Entity *)>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
         static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
     lua.new_usertype<Entity>(
         "Entity",
@@ -1626,7 +1626,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
     array<pair<VANILLA_SOUND_PARAM, string>> get_parameters()
     */
-    auto sound_set_callback = [this](PlayingSound *sound, sol::function callback)
+    auto sound_set_callback = [this](PlayingSound* sound, sol::function callback)
     {
         auto safe_cb = [this, callback = std::move(callback)]()
         {
@@ -1968,7 +1968,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
                            //, "", ...check__particle_emitters.txt__output__by__Overlunky...
                            //, "MINIGAME_BROKENASTEROID_SMOKE", 219
     );
-    for (const auto &particle : list_particles())
+    for (const auto& particle : list_particles())
     {
         auto name = particle.name.substr(16, particle.name.size());
         lua["PARTICLEEMITTER"][name] = particle.id;
@@ -2030,7 +2030,7 @@ bool SpelunkyScript::ScriptImpl::reset()
         result = "OK";
         return true;
     }
-    catch (const sol::error &e)
+    catch (const sol::error& e)
     {
         result = e.what();
         messages.push_back({result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
@@ -2088,7 +2088,7 @@ bool SpelunkyScript::ScriptImpl::run()
         /// Runs on any [screen change](#on).
         sol::optional<sol::function> on_screen = lua["on_screen"];
         g_players = get_players();
-        lua["players"] = std::vector<Player *>(g_players.begin(), g_players.end());
+        lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
         if (g_state->screen != state.screen && g_state->screen_last != 5)
         {
             level_timers.clear();
@@ -2178,10 +2178,10 @@ bool SpelunkyScript::ScriptImpl::run()
             }
         }
 
-        for (auto &[id, callback] : callbacks)
+        for (auto& [id, callback] : callbacks)
         {
             auto now = get_frame_count();
-            if (auto *cb = std::get_if<ScreenCallback>(&callback))
+            if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
                 if (g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
                 {
@@ -2284,7 +2284,7 @@ bool SpelunkyScript::ScriptImpl::run()
         state.reset = (g_state->quest_flags & 1);
         state.quest_flags = g_state->quest_flags;
     }
-    catch (const sol::error &e)
+    catch (const sol::error& e)
     {
         result = e.what();
         return false;
@@ -2292,7 +2292,7 @@ bool SpelunkyScript::ScriptImpl::run()
     return true;
 }
 
-void SpelunkyScript::ScriptImpl::draw(ImDrawList *dl)
+void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
 {
     if (!enabled)
         return;
@@ -2309,10 +2309,10 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList *dl)
             on_guiframe.value()();
         }
 
-        for (auto &[id, callback] : callbacks)
+        for (auto& [id, callback] : callbacks)
         {
             auto now = get_frame_count();
-            if (auto *cb = std::get_if<ScreenCallback>(&callback))
+            if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
                 if (cb->screen == 100) // ON.GUIFRAME
                 {
@@ -2322,7 +2322,7 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList *dl)
             }
         }
     }
-    catch (const sol::error &e)
+    catch (const sol::error& e)
     {
         result = e.what();
     }
@@ -2335,7 +2335,7 @@ std::string SpelunkyScript::ScriptImpl::script_id()
     return newid;
 }
 
-template <class... Args> bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args &&...args)
+template <class... Args> bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args&&... args)
 {
     auto lua_result = func(std::forward<Args>(args)...);
     if (!lua_result.valid())
@@ -2354,57 +2354,57 @@ template <class... Args> bool SpelunkyScript::ScriptImpl::handle_function(sol::f
 void SpelunkyScript::ScriptImpl::render_options()
 {
     ImGui::PushID(meta.id.data());
-    for (auto &name_option_pair : options)
+    for (auto& name_option_pair : options)
     {
         std::visit(
             overloaded{
-                [&](IntOption &option)
+                [&](IntOption& option)
                 {
                     if (ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
                     {
-                        auto &name = name_option_pair.first;
+                        auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](FloatOption &option)
+                [&](FloatOption& option)
                 {
                     if (ImGui::DragFloat(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
                     {
-                        auto &name = name_option_pair.first;
+                        auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](BoolOption &option)
+                [&](BoolOption& option)
                 {
                     if (ImGui::Checkbox(name_option_pair.second.desc.c_str(), &option.value))
                     {
-                        auto &name = name_option_pair.first;
+                        auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](StringOption &option)
+                [&](StringOption& option)
                 {
                     if (InputString(name_option_pair.second.desc.c_str(), &option.value, 0, nullptr, nullptr))
                     {
-                        auto &name = name_option_pair.first;
+                        auto& name = name_option_pair.first;
                         lua["options"][name] = option.value;
                     }
                 },
-                [&](ComboOption &option)
+                [&](ComboOption& option)
                 {
                     if (ImGui::Combo(name_option_pair.second.desc.c_str(), &option.value, option.options.c_str()))
                     {
-                        auto &name = name_option_pair.first;
+                        auto& name = name_option_pair.first;
                         lua["options"][name] = option.value + 1;
                     }
                 },
-                [&](ButtonOption &option)
+                [&](ButtonOption& option)
                 {
                     if (ImGui::Button(name_option_pair.second.desc.c_str()))
                     {
                         uint64_t now =
                             std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-                        auto &name = name_option_pair.first;
+                        auto& name = name_option_pair.first;
                         lua["options"][name] = now;
                         handle_function(option.on_click);
                     }
@@ -2419,13 +2419,13 @@ void SpelunkyScript::ScriptImpl::render_options()
     ImGui::PopID();
 }
 
-SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager *sound_manager, bool enable)
+SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
     : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, enable)}
 {
 }
 SpelunkyScript::~SpelunkyScript() = default; // Has to be in the source file
 
-std::deque<ScriptMessage> &SpelunkyScript::get_messages()
+std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 {
     return m_Impl->messages;
 }
@@ -2434,35 +2434,35 @@ std::vector<std::string> SpelunkyScript::consume_requires()
     return std::move(m_Impl->required_scripts);
 }
 
-const std::string &SpelunkyScript::get_id() const
+const std::string& SpelunkyScript::get_id() const
 {
     return m_Impl->meta.id;
 }
-const std::string &SpelunkyScript::get_name() const
+const std::string& SpelunkyScript::get_name() const
 {
     return m_Impl->meta.name;
 }
-const std::string &SpelunkyScript::get_description() const
+const std::string& SpelunkyScript::get_description() const
 {
     return m_Impl->meta.description;
 }
-const std::string &SpelunkyScript::get_author() const
+const std::string& SpelunkyScript::get_author() const
 {
     return m_Impl->meta.author;
 }
-const std::string &SpelunkyScript::get_file() const
+const std::string& SpelunkyScript::get_file() const
 {
     return m_Impl->meta.file;
 }
-const std::string &SpelunkyScript::get_filename() const
+const std::string& SpelunkyScript::get_filename() const
 {
     return m_Impl->meta.filename;
 }
-const std::string &SpelunkyScript::get_version() const
+const std::string& SpelunkyScript::get_version() const
 {
     return m_Impl->meta.version;
 }
-const std::string &SpelunkyScript::get_path() const
+const std::string& SpelunkyScript::get_path() const
 {
     return m_Impl->meta.path;
 }
@@ -2472,7 +2472,7 @@ bool SpelunkyScript::get_unsafe() const
 }
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
-char *SpelunkyScript::get_code() const
+char* SpelunkyScript::get_code() const
 {
     return m_Impl->code;
 }
@@ -2493,7 +2493,7 @@ void SpelunkyScript::update_code(std::string code)
     m_Impl->changed = true;
 }
 
-std::string &SpelunkyScript::get_result()
+std::string& SpelunkyScript::get_result()
 {
     return m_Impl->result;
 }
@@ -2520,7 +2520,7 @@ bool SpelunkyScript::run()
 {
     return m_Impl->run();
 }
-void SpelunkyScript::draw(ImDrawList *dl)
+void SpelunkyScript::draw(ImDrawList* dl)
 {
     m_Impl->draw(dl);
 }

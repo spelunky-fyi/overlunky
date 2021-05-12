@@ -18,7 +18,7 @@ struct StateMemory
     uint32_t screen;
     uint32_t screen_next;
     uint32_t loading;
-    Illumination *illumination;
+    Illumination* illumination;
     float fadevalue; // 0.0 = all visible; 1.0 = all black
     uint32_t fadeout;
     uint32_t fadein;
@@ -80,11 +80,11 @@ struct StateMemory
     int32_t hud_flags;
 
     char pada14[0x12b0 - 0xa14];
-    Items *items;
-    void *pad12b8;
-    Layer *layers[2];
+    Items* items;
+    void* pad12b8;
+    Layer* layers[2];
     char pad12d0[0x1308 - 0x12d0];
-    std::unordered_map<uint32_t, Entity *> instance_id_to_pointer;
+    std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
 };
 struct State
 {
@@ -97,19 +97,19 @@ struct State
 
     static void set_write_load_opt(bool allow);
 
-    static State &get();
+    static State& get();
 
-    StateMemory *ptr() const;
+    StateMemory* ptr() const;
 
-    Layer *layer(uint8_t index)
+    Layer* layer(uint8_t index)
     {
         return ptr()->layers[index];
     }
 
-    Items *items()
+    Items* items()
     {
         auto pointer = ptr()->items;
-        return (Items *)(pointer);
+        return (Items*)(pointer);
     }
 
     void godmode(bool g)
@@ -218,9 +218,9 @@ struct State
         return prng;
     }
 
-    Entity *find(uint32_t unique_id)
+    Entity* find(uint32_t unique_id)
     {
-        auto &map = ptr()->instance_id_to_pointer;
+        auto& map = ptr()->instance_id_to_pointer;
         auto it = map.find(unique_id);
         if (it == map.end())
             return nullptr;
@@ -231,7 +231,7 @@ struct State
     void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
-    SaveData *savedata();
+    SaveData* savedata();
 };
 
 struct SaturationVignette

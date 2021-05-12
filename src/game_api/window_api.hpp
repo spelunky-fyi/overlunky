@@ -3,10 +3,10 @@
 #include <Windows.h>
 #include <d3d11.h>
 
-bool init_hooks(void *swap_chain_ptr);
+bool init_hooks(void* swap_chain_ptr);
 
 using OnInputCallback = bool (*)(UINT, WPARAM, LPARAM);
-using ImguiInitCallback = void (*)(struct ImGuiContext *);
+using ImguiInitCallback = void (*)(struct ImGuiContext*);
 using ImguiDrawCallback = void (*)();
 using PreDrawCallback = void (*)();
 using PostDrawCallback = void (*)();
@@ -28,4 +28,4 @@ HWND get_window();
 void show_cursor();
 void hide_cursor();
 
-bool LoadTextureFromFile(const char *filename, ID3D11ShaderResourceView **out_srv, int *out_width, int *out_height);
+bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height);

@@ -5,7 +5,7 @@
 struct Texture
 {
     std::uint64_t id;
-    const char **name;
+    const char** name;
     std::uint32_t width;
     std::uint32_t height;
     std::uint32_t num_tiles_width;
@@ -26,4 +26,4 @@ struct Textures
     Texture textures[];
 };
 
-Textures *get_textures();
+Textures* get_textures();

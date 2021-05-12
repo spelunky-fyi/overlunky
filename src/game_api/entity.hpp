@@ -42,8 +42,8 @@ struct Color
 
 class Entity;
 // Creates an instance of this entity
-using EntityCreate = Entity *(*)();
-using EntityDestroy = void (*)(Entity *);
+using EntityCreate = Entity* (*)();
+using EntityDestroy = void (*)(Entity*);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
 
 struct EntityDB
@@ -103,10 +103,10 @@ struct EntityItem
     std::string name;
     uint16_t id;
 
-    EntityItem(const std::string &name_, uint64_t id_) : name(name_), id(id_)
+    EntityItem(const std::string& name_, uint64_t id_) : name(name_), id(id_)
     {
     }
-    bool operator<(const EntityItem &item) const
+    bool operator<(const EntityItem& item) const
     {
         return id < item.id;
     }
@@ -114,22 +114,22 @@ struct EntityItem
 
 std::vector<EntityItem> list_entities(size_t map_ptr);
 
-EntityDB *get_type(uint32_t id);
+EntityDB* get_type(uint32_t id);
 
 int32_t to_id(std::string id);
 
-Entity *state_find_item(size_t state_ptr, uint32_t unique_id);
+Entity* state_find_item(size_t state_ptr, uint32_t unique_id);
 
 template <typename T> std::string to_le_bytes(T fmt)
 {
-    return std::string((char *)&fmt, sizeof(T));
+    return std::string((char*)&fmt, sizeof(T));
 }
 
 class Vector
 {
   public:
-    uint32_t *heap;
-    uint32_t *begin;
+    uint32_t* heap;
+    uint32_t* begin;
     uint32_t size, count;
 
     bool empty()
@@ -141,8 +141,8 @@ class Vector
 class Entity
 {
   public:
-    EntityDB *type;
-    Entity *overlay;
+    EntityDB* type;
+    Entity* overlay;
     Vector items;
     uint32_t flags;
     uint32_t more_flags;
@@ -184,7 +184,7 @@ class Entity
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
 
-    Entity *topmost()
+    Entity* topmost()
     {
         auto cur = this;
         while (cur->overlay)
@@ -194,7 +194,7 @@ class Entity
         return cur;
     }
 
-    Entity *topmost_mount()
+    Entity* topmost_mount()
     {
         auto topmost = this;
         while (auto cur = topmost->overlay)
@@ -220,7 +220,7 @@ class Entity
         return left < rect_right && rect_left < right && bottom < rect_top && rect_bottom < top;
     }
 
-    bool overlaps_with(Entity *other)
+    bool overlaps_with(Entity* other)
     {
         const auto [other_posx, other_posy] = other->position();
         const float other_left = other_posx - other->hitboxx + other->offsetx;
@@ -239,18 +239,18 @@ class Entity
     void remove_item(uint32_t id);
     void destroy();
 
-    template <typename T> T *as()
+    template <typename T> T* as()
     {
-        return static_cast<T *>(this);
+        return static_cast<T*>(this);
     }
 
     virtual ~Entity() = 0;
     virtual void created() = 0;
-    virtual void kill(bool, Entity *frm) = 0;
-    virtual void v2(Entity *) = 0;
+    virtual void kill(bool, Entity* frm) = 0;
+    virtual void v2(Entity*) = 0;
     virtual void v3() = 0;
-    virtual void v4(void *) = 0;
-    virtual void hiredhand_description(char *) = 0;
+    virtual void v4(void*) = 0;
+    virtual void hiredhand_description(char*) = 0;
     virtual void v6() = 0;
     virtual void v7() = 0;
     virtual void v8() = 0;
@@ -264,7 +264,7 @@ class Entity
     virtual void v16() = 0;
     virtual float friction() = 0;
     virtual void v18() = 0;
-    virtual void remove_item_ptr(Entity *) = 0;
+    virtual void remove_item_ptr(Entity*) = 0;
     virtual void v20() = 0;
     virtual void v21() = 0;
     virtual void v22() = 0;

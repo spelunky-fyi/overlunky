@@ -29,12 +29,12 @@ template <typename T> class OnHeapPointer
     {
     }
 
-    T *decode()
+    T* decode()
     {
-        return reinterpret_cast<T *>(ptr_ + heap_base());
+        return reinterpret_cast<T*>(ptr_ + heap_base());
     }
 
-    T *operator->()
+    T* operator->()
     {
         return decode();
     }

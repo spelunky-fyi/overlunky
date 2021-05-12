@@ -15,7 +15,7 @@ size_t textures_ptr()
     }
 }
 
-Textures *get_textures()
+Textures* get_textures()
 {
-    return (Textures *)textures_ptr();
+    return (Textures*)textures_ptr();
 }

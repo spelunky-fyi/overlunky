@@ -9,7 +9,7 @@
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
-fs::path get_dll_path(const char *rel_path)
+fs::path get_dll_path(const char* rel_path)
 {
     char buf[0x1000];
     GetModuleFileNameA(NULL, buf, sizeof(buf));
@@ -17,7 +17,7 @@ fs::path get_dll_path(const char *rel_path)
     return path.parent_path().concat(rel_path);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     CmdLineParser cmd_line_parser(argc, argv);
 

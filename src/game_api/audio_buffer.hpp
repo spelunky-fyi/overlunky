@@ -23,4 +23,4 @@ struct DecodedAudioBuffer
     std::size_t data_size;
 };
 
-using DecodeAudioFile = DecodedAudioBuffer(const char *file_path);
+using DecodeAudioFile = DecodedAudioBuffer(const char* file_path);
