@@ -184,7 +184,19 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_charmin = 194, u
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-std::map<std::string, bool> options = {{"mouse_control", true}, {"god_mode", false}, {"noclip", false}, {"snap_to_grid", false}, {"stack_horizontally", false}, {"stack_vertically", false}, {"disable_pause", false}, {"draw_grid", false}, {"draw_hitboxes", false}, {"tabbed_interface", true}, {"enable_unsafe_scripts", false}};
+std::map<std::string, bool> options = {
+    {"mouse_control", true},
+    {"god_mode", false},
+    {"noclip", false},
+    {"snap_to_grid", false},
+    {"stack_horizontally", false},
+    {"stack_vertically", false},
+    {"disable_pause", false},
+    {"draw_grid", false},
+    {"draw_hitboxes", false},
+    {"tabbed_interface", true},
+    {"enable_unsafe_scripts", false},
+};
 
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
