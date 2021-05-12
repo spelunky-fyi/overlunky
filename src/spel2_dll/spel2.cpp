@@ -24,12 +24,7 @@ void InitSoundManager(Spelunky_DecodeAudioFile* decode_function)
         [](const char* file_path)
         {
             Spelunky_DecodedAudioBuffer buffer = local_decode_function(file_path);
-            return DecodedAudioBuffer{
-                buffer.num_channels,
-                buffer.frequency,
-                static_cast<SoundFormat>(buffer.format),
-                std::unique_ptr<const std::byte[]>{reinterpret_cast<const std::byte*>(buffer.data)},
-                buffer.data_size};
+            return DecodedAudioBuffer{buffer.num_channels, buffer.frequency, static_cast<SoundFormat>(buffer.format), std::unique_ptr<const std::byte[]>{reinterpret_cast<const std::byte*>(buffer.data)}, buffer.data_size};
         });
 }
 
@@ -169,24 +164,13 @@ SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::siz
     if (message_idx < messages.size())
     {
         const auto& message = messages[message_idx];
-        return SpelunkyScriptMessage{
-            message.message.c_str(),
-            static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(message.time.time_since_epoch()).count())};
+        return SpelunkyScriptMessage{message.message.c_str(), static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(message.time.time_since_epoch()).count())};
     }
     return SpelunkyScriptMessage{};
 }
 SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script)
 {
-    return {
-        script->get_file().c_str(),
-        script->get_name().c_str(),
-        script->get_version().c_str(),
-        script->get_description().c_str(),
-        script->get_author().c_str(),
-        script->get_id().c_str(),
-        script->get_path().c_str(),
-        script->get_filename().c_str(),
-        script->get_unsafe()};
+    return {script->get_file().c_str(), script->get_name().c_str(), script->get_version().c_str(), script->get_description().c_str(), script->get_author().c_str(), script->get_id().c_str(), script->get_path().c_str(), script->get_filename().c_str(), script->get_unsafe()};
 }
 
 StateMemory& get_state()

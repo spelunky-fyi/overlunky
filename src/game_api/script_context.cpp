@@ -9,7 +9,8 @@ void register_make_save_path(MakeSavePathCallback make_save_path_callback)
     g_MakeSavePathCallback = make_save_path_callback;
 }
 
-SaveContext::SaveContext(std::string_view _script_path, std::string_view _script_name) : script_path{_script_path}, script_name{_script_name}
+SaveContext::SaveContext(std::string_view _script_path, std::string_view _script_name)
+    : script_path{_script_path}, script_name{_script_name}
 {
 }
 bool SaveContext::Save(std::string data) const
@@ -23,7 +24,8 @@ bool SaveContext::Save(std::string data) const
     return false;
 }
 
-LoadContext::LoadContext(std::string_view _script_path, std::string_view _script_name) : script_path{_script_path}, script_name{_script_name}
+LoadContext::LoadContext(std::string_view _script_path, std::string_view _script_name)
+    : script_path{_script_path}, script_name{_script_name}
 {
 }
 std::string LoadContext::Load() const

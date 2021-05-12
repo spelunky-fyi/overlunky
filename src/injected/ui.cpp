@@ -164,17 +164,7 @@ std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
 std::string active_tab = "", activate_tab = "";
-std::vector<std::string> tab_order = {
-    "tool_entity",
-    "tool_door",
-    "tool_camera",
-    "tool_entity_properties",
-    "tool_game_properties",
-    "tool_save",
-    "tool_script",
-    "tool_options",
-    "tool_style",
-    "tool_debug"};
+std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_debug"};
 
 static char text[500];
 
@@ -194,18 +184,7 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_charmin = 194, u
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-std::map<std::string, bool> options = {
-    {"mouse_control", true},
-    {"god_mode", false},
-    {"noclip", false},
-    {"snap_to_grid", false},
-    {"stack_horizontally", false},
-    {"stack_vertically", false},
-    {"disable_pause", false},
-    {"draw_grid", false},
-    {"draw_hitboxes", false},
-    {"tabbed_interface", true},
-    {"enable_unsafe_scripts", false}};
+std::map<std::string, bool> options = {{"mouse_control", true}, {"god_mode", false}, {"noclip", false}, {"snap_to_grid", false}, {"stack_horizontally", false}, {"stack_vertically", false}, {"disable_pause", false}, {"draw_grid", false}, {"draw_hitboxes", false}, {"tabbed_interface", true}, {"enable_unsafe_scripts", false}};
 
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
@@ -464,7 +443,8 @@ void save_config(std::string file)
     writeData << "kits = [";
     for (int i = 0; i < saved_entities.size(); i++)
     {
-        writeData << std::endl << "  \"" << saved_entities[i] << "\"";
+        writeData << std::endl
+                  << "  \"" << saved_entities[i] << "\"";
         if (i < saved_entities.size() - 1)
             writeData << ",";
     }
@@ -476,7 +456,8 @@ void save_config(std::string file)
     writeData << "autorun_scripts = [";
     for (int i = 0; i < g_script_autorun.size(); i++)
     {
-        writeData << std::endl << "  \"" << g_script_autorun[i] << "\"";
+        writeData << std::endl
+                  << "  \"" << g_script_autorun[i] << "\"";
         if (i < g_script_autorun.size() - 1)
             writeData << ",";
     }
@@ -1397,7 +1378,8 @@ void write_file()
             {
                 std::string clean_event_name = event_name;
                 std::transform(
-                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
+                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
+                    { return std::toupper(c); });
                 std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
                 file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
             });
@@ -1409,7 +1391,8 @@ void write_file()
         g_SoundManager->for_each_parameter_name(
             [&file](std::string parameter_name, std::uint32_t id)
             {
-                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
+                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
+                               { return std::toupper(c); });
                 file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
             });
     }
@@ -2163,7 +2146,8 @@ void render_messages()
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
 
-    std::sort(queue.begin(), queue.end(), [](Message a, Message b) { return std::get<2>(a) < std::get<2>(b); });
+    std::sort(queue.begin(), queue.end(), [](Message a, Message b)
+              { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
@@ -3738,7 +3722,8 @@ void imgui_draw()
                 ImGui::Begin(tab.second->name.data(), &tab.second->detached);
                 render_tool(tab.first);
                 ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
+                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
+                     ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
                     ImGuiCond_Once);
                 ImGui::End();
             }

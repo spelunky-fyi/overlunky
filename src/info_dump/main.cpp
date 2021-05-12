@@ -14,14 +14,14 @@
 #include "texture.hpp"
 
 using float_json = nlohmann::basic_json<std::map, std::vector, std::string, bool, std::int64_t, std::uint64_t, float>;
-#define FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)                                                                                              \
-    inline void to_json(float_json& nlohmann_json_j, const Type& nlohmann_json_t)                                                                    \
-    {                                                                                                                                                \
-        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__))                                                                     \
-    }                                                                                                                                                \
-    inline void from_json(const float_json& nlohmann_json_j, Type& nlohmann_json_t)                                                                  \
-    {                                                                                                                                                \
-        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__))                                                                   \
+#define FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)                             \
+    inline void to_json(float_json& nlohmann_json_j, const Type& nlohmann_json_t)   \
+    {                                                                               \
+        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__))    \
+    }                                                                               \
+    inline void from_json(const float_json& nlohmann_json_j, Type& nlohmann_json_t) \
+    {                                                                               \
+        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__))  \
     }
 
 // Have to do this because otherwise it writes out animations like a mess
@@ -108,11 +108,13 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     }
 
     auto items = list_entities();
-    std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool { return a.id < b.id; });
+    std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
+              { return a.id < b.id; });
 
     Textures* textures_ptr = get_textures();
     std::sort(
-        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool { return a.id < b.id; });
+        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool
+        { return a.id < b.id; });
 
     std::filesystem::create_directories("game_data");
 

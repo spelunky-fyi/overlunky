@@ -103,7 +103,8 @@ struct EntityItem
     std::string name;
     uint16_t id;
 
-    EntityItem(const std::string& name_, uint64_t id_) : name(name_), id(id_)
+    EntityItem(const std::string& name_, uint64_t id_)
+        : name(name_), id(id_)
     {
     }
     bool operator<(const EntityItem& item) const
@@ -120,7 +121,8 @@ int32_t to_id(std::string id);
 
 Entity* state_find_item(size_t state_ptr, uint32_t unique_id);
 
-template <typename T> std::string to_le_bytes(T fmt)
+template <typename T>
+std::string to_le_bytes(T fmt)
 {
     return std::string((char*)&fmt, sizeof(T));
 }
@@ -239,7 +241,8 @@ class Entity
     void remove_item(uint32_t id);
     void destroy();
 
-    template <typename T> T* as()
+    template <typename T>
+    T* as()
     {
         return static_cast<T*>(this);
     }

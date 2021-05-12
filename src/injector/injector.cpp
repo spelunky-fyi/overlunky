@@ -30,7 +30,8 @@ std::vector<MemoryMap> memory_map(const Process& proc)
 
 std::string to_lower(std::string s)
 {
-    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c)
+                   { return std::tolower(c); });
     return s;
 }
 

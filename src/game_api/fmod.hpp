@@ -1,14 +1,14 @@
 #pragma once
 
-#define FMOD_CHECK_CALL(x)                                                                                                                           \
-    [](auto err)                                                                                                                                     \
-    {                                                                                                                                                \
-        if (err != FMOD::OK)                                                                                                                         \
-        {                                                                                                                                            \
-            DEBUG("{}: {}", #x, FMOD::ErrStr(err));                                                                                                  \
-            return false;                                                                                                                            \
-        }                                                                                                                                            \
-        return true;                                                                                                                                 \
+#define FMOD_CHECK_CALL(x)                          \
+    [](auto err)                                    \
+    {                                               \
+        if (err != FMOD::OK)                        \
+        {                                           \
+            DEBUG("{}: {}", #x, FMOD::ErrStr(err)); \
+            return false;                           \
+        }                                           \
+        return true;                                \
     }((x))
 
 namespace FMOD
@@ -101,8 +101,8 @@ enum FMOD_RESULT
 
 inline const char* ErrStr(FMOD_RESULT err)
 {
-#define ERR_CASE(err_enum)                                                                                                                           \
-    case err_enum:                                                                                                                                   \
+#define ERR_CASE(err_enum) \
+    case err_enum:         \
         return #err_enum
     switch (err)
     {
@@ -342,7 +342,8 @@ enum class ChannelControlCallbackType
 
 using BOOL = int;
 
-template <class tag> struct tagged_void
+template <class tag>
+struct tagged_void
 {
 };
 

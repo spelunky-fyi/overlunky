@@ -199,7 +199,8 @@ ImVec2 normalize(ImVec2 pos)
 
 std::string sanitize(std::string data)
 {
-    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c)
+                   { return std::tolower(c); });
     std::regex reg("[^a-z/]*");
     data = std::regex_replace(data, reg, "");
     return data;
@@ -292,7 +293,8 @@ class SpelunkyScript::ScriptImpl
     }
 
     std::string script_id();
-    template <class... Args> bool handle_function(sol::function func, Args&&... args);
+    template <class... Args>
+    bool handle_function(sol::function func, Args&&... args);
 
     void clear();
     bool reset();
@@ -468,11 +470,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return cbcount++;
     };
     /// Clear previously added callback `id`
-    lua["clear_callback"] = [this](int id) { clear_callbacks.push_back(id); };
+    lua["clear_callback"] = [this](int id)
+    { clear_callbacks.push_back(id); };
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
-    lua["load_script"] = [this](std::string id) { required_scripts.push_back(sanitize(id)); };
+    lua["load_script"] = [this](std::string id)
+    { required_scripts.push_back(sanitize(id)); };
     /// Seed the game prng.
     lua["seed_prng"] = [this](int64_t seed)
     {
@@ -491,7 +495,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///   end
     /// end, ON.LEVEL)
     /// ```
-    lua["read_prng"] = [this]() { return read_prng(); };
+    lua["read_prng"] = [this]()
+    { return read_prng(); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message)
     {
@@ -788,7 +793,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
     /// end, ON.GUIFRAME)
     /// ```
-    lua["get_bounds"] = [this]() { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
+    lua["get_bounds"] = [this]()
+    { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = get_camera_position;
     /// Sets the current camera position in the level.
@@ -796,17 +802,21 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_camera_position"] = set_camera_position;
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["set_flag"] = [](uint32_t flags, int bit) { return flags | (1U << (bit - 1)); };
+    lua["set_flag"] = [](uint32_t flags, int bit)
+    { return flags | (1U << (bit - 1)); };
     lua["setflag"] = lua["set_flag"];
     /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["clr_flag"] = [](uint32_t flags, int bit) { return flags & ~(1U << (bit - 1)); };
+    lua["clr_flag"] = [](uint32_t flags, int bit)
+    { return flags & ~(1U << (bit - 1)); };
     lua["clrflag"] = lua["clr_flag"];
     /// Returns true if a bit is set in the flags
-    lua["test_flag"] = [](uint32_t flags, int bit) { return (flags & (1U << (bit - 1))) > 0; };
+    lua["test_flag"] = [](uint32_t flags, int bit)
+    { return (flags & (1U << (bit - 1))) > 0; };
     lua["testflag"] = lua["test_flag"];
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
-    lua["rgba"] = [](int r, int g, int b, int a) { return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r); };
+    lua["rgba"] = [](int r, int g, int b, int a)
+    { return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r); };
     /// Draws a line on screen
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color)
     {
@@ -1082,13 +1092,17 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return win_open;
     };
     /// Add some text to window, automatically wrapped
-    lua["win_text"] = [](std::string text) { ImGui::TextWrapped(text.c_str()); };
+    lua["win_text"] = [](std::string text)
+    { ImGui::TextWrapped(text.c_str()); };
     /// Add a separator line to window
-    lua["win_separator"] = []() { ImGui::Separator(); };
+    lua["win_separator"] = []()
+    { ImGui::Separator(); };
     /// Add next thing on the same line. This is same as `win_sameline(0, -1)`
-    lua["win_inline"] = []() { ImGui::SameLine(); };
+    lua["win_inline"] = []()
+    { ImGui::SameLine(); };
     /// Add next thing on the same line, with an offset
-    lua["win_sameline"] = [](float offset, float spacing) { ImGui::SameLine(offset, spacing); };
+    lua["win_sameline"] = [](float offset, float spacing)
+    { ImGui::SameLine(offset, spacing); };
     /// Returns: `boolean`
     /// Add a button
     lua["win_button"] = [](std::string text)
@@ -1162,9 +1176,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return reals + 1;
     };
     /// Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
-    lua["win_pushid"] = [](int id) { ImGui::PushID(id); };
+    lua["win_pushid"] = [](int id)
+    { ImGui::PushID(id); };
     /// Pop unique identifier from the stack. Put after the input.
-    lua["win_popid"] = []() { ImGui::PopID(); };
+    lua["win_popid"] = []()
+    { ImGui::PopID(); };
     /// Draw image to window.
     lua["win_image"] = [this](int image, int width, int height)
     {
@@ -1678,7 +1694,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     bool set_parameter(VANILLA_SOUND_PARAM param, float value)
     */
 
-#define table_of(T, name)                                                                                                                            \
+#define table_of(T, name) \
     sol::property([this]() { return sol::as_table_ref(std::vector<T>(g_save->name, g_save->name + sizeof g_save->name / sizeof g_save->name[0])); })
 
     lua.new_usertype<SaveData>(
@@ -1918,7 +1934,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         {
             std::string clean_event_name = event_name;
             std::transform(
-                clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
+                clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
+                { return std::toupper(c); });
             std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
             lua["VANILLA_SOUND"][std::move(clean_event_name)] = std::move(event_name);
         });
@@ -1960,7 +1977,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     sound_manager->for_each_parameter_name(
         [this](std::string parameter_name, std::uint32_t id)
         {
-            std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
+            std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
+                           { return std::toupper(c); });
             lua["VANILLA_SOUND_PARAM"][std::move(parameter_name)] = id;
         });
     lua.create_named_table("PARTICLEEMITTER"
@@ -2335,7 +2353,8 @@ std::string SpelunkyScript::ScriptImpl::script_id()
     return newid;
 }
 
-template <class... Args> bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args&&... args)
+template <class... Args>
+bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args&&... args)
 {
     auto lua_result = func(std::forward<Args>(args)...);
     if (!lua_result.valid())

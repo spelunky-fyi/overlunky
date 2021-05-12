@@ -4,7 +4,7 @@ Cpp11BracedListStyle: true
 IndentWidth: 4
 BreakBeforeBraces: Allman
 AlignAfterOpenBracket: AlwaysBreak
-ColumnLimit: 150
+ColumnLimit: 0
 BinPackArguments: false
 BinPackParameters: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true

@@ -143,14 +143,16 @@ class SoundManager
     std::optional<float> get_parameter(PlayingSound playing_sound, std::uint32_t parameter_index);
     bool set_parameter(PlayingSound playing_sound, std::uint32_t parameter_index, float value);
 
-    template <class FunT> void for_each_event_name(FunT&& fun)
+    template <class FunT>
+    void for_each_event_name(FunT&& fun)
     {
         for (const auto& [id, event] : *m_SoundData.Events)
         {
             fun(event.Name);
         }
     }
-    template <class FunT> void for_each_parameter_name(FunT&& fun)
+    template <class FunT>
+    void for_each_parameter_name(FunT&& fun)
     {
         for (size_t i = 0; i < m_SoundData.Parameters->ParameterNames.size(); i++)
         {

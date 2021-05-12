@@ -198,7 +198,8 @@ int32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
     }
     if (!found.empty())
     {
-        std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool { return std::get<1>(a) < std::get<1>(b); });
+        std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool
+                  { return std::get<1>(a) < std::get<1>(b); });
         auto picked = found[0];
         auto entity = std::get<2>(picked);
         DEBUG("{}", (void*)entity);
@@ -418,7 +419,8 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types)
     return found;
 }
 
-template <typename... Args> std::vector<uint32_t> get_entities_by_type(Args... args)
+template <typename... Args>
+std::vector<uint32_t> get_entities_by_type(Args... args)
 {
     std::vector<uint32_t> types = {args...};
     auto state = State::get();

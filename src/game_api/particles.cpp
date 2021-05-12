@@ -57,7 +57,8 @@ const std::vector<ParticleEmitter>& list_particles()
         {
             particles.emplace_back(particle_name, particle_id);
         }
-        std::sort(particles.begin(), particles.end(), [](ParticleEmitter& a, ParticleEmitter& b) -> bool { return a.id < b.id; });
+        std::sort(particles.begin(), particles.end(), [](ParticleEmitter& a, ParticleEmitter& b) -> bool
+                  { return a.id < b.id; });
     }
     return particles;
 }

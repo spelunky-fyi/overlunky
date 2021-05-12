@@ -33,10 +33,10 @@ void write_mem(size_t addr, std::string payload)
     write_mem_prot(addr, payload, false);
 }
 
-#define DEFINE_ACCESSOR(name, type)                                                                                                                  \
-    type read_##name(size_t addr)                                                                                                                    \
-    {                                                                                                                                                \
-        return *(type*)(addr);                                                                                                                       \
+#define DEFINE_ACCESSOR(name, type) \
+    type read_##name(size_t addr)   \
+    {                               \
+        return *(type*)(addr);      \
     }
 
 DEFINE_ACCESSOR(u8, uint8_t);
@@ -105,12 +105,12 @@ static size_t decode_call(size_t off)
     return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
 }
 
-#define ONCE(type)                                                                                                                                   \
-    static bool once = false;                                                                                                                        \
-    static type res;                                                                                                                                 \
-    if (once)                                                                                                                                        \
-        return res;                                                                                                                                  \
-    once = true;                                                                                                                                     \
-    if (false)                                                                                                                                       \
-        ;                                                                                                                                            \
+#define ONCE(type)            \
+    static bool once = false; \
+    static type res;          \
+    if (once)                 \
+        return res;           \
+    once = true;              \
+    if (false)                \
+        ;                     \
     else
