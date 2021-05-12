@@ -22,7 +22,8 @@ struct StateMemory
     float fadevalue; // 0.0 = all visible; 1.0 = all black
     uint32_t fadeout;
     uint32_t fadein;
-    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits, ...)
+    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in
+                                         // credits, ...)
     uint8_t ingame;
     uint8_t playing;
     uint8_t pause;
@@ -30,7 +31,7 @@ struct StateMemory
     int32_t i34;
     uint32_t quest_flags;
     int32_t i3c;
-    uint32_t speedrun_character; // who administers the speedrun in base camp
+    uint32_t speedrun_character;         // who administers the speedrun in base camp
     uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
     uint8_t padding4;
     uint8_t padding5;

@@ -39,9 +39,10 @@ FMOD::FMOD_RESULT ChannelControlCallback(
             FMOD::Channel *channel = reinterpret_cast<FMOD::Channel *>(channel_control);
 
             std::lock_guard lock{s_SoundCallbacksMutex};
-            auto it = std::find_if(s_SoundCallbacks.begin(), s_SoundCallbacks.end(), [channel](const SoundCallbackData &callback) {
-                return callback.handle == channel;
-            });
+            auto it = std::find_if(
+                s_SoundCallbacks.begin(),
+                s_SoundCallbacks.end(),
+                [channel](const SoundCallbackData &callback) { return callback.handle == channel; });
             if (it != s_SoundCallbacks.end())
             {
                 snd_callback = std::move(it->callback);
@@ -309,7 +310,8 @@ SoundManager::SoundManager(DecodeAudioFile *decode_function) : m_DecodeFunction{
         auto lock_channel_group = reinterpret_cast<FMODStudio::LockChannelGroup *>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_LockChannelGroup"));
         auto get_channel_group = reinterpret_cast<FMODStudio::GetChannelGroup *>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_GetChannelGroup"));
 
-        auto get_channel_group_from_bus_name = [=](const char *bus_name, FMOD::ChannelGroup **channel_group) {
+        auto get_channel_group_from_bus_name = [=](const char *bus_name, FMOD::ChannelGroup **channel_group)
+        {
             FMODStudio::Bus *bus{nullptr};
             auto err = get_bus(fmod_studio_system, bus_name, &bus);
             if (err != FMOD::OK)
@@ -454,7 +456,8 @@ CustomSound SoundManager::get_sound(std::string path)
     create_sound_exinfo.length = (std::uint32_t)new_sound.buffer.data_size;
     create_sound_exinfo.numchannels = new_sound.buffer.num_channels;
     create_sound_exinfo.defaultfrequency = new_sound.buffer.frequency;
-    create_sound_exinfo.format = [path](SoundFormat format) {
+    create_sound_exinfo.format = [path](SoundFormat format)
+    {
         switch (format)
         {
         default:
@@ -558,11 +561,13 @@ bool SoundManager::is_playing(PlayingSound playing_sound)
 {
     return std::visit(
         overloaded{
-            [this](FMOD::Channel *channel) {
+            [this](FMOD::Channel *channel)
+            {
                 FMOD::BOOL is_playing{false};
                 return FMOD_CHECK_CALL(m_ChannelIsPlaying(channel, &is_playing)) && is_playing;
             },
-            [this](FMODStudio::EventInstance *event) {
+            [this](FMODStudio::EventInstance *event)
+            {
                 FMODStudio::PlaybackState playback_state;
                 return FMOD_CHECK_CALL(m_EventInstanceGetPlaybackState(event, &playback_state)) &&
                        playback_state == FMODStudio::PlaybackState::Playing;
@@ -584,7 +589,8 @@ bool SoundManager::set_pause(PlayingSound playing_sound, bool pause)
     return std::visit(
         overloaded{
             [this, pause](FMOD::Channel *channel) { return FMOD_CHECK_CALL(m_ChannelSetPaused(channel, pause)); },
-            [this, pause](FMODStudio::EventInstance *event) {
+            [this, pause](FMODStudio::EventInstance *event)
+            {
                 FMOD::BOOL paused{false};
                 if (!pause && FMOD_CHECK_CALL(m_EventInstanceGetPaused(event, &paused)) && !paused)
                 {
@@ -635,7 +641,8 @@ bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
 {
     return std::visit(
         overloaded{
-            [this, loop_mode](FMOD::Channel *channel) {
+            [this, loop_mode](FMOD::Channel *channel)
+            {
                 switch (loop_mode)
                 {
                 case LoopMode::Off:
@@ -670,9 +677,10 @@ bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunctio
             if (FMOD_CHECK_CALL(m_EventInstanceSetCallback(*instance, &EventInstanceCallback, FMODStudio::EventCallbackType::Stopped)))
             {
                 std::lock_guard lock{s_EventCallbacksMutex};
-                auto it = std::find_if(s_EventCallbacks.begin(), s_EventCallbacks.end(), [event](const EventCallbackData &callback) {
-                    return callback.handle == event;
-                });
+                auto it = std::find_if(
+                    s_EventCallbacks.begin(),
+                    s_EventCallbacks.end(),
+                    [event](const EventCallbackData &callback) { return callback.handle == event; });
                 if (it != s_EventCallbacks.end())
                 {
                     it->specific_callbacks[*instance] = std::move(callback);
@@ -739,7 +747,8 @@ std::unordered_map<std::uint32_t, const char *> SoundManager::get_parameters(Pla
     return std::visit(
         overloaded{
             [](FMOD::Channel *channel) { return std::unordered_map<std::uint32_t, const char *>{}; },
-            [this](FMODStudio::EventInstance *instance) {
+            [this](FMODStudio::EventInstance *instance)
+            {
                 FMODStudio::EventDescription *event;
                 if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(instance, &event)))
                 {
@@ -771,7 +780,8 @@ std::optional<float> SoundManager::get_parameter(PlayingSound playing_sound, std
     return std::visit(
         overloaded{
             [](FMOD::Channel *channel) { return std::optional<float>{}; },
-            [this, parameter_index](FMODStudio::EventInstance *instance) {
+            [this, parameter_index](FMODStudio::EventInstance *instance)
+            {
                 FMODStudio::EventDescription *event;
                 if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(instance, &event)))
                 {
@@ -795,7 +805,8 @@ bool SoundManager::set_parameter(PlayingSound playing_sound, std::uint32_t param
     return std::visit(
         overloaded{
             [](FMOD::Channel *channel) { return false; },
-            [this, parameter_index, value](FMODStudio::EventInstance *instance) {
+            [this, parameter_index, value](FMODStudio::EventInstance *instance)
+            {
                 FMODStudio::EventDescription *event;
                 if (FMOD_CHECK_CALL(m_EventInstanceGetDescription(instance, &event)))
                 {

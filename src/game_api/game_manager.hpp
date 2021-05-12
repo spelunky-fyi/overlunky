@@ -1,8 +1,9 @@
 #include "savedata.hpp"
 #include "thread_utils.hpp"
 
-struct TmpStruct {
-  OnHeapPointer<SaveData> savedata;
+struct TmpStruct
+{
+    OnHeapPointer<SaveData> savedata;
 };
 
 struct GameManager

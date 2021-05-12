@@ -2,11 +2,11 @@
 
 #include <chrono>
 #include <deque>
+#include <filesystem>
 #include <memory>
 #include <string>
-#include <vector>
 #include <variant>
-#include <filesystem>
+#include <vector>
 
 #include "imgui.h"
 #include <d3d11.h>
@@ -53,31 +53,31 @@ struct ScriptImage
 
 class SpelunkyScript
 {
-public:
-    SpelunkyScript(std::string script, std::string file, class SoundManager* sound_manager, bool enable = true);
+  public:
+    SpelunkyScript(std::string script, std::string file, class SoundManager *sound_manager, bool enable = true);
     ~SpelunkyScript();
 
-    std::deque<ScriptMessage>& get_messages();
+    std::deque<ScriptMessage> &get_messages();
     std::vector<std::string> consume_requires();
 
-    const std::string& get_id() const;
-    const std::string& get_name() const;
-    const std::string& get_description() const;
-    const std::string& get_author() const;
-    const std::string& get_file() const;
-    const std::string& get_filename() const;
-    const std::string& get_path() const;
-    const std::string& get_version() const;
+    const std::string &get_id() const;
+    const std::string &get_name() const;
+    const std::string &get_description() const;
+    const std::string &get_author() const;
+    const std::string &get_file() const;
+    const std::string &get_filename() const;
+    const std::string &get_path() const;
+    const std::string &get_version() const;
     bool get_unsafe() const;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    char* get_code() const;
+    char *get_code() const;
     std::size_t get_code_size() const;
 #endif
 
     void update_code(std::string code);
 
-    std::string& get_result(); // Thanks for non-const imgui
+    std::string &get_result(); // Thanks for non-const imgui
 
     bool is_enabled() const;
     void set_enabled(bool enabled);
@@ -89,7 +89,7 @@ public:
     void draw(ImDrawList *dl);
     void render_options();
 
-private:
+  private:
     class ScriptImpl;
     std::unique_ptr<ScriptImpl> m_Impl;
 };

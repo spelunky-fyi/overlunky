@@ -90,7 +90,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 {
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
-
     while (true)
     {
         auto entities = list_entities();
@@ -109,11 +108,11 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     }
 
     auto items = list_entities();
-    std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool { return a.id < b.id; });
+    std::sort(items.begin(), items.end(), [](EntityItem &a, EntityItem &b) -> bool { return a.id < b.id; });
 
-    Textures* textures_ptr = get_textures();
+    Textures *textures_ptr = get_textures();
     std::sort(
-        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool { return a.id < b.id; });
+        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture &a, Texture &b) -> bool { return a.id < b.id; });
 
     std::filesystem::create_directories("game_data");
 

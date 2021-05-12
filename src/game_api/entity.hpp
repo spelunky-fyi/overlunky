@@ -217,13 +217,10 @@ class Entity
         const float bottom = posy - hitboxy + offsety;
         const float top = posy + hitboxy + offsety;
 
-        return left < rect_right
-            && rect_left < right
-            && bottom < rect_top
-            && rect_bottom < top;
+        return left < rect_right && rect_left < right && bottom < rect_top && rect_bottom < top;
     }
 
-    bool overlaps_with(Entity* other)
+    bool overlaps_with(Entity *other)
     {
         const auto [other_posx, other_posy] = other->position();
         const float other_left = other_posx - other->hitboxx + other->offsetx;
@@ -323,7 +320,7 @@ class Arrowtrap : public Entity
     size_t unknown1;
     size_t unknown2;
     bool arrow_shot;
-    
+
     void rearm();
 };
 

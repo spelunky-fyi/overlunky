@@ -1,12 +1,21 @@
-#include <cstdarg>
 #include "../injected/ui.hpp"
 #include "entity.hpp"
-#include "state.hpp"
 #include "logger.h"
+#include "state.hpp"
+#include <cstdarg>
 
-uint32_t setflag(uint32_t flags, int bit) { return flags | (1U << (bit - 1)); }
-uint32_t clrflag(uint32_t flags, int bit) { return flags & ~(1U << (bit - 1)); }
-bool testflag(uint32_t flags, int bit) { return (flags & (1U << (bit - 1))) > 0; }
+uint32_t setflag(uint32_t flags, int bit)
+{
+    return flags | (1U << (bit - 1));
+}
+uint32_t clrflag(uint32_t flags, int bit)
+{
+    return flags & ~(1U << (bit - 1));
+}
+bool testflag(uint32_t flags, int bit)
+{
+    return (flags & (1U << (bit - 1))) > 0;
+}
 uint32_t flipflag(uint32_t flags, int bit)
 {
     if (testflag(flags, bit))
@@ -44,7 +53,7 @@ int32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, flo
     }
     else if (layer < 0)
     {
-        auto player = state.items()->player(abs(layer)-1);
+        auto player = state.items()->player(abs(layer) - 1);
         if (player == nullptr)
             return -1;
         auto [_x, _y] = player->position();
@@ -76,7 +85,7 @@ int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_
     }
     else if (layer < 0)
     {
-        auto player = state.items()->player(abs(layer)-1);
+        auto player = state.items()->player(abs(layer) - 1);
         if (player == nullptr)
             return -1;
         auto [_x, _y] = player->position();
@@ -220,7 +229,7 @@ uint32_t get_entity_flags(uint32_t id)
         return 0;
     auto state = State::get();
     auto ent = state.find(id);
-    if(ent)
+    if (ent)
         return ent->flags;
     return 0;
 }
@@ -409,8 +418,7 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types)
     return found;
 }
 
-template<typename... Args>
-std::vector<uint32_t> get_entities_by_type(Args... args)
+template <typename... Args> std::vector<uint32_t> get_entities_by_type(Args... args)
 {
     std::vector<uint32_t> types = {args...};
     auto state = State::get();
@@ -548,7 +556,7 @@ std::vector<uint32_t> get_entities_overlapping(uint32_t type, uint32_t mask, flo
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    for (auto& item : state.layer(layer)->items())
+    for (auto &item : state.layer(layer)->items())
     {
         if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == type || type == 0) && item->overlaps_with(sx, sy, sx2, sy2))
         {
@@ -586,7 +594,8 @@ void set_contents(uint32_t id, uint32_t item)
     if (container == nullptr)
         return;
     int type = container->type->id;
-    if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") && type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
+    if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
+        type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
         return;
     container->as<Container>()->inside = item;
 }
@@ -657,7 +666,9 @@ void lock_door_at(float x, float y)
             door->flags &= ~(1U << 19);
             door->flags |= 1U << 21;
         }
-        else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
+        else if (
+            door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
+            door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
             door->animation_frame &= ~1U;
         }
@@ -675,7 +686,9 @@ void unlock_door_at(float x, float y)
             door->flags |= 1U << 19;
             door->flags &= ~(1U << 21);
         }
-        else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
+        else if (
+            door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
+            door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
             door->animation_frame |= 1U;
         }
@@ -700,28 +713,28 @@ void carry(uint32_t id, uint32_t item)
 void kill_entity(uint32_t id)
 {
     Entity *ent = get_entity_ptr(id);
-    if(ent != nullptr)
+    if (ent != nullptr)
         ent->kill(true, nullptr);
 }
 
 void destroy_entity(uint32_t id)
 {
     Entity *ent = get_entity_ptr(id);
-    if(ent != nullptr)
+    if (ent != nullptr)
         ent->destroy(); // TODO
 }
 
 void apply_entity_db(uint32_t id)
 {
     Entity *ent = get_entity_ptr(id);
-    if(ent != nullptr)
+    if (ent != nullptr)
         ent->apply_db();
 }
 
 void flip_entity(uint32_t id)
 {
     Entity *ent = get_entity_ptr(id);
-    if(ent == nullptr)
+    if (ent == nullptr)
         return;
     ent->flags = flipflag(ent->flags, 17);
     if (ent->items.count > 0)
@@ -763,7 +776,7 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
 {
     static size_t offset_poison = 0;
     static size_t offset_regular = 0;
-    if ( offset_poison == 0 )
+    if (offset_poison == 0)
     {
         std::string pattern = "\xBA\x73\x01\x00\x00\x48\x8B\x8C\xC1\xC0\x12\x00\x00"s;
         auto memory = Memory::get();
@@ -910,7 +923,7 @@ void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_mu
     size_t offset_vladscape1 = 0;
     size_t offset_default2 = 0;
     size_t offset_vladscape2 = 0;
-    if ( offset_default1 == 0 )
+    if (offset_default1 == 0)
     {
         auto memory = Memory::get();
         auto exe = memory.exe();
@@ -929,7 +942,7 @@ void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_mu
     write_mem_prot(offset_vladscape2, to_le_bytes(vladscape_multiplier), true);
 }
 
-SaveData* savedata()
+SaveData *savedata()
 {
     auto state = State::get();
     return state.savedata();
@@ -949,11 +962,11 @@ void pick_up(uint32_t who, uint32_t what)
         auto memory = Memory::get();
         offset = memory.at_exe(find_inst(memory.exe(), "\x48\x89\x5c\x24\x08\x57\x48\x83\xec\x20\x4c\x8b\x5a\x08"s, memory.after_bundle));
     }
-    Movable *ent = (Movable*)get_entity_ptr(who);
-    Movable *item = (Movable*)get_entity_ptr(what);
-    if(ent != nullptr && item != nullptr)
+    Movable *ent = (Movable *)get_entity_ptr(who);
+    Movable *item = (Movable *)get_entity_ptr(what);
+    if (ent != nullptr && item != nullptr)
     {
-        auto pick_up_func = (void(*)(Movable*, Movable*))offset;
+        auto pick_up_func = (void (*)(Movable *, Movable *))offset;
         pick_up_func(ent, item);
     }
 }

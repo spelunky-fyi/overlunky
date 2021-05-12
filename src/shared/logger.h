@@ -25,7 +25,7 @@
     do                                                                                                                                               \
     {                                                                                                                                                \
         COMMON_FORMATTER("error", format, __VA_ARGS__);                                                                                              \
-        std::exit(-1);                                                                                                                           \
+        std::exit(-1);                                                                                                                               \
     } while (false)
 
 #define DEBUG(format, ...)                                                                                                                           \

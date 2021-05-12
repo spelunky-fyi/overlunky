@@ -224,12 +224,12 @@ void Mount::tame(bool value)
 
 void Arrowtrap::rearm()
 {
-    if ( arrow_shot )
+    if (arrow_shot)
     {
         static auto arrow_trap_trigger_id = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER");
         arrow_shot = false;
         auto trigger = get_entity_ptr(spawn_entity_over(arrow_trap_trigger_id, uid, 0., 0.));
-        if ( (flags & (1 << 16)) > 0 )
+        if ((flags & (1 << 16)) > 0)
         {
             trigger->flags |= (1 << 16);
         }
@@ -271,14 +271,14 @@ uint8_t Player::kapala_blood_amount()
 void Movable::poison(int16_t frames)
 {
     static size_t offset = 0;
-    if ( offset == 0 )
+    if (offset == 0)
     {
         auto memory = Memory::get();
         offset = memory.at_exe(find_inst(memory.exe(), "\xB8\x08\x07\x00\x00\x66\x89\x87\x18\x01\x00\x00"s, memory.after_bundle));
     }
     poison_tick_timer = frames;
 
-    if ( frames == -1 )
+    if (frames == -1)
     {
         frames = 1800;
     }
@@ -292,18 +292,15 @@ bool Movable::is_poisoned()
 
 bool Movable::is_button_pressed(uint32_t button)
 {
-    return (buttons & button) != 0
-        && (buttons & (button << 8)) == 0;
+    return (buttons & button) != 0 && (buttons & (button << 8)) == 0;
 }
 bool Movable::is_button_held(uint32_t button)
 {
-    return (buttons & button) != 0
-        && (buttons & (button << 8)) != 0;
+    return (buttons & button) != 0 && (buttons & (button << 8)) != 0;
 }
 bool Movable::is_button_released(uint32_t button)
 {
-    return (buttons & button) == 0
-        && (buttons & (button << 8)) != 0;
+    return (buttons & button) == 0 && (buttons & (button << 8)) != 0;
 }
 
 uint8_t Olmec::broken_floaters()
@@ -317,7 +314,7 @@ uint8_t Olmec::broken_floaters()
         if (type == olmec_floater_id)
         {
             auto olmec_floater = get_entity_ptr(pitems[x]);
-            if ( olmec_floater->animation_frame == 0x27 )
+            if (olmec_floater->animation_frame == 0x27)
             {
                 broken++;
             }

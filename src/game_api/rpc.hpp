@@ -35,8 +35,7 @@ float screen_distance(float x);
 float get_zoom_level();
 std::vector<uint32_t> get_entities();
 std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer);
-template <typename... Args>
-std::vector<uint32_t> get_entities_by_type(Args... args);
+template <typename... Args> std::vector<uint32_t> get_entities_by_type(Args... args);
 std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types);
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask);
 std::vector<uint32_t> get_entities_by_layer(int layer);
@@ -66,7 +65,7 @@ void modify_sparktraps(float angle_increment = 0.015, float distance = 3.0);
 void set_kapala_blood_threshold(uint8_t threshold);
 void set_kapala_hud_icon(int8_t icon_index);
 void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier);
-SaveData* savedata();
+SaveData *savedata();
 std::vector<int64_t> read_prng();
 void pick_up(uint32_t who, uint32_t what);
 void set_olmec_phase_y_level(uint8_t phase, float y);

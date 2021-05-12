@@ -41,7 +41,7 @@ HWND g_LastRegisteredRawInputWindow{nullptr};
 
 auto g_MouseLastActivity = std::chrono::system_clock::now();
 ImVec2 g_CursorLastPos = ImVec2(0, 0);
-std::atomic<std::int32_t> g_ShowCursor{ 0 };
+std::atomic<std::int32_t> g_ShowCursor{0};
 
 HWND HID_GetRegisteredDeviceWindow(USHORT usage)
 {
@@ -104,7 +104,7 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
 
 void init_imgui()
 {
-    ImGuiContext* imgui_context = ImGui::CreateContext();
+    ImGuiContext *imgui_context = ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     io.MouseDrawCursor = true;
     ImGui_ImplWin32_Init(g_Window);
@@ -120,7 +120,7 @@ void imgui_mouse_activity()
 {
     using namespace std::chrono_literals;
 
-    auto& io = ImGui::GetIO();
+    auto &io = ImGui::GetIO();
     auto now = std::chrono::system_clock::now();
 
     if (io.MousePos.x != g_CursorLastPos.x || io.MousePos.y != g_CursorLastPos.y)
@@ -322,9 +322,9 @@ HWND get_window()
 
 void show_cursor()
 {
-    if (g_ShowCursor.fetch_add(1) == 0) 
+    if (g_ShowCursor.fetch_add(1) == 0)
     {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO &io = ImGui::GetIO();
         io.MouseDrawCursor = true;
     }
 }
@@ -332,17 +332,17 @@ void hide_cursor()
 {
     if (g_ShowCursor.fetch_sub(1) == 1)
     {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO &io = ImGui::GetIO();
         io.MouseDrawCursor = false;
     }
 }
 
-bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
+bool LoadTextureFromFile(const char *filename, ID3D11ShaderResourceView **out_srv, int *out_width, int *out_height)
 {
     // Load from disk into a raw RGBA buffer
     int image_width = 0;
     int image_height = 0;
-    unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+    unsigned char *image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
     if (image_data == NULL)
         return false;
 

@@ -7,33 +7,33 @@
 
 #include <algorithm>
 #include <array>
-#include <chrono>
 #include <charconv>
+#include <chrono>
 #include <codecvt>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <locale>
 #include <map>
-#include <string>
 #include <regex>
+#include <string>
 #include <toml.hpp>
 
 #include "entity.hpp"
+#include "flags.hpp"
 #include "logger.h"
+#include "particles.hpp"
 #include "rpc.hpp"
+#include "savedata.hpp"
 #include "script.hpp"
 #include "script_context.hpp"
+#include "sound_manager.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
-#include "sound_manager.hpp"
-#include "savedata.hpp"
-#include "flags.hpp"
-#include "particles.hpp"
 
 #include "decode_audio_file.hpp"
 
-SoundManager* g_SoundManager{ nullptr };
+SoundManager *g_SoundManager{nullptr};
 
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -152,9 +152,9 @@ std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player *> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
-     file_written = false, show_debug = false, throw_held = false, paused = false,
-     show_app_metrics = false, lock_entity = false, lock_player = false, freeze_last = false, freeze_level = false,
-     freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false, enable_noclip = false, hide_script_messages = false, load_script_dir = true, load_packs_dir = false;
+     file_written = false, show_debug = false, throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
+     freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false,
+     enable_noclip = false, hide_script_messages = false, load_script_dir = true, load_packs_dir = false;
 Player *g_entity = 0;
 Movable *g_held_entity = 0;
 Inventory *g_inventory = 0;
@@ -299,7 +299,7 @@ void load_script(std::string file, bool enable = true)
         if (slash != std::string::npos)
             file = file.substr(slash + 1);*/
         SpelunkyScript *script = new SpelunkyScript(buf.str(), file, g_SoundManager, enable);
-        g_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{ script };
+        g_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{script};
         data.close();
     }
 }
@@ -694,7 +694,7 @@ void spawn_entities(bool s, std::string list = "")
         std::stringstream textss(texts);
         int id;
         std::vector<int> ents;
-        int spawned{ -1 };
+        int spawned{-1};
         while (textss >> id)
         {
             spawned = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
@@ -842,10 +842,11 @@ void force_noclip()
             {
                 auto cpos = player->position();
                 fix_co_coordinates(cpos);
-                if (cpos.first != player->position().first || cpos.second != player->position().second) {
+                if (cpos.first != player->position().first || cpos.second != player->position().second)
+                {
                     move_entity_abs(player->uid, cpos.first, cpos.second, player->velocityx, player->velocityy);
-                    //this just glitches the shaders, doesn't work
-                    //set_camera_position(cpos.first, cpos.second);
+                    // this just glitches the shaders, doesn't work
+                    // set_camera_position(cpos.first, cpos.second);
                 }
             }
         }
@@ -1100,8 +1101,9 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_state->pause == 0x20) {
-            g_pause_at = get_frame_count()+1;
+        if (g_state->pause == 0x20)
+        {
+            g_pause_at = get_frame_count() + 1;
             g_state->pause = 0;
         }
     }
@@ -1390,29 +1392,33 @@ void write_file()
     {
         std::ofstream file;
         file.open("vanilla_sounds.txt");
-        g_SoundManager->for_each_event_name([&file](std::string event_name) {
-            std::string clean_event_name = event_name;
-            std::transform(clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
-            std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
-            file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
-        });
+        g_SoundManager->for_each_event_name(
+            [&file](std::string event_name)
+            {
+                std::string clean_event_name = event_name;
+                std::transform(
+                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
+                std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
+                file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
+            });
     }
-
 
     {
         std::ofstream file;
         file.open("vanilla_sound_params.txt");
-        g_SoundManager->for_each_parameter_name([&file](std::string parameter_name, std::uint32_t id) {
-            std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
-            file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
-        });
+        g_SoundManager->for_each_parameter_name(
+            [&file](std::string parameter_name, std::uint32_t id)
+            {
+                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
+                file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
+            });
     }
 
     {
         std::ofstream file;
         file.open("particle_emitters.txt");
         auto particles = list_particles();
-        for (const auto& particle: particles)
+        for (const auto &particle : particles)
         {
             file << particle.id << ": " << particle.name << "\n";
         }
@@ -1666,70 +1672,70 @@ void render_narnia()
     Target *target = new Target;
     target->world = 0;
     int tnum = g_state->world * 100 + g_state->level;
-    switch(tnum)
+    switch (tnum)
     {
-        case 104:
-        case 301:
-            break;
-        case 501:
-            target->world = 6;
-            target->level = 1;
-            target->theme = 8;
-            break;
-        case 204:
-            target->world = 3;
-            target->level = 1;
-            target->theme = 4;
-            break;
-        case 403:
-            if (g_state->theme == 11)
-            {
-                target->world = 4;
-                target->level = 4;
-                target->theme = 6;
-            }
-            else
-            {
-                target->world = 4;
-                target->level = 4;
-                target->theme = 5;
-            }
-            break;
-        case 404:
-            target->world = 5;
-            target->level = 1;
-            target->theme = 7;
-            break;
-        case 603:
-            target->world = 6;
+    case 104:
+    case 301:
+        break;
+    case 501:
+        target->world = 6;
+        target->level = 1;
+        target->theme = 8;
+        break;
+    case 204:
+        target->world = 3;
+        target->level = 1;
+        target->theme = 4;
+        break;
+    case 403:
+        if (g_state->theme == 11)
+        {
+            target->world = 4;
             target->level = 4;
-            target->theme = 14;
-            break;
-        case 604:
-            target->world = 7;
-            target->level = 1;
-            target->theme = 9;
-            break;
-        case 702:
-            target->world = 7;
-            target->level = 3;
-            target->theme = 9;
-            break;
-        case 703:
-            target->world = 7;
+            target->theme = 6;
+        }
+        else
+        {
+            target->world = 4;
             target->level = 4;
-            target->theme = 16;
-            break;
-        case 704:
-            target->world = 8;
-            target->level = 5;
-            target->theme = 10;
-            break;
-        default:
-            target->world = g_state->world;
-            target->level = g_state->level + 1;
-            target->theme = g_state->theme;
-            break;
+            target->theme = 5;
+        }
+        break;
+    case 404:
+        target->world = 5;
+        target->level = 1;
+        target->theme = 7;
+        break;
+    case 603:
+        target->world = 6;
+        target->level = 4;
+        target->theme = 14;
+        break;
+    case 604:
+        target->world = 7;
+        target->level = 1;
+        target->theme = 9;
+        break;
+    case 702:
+        target->world = 7;
+        target->level = 3;
+        target->theme = 9;
+        break;
+    case 703:
+        target->world = 7;
+        target->level = 4;
+        target->theme = 16;
+        break;
+    case 704:
+        target->world = 8;
+        target->level = 5;
+        target->theme = 10;
+        break;
+    default:
+        target->world = g_state->world;
+        target->level = g_state->level + 1;
+        target->theme = g_state->theme;
+        break;
     }
     if (g_state->theme == 17)
     {
@@ -2067,16 +2073,17 @@ void render_hitbox(Movable *ent, bool cross, ImColor color)
     draw_list->AddLine(sboxd, sboxa, color, 2);
 }
 
-void fix_script_requires(SpelunkyScript* script)
+void fix_script_requires(SpelunkyScript *script)
 {
-    if (!script->is_enabled()) return;
+    if (!script->is_enabled())
+        return;
     for (auto req : script->consume_requires())
     {
-        for (auto& [name, script2] : g_scripts)
+        for (auto &[name, script2] : g_scripts)
         {
             if (script2->get_id() == req)
             {
-                if(!script2->is_enabled())
+                if (!script2->is_enabled())
                     script2->set_changed(true);
                 script2->set_enabled(true);
             }
@@ -2084,15 +2091,17 @@ void fix_script_requires(SpelunkyScript* script)
     }
 }
 
-void update_script(SpelunkyScript* script)
+void update_script(SpelunkyScript *script)
 {
-    if (!script->is_enabled()) return;
+    if (!script->is_enabled())
+        return;
     script->run();
 }
 
-void render_script(SpelunkyScript *script, ImDrawList* draw_list)
+void render_script(SpelunkyScript *script, ImDrawList *draw_list)
 {
-    if (!script->is_enabled()) return;
+    if (!script->is_enabled())
+        return;
     script->draw(draw_list);
 }
 
@@ -2142,7 +2151,7 @@ void render_messages()
     using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     auto now = std::chrono::system_clock::now();
     std::vector<Message> queue;
-    for (auto& [name, script] : g_scripts)
+    for (auto &[name, script] : g_scripts)
     {
         for (auto message : script->get_messages())
         {
@@ -2233,20 +2242,20 @@ void render_clickhandler()
             sprintf(buf, "Cursor: %0.2f, %0.2f", cpos.first, cpos.second);
             char buf2[32];
             sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
-            dl->AddText(ImVec2(io.MousePos.x+16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
-            dl->AddText(ImVec2(io.MousePos.x+16, io.MousePos.y+16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
+            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
+            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
         }
     }
     if (options["draw_hitboxes"] && update_entity())
     {
         render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
     }
-    for (auto& [name, script] : g_scripts)
+    for (auto &[name, script] : g_scripts)
     {
         fix_script_requires(script.get());
     }
-    auto* draw_list = ImGui::GetBackgroundDrawList();
-    for (auto& [name, script] : g_scripts)
+    auto *draw_list = ImGui::GetBackgroundDrawList();
+    for (auto &[name, script] : g_scripts)
     {
         update_script(script.get());
         render_script(script.get(), draw_list);
@@ -2256,10 +2265,20 @@ void render_clickhandler()
         ImDrawList *dl = ImGui::GetBackgroundDrawList();
         const char *warningtext = " Overlunky does\nnot work online!";
         ImVec2 warningsize = hugefont->CalcTextSizeA(144.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, warningtext);
-        dl->AddText(hugefont, 144.0, ImVec2(io.DisplaySize.x/2-warningsize.x/2, io.DisplaySize.y/2-warningsize.y/2), ImColor(1.0f, 1.0f, 1.0f, 0.8f), warningtext);
+        dl->AddText(
+            hugefont,
+            144.0,
+            ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2),
+            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            warningtext);
         const char *subtext = "Probably... Some things might, but don't just expect a random script to work.";
         ImVec2 subsize = font->CalcTextSizeA(18.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, subtext);
-        dl->AddText(font, 18.0, ImVec2(io.DisplaySize.x/2-subsize.x/2, io.DisplaySize.y/2+warningsize.y/2+20), ImColor(1.0f, 1.0f, 1.0f, 0.8f), subtext);
+        dl->AddText(
+            font,
+            18.0,
+            ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20),
+            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            subtext);
     }
     if (options["mouse_control"])
     {
@@ -2305,7 +2324,7 @@ void render_clickhandler()
         }
         else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
         {
-            if(g_players.empty())
+            if (g_players.empty())
                 return;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
@@ -2314,7 +2333,7 @@ void render_clickhandler()
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             move_entity_abs(g_players.at(0)->uid, cpos.first, cpos.second, g_vx, g_vy);
-            //set_camera_position(cpos.first, cpos.second);
+            // set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2322,7 +2341,7 @@ void render_clickhandler()
         }
         else if (released("mouse_teleport") && ImGui::IsWindowFocused())
         {
-            if(g_players.empty())
+            if (g_players.empty())
                 return;
             set_pos(startpos);
             ImVec2 mpos = normalize(io.MousePos);
@@ -2593,14 +2612,14 @@ void render_debug()
     ImGui::PopItemWidth();
 }
 
-std::string gen_random(const int len) {
+std::string gen_random(const int len)
+{
     std::string tmp_s;
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
+    static const char alphanum[] = "0123456789"
+                                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                   "abcdefghijklmnopqrstuvwxyz";
     tmp_s.reserve(len);
-    for (int i = 0; i < len; ++i) 
+    for (int i = 0; i < len; ++i)
         tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
     return tmp_s;
 }
@@ -2640,7 +2659,9 @@ void render_script_files()
             "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
-            name, g_SoundManager, true);
+            name,
+            g_SoundManager,
+            true);
         g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
     }
     ImGui::PopID();
@@ -2655,9 +2676,9 @@ void render_scripts()
         "your scripts work next week.");
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Hide script messages##HideScriptMessages", &hide_script_messages);
-    if(ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
+    if (ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
         refresh_script_files();
-    if(ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
+    if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
         refresh_script_files();
     ImGui::PushItemWidth(-1);
     int i = 0;
@@ -2665,7 +2686,7 @@ void render_scripts()
     ImVec4 origcolor = ImGui::GetStyle().Colors[ImGuiCol_Header];
     float gray = (origcolor.x + origcolor.y + origcolor.z) / 3.0f;
     ImVec4 disabledcolor = ImVec4(gray, gray, gray, 0.5f);
-    for (auto& [script_name, script] : g_scripts)
+    for (auto &[script_name, script] : g_scripts)
     {
         ImGui::PushID(i);
         char name[255];
@@ -2684,7 +2705,12 @@ void render_scripts()
         }
         if (ImGui::CollapsingHeader(name))
         {
-            ImGui::Text("%s %s by %s (%s)", script->get_name().c_str(), script->get_version().c_str(), script->get_author().c_str(), script->get_id().c_str());
+            ImGui::Text(
+                "%s %s by %s (%s)",
+                script->get_name().c_str(),
+                script->get_version().c_str(),
+                script->get_author().c_str(),
+                script->get_id().c_str());
             ImGui::TextWrapped(script->get_description().c_str());
             if (!script->get_unsafe() || options["enable_unsafe_scripts"])
             {
@@ -2694,7 +2720,8 @@ void render_scripts()
                     ImGui::PushTextWrapPos(0.0f);
                     ImGui::TextColored(
                         ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
-                        "Warning: This script uses unsafe commands and it could delete your files or download viruses. Only enable this script if you trust the author, have read the whole script or made it yourself.");
+                        "Warning: This script uses unsafe commands and it could delete your files or download viruses. Only enable this script if "
+                        "you trust the author, have read the whole script or made it yourself.");
                     ImGui::PopTextWrapPos();
                     ImGui::Checkbox("I understand the risks.", &run_unsafe);
                 }
@@ -3226,13 +3253,15 @@ void render_entity_props()
             auto coffin = (Container *)g_entity;
             ImGui::Text("Character in coffin:");
             ImGui::SliderInt("##CoffinSpawns", (int *)&coffin->inside, to_id("ENT_TYPE_CHAR_ANA_SPELUNKY"), to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"));
-            if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY")+1)
+            if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY") + 1)
                 coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
             ImGui::Text(entity_names[coffin->inside].data());
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int *)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
-        else if (g_entity_type == to_id("ENT_TYPE_ITEM_CRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT"))
+        else if (
+            g_entity_type == to_id("ENT_TYPE_ITEM_CRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_PRESENT") ||
+            g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT"))
         {
             auto container = (Container *)g_entity;
             ImGui::Text("Item in container:");
@@ -3247,7 +3276,9 @@ void render_entity_props()
         {
             ImGui::SliderInt("Uses left##MattockUses", (int *)&g_entity[1], 1, 255);
         }
-        else if (g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
+        else if (
+            g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
+            g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
             Target *target = reinterpret_cast<Target *>(&g_entity->anim_func);
             ImGui::Text("Door target:");
@@ -3583,8 +3614,9 @@ void render_tool(std::string tool)
         render_savegame();
 }
 
-void imgui_init(ImGuiContext*) {
-    ImGuiIO& io = ImGui::GetIO();
+void imgui_init(ImGuiContext *)
+{
+    ImGuiIO &io = ImGui::GetIO();
     io.FontAllowUserScaling = true;
     show_cursor();
     PWSTR fontdir;
@@ -3612,31 +3644,31 @@ void imgui_init(ImGuiContext*) {
     refresh_script_files();
     autorun_scripts();
     set_colors();
-    windows["tool_entity"] = new Window({ "Spawner (" + key_string(keys["tool_entity"]) + ")", false, true });
-    windows["tool_door"] = new Window({ "Warp (" + key_string(keys["tool_door"]) + ")", false, true });
-    windows["tool_camera"] = new Window({ "Camera (" + key_string(keys["tool_camera"]) + ")", false, true });
-    windows["tool_entity_properties"] = new Window({ "Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true });
-    windows["tool_game_properties"] = new Window({ "Game (" + key_string(keys["tool_game_properties"]) + ")", false, true });
-    windows["tool_options"] = new Window({ "Options (" + key_string(keys["tool_options"]) + ")", false, true });
-    windows["tool_debug"] = new Window({ "Debug (" + key_string(keys["tool_debug"]) + ")", false, false });
-    windows["tool_style"] = new Window({ "Style (" + key_string(keys["tool_style"]) + ")", false, false });
-    windows["tool_script"] = new Window({ "Scripts (" + key_string(keys["tool_script"]) + ")", false, true });
+    windows["tool_entity"] = new Window({"Spawner (" + key_string(keys["tool_entity"]) + ")", false, true});
+    windows["tool_door"] = new Window({"Warp (" + key_string(keys["tool_door"]) + ")", false, true});
+    windows["tool_camera"] = new Window({"Camera (" + key_string(keys["tool_camera"]) + ")", false, true});
+    windows["tool_entity_properties"] = new Window({"Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true});
+    windows["tool_game_properties"] = new Window({"Game (" + key_string(keys["tool_game_properties"]) + ")", false, true});
+    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, true});
+    windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", false, false});
+    windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", false, false});
+    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
     windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
 }
 
 void imgui_draw()
 {
-    ImGui::SetNextWindowSize({ -1, 20 });
+    ImGui::SetNextWindowSize({-1, 20});
     ImGui::Begin(
         "Overlay",
         NULL,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-        ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-        ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), "Overlunky");
     ImGui::SameLine();
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), TOSTRING(GIT_VERSION));
-    ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30 }, ImGuiCond_Always);
+    ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
     if (!hide_script_messages)
@@ -3655,8 +3687,8 @@ void imgui_draw()
     {
         if (options["tabbed_interface"])
         {
-            ImGui::SetNextWindowPos({ 0, 0 }, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowSize({ 600, ImGui::GetIO().DisplaySize.y / 2 }, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y / 2}, ImGuiCond_FirstUseEver);
             ImGui::Begin("Overlunky", NULL);
             if (ImGui::BeginTabBar("##TabBar"))
             {
@@ -3702,125 +3734,125 @@ void imgui_draw()
             {
                 if (!tab.second->detached)
                     continue;
-                ImGui::SetNextWindowSize({ toolwidth, toolwidth }, ImGuiCond_Once);
+                ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
                 ImGui::Begin(tab.second->name.data(), &tab.second->detached);
                 render_tool(tab.first);
                 ImGui::SetWindowPos(
-                    { ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2 },
+                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
                     ImGuiCond_Once);
                 ImGui::End();
             }
         }
         else if (options["stack_vertically"])
         {
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_options"]->name.c_str());
             render_options();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ 0, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
+            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_camera"]->name.c_str());
             render_camera();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ 0, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
+            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
             ImGui::Begin(windows["tool_door"]->name.c_str());
             render_narnia();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ 0, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
+            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y - lastheight }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
             ImGui::Begin(windows["tool_entity"]->name.c_str());
             render_spawner();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ 0, 0 }, win_condition);
+            ImGui::SetWindowPos({0, 0}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::Begin(windows["tool_entity_properties"]->name.c_str());
             render_entity_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, 0 }, win_condition);
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::Begin(windows["tool_game_properties"]->name.c_str());
             render_game_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::Begin(windows["tool_script"]->name.c_str());
             render_scripts();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3 }, win_condition);
+            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3}, win_condition);
             ImGui::End();
         }
         else
         {
-            ImGui::SetNextWindowSize({ toolwidth, toolwidth }, win_condition);
-            ImGui::SetNextWindowPos({ 0, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
+            ImGui::SetNextWindowPos({0, 0}, win_condition);
             ImGui::Begin(windows["tool_entity"]->name.c_str());
             render_spawner();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
-            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_door"]->name.c_str());
             render_narnia();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
-            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_camera"]->name.c_str());
             render_camera();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
-            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_entity_properties"]->name.c_str());
             render_entity_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
-            ImGui::SetNextWindowPos({ lastwidth, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_game_properties"]->name.c_str());
             render_game_props();
             lastwidth += ImGui::GetWindowWidth();
             lastheight += ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
-            ImGui::SetNextWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
             ImGui::Begin(windows["tool_options"]->name.c_str());
             render_options();
             lastwidth = ImGui::GetWindowWidth();
             lastheight = ImGui::GetWindowHeight();
             ImGui::End();
 
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
-            ImGui::SetNextWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
             ImGui::Begin(windows["tool_script"]->name.c_str());
             render_scripts();
             ImGui::End();
@@ -3828,8 +3860,8 @@ void imgui_draw()
 
         if (show_debug && !options["tabbed_interface"])
         {
-            ImGui::SetNextWindowSize({ toolwidth, -1 }, win_condition);
-            ImGui::SetNextWindowPos({ ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0 }, win_condition);
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
             ImGui::Begin(windows["tool_debug"]->name.c_str(), &show_debug);
             render_debug();
             ImGui::End();
@@ -3838,10 +3870,10 @@ void imgui_draw()
         if (change_colors && !options["tabbed_interface"])
         {
             ImGui::Begin(windows["tool_style"]->name.c_str(), &change_colors);
-            ImGui::SetWindowSize({ -1, -1 }, ImGuiCond_Always);
+            ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
             render_style_editor();
             ImGui::SetWindowPos(
-                { ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2 });
+                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2});
             ImGui::End();
         }
     }
@@ -3857,7 +3889,8 @@ void imgui_draw()
 
 void post_draw()
 {
-    if (!file_written) {
+    if (!file_written)
+    {
         write_file();
     }
     update_players();
@@ -3893,7 +3926,7 @@ void create_box(std::vector<EntityItem> items)
 
 std::string make_save_path(std::string_view script_path, std::string_view script_name)
 {
-    std::string save_path{ script_path };
+    std::string save_path{script_path};
     save_path += "/save_";
     save_path += script_name;
     save_path += ".dat";
