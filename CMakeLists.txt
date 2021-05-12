@@ -3,6 +3,9 @@ project(overlunky)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include(cmake/clang-format.cmake)
+setup_format_target(format_overlunky)
+
 if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../bin)
 endif()
