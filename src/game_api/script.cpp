@@ -878,6 +878,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         draw_list->AddImage(images[image]->texture, a, b, uva, uvb, color);
     };
 
+    /// <summary>
+    /// Gets the resolution (width and height) of the screen
+    /// </summary>
+    lua["get_window_size"] = [this]() { return std::make_tuple(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());};
+
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound> {
         if (CustomSound sound = sound_manager->get_sound((script_folder / path).string()))
