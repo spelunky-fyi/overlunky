@@ -121,10 +121,12 @@ Show a message that looks like a level feeling.
 Show a message coming from an entity
 ### [`register_option_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_int)
 #### Params: `string name, string desc, string long_desc, int value, int min, int max`
-Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
+Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+limits, you can override them in the UI with double click.
 ### [`register_option_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_float)
 #### Params: `string name, string desc, string long_desc, float value, float min, float max`
-Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft limits, you can override them in the UI with double click.
+Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+limits, you can override them in the UI with double click.
 ### [`register_option_bool`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_bool)
 #### Params: `string name, string desc, string long_desc, bool value`
 Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
@@ -133,7 +135,8 @@ Add a boolean option that the user can change in the UI. Read with `options.name
 Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
 ### [`register_option_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_combo)
 #### Params: `string name, string desc, string long_desc, string opts`
-Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`, with a double `\0\0` at the end.
+Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
+with a double `\0\0` at the end.
 ### [`register_option_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 #### Params: `int id, float x, float y, int layer, float vx, float vy`
@@ -347,7 +350,7 @@ Sets the arrow type (wooden, metal, light) that is shot from a regular arrow tra
 Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
 ### [`set_kapala_hud_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_kapala_hud_icon)
 #### Params: `int8_t icon_index`
-Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour). 
+Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
 If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
 ### [`modify_sparktraps`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_sparktraps)
 #### Params: `float angle_increment = 0.015, float distance = 3.0`
@@ -450,9 +453,7 @@ Create image from file.
 #### Params: `int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color`
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 ### [`get_window_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_window_size)
-<summary>
 Gets the resolution (width and height) of the screen
-</summary>
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 #### Params: `string path`
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -463,7 +464,8 @@ Gets an existing sound, either if a file at the same path was already loaded or 
 #### Params: `VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb`
 Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
-If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any properties on the sound. Otherwise you may cause a deadlock.
+If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
+properties on the sound. Otherwise you may cause a deadlock.
 ### [`clear_vanilla_sound_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_vanilla_sound_callback)
 #### Params: `int id`
 Clears a previously set callback
@@ -482,9 +484,12 @@ Read input
 ### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
 #### Params: `string title, float x, float y, float w, float h, bool movable, function callback`
 #### Returns: `bool` (false if the window was closed from the X)
-Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to autosize in center. Use just a `##Label` as title to hide titlebar.
-Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
-The window api is probably evolving still, this is just the first draft. Felt cute, might delete later!
+Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
+[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
+autosize in center. Use just a `##Label` as title to hide titlebar.
+Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
+give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
+still, this is just the first draft. Felt cute, might delete later!
 ### [`win_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
 #### Params: `string text`
 Add some text to window, automatically wrapped
