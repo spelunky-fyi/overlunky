@@ -1391,12 +1391,10 @@ void write_file()
         std::ofstream file;
         file.open("vanilla_sounds.txt");
         g_SoundManager->for_each_event_name(
-            [&file](std::string event_name)
-            {
+            [&file](std::string event_name) {
                 std::string clean_event_name = event_name;
                 std::transform(
-                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
-                    { return std::toupper(c); });
+                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) { return std::toupper(c); });
                 std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
                 file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
             });
@@ -1406,10 +1404,8 @@ void write_file()
         std::ofstream file;
         file.open("vanilla_sound_params.txt");
         g_SoundManager->for_each_parameter_name(
-            [&file](std::string parameter_name, std::uint32_t id)
-            {
-                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
-                               { return std::toupper(c); });
+            [&file](std::string parameter_name, std::uint32_t id) {
+                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c) { return std::toupper(c); });
                 file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
             });
     }
@@ -2163,8 +2159,7 @@ void render_messages()
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
 
-    std::sort(queue.begin(), queue.end(), [](Message a, Message b)
-              { return std::get<2>(a) < std::get<2>(b); });
+    std::sort(queue.begin(), queue.end(), [](Message a, Message b) { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
@@ -3954,8 +3949,10 @@ void init_ui()
 
 void reload_enabled_scripts()
 {
-    for (auto& [script_name, script] : g_scripts) {
-        if (script->is_enabled()) {
+    for (auto& [script_name, script] : g_scripts)
+    {
+        if (script->is_enabled())
+        {
             load_script(script->get_file(), true);
         }
     }
