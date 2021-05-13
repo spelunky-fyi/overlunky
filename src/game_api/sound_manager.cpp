@@ -464,7 +464,7 @@ CustomSound SoundManager::get_sound(std::string path)
     new_sound.path = std::move(path);
 
     FMOD::FMOD_MODE mode =
-        (FMOD::FMOD_MODE)(FMOD::MODE_CREATESAMPLE | FMOD::MODE_OPENMEMORY_POINT | FMOD::MODE_OPENRAW | FMOD::MODE_IGNORETAGS | FMOD::MODE_LOOP_OFF);
+        (FMOD::FMOD_MODE)(FMOD::MODE_CREATESAMPLE | FMOD::MODE_OPENMEMORY | FMOD::MODE_OPENRAW | FMOD::MODE_IGNORETAGS | FMOD::MODE_LOOP_OFF);
 
     FMOD::CREATESOUNDEXINFO create_sound_exinfo{};
     create_sound_exinfo.cbsize = sizeof(create_sound_exinfo);
