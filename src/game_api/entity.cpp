@@ -37,7 +37,7 @@ size_t entities_ptr()
 
 std::vector<EntityItem> list_entities()
 {
-    size_t map_ptr = *(size_t *)entities_ptr();
+    size_t map_ptr = *(size_t*)entities_ptr();
     size_t off = entities_offset();
     // Special case: map_ptr might be 0 if it's not initialized.
     // This only occurs in list_entities; for others, do not check the pointer
@@ -45,10 +45,10 @@ std::vector<EntityItem> list_entities()
     if (!map_ptr)
         return {};
 
-    auto map = reinterpret_cast<EntityMap *>(map_ptr + off);
+    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
 
     std::vector<EntityItem> result;
-    for (const auto &kv : *map)
+    for (const auto& kv : *map)
     {
         result.emplace_back(kv.first, kv.second);
         // auto entities = reinterpret_cast<EntityDB *>(map_ptr);
@@ -59,34 +59,34 @@ std::vector<EntityItem> list_entities()
     return result;
 }
 
-EntityDB *get_type(uint32_t id)
+EntityDB* get_type(uint32_t id)
 {
-    size_t map_ptr = *(size_t *)entities_ptr();
+    size_t map_ptr = *(size_t*)entities_ptr();
     // Special case: map_ptr might be 0 if it's not initialized.
     // This only occurs in list_entities; for others, do not check the pointer
     // to see if this assumption works.
     if (!map_ptr)
         return nullptr;
 
-    auto map = reinterpret_cast<EntityMap *>(map_ptr + entities_offset());
+    auto map = reinterpret_cast<EntityMap*>(map_ptr + entities_offset());
 
     std::vector<EntityItem> result;
-    auto entities = reinterpret_cast<EntityDB *>(map_ptr);
+    auto entities = reinterpret_cast<EntityDB*>(map_ptr);
     return &entities[id];
 }
 
 int32_t to_id(std::string name)
 {
-    size_t map_ptr = *(size_t *)entities_ptr();
+    size_t map_ptr = *(size_t*)entities_ptr();
     size_t off = entities_offset();
     if (!map_ptr)
         return 0;
-    auto map = reinterpret_cast<EntityMap *>(map_ptr + off);
+    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
     auto it = map->find(std::string(name.data(), name.size()));
     return it != map->end() ? it->second : -1;
 }
 
-using Carry = void (*)(Entity *, Entity *);
+using Carry = void (*)(Entity*, Entity*);
 
 Carry get_carry()
 {
@@ -143,7 +143,7 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
     // set velocity
     if (topmost->type->search_flags < 0x80)
     {
-        auto player = (Player *)topmost;
+        auto player = (Player*)topmost;
         player->velocityx = vx;
         player->velocityy = vy;
     }
@@ -159,7 +159,7 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
     y = dy;
     if (type->search_flags < 0x80)
     {
-        auto player = (Player *)pointer();
+        auto player = (Player*)pointer();
         player->velocityx = vx;
         player->velocityy = vy;
     }
@@ -198,7 +198,7 @@ void Door::set_target(uint8_t w, uint8_t l, uint8_t t)
 {
     uint8_t array[5] = {1, l, 1, w, t};
     DEBUG("Making door go to {}-{}, {}", w, l, t);
-    write_mem(pointer() + 0xc1, std::string((char *)array, sizeof(array)));
+    write_mem(pointer() + 0xc1, std::string((char*)array, sizeof(array)));
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> Door::get_target()
@@ -209,7 +209,7 @@ std::tuple<uint8_t, uint8_t, uint8_t> Door::get_target()
     return std::make_tuple(w, l, t);
 }
 
-void Mount::carry(Movable *rider)
+void Mount::carry(Movable* rider)
 {
     auto carry = (get_carry());
     rider->move_state = 0x11;
@@ -224,12 +224,12 @@ void Mount::tame(bool value)
 
 void Arrowtrap::rearm()
 {
-    if ( arrow_shot )
+    if (arrow_shot)
     {
         static auto arrow_trap_trigger_id = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER");
         arrow_shot = false;
         auto trigger = get_entity_ptr(spawn_entity_over(arrow_trap_trigger_id, uid, 0., 0.));
-        if ( (flags & (1 << 16)) > 0 )
+        if ((flags & (1 << 16)) > 0)
         {
             trigger->flags |= (1 << 16);
         }
@@ -239,7 +239,7 @@ void Arrowtrap::rearm()
 void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
-    int *pitems = (int *)items.begin;
+    int* pitems = (int*)items.begin;
     for (uint8_t x = 0; x < items.count; ++x)
     {
         auto type = get_entity_type(pitems[x]);
@@ -255,7 +255,7 @@ void Player::set_jetpack_fuel(uint8_t fuel)
 uint8_t Player::kapala_blood_amount()
 {
     static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
-    int *pitems = (int *)items.begin;
+    int* pitems = (int*)items.begin;
     for (uint8_t x = 0; x < items.count; ++x)
     {
         auto type = get_entity_type(pitems[x]);
@@ -271,14 +271,14 @@ uint8_t Player::kapala_blood_amount()
 void Movable::poison(int16_t frames)
 {
     static size_t offset = 0;
-    if ( offset == 0 )
+    if (offset == 0)
     {
         auto memory = Memory::get();
         offset = memory.at_exe(find_inst(memory.exe(), "\xB8\x08\x07\x00\x00\x66\x89\x87\x18\x01\x00\x00"s, memory.after_bundle));
     }
     poison_tick_timer = frames;
 
-    if ( frames == -1 )
+    if (frames == -1)
     {
         frames = 1800;
     }
@@ -292,32 +292,29 @@ bool Movable::is_poisoned()
 
 bool Movable::is_button_pressed(uint32_t button)
 {
-    return (buttons & button) != 0
-        && (buttons & (button << 8)) == 0;
+    return (buttons & button) != 0 && (buttons & (button << 8)) == 0;
 }
 bool Movable::is_button_held(uint32_t button)
 {
-    return (buttons & button) != 0
-        && (buttons & (button << 8)) != 0;
+    return (buttons & button) != 0 && (buttons & (button << 8)) != 0;
 }
 bool Movable::is_button_released(uint32_t button)
 {
-    return (buttons & button) == 0
-        && (buttons & (button << 8)) != 0;
+    return (buttons & button) == 0 && (buttons & (button << 8)) != 0;
 }
 
 uint8_t Olmec::broken_floaters()
 {
     static auto olmec_floater_id = to_id("ENT_TYPE_FX_OLMECPART_FLOATER");
     uint8_t broken = 0;
-    int *pitems = (int *)items.begin;
+    int* pitems = (int*)items.begin;
     for (uint8_t x = 0; x < items.count; ++x)
     {
         auto type = get_entity_type(pitems[x]);
         if (type == olmec_floater_id)
         {
             auto olmec_floater = get_entity_ptr(pitems[x]);
-            if ( olmec_floater->animation_frame == 0x27 )
+            if (olmec_floater->animation_frame == 0x27)
             {
                 broken++;
             }

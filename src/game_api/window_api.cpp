@@ -15,19 +15,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-IDXGISwapChain *g_SwapChain{nullptr};
-ID3D11Device *g_Device{nullptr};
-ID3D11DeviceContext *g_Context{nullptr};
-ID3D11RenderTargetView *g_MainRenderTargetView{nullptr};
+IDXGISwapChain* g_SwapChain{nullptr};
+ID3D11Device* g_Device{nullptr};
+ID3D11DeviceContext* g_Context{nullptr};
+ID3D11RenderTargetView* g_MainRenderTargetView{nullptr};
 HWND g_Window{nullptr};
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 WNDPROC g_OrigWndProc{nullptr};
 
-using PresentPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags);
+using PresentPtr = HRESULT(STDMETHODCALLTYPE*)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 PresentPtr g_OrigSwapChainPresent{nullptr};
 
-using ResizeBuffersPtr = HRESULT(STDMETHODCALLTYPE *)(IDXGISwapChain *, UINT, UINT, UINT, DXGI_FORMAT, UINT);
+using ResizeBuffersPtr = HRESULT(STDMETHODCALLTYPE*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
 ResizeBuffersPtr g_OrigSwapChainResizeBuffers{nullptr};
 
 OnInputCallback g_OnInputCallback{nullptr};
@@ -41,7 +41,7 @@ HWND g_LastRegisteredRawInputWindow{nullptr};
 
 auto g_MouseLastActivity = std::chrono::system_clock::now();
 ImVec2 g_CursorLastPos = ImVec2(0, 0);
-std::atomic<std::int32_t> g_ShowCursor{ 0 };
+std::atomic<std::int32_t> g_ShowCursor{0};
 
 HWND HID_GetRegisteredDeviceWindow(USHORT usage)
 {
@@ -105,7 +105,7 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
 void init_imgui()
 {
     ImGuiContext* imgui_context = ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
     ImGui_ImplWin32_Init(g_Window);
     ImGui_ImplDX11_Init(g_Device, g_Context);
@@ -157,8 +157,8 @@ void imgui_mouse_activity()
 
 void create_render_target()
 {
-    ID3D11Texture2D *pBackBuffer;
-    g_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&pBackBuffer);
+    ID3D11Texture2D* pBackBuffer;
+    g_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
     assert(pBackBuffer != nullptr);
     g_Device->CreateRenderTargetView(pBackBuffer, NULL, &g_MainRenderTargetView);
     pBackBuffer->Release();
@@ -173,12 +173,12 @@ void cleanup_render_target()
     }
 }
 
-HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterval, UINT Flags)
+HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
     static bool init = false;
     if (!init)
     {
-        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void **)&g_Device)))
+        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_Device)))
         {
             g_Device->GetImmediateContext(&g_Context);
             DXGI_SWAP_CHAIN_DESC sd;
@@ -247,7 +247,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain *pSwapChain, UINT SyncInterva
 }
 
 HRESULT STDMETHODCALLTYPE
-hkResizeBuffers(IDXGISwapChain *pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
     cleanup_render_target();
     const HRESULT result = g_OrigSwapChainResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
@@ -255,17 +255,19 @@ hkResizeBuffers(IDXGISwapChain *pSwapChain, UINT BufferCount, UINT Width, UINT H
     return result;
 }
 
-template <class FunT, typename T> FunT &vtable_find(T *obj, int index)
+template <class FunT, typename T>
+FunT& vtable_find(T* obj, int index)
 {
-    void ***ptr = reinterpret_cast<void ***>(obj);
+    void*** ptr = reinterpret_cast<void***>(obj);
     if (!ptr[0])
-        return *static_cast<FunT *>(nullptr);
-    return *reinterpret_cast<FunT *>(&ptr[0][index]);
+        return *static_cast<FunT*>(nullptr);
+    return *reinterpret_cast<FunT*>(&ptr[0][index]);
 }
 
-template <class FunT> void hook_virtual_function(FunT hook_fun, FunT &orig_fun, int vtable_index)
+template <class FunT>
+void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index)
 {
-    FunT &vtable_ptr = vtable_find<FunT>(g_SwapChain, vtable_index);
+    FunT& vtable_ptr = vtable_find<FunT>(g_SwapChain, vtable_index);
 
     DWORD oldProtect;
     if (!VirtualProtect(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(&vtable_ptr) & ~0xFFF), 0x1000, PAGE_READWRITE, &oldProtect))
@@ -282,9 +284,9 @@ template <class FunT> void hook_virtual_function(FunT hook_fun, FunT &orig_fun, 
     vtable_ptr = hook_fun;
 };
 
-bool init_hooks(void *swap_chain_ptr)
+bool init_hooks(void* swap_chain_ptr)
 {
-    g_SwapChain = reinterpret_cast<IDXGISwapChain *>(swap_chain_ptr);
+    g_SwapChain = reinterpret_cast<IDXGISwapChain*>(swap_chain_ptr);
 
     // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
     hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
@@ -322,7 +324,7 @@ HWND get_window()
 
 void show_cursor()
 {
-    if (g_ShowCursor.fetch_add(1) == 0) 
+    if (g_ShowCursor.fetch_add(1) == 0)
     {
         ImGuiIO& io = ImGui::GetIO();
         io.MouseDrawCursor = true;
@@ -359,7 +361,7 @@ bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_sr
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     desc.CPUAccessFlags = 0;
 
-    ID3D11Texture2D *pTexture = NULL;
+    ID3D11Texture2D* pTexture = NULL;
     D3D11_SUBRESOURCE_DATA subResource;
     subResource.pSysMem = image_data;
     subResource.SysMemPitch = desc.Width * 4;

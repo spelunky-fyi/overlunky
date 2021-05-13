@@ -14,21 +14,21 @@
 #include "texture.hpp"
 
 using float_json = nlohmann::basic_json<std::map, std::vector, std::string, bool, std::int64_t, std::uint64_t, float>;
-#define FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)                                                                                              \
-    inline void to_json(float_json &nlohmann_json_j, const Type &nlohmann_json_t)                                                                    \
-    {                                                                                                                                                \
-        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__))                                                                     \
-    }                                                                                                                                                \
-    inline void from_json(const float_json &nlohmann_json_j, Type &nlohmann_json_t)                                                                  \
-    {                                                                                                                                                \
-        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__))                                                                   \
+#define FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)                             \
+    inline void to_json(float_json& nlohmann_json_j, const Type& nlohmann_json_t)   \
+    {                                                                               \
+        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__))    \
+    }                                                                               \
+    inline void from_json(const float_json& nlohmann_json_j, Type& nlohmann_json_t) \
+    {                                                                               \
+        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__))  \
     }
 
 // Have to do this because otherwise it writes out animations like a mess
-auto get_animations_as_string_map(const EntityDB &ent)
+auto get_animations_as_string_map(const EntityDB& ent)
 {
     std::map<std::string, Animation> animations;
-    for (auto &[id, anim] : ent.animations)
+    for (auto& [id, anim] : ent.animations)
     {
         animations[std::to_string(id)] = anim;
     }
@@ -37,7 +37,7 @@ auto get_animations_as_string_map(const EntityDB &ent)
 
 FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Animation, texture, count, interval, key, repeat);
 FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Rect, masks, up_minus_down, side, up_plus_down);
-void to_json(float_json &j, const EntityDB &ent)
+void to_json(float_json& j, const EntityDB& ent)
 {
     j = float_json{
         {"id", ent.id},
@@ -63,7 +63,7 @@ void to_json(float_json &j, const EntityDB &ent)
         {"animations", get_animations_as_string_map(ent)},
     };
 }
-void to_json(float_json &j, const Texture &tex)
+void to_json(float_json& j, const Texture& tex)
 {
     j = float_json{
         {"path", *tex.name},
@@ -90,7 +90,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 {
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
-
     while (true)
     {
         auto entities = list_entities();
@@ -109,20 +108,22 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     }
 
     auto items = list_entities();
-    std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool { return a.id < b.id; });
+    std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
+              { return a.id < b.id; });
 
     Textures* textures_ptr = get_textures();
     std::sort(
-        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool { return a.id < b.id; });
+        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool
+        { return a.id < b.id; });
 
     std::filesystem::create_directories("game_data");
 
     if (std::ofstream entities_file = std::ofstream("game_data/entities.json"))
     {
         float_json entities(float_json::object());
-        for (auto &ent : items)
+        for (auto& ent : items)
         {
-            EntityDB *db = get_type(ent.id);
+            EntityDB* db = get_type(ent.id);
             if (!db)
                 break;
             entities[ent.name] = *db;
@@ -135,9 +136,9 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     if (std::ofstream entities_file = std::ofstream("game_data/entities_texture_only.json"))
     {
         float_json entities(float_json::object());
-        for (auto &ent : items)
+        for (auto& ent : items)
         {
-            EntityDB *db = get_type(ent.id);
+            EntityDB* db = get_type(ent.id);
             if (!db)
                 break;
             entities[ent.name] = float_json{
@@ -156,7 +157,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         float_json textures(float_json::object());
         for (std::size_t i = 0; i < textures_ptr->num_textures; i++)
         {
-            Texture &tex = textures_ptr->textures[i];
+            Texture& tex = textures_ptr->textures[i];
             textures[std::to_string(tex.id)] = tex;
         }
 
@@ -171,9 +172,9 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         {
             std::uint32_t search_flag = 1 << i;
             std::vector<std::string> entities;
-            for (auto &ent : items)
+            for (auto& ent : items)
             {
-                EntityDB *db = get_type(ent.id);
+                EntityDB* db = get_type(ent.id);
                 if (!db)
                     break;
                 if ((db->search_flags & search_flag) != 0)

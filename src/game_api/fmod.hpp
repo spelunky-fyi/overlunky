@@ -1,7 +1,8 @@
 #pragma once
 
 #define FMOD_CHECK_CALL(x)                          \
-    [](auto err) {                                  \
+    [](auto err)                                    \
+    {                                               \
         if (err != FMOD::OK)                        \
         {                                           \
             DEBUG("{}: {}", #x, FMOD::ErrStr(err)); \
@@ -98,10 +99,10 @@ enum FMOD_RESULT
     ERR_TOOMANYSAMPLES
 };
 
-inline const char *ErrStr(FMOD_RESULT err)
+inline const char* ErrStr(FMOD_RESULT err)
 {
-#define ERR_CASE(err_enum)                                                                                                                           \
-    case err_enum:                                                                                                                                   \
+#define ERR_CASE(err_enum) \
+    case err_enum:         \
         return #err_enum
     switch (err)
     {
@@ -299,20 +300,20 @@ struct CREATESOUNDEXINFO
     int numsubsounds;
     std::intptr_t inclusionlist;
     int inclusionlistnum;
-    void *pcmreadcallback;
-    void *pcmsetposcallback;
-    void *nonblockcallback;
+    void* pcmreadcallback;
+    void* pcmsetposcallback;
+    void* nonblockcallback;
     std::intptr_t dlsname;
     std::intptr_t encryptionkey;
     int maxpolyphony;
     std::intptr_t userdata;
     SOUND_TYPE suggestedsoundtype;
-    void *fileuseropen;
-    void *fileuserclose;
-    void *fileuserread;
-    void *fileuserseek;
-    void *fileuserasyncread;
-    void *fileuserasynccancel;
+    void* fileuseropen;
+    void* fileuserclose;
+    void* fileuserread;
+    void* fileuserseek;
+    void* fileuserasyncread;
+    void* fileuserasynccancel;
     std::intptr_t fileuserdata;
     int filebuffersize;
     CHANNELORDER channelorder;
@@ -341,7 +342,8 @@ enum class ChannelControlCallbackType
 
 using BOOL = int;
 
-template <class tag> struct tagged_void
+template <class tag>
+struct tagged_void
 {
 };
 
@@ -352,25 +354,25 @@ using Channel = tagged_void<struct channel_tag>;
 using ChannelGroup = tagged_void<struct channel_group_tag>;
 using ChannelControl = tagged_void<struct channel_control_tag>; // Either a Channel or a ChannelGroup
 
-using CreateSound = FMOD_RESULT(System *, const char *, FMOD_MODE, CREATESOUNDEXINFO *, Sound **);
-using ReleaseSound = FMOD_RESULT(Sound *);
-using PlaySound = FMOD_RESULT(System *, Sound *, ChannelGroup *, bool, Channel **);
+using CreateSound = FMOD_RESULT(System*, const char*, FMOD_MODE, CREATESOUNDEXINFO*, Sound**);
+using ReleaseSound = FMOD_RESULT(Sound*);
+using PlaySound = FMOD_RESULT(System*, Sound*, ChannelGroup*, bool, Channel**);
 
-using ChannelControlCallback = FMOD_RESULT(ChannelControl *, ChannelControlType, ChannelControlCallbackType, void *, void *);
+using ChannelControlCallback = FMOD_RESULT(ChannelControl*, ChannelControlType, ChannelControlCallbackType, void*, void*);
 
-using ChannelIsPlaying = FMOD_RESULT(Channel *, BOOL *);
-using ChannelStop = FMOD_RESULT(Channel *);
-using ChannelSetPaused = FMOD_RESULT(Channel *, BOOL);
-using ChannelSetMute = FMOD_RESULT(Channel *, BOOL);
-using ChannelSetPitch = FMOD_RESULT(Channel *, float);
-using ChannelSetPan = FMOD_RESULT(Channel *, float);
-using ChannelSetVolume = FMOD_RESULT(Channel *, float);
-using ChannelSetFrequency = FMOD_RESULT(Channel *, float);
-using ChannelSetMode = FMOD_RESULT(Channel *, FMOD_MODE);
-using ChannelSetCallback = FMOD_RESULT(Channel *, ChannelControlCallback *);
-using ChannelSetUserData = FMOD_RESULT(Channel *, void *);
-using ChannelGetUserData = FMOD_RESULT(Channel *, void **);
-using ChannelGetChannelGroup = FMOD_RESULT(Channel *, ChannelGroup **);
+using ChannelIsPlaying = FMOD_RESULT(Channel*, BOOL*);
+using ChannelStop = FMOD_RESULT(Channel*);
+using ChannelSetPaused = FMOD_RESULT(Channel*, BOOL);
+using ChannelSetMute = FMOD_RESULT(Channel*, BOOL);
+using ChannelSetPitch = FMOD_RESULT(Channel*, float);
+using ChannelSetPan = FMOD_RESULT(Channel*, float);
+using ChannelSetVolume = FMOD_RESULT(Channel*, float);
+using ChannelSetFrequency = FMOD_RESULT(Channel*, float);
+using ChannelSetMode = FMOD_RESULT(Channel*, FMOD_MODE);
+using ChannelSetCallback = FMOD_RESULT(Channel*, ChannelControlCallback*);
+using ChannelSetUserData = FMOD_RESULT(Channel*, void*);
+using ChannelGetUserData = FMOD_RESULT(Channel*, void**);
+using ChannelGetChannelGroup = FMOD_RESULT(Channel*, ChannelGroup**);
 } // namespace FMOD
 
 namespace FMODStudio
@@ -441,7 +443,7 @@ struct ParameterId
 };
 struct ParameterDescription
 {
-    const char *name;
+    const char* name;
     ParameterId id;
     float minimum;
     float maximum;
@@ -456,35 +458,35 @@ using Bus = tagged_void<struct bus_tag>;
 using EventDescription = tagged_void<struct event_description_tag>;
 using EventInstance = tagged_void<struct event_instance_tag>;
 
-using GetCoreSystem = FMOD_RESULT(System *, FMOD::System **);
-using FlushCommands = FMOD_RESULT(System *);
-using GetBus = FMOD_RESULT(System *, const char *, Bus **);
-using LockChannelGroup = FMOD_RESULT(Bus *);
-using GetChannelGroup = FMOD_RESULT(Bus *, ChannelGroup **);
+using GetCoreSystem = FMOD_RESULT(System*, FMOD::System**);
+using FlushCommands = FMOD_RESULT(System*);
+using GetBus = FMOD_RESULT(System*, const char*, Bus**);
+using LockChannelGroup = FMOD_RESULT(Bus*);
+using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
 
-using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance *, void *);
+using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
 
-using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription *, EventInstance **);
-using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription *, ParameterId, ParameterDescription *);
-using EventDescriptionGetParameterDescriptionByName = FMOD_RESULT(EventDescription *, const char *, ParameterDescription *);
-using EventDescriptionSetCallback = FMOD_RESULT(EventDescription *, EventInstanceCallback *, EventCallbackType);
+using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription*, EventInstance**);
+using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription*, ParameterId, ParameterDescription*);
+using EventDescriptionGetParameterDescriptionByName = FMOD_RESULT(EventDescription*, const char*, ParameterDescription*);
+using EventDescriptionSetCallback = FMOD_RESULT(EventDescription*, EventInstanceCallback*, EventCallbackType);
 
-using EventInstanceStart = FMOD_RESULT(EventInstance *);
-using EventInstanceStop = FMOD_RESULT(EventInstance *, StopMode);
-using EventInstanceGetPlaybackState = FMOD_RESULT(EventInstance *, PlaybackState *);
+using EventInstanceStart = FMOD_RESULT(EventInstance*);
+using EventInstanceStop = FMOD_RESULT(EventInstance*, StopMode);
+using EventInstanceGetPlaybackState = FMOD_RESULT(EventInstance*, PlaybackState*);
 // using EventInstanceIsPlaying = FMOD_RESULT(EventInstance*, BOOL*);
-using EventInstanceSetPaused = FMOD_RESULT(EventInstance *, BOOL);
-using EventInstanceGetPaused = FMOD_RESULT(EventInstance *, BOOL *);
+using EventInstanceSetPaused = FMOD_RESULT(EventInstance*, BOOL);
+using EventInstanceGetPaused = FMOD_RESULT(EventInstance*, BOOL*);
 // using EventInstanceSetMute = FMOD_RESULT(EventInstance*, BOOL);
-using EventInstanceSetPitch = FMOD_RESULT(EventInstance *, float);
+using EventInstanceSetPitch = FMOD_RESULT(EventInstance*, float);
 // using EventInstanceSetPan = FMOD_RESULT(EventInstance*, float);
-using EventInstanceSetVolume = FMOD_RESULT(EventInstance *, float);
+using EventInstanceSetVolume = FMOD_RESULT(EventInstance*, float);
 // using EventInstanceSetFrequency = FMOD_RESULT(EventInstance*, float);
 // using EventInstanceSetMode = FMOD_RESULT(EventInstance*, FMOD_MODE);
-using EventInstanceSetCallback = FMOD_RESULT(EventInstance *, EventInstanceCallback *, EventCallbackType);
-using EventInstanceSetUserData = FMOD_RESULT(EventInstance *, void *);
-using EventInstanceGetUserData = FMOD_RESULT(EventInstance *, void **);
-using EventInstanceGetDescription = FMOD_RESULT(EventInstance *, EventDescription **);
-using EventInstanceGetParameterByID = FMOD_RESULT(EventInstance *, ParameterId, float *, float *);
-using EventInstanceSetParameterByID = FMOD_RESULT(EventInstance *, ParameterId, float, bool);
+using EventInstanceSetCallback = FMOD_RESULT(EventInstance*, EventInstanceCallback*, EventCallbackType);
+using EventInstanceSetUserData = FMOD_RESULT(EventInstance*, void*);
+using EventInstanceGetUserData = FMOD_RESULT(EventInstance*, void**);
+using EventInstanceGetDescription = FMOD_RESULT(EventInstance*, EventDescription**);
+using EventInstanceGetParameterByID = FMOD_RESULT(EventInstance*, ParameterId, float*, float*);
+using EventInstanceSetParameterByID = FMOD_RESULT(EventInstance*, ParameterId, float, bool);
 } // namespace FMODStudio

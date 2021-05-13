@@ -35,7 +35,7 @@ struct ParticleDB
     float hor_velocity;
     float ver_velocity;
     float unknown27;
-    Texture *texture;
+    Texture* texture;
     size_t unknown29; // code pointer
     size_t unknown30; // code pointer
     uint32_t flags;
@@ -57,10 +57,11 @@ struct ParticleEmitter
     std::string name;
     uint16_t id;
 
-    ParticleEmitter(const std::string &name_, uint64_t id_) : name(name_), id(id_)
+    ParticleEmitter(const std::string& name_, uint64_t id_)
+        : name(name_), id(id_)
     {
     }
 };
 
-ParticleDB *get_particle_type(uint32_t id);
-const std::vector<ParticleEmitter> &list_particles();
+ParticleDB* get_particle_type(uint32_t id);
+const std::vector<ParticleEmitter>& list_particles();

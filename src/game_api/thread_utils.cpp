@@ -35,7 +35,7 @@ size_t heap_base()
     {
         auto main = get_main_thread();
         THREAD_BASIC_INFORMATION tib = {};
-        using FuncPtr = NTSTATUS(NTAPI *)(
+        using FuncPtr = NTSTATUS(NTAPI*)(
             IN HANDLE ThreadHandle,
             IN THREADINFOCLASS ThreadInformationClass,
             OUT PVOID ThreadInformation,
@@ -49,7 +49,7 @@ size_t heap_base()
         {
             NtQueryInformationThread_ptr(main, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
 
-            auto result = ((uint64_t *)tib.TebBaseAddress)[11];
+            auto result = ((uint64_t*)tib.TebBaseAddress)[11];
             return res = read_u64(read_u64((result)) + 0x130);
         }
     }

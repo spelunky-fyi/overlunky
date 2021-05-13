@@ -2,11 +2,11 @@
 
 #include <chrono>
 #include <deque>
+#include <filesystem>
 #include <memory>
 #include <string>
-#include <vector>
 #include <variant>
-#include <filesystem>
+#include <vector>
 
 #include "imgui.h"
 #include <d3d11.h>
@@ -46,14 +46,14 @@ struct ScriptInput
 
 struct ScriptImage
 {
-    ID3D11ShaderResourceView *texture;
+    ID3D11ShaderResourceView* texture;
     int width;
     int height;
 };
 
 class SpelunkyScript
 {
-public:
+  public:
     SpelunkyScript(std::string script, std::string file, class SoundManager* sound_manager, bool enable = true);
     ~SpelunkyScript();
 
@@ -86,10 +86,10 @@ public:
     void set_changed(bool changed);
 
     bool run();
-    void draw(ImDrawList *dl);
+    void draw(ImDrawList* dl);
     void render_options();
 
-private:
+  private:
     class ScriptImpl;
     std::unique_ptr<ScriptImpl> m_Impl;
 };

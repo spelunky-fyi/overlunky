@@ -1,12 +1,21 @@
-#include <cstdarg>
 #include "../injected/ui.hpp"
 #include "entity.hpp"
-#include "state.hpp"
 #include "logger.h"
+#include "state.hpp"
+#include <cstdarg>
 
-uint32_t setflag(uint32_t flags, int bit) { return flags | (1U << (bit - 1)); }
-uint32_t clrflag(uint32_t flags, int bit) { return flags & ~(1U << (bit - 1)); }
-bool testflag(uint32_t flags, int bit) { return (flags & (1U << (bit - 1))) > 0; }
+uint32_t setflag(uint32_t flags, int bit)
+{
+    return flags | (1U << (bit - 1));
+}
+uint32_t clrflag(uint32_t flags, int bit)
+{
+    return flags & ~(1U << (bit - 1));
+}
+bool testflag(uint32_t flags, int bit)
+{
+    return (flags & (1U << (bit - 1))) > 0;
+}
 uint32_t flipflag(uint32_t flags, int bit)
 {
     if (testflag(flags, bit))
@@ -44,7 +53,7 @@ int32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, flo
     }
     else if (layer < 0)
     {
-        auto player = state.items()->player(abs(layer)-1);
+        auto player = state.items()->player(abs(layer) - 1);
         if (player == nullptr)
             return -1;
         auto [_x, _y] = player->position();
@@ -76,7 +85,7 @@ int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_
     }
     else if (layer < 0)
     {
-        auto player = state.items()->player(abs(layer)-1);
+        auto player = state.items()->player(abs(layer) - 1);
         if (player == nullptr)
             return -1;
         auto [_x, _y] = player->position();
@@ -150,7 +159,7 @@ void list_items()
     auto player = state.items()->player(0);
     if (player == nullptr)
         return;
-    for (auto &item : state.layer(player->layer())->items())
+    for (auto& item : state.layer(player->layer())->items())
     {
         DEBUG("Item {} {:x}, {}", item->uid, item->type->search_flags, item->position_self());
     }
@@ -169,8 +178,8 @@ int32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
     auto player = state.items()->player(0);
     if (player == nullptr)
         return -1;
-    std::vector<std::tuple<int, float, Entity *>> found;
-    for (auto &item : state.layer(player->layer())->items())
+    std::vector<std::tuple<int, float, Entity*>> found;
+    for (auto& item : state.layer(player->layer())->items())
     {
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
@@ -189,10 +198,11 @@ int32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
     }
     if (!found.empty())
     {
-        std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool { return std::get<1>(a) < std::get<1>(b); });
+        std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool
+                  { return std::get<1>(a) < std::get<1>(b); });
         auto picked = found[0];
         auto entity = std::get<2>(picked);
-        DEBUG("{}", (void *)entity);
+        DEBUG("{}", (void*)entity);
         return std::get<0>(picked);
     }
     return -1;
@@ -220,7 +230,7 @@ uint32_t get_entity_flags(uint32_t id)
         return 0;
     auto state = State::get();
     auto ent = state.find(id);
-    if(ent)
+    if (ent)
         return ent->flags;
     return 0;
 }
@@ -292,12 +302,12 @@ void player_status()
     if (player == nullptr)
         return;
     auto status = player->inventory_ptr;
-    DEBUG("Player {}", (void *)status, status->ropes, status->bombs);
+    DEBUG("Player {}", (void*)status, status->ropes, status->bombs);
     status->ropes = (99);
     status->bombs = (99);
 }
 
-Entity *get_entity_ptr(uint32_t id)
+Entity* get_entity_ptr(uint32_t id)
 {
     auto state = State::get();
     auto p = state.find(id);
@@ -315,21 +325,21 @@ int32_t get_entity_type(uint32_t id)
     return p->type->id;
 }
 
-StateMemory *get_state_ptr()
+StateMemory* get_state_ptr()
 {
     auto state = State::get();
     return state.ptr();
 }
 
-std::vector<Player *> get_players()
+std::vector<Player*> get_players()
 {
     auto state = State::get();
-    std::vector<Player *> found;
+    std::vector<Player*> found;
     for (int i = 0; i < MAX_PLAYERS; i++)
     {
         auto player = state.items()->player(i);
         if (player)
-            found.push_back((Player *)player);
+            found.push_back((Player*)player);
     }
     return found;
 }
@@ -358,11 +368,11 @@ std::vector<uint32_t> get_entities()
     if (!player)
         return {};
     std::vector<uint32_t> found;
-    for (auto &item : state.layer(0)->items())
+    for (auto& item : state.layer(0)->items())
     {
         found.push_back(item->uid);
     }
-    for (auto &item : state.layer(1)->items())
+    for (auto& item : state.layer(1)->items())
     {
         found.push_back(item->uid);
     }
@@ -378,7 +388,7 @@ std::vector<uint32_t> get_entities_by_layer(int layer)
     if (layer == -1)
         layer = player->layer();
     std::vector<uint32_t> found;
-    for (auto &item : state.layer(layer)->items())
+    for (auto& item : state.layer(layer)->items())
     {
         found.push_back(item->uid);
     }
@@ -392,14 +402,14 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types)
     if (!player)
         return {};
     std::vector<uint32_t> found;
-    for (auto &item : state.layer(0)->items())
+    for (auto& item : state.layer(0)->items())
     {
         if (std::find(types.begin(), types.end(), item->type->id) != types.end())
         {
             found.push_back(item->uid);
         }
     }
-    for (auto &item : state.layer(1)->items())
+    for (auto& item : state.layer(1)->items())
     {
         if (std::find(types.begin(), types.end(), item->type->id) != types.end())
         {
@@ -409,7 +419,7 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types)
     return found;
 }
 
-template<typename... Args>
+template <typename... Args>
 std::vector<uint32_t> get_entities_by_type(Args... args)
 {
     std::vector<uint32_t> types = {args...};
@@ -418,14 +428,14 @@ std::vector<uint32_t> get_entities_by_type(Args... args)
     if (!player)
         return {};
     std::vector<uint32_t> found;
-    for (auto &item : state.layer(0)->items())
+    for (auto& item : state.layer(0)->items())
     {
         if (std::find(types.begin(), types.end(), item->type->id) != types.end())
         {
             found.push_back(item->uid);
         }
     }
-    for (auto &item : state.layer(1)->items())
+    for (auto& item : state.layer(1)->items())
     {
         if (std::find(types.begin(), types.end(), item->type->id) != types.end())
         {
@@ -466,14 +476,14 @@ std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
     if (!player)
         return {};
     std::vector<uint32_t> found;
-    for (auto &item : state.layer(0)->items())
+    for (auto& item : state.layer(0)->items())
     {
         if (item->type->search_flags & mask)
         {
             found.push_back(item->uid);
         }
     }
-    for (auto &item : state.layer(1)->items())
+    for (auto& item : state.layer(1)->items())
     {
         if (item->type->search_flags & mask)
         {
@@ -494,7 +504,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
         layer = player->layer();
     if (layer >= 0 && state.layer(layer))
     {
-        for (auto &item : state.layer(layer)->items())
+        for (auto& item : state.layer(layer)->items())
         {
             if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == type || type == 0))
             {
@@ -506,7 +516,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
     {
         if (state.layer(0))
         {
-            for (auto &item : state.layer(0)->items())
+            for (auto& item : state.layer(0)->items())
             {
                 if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == type || type == 0))
                 {
@@ -516,7 +526,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
         }
         if (state.layer(1))
         {
-            for (auto &item : state.layer(1)->items())
+            for (auto& item : state.layer(1)->items())
             {
                 if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == type || type == 0))
                 {
@@ -532,7 +542,7 @@ std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, flo
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    for (auto &item : state.layer(layer)->items())
+    for (auto& item : state.layer(layer)->items())
     {
         auto [ix, iy] = item->position();
         float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
@@ -561,19 +571,19 @@ std::vector<uint32_t> get_entities_overlapping(uint32_t type, uint32_t mask, flo
 void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();
-    Entity *door = get_entity_ptr(id);
+    Entity* door = get_entity_ptr(id);
     if (door == nullptr)
         return;
-    static_cast<Door *>(door)->set_target(w, l, t);
+    static_cast<Door*>(door)->set_target(w, l, t);
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t id)
 {
     auto state = State::get();
-    Entity *door = get_entity_ptr(id);
+    Entity* door = get_entity_ptr(id);
     if (door == nullptr)
         return std::make_tuple(0, 0, 0);
-    return static_cast<Door *>(door)->get_target();
+    return static_cast<Door*>(door)->get_target();
 }
 
 void set_contents(uint32_t id, uint32_t item)
@@ -582,18 +592,19 @@ void set_contents(uint32_t id, uint32_t item)
     auto player = state.items()->player(0);
     if (player == nullptr)
         return;
-    Entity *container = get_entity_ptr(id);
+    Entity* container = get_entity_ptr(id);
     if (container == nullptr)
         return;
     int type = container->type->id;
-    if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") && type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
+    if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
+        type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
         return;
     container->as<Container>()->inside = item;
 }
 
 void entity_remove_item(uint32_t id, uint32_t item)
 {
-    Entity *entity = get_entity_ptr(id);
+    Entity* entity = get_entity_ptr(id);
     if (entity == nullptr)
         return;
     entity->remove_item(item);
@@ -602,7 +613,7 @@ void entity_remove_item(uint32_t id, uint32_t item)
 int32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
 {
     auto state = State::get();
-    Entity *overlay = get_entity_ptr(over);
+    Entity* overlay = get_entity_ptr(over);
     if (overlay == nullptr)
         return -1;
     int layer = overlay->layer();
@@ -611,12 +622,12 @@ int32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
 
 bool entity_has_item_uid(uint32_t id, uint32_t item)
 {
-    Entity *entity = get_entity_ptr(id);
+    Entity* entity = get_entity_ptr(id);
     if (entity == nullptr)
         return false;
     if (entity->items.count > 0)
     {
-        int *pitems = (int *)entity->items.begin;
+        int* pitems = (int*)entity->items.begin;
         for (int i = 0; i < entity->items.count; i++)
         {
             if (pitems[i] == item)
@@ -628,15 +639,15 @@ bool entity_has_item_uid(uint32_t id, uint32_t item)
 
 bool entity_has_item_type(uint32_t id, uint32_t type)
 {
-    Entity *entity = get_entity_ptr(id);
+    Entity* entity = get_entity_ptr(id);
     if (entity == nullptr)
         return false;
     if (entity->items.count > 0)
     {
-        int *pitems = (int *)entity->items.begin;
+        int* pitems = (int*)entity->items.begin;
         for (int i = 0; i < entity->items.count; i++)
         {
-            Entity *item = get_entity_ptr(pitems[i]);
+            Entity* item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
                 continue;
             if (item->type->id == type)
@@ -651,13 +662,15 @@ void lock_door_at(float x, float y)
     std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
     for (auto id : items)
     {
-        Entity *door = get_entity_ptr(id);
+        Entity* door = get_entity_ptr(id);
         if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
             door->flags &= ~(1U << 19);
             door->flags |= 1U << 21;
         }
-        else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
+        else if (
+            door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
+            door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
             door->animation_frame &= ~1U;
         }
@@ -669,13 +682,15 @@ void unlock_door_at(float x, float y)
     std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
     for (auto id : items)
     {
-        Entity *door = get_entity_ptr(id);
+        Entity* door = get_entity_ptr(id);
         if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
             door->flags |= 1U << 19;
             door->flags &= ~(1U << 21);
         }
-        else if (door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") || door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
+        else if (
+            door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
+            door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
         {
             door->animation_frame |= 1U;
         }
@@ -699,37 +714,37 @@ void carry(uint32_t id, uint32_t item)
 
 void kill_entity(uint32_t id)
 {
-    Entity *ent = get_entity_ptr(id);
-    if(ent != nullptr)
+    Entity* ent = get_entity_ptr(id);
+    if (ent != nullptr)
         ent->kill(true, nullptr);
 }
 
 void destroy_entity(uint32_t id)
 {
-    Entity *ent = get_entity_ptr(id);
-    if(ent != nullptr)
+    Entity* ent = get_entity_ptr(id);
+    if (ent != nullptr)
         ent->destroy(); // TODO
 }
 
 void apply_entity_db(uint32_t id)
 {
-    Entity *ent = get_entity_ptr(id);
-    if(ent != nullptr)
+    Entity* ent = get_entity_ptr(id);
+    if (ent != nullptr)
         ent->apply_db();
 }
 
 void flip_entity(uint32_t id)
 {
-    Entity *ent = get_entity_ptr(id);
-    if(ent == nullptr)
+    Entity* ent = get_entity_ptr(id);
+    if (ent == nullptr)
         return;
     ent->flags = flipflag(ent->flags, 17);
     if (ent->items.count > 0)
     {
-        int *items = (int *)ent->items.begin;
+        int* items = (int*)ent->items.begin;
         for (int i = 0; i < ent->items.count; i++)
         {
-            Entity *item = get_entity_ptr(items[i]);
+            Entity* item = get_entity_ptr(items[i]);
             item->flags = flipflag(item->flags, 17);
         }
     }
@@ -763,7 +778,7 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
 {
     static size_t offset_poison = 0;
     static size_t offset_regular = 0;
-    if ( offset_poison == 0 )
+    if (offset_poison == 0)
     {
         std::string pattern = "\xBA\x73\x01\x00\x00\x48\x8B\x8C\xC1\xC0\x12\x00\x00"s;
         auto memory = Memory::get();
@@ -910,7 +925,7 @@ void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_mu
     size_t offset_vladscape1 = 0;
     size_t offset_default2 = 0;
     size_t offset_vladscape2 = 0;
-    if ( offset_default1 == 0 )
+    if (offset_default1 == 0)
     {
         auto memory = Memory::get();
         auto exe = memory.exe();
@@ -949,11 +964,11 @@ void pick_up(uint32_t who, uint32_t what)
         auto memory = Memory::get();
         offset = memory.at_exe(find_inst(memory.exe(), "\x48\x89\x5c\x24\x08\x57\x48\x83\xec\x20\x4c\x8b\x5a\x08"s, memory.after_bundle));
     }
-    Movable *ent = (Movable*)get_entity_ptr(who);
-    Movable *item = (Movable*)get_entity_ptr(what);
-    if(ent != nullptr && item != nullptr)
+    Movable* ent = (Movable*)get_entity_ptr(who);
+    Movable* item = (Movable*)get_entity_ptr(what);
+    if (ent != nullptr && item != nullptr)
     {
-        auto pick_up_func = (void(*)(Movable*, Movable*))offset;
+        auto pick_up_func = (void (*)(Movable*, Movable*))offset;
         pick_up_func(ent, item);
     }
 }

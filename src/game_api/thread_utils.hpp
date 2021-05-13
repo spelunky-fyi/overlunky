@@ -20,21 +20,23 @@ typedef struct _THREAD_BASIC_INFORMATION
 size_t heap_base();
 
 // I found some places that use offset from heap base, so wrote this class
-template <typename T> class OnHeapPointer
+template <typename T>
+class OnHeapPointer
 {
     int64_t ptr_;
 
   public:
-    explicit OnHeapPointer(size_t ptr) : ptr_(ptr)
+    explicit OnHeapPointer(size_t ptr)
+        : ptr_(ptr)
     {
     }
 
-    T *decode()
+    T* decode()
     {
-        return reinterpret_cast<T *>(ptr_ + heap_base());
+        return reinterpret_cast<T*>(ptr_ + heap_base());
     }
 
-    T *operator->()
+    T* operator->()
     {
         return decode();
     }
