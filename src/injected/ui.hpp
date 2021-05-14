@@ -6,3 +6,4 @@
 
 void create_box(std::vector<EntityItem> items);
 void init_ui();
+void reload_enabled_scripts();

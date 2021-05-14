@@ -120,6 +120,7 @@ std::map<std::string, int> keys{
     {"mouse_clone", 0x505},
     {"mouse_destroy", 0x405},
     {"mouse_destroy_unsafe", 0x605},
+    {"reload_enabled_scripts", 0x174} // ctrl + f5 same as playlunky
     //{ "", 0x },
 };
 
@@ -1334,6 +1335,10 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("escape", wParam))
     {
         escape();
+    }
+    else if (pressed("reload_enabled_scripts", wParam))
+    {
+        reload_enabled_scripts();
     }
     else
     {
@@ -3945,4 +3950,15 @@ void init_ui()
     register_post_draw(&post_draw);
 
     register_make_save_path(make_save_path);
+}
+
+void reload_enabled_scripts()
+{
+    for (auto& [script_name, script] : g_scripts)
+    {
+        if (script->is_enabled())
+        {
+            load_script(script->get_file(), true);
+        }
+    }
 }

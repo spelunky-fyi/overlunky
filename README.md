@@ -61,6 +61,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + Note: Doesn't automatically save to file, you need to let the game trigger a save for that.
   - **F8**: Scripts
       + You can load, edit and set options for Lua scripts here
+      + **Ctrl+F5**: Reload enabled scripts
   - **F9**: Options
       + Lots of options. **Check the ini for hotkeys, I'm tired of updating this.**
   - **F11**: Hide overlay
