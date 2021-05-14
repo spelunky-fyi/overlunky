@@ -120,7 +120,7 @@ std::map<std::string, int> keys{
     {"mouse_clone", 0x505},
     {"mouse_destroy", 0x405},
     {"mouse_destroy_unsafe", 0x605},
-    {"reload_enabled_scripts", 0x173} // ctrl + f4 same as playlunky
+    {"reload_enabled_scripts", 0x174} // ctrl + f5 same as playlunky
     //{ "", 0x },
 };
 
