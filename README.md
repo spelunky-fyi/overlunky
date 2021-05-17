@@ -5,7 +5,7 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.20.4d-green)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.21.0c-green)
 
 [![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.21.0c-green)
 
