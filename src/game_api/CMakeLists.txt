@@ -5,6 +5,8 @@ add_library(spel2_api STATIC
         items.hpp
         layer.cpp
         layer.hpp
+        level_api.cpp
+        level_api.hpp
         render_api.cpp
         render_api.hpp
         rpc.cpp
