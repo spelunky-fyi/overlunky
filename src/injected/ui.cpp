@@ -1178,7 +1178,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("spawn_kit_6", wParam))
     {
         if (saved_entities.size() > 5)
-            spawn_entities(false, saved_entities.at(6));
+            spawn_entities(false, saved_entities.at(5));
     }
     else if (pressed("spawn_kit_7", wParam))
     {
@@ -1188,7 +1188,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("spawn_kit_8", wParam))
     {
         if (saved_entities.size() > 7)
-            spawn_entities(false, saved_entities.at(8));
+            spawn_entities(false, saved_entities.at(7));
     }
     else if (pressed("spawn_kit_9", wParam))
     {
