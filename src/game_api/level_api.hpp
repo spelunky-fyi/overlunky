@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <optional>
 #include <unordered_map>
 
 struct ShortTileCodeDef
@@ -25,21 +26,26 @@ struct ChanceDef
 
 struct LevelGenSystem
 {
+    void init();
+
+    std::optional<std::uint32_t> get_tile_code(const std::string& tile_code);
+    std::uint32_t define_tile_code(std::string tile_code);
+
     // TODO: Get offsets from binary instead of hardcoding them
-    std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const
+    const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const
     {
-        return *(std::unordered_map<std::uint8_t, ShortTileCodeDef>*)((size_t)this + 0x48);
+        return *(const std::unordered_map<std::uint8_t, ShortTileCodeDef>*)((size_t)this + 0x48);
     }
-    std::unordered_map<std::string, TileCodeDef>& tile_codes() const
+    const std::unordered_map<std::string, TileCodeDef>& tile_codes() const
     {
-        return *(std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
+        return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
     }
-    std::unordered_map<std::string, TemplateDef>& templates() const
+    const std::unordered_map<std::string, TemplateDef>& templates() const
     {
-        return *(std::unordered_map<std::string, TemplateDef>*)((size_t)this + 0xC8);
+        return *(const std::unordered_map<std::string, TemplateDef>*)((size_t)this + 0xC8);
     }
-    std::unordered_map<std::string, ChanceDef>& chances() const
+    const std::unordered_map<std::string, ChanceDef>& chances() const
     {
-        return *(std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1330);
+        return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1330);
     }
 };
