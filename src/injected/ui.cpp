@@ -2546,11 +2546,12 @@ void render_options()
         {
             if (options["noclip"])
             {
-                player->type->max_speed = 0.4;
+                player->type->max_speed = 0.3;
             }
             else
             {
                 player->flags &= ~(1U << 9);
+                player->flags |= 1U << 10;
                 player->flags &= ~(1U << 4);
                 player->type->max_speed = 0.0725;
             }
