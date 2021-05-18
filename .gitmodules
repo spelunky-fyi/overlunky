@@ -16,3 +16,6 @@
 [submodule "src/json"]
 	path = src/json
 	url = https://github.com/nlohmann/json.git
+[submodule "src/Detours"]
+	path = src/Detours
+	url = https://github.com/microsoft/Detours.git
