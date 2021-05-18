@@ -1037,6 +1037,29 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         }
         return (uint16_t)0;
     };
+    /// <summary>
+    /// Read input that has been previously stolen with steal_input
+    /// </summary>
+    lua["read_stolen_input"] = [this](int uid)
+    {
+        Player* player = get_entity_ptr(uid)->as<Player>();
+        if (player == nullptr)
+            return (uint16_t)0;
+        ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
+        if (!IsBadReadPtr(readinput, 20))
+        {
+            readinput = reinterpret_cast<ScriptInput*>(readinput->orig_input);
+            if (!IsBadReadPtr(readinput, 20))
+            {
+                // idk what 7712 is but it seems like it's an uninitialized default value that we should ignore
+                if (readinput->next != 7712)
+                {
+                    return readinput->next;
+                }
+            }
+        }
+        return (uint16_t)0;
+    };
 
     /// Returns: `bool` (false if the window was closed from the X)
     /// Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the

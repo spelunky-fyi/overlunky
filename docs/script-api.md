@@ -481,6 +481,11 @@ Send input
 ### [`read_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
 #### Params: `int uid`
 Read input
+### [`read_stolen_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
+#### Params: `int uid`
+<summary>
+Read input that has been previously stolen with steal_input
+</summary>
 ### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
 #### Params: `string title, float x, float y, float w, float h, bool movable, function callback`
 #### Returns: `bool` (false if the window was closed from the X)
