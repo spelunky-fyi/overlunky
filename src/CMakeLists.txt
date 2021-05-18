@@ -51,7 +51,7 @@ set_property(
         SOURCE detours/src/uimports.cpp
         APPEND PROPERTY HEADER_FILE_ONLY true)
 
-target_compile_options(lib_detours_overlunky PRIVATE /W4 /WX /Zi /MT /Gy /Gm- /Zl /Od)
+target_compile_options(lib_detours_overlunky PRIVATE /w /Zi /MT /Gy /Gm- /Zl /Od)
 target_include_directories(lib_detours_overlunky PUBLIC detours/src)
 
 # --------------------------------------------------
