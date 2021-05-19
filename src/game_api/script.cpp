@@ -997,6 +997,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         newinput->current = 0;
         newinput->orig_input = player->input_ptr;
         newinput->orig_ai = player->ai_func;
+        newinput->is_input_stolen = true;
         player->input_ptr = reinterpret_cast<size_t>(newinput);
         player->ai_func = 0;
         script_input[uid] = newinput;
@@ -1046,14 +1047,13 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
         if (!IsBadReadPtr(readinput, 20))
         {
+            if (!readinput->is_input_stolen) {
+                return (uint16_t)0;
+            }
             readinput = reinterpret_cast<ScriptInput*>(readinput->orig_input);
             if (!IsBadReadPtr(readinput, 20))
             {
-                // idk what 7712 is but it seems like it's an uninitialized default value that we should ignore
-                if (readinput->next != 7712)
-                {
-                    return readinput->next;
-                }
+                return readinput->next;
             }
         }
         return (uint16_t)0;

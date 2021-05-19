@@ -42,6 +42,7 @@ struct ScriptInput
     uint16_t current;
     size_t orig_input;
     size_t orig_ai;
+    bool is_input_stolen;
 };
 
 struct ScriptImage
