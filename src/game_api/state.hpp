@@ -55,7 +55,7 @@ struct StateMemory
     uint8_t world_next;
     uint8_t level;
     uint8_t level_next;
-    int32_t i6c;
+    int32_t i6c; // i6c and i70 are a pointer to ThemeInfo (todo)
     int32_t i70;
     uint8_t theme;
     uint8_t theme_next;
@@ -72,8 +72,11 @@ struct StateMemory
     uint8_t level_count;
     uint8_t pad84[0x970];
     uint32_t journal_flags;
-    int32_t i9f0;
-    int32_t i9f4;
+    int32_t first_damage_cause; // entity type that caused first damage, for the journal
+    int8_t first_damage_world;
+    int8_t first_damage_level;
+    uint8_t i9f4c;
+    uint8_t i9f4d;
     uint32_t time_last_level;
     uint32_t time_level;
     int32_t ia00;
