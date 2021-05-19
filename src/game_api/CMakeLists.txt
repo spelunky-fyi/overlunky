@@ -34,7 +34,9 @@ add_library(spel2_api STATIC
         audio_buffer.hpp
         game_manager.cpp
         game_manager.hpp
-        overloaded.hpp)
+        overloaded.hpp
+        virtual_table.hpp
+        virtual_table.cpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
         imgui)
