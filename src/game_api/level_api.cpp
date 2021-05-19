@@ -1,15 +1,135 @@
 #include "level_api.hpp"
 
+#include "entity.hpp"
 #include "layer.hpp"
 #include "logger.h"
 #include "memory.hpp"
 #include "rpc.hpp"
 
+#include <array>
+#include <string_view>
+
 #include <Windows.h>
 #include <detours.h>
 
 std::uint32_t g_last_tile_code_id;
+std::uint32_t g_last_community_tile_code_id;
 std::uint32_t g_current_tile_code_id;
+
+std::unordered_map<std::uint32_t, std::string_view> g_IdToName;
+
+struct CommunityTileCode
+{
+    std::string_view tile_code;
+    std::string_view entity_type;
+    std::uint32_t entity_id;
+    std::uint32_t tile_code_id;
+};
+std::array g_community_tile_codes{
+    CommunityTileCode{"cog_door", "ENT_TYPE_FLOOR_DOOR_COG"},
+    CommunityTileCode{"totem_trap", "ENT_TYPE_FLOOR_TOTEM_TRAP"},
+    CommunityTileCode{"dustwall", "ENT_TYPE_FLOOR_DUSTWALL"},
+    CommunityTileCode{"bat", "ENT_TYPE_MONS_BAT"},
+    CommunityTileCode{"skeleton", "ENT_TYPE_MONS_SKELETON"},
+    CommunityTileCode{"lizard", "ENT_TYPE_MONS_HORNEDLIZARD"},
+    CommunityTileCode{"mole", "ENT_TYPE_MONS_MOLE"},
+    CommunityTileCode{"mosquito", "ENT_TYPE_MONS_MOSQUITO"},
+    CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
+    CommunityTileCode{"firebug", "ENT_TYPE_MONS_FIREBUG"},
+    CommunityTileCode{"vampire", "ENT_TYPE_MONS_VAMPIRE"},
+    CommunityTileCode{"osrirs", "ENT_TYPE_MONS_OSIRIS_HEAD"},
+    CommunityTileCode{"anubis2", "ENT_TYPE_MONS_ANUBIS2"},
+    CommunityTileCode{"assassin", "ENT_TYPE_MONS_FEMALE_JIANGSHI"},
+    CommunityTileCode{"yeti_king", "ENT_TYPE_MONS_YETIKING"},
+    CommunityTileCode{"yeti_queen", "ENT_TYPE_MONS_YETIQUEEN"},
+    CommunityTileCode{"bee", "ENT_TYPE_MONS_BEE"},
+    CommunityTileCode{"bee_queen", "ENT_TYPE_MONS_QUEENBEE"},
+    CommunityTileCode{"frog", "ENT_TYPE_MONS_FROG"},
+    CommunityTileCode{"frog_orange", "ENT_TYPE_MONS_FIREFROG"},
+    CommunityTileCode{"hundun", "ENT_TYPE_MONS_HUNDUN"},
+    CommunityTileCode{"scarab", "ENT_TYPE_MONS_SCARAB"},
+    CommunityTileCode{"cosmic_jelly", "ENT_TYPE_MONS_MEGAJELLYFISH"},
+    CommunityTileCode{"ghost", "ENT_TYPE_MONS_GHOST"},
+    CommunityTileCode{"ghost_med_sad", "ENT_TYPE_MONS_GHOST_MEDIUM_SAD"},
+    CommunityTileCode{"ghost_med_happy", "ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY"},
+    CommunityTileCode{"ghost_small_angry", "ENT_TYPE_MONS_GHOST_SMALL_ANGRY"},
+    CommunityTileCode{"ghost_small_sad", "ENT_TYPE_MONS_GHOST_SMALL_SAD"},
+    CommunityTileCode{"ghost_small_surprised", "ENT_TYPE_MONS_GHOST_SMALL_SURPRISED"},
+    CommunityTileCode{"ghost_small_happy", "ENT_TYPE_MONS_GHOST_SMALL_HAPPY"},
+    CommunityTileCode{"leaf", "ENT_TYPE_ITEM_LEAF"},
+    CommunityTileCode{"udjat_key", "ENT_TYPE_ITEM_LOCKEDCHEST_KEY"},
+    CommunityTileCode{"tutorial_speedrun_sign", "ENT_TYPE_ITEM_SPEEDRUN_SIGN"},
+    CommunityTileCode{"tutorial_menu_sign", "ENT_TYPE_ITEM_BASECAMP_TUTORIAL_SIGN"},
+    CommunityTileCode{"boombox", "ENT_TYPE_ITEM_BOOMBOX"},
+    CommunityTileCode{"eggplant", "ENT_TYPE_ITEM_EGGPLANT"},
+    CommunityTileCode{"gold_bar", "ENT_TYPE_ITEM_GOLDBAR"},
+    CommunityTileCode{"diamond", "ENT_TYPE_ITEM_DIAMOND"},
+    CommunityTileCode{"emerald", "ENT_TYPE_ITEM_EMERALD"},
+    CommunityTileCode{"sapphire", "ENT_TYPE_ITEM_SAPPHIRE"},
+    CommunityTileCode{"ruby", "ENT_TYPE_ITEM_RUBY"},
+    CommunityTileCode{"rope_pile", "ENT_TYPE_ITEM_PICKUP_ROPEPILE"},
+    CommunityTileCode{"bomb_bag", "ENT_TYPE_ITEM_PICKUP_BOMBBAG"},
+    CommunityTileCode{"bomb_box", "ENT_TYPE_ITEM_PICKUP_BOMBBOX"},
+    CommunityTileCode{"bomb", "ENT_TYPE_ITEM_BOMB"},
+    CommunityTileCode{"giantfood", "ENT_TYPE_ITEM_PICKUP_GIANTFOOD"},
+    CommunityTileCode{"elixir", "ENT_TYPE_ITEM_PICKUP_ELIXIR"},
+    CommunityTileCode{"seeded_run_unlocker", "ENT_TYPE_ITEM_PICKUP_SEEDEDRUNSUNLOCKER"},
+    CommunityTileCode{"specs", "ENT_TYPE_ITEM_PICKUP_SPECTACLES"},
+    CommunityTileCode{"climbing_gloves", "ENT_TYPE_ITEM_PICKUP_CLIMBINGGLOVES"},
+    CommunityTileCode{"pitchers_mitt", "ENT_TYPE_ITEM_PICKUP_PITCHERSMITT"},
+    CommunityTileCode{"shoes_spring", "ENT_TYPE_ITEM_PICKUP_SPRINGSHOES"},
+    CommunityTileCode{"shoes_spike", "ENT_TYPE_ITEM_PICKUP_SPIKESHOES"},
+    CommunityTileCode{"paste", "ENT_TYPE_ITEM_PICKUP_PASTE"},
+    CommunityTileCode{"compass", "ENT_TYPE_ITEM_PICKUP_COMPASS"},
+    CommunityTileCode{"compass_alien", "ENT_TYPE_ITEM_PICKUP_SPECIALCOMPASS"},
+    CommunityTileCode{"parachute", "ENT_TYPE_ITEM_PICKUP_PARACHUTE"},
+    CommunityTileCode{"udjat_eye", "ENT_TYPE_ITEM_PICKUP_UDJATEYE"},
+    CommunityTileCode{"kapala", "ENT_TYPE_ITEM_PICKUP_KAPALA"},
+    CommunityTileCode{"hedjet", "ENT_TYPE_ITEM_PICKUP_HEDJET"},
+    CommunityTileCode{"crown", "ENT_TYPE_ITEM_PICKUP_CROWN"},
+    CommunityTileCode{"eggplant_crown", "ENT_TYPE_ITEM_PICKUP_EGGPLANTCROWN"},
+    CommunityTileCode{"true_crown", "ENT_TYPE_ITEM_PICKUP_TRUECROWN"},
+    CommunityTileCode{"tablet", "ENT_TYPE_ITEM_PICKUP_TABLETOFDESTINY"},
+    CommunityTileCode{"bone_key", "ENT_TYPE_ITEM_PICKUP_SKELETON_KEY"},
+    CommunityTileCode{"playerbag", "ENT_TYPE_ITEM_PICKUP_PLAYERBAG"},
+    CommunityTileCode{"cape", "ENT_TYPE_ITEM_CAPE"},
+    CommunityTileCode{"vlads_cape", "ENT_TYPE_ITEM_VLADS_CAPE"},
+    CommunityTileCode{"back_jetpack", "ENT_TYPE_ITEM_JETPACK"},
+    CommunityTileCode{"back_telepack", "ENT_TYPE_ITEM_TELEPORTER_BACKPACK"},
+    CommunityTileCode{"back_hoverpack", "ENT_TYPE_ITEM_HOVERPACK"},
+    CommunityTileCode{"back_powerpack", "ENT_TYPE_ITEM_POWERPACK"},
+    CommunityTileCode{"gun_webgun", "ENT_TYPE_ITEM_WEBGUN"},
+    CommunityTileCode{"gun_shotgun", "ENT_TYPE_ITEM_SHOTGUN"},
+    CommunityTileCode{"gun_freezeray", "ENT_TYPE_ITEM_FREEZERAY"},
+    CommunityTileCode{"camera", "ENT_TYPE_ITEM_CAMERA"},
+    CommunityTileCode{"teleporter", "ENT_TYPE_ITEM_TELEPORTER"},
+    CommunityTileCode{"boomerang", "ENT_TYPE_ITEM_BOOMERANG"},
+    CommunityTileCode{"machete", "ENT_TYPE_ITEM_MACHETE"},
+    CommunityTileCode{"excalibur", "ENT_TYPE_ITEM_EXCALIBUR"},
+    CommunityTileCode{"excalibur_broken", "ENT_TYPE_ITEM_BROKENEXCALIBUR"},
+    CommunityTileCode{"scepter", "ENT_TYPE_ITEM_SCEPTER"},
+    CommunityTileCode{"clonegun", "ENT_TYPE_ITEM_CLONEGUN"},
+    CommunityTileCode{"shield_wooden", "ENT_TYPE_ITEM_WOODEN_SHIELD"},
+    CommunityTileCode{"shield_metal", "ENT_TYPE_ITEM_METAL_SHIELD"},
+    CommunityTileCode{"udjat_target", "ENT_TYPE_LOGICAL_BLACKMARKET_DOOR"},
+    CommunityTileCode{"mount_rockdog", "ENT_TYPE_MOUNT_ROCKDOG"},
+    CommunityTileCode{"mount_axolotl", "ENT_TYPE_MOUNT_AXOLOTL"},
+    CommunityTileCode{"mount_qilin", "ENT_TYPE_MOUNT_QILIN"},
+    CommunityTileCode{"humphead", "ENT_TYPE_MONS_GIANTFISH"},
+    CommunityTileCode{"present", "ENT_TYPE_ITEM_PRESENT"},
+    CommunityTileCode{"forcefield_horizontal", "ENT_TYPE_FLOOR_HORIZONTAL_FORCEFIELD"},
+    CommunityTileCode{"forcefield_horizontal_top", "ENT_TYPE_FLOOR_HORIZONTAL_FORCEFIELD_TOP"},
+    CommunityTileCode{"damsel_monty", "ENT_TYPE_MONS_PET_DOG"},
+    CommunityTileCode{"damsel_percy", "ENT_TYPE_MONS_PET_CAT"},
+    CommunityTileCode{"damsel_poochi", "ENT_TYPE_MONS_PET_HAMSTER"},
+    CommunityTileCode{"lion_trap", "ENT_TYPE_FLOOR_LION_TRAP"},
+    CommunityTileCode{"bomb", "ENT_TYPE_ITEM_BOMB"},
+    CommunityTileCode{"rope", "ENT_TYPE_ITEM_UNROLLED_ROPE"},
+    CommunityTileCode{"cosmic_orb", "ENT_TYPE_ITEM_FLOATING_ORB"},
+    CommunityTileCode{"monkey_gold", "ENT_TYPE_MONS_GOLDMONKEY"},
+    CommunityTileCode{"altar_duat", "ENT_TYPE_FLOOR_DUAT_ALTAR"},
+    CommunityTileCode{"spikeball", "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL"},
+};
 
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
@@ -17,12 +137,10 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
 {
     // TODO: Hook pre-level-gen-spawn here to allow changing/blocking spawns
 
-    if (tile_code > g_last_tile_code_id && tile_code < g_current_tile_code_id)
+    if (tile_code > g_last_tile_code_id && tile_code < g_last_community_tile_code_id)
     {
-        // TODO: Handle all new tilecodes here
-
-        // Just spawns a bomb-box for testing when encountering a non-vanilla code
-        State::get().layer(layer)->spawn_entity(514, x, y, false, 0.0f, 0.0f, false);
+        const CommunityTileCode& community_tile_code = g_community_tile_codes[tile_code - g_last_tile_code_id];
+        State::get().layer(layer)->spawn_entity(community_tile_code.entity_id, x, y, false, 0.0f, 0.0f, true);
     }
     else
     {
@@ -50,6 +168,21 @@ void LevelGenSystem::init()
     }
 
     g_current_tile_code_id = g_last_tile_code_id + 1;
+
+    for (auto& community_tile_code : g_community_tile_codes)
+    {
+        community_tile_code.tile_code_id = define_tile_code(std::string{community_tile_code.tile_code});
+        const auto entity_id = to_id(community_tile_code.entity_type);
+        if (entity_id < 0) {
+            community_tile_code.entity_id = to_id("ENT_TYPE_ITEM_BOMB");
+        }
+        else {
+            community_tile_code.entity_id = entity_id;
+        }
+    }
+
+    // Remember this for fast access later
+    g_last_community_tile_code_id = g_current_tile_code_id;
 
     {
         auto memory = Memory::get();
