@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -115,7 +116,7 @@ struct EntityItem
 
 EntityDB* get_type(uint32_t id);
 
-int32_t to_id(std::string id);
+int32_t to_id(std::string_view id);
 
 template <typename T>
 std::string to_le_bytes(T fmt)

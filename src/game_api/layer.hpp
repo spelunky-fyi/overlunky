@@ -12,7 +12,7 @@ struct Layer
         int size;
     } items_;
 
-    Entity* spawn_entity(size_t id, float x, float y, bool s, float vx, float vy, bool snap);
+    Entity* spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap);
 
     Entity* spawn_entity_over(size_t id, Entity* overlay, float x, float y);
 
