@@ -1047,7 +1047,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
         if (!IsBadReadPtr(readinput, 20))
         {
-            if (!readinput->is_input_stolen) {
+            if (!readinput->is_input_stolen)
+            {
                 return (uint16_t)0;
             }
             readinput = reinterpret_cast<ScriptInput*>(readinput->orig_input);
