@@ -1318,3 +1318,23 @@ void replace_drop(uint16_t drop_id, uint32_t new_drop_uid)
         }
     }
 }
+
+void force_co_subtheme(int8_t subtheme)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(find_inst(memory.exe(), "\x48\xC1\xE0\x03\x48\xC1\xE8\x20\x49\x89\x48\x08\x48\x98"s, memory.after_bundle));
+    }
+    if (subtheme >= 0 && subtheme <= 7)
+    {
+        uint8_t replacement[] = {0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90};
+        std::string replacement_s = std::string((char*)replacement, sizeof(replacement));
+        write_mem_prot(offset, replacement_s, true);
+    }
+    else if (subtheme == -1)
+    {
+        write_mem_prot(offset, "\x48\xC1\xE0\x03\x48\xC1\xE8\x20"s, true);
+    }
+}
