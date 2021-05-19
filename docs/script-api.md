@@ -371,6 +371,12 @@ Sets the Y-level at which Olmec changes phases
 Determines when the ghost appears, either when the player is cursed or not
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 Get the [ParticleDB](#particledb) details of the specified ID
+### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
+#### Params: `int dropchance_id, int new_drop_chance`
+Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+### [`replace_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_drop)
+#### Params: `int drop_id, int new_drop_uid`
+Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 #### Params: `int a, int b`
 Calculate the tile distance of two entities by uid
@@ -996,3 +1002,102 @@ Params: `PlayingSound vanilla_sound`
 - [`TIAMAT_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.TIAMAT_WIN) 1
 - [`HUNDUN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.HUNDUN_WIN) 2
 - [`COSMIC_OCEAN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.COSMIC_OCEAN_WIN) 3
+### DROPCHANCE
+- [`BONEBLOCK_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) 0
+- [`CROCMAN_TELEPACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.CROCMAN_TELEPACK) 1
+- [`HANGINGSPIDER_WEBGUN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.HANGINGSPIDER_WEBGUN) 2
+- [`JIANGSHIASSASSIN_SPIKESHOES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.JIANGSHIASSASSIN_SPIKESHOES) 3
+- [`JIANGSHI_SPRINGSHOES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.JIANGSHI_SPRINGSHOES) 4
+- [`MOLE_MATTOCK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.MOLE_MATTOCK) 5
+- [`MOSQUITO_HOVERPACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.MOSQUITO_HOVERPACK) 6
+- [`ROBOT_METALSHIELD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.ROBOT_METALSHIELD) 7
+- [`SKELETON_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.SKELETON_SKELETONKEY) 8
+- [`UFO_PARACHUTE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.UFO_PARACHUTE) 9
+- [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.YETI_PITCHERSMITT) 10
+### DROP
+- [`ALTAR_DICE_CLIMBINGGLOVES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_CLIMBINGGLOVES) 0
+- [`ALTAR_DICE_COOKEDTURKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_COOKEDTURKEY) 1
+- [`ALTAR_DICE_DIAMOND`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_DIAMOND) 2
+- [`ALTAR_DICE_MACHETE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_MACHETE) 3
+- [`ALTAR_DICE_ROPEPILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_ROPEPILE) 4
+- [`ALTAR_DICE_SPECTACLES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_SPECTACLES) 5
+- [`ALTAR_DICE_TELEPACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_TELEPACK) 6
+- [`ALTAR_DICE_VAMPIRE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_VAMPIRE) 7
+- [`ALTAR_DICE_WEBGUN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_WEBGUN) 8
+- [`ALTAR_IDOL_GOLDEN_MONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_IDOL_GOLDEN_MONKEY) 9
+- [`ALTAR_KAPALA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_KAPALA) 10
+- [`ALTAR_PRESENT_EGGPLANT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_PRESENT_EGGPLANT) 11
+- [`ALTAR_ROCK_WOODENARROW`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_ROCK_WOODENARROW) 12
+- [`ALTAR_ROYAL_JELLY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_ROYAL_JELLY) 13
+- [`ALTAR_USHABTI_CAVEMAN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_USHABTI_CAVEMAN) 14
+- [`ALTAR_USHABTI_TURKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_USHABTI_TURKEY) 15
+- [`ALTAR_USHABTI_VAMPIRE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_USHABTI_VAMPIRE) 16
+- [`ANUBIS2_JETPACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ANUBIS2_JETPACK) 17
+- [`ANUBIS_SCEPTER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ANUBIS_SCEPTER) 18
+- [`BEG_BOMBBAG`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.BEG_BOMBBAG) 19
+- [`BEG_TRUECROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.BEG_TRUECROWN) 20
+- [`BONEPILE_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.BONEPILE_SKELETONKEY) 21
+- [`BONEPILE_SKULL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.BONEPILE_SKULL) 22
+- [`CROCMAN_TELEPACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.CROCMAN_TELEPACK) 23
+- [`CROCMAN_TELEPORTER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.CROCMAN_TELEPORTER) 24
+- [`GHOSTJAR_DIAMOND`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GHOSTJAR_DIAMOND) 25
+- [`GHOST_DIAMOND`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GHOST_DIAMOND) 26
+- [`GIANTSPIDER_PASTE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GIANTSPIDER_PASTE) 27
+- [`GOLDENMONKEY_NUGGET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GOLDENMONKEY_NUGGET) 28
+- [`GOLDENMONKEY_SMALLEMERALD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GOLDENMONKEY_SMALLEMERALD) 29
+- [`GOLDENMONKEY_SMALLNUGGET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GOLDENMONKEY_SMALLNUGGET) 30
+- [`GOLDENMONKEY_SMALLRUBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GOLDENMONKEY_SMALLRUBY) 31
+- [`GOLDENMONKEY_SMALLSAPPHIRE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GOLDENMONKEY_SMALLSAPPHIRE) 32
+- [`GOLDENPARACHUTE_SMALLNUGGET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.GOLDENPARACHUTE_SMALLNUGGET) 33
+- [`HANGINGSPIDER_WEBGUN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.HANGINGSPIDER_WEBGUN) 34
+- [`ICECAVE_BOULDER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ICECAVE_BOULDER) 35
+- [`JIANGSHIASSASSIN_SPIKESHOES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.JIANGSHIASSASSIN_SPIKESHOES) 36
+- [`JIANGSHI_SPRINGSHOES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.JIANGSHI_SPRINGSHOES) 37
+- [`KINGU_TABLETOFDESTINY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.KINGU_TABLETOFDESTINY) 38
+- [`LEPRECHAUN_CLOVER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.LEPRECHAUN_CLOVER) 39
+- [`MATTOCK_BROKENMATTOCK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.MATTOCK_BROKENMATTOCK) 40
+- [`MOLE_MATTOCK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.MOLE_MATTOCK) 41
+- [`MOSQUITO_HOVERPACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.MOSQUITO_HOVERPACK) 42
+- [`MUMMY_DIAMOND`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.MUMMY_DIAMOND) 43
+- [`MUMMY_FLY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.MUMMY_FLY) 44
+- [`NECROMANCER_RUBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.NECROMANCER_RUBY) 45
+- [`OLMEC_BOMB`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.OLMEC_BOMB) 46
+- [`OLMEC_CAVEMEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.OLMEC_CAVEMEN) 47
+- [`OLMEC_UFO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.OLMEC_UFO) 48
+- [`OSIRIS_EMERALDS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.OSIRIS_EMERALDS) 49
+- [`OSIRIS_TABLETOFDESTINY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.OSIRIS_TABLETOFDESTINY) 50
+- [`PANGXIE_ACIDBUBBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.PANGXIE_ACIDBUBBLE) 51
+- [`QUEENBEE_ROYALJELLY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.QUEENBEE_ROYALJELLY) 52
+- [`ROBOT_METALSHIELD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ROBOT_METALSHIELD) 53
+- [`SCEPTER_ANUBISSPECIALSHOT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.SCEPTER_ANUBISSPECIALSHOT) 54
+- [`SCEPTER_PLAYERSHOT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.SCEPTER_PLAYERSHOT) 55
+- [`SHOPKEEPER_GOLDCOIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.SHOPKEEPER_GOLDCOIN) 56
+- [`SKELETON_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.SKELETON_SKELETONKEY) 57
+- [`SORCERESS_RUBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.SORCERESS_RUBY) 58
+- [`SPARROW_ROPEPILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.SPARROW_ROPEPILE) 59
+- [`SPARROW_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.SPARROW_SKELETONKEY) 60
+- [`TIAMAT_BAT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_BAT) 61
+- [`TIAMAT_BEE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_BEE) 62
+- [`TIAMAT_CAVEMAN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_CAVEMAN) 63
+- [`TIAMAT_COBRA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_COBRA) 64
+- [`TIAMAT_HERMITCRAB`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_HERMITCRAB) 65
+- [`TIAMAT_MONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_MONKEY) 66
+- [`TIAMAT_MOSQUITO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_MOSQUITO) 67
+- [`TIAMAT_OCTOPUS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_OCTOPUS) 68
+- [`TIAMAT_OLMITE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_OLMITE) 69
+- [`TIAMAT_SCORPION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_SCORPION) 70
+- [`TIAMAT_SHOT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_SHOT) 71
+- [`TIAMAT_SNAKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_SNAKE) 72
+- [`TIAMAT_UFO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_UFO) 73
+- [`TIAMAT_YETI`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TIAMAT_YETI) 74
+- [`TORCH_SMALLNUGGET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TORCH_SMALLNUGGET) 75
+- [`TURKEY_COOKEDTURKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.TURKEY_COOKEDTURKEY) 76
+- [`UFO_PARACHUTE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.UFO_PARACHUTE) 77
+- [`VAMPIRE_CAPE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.VAMPIRE_CAPE) 78
+- [`VAN_HORSING_COMPASS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.VAN_HORSING_COMPASS) 79
+- [`VAN_HORSING_DIAMOND`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.VAN_HORSING_DIAMOND) 80
+- [`VLAD_VLADSCAPE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.VLAD_VLADSCAPE) 81
+- [`YETIKING_FREEZERAY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETIKING_FREEZERAY) 82
+- [`YETIKING_ICESPIRE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETIKING_ICESPIRE) 83
+- [`YETIQUEEN_POWERPACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETIQUEEN_POWERPACK) 84
+- [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETI_PITCHERSMITT) 85
