@@ -113,13 +113,9 @@ struct EntityItem
     }
 };
 
-std::vector<EntityItem> list_entities(size_t map_ptr);
-
 EntityDB* get_type(uint32_t id);
 
 int32_t to_id(std::string id);
-
-Entity* state_find_item(size_t state_ptr, uint32_t unique_id);
 
 template <typename T>
 std::string to_le_bytes(T fmt)
