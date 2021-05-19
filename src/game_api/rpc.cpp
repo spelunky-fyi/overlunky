@@ -1093,9 +1093,8 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
 
     if (!dropchance_entries_sorted)
     {
-        std::sort(dropchance_entries.begin(), dropchance_entries.end(), [](DropChanceEntry a, DropChanceEntry b) {
-            return a.caption.compare(b.caption) <= 0;
-        });
+        std::sort(dropchance_entries.begin(), dropchance_entries.end(), [](DropChanceEntry a, DropChanceEntry b)
+                  { return a.caption.compare(b.caption) <= 0; });
         dropchance_entries_sorted = true;
     }
 
@@ -1255,7 +1254,8 @@ void replace_drop(uint16_t drop_id, uint32_t new_drop_uid)
 
     if (!drop_entries_sorted)
     {
-        std::sort(drop_entries.begin(), drop_entries.end(), [](DropEntry a, DropEntry b) { return a.caption.compare(b.caption) <= 0; });
+        std::sort(drop_entries.begin(), drop_entries.end(), [](DropEntry a, DropEntry b)
+                  { return a.caption.compare(b.caption) <= 0; });
         drop_entries_sorted = true;
     }
 
