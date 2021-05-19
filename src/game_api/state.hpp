@@ -31,7 +31,10 @@ struct StateMemory
     uint8_t b33;
     int32_t i34;
     uint32_t quest_flags;
-    int32_t i3c;
+    uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
+    uint8_t i3cb;
+    uint8_t i3cc;
+    uint8_t i3cd;
     uint32_t speedrun_character;         // who administers the speedrun in base camp
     uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
     uint8_t padding4;
