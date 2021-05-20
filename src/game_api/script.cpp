@@ -997,7 +997,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         newinput->current = 0;
         newinput->orig_input = player->input_ptr;
         newinput->orig_ai = player->ai_func;
-        newinput->is_input_stolen = true;
         player->input_ptr = reinterpret_cast<size_t>(newinput);
         player->ai_func = 0;
         script_input[uid] = newinput;
@@ -1041,16 +1040,17 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Read input that has been previously stolen with steal_input
     lua["read_stolen_input"] = [this](int uid)
     {
+        if (script_input.find(uid) == script_input.end())
+        {
+            // this means that the input is attacked to the real input and not stolen so return early
+            return (uint16_t)0;
+        }
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return (uint16_t)0;
         ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
         if (!IsBadReadPtr(readinput, 20))
         {
-            if (!readinput->is_input_stolen)
-            {
-                return (uint16_t)0;
-            }
             readinput = reinterpret_cast<ScriptInput*>(readinput->orig_input);
             if (!IsBadReadPtr(readinput, 20))
             {
