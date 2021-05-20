@@ -541,6 +541,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     {
         post_level_gen_callbacks.push_back(LevelGenCallback{std::move(tile_code), std::move(cb)});
     };
+    /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`
+    lua["define_tile_code"] = [this](std::string tile_code)
+    {
+        (*g_state->level_gen)->define_tile_code(std::move(tile_code));
+    };
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
