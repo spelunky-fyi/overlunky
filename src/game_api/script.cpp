@@ -1,5 +1,6 @@
 #include "script.hpp"
 #include "entity.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "overloaded.hpp"
 #include "particles.hpp"
@@ -24,6 +25,8 @@
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
+
+std::vector<SpelunkyScript*> g_all_scripts;
 
 enum class ON
 {
@@ -120,6 +123,14 @@ struct ScreenCallback
     int lastRan;
 };
 
+struct LevelGenCallback
+{
+    std::string tile_code;
+    sol::function func;
+};
+
+using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
+
 struct ScriptState
 {
     Player* player;
@@ -132,8 +143,6 @@ struct ScriptState
     uint32_t reset;
     uint32_t quest_flags;
 };
-
-using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 
 using Toast = void (*)(void*, wchar_t*);
 Toast get_toast()
@@ -309,6 +318,8 @@ class SpelunkyScript::ScriptImpl
     std::map<int, Callback> global_timers;
     std::map<int, Callback> callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
+    std::vector<LevelGenCallback> pre_level_gen_callbacks;
+    std::vector<LevelGenCallback> post_level_gen_callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
     std::map<int, ScriptInput*> script_input;
@@ -334,6 +345,8 @@ class SpelunkyScript::ScriptImpl
     std::string script_id();
     template <class... Args>
     bool handle_function(sol::function func, Args&&... args);
+    template <class Ret, class... Args>
+    std::optional<Ret> handle_function_with_return(sol::function func, Args&&... args);
 
     void clear();
     bool reset();
@@ -341,6 +354,9 @@ class SpelunkyScript::ScriptImpl
     bool run();
     void draw(ImDrawList* dl);
     void render_options();
+
+    bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+    void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
 };
 
 SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
@@ -513,6 +529,18 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Clear previously added callback `id`
     lua["clear_callback"] = [this](int id)
     { clear_callbacks.push_back(id); };
+    /// Add a callback for a specific tile code that is called before the game handles the tile code
+    /// Return true in order to block the game from handling the tile code, aka to block a spawn
+    lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
+    {
+        pre_level_gen_callbacks.push_back(LevelGenCallback{std::move(tile_code), std::move(cb)});
+    };
+    /// Add a callback for a specific tile code that is called after the game handles the tile code
+    /// Use this to affect what the game spawned in this position
+    lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
+    {
+        post_level_gen_callbacks.push_back(LevelGenCallback{std::move(tile_code), std::move(cb)});
+    };
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
@@ -2449,6 +2477,11 @@ std::string SpelunkyScript::ScriptImpl::script_id()
 template <class... Args>
 bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args&&... args)
 {
+    return handle_function_with_return<std::monostate>(std::move(func), std::forward<Args>(args)...) != std::nullopt;
+}
+template <class Ret, class... Args>
+std::optional<Ret> SpelunkyScript::ScriptImpl::handle_function_with_return(sol::function func, Args&&... args)
+{
     auto lua_result = func(std::forward<Args>(args)...);
     if (!lua_result.valid())
     {
@@ -2460,9 +2493,16 @@ bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args&&... a
         if (messages.size() > 20)
             messages.pop_front();
 #endif
-        return false;
+        return std::nullopt;
     }
-    return true;
+    if constexpr (std::is_same_v<Ret, std::monostate>)
+    {
+        return std::optional{std::monostate{}};
+    }
+    else
+    {
+        return std::optional{static_cast<Ret>(lua_result)};
+    }
 }
 
 void SpelunkyScript::ScriptImpl::render_options()
@@ -2533,11 +2573,40 @@ void SpelunkyScript::ScriptImpl::render_options()
     ImGui::PopID();
 }
 
+bool SpelunkyScript::ScriptImpl::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    for (auto& callback : pre_level_gen_callbacks)
+    {
+        if (callback.tile_code == tile_code)
+        {
+            if (handle_function_with_return<bool>(callback.func, x, y, layer).value_or(false))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+void SpelunkyScript::ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    for (auto& callback : post_level_gen_callbacks)
+    {
+        if (callback.tile_code == tile_code)
+        {
+            handle_function(callback.func, x, y, layer);
+        }
+    }
+}
+
 SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
     : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, enable)}
 {
+    g_all_scripts.push_back(this);
 }
-SpelunkyScript::~SpelunkyScript() = default; // Has to be in the source file
+SpelunkyScript::~SpelunkyScript()
+{
+    g_all_scripts.erase(std::find(g_all_scripts.begin(), g_all_scripts.end(), this));
+}
 
 std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 {
@@ -2641,4 +2710,24 @@ void SpelunkyScript::draw(ImDrawList* dl)
 void SpelunkyScript::render_options()
 {
     m_Impl->render_options();
+}
+
+bool SpelunkyScript::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    return m_Impl->pre_level_gen_spawn(tile_code, x, y, layer);
+}
+void SpelunkyScript::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    m_Impl->post_level_gen_spawn(tile_code, x, y, layer);
+}
+
+void SpelunkyScript::for_each_script(std::function<bool(SpelunkyScript&)> fun)
+{
+    for (auto* script : g_all_scripts)
+    {
+        if (!fun(*script))
+        {
+            break;
+        }
+    }
 }

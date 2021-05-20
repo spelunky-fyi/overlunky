@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "memory.hpp"
 #include "rpc.hpp"
+#include "script.hpp"
 
 #include <array>
 #include <string_view>
@@ -26,14 +27,14 @@ struct CommunityTileCode
     std::uint32_t tile_code_id;
 };
 std::array g_community_tile_codes{
+    //CommunityTileCode{"totem_trap", "ENT_TYPE_FLOOR_TOTEM_TRAP"}, // This needs some special treatment, by default it only spawns the lower part
+    //CommunityTileCode{"lion_trap", "ENT_TYPE_FLOOR_LION_TRAP"}, // This needs some special treatment, by default it only spawns the lower part
     CommunityTileCode{"cog_door", "ENT_TYPE_FLOOR_DOOR_COG"},
-    CommunityTileCode{"totem_trap", "ENT_TYPE_FLOOR_TOTEM_TRAP"},
     CommunityTileCode{"dustwall", "ENT_TYPE_FLOOR_DUSTWALL"},
     CommunityTileCode{"bat", "ENT_TYPE_MONS_BAT"},
     CommunityTileCode{"skeleton", "ENT_TYPE_MONS_SKELETON"},
     CommunityTileCode{"lizard", "ENT_TYPE_MONS_HORNEDLIZARD"},
     CommunityTileCode{"mole", "ENT_TYPE_MONS_MOLE"},
-    CommunityTileCode{"mosquito", "ENT_TYPE_MONS_MOSQUITO"},
     CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
     CommunityTileCode{"firebug", "ENT_TYPE_MONS_FIREBUG"},
     CommunityTileCode{"vampire", "ENT_TYPE_MONS_VAMPIRE"},
@@ -122,8 +123,6 @@ std::array g_community_tile_codes{
     CommunityTileCode{"damsel_monty", "ENT_TYPE_MONS_PET_DOG"},
     CommunityTileCode{"damsel_percy", "ENT_TYPE_MONS_PET_CAT"},
     CommunityTileCode{"damsel_poochi", "ENT_TYPE_MONS_PET_HAMSTER"},
-    CommunityTileCode{"lion_trap", "ENT_TYPE_FLOOR_LION_TRAP"},
-    CommunityTileCode{"bomb", "ENT_TYPE_ITEM_BOMB"},
     CommunityTileCode{"rope", "ENT_TYPE_ITEM_UNROLLED_ROPE"},
     CommunityTileCode{"cosmic_orb", "ENT_TYPE_ITEM_FLOATING_ORB"},
     CommunityTileCode{"monkey_gold", "ENT_TYPE_MONS_GOLDMONKEY"},
@@ -135,11 +134,26 @@ using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, fl
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
 {
-    // TODO: Hook pre-level-gen-spawn here to allow changing/blocking spawns
+    std::string_view tile_code_name = g_IdToName[tile_code];
+
+    {
+        bool block_spawn = false;
+        SpelunkyScript::for_each_script([&](SpelunkyScript& script)
+                                        {
+                                            block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
+                                            if (block_spawn)
+                                                return false;
+                                            return true;
+                                        });
+        if (block_spawn)
+        {
+            tile_code = g_last_tile_code_id;
+        }
+    }
 
     if (tile_code > g_last_tile_code_id && tile_code < g_last_community_tile_code_id)
     {
-        const CommunityTileCode& community_tile_code = g_community_tile_codes[tile_code - g_last_tile_code_id];
+        const CommunityTileCode& community_tile_code = g_community_tile_codes[tile_code - g_last_tile_code_id - 1];
         State::get().layer(layer)->spawn_entity(community_tile_code.entity_id, x, y, false, 0.0f, 0.0f, true);
     }
     else
@@ -147,7 +161,11 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
         g_handle_tile_code_trampoline(_this, tile_code, _ull_0, x, y, layer);
     }
 
-    // TODO: Hook post-level-gen-spawn here to all interacting with default spawned things
+    SpelunkyScript::for_each_script([&](SpelunkyScript& script)
+                                    {
+                                        script.post_level_gen_spawn(tile_code_name, x, y, layer);
+                                        return true;
+                                    });
 }
 
 void LevelGenSystem::init()
@@ -160,6 +178,7 @@ void LevelGenSystem::init()
         for (auto& [name, def] : tile_codes_map)
         {
             max_id = std::max(def.id, max_id);
+            g_IdToName[def.id] = name;
         }
 
         // The game uses last id to check if the tilecode is valid using a != instead of a <
@@ -173,10 +192,12 @@ void LevelGenSystem::init()
     {
         community_tile_code.tile_code_id = define_tile_code(std::string{community_tile_code.tile_code});
         const auto entity_id = to_id(community_tile_code.entity_type);
-        if (entity_id < 0) {
+        if (entity_id < 0)
+        {
             community_tile_code.entity_id = to_id("ENT_TYPE_ITEM_BOMB");
         }
-        else {
+        else
+        {
             community_tile_code.entity_id = entity_id;
         }
     }
@@ -229,9 +250,9 @@ std::uint32_t LevelGenSystem::define_tile_code(std::string tile_code)
     auto& tile_code_map = *(std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
 
     // TODO: This should be forwarded to the instantiation of this operator in Spel2.exe to avoid CRT mismatch in Debug mode
-    auto& new_id = tile_code_map[tile_code].id;
-
-    new_id = g_current_tile_code_id;
+    auto [it, success] = tile_code_map.emplace(std::move(tile_code), TileCodeDef{g_current_tile_code_id});
     g_current_tile_code_id++;
-    return new_id;
+
+    g_IdToName[it->second.id] = it->first;
+    return it->second.id;
 }

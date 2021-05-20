@@ -3,8 +3,11 @@
 #include <chrono>
 #include <deque>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -88,6 +91,11 @@ class SpelunkyScript
     bool run();
     void draw(ImDrawList* dl);
     void render_options();
+
+    bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+    void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+
+    static void for_each_script(std::function<bool(SpelunkyScript&)> fun);
 
   private:
     class ScriptImpl;
