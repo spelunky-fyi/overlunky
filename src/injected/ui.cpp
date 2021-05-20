@@ -2049,13 +2049,13 @@ void render_hitbox(Movable* ent, bool cross, ImColor color)
         return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
     std::pair<float, float> boxa =
-        screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxb =
-        screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxc =
-        screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second + ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
     std::pair<float, float> boxd =
-        screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second + ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
     ImVec2 spos = screenify({pos.first, pos.second});
     ImVec2 sboxa = screenify({boxa.first, boxa.second});
     ImVec2 sboxb = screenify({boxb.first, boxb.second});

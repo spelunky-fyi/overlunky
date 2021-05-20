@@ -189,6 +189,13 @@ std::pair<float, float> Entity::position_self() const
     return std::pair<float, float>(x, y);
 }
 
+std::pair<float, float> Entity::position_render() const
+{
+    auto _rx = read_f32(rendering_info + 0x0c);
+    auto _ry = read_f32(rendering_info + 0x10);
+    return std::pair<float, float>(_rx, _ry);
+}
+
 void Entity::remove_item(uint32_t id)
 {
     remove_item_ptr(State::get().find(id));
