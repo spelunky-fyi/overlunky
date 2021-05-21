@@ -125,6 +125,7 @@ struct ScreenCallback
 
 struct LevelGenCallback
 {
+    int id;
     std::string tile_code;
     sol::function func;
 };
@@ -533,13 +534,15 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Return true in order to block the game from handling the tile code, aka to block a spawn
     lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
     {
-        pre_level_gen_callbacks.push_back(LevelGenCallback{std::move(tile_code), std::move(cb)});
+        pre_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
+        return cbcount++;
     };
     /// Add a callback for a specific tile code that is called after the game handles the tile code
     /// Use this to affect what the game spawned in this position
     lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
     {
-        post_level_gen_callbacks.push_back(LevelGenCallback{std::move(tile_code), std::move(cb)});
+        post_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
+        return cbcount++;
     };
     /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`
     lua["define_tile_code"] = [this](std::string tile_code)
@@ -2254,6 +2257,16 @@ bool SpelunkyScript::ScriptImpl::run()
             auto it3 = callbacks.find(id);
             if (it3 != callbacks.end())
                 callbacks.erase(id);
+
+            auto it4 = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
+                                    { return cb.id == id; });
+            if (it4 != pre_level_gen_callbacks.end())
+                pre_level_gen_callbacks.erase(it4);
+
+            auto it5 = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
+                                    { return cb.id == id; });
+            if (it5 != post_level_gen_callbacks.end())
+                post_level_gen_callbacks.erase(it5);
         }
         clear_callbacks.clear();
 
@@ -2580,6 +2593,9 @@ void SpelunkyScript::ScriptImpl::render_options()
 
 bool SpelunkyScript::ScriptImpl::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
 {
+    if (!enabled)
+        return false;
+
     for (auto& callback : pre_level_gen_callbacks)
     {
         if (callback.tile_code == tile_code)
@@ -2594,6 +2610,9 @@ bool SpelunkyScript::ScriptImpl::pre_level_gen_spawn(std::string_view tile_code,
 }
 void SpelunkyScript::ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
 {
+    if (!enabled)
+        return;
+
     for (auto& callback : post_level_gen_callbacks)
     {
         if (callback.tile_code == tile_code)
