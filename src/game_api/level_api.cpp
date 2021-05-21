@@ -75,7 +75,7 @@ std::array g_community_tile_codes{
     CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
     CommunityTileCode{"firebug", "ENT_TYPE_MONS_FIREBUG"},
     CommunityTileCode{"vampire", "ENT_TYPE_MONS_VAMPIRE"},
-    CommunityTileCode{"osrirs", "ENT_TYPE_MONS_OSIRIS_HEAD"},
+    CommunityTileCode{"osiris", "ENT_TYPE_MONS_OSIRIS_HEAD"},
     CommunityTileCode{"anubis2", "ENT_TYPE_MONS_ANUBIS2"},
     CommunityTileCode{"assassin", "ENT_TYPE_MONS_FEMALE_JIANGSHI"},
     CommunityTileCode{"yeti_king", "ENT_TYPE_MONS_YETIKING"},
