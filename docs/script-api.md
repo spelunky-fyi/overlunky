@@ -94,6 +94,17 @@ Add global callback function to be called on an [event](#on).
 ### [`clear_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
 #### Params: `int id`
 Clear previously added callback `id`
+### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
+#### Params: `function cb, string tile_code`
+Add a callback for a specific tile code that is called before the game handles the tile code
+Return true in order to block the game from handling the tile code, aka to block a spawn
+### [`set_post_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_tile_code_callback)
+#### Params: `function cb, string tile_code`
+Add a callback for a specific tile code that is called after the game handles the tile code
+Use this to affect what the game spawned in this position
+### [`define_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_tile_code)
+#### Params: `string tile_code`
+Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 #### Params: `string id`
 Load another script by id "author/name"
