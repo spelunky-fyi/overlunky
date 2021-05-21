@@ -491,7 +491,8 @@ CustomSound SoundManager::get_sound(std::string path)
         }
     }(new_sound.buffer.format);
 
-    FMOD::FMOD_RESULT err = m_CreateSound(m_FmodSystem, (const char*)new_sound.buffer.data.get(), mode, &create_sound_exinfo, &new_sound.fmod_sound);
+    auto data = (const char*)new_sound.buffer.data.get() + 16; // 16 bytes padding in front
+    FMOD::FMOD_RESULT err = m_CreateSound(m_FmodSystem, data, mode, &create_sound_exinfo, &new_sound.fmod_sound);
     if (err != FMOD::OK)
     {
         return CustomSound{nullptr, nullptr};
