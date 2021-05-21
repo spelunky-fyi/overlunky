@@ -8,8 +8,8 @@
 struct ShortTileCodeDef
 {
     std::uint32_t id;
-    std::uint8_t _uint_0;
-    std::uint32_t _uint_1;
+    std::uint8_t chance;
+    std::uint32_t alt_id;
 };
 struct TileCodeDef
 {
@@ -24,7 +24,7 @@ struct ChanceDef
     std::uint32_t id;
 };
 
-struct LevelGenSystem
+struct LevelGenData
 {
     void init();
 
@@ -48,4 +48,10 @@ struct LevelGenSystem
     {
         return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1330);
     }
+};
+
+struct LevelGenSystem
+{
+    LevelGenData* data;
+    // Some other stuff, I don't know and didn't check they type
 };

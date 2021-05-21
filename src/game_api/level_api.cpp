@@ -249,7 +249,7 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
     }
 }
 
-void LevelGenSystem::init()
+void LevelGenData::init()
 {
     {
         auto& tile_codes_map = tile_codes();
@@ -317,7 +317,7 @@ void LevelGenSystem::init()
     }
 }
 
-std::optional<std::uint32_t> LevelGenSystem::get_tile_code(const std::string& tile_code)
+std::optional<std::uint32_t> LevelGenData::get_tile_code(const std::string& tile_code)
 {
     auto& tile_codes_map = tile_codes();
     auto it = tile_codes_map.find(tile_code);
@@ -327,7 +327,7 @@ std::optional<std::uint32_t> LevelGenSystem::get_tile_code(const std::string& ti
     }
     return {};
 }
-std::uint32_t LevelGenSystem::define_tile_code(std::string tile_code)
+std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
 {
     if (auto existing = get_tile_code(tile_code))
     {
