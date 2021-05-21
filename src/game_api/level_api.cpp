@@ -37,7 +37,8 @@ struct CommunityTileCode
 {
     std::string_view tile_code;
     std::string_view entity_type;
-    TileCodeFunc* func = [](const CommunityTileCode& self, float x, float y, int layer) {
+    TileCodeFunc* func = [](const CommunityTileCode& self, float x, float y, int layer)
+    {
         auto* layer_ptr = State::get().layer(layer);
         layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
     };
@@ -48,7 +49,8 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "totem_trap",
         "ENT_TYPE_FLOOR_TOTEM_TRAP",
-        [](const CommunityTileCode& self, float x, float y, int layer) {
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
             auto* layer_ptr = State::get().layer(layer);
             Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
@@ -58,7 +60,8 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "lion_trap",
         "ENT_TYPE_FLOOR_LION_TRAP",
-        [](const CommunityTileCode& self, float x, float y, int layer) {
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
             auto* layer_ptr = State::get().layer(layer);
             Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
@@ -186,12 +189,13 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
 
     {
         bool block_spawn = false;
-        SpelunkyScript::for_each_script([&](SpelunkyScript& script) {
-            block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
-            if (block_spawn)
-                return false;
-            return true;
-        });
+        SpelunkyScript::for_each_script([&](SpelunkyScript& script)
+                                        {
+                                            block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
+                                            if (block_spawn)
+                                                return false;
+                                            return true;
+                                        });
         if (block_spawn)
         {
             tile_code = g_last_tile_code_id;
@@ -208,10 +212,11 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
         g_handle_tile_code_trampoline(_this, tile_code, _ull_0, x, y, layer);
     }
 
-    SpelunkyScript::for_each_script([&](SpelunkyScript& script) {
-        script.post_level_gen_spawn(tile_code_name, x, y, layer);
-        return true;
-    });
+    SpelunkyScript::for_each_script([&](SpelunkyScript& script)
+                                    {
+                                        script.post_level_gen_spawn(tile_code_name, x, y, layer);
+                                        return true;
+                                    });
 
     if (!g_floor_requiring_entities.empty())
     {
@@ -238,7 +243,9 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
             }
         }
 
-        g_floor_requiring_entities.erase(std::remove_if(g_floor_requiring_entities.begin(), g_floor_requiring_entities.end(), [](const FloorRequiringEntity& ent) { return ent.handled || get_entity_ptr(ent.uid) == nullptr; }), g_floor_requiring_entities.end());
+        g_floor_requiring_entities.erase(std::remove_if(g_floor_requiring_entities.begin(), g_floor_requiring_entities.end(), [](const FloorRequiringEntity& ent)
+                                                        { return ent.handled || get_entity_ptr(ent.uid) == nullptr; }),
+                                         g_floor_requiring_entities.end());
     }
 }
 
