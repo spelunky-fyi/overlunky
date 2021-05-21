@@ -163,7 +163,7 @@ class Entity
     float hitboxy;
     uint32_t duckmask;
     float angle;
-    size_t p80;
+    size_t rendering_info;
     size_t texture;
     float tilew;
     float tileh;
@@ -235,6 +235,7 @@ class Entity
         return read_u8(pointer() + 0x98);
     }
     std::pair<float, float> position_self() const;
+    std::pair<float, float> position_render() const;
     void remove_item(uint32_t id);
     void destroy();
 

@@ -311,6 +311,8 @@ Translate a distance of `x` tiles to screen distance to be be used in drawing fu
 ### [`get_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_position)
 Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
 you're standing on, not real level coordinates.
+### [`get_render_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_position)
+Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
 ### [`entity_remove_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 #### Params: `int id, int item`
 Remove item by uid from entity
@@ -492,6 +494,9 @@ Send input
 ### [`read_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
 #### Params: `int uid`
 Read input
+### [`read_stolen_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
+#### Params: `int uid`
+Read input that has been previously stolen with steal_input
 ### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
 #### Params: `string title, float x, float y, float w, float h, bool movable, function callback`
 #### Returns: `bool` (false if the window was closed from the X)

@@ -202,6 +202,14 @@ std::tuple<float, float, int> get_position(uint32_t id)
     return {0.0f, 0.0f, 0};
 }
 
+std::tuple<float, float, int> get_render_position(uint32_t id)
+{
+    Entity* ent = get_entity_ptr(id);
+    if (ent)
+        return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer());
+    return {0.0f, 0.0f, 0};
+}
+
 float screenify(float dis)
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -797,6 +805,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
     /// you're standing on, not real level coordinates.
     lua["get_position"] = get_position;
+    /// Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
+    lua["get_render_position"] = get_render_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
     /// Spawn an entity by `id` attached to some other entity `over`, in offset `x`, `y`
@@ -1111,6 +1121,28 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         if (!IsBadReadPtr(readinput, 20))
         {
             return readinput->next;
+        }
+        return (uint16_t)0;
+    };
+    /// Read input that has been previously stolen with steal_input
+    lua["read_stolen_input"] = [this](int uid)
+    {
+        if (script_input.find(uid) == script_input.end())
+        {
+            // this means that the input is attacked to the real input and not stolen so return early
+            return (uint16_t)0;
+        }
+        Player* player = get_entity_ptr(uid)->as<Player>();
+        if (player == nullptr)
+            return (uint16_t)0;
+        ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
+        if (!IsBadReadPtr(readinput, 20))
+        {
+            readinput = reinterpret_cast<ScriptInput*>(readinput->orig_input);
+            if (!IsBadReadPtr(readinput, 20))
+            {
+                return readinput->next;
+            }
         }
         return (uint16_t)0;
     };

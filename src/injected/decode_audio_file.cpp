@@ -14,10 +14,10 @@ DecodedAudioBuffer LoadAudioFile(const char* file_path)
     loader.Load(&decoded_data, file_path);
 
     const auto data_size = decoded_data.samples.size() * (GetFormatBitsPerSample(decoded_data.sourceFormat) / 8);
-    auto data = std::make_unique<std::byte[]>(data_size);
+    auto data = std::make_unique<std::byte[]>(data_size + 32); // 16 bytes padding front and back
     if (decoded_data.sourceFormat == nqr::PCM_FLT)
     {
-        memcpy(data.get(), decoded_data.samples.data(), data_size);
+        memcpy(data.get() + 16, decoded_data.samples.data(), data_size);
     }
     else
     {

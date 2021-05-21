@@ -1178,7 +1178,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("spawn_kit_6", wParam))
     {
         if (saved_entities.size() > 5)
-            spawn_entities(false, saved_entities.at(6));
+            spawn_entities(false, saved_entities.at(5));
     }
     else if (pressed("spawn_kit_7", wParam))
     {
@@ -1188,7 +1188,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("spawn_kit_8", wParam))
     {
         if (saved_entities.size() > 7)
-            spawn_entities(false, saved_entities.at(8));
+            spawn_entities(false, saved_entities.at(7));
     }
     else if (pressed("spawn_kit_9", wParam))
     {
@@ -2049,13 +2049,13 @@ void render_hitbox(Movable* ent, bool cross, ImColor color)
         return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
     std::pair<float, float> boxa =
-        screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxb =
-        screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second - ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxc =
-        screen_position(ent->position().first + ent->hitboxx + ent->offsetx, ent->position().second + ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
     std::pair<float, float> boxd =
-        screen_position(ent->position().first - ent->hitboxx + ent->offsetx, ent->position().second + ent->hitboxy + ent->offsety);
+        screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
     ImVec2 spos = screenify({pos.first, pos.second});
     ImVec2 sboxa = screenify({boxa.first, boxa.second});
     ImVec2 sboxb = screenify({boxb.first, boxb.second});
@@ -2546,11 +2546,12 @@ void render_options()
         {
             if (options["noclip"])
             {
-                player->type->max_speed = 0.4;
+                player->type->max_speed = 0.3;
             }
             else
             {
                 player->flags &= ~(1U << 9);
+                player->flags |= 1U << 10;
                 player->flags &= ~(1U << 4);
                 player->type->max_speed = 0.0725;
             }
