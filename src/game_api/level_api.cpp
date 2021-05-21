@@ -72,6 +72,7 @@ std::array g_community_tile_codes{
     CommunityTileCode{"dustwall", "ENT_TYPE_FLOOR_DUSTWALL"},
     CommunityTileCode{"bat", "ENT_TYPE_MONS_BAT"},
     CommunityTileCode{"skeleton", "ENT_TYPE_MONS_SKELETON"},
+    CommunityTileCode{"skeleton", "ENT_TYPE_MONS_REDSKELETON"},
     CommunityTileCode{"lizard", "ENT_TYPE_MONS_HORNEDLIZARD"},
     CommunityTileCode{"mole", "ENT_TYPE_MONS_MOLE"},
     CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
