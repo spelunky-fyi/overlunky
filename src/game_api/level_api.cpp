@@ -13,6 +13,8 @@
 #include <Windows.h>
 #include <detours.h>
 
+//#define HOOK_LOAD_ITEM
+
 std::uint32_t g_last_tile_code_id;
 std::uint32_t g_last_community_tile_code_id;
 std::uint32_t g_current_tile_code_id;
@@ -35,7 +37,8 @@ struct CommunityTileCode
 {
     std::string_view tile_code;
     std::string_view entity_type;
-    TileCodeFunc* func = [](const CommunityTileCode& self, float x, float y, int layer) {
+    TileCodeFunc* func = [](const CommunityTileCode& self, float x, float y, int layer)
+    {
         auto* layer_ptr = State::get().layer(layer);
         layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
     };
@@ -46,7 +49,8 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "totem_trap",
         "ENT_TYPE_FLOOR_TOTEM_TRAP",
-        [](const CommunityTileCode& self, float x, float y, int layer) {
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
             auto* layer_ptr = State::get().layer(layer);
             Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
@@ -56,7 +60,8 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "lion_trap",
         "ENT_TYPE_FLOOR_LION_TRAP",
-        [](const CommunityTileCode& self, float x, float y, int layer) {
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
             auto* layer_ptr = State::get().layer(layer);
             Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
@@ -165,6 +170,15 @@ std::array g_community_tile_codes{
     CommunityTileCode{"spikeball", "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL"},
 };
 
+#ifdef HOOK_LOAD_ITEM
+using LoadItemFun = void*(Layer*, std::uint32_t, float, float);
+LoadItemFun* g_load_item_trampoline{nullptr};
+void* load_item(Layer* _this, std::uint32_t entity_id, float x, float y)
+{
+    return g_load_item_trampoline(_this, entity_id, x, y);
+}
+#endif
+
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
@@ -173,12 +187,13 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
 
     {
         bool block_spawn = false;
-        SpelunkyScript::for_each_script([&](SpelunkyScript& script) {
-            block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
-            if (block_spawn)
-                return false;
-            return true;
-        });
+        SpelunkyScript::for_each_script([&](SpelunkyScript& script)
+                                        {
+                                            block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
+                                            if (block_spawn)
+                                                return false;
+                                            return true;
+                                        });
         if (block_spawn)
         {
             tile_code = g_last_tile_code_id;
@@ -195,10 +210,11 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
         g_handle_tile_code_trampoline(_this, tile_code, _ull_0, x, y, layer);
     }
 
-    SpelunkyScript::for_each_script([&](SpelunkyScript& script) {
-        script.post_level_gen_spawn(tile_code_name, x, y, layer);
-        return true;
-    });
+    SpelunkyScript::for_each_script([&](SpelunkyScript& script)
+                                    {
+                                        script.post_level_gen_spawn(tile_code_name, x, y, layer);
+                                        return true;
+                                    });
 
     if (!g_floor_requiring_entities.empty())
     {
@@ -225,7 +241,9 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
             }
         }
 
-        g_floor_requiring_entities.erase(std::remove_if(g_floor_requiring_entities.begin(), g_floor_requiring_entities.end(), [](const FloorRequiringEntity& ent) { return ent.handled || get_entity_ptr(ent.uid) == nullptr; }), g_floor_requiring_entities.end());
+        g_floor_requiring_entities.erase(std::remove_if(g_floor_requiring_entities.begin(), g_floor_requiring_entities.end(), [](const FloorRequiringEntity& ent)
+                                                        { return ent.handled || get_entity_ptr(ent.uid) == nullptr; }),
+                                         g_floor_requiring_entities.end());
     }
 }
 
@@ -280,6 +298,12 @@ void LevelGenSystem::init()
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
+
+#ifdef HOOK_LOAD_ITEM
+        auto load_item_off = find_inst(exe, "\x48\x89\x5c\x24\x10\x48\x89\x6c\x24\x18\x56\x57\x41\x56\x48\x83\xec\x60\x48\x8b\xf1\x0f\xb6\x01\xc6\x44\x24\x30\x00\x48\xc7\x44\x24\x28\x00\x00\x00\x00\x88\x44\x24\x20"s, after_bundle);
+        g_load_item_trampoline = (LoadItemFun*)memory.at_exe(load_item_off);
+        DetourAttach((void**)&g_load_item_trampoline, load_item);
+#endif
 
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
 
