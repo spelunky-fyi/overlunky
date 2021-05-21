@@ -69,7 +69,7 @@ std::array g_community_tile_codes{
     CommunityTileCode{"dustwall", "ENT_TYPE_FLOOR_DUSTWALL"},
     CommunityTileCode{"bat", "ENT_TYPE_MONS_BAT"},
     CommunityTileCode{"skeleton", "ENT_TYPE_MONS_SKELETON"},
-    CommunityTileCode{"skeleton", "ENT_TYPE_MONS_REDSKELETON"},
+    CommunityTileCode{"redskeleton", "ENT_TYPE_MONS_REDSKELETON"},
     CommunityTileCode{"lizard", "ENT_TYPE_MONS_HORNEDLIZARD"},
     CommunityTileCode{"mole", "ENT_TYPE_MONS_MOLE"},
     CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
@@ -166,7 +166,7 @@ std::array g_community_tile_codes{
     CommunityTileCode{"monkey_gold", "ENT_TYPE_MONS_GOLDMONKEY"},
     CommunityTileCode{"altar_duat", "ENT_TYPE_FLOOR_DUAT_ALTAR"},
     CommunityTileCode{"spikeball", "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL"},
-    CommunityTileCode{"ENT_TYPE_ITEM_WEB", "ENT_TYPE_ITEM_WEB"},
+    CommunityTileCode{"cobweb", "ENT_TYPE_ITEM_WEB"},
 };
 
 #ifdef HOOK_LOAD_ITEM
