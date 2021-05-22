@@ -96,15 +96,18 @@ Add global callback function to be called on an [event](#on).
 Clear previously added callback `id`
 ### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
 #### Params: `function cb, string tile_code`
-Add a callback for a specific tile code that is called before the game handles the tile code
-Return true in order to block the game from handling the tile code, aka to block a spawn
+Add a callback for a specific tile code that is called before the game handles the tile code.
+Return true in order to stop the game or scripts loaded after this script from handling this tile code.
+For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
 ### [`set_post_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_tile_code_callback)
 #### Params: `function cb, string tile_code`
-Add a callback for a specific tile code that is called after the game handles the tile code
-Use this to affect what the game spawned in this position
+Add a callback for a specific tile code that is called after the game handles the tile code.
+Use this to affect what the game or other scripts spawned in this position.
+This is received even if a previous pre-tile-code-callback has returned true
 ### [`define_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_tile_code)
 #### Params: `string tile_code`
-Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`
+Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 #### Params: `string id`
 Load another script by id "author/name"

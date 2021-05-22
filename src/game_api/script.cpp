@@ -538,21 +538,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Clear previously added callback `id`
     lua["clear_callback"] = [this](int id)
     { clear_callbacks.push_back(id); };
-    /// Add a callback for a specific tile code that is called before the game handles the tile code
-    /// Return true in order to block the game from handling the tile code, aka to block a spawn
+    /// Add a callback for a specific tile code that is called before the game handles the tile code.
+    /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
+    /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
     lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
     {
         pre_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
         return cbcount++;
     };
-    /// Add a callback for a specific tile code that is called after the game handles the tile code
-    /// Use this to affect what the game spawned in this position
+    /// Add a callback for a specific tile code that is called after the game handles the tile code.
+    /// Use this to affect what the game or other scripts spawned in this position.
+    /// This is received even if a previous pre-tile-code-callback has returned true
     lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
     {
         post_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
         return cbcount++;
     };
-    /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`
+    /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+    /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
     lua["define_tile_code"] = [this](std::string tile_code)
     {
         g_state->level_gen->data->define_tile_code(std::move(tile_code));
