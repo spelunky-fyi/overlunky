@@ -2554,10 +2554,16 @@ std::optional<Ret> SpelunkyScript::ScriptImpl::handle_function_with_return(sol::
     }
     else
     {
-        auto return_type = lua_result.get_type();
-        return return_type == sol::type::none || return_type == sol::type::nil
-                   ? std::optional<Ret>{}
-                   : std::optional{static_cast<Ret>(lua_result)};
+        try {
+            auto return_type = lua_result.get_type();
+            return return_type == sol::type::none || return_type == sol::type::nil
+                        ? std::optional<Ret>{}
+                        : std::optional{static_cast<Ret>(lua_result)};
+        }
+        catch (...)
+        {
+            result = "Unexpected return type from function.";
+        }
     }
 }
 
