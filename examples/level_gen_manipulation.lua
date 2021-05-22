@@ -40,7 +40,7 @@ end, "spikes")
 set_pre_tile_code_callback(function(x, y, layer)
     spawn_entity(ENT_TYPE.ITEM_PICKUP_GIANTFOOD, x, y + 0.5, layer, 0.0, 0.0);
     spawn_entity(ENT_TYPE.ITEM_PICKUP_GIANTFOOD, x + 1.0, y + 0.5, layer, 0.0, 0.0);
-    return false
+    -- returns nil, the result is the same as returning false
 end, "diningtable")
 
 -- Randomly distributes treasure in minewood_floor
@@ -52,20 +52,31 @@ set_post_tile_code_callback(function(x, y, layer)
             local entity_type = nil
             local ent_uid = nil
             if rand > 95 then
-                -- TODO: Fix spawning entities in the floor
-                -- entity_type = ENT_TYPE.ITEM_CRATE
-                entity_type = ENT_TYPE.EMBED_GOLD_BIG
+                entity_type = ENT_TYPE.ITEM_JETPACK
             elseif rand > 80 then
                 entity_type = ENT_TYPE.EMBED_GOLD_BIG
             else
                 entity_type = ENT_TYPE.EMBED_GOLD
             end
-            local ent_uid = spawn_entity_over(entity_type, ents[1], 0, 0)
-            --local ent = get_entity(ent_uid)
-            --local ent_flags = ent.flags
-            --ent_flags = set_flag(ent_flags, 10)
-            --ent_flags = clr_flag(ent_flags, 13)
-            --ent.flags = ent_flags
+
+            -- thanks to ha#9722 for the embed code
+            -- note, embed code does not work properly for all entities!
+            if entity_type ~= ENT_TYPE.EMBED_GOLD and entity_type ~= ENT_TYPE.EMBED_GOLD_BIG then
+                local entity_db = get_type(entity_type)
+                local previous_draw, previous_flags = entity_db.draw_depth, entity_db.default_flags
+                entity_db.draw_depth = 9
+                entity_db.default_flags = set_flag(entity_db.default_flags, 1)
+                entity_db.default_flags = set_flag(entity_db.default_flags, 4)
+                entity_db.default_flags = set_flag(entity_db.default_flags, 10)
+                entity_db.default_flags = clr_flag(entity_db.default_flags, 13)
+
+                local entity = get_entity(spawn_entity_over(entity_type, ents[1], 0, 0))
+
+                entity_db.draw_depth = previous_draw
+                entity_db.default_flags = previous_flags
+            else
+                spawn_entity_over(entity_type, ents[1], 0, 0)
+            end
         end
     end
 end, "minewood_floor")
