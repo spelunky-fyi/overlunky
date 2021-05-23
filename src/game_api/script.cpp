@@ -1,4 +1,5 @@
 #include "script.hpp"
+#include "drops.hpp"
 #include "entity.hpp"
 #include "level_api.hpp"
 #include "logger.h"
@@ -912,8 +913,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Get the [ParticleDB](#particledb) details of the specified ID
     lua["get_particle_type"] = get_particle_type;
     /// Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+    /// void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
     lua["set_drop_chance"] = set_drop_chance;
     /// Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+    /// void replace_drop(uint16_t drop_id, uint32_t new_drop_uid)
     lua["replace_drop"] = replace_drop;
     /// Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
     lua["force_co_subtheme"] = force_co_subtheme;
@@ -2191,10 +2194,27 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_enum("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
-    /// Parameter 1 to set_drop_chance
-    lua.new_enum("DROPCHANCE", "BONEBLOCK_SKELETONKEY", 0, "CROCMAN_TELEPACK", 1, "HANGINGSPIDER_WEBGUN", 2, "JIANGSHIASSASSIN_SPIKESHOES", 3, "JIANGSHI_SPRINGSHOES", 4, "MOLE_MATTOCK", 5, "MOSQUITO_HOVERPACK", 6, "ROBOT_METALSHIELD", 7, "SKELETON_SKELETONKEY", 8, "UFO_PARACHUTE", 9, "YETI_PITCHERSMITT", 10);
-    /// Parameter 1 to replace_drop
-    lua.new_enum("DROP", "ALTAR_DICE_CLIMBINGGLOVES", 0, "ALTAR_DICE_COOKEDTURKEY", 1, "ALTAR_DICE_DIAMOND", 2, "ALTAR_DICE_MACHETE", 3, "ALTAR_DICE_ROPEPILE", 4, "ALTAR_DICE_SPECTACLES", 5, "ALTAR_DICE_TELEPACK", 6, "ALTAR_DICE_VAMPIRE", 7, "ALTAR_DICE_WEBGUN", 8, "ALTAR_IDOL_GOLDEN_MONKEY", 9, "ALTAR_KAPALA", 10, "ALTAR_PRESENT_EGGPLANT", 11, "ALTAR_ROCK_WOODENARROW", 12, "ALTAR_ROYAL_JELLY", 13, "ALTAR_USHABTI_CAVEMAN", 14, "ALTAR_USHABTI_TURKEY", 15, "ALTAR_USHABTI_VAMPIRE", 16, "ANUBIS2_JETPACK", 17, "ANUBIS_SCEPTER", 18, "BEG_BOMBBAG", 19, "BEG_TRUECROWN", 20, "BONEPILE_SKELETONKEY", 21, "BONEPILE_SKULL", 22, "CROCMAN_TELEPACK", 23, "CROCMAN_TELEPORTER", 24, "GHOSTJAR_DIAMOND", 25, "GHOST_DIAMOND", 26, "GIANTSPIDER_PASTE", 27, "GOLDENMONKEY_NUGGET", 28, "GOLDENMONKEY_SMALLEMERALD", 29, "GOLDENMONKEY_SMALLNUGGET", 30, "GOLDENMONKEY_SMALLRUBY", 31, "GOLDENMONKEY_SMALLSAPPHIRE", 32, "GOLDENPARACHUTE_SMALLNUGGET", 33, "HANGINGSPIDER_WEBGUN", 34, "ICECAVE_BOULDER", 35, "JIANGSHIASSASSIN_SPIKESHOES", 36, "JIANGSHI_SPRINGSHOES", 37, "KINGU_TABLETOFDESTINY", 38, "LEPRECHAUN_CLOVER", 39, "MATTOCK_BROKENMATTOCK", 40, "MOLE_MATTOCK", 41, "MOSQUITO_HOVERPACK", 42, "MUMMY_DIAMOND", 43, "MUMMY_FLY", 44, "NECROMANCER_RUBY", 45, "OLMEC_BOMB", 46, "OLMEC_CAVEMEN", 47, "OLMEC_UFO", 48, "OSIRIS_EMERALDS", 49, "OSIRIS_TABLETOFDESTINY", 50, "PANGXIE_ACIDBUBBLE", 51, "QUEENBEE_ROYALJELLY", 52, "ROBOT_METALSHIELD", 53, "SCEPTER_ANUBISSPECIALSHOT", 54, "SCEPTER_PLAYERSHOT", 55, "SHOPKEEPER_GOLDCOIN", 56, "SKELETON_SKELETONKEY", 57, "SORCERESS_RUBY", 58, "SPARROW_ROPEPILE", 59, "SPARROW_SKELETONKEY", 60, "TIAMAT_BAT", 61, "TIAMAT_BEE", 62, "TIAMAT_CAVEMAN", 63, "TIAMAT_COBRA", 64, "TIAMAT_HERMITCRAB", 65, "TIAMAT_MONKEY", 66, "TIAMAT_MOSQUITO", 67, "TIAMAT_OCTOPUS", 68, "TIAMAT_OLMITE", 69, "TIAMAT_SCORPION", 70, "TIAMAT_SHOT", 71, "TIAMAT_SNAKE", 72, "TIAMAT_UFO", 73, "TIAMAT_YETI", 74, "TORCH_SMALLNUGGET", 75, "TURKEY_COOKEDTURKEY", 76, "UFO_PARACHUTE", 77, "VAMPIRE_CAPE", 78, "VAN_HORSING_COMPASS", 79, "VAN_HORSING_DIAMOND", 80, "VLAD_VLADSCAPE", 81, "YETIKING_FREEZERAY", 82, "YETIKING_ICESPIRE", 83, "YETIQUEEN_POWERPACK", 84, "YETI_PITCHERSMITT", 85);
+
+    lua.create_named_table("DROPCHANCE"
+                           //, "BONEBLOCK_SKELETONKEY", 0
+                           //, "", ...see_drops.hpp_for_a_list_of_possible_dropchances...
+                           //, "YETI_PITCHERSMITT", 10
+    );
+    for (auto x = 0; x < dropchance_entries.size(); ++x)
+    {
+        lua["DROPCHANCE"][dropchance_entries.at(x).caption] = x;
+    }
+
+    lua.create_named_table("DROP"
+                           //, "ALTAR_DICE_CLIMBINGGLOVES", 0
+                           //, "", ...see_drops.hpp_for_a_list_of_possible_drops...
+                           //, "YETI_PITCHERSMITT", 85
+    );
+    for (auto x = 0; x < drop_entries.size(); ++x)
+    {
+        lua["DROP"][drop_entries.at(x).caption] = x;
+    }
+
     /// Parameter to force_co_subtheme
     lua.new_enum("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
 }

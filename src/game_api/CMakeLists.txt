@@ -36,7 +36,8 @@ add_library(spel2_api STATIC
         game_manager.hpp
         overloaded.hpp
         virtual_table.hpp
-        virtual_table.cpp)
+        virtual_table.cpp
+        drops.hpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
         imgui)
