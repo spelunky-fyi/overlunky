@@ -5,6 +5,8 @@ add_library(spel2_api STATIC
         items.hpp
         layer.cpp
         layer.hpp
+        level_api.cpp
+        level_api.hpp
         render_api.cpp
         render_api.hpp
         rpc.cpp
@@ -39,7 +41,8 @@ target_link_libraries(spel2_api PUBLIC
 target_link_libraries(spel2_api PRIVATE
         shared
         sol2::sol2
-        ${LUA_LIBRARIES})
+        ${LUA_LIBRARIES}
+        lib_detours_overlunky)
 
 if (MSVC)
         target_compile_options(spel2_api PRIVATE /bigobj)

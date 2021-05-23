@@ -1,5 +1,6 @@
 #include "script.hpp"
 #include "entity.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "overloaded.hpp"
 #include "particles.hpp"
@@ -24,6 +25,47 @@
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
+
+std::vector<SpelunkyScript*> g_all_scripts;
+
+enum class ON
+{
+    LOGO = 0,
+    INTRO = 1,
+    PROLOGUE = 2,
+    TITLE = 3,
+    MENU = 4,
+    OPTIONS = 5,
+    LEADERBOARD = 7,
+    SEED_INPUT = 8,
+    CHARACTER_SELECT = 9,
+    TEAM_SELECT = 10,
+    CAMP = 11,
+    LEVEL = 12,
+    TRANSITION = 13,
+    DEATH = 14,
+    SPACESHIP = 15,
+    WIN = 16,
+    CREDITS = 17,
+    SCORES = 18,
+    CONSTELLATION = 19,
+    RECAP = 20,
+    ARENA_MENU = 21,
+    ARENA_INTRO = 25,
+    ARENA_MATCH = 26,
+    ARENA_SCORE = 27,
+    ONLINE_LOADING = 28,
+    ONLINE_LOBBY = 29,
+    GUIFRAME = 100,
+    FRAME = 101,
+    SCREEN = 102,
+    START = 103,
+    LOADING = 104,
+    RESET = 105,
+    SAVE = 106,
+    LOAD = 107,
+    GAMEFRAME = 108
+};
 
 struct IntOption
 {
@@ -77,9 +119,18 @@ struct TimeoutCallback
 struct ScreenCallback
 {
     sol::function func;
-    int screen;
+    ON screen;
     int lastRan;
 };
+
+struct LevelGenCallback
+{
+    int id;
+    std::string tile_code;
+    sol::function func;
+};
+
+using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 
 struct ScriptState
 {
@@ -93,8 +144,6 @@ struct ScriptState
     uint32_t reset;
     uint32_t quest_flags;
 };
-
-using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
 
 using Toast = void (*)(void*, wchar_t*);
 Toast get_toast()
@@ -278,6 +327,8 @@ class SpelunkyScript::ScriptImpl
     std::map<int, Callback> global_timers;
     std::map<int, Callback> callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
+    std::vector<LevelGenCallback> pre_level_gen_callbacks;
+    std::vector<LevelGenCallback> post_level_gen_callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::string> required_scripts;
     std::map<int, ScriptInput*> script_input;
@@ -303,6 +354,8 @@ class SpelunkyScript::ScriptImpl
     std::string script_id();
     template <class... Args>
     bool handle_function(sol::function func, Args&&... args);
+    template <class Ret, class... Args>
+    std::optional<Ret> handle_function_with_return(sol::function func, Args&&... args);
 
     void clear();
     bool reset();
@@ -310,6 +363,9 @@ class SpelunkyScript::ScriptImpl
     bool run();
     void draw(ImDrawList* dl);
     void render_options();
+
+    bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+    void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
 };
 
 SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
@@ -409,10 +465,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     catch (const sol::error& e)
     {
         result = e.what();
+#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
         messages.push_back({result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
         DEBUG("{}", result);
         if (messages.size() > 20)
             messages.pop_front();
+#endif
     }
 
     /// A bunch of [game state](#statememory) variables
@@ -473,13 +531,35 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Add global callback function to be called on an [event](#on).
     lua["set_callback"] = [this](sol::function cb, int screen)
     {
-        auto luaCb = ScreenCallback{cb, screen, -1};
+        auto luaCb = ScreenCallback{cb, (ON)screen, -1};
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     /// Clear previously added callback `id`
     lua["clear_callback"] = [this](int id)
     { clear_callbacks.push_back(id); };
+    /// Add a callback for a specific tile code that is called before the game handles the tile code.
+    /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
+    /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
+    lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
+    {
+        pre_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
+        return cbcount++;
+    };
+    /// Add a callback for a specific tile code that is called after the game handles the tile code.
+    /// Use this to affect what the game or other scripts spawned in this position.
+    /// This is received even if a previous pre-tile-code-callback has returned true
+    lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
+    {
+        post_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
+        return cbcount++;
+    };
+    /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+    /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
+    lua["define_tile_code"] = [this](std::string tile_code)
+    {
+        g_state->level_gen->data->define_tile_code(std::move(tile_code));
+    };
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
@@ -1898,6 +1978,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         100,
         "FRAME",
         101,
+        "GAMEFRAME",
+        108,
         "SCREEN",
         102,
         "START",
@@ -1909,10 +1991,20 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "SAVE",
         106,
         "LOAD",
-        107,
-        "GAMEFRAME",
-        108);
+        107);
     /* ON
+    // GUIFRAME
+    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
+    // FRAME
+    // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
+    // GAMEFRAME
+    // Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen
+    // SCREEN
+    // Runs whenever state.screen changes
+    // START
+    // Runs on the first ON.SCREEN of a run
+    // RESET
+    // Runs when resetting a run
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -2086,10 +2178,12 @@ bool SpelunkyScript::ScriptImpl::reset()
     catch (const sol::error& e)
     {
         result = e.what();
+#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
         messages.push_back({result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
         DEBUG("{}", result);
         if (messages.size() > 20)
             messages.pop_front();
+#endif
         return false;
     }
 }
@@ -2198,6 +2292,16 @@ bool SpelunkyScript::ScriptImpl::run()
             auto it3 = callbacks.find(id);
             if (it3 != callbacks.end())
                 callbacks.erase(id);
+
+            auto it4 = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
+                                    { return cb.id == id; });
+            if (it4 != pre_level_gen_callbacks.end())
+                pre_level_gen_callbacks.erase(it4);
+
+            auto it5 = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
+                                    { return cb.id == id; });
+            if (it5 != post_level_gen_callbacks.end())
+                post_level_gen_callbacks.erase(it5);
         }
         clear_callbacks.clear();
 
@@ -2236,60 +2340,95 @@ bool SpelunkyScript::ScriptImpl::run()
             auto now = get_frame_count();
             if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
-                if (g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
+                if ((ON)g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (
-                    cb->screen == 12 && g_state->screen == 12 && g_state->screen_last != 5 && !g_players.empty() &&
-                    (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
-                { // run ON.LEVEL on instant restart too
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 101 && g_state->time_level != state.time_level && g_state->screen == 12) // ON.FRAME
+                else if (cb->screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;
                 }
-                else if (cb->screen == 102 && g_state->screen != state.screen) // ON.SCREEN
+                else
                 {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (
-                    cb->screen == 103 && g_state->screen == 12 && g_state->level_count == 0 && !g_players.empty() &&
-                    state.player != g_players.at(0)) // ON.START
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 104 && g_state->loading > 0 && g_state->loading != state.loading) // ON.LOADING
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 105 && (g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset) // ON.RESET
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 106 && g_state->screen != state.screen) // ON.SAVE
-                {
-                    handle_function(cb->func, SaveContext{meta.path, meta.stem});
-                    cb->lastRan = now;
-                }
-                else if (cb->screen == 107 && cb->lastRan < 0) // ON.LOAD
-                {
-                    handle_function(cb->func, LoadContext{meta.path, meta.stem});
-                    cb->lastRan = now;
-                }
-                else if (
-                    cb->screen == 108 && !g_state->pause && get_frame_count() != state.time_global &&
-                    (g_state->screen >= 11 && g_state->screen <= 14)) // ON.GAMEFRAME
-                {
-                    handle_function(cb->func);
+                    switch (cb->screen)
+                    {
+                    case ON::FRAME:
+                    {
+                        if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    case ON::GAMEFRAME:
+                    {
+                        if (!g_state->pause && get_frame_count() != state.time_global &&
+                            ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    case ON::SCREEN:
+                    {
+                        if (g_state->screen != state.screen)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    case ON::START:
+                    {
+                        if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !g_players.empty() &&
+                            state.player != g_players.at(0))
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    case ON::LOADING:
+                    {
+                        if (g_state->loading > 0 && g_state->loading != state.loading)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    case ON::RESET:
+                    {
+                        if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
+                        {
+                            handle_function(cb->func);
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    case ON::SAVE:
+                    {
+                        if (g_state->screen != state.screen && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
+                        {
+                            handle_function(cb->func, SaveContext{meta.path, meta.stem});
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    case ON::LOAD:
+                    {
+                        if (cb->lastRan < 0)
+                        {
+                            handle_function(cb->func, LoadContext{meta.path, meta.stem});
+                            cb->lastRan = now;
+                        }
+                        break;
+                    }
+                    }
                 }
             }
         }
@@ -2367,7 +2506,7 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
             auto now = get_frame_count();
             if (auto* cb = std::get_if<ScreenCallback>(&callback))
             {
-                if (cb->screen == 100) // ON.GUIFRAME
+                if (cb->screen == ON::GUIFRAME)
                 {
                     handle_function(cb->func);
                     cb->lastRan = now;
@@ -2391,18 +2530,42 @@ std::string SpelunkyScript::ScriptImpl::script_id()
 template <class... Args>
 bool SpelunkyScript::ScriptImpl::handle_function(sol::function func, Args&&... args)
 {
+    return handle_function_with_return<std::monostate>(std::move(func), std::forward<Args>(args)...) != std::nullopt;
+}
+template <class Ret, class... Args>
+std::optional<Ret> SpelunkyScript::ScriptImpl::handle_function_with_return(sol::function func, Args&&... args)
+{
     auto lua_result = func(std::forward<Args>(args)...);
     if (!lua_result.valid())
     {
         sol::error e = lua_result;
         result = e.what();
+#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
         messages.push_back({result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
         DEBUG("{}", result);
         if (messages.size() > 20)
             messages.pop_front();
-        return false;
+#endif
+        return std::nullopt;
     }
-    return true;
+    if constexpr (std::is_same_v<Ret, std::monostate>)
+    {
+        return std::optional{std::monostate{}};
+    }
+    else
+    {
+        try
+        {
+            auto return_type = lua_result.get_type();
+            return return_type == sol::type::none || return_type == sol::type::nil
+                       ? std::optional<Ret>{}
+                       : std::optional{static_cast<Ret>(lua_result)};
+        }
+        catch (...)
+        {
+            result = "Unexpected return type from function.";
+        }
+    }
 }
 
 void SpelunkyScript::ScriptImpl::render_options()
@@ -2473,11 +2636,46 @@ void SpelunkyScript::ScriptImpl::render_options()
     ImGui::PopID();
 }
 
+bool SpelunkyScript::ScriptImpl::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    if (!enabled)
+        return false;
+
+    for (auto& callback : pre_level_gen_callbacks)
+    {
+        if (callback.tile_code == tile_code)
+        {
+            if (handle_function_with_return<bool>(callback.func, x, y, layer).value_or(false))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+void SpelunkyScript::ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    if (!enabled)
+        return;
+
+    for (auto& callback : post_level_gen_callbacks)
+    {
+        if (callback.tile_code == tile_code)
+        {
+            handle_function(callback.func, x, y, layer);
+        }
+    }
+}
+
 SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
     : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, enable)}
 {
+    g_all_scripts.push_back(this);
 }
-SpelunkyScript::~SpelunkyScript() = default; // Has to be in the source file
+SpelunkyScript::~SpelunkyScript()
+{
+    g_all_scripts.erase(std::find(g_all_scripts.begin(), g_all_scripts.end(), this));
+}
 
 std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 {
@@ -2581,4 +2779,24 @@ void SpelunkyScript::draw(ImDrawList* dl)
 void SpelunkyScript::render_options()
 {
     m_Impl->render_options();
+}
+
+bool SpelunkyScript::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    return m_Impl->pre_level_gen_spawn(tile_code, x, y, layer);
+}
+void SpelunkyScript::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+{
+    m_Impl->post_level_gen_spawn(tile_code, x, y, layer);
+}
+
+void SpelunkyScript::for_each_script(std::function<bool(SpelunkyScript&)> fun)
+{
+    for (auto* script : g_all_scripts)
+    {
+        if (!fun(*script))
+        {
+            break;
+        }
+    }
 }

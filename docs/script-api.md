@@ -94,6 +94,20 @@ Add global callback function to be called on an [event](#on).
 ### [`clear_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
 #### Params: `int id`
 Clear previously added callback `id`
+### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
+#### Params: `function cb, string tile_code`
+Add a callback for a specific tile code that is called before the game handles the tile code.
+Return true in order to stop the game or scripts loaded after this script from handling this tile code.
+For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
+### [`set_post_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_tile_code_callback)
+#### Params: `function cb, string tile_code`
+Add a callback for a specific tile code that is called after the game handles the tile code.
+Use this to affect what the game or other scripts spawned in this position.
+This is received even if a previous pre-tile-code-callback has returned true
+### [`define_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_tile_code)
+#### Params: `string tile_code`
+Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 #### Params: `string id`
 Load another script by id "author/name"
@@ -923,11 +937,24 @@ end, ON.LEVEL)
 - [`ONLINE_LOADING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOADING) 28
 - [`ONLINE_LOBBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) 29
 - [`GUIFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GUIFRAME) 100
+\
+Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
 - [`FRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.FRAME) 101
+\
+Runs while playing the game while the player is controllable, not in the base camp or the arena mode
+- [`GAMEFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) 108
+\
+Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen
 - [`SCREEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCREEN) 102
+\
+Runs whenever state.screen changes
 - [`START`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.START) 103
+\
+Runs on the first ON.SCREEN of a run
 - [`LOADING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOADING) 104
 - [`RESET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RESET) 105
+\
+Runs when resetting a run
 - [`SAVE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SAVE) 106
 \
 Params: `SaveContext save_ctx`\
@@ -936,7 +963,6 @@ Runs at the same times as ON.SCREEN, but receives the save_ctx
 \
 Params: `LoadContext load_ctx`\
 Runs as soon as your script is loaded, including reloads, then never again
-- [`GAMEFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) 108
 ### LAYER
 - [`FRONT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.FRONT) 0
 - [`BACK`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.BACK) 1

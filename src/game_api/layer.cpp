@@ -1,5 +1,6 @@
 #include "layer.hpp"
 
+#include "entity.hpp"
 #include "logger.h"
 #include "state.hpp"
 
@@ -36,12 +37,12 @@ LoadItemOver get_load_item_over()
     }
 }
 
-Entity* Layer::spawn_entity(size_t id, float x, float y, bool s, float vx, float vy, bool snap)
+Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap)
 {
     if (id == 0)
         return nullptr;
     auto load_item = (get_load_item());
-    if (!s)
+    if (!screen)
     {
         if (snap)
         {

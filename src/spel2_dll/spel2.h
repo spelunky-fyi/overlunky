@@ -112,3 +112,5 @@ enum class SpelunkyScreen
     Online = 29
 };
 SpelunkyScreen SpelunkyState_GetScreen();
+
+std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, float x, float y, float vel_x, float vel_y);

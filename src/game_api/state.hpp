@@ -9,6 +9,7 @@
 const float ZF = 0.737;
 
 struct Layer;
+struct LevelGenSystem;
 struct Illumination;
 
 struct StateMemory
@@ -81,7 +82,7 @@ struct StateMemory
 
     char pada14[0x12b0 - 0xa14];
     Items* items;
-    void* pad12b8;
+    LevelGenSystem* level_gen;
     Layer* layers[2];
     char pad12d0[0x1308 - 0x12d0];
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;

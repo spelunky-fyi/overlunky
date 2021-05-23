@@ -1,5 +1,6 @@
 #include "spel2.h"
 
+#include "rpc.hpp"
 #include "script.hpp"
 #include "script_context.hpp"
 #include "sound_manager.hpp"
@@ -201,4 +202,9 @@ StateMemory& get_state()
 SpelunkyScreen SpelunkyState_GetScreen()
 {
     return static_cast<SpelunkyScreen>(get_state().screen);
+}
+
+std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, float x, float y, float vel_x, float vel_y)
+{
+    return spawn_entity_abs(entity_id, x, y, layer, vel_x, vel_y);
 }
