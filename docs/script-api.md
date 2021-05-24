@@ -267,7 +267,6 @@ Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to
 #### Params: `int type, int mask, float sx, float sy, float sx2, float sy2, int layer`
 #### Returns: `array<int>`
 Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
-list[uint32_t] get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
 ### [`get_entity_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags)
 #### Params: `int id`
 #### Returns: `int`
@@ -478,6 +477,7 @@ Loads a sound from disk relative to this script, ownership might be shared with 
 Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
 ### [`set_vanilla_sound_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_vanilla_sound_callback)
 #### Params: `VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb`
+#### Returns: `int` unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
 Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
@@ -634,7 +634,9 @@ end
 - [`angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Movable::angle
 - [`topmost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) &Entity::topmost
 - [`topmost_mount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) &Entity::topmost_mount
-- [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with)
+- [`overlaps_with`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
+<br>Params: `Entity other`
+<br>Returns: `bool`
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
 - [`as_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_door) &Entity::as&lt;Door&gt;
 - [`as_container`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_container) &Entity::as&lt;Container&gt;
@@ -680,15 +682,23 @@ Derived from [`Entity`](#entity)
 - [`offsetx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) &Movable::offsetx
 - [`offsety`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) &Movable::offsety
 - [`airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::airtime
-- [`bool is_poisoned()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned)
-- [`void poison(int16_t frames)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison)
+- [`is_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) &Movable::is_poisoned
+<br>Returns: `bool`
+- [`poison`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) &Movable::poison
+<br>Params: `int16_t frames`
 - [`dark_shadow_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_shadow_timer) &Movable::dark_shadow_timer
 - [`exit_invincibility_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_invincibility_timer) &Movable::exit_invincibility_timer
 - [`invincibility_frames_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invincibility_frames_timer) &Movable::invincibility_frames_timer
 - [`frozen_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frozen_timer) &Movable::frozen_timer
-- [`bool is_button_pressed(uint32_t button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_pressed)
-- [`bool is_button_held(uint32_t button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_held)
-- [`bool is_button_released(uint32_t button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_released)
+- [`is_button_pressed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_pressed) &Movable::is_button_pressed
+<br>Params: `int button`
+<br>Returns: `bool`
+- [`is_button_held`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_held) &Movable::is_button_held
+<br>Params: `int button`
+<br>Returns: `bool`
+- [`is_button_released`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_released) &Movable::is_button_released
+<br>Params: `int button`
+<br>Returns: `bool`
 - [`price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) &Movable::price
 ### `Monster`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
@@ -734,7 +744,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Olmec::jump_timer
 - [`phase1_amount_of_bomb_salvos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase1_amount_of_bomb_salvos) &Olmec::phase1_amount_of_bomb_salvos
 - [`unknown_attack_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_attack_state) &Olmec::unknown_attack_state
-- [`int broken_floaters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=broken_floaters)
+- [`broken_floaters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=broken_floaters) &Olmec::broken_floaters
+<br>Returns: `int`
 ### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
@@ -823,21 +834,45 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`hor_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hor_velocity) &ParticleDB::hor_velocity
 - [`ver_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ver_velocity) &ParticleDB::ver_velocity
 ### `CustomSound`
-- [`PlayingSound play(bool start_paused, SOUND_TYPE sound_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play)
-- [`string>> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
+- [`play`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) play
+<br>Params: `bool start_paused, SOUND_TYPE sound_type`
+<br>Returns: `PlayingSound`
+- [`get_parameters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) &CustomSound::get_parameters
+<br>Returns: `map<VANILLA_SOUND_PARAM,string>`
 ### `PlayingSound`
-- [`bool is_playing()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_playing)
-- [`bool stop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop)
-- [`bool set_pause(bool pause)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pause)
-- [`bool set_mute(bool mute)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_mute)
-- [`bool set_pitch(float pitch)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pitch)
-- [`bool set_pan(float pan)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pan)
-- [`bool set_volume(float volume)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume)
-- [`bool set_looping(SOUND_LOOP_MODE looping)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_looping)
-- [`bool set_callback(function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback)
-- [`string>> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
-- [`optional<float> get_parameter(VANILLA_SOUND_PARAM param)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter)
-- [`bool set_parameter(VANILLA_SOUND_PARAM param, float value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter)
+- [`is_playing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_playing) &PlayingSound::is_playing
+<br>Returns: `bool`
+- [`stop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop) &PlayingSound::stop
+<br>Returns: `bool`
+- [`set_pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pause) &PlayingSound::set_pause
+<br>Params: `bool pause`
+<br>Returns: `bool`
+- [`set_mute`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_mute) &PlayingSound::set_mute
+<br>Params: `bool mute`
+<br>Returns: `bool`
+- [`set_pitch`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pitch) &PlayingSound::set_pitch
+<br>Params: `float pitch`
+<br>Returns: `bool`
+- [`set_pan`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pan) &PlayingSound::set_pan
+<br>Params: `float pan`
+<br>Returns: `bool`
+- [`set_volume`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume) &PlayingSound::set_volume
+<br>Params: `float volume`
+<br>Returns: `bool`
+- [`set_looping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_looping) &PlayingSound::set_looping
+<br>Params: `SOUND_LOOP_MODE looping`
+<br>Returns: `bool`
+- [`set_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback) std::move(sound_set_callback)
+<br>Params: `function callback`
+<br>Returns: `bool`
+- [`get_parameters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) &PlayingSound::get_parameters
+<br>Returns: `map<VANILLA_SOUND_PARAM,string>`
+- [`get_parameter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) &PlayingSound::get_parameter
+<br>Params: `VANILLA_SOUND_PARAM param`
+<br>Returns: `optional<float>`
+- [`set_parameter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) &PlayingSound::set_parameter
+<br>Params: `VANILLA_SOUND_PARAM param, float value`
+<br>Returns: `bool`
 ### `SaveData`
 - [`places`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=places) bool[]
 - [`bestiary`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary) bool[]
@@ -861,9 +896,12 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`deepest_area`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_area) sol::readonly(&SaveData::deepest_area)
 - [`deepest_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level) sol::readonly(&SaveData::deepest_level)
 ### `SaveContext`
-- [`bool save(string data)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save)
+- [`save`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) &SaveContext::Save
+<br>Params: `string data`
+<br>Returns: `bool`
 ### `LoadContext`
-- [`string load()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load)
+- [`load`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load) &LoadContext::Load
+<br>Returns: `string`
 ## Enums
 Enums are like numbers but in text that's easier to remember. Example:
 ```lua

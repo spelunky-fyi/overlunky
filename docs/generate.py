@@ -295,7 +295,13 @@ for type in types:
     for var in type['vars']:
         search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+var['name']
         if 'signature' in var:
-            print('- [`'+var['signature']+'`]('+search_link+')')
+            print('- [`'+var['name']+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
+            m = re.search(r'\s*(.*)\s+([^\(]*)\(([^\)]*)', var['signature'])
+            if m:
+                ret = replace_all(m.group(1), replace)
+                param = replace_all(m.group(3), replace)
+                if param: print('<br>Params: `'+param+'`')
+                if ret: print('<br>Returns: `'+ret+'`')
         else:
             print('- [`'+var['name']+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
 

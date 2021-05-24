@@ -779,7 +779,6 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
     /// Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
-    /// list[uint32_t] get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
     lua["get_entities_overlapping"] = get_entities_overlapping;
     /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
@@ -1047,12 +1046,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return sol::nullopt;
     };
 
+    /// Returns: `int` unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
     /// Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
     /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
     /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
     /// properties on the sound. Otherwise you may cause a deadlock.
-    // lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) {
-    lua["set_vanilla_sound_callback"] = [this](std::string name, int types, sol::function cb)
+    using VANILLA_SOUND = std::string;
+    using VANILLA_SOUND_CALLBACK_TYPE = int;
+    lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb)
     {
         auto safe_cb = [this, cb = std::move(cb)](PlayingSound sound)
         {
@@ -1755,7 +1756,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_usertype<CustomSound>("CustomSound", "play", play, "get_parameters", &CustomSound::get_parameters);
     /* CustomSound
     PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
-    array<pair<VANILLA_SOUND_PARAM, string>> get_parameters()
+    map<VANILLA_SOUND_PARAM,string> get_parameters()
     */
     auto sound_set_callback = [this](PlayingSound* sound, sol::function callback)
     {
@@ -1804,7 +1805,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     bool set_volume(float volume)
     bool set_looping(SOUND_LOOP_MODE looping)
     bool set_callback(function callback)
-    array<pair<VANILLA_SOUND_PARAM, string>> get_parameters()
+    map<VANILLA_SOUND_PARAM,string> get_parameters()
     optional<float> get_parameter(VANILLA_SOUND_PARAM param)
     bool set_parameter(VANILLA_SOUND_PARAM param, float value)
     */
