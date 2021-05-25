@@ -24,7 +24,7 @@ uint32_t flipflag(uint32_t flags, int bit)
         return setflag(flags, bit);
 }
 
-int32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
+int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();
 
@@ -34,22 +34,22 @@ int32_t spawn_entity(uint32_t id, float x, float y, bool s, float vx, float vy, 
     auto [_x, _y] = player->position();
     if (!s)
     {
-        DEBUG("Spawning {} on {}, {}", id, x + _x, y + _y);
-        return state.layer(player->layer())->spawn_entity(id, x + _x, y + _y, s, vx, vy, snap)->uid;
+        DEBUG("Spawning {} on {}, {}", entity_type, x + _x, y + _y);
+        return state.layer(player->layer())->spawn_entity(entity_type, x + _x, y + _y, s, vx, vy, snap)->uid;
     }
     else
     {
-        DEBUG("Spawning {} on screen {}, {}", id, x, y);
-        return state.layer(player->layer())->spawn_entity(id, x, y, s, vx, vy, snap)->uid;
+        DEBUG("Spawning {} on screen {}, {}", entity_type, x, y);
+        return state.layer(player->layer())->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
     }
 }
 
-int32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, float vy)
+int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
 {
     auto state = State::get();
     if (layer == 0 || layer == 1)
     {
-        return state.layer(layer)->spawn_entity(id, x, y, false, vx, vy, false)->uid;
+        return state.layer(layer)->spawn_entity(entity_type, x, y, false, vx, vy, false)->uid;
     }
     else if (layer < 0)
     {
@@ -57,8 +57,8 @@ int32_t spawn_entity_abs(uint32_t id, float x, float y, int layer, float vx, flo
         if (player == nullptr)
             return -1;
         auto [_x, _y] = player->position();
-        DEBUG("Spawning {} on {}, {}", id, x + _x, y + _y);
-        return state.layer(player->layer())->spawn_entity(id, x + _x, y + _y, false, vx, vy, false)->uid;
+        DEBUG("Spawning {} on {}, {}", entity_type, x + _x, y + _y);
+        return state.layer(player->layer())->spawn_entity(entity_type, x + _x, y + _y, false, vx, vy, false)->uid;
     }
     return -1;
 }
@@ -165,7 +165,7 @@ void list_items()
     }
 }
 
-int32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
+int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
     auto state = State::get();
     if (s)
@@ -208,70 +208,70 @@ int32_t get_entity_at(float x, float y, bool s, float r, uint32_t mask)
     return -1;
 }
 
-void move_entity(uint32_t id, float x, float y, bool s, float vx, float vy, bool snap)
+void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();
-    auto ent = state.find(id);
+    auto ent = state.find(uid);
     if (ent)
         ent->teleport(x, y, s, vx, vy, snap);
 }
 
-void move_entity_abs(uint32_t id, float x, float y, float vx, float vy)
+void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
     auto state = State::get();
-    auto ent = state.find(id);
+    auto ent = state.find(uid);
     if (ent)
         ent->teleport_abs(x, y, vx, vy);
 }
 
-uint32_t get_entity_flags(uint32_t id)
+uint32_t get_entity_flags(uint32_t uid)
 {
-    if (id == 0)
+    if (uid == 0)
         return 0;
     auto state = State::get();
-    auto ent = state.find(id);
+    auto ent = state.find(uid);
     if (ent)
         return ent->flags;
     return 0;
 }
 
-void set_entity_flags(uint32_t id, uint32_t flags)
+void set_entity_flags(uint32_t uid, uint32_t flags)
 {
-    if (id == 0)
+    if (uid == 0)
         return;
     auto state = State::get();
-    auto ent = state.find(id);
+    auto ent = state.find(uid);
     if (ent)
         ent->flags = flags;
 }
 
-uint32_t get_entity_flags2(uint32_t id)
+uint32_t get_entity_flags2(uint32_t uid)
 {
-    if (id == 0)
+    if (uid == 0)
         return 0;
     auto state = State::get();
-    auto ent = state.find(id);
+    auto ent = state.find(uid);
     if (ent)
         return ent->more_flags;
     return 0;
 }
 
-void set_entity_flags2(uint32_t id, uint32_t flags)
+void set_entity_flags2(uint32_t uid, uint32_t flags)
 {
-    if (id == 0)
+    if (uid == 0)
         return;
     auto state = State::get();
-    auto ent = state.find(id);
+    auto ent = state.find(uid);
     if (ent)
         ent->more_flags = flags;
 }
 
-int get_entity_ai_state(uint32_t id)
+int get_entity_ai_state(uint32_t uid)
 {
-    if (id == 0)
+    if (uid == 0)
         return 0;
     auto state = State::get();
-    auto ent = state.find(id)->as<Movable>();
+    auto ent = state.find(uid)->as<Movable>();
     if (ent)
         return ent->move_state;
     return 0;
@@ -307,19 +307,19 @@ void player_status()
     status->bombs = (99);
 }
 
-Entity* get_entity_ptr(uint32_t id)
+Entity* get_entity_ptr(uint32_t uid)
 {
     auto state = State::get();
-    auto p = state.find(id);
+    auto p = state.find(uid);
     if (IsBadWritePtr(p, 0x178))
         return nullptr;
     return p;
 }
 
-int32_t get_entity_type(uint32_t id)
+int32_t get_entity_type(uint32_t uid)
 {
     auto state = State::get();
-    auto p = state.find(id);
+    auto p = state.find(uid);
     if (p == nullptr || IsBadWritePtr(p, 0x178))
         return -1;
     return p->type->id;
@@ -395,7 +395,7 @@ std::vector<uint32_t> get_entities_by_layer(int layer)
     return found;
 }
 
-std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types)
+std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types)
 {
     auto state = State::get();
     auto player = state.items()->player(0);
@@ -404,14 +404,14 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> types)
     std::vector<uint32_t> found;
     for (auto& item : state.layer(0)->items())
     {
-        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
+        if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
         {
             found.push_back(item->uid);
         }
     }
     for (auto& item : state.layer(1)->items())
     {
-        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
+        if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
         {
             found.push_back(item->uid);
         }
@@ -493,7 +493,7 @@ std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
     return found;
 }
 
-std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
+std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int layer)
 {
     auto state = State::get();
     auto player = state.items()->player(0);
@@ -506,7 +506,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
     {
         for (auto& item : state.layer(layer)->items())
         {
-            if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == type || type == 0))
+            if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
             {
                 found.push_back(item->uid);
             }
@@ -518,7 +518,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
         {
             for (auto& item : state.layer(0)->items())
             {
-                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == type || type == 0))
+                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
                 {
                     found.push_back(item->uid);
                 }
@@ -528,7 +528,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
         {
             for (auto& item : state.layer(1)->items())
             {
-                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == type || type == 0))
+                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
                 {
                     found.push_back(item->uid);
                 }
@@ -538,7 +538,7 @@ std::vector<uint32_t> get_entities_by(uint32_t type, uint32_t mask, int layer)
     return found;
 }
 
-std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, float y, int layer, float r)
+std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, int layer, float radius)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
@@ -546,7 +546,7 @@ std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, flo
     {
         auto [ix, iy] = item->position();
         float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
-        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == type || type == 0) && distance < r)
+        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && distance < radius)
         {
             found.push_back(item->uid);
         }
@@ -554,13 +554,13 @@ std::vector<uint32_t> get_entities_at(uint32_t type, uint32_t mask, float x, flo
     return found;
 }
 
-std::vector<uint32_t> get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
+std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
     for (auto& item : state.layer(layer)->items())
     {
-        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == type || type == 0) && item->overlaps_with(sx, sy, sx2, sy2))
+        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && item->overlaps_with(sx, sy, sx2, sy2))
         {
             found.push_back(item->uid);
         }
@@ -568,61 +568,61 @@ std::vector<uint32_t> get_entities_overlapping(uint32_t type, uint32_t mask, flo
     return found;
 }
 
-void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t)
+void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get();
-    Entity* door = get_entity_ptr(id);
+    Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return;
     static_cast<Door*>(door)->set_target(w, l, t);
 }
 
-std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t id)
+std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
     auto state = State::get();
-    Entity* door = get_entity_ptr(id);
+    Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return std::make_tuple(0, 0, 0);
     return static_cast<Door*>(door)->get_target();
 }
 
-void set_contents(uint32_t id, uint32_t item)
+void set_contents(uint32_t uid, uint32_t item_uid)
 {
     auto state = State::get();
     auto player = state.items()->player(0);
     if (player == nullptr)
         return;
-    Entity* container = get_entity_ptr(id);
+    Entity* container = get_entity_ptr(uid);
     if (container == nullptr)
         return;
     int type = container->type->id;
     if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
         type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
         return;
-    container->as<Container>()->inside = item;
+    container->as<Container>()->inside = item_uid;
 }
 
-void entity_remove_item(uint32_t id, uint32_t item)
+void entity_remove_item(uint32_t uid, uint32_t item_uid)
 {
-    Entity* entity = get_entity_ptr(id);
+    Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return;
-    entity->remove_item(item);
+    entity->remove_item(item_uid);
 }
 
-int32_t spawn_entity_over(uint32_t id, uint32_t over, float x, float y)
+int32_t spawn_entity_over(uint32_t uid, uint32_t over_uid, float x, float y)
 {
     auto state = State::get();
-    Entity* overlay = get_entity_ptr(over);
+    Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
         return -1;
     int layer = overlay->layer();
-    return state.layer(layer)->spawn_entity_over(id, overlay, x, y)->uid;
+    return state.layer(layer)->spawn_entity_over(uid, overlay, x, y)->uid;
 }
 
-bool entity_has_item_uid(uint32_t id, uint32_t item)
+bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
 {
-    Entity* entity = get_entity_ptr(id);
+    Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return false;
     if (entity->items.count > 0)
@@ -630,16 +630,16 @@ bool entity_has_item_uid(uint32_t id, uint32_t item)
         int* pitems = (int*)entity->items.begin;
         for (int i = 0; i < entity->items.count; i++)
         {
-            if (pitems[i] == item)
+            if (pitems[i] == item_uid)
                 return true;
         }
     }
     return false;
 };
 
-bool entity_has_item_type(uint32_t id, uint32_t type)
+bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
 {
-    Entity* entity = get_entity_ptr(id);
+    Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return false;
     if (entity->items.count > 0)
@@ -650,7 +650,7 @@ bool entity_has_item_type(uint32_t id, uint32_t type)
             Entity* item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
                 continue;
-            if (item->type->id == type)
+            if (item->type->id == entity_type)
                 return true;
         }
     }
@@ -703,39 +703,39 @@ uint32_t get_frame_count()
     return state.get_frame_count();
 }
 
-void carry(uint32_t id, uint32_t item)
+void carry(uint32_t mount_uid, uint32_t rider_uid)
 {
-    auto mount = get_entity_ptr(id)->as<Mount>();
-    auto rider = get_entity_ptr(item)->as<Player>();
+    auto mount = get_entity_ptr(mount_uid)->as<Mount>();
+    auto rider = get_entity_ptr(rider_uid)->as<Player>();
     if (mount == nullptr || rider == nullptr)
         return;
     mount->carry(rider);
 }
 
-void kill_entity(uint32_t id)
+void kill_entity(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr(id);
+    Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
         ent->kill(true, nullptr);
 }
 
-void destroy_entity(uint32_t id)
+void destroy_entity(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr(id);
+    Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
         ent->destroy(); // TODO
 }
 
-void apply_entity_db(uint32_t id)
+void apply_entity_db(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr(id);
+    Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
         ent->apply_db();
 }
 
-void flip_entity(uint32_t id)
+void flip_entity(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr(id);
+    Entity* ent = get_entity_ptr(uid);
     if (ent == nullptr)
         return;
     ent->flags = flipflag(ent->flags, 17);
@@ -774,7 +774,7 @@ void set_seed(uint32_t seed)
     state.set_seed(seed);
 }
 
-void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
+void set_arrowtrap_projectile(uint32_t regular_entity_type, uint32_t poison_entity_type)
 {
     static size_t offset_poison = 0;
     static size_t offset_regular = 0;
@@ -789,8 +789,8 @@ void set_arrowtrap_projectile(uint32_t regular_item_id, uint32_t poison_item_id)
         offset_regular = memory.at_exe(find_inst(memory.exe(), pattern, offset_poison + 1));
         offset_poison = memory.at_exe(offset_poison);
     }
-    write_mem_prot(offset_regular + 1, to_le_bytes(regular_item_id), true);
-    write_mem_prot(offset_poison + 1, to_le_bytes(poison_item_id), true);
+    write_mem_prot(offset_regular + 1, to_le_bytes(regular_entity_type), true);
+    write_mem_prot(offset_poison + 1, to_le_bytes(poison_entity_type), true);
 }
 
 void modify_sparktraps(float angle_increment, float distance)
@@ -956,7 +956,7 @@ std::vector<int64_t> read_prng()
     return state.read_prng();
 }
 
-void pick_up(uint32_t who, uint32_t what)
+void pick_up(uint32_t who_uid, uint32_t what_uid)
 {
     static size_t offset = 0;
     if (offset == 0)
@@ -964,8 +964,8 @@ void pick_up(uint32_t who, uint32_t what)
         auto memory = Memory::get();
         offset = memory.at_exe(find_inst(memory.exe(), "\x48\x89\x5c\x24\x08\x57\x48\x83\xec\x20\x4c\x8b\x5a\x08"s, memory.after_bundle));
     }
-    Movable* ent = (Movable*)get_entity_ptr(who);
-    Movable* item = (Movable*)get_entity_ptr(what);
+    Movable* ent = (Movable*)get_entity_ptr(who_uid);
+    Movable* item = (Movable*)get_entity_ptr(what_uid);
     if (ent != nullptr && item != nullptr)
     {
         auto pick_up_func = (void (*)(Movable*, Movable*))offset;

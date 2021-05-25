@@ -592,10 +592,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         toast(NULL, message.data());
     };
     /// Show a message coming from an entity
-    lua["say"] = [this](uint32_t entity_id, std::wstring message, int unk_type, bool top)
+    lua["say"] = [this](uint32_t entity_uid, std::wstring message, int unk_type, bool top)
     {
         auto say = get_say();
-        auto entity = get_entity_ptr(entity_id);
+        auto entity = get_entity_ptr(entity_uid);
         if (entity == nullptr)
             return;
         say(NULL, entity, message.data(), unk_type, top);
@@ -733,7 +733,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_door"] = set_door_target;
     /// Get door target `world`, `level`, `theme`
     lua["get_door_target"] = get_door_target;
-    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
+    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_uid`
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid
     lua["get_entity"] = get_entity_ptr;
@@ -741,7 +741,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_type"] = get_type;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
-    /// Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore that.
+    /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
     /// Returns: `array<int>`
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
@@ -751,7 +751,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// function on_level()
     ///     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
     ///     -- is not the same thing as this, but also works
-    ///     uids2 = get_entities_by_type(types)
+    ///     uids2 = get_entities_by_type(entity_types)
     ///     message(tostring(#uids).." == "..tostring(#uids2))
     /// end
     /// ```
@@ -776,10 +776,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_entities_by_mask"] = get_entities_by_mask;
     /// Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
     lua["get_entities_by_layer"] = get_entities_by_layer;
-    /// Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
+    /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
-    /// Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
-    /// list[uint32_t] get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
+    /// Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
+    /// list[uint32_t] get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
     lua["get_entities_overlapping"] = get_entities_overlapping;
     /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
@@ -812,11 +812,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_render_position"] = get_render_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
-    /// Spawn an entity by `id` attached to some other entity `over`, in offset `x`, `y`
+    /// Spawn an entity by `uid` attached to some other entity `over`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
-    /// Check if the entity `id` has some specific `item` by uid in their inventory
+    /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
-    /// Check if the entity `id` has some ENT_TYPE `type` in their inventory
+    /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
     lua["entity_has_item_type"] = entity_has_item_type;
     /// Kills an entity by uid.
     lua["kill_entity"] = kill_entity;
@@ -837,7 +837,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Get the current timestamp in milliseconds since the Unix Epoch.
     lua["get_ms"] = []()
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
-    /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
+    /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
     /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
@@ -862,10 +862,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_particle_type"] = get_particle_type;
 
     /// Calculate the tile distance of two entities by uid
-    lua["distance"] = [this](uint32_t a, uint32_t b)
+    lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b)
     {
-        Entity* ea = get_entity_ptr(a);
-        Entity* eb = get_entity_ptr(b);
+        Entity* ea = get_entity_ptr(uid_a);
+        Entity* eb = get_entity_ptr(uid_b);
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
