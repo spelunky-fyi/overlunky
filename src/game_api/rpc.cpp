@@ -657,6 +657,31 @@ bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
     return false;
 };
 
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, uint32_t mask)
+{
+    std::vector<uint32_t> found;
+    Entity* entity = get_entity_ptr(uid);
+    if (entity == nullptr)
+        return found;
+    if (entity->items.count > 0)
+    {
+        int* pitems = (int*)entity->items.begin;
+        for (int i = 0; i < entity->items.count; i++)
+        {
+            Entity* item = get_entity_ptr(pitems[i]);
+            if (item == nullptr)
+            {
+                continue;
+            }
+            if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
+            {
+                found.push_back(item->uid);
+            }
+        }
+    }
+    return found;
+}
+
 void lock_door_at(float x, float y)
 {
     std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
