@@ -254,6 +254,57 @@ ImVec2 normalize(ImVec2 pos)
     return normal;
 }
 
+void AddImageRotated(ImDrawList* draw_list, ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float angle, const ImVec2& rel_pivot)
+{
+    if ((col & IM_COL32_A_MASK) == 0)
+        return;
+
+    auto add = [](const ImVec2& lhs, const ImVec2& rhs) -> ImVec2
+    {
+        return {lhs.x + rhs.x, lhs.y + rhs.y};
+    };
+    auto sub = [](const ImVec2& lhs, const ImVec2& rhs) -> ImVec2
+    {
+        return {lhs.x - rhs.x, lhs.y - rhs.y};
+    };
+    auto mul = [](const ImVec2& lhs, float rhs) -> ImVec2
+    {
+        return {lhs.x * rhs, lhs.y * rhs};
+    };
+
+    const float sin_a = std::sin(angle);
+    const float cos_a = std::cos(angle);
+    auto rot = [sin_a, cos_a, add, sub](const ImVec2& vec, const ImVec2& pivot)
+    {
+        const ImVec2 off = sub(vec, pivot);
+        const ImVec2 rot{off.x * cos_a - off.y * sin_a, off.x * sin_a + off.y * cos_a};
+        return add(rot, pivot);
+    };
+
+    const ImVec2 center = mul(add(p_min, p_max), 0.5f);
+    const ImVec2 pivot = add(center, rel_pivot);
+
+    const ImVec2 a = rot(p_min, pivot);
+    const ImVec2 b = rot(ImVec2{p_max.x, p_min.y}, pivot);
+    const ImVec2 c = rot(p_max, pivot);
+    const ImVec2 d = rot(ImVec2{p_min.x, p_max.y}, pivot);
+
+    const ImVec2 uv_a = uv_min;
+    const ImVec2 uv_b = ImVec2{uv_max.x, uv_min.y};
+    const ImVec2 uv_c = uv_max;
+    const ImVec2 uv_d = ImVec2{uv_min.x, uv_max.y};
+
+    const bool push_texture_id = user_texture_id != draw_list->_CmdHeader.TextureId;
+    if (push_texture_id)
+        draw_list->PushTextureID(user_texture_id);
+
+    draw_list->PrimReserve(6, 4);
+    draw_list->PrimQuadUV(a, b, c, d, uv_a, uv_b, uv_c, uv_d, col);
+
+    if (push_texture_id)
+        draw_list->PopTextureID();
+}
+
 std::string sanitize(std::string data)
 {
     std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c)
@@ -1017,6 +1068,18 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         ImVec2 uva = ImVec2(uvx1, uvy1);
         ImVec2 uvb = ImVec2(uvx2, uvy2);
         draw_list->AddImage(images[image]->texture, a, b, uva, uvb, color);
+    };
+    /// Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
+    lua["draw_image_rotated"] = [this](int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, ImU32 color, float angle, float px, float py)
+    {
+        if (images.find(image) == images.end())
+            return;
+        ImVec2 a = screenify({x1, y1});
+        ImVec2 b = screenify({x2, y2});
+        ImVec2 uva = ImVec2(uvx1, uvy1);
+        ImVec2 uvb = ImVec2(uvx2, uvy2);
+        ImVec2 pivot = {screenify(px), screenify(py)};
+        AddImageRotated(draw_list, images[image]->texture, a, b, uva, uvb, color, angle, pivot);
     };
 
     /// Gets the resolution (width and height) of the screen
@@ -2566,6 +2629,7 @@ std::optional<Ret> SpelunkyScript::ScriptImpl::handle_function_with_return(sol::
             result = "Unexpected return type from function.";
         }
     }
+    return std::nullopt;
 }
 
 void SpelunkyScript::ScriptImpl::render_options()
