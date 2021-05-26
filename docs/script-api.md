@@ -390,14 +390,15 @@ Get the [ParticleDB](#particledb) details of the specified ID
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 #### Params: `int dropchance_id, int new_drop_chance`
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
-void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
 ### [`replace_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_drop)
-#### Params: `int drop_id, int new_drop_uid`
+#### Params: `int drop_id, int new_drop_entity_type`
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
-void replace_drop(uint16_t drop_id, uint32_t new_drop_uid)
 ### [`force_co_subtheme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_co_subtheme)
 #### Params: `int8_t subtheme`
 Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
+### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
+#### Params: `int particle_emitter_id, int uid`
+Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 #### Params: `int uid_a, int uid_b`
 Calculate the tile distance of two entities by uid

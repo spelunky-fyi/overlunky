@@ -918,6 +918,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["replace_drop"] = replace_drop;
     /// Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
     lua["force_co_subtheme"] = force_co_subtheme;
+    /// Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
+    lua["generate_particles"] = generate_particles;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b)

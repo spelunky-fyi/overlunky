@@ -90,7 +90,13 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    char pad12d0[0x1308 - 0x12d0];
+    size_t unknown23;
+    size_t unknown24;
+    size_t unknown25;
+    size_t unknown26;
+    size_t particle_emitters_info;
+    size_t unknown28;
+    size_t unknown29;
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
 };
 struct State
