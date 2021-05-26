@@ -131,7 +131,7 @@ end, ON.LEVEL)
 #### Params: `string message`
 Show a message that looks like a level feeling.
 ### [`say`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=say)
-#### Params: `int entity_id, string message, int unk_type, bool top`
+#### Params: `int entity_uid, string message, int unk_type, bool top`
 Show a message coming from an entity
 ### [`register_option_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_int)
 #### Params: `string name, string desc, string long_desc, int value, int min, int max`
@@ -153,7 +153,7 @@ Add a combobox option that the user can change in the UI. Read the int index of 
 with a double `\0\0` at the end.
 ### [`register_option_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
-#### Params: `int id, float x, float y, int layer, float vx, float vy`
+#### Params: `int entity_type, float x, float y, int layer, float vx, float vy`
 #### Returns: `int`
 Spawn an entity in position with some velocity and return the uid of spawned entity.
 Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
@@ -170,7 +170,7 @@ set_callback(function()
 end, ON.LEVEL)
 ```
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
-#### Params: `int id, float x, float y, int layer, float vx, float vy`
+#### Params: `int entity_type, float x, float y, int layer, float vx, float vy`
 #### Returns: `int`
 Short for [spawn_entity](#spawn_entity).
 ### [`spawn_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door)
@@ -207,7 +207,7 @@ Set the zoom level used in levels and shops. 13.5 is the default.
 #### Params: `bool p`
 Enable/disable game engine pause.
 ### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
-#### Params: `int id, float x, float y, float vx, float vy`
+#### Params: `int uid, float x, float y, float vx, float vy`
 Teleport entity to coordinates with optional velocity
 ### [`set_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door_target)
 #### Params: `int id, int w, int l, int t`
@@ -216,14 +216,14 @@ Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
 #### Params: `int id, int w, int l, int t`
 Short for [set_door_target](#set_door_target).
 ### [`get_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_door_target)
-#### Params: `int id`
+#### Params: `int uid`
 #### Returns: `tuple<int, int, int>`
 Get door target `world`, `level`, `theme`
 ### [`set_contents`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_contents)
-#### Params: `int id, int item`
-Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
+#### Params: `int uid, int item_uid`
+Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_uid`
 ### [`get_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
-#### Params: `int id`
+#### Params: `int uid`
 #### Returns: `Entity`
 Get the [Entity](#entity) behind an uid
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
@@ -234,9 +234,9 @@ Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 #### Returns: `array<int>`
 Get uids of all entities currently loaded
 ### [`get_entities_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
-#### Params: `int type, int mask, int layer`
+#### Params: `int entity_type, int mask, int layer`
 #### Returns: `array<int>`
-Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore that.
+Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_by_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 #### Params: `int, int...`
 #### Returns: `array<int>`
@@ -247,7 +247,7 @@ types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
 function on_level()
     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
     -- is not the same thing as this, but also works
-    uids2 = get_entities_by_type(types)
+    uids2 = get_entities_by_type(entity_types)
     message(tostring(#uids).." == "..tostring(#uids2))
 end
 ```
@@ -260,30 +260,30 @@ Get uids of entities by some search_flags
 #### Returns: `array<int>`
 Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
 ### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
-#### Params: `int type, int mask, float x, float y, int layer, float r`
+#### Params: `int entity_type, int mask, float x, float y, int layer, float radius`
 #### Returns: `array<int>`
-Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
+Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
-#### Params: `int type, int mask, float sx, float sy, float sx2, float sy2, int layer`
+#### Params: `int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer`
 #### Returns: `array<int>`
-Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
-list[uint32_t] get_entities_overlapping(uint32_t type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
+Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
+list[uint32_t] get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
 ### [`get_entity_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags)
-#### Params: `int id`
+#### Params: `int uid`
 #### Returns: `int`
 Get the `flags` field from entity by uid
 ### [`set_entity_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_entity_flags)
-#### Params: `int id, int flags`
+#### Params: `int uid, int flags`
 Set the `flags` field from entity by uid
 ### [`get_entity_flags2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags2)
 #### Params: `int id`
 #### Returns: `int`
 Get the `more_flags` field from entity by uid
 ### [`set_entity_flags2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_entity_flags2)
-#### Params: `int id, int flags`
+#### Params: `int uid, int flags`
 Set the `more_flags` field from entity by uid
 ### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
-#### Params: `int id`
+#### Params: `int uid`
 #### Returns: `int`
 Get the `move_state` field from entity by uid
 ### [`get_level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_flags)
@@ -293,7 +293,7 @@ Get `state.level_flags`
 #### Params: `int flags`
 Set `state.level_flags`
 ### [`get_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_type)
-#### Params: `int id`
+#### Params: `int uid`
 #### Returns: `int`
 Get the ENT_TYPE... for entity by uid
 ### [`get_zoom_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_zoom_level)
@@ -317,32 +317,32 @@ you're standing on, not real level coordinates.
 ### [`get_render_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_position)
 Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
 ### [`entity_remove_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
-#### Params: `int id, int item`
+#### Params: `int id, int item_uid`
 Remove item by uid from entity
 ### [`spawn_entity_over`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_over)
-#### Params: `int id, int over, float x, float y`
+#### Params: `int item_uid, int over_uid, float x, float y`
 #### Returns: `int`
-Spawn an entity by `id` attached to some other entity `over`, in offset `x`, `y`
+Spawn an entity by `uid` attached to some other entity `over`, in offset `x`, `y`
 ### [`entity_has_item_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_uid)
-#### Params: `int id, int item`
+#### Params: `int uid, int item_uid`
 #### Returns: `bool`
-Check if the entity `id` has some specific `item` by uid in their inventory
+Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 ### [`entity_has_item_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
-#### Params: `int id, int type`
+#### Params: `int uid, int entity_type`
 #### Returns: `bool`
-Check if the entity `id` has some ENT_TYPE `type` in their inventory
+Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
 ### [`kill_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_entity)
-#### Params: `int id`
+#### Params: `int uid`
 Kills an entity by uid.
 ### [`pick_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up)
-#### Params: `int who, int what`
+#### Params: `int who_uid, int what_uid`
 Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
 ```lua
 -- spawn and equip a jetpack
 pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
 ```
 ### [`apply_entity_db`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_entity_db)
-#### Params: `int id`
+#### Params: `int uid`
 Apply changes made in [get_type](#get_type)() to entity instance by uid.
 ### [`lock_door_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_door_at)
 #### Params: `float x, float y`
@@ -356,10 +356,10 @@ Get the current global frame count since the game was started. You can use this 
 ### [`get_ms`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ms)
 Get the current timestamp in milliseconds since the Unix Epoch.
 ### [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry)
-#### Params: `int mount, int rider`
-Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
+#### Params: `int mount_uid, int rider_uid`
+Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
 ### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
-#### Params: `int regular_item_id, int poison_item_id`
+#### Params: `int regular_entity_type, int poison_entity_type`
 Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
 ### [`set_kapala_blood_threshold`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_kapala_blood_threshold)
 #### Params: `int threshold`
@@ -377,7 +377,7 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 #### Params: `int default_multiplier, int vladscape_multiplier`
 Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
-#### Params: `int id`
+#### Params: `int uid`
 Flip entity around by uid. All new entities face right by default.
 ### [`set_olmec_phase_y_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_phase_y_level)
 #### Params: `int phase, float y`
@@ -388,7 +388,7 @@ Determines when the ghost appears, either when the player is cursed or not
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 Get the [ParticleDB](#particledb) details of the specified ID
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
-#### Params: `int a, int b`
+#### Params: `int uid_a, int uid_b`
 Calculate the tile distance of two entities by uid
 ### [`get_bounds`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bounds)
 #### Returns: `float`, `float`, `float`, `float`
