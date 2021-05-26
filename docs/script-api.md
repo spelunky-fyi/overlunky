@@ -232,10 +232,10 @@ Get the game coordinates at the screen position (`x`, `y`)
 Translate an entity position to screen position to be used in drawing functions
 ### [`float screen_distance(float x)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_distance)
 Translate a distance of `x` tiles to screen distance to be be used in drawing functions
-### [`nil get_position()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_position)
+### [`tuple<float, float, int> get_position(int id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_position)
 Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
 you're standing on, not real level coordinates.
-### [`nil get_render_position()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_position)
+### [`tuple<float, float, int> get_render_position(int id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_position)
 Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
 ### [`nil entity_remove_item(int id, int item)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 Remove item by uid from entity

@@ -196,27 +196,6 @@ void infinite_loop(lua_State* argst, lua_Debug* argdb)
     luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
 };
 
-Movable* get_entity(uint32_t id)
-{
-    return (Movable*)get_entity_ptr(id);
-}
-
-std::tuple<float, float, int> get_position(uint32_t id)
-{
-    Entity* ent = get_entity_ptr(id);
-    if (ent)
-        return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
-    return {0.0f, 0.0f, 0};
-}
-
-std::tuple<float, float, int> get_render_position(uint32_t id)
-{
-    Entity* ent = get_entity_ptr(id);
-    if (ent)
-        return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer());
-    return {0.0f, 0.0f, 0};
-}
-
 float screenify(float dis)
 {
     ImGuiIO& io = ImGui::GetIO();
