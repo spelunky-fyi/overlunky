@@ -11,10 +11,10 @@ end
 -- entity uid, health, distance
 set_callback(function()
     if #players < 1 then return end
-    x, y, l = get_position(players[1].uid)
+    x, y, l = get_render_position(players[1].uid)
     ents = get_entities_at(0, 255, x, y, l, 30)
     for i,v in ipairs(ents) do
-        ex, ey, el = get_position(v)
+        ex, ey, el = get_render_position(v)
         e = get_entity(v)
         if e ~= nil then
             e = e:as_container()
@@ -39,7 +39,7 @@ set_callback(function()
         e = get_entity(v)
         if e ~= nil and string.match(names[e.type.id], "TRAP") then
             e = e:as_movable()
-            ex, ey, el = get_position(v)
+            ex, ey, el = get_render_position(v)
             sx, sy = screen_position(ex-e.hitboxx, ey-e.hitboxy+e.offsety)
             dist = distance(players[1].uid, v)
             draw_text(sx, sy, 0,
@@ -53,10 +53,10 @@ end, ON.GUIFRAME)
 -- door finder
 set_callback(function()
     if #players < 1 then return end
-    px, py, pl = get_position(players[1].uid)
+    px, py, pl = get_render_position(players[1].uid)
     ents = get_entities_by_type(ENT_TYPE.LOGICAL_DOOR)
     for i,v in ipairs(ents) do
-        x, y, l = get_position(v)
+        x, y, l = get_render_position(v)
         e = get_entity(v):as_movable()
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if l == pl then

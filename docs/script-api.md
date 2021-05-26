@@ -103,7 +103,6 @@ Load another script by id "author/name"
 ### [`seed_prng(int seed)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_prng)
 Seed the game prng.
 ### [`array<int> read_prng()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
-Returns: `int[20]`
 Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
 ```lua
 -- this should always print the same table D877...E555
@@ -190,7 +189,6 @@ Get uids of all entities currently loaded
 ### [array<int> `get_entities_by`(int type, int mask, int layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore that.
 ### [`array<int> get_entities_by_type(int, int...)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
-Returns: `array<int>`
 Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
 You can even pass a table! Example:
 ```lua
@@ -291,7 +289,6 @@ Get the [ParticleDB](#particledb) details of the specified ID
 ### [`float distance(int a, int b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 Calculate the tile distance of two entities by uid
 ### [`tuple<float, float, float, float> get_bounds()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bounds)
-Returns: `float`, `float`, `float`, `float`
 Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
 inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
 ```lua
@@ -332,8 +329,7 @@ Draws a filled circle on screen
 ### [`draw_text(float x, float y, float size, string text, int color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
 Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
 ### [`tuple<float, float> draw_text_size(float size, string text)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size)
-Returns: `w`, `h` in screen distance.
-Calculate the bounding box of text, so you can center it etc.
+Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
 Example:
 ```lua
 function on_guiframe()
@@ -352,6 +348,8 @@ end
 Create image from file. Returns a tuple containing id, width and height.
 ### [`draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+### [`draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated)
+Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 ### [`tuple<int, int> get_window_size()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_window_size)
 Gets the resolution (width and height) of the screen
 ### [`optional<CustomSound> create_sound(string path)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
@@ -377,13 +375,13 @@ Read input
 ### [`read_stolen_input(int uid)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
 Read input that has been previously stolen with steal_input
 ### [`window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
-Returns: `bool` (false if the window was closed from the X)
 Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
 [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
 autosize in center. Use just a `##Label` as title to hide titlebar.
 Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
 give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
 still, this is just the first draft. Felt cute, might delete later!
+Returns false if the window was closed from the X.
 ### [`win_text(string text)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
 Add some text to window, automatically wrapped
 ### [`win_separator()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator)

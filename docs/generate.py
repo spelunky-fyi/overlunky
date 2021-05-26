@@ -282,10 +282,10 @@ for lf in funcs:
         ret = ''
         param = ''
         if m:
-            ret = replace_all(m.group(2), replace)
+            ret = replace_all(m.group(2), replace).strip()
         if m or m2:
             param = (m or m2).group(1)
-            param = replace_all(param, replace)
+            param = replace_all(param, replace).strip()
         name = lf["name"]
         fun = f'{ret} {name}({param})'.strip()
         search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
