@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(overlunky)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(cmake/clang-format.cmake)
 setup_format_target(format_overlunky)
