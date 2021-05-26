@@ -26,6 +26,13 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
 
+using CALLBACK_ID = int;
+using FLAGS = std::uint32_t;
+using COLOR = ImU32;
+using VANILLA_SOUND = std::string;
+using VANILLA_SOUND_CALLBACK_TYPE = int;
+using BUTTONS = std::uint16_t;
+
 std::vector<SpelunkyScript*> g_all_scripts;
 
 enum class ON
@@ -130,7 +137,7 @@ struct LevelGenCallback
     sol::function func;
 };
 
-using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
+using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>; // NoAlias
 
 struct ScriptState
 {
@@ -145,7 +152,7 @@ struct ScriptState
     uint32_t quest_flags;
 };
 
-using Toast = void (*)(void*, wchar_t*);
+using Toast = void (*)(void*, wchar_t*); // NoAlias
 Toast get_toast()
 {
     ONCE(Toast)
@@ -157,7 +164,7 @@ Toast get_toast()
     }
 }
 
-using Say = void (*)(void*, Entity*, wchar_t*, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);
+using Say = void (*)(void*, Entity*, wchar_t*, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */); // NoAlias
 Say get_say()
 {
     ONCE(Say)
@@ -169,7 +176,7 @@ Say get_say()
     }
 }
 
-using Prng = void (*)(int64_t seed);
+using Prng = void (*)(int64_t seed); // NoAlias
 Prng get_seed_prng()
 {
     ONCE(Prng)
@@ -487,61 +494,61 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["savegame"] = g_save;
 
     /// Print a log message on screen.
-    lua["message"] = [this](std::string message)
+    lua["message"] = [this](std::string message) -> void
     {
         messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (messages.size() > 20)
             messages.pop_front();
     };
-    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_interval"] = [this](sol::function cb, int frames)
+    lua["set_interval"] = [this](sol::function cb, int frames) -> CALLBACK_ID
     {
         auto luaCb = IntervalCallback{cb, frames, -1};
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
-    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_timeout"] = [this](sol::function cb, int frames)
+    lua["set_timeout"] = [this](sol::function cb, int frames) -> CALLBACK_ID
     {
         int now = g_state->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
         level_timers[cbcount] = luaCb;
         return cbcount++;
     };
-    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_interval"] = [this](sol::function cb, int frames)
+    lua["set_global_interval"] = [this](sol::function cb, int frames) -> CALLBACK_ID
     {
         auto luaCb = IntervalCallback{cb, frames, -1};
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
-    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_timeout"] = [this](sol::function cb, int frames)
+    lua["set_global_timeout"] = [this](sol::function cb, int frames) -> CALLBACK_ID
     {
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         global_timers[cbcount] = luaCb;
         return cbcount++;
     };
-    /// Returns: `int` unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called on an [event](#on).
-    lua["set_callback"] = [this](sol::function cb, int screen)
+    lua["set_callback"] = [this](sol::function cb, int screen) -> CALLBACK_ID
     {
         auto luaCb = ScreenCallback{cb, (ON)screen, -1};
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     /// Clear previously added callback `id`
-    lua["clear_callback"] = [this](int id)
+    lua["clear_callback"] = [this](CALLBACK_ID id)
     { clear_callbacks.push_back(id); };
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
     /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
-    lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
+    lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code) -> CALLBACK_ID
     {
         pre_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
         return cbcount++;
@@ -549,7 +556,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Add a callback for a specific tile code that is called after the game handles the tile code.
     /// Use this to affect what the game or other scripts spawned in this position.
     /// This is received even if a previous pre-tile-code-callback has returned true
-    lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code)
+    lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code) -> CALLBACK_ID
     {
         post_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
         return cbcount++;
@@ -583,8 +590,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///   end
     /// end, ON.LEVEL)
     /// ```
-    lua["read_prng"] = [this]()
-    { return read_prng(); };
+    lua["read_prng"] = [this]() -> std::vector<int64_t> { return read_prng(); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [this](std::wstring message)
     {
@@ -755,7 +761,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///     message(tostring(#uids).." == "..tostring(#uids2))
     /// end
     /// ```
-    lua["get_entities_by_type"] = [](sol::variadic_args va)
+    lua["get_entities_by_type"] = [](sol::variadic_args va) -> std::vector<uint32_t>
     {
         sol::type type = va.get_type();
         if (type == sol::type::number)
@@ -861,7 +867,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_particle_type"] = get_particle_type;
 
     /// Calculate the tile distance of two entities by uid
-    lua["distance"] = [this](uint32_t a, uint32_t b)
+    lua["distance"] = [this](uint32_t a, uint32_t b) -> float
     {
         Entity* ea = get_entity_ptr(a);
         Entity* eb = get_entity_ptr(b);
@@ -882,8 +888,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
     /// end, ON.GUIFRAME)
     /// ```
-    lua["get_bounds"] = [this]()
-    { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
+    lua["get_bounds"] = [this]() -> std::tuple<float, float, float, float> { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = get_camera_position;
     /// Sets the current camera position in the level.
@@ -891,21 +896,21 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_camera_position"] = set_camera_position;
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["set_flag"] = [](uint32_t flags, int bit)
+    lua["set_flag"] = [](FLAGS flags, int bit) -> FLAGS
     { return flags | (1U << (bit - 1)); };
     lua["setflag"] = lua["set_flag"];
     /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["clr_flag"] = [](uint32_t flags, int bit)
+    lua["clr_flag"] = [](FLAGS flags, int bit) -> FLAGS
     { return flags & ~(1U << (bit - 1)); };
     lua["clrflag"] = lua["clr_flag"];
     /// Returns true if a bit is set in the flags
-    lua["test_flag"] = [](uint32_t flags, int bit)
+    lua["test_flag"] = [](FLAGS flags, int bit) -> FLAGS
     { return (flags & (1U << (bit - 1))) > 0; };
     lua["testflag"] = lua["test_flag"];
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
-    lua["rgba"] = [](int r, int g, int b, int a)
-    { return (unsigned int)(a << 24) + (b << 16) + (g << 8) + (r); };
+    lua["rgba"] = [](int r, int g, int b, int a) -> COLOR
+    { return (ImU32)(a << 24) + (b << 16) + (g << 8) + (r); };
     /// Draws a line on screen
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color)
     {
@@ -973,7 +978,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     ///     draw_text(0-w/2, 0-h/2, size, text, color)
     /// end
     /// ```
-    lua["draw_text_size"] = [this](float size, std::string text)
+    lua["draw_text_size"] = [this](float size, std::string text) -> std::pair<float, float>
     {
         ImGuiIO& io = ImGui::GetIO();
         ImFont* font = io.Fonts->Fonts.back();
@@ -990,8 +995,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         auto b = normalize(textsize);
         return std::make_pair(b.x - a.x, b.y - a.y);
     };
-    /// Returns: `id, width, height`
-    /// Create image from file.
+    /// Create image from file. Returns a tuple containing id, width and height.
     lua["create_image"] = [this](std::string path) -> std::tuple<int, int, int>
     {
         ScriptImage* image = new ScriptImage;
@@ -1019,8 +1023,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
 
     /// Gets the resolution (width and height) of the screen
-    lua["get_window_size"] = [this]()
-    { return std::make_tuple(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()); };
+    lua["get_window_size"] = [this]() -> std::tuple<int, int> { return std::make_tuple(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()); };
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [this](std::string path) -> sol::optional<CustomSound>
@@ -1046,14 +1049,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return sol::nullopt;
     };
 
-    /// Returns: `int` unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
+    /// Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
     /// Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
     /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
     /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
     /// properties on the sound. Otherwise you may cause a deadlock.
-    using VANILLA_SOUND = std::string;
-    using VANILLA_SOUND_CALLBACK_TYPE = int;
-    lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb)
+    lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CALLBACK_ID
     {
         auto safe_cb = [this, cb = std::move(cb)](PlayingSound sound)
         {
@@ -1065,7 +1066,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return id;
     };
     /// Clears a previously set callback
-    lua["clear_vanilla_sound_callback"] = [this](std::uint32_t id)
+    lua["clear_vanilla_sound_callback"] = [this](CALLBACK_ID id)
     {
         sound_manager->clear_callback(id);
         auto it = std::find(vanilla_sound_callbacks.begin(), vanilla_sound_callbacks.end(), id);
@@ -1107,7 +1108,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         script_input.erase(uid);
     };
     /// Send input
-    lua["send_input"] = [this](int uid, uint16_t buttons)
+    lua["send_input"] = [this](int uid, BUTTONS buttons)
     {
         if (script_input.find(uid) != script_input.end())
         {
@@ -1116,7 +1117,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         }
     };
     /// Read input
-    lua["read_input"] = [this](int uid)
+    lua["read_input"] = [this](int uid) -> BUTTONS
     {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
@@ -1219,9 +1220,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Add next thing on the same line, with an offset
     lua["win_sameline"] = [](float offset, float spacing)
     { ImGui::SameLine(offset, spacing); };
-    /// Returns: `boolean`
     /// Add a button
-    lua["win_button"] = [](std::string text)
+    lua["win_button"] = [](std::string text) -> bool
     {
         if (ImGui::Button(text.c_str()))
         {
@@ -1229,63 +1229,56 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         }
         return false;
     };
-    /// Returns: `string`
     /// Add a text field
-    lua["win_input_text"] = [](std::string label, std::string value)
+    lua["win_input_text"] = [](std::string label, std::string value) -> std::string
     {
         InputString(label.c_str(), &value, 0, nullptr, nullptr);
         return value;
     };
-    /// Returns: `int`
     /// Add an integer field
-    lua["win_input_int"] = [](std::string label, int value)
+    lua["win_input_int"] = [](std::string label, int value) -> int
     {
         ImGui::InputInt(label.c_str(), &value);
         return value;
     };
-    /// Returns: `float`
     /// Add a float field
-    lua["win_input_float"] = [](std::string label, float value)
+    lua["win_input_float"] = [](std::string label, float value) -> float
     {
         ImGui::InputFloat(label.c_str(), &value);
         return value;
     };
-    /// Returns: `int`
     /// Add an integer slider
-    lua["win_slider_int"] = [](std::string label, int value, int min, int max)
+    lua["win_slider_int"] = [](std::string label, int value, int min, int max) -> int
     {
         ImGui::SliderInt(label.c_str(), &value, min, max);
         return value;
     };
-    /// Returns: `int`
     /// Add an integer dragfield
-    lua["win_drag_int"] = [](std::string label, int value, int min, int max)
+    lua["win_drag_int"] = [](std::string label, int value, int min, int max) -> int
     {
         ImGui::DragInt(label.c_str(), &value, 0.5f, min, max);
         return value;
     };
-    /// Returns: `float`
     /// Add an float slider
-    lua["win_slider_float"] = [](std::string label, float value, float min, float max)
+    lua["win_slider_float"] = [](std::string label, float value, float min, float max) -> float
     {
         ImGui::SliderFloat(label.c_str(), &value, min, max);
         return value;
     };
-    /// Returns: `float`
     /// Add an float dragfield
-    lua["win_drag_float"] = [](std::string label, float value, float min, float max)
+    lua["win_drag_float"] = [](std::string label, float value, float min, float max) -> float
     {
         ImGui::DragFloat(label.c_str(), &value, 0.5f, min, max);
         return value;
     };
-    /// Returns: `boolean`
-    lua["win_check"] = [](std::string label, bool value)
+    /// Add a checkbox
+    lua["win_check"] = [](std::string label, bool value) -> bool
     {
         ImGui::Checkbox(label.c_str(), &value);
         return value;
     };
-    /// Returns: `int`
-    lua["win_combo"] = [](std::string label, int selected, std::string opts)
+    /// Add a combo box
+    lua["win_combo"] = [](std::string label, int selected, std::string opts) -> int
     {
         int reals = selected - 1;
         ImGui::Combo(label.c_str(), &reals, opts.c_str());

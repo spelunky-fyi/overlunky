@@ -10,16 +10,22 @@ rpc = []
 events = []
 funcs = []
 types = []
+aliases = []
 lualibs = []
 enums = []
 replace = {
     'uint8_t': 'int',
     'uint16_t': 'int',
     'uint32_t': 'int',
+    'uint64_t': 'int',
+    'int8_t': 'int',
+    'int16_t': 'int',
     'int32_t': 'int',
+    'int64_t': 'int',
     'ImU32': 'int',
     'vector': 'array',
     'wstring': 'string',
+    'pair': 'tuple',
     'std::': '',
     'sol::': '',
     'void': '',
@@ -47,13 +53,14 @@ def replace_all(text, dic):
     return text
 
 def print_af(lf, af):
-    ret = replace_all(af['return'], replace)
-    param = replace_all(af['param'], replace)
-    print('### [`'+lf['name']+'`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+lf['name']+')')
-    if param: print('#### Params: `'+param+'`')
-    if ret: print('#### Returns: `'+ret+'`')
+    ret = replace_all(af['return'], replace) or ''
+    name = lf['name']
+    param = replace_all(af['param'], replace) or ''
+    fun = f'{ret} `{name}`({param})'.strip()
+    search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
+    print(f'### [{fun}]({search_link})')
     for com in lf['comment']:
-        print(('#### ' if com.startswith('Returns:') else '')+com)
+        print(com)
 
 for file in header_files:
     data = open(file, 'r').read().split('\n')
@@ -211,6 +218,16 @@ for file in api_files:
         for lib in libs:
             lualibs.append(lib.replace('sol::lib::', ''))
 
+for file in api_files:
+    data = open(file, 'r').read().split('\n')
+    for line in data:
+        if not line.endswith('NoAlias'):
+            m = re.search(r'using\s*(\S*)\s*=\s*(\S*)', line)
+            if m:
+                name = m.group(1)
+                type = replace_all(m.group(2), replace)
+                aliases.append({'name': name, 'type': type})
+
 print('# Overlunky Lua API')
 print('- Everything here is still changing, don\'t be sad if your scripts break next week!')
 print('- This doc doesn\'t have a lot of examples, that\'s why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).')
@@ -260,22 +277,28 @@ for lf in funcs:
         for af in rpcfunc(lf['cpp']):
             print_af(lf, af)
     elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']):
-        m = re.search(r'\(([^\{]*)\)', lf['cpp'])
+        m = re.search(r'\(([^\{]*)\)\s*->\s*([^\{]*)', lf['cpp'])
+        m2 = re.search(r'\(([^\{]*)\)', lf['cpp'])
+        ret = ''
         param = ''
         if m:
-            param = m.group(1)
+            ret = replace_all(m.group(2), replace)
+        if m or m2:
+            param = (m or m2).group(1)
             param = replace_all(param, replace)
-        print('### [`'+lf['name']+'`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+lf['name']+')')
-        if param: print('#### Params: `'+param+'`')
+        name = lf["name"]
+        fun = f'{ret} {name}({param})'.strip()
+        search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
+        print(f'### [`{fun}`]({search_link})')
         for com in lf['comment']:
-            print(('#### ' if com.startswith('Returns:') else '')+com)
+            print(com)
 
 print('## Types')
 print('Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They\'re mostly just ints and floats. Example:')
 print("""```lua
 -- This doesn't make any sense, as you could just access the variables directly from players[]
 -- It's just a weird example OK!
-ids = get_entities_by_mask(1) -- I think this just covers CHARs
+ids = get_entities_by_mask(MASK.PLAYER) -- This just covers CHARs
 for i,id in ipairs(ids) do
     e = get_entity(id):as_player() -- cast Entity to Player to access inventory
     e.health = 99
@@ -295,13 +318,15 @@ for type in types:
     for var in type['vars']:
         search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+var['name']
         if 'signature' in var:
-            print('- [`'+var['name']+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
+            signature = var['signature']
             m = re.search(r'\s*(.*)\s+([^\(]*)\(([^\)]*)', var['signature'])
             if m:
-                ret = replace_all(m.group(1), replace)
-                param = replace_all(m.group(3), replace)
-                if param: print('<br>Params: `'+param+'`')
-                if ret: print('<br>Returns: `'+ret+'`')
+                ret = replace_all(m.group(1), replace) or ''
+                name = m.group(2)
+                param = replace_all(m.group(3), replace) or ''
+                signature = ret + ' ' + name + '(' + param + ')'
+            signature = signature.strip()
+            print('- [`'+signature+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
         else:
             print('- [`'+var['name']+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
 
@@ -325,3 +350,9 @@ for type in enums:
         if 'docs' in var:
             print(var['docs'])
 
+print('## Aliases')
+print('We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.')
+for alias in aliases:
+    name = alias['name']
+    type = alias['type']
+    print(f'### {name} == {type}')
