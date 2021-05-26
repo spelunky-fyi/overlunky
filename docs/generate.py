@@ -53,9 +53,9 @@ def replace_all(text, dic):
     return text
 
 def print_af(lf, af):
-    ret = replace_all(af['return'], replace) or ''
+    ret = replace_all(af['return'], replace) or 'nil'
     name = lf['name']
-    param = replace_all(af['param'], replace) or ''
+    param = replace_all(af['param'], replace)
     fun = f'{ret} {name}({param})'.strip()
     search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
     print(f'### [`{fun}`]({search_link})')
@@ -279,7 +279,7 @@ for lf in funcs:
     elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']):
         m = re.search(r'\(([^\{]*)\)\s*->\s*([^\{]*)', lf['cpp'])
         m2 = re.search(r'\(([^\{]*)\)', lf['cpp'])
-        ret = ''
+        ret = 'nil'
         param = ''
         if m:
             ret = replace_all(m.group(2), replace).strip()
@@ -321,9 +321,9 @@ for type in types:
             signature = var['signature']
             m = re.search(r'\s*(.*)\s+([^\(]*)\(([^\)]*)', var['signature'])
             if m:
-                ret = replace_all(m.group(1), replace) or ''
+                ret = replace_all(m.group(1), replace) or 'nil'
                 name = m.group(2)
-                param = replace_all(m.group(3), replace) or ''
+                param = replace_all(m.group(3), replace)
                 signature = ret + ' ' + name + '(' + param + ')'
             signature = signature.strip()
             print('- [`'+signature+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
