@@ -913,10 +913,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Get the [ParticleDB](#particledb) details of the specified ID
     lua["get_particle_type"] = get_particle_type;
     /// Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
-    /// void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
     lua["set_drop_chance"] = set_drop_chance;
     /// Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
-    /// void replace_drop(uint16_t drop_id, uint32_t new_drop_uid)
     lua["replace_drop"] = replace_drop;
     /// Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
     lua["force_co_subtheme"] = force_co_subtheme;
