@@ -184,7 +184,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
         float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
-        if (((mask & flags) > 0 || mask == 0) && distance < r)
+        if (((mask & flags) > 0 || mask == 0) && distance < radius)
         {
             DEBUG(
                 "Item {}, {:x} type, {} position, {} distance, {:x}",
