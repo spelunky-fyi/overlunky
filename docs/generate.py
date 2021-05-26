@@ -56,9 +56,9 @@ def print_af(lf, af):
     ret = replace_all(af['return'], replace) or ''
     name = lf['name']
     param = replace_all(af['param'], replace) or ''
-    fun = f'{ret} `{name}`({param})'.strip()
+    fun = f'{ret} {name}({param})'.strip()
     search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
-    print(f'### [{fun}]({search_link})')
+    print(f'### [`{fun}`]({search_link})')
     for com in lf['comment']:
         print(com)
 
