@@ -23,7 +23,8 @@ struct Texture
 struct Textures
 {
     std::uint32_t num_textures;
-    Texture textures[];
+    Texture textures[0x186];
+    Texture* texture_map[0x186];
 };
 
 Textures* get_textures();
