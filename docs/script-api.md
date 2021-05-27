@@ -815,6 +815,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &StateMemory::illumination
 - [`money_last_levels`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) &StateMemory::money_last_levels
 - [`money_shop_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) &StateMemory::money_shop_total
+- [`player_inputs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) sol::readonly(&StateMemory::player_inputs)
 ### `SaturationVignette`
 - [`red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &SaturationVignette::red
 - [`green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &SaturationVignette::green
@@ -837,6 +838,39 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`scale_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_y) &ParticleDB::scale_y
 - [`hor_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hor_velocity) &ParticleDB::hor_velocity
 - [`ver_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ver_velocity) &ParticleDB::ver_velocity
+### `PlayerSlotSettings`
+- [`controller_vibration`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller_vibration) sol::readonly(&PlayerSlotSettings::controller_vibration)
+- [`auto_run_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=auto_run_enabled) sol::readonly(&PlayerSlotSettings::auto_run_enabled)
+- [`controller_right_stick`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller_right_stick) sol::readonly(&PlayerSlotSettings::controller_right_stick)
+### `PlayerSlot`
+- [`buttons_gameplay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_gameplay) sol::readonly(&PlayerSlot::buttons_gameplay)
+- [`buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) sol::readonly(&PlayerSlot::buttons)
+- [`input_mapping_keyboard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_keyboard) sol::readonly(&PlayerSlot::input_mapping_keyboard)
+- [`input_mapping_controller`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_controller) sol::readonly(&PlayerSlot::input_mapping_controller)
+- [`player_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_id) sol::readonly(&PlayerSlot::player_id)
+- [`is_participating`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_participating) sol::readonly(&PlayerSlot::is_participating)
+### `InputMapping`
+- [`jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump) sol::readonly(&InputMapping::jump)
+- [`attack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack) sol::readonly(&InputMapping::attack)
+- [`bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bomb) sol::readonly(&InputMapping::bomb)
+- [`rope`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rope) sol::readonly(&InputMapping::rope)
+- [`walk_run`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_run) sol::readonly(&InputMapping::walk_run)
+- [`use_door_buy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=use_door_buy) sol::readonly(&InputMapping::use_door_buy)
+- [`pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) sol::readonly(&InputMapping::pause_menu)
+- [`journal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal) sol::readonly(&InputMapping::journal)
+- [`left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) sol::readonly(&InputMapping::left)
+- [`right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) sol::readonly(&InputMapping::right)
+- [`up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) sol::readonly(&InputMapping::up)
+- [`down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) sol::readonly(&InputMapping::down)
+### `PlayerInputs`
+- [`player_slot_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1) sol::readonly(&PlayerInputs::player_slot_1)
+- [`player_slot_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2) sol::readonly(&PlayerInputs::player_slot_2)
+- [`player_slot_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3) sol::readonly(&PlayerInputs::player_slot_3)
+- [`player_slot_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4) sol::readonly(&PlayerInputs::player_slot_4)
+- [`player_slot_1_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1_settings) sol::readonly(&PlayerInputs::player_slot_1_settings)
+- [`player_slot_2_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) sol::readonly(&PlayerInputs::player_slot_2_settings)
+- [`player_slot_3_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) sol::readonly(&PlayerInputs::player_slot_3_settings)
+- [`player_slot_4_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) sol::readonly(&PlayerInputs::player_slot_4_settings)
 ### `CustomSound`
 - [`PlayingSound play(bool start_paused, SOUND_TYPE sound_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play)
 - [`string>> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters)
