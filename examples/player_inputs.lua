@@ -7,67 +7,77 @@ player_slot = state.player_inputs.player_slot_1
 player_slot_settings = state.player_inputs.player_slot_1_settings
 white = rgba(255, 255, 255, 255)
 red = rgba(230, 60, 45, 255)
+font_size = 16
+up_width, line_height = draw_text_size(font_size, "UP")
+down_width, _ = draw_text_size(font_size, "DOWN")
+left_width, _ = draw_text_size(font_size, "LEFT")
+right_width, _ = draw_text_size(font_size, "RIGHT")
+cross_center_x = -0.70
+cross_center_hor_margin = 0.05
 
 set_callback(function()
-    y = -0.50;
+    y = -1 - line_height * 9.5;
+    x = -0.98
 
     autorun = player_slot_settings.auto_run_enabled and "Auto run enabled" or "Auto run disabled"
-    draw_text(-0.95, y, 0, autorun, white)
+    draw_text(x, y, font_size, autorun, white)
 
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 1) and red or white
-    draw_text(-0.95, y, 0, "JUMP", color)
+    draw_text(x, y, font_size, "JUMP", color)
 
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 2) and red or white
-    draw_text(-0.95, y, 0, "ATTACK", color)
+    draw_text(x, y, font_size, "ATTACK", color)
 
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 3) and red or white
-    draw_text(-0.95, y, 0, "BOMB", color)
+    draw_text(x, y, font_size, "BOMB", color)
 
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 4) and red or white
-    draw_text(-0.95, y, 0, "ROPE", color)
+    draw_text(x, y, font_size, "ROPE", color)
 
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 5) and red or white
-    draw_text(-0.95, y, 0, "RUN", color)
+    draw_text(x, y, font_size, "RUN", color)
     
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 6) and red or white
-    draw_text(-0.95, y, 0, "USE DOOR/BUY", color)
+    draw_text(x, y, font_size, "USE DOOR/BUY", color)
     
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 7) and red or white
-    draw_text(-0.95, y, 0, "PAUSE", color)
+    draw_text(x, y, font_size, "PAUSE", color)
     
-    y = y - 0.05
+    y = y + line_height
 
     color = test_flag(player_slot.buttons, 8) and red or white
-    draw_text(-0.95, y, 0, "JOURNAL", color)
+    draw_text(x, y, font_size, "JOURNAL", color)
 
-    y = y + 0.20
-    x = -0.75
+    y = -1 - line_height * 5.5;
 
     color = test_flag(player_slot.buttons, 9) and red or white
-    draw_text(x, y, 0, "LEFT", color)
+    draw_text(cross_center_x - cross_center_hor_margin - left_width, y, font_size, "LEFT", color)
 
     color = test_flag(player_slot.buttons, 10) and red or white
-    draw_text(x + 0.10, y, 0, "RIGHT", color)
+    draw_text(cross_center_x + cross_center_hor_margin, y, font_size, "RIGHT", color)
+
+    y = -1 - line_height * 7.5;
 
     color = test_flag(player_slot.buttons, 11) and red or white
-    draw_text(x + 0.06, y + 0.10, 0, "UP", color)
+    draw_text(cross_center_x - (up_width / 2.0), y, font_size, "UP", color)
+
+    y = -1 - line_height * 3.5;
 
     color = test_flag(player_slot.buttons, 12) and red or white
-    draw_text(x + 0.035, y - 0.10, 0, "DOWN", color)
-
+    draw_text(cross_center_x - (down_width / 2.0), y, font_size, "DOWN", color)
 
 end, ON.GUIFRAME)
