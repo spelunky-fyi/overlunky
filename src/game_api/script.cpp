@@ -2197,7 +2197,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
 
     lua.create_named_table("DROPCHANCE"
                            //, "BONEBLOCK_SKELETONKEY", 0
-                           //, "", ...see_drops.hpp_for_a_list_of_possible_dropchances...
+                           //, "", ...see__drops.hpp__for__a__list__of__possible__dropchances...
                            //, "YETI_PITCHERSMITT", 10
     );
     for (auto x = 0; x < dropchance_entries.size(); ++x)
@@ -2207,7 +2207,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
 
     lua.create_named_table("DROP"
                            //, "ALTAR_DICE_CLIMBINGGLOVES", 0
-                           //, "", ...see_drops.hpp_for_a_list_of_possible_drops...
+                           //, "", ...see__drops.hpp__for__a__list__of__possible__drops...
                            //, "YETI_PITCHERSMITT", 85
     );
     for (auto x = 0; x < drop_entries.size(); ++x)
