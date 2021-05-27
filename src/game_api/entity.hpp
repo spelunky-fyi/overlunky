@@ -8,6 +8,9 @@
 
 #include "memory.hpp"
 
+struct RenderInfo;
+struct Texture;
+
 enum RepeatType : uint8_t
 {
     NoRepeat,
@@ -163,8 +166,8 @@ class Entity
     float hitboxy;
     uint32_t duckmask;
     float angle;
-    size_t rendering_info;
-    size_t texture;
+    RenderInfo* rendering_info;
+    Texture* texture;
     float tilew;
     float tileh;
     uint8_t camera_layer;
@@ -238,6 +241,8 @@ class Entity
     std::pair<float, float> position_render() const;
     void remove_item(uint32_t id);
     void destroy();
+
+    bool set_texture(std::uint32_t texture_id);
 
     template <typename T>
     T* as()

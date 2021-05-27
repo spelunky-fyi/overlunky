@@ -310,7 +310,7 @@ std::string sanitize(std::string data)
 {
     std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c)
                    { return std::tolower(c); });
-    std::regex reg("[^a-z/]*");
+    static std::regex reg("[^a-z/]*", std::regex_constants::optimize);
     data = std::regex_replace(data, reg, "");
     return data;
 }
@@ -1487,6 +1487,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::topmost_mount,
         "overlaps_with",
         overlaps_with,
+        "set_texture",
+        &Entity::set_texture,
         "as_movable",
         &Entity::as<Movable>,
         "as_door",
@@ -1525,6 +1527,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<Jiangshi>);
     /* Entity
         bool overlaps_with(Entity other)
+        bool set_texture(uint32_t texture_id)
     */
     lua.new_usertype<Movable>(
         "Movable",
