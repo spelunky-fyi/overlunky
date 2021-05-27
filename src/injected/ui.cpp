@@ -21,6 +21,7 @@
 
 #include "entity.hpp"
 #include "flags.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "particles.hpp"
 #include "rpc.hpp"
@@ -1421,6 +1422,21 @@ void write_file()
         for (const auto& particle : particles)
         {
             file << particle.id << ": " << particle.name << "\n";
+        }
+    }
+
+    {
+        std::map<std::uint32_t, std::string> sorted_tile_codes;
+        for (auto& [name, def] : g_state->level_gen->data->tile_codes())
+        {
+            sorted_tile_codes[def.id] = name;
+        }
+
+        std::ofstream file;
+        file.open("tile_codes.txt");
+        for (auto& [id, name] : sorted_tile_codes)
+        {
+            file << name << ": 0x" << std::hex << id << std::endl;
         }
     }
 
