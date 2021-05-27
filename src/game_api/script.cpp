@@ -1,4 +1,5 @@
 #include "script.hpp"
+#include "drops.hpp"
 #include "entity.hpp"
 #include "level_api.hpp"
 #include "logger.h"
@@ -911,6 +912,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
     /// Get the [ParticleDB](#particledb) details of the specified ID
     lua["get_particle_type"] = get_particle_type;
+    /// Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+    lua["set_drop_chance"] = set_drop_chance;
+    /// Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+    lua["replace_drop"] = replace_drop;
+    /// Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
+    lua["force_co_subtheme"] = force_co_subtheme;
+    /// Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
+    lua["generate_particles"] = generate_particles;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b)
@@ -2185,6 +2194,29 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_enum("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
+
+    lua.create_named_table("DROPCHANCE"
+                           //, "BONEBLOCK_SKELETONKEY", 0
+                           //, "", ...see__drops.hpp__for__a__list__of__possible__dropchances...
+                           //, "YETI_PITCHERSMITT", 10
+    );
+    for (auto x = 0; x < dropchance_entries.size(); ++x)
+    {
+        lua["DROPCHANCE"][dropchance_entries.at(x).caption] = x;
+    }
+
+    lua.create_named_table("DROP"
+                           //, "ALTAR_DICE_CLIMBINGGLOVES", 0
+                           //, "", ...see__drops.hpp__for__a__list__of__possible__drops...
+                           //, "YETI_PITCHERSMITT", 85
+    );
+    for (auto x = 0; x < drop_entries.size(); ++x)
+    {
+        lua["DROP"][drop_entries.at(x).caption] = x;
+    }
+
+    /// Parameter to force_co_subtheme
+    lua.new_enum("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
 }
 
 void SpelunkyScript::ScriptImpl::clear()

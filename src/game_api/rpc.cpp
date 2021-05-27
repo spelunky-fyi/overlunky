@@ -1,7 +1,9 @@
 #include "../injected/ui.hpp"
+#include "drops.hpp"
 #include "entity.hpp"
 #include "logger.h"
 #include "state.hpp"
+#include "virtual_table.hpp"
 #include <cstdarg>
 
 uint32_t setflag(uint32_t flags, int bit)
@@ -1059,4 +1061,128 @@ void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
     }
     write_mem_prot(normal_offset, to_le_bytes(normal), true);
     write_mem_prot(cursed_offset, to_le_bytes(cursed), true);
+}
+
+void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
+{
+    if (dropchance_id < dropchance_entries.size())
+    {
+        auto& entry = dropchance_entries.at(dropchance_id);
+        if (entry.offset == 0)
+        {
+            auto memory = Memory::get();
+            size_t offset = memory.at_exe(find_inst(memory.exe(), entry.pattern, get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)));
+            if (offset > memory.exe_ptr)
+            {
+                entry.offset = offset;
+            }
+        }
+
+        if (entry.offset != 0)
+        {
+            if (entry.chance_sizeof == 4)
+            {
+                write_mem_prot(entry.offset, to_le_bytes(new_drop_chance), true);
+            }
+            else if (entry.chance_sizeof == 1)
+            {
+                uint8_t value = new_drop_chance;
+                write_mem_prot(entry.offset, to_le_bytes(value), true);
+            }
+        }
+    }
+}
+
+void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type)
+{
+    if (new_drop_entity_type == 0)
+    {
+        return;
+    }
+
+    if (drop_id < drop_entries.size())
+    {
+        auto& entry = drop_entries.at(drop_id);
+        if (entry.offsets[0] == 0)
+        {
+            auto memory = Memory::get();
+            size_t offset = 0;
+            size_t exe_offset = 0;
+            if (entry.vtable_offset == VTABLE_OFFSET::NONE)
+            {
+                exe_offset = memory.at_exe(find_inst(memory.exe(), entry.pattern, memory.after_bundle) + entry.value_offset);
+            }
+            else
+            {
+                offset = find_inst(memory.exe(), entry.pattern, get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)) + entry.value_offset;
+                exe_offset = memory.at_exe(offset);
+            }
+
+            for (auto x = 0; x < entry.vtable_occurrence; ++x)
+            {
+                if (exe_offset > memory.exe_ptr)
+                {
+                    entry.offsets[x] = exe_offset;
+                }
+
+                if (x + 1 < entry.vtable_occurrence)
+                {
+                    offset = find_inst(memory.exe(), entry.pattern, offset + 1) + entry.value_offset;
+                    exe_offset = memory.at_exe(offset);
+                }
+            }
+        }
+
+        if (entry.offsets[0] != 0)
+        {
+            for (auto x = 0; x < entry.vtable_occurrence; ++x)
+            {
+                write_mem_prot(entry.offsets[x], to_le_bytes(new_drop_entity_type), true);
+            }
+        }
+    }
+}
+
+void force_co_subtheme(int8_t subtheme)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(find_inst(memory.exe(), "\x48\xC1\xE0\x03\x48\xC1\xE8\x20\x49\x89\x48\x08\x48\x98"s, memory.after_bundle));
+    }
+    if (subtheme >= 0 && subtheme <= 7)
+    {
+        uint8_t replacement[] = {0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90};
+        std::string replacement_s = std::string((char*)replacement, sizeof(replacement));
+        write_mem_prot(offset, replacement_s, true);
+    }
+    else if (subtheme == -1)
+    {
+        write_mem_prot(offset, "\x48\xC1\xE0\x03\x48\xC1\xE8\x20"s, true);
+    }
+}
+
+void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        std::string pattern = "\x48\x8B\xD9\xB9\xB0\x01\x00\x00"s;
+        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+    }
+
+    if (offset != 0)
+    {
+        auto entity = get_entity_ptr(uid);
+        if (entity != nullptr)
+        {
+            auto state = get_state_ptr();
+            typedef size_t generate_particles_func(size_t, uint32_t, Entity*);
+            static generate_particles_func* gpf = (generate_particles_func*)(offset);
+            auto result = gpf(state->particle_emitters_info, particle_emitter_id, entity);
+        }
+    }
 }
