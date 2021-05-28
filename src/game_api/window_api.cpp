@@ -255,15 +255,6 @@ hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT H
     return result;
 }
 
-template <class FunT, typename T>
-FunT& vtable_find(T* obj, int index)
-{
-    void*** ptr = reinterpret_cast<void***>(obj);
-    if (!ptr[0])
-        return *static_cast<FunT*>(nullptr);
-    return *reinterpret_cast<FunT*>(&ptr[0][index]);
-}
-
 template <class FunT>
 void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index)
 {
