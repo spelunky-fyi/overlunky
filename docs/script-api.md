@@ -399,6 +399,9 @@ Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(C
 ### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 #### Params: `int particle_emitter_id, int uid`
 Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
+### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
+#### Params: `bool b`
+Enables or disables the journal
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 #### Params: `int uid_a, int uid_b`
 Calculate the tile distance of two entities by uid

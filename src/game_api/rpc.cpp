@@ -1186,3 +1186,28 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
         }
     }
 }
+
+void set_journal_enabled(bool b)
+{
+    static size_t offset = 0;
+    static char original_call_instruction[5] = {0};
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        std::string pattern = "\x75\x1F\xF6\xC1\x08"s;
+        offset = memory.at_exe(find_inst(exe, pattern, memory.after_bundle) + 14);
+        for (uint8_t x = 0; x < 5; ++x)
+        {
+            original_call_instruction[x] = read_u8(offset + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset, std::string(original_call_instruction, 5), true);
+    }
+    else
+    {
+        write_mem_prot(offset, "\x90\x90\x90\x90\x90"s, true);
+    }
+}
