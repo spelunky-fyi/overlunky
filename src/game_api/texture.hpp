@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 struct Texture
@@ -23,8 +24,8 @@ struct Texture
 struct Textures
 {
     std::uint32_t num_textures;
-    Texture textures[0x186];
-    Texture* texture_map[0x186];
+    std::array<Texture, 0x186> textures;
+    std::array<Texture*, 0x186> texture_map;
 };
 
 Textures* get_textures();

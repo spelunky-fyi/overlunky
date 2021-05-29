@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "overloaded.hpp"
 #include "particles.hpp"
+#include "render_api.hpp"
 #include "rpc.hpp"
 #include "savedata.hpp"
 #include "script_context.hpp"
@@ -1379,7 +1380,38 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             height = images[image]->height;
         ImGui::Image(images[image]->texture, ImVec2(width, height));
     };
+    /// Defines a new texture that can be used in Entity::set_texture
+    lua["define_entity_texture"] = [this](TextureLoadingData texture_data)
+    {
+        texture_data.texture_path = texture_data.texture_path;
+        return RenderAPI::get().define_texture(std::move(texture_data));
+    };
 
+    /// Use `TextureData.new()` to get a new instance to this and pass it to define_entity_texture.
+    /// `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
+    /// `tile_width` and `tile_height` define the size of a single tile, the image will automatically be divided into these tiles.
+    /// Tiles are labeled in sequence starting at the top left, going right and down at the end of the image (you know, like sentences work in the English language). Use those numbers in `Entity::animation_frame`.
+    /// `sub_image_offset_x`, `sub_image_offset_y`, `sub_image_width` and `sub_image_height` can be used if only a part of the image should be used. Leave them at zero to ignore this.
+    lua.new_usertype<TextureLoadingData>(
+        "TextureData",
+        "texture_path",
+        &TextureLoadingData::texture_path,
+        "width",
+        &TextureLoadingData::width,
+        "height",
+        &TextureLoadingData::height,
+        "tile_width",
+        &TextureLoadingData::tile_width,
+        "tile_height",
+        &TextureLoadingData::tile_height,
+        "sub_image_offset_x",
+        &TextureLoadingData::sub_image_offset_x,
+        "sub_image_offset_y",
+        &TextureLoadingData::sub_image_offset_y,
+        "sub_image_width",
+        &TextureLoadingData::sub_image_width,
+        "sub_image_height",
+        &TextureLoadingData::sub_image_height);
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",

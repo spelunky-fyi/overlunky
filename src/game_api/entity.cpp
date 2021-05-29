@@ -339,12 +339,12 @@ void Entity::destroy()
 
 bool Entity::set_texture(std::uint32_t texture_id)
 {
-    const auto* textures = get_textures();
-    if (texture_id >= sizeof(textures->texture_map) / sizeof(Texture*))
-        return false;
-
-    texture = textures->texture_map[texture_id];
-    rendering_info->texture = texture;
-    rendering_info->texture_name = texture->name;
-    return true;
+    if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
+    {
+        texture = new_texture;
+        rendering_info->texture = new_texture;
+        rendering_info->texture_name = new_texture->name;
+        return true;
+    }
+    return false;
 }

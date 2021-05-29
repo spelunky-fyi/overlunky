@@ -3,13 +3,26 @@
 #include "memory.hpp"
 
 struct Texture;
+struct TextureLoadingData
+{
+    std::string texture_path;
+    uint32_t width;
+    uint32_t height;
+    uint32_t tile_width;
+    uint32_t tile_height;
+    uint32_t sub_image_offset_x{0};
+    uint32_t sub_image_offset_y{0};
+    uint32_t sub_image_width{0};
+    uint32_t sub_image_height{0};
+};
 
 struct RenderAPI
 {
     const size_t* api;
     size_t swap_chain_off;
+    std::unordered_map<std::uint32_t, Texture> custom_textures;
 
-    static RenderAPI get();
+    static RenderAPI& get();
 
     size_t renderer() const
     {
@@ -20,6 +33,10 @@ struct RenderAPI
     {
         return read_u64(renderer() + swap_chain_off);
     }
+
+    Texture* get_texture(std::uint32_t texture_id);
+    std::uint32_t define_texture(TextureLoadingData data);
+    const char** load_texture(std::string file_name);
 };
 
 // straight out of the x64dbg plugin
