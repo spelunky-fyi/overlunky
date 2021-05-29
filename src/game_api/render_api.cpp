@@ -15,7 +15,7 @@ size_t* find_api(Memory memory)
         auto off = find_inst(exe, "\x48\x8B\x50\x10\x48\x89"s, after_bundle) - 5;
         off = off + (*(int32_t*)(&exe[off + 1])) + 5;
 
-        return (size_t*)memory.at_exe(decode_pc(exe, off + 6));
+        return res = (size_t*)memory.at_exe(decode_pc(exe, off + 6));
     }
 }
 
@@ -29,7 +29,7 @@ size_t get_load_texture()
         auto off = find_inst(exe, "\x75\xf7\x48\x8d\x54\x24\x40\x48"s, after_bundle);
         off = find_inst(exe, "\xe8"s, off);
         off = find_inst(exe, "\xe8"s, off + 1);
-        return memory.at_exe(decode_pc(exe, off, 1));
+        return res = memory.at_exe(decode_pc(exe, off, 1));
     }
 }
 
