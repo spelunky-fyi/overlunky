@@ -49,6 +49,7 @@ void entity_remove_item(uint32_t id, uint32_t item_uid);
 int32_t spawn_entity_over(uint32_t item_uid, uint32_t over_uid, float x, float y);
 bool entity_has_item_uid(uint32_t uid, uint32_t item_uid);
 bool entity_has_item_type(uint32_t uid, uint32_t entity_type);
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, uint32_t mask);
 void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
 uint32_t get_frame_count();
