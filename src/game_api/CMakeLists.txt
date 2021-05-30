@@ -37,7 +37,9 @@ add_library(spel2_api STATIC
         overloaded.hpp
         virtual_table.hpp
         virtual_table.cpp
-        drops.hpp)
+        drops.hpp
+        lua_libs.cpp
+        lua_libs.hpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
         imgui)

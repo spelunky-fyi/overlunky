@@ -3,6 +3,7 @@
 #include "entity.hpp"
 #include "level_api.hpp"
 #include "logger.h"
+#include "lua_libs.hpp"
 #include "overloaded.hpp"
 #include "particles.hpp"
 #include "rpc.hpp"
@@ -458,6 +459,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     state.quest_flags = g_state->quest_flags;
 
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
+    require_json_lua(lua);
+    require_inspect_lua(lua);
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
