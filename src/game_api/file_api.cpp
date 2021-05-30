@@ -90,17 +90,20 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             auto data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
             auto allocation_size = sizeof(FileInfo) + data_size;
             auto file_buffer = (char*)alloc_fun(allocation_size);
+
             FileInfo* file_info = new (file_buffer) FileInfo{};
             file_info->Data = file_buffer + sizeof(FileInfo);
             file_info->DataSize = data_size;
             file_info->AllocationSize = allocation_size;
 
-            auto data = file_buffer + sizeof(FileInfo);
-            memcpy("DDS ", data, 4);
-            memcpy(&header, data + 4, sizeof(DDS_HEADER));
-            memcpy(image_data, data + 4 + sizeof(DDS_HEADER), image_data_size);
+            auto dds_image_data = file_buffer + sizeof(FileInfo);
+            memcpy(dds_image_data, "DDS ", 4);
+            memcpy(dds_image_data + 4, &header, sizeof(DDS_HEADER));
+            memcpy(dds_image_data + 4 + sizeof(DDS_HEADER), image_data, image_data_size);
 
             stbi_image_free(image_data);
+
+            return file_info;
         }
     }
     return nullptr;
