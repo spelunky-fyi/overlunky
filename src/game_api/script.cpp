@@ -1,6 +1,7 @@
 #include "script.hpp"
 #include "drops.hpp"
 #include "entity.hpp"
+#include "file_api.hpp"
 #include "level_api.hpp"
 #include "logger.h"
 #include "overloaded.hpp"
@@ -25,8 +26,10 @@
 #include <regex>
 #include <set>
 
+#include <d3d11.h>
+
 #define SOL_ALL_SAFETIES_ON 1
-#include "sol/sol.hpp"
+#include <sol/sol.hpp>
 
 std::vector<SpelunkyScript*> g_all_scripts;
 
@@ -1060,7 +1063,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         image->width = 0;
         image->height = 0;
         image->texture = NULL;
-        if (LoadTextureFromFile((script_folder / path).string().data(), &image->texture, &image->width, &image->height))
+        if (create_d3d11_texture_from_file((script_folder / path).string().data(), &image->texture, &image->width, &image->height))
         {
             int id = images.size();
             images[id] = image;
@@ -1383,7 +1386,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Defines a new texture that can be used in Entity::set_texture
     lua["define_entity_texture"] = [this](TextureLoadingData texture_data)
     {
-        texture_data.texture_path = texture_data.texture_path;
+        texture_data.texture_path = get_image_file_path(meta.path, std::move(texture_data.texture_path));
         return RenderAPI::get().define_texture(std::move(texture_data));
     };
 

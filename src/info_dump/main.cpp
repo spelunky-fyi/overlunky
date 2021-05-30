@@ -113,7 +113,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 
     Textures* textures_ptr = get_textures();
     std::sort(
-        textures_ptr->textures, textures_ptr->textures + textures_ptr->num_textures, [](Texture& a, Texture& b) -> bool
+        textures_ptr->textures.begin(), textures_ptr->textures.end(), [](Texture& a, Texture& b) -> bool
         { return a.id < b.id; });
 
     std::filesystem::create_directories("game_data");
@@ -158,7 +158,10 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         for (std::size_t i = 0; i < textures_ptr->num_textures; i++)
         {
             Texture& tex = textures_ptr->textures[i];
-            textures[std::to_string(tex.id)] = tex;
+            if (tex.name != nullptr)
+            {
+                textures[std::to_string(tex.id)] = tex;
+            }
         }
 
         std::string dump = textures.dump(2);

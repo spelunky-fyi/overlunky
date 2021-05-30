@@ -20,6 +20,7 @@
 #include <toml.hpp>
 
 #include "entity.hpp"
+#include "file_api.hpp"
 #include "flags.hpp"
 #include "level_api.hpp"
 #include "logger.h"
@@ -3966,7 +3967,9 @@ void init_ui()
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);
 
-    register_make_save_path(make_save_path);
+    register_make_save_path(&make_save_path);
+
+    register_on_load_file(&load_file_as_dds_if_image);
 }
 
 void reload_enabled_scripts()

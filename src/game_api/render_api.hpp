@@ -1,8 +1,8 @@
 #pragma once
 
 #include "memory.hpp"
+#include "texture.hpp"
 
-struct Texture;
 struct TextureLoadingData
 {
     std::string texture_path;
