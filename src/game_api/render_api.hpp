@@ -3,7 +3,7 @@
 #include "memory.hpp"
 #include "texture.hpp"
 
-struct TextureLoadingData
+struct TextureDefinition
 {
     std::string texture_path;
     uint32_t width;
@@ -35,7 +35,7 @@ struct RenderAPI
     }
 
     Texture* get_texture(std::uint32_t texture_id);
-    std::uint32_t define_texture(TextureLoadingData data);
+    std::uint32_t define_texture(TextureDefinition data);
     const char** load_texture(std::string file_name);
 };
 

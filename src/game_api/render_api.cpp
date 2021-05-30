@@ -56,7 +56,7 @@ Texture* RenderAPI::get_texture(std::uint32_t texture_id)
     return textures->texture_map[texture_id];
 }
 
-std::uint32_t RenderAPI::define_texture(TextureLoadingData data)
+std::uint32_t RenderAPI::define_texture(TextureDefinition data)
 {
     for (auto& [id, texture] : custom_textures)
     {

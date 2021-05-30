@@ -8,7 +8,7 @@ meta = {
 -- load a textured just like "floor_cave.png"
 local bad_texture_id = nil
 do
-    local texture_data = TextureData.new()
+    local texture_data = TextureDefinition.new()
     texture_data.texture_path = "floor_puke.png"
     texture_data.width = 1536
     texture_data.height = 1536
