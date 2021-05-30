@@ -132,7 +132,7 @@ struct LevelGenCallback
     sol::function func;
 };
 
-using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>;
+using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>;
 
 struct ScriptState
 {
@@ -376,9 +376,10 @@ class SpelunkyScript::ScriptImpl
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
-    std::map<int, Callback> level_timers;
-    std::map<int, Callback> global_timers;
-    std::map<int, Callback> callbacks;
+    std::map<int, TimerCallback> level_timers;
+    std::map<int, TimerCallback> global_timers;
+    std::map<int, ScreenCallback> callbacks;
+    std::map<int, ScreenCallback> load_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_level_gen_callbacks;
     std::vector<LevelGenCallback> post_level_gen_callbacks;
@@ -587,7 +588,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_callback"] = [this](sol::function cb, int screen)
     {
         auto luaCb = ScreenCallback{cb, (ON)screen, -1};
-        callbacks[cbcount] = luaCb;
+        if (luaCb.screen == ON::LOAD)
+            load_callbacks[cbcount] = luaCb; // Make sure load always runs before other callbacks
+        else
+            callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     /// Clear previously added callback `id`
@@ -2381,27 +2385,24 @@ bool SpelunkyScript::ScriptImpl::run()
 
         for (auto id : clear_callbacks)
         {
-            auto it = level_timers.find(id);
-            if (it != level_timers.end())
-                level_timers.erase(id);
+            level_timers.erase(id);
+            global_timers.erase(id);
+            callbacks.erase(id);
+            load_callbacks.erase(id);
 
-            auto it2 = global_timers.find(id);
-            if (it2 != global_timers.end())
-                global_timers.erase(id);
+            {
+                auto it = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
+                                       { return cb.id == id; });
+                if (it != pre_level_gen_callbacks.end())
+                    pre_level_gen_callbacks.erase(it);
+            }
 
-            auto it3 = callbacks.find(id);
-            if (it3 != callbacks.end())
-                callbacks.erase(id);
-
-            auto it4 = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
-                                    { return cb.id == id; });
-            if (it4 != pre_level_gen_callbacks.end())
-                pre_level_gen_callbacks.erase(it4);
-
-            auto it5 = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
-                                    { return cb.id == id; });
-            if (it5 != post_level_gen_callbacks.end())
-                post_level_gen_callbacks.erase(it5);
+            {
+                auto it = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
+                                       { return cb.id == id; });
+                if (it != post_level_gen_callbacks.end())
+                    post_level_gen_callbacks.erase(it);
+            }
         }
         clear_callbacks.clear();
 
@@ -2435,100 +2436,98 @@ bool SpelunkyScript::ScriptImpl::run()
             }
         }
 
+        auto now = get_frame_count();
+        for (auto& [id, callback] : load_callbacks)
+        {
+            if (callback.lastRan < 0)
+            {
+                handle_function(callback.func, LoadContext{meta.path, meta.stem});
+                callback.lastRan = now;
+            }
+            break;
+        }
+
         for (auto& [id, callback] : callbacks)
         {
-            auto now = get_frame_count();
-            if (auto* cb = std::get_if<ScreenCallback>(&callback))
+            if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
             {
-                if ((ON)g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
+                handle_function(callback.func);
+                callback.lastRan = now;
+            }
+            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+            {
+                handle_function(callback.func);
+                callback.lastRan = now;
+            }
+            else
+            {
+                switch (callback.screen)
                 {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
+                case ON::FRAME:
+                {
+                    if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
+                    {
+                        handle_function(callback.func);
+                        callback.lastRan = now;
+                    }
+                    break;
                 }
-                else if (cb->screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+                case ON::GAMEFRAME:
                 {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
+                    if (!g_state->pause && get_frame_count() != state.time_global &&
+                        ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
+                    {
+                        handle_function(callback.func);
+                        callback.lastRan = now;
+                    }
+                    break;
                 }
-                else
+                case ON::SCREEN:
                 {
-                    switch (cb->screen)
+                    if (g_state->screen != state.screen)
                     {
-                    case ON::FRAME:
+                        handle_function(callback.func);
+                        callback.lastRan = now;
+                    }
+                    break;
+                }
+                case ON::START:
+                {
+                    if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !g_players.empty() &&
+                        state.player != g_players.at(0))
                     {
-                        if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func);
+                        callback.lastRan = now;
                     }
-                    case ON::GAMEFRAME:
+                    break;
+                }
+                case ON::LOADING:
+                {
+                    if (g_state->loading > 0 && g_state->loading != state.loading)
                     {
-                        if (!g_state->pause && get_frame_count() != state.time_global &&
-                            ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func);
+                        callback.lastRan = now;
                     }
-                    case ON::SCREEN:
+                    break;
+                }
+                case ON::RESET:
+                {
+                    if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
                     {
-                        if (g_state->screen != state.screen)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func);
+                        callback.lastRan = now;
                     }
-                    case ON::START:
+                    break;
+                }
+                case ON::SAVE:
+                {
+                    if (g_state->screen != state.screen && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
                     {
-                        if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !g_players.empty() &&
-                            state.player != g_players.at(0))
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func, SaveContext{meta.path, meta.stem});
+                        callback.lastRan = now;
                     }
-                    case ON::LOADING:
-                    {
-                        if (g_state->loading > 0 && g_state->loading != state.loading)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    case ON::RESET:
-                    {
-                        if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    case ON::SAVE:
-                    {
-                        if (g_state->screen != state.screen && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
-                        {
-                            handle_function(cb->func, SaveContext{meta.path, meta.stem});
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    case ON::LOAD:
-                    {
-                        if (cb->lastRan < 0)
-                        {
-                            handle_function(cb->func, LoadContext{meta.path, meta.stem});
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    }
+                    break;
+                }
                 }
             }
         }
@@ -2604,13 +2603,10 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
         for (auto& [id, callback] : callbacks)
         {
             auto now = get_frame_count();
-            if (auto* cb = std::get_if<ScreenCallback>(&callback))
+            if (callback.screen == ON::GUIFRAME)
             {
-                if (cb->screen == ON::GUIFRAME)
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
+                handle_function(callback.func);
+                callback.lastRan = now;
             }
         }
     }
