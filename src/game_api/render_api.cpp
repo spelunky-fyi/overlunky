@@ -80,8 +80,6 @@ std::uint32_t RenderAPI::define_texture(TextureDefinition data)
     {
         if (*texture.name == data.texture_path)
         {
-            // Hotload?
-            texture.name = load_texture(std::move(data.texture_path));
             return texture.id;
         }
     }
