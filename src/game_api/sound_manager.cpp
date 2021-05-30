@@ -681,6 +681,7 @@ bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
                        case LoopMode::Bidirectional:
                            return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_BIDI));
                        }
+                       return false;
                    },
                    [](FMODStudio::EventInstance* event)
                    { return false; },
