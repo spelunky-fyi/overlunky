@@ -31,7 +31,10 @@ struct StateMemory
     uint8_t b33;
     int32_t i34;
     uint32_t quest_flags;
-    int32_t i3c;
+    uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
+    uint8_t i3cb;
+    uint8_t i3cc;
+    uint8_t i3cd;
     uint32_t speedrun_character;         // who administers the speedrun in base camp
     uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
     uint8_t padding4;
@@ -55,7 +58,7 @@ struct StateMemory
     uint8_t world_next;
     uint8_t level;
     uint8_t level_next;
-    int32_t i6c;
+    int32_t i6c; // i6c and i70 are a pointer to ThemeInfo (todo)
     int32_t i70;
     uint8_t theme;
     uint8_t theme_next;
@@ -72,8 +75,11 @@ struct StateMemory
     uint8_t level_count;
     uint8_t pad84[0x970];
     uint32_t journal_flags;
-    int32_t i9f0;
-    int32_t i9f4;
+    int32_t first_damage_cause; // entity type that caused first damage, for the journal
+    int8_t first_damage_world;
+    int8_t first_damage_level;
+    uint8_t i9f4c;
+    uint8_t i9f4d;
     uint32_t time_last_level;
     uint32_t time_level;
     int32_t ia00;
@@ -84,7 +90,13 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    char pad12d0[0x1308 - 0x12d0];
+    size_t unknown23;
+    size_t unknown24;
+    size_t unknown25;
+    size_t unknown26;
+    size_t particle_emitters_info;
+    size_t unknown28;
+    size_t unknown29;
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
 };
 struct State

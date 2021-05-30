@@ -1,4 +1,5 @@
 #include "script.hpp"
+#include "drops.hpp"
 #include "entity.hpp"
 #include "level_api.hpp"
 #include "logger.h"
@@ -627,10 +628,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         toast(NULL, message.data());
     };
     /// Show a message coming from an entity
-    lua["say"] = [this](uint32_t entity_id, std::wstring message, int unk_type, bool top)
+    lua["say"] = [this](uint32_t entity_uid, std::wstring message, int unk_type, bool top)
     {
         auto say = get_say();
-        auto entity = get_entity_ptr(entity_id);
+        auto entity = get_entity_ptr(entity_uid);
         if (entity == nullptr)
             return;
         say(NULL, entity, message.data(), unk_type, top);
@@ -768,7 +769,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_door"] = set_door_target;
     /// Get door target `world`, `level`, `theme`
     lua["get_door_target"] = get_door_target;
-    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
+    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_uid`
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid
     lua["get_entity"] = get_entity_ptr;
@@ -776,7 +777,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_type"] = get_type;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
-    /// Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore that.
+    /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
     /// You can even pass a table! Example:
@@ -785,7 +786,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// function on_level()
     ///     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
     ///     -- is not the same thing as this, but also works
-    ///     uids2 = get_entities_by_type(types)
+    ///     uids2 = get_entities_by_type(entity_types)
     ///     message(tostring(#uids).." == "..tostring(#uids2))
     /// end
     /// ```
@@ -810,9 +811,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_entities_by_mask"] = get_entities_by_mask;
     /// Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
     lua["get_entities_by_layer"] = get_entities_by_layer;
-    /// Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
+    /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
-    /// Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
+    /// Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_overlapping"] = get_entities_overlapping;
     /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
@@ -845,12 +846,14 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["get_render_position"] = get_render_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
-    /// Spawn an entity by `id` attached to some other entity `over`, in offset `x`, `y`
+    /// Spawn an entity by `uid` attached to some other entity `over`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
-    /// Check if the entity `id` has some specific `item` by uid in their inventory
+    /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
-    /// Check if the entity `id` has some ENT_TYPE `type` in their inventory
+    /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
     lua["entity_has_item_type"] = entity_has_item_type;
+    /// Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
+    lua["entity_get_items_by"] = entity_get_items_by;
     /// Kills an entity by uid.
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
@@ -870,7 +873,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Get the current timestamp in milliseconds since the Unix Epoch.
     lua["get_ms"] = []()
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
-    /// Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
+    /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
     /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
@@ -893,12 +896,20 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
     /// Get the [ParticleDB](#particledb) details of the specified ID
     lua["get_particle_type"] = get_particle_type;
+    /// Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+    lua["set_drop_chance"] = set_drop_chance;
+    /// Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+    lua["replace_drop"] = replace_drop;
+    /// Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
+    lua["force_co_subtheme"] = force_co_subtheme;
+    /// Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
+    lua["generate_particles"] = generate_particles;
 
     /// Calculate the tile distance of two entities by uid
-    lua["distance"] = [this](uint32_t a, uint32_t b) -> float
+    lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b) -> float
     {
-        Entity* ea = get_entity_ptr(a);
-        Entity* eb = get_entity_ptr(b);
+        Entity* ea = get_entity_ptr(uid_a);
+        Entity* eb = get_entity_ptr(uid_b);
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
@@ -2154,6 +2165,29 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua.new_enum("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
+
+    lua.create_named_table("DROPCHANCE"
+                           //, "BONEBLOCK_SKELETONKEY", 0
+                           //, "", ...see__drops.hpp__for__a__list__of__possible__dropchances...
+                           //, "YETI_PITCHERSMITT", 10
+    );
+    for (auto x = 0; x < dropchance_entries.size(); ++x)
+    {
+        lua["DROPCHANCE"][dropchance_entries.at(x).caption] = x;
+    }
+
+    lua.create_named_table("DROP"
+                           //, "ALTAR_DICE_CLIMBINGGLOVES", 0
+                           //, "", ...see__drops.hpp__for__a__list__of__possible__drops...
+                           //, "YETI_PITCHERSMITT", 85
+    );
+    for (auto x = 0; x < drop_entries.size(); ++x)
+    {
+        lua["DROP"][drop_entries.at(x).caption] = x;
+    }
+
+    /// Parameter to force_co_subtheme
+    lua.new_enum("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
 }
 
 void SpelunkyScript::ScriptImpl::clear()

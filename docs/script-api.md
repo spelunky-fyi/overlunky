@@ -116,7 +116,7 @@ end, ON.LEVEL)
 ```
 ### [`nil toast(string message)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast)
 Show a message that looks like a level feeling.
-### [`nil say(int entity_id, string message, int unk_type, bool top)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=say)
+### [`nil say(int entity_uid, string message, int unk_type, bool top)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=say)
 Show a message coming from an entity
 ### [`nil register_option_int(string name, string desc, string long_desc, int value, int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_int)
 Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
@@ -133,7 +133,7 @@ Add a combobox option that the user can change in the UI. Read the int index of 
 with a double `\0\0` at the end.
 ### [`nil register_option_button()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
-`int spawn_entity(int id, float x, float y, int layer, float vx, float vy)`<br/>
+`int spawn_entity(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Spawn an entity in position with some velocity and return the uid of spawned entity.
 Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
 Example:
@@ -149,7 +149,7 @@ set_callback(function()
 end, ON.LEVEL)
 ```
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
-`int spawn(int id, float x, float y, int layer, float vx, float vy)`<br/>
+`int spawn(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Short for [spawn_entity](#spawn_entity).
 ### [`spawn_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door)
 `int spawn_door(float x, float y, int layer, int w, int l, int t)`<br/>
@@ -182,7 +182,7 @@ Set the zoom level used in levels and shops. 13.5 is the default.
 ### [`nil pause(bool p)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause)
 Enable/disable game engine pause.
 ### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
-`nil move_entity(int id, float x, float y, float vx, float vy)`<br/>
+`nil move_entity(int uid, float x, float y, float vx, float vy)`<br/>
 Teleport entity to coordinates with optional velocity
 ### [`set_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door_target)
 `nil set_door_target(int id, int w, int l, int t)`<br/>
@@ -191,13 +191,13 @@ Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
 `nil set_door(int id, int w, int l, int t)`<br/>
 Short for [set_door_target](#set_door_target).
 ### [`get_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_door_target)
-`tuple<int, int, int> get_door_target(int id)`<br/>
+`tuple<int, int, int> get_door_target(int uid)`<br/>
 Get door target `world`, `level`, `theme`
 ### [`set_contents`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_contents)
-`nil set_contents(int id, int item)`<br/>
-Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `id` to ENT_TYPE... `item`
+`nil set_contents(int uid, int item_uid)`<br/>
+Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_uid`
 ### [`get_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
-`Entity get_entity(int id)`<br/>
+`Entity get_entity(int uid)`<br/>
 Get the [Entity](#entity) behind an uid
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 `EntityDB get_type(int id)`<br/>
@@ -206,8 +206,8 @@ Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 `array<int> get_entities()`<br/>
 Get uids of all entities currently loaded
 ### [`get_entities_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
-`array<int> get_entities_by(int type, int mask, int layer)`<br/>
-Get uids of entities by some conditions. Set `type` or `mask` to `0` to ignore that.
+`array<int> get_entities_by(int entity_type, int mask, int layer)`<br/>
+Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`array<int> get_entities_by_type(int, int...)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
 You can even pass a table! Example:
@@ -216,7 +216,7 @@ types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
 function on_level()
     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
     -- is not the same thing as this, but also works
-    uids2 = get_entities_by_type(types)
+    uids2 = get_entities_by_type(entity_types)
     message(tostring(#uids).." == "..tostring(#uids2))
 end
 ```
@@ -227,25 +227,25 @@ Get uids of entities by some search_flags
 `array<int> get_entities_by_layer(int layer)`<br/>
 Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
 ### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
-`array<int> get_entities_at(int type, int mask, float x, float y, int layer, float r)`<br/>
-Get uids of matching entities inside some radius. Set `type` or `mask` to `0` to ignore that.
+`array<int> get_entities_at(int entity_type, int mask, float x, float y, int layer, float radius)`<br/>
+Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
-`array<int> get_entities_overlapping(int type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
-Get uids of matching entities overlapping with the given rect. Set `type` or `mask` to `0` to ignore that.
+`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
+Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entity_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags)
-`int get_entity_flags(int id)`<br/>
+`int get_entity_flags(int uid)`<br/>
 Get the `flags` field from entity by uid
 ### [`set_entity_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_entity_flags)
-`nil set_entity_flags(int id, int flags)`<br/>
+`nil set_entity_flags(int uid, int flags)`<br/>
 Set the `flags` field from entity by uid
 ### [`get_entity_flags2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags2)
 `int get_entity_flags2(int id)`<br/>
 Get the `more_flags` field from entity by uid
 ### [`set_entity_flags2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_entity_flags2)
-`nil set_entity_flags2(int id, int flags)`<br/>
+`nil set_entity_flags2(int uid, int flags)`<br/>
 Set the `more_flags` field from entity by uid
 ### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
-`int get_entity_ai_state(int id)`<br/>
+`int get_entity_ai_state(int uid)`<br/>
 Get the `move_state` field from entity by uid
 ### [`get_level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_flags)
 `int get_level_flags()`<br/>
@@ -254,7 +254,7 @@ Get `state.level_flags`
 `nil set_level_flags(int flags)`<br/>
 Set `state.level_flags`
 ### [`get_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_type)
-`int get_entity_type(int id)`<br/>
+`int get_entity_type(int uid)`<br/>
 Get the ENT_TYPE... for entity by uid
 ### [`get_zoom_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_zoom_level)
 `float get_zoom_level()`<br/>
@@ -276,29 +276,32 @@ you're standing on, not real level coordinates.
 `tuple<float, float, int> get_render_position(int id)`<br/>
 Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
 ### [`entity_remove_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
-`nil entity_remove_item(int id, int item)`<br/>
+`nil entity_remove_item(int id, int item_uid)`<br/>
 Remove item by uid from entity
 ### [`spawn_entity_over`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_over)
-`int spawn_entity_over(int id, int over, float x, float y)`<br/>
-Spawn an entity by `id` attached to some other entity `over`, in offset `x`, `y`
+`int spawn_entity_over(int item_uid, int over_uid, float x, float y)`<br/>
+Spawn an entity by `uid` attached to some other entity `over`, in offset `x`, `y`
 ### [`entity_has_item_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_uid)
-`bool entity_has_item_uid(int id, int item)`<br/>
-Check if the entity `id` has some specific `item` by uid in their inventory
+`bool entity_has_item_uid(int uid, int item_uid)`<br/>
+Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 ### [`entity_has_item_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
-`bool entity_has_item_type(int id, int type)`<br/>
-Check if the entity `id` has some ENT_TYPE `type` in their inventory
+`bool entity_has_item_type(int uid, int entity_type)`<br/>
+Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
+### [`entity_get_items_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
+`array<int> entity_get_items_by(int uid, int entity_type, int mask)`<br/>
+Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
 ### [`kill_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_entity)
-`nil kill_entity(int id)`<br/>
+`nil kill_entity(int uid)`<br/>
 Kills an entity by uid.
 ### [`pick_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up)
-`nil pick_up(int who, int what)`<br/>
+`nil pick_up(int who_uid, int what_uid)`<br/>
 Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
 ```lua
 -- spawn and equip a jetpack
 pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
 ```
 ### [`apply_entity_db`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_entity_db)
-`nil apply_entity_db(int id)`<br/>
+`nil apply_entity_db(int uid)`<br/>
 Apply changes made in [get_type](#get_type)() to entity instance by uid.
 ### [`lock_door_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_door_at)
 `nil lock_door_at(float x, float y)`<br/>
@@ -312,10 +315,10 @@ Get the current global frame count since the game was started. You can use this 
 ### [`nil get_ms()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ms)
 Get the current timestamp in milliseconds since the Unix Epoch.
 ### [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry)
-`nil carry(int mount, int rider)`<br/>
-Make `mount` carry `rider` on their back. Only use this with actual mounts and living things.
+`nil carry(int mount_uid, int rider_uid)`<br/>
+Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
 ### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
-`nil set_arrowtrap_projectile(int regular_item_id, int poison_item_id)`<br/>
+`nil set_arrowtrap_projectile(int regular_entity_type, int poison_entity_type)`<br/>
 Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
 ### [`set_kapala_blood_threshold`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_kapala_blood_threshold)
 `nil set_kapala_blood_threshold(int threshold)`<br/>
@@ -333,7 +336,7 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 `nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)`<br/>
 Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
-`nil flip_entity(int id)`<br/>
+`nil flip_entity(int uid)`<br/>
 Flip entity around by uid. All new entities face right by default.
 ### [`set_olmec_phase_y_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_phase_y_level)
 `nil set_olmec_phase_y_level(int phase, float y)`<br/>
@@ -343,7 +346,19 @@ Sets the Y-level at which Olmec changes phases
 Determines when the ghost appears, either when the player is cursed or not
 ### [`nil get_particle_type()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 Get the [ParticleDB](#particledb) details of the specified ID
-### [`float distance(int a, int b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
+### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
+`nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
+Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+### [`replace_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_drop)
+`nil replace_drop(int drop_id, int new_drop_entity_type)`<br/>
+Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+### [`force_co_subtheme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_co_subtheme)
+`nil force_co_subtheme(int subtheme)`<br/>
+Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
+### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
+`nil generate_particles(int particle_emitter_id, int uid)`<br/>
+Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
+### [`float distance(int uid_a, int uid_b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 Calculate the tile distance of two entities by uid
 ### [`tuple<float, float, float, float> get_bounds()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bounds)
 Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
@@ -800,6 +815,14 @@ end, ON.LEVEL)
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
 - ...check particle_emitters.txt output by Overlunky...
 - [`MINIGAME_BROKENASTEROID_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) 219
+### DROPCHANCE
+- [`BONEBLOCK_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) 0
+- ...see drops.hpp for a list of possible dropchances...
+- [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.YETI_PITCHERSMITT) 10
+### DROP
+- [`ALTAR_DICE_CLIMBINGGLOVES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_CLIMBINGGLOVES) 0
+- ...see drops.hpp for a list of possible drops...
+- [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETI_PITCHERSMITT) 85
 ### THEME
 - [`DWELLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME.DWELLING) 1
 - [`JUNGLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME.JUNGLE) 2
@@ -937,6 +960,16 @@ Params: `PlayingSound vanilla_sound`
 - [`TIAMAT_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.TIAMAT_WIN) 1
 - [`HUNDUN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.HUNDUN_WIN) 2
 - [`COSMIC_OCEAN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.COSMIC_OCEAN_WIN) 3
+### COSUBTHEME
+- [`RESET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.RESET) -1
+- [`DWELLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.DWELLING) 0
+- [`JUNGLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.JUNGLE) 1
+- [`VOLCANA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.VOLCANA) 2
+- [`TIDEPOOL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.TIDEPOOL) 3
+- [`TEMPLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.TEMPLE) 4
+- [`ICECAVES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.ICECAVES) 5
+- [`NEOBABYLON`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEOBABYLON) 6
+- [`SUNKENCITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKENCITY) 7
 ## Aliases
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 ### CALLBACK_ID == int;
