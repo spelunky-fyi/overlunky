@@ -61,9 +61,9 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             DDS_HEADER header{
                 124,        // hardcoded
                 0x0002100F, // required flags + pitch + mipmapped
-                image_height,
-                image_width,
-                image_width * 4, // aka bytes per line
+                static_cast<DWORD>(image_height),
+                static_cast<DWORD>(image_width),
+                static_cast<DWORD>(image_width * 4), // aka bytes per line
                 1,
                 1,
                 {},
