@@ -283,14 +283,15 @@ for lf in funcs:
         ret = 'nil'
         param = ''
         if m:
-            ret = replace_all(m.group(2), replace).strip()
+            ret = replace_all(m.group(2), replace).strip() or 'nil'
         if m or m2:
             param = (m or m2).group(1)
             param = replace_all(param, replace).strip()
         name = lf["name"]
         fun = f'{ret} {name}({param})'.strip()
         search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
-        print(f'### [`{fun}`]({search_link})')
+        print(f'### [`{name}`]({search_link})')
+        print(f'`{fun}`<br/>')
         for com in lf['comment']:
             print(com)
 
