@@ -1383,6 +1383,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             height = images[image]->height;
         ImGui::Image(images[image]->texture, ImVec2(width, height));
     };
+    /// Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
+    lua["get_texture_definition"] = [this](uint32_t texture_id) -> TextureDefinition
+    {
+        return RenderAPI::get().get_texture_definition(texture_id);
+    };
     /// Defines a new texture that can be used in Entity::set_texture
     lua["define_texture"] = [this](TextureDefinition texture_data) -> uint32_t
     {

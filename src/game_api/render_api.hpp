@@ -34,6 +34,7 @@ struct RenderAPI
         return read_u64(renderer() + swap_chain_off);
     }
 
+    TextureDefinition get_texture_definition(std::uint32_t texture_id);
     Texture* get_texture(std::uint32_t texture_id);
     std::uint32_t define_texture(TextureDefinition data);
     const char** load_texture(std::string file_name);

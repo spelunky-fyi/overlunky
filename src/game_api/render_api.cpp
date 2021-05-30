@@ -46,6 +46,24 @@ RenderAPI& RenderAPI::get()
     return render_api;
 }
 
+TextureDefinition RenderAPI::get_texture_definition(std::uint32_t texture_id)
+{
+    if (Texture* tex = get_texture(texture_id))
+    {
+        return TextureDefinition{
+            *tex->name,
+            tex->width,
+            tex->height,
+            static_cast<std::uint32_t>(tex->tile_width_fraction * tex->width),
+            static_cast<std::uint32_t>(tex->tile_height_fraction * tex->height),
+            static_cast<std::uint32_t>(tex->offset_x_weird_math * tex->width - 0.5f),
+            static_cast<std::uint32_t>(tex->offset_y_weird_math * tex->height - 0.5f),
+            static_cast<std::uint32_t>(tex->tile_width_fraction * tex->width * tex->num_tiles_width),
+            static_cast<std::uint32_t>(tex->tile_height_fraction * tex->height * tex->num_tiles_height)};
+    }
+    return {};
+}
+
 Texture* RenderAPI::get_texture(std::uint32_t texture_id)
 {
     auto* textures = get_textures();
