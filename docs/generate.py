@@ -58,7 +58,8 @@ def print_af(lf, af):
     param = replace_all(af['param'], replace)
     fun = f'{ret} {name}({param})'.strip()
     search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
-    print(f'### [`{fun}`]({search_link})')
+    print(f'### [`{name}`]({search_link})')
+    print(f'`{fun}`<br/>')
     for com in lf['comment']:
         print(com)
 
@@ -326,9 +327,12 @@ for type in types:
                 param = replace_all(m.group(3), replace)
                 signature = ret + ' ' + name + '(' + param + ')'
             signature = signature.strip()
-            print('- [`'+signature+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
+            type_str = var['type'].replace('<', '&lt;').replace('>', '&gt;')
+            print(f'- [`{signature}`]({search_link}) {type_str}')
         else:
-            print('- [`'+var['name']+'`]('+search_link+') '+var['type'].replace('<', '&lt;').replace('>', '&gt;'))
+            name = var['name']
+            type_str = var['type'].replace('<', '&lt;').replace('>', '&gt;')
+            print(f'- [`{name}`]({search_link}) {type_str}')
 
 print('## Enums')
 print('Enums are like numbers but in text that\'s easier to remember. Example:')
