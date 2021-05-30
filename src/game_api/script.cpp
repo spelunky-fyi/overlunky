@@ -2253,6 +2253,34 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         lua["DROP"][drop_entries.at(x).caption] = x;
     }
 
+    lua.create_named_table("TEXTURE"
+                           //, "DATA_TEXTURES_PLACEHOLDER_0", 0
+                           //, "", ...see__textures.txt__for__a__list__of__textures...
+                           //, "DATA_TEXTURES_SHINE_0", 388
+                           //, "DATA_TEXTURES_OLDTEXTURES_AI_0", 389
+    );
+    {
+        std::unordered_map<std::string, uint32_t> counts;
+        for (const auto* tex : get_textures()->texture_map)
+        {
+            if (tex != nullptr && tex->name != nullptr)
+            {
+                std::string clean_tex_name = *tex->name;
+                std::transform(
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
+                    { return std::toupper(c); });
+                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                size_t index = clean_tex_name.find(".DDS", 0);
+                if (index != std::string::npos)
+                {
+                    clean_tex_name.erase(index, 4);
+                }
+                clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
+                lua["TEXTURE"][clean_tex_name] = tex->id;
+            }
+        }
+    }
+
     /// Parameter to force_co_subtheme
     lua.new_enum("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
 }
