@@ -1823,7 +1823,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "hor_velocity",
         &ParticleDB::hor_velocity,
         "ver_velocity",
-        &ParticleDB::ver_velocity);
+        &ParticleDB::ver_velocity,
+        "permanent",
+        &ParticleDB::permanent);
     lua.new_usertype<PlayerSlotSettings>(
         "PlayerSlotSettings",
         "controller_vibration",

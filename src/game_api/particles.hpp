@@ -41,7 +41,7 @@ struct ParticleDB
     uint32_t flags;
     float unknown32;
     float unknown33;
-    uint8_t unknown34;
+    bool permanent; // whether you have to constantly refresh, or whether it does so on its own (e.g. petting hearts vs dustwall)
     uint8_t unknown35;
     uint8_t unknown36;
     uint8_t unknown37;

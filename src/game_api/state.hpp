@@ -120,7 +120,7 @@ struct StateMemory
     size_t arena_scorepillars_screen;
     size_t unknown17;
     size_t unknown18;
-    uint32_t unknown19;
+    uint32_t next_entity_uid;
     uint16_t unknown20;
     uint16_t unknown21;
     PlayerInputs* player_inputs;
