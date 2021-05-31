@@ -10,7 +10,7 @@ rpc = []
 events = []
 funcs = []
 types = []
-lualibs = []
+lualibs = ['json', 'inspect']
 enums = []
 replace = {
     'uint8_t': 'int',
