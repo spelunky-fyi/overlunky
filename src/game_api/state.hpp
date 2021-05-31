@@ -12,6 +12,7 @@ struct Layer;
 struct LevelGenSystem;
 struct Illumination;
 struct PlayerInputs;
+struct QuestsInfo;
 
 struct StateMemory
 {
@@ -127,13 +128,13 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    size_t unknown23;
+    size_t unknown22;
+    QuestsInfo* quests;
     size_t unknown24;
     size_t unknown25;
-    size_t unknown26;
     size_t particle_emitters_info;
-    size_t unknown28;
-    size_t unknown29;
+    size_t unknown26;
+    size_t unknown27;
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
 };
 struct State
@@ -359,4 +360,24 @@ struct PlayerInputs
     PlayerSlotSettings player_slot_2_settings;
     PlayerSlotSettings player_slot_3_settings;
     PlayerSlotSettings player_slot_4_settings;
+};
+
+struct QuestsInfo
+{
+    size_t unknown1; // the first six are pointers to small similar objects
+    size_t unknown2; // that don't appear to change at all
+    size_t unknown3;
+    size_t unknown4;
+    size_t unknown5;
+    size_t unknown6;
+    int8_t yang_state;
+    int8_t jungle_sisters_flags; // flags! not state ; -1 = sisters angry
+    int8_t van_horsing_state;
+    int8_t sparrow_state;
+    int8_t madame_tusk_state;
+    int8_t beg_state;
+    uint8_t unknown13;
+    uint8_t unknown14;
+    uint32_t unknown15;
+    uint32_t unknown16;
 };
