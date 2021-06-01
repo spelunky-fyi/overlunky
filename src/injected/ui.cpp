@@ -1379,6 +1379,23 @@ void update_filter(const char* s)
 void write_file()
 {
     {
+        SpelunkyScript api_gen_script(
+            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'",
+            "api_gen",
+            g_SoundManager,
+            true);
+
+        if (!std::filesystem::exists("lua_api"))
+        {
+            std::filesystem::create_directory("lua_api");
+        }
+
+        std::ofstream file;
+        file.open("lua_api/spel2.lua");
+        file << api_gen_script.dump_api() << std::endl;
+    }
+
+    {
         std::ofstream file;
         file.open("entities.txt");
         for (int i = 1; i < g_items.size(); i++)

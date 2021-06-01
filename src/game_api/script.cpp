@@ -14,6 +14,7 @@
 #include "window_api.hpp"
 
 #include <algorithm>
+#include <unordered_set>
 #include <array>
 #include <codecvt>
 #include <filesystem>
@@ -420,6 +421,8 @@ class SpelunkyScript::ScriptImpl
 
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+
+    std::string dump_api();
 };
 
 SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
@@ -1963,7 +1966,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
         lua["ENT_TYPE"][name] = g_items[i].id;
     }
-    lua.new_enum(
+    lua.create_named_table(
         "THEME",
         "DWELLING",
         1,
@@ -2001,7 +2004,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         17,
         "ARENA",
         18);
-    lua.new_enum(
+    lua.create_named_table(
         "ON",
         "LOGO",
         0,
@@ -2093,9 +2096,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     // Params: `LoadContext load_ctx`
     // Runs as soon as your script is loaded, including reloads, then never again
     */
-    lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
-    lua.new_enum("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
-    lua.new_enum(
+    lua.create_named_table("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.create_named_table("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
+    lua.create_named_table(
         "MASK",
         "PLAYER",
         0x1,
@@ -2128,9 +2131,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "LAVA",
         0x4000);
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
-    lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
+    lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
     /// Paramater to `PlayingSound:set_looping()`, specifies what type of looping this sound should do
-    lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
+    lua.create_named_table("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
     /// Paramater to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`,
     lua.create_named_table("VANILLA_SOUND"
                            //, "BGM_BGM_TITLE", BGM/BGM_title
@@ -2148,7 +2151,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             lua["VANILLA_SOUND"][std::move(clean_event_name)] = std::move(event_name);
         });
     /// Bitmask parameter to `set_vanilla_sound_callback()`
-    lua.new_enum(
+    lua.create_named_table(
         "VANILLA_SOUND_CALLBACK_TYPE",
         "CREATED",
         FMODStudio::EventCallbackType::Created,
@@ -2200,9 +2203,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         lua["PARTICLEEMITTER"][name] = particle.id;
     }
 
-    lua.new_enum("CONST", "ENGINE_FPS", 60);
+    lua.create_named_table("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
-    lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
+    lua.create_named_table("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
 
     lua.create_named_table("DROPCHANCE"
                            //, "BONEBLOCK_SKELETONKEY", 0
@@ -2225,7 +2228,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     }
 
     /// Parameter to force_co_subtheme
-    lua.new_enum("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
+    lua.create_named_table("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
 }
 
 void SpelunkyScript::ScriptImpl::clear()
@@ -2764,6 +2767,58 @@ void SpelunkyScript::ScriptImpl::post_level_gen_spawn(std::string_view tile_code
     }
 }
 
+std::string SpelunkyScript::ScriptImpl::dump_api()
+{
+    std::set<std::string> excluded_keys{ "meta" };
+
+    sol::state dummy_state;
+    dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
+
+    for (auto& [key, value] : lua["_G"].get<sol::table>())
+    {
+        std::string key_str = key.as<std::string>();
+        if (key_str.starts_with("sol."))
+        {
+            excluded_keys.insert(std::move(key_str));
+        }
+    }
+
+    for (auto& [key, value] : dummy_state["_G"].get<sol::table>())
+    {
+        std::string key_str = key.as<std::string>();
+        excluded_keys.insert(std::move(key_str));
+    }
+
+    require_serpent_lua(dummy_state);
+    sol::table opts = dummy_state.create_table();
+    opts["comment"] = false;
+    sol::function serpent = dummy_state["serpent"]["block"];
+
+    std::map<std::string, std::string> sorted_output;
+    for (auto& [key, value] : lua["_G"].get<sol::table>())
+    {
+        std::string key_str = key.as<std::string>();
+        if (!excluded_keys.contains(key_str))
+        {
+            std::string value_str = serpent(value, opts).get<std::string>();
+            if (value_str.starts_with("\"function"))
+            {
+                value_str = "function(...) end";
+            }
+            else if (value_str.starts_with("\"userdata"))
+            {
+                value_str = {};
+            }
+            sorted_output[std::move(key_str)] = std::move(value_str);
+        }
+    }
+
+    std::string api;
+    for (auto& [key, value] : sorted_output)
+        api += fmt::format("{} = {}\n", key, value);
+    return api;
+}
+
 SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
     : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, enable)}
 {
@@ -2885,6 +2940,11 @@ bool SpelunkyScript::pre_level_gen_spawn(std::string_view tile_code, float x, fl
 void SpelunkyScript::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
 {
     m_Impl->post_level_gen_spawn(tile_code, x, y, layer);
+}
+
+std::string SpelunkyScript::dump_api()
+{
+    return m_Impl->dump_api();
 }
 
 void SpelunkyScript::for_each_script(std::function<bool(SpelunkyScript&)> fun)
