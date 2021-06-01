@@ -659,6 +659,31 @@ bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
     return false;
 };
 
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, uint32_t mask)
+{
+    std::vector<uint32_t> found;
+    Entity* entity = get_entity_ptr(uid);
+    if (entity == nullptr)
+        return found;
+    if (entity->items.count > 0)
+    {
+        int* pitems = (int*)entity->items.begin;
+        for (int i = 0; i < entity->items.count; i++)
+        {
+            Entity* item = get_entity_ptr(pitems[i]);
+            if (item == nullptr)
+            {
+                continue;
+            }
+            if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
+            {
+                found.push_back(item->uid);
+            }
+        }
+    }
+    return found;
+}
+
 void lock_door_at(float x, float y)
 {
     std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
@@ -1184,5 +1209,30 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
             static generate_particles_func* gpf = (generate_particles_func*)(offset);
             auto result = gpf(state->particle_emitters_info, particle_emitter_id, entity);
         }
+    }
+}
+
+void set_journal_enabled(bool b)
+{
+    static size_t offset = 0;
+    static char original_call_instruction[5] = {0};
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        std::string pattern = "\x75\x1F\xF6\xC1\x08"s;
+        offset = memory.at_exe(find_inst(exe, pattern, memory.after_bundle) + 14);
+        for (uint8_t x = 0; x < 5; ++x)
+        {
+            original_call_instruction[x] = read_u8(offset + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset, std::string(original_call_instruction, 5), true);
+    }
+    else
+    {
+        write_mem_prot(offset, "\x90\x90\x90\x90\x90"s, true);
     }
 }

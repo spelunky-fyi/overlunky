@@ -11,6 +11,8 @@ const float ZF = 0.737;
 struct Layer;
 struct LevelGenSystem;
 struct Illumination;
+struct PlayerInputs;
+struct QuestsInfo;
 
 struct StateMemory
 {
@@ -85,18 +87,54 @@ struct StateMemory
     int32_t ia00;
     uint32_t money_last_levels;
     int32_t hud_flags;
+    uint32_t unknown1;
+    uint32_t unknown2;
+    uint32_t unknown3;
+    uint32_t unknown4;
+    int32_t unknown5;
+    size_t toast;
+    size_t speechbubble;
+    uint32_t speechbubble_timer;
+    uint32_t toast_timer;
+    int32_t unknown6;
 
-    char pada14[0x12b0 - 0xa14];
+    char pada14[1980];
+
+    size_t arena_choose_teams_screen;
+    size_t unknown8_during_basecamp;
+    size_t unknown9_during_level;
+    size_t level_transition_screen;
+    size_t unknown11;
+    size_t unknown12;
+    size_t victory_walk_screen;
+    size_t credits_screen;
+    size_t final_score_screen;
+    size_t cosmic_ocean_win_screen;
+    size_t dear_journal_screen;
+    size_t unknown13;
+    size_t unknown14_screen;
+    size_t unknown15;
+    size_t unknown16_screen;
+    size_t arena_lineup_screen;
+    size_t arena_gameplay_screen;
+    size_t arena_scorepillars_screen;
+    size_t unknown17;
+    size_t unknown18;
+    uint32_t next_entity_uid;
+    uint16_t unknown20;
+    uint16_t unknown21;
+    PlayerInputs* player_inputs;
+
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    size_t unknown23;
+    size_t unknown22;
+    QuestsInfo* quests;
     size_t unknown24;
     size_t unknown25;
-    size_t unknown26;
     size_t particle_emitters_info;
-    size_t unknown28;
-    size_t unknown29;
+    size_t unknown26;
+    size_t unknown27;
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
 };
 struct State
@@ -273,4 +311,73 @@ struct Illumination
     uint8_t unknown_illumination2;         // influences backlayer_global_illumination
     uint32_t unknown_int1;                 // crash when changed
     uint32_t unknown_int2;
+};
+
+struct InputMapping
+{
+    uint8_t jump;
+    uint8_t attack;
+    uint8_t bomb;
+    uint8_t rope;
+    uint8_t walk_run;
+    uint8_t use_door_buy;
+    uint8_t pause_menu;
+    uint8_t journal;
+    uint8_t left;
+    uint8_t right;
+    uint8_t up;
+    uint8_t down;
+};
+
+struct PlayerSlot
+{
+    uint16_t buttons_gameplay;
+    uint16_t buttons;
+    uint32_t unknown1;
+    InputMapping* input_mapping_keyboard;
+    InputMapping* input_mapping_controller;
+    uint8_t player_id;
+    bool is_participating;
+    uint8_t unknown4; // padding most likely
+    uint8_t unknown5; // padding most likely
+    uint32_t unknown6;
+};
+
+struct PlayerSlotSettings
+{
+    bool controller_vibration;
+    bool auto_run_enabled;
+    bool controller_right_stick;
+};
+
+struct PlayerInputs
+{
+    PlayerSlot player_slot_1;
+    PlayerSlot player_slot_2;
+    PlayerSlot player_slot_3;
+    PlayerSlot player_slot_4;
+    PlayerSlotSettings player_slot_1_settings;
+    PlayerSlotSettings player_slot_2_settings;
+    PlayerSlotSettings player_slot_3_settings;
+    PlayerSlotSettings player_slot_4_settings;
+};
+
+struct QuestsInfo
+{
+    size_t unknown1; // the first six are pointers to small similar objects
+    size_t unknown2; // that don't appear to change at all
+    size_t unknown3;
+    size_t unknown4;
+    size_t unknown5;
+    size_t unknown6;
+    int8_t yang_state;
+    int8_t jungle_sisters_flags; // flags! not state ; -1 = sisters angry
+    int8_t van_horsing_state;
+    int8_t sparrow_state;
+    int8_t madame_tusk_state;
+    int8_t beg_state;
+    uint8_t unknown13;
+    uint8_t unknown14;
+    uint32_t unknown15;
+    uint32_t unknown16;
 };

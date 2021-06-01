@@ -14,11 +14,6 @@
 
 struct SoundCallbackData
 {
-    SoundCallbackData(const SoundCallbackData&) = delete;
-    SoundCallbackData& operator=(const SoundCallbackData&) = delete;
-    SoundCallbackData(SoundCallbackData&&) = default;
-    SoundCallbackData& operator=(SoundCallbackData&&) = default;
-
     FMOD::Channel* handle;
     SoundCallbackFunction callback;
 };
@@ -62,11 +57,6 @@ FMOD::FMOD_RESULT ChannelControlCallback(
 
 struct EventCallbackData
 {
-    EventCallbackData(const EventCallbackData&) = delete;
-    EventCallbackData& operator=(const EventCallbackData&) = delete;
-    EventCallbackData(EventCallbackData&&) = default;
-    EventCallbackData& operator=(EventCallbackData&&) = default;
-
     struct Callback
     {
         std::uint32_t id;
