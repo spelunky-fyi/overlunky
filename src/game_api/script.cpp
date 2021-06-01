@@ -922,6 +922,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["force_co_subtheme"] = force_co_subtheme;
     /// Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
     lua["generate_particles"] = generate_particles;
+    /// Enables or disables the journal
+    lua["set_journal_enabled"] = set_journal_enabled;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b)
@@ -1775,7 +1777,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "money_last_levels",
         &StateMemory::money_last_levels,
         "money_shop_total",
-        &StateMemory::money_shop_total);
+        &StateMemory::money_shop_total,
+        "player_inputs",
+        sol::readonly(&StateMemory::player_inputs),
+        "quests",
+        &StateMemory::quests);
     lua.new_usertype<SaturationVignette>(
         "SaturationVignette",
         "red",
@@ -1802,24 +1808,140 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "ParticleDB",
         "id",
         &ParticleDB::id,
+        "spawn_count_min",
+        &ParticleDB::spawn_count_min,
+        "spawn_count",
+        &ParticleDB::spawn_count,
+        "lifespan_min",
+        &ParticleDB::lifespan_min,
+        "lifespan",
+        &ParticleDB::lifespan,
         "sheet_id",
         &ParticleDB::sheet_id,
+        "animation_sequence_length",
+        &ParticleDB::animation_sequence_length,
+        "spawn_interval",
+        &ParticleDB::spawn_interval,
         "shrink_growth_factor",
         &ParticleDB::shrink_growth_factor,
+        "rotation_speed",
+        &ParticleDB::rotation_speed,
         "opacity",
         &ParticleDB::opacity,
         "hor_scattering",
         &ParticleDB::hor_scattering,
         "ver_scattering",
         &ParticleDB::ver_scattering,
+        "scale_x_min",
+        &ParticleDB::scale_x_min,
         "scale_x",
         &ParticleDB::scale_x,
+        "scale_y_min",
+        &ParticleDB::scale_y_min,
         "scale_y",
         &ParticleDB::scale_y,
+        "hor_deflection_1",
+        &ParticleDB::hor_deflection_1,
+        "ver_deflection_1",
+        &ParticleDB::ver_deflection_1,
+        "hor_deflection_2",
+        &ParticleDB::hor_deflection_2,
+        "ver_deflection_2",
+        &ParticleDB::ver_deflection_2,
         "hor_velocity",
         &ParticleDB::hor_velocity,
         "ver_velocity",
-        &ParticleDB::ver_velocity);
+        &ParticleDB::ver_velocity,
+        "cyan",
+        &ParticleDB::cyan,
+        "magenta",
+        &ParticleDB::magenta,
+        "yellow",
+        &ParticleDB::yellow,
+        "permanent",
+        &ParticleDB::permanent,
+        "invisible",
+        &ParticleDB::invisible);
+    lua.new_usertype<PlayerSlotSettings>(
+        "PlayerSlotSettings",
+        "controller_vibration",
+        sol::readonly(&PlayerSlotSettings::controller_vibration),
+        "auto_run_enabled",
+        sol::readonly(&PlayerSlotSettings::auto_run_enabled),
+        "controller_right_stick",
+        sol::readonly(&PlayerSlotSettings::controller_right_stick));
+    lua.new_usertype<PlayerSlot>(
+        "PlayerSlot",
+        "buttons_gameplay",
+        sol::readonly(&PlayerSlot::buttons_gameplay),
+        "buttons",
+        sol::readonly(&PlayerSlot::buttons),
+        "input_mapping_keyboard",
+        sol::readonly(&PlayerSlot::input_mapping_keyboard),
+        "input_mapping_controller",
+        sol::readonly(&PlayerSlot::input_mapping_controller),
+        "player_id",
+        sol::readonly(&PlayerSlot::player_id),
+        "is_participating",
+        sol::readonly(&PlayerSlot::is_participating));
+    lua.new_usertype<InputMapping>(
+        "InputMapping",
+        "jump",
+        sol::readonly(&InputMapping::jump),
+        "attack",
+        sol::readonly(&InputMapping::attack),
+        "bomb",
+        sol::readonly(&InputMapping::bomb),
+        "rope",
+        sol::readonly(&InputMapping::rope),
+        "walk_run",
+        sol::readonly(&InputMapping::walk_run),
+        "use_door_buy",
+        sol::readonly(&InputMapping::use_door_buy),
+        "pause_menu",
+        sol::readonly(&InputMapping::pause_menu),
+        "journal",
+        sol::readonly(&InputMapping::journal),
+        "left",
+        sol::readonly(&InputMapping::left),
+        "right",
+        sol::readonly(&InputMapping::right),
+        "up",
+        sol::readonly(&InputMapping::up),
+        "down",
+        sol::readonly(&InputMapping::down));
+    lua.new_usertype<PlayerInputs>(
+        "PlayerInputs",
+        "player_slot_1",
+        sol::readonly(&PlayerInputs::player_slot_1),
+        "player_slot_2",
+        sol::readonly(&PlayerInputs::player_slot_2),
+        "player_slot_3",
+        sol::readonly(&PlayerInputs::player_slot_3),
+        "player_slot_4",
+        sol::readonly(&PlayerInputs::player_slot_4),
+        "player_slot_1_settings",
+        sol::readonly(&PlayerInputs::player_slot_1_settings),
+        "player_slot_2_settings",
+        sol::readonly(&PlayerInputs::player_slot_2_settings),
+        "player_slot_3_settings",
+        sol::readonly(&PlayerInputs::player_slot_3_settings),
+        "player_slot_4_settings",
+        sol::readonly(&PlayerInputs::player_slot_4_settings));
+    lua.new_usertype<QuestsInfo>(
+        "QuestsInfo",
+        "yang_state",
+        &QuestsInfo::yang_state,
+        "jungle_sisters_flags",
+        &QuestsInfo::jungle_sisters_flags,
+        "van_horsing_state",
+        &QuestsInfo::van_horsing_state,
+        "sparrow_state",
+        &QuestsInfo::sparrow_state,
+        "madame_tusk_state",
+        &QuestsInfo::madame_tusk_state,
+        "beg_state",
+        &QuestsInfo::beg_state);
     auto play = sol::overload(
         static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
@@ -2219,6 +2341,24 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
 
     /// Parameter to force_co_subtheme
     lua.new_enum("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
+
+    /// Yang quest states
+    lua.new_enum("YANG", "ANGRY", -1, "QUEST_NOT_STARTED", 0, "TURKEY_PEN_SPAWNED", 2, "BOTH_TURKEYS_DELIVERED", 3, "TURKEY_SHOP_SPAWNED", 4, "ONE_TURKEY_BOUGHT", 5, "TWO_TURKEYS_BOUGHT", 6, "THREE_TURKEYS_BOUGHT", 7);
+
+    /// Jungle sister quest flags (angry = -1)
+    lua.new_enum("JUNGLESISTERS", "PARSLEY_RESCUED", 1, "PARSNIP_RESCUED", 2, "PARMESAN_RESCUED", 3, "WARNING_ONE_WAY_DOOR", 4, "GREAT_PARTY_HUH", 5, "I_WISH_BROUGHT_A_JACKET", 6);
+
+    /// Van Horsing quest states
+    lua.new_enum("VANHORSING", "QUEST_NOT_STARTED", 0, "JAILCELL_SPAWNED", 1, "FIRST_ENCOUNTER_DIAMOND_THROWN", 2, "SPAWNED_IN_VLADS_CASTLE", 3, "SHOT_VLAD", 4, "TEMPLE_HIDEOUT_SPAWNED", 5, "SECOND_ENCOUNTER_COMPASS_THROWN", 6, "TUSK_CELLAR", 7);
+
+    /// Sparrow quest states
+    lua.new_enum("SPARROW", "QUEST_NOT_STARTED", 0, "THIEF_STATUS", 1, "FINISHED_LEVEL_WITH_THIEF_STATUS", 2, "FIRST_HIDEOUT_SPAWNED_ROPE_THROW", 3, "FIRST_ENCOUNTER_ROPES_THROWN", 4, "TUSK_IDOL_STOLEN", 5, "SECOND_HIDEOUT_SPAWNED_NEOBAB", 6, "SECOND_ENCOUNTER_INTERACTED", 7, "MEETING_AT_TUSK_BASEMENT", 8);
+
+    /// Madame Tusk quest states
+    lua.new_enum("TUSK", "ANGRY", -2, "DEAD", -1, "QUEST_NOT_STARTED", 0, "DICE_HOUSE_SPAWNED", 1, "HIGH_ROLLER_STATUS", 2, "PALACE_WELCOME_MESSAGE", 3);
+
+    /// Beg quest states
+    lua.new_enum("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
 }
 
 void SpelunkyScript::ScriptImpl::clear()
