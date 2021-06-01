@@ -76,22 +76,6 @@ Texture* RenderAPI::get_texture(std::uint32_t texture_id)
 
 std::uint32_t RenderAPI::define_texture(TextureDefinition data)
 {
-    for (auto& [id, texture] : custom_textures)
-    {
-        if (*texture.name == data.texture_path)
-        {
-            return texture.id;
-        }
-    }
-
-    auto* textures = get_textures();
-    for (auto& texture : textures->textures)
-    {
-        if (texture.name != nullptr && *texture.name == data.texture_path)
-        {
-            return texture.id;
-        }
-    }
 
     if (data.sub_image_width == 0 || data.sub_image_height == 0)
     {
@@ -99,6 +83,7 @@ std::uint32_t RenderAPI::define_texture(TextureDefinition data)
         data.sub_image_height = data.height;
     }
 
+    auto* textures = get_textures();
     Texture new_texture{
         textures->texture_map.size() + custom_textures.size() + 1,
         nullptr,
@@ -115,6 +100,29 @@ std::uint32_t RenderAPI::define_texture(TextureDefinition data)
         1.0f / data.width,
         1.0f / data.height,
     };
+    constexpr auto compare_offset = offsetof(Texture, Texture::width);
+    constexpr auto compare_size = sizeof(Texture) - offsetof(Texture, Texture::width);
+    auto is_same = [](const Texture& lhs, const Texture& rhs)
+    {
+        // Note, even bits for floats should be the same here since all calculations are matched 1-to-1 from the games code
+        return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
+    };
+
+    for (auto& [id, texture] : custom_textures)
+    {
+        if (*texture.name == data.texture_path && is_same(texture, new_texture))
+        {
+            return texture.id;
+        }
+    }
+
+    for (auto& texture : textures->textures)
+    {
+        if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
+        {
+            return texture.id;
+        }
+    }
 
     new_texture.name = load_texture(std::move(data.texture_path));
     custom_textures[new_texture.id] = new_texture;
