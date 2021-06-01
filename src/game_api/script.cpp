@@ -14,7 +14,6 @@
 #include "window_api.hpp"
 
 #include <algorithm>
-#include <unordered_set>
 #include <array>
 #include <codecvt>
 #include <filesystem>
@@ -25,6 +24,7 @@
 #include <mutex>
 #include <regex>
 #include <set>
+#include <unordered_set>
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
@@ -2769,7 +2769,7 @@ void SpelunkyScript::ScriptImpl::post_level_gen_spawn(std::string_view tile_code
 
 std::string SpelunkyScript::ScriptImpl::dump_api()
 {
-    std::set<std::string> excluded_keys{ "meta" };
+    std::set<std::string> excluded_keys{"meta"};
 
     sol::state dummy_state;
     dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
