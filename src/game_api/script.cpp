@@ -1531,6 +1531,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::topmost_mount,
         "overlaps_with",
         overlaps_with,
+        "get_texture",
+        &Entity::get_texture,
         "set_texture",
         &Entity::set_texture,
         "as_movable",
@@ -1904,7 +1906,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "permanent",
         &ParticleDB::permanent,
         "invisible",
-        &ParticleDB::invisible);
+        &ParticleDB::invisible,
+        "get_texture",
+        &ParticleDB::get_texture,
+        "set_texture",
+        &ParticleDB::set_texture);
     lua.new_usertype<PlayerSlotSettings>(
         "PlayerSlotSettings",
         "controller_vibration",

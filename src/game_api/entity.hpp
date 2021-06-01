@@ -242,6 +242,7 @@ class Entity
     void remove_item(uint32_t id);
     void destroy();
 
+    std::uint32_t get_texture();
     bool set_texture(std::uint32_t texture_id);
 
     template <typename T>

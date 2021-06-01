@@ -24,3 +24,16 @@ set_post_tile_code_callback(function(x, y, l)
         end
     end
 end, "floor")
+
+-- adds a trail to the player, note that this changes the texture for all particles of that type
+-- so it's actually a bad idea to do this
+function create_particles()
+    for _, player in pairs(players) do
+        local particle_type = get_particle_type(PARTICLEEMITTER.WITCHDOCTORSKULL_TRAIL)
+        particle_type:set_texture(player:get_texture())
+        generate_particles(PARTICLEEMITTER.WITCHDOCTORSKULL_TRAIL, player.uid)
+    end
+end
+set_callback(create_particles, ON.CAMP)
+set_callback(create_particles, ON.LEVEL)
+set_callback(create_particles, ON.TRANSITION)

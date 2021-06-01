@@ -337,6 +337,10 @@ void Entity::destroy()
     delete this; // TODO
 }
 
+std::uint32_t Entity::get_texture()
+{
+    return texture->id;
+}
 bool Entity::set_texture(std::uint32_t texture_id)
 {
     if (auto* new_texture = RenderAPI::get().get_texture(texture_id))

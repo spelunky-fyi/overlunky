@@ -1,6 +1,7 @@
 #include "particles.hpp"
 #include "logger.h"
 #include "memory.hpp"
+#include "render_api.hpp"
 
 size_t particle_db_ptr()
 {
@@ -12,6 +13,20 @@ size_t particle_db_ptr()
         res = mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), pattern, find_inst(mem.exe(), pattern, mem.after_bundle) + 1) + 5));
         return res;
     }
+}
+
+std::uint32_t ParticleDB::get_texture()
+{
+    return texture->id;
+}
+bool ParticleDB::set_texture(std::uint32_t texture_id)
+{
+    if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
+    {
+        texture = new_texture;
+        return true;
+    }
+    return false;
 }
 
 ParticleDB* get_particle_type(uint32_t id)

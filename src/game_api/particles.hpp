@@ -56,6 +56,9 @@ struct ParticleDB
     uint8_t unknown40;
     uint8_t unknown41;
     uint32_t unknown42;
+
+    std::uint32_t get_texture();
+    bool set_texture(std::uint32_t texture_id);
 };
 
 struct ParticleEmitter
