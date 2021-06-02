@@ -11,8 +11,7 @@
 #include <variant>
 #include <vector>
 
-#include "imgui.h"
-#include <d3d11.h>
+#include <imgui.h>
 
 ImVec2 screenify(ImVec2 pos);
 float screenify(float dis);
@@ -49,7 +48,7 @@ struct ScriptInput
 
 struct ScriptImage
 {
-    ID3D11ShaderResourceView* texture;
+    struct ID3D11ShaderResourceView* texture;
     int width;
     int height;
 };

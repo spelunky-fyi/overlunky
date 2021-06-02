@@ -1,10 +1,12 @@
 #include "script.hpp"
 #include "drops.hpp"
 #include "entity.hpp"
+#include "file_api.hpp"
 #include "level_api.hpp"
 #include "logger.h"
 #include "overloaded.hpp"
 #include "particles.hpp"
+#include "render_api.hpp"
 #include "rpc.hpp"
 #include "savedata.hpp"
 #include "script_context.hpp"
@@ -24,8 +26,10 @@
 #include <regex>
 #include <set>
 
+#include <d3d11.h>
+
 #define SOL_ALL_SAFETIES_ON 1
-#include "sol/sol.hpp"
+#include <sol/sol.hpp>
 
 std::vector<SpelunkyScript*> g_all_scripts;
 
@@ -310,7 +314,7 @@ std::string sanitize(std::string data)
 {
     std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c)
                    { return std::tolower(c); });
-    std::regex reg("[^a-z/]*");
+    static std::regex reg("[^a-z/]*", std::regex_constants::optimize);
     data = std::regex_replace(data, reg, "");
     return data;
 }
@@ -1063,7 +1067,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         image->width = 0;
         image->height = 0;
         image->texture = NULL;
-        if (LoadTextureFromFile((script_folder / path).string().data(), &image->texture, &image->width, &image->height))
+        if (create_d3d11_texture_from_file((script_folder / path).string().data(), &image->texture, &image->width, &image->height))
         {
             int id = images.size();
             images[id] = image;
@@ -1383,7 +1387,43 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             height = images[image]->height;
         ImGui::Image(images[image]->texture, ImVec2(width, height));
     };
+    /// Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
+    lua["get_texture_definition"] = [this](uint32_t texture_id) -> TextureDefinition
+    {
+        return RenderAPI::get().get_texture_definition(texture_id);
+    };
+    /// Defines a new texture that can be used in Entity::set_texture
+    lua["define_texture"] = [this](TextureDefinition texture_data) -> uint32_t
+    {
+        texture_data.texture_path = get_image_file_path(meta.path, std::move(texture_data.texture_path));
+        return RenderAPI::get().define_texture(std::move(texture_data));
+    };
 
+    /// Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
+    /// `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
+    /// `tile_width` and `tile_height` define the size of a single tile, the image will automatically be divided into these tiles.
+    /// Tiles are labeled in sequence starting at the top left, going right and down at the end of the image (you know, like sentences work in the English language). Use those numbers in `Entity::animation_frame`.
+    /// `sub_image_offset_x`, `sub_image_offset_y`, `sub_image_width` and `sub_image_height` can be used if only a part of the image should be used. Leave them at zero to ignore this.
+    lua.new_usertype<TextureDefinition>(
+        "TextureDefinition",
+        "texture_path",
+        &TextureDefinition::texture_path,
+        "width",
+        &TextureDefinition::width,
+        "height",
+        &TextureDefinition::height,
+        "tile_width",
+        &TextureDefinition::tile_width,
+        "tile_height",
+        &TextureDefinition::tile_height,
+        "sub_image_offset_x",
+        &TextureDefinition::sub_image_offset_x,
+        "sub_image_offset_y",
+        &TextureDefinition::sub_image_offset_y,
+        "sub_image_width",
+        &TextureDefinition::sub_image_width,
+        "sub_image_height",
+        &TextureDefinition::sub_image_height);
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",
@@ -1491,6 +1531,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::topmost_mount,
         "overlaps_with",
         overlaps_with,
+        "get_texture",
+        &Entity::get_texture,
+        "set_texture",
+        &Entity::set_texture,
         "as_movable",
         &Entity::as<Movable>,
         "as_door",
@@ -1529,6 +1573,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<Jiangshi>);
     /* Entity
         bool overlaps_with(Entity other)
+        bool set_texture(uint32_t texture_id)
     */
     lua.new_usertype<Movable>(
         "Movable",
@@ -1861,7 +1906,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "permanent",
         &ParticleDB::permanent,
         "invisible",
-        &ParticleDB::invisible);
+        &ParticleDB::invisible,
+        "get_texture",
+        &ParticleDB::get_texture,
+        "set_texture",
+        &ParticleDB::set_texture);
     lua.new_usertype<PlayerSlotSettings>(
         "PlayerSlotSettings",
         "controller_vibration",
@@ -2337,6 +2386,34 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     for (auto x = 0; x < drop_entries.size(); ++x)
     {
         lua["DROP"][drop_entries.at(x).caption] = x;
+    }
+
+    lua.create_named_table("TEXTURE"
+                           //, "DATA_TEXTURES_PLACEHOLDER_0", 0
+                           //, "", ...see__textures.txt__for__a__list__of__textures...
+                           //, "DATA_TEXTURES_SHINE_0", 388
+                           //, "DATA_TEXTURES_OLDTEXTURES_AI_0", 389
+    );
+    {
+        std::unordered_map<std::string, uint32_t> counts;
+        for (const auto* tex : get_textures()->texture_map)
+        {
+            if (tex != nullptr && tex->name != nullptr)
+            {
+                std::string clean_tex_name = *tex->name;
+                std::transform(
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
+                    { return std::toupper(c); });
+                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                size_t index = clean_tex_name.find(".DDS", 0);
+                if (index != std::string::npos)
+                {
+                    clean_tex_name.erase(index, 4);
+                }
+                clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
+                lua["TEXTURE"][clean_tex_name] = tex->id;
+            }
+        }
     }
 
     /// Parameter to force_co_subtheme

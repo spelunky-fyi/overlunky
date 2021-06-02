@@ -5,8 +5,10 @@
 #include <vector>
 
 #include "logger.h"
+#include "render_api.hpp"
 #include "rpc.hpp"
 #include "state.hpp"
+#include "texture.hpp"
 
 // Items::entity_map = EntityMap;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
@@ -191,9 +193,9 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    auto _rx = read_f32(rendering_info + 0x0c);
-    auto _ry = read_f32(rendering_info + 0x10);
-    return std::pair<float, float>(_rx, _ry);
+    return std::pair<float, float>(
+        rendering_info->x,
+        rendering_info->y);
 }
 
 void Entity::remove_item(uint32_t id)
@@ -333,4 +335,20 @@ uint8_t Olmec::broken_floaters()
 void Entity::destroy()
 {
     delete this; // TODO
+}
+
+std::uint32_t Entity::get_texture()
+{
+    return texture->id;
+}
+bool Entity::set_texture(std::uint32_t texture_id)
+{
+    if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
+    {
+        texture = new_texture;
+        rendering_info->texture = new_texture;
+        rendering_info->texture_name = new_texture->name;
+        return true;
+    }
+    return false;
 }

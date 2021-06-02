@@ -20,7 +20,9 @@
 #include <toml.hpp>
 
 #include "entity.hpp"
+#include "file_api.hpp"
 #include "flags.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "particles.hpp"
 #include "rpc.hpp"
@@ -1421,6 +1423,45 @@ void write_file()
         for (const auto& particle : particles)
         {
             file << particle.id << ": " << particle.name << "\n";
+        }
+    }
+
+    {
+        std::map<std::uint32_t, std::string> sorted_tile_codes;
+        for (auto& [name, def] : g_state->level_gen->data->tile_codes())
+        {
+            sorted_tile_codes[def.id] = name;
+        }
+
+        std::ofstream file;
+        file.open("tile_codes.txt");
+        for (auto& [id, name] : sorted_tile_codes)
+        {
+            file << name << ": 0x" << std::hex << id << std::endl;
+        }
+    }
+
+    {
+        std::ofstream file;
+        file.open("textures.txt");
+        std::unordered_map<std::string, uint32_t> counts;
+        for (auto* tex : get_textures()->texture_map)
+        {
+            if (tex != nullptr && tex->name != nullptr)
+            {
+                std::string clean_tex_name = *tex->name;
+                std::transform(
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
+                    { return std::toupper(c); });
+                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                size_t index = clean_tex_name.find(".DDS", 0);
+                if (index != std::string::npos)
+                {
+                    clean_tex_name.erase(index, 4);
+                }
+                clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
+                file << "TEXTURE." << clean_tex_name << ": " << tex->id << std::endl;
+            }
         }
     }
 
@@ -3950,7 +3991,9 @@ void init_ui()
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);
 
-    register_make_save_path(make_save_path);
+    register_make_save_path(&make_save_path);
+
+    register_on_load_file(&load_file_as_dds_if_image);
 }
 
 void reload_enabled_scripts()
