@@ -220,8 +220,9 @@ Short for [set_door_target](#set_door_target).
 #### Returns: `tuple<int, int, int>`
 Get door target `world`, `level`, `theme`
 ### [`set_contents`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_contents)
-#### Params: `int uid, int item_uid`
-Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_uid`
+#### Params: `int uid, int item_entity_type`
+Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE, ENT_TYPE_ITEM_PRESENT, ENT_TYPE_ITEM_GHIST_PRESENT,
+or ENT_TYPE.ITEM_COFFIN `uid` with item ENT_TYPE `item_entity_type`
 ### [`get_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
 #### Params: `int uid`
 #### Returns: `Entity`
