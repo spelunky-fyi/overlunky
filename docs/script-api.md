@@ -72,35 +72,35 @@ Note: The game functions like `spawn` use [level coordinates](#get_position). Dr
 `nil message(string message)`<br/>
 Print a log message on screen.
 ### [`set_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_interval)
-`CALLBACK_ID set_interval(function cb, int frames)`<br/>
+`CallbackId set_interval(function cb, int frames)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
 ### [`set_timeout`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_timeout)
-`CALLBACK_ID set_timeout(function cb, int frames)`<br/>
+`CallbackId set_timeout(function cb, int frames)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
 ### [`set_global_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_interval)
-`CALLBACK_ID set_global_interval(function cb, int frames)`<br/>
+`CallbackId set_global_interval(function cb, int frames)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
 ### [`set_global_timeout`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_timeout)
-`CALLBACK_ID set_global_timeout(function cb, int frames)`<br/>
+`CallbackId set_global_timeout(function cb, int frames)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
 ### [`set_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback)
-`CALLBACK_ID set_callback(function cb, int screen)`<br/>
+`CallbackId set_callback(function cb, int screen)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 Add global callback function to be called on an [event](#on).
 ### [`clear_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
-`nil clear_callback(CALLBACK_ID id)`<br/>
+`nil clear_callback(CallbackId id)`<br/>
 Clear previously added callback `id`
 ### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
-`CALLBACK_ID set_pre_tile_code_callback(function cb, string tile_code)`<br/>
+`CallbackId set_pre_tile_code_callback(function cb, string tile_code)`<br/>
 Add a callback for a specific tile code that is called before the game handles the tile code.
 Return true in order to stop the game or scripts loaded after this script from handling this tile code.
 For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
 ### [`set_post_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_tile_code_callback)
-`CALLBACK_ID set_post_tile_code_callback(function cb, string tile_code)`<br/>
+`CallbackId set_post_tile_code_callback(function cb, string tile_code)`<br/>
 Add a callback for a specific tile code that is called after the game handles the tile code.
 Use this to affect what the game or other scripts spawned in this position.
 This is received even if a previous pre-tile-code-callback has returned true
@@ -407,22 +407,22 @@ Gets the current camera position in the level
 Sets the current camera position in the level.
 Note: The camera will still try to follow the player and this doesn't actually work at all.
 ### [`set_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_flag)
-`FLAGS set_flag(FLAGS flags, int bit)`<br/>
+`Flags set_flag(Flags flags, int bit)`<br/>
 Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
 ### [`setflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setflag)
 `nil setflag()`<br/>
 ### [`clr_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_flag)
-`FLAGS clr_flag(FLAGS flags, int bit)`<br/>
+`Flags clr_flag(Flags flags, int bit)`<br/>
 Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
 ### [`clrflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
 `nil clrflag()`<br/>
 ### [`test_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_flag)
-`FLAGS test_flag(FLAGS flags, int bit)`<br/>
+`Flags test_flag(Flags flags, int bit)`<br/>
 Returns true if a bit is set in the flags
 ### [`testflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 `nil testflag()`<br/>
 ### [`rgba`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rgba)
-`COLOR rgba(int r, int g, int b, int a)`<br/>
+`uColor rgba(int r, int g, int b, int a)`<br/>
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
 ### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
 `nil draw_line(float x1, float y1, float x2, float y2, float thickness, int color)`<br/>
@@ -478,14 +478,14 @@ Loads a sound from disk relative to this script, ownership might be shared with 
 `optional<CustomSound> get_sound(string path_or_vanilla_sound)`<br/>
 Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
 ### [`set_vanilla_sound_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_vanilla_sound_callback)
-`CALLBACK_ID set_vanilla_sound_callback(VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb)`<br/>
+`CallbackId set_vanilla_sound_callback(VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb)`<br/>
 Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
 Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
 properties on the sound. Otherwise you may cause a deadlock.
 ### [`clear_vanilla_sound_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_vanilla_sound_callback)
-`nil clear_vanilla_sound_callback(CALLBACK_ID id)`<br/>
+`nil clear_vanilla_sound_callback(CallbackId id)`<br/>
 Clears a previously set callback
 ### [`steal_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
 `nil steal_input(int uid)`<br/>
@@ -1044,9 +1044,6 @@ Params: `PlayingSound vanilla_sound`
 - [`SUNKENCITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKENCITY) 7
 ## Aliases
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
-### CALLBACK_ID == int;
-### FLAGS == int;
-### COLOR == int;
-### VANILLA_SOUND == string;
-### VANILLA_SOUND_CALLBACK_TYPE == int;
-### BUTTONS == int;
+### CallbackId == int;
+### Flags == int;
+### uColor == int;

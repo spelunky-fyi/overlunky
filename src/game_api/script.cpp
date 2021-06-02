@@ -27,12 +27,12 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
 
-using CALLBACK_ID = int;
-using FLAGS = std::uint32_t;
-using COLOR = ImU32;
-using VANILLA_SOUND = std::string;
-using VANILLA_SOUND_CALLBACK_TYPE = int;
-using BUTTONS = std::uint16_t;
+using CallbackId = int;
+using Flags = std::uint32_t;
+using uColor = ImU32;
+using VANILLA_SOUND = std::string; // NoAlias
+using VANILLA_SOUND_CALLBACK_TYPE = int; // NoAlias
+using BUTTONS = std::uint16_t; // NoAlias
 
 std::vector<SpelunkyScript*> g_all_scripts;
 
@@ -533,7 +533,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_interval"] = [this](sol::function cb, int frames) -> CALLBACK_ID
+    lua["set_interval"] = [this](sol::function cb, int frames) -> CallbackId
     {
         auto luaCb = IntervalCallback{cb, frames, -1};
         level_timers[cbcount] = luaCb;
@@ -541,7 +541,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_timeout"] = [this](sol::function cb, int frames) -> CALLBACK_ID
+    lua["set_timeout"] = [this](sol::function cb, int frames) -> CallbackId
     {
         int now = g_state->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
@@ -550,7 +550,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_interval"] = [this](sol::function cb, int frames) -> CALLBACK_ID
+    lua["set_global_interval"] = [this](sol::function cb, int frames) -> CallbackId
     {
         auto luaCb = IntervalCallback{cb, frames, -1};
         global_timers[cbcount] = luaCb;
@@ -558,7 +558,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_timeout"] = [this](sol::function cb, int frames) -> CALLBACK_ID
+    lua["set_global_timeout"] = [this](sol::function cb, int frames) -> CallbackId
     {
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
@@ -567,19 +567,19 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called on an [event](#on).
-    lua["set_callback"] = [this](sol::function cb, int screen) -> CALLBACK_ID
+    lua["set_callback"] = [this](sol::function cb, int screen) -> CallbackId
     {
         auto luaCb = ScreenCallback{cb, (ON)screen, -1};
         callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     /// Clear previously added callback `id`
-    lua["clear_callback"] = [this](CALLBACK_ID id)
+    lua["clear_callback"] = [this](CallbackId id)
     { clear_callbacks.push_back(id); };
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
     /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
-    lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code) -> CALLBACK_ID
+    lua["set_pre_tile_code_callback"] = [this](sol::function cb, std::string tile_code) -> CallbackId
     {
         pre_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
         return cbcount++;
@@ -587,7 +587,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Add a callback for a specific tile code that is called after the game handles the tile code.
     /// Use this to affect what the game or other scripts spawned in this position.
     /// This is received even if a previous pre-tile-code-callback has returned true
-    lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code) -> CALLBACK_ID
+    lua["set_post_tile_code_callback"] = [this](sol::function cb, std::string tile_code) -> CallbackId
     {
         post_level_gen_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
         return cbcount++;
@@ -934,20 +934,20 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_camera_position"] = set_camera_position;
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["set_flag"] = [](FLAGS flags, int bit) -> FLAGS
+    lua["set_flag"] = [](Flags flags, int bit) -> Flags
     { return flags | (1U << (bit - 1)); };
     lua["setflag"] = lua["set_flag"];
     /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
-    lua["clr_flag"] = [](FLAGS flags, int bit) -> FLAGS
+    lua["clr_flag"] = [](Flags flags, int bit) -> Flags
     { return flags & ~(1U << (bit - 1)); };
     lua["clrflag"] = lua["clr_flag"];
     /// Returns true if a bit is set in the flags
-    lua["test_flag"] = [](FLAGS flags, int bit) -> FLAGS
+    lua["test_flag"] = [](Flags flags, int bit) -> Flags
     { return (flags & (1U << (bit - 1))) > 0; };
     lua["testflag"] = lua["test_flag"];
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
-    lua["rgba"] = [](int r, int g, int b, int a) -> COLOR
+    lua["rgba"] = [](int r, int g, int b, int a) -> uColor
     { return (ImU32)(a << 24) + (b << 16) + (g << 8) + (r); };
     /// Draws a line on screen
     lua["draw_line"] = [this](float x1, float y1, float x2, float y2, float thickness, ImU32 color)
@@ -1103,7 +1103,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
     /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
     /// properties on the sound. Otherwise you may cause a deadlock.
-    lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CALLBACK_ID
+    lua["set_vanilla_sound_callback"] = [this](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
     {
         auto safe_cb = [this, cb = std::move(cb)](PlayingSound sound)
         {
@@ -1115,7 +1115,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         return id;
     };
     /// Clears a previously set callback
-    lua["clear_vanilla_sound_callback"] = [this](CALLBACK_ID id)
+    lua["clear_vanilla_sound_callback"] = [this](CallbackId id)
     {
         sound_manager->clear_callback(id);
         auto it = std::find(vanilla_sound_callbacks.begin(), vanilla_sound_callbacks.end(), id);
