@@ -11,7 +11,7 @@ events = []
 funcs = []
 types = []
 aliases = []
-lualibs = []
+lualibs = ['json', 'inspect']
 enums = []
 replace = {
     'uint8_t': 'int',
@@ -173,7 +173,7 @@ for file in api_files:
     data = open(file, 'r').read()
     data = data.replace('\n', '')
     data = re.sub(r' ', '', data)
-    m = re.findall(r'new_enum\s*\(\s*"([^"]*)",([^\)]*)', data)
+    m = re.findall(r'create_named_table\s*\(\s*"([^"]*)",([^\)]*)', data)
     for type in m:
         name = type[0]
         attr = type[1]
@@ -361,3 +361,6 @@ for alias in aliases:
     name = alias['name']
     type = alias['type']
     print(f'### {name} == {type}')
+
+print('## External Function Library')
+print('If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting')

@@ -3,6 +3,7 @@
 #include "entity.hpp"
 #include "level_api.hpp"
 #include "logger.h"
+#include "lua_libs.hpp"
 #include "overloaded.hpp"
 #include "particles.hpp"
 #include "rpc.hpp"
@@ -23,6 +24,7 @@
 #include <mutex>
 #include <regex>
 #include <set>
+#include <unordered_set>
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
@@ -30,9 +32,9 @@
 using CallbackId = int;
 using Flags = std::uint32_t;
 using uColor = ImU32;
-using VANILLA_SOUND = std::string; // NoAlias
+using VANILLA_SOUND = std::string;       // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = int; // NoAlias
-using BUTTONS = std::uint16_t; // NoAlias
+using BUTTONS = std::uint16_t;           // NoAlias
 
 std::vector<SpelunkyScript*> g_all_scripts;
 
@@ -138,7 +140,7 @@ struct LevelGenCallback
     sol::function func;
 };
 
-using Callback = std::variant<IntervalCallback, TimeoutCallback, ScreenCallback>; // NoAlias
+using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>; // NoAlias
 
 struct ScriptState
 {
@@ -361,9 +363,10 @@ class SpelunkyScript::ScriptImpl
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
-    std::map<int, Callback> level_timers;
-    std::map<int, Callback> global_timers;
-    std::map<int, Callback> callbacks;
+    std::map<int, TimerCallback> level_timers;
+    std::map<int, TimerCallback> global_timers;
+    std::map<int, ScreenCallback> callbacks;
+    std::map<int, ScreenCallback> load_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_level_gen_callbacks;
     std::vector<LevelGenCallback> post_level_gen_callbacks;
@@ -404,6 +407,8 @@ class SpelunkyScript::ScriptImpl
 
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+
+    std::string dump_api();
 };
 
 SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
@@ -444,6 +449,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     state.quest_flags = g_state->quest_flags;
 
     lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
+    require_json_lua(lua);
+    require_inspect_lua(lua);
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
@@ -570,7 +577,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_callback"] = [this](sol::function cb, int screen) -> CallbackId
     {
         auto luaCb = ScreenCallback{cb, (ON)screen, -1};
-        callbacks[cbcount] = luaCb;
+        if (luaCb.screen == ON::LOAD)
+            load_callbacks[cbcount] = luaCb; // Make sure load always runs before other callbacks
+        else
+            callbacks[cbcount] = luaCb;
         return cbcount++;
     };
     /// Clear previously added callback `id`
@@ -1925,7 +1935,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         auto name = g_items[i].name.substr(9, g_items[i].name.size());
         lua["ENT_TYPE"][name] = g_items[i].id;
     }
-    lua.new_enum(
+    lua.create_named_table(
         "THEME",
         "DWELLING",
         1,
@@ -1963,7 +1973,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         17,
         "ARENA",
         18);
-    lua.new_enum(
+    lua.create_named_table(
         "ON",
         "LOGO",
         0,
@@ -2055,9 +2065,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     // Params: `LoadContext load_ctx`
     // Runs as soon as your script is loaded, including reloads, then never again
     */
-    lua.new_enum("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
-    lua.new_enum("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
-    lua.new_enum(
+    lua.create_named_table("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.create_named_table("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
+    lua.create_named_table(
         "MASK",
         "PLAYER",
         0x1,
@@ -2090,9 +2100,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "LAVA",
         0x4000);
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
-    lua.new_enum("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
+    lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
     /// Paramater to `PlayingSound:set_looping()`, specifies what type of looping this sound should do
-    lua.new_enum("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
+    lua.create_named_table("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
     /// Paramater to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`,
     lua.create_named_table("VANILLA_SOUND"
                            //, "BGM_BGM_TITLE", BGM/BGM_title
@@ -2110,7 +2120,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             lua["VANILLA_SOUND"][std::move(clean_event_name)] = std::move(event_name);
         });
     /// Bitmask parameter to `set_vanilla_sound_callback()`
-    lua.new_enum(
+    lua.create_named_table(
         "VANILLA_SOUND_CALLBACK_TYPE",
         "CREATED",
         FMODStudio::EventCallbackType::Created,
@@ -2162,9 +2172,9 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         lua["PARTICLEEMITTER"][name] = particle.id;
     }
 
-    lua.new_enum("CONST", "ENGINE_FPS", 60);
+    lua.create_named_table("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
-    lua.new_enum("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
+    lua.create_named_table("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
 
     lua.create_named_table("DROPCHANCE"
                            //, "BONEBLOCK_SKELETONKEY", 0
@@ -2187,7 +2197,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     }
 
     /// Parameter to force_co_subtheme
-    lua.new_enum("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
+    lua.create_named_table("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
 }
 
 void SpelunkyScript::ScriptImpl::clear()
@@ -2347,27 +2357,24 @@ bool SpelunkyScript::ScriptImpl::run()
 
         for (auto id : clear_callbacks)
         {
-            auto it = level_timers.find(id);
-            if (it != level_timers.end())
-                level_timers.erase(id);
+            level_timers.erase(id);
+            global_timers.erase(id);
+            callbacks.erase(id);
+            load_callbacks.erase(id);
 
-            auto it2 = global_timers.find(id);
-            if (it2 != global_timers.end())
-                global_timers.erase(id);
+            {
+                auto it = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
+                                       { return cb.id == id; });
+                if (it != pre_level_gen_callbacks.end())
+                    pre_level_gen_callbacks.erase(it);
+            }
 
-            auto it3 = callbacks.find(id);
-            if (it3 != callbacks.end())
-                callbacks.erase(id);
-
-            auto it4 = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
-                                    { return cb.id == id; });
-            if (it4 != pre_level_gen_callbacks.end())
-                pre_level_gen_callbacks.erase(it4);
-
-            auto it5 = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
-                                    { return cb.id == id; });
-            if (it5 != post_level_gen_callbacks.end())
-                post_level_gen_callbacks.erase(it5);
+            {
+                auto it = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
+                                       { return cb.id == id; });
+                if (it != post_level_gen_callbacks.end())
+                    post_level_gen_callbacks.erase(it);
+            }
         }
         clear_callbacks.clear();
 
@@ -2401,100 +2408,98 @@ bool SpelunkyScript::ScriptImpl::run()
             }
         }
 
+        auto now = get_frame_count();
+        for (auto& [id, callback] : load_callbacks)
+        {
+            if (callback.lastRan < 0)
+            {
+                handle_function(callback.func, LoadContext{meta.path, meta.stem});
+                callback.lastRan = now;
+            }
+            break;
+        }
+
         for (auto& [id, callback] : callbacks)
         {
-            auto now = get_frame_count();
-            if (auto* cb = std::get_if<ScreenCallback>(&callback))
+            if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
             {
-                if ((ON)g_state->screen == cb->screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
+                handle_function(callback.func);
+                callback.lastRan = now;
+            }
+            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+            {
+                handle_function(callback.func);
+                callback.lastRan = now;
+            }
+            else
+            {
+                switch (callback.screen)
                 {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
+                case ON::FRAME:
+                {
+                    if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
+                    {
+                        handle_function(callback.func);
+                        callback.lastRan = now;
+                    }
+                    break;
                 }
-                else if (cb->screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+                case ON::GAMEFRAME:
                 {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
+                    if (!g_state->pause && get_frame_count() != state.time_global &&
+                        ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
+                    {
+                        handle_function(callback.func);
+                        callback.lastRan = now;
+                    }
+                    break;
                 }
-                else
+                case ON::SCREEN:
                 {
-                    switch (cb->screen)
+                    if (g_state->screen != state.screen)
                     {
-                    case ON::FRAME:
+                        handle_function(callback.func);
+                        callback.lastRan = now;
+                    }
+                    break;
+                }
+                case ON::START:
+                {
+                    if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !g_players.empty() &&
+                        state.player != g_players.at(0))
                     {
-                        if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func);
+                        callback.lastRan = now;
                     }
-                    case ON::GAMEFRAME:
+                    break;
+                }
+                case ON::LOADING:
+                {
+                    if (g_state->loading > 0 && g_state->loading != state.loading)
                     {
-                        if (!g_state->pause && get_frame_count() != state.time_global &&
-                            ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func);
+                        callback.lastRan = now;
                     }
-                    case ON::SCREEN:
+                    break;
+                }
+                case ON::RESET:
+                {
+                    if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
                     {
-                        if (g_state->screen != state.screen)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func);
+                        callback.lastRan = now;
                     }
-                    case ON::START:
+                    break;
+                }
+                case ON::SAVE:
+                {
+                    if (g_state->screen != state.screen && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
                     {
-                        if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !g_players.empty() &&
-                            state.player != g_players.at(0))
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
+                        handle_function(callback.func, SaveContext{meta.path, meta.stem});
+                        callback.lastRan = now;
                     }
-                    case ON::LOADING:
-                    {
-                        if (g_state->loading > 0 && g_state->loading != state.loading)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    case ON::RESET:
-                    {
-                        if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
-                        {
-                            handle_function(cb->func);
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    case ON::SAVE:
-                    {
-                        if (g_state->screen != state.screen && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
-                        {
-                            handle_function(cb->func, SaveContext{meta.path, meta.stem});
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    case ON::LOAD:
-                    {
-                        if (cb->lastRan < 0)
-                        {
-                            handle_function(cb->func, LoadContext{meta.path, meta.stem});
-                            cb->lastRan = now;
-                        }
-                        break;
-                    }
-                    }
+                    break;
+                }
                 }
             }
         }
@@ -2570,13 +2575,10 @@ void SpelunkyScript::ScriptImpl::draw(ImDrawList* dl)
         for (auto& [id, callback] : callbacks)
         {
             auto now = get_frame_count();
-            if (auto* cb = std::get_if<ScreenCallback>(&callback))
+            if (callback.screen == ON::GUIFRAME)
             {
-                if (cb->screen == ON::GUIFRAME)
-                {
-                    handle_function(cb->func);
-                    cb->lastRan = now;
-                }
+                handle_function(callback.func);
+                callback.lastRan = now;
             }
         }
     }
@@ -2734,6 +2736,58 @@ void SpelunkyScript::ScriptImpl::post_level_gen_spawn(std::string_view tile_code
     }
 }
 
+std::string SpelunkyScript::ScriptImpl::dump_api()
+{
+    std::set<std::string> excluded_keys{"meta"};
+
+    sol::state dummy_state;
+    dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
+
+    for (auto& [key, value] : lua["_G"].get<sol::table>())
+    {
+        std::string key_str = key.as<std::string>();
+        if (key_str.starts_with("sol."))
+        {
+            excluded_keys.insert(std::move(key_str));
+        }
+    }
+
+    for (auto& [key, value] : dummy_state["_G"].get<sol::table>())
+    {
+        std::string key_str = key.as<std::string>();
+        excluded_keys.insert(std::move(key_str));
+    }
+
+    require_serpent_lua(dummy_state);
+    sol::table opts = dummy_state.create_table();
+    opts["comment"] = false;
+    sol::function serpent = dummy_state["serpent"]["block"];
+
+    std::map<std::string, std::string> sorted_output;
+    for (auto& [key, value] : lua["_G"].get<sol::table>())
+    {
+        std::string key_str = key.as<std::string>();
+        if (!excluded_keys.contains(key_str))
+        {
+            std::string value_str = serpent(value, opts).get<std::string>();
+            if (value_str.starts_with("\"function"))
+            {
+                value_str = "function(...) end";
+            }
+            else if (value_str.starts_with("\"userdata"))
+            {
+                value_str = {};
+            }
+            sorted_output[std::move(key_str)] = std::move(value_str);
+        }
+    }
+
+    std::string api;
+    for (auto& [key, value] : sorted_output)
+        api += fmt::format("{} = {}\n", key, value);
+    return api;
+}
+
 SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
     : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, enable)}
 {
@@ -2855,6 +2909,11 @@ bool SpelunkyScript::pre_level_gen_spawn(std::string_view tile_code, float x, fl
 void SpelunkyScript::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
 {
     m_Impl->post_level_gen_spawn(tile_code, x, y, layer);
+}
+
+std::string SpelunkyScript::dump_api()
+{
+    return m_Impl->dump_api();
 }
 
 void SpelunkyScript::for_each_script(std::function<bool(SpelunkyScript&)> fun)

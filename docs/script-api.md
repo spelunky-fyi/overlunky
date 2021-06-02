@@ -7,6 +7,8 @@
 - Click on the names of things to search for examples on how to use that function or variable.
 ## Lua libraries
 The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6).
+### `json`
+### `inspect`
 ### `math`
 ### `base`
 ### `string`
@@ -1047,3 +1049,5 @@ We use those to clarify what kind of values can be passed and returned from a fu
 ### CallbackId == int;
 ### Flags == int;
 ### uColor == int;
+## External Function Library
+If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting
