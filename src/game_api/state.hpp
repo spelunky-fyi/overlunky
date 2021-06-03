@@ -87,16 +87,19 @@ struct StateMemory
     int32_t ia00;
     uint32_t money_last_levels;
     int32_t hud_flags;
-    uint32_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
-    uint32_t unknown4;
-    int32_t unknown5;
+    uint32_t presence_flags;
+    uint32_t coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
+    bool player_died;
+    uint8_t padding10;
+    uint8_t padding11;
+    uint8_t padding12;
+    uint32_t cause_of_death;       // entity type
+    int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
     size_t toast;
     size_t speechbubble;
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
-    int32_t unknown6;
+    int32_t speechbubble_owner;
 
     char pada14[1980];
 
@@ -128,10 +131,10 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    size_t unknown22;
+    size_t logic;
     QuestsInfo* quests;
     size_t unknown24;
-    size_t unknown25;
+    size_t liquid_physics;
     size_t particle_emitters_info;
     size_t unknown26;
     size_t unknown27;

@@ -1801,6 +1801,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &StateMemory::loading,
         "quest_flags",
         &StateMemory::quest_flags,
+        "presence_flags",
+        &StateMemory::presence_flags,
         "fadevalue",
         &StateMemory::fadevalue,
         "fadeout",
