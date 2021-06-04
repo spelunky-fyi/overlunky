@@ -28,7 +28,6 @@
 
 #include <d3d11.h>
 
-#define SOL_ALL_SAFETIES_ON 1
 #include <sol/sol.hpp>
 
 std::vector<SpelunkyScript*> g_all_scripts;
@@ -69,7 +68,8 @@ enum class ON
     RESET = 105,
     SAVE = 106,
     LOAD = 107,
-    GAMEFRAME = 108
+    GAMEFRAME = 108,
+    SCRIPT_DISABLE = 109
 };
 
 struct IntOption

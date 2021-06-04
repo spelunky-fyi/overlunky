@@ -48,6 +48,11 @@ target_link_libraries(spel2_api PRIVATE
         sol2::sol2
         ${LUA_LIBRARIES}
         lib_detours_overlunky)
+target_compile_definitions(spel2_api PRIVATE
+        SOL_ALL_SAFETIES_ON=1)
+target_precompile_headers(spel2_api PRIVATE
+        <sol/sol.hpp>
+        <d3d11.h>)
 
 if (MSVC)
         target_compile_options(spel2_api PRIVATE /bigobj)
