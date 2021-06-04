@@ -69,7 +69,8 @@ enum class ON
     SAVE = 106,
     LOAD = 107,
     GAMEFRAME = 108,
-    SCRIPT_DISABLE = 109
+    SCRIPT_ENABLE = 109,
+    SCRIPT_DISABLE = 110
 };
 
 struct IntOption
@@ -404,6 +405,7 @@ class SpelunkyScript::ScriptImpl
     ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
     ~ScriptImpl()
     {
+        set_enabled(false);
         clear();
     }
 
@@ -415,6 +417,7 @@ class SpelunkyScript::ScriptImpl
 
     void clear();
     bool reset();
+    void set_enabled(bool enabled);
 
     bool run();
     void draw(ImDrawList* dl);
@@ -2236,7 +2239,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "SAVE",
         106,
         "LOAD",
-        107);
+        107,
+        "SCRIPT_ENABLE",
+        109,
+        "SCRIPT_DISABLE",
+        110);
     /* ON
     // GUIFRAME
     // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
@@ -2500,6 +2507,27 @@ bool SpelunkyScript::ScriptImpl::reset()
 #endif
         return false;
     }
+}
+
+void SpelunkyScript::ScriptImpl::set_enabled(bool enabled)
+{
+    if (enabled != this->enabled)
+    {
+        auto cb_type = enabled ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
+        auto now = get_frame_count();
+        for (auto& [id, callback] : callbacks)
+        {
+            if (auto* cb = std::get_if<ScreenCallback>(&callback))
+            {
+                if (cb->screen == cb_type)
+                {
+                    handle_function(cb->func);
+                    cb->lastRan = now;
+                }
+            }
+        }
+    }
+    this->enabled = enabled;
 }
 
 bool SpelunkyScript::ScriptImpl::run()
@@ -3071,7 +3099,7 @@ bool SpelunkyScript::is_enabled() const
 }
 void SpelunkyScript::set_enabled(bool enabled)
 {
-    m_Impl->enabled = enabled;
+    m_Impl->set_enabled(enabled);
 }
 
 bool SpelunkyScript::is_changed() const
