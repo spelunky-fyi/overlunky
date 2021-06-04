@@ -13,6 +13,7 @@ struct LevelGenSystem;
 struct Illumination;
 struct PlayerInputs;
 struct QuestsInfo;
+struct Camera;
 
 struct StateMemory
 {
@@ -84,7 +85,7 @@ struct StateMemory
     uint8_t i9f4d;
     uint32_t time_last_level;
     uint32_t time_level;
-    int32_t ia00;
+    uint32_t time_speedrun;
     uint32_t money_last_levels;
     int32_t hud_flags;
     uint32_t presence_flags;
@@ -125,7 +126,7 @@ struct StateMemory
     size_t unknown18;
     uint32_t next_entity_uid;
     uint16_t unknown20;
-    uint16_t unknown21;
+    uint16_t screen_change_counter; // increments every time screen changes; used in online sync together with next_entity_uid and unknown20 as a 64bit number
     PlayerInputs* player_inputs;
 
     Items* items;
@@ -139,6 +140,18 @@ struct StateMemory
     size_t unknown26;
     size_t unknown27;
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
+    size_t unknown28;
+    size_t unknown29;
+    size_t unknown30;
+    size_t unknown31;
+    size_t unknown32;
+    size_t unknown33;
+    size_t unknown34;
+    size_t unknown35;
+    size_t unknown36;
+    uint32_t time_startup;
+    uint32_t unknown38;
+    Camera* camera;
 };
 struct State
 {
@@ -383,4 +396,43 @@ struct QuestsInfo
     uint8_t unknown14;
     uint32_t unknown15;
     uint32_t unknown16;
+};
+
+struct Camera
+{
+    float bounds_left;
+    float bounds_right;
+    float bounds_bottom;
+    float bounds_top;
+    float adjusted_focus_x; // focus adjusted so camera doesn't show beyond borders
+    float adjusted_focus_y;
+    float calculated_focus_x; // forced values
+    float calculated_focus_y;
+    float focus_offset_x; // added to position of focused entity, if any
+    float focus_offset_y;
+    float unknown1; // does not get reset on level reload
+    float focus_x;  // the unadjusted center point to focus the camera on; set this for full camera control when the focused entity = -1
+    float focus_y;
+    float unknown2;
+    float vertical_pan; // set to a high number, like 5000 and the camera pans from top to bottom
+
+    // to shake the camera, set shake_countdown_start and shake_countdown to the number of frames you want to shake for
+    // set the shake amplitude, and control the direction with the multipliers, optionally add randomness by toggling uniform_shake
+
+    uint32_t shake_countdown_start; // probably used to calculate the percentage of the amplitude when progressing through the shake
+    uint32_t shake_countdown;
+    float shake_amplitude;    // the amount of camera shake
+    float shake_multiplier_x; // set to 0 to eliminate horizontal shake; negative inverts direction
+    float shake_multiplier_y; // set to 0 to eliminate vertical shake; negative inverts direction
+    bool uniform_shake;       // if false, the shake gets randomized a bit
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
+    int32_t focused_entity_uid; // if set to -1, you have free control over camera focus through focus_x, focus_y
+    uint32_t unknown3;
+    uint32_t unknown4;
+    float unknown_adjustment;
+    uint32_t unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7;
 };
