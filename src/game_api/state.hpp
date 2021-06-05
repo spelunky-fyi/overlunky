@@ -76,7 +76,10 @@ struct StateMemory
     uint8_t saved_hamsters;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t pad84[0x970];
+    uint32_t unknown1;
+    uint32_t unknown2;
+    uint32_t waddler_storage[99];
+    uint8_t pad84[2012];
     uint32_t journal_flags;
     int32_t first_damage_cause; // entity type that caused first damage, for the journal
     int8_t first_damage_world;

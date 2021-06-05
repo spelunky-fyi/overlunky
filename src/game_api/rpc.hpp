@@ -77,3 +77,6 @@ void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type);
 void force_co_subtheme(int8_t subtheme);
 void generate_particles(uint32_t particle_emitter_id, uint32_t uid);
 void set_journal_enabled(bool b);
+uint8_t waddler_count_entity(uint32_t entity_type);
+bool waddler_store_entity(uint32_t entity_type);
+void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove = 99);

@@ -1236,3 +1236,67 @@ void set_journal_enabled(bool b)
         write_mem_prot(offset, "\x90\x90\x90\x90\x90"s, true);
     }
 }
+
+uint8_t waddler_count_entity(uint32_t entity_type)
+{
+    auto state = get_state_ptr();
+    uint8_t count = 0;
+    for (uint8_t x = 0; x < 99; ++x)
+    {
+        if (state->waddler_storage[x] == entity_type)
+        {
+            count++;
+        }
+    }
+    return count;
+}
+
+bool waddler_store_entity(uint32_t entity_type)
+{
+    auto state = get_state_ptr();
+    bool item_stored = false;
+    for (uint8_t x = 0; x < 99; ++x)
+    {
+        if (state->waddler_storage[x] == 0)
+        {
+            state->waddler_storage[x] = entity_type;
+            item_stored = true;
+            break;
+        }
+    }
+    return item_stored;
+}
+
+void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove)
+{
+    auto state = get_state_ptr();
+
+    uint8_t remove_count = 0;
+    for (uint8_t x = 0; x < 99; ++x)
+    {
+        if (amount_to_remove == remove_count)
+        {
+            break;
+        }
+
+        if (state->waddler_storage[x] == entity_type)
+        {
+            state->waddler_storage[x] = 0;
+            remove_count++;
+        }
+    }
+
+    if (remove_count > 0)
+    {
+        uint32_t tmp[99] = {0};
+        uint8_t tmp_x = 0;
+        for (uint8_t x = 0; x < 99; ++x)
+        {
+            if (state->waddler_storage[x] != 0)
+            {
+                tmp[tmp_x++] = state->waddler_storage[x];
+            }
+        }
+        memcpy(&(state->waddler_storage[0]), tmp, 99 * sizeof(uint32_t));
+    }
+}

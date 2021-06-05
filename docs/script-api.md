@@ -406,6 +406,17 @@ Generate particles of the specified type around the specified entity uid (use e.
 ### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
 #### Params: `bool b`
 Enables or disables the journal
+### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
+#### Params: `int entity_type`
+#### Returns: `int`
+Returns how many of a specific entity type Waddler has stored
+### [`waddler_store_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_store_entity)
+#### Params: `int entity_type`
+#### Returns: `bool`
+Store an entity type in Waddler's storage. Returns false when storage is full and the item couldn't be stored.
+### [`waddler_remove_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_remove_entity)
+#### Params: `int entity_type, int amount_to_remove = 99`
+Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 #### Params: `int uid_a, int uid_b`
 Calculate the tile distance of two entities by uid

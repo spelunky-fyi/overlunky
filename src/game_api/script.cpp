@@ -928,6 +928,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["generate_particles"] = generate_particles;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
+    /// Returns how many of a specific entity type Waddler has stored
+    lua["waddler_count_entity"] = waddler_count_entity;
+    /// Store an entity type in Waddler's storage. Returns false when storage is full and the item couldn't be stored.
+    lua["waddler_store_entity"] = waddler_store_entity;
+    /// Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
+    lua["waddler_remove_entity"] = waddler_remove_entity;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b)
