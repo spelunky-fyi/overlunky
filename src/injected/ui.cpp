@@ -2086,7 +2086,7 @@ void render_hitbox(Movable* ent, bool cross, ImColor color)
         }
     }
     const int type = entity_type(ent->uid);
-    if (!type || ((type >= 538 && type <= 555) || type == 648))
+    if (!type || ((type >= to_id("ENT_TYPE_ITEM_POWERUP_PASTE") && type <= to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY")) || type == to_id("ENT_TYPE_FX_PICKUPEFFECT")))
         return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
     std::pair<float, float> boxa =
