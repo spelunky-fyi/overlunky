@@ -3,6 +3,9 @@ target_include_directories(shared INTERFACE .)
 target_link_libraries(shared INTERFACE
         fmt)
 target_precompile_headers(shared INTERFACE
+        "logger.h"
+        <fmt/format.h>
+        <fmt/ranges.h>
         <string>
         <string_view>
         <array>
