@@ -13,4 +13,5 @@ jobs:
         with:
           source: 'src'
           extensions: 'h,hpp,cpp'
+          exclude: './src/game_api/lua_libs'
           clangFormatVersion: 12
