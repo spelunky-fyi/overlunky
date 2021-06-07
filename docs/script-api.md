@@ -386,7 +386,7 @@ Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(C
 `nil generate_particles(int particle_emitter_id, int uid)`<br/>
 Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
 ### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
-#### Params: `bool b`
+`nil set_journal_enabled(bool b)`<br/>
 Enables or disables the journal
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 `float distance(int uid_a, int uid_b)`<br/>
@@ -568,10 +568,10 @@ Pop unique identifier from the stack. Put after the input.
 `nil win_image(int image, int width, int height)`<br/>
 Draw image to window.
 ### [`get_texture_definition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture_definition)
-#### Params: `int texture_id`
+`TextureDefinition get_texture_definition(int texture_id)`<br/>
 Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
 ### [`define_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_texture)
-#### Params: `TextureDefinition texture_data`
+`int define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
@@ -652,13 +652,9 @@ end
 - [`angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Movable::angle
 - [`topmost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) &Entity::topmost
 - [`topmost_mount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) &Entity::topmost_mount
-<<<<<<< HEAD
 - [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
-=======
-- [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with)
 - [`get_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
-- [`bool set_texture(uint32_t texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture)
->>>>>>> 5a0d40f36be91828ed477ca3d41c57a8e4cbd070
+- [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
 - [`as_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_door) &Entity::as&lt;Door&gt;
 - [`as_container`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_container) &Entity::as&lt;Container&gt;
@@ -1136,15 +1132,6 @@ Params: `PlayingSound vanilla_sound`
 - [`ICECAVES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.ICECAVES) 5
 - [`NEOBABYLON`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEOBABYLON) 6
 - [`SUNKENCITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKENCITY) 7
-<<<<<<< HEAD
-## Aliases
-We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
-### CallbackId == int;
-### Flags == int;
-### uColor == int;
-## External Function Library
-If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting
-=======
 ### YANG
 - [`ANGRY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=YANG.ANGRY) -1
 - [`QUEST_NOT_STARTED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=YANG.QUEST_NOT_STARTED) 0
@@ -1194,4 +1181,10 @@ If you use a text editor/IDE that has a Lua linter available you can download [s
 - [`BOMBBAG_THROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.BOMBBAG_THROWN) 3
 - [`SPAWNED_WITH_TRUECROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.SPAWNED_WITH_TRUECROWN) 4
 - [`TRUECROWN_THROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.TRUECROWN_THROWN) 5
->>>>>>> 5a0d40f36be91828ed477ca3d41c57a8e4cbd070
+## Aliases
+We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
+### CallbackId == int;
+### Flags == int;
+### uColor == int;
+## External Function Library
+If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting
