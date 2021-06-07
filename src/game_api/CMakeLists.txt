@@ -37,6 +37,7 @@ add_library(spel2_api STATIC
         overloaded.hpp
         virtual_table.cpp
         virtual_table.hpp
+        drops.cpp
         drops.hpp
         file_api.cpp
         file_api.hpp)
