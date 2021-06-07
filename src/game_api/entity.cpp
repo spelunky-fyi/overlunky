@@ -193,9 +193,19 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    return std::pair<float, float>(
-        rendering_info->x,
-        rendering_info->y);
+    // This isn't perfect but at least it fixes the trigger hitboxes for now
+    auto [x, y] = position_self();
+    switch ((size_t)overlay)
+    {
+    case NULL:
+        return {rendering_info->x, rendering_info->y};
+    default:
+    {
+        float _x, _y;
+        std::tie(_x, _y) = overlay->position();
+        return {x + _x, y + _y};
+    }
+    }
 }
 
 void Entity::remove_item(uint32_t id)
@@ -335,6 +345,22 @@ uint8_t Olmec::broken_floaters()
 void Entity::destroy()
 {
     delete this; // TODO
+}
+
+std::tuple<float, float, int> get_position(uint32_t id)
+{
+    Entity* ent = get_entity_ptr(id);
+    if (ent)
+        return std::make_tuple(ent->position().first, ent->position().second, ent->layer());
+    return {0.0f, 0.0f, 0};
+}
+
+std::tuple<float, float, int> get_render_position(uint32_t id)
+{
+    Entity* ent = get_entity_ptr(id);
+    if (ent)
+        return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer());
+    return {0.0f, 0.0f, 0};
 }
 
 std::uint32_t Entity::get_texture()

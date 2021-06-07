@@ -11,6 +11,9 @@
 #include "entity.hpp"
 #include "logger.h"
 #include "memory.h"
+#include "particles.hpp"
+#include "script.hpp"
+#include "sound_manager.hpp"
 #include "texture.hpp"
 
 using float_json = nlohmann::basic_json<std::map, std::vector, std::string, bool, std::int64_t, std::uint64_t, float>;
@@ -168,6 +171,29 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         textures_file.write(dump.data(), dump.size());
     }
 
+    if (std::ofstream file = std::ofstream("game_data/textures.txt"))
+    {
+        std::unordered_map<std::string, uint32_t> counts;
+        for (auto* tex : get_textures()->texture_map)
+        {
+            if (tex != nullptr && tex->name != nullptr)
+            {
+                std::string clean_tex_name = *tex->name;
+                std::transform(
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
+                    { return std::toupper(c); });
+                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                size_t index = clean_tex_name.find(".DDS", 0);
+                if (index != std::string::npos)
+                {
+                    clean_tex_name.erase(index, 4);
+                }
+                clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
+                file << "TEXTURE." << clean_tex_name << ": " << tex->id << std::endl;
+            }
+        }
+    }
+
     if (std::ofstream search_flags_file = std::ofstream("game_data/search_flags.json"))
     {
         float_json search_flags(float_json::object());
@@ -190,6 +216,69 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
 
         std::string dump = search_flags.dump(2);
         search_flags_file.write(dump.data(), dump.size());
+    }
+
+    if (auto file = std::ofstream("game_data/entities.txt"))
+    {
+        for (auto& ent : items)
+        {
+            EntityDB* db = get_type(ent.id);
+            if (!db)
+                break;
+            file << ent.id << ": " << ent.name << std::endl;
+        }
+    }
+
+    SoundManager sound_mgr(nullptr);
+
+    if (auto file = std::ofstream("game_data/vanilla_sounds.txt"))
+    {
+        sound_mgr.for_each_event_name(
+            [&file](std::string event_name)
+            {
+                std::string clean_event_name = event_name;
+                std::transform(
+                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
+                    { return std::toupper(c); });
+                std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
+                file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
+            });
+    }
+
+    if (auto file = std::ofstream("game_data/vanilla_sound_params.txt"))
+    {
+        sound_mgr.for_each_parameter_name(
+            [&file](std::string parameter_name, std::uint32_t id)
+            {
+                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
+                               { return std::toupper(c); });
+                file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
+            });
+    }
+
+    if (auto file = std::ofstream("game_data/particle_emitters.txt"))
+    {
+        auto particles = list_particles();
+        for (const auto& particle : particles)
+        {
+            file << particle.id << ": " << particle.name << "\n";
+        }
+    }
+
+    if (auto file = std::ofstream("game_data/spel2.lua"))
+    {
+        SpelunkyScript api_gen_script(
+            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'",
+            "api_gen",
+            &sound_mgr,
+            true);
+
+        if (!std::filesystem::exists("lua_api"))
+        {
+            std::filesystem::create_directory("lua_api");
+        }
+
+        file << api_gen_script.dump_api() << std::endl;
     }
 
     std::exit(0);

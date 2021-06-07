@@ -332,3 +332,6 @@ class Arrowtrap : public Entity
 };
 
 std::vector<EntityItem> list_entities();
+
+std::tuple<float, float, int> get_position(uint32_t id);
+std::tuple<float, float, int> get_render_position(uint32_t id);
