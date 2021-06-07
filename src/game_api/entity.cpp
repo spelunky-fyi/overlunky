@@ -25,9 +25,9 @@ size_t entities_offset()
 
 struct EntityBucket
 {
-    void* begin;
-    void* current;
-    void* end;
+    void** begin;
+    void** current; // Note, counts down from end to begin instead of up from begin to end :shrug:
+    void** end;
 };
 struct EntityPool
 {
