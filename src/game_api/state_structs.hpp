@@ -2,32 +2,32 @@
 
 #include <cstdint>
 
-struct SaturationVignette
+struct LightParams
 {
     float red; // default = 1.0 (can go over 1.0 for oversaturation)
     float green;
     float blue;
-    float vignette_aperture; // default = 20000.0 ; visible aperture change in range 1.0 - 100.0
+    float size;
 };
 
 struct Illumination
 {
-    SaturationVignette saturation_vignette;
-    SaturationVignette saturation_vignette_other[3]; // there's three more
-    float brightness1;
-    float brightness2;
-    float something_min;
-    float something_max;
-    size_t unknown_empty;
-    float unknown_float;
-    float unknown_nan;
-    uint32_t unknown_timer;
-    uint8_t frontlayer_global_illumination; // 0 = on; 1 = off; 4 = white; ... higher starts to flicker
-    uint8_t unknown_illumination1;
-    uint8_t backlayer_global_illumination; // 0 = off ; 1 = on but turns front layer off
-    uint8_t unknown_illumination2;         // influences backlayer_global_illumination
-    uint32_t unknown_int1;                 // crash when changed
-    uint32_t unknown_int2;
+    LightParams light1;
+    LightParams light2;
+    LightParams light3;
+    LightParams light4;
+    float brightness;
+    float brightness_multiplier;
+    float light_pos_x;
+    float light_pos_y;
+    float offset_x;
+    float offset_y;
+    float distortion;
+    int32_t entity_uid;
+    uint32_t timer;
+    uint32_t flags; // see flags.hpp illumination_flags
+    uint32_t unknown1;
+    uint32_t unknown2;
 };
 
 struct InputMapping
@@ -519,4 +519,71 @@ struct Logic
     size_t arena_3;
     size_t unknown26;
     size_t unknown27;
+};
+
+struct LiquidPhysicsParams
+{
+    uint8_t unknown1; // anything other than 1 and standing water doesn't visually generate
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
+    uint8_t unknown2;
+    uint8_t padding4;
+    uint8_t padding5;
+    uint8_t padding6;
+    float unknown3;
+    float cohesion; // unsure about name; negative number makes the liquid balls come apart more easily?
+    float gravity;  // negative number to invert gravity
+    float unknown6;
+    float unknown7;
+    float agitation;
+    float unknown9; // starts going nuts at around 2.70
+    float unknown10;
+    float unknown11;
+    float unknown12;
+    float unknown13;
+    float unknown14;
+    float unknown15;
+    float unknown16;
+    float unknown17;
+    float unknown18;
+    float unknown19;
+    uint32_t unknown20;
+    float unknown21;
+    uint32_t unknown22;
+    float unknown23;
+    uint32_t unknown24;
+    size_t unknown25;
+    float unknown26;
+    float x_right;
+    float y_top;
+    float unknown29;
+    uint32_t unknown30;
+    uint32_t unknown31;
+    uint32_t unknown32;
+    uint32_t unknown33;
+    size_t unknown34;
+    uint32_t unknown35;
+    uint32_t unknown36;
+    uint32_t unknown37;
+    float unknown38;
+    uint32_t unknown39; // entity uid
+    float unknown40;
+    float unknown41;
+    uint32_t unknown42;
+};
+
+struct LiquidPhysics
+{
+    size_t unknown1;
+    LiquidPhysicsParams pools[4];
+};
+
+struct PointerList
+{
+    size_t begin;
+    size_t end; // one past the last pointer, like end iterator
+    size_t unknown1;
+    uint32_t unknown2;
+    uint32_t unknown3;
 };

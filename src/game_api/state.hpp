@@ -151,9 +151,9 @@ struct StateMemory
     Logic* logic;
     QuestsInfo* quests;
     size_t unknown24;
-    size_t liquid_physics;
-    size_t particle_emitters_info;
-    size_t unknown26;
+    LiquidPhysics* liquid_physics;
+    PointerList* particle_emitters; // list of ParticleEmitterInfo*
+    PointerList* lightsources;      // list of Illumination*
     size_t unknown27;
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
     size_t unknown28;

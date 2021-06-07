@@ -389,15 +389,13 @@ Generate particles of the specified type around the specified entity uid (use e.
 `nil set_journal_enabled(bool b)`<br/>
 Enables or disables the journal
 ### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
-#### Params: `int entity_type`
-#### Returns: `int`
+`int waddler_count_entity(int entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
 ### [`waddler_store_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_store_entity)
-#### Params: `int entity_type`
-#### Returns: `bool`
+`bool waddler_store_entity(int entity_type)`<br/>
 Store an entity type in Waddler's storage. Returns false when storage is full and the item couldn't be stored.
 ### [`waddler_remove_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_remove_entity)
-#### Params: `int entity_type, int amount_to_remove = 99`
+`nil waddler_remove_entity(int entity_type, int amount_to_remove = 99)`<br/>
 Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 `float distance(int uid_a, int uid_b)`<br/>
@@ -727,6 +725,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Player`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr
+- [`emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Player::emitted_light
 - [`set_jetpack_fuel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) &Player::set_jetpack_fuel
 - [`kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Player::kapala_blood_amount
 ### `Mount`
@@ -835,17 +834,25 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`player_inputs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) sol::readonly(&StateMemory::player_inputs)
 - [`quests`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quests) &StateMemory::quests
 - [`camera`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) &StateMemory::camera
-### `SaturationVignette`
-- [`red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &SaturationVignette::red
-- [`green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &SaturationVignette::green
-- [`blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &SaturationVignette::blue
-- [`vignette_aperture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vignette_aperture) &SaturationVignette::vignette_aperture
+### `LightParams`
+- [`red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &LightParams::red
+- [`green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &LightParams::green
+- [`blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &LightParams::blue
+- [`size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &LightParams::size
 ### `Illumination`
-- [`saturation_vignette`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saturation_vignette) &Illumination::saturation_vignette
-- [`brightness1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brightness1) &Illumination::brightness1
-- [`brightness2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brightness2) &Illumination::brightness2
-- [`frontlayer_global_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frontlayer_global_illumination) &Illumination::frontlayer_global_illumination
-- [`backlayer_global_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_global_illumination) &Illumination::backlayer_global_illumination
+- [`light1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light1) &Illumination::light1
+- [`light2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light2) &Illumination::light2
+- [`light3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light3) &Illumination::light3
+- [`light4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light4) &Illumination::light4
+- [`brightness`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brightness) &Illumination::brightness
+- [`brightness_multiplier`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brightness_multiplier) &Illumination::brightness_multiplier
+- [`light_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_pos_x) &Illumination::light_pos_x
+- [`light_pos_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_pos_y) &Illumination::light_pos_y
+- [`offset_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) &Illumination::offset_x
+- [`offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) &Illumination::offset_y
+- [`distortion`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distortion) &Illumination::distortion
+- [`entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) &Illumination::entity_uid
+- [`flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) &Illumination::flags
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min

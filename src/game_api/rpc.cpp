@@ -1205,9 +1205,9 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
         if (entity != nullptr)
         {
             auto state = get_state_ptr();
-            typedef size_t generate_particles_func(size_t, uint32_t, Entity*);
+            typedef size_t generate_particles_func(PointerList*, uint32_t, Entity*);
             static generate_particles_func* gpf = (generate_particles_func*)(offset);
-            auto result = gpf(state->particle_emitters_info, particle_emitter_id, entity);
+            auto result = gpf(state->particle_emitters, particle_emitter_id, entity);
         }
     }
 }
