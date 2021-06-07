@@ -40,8 +40,8 @@ add_library(spel2_api STATIC
         drops.hpp
         file_api.cpp
         file_api.hpp
-        lua_libs.cpp
-        lua_libs.hpp)
+        lua_libs/lua_libs.cpp
+        lua_libs/lua_libs.hpp)
 target_include_directories(spel2_api PUBLIC .)
 target_link_libraries(spel2_api PUBLIC
         imgui)

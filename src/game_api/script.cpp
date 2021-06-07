@@ -4,7 +4,7 @@
 #include "file_api.hpp"
 #include "level_api.hpp"
 #include "logger.h"
-#include "lua_libs.hpp"
+#include "lua_libs/lua_libs.hpp"
 #include "overloaded.hpp"
 #include "particles.hpp"
 #include "render_api.hpp"
