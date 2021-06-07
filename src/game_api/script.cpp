@@ -1,11 +1,13 @@
 #include "script.hpp"
 #include "drops.hpp"
 #include "entity.hpp"
+#include "file_api.hpp"
 #include "level_api.hpp"
 #include "logger.h"
 #include "lua_libs.hpp"
 #include "overloaded.hpp"
 #include "particles.hpp"
+#include "render_api.hpp"
 #include "rpc.hpp"
 #include "savedata.hpp"
 #include "script_context.hpp"
@@ -26,8 +28,10 @@
 #include <set>
 #include <unordered_set>
 
+#include <d3d11.h>
+
 #define SOL_ALL_SAFETIES_ON 1
-#include "sol/sol.hpp"
+#include <sol/sol.hpp>
 
 using CallbackId = int;
 using Flags = std::uint32_t;
@@ -298,7 +302,7 @@ std::string sanitize(std::string data)
 {
     std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c)
                    { return std::tolower(c); });
-    std::regex reg("[^a-z/]*");
+    static std::regex reg("[^a-z/]*", std::regex_constants::optimize);
     data = std::regex_replace(data, reg, "");
     return data;
 }
@@ -914,6 +918,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["force_co_subtheme"] = force_co_subtheme;
     /// Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
     lua["generate_particles"] = generate_particles;
+    /// Enables or disables the journal
+    lua["set_journal_enabled"] = set_journal_enabled;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b) -> float
@@ -1049,7 +1055,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         image->width = 0;
         image->height = 0;
         image->texture = NULL;
-        if (LoadTextureFromFile((script_folder / path).string().data(), &image->texture, &image->width, &image->height))
+        if (create_d3d11_texture_from_file((script_folder / path).string().data(), &image->texture, &image->width, &image->height))
         {
             int id = images.size();
             images[id] = image;
@@ -1360,7 +1366,43 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
             height = images[image]->height;
         ImGui::Image(images[image]->texture, ImVec2(width, height));
     };
+    /// Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
+    lua["get_texture_definition"] = [this](uint32_t texture_id) -> TextureDefinition
+    {
+        return RenderAPI::get().get_texture_definition(texture_id);
+    };
+    /// Defines a new texture that can be used in Entity::set_texture
+    lua["define_texture"] = [this](TextureDefinition texture_data) -> uint32_t
+    {
+        texture_data.texture_path = get_image_file_path(meta.path, std::move(texture_data.texture_path));
+        return RenderAPI::get().define_texture(std::move(texture_data));
+    };
 
+    /// Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
+    /// `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
+    /// `tile_width` and `tile_height` define the size of a single tile, the image will automatically be divided into these tiles.
+    /// Tiles are labeled in sequence starting at the top left, going right and down at the end of the image (you know, like sentences work in the English language). Use those numbers in `Entity::animation_frame`.
+    /// `sub_image_offset_x`, `sub_image_offset_y`, `sub_image_width` and `sub_image_height` can be used if only a part of the image should be used. Leave them at zero to ignore this.
+    lua.new_usertype<TextureDefinition>(
+        "TextureDefinition",
+        "texture_path",
+        &TextureDefinition::texture_path,
+        "width",
+        &TextureDefinition::width,
+        "height",
+        &TextureDefinition::height,
+        "tile_width",
+        &TextureDefinition::tile_width,
+        "tile_height",
+        &TextureDefinition::tile_height,
+        "sub_image_offset_x",
+        &TextureDefinition::sub_image_offset_x,
+        "sub_image_offset_y",
+        &TextureDefinition::sub_image_offset_y,
+        "sub_image_width",
+        &TextureDefinition::sub_image_width,
+        "sub_image_height",
+        &TextureDefinition::sub_image_height);
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
         "Inventory",
@@ -1468,6 +1510,10 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::topmost_mount,
         "overlaps_with",
         overlaps_with,
+        "get_texture",
+        &Entity::get_texture,
+        "set_texture",
+        &Entity::set_texture,
         "as_movable",
         &Entity::as<Movable>,
         "as_door",
@@ -1506,6 +1552,7 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &Entity::as<Jiangshi>);
     /* Entity
         bool overlaps_with(Entity other)
+        bool set_texture(uint32_t texture_id)
     */
     lua.new_usertype<Movable>(
         "Movable",
@@ -1754,7 +1801,11 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "money_last_levels",
         &StateMemory::money_last_levels,
         "money_shop_total",
-        &StateMemory::money_shop_total);
+        &StateMemory::money_shop_total,
+        "player_inputs",
+        sol::readonly(&StateMemory::player_inputs),
+        "quests",
+        &StateMemory::quests);
     lua.new_usertype<SaturationVignette>(
         "SaturationVignette",
         "red",
@@ -1781,24 +1832,144 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "ParticleDB",
         "id",
         &ParticleDB::id,
+        "spawn_count_min",
+        &ParticleDB::spawn_count_min,
+        "spawn_count",
+        &ParticleDB::spawn_count,
+        "lifespan_min",
+        &ParticleDB::lifespan_min,
+        "lifespan",
+        &ParticleDB::lifespan,
         "sheet_id",
         &ParticleDB::sheet_id,
+        "animation_sequence_length",
+        &ParticleDB::animation_sequence_length,
+        "spawn_interval",
+        &ParticleDB::spawn_interval,
         "shrink_growth_factor",
         &ParticleDB::shrink_growth_factor,
+        "rotation_speed",
+        &ParticleDB::rotation_speed,
         "opacity",
         &ParticleDB::opacity,
         "hor_scattering",
         &ParticleDB::hor_scattering,
         "ver_scattering",
         &ParticleDB::ver_scattering,
+        "scale_x_min",
+        &ParticleDB::scale_x_min,
         "scale_x",
         &ParticleDB::scale_x,
+        "scale_y_min",
+        &ParticleDB::scale_y_min,
         "scale_y",
         &ParticleDB::scale_y,
+        "hor_deflection_1",
+        &ParticleDB::hor_deflection_1,
+        "ver_deflection_1",
+        &ParticleDB::ver_deflection_1,
+        "hor_deflection_2",
+        &ParticleDB::hor_deflection_2,
+        "ver_deflection_2",
+        &ParticleDB::ver_deflection_2,
         "hor_velocity",
         &ParticleDB::hor_velocity,
         "ver_velocity",
-        &ParticleDB::ver_velocity);
+        &ParticleDB::ver_velocity,
+        "cyan",
+        &ParticleDB::cyan,
+        "magenta",
+        &ParticleDB::magenta,
+        "yellow",
+        &ParticleDB::yellow,
+        "permanent",
+        &ParticleDB::permanent,
+        "invisible",
+        &ParticleDB::invisible,
+        "get_texture",
+        &ParticleDB::get_texture,
+        "set_texture",
+        &ParticleDB::set_texture);
+    lua.new_usertype<PlayerSlotSettings>(
+        "PlayerSlotSettings",
+        "controller_vibration",
+        sol::readonly(&PlayerSlotSettings::controller_vibration),
+        "auto_run_enabled",
+        sol::readonly(&PlayerSlotSettings::auto_run_enabled),
+        "controller_right_stick",
+        sol::readonly(&PlayerSlotSettings::controller_right_stick));
+    lua.new_usertype<PlayerSlot>(
+        "PlayerSlot",
+        "buttons_gameplay",
+        sol::readonly(&PlayerSlot::buttons_gameplay),
+        "buttons",
+        sol::readonly(&PlayerSlot::buttons),
+        "input_mapping_keyboard",
+        sol::readonly(&PlayerSlot::input_mapping_keyboard),
+        "input_mapping_controller",
+        sol::readonly(&PlayerSlot::input_mapping_controller),
+        "player_id",
+        sol::readonly(&PlayerSlot::player_id),
+        "is_participating",
+        sol::readonly(&PlayerSlot::is_participating));
+    lua.new_usertype<InputMapping>(
+        "InputMapping",
+        "jump",
+        sol::readonly(&InputMapping::jump),
+        "attack",
+        sol::readonly(&InputMapping::attack),
+        "bomb",
+        sol::readonly(&InputMapping::bomb),
+        "rope",
+        sol::readonly(&InputMapping::rope),
+        "walk_run",
+        sol::readonly(&InputMapping::walk_run),
+        "use_door_buy",
+        sol::readonly(&InputMapping::use_door_buy),
+        "pause_menu",
+        sol::readonly(&InputMapping::pause_menu),
+        "journal",
+        sol::readonly(&InputMapping::journal),
+        "left",
+        sol::readonly(&InputMapping::left),
+        "right",
+        sol::readonly(&InputMapping::right),
+        "up",
+        sol::readonly(&InputMapping::up),
+        "down",
+        sol::readonly(&InputMapping::down));
+    lua.new_usertype<PlayerInputs>(
+        "PlayerInputs",
+        "player_slot_1",
+        sol::readonly(&PlayerInputs::player_slot_1),
+        "player_slot_2",
+        sol::readonly(&PlayerInputs::player_slot_2),
+        "player_slot_3",
+        sol::readonly(&PlayerInputs::player_slot_3),
+        "player_slot_4",
+        sol::readonly(&PlayerInputs::player_slot_4),
+        "player_slot_1_settings",
+        sol::readonly(&PlayerInputs::player_slot_1_settings),
+        "player_slot_2_settings",
+        sol::readonly(&PlayerInputs::player_slot_2_settings),
+        "player_slot_3_settings",
+        sol::readonly(&PlayerInputs::player_slot_3_settings),
+        "player_slot_4_settings",
+        sol::readonly(&PlayerInputs::player_slot_4_settings));
+    lua.new_usertype<QuestsInfo>(
+        "QuestsInfo",
+        "yang_state",
+        &QuestsInfo::yang_state,
+        "jungle_sisters_flags",
+        &QuestsInfo::jungle_sisters_flags,
+        "van_horsing_state",
+        &QuestsInfo::van_horsing_state,
+        "sparrow_state",
+        &QuestsInfo::sparrow_state,
+        "madame_tusk_state",
+        &QuestsInfo::madame_tusk_state,
+        "beg_state",
+        &QuestsInfo::beg_state);
     auto play = sol::overload(
         static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
@@ -2196,8 +2367,54 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         lua["DROP"][drop_entries.at(x).caption] = x;
     }
 
+    lua.create_named_table("TEXTURE"
+                           //, "DATA_TEXTURES_PLACEHOLDER_0", 0
+                           //, "", ...see__textures.txt__for__a__list__of__textures...
+                           //, "DATA_TEXTURES_SHINE_0", 388
+                           //, "DATA_TEXTURES_OLDTEXTURES_AI_0", 389
+    );
+    {
+        std::unordered_map<std::string, uint32_t> counts;
+        for (const auto* tex : get_textures()->texture_map)
+        {
+            if (tex != nullptr && tex->name != nullptr)
+            {
+                std::string clean_tex_name = *tex->name;
+                std::transform(
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
+                    { return std::toupper(c); });
+                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                size_t index = clean_tex_name.find(".DDS", 0);
+                if (index != std::string::npos)
+                {
+                    clean_tex_name.erase(index, 4);
+                }
+                clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
+                lua["TEXTURE"][clean_tex_name] = tex->id;
+            }
+        }
+    }
+
     /// Parameter to force_co_subtheme
     lua.create_named_table("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
+
+    /// Yang quest states
+    lua.create_named_table("YANG", "ANGRY", -1, "QUEST_NOT_STARTED", 0, "TURKEY_PEN_SPAWNED", 2, "BOTH_TURKEYS_DELIVERED", 3, "TURKEY_SHOP_SPAWNED", 4, "ONE_TURKEY_BOUGHT", 5, "TWO_TURKEYS_BOUGHT", 6, "THREE_TURKEYS_BOUGHT", 7);
+
+    /// Jungle sister quest flags (angry = -1)
+    lua.create_named_table("JUNGLESISTERS", "PARSLEY_RESCUED", 1, "PARSNIP_RESCUED", 2, "PARMESAN_RESCUED", 3, "WARNING_ONE_WAY_DOOR", 4, "GREAT_PARTY_HUH", 5, "I_WISH_BROUGHT_A_JACKET", 6);
+
+    /// Van Horsing quest states
+    lua.create_named_table("VANHORSING", "QUEST_NOT_STARTED", 0, "JAILCELL_SPAWNED", 1, "FIRST_ENCOUNTER_DIAMOND_THROWN", 2, "SPAWNED_IN_VLADS_CASTLE", 3, "SHOT_VLAD", 4, "TEMPLE_HIDEOUT_SPAWNED", 5, "SECOND_ENCOUNTER_COMPASS_THROWN", 6, "TUSK_CELLAR", 7);
+
+    /// Sparrow quest states
+    lua.create_named_table("SPARROW", "QUEST_NOT_STARTED", 0, "THIEF_STATUS", 1, "FINISHED_LEVEL_WITH_THIEF_STATUS", 2, "FIRST_HIDEOUT_SPAWNED_ROPE_THROW", 3, "FIRST_ENCOUNTER_ROPES_THROWN", 4, "TUSK_IDOL_STOLEN", 5, "SECOND_HIDEOUT_SPAWNED_NEOBAB", 6, "SECOND_ENCOUNTER_INTERACTED", 7, "MEETING_AT_TUSK_BASEMENT", 8);
+
+    /// Madame Tusk quest states
+    lua.create_named_table("TUSK", "ANGRY", -2, "DEAD", -1, "QUEST_NOT_STARTED", 0, "DICE_HOUSE_SPAWNED", 1, "HIGH_ROLLER_STATUS", 2, "PALACE_WELCOME_MESSAGE", 3);
+
+    /// Beg quest states
+    lua.create_named_table("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
 }
 
 void SpelunkyScript::ScriptImpl::clear()

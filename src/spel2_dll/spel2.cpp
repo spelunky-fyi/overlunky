@@ -1,5 +1,6 @@
 #include "spel2.h"
 
+#include "file_api.hpp"
 #include "rpc.hpp"
 #include "script.hpp"
 #include "script_context.hpp"
@@ -18,9 +19,9 @@ void InitSwapChainHooks(IDXGISwapChain* swap_chain)
 {
     init_hooks(swap_chain);
 }
-void InitSoundManager(Spelunky_DecodeAudioFile* decode_function)
+void InitSoundManager(Spelunky_DecodeAudioFile decode_function)
 {
-    static Spelunky_DecodeAudioFile* local_decode_function = decode_function;
+    static Spelunky_DecodeAudioFile local_decode_function = decode_function;
     g_SoundManager = new SoundManager(
         [](const char* file_path)
         {
@@ -67,7 +68,8 @@ void RegisterPostDrawFunc(PostDrawFunc post_draw)
 
 void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
 {
-    static Spelunky_MakeSavePathFunc local_make_save_path_func = make_save_path;
+    static Spelunky_MakeSavePathFunc local_make_save_path_func;
+    local_make_save_path_func = make_save_path;
     register_make_save_path(
         [](std::string_view script_path, std::string_view script_name) -> std::string
         {
@@ -75,6 +77,26 @@ void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
             if (local_make_save_path_func(script_path.data(), script_path.size(), script_name.data(), script_name.size(), out_buffer, MAX_PATH))
             {
                 return out_buffer;
+            }
+            return "";
+        });
+}
+
+void RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file)
+{
+    register_on_load_file((LoadFileCallback*)on_load_file);
+}
+void RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path)
+{
+    static Spelunky_GetImageFilePathFunc local_get_image_file_path;
+    local_get_image_file_path = get_image_file_path;
+    register_get_image_file_path(
+        [](std::string root_path, std::string relative_path) -> std::string
+        {
+            char out_file_path[MAX_PATH];
+            if (local_get_image_file_path(root_path.c_str(), relative_path.c_str(), out_file_path, MAX_PATH))
+            {
+                return out_file_path;
             }
             return "";
         });

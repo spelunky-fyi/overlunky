@@ -76,3 +76,4 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance);
 void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type);
 void force_co_subtheme(int8_t subtheme);
 void generate_particles(uint32_t particle_emitter_id, uint32_t uid);
+void set_journal_enabled(bool b);

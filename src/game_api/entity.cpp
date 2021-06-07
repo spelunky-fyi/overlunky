@@ -5,8 +5,10 @@
 #include <vector>
 
 #include "logger.h"
+#include "render_api.hpp"
 #include "rpc.hpp"
 #include "state.hpp"
+#include "texture.hpp"
 
 // Items::entity_map = EntityMap;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
@@ -191,9 +193,19 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    auto _rx = read_f32(rendering_info + 0x0c);
-    auto _ry = read_f32(rendering_info + 0x10);
-    return std::pair<float, float>(_rx, _ry);
+    // This isn't perfect but at least it fixes the trigger hitboxes for now
+    auto [x, y] = position_self();
+    switch ((size_t)overlay)
+    {
+    case NULL:
+        return {rendering_info->x, rendering_info->y};
+    default:
+    {
+        float _x, _y;
+        std::tie(_x, _y) = overlay->position();
+        return {x + _x, y + _y};
+    }
+    }
 }
 
 void Entity::remove_item(uint32_t id)
@@ -349,4 +361,20 @@ std::tuple<float, float, int> get_render_position(uint32_t id)
     if (ent)
         return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer());
     return {0.0f, 0.0f, 0};
+}
+
+std::uint32_t Entity::get_texture()
+{
+    return texture->id;
+}
+bool Entity::set_texture(std::uint32_t texture_id)
+{
+    if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
+    {
+        texture = new_texture;
+        rendering_info->texture = new_texture;
+        rendering_info->texture_name = new_texture->name;
+        return true;
+    }
+    return false;
 }

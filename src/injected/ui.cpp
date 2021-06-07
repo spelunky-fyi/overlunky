@@ -20,7 +20,9 @@
 #include <toml.hpp>
 
 #include "entity.hpp"
+#include "file_api.hpp"
 #include "flags.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "particles.hpp"
 #include "rpc.hpp"
@@ -1994,32 +1996,23 @@ void render_hitbox(Movable* ent, bool cross, ImColor color)
         }
     }
     const int type = entity_type(ent->uid);
-    if (!type || ((type >= 538 && type <= 555) || type == 648))
+    if (!type || ((type >= to_id("ENT_TYPE_ITEM_POWERUP_PASTE") && type <= to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY")) || type == to_id("ENT_TYPE_FX_PICKUPEFFECT")))
         return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
     std::pair<float, float> boxa =
         screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
     std::pair<float, float> boxb =
-        screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
-    std::pair<float, float> boxc =
         screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
-    std::pair<float, float> boxd =
-        screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
     ImVec2 spos = screenify({pos.first, pos.second});
     ImVec2 sboxa = screenify({boxa.first, boxa.second});
     ImVec2 sboxb = screenify({boxb.first, boxb.second});
-    ImVec2 sboxc = screenify({boxc.first, boxc.second});
-    ImVec2 sboxd = screenify({boxd.first, boxd.second});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
     }
-    draw_list->AddLine(sboxa, sboxb, color, 2);
-    draw_list->AddLine(sboxb, sboxc, color, 2);
-    draw_list->AddLine(sboxc, sboxd, color, 2);
-    draw_list->AddLine(sboxd, sboxa, color, 2);
+    draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 }
 
 void fix_script_requires(SpelunkyScript* script)
@@ -3895,7 +3888,9 @@ void init_ui()
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);
 
-    register_make_save_path(make_save_path);
+    register_make_save_path(&make_save_path);
+
+    register_on_load_file(&load_file_as_dds_if_image);
 }
 
 void reload_enabled_scripts()

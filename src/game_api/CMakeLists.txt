@@ -35,9 +35,11 @@ add_library(spel2_api STATIC
         game_manager.cpp
         game_manager.hpp
         overloaded.hpp
-        virtual_table.hpp
         virtual_table.cpp
+        virtual_table.hpp
         drops.hpp
+        file_api.cpp
+        file_api.hpp
         lua_libs.cpp
         lua_libs.hpp)
 target_include_directories(spel2_api PUBLIC .)

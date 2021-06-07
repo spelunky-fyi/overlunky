@@ -1,7 +1,6 @@
 #include <cstdint>
 
 #include <Windows.h>
-#include <d3d11.h>
 
 bool init_hooks(void* swap_chain_ptr);
 
@@ -28,4 +27,4 @@ HWND get_window();
 void show_cursor();
 void hide_cursor();
 
-bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height);
+struct ID3D11Device* get_device();
