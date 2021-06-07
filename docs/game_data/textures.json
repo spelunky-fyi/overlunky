@@ -1,0 +1,5837 @@
+{
+  "0": {
+    "height": 16,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/placeholder",
+    "tile_height": 16,
+    "tile_width": 16,
+    "width": 16
+  },
+  "1": {
+    "height": 256,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/loading.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 256
+  },
+  "10": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_title.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "100": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship3.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "101": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_skynight.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "102": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_surface.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "103": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_surface.DDS",
+    "tile_height": 256,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "104": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_surface2.DDS",
+    "tile_height": 512,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "105": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "106": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "107": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "108": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 4,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 512,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "109": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "11": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_titlegal.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "110": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 1408,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "111": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 4,
+      "width": 2
+    },
+    "offset": {
+      "height": 1024,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 512,
+    "tile_width": 896,
+    "width": 2048
+  },
+  "112": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 1024,
+      "width": 896
+    },
+    "path": "Data/Textures/deco_basecamp.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "113": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_tutorial.DDS",
+    "tile_height": 256,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "114": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 512,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_tutorial.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "115": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_cave.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "116": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 12
+    },
+    "offset": {
+      "height": 128,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_cave.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "117": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_cave.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "118": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_cave.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "119": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_cave.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "12": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_body.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "120": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_cave.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "121": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_cave.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "122": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_cave.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "123": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_cave.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "124": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_jungle.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "125": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_jungle.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "126": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_jungle.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "127": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_jungle.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "128": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_jungle.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "129": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_jungle.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "13": {
+    "height": 256,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_dirt.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "130": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_jungle.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "131": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_volcano.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "132": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 6
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_volcano.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "133": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_volcano.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "134": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_volcano.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "135": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_volcano.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "136": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_volcano.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "137": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 4,
+      "width": 3
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_volcano.DDS",
+    "tile_height": 384,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "138": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 1024,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_volcano.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "139": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_volcano.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "14": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_door.DDS",
+    "tile_height": 1024,
+    "tile_width": 512,
+    "width": 512
+  },
+  "140": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_volcano.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "141": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_jungle.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "142": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_stone.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "143": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_stone.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "144": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 768,
+      "width": 512
+    },
+    "path": "Data/Textures/floorstyled_stone.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "145": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_temple.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "146": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_temple.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "147": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_temple.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "148": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_temple.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "149": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_temple.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "15": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_doorback.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "150": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_temple.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "151": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_temple.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "152": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/floor_temple.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "153": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_tidepool.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "154": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 12
+    },
+    "offset": {
+      "height": 128,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_tidepool.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "155": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_tidepool.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "156": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_tidepool.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "157": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_tidepool.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "158": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_tidepool.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "159": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_tidepool.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "16": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_doorframe.DDS",
+    "tile_height": 1080,
+    "tile_width": 1280,
+    "width": 1280
+  },
+  "160": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_tidepool.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "161": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_tidepool.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "162": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_ice.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "163": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_ice.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "164": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_ice.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "165": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_ice.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "166": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_ice.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "167": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_ice.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "168": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_ice.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "169": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_ice.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "17": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_fore1.DDS",
+    "tile_height": 1080,
+    "tile_width": 512,
+    "width": 512
+  },
+  "170": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_ice.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "171": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 1152,
+      "width": 384
+    },
+    "path": "Data/Textures/floor_ice.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "172": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "173": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_babylon.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "174": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_babylon.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "175": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 1024,
+      "width": 384
+    },
+    "path": "Data/Textures/floor_babylon.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "176": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_babylon.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "177": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_babylon.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "178": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 6
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "179": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/items_ushabti.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "18": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_fore2.DDS",
+    "tile_height": 1080,
+    "tile_width": 768,
+    "width": 768
+  },
+  "180": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_babylon.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "181": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "182": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "183": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 6
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "184": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 6
+    },
+    "offset": {
+      "height": 896,
+      "width": 384
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "185": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "186": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "187": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_eggplant.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "188": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "189": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "19": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_head.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "190": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 6
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 768,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "191": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 640,
+      "width": 256
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "192": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_sunken.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "193": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "194": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "195": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 24,
+      "width": 24
+    },
+    "offset": {
+      "height": 1408,
+      "width": 768
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 1536
+  },
+  "196": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_duat.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "197": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 768,
+      "width": 512
+    },
+    "path": "Data/Textures/floorstyled_duat.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "198": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_duat.DDS",
+    "tile_height": 256,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "199": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/bg_duat.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "2": {
+    "height": 128,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/saving.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 128
+  },
+  "20": {
+    "height": 768,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 192
+    },
+    "path": "Data/Textures/menu_disp.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1408
+  },
+  "200": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_duat2.DDS",
+    "tile_height": 512,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "201": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_temple.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "202": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_eggplant.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "203": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_eggplant.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "204": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_eggplant.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "205": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_eggplant.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "206": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_eggplant.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "207": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_eggplant.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "208": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_eggplant.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "209": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_eggplant.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "21": {
+    "height": 768,
+    "num_tiles": {
+      "height": 3,
+      "width": 11
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_disp.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1408
+  },
+  "210": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_beehive.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "211": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_beehive.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "212": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_beehive.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "213": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_cosmic.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "214": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 16
+    },
+    "offset": {
+      "height": 1280,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_cosmic.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "215": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 16
+    },
+    "offset": {
+      "height": 1024,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_cosmic.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "216": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_wood.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "217": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_wood.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "218": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_wood.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "219": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_wood.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "22": {
+    "height": 768,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 256,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_disp.DDS",
+    "tile_height": 256,
+    "tile_width": 1408,
+    "width": 1408
+  },
+  "220": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 512,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_wood.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "221": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_stone.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "222": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 128,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_stone.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "223": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_stone.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "224": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_stone.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "225": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_temple.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "226": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_temple.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "227": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_temple.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "228": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_pagoda.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "229": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_pagoda.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "23": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_charsel.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "230": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_pagoda.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "231": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "232": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "233": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "234": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 1
+    },
+    "offset": {
+      "height": 1024,
+      "width": 384
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 896,
+    "width": 1280
+  },
+  "235": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "236": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "237": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "238": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 1
+    },
+    "offset": {
+      "height": 1024,
+      "width": 384
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 896,
+    "width": 1280
+  },
+  "239": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "24": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_chardoor.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "240": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "241": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "242": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "243": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "244": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 384,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "245": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_vlad.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "246": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_gold.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "247": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_gold.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "248": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_gold.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "249": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_gold.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "25": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_generic.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "250": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_gold_normal.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "251": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_gold.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "252": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_gold.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "253": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_gold.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "254": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_gold.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "255": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 1152,
+      "width": 896
+    },
+    "path": "Data/Textures/floorstyled_gold.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "256": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_mothership.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "257": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_mothership.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "258": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_duat.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "259": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_palace.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "26": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_cave1.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "260": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_palace.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "261": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 3
+    },
+    "offset": {
+      "height": 1024,
+      "width": 512
+    },
+    "path": "Data/Textures/floorstyled_palace.DDS",
+    "tile_height": 256,
+    "tile_width": 384,
+    "width": 1280
+  },
+  "262": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 5
+    },
+    "offset": {
+      "height": 640,
+      "width": 768
+    },
+    "path": "Data/Textures/floorstyled_palace.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "263": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_guts.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "264": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_extra.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "265": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_extra.DDS",
+    "tile_height": 768,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "266": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floormisc.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "267": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floormisc.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "268": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/border_main.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "269": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/border_main.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "27": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_cave2.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "270": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_yellow.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "271": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_magenta.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "272": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_cyan.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "273": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_black.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "274": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_cinnabar.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "275": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_green.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "276": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_olive.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "277": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_white.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "278": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_cerulean.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "279": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_blue.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "28": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_brick1.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "280": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_lime.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "281": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_lemon.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "282": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_iris.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "283": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_gold.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "284": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_red.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "285": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_pink.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "286": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_violet.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "287": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_gray.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "288": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_khaki.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "289": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_orange.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "29": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_brick2.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "290": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_hired.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "291": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_eggchild.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "292": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_pets.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "293": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbasic01.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "294": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbasic02.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "295": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbasic03.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "296": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters01.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "297": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters02.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "298": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters03.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "299": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters03.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "3": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/splash0.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "30": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
+    "width": 1280
+  },
+  "300": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig01.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "301": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig02.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "302": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 8
+    },
+    "offset": {
+      "height": 1024,
+      "width": 512
+    },
+    "path": "Data/Textures/monstersbig02.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "303": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 1280
+    },
+    "path": "Data/Textures/monstersbig02.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "304": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig03.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "305": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig04.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "306": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig04.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "307": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 5
+    },
+    "offset": {
+      "height": 1792,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig04.DDS",
+    "tile_height": 256,
+    "tile_width": 384,
+    "width": 2048
+  },
+  "308": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig05.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "309": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig05.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "31": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 20,
+      "width": 20
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 1280
+  },
+  "311": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 1664,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig05.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 2048
+  },
+  "312": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 16
+    },
+    "offset": {
+      "height": 1280,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig05.DDS",
+    "tile_height": 384,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "313": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig05.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "314": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 640
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "315": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 768,
+    "tile_width": 640,
+    "width": 2048
+  },
+  "316": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 256,
+      "width": 1536
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "317": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 1,
+      "width": 5
+    },
+    "offset": {
+      "height": 896,
+      "width": 640
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "318": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 8
+    },
+    "offset": {
+      "height": 256,
+      "width": 640
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "319": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 16
+    },
+    "offset": {
+      "height": 256,
+      "width": 896
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 384,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "32": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "320": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 8
+    },
+    "offset": {
+      "height": 256,
+      "width": 1024
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "321": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 8
+    },
+    "offset": {
+      "height": 256,
+      "width": 1280
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "322": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 640,
+      "width": 640
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "323": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 1280,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "324": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 4
+    },
+    "offset": {
+      "height": 1536,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbig06.DDS",
+    "tile_height": 256,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "325": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_ghost.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "326": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 1280,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_ghost.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "327": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_olmec.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "328": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_olmec.DDS",
+    "tile_height": 256,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "329": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_olmec.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "33": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "330": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 128,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_olmec.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "331": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_olmec.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "332": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_osiris.DDS",
+    "tile_height": 896,
+    "tile_width": 640,
+    "width": 2048
+  },
+  "333": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_osiris.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 2048
+  },
+  "334": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 1280,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_osiris.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 2048
+  },
+  "335": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 1664,
+      "width": 1920
+    },
+    "path": "Data/Textures/monsters_osiris.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "336": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 5
+    },
+    "offset": {
+      "height": 1152,
+      "width": 1536
+    },
+    "path": "Data/Textures/monsters_osiris.DDS",
+    "tile_height": 128,
+    "tile_width": 384,
+    "width": 2048
+  },
+  "337": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "338": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 2048
+  },
+  "339": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 5,
+      "width": 16
+    },
+    "offset": {
+      "height": 384,
+      "width": 384
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 384,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "34": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 2
+    },
+    "offset": {
+      "height": 640,
+      "width": 384
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 512,
+    "width": 1280
+  },
+  "340": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 16
+    },
+    "offset": {
+      "height": 1152,
+      "width": 1536
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "341": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 1152,
+      "width": 1280
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "342": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 3,
+      "width": 16
+    },
+    "offset": {
+      "height": 1408,
+      "width": 1920
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 640,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "343": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 1408,
+      "width": 768
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 640,
+    "tile_width": 1152,
+    "width": 2048
+  },
+  "344": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 896,
+      "width": 768
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "345": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 768,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_tiamat.DDS",
+    "tile_height": 1280,
+    "tile_width": 768,
+    "width": 2048
+  },
+  "346": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 1024
+    },
+    "path": "Data/Textures/monsters_yama.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "347": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_yama.DDS",
+    "tile_height": 1280,
+    "tile_width": 1024,
+    "width": 1280
+  },
+  "348": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 2,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/monsters_yama.DDS",
+    "tile_height": 512,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "349": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_hundun.DDS",
+    "tile_height": 512,
+    "tile_width": 384,
+    "width": 1280
+  },
+  "35": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 3
+    },
+    "offset": {
+      "height": 640,
+      "width": 896
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 384,
+    "width": 1280
+  },
+  "350": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 384
+    },
+    "path": "Data/Textures/monsters_hundun.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "351": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 256,
+      "width": 384
+    },
+    "path": "Data/Textures/monsters_hundun.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "352": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/monsters_hundun.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "353": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 2,
+      "width": 10
+    },
+    "offset": {
+      "height": 512,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_hundun.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "354": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 768,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_hundun.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 1280
+  },
+  "355": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 256,
+      "width": 1792
+    },
+    "path": "Data/Textures/monstersbig04.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "356": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 1,
+      "width": 6
+    },
+    "offset": {
+      "height": 640,
+      "width": 640
+    },
+    "path": "Data/Textures/monsters02.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "357": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 1,
+      "width": 6
+    },
+    "offset": {
+      "height": 1664,
+      "width": 768
+    },
+    "path": "Data/Textures/monsters02.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "358": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/items.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "359": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/mounts.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "36": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 768,
+      "width": 768
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "360": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_explosion.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "361": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_small.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "362": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_small2.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "363": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_small3.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "364": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_big.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "365": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_rubble.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "366": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_ankh.DDS",
+    "tile_height": 768,
+    "tile_width": 512,
+    "width": 2048
+  },
+  "367": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 8
+    },
+    "offset": {
+      "height": 1536,
+      "width": 0
+    },
+    "path": "Data/Textures/fx_ankh.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "368": {
+    "height": 256,
+    "num_tiles": {
+      "height": 1,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/shadows.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "369": {
+    "height": 768,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/coffins.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "37": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_header.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
+    "width": 1280
+  },
+  "370": {
+    "height": 768,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 256,
+      "width": 0
+    },
+    "path": "Data/Textures/coffins.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "371": {
+    "height": 768,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/coffins.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "372": {
+    "height": 768,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 512,
+      "width": 0
+    },
+    "path": "Data/Textures/coffins.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "373": {
+    "height": 768,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/coffins.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "374": {
+    "height": 768,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 256,
+      "width": 512
+    },
+    "path": "Data/Textures/coffins.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "375": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/credits.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "376": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 512,
+      "width": 0
+    },
+    "path": "Data/Textures/credits.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "377": {
+    "height": 1,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/liquidgradient_water",
+    "tile_height": 1,
+    "tile_width": 1,
+    "width": 1
+  },
+  "378": {
+    "height": 1,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/liquidgradient_eggplant_water",
+    "tile_height": 1,
+    "tile_width": 1,
+    "width": 1
+  },
+  "379": {
+    "height": 1,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/liquidgradient_lava",
+    "tile_height": 1,
+    "tile_width": 1,
+    "width": 1
+  },
+  "38": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "380": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/noise0.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "381": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/noise1.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "382": {
+    "height": 8,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bayer8.DDS",
+    "tile_height": 8,
+    "tile_width": 8,
+    "width": 8
+  },
+  "383": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/lut_original.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "384": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/lut_backlayer.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "385": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/lut_blackmarket.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "386": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/lut_vlad.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "387": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/lut_icecaves.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "388": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/shine.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "389": {
+    "height": 128,
+    "num_tiles": {
+      "height": 8,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/OldTextures/ai.DDS",
+    "tile_height": 16,
+    "tile_width": 16,
+    "width": 64
+  },
+  "39": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 128,
+    "tile_width": 1152,
+    "width": 1280
+  },
+  "4": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/splash1.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "40": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "41": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 2
+    },
+    "offset": {
+      "height": 640,
+      "width": 256
+    },
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 384,
+    "tile_width": 640,
+    "width": 1280
+  },
+  "42": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "43": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch2.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "44": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch3.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "45": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch4.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
+    "width": 1280
+  },
+  "46": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
+    "width": 1280
+  },
+  "47": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "48": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 6
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "tile_height": 128,
+    "tile_width": 192,
+    "width": 1280
+  },
+  "49": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 27
+    },
+    "offset": {
+      "height": 768,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "tile_height": 32,
+    "tile_width": 32,
+    "width": 1280
+  },
+  "5": {
+    "height": 256,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/splash2.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "50": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch6.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "51": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_online.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "52": {
+    "height": 1152,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_tunnel.DDS",
+    "tile_height": 384,
+    "tile_width": 512,
+    "width": 512
+  },
+  "53": {
+    "height": 512,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 512
+  },
+  "54": {
+    "height": 512,
+    "num_tiles": {
+      "height": 2,
+      "width": 8
+    },
+    "offset": {
+      "height": 128,
+      "width": 0
+    },
+    "path": "Data/Textures/hud.DDS",
+    "tile_height": 32,
+    "tile_width": 32,
+    "width": 512
+  },
+  "55": {
+    "height": 512,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 512
+  },
+  "56": {
+    "height": 512,
+    "num_tiles": {
+      "height": 4,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_text.DDS",
+    "tile_height": 128,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "57": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "58": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "59": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 384,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "6": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontfirasans.DDS",
+    "tile_height": 512,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "60": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 768,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "61": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 1152,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "62": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/keyboard_buttons",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 3072
+  },
+  "63": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_pagetorn.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "64": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_back.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "65": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_pageflip.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "66": {
+    "height": 96,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_select.DDS",
+    "tile_height": 96,
+    "tile_width": 640,
+    "width": 640
+  },
+  "67": {
+    "height": 800,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_stickers.DDS",
+    "tile_height": 80,
+    "tile_width": 80,
+    "width": 800
+  },
+  "68": {
+    "height": 800,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 160,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_stickers.DDS",
+    "tile_height": 80,
+    "tile_width": 80,
+    "width": 800
+  },
+  "69": {
+    "height": 800,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 480,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_stickers.DDS",
+    "tile_height": 160,
+    "tile_width": 160,
+    "width": 800
+  },
+  "7": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontyorkten.DDS",
+    "tile_height": 512,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "70": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_top_main.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "71": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_top_entry.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "72": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_top_gameover.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "73": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_top_profile.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "74": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_bg.DDS",
+    "tile_height": 320,
+    "tile_width": 320,
+    "width": 1280
+  },
+  "75": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_place.DDS",
+    "tile_height": 320,
+    "tile_width": 640,
+    "width": 2560
+  },
+  "76": {
+    "height": 960,
+    "num_tiles": {
+      "height": 6,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_mons.DDS",
+    "tile_height": 160,
+    "tile_width": 160,
+    "width": 1600
+  },
+  "77": {
+    "height": 1920,
+    "num_tiles": {
+      "height": 6,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_mons_big.DDS",
+    "tile_height": 320,
+    "tile_width": 320,
+    "width": 1600
+  },
+  "78": {
+    "height": 800,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_people.DDS",
+    "tile_height": 160,
+    "tile_width": 160,
+    "width": 1600
+  },
+  "79": {
+    "height": 800,
+    "num_tiles": {
+      "height": 2,
+      "width": 5
+    },
+    "offset": {
+      "height": 480,
+      "width": 640
+    },
+    "path": "Data/Textures/journal_entry_people.DDS",
+    "tile_height": 320,
+    "tile_width": 320,
+    "width": 1600
+  },
+  "8": {
+    "height": 256,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontmono.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 256
+  },
+  "80": {
+    "height": 1600,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_items.DDS",
+    "tile_height": 160,
+    "tile_width": 160,
+    "width": 1600
+  },
+  "81": {
+    "height": 512,
+    "num_tiles": {
+      "height": 5,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_elements.DDS",
+    "tile_height": 96,
+    "tile_width": 192,
+    "width": 512
+  },
+  "82": {
+    "height": 512,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 32,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_elements.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 512
+  },
+  "83": {
+    "height": 1600,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_traps.DDS",
+    "tile_height": 160,
+    "tile_width": 160,
+    "width": 1600
+  },
+  "84": {
+    "height": 1600,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_traps.DDS",
+    "tile_height": 320,
+    "tile_width": 160,
+    "width": 1600
+  },
+  "85": {
+    "height": 1600,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 1280,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_traps.DDS",
+    "tile_height": 320,
+    "tile_width": 320,
+    "width": 1600
+  },
+  "86": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_story.DDS",
+    "tile_height": 2048,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "87": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_surface.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "88": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "89": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 752,
+      "width": 640
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 16,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "9": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontdebug.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "90": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "91": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 384
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "92": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "93": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 2
+    },
+    "offset": {
+      "height": 384,
+      "width": 512
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 128,
+    "tile_width": 348,
+    "width": 1024
+  },
+  "94": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship2.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "95": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship2.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "96": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 384,
+      "width": 512
+    },
+    "path": "Data/Textures/base_eggship2.DDS",
+    "tile_height": 128,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "97": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 384,
+      "width": 384
+    },
+    "path": "Data/Textures/base_eggship3.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "98": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship3.DDS",
+    "tile_height": 640,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "99": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship3.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  }
+}

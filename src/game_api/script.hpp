@@ -94,6 +94,8 @@ class SpelunkyScript
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
 
+    std::string dump_api();
+
     static void for_each_script(std::function<bool(SpelunkyScript&)> fun);
 
   private:

@@ -155,7 +155,7 @@ std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
-     file_written = false, show_debug = false, throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
+     show_debug = false, throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false,
      enable_noclip = false, hide_script_messages = false, load_script_dir = true, load_packs_dir = false;
 Player* g_entity = 0;
@@ -1376,96 +1376,6 @@ void update_filter(const char* s)
     g_filtered_count = count;
     g_current_item = 0;
     scroll_top = true;
-}
-
-void write_file()
-{
-    {
-        std::ofstream file;
-        file.open("entities.txt");
-        for (int i = 1; i < g_items.size(); i++)
-        {
-            file << g_items[i].id << ": " << g_items[i].name.data() << std::endl;
-        }
-    }
-
-    {
-        std::ofstream file;
-        file.open("vanilla_sounds.txt");
-        g_SoundManager->for_each_event_name(
-            [&file](std::string event_name)
-            {
-                std::string clean_event_name = event_name;
-                std::transform(
-                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
-                    { return std::toupper(c); });
-                std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
-                file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
-            });
-    }
-
-    {
-        std::ofstream file;
-        file.open("vanilla_sound_params.txt");
-        g_SoundManager->for_each_parameter_name(
-            [&file](std::string parameter_name, std::uint32_t id)
-            {
-                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
-                               { return std::toupper(c); });
-                file << id << ": VANILLA_SOUND_PARAM." << parameter_name << std::endl;
-            });
-    }
-
-    {
-        std::ofstream file;
-        file.open("particle_emitters.txt");
-        auto particles = list_particles();
-        for (const auto& particle : particles)
-        {
-            file << particle.id << ": " << particle.name << "\n";
-        }
-    }
-
-    {
-        std::map<std::uint32_t, std::string> sorted_tile_codes;
-        for (auto& [name, def] : g_state->level_gen->data->tile_codes())
-        {
-            sorted_tile_codes[def.id] = name;
-        }
-
-        std::ofstream file;
-        file.open("tile_codes.txt");
-        for (auto& [id, name] : sorted_tile_codes)
-        {
-            file << name << ": 0x" << std::hex << id << std::endl;
-        }
-    }
-
-    {
-        std::ofstream file;
-        file.open("textures.txt");
-        std::unordered_map<std::string, uint32_t> counts;
-        for (auto* tex : get_textures()->texture_map)
-        {
-            if (tex != nullptr && tex->name != nullptr)
-            {
-                std::string clean_tex_name = *tex->name;
-                std::transform(
-                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
-                    { return std::toupper(c); });
-                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
-                size_t index = clean_tex_name.find(".DDS", 0);
-                if (index != std::string::npos)
-                {
-                    clean_tex_name.erase(index, 4);
-                }
-                clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
-                file << "TEXTURE." << clean_tex_name << ": " << tex->id << std::endl;
-            }
-        }
-    }
-
-    file_written = true;
 }
 
 void render_int(const char* label, int state)
@@ -3924,10 +3834,6 @@ void imgui_draw()
 
 void post_draw()
 {
-    if (!file_written)
-    {
-        write_file();
-    }
     update_players();
     force_zoom();
     force_hud_flags();
