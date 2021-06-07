@@ -4,16 +4,13 @@
 #include "layer.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"
+#include "state_structs.hpp"
 #include "thread_utils.hpp"
 
 const float ZF = 0.737;
 
 struct Layer;
 struct LevelGenSystem;
-struct Illumination;
-struct PlayerInputs;
-struct QuestsInfo;
-struct Camera;
 
 struct StateMemory
 {
@@ -76,10 +73,26 @@ struct StateMemory
     uint8_t saved_hamsters;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint32_t unknown1;
-    uint32_t unknown2;
+    uint8_t unknown1a;
+    uint8_t unknown1b;
+    bool world2_coffin_spawned;
+    bool world4_coffin_spawned;
+    bool world6_coffin_spawned;
+    uint8_t unknown2b;
+    uint8_t unknown2c;
+    uint8_t unknown2d;
     uint32_t waddler_storage[99];
-    uint8_t pad84[2012];
+    uint8_t skip1[196];
+    JournalProgression journal_progression;
+    uint8_t skip2[844];
+    ThemeProgression theme_progression;
+    uint8_t unknown3;
+    uint8_t unknown4;
+    uint8_t unknown5a;
+    uint8_t unknown5b;
+    uint8_t unknown5c;
+    uint8_t unknown5d;
+    ArenaState arena;
     uint32_t journal_flags;
     int32_t first_damage_cause; // entity type that caused first damage, for the journal
     int8_t first_damage_world;
@@ -135,7 +148,7 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    size_t logic;
+    Logic* logic;
     QuestsInfo* quests;
     size_t unknown24;
     size_t liquid_physics;
@@ -302,140 +315,4 @@ struct State
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
     SaveData* savedata();
-};
-
-struct SaturationVignette
-{
-    float red; // default = 1.0 (can go over 1.0 for oversaturation)
-    float green;
-    float blue;
-    float vignette_aperture; // default = 20000.0 ; visible aperture change in range 1.0 - 100.0
-};
-
-struct Illumination
-{
-    SaturationVignette saturation_vignette;
-    SaturationVignette saturation_vignette_other[3]; // there's three more, no idea why (multiplayer doesn't change these)
-    float brightness1;
-    float brightness2;
-    float something_min;
-    float something_max;
-    size_t unknown_empty;
-    float unknown_float;
-    float unknown_nan;
-    uint32_t unknown_timer;
-    uint8_t frontlayer_global_illumination; // 0 = on; 1 = off; 4 = white; ... higher starts to flicker
-    uint8_t unknown_illumination1;
-    uint8_t backlayer_global_illumination; // 0 = off ; 1 = on but turns front layer off
-    uint8_t unknown_illumination2;         // influences backlayer_global_illumination
-    uint32_t unknown_int1;                 // crash when changed
-    uint32_t unknown_int2;
-};
-
-struct InputMapping
-{
-    uint8_t jump;
-    uint8_t attack;
-    uint8_t bomb;
-    uint8_t rope;
-    uint8_t walk_run;
-    uint8_t use_door_buy;
-    uint8_t pause_menu;
-    uint8_t journal;
-    uint8_t left;
-    uint8_t right;
-    uint8_t up;
-    uint8_t down;
-};
-
-struct PlayerSlot
-{
-    uint16_t buttons_gameplay;
-    uint16_t buttons;
-    uint32_t unknown1;
-    InputMapping* input_mapping_keyboard;
-    InputMapping* input_mapping_controller;
-    uint8_t player_id;
-    bool is_participating;
-    uint8_t unknown4; // padding most likely
-    uint8_t unknown5; // padding most likely
-    uint32_t unknown6;
-};
-
-struct PlayerSlotSettings
-{
-    bool controller_vibration;
-    bool auto_run_enabled;
-    bool controller_right_stick;
-};
-
-struct PlayerInputs
-{
-    PlayerSlot player_slot_1;
-    PlayerSlot player_slot_2;
-    PlayerSlot player_slot_3;
-    PlayerSlot player_slot_4;
-    PlayerSlotSettings player_slot_1_settings;
-    PlayerSlotSettings player_slot_2_settings;
-    PlayerSlotSettings player_slot_3_settings;
-    PlayerSlotSettings player_slot_4_settings;
-};
-
-struct QuestsInfo
-{
-    size_t unknown1; // the first six are pointers to small similar objects
-    size_t unknown2; // that don't appear to change at all
-    size_t unknown3;
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
-    int8_t yang_state;
-    int8_t jungle_sisters_flags; // flags! not state ; -1 = sisters angry
-    int8_t van_horsing_state;
-    int8_t sparrow_state;
-    int8_t madame_tusk_state;
-    int8_t beg_state;
-    uint8_t unknown13;
-    uint8_t unknown14;
-    uint32_t unknown15;
-    uint32_t unknown16;
-};
-
-struct Camera
-{
-    float bounds_left;
-    float bounds_right;
-    float bounds_bottom;
-    float bounds_top;
-    float adjusted_focus_x; // focus adjusted so camera doesn't show beyond borders
-    float adjusted_focus_y;
-    float calculated_focus_x; // forced values
-    float calculated_focus_y;
-    float focus_offset_x; // added to position of focused entity, if any
-    float focus_offset_y;
-    float unknown1; // does not get reset on level reload
-    float focus_x;  // the unadjusted center point to focus the camera on; set this for full camera control when the focused entity = -1
-    float focus_y;
-    float unknown2;
-    float vertical_pan; // set to a high number, like 5000 and the camera pans from top to bottom
-
-    // to shake the camera, set shake_countdown_start and shake_countdown to the number of frames you want to shake for
-    // set the shake amplitude, and control the direction with the multipliers, optionally add randomness by toggling uniform_shake
-
-    uint32_t shake_countdown_start; // probably used to calculate the percentage of the amplitude when progressing through the shake
-    uint32_t shake_countdown;
-    float shake_amplitude;    // the amount of camera shake
-    float shake_multiplier_x; // set to 0 to eliminate horizontal shake; negative inverts direction
-    float shake_multiplier_y; // set to 0 to eliminate vertical shake; negative inverts direction
-    bool uniform_shake;       // if false, the shake gets randomized a bit
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    int32_t focused_entity_uid; // if set to -1, you have free control over camera focus through focus_x, focus_y
-    uint32_t unknown3;
-    uint32_t unknown4;
-    float unknown_adjustment;
-    uint32_t unknown5;
-    uint32_t unknown6;
-    uint32_t unknown7;
 };
