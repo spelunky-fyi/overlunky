@@ -1,6 +1,7 @@
 #include "particles_lua.hpp"
 
 #include "particles.hpp"
+#include "rpc.hpp"
 
 #include <sol/sol.hpp>
 

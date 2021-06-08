@@ -1,5 +1,7 @@
 #pragma once
 
+#include "entity.hpp"
+
 #include <cstdint>
 
 struct LightParams

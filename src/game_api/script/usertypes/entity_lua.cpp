@@ -1,12 +1,13 @@
 #include "entity_lua.hpp"
 
 #include "entity.hpp"
+#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntity
 {
-void register_usertypes(sol::state& lua)
+void register_usertypes(sol::state& lua, ScriptImpl* script)
 {
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
@@ -325,10 +326,10 @@ void register_usertypes(sol::state& lua)
                            //, "", ...blah__blah__read__your__entities.txt...
                            //, "LIQUID_STAGNANT_LAVA", 898
     );
-    for (int i = 0; i < g_items.size(); i++)
+    for (auto& item : script->g_items)
     {
-        auto name = g_items[i].name.substr(9, g_items[i].name.size());
-        lua["ENT_TYPE"][name] = g_items[i].id;
+        auto name = item.name.substr(9, item.name.size());
+        lua["ENT_TYPE"][name] = item.id;
     }
     lua.create_named_table("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
     lua.create_named_table(

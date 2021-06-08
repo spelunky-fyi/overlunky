@@ -1,3 +1,6 @@
+#pragma once
+
+#include "entity.hpp"
 #include "state_structs.hpp"
 
 class Movable : public Entity

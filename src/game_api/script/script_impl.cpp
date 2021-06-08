@@ -634,8 +634,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NLevel::register_usertypes(lua, this);
     NGui::register_usertypes(lua, this);
     NTexture::register_usertypes(lua, this);
+    NEntity::register_usertypes(lua, this);
     NParticles::register_usertypes(lua);
-    NEntity::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);
     NPlayer::register_usertypes(lua);

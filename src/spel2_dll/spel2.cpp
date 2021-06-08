@@ -3,7 +3,7 @@
 #include "file_api.hpp"
 #include "rpc.hpp"
 #include "script.hpp"
-#include "script/script_context.hpp"
+#include "script/usertypes/save_context.hpp"
 #include "sound_manager.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
