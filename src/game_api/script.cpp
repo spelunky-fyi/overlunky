@@ -783,7 +783,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_door"] = set_door_target;
     /// Get door target `world`, `level`, `theme`
     lua["get_door_target"] = get_door_target;
-    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_uid`
+    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE, ENT_TYPE_ITEM_PRESENT, ENT_TYPE_ITEM_GHIST_PRESENT,
+    /// or ENT_TYPE.ITEM_COFFIN `uid` with item ENT_TYPE `item_entity_type`
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid
     lua["get_entity"] = get_entity_ptr;

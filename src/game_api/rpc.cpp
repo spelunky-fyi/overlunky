@@ -588,7 +588,7 @@ std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
     return static_cast<Door*>(door)->get_target();
 }
 
-void set_contents(uint32_t uid, uint32_t item_uid)
+void set_contents(uint32_t uid, uint32_t item_entity_type)
 {
     auto state = State::get();
     auto player = state.items()->player(0);
@@ -601,7 +601,7 @@ void set_contents(uint32_t uid, uint32_t item_uid)
     if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
         type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
         return;
-    container->as<Container>()->inside = item_uid;
+    container->as<Container>()->inside = item_entity_type;
 }
 
 void entity_remove_item(uint32_t uid, uint32_t item_uid)
