@@ -27,8 +27,30 @@ add_library(spel2_api STATIC
         window_api.hpp
         script.cpp
         script.hpp
-        script_context.cpp
-        script_context.hpp
+        script/script_impl.cpp
+        script/script_impl.hpp
+        script/script_util.cpp
+        script/script_util.hpp
+        script/usertypes/save_context.cpp
+        script/usertypes/save_context.hpp
+        script/usertypes/state_lua.cpp
+        script/usertypes/state_lua.hpp
+        script/usertypes/entity_lua.cpp
+        script/usertypes/entity_lua.hpp
+        script/usertypes/particles_lua.cpp
+        script/usertypes/particles_lua.hpp
+        script/usertypes/level_lua.cpp
+        script/usertypes/level_lua.hpp
+        script/usertypes/sound_lua.cpp
+        script/usertypes/sound_lua.hpp
+        script/usertypes/player_lua.cpp
+        script/usertypes/player_lua.hpp
+        script/usertypes/gui_lua.cpp
+        script/usertypes/gui_lua.hpp
+        script/usertypes/drops_lua.cpp
+        script/usertypes/drops_lua.hpp
+        script/usertypes/texture_lua.cpp
+        script/usertypes/texture_lua.hpp
         sound_manager.cpp
         sound_manager.hpp
         fmod.hpp

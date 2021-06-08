@@ -14,6 +14,8 @@ option(BUILD_OVERLUNKY CACHE ON)
 option(BUILD_INFO_DUMP CACHE ON)
 option(BUILD_SPEL2_DLL CACHE OFF)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftime-trace")
+
 execute_process(
   COMMAND git describe --always --dirty=-modified
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

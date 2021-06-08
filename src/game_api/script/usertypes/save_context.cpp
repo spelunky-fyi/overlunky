@@ -1,9 +1,10 @@
-#include "script_context.hpp"
+#include "save_context.hpp"
 
 #include <fstream>
 
-MakeSavePathCallback g_MakeSavePathCallback{nullptr};
+#include <sol/sol.hpp>
 
+MakeSavePathCallback g_MakeSavePathCallback{nullptr};
 void register_make_save_path(MakeSavePathCallback make_save_path_callback)
 {
     g_MakeSavePathCallback = make_save_path_callback;
@@ -44,3 +45,24 @@ std::string LoadContext::Load() const
 
     return data;
 }
+
+namespace NSaveContext
+{
+void register_usertypes(sol::state& lua)
+{
+    // Context received in ON.SAVE
+    // Used to save a string to some form of save_{}.dat
+    // Future calls to this will override the save
+    lua.new_usertype<SaveContext>("SaveContext", sol::no_constructor, "save", &SaveContext::Save);
+    /* SaveContext
+        bool save(string data)
+        */
+
+    // Context received in ON.LOAD
+    // Used to load from save_{}.dat into a string
+    lua.new_usertype<LoadContext>("LoadContext", sol::no_constructor, "load", &LoadContext::Load);
+    /* LoadContext
+        string load()
+        */
+}
+} // namespace NSaveContext
