@@ -3493,6 +3493,13 @@ void render_game_props()
             ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, pow(2, i));
         }
     }
+    if (ImGui::CollapsingHeader("Presence flags"))
+    {
+        for (int i = 0; i < 11; i++)
+        {
+            ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, pow(2, i));
+        }
+    }
     ImGui::PopItemWidth();
 }
 

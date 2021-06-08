@@ -4,15 +4,13 @@
 #include "layer.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"
+#include "state_structs.hpp"
 #include "thread_utils.hpp"
 
 const float ZF = 0.737;
 
 struct Layer;
 struct LevelGenSystem;
-struct Illumination;
-struct PlayerInputs;
-struct QuestsInfo;
 
 struct StateMemory
 {
@@ -75,7 +73,26 @@ struct StateMemory
     uint8_t saved_hamsters;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t pad84[0x970];
+    uint8_t unknown1a;
+    uint8_t unknown1b;
+    bool world2_coffin_spawned;
+    bool world4_coffin_spawned;
+    bool world6_coffin_spawned;
+    uint8_t unknown2b;
+    uint8_t unknown2c;
+    uint8_t unknown2d;
+    uint32_t waddler_storage[99];
+    uint8_t skip1[196];
+    JournalProgression journal_progression;
+    uint8_t skip2[844];
+    ThemeProgression theme_progression;
+    uint8_t unknown3;
+    uint8_t unknown4;
+    uint8_t unknown5a;
+    uint8_t unknown5b;
+    uint8_t unknown5c;
+    uint8_t unknown5d;
+    ArenaState arena;
     uint32_t journal_flags;
     int32_t first_damage_cause; // entity type that caused first damage, for the journal
     int8_t first_damage_world;
@@ -84,19 +101,22 @@ struct StateMemory
     uint8_t i9f4d;
     uint32_t time_last_level;
     uint32_t time_level;
-    int32_t ia00;
+    uint32_t time_speedrun;
     uint32_t money_last_levels;
     int32_t hud_flags;
-    uint32_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
-    uint32_t unknown4;
-    int32_t unknown5;
+    uint32_t presence_flags;
+    uint32_t coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
+    bool player_died;
+    uint8_t padding10;
+    uint8_t padding11;
+    uint8_t padding12;
+    uint32_t cause_of_death;       // entity type
+    int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
     size_t toast;
     size_t speechbubble;
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
-    int32_t unknown6;
+    int32_t speechbubble_owner;
 
     char pada14[1980];
 
@@ -122,20 +142,32 @@ struct StateMemory
     size_t unknown18;
     uint32_t next_entity_uid;
     uint16_t unknown20;
-    uint16_t unknown21;
+    uint16_t screen_change_counter; // increments every time screen changes; used in online sync together with next_entity_uid and unknown20 as a 64bit number
     PlayerInputs* player_inputs;
 
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    size_t unknown22;
+    Logic* logic;
     QuestsInfo* quests;
     size_t unknown24;
-    size_t unknown25;
-    size_t particle_emitters_info;
-    size_t unknown26;
+    LiquidPhysics* liquid_physics;
+    PointerList* particle_emitters; // list of ParticleEmitterInfo*
+    PointerList* lightsources;      // list of Illumination*
     size_t unknown27;
     std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
+    size_t unknown28;
+    size_t unknown29;
+    size_t unknown30;
+    size_t unknown31;
+    size_t unknown32;
+    size_t unknown33;
+    size_t unknown34;
+    size_t unknown35;
+    size_t unknown36;
+    uint32_t time_startup;
+    uint32_t unknown38;
+    Camera* camera;
 };
 struct State
 {
@@ -283,101 +315,4 @@ struct State
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
     SaveData* savedata();
-};
-
-struct SaturationVignette
-{
-    float red; // default = 1.0 (can go over 1.0 for oversaturation)
-    float green;
-    float blue;
-    float vignette_aperture; // default = 20000.0 ; visible aperture change in range 1.0 - 100.0
-};
-
-struct Illumination
-{
-    SaturationVignette saturation_vignette;
-    SaturationVignette saturation_vignette_other[3]; // there's three more, no idea why (multiplayer doesn't change these)
-    float brightness1;
-    float brightness2;
-    float something_min;
-    float something_max;
-    size_t unknown_empty;
-    float unknown_float;
-    float unknown_nan;
-    uint32_t unknown_timer;
-    uint8_t frontlayer_global_illumination; // 0 = on; 1 = off; 4 = white; ... higher starts to flicker
-    uint8_t unknown_illumination1;
-    uint8_t backlayer_global_illumination; // 0 = off ; 1 = on but turns front layer off
-    uint8_t unknown_illumination2;         // influences backlayer_global_illumination
-    uint32_t unknown_int1;                 // crash when changed
-    uint32_t unknown_int2;
-};
-
-struct InputMapping
-{
-    uint8_t jump;
-    uint8_t attack;
-    uint8_t bomb;
-    uint8_t rope;
-    uint8_t walk_run;
-    uint8_t use_door_buy;
-    uint8_t pause_menu;
-    uint8_t journal;
-    uint8_t left;
-    uint8_t right;
-    uint8_t up;
-    uint8_t down;
-};
-
-struct PlayerSlot
-{
-    uint16_t buttons_gameplay;
-    uint16_t buttons;
-    uint32_t unknown1;
-    InputMapping* input_mapping_keyboard;
-    InputMapping* input_mapping_controller;
-    uint8_t player_id;
-    bool is_participating;
-    uint8_t unknown4; // padding most likely
-    uint8_t unknown5; // padding most likely
-    uint32_t unknown6;
-};
-
-struct PlayerSlotSettings
-{
-    bool controller_vibration;
-    bool auto_run_enabled;
-    bool controller_right_stick;
-};
-
-struct PlayerInputs
-{
-    PlayerSlot player_slot_1;
-    PlayerSlot player_slot_2;
-    PlayerSlot player_slot_3;
-    PlayerSlot player_slot_4;
-    PlayerSlotSettings player_slot_1_settings;
-    PlayerSlotSettings player_slot_2_settings;
-    PlayerSlotSettings player_slot_3_settings;
-    PlayerSlotSettings player_slot_4_settings;
-};
-
-struct QuestsInfo
-{
-    size_t unknown1; // the first six are pointers to small similar objects
-    size_t unknown2; // that don't appear to change at all
-    size_t unknown3;
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
-    int8_t yang_state;
-    int8_t jungle_sisters_flags; // flags! not state ; -1 = sisters angry
-    int8_t van_horsing_state;
-    int8_t sparrow_state;
-    int8_t madame_tusk_state;
-    int8_t beg_state;
-    uint8_t unknown13;
-    uint8_t unknown14;
-    uint32_t unknown15;
-    uint32_t unknown16;
 };

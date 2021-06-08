@@ -13,6 +13,7 @@ add_library(spel2_api STATIC
         rpc.hpp
         state.cpp
         state.hpp
+        state_structs.hpp
         texture.cpp
         texture.hpp
         particles.cpp

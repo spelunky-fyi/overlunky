@@ -11,11 +11,11 @@ struct SaveData
     bool traps[24];
     int8_t bd2;
     int8_t bd3;
-    int32_t id4;
+    int32_t best_time_speedrun;
     char last_daily[8];
     int8_t be1;
     uint32_t characters;
-    int8_t be8;
+    int8_t tutorial_state;
     uint8_t shortcuts;
     int8_t bea;
     int8_t beb;

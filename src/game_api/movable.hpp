@@ -1,3 +1,5 @@
+#include "state_structs.hpp"
+
 class Movable : public Entity
 {
   public:
@@ -113,7 +115,7 @@ class Player : public Monster
 {
   public:
     Inventory* inventory_ptr;
-    size_t p140;
+    Illumination* emitted_light;
     int32_t i148;
     int32_t i14c;
     size_t ai_func;
