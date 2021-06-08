@@ -11,8 +11,7 @@
 #include <variant>
 #include <vector>
 
-#include "imgui.h"
-#include <d3d11.h>
+#include <imgui.h>
 
 ImVec2 screenify(ImVec2 pos);
 float screenify(float dis);
@@ -49,7 +48,7 @@ struct ScriptInput
 
 struct ScriptImage
 {
-    ID3D11ShaderResourceView* texture;
+    struct ID3D11ShaderResourceView* texture;
     int width;
     int height;
 };
@@ -94,6 +93,8 @@ class SpelunkyScript
 
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+
+    std::string dump_api();
 
     static void for_each_script(std::function<bool(SpelunkyScript&)> fun);
 

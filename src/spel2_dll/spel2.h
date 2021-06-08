@@ -23,7 +23,7 @@ struct Spelunky_DecodedAudioBuffer
     std::size_t data_size;
 };
 
-using Spelunky_DecodeAudioFile = Spelunky_DecodedAudioBuffer(const char* file_path);
+using Spelunky_DecodeAudioFile = Spelunky_DecodedAudioBuffer (*)(const char* file_path);
 
 using OnInputFunc = bool (*)(std::uint32_t, std::uint64_t, std::int64_t);
 using ImguiInitFunc = void (*)(struct ImGuiContext*);
@@ -34,12 +34,24 @@ using PostDrawFunc = void (*)();
 using Spelunky_MakeSavePathFunc = bool (*)(
     const char* script_path, size_t script_path_size, const char* script_name, size_t script_name_size, char* out_buffer, size_t out_buffer_size);
 
+using SpelunkyAllocFun = void* (*)(size_t);
+struct SpelunkyFileInfo
+{
+    void* Data{nullptr};
+    int _member_1{0};
+    int DataSize{0};
+    int AllocationSize{0};
+    int _member_4{0};
+};
+using Spelunky_LoadFileFunc = SpelunkyFileInfo* (*)(const char* file_path, SpelunkyAllocFun alloc_fun);
+using Spelunky_GetImageFilePathFunc = bool (*)(const char* root_path, const char* relative_path, char* out_buffer, size_t out_buffer_size);
+
 class SpelunkyScript;
 
 void SetWriteLoadOptimization(bool write_load_opt);
 
 void InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
-void InitSoundManager(Spelunky_DecodeAudioFile* decode_function);
+void InitSoundManager(Spelunky_DecodeAudioFile decode_function);
 
 void ShowCursor();
 void HideCursor();
@@ -51,6 +63,9 @@ void RegisterPreDrawFunc(PreDrawFunc pre_draw);
 void RegisterPostDrawFunc(PostDrawFunc post_draw);
 
 void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
+
+void RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file);
+void RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path);
 
 SpelunkyScript* CreateScript(const char* file_path, bool enabled);
 void FreeScript(SpelunkyScript* script);
