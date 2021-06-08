@@ -6,5 +6,5 @@ class ScriptImpl;
 
 namespace NTexture
 {
-    void register_usertypes(sol::state& lua, ScriptImpl* script);
+void register_usertypes(sol::state& lua, ScriptImpl* script);
 };

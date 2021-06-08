@@ -6,5 +6,5 @@ class ScriptImpl;
 
 namespace NDrops
 {
-    void register_usertypes(sol::state& lua);
+void register_usertypes(sol::state& lua);
 };
