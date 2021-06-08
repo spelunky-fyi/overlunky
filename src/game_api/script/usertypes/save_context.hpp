@@ -5,9 +5,6 @@
 
 #include <sol/forward.hpp>
 
-using MakeSavePathCallback = std::string (*)(std::string_view script_path, std::string_view script_name);
-void register_make_save_path(MakeSavePathCallback make_save_path_callback);
-
 class SaveContext
 {
   public:

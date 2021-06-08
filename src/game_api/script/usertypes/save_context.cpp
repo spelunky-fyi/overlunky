@@ -1,14 +1,12 @@
 #include "save_context.hpp"
 
-#include <fstream>
+#include "file_api.hpp"
 
 #include <sol/sol.hpp>
 
-MakeSavePathCallback g_MakeSavePathCallback{nullptr};
-void register_make_save_path(MakeSavePathCallback make_save_path_callback)
-{
-    g_MakeSavePathCallback = make_save_path_callback;
-}
+#include <fstream>
+
+extern MakeSavePathCallback g_MakeSavePathCallback;
 
 SaveContext::SaveContext(std::string_view _script_path, std::string_view _script_name)
     : script_path{_script_path}, script_name{_script_name}

@@ -218,3 +218,45 @@ class ScriptImpl
 
     std::string dump_api();
 };
+
+template <class... Args>
+bool ScriptImpl::handle_function(sol::function func, Args&&... args)
+{
+    return handle_function_with_return<std::monostate>(std::move(func), std::forward<Args>(args)...) != std::nullopt;
+}
+template <class Ret, class... Args>
+std::optional<Ret> ScriptImpl::handle_function_with_return(sol::function func, Args&&... args)
+{
+    auto lua_result = func(std::forward<Args>(args)...);
+    if (!lua_result.valid())
+    {
+        sol::error e = lua_result;
+        result = e.what();
+#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
+        messages.push_back({result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
+        DEBUG("{}", result);
+        if (messages.size() > 20)
+            messages.pop_front();
+#endif
+        return std::nullopt;
+    }
+    if constexpr (std::is_same_v<Ret, std::monostate>)
+    {
+        return std::optional{std::monostate{}};
+    }
+    else
+    {
+        try
+        {
+            auto return_type = lua_result.get_type();
+            return return_type == sol::type::none || return_type == sol::type::nil
+                       ? std::optional<Ret>{}
+                       : std::optional{static_cast<Ret>(lua_result)};
+        }
+        catch (...)
+        {
+            result = "Unexpected return type from function.";
+        }
+    }
+    return std::nullopt;
+}

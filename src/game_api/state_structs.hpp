@@ -1,8 +1,8 @@
 #pragma once
 
-#include "entity.hpp"
-
 #include <cstdint>
+
+class Entity;
 
 struct LightParams
 {
