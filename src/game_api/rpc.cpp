@@ -588,7 +588,7 @@ std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
     return static_cast<Door*>(door)->get_target();
 }
 
-void set_contents(uint32_t uid, uint32_t item_uid)
+void set_contents(uint32_t uid, uint32_t item_entity_type)
 {
     auto state = State::get();
     auto player = state.items()->player(0);
@@ -601,7 +601,7 @@ void set_contents(uint32_t uid, uint32_t item_uid)
     if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
         type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
         return;
-    container->as<Container>()->inside = item_uid;
+    container->as<Container>()->inside = item_entity_type;
 }
 
 void entity_remove_item(uint32_t uid, uint32_t item_uid)
@@ -1205,9 +1205,9 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
         if (entity != nullptr)
         {
             auto state = get_state_ptr();
-            typedef size_t generate_particles_func(size_t, uint32_t, Entity*);
+            typedef size_t generate_particles_func(PointerList*, uint32_t, Entity*);
             static generate_particles_func* gpf = (generate_particles_func*)(offset);
-            auto result = gpf(state->particle_emitters_info, particle_emitter_id, entity);
+            auto result = gpf(state->particle_emitters, particle_emitter_id, entity);
         }
     }
 }
@@ -1234,5 +1234,69 @@ void set_journal_enabled(bool b)
     else
     {
         write_mem_prot(offset, "\x90\x90\x90\x90\x90"s, true);
+    }
+}
+
+uint8_t waddler_count_entity(uint32_t entity_type)
+{
+    auto state = get_state_ptr();
+    uint8_t count = 0;
+    for (uint8_t x = 0; x < 99; ++x)
+    {
+        if (state->waddler_storage[x] == entity_type)
+        {
+            count++;
+        }
+    }
+    return count;
+}
+
+bool waddler_store_entity(uint32_t entity_type)
+{
+    auto state = get_state_ptr();
+    bool item_stored = false;
+    for (uint8_t x = 0; x < 99; ++x)
+    {
+        if (state->waddler_storage[x] == 0)
+        {
+            state->waddler_storage[x] = entity_type;
+            item_stored = true;
+            break;
+        }
+    }
+    return item_stored;
+}
+
+void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove)
+{
+    auto state = get_state_ptr();
+
+    uint8_t remove_count = 0;
+    for (uint8_t x = 0; x < 99; ++x)
+    {
+        if (amount_to_remove == remove_count)
+        {
+            break;
+        }
+
+        if (state->waddler_storage[x] == entity_type)
+        {
+            state->waddler_storage[x] = 0;
+            remove_count++;
+        }
+    }
+
+    if (remove_count > 0)
+    {
+        uint32_t tmp[99] = {0};
+        uint8_t tmp_x = 0;
+        for (uint8_t x = 0; x < 99; ++x)
+        {
+            if (state->waddler_storage[x] != 0)
+            {
+                tmp[tmp_x++] = state->waddler_storage[x];
+            }
+        }
+        memcpy(&(state->waddler_storage[0]), tmp, 99 * sizeof(uint32_t));
     }
 }

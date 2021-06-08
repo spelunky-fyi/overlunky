@@ -72,5 +72,11 @@ struct ParticleEmitter
     }
 };
 
+struct ParticleEmitterInfo
+{
+    ParticleDB* particle_type;
+    uint8_t particle_count;
+};
+
 ParticleDB* get_particle_type(uint32_t id);
 const std::vector<ParticleEmitter>& list_particles();

@@ -786,7 +786,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["set_door"] = set_door_target;
     /// Get door target `world`, `level`, `theme`
     lua["get_door_target"] = get_door_target;
-    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_uid`
+    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE, ENT_TYPE_ITEM_PRESENT, ENT_TYPE_ITEM_GHIST_PRESENT,
+    /// or ENT_TYPE.ITEM_COFFIN `uid` with item ENT_TYPE `item_entity_type`
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid
     lua["get_entity"] = get_entity_ptr;
@@ -923,6 +924,12 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
     lua["generate_particles"] = generate_particles;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
+    /// Returns how many of a specific entity type Waddler has stored
+    lua["waddler_count_entity"] = waddler_count_entity;
+    /// Store an entity type in Waddler's storage. Returns false when storage is full and the item couldn't be stored.
+    lua["waddler_store_entity"] = waddler_store_entity;
+    /// Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
+    lua["waddler_remove_entity"] = waddler_remove_entity;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b) -> float
@@ -1643,6 +1650,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "Player",
         "inventory",
         &Player::inventory_ptr,
+        "emitted_light",
+        &Player::emitted_light,
         "set_jetpack_fuel",
         &Player::set_jetpack_fuel,
         "kapala_blood_amount",
@@ -1783,6 +1792,8 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &StateMemory::loading,
         "quest_flags",
         &StateMemory::quest_flags,
+        "presence_flags",
+        &StateMemory::presence_flags,
         "fadevalue",
         &StateMemory::fadevalue,
         "fadeout",
@@ -1808,29 +1819,47 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         "player_inputs",
         sol::readonly(&StateMemory::player_inputs),
         "quests",
-        &StateMemory::quests);
-    lua.new_usertype<SaturationVignette>(
-        "SaturationVignette",
+        &StateMemory::quests,
+        "camera",
+        &StateMemory::camera);
+    lua.new_usertype<LightParams>(
+        "LightParams",
         "red",
-        &SaturationVignette::red,
+        &LightParams::red,
         "green",
-        &SaturationVignette::green,
+        &LightParams::green,
         "blue",
-        &SaturationVignette::blue,
-        "vignette_aperture",
-        &SaturationVignette::vignette_aperture);
+        &LightParams::blue,
+        "size",
+        &LightParams::size);
     lua.new_usertype<Illumination>(
         "Illumination",
-        "saturation_vignette",
-        &Illumination::saturation_vignette,
-        "brightness1",
-        &Illumination::brightness1,
-        "brightness2",
-        &Illumination::brightness2,
-        "frontlayer_global_illumination",
-        &Illumination::frontlayer_global_illumination,
-        "backlayer_global_illumination",
-        &Illumination::backlayer_global_illumination);
+        "light1",
+        &Illumination::light1,
+        "light2",
+        &Illumination::light2,
+        "light3",
+        &Illumination::light3,
+        "light4",
+        &Illumination::light4,
+        "brightness",
+        &Illumination::brightness,
+        "brightness_multiplier",
+        &Illumination::brightness_multiplier,
+        "light_pos_x",
+        &Illumination::light_pos_x,
+        "light_pos_y",
+        &Illumination::light_pos_y,
+        "offset_x",
+        &Illumination::offset_x,
+        "offset_y",
+        &Illumination::offset_y,
+        "distortion",
+        &Illumination::distortion,
+        "entity_uid",
+        &Illumination::entity_uid,
+        "flags",
+        &Illumination::flags);
     lua.new_usertype<ParticleDB>(
         "ParticleDB",
         "id",
@@ -1973,6 +2002,44 @@ SpelunkyScript::ScriptImpl::ScriptImpl(std::string script, std::string file, Sou
         &QuestsInfo::madame_tusk_state,
         "beg_state",
         &QuestsInfo::beg_state);
+    lua.new_usertype<Camera>(
+        "Camera",
+        "bounds_left",
+        &Camera::bounds_left,
+        "bounds_right",
+        &Camera::bounds_right,
+        "bounds_bottom",
+        &Camera::bounds_bottom,
+        "bounds_top",
+        &Camera::bounds_top,
+        "adjusted_focus_x",
+        &Camera::adjusted_focus_x,
+        "adjusted_focus_y",
+        &Camera::adjusted_focus_y,
+        "focus_offset_x",
+        &Camera::focus_offset_x,
+        "focus_offset_y",
+        &Camera::focus_offset_y,
+        "focus_x",
+        &Camera::focus_x,
+        "focus_y",
+        &Camera::focus_y,
+        "vertical_pan",
+        &Camera::vertical_pan,
+        "shake_countdown_start",
+        &Camera::shake_countdown_start,
+        "shake_countdown",
+        &Camera::shake_countdown,
+        "shake_amplitude",
+        &Camera::shake_amplitude,
+        "shake_multiplier_x",
+        &Camera::shake_multiplier_x,
+        "shake_multiplier_y",
+        &Camera::shake_multiplier_y,
+        "uniform_shake",
+        &Camera::uniform_shake,
+        "focused_entity_uid",
+        &Camera::focused_entity_uid);
     auto play = sol::overload(
         static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
