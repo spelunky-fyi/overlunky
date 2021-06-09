@@ -260,6 +260,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Player::get_heart_color,
         "is_female",
         &Player::is_female,
+        "set_heart_color",
+        &Player::set_heart_color,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());

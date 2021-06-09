@@ -139,6 +139,8 @@ class Player : public Monster
     std::u16string get_short_name();
     Color get_heart_color();
     bool is_female();
+
+    void set_heart_color(Color color);
 };
 
 class Container : public Movable

@@ -327,6 +327,11 @@ bool Player::is_female()
     return get_character_gender(get_character_index(type->id));
 }
 
+void Player::set_heart_color(Color color)
+{
+    set_character_heart_color(get_character_index(type->id), color);
+}
+
 void Movable::poison(int16_t frames)
 {
     static size_t offset = 0;
