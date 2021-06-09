@@ -66,9 +66,10 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;
 
-    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
+    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
     require_json_lua(lua);
     require_inspect_lua(lua);
+    require_format_lua(lua);
 
     /// Table of strings where you should set some script metadata shown in the UI.
     /// - `meta.name` Script name
@@ -775,7 +776,7 @@ void ScriptImpl::clear()
     {
         lua["package"]["path"] = meta.path + "/?.lua;" + meta.path + "/?/init.lua";
         lua["package"]["cpath"] = meta.path + "/?.dll;" + meta.path + "/?/init.dll";
-        lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
+        lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi);
     }
     else
     {
@@ -1263,7 +1264,7 @@ std::string ScriptImpl::dump_api()
     std::set<std::string> excluded_keys{"meta"};
 
     sol::state dummy_state;
-    dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
+    dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
 
     for (auto& [key, value] : lua["_G"].get<sol::table>())
     {
