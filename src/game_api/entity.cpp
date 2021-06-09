@@ -9,6 +9,7 @@
 #include "rpc.hpp"
 #include "state.hpp"
 #include "texture.hpp"
+#include "character_def.hpp"
 
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
@@ -307,6 +308,23 @@ uint8_t Player::kapala_blood_amount()
         }
     }
     return 0;
+}
+
+std::u16string Player::get_name()
+{
+    return get_character_full_name(get_character_index(type->id));
+}
+std::u16string Player::get_short_name()
+{
+    return get_character_short_name(get_character_index(type->id));
+}
+Color Player::get_heart_color()
+{
+    return get_character_heart_color(get_character_index(type->id));
+}
+bool Player::is_female()
+{
+    return get_character_gender(get_character_index(type->id));
 }
 
 void Movable::poison(int16_t frames)

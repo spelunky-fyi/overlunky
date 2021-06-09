@@ -134,6 +134,11 @@ class Player : public Monster
 
     void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();
+
+    std::u16string get_name();
+    std::u16string get_short_name();
+    Color get_heart_color();
+    bool is_female();
 };
 
 class Container : public Movable
