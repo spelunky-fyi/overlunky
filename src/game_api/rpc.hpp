@@ -1,3 +1,5 @@
+#pragma once
+
 #include "state.hpp"
 #include <cstdint>
 #include <vector>
