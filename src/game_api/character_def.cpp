@@ -110,7 +110,7 @@ Color get_character_heart_color(std::uint32_t character_index)
 }
 bool get_character_gender(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).gender != CharGender::Female;
+    return get_character_definition(character_index).gender == CharGender::Female;
 }
 
 void set_character_full_name(std::uint32_t character_index, std::u16string_view name)
