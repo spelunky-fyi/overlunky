@@ -7,25 +7,25 @@
 #include <cassert>
 #include <span>
 
+enum class CharGender {
+    Male,
+    Female,
+};
 enum class SomeCharEnum {
     Variant_1,
     Variant_2,
     Variant_3,
 };
-enum class CharGender {
-    Male,
-    Female,
-};
 struct CharacterDefinition
 {
-    float _float_1;
-    float _float_2;
-    SomeCharEnum some_enum;
     CharGender gender;
     Color heart_color;
     char16_t full_name[0x18];
     char16_t short_name[0xc];
     std::uint32_t _uint0;
+    float bed_position_x;
+    float bed_position_y;
+    SomeCharEnum some_enum;
 };
 static constexpr auto sizeof_CharacterDefinition = sizeof(CharacterDefinition);
 static constexpr auto expect_CharacterDefinition = 0x36 * sizeof(char16_t);
@@ -45,7 +45,8 @@ std::span<CharacterDefinition> GetCharacterDefinitions()
         const auto write_ana_strings = find_inst(exe, "\x0f\x11"s, load_ana_strings);
 
         auto ana_strings = memory.at_exe(decode_pc(exe, write_ana_strings));
-        auto string_table_first_element = ana_strings + sizeof(CharacterDefinition::full_name) + sizeof(CharacterDefinition::short_name) + sizeof(CharacterDefinition::_uint0);
+        static constexpr auto start_offset = sizeof(CharacterDefinition::short_name) + 0x10;
+        auto string_table_first_element = ana_strings + sizeof(CharacterDefinition::full_name) + start_offset;
         auto string_table_start = string_table_first_element - sizeof(CharacterDefinition);
         std::span<CharacterDefinition> character_table{ (CharacterDefinition*)(string_table_start), 20 };
         [[maybe_unused]] constexpr std::array known_tables{
@@ -115,7 +116,7 @@ void set_character_full_name(std::uint32_t character_index, std::u16string_view 
     const auto max_size = sizeof(CharacterDefinition::full_name) / sizeof(char16_t);
     if (name.size() > max_size)
     {
-        ERROR("Character name is too long, max supported size is {}", max_size);
+        DEBUG("Character name is too long, max supported size is {}", max_size);
     }
     auto& char_def = get_character_definition(character_index);
     memset(char_def.full_name, 0, max_size * sizeof(char16_t));
@@ -126,7 +127,7 @@ void set_character_short_name(std::uint32_t character_index, std::u16string_view
     const auto max_size = sizeof(CharacterDefinition::short_name) / sizeof(char16_t);
     if (name.size() > max_size)
     {
-        ERROR("Character name is too long, max supported size is {}", max_size);
+        DEBUG("Character name is too long, max supported size is {}", max_size);
     }
     auto& char_def = get_character_definition(character_index);
     memset(char_def.short_name, 0, max_size * sizeof(char16_t));
