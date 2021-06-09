@@ -288,7 +288,7 @@ Get interpolated render position `x, y, layer` of entity by uid. This gives smoo
 Remove item by uid from entity
 ### [`spawn_entity_over`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_over)
 `int spawn_entity_over(int item_uid, int over_uid, float x, float y)`<br/>
-Spawn an entity by `uid` attached to some other entity `over`, in offset `x`, `y`
+Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
 ### [`entity_has_item_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_uid)
 `bool entity_has_item_uid(int uid, int item_uid)`<br/>
 Check if the entity `uid` has some specific `item_uid` by uid in their inventory
@@ -402,7 +402,7 @@ Clears a bit in a number. This doesn't actually change the bit in the entity you
 ### [`clrflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
 `nil clrflag()`<br/>
 ### [`test_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_flag)
-`Flags test_flag(Flags flags, int bit)`<br/>
+`bool test_flag(Flags flags, int bit)`<br/>
 Returns true if a bit is set in the flags
 ### [`testflag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 `nil testflag()`<br/>

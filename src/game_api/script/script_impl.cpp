@@ -451,7 +451,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_render_position"] = get_render_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
-    /// Spawn an entity by `uid` attached to some other entity `over`, in offset `x`, `y`
+    /// Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
     /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
@@ -547,7 +547,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     { return flags & ~(1U << (bit - 1)); };
     lua["clrflag"] = lua["clr_flag"];
     /// Returns true if a bit is set in the flags
-    lua["test_flag"] = [](Flags flags, int bit) -> Flags
+    lua["test_flag"] = [](Flags flags, int bit) -> bool
     { return (flags & (1U << (bit - 1))) > 0; };
     lua["testflag"] = lua["test_flag"];
 
