@@ -1,4 +1,6 @@
 add_library(spel2_api STATIC
+        character_def.cpp
+        character_def.hpp
         entity.cpp
         entity.hpp
         items.cpp
