@@ -1,10 +1,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
-using MakeSavePathCallback = std::string (*)(std::string_view script_path, std::string_view script_name);
-
-void register_make_save_path(MakeSavePathCallback make_save_path_callback);
+#include <sol/forward.hpp>
 
 class SaveContext
 {
@@ -28,3 +27,8 @@ class LoadContext
     std::string_view script_path;
     std::string_view script_name;
 };
+
+namespace NSaveContext
+{
+void register_usertypes(sol::state& lua);
+}

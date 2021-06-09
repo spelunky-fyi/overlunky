@@ -4,7 +4,6 @@
 #include "file_api.hpp"
 #include "rpc.hpp"
 #include "script.hpp"
-#include "script_context.hpp"
 #include "sound_manager.hpp"
 #include "state.hpp"
 #include "window_api.hpp"

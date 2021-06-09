@@ -28,7 +28,6 @@
 #include "rpc.hpp"
 #include "savedata.hpp"
 #include "script.hpp"
-#include "script_context.hpp"
 #include "sound_manager.hpp"
 #include "state.hpp"
 #include "window_api.hpp"

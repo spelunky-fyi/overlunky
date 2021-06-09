@@ -10,10 +10,7 @@
 #include "state.hpp"
 #include "texture.hpp"
 
-// Items::entity_map = EntityMap;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
-
-class Entity;
 
 size_t cache_entities_ptr = 0;
 
@@ -25,6 +22,31 @@ size_t entities_offset()
         return res = decode_imm(mem.exe(), find_inst(mem.exe(), "\x48\x8D\x8B"s, find_inst(mem.exe(), "\x29\x5C\x8F\x3D"s, mem.after_bundle)));
     }
 }
+
+struct EntityBucket
+{
+    void** begin;
+    void** current; // Note, counts down from end to begin instead of up from begin to end :shrug:
+    void** end;
+};
+struct EntityPool
+{
+    std::uint32_t slot_size;
+    std::uint32_t initial_slots;
+    std::uint32_t slots_growth;
+    std::uint32_t current_slots;
+    std::uint64_t _ulong_0;
+    EntityBucket* _some_bucket;
+    EntityBucket* bucket;
+};
+struct EntityStore
+{
+    EntityDB types[0x391];
+    bool type_set[0x391];
+    std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map;
+    EntityMap entity_map;
+    void* _ptr_7;
+};
 
 size_t entities_ptr()
 {
