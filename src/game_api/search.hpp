@@ -20,10 +20,26 @@ size_t decode_imm(char* exe, size_t offset, uint8_t opcode_offset = 3)
     return *(uint32_t*)(&exe[offset + opcode_offset]);
 }
 
-size_t find_inst(char* exe, std::string needle, size_t start)
+// Find the location of the instruction (needle) with wildcard support
+size_t find_inst(char* exe, std::string_view needle, size_t start)
 {
-    // Find the location of the instruction (needle) using memmem()
-    return (char*)std::search(&exe[start], exe + 0x1000000000, needle.begin(), needle.end()) - exe;
+    const std::size_t exe_size = 0x1000000000; // this would be nice to pass as a param
+    const std::size_t needle_length = needle.size();
+
+    for (std::size_t j = start; j < exe_size - needle_length; j++)
+    {
+        bool found = true;
+        for (std::size_t k = 0; k < needle_length && found; k++)
+        {
+            found = needle[k] == '*' || needle[k] == *((char*)exe + j + k);
+        }
+
+        if (found)
+        {
+            return j;
+        }
+    }
+    return -1;
 }
 
 size_t find_after_bundle(size_t exe)
