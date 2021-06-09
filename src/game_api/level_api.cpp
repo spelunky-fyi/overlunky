@@ -291,8 +291,8 @@ void LevelGenData::init()
         auto exe = memory.exe();
         auto after_bundle = memory.after_bundle;
 
-        auto off = find_inst(exe, "\x0f\xb6\xbc\x24\x28\x01\x00\x00"s, after_bundle) - 0x30;
-        auto fun_start = find_inst(exe, "\x4c\x8b\xdc"s, off);
+        auto off = find_inst(exe, "\x44\x0f\xb7\xc5\xf3\x0f\x11\x7c\x24\x20"s, after_bundle);
+        auto fun_start = decode_pc(exe, find_inst(exe, "\xe8"s, off), 1);
 
         g_handle_tile_code_trampoline = (HandleTileCodeFun*)memory.at_exe(fun_start);
 
