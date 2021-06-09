@@ -15,6 +15,7 @@
 
 LoadFileCallback* g_OnLoadFile{nullptr};
 GetImageFilePathCallback* g_GetImageFilePath{nullptr};
+MakeSavePathCallback g_MakeSavePathCallback{nullptr};
 
 FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 {
@@ -151,6 +152,10 @@ void register_on_load_file(LoadFileCallback on_load_file)
 void register_get_image_file_path(GetImageFilePathCallback get_image_file_path)
 {
     g_GetImageFilePath = get_image_file_path;
+}
+void register_make_save_path(MakeSavePathCallback make_save_path_callback)
+{
+    g_MakeSavePathCallback = make_save_path_callback;
 }
 
 std::string get_image_file_path(std::string root_path, std::string relative_path)

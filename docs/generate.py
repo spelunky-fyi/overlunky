@@ -5,7 +5,20 @@ import sys
 sys.stdout = open('script-api.md', 'w')
 
 header_files = ['../src/game_api/rpc.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
-api_files = ['../src/game_api/script.cpp']
+api_files = [
+        '../src/game_api/script/script_impl.cpp',
+        '../src/game_api/script/script_impl.hpp',
+        '../src/game_api/script/usertypes/save_context.cpp',
+        '../src/game_api/script/usertypes/state_lua.cpp',
+        '../src/game_api/script/usertypes/entity_lua.cpp',
+        '../src/game_api/script/usertypes/particles_lua.cpp',
+        '../src/game_api/script/usertypes/level_lua.cpp',
+        '../src/game_api/script/usertypes/sound_lua.cpp',
+        '../src/game_api/script/usertypes/player_lua.cpp',
+        '../src/game_api/script/usertypes/gui_lua.cpp',
+        '../src/game_api/script/usertypes/drops_lua.cpp',
+        '../src/game_api/script/usertypes/texture_lua.cpp',
+    ]
 rpc = []
 events = []
 funcs = []

@@ -27,8 +27,30 @@ add_library(spel2_api STATIC
         window_api.hpp
         script.cpp
         script.hpp
-        script_context.cpp
-        script_context.hpp
+        script/script_impl.cpp
+        script/script_impl.hpp
+        script/script_util.cpp
+        script/script_util.hpp
+        script/usertypes/save_context.cpp
+        script/usertypes/save_context.hpp
+        script/usertypes/state_lua.cpp
+        script/usertypes/state_lua.hpp
+        script/usertypes/entity_lua.cpp
+        script/usertypes/entity_lua.hpp
+        script/usertypes/particles_lua.cpp
+        script/usertypes/particles_lua.hpp
+        script/usertypes/level_lua.cpp
+        script/usertypes/level_lua.hpp
+        script/usertypes/sound_lua.cpp
+        script/usertypes/sound_lua.hpp
+        script/usertypes/player_lua.cpp
+        script/usertypes/player_lua.hpp
+        script/usertypes/gui_lua.cpp
+        script/usertypes/gui_lua.hpp
+        script/usertypes/drops_lua.cpp
+        script/usertypes/drops_lua.hpp
+        script/usertypes/texture_lua.cpp
+        script/usertypes/texture_lua.hpp
         sound_manager.cpp
         sound_manager.hpp
         fmod.hpp
@@ -38,6 +60,7 @@ add_library(spel2_api STATIC
         overloaded.hpp
         virtual_table.cpp
         virtual_table.hpp
+        drops.cpp
         drops.hpp
         file_api.cpp
         file_api.hpp
@@ -51,6 +74,11 @@ target_link_libraries(spel2_api PRIVATE
         sol2::sol2
         ${LUA_LIBRARIES}
         lib_detours_overlunky)
+target_compile_definitions(spel2_api PRIVATE
+        SOL_ALL_SAFETIES_ON=1)
+target_precompile_headers(spel2_api PRIVATE
+        <sol/sol.hpp>
+        <d3d11.h>)
 
 if (MSVC)
         target_compile_options(spel2_api PRIVATE /bigobj)

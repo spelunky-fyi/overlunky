@@ -612,14 +612,14 @@ void entity_remove_item(uint32_t uid, uint32_t item_uid)
     entity->remove_item(item_uid);
 }
 
-int32_t spawn_entity_over(uint32_t uid, uint32_t over_uid, float x, float y)
+int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, float y)
 {
     auto state = State::get();
     Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
         return -1;
     int layer = overlay->layer();
-    return state.layer(layer)->spawn_entity_over(uid, overlay, x, y)->uid;
+    return state.layer(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
 bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)

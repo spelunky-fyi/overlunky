@@ -53,6 +53,8 @@ struct ScriptImage
     int height;
 };
 
+class ScriptImpl;
+
 class SpelunkyScript
 {
   public:
@@ -99,6 +101,5 @@ class SpelunkyScript
     static void for_each_script(std::function<bool(SpelunkyScript&)> fun);
 
   private:
-    class ScriptImpl;
     std::unique_ptr<ScriptImpl> m_Impl;
 };

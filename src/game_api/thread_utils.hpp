@@ -26,6 +26,7 @@ class OnHeapPointer
     int64_t ptr_;
 
   public:
+    OnHeapPointer() = default;
     explicit OnHeapPointer(size_t ptr)
         : ptr_(ptr)
     {
