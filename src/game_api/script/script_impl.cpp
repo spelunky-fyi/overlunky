@@ -201,6 +201,9 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
             callbacks[cbcount] = luaCb;
         return cbcount++;
     };
+    /// Clear previously added callback `id`
+    lua["clear_callback"] = [this](CallbackId id)
+    { clear_callbacks.push_back(id); };
 
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");

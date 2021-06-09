@@ -93,6 +93,9 @@ Add global callback function to be called after `frames` engine frames. This tim
 `CallbackId set_callback(function cb, int screen)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 Add global callback function to be called on an [event](#on).
+### [`clear_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
+`nil clear_callback(CallbackId id)`<br/>
+Clear previously added callback `id`
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 `nil load_script(string id)`<br/>
 Load another script by id "author/name"
