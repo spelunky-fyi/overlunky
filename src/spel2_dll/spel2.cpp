@@ -239,7 +239,7 @@ const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index)
 {
     return get_character_short_name(character_index);
 }
-void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float(&color)[4])
+void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
     static_assert(sizeof(Color) == sizeof(color));
 
@@ -259,7 +259,7 @@ void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_
 {
     set_character_short_name(character_index, name);
 }
-void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float(&color)[4])
+void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
     static_assert(sizeof(Color) == sizeof(color));
 

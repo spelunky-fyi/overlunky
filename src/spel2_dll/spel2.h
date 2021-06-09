@@ -137,5 +137,5 @@ bool Spelunky_GetCharacterGender(std::uint32_t character_index);
 
 void Spelunky_SetCharacterFullName(std::uint32_t character_index, const char16_t* name);
 void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_t* name);
-void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float(&color)[4]);
+void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4]);
 void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female);

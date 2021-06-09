@@ -7,11 +7,13 @@
 #include <cassert>
 #include <span>
 
-enum class CharGender {
+enum class CharGender
+{
     Male,
     Female,
 };
-enum class SomeCharEnum {
+enum class SomeCharEnum
+{
     Variant_1,
     Variant_2,
     Variant_3,
@@ -48,28 +50,28 @@ std::span<CharacterDefinition> GetCharacterDefinitions()
         static constexpr auto start_offset = sizeof(CharacterDefinition::short_name) + 0x10;
         auto string_table_first_element = ana_strings + sizeof(CharacterDefinition::full_name) + start_offset;
         auto string_table_start = string_table_first_element - sizeof(CharacterDefinition);
-        std::span<CharacterDefinition> character_table{ (CharacterDefinition*)(string_table_start), 20 };
+        std::span<CharacterDefinition> character_table{(CharacterDefinition*)(string_table_start), 20};
         [[maybe_unused]] constexpr std::array known_tables{
-            CharacterDefinition{.full_name{ u"Ana Spelunky" }, .short_name{ u"Ana" } },
-            CharacterDefinition{.full_name{ u"Margaret Tunnel" }, .short_name{ u"Margaret" } },
-            CharacterDefinition{.full_name{ u"Colin Northward" }, .short_name{ u"Colin" } },
-            CharacterDefinition{.full_name{ u"Roffy D. Sloth" }, .short_name{ u"Roffy" } },
-            CharacterDefinition{.full_name{ u"Alto Singh" }, .short_name{ u"Alto" } },
-            CharacterDefinition{.full_name{ u"Liz Mutton" }, .short_name{ u"Liz" } },
-            CharacterDefinition{.full_name{ u"Nekka The Eagle" }, .short_name{ u"Nekka" } },
-            CharacterDefinition{.full_name{ u"LISE Project" }, .short_name{ u"LISE" } },
-            CharacterDefinition{.full_name{ u"Coco Von Diamonds" }, .short_name{ u"Coco" } },
-            CharacterDefinition{.full_name{ u"Manfred Tunnel" }, .short_name{ u"Manfred" } },
-            CharacterDefinition{.full_name{ u"Little Jay" }, .short_name{ u"Jay" } },
-            CharacterDefinition{.full_name{ u"Tina Flan" }, .short_name{ u"Tina" } },
-            CharacterDefinition{.full_name{ u"Valerie Crump" }, .short_name{ u"Valerie" } },
-            CharacterDefinition{.full_name{ u"Au" }, .short_name{ u"Au" } },
-            CharacterDefinition{.full_name{ u"Demi Von Diamonds" }, .short_name{ u"Demi" } },
-            CharacterDefinition{.full_name{ u"Pilot" }, .short_name{ u"Pilot" } },
-            CharacterDefinition{.full_name{ u"Princess Airyn" }, .short_name{ u"Airyn" } },
-            CharacterDefinition{.full_name{ u"Dirk Yamaoka" }, .short_name{ u"Dirk" } },
-            CharacterDefinition{.full_name{ u"Guy Spelunky" }, .short_name{ u"Guy" } },
-            CharacterDefinition{.full_name{ u"Classic Guy" }, .short_name{ u"Classic Guy" } },
+            CharacterDefinition{.full_name{u"Ana Spelunky"}, .short_name{u"Ana"}},
+            CharacterDefinition{.full_name{u"Margaret Tunnel"}, .short_name{u"Margaret"}},
+            CharacterDefinition{.full_name{u"Colin Northward"}, .short_name{u"Colin"}},
+            CharacterDefinition{.full_name{u"Roffy D. Sloth"}, .short_name{u"Roffy"}},
+            CharacterDefinition{.full_name{u"Alto Singh"}, .short_name{u"Alto"}},
+            CharacterDefinition{.full_name{u"Liz Mutton"}, .short_name{u"Liz"}},
+            CharacterDefinition{.full_name{u"Nekka The Eagle"}, .short_name{u"Nekka"}},
+            CharacterDefinition{.full_name{u"LISE Project"}, .short_name{u"LISE"}},
+            CharacterDefinition{.full_name{u"Coco Von Diamonds"}, .short_name{u"Coco"}},
+            CharacterDefinition{.full_name{u"Manfred Tunnel"}, .short_name{u"Manfred"}},
+            CharacterDefinition{.full_name{u"Little Jay"}, .short_name{u"Jay"}},
+            CharacterDefinition{.full_name{u"Tina Flan"}, .short_name{u"Tina"}},
+            CharacterDefinition{.full_name{u"Valerie Crump"}, .short_name{u"Valerie"}},
+            CharacterDefinition{.full_name{u"Au"}, .short_name{u"Au"}},
+            CharacterDefinition{.full_name{u"Demi Von Diamonds"}, .short_name{u"Demi"}},
+            CharacterDefinition{.full_name{u"Pilot"}, .short_name{u"Pilot"}},
+            CharacterDefinition{.full_name{u"Princess Airyn"}, .short_name{u"Airyn"}},
+            CharacterDefinition{.full_name{u"Dirk Yamaoka"}, .short_name{u"Dirk"}},
+            CharacterDefinition{.full_name{u"Guy Spelunky"}, .short_name{u"Guy"}},
+            CharacterDefinition{.full_name{u"Classic Guy"}, .short_name{u"Classic Guy"}},
         };
         for (size_t i = 0; i < 20; i++)
         {

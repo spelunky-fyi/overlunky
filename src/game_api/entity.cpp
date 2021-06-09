@@ -4,12 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "character_def.hpp"
 #include "logger.h"
 #include "render_api.hpp"
 #include "rpc.hpp"
 #include "state.hpp"
 #include "texture.hpp"
-#include "character_def.hpp"
 
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
