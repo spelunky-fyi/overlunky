@@ -1,4 +1,8 @@
 add_library(spel2_api STATIC
+        character_def.cpp
+        character_def.hpp
+        game_allocator.cpp
+        game_allocator.hpp
         entity.cpp
         entity.hpp
         items.cpp

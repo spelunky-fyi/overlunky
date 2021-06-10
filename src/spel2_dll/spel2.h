@@ -129,3 +129,13 @@ enum class SpelunkyScreen
 SpelunkyScreen SpelunkyState_GetScreen();
 
 std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, float x, float y, float vel_x, float vel_y);
+
+const char16_t* Spelunky_GetCharacterFullName(std::uint32_t character_index);
+const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index);
+void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4]);
+bool Spelunky_GetCharacterGender(std::uint32_t character_index);
+
+void Spelunky_SetCharacterFullName(std::uint32_t character_index, const char16_t* name);
+void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_t* name);
+void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4]);
+void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female);

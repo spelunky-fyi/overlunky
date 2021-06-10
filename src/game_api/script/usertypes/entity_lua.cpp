@@ -252,6 +252,16 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Player::set_jetpack_fuel,
         "kapala_blood_amount",
         &Player::kapala_blood_amount,
+        "get_name",
+        &Player::get_name,
+        "get_short_name",
+        &Player::get_short_name,
+        "get_heart_color",
+        &Player::get_heart_color,
+        "is_female",
+        &Player::is_female,
+        "set_heart_color",
+        &Player::set_heart_color,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
