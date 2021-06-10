@@ -1,6 +1,7 @@
 #include "level_api.hpp"
 
 #include "entity.hpp"
+#include "game_allocator.hpp"
 #include "layer.hpp"
 #include "logger.h"
 #include "memory.hpp"
@@ -9,6 +10,7 @@
 
 #include <array>
 #include <string_view>
+#include <tuple>
 
 #include <Windows.h>
 #include <detours.h>
@@ -334,7 +336,11 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
         return existing.value();
     }
 
-    auto& tile_code_map = *(std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
+    using string_t = std::basic_string<char, std::char_traits<char>, game_allocator<char>>;
+    using map_value_t = std::pair<const string_t, TileCodeDef>;
+    using map_allocator_t = game_allocator<map_value_t>;
+    using mutable_tile_code_map_t = std::unordered_map<string_t, TileCodeDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
+    auto& tile_code_map = *(mutable_tile_code_map_t*)((size_t)this + 0x88);
 
     // TODO: This should be forwarded to the instantiation of this operator in Spel2.exe to avoid CRT mismatch in Debug mode
     auto [it, success] = tile_code_map.emplace(std::move(tile_code), TileCodeDef{g_current_tile_code_id});
