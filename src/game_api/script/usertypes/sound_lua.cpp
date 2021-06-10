@@ -10,7 +10,7 @@ namespace NSound
 void register_usertypes(sol::state& lua, ScriptImpl* script)
 {
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
-    lua["create_sound"] = [&](std::string path) -> sol::optional<CustomSound>
+    lua["create_sound"] = [script](std::string path) -> sol::optional<CustomSound>
     {
         if (CustomSound sound = script->sound_manager->get_sound((script->script_folder / path).string()))
         {
@@ -20,7 +20,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     };
 
     /// Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
-    lua["get_sound"] = [&](std::string path_or_vanilla_sound) -> sol::optional<CustomSound>
+    lua["get_sound"] = [script](std::string path_or_vanilla_sound) -> sol::optional<CustomSound>
     {
         if (CustomSound event = script->sound_manager->get_event(path_or_vanilla_sound))
         {
@@ -38,7 +38,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
     /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
     /// properties on the sound. Otherwise you may cause a deadlock.
-    lua["set_vanilla_sound_callback"] = [&](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
+    lua["set_vanilla_sound_callback"] = [script](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
     {
         auto safe_cb = [&, cb = std::move(cb)](PlayingSound sound)
         {
@@ -50,7 +50,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         return id;
     };
     /// Clears a previously set callback
-    lua["clear_vanilla_sound_callback"] = [&](CallbackId id)
+    lua["clear_vanilla_sound_callback"] = [script](CallbackId id)
     {
         script->sound_manager->clear_callback(id);
         auto it = std::find(script->vanilla_sound_callbacks.begin(), script->vanilla_sound_callbacks.end(), id);
@@ -71,7 +71,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
         map<VANILLA_SOUND_PARAM,string> get_parameters()
         */
-    auto sound_set_callback = [&](PlayingSound* sound, sol::function callback)
+    auto sound_set_callback = [script](PlayingSound* sound, sol::function callback)
     {
         auto safe_cb = [&, callback = std::move(callback)]()
         {
@@ -134,7 +134,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
                            //, "FX_FX_DM_BANNER", FX/FX_dm_banner
     );
     script->sound_manager->for_each_event_name(
-        [&](std::string event_name)
+        [&lua](std::string event_name)
         {
             std::string clean_event_name = event_name;
             std::transform(
@@ -179,7 +179,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
                            //, "CURRENT_LAYER2", 37
     );
     script->sound_manager->for_each_parameter_name(
-        [&](std::string parameter_name, std::uint32_t id)
+        [&lua](std::string parameter_name, std::uint32_t id)
         {
             std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
                            { return std::toupper(c); });
