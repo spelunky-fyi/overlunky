@@ -3506,6 +3506,37 @@ void render_game_props()
             ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, pow(2, i));
         }
     }
+    if (ImGui::CollapsingHeader("AI targets"))
+    {
+        for (const auto& [ai, target] : *(g_state->ai_targets))
+        {
+            auto ai_entity = get_entity_ptr(ai);
+            if (ai_entity == nullptr)
+            {
+                continue;
+            }
+            ImGui::Text(entity_names[ai_entity->type->id].data());
+            ImGui::SameLine();
+            ImGui::Text(": ");
+            ImGui::SameLine();
+            if (target == -1)
+            {
+                ImGui::Text("Nothing");
+            }
+            else
+            {
+                auto target_entity = get_entity_ptr(target);
+                if (target_entity != nullptr)
+                {
+                    ImGui::Text(entity_names[target_entity->type->id].data());
+                }
+                else
+                {
+                    ImGui::Text(("Invalid target uid: " + std::to_string(target)).c_str());
+                }
+            }
+        }
+    }
     ImGui::PopItemWidth();
 }
 

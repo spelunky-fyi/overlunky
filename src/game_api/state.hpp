@@ -150,7 +150,7 @@ struct StateMemory
     Layer* layers[2];
     Logic* logic;
     QuestsInfo* quests;
-    size_t unknown24;
+    std::unordered_map<uint32_t, int32_t>* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
     PointerList* particle_emitters; // list of ParticleEmitterInfo*
     PointerList* lightsources;      // list of Illumination*
@@ -159,7 +159,8 @@ struct StateMemory
     size_t unknown28;
     size_t unknown29;
     size_t unknown30;
-    size_t unknown31;
+    uint32_t layer_transition_effect_timer;
+    uint32_t camera_layer;
     size_t unknown32;
     size_t unknown33;
     size_t unknown34;
