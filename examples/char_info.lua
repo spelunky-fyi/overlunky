@@ -13,7 +13,7 @@ set_callback(function()
         else
             royal_title = 'King'
         end
-        local name = f'{char:get_name()} aka {royal_title} {char:get_short_name()}'
+        local name = F'{char:get_name()} aka {royal_title} {char:get_short_name()}'
         local color = char:get_heart_color()
         local u_color = rgba(
             math.floor(color.r * 255),
