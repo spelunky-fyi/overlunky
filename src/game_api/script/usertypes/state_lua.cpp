@@ -105,7 +105,9 @@ void register_usertypes(sol::state& lua)
         "quests",
         &StateMemory::quests,
         "camera",
-        &StateMemory::camera);
+        &StateMemory::camera,
+        "special_visibility_flags",
+        &StateMemory::special_visibility_flags);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",

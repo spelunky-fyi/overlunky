@@ -3499,6 +3499,13 @@ void render_game_props()
             ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, pow(2, i));
         }
     }
+    if (ImGui::CollapsingHeader("Special visibility flags"))
+    {
+        for (int i = 0; i < 32; i++)
+        {
+            ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, pow(2, i));
+        }
+    }
     ImGui::PopItemWidth();
 }
 

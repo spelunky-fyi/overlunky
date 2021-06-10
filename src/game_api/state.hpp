@@ -166,7 +166,7 @@ struct StateMemory
     size_t unknown35;
     size_t unknown36;
     uint32_t time_startup;
-    uint32_t unknown38;
+    uint32_t special_visibility_flags;
     Camera* camera;
 };
 struct State
