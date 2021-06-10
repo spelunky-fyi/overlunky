@@ -4814,21 +4814,6 @@
     "tile_width": 512,
     "width": 512
   },
-  "389": {
-    "height": 128,
-    "num_tiles": {
-      "height": 8,
-      "width": 4
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/OldTextures/ai.DDS",
-    "tile_height": 16,
-    "tile_width": 16,
-    "width": 64
-  },
   "39": {
     "height": 1280,
     "num_tiles": {
