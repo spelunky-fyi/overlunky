@@ -804,7 +804,7 @@ setmetatable(F, {
 
 return F
 )";
-    lua["f"] = lua.require_script("f", format_code);
+    lua["F"] = lua.require_script("f", format_code);
 }
 
 void require_serpent_lua(sol::state& lua)

@@ -57,7 +57,7 @@ message(inspect(look_ma_no_tostring))
 ]]
 ```
 ### `format`
-This allows you to make strings without having to do a lot of `tostring` and `..` by placing your variables directly inside of the string. Use `f` in front of your string and wrap variables you want to print in `{}`, for example like this:
+This allows you to make strings without having to do a lot of `tostring` and `..` by placing your variables directly inside of the string. Use `F` in front of your string and wrap variables you want to print in `{}`, for example like this:
 ```Lua
 for _, player in players do
     local royal_title = nil
@@ -66,7 +66,7 @@ for _, player in players do
     else
         royal_title = 'King'
     end
-    local name = f'{player:get_name()} aka {royal_title} {player:get_short_name()}'
+    local name = F'{player:get_name()} aka {royal_title} {player:get_short_name()}'
     message(name)
 end
 ```
