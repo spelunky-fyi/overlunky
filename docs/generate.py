@@ -18,6 +18,8 @@ api_files = [
         '../src/game_api/script/usertypes/gui_lua.cpp',
         '../src/game_api/script/usertypes/drops_lua.cpp',
         '../src/game_api/script/usertypes/texture_lua.cpp',
+        '../src/game_api/script/usertypes/flags_lua.cpp',
+        '../src/game_api/script/usertypes/char_state.cpp'
     ]
 rpc = []
 events = []

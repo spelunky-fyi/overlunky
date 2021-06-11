@@ -2,9 +2,9 @@ Animation = {
   __name = "sol.Animation.user"
 }
 Arrowtrap = {
-  __index = "function: 000002BF4CC7E860",
+  __index = "function: 0000028B8CEE6660",
   __name = "sol.Arrowtrap.user",
-  __newindex = "function: 000002BF4CC7FFE0"
+  __newindex = "function: 0000028B8CEE7060"
 }
 BEG = {
   ALTAR_DESTROYED = 1,
@@ -23,9 +23,28 @@ BUTTON = {
   WHIP = 2
 }
 Bomb = {
-  __index = "function: 000002BF4CC7B9E0",
+  __index = "function: 0000028B8CEE6360",
   __name = "sol.Bomb.user",
-  __newindex = "function: 000002BF4CC7C260"
+  __newindex = "function: 0000028B8CEE50E0"
+}
+CHAR_STATE = {
+  ATTACKING = 12,
+  CLIMBING = 6,
+  DROPPING = 10,
+  DUCKING = 5,
+  DYING = 22,
+  ENTERING = 19,
+  EXITING = 21,
+  FALLING = 9,
+  FLAILING = 0,
+  HANGING = 4,
+  JUMPING = 8,
+  LOADING = 20,
+  PUSHING = 7,
+  SITTING = 2,
+  STANDING = 1,
+  STUNNED = 18,
+  THROWING = 17
 }
 CONST = {
   ENGINE_FPS = 60
@@ -45,27 +64,27 @@ Camera = {
   __name = "sol.Camera.user"
 }
 Cape = {
-  __index = "function: 000002BF4CC81F60",
+  __index = "function: 0000028B8CEE9A60",
   __name = "sol.Cape.user",
-  __newindex = "function: 000002BF4CC82A60"
+  __newindex = "function: 0000028B8CEE91E0"
 }
 ChasingMonster = {
-  __index = "function: 000002BF4CC7C460",
+  __index = "function: 0000028B8CEEB860",
   __name = "sol.ChasingMonster.user",
-  __newindex = "function: 000002BF4CC7C4E0"
+  __newindex = "function: 0000028B8CEECC60"
 }
 Color = {
   __name = "sol.Color.user"
 }
 Container = {
-  __index = "function: 000002BF4CC7C660",
+  __index = "function: 0000028B8CEE56E0",
   __name = "sol.Container.user",
-  __newindex = "function: 000002BF4CC7CCE0"
+  __newindex = "function: 0000028B8CEE51E0"
 }
 Crushtrap = {
-  __index = "function: 000002BF4CC7DAE0",
+  __index = "function: 0000028B8CEE8A60",
   __name = "sol.Crushtrap.user",
-  __newindex = "function: 000002BF4CC7DE60"
+  __newindex = "function: 0000028B8CEE70E0"
 }
 CustomSound = {
   __name = "sol.CustomSound.user"
@@ -170,6 +189,36 @@ DROPCHANCE = {
   SKELETON_SKELETONKEY = 8,
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
+}
+ENT_FLAG = {
+  CAN_BE_STOMPED = 15,
+  CLIMBABLE = 9,
+  COLLIDES_WALLS = 13,
+  DEAD = 29,
+  ENABLE_BUTTON_PROMPT = 20,
+  FACING_LEFT = 17,
+  HAS_BACKITEM = 32,
+  INDESTRUCTIBLE_OR_SPECIAL_FLOOR = 2,
+  INTERACT_WITH_SEMISOLIDS = 14,
+  INTERACT_WITH_WATER = 11,
+  INTERACT_WITH_WEBS = 21,
+  INVISIBLE = 1,
+  IS_PLATFORM = 8,
+  LOCKED = 22,
+  NO_GRAVITY = 10,
+  PASSES_THROUGH_EVERYTHING = 5,
+  PASSES_THROUGH_OBJECTS = 4,
+  PASSES_THROUGH_PLAYER = 25,
+  PAUSE_AI_AND_PHYSICS = 28,
+  PICKUPABLE = 18,
+  POWER_STOMPS = 16,
+  SHOP_FLOOR = 24,
+  SHOP_ITEM = 23,
+  SOLID = 3,
+  STUNNABLE = 12,
+  TAKE_NO_DAMAGE = 6,
+  THROWABLE_OR_KNOCKBACKABLE = 7,
+  USABLE_ITEM = 19
 }
 ENT_TYPE = {
   ACTIVEFLOOR_BONEBLOCK = 599,
@@ -1053,14 +1102,14 @@ EntityDB = {
 }
 F = {}
 Ghost = {
-  __index = "function: 000002BF4CC7E960",
+  __index = "function: 0000028B8CEEB9E0",
   __name = "sol.Ghost.user",
-  __newindex = "function: 000002BF4CC7DB60"
+  __newindex = "function: 0000028B8CEEB960"
 }
 Gun = {
-  __index = "function: 000002BF4CC7D8E0",
+  __index = "function: 0000028B8CEE5AE0",
   __name = "sol.Gun.user",
-  __newindex = "function: 000002BF4CC7D560"
+  __newindex = "function: 0000028B8CEE5B60"
 }
 Illumination = {
   __name = "sol.Illumination.user"
@@ -1080,9 +1129,9 @@ JUNGLESISTERS = {
   WARNING_ONE_WAY_DOOR = 4
 }
 Jiangshi = {
-  __index = "function: 000002BF4CC80D60",
+  __index = "function: 0000028B8CEED760",
   __name = "sol.Jiangshi.user",
-  __newindex = "function: 000002BF4CC7F1E0"
+  __newindex = "function: 0000028B8CEEEE60"
 }
 LAYER = {
   BACK = 1,
@@ -1117,19 +1166,19 @@ MASK = {
   WATER = 8192
 }
 Monster = {
-  __index = "function: 000002BF4C0B3D20",
+  __index = "function: 0000028BFF8441F0",
   __name = "sol.Monster.user",
-  __newindex = "function: 000002BF4C0B3EA0"
+  __newindex = "function: 0000028BFF845370"
 }
 Mount = {
-  __index = "function: 000002BF4CC79B60",
+  __index = "function: 0000028BFF847270",
   __name = "sol.Mount.user",
-  __newindex = "function: 000002BF4CC79BE0"
+  __newindex = "function: 0000028BFF847570"
 }
 Movable = {
-  __index = "function: 000002BF4C0B2120",
+  __index = "function: 0000028BFF844D70",
   __name = "sol.Movable.user",
-  __newindex = "function: 000002BF4C0B25A0"
+  __newindex = "function: 0000028BFF843EF0"
 }
 ON = {
   ARENA_INTRO = 25,
@@ -1171,14 +1220,14 @@ ON = {
   WIN = 16
 }
 Olmec = {
-  __index = "function: 000002BF4CC7F160",
+  __index = "function: 0000028B8CEE8BE0",
   __name = "sol.Olmec.user",
-  __newindex = "function: 000002BF4CC80CE0"
+  __newindex = "function: 0000028B8CEE8D60"
 }
 OlmecFloater = {
-  __index = "function: 000002BF4CC7F360",
+  __index = "function: 0000028B8CEE9EE0",
   __name = "sol.OlmecFloater.user",
-  __newindex = "function: 000002BF4CC7F4E0"
+  __newindex = "function: 0000028B8CEE95E0"
 }
 PARTICLEEMITTER = {
   ACIDBUBBLEBURST_BUBBLES = 101,
@@ -1405,9 +1454,9 @@ ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
 Player = {
-  __index = "function: 000002BF4CC79A60",
+  __index = "function: 0000028BFF8469F0",
   __name = "sol.Player.user",
-  __newindex = "function: 000002BF4CC7AB60"
+  __newindex = "function: 0000028BFF846270"
 }
 PlayerInputs = {
   __name = "sol.PlayerInputs.user"
@@ -2469,9 +2518,9 @@ VANILLA_SOUND_PARAM = {
   VELOCITY = 15
 }
 VladsCape = {
-  __index = "function: 000002BF4CC7A2E0",
+  __index = "function: 0000028B8CEE93E0",
   __name = "sol.VladsCape.user",
-  __newindex = "function: 000002BF4CC7A460"
+  __newindex = "function: 0000028B8CEEA3E0"
 }
 WIN_STATE = {
   COSMIC_OCEAN_WIN = 3,
