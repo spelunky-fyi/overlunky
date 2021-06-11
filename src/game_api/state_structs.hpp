@@ -152,13 +152,6 @@ struct JournalProgressionSlot
     float angle;
 };
 
-struct JournalProgression
-{
-    uint16_t unknown1;
-    uint16_t count;
-    JournalProgressionSlot slots[40];
-};
-
 struct ThemeProgression
 {
     uint8_t count;

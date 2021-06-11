@@ -82,8 +82,9 @@ struct StateMemory
     uint8_t unknown2c;
     uint8_t unknown2d;
     uint32_t waddler_storage[99];
-    uint8_t skip1[196];
-    JournalProgression journal_progression;
+    int16_t waddler_storage_meta[99]; // to store mattock durability for example
+    uint16_t journal_progression_count;
+    JournalProgressionSlot journal_progression_slots[40];
     uint8_t skip2[844];
     ThemeProgression theme_progression;
     uint8_t unknown3;

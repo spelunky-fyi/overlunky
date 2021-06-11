@@ -366,11 +366,20 @@ Enables or disables the journal
 `int waddler_count_entity(int entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
 ### [`waddler_store_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_store_entity)
-`bool waddler_store_entity(int entity_type)`<br/>
-Store an entity type in Waddler's storage. Returns false when storage is full and the item couldn't be stored.
+`int waddler_store_entity(int entity_type)`<br/>
+Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
 ### [`waddler_remove_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_remove_entity)
 `nil waddler_remove_entity(int entity_type, int amount_to_remove = 99)`<br/>
 Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
+### [`waddler_get_entity_meta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_get_entity_meta)
+`int waddler_get_entity_meta(int slot)`<br/>
+Gets the 16-bit meta-value associated with the entity type in the associated slot
+### [`waddler_set_entity_meta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_set_entity_meta)
+`nil waddler_set_entity_meta(int slot, int meta)`<br/>
+Sets the 16-bit meta-value associated with the entity type in the associated slot
+### [`waddler_entity_type_in_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_entity_type_in_slot)
+`int waddler_entity_type_in_slot(int slot)`<br/>
+Gets the entity type of the item in the provided slot
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 `float distance(int uid_a, int uid_b)`<br/>
 Calculate the tile distance of two entities by uid
