@@ -55,6 +55,8 @@ add_library(spel2_api STATIC
         script/usertypes/drops_lua.hpp
         script/usertypes/texture_lua.cpp
         script/usertypes/texture_lua.hpp
+        script/usertypes/char_state.cpp
+        script/usertypes/char_state.hpp
         sound_manager.cpp
         sound_manager.hpp
         fmod.hpp
