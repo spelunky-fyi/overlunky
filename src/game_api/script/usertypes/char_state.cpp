@@ -12,7 +12,7 @@ void register_usertypes(sol::state& lua)
         0,
         "STANDING",
         1,
-        "SITTING", 
+        "SITTING",
         2,
         "HANGING",
         4,
@@ -41,7 +41,6 @@ void register_usertypes(sol::state& lua)
         "EXITING",
         21,
         "DYING",
-        22
-        );
+        22);
 }
-}
+} // namespace NCharacterState
