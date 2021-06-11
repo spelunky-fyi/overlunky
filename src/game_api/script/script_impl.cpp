@@ -21,6 +21,7 @@
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
+#include "usertypes/char_state.hpp"
 
 #include <sol/sol.hpp>
 
@@ -644,6 +645,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NState::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
+    NCharacterState::register_usertypes(lua);
 
     lua.create_named_table(
         "ON",
