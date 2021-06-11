@@ -14,6 +14,7 @@
 #include "usertypes/char_state.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entity_lua.hpp"
+#include "usertypes/flags_lua.hpp"
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/level_lua.hpp"
 #include "usertypes/particles_lua.hpp"
@@ -646,6 +647,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
+    NEntityFlags::register_usertypes(lua);
 
     lua.create_named_table(
         "ON",
