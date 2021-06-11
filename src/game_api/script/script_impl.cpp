@@ -11,6 +11,7 @@
 #include "sound_manager.hpp"
 #include "state.hpp"
 
+#include "usertypes/char_state.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entity_lua.hpp"
 #include "usertypes/gui_lua.hpp"
@@ -21,7 +22,7 @@
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
-#include "usertypes/char_state.hpp"
+
 
 #include <sol/sol.hpp>
 
