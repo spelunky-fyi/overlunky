@@ -23,7 +23,6 @@
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
 
-
 #include <sol/sol.hpp>
 
 void infinite_loop(lua_State* argst, lua_Debug* argdb)
