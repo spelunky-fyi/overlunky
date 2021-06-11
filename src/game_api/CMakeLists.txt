@@ -57,6 +57,8 @@ add_library(spel2_api STATIC
         script/usertypes/texture_lua.hpp
         script/usertypes/char_state.cpp
         script/usertypes/char_state.hpp
+        script/usertypes/flags_lua.cpp
+        script/usertypes/flags_lua.hpp
         sound_manager.cpp
         sound_manager.hpp
         fmod.hpp
