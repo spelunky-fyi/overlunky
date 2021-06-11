@@ -196,6 +196,10 @@ Add a combobox option that the user can change in the UI. Read the int index of 
 with a double `\0\0` at the end.
 ### [`register_option_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
 `nil register_option_button()`<br/>
+### [`spawn_liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_liquid)
+`nil spawn_liquid(int entity_type, float x, float y)`<br/>
+Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.
+Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 `int spawn_entity(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Spawn an entity in position with some velocity and return the uid of spawned entity.

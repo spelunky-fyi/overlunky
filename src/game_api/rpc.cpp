@@ -27,6 +27,25 @@ uint32_t flipflag(uint32_t flags, int bit)
         return setflag(flags, bit);
 }
 
+void spawn_liquid(uint32_t entity_type, float x, float y)
+{
+    using spawn_liquid_fun_t = std::uint64_t(void*, float, float, std::uint32_t, bool);
+    static auto spawn_liquid_call = (spawn_liquid_fun_t*)[]()
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        auto start = memory.after_bundle;
+        auto location = find_inst(exe, "\x41\xb9\x8b\x03\x00\x00\x0f\x28\xd7"s, start) - 0x1;
+        location = find_inst(exe, "\xe8"s, location);
+        location = decode_pc(exe, location, 1);
+        return memory.at_exe(location);
+    }
+    ();
+
+    auto state = State::get().ptr();
+    spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
+}
+
 int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();

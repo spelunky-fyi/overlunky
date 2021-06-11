@@ -326,6 +326,9 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
             lua["options"][name] = -1;
         });
 
+    /// Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.
+    /// Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
+    lua["spawn_liquid"] = spawn_liquid;
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     /// Example:

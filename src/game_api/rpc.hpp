@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 
+void spawn_liquid(uint32_t entity_type, float x, float y);
 int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap);
 int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 void spawn_backdoor(float x, float y);
