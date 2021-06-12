@@ -582,3 +582,114 @@ struct PointerList
     uint32_t unknown2;
     uint32_t unknown3;
 };
+
+struct DialogueDetails
+{
+    uint32_t line;          // strings table ID
+    uint8_t param_player1;  // character db ID (although they don't always match up with the in game dialogue)
+    uint8_t param_player2;  // for %-replacement in line
+    uint8_t unknown3;       // most likely padding
+    uint8_t unknown4;       // most likely padding
+    uint32_t param_string1; // strings table ID for %-replacement in line
+    uint32_t param_string2;
+};
+
+struct DialogueDetailsGroup
+{
+    DialogueDetails ana_spelunky;
+    DialogueDetails margaret_tunnel;
+    DialogueDetails colin_northward;
+    DialogueDetails roffy_d_sloth;
+    DialogueDetails alto_singh;
+    DialogueDetails liz_mutton;
+    DialogueDetails nekka_the_eagle;
+    DialogueDetails lise_project;
+    DialogueDetails coco_von_diamonds;
+    DialogueDetails manfred_tunnel;
+    DialogueDetails little_jay;
+    DialogueDetails tina_flan;
+    DialogueDetails valerie_crump;
+    DialogueDetails au;
+    DialogueDetails demi_von_diamonds;
+    DialogueDetails pilot;
+    DialogueDetails princess_airyn;
+    DialogueDetails dirk_yamaoka;
+    DialogueDetails guy_spelunky;
+    DialogueDetails classic_guy;
+    DialogueDetails mama_tunnel;
+};
+
+#pragma pack(push, 1) // disable struct padding because of that straggling uint8_t at the end
+struct DialogueInteraction
+{
+    bool interacted;
+    uint8_t unknown1;
+    uint8_t unknown2;
+    uint8_t unknown3;
+    uint32_t unknown4;
+    uint32_t unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7;
+    uint8_t unknown8;
+};
+#pragma pack(pop)
+
+struct DialogueInteractionGroup
+{
+    DialogueInteraction ana_spelunky;
+    DialogueInteraction margaret_tunnel;
+    DialogueInteraction colin_northward;
+    DialogueInteraction roffy_d_sloth;
+    DialogueInteraction alto_singh;
+    DialogueInteraction liz_mutton;
+    DialogueInteraction nekka_the_eagle;
+    DialogueInteraction lise_project;
+    DialogueInteraction coco_von_diamonds;
+    DialogueInteraction manfred_tunnel;
+    DialogueInteraction little_jay;
+    DialogueInteraction tina_flan;
+    DialogueInteraction valerie_crump;
+    DialogueInteraction au;
+    DialogueInteraction demi_von_diamonds;
+    DialogueInteraction pilot;
+    DialogueInteraction princess_airyn;
+    DialogueInteraction dirk_yamaoka;
+    DialogueInteraction guy_spelunky;
+    DialogueInteraction classic_guy;
+    DialogueInteraction mama_tunnel;
+};
+
+struct Dialogue
+{
+    DialogueDetailsGroup base_dialogue;
+    DialogueDetailsGroup extra_dialogue;
+    DialogueDetailsGroup win_dialogue;
+    DialogueInteractionGroup interaction1;
+    DialogueInteractionGroup interaction2;
+    uint8_t lise_calculated_victory_chance; // random number 1-100 used in the 'Calculating the change of victory on your next run' line
+    uint8_t padding1;
+    uint32_t win_flags;             // see flags.hpp ; character saved -> triggers the 'Thanks for getting me out of there' line
+    bool trigger_win_dialogue;      // set before entering basecamp
+    bool trigger_progress_dialogue; // set before entering basecamp
+    uint16_t win_related;
+    uint32_t unknown1;
+    uint32_t unknown2;
+    uint32_t unknown3;
+    uint32_t unknown4;
+    uint32_t unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7;
+    uint32_t unknown8;
+    uint32_t unknown9;
+    uint32_t unknown10;
+    uint32_t unknown11;
+    uint32_t unknown12;
+    uint32_t unknown13;
+    uint32_t unknown14;
+    uint32_t unknown15;
+    uint32_t unknown16;
+    uint32_t unknown17;
+    uint32_t unknown18;
+    uint32_t unknown19;
+    uint32_t unknown20;
+};

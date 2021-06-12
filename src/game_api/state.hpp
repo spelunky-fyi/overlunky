@@ -118,9 +118,7 @@ struct StateMemory
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
     int32_t speechbubble_owner;
-
-    char pada14[1980];
-
+    Dialogue basecamp_dialogue;
     size_t arena_choose_teams_screen;
     size_t unknown8_during_basecamp;
     size_t unknown9_during_level;
