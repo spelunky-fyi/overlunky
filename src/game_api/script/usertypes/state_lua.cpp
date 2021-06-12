@@ -107,7 +107,11 @@ void register_usertypes(sol::state& lua)
         "camera",
         &StateMemory::camera,
         "special_visibility_flags",
-        &StateMemory::special_visibility_flags);
+        &StateMemory::special_visibility_flags,
+        "cause_of_death",
+        &StateMemory::cause_of_death,
+        "cause_of_death_entity_type",
+        &StateMemory::cause_of_death_entity_type);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
@@ -184,5 +188,7 @@ void register_usertypes(sol::state& lua)
         &Camera::uniform_shake,
         "focused_entity_uid",
         &Camera::focused_entity_uid);
+
+    lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 }
 }; // namespace NState

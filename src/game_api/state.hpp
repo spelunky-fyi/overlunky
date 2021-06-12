@@ -107,11 +107,11 @@ struct StateMemory
     int32_t hud_flags;
     uint32_t presence_flags;
     uint32_t coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
-    bool player_died;
+    uint8_t cause_of_death;
     uint8_t padding10;
     uint8_t padding11;
     uint8_t padding12;
-    uint32_t cause_of_death;       // entity type
+    uint32_t cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
     size_t toast;
     size_t speechbubble;
