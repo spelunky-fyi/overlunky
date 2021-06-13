@@ -14,7 +14,7 @@ The following Lua libraries and their functions are available. You can read more
 ### `coroutine`
 ### `package`
 ### `debug`
-### `inspect`
+### `json`
 To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
 ```Lua
 local some_mod_data_that_should_be_saved = {{
@@ -486,6 +486,21 @@ Read input
 ### [`read_stolen_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
 `nil read_stolen_input(int uid)`<br/>
 Read input that has been previously stolen with steal_input
+### [`clear_entity_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_entity_callback)
+`nil clear_entity_callback(int uid, CallbackId cb_id)`<br/>
+Clears a callback that is specific to an entity.
+### [`set_pre_statemachine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_statemachine)
+`optional<CallbackId> set_pre_statemachine(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Movable` or else stuff will break.
+Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
+Use this only when no other approach works, this call can be expensive if overused.
+### [`set_post_statemachine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_statemachine)
+`optional<CallbackId> set_post_statemachine(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Movable` or else stuff will break.
+Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+Use this only when no other approach works, this call can be expensive if overused.
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 `nil get_particle_type()`<br/>
 Runs on every screen frame. You need this to use draw functions.

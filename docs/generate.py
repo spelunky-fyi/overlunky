@@ -254,7 +254,7 @@ print('## Lua libraries')
 print('The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6).')
 for lib in lualibs:
     print('### `' + lib + '`')
-print('### `inspect`')
+print('### `json`')
 print("""To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
 ```Lua
 local some_mod_data_that_should_be_saved = {{

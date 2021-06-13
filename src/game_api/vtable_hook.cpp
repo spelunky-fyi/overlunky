@@ -46,9 +46,10 @@ void* register_hook_function(void*** vtable, size_t index, void* hook_function)
         g_TableHooks.push_back({*vtable});
         vtable_hook = &g_TableHooks.back();
     }
-    if (get_vfunction_hook(*vtable_hook, index))
+    if (auto* existing_hook = get_vfunction_hook(*vtable_hook, index))
     {
         DEBUG("Multiple hooks to the same function are not allowed...");
+        return existing_hook->original_function;
     }
     else
     {
