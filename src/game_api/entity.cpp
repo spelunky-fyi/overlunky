@@ -10,6 +10,7 @@
 #include "rpc.hpp"
 #include "state.hpp"
 #include "texture.hpp"
+#include "vtable_hook.hpp"
 
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
@@ -365,6 +366,24 @@ bool Movable::is_button_held(uint32_t button)
 bool Movable::is_button_released(uint32_t button)
 {
     return (buttons & button) == 0 && (buttons & (button << 8)) != 0;
+}
+
+void Movable::set_statemachine_callbacks(std::function<bool(Movable*)> pre_state_machine, std::function<void(Movable*)> post_state_machine)
+{
+    hook_vtable<void(Movable*)>(
+        this,
+        [pre_state_machine = std::move(pre_state_machine), post_state_machine = std::move(post_state_machine)](Movable* self, void (*original)(Movable*))
+        {
+            if (pre_state_machine == nullptr || !pre_state_machine(self))
+            {
+                original(self);
+                if (post_state_machine)
+                {
+                    post_state_machine(self);
+                }
+            }
+        },
+        0x24);
 }
 
 uint8_t Olmec::broken_floaters()

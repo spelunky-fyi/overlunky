@@ -232,6 +232,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Movable::is_button_released,
         "price",
         &Movable::price,
+        "set_statemachine_callbacks",
+        &Movable::set_statemachine_callbacks,
         sol::base_classes,
         sol::bases<Entity>());
     /* Movable

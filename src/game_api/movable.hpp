@@ -3,6 +3,8 @@
 #include "entity.hpp"
 #include "state_structs.hpp"
 
+#include <functional>
+
 class Movable : public Entity
 {
   public:
@@ -106,6 +108,8 @@ class Movable : public Entity
     bool is_button_pressed(uint32_t button);
     bool is_button_held(uint32_t button);
     bool is_button_released(uint32_t button);
+
+    void set_statemachine_callbacks(std::function<bool(Movable*)> pre_state_machine, std::function<void(Movable*)> post_state_machine);
 };
 
 class Monster : public Movable

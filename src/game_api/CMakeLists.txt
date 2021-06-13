@@ -1,4 +1,6 @@
 add_library(spel2_api STATIC
+        vtable_hook.cpp
+        vtable_hook.hpp
         character_def.cpp
         character_def.hpp
         game_allocator.cpp
