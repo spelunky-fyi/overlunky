@@ -794,6 +794,7 @@ end
 - [`as_chasingmonster`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_chasingmonster) &Entity::as&lt;ChasingMonster&gt;
 - [`as_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_ghost) &Entity::as&lt;Ghost&gt;
 - [`as_jiangshi`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_jiangshi) &Entity::as&lt;Jiangshi&gt;
+- [`as_kapala_powerup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_kapala_powerup) &Entity::as&lt;KapalaPowerup&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -897,6 +898,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 ### `Jiangshi`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`ChasingMonster`](#chasingmonster)
 - [`wait_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wait_timer) &Jiangshi::wait_timer
+### `KapalaPowerup`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`amount_of_blood`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=amount_of_blood) &KapalaPowerup::amount_of_blood
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
