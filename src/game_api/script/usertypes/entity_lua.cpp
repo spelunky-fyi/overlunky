@@ -21,7 +21,9 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "kills_level",
         &Inventory::kills_level,
         "kills_total",
-        &Inventory::kills_total);
+        &Inventory::kills_total,
+        "collected_money_total",
+        &Inventory::collected_money_total);
     lua.new_usertype<Animation>(
         "Animation",
         "first_tile",
