@@ -637,6 +637,41 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         return (uint16_t)0;
     };
 
+    /// Clears a callback that is specific to an entity.
+    lua["clear_entity_callback"] = [this](int uid, CallbackId cb_id)
+    {
+        clear_entity_hooks.push_back({uid, cb_id});
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// `uid` has to be the uid of a `Movable` or else stuff will break.
+    /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_pre_statemachine"] = [this](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
+        {
+            std::uint32_t id = movable->set_pre_statemachine([this, fun = std::move(fun)](Movable* self)
+                                                             { return handle_function_with_return<bool>(fun, self).value_or(false); });
+            entity_hooks.push_back({uid, id});
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// `uid` has to be the uid of a `Movable` or else stuff will break.
+    /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_post_statemachine"] = [this](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
+        {
+            std::uint32_t id = movable->set_post_statemachine([this, fun = std::move(fun)](Movable* self)
+                                                              { handle_function(fun, self); });
+            entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+
     NSound::register_usertypes(lua, this);
     NLevel::register_usertypes(lua, this);
     NGui::register_usertypes(lua, this);
@@ -764,6 +799,14 @@ void ScriptImpl::clear()
         sound_manager->clear_callback(id);
     }
     vanilla_sound_callbacks.clear();
+    for (auto& [ent_uid, id] : entity_hooks)
+    {
+        if (Entity* ent = get_entity_ptr(ent_uid))
+        {
+            ent->unhook(id);
+        }
+    }
+    entity_hooks.clear();
     options.clear();
     required_scripts.clear();
     lua["on_guiframe"] = sol::lua_nil;
@@ -906,6 +949,8 @@ bool ScriptImpl::run()
             }
             if (on_level)
                 on_level.value()();
+            entity_hooks.clear();
+            clear_entity_hooks.clear();
         }
         if (g_state->screen == 13 && state.screen != 13)
         {
@@ -945,6 +990,20 @@ bool ScriptImpl::run()
             }
         }
         clear_callbacks.clear();
+
+        for (auto& [ent_uid, id] : clear_entity_hooks)
+        {
+            auto it = std::find(entity_hooks.begin(), entity_hooks.end(), std::pair{ent_uid, id});
+            if (it != entity_hooks.end())
+            {
+                if (Entity* ent = get_entity_ptr(ent_uid))
+                {
+                    ent->unhook(id);
+                }
+                entity_hooks.erase(it);
+            }
+        }
+        clear_entity_hooks.clear();
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {

@@ -2,14 +2,16 @@
 
 #include "memory.hpp"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
-struct VFunctionHook {
+struct VFunctionHook
+{
     std::size_t vtable_index;
     void* original_function;
 };
-struct VTableHook {
+struct VTableHook
+{
     void** vtable;
     std::vector<VFunctionHook> functions;
 };
@@ -17,7 +19,8 @@ std::vector<VTableHook> g_TableHooks;
 
 VTableHook* get_vtable_hook(void** vtable)
 {
-    auto it = std::find_if(g_TableHooks.begin(), g_TableHooks.end(), [vtable](const VTableHook& hook) { return hook.vtable == vtable; });
+    auto it = std::find_if(g_TableHooks.begin(), g_TableHooks.end(), [vtable](const VTableHook& hook)
+                           { return hook.vtable == vtable; });
     if (it != g_TableHooks.end())
     {
         return &*it;
@@ -26,7 +29,8 @@ VTableHook* get_vtable_hook(void** vtable)
 }
 VFunctionHook* get_vfunction_hook(VTableHook& vtable_hook, size_t index)
 {
-    auto it = std::find_if(vtable_hook.functions.begin(), vtable_hook.functions.end(), [index](const VFunctionHook& hook) { return hook.vtable_index == index; });
+    auto it = std::find_if(vtable_hook.functions.begin(), vtable_hook.functions.end(), [index](const VFunctionHook& hook)
+                           { return hook.vtable_index == index; });
     if (it != vtable_hook.functions.end())
     {
         return &*it;
@@ -39,7 +43,7 @@ void* register_hook_function(void*** vtable, size_t index, void* hook_function)
     VTableHook* vtable_hook = get_vtable_hook(*vtable);
     if (vtable_hook == nullptr)
     {
-        g_TableHooks.push_back({ *vtable });
+        g_TableHooks.push_back({*vtable});
         vtable_hook = &g_TableHooks.back();
     }
     if (get_vfunction_hook(*vtable_hook, index))
@@ -58,7 +62,7 @@ void* register_hook_function(void*** vtable, size_t index, void* hook_function)
 
         void* original_function = vtable_ptr;
         vtable_ptr = hook_function;
-        vtable_hook->functions.push_back({ index, original_function });
+        vtable_hook->functions.push_back({index, original_function});
         return original_function;
     }
 }

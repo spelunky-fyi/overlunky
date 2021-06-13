@@ -109,7 +109,8 @@ class Movable : public Entity
     bool is_button_held(uint32_t button);
     bool is_button_released(uint32_t button);
 
-    void set_statemachine_callbacks(std::function<bool(Movable*)> pre_state_machine, std::function<void(Movable*)> post_state_machine);
+    std::uint32_t set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine);
+    std::uint32_t set_post_statemachine(std::function<void(Movable*)> post_state_machine);
 };
 
 class Monster : public Movable

@@ -245,6 +245,9 @@ class Entity
     std::uint32_t get_texture();
     bool set_texture(std::uint32_t texture_id);
 
+    void unhook(std::uint32_t id);
+    struct EntityHooksInfo& get_hooks();
+
     template <typename T>
     T* as()
     {

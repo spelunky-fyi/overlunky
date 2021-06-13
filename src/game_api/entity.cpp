@@ -14,6 +14,21 @@
 
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
+template <class FunT>
+struct HookWithId
+{
+    std::uint32_t id;
+    std::function<FunT> fun;
+};
+struct EntityHooksInfo
+{
+    void* entity;
+    std::uint32_t cbcount;
+    std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
+    std::vector<HookWithId<void(Movable*)>> post_statemachine;
+};
+std::vector<EntityHooksInfo> g_entity_hooks;
+
 size_t cache_entities_ptr = 0;
 
 size_t entities_offset()
@@ -368,24 +383,55 @@ bool Movable::is_button_released(uint32_t button)
     return (buttons & button) == 0 && (buttons & (button << 8)) != 0;
 }
 
-void Movable::set_statemachine_callbacks(std::function<bool(Movable*)> pre_state_machine, std::function<void(Movable*)> post_state_machine)
+void hook_movable_state_machine(Movable* self)
 {
     hook_vtable<void(Movable*)>(
-        this,
-        [pre_state_machine = std::move(pre_state_machine), post_state_machine = std::move(post_state_machine)](Movable* self, void (*original)(Movable*))
+        self,
+        [](Movable* self, void (*original)(Movable*))
         {
-            if (pre_state_machine == nullptr || !pre_state_machine(self))
+            EntityHooksInfo& hook_info = self->get_hooks();
+
+            bool skip_orig = false;
+            for (auto& [id, pre] : hook_info.pre_statemachine)
+            {
+                if (pre(self))
+                {
+                    skip_orig = true;
+                }
+            }
+
+            if (!skip_orig)
             {
                 original(self);
-                if (post_state_machine)
-                {
-                    post_state_machine(self);
-                }
+            }
+
+            for (auto& [id, post] : hook_info.post_statemachine)
+            {
+                post(self);
             }
         },
         0x24);
 }
-
+std::uint32_t Movable::set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.post_statemachine.empty() && hook_info.post_statemachine.empty())
+    {
+        hook_movable_state_machine(this);
+    }
+    hook_info.pre_statemachine.push_back({hook_info.cbcount++, std::move(pre_state_machine)});
+    return hook_info.pre_statemachine.back().id;
+}
+std::uint32_t Movable::set_post_statemachine(std::function<void(Movable*)> post_state_machine)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.post_statemachine.empty() && hook_info.post_statemachine.empty())
+    {
+        hook_movable_state_machine(this);
+    }
+    hook_info.post_statemachine.push_back({hook_info.cbcount++, std::move(post_state_machine)});
+    return hook_info.post_statemachine.back().id;
+}
 uint8_t Olmec::broken_floaters()
 {
     static auto olmec_floater_id = to_id("ENT_TYPE_FX_OLMECPART_FLOATER");
@@ -441,4 +487,31 @@ bool Entity::set_texture(std::uint32_t texture_id)
         return true;
     }
     return false;
+}
+
+void Entity::unhook(std::uint32_t id)
+{
+    auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
+                           { return hook.entity == this; });
+    if (it != g_entity_hooks.end())
+    {
+        std::erase_if(it->pre_statemachine, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->post_statemachine, [id](auto& hook)
+                      { return hook.id == id; });
+    }
+}
+EntityHooksInfo& Entity::get_hooks()
+{
+    auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
+                           { return hook.entity == this; });
+    if (it == g_entity_hooks.end())
+    {
+        hook_dtor(this, [](void* self)
+                  { std::erase_if(g_entity_hooks, [self](auto& hook)
+                                  { return hook.entity == self; }); });
+        g_entity_hooks.push_back({this});
+        return g_entity_hooks.back();
+    }
+    return *it;
 }

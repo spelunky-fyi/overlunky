@@ -177,6 +177,8 @@ class ScriptImpl
     std::vector<LevelGenCallback> pre_level_gen_callbacks;
     std::vector<LevelGenCallback> post_level_gen_callbacks;
     std::vector<int> clear_callbacks;
+    std::vector<std::pair<int, std::uint32_t>> entity_hooks;
+    std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
     std::vector<std::string> required_scripts;
     std::map<int, ScriptInput*> script_input;
     std::set<std::string> windows;
