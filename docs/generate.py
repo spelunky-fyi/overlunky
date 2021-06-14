@@ -4,7 +4,7 @@ import re
 import sys
 sys.stdout = open('script-api.md', 'w')
 
-header_files = ['../src/game_api/rpc.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
+header_files = ['../src/game_api/rpc.hpp', '../src/game_api/spawn_api.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
 api_files = [
         '../src/game_api/script/script_impl.cpp',
         '../src/game_api/script/script_impl.hpp',

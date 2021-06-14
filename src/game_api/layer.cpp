@@ -30,7 +30,7 @@ LoadItemOver get_load_item_over()
     ONCE(LoadItemOver)
     {
         auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xBA\x51\x00\x00\x00\x48\x8B"s, memory.after_bundle);
+        auto off = find_inst(memory.exe(), " BA 51 00 00 00 48 8B"s, memory.after_bundle);
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
         return res = (LoadItemOver)memory.at_exe(decode_call(off));

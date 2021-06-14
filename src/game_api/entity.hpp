@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <map>
 #include <string>
 #include <string_view>
@@ -247,6 +248,8 @@ class Entity
 
     void unhook(std::uint32_t id);
     struct EntityHooksInfo& get_hooks();
+
+    std::uint32_t set_on_destroy(std::function<void(Entity*)> cb);
 
     template <typename T>
     T* as()

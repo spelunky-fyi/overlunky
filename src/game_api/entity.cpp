@@ -8,6 +8,7 @@
 #include "logger.h"
 #include "render_api.hpp"
 #include "rpc.hpp"
+#include "spawn_api.hpp"
 #include "state.hpp"
 #include "texture.hpp"
 #include "vtable_hook.hpp"
@@ -24,6 +25,7 @@ struct EntityHooksInfo
 {
     void* entity;
     std::uint32_t cbcount;
+    std::vector<HookWithId<void(Entity*)>> on_destroy;
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
     std::vector<HookWithId<void(Movable*)>> post_statemachine;
 };
@@ -499,6 +501,8 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->post_statemachine, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->on_destroy, [id](auto& hook)
+                      { return hook.id == id; });
     }
 }
 EntityHooksInfo& Entity::get_hooks()
@@ -508,10 +512,26 @@ EntityHooksInfo& Entity::get_hooks()
     if (it == g_entity_hooks.end())
     {
         hook_dtor(this, [](void* self)
-                  { std::erase_if(g_entity_hooks, [self](auto& hook)
-                                  { return hook.entity == self; }); });
+                  {
+                      auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
+                                             { return hook.entity == self; });
+                      if (it != g_entity_hooks.end())
+                      {
+                          for (auto& cb : it->on_destroy)
+                          {
+                              cb.fun((Entity*)self);
+                          }
+                      }
+                  });
         g_entity_hooks.push_back({this});
         return g_entity_hooks.back();
     }
     return *it;
+}
+
+std::uint32_t Entity::set_on_destroy(std::function<void(Entity*)> cb)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    hook_info.on_destroy.push_back({hook_info.cbcount++, std::move(cb)});
+    return hook_info.on_destroy.back().id;
 }

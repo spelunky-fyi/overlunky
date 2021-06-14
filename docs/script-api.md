@@ -232,6 +232,17 @@ Spawn a door to backlayer.
 ### [`layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_door)
 `nil layer_door(float x, float y)`<br/>
 Short for [spawn_layer_door](#spawn_layer_door).
+### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
+`CallbackId set_pre_entity_spawn(function cb, int mask, variadic_args entity_types)`<br/>
+Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
+In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+### [`set_post_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_entity_spawn)
+`CallbackId set_post_entity_spawn(function cb, int mask, variadic_args entity_types)`<br/>
+Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
+The callback signature is `nil post_entity_spawn(entity)`
 ### [`warp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=warp)
 `nil warp(int w, int l, int t)`<br/>
 Warp to a level immediately.

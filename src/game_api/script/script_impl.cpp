@@ -9,6 +9,7 @@
 #include "rpc.hpp"
 #include "script_util.hpp"
 #include "sound_manager.hpp"
+#include "spawn_api.hpp"
 #include "state.hpp"
 
 #include "usertypes/drops_lua.hpp"
@@ -355,6 +356,44 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["spawn_layer_door"] = spawn_backdoor_abs;
     /// Short for [spawn_layer_door](#spawn_layer_door).
     lua["layer_door"] = spawn_backdoor_abs;
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
+    /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+    lua["set_pre_entity_spawn"] = [this](sol::function cb, int mask, sol::variadic_args entity_types) -> CallbackId
+    {
+        std::vector<uint32_t> types;
+        sol::type va_type = entity_types.get_type();
+        if (va_type == sol::type::number)
+        {
+            types = std::vector<uint32_t>(entity_types.begin(), entity_types.end());
+        }
+        else if (va_type == sol::type::table)
+        {
+            types = entity_types.get<std::vector<uint32_t>>(0);
+        }
+        pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), std::move(cb)});
+        return cbcount++;
+    };
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
+    /// The callback signature is `nil post_entity_spawn(entity)`
+    lua["set_post_entity_spawn"] = [this](sol::function cb, int mask, sol::variadic_args entity_types) -> CallbackId
+    {
+        std::vector<uint32_t> types;
+        sol::type va_type = entity_types.get_type();
+        if (va_type == sol::type::number)
+        {
+            types = std::vector<uint32_t>(entity_types.begin(), entity_types.end());
+        }
+        else if (va_type == sol::type::table)
+        {
+            types = entity_types.get<std::vector<uint32_t>>(0);
+        }
+        post_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), std::move(cb)});
+        return cbcount++;
+    };
+
     /// Warp to a level immediately.
     lua["warp"] = warp;
     /// Set seed and reset run.
@@ -652,6 +691,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         {
             std::uint32_t id = movable->set_pre_statemachine([this, fun = std::move(fun)](Movable* self)
                                                              { return handle_function_with_return<bool>(fun, self).value_or(false); });
+            hook_entity_dtor(movable);
             entity_hooks.push_back({uid, id});
         }
         return sol::nullopt;
@@ -666,6 +706,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         {
             std::uint32_t id = movable->set_post_statemachine([this, fun = std::move(fun)](Movable* self)
                                                               { handle_function(fun, self); });
+            hook_entity_dtor(movable);
             entity_hooks.push_back({uid, id});
             return id;
         }
@@ -806,7 +847,16 @@ void ScriptImpl::clear()
             ent->unhook(id);
         }
     }
+    for (auto& [ent_uid, id] : entity_dtor_hooks)
+    {
+        if (Entity* ent = get_entity_ptr(ent_uid))
+        {
+            ent->unhook(id);
+        }
+    }
     entity_hooks.clear();
+    clear_entity_hooks.clear();
+    entity_dtor_hooks.clear();
     options.clear();
     required_scripts.clear();
     lua["on_guiframe"] = sol::lua_nil;
@@ -949,8 +999,6 @@ bool ScriptImpl::run()
             }
             if (on_level)
                 on_level.value()();
-            entity_hooks.clear();
-            clear_entity_hooks.clear();
         }
         if (g_state->screen == 13 && state.screen != 13)
         {
@@ -975,19 +1023,14 @@ bool ScriptImpl::run()
             callbacks.erase(id);
             load_callbacks.erase(id);
 
-            {
-                auto it = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
-                                       { return cb.id == id; });
-                if (it != pre_level_gen_callbacks.end())
-                    pre_level_gen_callbacks.erase(it);
-            }
-
-            {
-                auto it = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
-                                       { return cb.id == id; });
-                if (it != post_level_gen_callbacks.end())
-                    post_level_gen_callbacks.erase(it);
-            }
+            std::erase_if(pre_level_gen_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
+            std::erase_if(post_level_gen_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
+            std::erase_if(pre_entity_spawn_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
+            std::erase_if(post_entity_spawn_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
         }
         clear_callbacks.clear();
 
@@ -1319,6 +1362,59 @@ void ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float
             handle_function(callback.func, x, y, layer);
         }
     }
+}
+
+Entity* ScriptImpl::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay)
+{
+    if (!enabled)
+        return nullptr;
+
+    for (auto& callback : pre_entity_spawn_callbacks)
+    {
+        bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
+        bool match = mask_match && std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
+        if (match)
+        {
+            if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay))
+            {
+                return get_entity_ptr(spawn_replacement.value());
+            }
+        }
+    }
+    return nullptr;
+}
+void ScriptImpl::post_entity_spawn(Entity* entity)
+{
+    if (!enabled)
+        return;
+
+    for (auto& callback : post_entity_spawn_callbacks)
+    {
+        bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
+        bool match = mask_match && (callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0);
+        if (match)
+        {
+            handle_function(callback.func, entity);
+        }
+    }
+}
+
+void ScriptImpl::hook_entity_dtor(Entity* entity)
+{
+    if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)
+                      { return dtor_hook.first == entity->uid; }) == 0)
+    {
+        std::uint32_t dtor_hook_id = entity->set_on_destroy([this](Entity* entity)
+                                                            { pre_entity_destroyed(entity); });
+        entity_dtor_hooks.push_back({entity->uid, dtor_hook_id});
+    }
+}
+void ScriptImpl::pre_entity_destroyed(Entity* entity)
+{
+    std::erase_if(entity_hooks, [entity](auto& hook)
+                  { return hook.first == entity->uid; });
+    std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
+                  { return dtor_hook.first == entity->uid; });
 }
 
 std::string ScriptImpl::dump_api()

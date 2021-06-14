@@ -127,6 +127,14 @@ struct LevelGenCallback
     sol::function func;
 };
 
+struct EntitySpawnCallback
+{
+    int id;
+    int entity_mask;
+    std::vector<uint32_t> entity_types;
+    sol::function func;
+};
+
 using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>; // NoAlias
 
 struct ScriptState
@@ -176,9 +184,12 @@ class ScriptImpl
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_level_gen_callbacks;
     std::vector<LevelGenCallback> post_level_gen_callbacks;
+    std::vector<EntitySpawnCallback> pre_entity_spawn_callbacks;
+    std::vector<EntitySpawnCallback> post_entity_spawn_callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::pair<int, std::uint32_t>> entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
+    std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
     std::vector<std::string> required_scripts;
     std::map<int, ScriptInput*> script_input;
     std::set<std::string> windows;
@@ -217,6 +228,12 @@ class ScriptImpl
 
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+
+    Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay);
+    void post_entity_spawn(Entity* entity);
+
+    void hook_entity_dtor(Entity* entity);
+    void pre_entity_destroyed(Entity* entity);
 
     std::string dump_api();
 };

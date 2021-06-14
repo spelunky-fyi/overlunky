@@ -127,6 +127,15 @@ void SpelunkyScript::post_level_gen_spawn(std::string_view tile_code, float x, f
     m_Impl->post_level_gen_spawn(tile_code, x, y, layer);
 }
 
+Entity* SpelunkyScript::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay)
+{
+    return m_Impl->pre_entity_spawn(entity_type, x, y, layer, overlay);
+}
+void SpelunkyScript::post_entity_spawn(Entity* entity)
+{
+    m_Impl->post_entity_spawn(entity);
+}
+
 std::string SpelunkyScript::dump_api()
 {
     return m_Impl->dump_api();

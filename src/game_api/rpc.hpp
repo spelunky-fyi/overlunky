@@ -4,13 +4,6 @@
 #include <cstdint>
 #include <vector>
 
-void spawn_liquid(uint32_t entity_type, float x, float y);
-int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap);
-int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
-void spawn_backdoor(float x, float y);
-int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, float vx, float vy);
-int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t);
-void spawn_backdoor_abs(float x, float y);
 void teleport(float x, float y, bool s, float vx, float vy, bool snap);
 void godmode(bool g);
 void darkmode(bool g);
@@ -49,7 +42,6 @@ void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t);
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid);
 void set_contents(uint32_t uid, uint32_t item_entity_type);
 void entity_remove_item(uint32_t id, uint32_t item_uid);
-int32_t spawn_entity_over(uint32_t item_uid, uint32_t over_uid, float x, float y);
 bool entity_has_item_uid(uint32_t uid, uint32_t item_uid);
 bool entity_has_item_type(uint32_t uid, uint32_t entity_type);
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, uint32_t mask);
