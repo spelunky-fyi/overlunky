@@ -521,6 +521,7 @@ EntityHooksInfo& Entity::get_hooks()
                           {
                               cb.fun((Entity*)self);
                           }
+                          g_entity_hooks.erase(it);
                       }
                   });
         g_entity_hooks.push_back({this});

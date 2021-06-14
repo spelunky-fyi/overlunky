@@ -1411,10 +1411,12 @@ void ScriptImpl::hook_entity_dtor(Entity* entity)
 }
 void ScriptImpl::pre_entity_destroyed(Entity* entity)
 {
-    std::erase_if(entity_hooks, [entity](auto& hook)
-                  { return hook.first == entity->uid; });
-    std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
-                  { return dtor_hook.first == entity->uid; });
+    auto num_erased_hooks = std::erase_if(entity_hooks, [entity](auto& hook)
+                                          { return hook.first == entity->uid; });
+    assert(num_erased_hooks != 0);
+    auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
+                                          { return dtor_hook.first == entity->uid; });
+    assert(num_erased_dtors == 1);
 }
 
 std::string ScriptImpl::dump_api()
