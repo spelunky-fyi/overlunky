@@ -29,6 +29,7 @@
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
+#include "spawn_api.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
 
