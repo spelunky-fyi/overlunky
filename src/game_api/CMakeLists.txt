@@ -1,6 +1,7 @@
 add_library(spel2_api STATIC
         entity.cpp
         entity.hpp
+        entities_monsters.hpp
         items.cpp
         items.hpp
         layer.cpp

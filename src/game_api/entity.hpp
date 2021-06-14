@@ -371,6 +371,23 @@ struct Inventory
     uint8_t unknown53;
 };
 
+class SoundPosition
+{
+  public:
+    size_t __vftable;
+    float x;
+    float y;
+    size_t sound_effect_pointer; // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30); soundeffect doesn't seem to change when you pick a similar object around it
+    uint64_t fmod_param_id;      // param to FMOD::Studio::EventInstance::SetParameterByID
+    float sound_x_coord_1;
+    float sound_x_coord_2; // sometimes similar as coord_1, sometimes inverted, sometimes different
+    float unknown5;
+    float unknown6;
+    float unknown7;
+    float unknown8;
+    float unknown9;
+};
+
 #include "movable.hpp"
 
 struct Target
