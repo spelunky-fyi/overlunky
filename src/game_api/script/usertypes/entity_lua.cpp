@@ -83,7 +83,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "default_flags",
         &EntityDB::default_flags,
         "default_more_flags",
-        &EntityDB::default_more_flags);
+        &EntityDB::default_more_flags,
+        "leaves_corpse_behind",
+        &EntityDB::leaves_corpse_behind,
+        "sound_killed_by_player",
+        &EntityDB::sound_killed_by_player,
+        "sound_killed_by_other",
+        &EntityDB::sound_killed_by_other);
 
     auto overlaps_with = sol::overload(
         static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),

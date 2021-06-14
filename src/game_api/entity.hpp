@@ -90,10 +90,13 @@ struct EntityDB
     uint8_t life;
     uint8_t field_96;
     uint8_t blood_content;
-    uint8_t field_98;
+    bool leaves_corpse_behind;
+    uint8_t field_99;
+    uint8_t field_9A;
+    uint8_t field_9B;
     int32_t description;
-    int32_t field_a0;
-    int32_t field_a4;
+    int32_t sound_killed_by_player;
+    int32_t sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
     AnimationMap animations;
