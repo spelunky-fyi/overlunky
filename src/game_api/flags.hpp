@@ -126,7 +126,7 @@ const char* entity_type_properties_flags[]{
     "15: ",
     "16: ",
     "17: ",
-    "18: ",
+    "18: Can be carried through layer doors",
     "19: ",
     "20: ",
     "21: Can spawn monsters on top",
