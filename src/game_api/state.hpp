@@ -82,8 +82,9 @@ struct StateMemory
     uint8_t unknown2c;
     uint8_t unknown2d;
     uint32_t waddler_storage[99];
-    uint8_t skip1[196];
-    JournalProgression journal_progression;
+    int16_t waddler_storage_meta[99]; // to store mattock durability for example
+    uint16_t journal_progression_count;
+    JournalProgressionSlot journal_progression_slots[40];
     uint8_t skip2[844];
     ThemeProgression theme_progression;
     uint8_t unknown3;
@@ -106,20 +107,18 @@ struct StateMemory
     int32_t hud_flags;
     uint32_t presence_flags;
     uint32_t coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
-    bool player_died;
+    uint8_t cause_of_death;
     uint8_t padding10;
     uint8_t padding11;
     uint8_t padding12;
-    uint32_t cause_of_death;       // entity type
+    uint32_t cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
     size_t toast;
     size_t speechbubble;
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
     int32_t speechbubble_owner;
-
-    char pada14[1980];
-
+    Dialogue basecamp_dialogue;
     size_t arena_choose_teams_screen;
     size_t unknown8_during_basecamp;
     size_t unknown9_during_level;
@@ -150,7 +149,7 @@ struct StateMemory
     Layer* layers[2];
     Logic* logic;
     QuestsInfo* quests;
-    size_t unknown24;
+    std::unordered_map<uint32_t, int32_t>* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
     PointerList* particle_emitters; // list of ParticleEmitterInfo*
     PointerList* lightsources;      // list of Illumination*
@@ -159,14 +158,15 @@ struct StateMemory
     size_t unknown28;
     size_t unknown29;
     size_t unknown30;
-    size_t unknown31;
+    uint32_t layer_transition_effect_timer;
+    uint32_t camera_layer;
     size_t unknown32;
     size_t unknown33;
     size_t unknown34;
     size_t unknown35;
     size_t unknown36;
     uint32_t time_startup;
-    uint32_t unknown38;
+    uint32_t special_visibility_flags;
     Camera* camera;
 };
 struct State

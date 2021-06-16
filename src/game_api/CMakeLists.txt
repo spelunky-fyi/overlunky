@@ -5,6 +5,7 @@ add_library(spel2_api STATIC
         game_allocator.hpp
         entity.cpp
         entity.hpp
+        entities_monsters.hpp
         items.cpp
         items.hpp
         layer.cpp
