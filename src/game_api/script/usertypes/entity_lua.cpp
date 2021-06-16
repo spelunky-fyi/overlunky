@@ -166,7 +166,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "as_kapala_powerup",
         &Entity::as<KapalaPowerup>,
         "as_caveman",
-        &Entity::as<Caveman>);
+        &Entity::as<Caveman>,
+        "as_backpack",
+        &Entity::as<Backpack>,
+        "as_jetpack",
+        &Entity::as<Jetpack>,
+        "as_hoverpack",
+        &Entity::as<Hoverpack>);
     /* Entity
             bool overlaps_with(Entity other)
             bool set_texture(uint32_t texture_id)
@@ -358,6 +364,28 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Caveman::aggro_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Backpack>(
+        "Backpack",
+        "explosion_trigger",
+        &Backpack::explosion_trigger,
+        "explosion_timer",
+        &Backpack::explosion_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+    lua.new_usertype<Jetpack>(
+        "Jetpack",
+        "flame_on",
+        &Jetpack::flame_on,
+        "fuel",
+        &Jetpack::fuel,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Backpack>());
+    lua.new_usertype<Hoverpack>(
+        "Hoverpack",
+        "is_on",
+        &Hoverpack::is_on,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Backpack>());
 
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1
