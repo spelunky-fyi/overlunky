@@ -164,7 +164,9 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "as_jiangshi",
         &Entity::as<Jiangshi>,
         "as_kapala_powerup",
-        &Entity::as<KapalaPowerup>);
+        &Entity::as<KapalaPowerup>,
+        "as_caveman",
+        &Entity::as<Caveman>);
     /* Entity
             bool overlaps_with(Entity other)
             bool set_texture(uint32_t texture_id)
@@ -330,6 +332,22 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Jiangshi", "wait_timer", &Jiangshi::wait_timer, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<KapalaPowerup>(
         "KapalaPowerup", "amount_of_blood", &KapalaPowerup::amount_of_blood, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Caveman>(
+        "Caveman",
+        "chatting_to_uid",
+        &Caveman::chatting_to_uid,
+        "walk_pause_timer",
+        &Caveman::walk_pause_timer,
+        "chatting_timer",
+        &Caveman::chatting_timer,
+        "wake_up_timer",
+        &Caveman::wake_up_timer,
+        "can_pick_up_timer",
+        &Caveman::can_pick_up_timer,
+        "aggro_timer",
+        &Caveman::aggro_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
 
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1

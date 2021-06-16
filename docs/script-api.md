@@ -795,10 +795,10 @@ end
 - [`as_olmec_floater`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec_floater) &Entity::as&lt;OlmecFloater&gt;
 - [`as_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_cape) &Entity::as&lt;Cape&gt;
 - [`as_vlads_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_vlads_cape) &Entity::as&lt;VladsCape&gt;
-- [`as_chasingmonster`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_chasingmonster) &Entity::as&lt;ChasingMonster&gt;
 - [`as_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_ghost) &Entity::as&lt;Ghost&gt;
 - [`as_jiangshi`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_jiangshi) &Entity::as&lt;Jiangshi&gt;
 - [`as_kapala_powerup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_kapala_powerup) &Entity::as&lt;KapalaPowerup&gt;
+- [`as_caveman`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_caveman) &Entity::as&lt;Caveman&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -838,15 +838,16 @@ Derived from [`Entity`](#entity)
 - [`price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) &Movable::price
 ### `Monster`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
+- [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Ghost::chased_target_uid
+- [`target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Ghost::target_selection_timer
 ### `Player`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr
 - [`emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Player::emitted_light
 - [`set_jetpack_fuel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) &Player::set_jetpack_fuel
 - [`kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Player::kapala_blood_amount
 ### `Mount`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
 - [`tame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tame) &Mount::tame
 ### `Bomb`
@@ -891,20 +892,24 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `VladsCape`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
 - [`can_double_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_double_jump) &VladsCape::can_double_jump
-### `ChasingMonster`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
-- [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Ghost::chased_target_uid
-- [`target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Ghost::target_selection_timer
 ### `Ghost`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`ChasingMonster`](#chasingmonster)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`split_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split_timer) &Ghost::split_timer
 - [`velocity_multiplier`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_multiplier) &Ghost::velocity_multiplier
 ### `Jiangshi`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`ChasingMonster`](#chasingmonster)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`wait_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wait_timer) &Jiangshi::wait_timer
 ### `KapalaPowerup`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`amount_of_blood`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=amount_of_blood) &KapalaPowerup::amount_of_blood
+### `Caveman`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+- [`chatting_to_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chatting_to_uid) &Caveman::chatting_to_uid
+- [`walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &Caveman::walk_pause_timer
+- [`chatting_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chatting_timer) &Caveman::chatting_timer
+- [`wake_up_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wake_up_timer) &Caveman::wake_up_timer
+- [`can_pick_up_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_pick_up_timer) &Caveman::can_pick_up_timer
+- [`aggro_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aggro_timer) &Caveman::aggro_timer
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
