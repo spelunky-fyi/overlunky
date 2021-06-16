@@ -893,8 +893,8 @@ Derived from [`Entity`](#entity)
 - [`price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) &Movable::price
 ### `Monster`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Ghost::chased_target_uid
-- [`target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Ghost::target_selection_timer
+- [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Monster::chased_target_uid
+- [`target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Monster::target_selection_timer
 ### `Player`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr

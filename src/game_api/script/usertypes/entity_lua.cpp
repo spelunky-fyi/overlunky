@@ -255,9 +255,9 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua.new_usertype<Monster>(
         "Monster",
         "chased_target_uid",
-        &Ghost::chased_target_uid,
+        &Monster::chased_target_uid,
         "target_selection_timer",
-        &Ghost::target_selection_timer,
+        &Monster::target_selection_timer,
         sol::base_classes,
         sol::bases<Entity, Movable>());
     lua.new_usertype<Player>(
