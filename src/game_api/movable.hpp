@@ -114,8 +114,8 @@ class Player : public Movable
     std::map<int64_t, int64_t> inside;
     Inventory* inventory_ptr;
     Illumination* emitted_light;
-    int32_t i148;
-    int32_t i14c;
+    int32_t linked_companion_child;  // entity uid
+    int32_t linked_companion_parent; // entity uid
     size_t ai_func;
     size_t input_ptr;
     size_t p160;
@@ -189,14 +189,30 @@ class Mount : public Movable
     void tame(bool value);
 };
 
-class Jetpack : public Movable
+class Backpack : public Movable
 {
   public:
-    int32_t unknown1;
-    int32_t unknown2;
-    int32_t unknown3;
-    int32_t unknown4;
-    uint8_t fuel; // only set the fuel for an equipped jetpack (player->items)!
+    bool explosion_trigger;
+    uint8_t explosion_timer; // counts from 0 to 30
+    uint16_t unknown1;
+    uint32_t unknown2;
+};
+
+class Jetpack : public Backpack
+{
+  public:
+    bool flame_on; // Can be used as is_on
+    uint8_t unknown1;
+    uint16_t unknown2;
+    uint32_t fly_time; // it's per level, not even per jatpack lol, it also adds at when it explodes
+    uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
+};
+
+class Hoverpack : public Backpack
+{
+  public:
+    SoundPosition* sound_pos;
+    bool is_on;
 };
 
 class Bomb : public Movable

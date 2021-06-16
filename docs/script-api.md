@@ -854,6 +854,9 @@ end
 - [`as_jiangshi`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_jiangshi) &Entity::as&lt;Jiangshi&gt;
 - [`as_kapala_powerup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_kapala_powerup) &Entity::as&lt;KapalaPowerup&gt;
 - [`as_caveman`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_caveman) &Entity::as&lt;Caveman&gt;
+- [`as_backpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_backpack) &Entity::as&lt;Backpack&gt;
+- [`as_jetpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_jetpack) &Entity::as&lt;Jetpack&gt;
+- [`as_hoverpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_hoverpack) &Entity::as&lt;Hoverpack&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -893,8 +896,8 @@ Derived from [`Entity`](#entity)
 - [`price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) &Movable::price
 ### `Monster`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Ghost::chased_target_uid
-- [`target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Ghost::target_selection_timer
+- [`chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Monster::chased_target_uid
+- [`target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Monster::target_selection_timer
 ### `Player`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr
@@ -970,6 +973,17 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`wake_up_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wake_up_timer) &Caveman::wake_up_timer
 - [`can_pick_up_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_pick_up_timer) &Caveman::can_pick_up_timer
 - [`aggro_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aggro_timer) &Caveman::aggro_timer
+### `Backpack`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`explosion_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_trigger) &Backpack::explosion_trigger
+- [`explosion_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) &Backpack::explosion_timer
+### `Jetpack`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
+- [`flame_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_on) &Jetpack::flame_on
+- [`fuel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuel) &Jetpack::fuel
+### `Hoverpack`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
+- [`is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &Hoverpack::is_on
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
