@@ -857,6 +857,7 @@ end
 - [`as_backpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_backpack) &Entity::as&lt;Backpack&gt;
 - [`as_jetpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_jetpack) &Entity::as&lt;Jetpack&gt;
 - [`as_hoverpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_hoverpack) &Entity::as&lt;Hoverpack&gt;
+- [`as_walltorchflame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_walltorchflame) &Entity::as&lt;WalltorchFlame&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -984,6 +985,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 ### `Hoverpack`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 - [`is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &Hoverpack::is_on
+### `WalltorchFlame`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &WalltorchFlame::emitted_light
+- [`flare_up_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flare_up_size) &WalltorchFlame::flare_up_size
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min

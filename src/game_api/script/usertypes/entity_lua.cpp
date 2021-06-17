@@ -1,6 +1,8 @@
 #include "entity_lua.hpp"
 
+#include "entities_items.hpp"
 #include "entities_monsters.hpp"
+#include "entities_mounts.hpp"
 #include "entity.hpp"
 #include "script/script_impl.hpp"
 
@@ -172,7 +174,9 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "as_jetpack",
         &Entity::as<Jetpack>,
         "as_hoverpack",
-        &Entity::as<Hoverpack>);
+        &Entity::as<Hoverpack>,
+        "as_walltorchflame",
+        &Entity::as<WalltorchFlame>);
     /* Entity
             bool overlaps_with(Entity other)
             bool set_texture(uint32_t texture_id)
@@ -386,6 +390,14 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Hoverpack::is_on,
         sol::base_classes,
         sol::bases<Entity, Movable, Backpack>());
+    lua.new_usertype<WalltorchFlame>(
+        "WalltorchFlame",
+        "emitted_light",
+        &WalltorchFlame::emitted_light,
+        "flare_up_size",
+        &WalltorchFlame::flare_up_size,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
 
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1
