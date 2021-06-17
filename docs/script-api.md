@@ -1008,9 +1008,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 - [`ver_deflection_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ver_deflection_2) &ParticleDB::ver_deflection_2
 - [`hor_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hor_velocity) &ParticleDB::hor_velocity
 - [`ver_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ver_velocity) &ParticleDB::ver_velocity
-- [`cyan`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cyan) &ParticleDB::cyan
-- [`magenta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magenta) &ParticleDB::magenta
-- [`yellow`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yellow) &ParticleDB::yellow
+- [`red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &ParticleDB::red
+- [`green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &ParticleDB::green
+- [`blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &ParticleDB::blue
 - [`permanent`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=permanent) &ParticleDB::permanent
 - [`invisible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invisible) &ParticleDB::invisible
 - [`get_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &ParticleDB::get_texture
