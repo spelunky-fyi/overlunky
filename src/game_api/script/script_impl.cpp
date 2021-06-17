@@ -12,8 +12,10 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 
+#include "usertypes/char_state.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entity_lua.hpp"
+#include "usertypes/flags_lua.hpp"
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/level_lua.hpp"
 #include "usertypes/particles_lua.hpp"
@@ -600,10 +602,16 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["set_journal_enabled"] = set_journal_enabled;
     /// Returns how many of a specific entity type Waddler has stored
     lua["waddler_count_entity"] = waddler_count_entity;
-    /// Store an entity type in Waddler's storage. Returns false when storage is full and the item couldn't be stored.
+    /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
     lua["waddler_store_entity"] = waddler_store_entity;
     /// Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
     lua["waddler_remove_entity"] = waddler_remove_entity;
+    /// Gets the 16-bit meta-value associated with the entity type in the associated slot
+    lua["waddler_get_entity_meta"] = waddler_get_entity_meta;
+    /// Sets the 16-bit meta-value associated with the entity type in the associated slot
+    lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
+    /// Gets the entity type of the item in the provided slot
+    lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b) -> float
@@ -772,6 +780,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NState::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
+    NCharacterState::register_usertypes(lua);
+    NEntityFlags::register_usertypes(lua);
 
     lua.create_named_table(
         "ON",

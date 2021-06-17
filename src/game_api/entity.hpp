@@ -91,10 +91,13 @@ struct EntityDB
     uint8_t life;
     uint8_t field_96;
     uint8_t blood_content;
-    uint8_t field_98;
+    bool leaves_corpse_behind;
+    uint8_t field_99;
+    uint8_t field_9A;
+    uint8_t field_9B;
     int32_t description;
-    int32_t field_a0;
-    int32_t field_a4;
+    int32_t sound_killed_by_player;
+    int32_t sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
     AnimationMap animations;
@@ -301,11 +304,94 @@ struct Inventory
     uint32_t money;
     uint8_t bombs;
     uint8_t ropes;
-    uint8_t b06;
-    uint8_t b07;
-    uint8_t pad08[0x141c]; // specific treasure and killed monsters here, boring
+    int16_t poison_tick_timer; // Used in level transition to transfer to new player entity
+    bool cursed;               // Used in level transition to transfer to new player entity
+    uint8_t unknown_state;
+    uint8_t kapala_blood_amount; // Used in level transition to transfer to new player entity
+
+    uint8_t unknown2;
+    uint32_t unknown3;
+    uint32_t unknown4;
+    uint8_t unknown5a;
+    uint8_t unknown5b;
+    uint8_t unknown5c;
+
+    uint8_t player_slot;
+
+    uint32_t unknown6;
+    uint32_t unknown7;
+
+    uint32_t collected_money[512]; // entity types
+    uint32_t collected_money_values[512];
+    uint32_t collected_money_count;
+    uint32_t killed_enemies[256]; // entity types
     uint32_t kills_level;
     uint32_t kills_total;
+
+    uint32_t unknown8;
+    uint32_t unknown9;
+    uint32_t unknown10;
+    uint32_t unknown11;
+    int32_t unknown12;
+    int32_t unknown13;
+    int32_t unknown14;
+    int32_t unknown15;
+
+    uint32_t companions[8]; // hired hands, unlocked chars
+
+    uint32_t unknown24;
+    uint32_t unknown25;
+    uint32_t unknown26;
+    uint32_t unknown27;
+    uint32_t unknown28;
+    uint32_t unknown29;
+    uint32_t unknown30;
+    uint32_t unknown31;
+
+    uint8_t companion_trust[8];
+    uint8_t companion_count;
+    uint8_t companion_unknown_state[8];
+
+    uint8_t unknown35;
+    uint8_t unknown36;
+    uint8_t unknown37;
+    uint32_t unknown38;
+    uint32_t unknown39;
+
+    uint32_t acquired_powerups[30]; // Used in level transition to transfer to new player entity
+    uint32_t collected_money_total;
+
+    uint32_t unknown40; // might be garbage onwards
+    uint8_t unknown41;
+    uint8_t unknown42;
+    int16_t unknown43;
+    uint8_t unknown44;
+    uint8_t unknown45;
+    uint8_t unknown46;
+    uint8_t unknown47;
+    uint32_t unknown48;
+    uint32_t unknown49;
+    uint8_t unknown50;
+    uint8_t unknown51;
+    uint8_t unknown52;
+    uint8_t unknown53;
+};
+
+class SoundPosition
+{
+  public:
+    size_t __vftable;
+    float x;
+    float y;
+    size_t sound_effect_pointer; // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30); soundeffect doesn't seem to change when you pick a similar object around it
+    uint64_t fmod_param_id;      // param to FMOD::Studio::EventInstance::SetParameterByID
+    float sound_x_coord_1;
+    float sound_x_coord_2; // sometimes similar as coord_1, sometimes inverted, sometimes different
+    float unknown5;
+    float unknown6;
+    float unknown7;
+    float unknown8;
+    float unknown9;
 };
 
 #include "movable.hpp"
