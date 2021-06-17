@@ -152,12 +152,46 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["savegame"] = g_save;
 
     /// Print a log message on screen.
-    lua["message"] = [this](std::string message) -> void
+    lua["print"] = [this](std::string message) -> void
     {
         messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (messages.size() > 20)
             messages.pop_front();
     };
+    /// Same as `message`
+    lua["message"] = lua["print"];
+    /// Prints any object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
+    lua["prinspect"] = [this](sol::variadic_args objects) -> void
+    {
+        std::vector<sol::object> args;
+        {
+            sol::type va_type = objects.get_type();
+            if (va_type == sol::type::table)
+            {
+                args = objects.get<std::vector<sol::object>>(0);
+            }
+            else
+            {
+                args = std::vector<sol::object>{objects.begin(), objects.end()};
+            }
+        }
+
+        if (!args.empty())
+        {
+            std::string message = lua["inspect"](args.front());
+            args.erase(args.begin());
+
+            for (const auto& obj : args)
+            {
+                message += ", ";
+                message += lua["inspect"](args.front());
+            }
+
+            lua["print"](std::move(message));
+        }
+    };
+    /// Same as `prinspect`
+    lua["messpect"] = lua["prinspect"];
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames) -> CallbackId
