@@ -678,9 +678,17 @@ void spawn_entities(bool s, std::string list = "")
     {
         if (g_current_item == 0 && g_filtered_count == g_items.size())
             return;
-        int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
-        if (!lock_entity)
-            g_last_id = spawned;
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
+        {
+            int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
+            if (!lock_entity)
+                g_last_id = spawned;
+        }
+        else
+        {
+            std::pair<float, float> cpos = click_position(g_x, g_y);
+            spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second);
+        }
     }
     else
     {
