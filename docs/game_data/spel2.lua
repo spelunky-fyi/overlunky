@@ -2,9 +2,9 @@ Animation = {
   __name = "sol.Animation.user"
 }
 Arrowtrap = {
-  __index = "function: 00000245C77B21F0",
+  __index = "function: 0000020E8E230C90",
   __name = "sol.Arrowtrap.user",
-  __newindex = "function: 00000245C77B2F70"
+  __newindex = "function: 0000020E8E230690"
 }
 BEG = {
   ALTAR_DESTROYED = 1,
@@ -23,9 +23,28 @@ BUTTON = {
   WHIP = 2
 }
 Bomb = {
-  __index = "function: 00000245C77ADE70",
+  __index = "function: 0000028B8CEE6360",
   __name = "sol.Bomb.user",
-  __newindex = "function: 00000245C77AEEF0"
+  __newindex = "function: 0000028B8CEE50E0"
+}
+CHAR_STATE = {
+  ATTACKING = 12,
+  CLIMBING = 6,
+  DROPPING = 10,
+  DUCKING = 5,
+  DYING = 22,
+  ENTERING = 19,
+  EXITING = 21,
+  FALLING = 9,
+  FLAILING = 0,
+  HANGING = 4,
+  JUMPING = 8,
+  LOADING = 20,
+  PUSHING = 7,
+  SITTING = 2,
+  STANDING = 1,
+  STUNNED = 18,
+  THROWING = 17
 }
 CONST = {
   ENGINE_FPS = 60
@@ -45,27 +64,27 @@ Camera = {
   __name = "sol.Camera.user"
 }
 Cape = {
-  __index = "function: 00000245C77AE1F0",
+  __index = "function: 0000020E8E22C790",
   __name = "sol.Cape.user",
-  __newindex = "function: 00000245C77AEF70"
+  __newindex = "function: 0000020E8E22C210"
 }
 ChasingMonster = {
-  __index = "function: 00000245C77B0570",
+  __index = "function: 0000020E8E230090",
   __name = "sol.ChasingMonster.user",
-  __newindex = "function: 00000245C77B10F0"
+  __newindex = "function: 0000020E8E231290"
 }
 Color = {
   __name = "sol.Color.user"
 }
 Container = {
-  __index = "function: 00000245C77ADC70",
+  __index = "function: 0000020E8E22CE90",
   __name = "sol.Container.user",
-  __newindex = "function: 00000245C77AE670"
+  __newindex = "function: 0000020E8E22BD90"
 }
 Crushtrap = {
-  __index = "function: 00000245C77B0E70",
+  __index = "function: 0000020E8E22F690",
   __name = "sol.Crushtrap.user",
-  __newindex = "function: 00000245C77AF570"
+  __newindex = "function: 0000020E8E22E290"
 }
 CustomSound = {
   __name = "sol.CustomSound.user"
@@ -170,6 +189,36 @@ DROPCHANCE = {
   SKELETON_SKELETONKEY = 8,
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
+}
+ENT_FLAG = {
+  CAN_BE_STOMPED = 15,
+  CLIMBABLE = 9,
+  COLLIDES_WALLS = 13,
+  DEAD = 29,
+  ENABLE_BUTTON_PROMPT = 20,
+  FACING_LEFT = 17,
+  HAS_BACKITEM = 32,
+  INDESTRUCTIBLE_OR_SPECIAL_FLOOR = 2,
+  INTERACT_WITH_SEMISOLIDS = 14,
+  INTERACT_WITH_WATER = 11,
+  INTERACT_WITH_WEBS = 21,
+  INVISIBLE = 1,
+  IS_PLATFORM = 8,
+  LOCKED = 22,
+  NO_GRAVITY = 10,
+  PASSES_THROUGH_EVERYTHING = 5,
+  PASSES_THROUGH_OBJECTS = 4,
+  PASSES_THROUGH_PLAYER = 25,
+  PAUSE_AI_AND_PHYSICS = 28,
+  PICKUPABLE = 18,
+  POWER_STOMPS = 16,
+  SHOP_FLOOR = 24,
+  SHOP_ITEM = 23,
+  SOLID = 3,
+  STUNNABLE = 12,
+  TAKE_NO_DAMAGE = 6,
+  THROWABLE_OR_KNOCKBACKABLE = 7,
+  USABLE_ITEM = 19
 }
 ENT_TYPE = {
   ACTIVEFLOOR_BONEBLOCK = 599,
@@ -1053,14 +1102,14 @@ EntityDB = {
 }
 F = {}
 Ghost = {
-  __index = "function: 00000245C77B2C70",
+  __index = "function: 0000020E8E231B90",
   __name = "sol.Ghost.user",
-  __newindex = "function: 00000245C77B2670"
+  __newindex = "function: 0000020E8E22FD10"
 }
 Gun = {
-  __index = "function: 00000245C77B11F0",
+  __index = "function: 0000020E8E22EF90",
   __name = "sol.Gun.user",
-  __newindex = "function: 00000245C77B08F0"
+  __newindex = "function: 0000020E8E22E810"
 }
 Illumination = {
   __name = "sol.Illumination.user"
@@ -1080,9 +1129,9 @@ JUNGLESISTERS = {
   WARNING_ONE_WAY_DOOR = 4
 }
 Jiangshi = {
-  __index = "function: 00000245C77B4D70",
+  __index = "function: 0000020E8E232510",
   __name = "sol.Jiangshi.user",
-  __newindex = "function: 00000245C77B52F0"
+  __newindex = "function: 0000020E8E232610"
 }
 LAYER = {
   BACK = 1,
@@ -1117,19 +1166,19 @@ MASK = {
   WATER = 8192
 }
 Monster = {
-  __index = "function: 00000245C7091BA0",
+  __index = "function: 0000020E8D7A4180",
   __name = "sol.Monster.user",
-  __newindex = "function: 00000245C7091B20"
+  __newindex = "function: 0000020E8D7A4E80"
 }
 Mount = {
-  __index = "function: 00000245C70915A0",
+  __index = "function: 0000020E8D7A4580",
   __name = "sol.Mount.user",
-  __newindex = "function: 00000245C7091620"
+  __newindex = "function: 0000020E8D79CA80"
 }
 Movable = {
-  __index = "function: 00000245C70A0C20",
+  __index = "function: 0000020E8D7A2280",
   __name = "sol.Movable.user",
-  __newindex = "function: 00000245C70A0CA0"
+  __newindex = "function: 0000020E8D7A2300"
 }
 ON = {
   ARENA_INTRO = 25,
@@ -1171,14 +1220,14 @@ ON = {
   WIN = 16
 }
 Olmec = {
-  __index = "function: 00000245C77B3270",
+  __index = "function: 0000020E8E231C10",
   __name = "sol.Olmec.user",
-  __newindex = "function: 00000245C77B14F0"
+  __newindex = "function: 0000020E8E230B90"
 }
 OlmecFloater = {
-  __index = "function: 00000245C77B50F0",
+  __index = "function: 0000020E8E232F10",
   __name = "sol.OlmecFloater.user",
-  __newindex = "function: 00000245C77B3D70"
+  __newindex = "function: 0000020E8E232290"
 }
 PARTICLEEMITTER = {
   ACIDBUBBLEBURST_BUBBLES = 101,
@@ -1405,9 +1454,9 @@ ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
 Player = {
-  __index = "function: 00000245C70928A0",
+  __index = "function: 0000020E8D7A3B80",
   __name = "sol.Player.user",
-  __newindex = "function: 00000245C7092EA0"
+  __newindex = "function: 0000020E8D7A4C80"
 }
 PlayerInputs = {
   __name = "sol.PlayerInputs.user"
@@ -1443,6 +1492,12 @@ SPARROW = {
   SECOND_HIDEOUT_SPAWNED_NEOBAB = 6,
   THIEF_STATUS = 1,
   TUSK_IDOL_STOLEN = 5
+}
+SPAWN_TYPE = {
+  ANY = 7,
+  LEVEL_GEN = 1,
+  SCRIPT = 2,
+  SYSTEMIC = 4
 }
 SaveContext = {
   __name = "sol.SaveContext.user"
@@ -2469,9 +2524,9 @@ VANILLA_SOUND_PARAM = {
   VELOCITY = 15
 }
 VladsCape = {
-  __index = "function: 00000245C77AD8F0",
+  __index = "function: 0000020E8E22F310",
   __name = "sol.VladsCape.user",
-  __newindex = "function: 00000245C77AD9F0"
+  __newindex = "function: 0000020E8E22EE10"
 }
 WIN_STATE = {
   COSMIC_OCEAN_WIN = 3,
@@ -2555,24 +2610,26 @@ inspect = {
   _LICENSE = "    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, modify, merge, publish,\n    distribute, sublicense, and/or sell copies of the Software, and to\n    permit persons to whom the Software is furnished to do so, subject to\n    the following conditions:\n\n    The above copyright notice and this permission notice shall be included\n    in all copies or substantial portions of the Software.\n\n    THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n  ",
   _URL = "http://github.com/kikito/inspect.lua",
   _VERSION = "inspect.lua 3.1.0",
-  inspect = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4Ä\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2∞\2 \2\0\11Ω¬Ä\0\0008\1\0Ä\19\1\0\0R\0\0\0Ä\0\2\0\14\1\1\0BÅ\0\0∏\0\0Ä\11\1\0\1\14\1\2\2é\1\1\3¬Å\0\0008\0\0ÄÉ\1\2\0\14\2\1\5BÇ\0\0008\0\0Ä\3\2\3\0é\2\1\7¬\2\0\0008\4\0Ä\9\3\1\0Ä\3\5\0\0\4\0\0ì\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8ì\3\4\0R\0\0\0í\3\0\2íÉ\9\n\19\4\0\0R\0\0\0í\3\11\8\19\4\0\0R\0\0\0í\3\12\8\19\4\0\0R\0\0\0í\3\13\8í\3\3\3í\3\5\4\9\4\2\0Ä\4\0\0D\4\2\2í\3\14\8\9\4\3\0D\3\3\2îÉ\6\15Ä\4\0\0ƒ\3\3\1ã\3\0\16é\3\7\17\14\4\6\11≈\3\2\0∆\3\0\0«\3\1\0í\4Üdepth\4Ömath\4Öhuge\4ànewline\4Ç\n\4áindent\4É  \4àprocess\4çsetmetatable\4Ülevel\3\0\0\0\0\0\0\0\0\4ábuffer\4Ñids\4ámaxIds\4ëtableAppearances\4âputValue\4Ütable\4áconcatÑ\0\0\0\1\16\0\1\13\0\1\18\0ÄΩ\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1˜\11\0\0\2\0\0\0\0\1ÄáÖrootÄΩàoptionsÄΩÜdepthäΩànewlineéΩáindentíΩàprocessìΩäinspector¥ΩÑÖ_ENVëprocessRecursiveñcountTableAppearancesçInspector_mt",'@serialized'))
+  inspect = ((loadstring or load)("\27LuaT\0\25ÔøΩ\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4ÔøΩ\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2ÔøΩ\2ÔøΩ\2\0\11ÔøΩ¬Ä\0\0008\1\0ÔøΩ\19\1\0\0R\0\0\0ÔøΩ\0\2\0\14\1\1\0BÔøΩ\0\0ÔøΩ\0\0ÔøΩ\11\1\0\1\14\1\2\2ÔøΩ\1\1\3¬Å\0\0008\0\0ÔøΩÔøΩ\1\2\0\14\2\1\5BÔøΩ\0\0008\0\0ÔøΩ\3\2\3\0ÔøΩ\2\1\7ÔøΩ\2\0\0008\4\0ÔøΩ\9\3\1\0ÔøΩ\3\5\0\0\4\0\0ÔøΩ\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8ÔøΩ\3\4\0R\0\0\0ÔøΩ\3\0\2ÔøΩÔøΩ\9\n\19\4\0\0R\0\0\0ÔøΩ\3\11\8\19\4\0\0R\0\0\0ÔøΩ\3\12\8\19\4\0\0R\0\0\0ÔøΩ\3\13\8ÔøΩ\3\3\3ÔøΩ\3\5\4\9\4\2\0ÔøΩ\4\0\0D\4\2\2ÔøΩ\3\14\8\9\4\3\0D\3\3\2ÔøΩÔøΩ\6\15ÔøΩ\4\0\0ÔøΩ\3\3\1ÔøΩ\3\0\16ÔøΩ\3\7\17\14\4\6\11ÔøΩ\3\2\0ÔøΩ\3\0\0ÔøΩ\3\1\0ÔøΩ\4ÔøΩdepth\4ÔøΩmath\4ÔøΩhuge\4ÔøΩnewline\4ÔøΩ\n\4ÔøΩindent\4ÔøΩ  \4ÔøΩprocess\4ÔøΩsetmetatable\4ÔøΩlevel\3\0\0\0\0\0\0\0\0\4ÔøΩbuffer\4ÔøΩids\4ÔøΩmaxIds\4ÔøΩtableAppearances\4ÔøΩputValue\4ÔøΩtable\4ÔøΩconcatÔøΩ\0\0\0\1\16\0\1\13\0\1\18\0ÔøΩÔøΩ\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1ÔøΩ\11\0\0\2\0\0\0\0\1ÔøΩÔøΩÔøΩrootÔøΩÔøΩÔøΩoptionsÔøΩÔøΩÔøΩdepthÔøΩÔøΩÔøΩnewlineÔøΩÔøΩÔøΩindentÔøΩÔøΩÔøΩprocessÔøΩÔøΩÔøΩinspectorÔøΩÔøΩÔøΩÔøΩ_ENVÔøΩprocessRecursiveÔøΩcountTableAppearancesÔøΩInspector_mt",'@serialized'))
 }
 json = {
   _version = "0.1.2",
-  decode = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4Ä\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2¯\3Ç\1\0\8¶ã\0\0\0\0\1\0\0ƒ\0\2\2ºÄ\1\0008\3\0Äã\0\0\2\3Å\1\0ã\1\0\0\0\2\0\0ƒ\1\2\0025\1\2\0ƒ\0\2\1â\0\1\0\0\1\0\0â\1\2\0\0\2\0\0Å\2\0Ä\9\3\3\0á\3\0\0ƒ\1\5\0ƒ\0\0\3â\1\2\0\0\2\0\0Ä\2\2\0\9\3\3\0á\3\0\0ƒ\1\5\2\0\1\3\0¥\1\0\0;\1\3\0008\2\0Äâ\1\4\0\0\2\0\0Ä\2\2\0\3\3\2\0ƒ\1\4\1»\0\2\0«\1\1\0Ö\4Ötype\4ástring\4Üerror\4ßexpected argument of type string, got \4ëtrailing garbageÖ\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0Ä¶\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1ÄÉÑstrÄ¶Ñresï¶Ñidxï¶ÖÖ_ENVÜparseänext_charåspace_charsçdecode_error",'@serialized')),
-  encode = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1á\1â\1\0\3Öâ\0\0\0\0\1\0\0ƒ\0\2\2»\0\2\0«\0\1\0ÄÅ\1\1\0ÄÖ\1\0\0\0\1ÄÅÑvalÄÖÅáencode",'@serialized'))
+  decode = ((loadstring or load)("\27LuaT\0\25ÔøΩ\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4ÔøΩ\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2ÔøΩ\3ÔøΩ\1\0\8ÔøΩÔøΩ\0\0\0\0\1\0\0ÔøΩ\0\2\2ÔøΩÔøΩ\1\0008\3\0ÔøΩÔøΩ\0\0\2\3ÔøΩ\1\0ÔøΩ\1\0\0\0\2\0\0ÔøΩ\1\2\0025\1\2\0ÔøΩ\0\2\1ÔøΩ\0\1\0\0\1\0\0ÔøΩ\1\2\0\0\2\0\0ÔøΩ\2\0ÔøΩ\9\3\3\0ÔøΩ\3\0\0ÔøΩ\1\5\0ÔøΩ\0\0\3ÔøΩ\1\2\0\0\2\0\0ÔøΩ\2\2\0\9\3\3\0ÔøΩ\3\0\0ÔøΩ\1\5\2\0\1\3\0ÔøΩ\1\0\0;\1\3\0008\2\0ÔøΩÔøΩ\1\4\0\0\2\0\0ÔøΩ\2\2\0\3\3\2\0ÔøΩ\1\4\1ÔøΩ\0\2\0ÔøΩ\1\1\0ÔøΩ\4ÔøΩtype\4ÔøΩstring\4ÔøΩerror\4ÔøΩexpected argument of type string, got \4ÔøΩtrailing garbageÔøΩ\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0ÔøΩÔøΩ\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1ÔøΩÔøΩÔøΩstrÔøΩÔøΩÔøΩresÔøΩÔøΩÔøΩidxÔøΩÔøΩÔøΩÔøΩ_ENVÔøΩparseÔøΩnext_charÔøΩspace_charsÔøΩdecode_error",'@serialized')),
+  encode = ((loadstring or load)("\27LuaT\0\25ÔøΩ\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4ÔøΩ\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1ÔøΩ\1ÔøΩ\1\0\3ÔøΩÔøΩ\0\0\0\0\1\0\0ÔøΩ\0\2\2ÔøΩ\0\2\0ÔøΩ\0\1\0ÔøΩÔøΩ\1\1\0ÔøΩÔøΩ\1\0\0\0\1ÔøΩÔøΩÔøΩvalÔøΩÔøΩÔøΩÔøΩencode",'@serialized'))
 }
 kill_entity = function(...) end
 layer_door = function(...) end
 load_script = function(...) end
 lock_door_at = function(...) end
 message = function(...) end
+messpect = function(...) end
 modify_sparktraps = function(...) end
 move_entity = function(...) end
 options = {}
 pause = function(...) end
 pick_up = function(...) end
 players = 
+prinspect = function(...) end
 read_input = function(...) end
 read_prng = function(...) end
 read_stolen_input = function(...) end
@@ -2622,8 +2679,10 @@ set_timeout = function(...) end
 set_vanilla_sound_callback = function(...) end
 setflag = function(...) end
 spawn = function(...) end
+spawn_critical = function(...) end
 spawn_door = function(...) end
 spawn_entity = function(...) end
+spawn_entity_nonreplaceable = function(...) end
 spawn_entity_over = function(...) end
 spawn_layer_door = function(...) end
 spawn_liquid = function(...) end

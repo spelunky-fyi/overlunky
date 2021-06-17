@@ -7,6 +7,7 @@ add_library(spel2_api STATIC
         game_allocator.hpp
         entity.cpp
         entity.hpp
+        entities_monsters.hpp
         items.cpp
         items.hpp
         layer.cpp
@@ -59,6 +60,10 @@ add_library(spel2_api STATIC
         script/usertypes/drops_lua.hpp
         script/usertypes/texture_lua.cpp
         script/usertypes/texture_lua.hpp
+        script/usertypes/char_state.cpp
+        script/usertypes/char_state.hpp
+        script/usertypes/flags_lua.cpp
+        script/usertypes/flags_lua.hpp
         sound_manager.cpp
         sound_manager.hpp
         fmod.hpp

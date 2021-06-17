@@ -1,5 +1,6 @@
 #include "entity_lua.hpp"
 
+#include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "script/script_impl.hpp"
 
@@ -21,7 +22,9 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "kills_level",
         &Inventory::kills_level,
         "kills_total",
-        &Inventory::kills_total);
+        &Inventory::kills_total,
+        "collected_money_total",
+        &Inventory::collected_money_total);
     lua.new_usertype<Animation>(
         "Animation",
         "first_tile",
@@ -81,7 +84,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "default_flags",
         &EntityDB::default_flags,
         "default_more_flags",
-        &EntityDB::default_more_flags);
+        &EntityDB::default_more_flags,
+        "leaves_corpse_behind",
+        &EntityDB::leaves_corpse_behind,
+        "sound_killed_by_player",
+        &EntityDB::sound_killed_by_player,
+        "sound_killed_by_other",
+        &EntityDB::sound_killed_by_other);
 
     auto overlaps_with = sol::overload(
         static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
@@ -150,12 +159,20 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Entity::as<Cape>,
         "as_vlads_cape",
         &Entity::as<VladsCape>,
-        "as_chasingmonster",
-        &Entity::as<ChasingMonster>,
         "as_ghost",
         &Entity::as<Ghost>,
         "as_jiangshi",
-        &Entity::as<Jiangshi>);
+        &Entity::as<Jiangshi>,
+        "as_kapala_powerup",
+        &Entity::as<KapalaPowerup>,
+        "as_caveman",
+        &Entity::as<Caveman>,
+        "as_backpack",
+        &Entity::as<Backpack>,
+        "as_jetpack",
+        &Entity::as<Jetpack>,
+        "as_hoverpack",
+        &Entity::as<Hoverpack>);
     /* Entity
             bool overlaps_with(Entity other)
             bool set_texture(uint32_t texture_id)
@@ -241,7 +258,14 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
             bool is_button_held(uint32_t button)
             bool is_button_released(uint32_t button)
         */
-    lua.new_usertype<Monster>("Monster", sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Monster>(
+        "Monster",
+        "chased_target_uid",
+        &Monster::chased_target_uid,
+        "target_selection_timer",
+        &Monster::target_selection_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
     lua.new_usertype<Player>(
         "Player",
         "inventory",
@@ -263,8 +287,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "set_heart_color",
         &Player::set_heart_color,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
-    lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable>());
+    lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Bomb>("Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Container>(
         "Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
@@ -312,14 +336,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "OlmecFloater", "both_floaters_intact", &OlmecFloater::both_floaters_intact, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Cape>("Cape", "floating_down", &VladsCape::floating_down, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Cape>());
-    lua.new_usertype<ChasingMonster>(
-        "ChasingMonster",
-        "chased_target_uid",
-        &Ghost::chased_target_uid,
-        "target_selection_timer",
-        &Ghost::target_selection_timer,
-        sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Ghost>(
         "Ghost",
         "split_timer",
@@ -327,9 +343,49 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "velocity_multiplier",
         &Ghost::velocity_multiplier,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, ChasingMonster>());
+        sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Jiangshi>(
-        "Jiangshi", "wait_timer", &Jiangshi::wait_timer, sol::base_classes, sol::bases<Entity, Movable, Monster, ChasingMonster>());
+        "Jiangshi", "wait_timer", &Jiangshi::wait_timer, sol::base_classes, sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<KapalaPowerup>(
+        "KapalaPowerup", "amount_of_blood", &KapalaPowerup::amount_of_blood, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Caveman>(
+        "Caveman",
+        "chatting_to_uid",
+        &Caveman::chatting_to_uid,
+        "walk_pause_timer",
+        &Caveman::walk_pause_timer,
+        "chatting_timer",
+        &Caveman::chatting_timer,
+        "wake_up_timer",
+        &Caveman::wake_up_timer,
+        "can_pick_up_timer",
+        &Caveman::can_pick_up_timer,
+        "aggro_timer",
+        &Caveman::aggro_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
+    lua.new_usertype<Backpack>(
+        "Backpack",
+        "explosion_trigger",
+        &Backpack::explosion_trigger,
+        "explosion_timer",
+        &Backpack::explosion_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+    lua.new_usertype<Jetpack>(
+        "Jetpack",
+        "flame_on",
+        &Jetpack::flame_on,
+        "fuel",
+        &Jetpack::fuel,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Backpack>());
+    lua.new_usertype<Hoverpack>(
+        "Hoverpack",
+        "is_on",
+        &Hoverpack::is_on,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Backpack>());
 
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1

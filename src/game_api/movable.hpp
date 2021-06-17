@@ -113,19 +113,14 @@ class Movable : public Entity
     std::uint32_t set_post_statemachine(std::function<void(Movable*)> post_state_machine);
 };
 
-class Monster : public Movable
+class Player : public Movable
 {
   public:
     std::map<int64_t, int64_t> inside;
-};
-
-class Player : public Monster
-{
-  public:
     Inventory* inventory_ptr;
     Illumination* emitted_light;
-    int32_t i148;
-    int32_t i14c;
+    int32_t linked_companion_child;  // entity uid
+    int32_t linked_companion_parent; // entity uid
     size_t ai_func;
     size_t input_ptr;
     size_t p160;
@@ -178,22 +173,51 @@ class Mattock : public Movable
     int32_t remaining;
 };
 
-class Mount : public Monster
+class Mount : public Movable
 {
   public:
+    size_t unknown1;
+    uint64_t unknown2;
+    int32_t rider_uid; // who rides it
+    uint32_t unknown4;
+    SoundPosition* sound_pos;
+    bool can_doublejump; // whether the doublejump has already occurred or not
+    bool tamed;
+    uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
+    uint8_t unknown9a;
+    uint8_t unknown9b;
+    uint8_t taming_timer; // when 0 it's tame
+    uint8_t unknown9d;
+
     void carry(Movable* rider);
 
     void tame(bool value);
 };
 
-class Jetpack : public Movable
+class Backpack : public Movable
 {
   public:
-    int32_t unknown1;
-    int32_t unknown2;
-    int32_t unknown3;
-    int32_t unknown4;
-    uint8_t fuel; // only set the fuel for an equipped jetpack (player->items)!
+    bool explosion_trigger;
+    uint8_t explosion_timer; // counts from 0 to 30
+    uint16_t unknown1;
+    uint32_t unknown2;
+};
+
+class Jetpack : public Backpack
+{
+  public:
+    bool flame_on; // Can be used as is_on
+    uint8_t unknown1;
+    uint16_t unknown2;
+    uint32_t fly_time; // it's per level, not even per jatpack lol, it also adds at when it explodes
+    uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
+};
+
+class Hoverpack : public Backpack
+{
+  public:
+    SoundPosition* sound_pos;
+    bool is_on;
 };
 
 class Bomb : public Movable
@@ -250,24 +274,43 @@ class KapalaPowerup : public Movable
     uint8_t amount_of_blood;
 };
 
-class ChasingMonster : public Monster
+class PlayerTracker
 {
   public:
-    int32_t chased_target_uid;
-    uint32_t target_selection_timer; // when reaches zero, checks for new chase target and updates chased_target_uid
-};
-
-class Ghost : public ChasingMonster
-{
-  public:
-    uint16_t split_timer;
-    uint8_t unknown_counter;
-    uint8_t padding;
-    float velocity_multiplier;
-};
-
-class Jiangshi : public ChasingMonster
-{
-  public:
-    uint8_t wait_timer; // wait time between jumps
+    size_t __vftable;
+    size_t unknown1; // points to a CodePointer
+    Entity* parent_entity_pointer;
+    uint64_t unknown3;
+    uint64_t unknown4;
+    uint64_t unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7;
+    int32_t affected_entity_uid;
+    uint8_t animation_frame; // changes the color of the eyeball on Lahamu
+    uint8_t unknown9b;
+    uint8_t unknown9c;
+    uint8_t unknown9d;
+    float offset_x;
+    float offset_y;
+    float scale_x;
+    float scale_y;
+    float unknown_dupe_offset_x;
+    float unknown_dupe_offset_y;
+    float unknown10;
+    float unknown11;
+    float unknown12;
+    float unknown13;
+    float unknown14;
+    float unknown15;
+    float unknown16;
+    float unknown17;
+    uint8_t unknown18; // related to unknown14,15,16,17
+    uint8_t unknown19;
+    uint8_t unknown20;
+    uint8_t unknown21;
+    uint32_t unknown22;
+    RenderInfo* unknown23;
+    Texture* texture;
+    float texture_offset_x;
+    float texture_offset_y;
 };

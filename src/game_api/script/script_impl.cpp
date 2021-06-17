@@ -12,8 +12,10 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 
+#include "usertypes/char_state.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entity_lua.hpp"
+#include "usertypes/flags_lua.hpp"
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/level_lua.hpp"
 #include "usertypes/particles_lua.hpp"
@@ -152,12 +154,57 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["savegame"] = g_save;
 
     /// Print a log message on screen.
-    lua["message"] = [this](std::string message) -> void
+    lua["print"] = [this](std::string message) -> void
     {
         messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (messages.size() > 20)
             messages.pop_front();
     };
+    /// Same as `message`
+    lua["message"] = [this](std::string message) -> void
+    { lua["print"](message); };
+    /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
+    /// For example use it like this
+    /// ```lua
+    /// prinspect(state.level, state.level_next)
+    /// local some_stuff_in_a_table = {
+    ///     some = state.time_total,
+    ///     stuff = state.world
+    /// }
+    /// prinspect(some_stuff_in_a_table)
+    /// ```
+    lua["prinspect"] = [this](sol::variadic_args objects) -> void
+    {
+        std::vector<sol::object> args;
+        {
+            sol::type va_type = objects.get_type();
+            if (va_type == sol::type::table)
+            {
+                args = objects.get<std::vector<sol::object>>(0);
+            }
+            else
+            {
+                args = std::vector<sol::object>{objects.begin(), objects.end()};
+            }
+        }
+
+        if (!args.empty())
+        {
+            std::string message = lua["inspect"](args.front());
+            args.erase(args.begin());
+
+            for (const auto& obj : args)
+            {
+                message += ", ";
+                message += lua["inspect"](args.front());
+            }
+
+            lua["print"](std::move(message));
+        }
+    };
+    /// Same as `prinspect`
+    lua["messpect"] = [this](sol::variadic_args objects) -> void
+    { lua["prinspect"](objects); };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames) -> CallbackId
@@ -347,6 +394,10 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
+    /// Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
+    lua["spawn_entity_nonreplaceable"] = spawn_entity_abs_nonreplaceable;
+    /// Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
+    lua["spawn_critical"] = spawn_entity_abs_nonreplaceable;
     /// Spawn a door to another world, level and theme and return the uid of spawned entity.
     /// Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
     lua["spawn_door"] = spawn_door_abs;
@@ -360,7 +411,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
     /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
-    lua["set_pre_entity_spawn"] = [this](sol::function cb, int mask, sol::variadic_args entity_types) -> CallbackId
+    lua["set_pre_entity_spawn"] = [this](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
         sol::type va_type = entity_types.get_type();
@@ -372,13 +423,13 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
-        pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), std::move(cb)});
+        pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), flags, std::move(cb)});
         return cbcount++;
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
     /// The callback signature is `nil post_entity_spawn(entity)`
-    lua["set_post_entity_spawn"] = [this](sol::function cb, int mask, sol::variadic_args entity_types) -> CallbackId
+    lua["set_post_entity_spawn"] = [this](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
         sol::type va_type = entity_types.get_type();
@@ -390,7 +441,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
-        post_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), std::move(cb)});
+        post_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), flags, std::move(cb)});
         return cbcount++;
     };
 
@@ -551,10 +602,16 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["set_journal_enabled"] = set_journal_enabled;
     /// Returns how many of a specific entity type Waddler has stored
     lua["waddler_count_entity"] = waddler_count_entity;
-    /// Store an entity type in Waddler's storage. Returns false when storage is full and the item couldn't be stored.
+    /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
     lua["waddler_store_entity"] = waddler_store_entity;
     /// Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
     lua["waddler_remove_entity"] = waddler_remove_entity;
+    /// Gets the 16-bit meta-value associated with the entity type in the associated slot
+    lua["waddler_get_entity_meta"] = waddler_get_entity_meta;
+    /// Sets the 16-bit meta-value associated with the entity type in the associated slot
+    lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
+    /// Gets the entity type of the item in the provided slot
+    lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [this](uint32_t uid_a, uint32_t uid_b) -> float
@@ -723,6 +780,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NState::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
+    NCharacterState::register_usertypes(lua);
+    NEntityFlags::register_usertypes(lua);
 
     lua.create_named_table(
         "ON",
@@ -821,6 +880,17 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     // Runs as soon as your script is loaded, including reloads, then never again
     */
 
+    lua.create_named_table("SPAWN_TYPE", "LEVEL_GEN", SPAWN_TYPE_LEVEL_GEN, "SCRIPT", SPAWN_TYPE_SCRIPT, "SYSTEMIC", SPAWN_TYPE_SYSTEMIC, "ANY", SPAWN_TYPE_ANY);
+    /* SPAWN_TYPE
+    // LEVEL_GEN
+    // For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
+    // SCRIPT
+    // Runs for any spawn happening through a call from the Lua API, also during level generation.
+    // SYSTEMIC
+    // Covers all other spawns, such as items from crates or the player throwing bombs.
+    // ANY
+    // Covers all of the above.
+    */
     lua.create_named_table("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.create_named_table("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
@@ -1364,7 +1434,7 @@ void ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float
     }
 }
 
-Entity* ScriptImpl::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay)
+Entity* ScriptImpl::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
 {
     if (!enabled)
         return nullptr;
@@ -1372,18 +1442,22 @@ Entity* ScriptImpl::pre_entity_spawn(std::uint32_t entity_type, float x, float y
     for (auto& callback : pre_entity_spawn_callbacks)
     {
         bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
-        bool match = mask_match && std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
-        if (match)
+        bool flags_match = callback.spawn_type_flags & spawn_type_flags;
+        if (mask_match)
         {
-            if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay))
+            bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
+            if (type_match)
             {
-                return get_entity_ptr(spawn_replacement.value());
+                if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay))
+                {
+                    return get_entity_ptr(spawn_replacement.value());
+                }
             }
         }
     }
     return nullptr;
 }
-void ScriptImpl::post_entity_spawn(Entity* entity)
+void ScriptImpl::post_entity_spawn(Entity* entity, int spawn_type_flags)
 {
     if (!enabled)
         return;
@@ -1391,10 +1465,14 @@ void ScriptImpl::post_entity_spawn(Entity* entity)
     for (auto& callback : post_entity_spawn_callbacks)
     {
         bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
-        bool match = mask_match && (callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0);
-        if (match)
+        bool flags_match = callback.spawn_type_flags & spawn_type_flags;
+        if (mask_match)
         {
-            handle_function(callback.func, entity);
+            bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
+            if (type_match)
+            {
+                handle_function(callback.func, entity);
+            }
         }
     }
 }
