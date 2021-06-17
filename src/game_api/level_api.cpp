@@ -7,6 +7,8 @@
 #include "memory.hpp"
 #include "rpc.hpp"
 #include "script.hpp"
+#include "spawn_api.hpp"
+#include "util.hpp"
 
 #include <array>
 #include <string_view>
@@ -187,6 +189,9 @@ using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, fl
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
 {
+    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN); } };
+
     std::string_view tile_code_name = g_IdToName[tile_code];
 
     {

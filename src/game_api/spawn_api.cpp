@@ -6,9 +6,14 @@
 #include "memory.hpp"
 #include "rpc.hpp"
 #include "script.hpp"
+#include "util.hpp"
 
 #include <Windows.h>
 #include <detours.h>
+
+std::uint32_t g_SpawnNonReplacable;
+SpawnTypeFlags g_SpawnTypeFlags;
+std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
 
 void spawn_liquid(uint32_t entity_type, float x, float y)
 {
@@ -31,6 +36,9 @@ void spawn_liquid(uint32_t entity_type, float x, float y)
 
 int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
 
     auto player = state.items()->player(0);
@@ -51,6 +59,9 @@ int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, f
 
 int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
     if (layer == 0 || layer == 1)
     {
@@ -68,8 +79,18 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, floa
     return -1;
 }
 
+int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
+{
+    g_SpawnNonReplacable++;
+    OnScopeExit pop{ [] { g_SpawnNonReplacable--; } };
+    return spawn_entity_abs(entity_type, x, y, layer, vx, vy);
+}
+
 int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, float y)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
     Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
@@ -80,6 +101,9 @@ int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, floa
 
 int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
 
     auto player = state.items()->player(0);
@@ -93,6 +117,9 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 
 int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
     if (layer == 0 || layer == 1)
     {
@@ -112,6 +139,9 @@ int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_
 
 void spawn_backdoor(float x, float y)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
 
     auto player = state.items()->player(0);
@@ -129,12 +159,46 @@ void spawn_backdoor(float x, float y)
 
 void spawn_backdoor_abs(float x, float y)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
     DEBUG("Spawning backdoor on {}, {}", x, y);
     state.layer(0)->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     state.layer(1)->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     state.layer(0)->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
     state.layer(1)->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
+}
+
+void push_spawn_type_flags(SpawnTypeFlags flags)
+{
+    for (size_t i = 0; i < g_SpawnTypes.size(); i++)
+    {
+        if (flags & (1 << i))
+        {
+            g_SpawnTypes[i]++;
+        }
+    }
+
+    g_SpawnTypeFlags = 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
+}
+void pop_spawn_type_flags(SpawnTypeFlags flags)
+{
+    for (size_t i = 0; i < g_SpawnTypes.size(); i++)
+    {
+        if (flags & (1 << i))
+        {
+            g_SpawnTypes[i]--;
+        }
+    }
+
+    g_SpawnTypeFlags = 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
 }
 
 //#define HOOK_LOAD_ITEM
@@ -153,11 +217,14 @@ SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
     Entity* spawned_ent{nullptr};
-    SpelunkyScript::for_each_script([=, &spawned_ent](SpelunkyScript& script)
-                                    {
-                                        spawned_ent = script.pre_entity_spawn(entity_type, x, y, layer, overlay);
-                                        return spawned_ent == nullptr;
-                                    });
+    if (g_SpawnNonReplacable == 0)
+    {
+        SpelunkyScript::for_each_script([=, &spawned_ent](SpelunkyScript& script)
+                                        {
+                                            spawned_ent = script.pre_entity_spawn(entity_type, x, y, layer, overlay, g_SpawnTypeFlags);
+                                            return spawned_ent == nullptr;
+                                        });
+    }
 
     if (spawned_ent == nullptr)
     {
@@ -166,7 +233,7 @@ Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float
 
     SpelunkyScript::for_each_script([spawned_ent](SpelunkyScript& script)
                                     {
-                                        script.post_entity_spawn(spawned_ent);
+                                        script.post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
                                         return true;
                                     });
     return spawned_ent;

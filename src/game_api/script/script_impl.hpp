@@ -19,6 +19,7 @@
 using CallbackId = int;
 using Flags = std::uint32_t;
 using uColor = ImU32;
+using SPAWN_TYPE = int;                  // NoAlias
 using VANILLA_SOUND = std::string;       // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = int; // NoAlias
 using BUTTONS = std::uint16_t;           // NoAlias
@@ -132,6 +133,7 @@ struct EntitySpawnCallback
     int id;
     int entity_mask;
     std::vector<uint32_t> entity_types;
+    SPAWN_TYPE spawn_type_flags;
     sol::function func;
 };
 
@@ -229,8 +231,8 @@ class ScriptImpl
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
 
-    Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay);
-    void post_entity_spawn(Entity* entity);
+    Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
+    void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
     void hook_entity_dtor(Entity* entity);
     void pre_entity_destroyed(Entity* entity);
