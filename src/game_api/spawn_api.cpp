@@ -37,7 +37,8 @@ void spawn_liquid(uint32_t entity_type, float x, float y)
 int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
 
@@ -60,7 +61,8 @@ int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, f
 int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
     if (layer == 0 || layer == 1)
@@ -82,14 +84,16 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, floa
 int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
 {
     g_SpawnNonReplacable++;
-    OnScopeExit pop{ [] { g_SpawnNonReplacable--; } };
+    OnScopeExit pop{[]
+                    { g_SpawnNonReplacable--; }};
     return spawn_entity_abs(entity_type, x, y, layer, vx, vy);
 }
 
 int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, float y)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
     Entity* overlay = get_entity_ptr(over_uid);
@@ -102,7 +106,8 @@ int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, floa
 int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
 
@@ -118,7 +123,8 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
     if (layer == 0 || layer == 1)
@@ -140,7 +146,8 @@ int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_
 void spawn_backdoor(float x, float y)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
 
@@ -160,7 +167,8 @@ void spawn_backdoor(float x, float y)
 void spawn_backdoor_abs(float x, float y)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ [] { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
     DEBUG("Spawning backdoor on {}, {}", x, y);

@@ -159,7 +159,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
             messages.pop_front();
     };
     /// Same as `message`
-    lua["message"] = [this](std::string message) -> void { lua["print"](message); };
+    lua["message"] = [this](std::string message) -> void
+    { lua["print"](message); };
     /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
     /// For example use it like this
     /// ```lua
@@ -200,7 +201,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         }
     };
     /// Same as `prinspect`
-    lua["messpect"] = [this](sol::variadic_args objects)->void { lua["prinspect"](objects); };
+    lua["messpect"] = [this](sol::variadic_args objects) -> void
+    { lua["prinspect"](objects); };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames) -> CallbackId
