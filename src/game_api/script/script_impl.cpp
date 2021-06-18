@@ -160,7 +160,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         if (messages.size() > 20)
             messages.pop_front();
     };
-    /// Same as `message`
+    /// Same as `print`
     lua["message"] = [this](std::string message) -> void
     { lua["print"](message); };
     /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.

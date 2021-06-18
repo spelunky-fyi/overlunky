@@ -130,7 +130,7 @@ Note: The game functions like `spawn` use [level coordinates](#get_position). Dr
 Print a log message on screen.
 ### [`message`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=message)
 `nil message(string message)`<br/>
-Same as `message`
+Same as `print`
 ### [`prinspect`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prinspect)
 `nil prinspect(variadic_args objects)`<br/>
 Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
