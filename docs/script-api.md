@@ -14,7 +14,7 @@ The following Lua libraries and their functions are available. You can read more
 ### `coroutine`
 ### `package`
 ### `debug`
-### `inspect`
+### `json`
 To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
 ```Lua
 local some_mod_data_that_should_be_saved = {{
@@ -125,9 +125,27 @@ Runs on any [screen change](#on).
 Runs on every screen frame. You need this to use draw functions.
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
+### [`print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=print)
+`nil print(string message)`<br/>
+Print a log message on screen.
 ### [`message`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=message)
 `nil message(string message)`<br/>
-Print a log message on screen.
+Same as `print`
+### [`prinspect`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prinspect)
+`nil prinspect(variadic_args objects)`<br/>
+Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
+For example use it like this
+```lua
+prinspect(state.level, state.level_next)
+local some_stuff_in_a_table = {
+    some = state.time_total,
+    stuff = state.world
+}
+prinspect(some_stuff_in_a_table)
+```
+### [`messpect`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=messpect)
+`nil messpect(variadic_args objects)`<br/>
+Same as `prinspect`
 ### [`set_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_interval)
 `CallbackId set_interval(function cb, int frames)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
@@ -196,6 +214,10 @@ Add a combobox option that the user can change in the UI. Read the int index of 
 with a double `\0\0` at the end.
 ### [`register_option_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
 `nil register_option_button()`<br/>
+### [`spawn_liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_liquid)
+`nil spawn_liquid(int entity_type, float x, float y)`<br/>
+Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.
+Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 `int spawn_entity(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Spawn an entity in position with some velocity and return the uid of spawned entity.
@@ -215,6 +237,12 @@ end, ON.LEVEL)
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
 `int spawn(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Short for [spawn_entity](#spawn_entity).
+### [`spawn_entity_nonreplaceable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_nonreplaceable)
+`int spawn_entity_nonreplaceable(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
+Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
+### [`spawn_critical`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_critical)
+`int spawn_critical(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
+Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
 ### [`spawn_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door)
 `int spawn_door(float x, float y, int layer, int w, int l, int t)`<br/>
 Spawn a door to another world, level and theme and return the uid of spawned entity.
@@ -228,6 +256,17 @@ Spawn a door to backlayer.
 ### [`layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_door)
 `nil layer_door(float x, float y)`<br/>
 Short for [spawn_layer_door](#spawn_layer_door).
+### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
+`CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
+Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
+In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+### [`set_post_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_entity_spawn)
+`CallbackId set_post_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
+Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
+The callback signature is `nil post_entity_spawn(entity)`
 ### [`warp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=warp)
 `nil warp(int w, int l, int t)`<br/>
 Warp to a level immediately.
@@ -491,6 +530,21 @@ Read input
 ### [`read_stolen_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
 `nil read_stolen_input(int uid)`<br/>
 Read input that has been previously stolen with steal_input
+### [`clear_entity_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_entity_callback)
+`nil clear_entity_callback(int uid, CallbackId cb_id)`<br/>
+Clears a callback that is specific to an entity.
+### [`set_pre_statemachine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_statemachine)
+`optional<CallbackId> set_pre_statemachine(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Movable` or else stuff will break.
+Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
+Use this only when no other approach works, this call can be expensive if overused.
+### [`set_post_statemachine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_statemachine)
+`optional<CallbackId> set_post_statemachine(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Movable` or else stuff will break.
+Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+Use this only when no other approach works, this call can be expensive if overused.
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 `nil get_particle_type()`<br/>
 Runs on every screen frame. You need this to use draw functions.
@@ -1198,6 +1252,19 @@ Params: `LoadContext load_ctx`\
 Runs as soon as your script is loaded, including reloads, then never again
 - [`SCRIPT_ENABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) 109
 - [`SCRIPT_DISABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) 110
+### SPAWN_TYPE
+- [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
+\
+For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
+- [`SCRIPT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.SCRIPT) SPAWN_TYPE_SCRIPT
+\
+Runs for any spawn happening through a call from the Lua API, also during level generation.
+- [`SYSTEMIC`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.SYSTEMIC) SPAWN_TYPE_SYSTEMIC
+\
+Covers all other spawns, such as items from crates or the player throwing bombs.
+- [`ANY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.ANY) SPAWN_TYPE_ANY
+\
+Covers all of the above.
 ### CONST
 - [`ENGINE_FPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ENGINE_FPS) 60
 ### WIN_STATE

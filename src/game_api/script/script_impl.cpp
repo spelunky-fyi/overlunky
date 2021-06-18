@@ -9,6 +9,7 @@
 #include "rpc.hpp"
 #include "script_util.hpp"
 #include "sound_manager.hpp"
+#include "spawn_api.hpp"
 #include "state.hpp"
 
 #include "usertypes/char_state.hpp"
@@ -153,12 +154,57 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["savegame"] = g_save;
 
     /// Print a log message on screen.
-    lua["message"] = [this](std::string message) -> void
+    lua["print"] = [this](std::string message) -> void
     {
         messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (messages.size() > 20)
             messages.pop_front();
     };
+    /// Same as `print`
+    lua["message"] = [this](std::string message) -> void
+    { lua["print"](message); };
+    /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
+    /// For example use it like this
+    /// ```lua
+    /// prinspect(state.level, state.level_next)
+    /// local some_stuff_in_a_table = {
+    ///     some = state.time_total,
+    ///     stuff = state.world
+    /// }
+    /// prinspect(some_stuff_in_a_table)
+    /// ```
+    lua["prinspect"] = [this](sol::variadic_args objects) -> void
+    {
+        std::vector<sol::object> args;
+        {
+            sol::type va_type = objects.get_type();
+            if (va_type == sol::type::table)
+            {
+                args = objects.get<std::vector<sol::object>>(0);
+            }
+            else
+            {
+                args = std::vector<sol::object>{objects.begin(), objects.end()};
+            }
+        }
+
+        if (!args.empty())
+        {
+            std::string message = lua["inspect"](args.front());
+            args.erase(args.begin());
+
+            for (const auto& obj : args)
+            {
+                message += ", ";
+                message += lua["inspect"](args.front());
+            }
+
+            lua["print"](std::move(message));
+        }
+    };
+    /// Same as `prinspect`
+    lua["messpect"] = [this](sol::variadic_args objects) -> void
+    { lua["prinspect"](objects); };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [this](sol::function cb, int frames) -> CallbackId
@@ -328,6 +374,9 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
             lua["options"][name] = -1;
         });
 
+    /// Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.
+    /// Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
+    lua["spawn_liquid"] = spawn_liquid;
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     /// Example:
@@ -345,6 +394,10 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
+    /// Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
+    lua["spawn_entity_nonreplaceable"] = spawn_entity_abs_nonreplaceable;
+    /// Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
+    lua["spawn_critical"] = spawn_entity_abs_nonreplaceable;
     /// Spawn a door to another world, level and theme and return the uid of spawned entity.
     /// Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
     lua["spawn_door"] = spawn_door_abs;
@@ -354,6 +407,44 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["spawn_layer_door"] = spawn_backdoor_abs;
     /// Short for [spawn_layer_door](#spawn_layer_door).
     lua["layer_door"] = spawn_backdoor_abs;
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
+    /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+    lua["set_pre_entity_spawn"] = [this](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
+    {
+        std::vector<uint32_t> types;
+        sol::type va_type = entity_types.get_type();
+        if (va_type == sol::type::number)
+        {
+            types = std::vector<uint32_t>(entity_types.begin(), entity_types.end());
+        }
+        else if (va_type == sol::type::table)
+        {
+            types = entity_types.get<std::vector<uint32_t>>(0);
+        }
+        pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), flags, std::move(cb)});
+        return cbcount++;
+    };
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
+    /// The callback signature is `nil post_entity_spawn(entity)`
+    lua["set_post_entity_spawn"] = [this](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
+    {
+        std::vector<uint32_t> types;
+        sol::type va_type = entity_types.get_type();
+        if (va_type == sol::type::number)
+        {
+            types = std::vector<uint32_t>(entity_types.begin(), entity_types.end());
+        }
+        else if (va_type == sol::type::table)
+        {
+            types = entity_types.get<std::vector<uint32_t>>(0);
+        }
+        post_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(types), flags, std::move(cb)});
+        return cbcount++;
+    };
+
     /// Warp to a level immediately.
     lua["warp"] = warp;
     /// Set seed and reset run.
@@ -642,6 +733,43 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         return (uint16_t)0;
     };
 
+    /// Clears a callback that is specific to an entity.
+    lua["clear_entity_callback"] = [this](int uid, CallbackId cb_id)
+    {
+        clear_entity_hooks.push_back({uid, cb_id});
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// `uid` has to be the uid of a `Movable` or else stuff will break.
+    /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_pre_statemachine"] = [this](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
+        {
+            std::uint32_t id = movable->set_pre_statemachine([this, fun = std::move(fun)](Movable* self)
+                                                             { return handle_function_with_return<bool>(fun, self).value_or(false); });
+            hook_entity_dtor(movable);
+            entity_hooks.push_back({uid, id});
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// `uid` has to be the uid of a `Movable` or else stuff will break.
+    /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_post_statemachine"] = [this](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
+        {
+            std::uint32_t id = movable->set_post_statemachine([this, fun = std::move(fun)](Movable* self)
+                                                              { handle_function(fun, self); });
+            hook_entity_dtor(movable);
+            entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+
     NSound::register_usertypes(lua, this);
     NLevel::register_usertypes(lua, this);
     NGui::register_usertypes(lua, this);
@@ -752,6 +880,17 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     // Runs as soon as your script is loaded, including reloads, then never again
     */
 
+    lua.create_named_table("SPAWN_TYPE", "LEVEL_GEN", SPAWN_TYPE_LEVEL_GEN, "SCRIPT", SPAWN_TYPE_SCRIPT, "SYSTEMIC", SPAWN_TYPE_SYSTEMIC, "ANY", SPAWN_TYPE_ANY);
+    /* SPAWN_TYPE
+    // LEVEL_GEN
+    // For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
+    // SCRIPT
+    // Runs for any spawn happening through a call from the Lua API, also during level generation.
+    // SYSTEMIC
+    // Covers all other spawns, such as items from crates or the player throwing bombs.
+    // ANY
+    // Covers all of the above.
+    */
     lua.create_named_table("CONST", "ENGINE_FPS", 60);
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.create_named_table("WIN_STATE", "NO_WIN", 0, "TIAMAT_WIN", 1, "HUNDUN_WIN", 2, "COSMIC_OCEAN_WIN", 3);
@@ -771,6 +910,23 @@ void ScriptImpl::clear()
         sound_manager->clear_callback(id);
     }
     vanilla_sound_callbacks.clear();
+    for (auto& [ent_uid, id] : entity_hooks)
+    {
+        if (Entity* ent = get_entity_ptr(ent_uid))
+        {
+            ent->unhook(id);
+        }
+    }
+    for (auto& [ent_uid, id] : entity_dtor_hooks)
+    {
+        if (Entity* ent = get_entity_ptr(ent_uid))
+        {
+            ent->unhook(id);
+        }
+    }
+    entity_hooks.clear();
+    clear_entity_hooks.clear();
+    entity_dtor_hooks.clear();
     options.clear();
     required_scripts.clear();
     lua["on_guiframe"] = sol::lua_nil;
@@ -937,21 +1093,30 @@ bool ScriptImpl::run()
             callbacks.erase(id);
             load_callbacks.erase(id);
 
-            {
-                auto it = std::find_if(pre_level_gen_callbacks.begin(), pre_level_gen_callbacks.end(), [id](auto& cb)
-                                       { return cb.id == id; });
-                if (it != pre_level_gen_callbacks.end())
-                    pre_level_gen_callbacks.erase(it);
-            }
-
-            {
-                auto it = std::find_if(post_level_gen_callbacks.begin(), post_level_gen_callbacks.end(), [id](auto& cb)
-                                       { return cb.id == id; });
-                if (it != post_level_gen_callbacks.end())
-                    post_level_gen_callbacks.erase(it);
-            }
+            std::erase_if(pre_level_gen_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
+            std::erase_if(post_level_gen_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
+            std::erase_if(pre_entity_spawn_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
+            std::erase_if(post_entity_spawn_callbacks, [id](auto& cb)
+                          { return cb.id == id; });
         }
         clear_callbacks.clear();
+
+        for (auto& [ent_uid, id] : clear_entity_hooks)
+        {
+            auto it = std::find(entity_hooks.begin(), entity_hooks.end(), std::pair{ent_uid, id});
+            if (it != entity_hooks.end())
+            {
+                if (Entity* ent = get_entity_ptr(ent_uid))
+                {
+                    ent->unhook(id);
+                }
+                entity_hooks.erase(it);
+            }
+        }
+        clear_entity_hooks.clear();
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
@@ -1267,6 +1432,69 @@ void ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float
             handle_function(callback.func, x, y, layer);
         }
     }
+}
+
+Entity* ScriptImpl::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
+{
+    if (!enabled)
+        return nullptr;
+
+    for (auto& callback : pre_entity_spawn_callbacks)
+    {
+        bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
+        bool flags_match = callback.spawn_type_flags & spawn_type_flags;
+        if (mask_match)
+        {
+            bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
+            if (type_match)
+            {
+                if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay))
+                {
+                    return get_entity_ptr(spawn_replacement.value());
+                }
+            }
+        }
+    }
+    return nullptr;
+}
+void ScriptImpl::post_entity_spawn(Entity* entity, int spawn_type_flags)
+{
+    if (!enabled)
+        return;
+
+    for (auto& callback : post_entity_spawn_callbacks)
+    {
+        bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
+        bool flags_match = callback.spawn_type_flags & spawn_type_flags;
+        if (mask_match)
+        {
+            bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
+            if (type_match)
+            {
+                handle_function(callback.func, entity);
+            }
+        }
+    }
+}
+
+void ScriptImpl::hook_entity_dtor(Entity* entity)
+{
+    if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)
+                      { return dtor_hook.first == entity->uid; }) == 0)
+    {
+        std::uint32_t dtor_hook_id = entity->set_on_destroy([this](Entity* entity)
+                                                            { pre_entity_destroyed(entity); });
+        entity_dtor_hooks.push_back({entity->uid, dtor_hook_id});
+    }
+}
+void ScriptImpl::pre_entity_destroyed(Entity* entity)
+{
+    auto num_erased_hooks = std::erase_if(entity_hooks, [entity](auto& hook)
+                                          { return hook.first == entity->uid; });
+    assert(num_erased_hooks != 0);
+    auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
+                                          { return dtor_hook.first == entity->uid; });
+    assert(num_erased_dtors == 1);
 }
 
 std::string ScriptImpl::dump_api()

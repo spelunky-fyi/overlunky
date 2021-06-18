@@ -4,7 +4,7 @@ import re
 import sys
 sys.stdout = open('script-api.md', 'w')
 
-header_files = ['../src/game_api/rpc.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
+header_files = ['../src/game_api/rpc.hpp', '../src/game_api/spawn_api.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
 api_files = [
         '../src/game_api/script/script_impl.cpp',
         '../src/game_api/script/script_impl.hpp',
@@ -256,7 +256,7 @@ print('## Lua libraries')
 print('The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6).')
 for lib in lualibs:
     print('### `' + lib + '`')
-print('### `inspect`')
+print('### `json`')
 print("""To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
 ```Lua
 local some_mod_data_that_should_be_saved = {{

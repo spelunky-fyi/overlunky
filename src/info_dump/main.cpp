@@ -272,12 +272,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             "api_gen",
             &sound_mgr,
             true);
-
-        if (!std::filesystem::exists("lua_api"))
-        {
-            std::filesystem::create_directory("lua_api");
-        }
-
         file << api_gen_script.dump_api() << std::endl;
     }
 

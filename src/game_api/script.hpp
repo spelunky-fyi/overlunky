@@ -53,6 +53,7 @@ struct ScriptImage
     int height;
 };
 
+class Entity;
 class ScriptImpl;
 
 class SpelunkyScript
@@ -95,6 +96,9 @@ class SpelunkyScript
 
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+
+    Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
+    void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
     std::string dump_api();
 
