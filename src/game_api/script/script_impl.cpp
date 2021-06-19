@@ -196,7 +196,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
             for (const auto& obj : args)
             {
                 message += ", ";
-                message += lua["inspect"](args.front());
+                message += lua["inspect"](obj);
             }
 
             lua["print"](std::move(message));
