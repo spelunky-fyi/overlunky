@@ -187,7 +187,9 @@ void register_usertypes(sol::state& lua)
         "uniform_shake",
         &Camera::uniform_shake,
         "focused_entity_uid",
-        &Camera::focused_entity_uid);
+        &Camera::focused_entity_uid,
+        "inertia",
+        &Camera::inertia);
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 }

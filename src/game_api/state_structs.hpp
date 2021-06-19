@@ -134,7 +134,7 @@ struct Camera
     int32_t focused_entity_uid; // if set to -1, you have free control over camera focus through focus_x, focus_y
     uint32_t unknown3;
     uint32_t unknown4;
-    float unknown_adjustment;
+    float inertia; // 0 = still; 1 = follow immediately
     uint32_t unknown5;
     uint32_t unknown6;
     uint32_t unknown7;
