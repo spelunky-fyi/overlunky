@@ -1,0 +1,79 @@
+{
+	"Mod Metadata": {
+		"prefix": "meta",
+		"body": [
+			"meta.name = '${1:Untitled Mod}'",
+			"meta.version = '${2:1.0}'",
+			"meta.description = '$3'",
+			"meta.author = '$4'"
+		]
+	},
+	"Set Callback": {
+		"prefix": "sc",
+		"body": [
+			"set_callback(function ()",
+			"\t$0",
+			"end, ON.$1)"
+		]
+	},
+	"Set Pre Entity Spawn": {
+		"prefix": "spr",
+		"body": [
+			"set_pre_entity_spawn(function(ent_type, x, y, l, overlay)",
+			"\treturn $0",
+			"end, SPAWN_TYPE.$1, ${2|MASK.,0|}, ENT_TYPE.$3)"
+		]
+	},
+	"Set Post Entity Spawn": {
+		"prefix": "spo",
+		"body": [
+			"set_post_entity_spawn(function(entity)",
+			"\t$0",
+			"end, SPAWN_TYPE.$1, ${2|MASK.,0|}, ENT_TYPE.$3)"
+		]
+	},
+	"Player UID": {
+		"prefix": "pui",
+		"body": "players[${1:1}].uid"
+	},
+	"Get Entity": {
+		"prefix": "ge",
+		"body": "get_entity(${1:uid})"
+	},
+	"Get Entities By Type": {
+		"prefix": "gebt",
+		"body": "get_entities_by_type(ENT_TYPE.$1)"
+	},
+	"Get Entities By Mask": {
+		"prefix": "gebm",
+		"body": "get_entities_by_mask(MASK.$1)"
+	},
+	"Get Entities By Layer": {
+		"prefix": "gebl",
+		"body": "get_entities_by_layer(LAYER.$1)"
+	},
+	"Get Entities At": {
+		"prefix": "gea",
+		"body": "get_entities_at(ENT_TYPE.$1, ${2|MASK.,0|}, ${3:x}, ${4:y}, ${5:layer}, ${6:radius})"
+	},
+	"Get Entities Overlapping": {
+		"prefix": "geo",
+		"body": "get_entities_overlapping(ENT_TYPE.$1, ${2|MASK.,0|}, ${3:sx}, ${4:sy}, ${5:sx2}, ${6:sy2}, ${7:layer})"
+	},
+	"Get Entities By": {
+		"prefix": "geb",
+		"body": "get_entities_by(ENT_TYPE.$1, ${2|MASK.,0|}, ${3:layer})"
+	},
+	"Set Flag": {
+		"prefix": "sf",
+		"body": "set_flag(${1:flags}, ${2:bit})"
+	},
+	"Clear Flag": {
+		"prefix": "cf",
+		"body": "clr_flag(${1:flags}, ${2:bit})"
+	},
+	"Test Flag": {
+		"prefix": "tf",
+		"body": "test_flag(${1:flags}, ${2:bit})"
+	}
+}
