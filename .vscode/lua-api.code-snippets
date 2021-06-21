@@ -16,6 +16,42 @@
 			"end, ON.$1)"
 		]
 	},
+	"Set Interval": {
+		"prefix": "si",
+		"body": [
+			"set_interval(function ()",
+			"\t$0",
+			"end, ${1:frames})"
+		]
+	},
+	"Set Timeout": {
+		"prefix": "st",
+		"body": [
+			"set_timeout(function ()",
+			"\t$0",
+			"end, ${1:frames})"
+		]
+	},
+	"Set Global Interval": {
+		"prefix": "sgi",
+		"body": [
+			"set_global_interval(function ()",
+			"\t$0",
+			"end, ${1:frames})"
+		]
+	},
+	"Set Global Timeout": {
+		"prefix": "sgt",
+		"body": [
+			"set_global_timeout(function ()",
+			"\t$0",
+			"end, ${1:frames})"
+		]
+	},
+	"Clear Callback": {
+		"prefix": "cc",
+		"body": "clear_callback(${1:id})"
+	},
 	"Set Pre Entity Spawn": {
 		"prefix": "spr",
 		"body": [
@@ -75,5 +111,49 @@
 	"Test Flag": {
 		"prefix": "tf",
 		"body": "test_flag(${1:flags}, ${2:bit})"
+	},
+	"Register Option Int": {
+		"prefix": "roi",
+		"body": "register_option_int('${1:name}', '${2:desc}', '${3:long_desc}', ${4:value}, ${5:min}, ${6:max})"
+	},
+	"Register Option Float": {
+		"prefix": "rof",
+		"body": "register_option_float('${1:name}', '${2:desc}', '${3:long_desc}', ${4:value}, ${5:min}, ${6:max})"
+	},
+	"Register Option Boolean": {
+		"prefix": "rob",
+		"body": "register_option_bool('${1:name}', '${2:desc}', '${3:long_desc}', ${4:value})"
+	},
+	"Register Option String": {
+		"prefix": "ros",
+		"body": "register_option_string('${1:name}', '${2:desc}', '${3:long_desc}', '${4:value}')"
+	},
+	"Register Option Combo": {
+		"prefix": "roc",
+		"body": "register_option_combo('${1:name}', '${2:desc}', '${3:long_desc}', '${4:opts}')"
+	},
+	"Register Option Button": {
+		"prefix": "robt",
+		"body": [
+			"register_option_button('${1:name}', '${2:desc}', '${3:long_desc}', function ()",
+			"\t$0",
+			"end)"
+		]
+	},
+	"Set Pre Tile Code Callback": {
+		"prefix": "sprtc",
+		"body": [
+			"set_pre_tile_code_callback(function ()",
+			"\treturn $0",
+			"end, '${1:tile_code})'"
+		]
+	},
+	"Set Post Tile Code Callback": {
+		"prefix": "spotc",
+		"body": [
+			"set_post_tile_code_callback(function ()",
+			"\t$0",
+			"end, '${1:tile_code})'"
+		]
 	}
 }
