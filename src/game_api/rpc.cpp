@@ -94,6 +94,40 @@ void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
     }
 }
 
+int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
+{
+    if (Entity* entity = get_entity_ptr(uid))
+    {
+        static const auto ball_entity_type = to_id("ENT_TYPE_ITEM_PUNISHBALL");
+        static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
+
+        auto [x, y, l] = get_position(uid);
+
+        auto* layer_ptr = State::get().layer(l);
+
+        Entity* ball = layer_ptr->spawn_entity(ball_entity_type, x + off_x, y + off_y, false, 0.0f, 0.0f, false);
+
+        // This should use proper types, but I am lazy, info stolen from zapp's tool
+        *(uint32_t*)((size_t)ball + sizeof(Movable)) = uid;
+
+        const uint8_t chain_length = 15;
+        for (uint8_t i = 0; i < chain_length; i++)
+        {
+            Entity* chain = layer_ptr->spawn_entity(chain_entity_type, x, y, false, 0.0f, 0.0f, false);
+            chain->animation_frame -= (i % 2);
+
+            // This too should use proper types
+            *(uint32_t*)((size_t)chain + sizeof(Movable)) = ball->uid;
+            *(float*)((size_t)chain + sizeof(Movable) + 4) = (float)i / chain_length;
+            *(uint8_t*)((size_t)chain + sizeof(Movable) + 8) = i;
+            *(uint8_t*)((size_t)chain + sizeof(Movable) + 12) = (chain_length - i) * 2;
+        }
+
+        return ball->uid;
+    }
+    return -1;
+}
+
 int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
     auto state = State::get();

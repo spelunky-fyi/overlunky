@@ -553,6 +553,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_render_position"] = get_render_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
+    /// Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
+    lua["attach_ball_and_chain"] = attach_ball_and_chain;
     /// Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
     /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
