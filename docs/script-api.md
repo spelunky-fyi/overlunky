@@ -306,6 +306,9 @@ Get the [Entity](#entity) behind an uid
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 `EntityDB get_type(int id)`<br/>
 Get the [EntityDB](#entitydb) behind an ENT_TYPE...
+### [`get_grid_entity_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_grid_entity_at)
+`int get_grid_entity_at(float x, float y, int layer)`<br/>
+Gets a grid entity, such as floor or spikes, at the given position and layer.
 ### [`get_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 `array<int> get_entities()`<br/>
 Get uids of all entities currently loaded
@@ -337,6 +340,10 @@ Get uids of matching entities inside some radius. Set `entity_type` or `mask` to
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 `array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
 Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
+### [`attach_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach_entity)
+`nil attach_entity(int overlay_uid, int attachee_uid)`<br/>
+Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
+However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
 ### [`get_entity_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags)
 `int get_entity_flags(int uid)`<br/>
 Get the `flags` field from entity by uid
@@ -383,6 +390,9 @@ Get interpolated render position `x, y, layer` of entity by uid. This gives smoo
 ### [`entity_remove_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 `nil entity_remove_item(int id, int item_uid)`<br/>
 Remove item by uid from entity
+### [`attach_ball_and_chain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach_ball_and_chain)
+`int attach_ball_and_chain(int uid, float off_x, float off_y)`<br/>
+Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
 ### [`spawn_entity_over`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_over)
 `int spawn_entity_over(int item_uid, int over_uid, float x, float y)`<br/>
 Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
