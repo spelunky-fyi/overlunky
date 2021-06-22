@@ -11,13 +11,12 @@
 #include "util.hpp"
 
 #include <array>
+#include <numbers>
 #include <string_view>
 #include <tuple>
 
 #include <Windows.h>
 #include <detours.h>
-
-//#define HOOK_LOAD_ITEM
 
 std::uint32_t g_last_tile_code_id;
 std::uint32_t g_last_community_tile_code_id;
@@ -27,8 +26,13 @@ std::unordered_map<std::uint32_t, std::string_view> g_IdToName;
 
 struct FloorRequiringEntity
 {
-    float x;
-    float y;
+    struct Position
+    {
+        float x;
+        float y;
+        std::optional<float> angle;
+    };
+    std::vector<Position> pos;
     std::int32_t uid;
     bool handled;
 };
@@ -50,6 +54,7 @@ struct CommunityTileCode
     std::uint32_t tile_code_id;
 };
 std::array g_community_tile_codes{
+    // Wave 1
     CommunityTileCode{
         "totem_trap",
         "ENT_TYPE_FLOOR_TOTEM_TRAP",
@@ -58,7 +63,7 @@ std::array g_community_tile_codes{
             auto* layer_ptr = State::get().layer(layer);
             Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
-            g_floor_requiring_entities.push_back({x, y - 1.0f, bottom->uid});
+            g_floor_requiring_entities.push_back({{{x, y - 1.0f}}, bottom->uid});
         },
     },
     CommunityTileCode{
@@ -69,7 +74,7 @@ std::array g_community_tile_codes{
             auto* layer_ptr = State::get().layer(layer);
             Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
-            g_floor_requiring_entities.push_back({x, y - 1.0f, bottom->uid});
+            g_floor_requiring_entities.push_back({{{x, y - 1.0f}}, bottom->uid});
         },
     },
     CommunityTileCode{"cog_door", "ENT_TYPE_FLOOR_DOOR_COG"},
@@ -174,6 +179,30 @@ std::array g_community_tile_codes{
     CommunityTileCode{"altar_duat", "ENT_TYPE_FLOOR_DUAT_ALTAR"},
     CommunityTileCode{"spikeball", "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL"},
     CommunityTileCode{"cobweb", "ENT_TYPE_ITEM_WEB"},
+    // Wave 2
+    CommunityTileCode{
+        "egg_sac",
+        "ENT_TYPE_ITEM_EGGSAC",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            if (Entity* left = layer_ptr->get_grid_entity_at(x - 1.0f, y))
+            {
+                attach_entity(left, eggsac);
+                eggsac->angle = -std::numbers::pi_v<float> / 2.0f;
+            }
+            else if (Entity* top = layer_ptr->get_grid_entity_at(x, y + 1.0f))
+            {
+                attach_entity(top, eggsac);
+                eggsac->angle = std::numbers::pi_v<float>;
+            }
+            else
+            {
+                g_floor_requiring_entities.push_back({{{x + 1.0f, y, std::numbers::pi_v<float> / 2.0f}, {x, y - 1.0f}}, eggsac->uid});
+            }
+        },
+    },
 };
 
 #ifdef HOOK_LOAD_ITEM
@@ -228,24 +257,31 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
 
     if (!g_floor_requiring_entities.empty())
     {
-        std::optional<std::vector<std::uint32_t>> floors;
+        Entity* floor{nullptr};
         for (auto& pending_entity : g_floor_requiring_entities)
         {
-            if (std::abs(pending_entity.x - x) < 0.01f && std::abs(pending_entity.y - y) < 0.01f)
+            for (const auto& pos : pending_entity.pos)
             {
-                if (auto* entity = get_entity_ptr(pending_entity.uid))
+                if (std::abs(pos.x - x) < 0.01f && std::abs(pos.y - y) < 0.01f)
                 {
-                    if (!floors)
+                    if (auto* entity = get_entity_ptr(pending_entity.uid))
                     {
-                        floors = get_entities_overlapping(0, 0x100 /*MASK.FLOOR*/, x - 0.1f, y - 0.1f, x + 0.1f, y + 0.1f, layer);
-                    }
+                        if (floor == nullptr)
+                        {
+                            auto* layer_ptr = State::get().layer(layer);
+                            floor = layer_ptr->get_grid_entity_at(x, y);
+                        }
 
-                    if (!floors->empty())
-                    {
-                        entity->overlay = get_entity_ptr(floors->at(0));
-                        entity->x = 0.0f;
-                        entity->y = 1.0f;
-                        pending_entity.handled = true;
+                        if (floor != nullptr)
+                        {
+                            attach_entity(floor, entity);
+                            if (pos.angle)
+                            {
+                                entity->angle = pos.angle.value();
+                            }
+                            pending_entity.handled = true;
+                            break;
+                        }
                     }
                 }
             }
