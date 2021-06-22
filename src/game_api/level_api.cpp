@@ -203,6 +203,144 @@ std::array g_community_tile_codes{
             }
         },
     },
+    CommunityTileCode{
+        "egg_sac_left",
+        "ENT_TYPE_ITEM_EGGSAC",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            eggsac->angle = -std::numbers::pi_v<float> / 2.0f;
+            if (Entity* left = layer_ptr->get_grid_entity_at(x - 1.0f, y))
+            {
+                attach_entity(left, eggsac);
+            }
+        },
+    },
+    CommunityTileCode{
+        "egg_sac_top",
+        "ENT_TYPE_ITEM_EGGSAC",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            eggsac->angle = std::numbers::pi_v<float>;
+            if (Entity* top = layer_ptr->get_grid_entity_at(x, y + 1.0f))
+            {
+                attach_entity(top, eggsac);
+            }
+        },
+    },
+    CommunityTileCode{
+        "egg_sac_right",
+        "ENT_TYPE_ITEM_EGGSAC",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            eggsac->angle = std::numbers::pi_v<float> / 2.0f;
+            g_floor_requiring_entities.push_back({{{x + 1.0f, y}}, eggsac->uid});
+        },
+    },
+    CommunityTileCode{
+        "egg_sac_bottom",
+        "ENT_TYPE_ITEM_EGGSAC",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            g_floor_requiring_entities.push_back({{{x, y - 1.0f}}, eggsac->uid});
+        },
+    },
+    CommunityTileCode{"grub", "ENT_TYPE_MONS_GRUB"},
+    CommunityTileCode{"spider", "ENT_TYPE_MONS_SPIDER"},
+    CommunityTileCode{
+        "spider_hanging",
+        "ENT_TYPE_MONS_HANGSPIDER",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            static const auto web_id = to_id("ENT_TYPE_ITEM_WEB");
+            static const auto anchor_id = to_id("ENT_TYPE_ITEM_HANGANCHOR");
+            static const auto strand_id = to_id("ENT_TYPE_ITEM_HANGSTRAND");
+
+            auto* layer_ptr = State::get().layer(layer);
+
+            Entity* spider = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            layer_ptr->spawn_entity_over(strand_id, spider, 0.0f, 0.0f);
+
+            Entity* web = layer_ptr->spawn_entity(web_id, x, y, false, 0.0f, 0.0f, true);
+            layer_ptr->spawn_entity_over(anchor_id, web, 0.0f, 0.0f);
+        },
+    },
+    CommunityTileCode{"skull_drop_trap", "ENT_TYPE_ITEM_SKULLDROPTRAP"},
+    CommunityTileCode{"lava_pot", "ENT_TYPE_ITEM_LAVAPOT"},
+    CommunityTileCode{"proto_shopkeeper", "ENT_TYPE_MONS_PROTOSHOPKEEPER"},
+    CommunityTileCode{"shopkeeper_clone", "ENT_TYPE_MONS_SHOPKEEPERCLONE"},
+    CommunityTileCode{"tadpole", "ENT_TYPE_MONS_TADPOLE"},
+    CommunityTileCode{"ghist_present", "ENT_TYPE_ITEM_GHIST_PRESENT"},
+    CommunityTileCode{
+        "palace_sign",
+        "ENT_TYPE_DECORATION_PALACE_SIGN",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            static const auto floor_id = to_id("ENT_TYPE_FLOOR_GENERIC");
+
+            auto* layer_ptr = State::get().layer(layer);
+
+            Entity* floor = layer_ptr->spawn_entity(floor_id, x, y, false, 0.0f, 0.0f, true);
+            layer_ptr->spawn_entity_over(self.entity_id, floor, 0.0f, 0.0f);
+        },
+    },
+    CommunityTileCode{"critter_dungbeetle", "ENT_TYPE_MONS_CRITTERDUNGBEETLE"},
+    CommunityTileCode{"critter_butterfly", "ENT_TYPE_MONS_CRITTERBUTTERFLY"},
+    CommunityTileCode{"critter_snail", "ENT_TYPE_MONS_CRITTERSNAIL"},
+    CommunityTileCode{"critter_fish", "ENT_TYPE_MONS_CRITTERFISH"},
+    CommunityTileCode{"critter_crab", "ENT_TYPE_MONS_CRITTERCRAB"},
+    CommunityTileCode{"critter_locust", "ENT_TYPE_MONS_CRITTERLOCUST"},
+    CommunityTileCode{"critter_penguin", "ENT_TYPE_MONS_CRITTERPENGUIN"},
+    CommunityTileCode{"critter_firefly", "ENT_TYPE_MONS_CRITTERFIREFLY"},
+    CommunityTileCode{"critter_drone", "ENT_TYPE_MONS_CRITTERDRONE"},
+    CommunityTileCode{
+        "lake_imposter",
+        "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
+        [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] int layer)
+        {
+            spawn_liquid(self.entity_id, x, y);
+        },
+    },
+    CommunityTileCode{"bubble_platform", "ENT_TYPE_ACTIVEFLOOR_BUBBLE_PLATFORM"},
+    CommunityTileCode{"punishball", "ENT_TYPE_ITEM_PUNISHBALL"},
+    CommunityTileCode{
+        "punishball_attach",
+        "ENT_TYPE_ITEM_PUNISHBALL",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            static const auto chain_id = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
+
+            std::vector<uint32_t> entities_left = get_entities_overlapping(0, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
+            if (!entities_left.empty())
+            {
+                attach_ball_and_chain(entities_left.front(), 1.0f, 0.0f);
+            }
+        },
+    },
+    CommunityTileCode{"giant_fly", "ENT_TYPE_MONS_GIANTFLY"},
+    CommunityTileCode{"flying_fish", "ENT_TYPE_MONS_FISH"},
+    CommunityTileCode{"crabman", "ENT_TYPE_MONS_CRABMAN"},
+    CommunityTileCode{"slidingwall", "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"},
+    CommunityTileCode{"spikeball_trap", "ENT_TYPE_FLOOR_SPIKEBALL_CEILING"},
+    CommunityTileCode{
+        "spikeball_no_bounce",
+        "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* spikeball = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            *(bool*)((size_t)spikeball + sizeof(Movable)) = true;
+        },
+    },
+    CommunityTileCode{"boulder", "ENT_TYPE_ACTIVEFLOOR_BOULDER"},
+    CommunityTileCode{"apep", "ENT_TYPE_MONS_APEP_HEAD"},
 };
 
 #ifdef HOOK_LOAD_ITEM
@@ -315,6 +453,7 @@ void LevelGenData::init()
 
     for (auto& community_tile_code : g_community_tile_codes)
     {
+        assert(!get_tile_code(std::string{community_tile_code.tile_code}).has_value());
         community_tile_code.tile_code_id = define_tile_code(std::string{community_tile_code.tile_code});
         const auto entity_id = to_id(community_tile_code.entity_type);
         if (entity_id < 0)
