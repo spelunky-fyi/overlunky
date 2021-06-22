@@ -4,9 +4,7 @@
 #include "logger.h"
 #include "state.hpp"
 
-struct Layer;
 using LoadItem = size_t (*)(Layer*, size_t, float, float);
-
 LoadItem get_load_item()
 {
     ONCE(LoadItem)
@@ -24,7 +22,6 @@ LoadItem get_load_item()
 }
 
 using LoadItemOver = Entity* (*)(Layer*, size_t, Entity*, float, float, bool);
-
 LoadItemOver get_load_item_over()
 {
     ONCE(LoadItemOver)
@@ -34,6 +31,18 @@ LoadItemOver get_load_item_over()
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
         return res = (LoadItemOver)memory.at_exe(decode_call(off));
+    }
+}
+
+using GetGridEntityAt = Entity* (*)(Layer*, float, float);
+GetGridEntityAt get_get_grid_entity_at()
+{
+    ONCE(GetGridEntityAt)
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x48\x8b\x00\xff\x90\x38\x01\x00\x00"s, memory.after_bundle);
+        off = find_inst(memory.exe(), "\xE8"s, off - 0x10);
+        return res = (GetGridEntityAt)memory.at_exe(decode_call(off));
     }
 }
 
@@ -85,6 +94,12 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
     auto load_item_over = (get_load_item_over());
 
     return load_item_over(this, id, overlay, x, y, true);
+}
+
+Entity* Layer::get_grid_entity_at(float x, float y)
+{
+    auto get_grid_entity_at = (get_get_grid_entity_at());
+    return get_grid_entity_at(this, x, y);
 }
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)

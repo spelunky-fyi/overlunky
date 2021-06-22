@@ -70,6 +70,30 @@ void list_items()
     }
 }
 
+void attach_entity(Entity* overlay, Entity* attachee)
+{
+    using AttachEntity = void (*)(Entity*, Entity*);
+    static AttachEntity attach_entity = []()
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x48\x8b\xd0\x48\x8b\xcd\x48\x8b\xd8"s, memory.after_bundle);
+        off = find_inst(memory.exe(), "\xe8"s, off);
+        return (AttachEntity)memory.at_exe(decode_call(off));
+    }();
+    attach_entity(overlay, attachee);
+}
+
+void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
+{
+    if (Entity* overlay = get_entity_ptr(overlay_uid))
+    {
+        if (Entity* attachee = get_entity_ptr(attachee_uid))
+        {
+            attach_entity(overlay, attachee);
+        }
+    }
+}
+
 int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
     auto state = State::get();
@@ -110,6 +134,31 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
         DEBUG("{}", (void*)entity);
         return std::get<0>(picked);
     }
+    return -1;
+}
+
+int32_t get_grid_entity_at(float x, float y, int layer)
+{
+    auto state = State::get();
+    if (layer == 0 || layer == 1)
+    {
+        if (Entity* ent = state.layer(layer)->get_grid_entity_at(x, y))
+        {
+            return ent->uid;
+        }
+    }
+    else if (layer < 0)
+    {
+        auto player = state.items()->player(abs(layer) - 1);
+        if (player != nullptr)
+        {
+            if (Entity* ent = state.layer(player->layer())->get_grid_entity_at(x, y))
+            {
+                return ent->uid;
+            }
+        }
+    }
+
     return -1;
 }
 

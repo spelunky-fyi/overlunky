@@ -477,6 +477,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_entity"] = get_entity_ptr;
     /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
     lua["get_type"] = get_type;
+    /// Gets a grid entity, such as floor or spikes, at the given position and layer.
+    lua["get_grid_entity_at"] = get_grid_entity_at;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
@@ -517,6 +519,9 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_entities_at"] = get_entities_at;
     /// Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_overlapping"] = get_entities_overlapping;
+    /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
+    /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
+    lua["attach_entity"] = attach_entity_by_uid;
     /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
     /// Set the `flags` field from entity by uid

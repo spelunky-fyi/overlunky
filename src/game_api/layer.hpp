@@ -18,5 +18,7 @@ struct Layer
 
     Entity* spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 
+    Entity* get_grid_entity_at(float x, float y);
+
     std::vector<Entity*> items() const;
 };
