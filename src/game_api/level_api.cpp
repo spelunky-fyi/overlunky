@@ -353,6 +353,37 @@ std::array g_community_tile_codes{
     },
     CommunityTileCode{"boulder", "ENT_TYPE_ACTIVEFLOOR_BOULDER"},
     CommunityTileCode{"apep", "ENT_TYPE_MONS_APEP_HEAD"},
+    CommunityTileCode{"olmite_naked", "ENT_TYPE_MONS_OLMITE_NAKED"},
+    CommunityTileCode{"olmite_helmet", "ENT_TYPE_MONS_OLMITE_HELMET"},
+    CommunityTileCode{
+        "olmite_armored",
+        "ENT_TYPE_MONS_OLMITE_BODYARMORED",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            static const auto helmet_id = to_id("ENT_TYPE_MONS_OLMITE_HELMET");
+            static const auto naked_id = to_id("ENT_TYPE_MONS_OLMITE_NAKED");
+
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* olmite = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+
+            std::vector<uint32_t> entities_above = get_entities_overlapping(0, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
+            for (uint32_t uid : entities_above)
+            {
+                if (Entity* ent = get_entity_ptr(uid))
+                {
+                    if (ent->type->id == helmet_id || ent->type->id == naked_id || ent->type->id == self.entity_id)
+                    {
+                        *(bool*)((size_t)ent + 0x149) = true;
+                        *(bool*)((size_t)olmite + 0x149) = true;
+                        *(uint32_t*)((size_t)olmite + 0x14c) = ent->uid;
+
+                        float offset[]{0.0f, 0.64f};
+                        stack_entities(olmite->uid, ent->uid, offset);
+                    }
+                }
+            }
+        },
+    },
 };
 
 #ifdef HOOK_LOAD_ITEM

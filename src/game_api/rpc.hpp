@@ -12,6 +12,7 @@ void list_items();
 void attach_entity(Entity* overlay, Entity* attachee);
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid);
 int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y);
+void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2]);
 int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask);
 int32_t get_grid_entity_at(float x, float y, int layer);
 void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap);

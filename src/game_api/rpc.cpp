@@ -128,6 +128,26 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
     return -1;
 }
 
+void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
+{
+    using StackEntities = void (*)(Entity*, Entity*, float(&)[2]);
+    static StackEntities stack_entities = []()
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x49\x8b\xc9\xf3\x0f\x11\x5c\x24\x34"s, memory.after_bundle);
+        off = find_inst(memory.exe(), "\xe8"s, off);
+        return (StackEntities)memory.at_exe(decode_call(off));
+    }();
+
+    if (Entity* bottom = get_entity_ptr(bottom_uid))
+    {
+        if (Entity* top = get_entity_ptr(top_uid))
+        {
+            stack_entities(bottom, top, offset);
+        }
+    }
+}
+
 int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
     auto state = State::get();
