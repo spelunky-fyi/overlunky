@@ -213,7 +213,8 @@ Add a string option that the user can change in the UI. Read with `options.name`
 Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
 with a double `\0\0` at the end.
 ### [`register_option_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
-`nil register_option_button()`<br/>
+`nil register_option_button(string name, string desc, string long_desc, function on_click)`<br/>
+Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
 ### [`spawn_liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_liquid)
 `nil spawn_liquid(int entity_type, float x, float y)`<br/>
 Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.

@@ -361,7 +361,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
             lua["options"][name] = 1;
         });
     /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
-    // lua["register_option_combo"] = [this](std::string name, std::string desc, std::string long_desc, sol::function on_click)
+    // lua["register_option_button"] = [this](std::string name, std::string desc, std::string long_desc, sol::function on_click)
     lua["register_option_button"] = sol::overload(
         [this](std::string name, std::string desc, std::string long_desc, sol::function callback)
         {
