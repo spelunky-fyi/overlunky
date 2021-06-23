@@ -9,6 +9,7 @@
 #include "script.hpp"
 #include "spawn_api.hpp"
 #include "util.hpp"
+#include "vtable_hook.hpp"
 
 #include <array>
 #include <numbers>
@@ -327,12 +328,16 @@ std::array g_community_tile_codes{
     CommunityTileCode{"giant_fly", "ENT_TYPE_MONS_GIANTFLY"},
     CommunityTileCode{"flying_fish", "ENT_TYPE_MONS_FISH"},
     CommunityTileCode{"crabman", "ENT_TYPE_MONS_CRABMAN"},
-    CommunityTileCode{"slidingwall", "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL",
+    CommunityTileCode{
+        "slidingwall",
+        "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL",
         [](const CommunityTileCode& self, float x, float y, int layer)
         {
             auto* layer_ptr = State::get().layer(layer);
             Entity* slidingwall = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            slidingwall->flags |= 1 << 27; // top part is broken, prevents access violation
+            // hook the function that dereferences the top part of the trap (which is nullptr right now)
+            hook_vtable<void(Entity*, Entity*)>(
+                slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {}, 25);
         },
     },
     CommunityTileCode{"spikeball_trap", "ENT_TYPE_FLOOR_SPIKEBALL_CEILING"},
