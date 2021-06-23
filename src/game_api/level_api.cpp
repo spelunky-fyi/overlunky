@@ -327,7 +327,14 @@ std::array g_community_tile_codes{
     CommunityTileCode{"giant_fly", "ENT_TYPE_MONS_GIANTFLY"},
     CommunityTileCode{"flying_fish", "ENT_TYPE_MONS_FISH"},
     CommunityTileCode{"crabman", "ENT_TYPE_MONS_CRABMAN"},
-    CommunityTileCode{"slidingwall", "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"},
+    CommunityTileCode{"slidingwall", "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL",
+        [](const CommunityTileCode& self, float x, float y, int layer)
+        {
+            auto* layer_ptr = State::get().layer(layer);
+            Entity* slidingwall = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            slidingwall->flags |= 1 << 27; // top part is broken, prevents access violation
+        },
+    },
     CommunityTileCode{"spikeball_trap", "ENT_TYPE_FLOOR_SPIKEBALL_CEILING"},
     CommunityTileCode{
         "spikeball_no_bounce",
