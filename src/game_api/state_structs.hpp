@@ -693,3 +693,13 @@ struct Dialogue
     uint32_t unknown19;
     uint32_t unknown20;
 };
+
+struct SelectPlayerSlot
+{
+    bool activated;
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
+    uint32_t character;  // Entity DB ID
+    uint32_t texture_id; // Texture DB ID
+};
