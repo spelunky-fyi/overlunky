@@ -408,9 +408,9 @@ class Waddler : public Monster
     uint8_t unknown8;
     uint8_t unknown9;
     uint64_t unknown10;
-    uint8_t unknown11;
+    bool player_detected; // to show the welcome message
     bool on_the_ground;
-    uint16_t aggro_timer;
+    uint16_t air_timer;
 };
 
 class Octopus : public Monster
