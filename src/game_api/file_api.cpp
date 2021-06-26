@@ -8,6 +8,7 @@
 
 #include "logger.h"
 #include "memory.hpp"
+#include "util.hpp"
 #include "window_api.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -106,6 +107,50 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 
             return file_info;
         }
+    }
+    else
+    {
+        auto read_file_from_disk = [](const char* file_path, void* (*allocator)(std::size_t)) -> FileInfo* {
+            FILE* file{ nullptr };
+            auto error = fopen_s(&file, file_path, "rb");
+            if (error == 0 && file != nullptr)
+            {
+                auto close_file = OnScopeExit{ [file]()
+                                                { fclose(file); } };
+
+                fseek(file, 0, SEEK_END);
+                const std::size_t file_size = ftell(file);
+                fseek(file, 0, SEEK_SET);
+
+                if (allocator == nullptr)
+                {
+                    allocator = malloc;
+                }
+
+                const std::size_t allocation_size = file_size + sizeof(FileInfo);
+                if (void* buf = allocator(allocation_size))
+                {
+                    void* data = static_cast<void*>(reinterpret_cast<char*>(buf) + 24);
+                    const auto size_read = fread(data, 1, file_size, file);
+                    if (size_read != file_size)
+                    {
+                        DEBUG("Could not read file {}, this will either crash or cause glitches...", file_path);
+                    }
+
+                    FileInfo* file_info = new (buf) FileInfo();
+                    *file_info = {
+                        .Data = data,
+                        .DataSize = static_cast<int>(file_size),
+                        .AllocationSize = static_cast<int>(allocation_size)
+                    };
+
+                    return file_info;
+                }
+            }
+
+            return nullptr;
+        };
+        return read_file_from_disk(file_path, alloc_fun);
     }
     return nullptr;
 }
