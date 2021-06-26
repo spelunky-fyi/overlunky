@@ -27,6 +27,11 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
+        // check for nan in the vectors because this will cause a crash in ImGui
+        if (isnan(a.x) || isnan(a.y) || isnan(b.x) || isnan(b.y))
+        {
+            return;
+        }
         script->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
     };
     /// Draws a filled rectangle on screen from top-left to bottom-right.
