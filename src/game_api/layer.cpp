@@ -4,7 +4,7 @@
 #include "logger.h"
 #include "state.hpp"
 
-using LoadItem = size_t (*)(Layer*, size_t, float, float);
+using LoadItem = size_t (*)(Layer*, size_t, float, float, bool);
 LoadItem get_load_item()
 {
     ONCE(LoadItem)
@@ -50,7 +50,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
 {
     if (id == 0)
         return nullptr;
-    auto load_item = (get_load_item());
+    auto load_item = get_load_item();
     if (!screen)
     {
         if (snap)
@@ -58,7 +58,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
             x = round(x);
             y = round(y);
         }
-        auto addr = load_item(this, id, x, y);
+        auto addr = load_item(this, id, x, y, false);
         if (abs(vx) + abs(vy) > 0.01)
         {
             write_mem(addr + 0x100, to_le_bytes(vx));
@@ -76,7 +76,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
             rx = round(rx);
             ry = round(ry);
         }
-        auto addr = load_item(this, id, rx, ry);
+        auto addr = load_item(this, id, rx, ry, false);
         if (abs(vx) + abs(vy) > 0.04)
         {
             write_mem(addr + 0x100, to_le_bytes(vx));
