@@ -59,6 +59,7 @@ size_t get_location()
         return res = location;
     }
 }
+
 size_t get_damage()
 {
     ONCE(size_t)
@@ -167,8 +168,13 @@ State& State::get()
 StateMemory* State::ptr() const
 {
     OnHeapPointer<StateMemory> p(read_u64(location));
-    // log::debug!("{:x?}" State; p);
     return p.decode();
+}
+
+StateMemory* State::ptr_local() const
+{
+    OnHeapPointer<StateMemory> p(read_u64(location));
+    return p.decode_local();
 }
 
 std::pair<float, float> State::click_position(float x, float y)

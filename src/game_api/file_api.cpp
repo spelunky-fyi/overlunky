@@ -110,13 +110,14 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
     }
     else
     {
-        auto read_file_from_disk = [](const char* file_path, void* (*allocator)(std::size_t)) -> FileInfo* {
-            FILE* file{ nullptr };
+        auto read_file_from_disk = [](const char* file_path, void* (*allocator)(std::size_t)) -> FileInfo*
+        {
+            FILE* file{nullptr};
             auto error = fopen_s(&file, file_path, "rb");
             if (error == 0 && file != nullptr)
             {
-                auto close_file = OnScopeExit{ [file]()
-                                                { fclose(file); } };
+                auto close_file = OnScopeExit{[file]()
+                                              { fclose(file); }};
 
                 fseek(file, 0, SEEK_END);
                 const std::size_t file_size = ftell(file);
@@ -141,8 +142,7 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
                     *file_info = {
                         .Data = data,
                         .DataSize = static_cast<int>(file_size),
-                        .AllocationSize = static_cast<int>(allocation_size)
-                    };
+                        .AllocationSize = static_cast<int>(allocation_size)};
 
                     return file_info;
                 }

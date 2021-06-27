@@ -565,8 +565,13 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
 {
     auto state = State::get();
+    return get_entities_overlapping_by_pointer(entity_type, mask, sx, sy, sx2, sy2, state.layer(layer));
+}
+
+std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
+{
     std::vector<uint32_t> found;
-    for (auto& item : state.layer(layer)->items())
+    for (auto& item : layer->items())
     {
         if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && item->overlaps_with(sx, sy, sx2, sy2))
         {

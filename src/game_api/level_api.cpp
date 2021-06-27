@@ -40,16 +40,15 @@ struct FloorRequiringEntity
 std::vector<FloorRequiringEntity> g_floor_requiring_entities;
 
 struct CommunityTileCode;
-using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, int layer);
+using TileCodeFunc = Entity*(const CommunityTileCode& self, float x, float y, Layer* layer);
 
 struct CommunityTileCode
 {
     std::string_view tile_code;
     std::string_view entity_type;
-    TileCodeFunc* func = [](const CommunityTileCode& self, float x, float y, int layer)
+    TileCodeFunc* func = [](const CommunityTileCode& self, float x, float y, Layer* layer)
     {
-        auto* layer_ptr = State::get().layer(layer);
-        layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+        return layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, false);
     };
     std::uint32_t entity_id;
     std::uint32_t tile_code_id;
@@ -59,23 +58,23 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "totem_trap",
         "ENT_TYPE_FLOOR_TOTEM_TRAP",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
+            Entity* bottom = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            layer->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
             g_floor_requiring_entities.push_back({{{x, y - 1.0f}}, bottom->uid});
+            return bottom;
         },
     },
     CommunityTileCode{
         "lion_trap",
         "ENT_TYPE_FLOOR_LION_TRAP",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* bottom = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            layer_ptr->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
+            Entity* bottom = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            layer->spawn_entity_over(self.entity_id, bottom, 0.0f, 1.0f);
             g_floor_requiring_entities.push_back({{{x, y - 1.0f}}, bottom->uid});
+            return bottom;
         },
     },
     CommunityTileCode{"cog_door", "ENT_TYPE_FLOOR_DOOR_COG"},
@@ -184,16 +183,15 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "egg_sac",
         "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            if (Entity* left = layer_ptr->get_grid_entity_at(x - 1.0f, y))
+            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            if (Entity* left = layer->get_grid_entity_at(x - 1.0f, y))
             {
                 attach_entity(left, eggsac);
                 eggsac->angle = -std::numbers::pi_v<float> / 2.0f;
             }
-            else if (Entity* top = layer_ptr->get_grid_entity_at(x, y + 1.0f))
+            else if (Entity* top = layer->get_grid_entity_at(x, y + 1.0f))
             {
                 attach_entity(top, eggsac);
                 eggsac->angle = std::numbers::pi_v<float>;
@@ -202,55 +200,56 @@ std::array g_community_tile_codes{
             {
                 g_floor_requiring_entities.push_back({{{x + 1.0f, y, std::numbers::pi_v<float> / 2.0f}, {x, y - 1.0f}}, eggsac->uid});
             }
+            return eggsac;
         },
     },
     CommunityTileCode{
         "egg_sac_left",
         "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             eggsac->angle = -std::numbers::pi_v<float> / 2.0f;
-            if (Entity* left = layer_ptr->get_grid_entity_at(x - 1.0f, y))
+            if (Entity* left = layer->get_grid_entity_at(x - 1.0f, y))
             {
                 attach_entity(left, eggsac);
             }
+            return eggsac;
         },
     },
     CommunityTileCode{
         "egg_sac_top",
         "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             eggsac->angle = std::numbers::pi_v<float>;
-            if (Entity* top = layer_ptr->get_grid_entity_at(x, y + 1.0f))
+            if (Entity* top = layer->get_grid_entity_at(x, y + 1.0f))
             {
                 attach_entity(top, eggsac);
             }
+            return eggsac;
         },
     },
     CommunityTileCode{
         "egg_sac_right",
         "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             eggsac->angle = std::numbers::pi_v<float> / 2.0f;
             g_floor_requiring_entities.push_back({{{x + 1.0f, y}}, eggsac->uid});
+            return eggsac;
         },
     },
     CommunityTileCode{
         "egg_sac_bottom",
         "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* eggsac = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             g_floor_requiring_entities.push_back({{{x, y - 1.0f}}, eggsac->uid});
+            return eggsac;
         },
     },
     CommunityTileCode{"grub", "ENT_TYPE_MONS_GRUB"},
@@ -258,19 +257,19 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "spider_hanging",
         "ENT_TYPE_MONS_HANGSPIDER",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
             static const auto web_id = to_id("ENT_TYPE_ITEM_WEB");
             static const auto anchor_id = to_id("ENT_TYPE_ITEM_HANGANCHOR");
             static const auto strand_id = to_id("ENT_TYPE_ITEM_HANGSTRAND");
 
-            auto* layer_ptr = State::get().layer(layer);
+            Entity* spider = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            layer->spawn_entity_over(strand_id, spider, 0.0f, 0.0f);
 
-            Entity* spider = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            layer_ptr->spawn_entity_over(strand_id, spider, 0.0f, 0.0f);
+            Entity* web = layer->spawn_entity(web_id, x, y, false, 0.0f, 0.0f, true);
+            layer->spawn_entity_over(anchor_id, web, 0.0f, 0.0f);
 
-            Entity* web = layer_ptr->spawn_entity(web_id, x, y, false, 0.0f, 0.0f, true);
-            layer_ptr->spawn_entity_over(anchor_id, web, 0.0f, 0.0f);
+            return spider;
         },
     },
     CommunityTileCode{"skull_drop_trap", "ENT_TYPE_ITEM_SKULLDROPTRAP"},
@@ -282,14 +281,14 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "palace_sign",
         "ENT_TYPE_DECORATION_PALACE_SIGN",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
             static const auto floor_id = to_id("ENT_TYPE_FLOOR_GENERIC");
 
-            auto* layer_ptr = State::get().layer(layer);
+            Entity* floor = layer->spawn_entity(floor_id, x, y, false, 0.0f, 0.0f, true);
+            layer->spawn_entity_over(self.entity_id, floor, 0.0f, 0.0f);
 
-            Entity* floor = layer_ptr->spawn_entity(floor_id, x, y, false, 0.0f, 0.0f, true);
-            layer_ptr->spawn_entity_over(self.entity_id, floor, 0.0f, 0.0f);
+            return floor;
         },
     },
     CommunityTileCode{"critter_dungbeetle", "ENT_TYPE_MONS_CRITTERDUNGBEETLE"},
@@ -304,9 +303,9 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "lake_imposter",
         "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
-        [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] int layer)
+        [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] Layer* layer)
         {
-            spawn_liquid(self.entity_id, x, y);
+            return spawn_liquid(self.entity_id, x, y);
         },
     },
     CommunityTileCode{"bubble_platform", "ENT_TYPE_ACTIVEFLOOR_BUBBLE_PLATFORM"},
@@ -314,15 +313,18 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "punishball_attach",
         "ENT_TYPE_ITEM_PUNISHBALL",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
             static const auto chain_id = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
 
-            std::vector<uint32_t> entities_left = get_entities_overlapping(0, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
+            std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer(0, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
             if (!entities_left.empty())
             {
-                attach_ball_and_chain(entities_left.front(), 1.0f, 0.0f);
+                return get_entity_ptr(attach_ball_and_chain(entities_left.front(), 1.0f, 0.0f));
             }
+
+            return layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            ;
         },
     },
     CommunityTileCode{"giant_fly", "ENT_TYPE_MONS_GIANTFLY"},
@@ -331,24 +333,24 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "slidingwall",
         "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* slidingwall = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* slidingwall = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             // hook the function that dereferences the top part of the trap (which is nullptr right now)
             hook_vtable<void(Entity*, Entity*)>(
                 slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {}, 25);
+            return slidingwall;
         },
     },
     CommunityTileCode{"spikeball_trap", "ENT_TYPE_FLOOR_SPIKEBALL_CEILING"},
     CommunityTileCode{
         "spikeball_no_bounce",
         "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* spikeball = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* spikeball = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             *(bool*)((size_t)spikeball + sizeof(Movable)) = true;
+            return spikeball;
         },
     },
     CommunityTileCode{"boulder", "ENT_TYPE_ACTIVEFLOOR_BOULDER"},
@@ -358,15 +360,14 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "olmite_armored",
         "ENT_TYPE_MONS_OLMITE_BODYARMORED",
-        [](const CommunityTileCode& self, float x, float y, int layer)
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
             static const auto helmet_id = to_id("ENT_TYPE_MONS_OLMITE_HELMET");
             static const auto naked_id = to_id("ENT_TYPE_MONS_OLMITE_NAKED");
 
-            auto* layer_ptr = State::get().layer(layer);
-            Entity* olmite = layer_ptr->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* olmite = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
 
-            std::vector<uint32_t> entities_above = get_entities_overlapping(0, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
+            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer(0, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
             {
                 if (Entity* ent = get_entity_ptr(uid))
@@ -382,22 +383,25 @@ std::array g_community_tile_codes{
                     }
                 }
             }
+
+            return olmite;
         },
     },
 };
 
+//#define HOOK_LOAD_ITEM
 #ifdef HOOK_LOAD_ITEM
-using LoadItemFun = void*(Layer*, std::uint32_t, float, float);
+using LoadItemFun = void*(Layer*, std::uint32_t, float, float, bool);
 LoadItemFun* g_load_item_trampoline{nullptr};
-void* load_item(Layer* _this, std::uint32_t entity_id, float x, float y)
+void* load_item(Layer* _this, std::uint32_t entity_id, float x, float y, bool some_bool)
 {
-    return g_load_item_trampoline(_this, entity_id, x, y);
+    return g_load_item_trampoline(_this, entity_id, x, y, some_bool);
 }
 #endif
 
-using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
+using HandleTileCodeFun = Entity*(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
-void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
+Entity* handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN);
     OnScopeExit pop{[]
@@ -407,34 +411,38 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
 
     {
         bool block_spawn = false;
-        SpelunkyScript::for_each_script([&](SpelunkyScript& script)
-                                        {
-                                            block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
-                                            if (block_spawn)
-                                                return false;
-                                            return true;
-                                        });
+        SpelunkyScript::for_each_script(
+            [&](SpelunkyScript& script)
+            {
+                block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
+                if (block_spawn)
+                    return false;
+                return true;
+            });
         if (block_spawn)
         {
             tile_code = g_last_tile_code_id;
         }
     }
 
+    Entity* spawned_ent{nullptr};
     if (tile_code > g_last_tile_code_id && tile_code < g_last_community_tile_code_id)
     {
+        auto* layer_ptr = State::get().ptr_local()->layers[layer];
         const CommunityTileCode& community_tile_code = g_community_tile_codes[tile_code - g_last_tile_code_id - 1];
-        community_tile_code.func(community_tile_code, x, y, layer);
+        spawned_ent = community_tile_code.func(community_tile_code, x, y, layer_ptr);
     }
     else
     {
-        g_handle_tile_code_trampoline(_this, tile_code, _ull_0, x, y, layer);
+        spawned_ent = g_handle_tile_code_trampoline(_this, tile_code, _ull_0, x, y, layer);
     }
 
-    SpelunkyScript::for_each_script([&](SpelunkyScript& script)
-                                    {
-                                        script.post_level_gen_spawn(tile_code_name, x, y, layer);
-                                        return true;
-                                    });
+    SpelunkyScript::for_each_script(
+        [&](SpelunkyScript& script)
+        {
+            script.post_level_gen_spawn(tile_code_name, x, y, layer);
+            return true;
+        });
 
     if (!g_floor_requiring_entities.empty())
     {
@@ -449,7 +457,7 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
                     {
                         if (floor == nullptr)
                         {
-                            auto* layer_ptr = State::get().layer(layer);
+                            auto* layer_ptr = State::get().ptr_local()->layers[layer];
                             floor = layer_ptr->get_grid_entity_at(x, y);
                         }
 
@@ -472,6 +480,8 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
                                                         { return ent.handled || get_entity_ptr(ent.uid) == nullptr; }),
                                          g_floor_requiring_entities.end());
     }
+
+    return spawned_ent;
 }
 
 void LevelGenData::init()
