@@ -87,6 +87,22 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
     }
 }
 
+Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
+{
+    using SpawnEntityHopefullySynced = Entity* (*)(Layer*, size_t, float, float);
+    SpawnEntityHopefullySynced spawn_entity_snap_to_floor = []
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        auto off = find_inst(exe, "\x41\x0f\x28\xd8\x49\x8b\xce"s, memory.after_bundle);
+        off = find_inst(exe, "\xE8"s, off + 5);
+
+        return (SpawnEntityHopefullySynced)memory.at_exe(decode_call(off));
+    }();
+
+    return spawn_entity_snap_to_floor(this, id, x, y);
+}
+
 Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 {
     if (id == 0)
