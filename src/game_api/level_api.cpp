@@ -179,7 +179,7 @@ std::array g_community_tile_codes{
     CommunityTileCode{"cobweb", "ENT_TYPE_ITEM_WEB"},
     // Wave 2
     CommunityTileCode{
-        "egg_sac",
+        "eggsac",
         "ENT_TYPE_ITEM_EGGSAC",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
@@ -201,7 +201,7 @@ std::array g_community_tile_codes{
         },
     },
     CommunityTileCode{
-        "egg_sac_left",
+        "eggsac_left",
         "ENT_TYPE_ITEM_EGGSAC",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
@@ -214,7 +214,7 @@ std::array g_community_tile_codes{
         },
     },
     CommunityTileCode{
-        "egg_sac_top",
+        "eggsac_top",
         "ENT_TYPE_ITEM_EGGSAC",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
@@ -227,7 +227,7 @@ std::array g_community_tile_codes{
         },
     },
     CommunityTileCode{
-        "egg_sac_right",
+        "eggsac_right",
         "ENT_TYPE_ITEM_EGGSAC",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
@@ -237,7 +237,7 @@ std::array g_community_tile_codes{
         },
     },
     CommunityTileCode{
-        "egg_sac_bottom",
+        "eggsac_bottom",
         "ENT_TYPE_ITEM_EGGSAC",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
