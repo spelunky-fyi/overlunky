@@ -289,14 +289,14 @@ std::array g_community_tile_codes{
     CommunityTileCode{"critter_penguin", "ENT_TYPE_MONS_CRITTERPENGUIN"},
     CommunityTileCode{"critter_firefly", "ENT_TYPE_MONS_CRITTERFIREFLY"},
     CommunityTileCode{"critter_drone", "ENT_TYPE_MONS_CRITTERDRONE"},
-    CommunityTileCode{
-        "lake_imposter",
-        "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
-        [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] Layer* layer)
-        {
-            spawn_liquid(self.entity_id, x, y);
-        },
-    },
+    //CommunityTileCode{
+    //    "lake_imposter",
+    //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
+    //    [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] Layer* layer)
+    //    {
+    //        layer->spawn_entity(self.entity_id, x, y, false, 0, 0, true);
+    //    },
+    //},
     CommunityTileCode{"bubble_platform", "ENT_TYPE_ACTIVEFLOOR_BUBBLE_PLATFORM"},
     CommunityTileCode{"punishball", "ENT_TYPE_ITEM_PUNISHBALL"},
     CommunityTileCode{
@@ -372,6 +372,42 @@ std::array g_community_tile_codes{
             }
         },
     },
+    //CommunityTileCode{
+    //    "telefloor_left",
+    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
+    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
+    //    {
+    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 1;
+    //    },
+    //},
+    //CommunityTileCode{
+    //    "telefloor_top",
+    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
+    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
+    //    {
+    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 3;
+    //    },
+    //},
+    //CommunityTileCode{
+    //    "telefloor_right",
+    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
+    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
+    //    {
+    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 0;
+    //    },
+    //},
+    //CommunityTileCode{
+    //    "telefloor_bottom",
+    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
+    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
+    //    {
+    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 2;
+    //    },
+    //},
 };
 
 //#define HOOK_LOAD_ITEM
