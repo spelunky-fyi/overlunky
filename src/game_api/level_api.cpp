@@ -205,10 +205,10 @@ std::array g_community_tile_codes{
         "ENT_TYPE_ITEM_EGGSAC",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            eggsac->angle = -std::numbers::pi_v<float> / 2.0f;
             if (Entity* left = layer->get_grid_entity_at(x - 1.0f, y))
             {
+                Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+                eggsac->angle = -std::numbers::pi_v<float> / 2.0f;
                 attach_entity(left, eggsac);
             }
         },
@@ -218,10 +218,10 @@ std::array g_community_tile_codes{
         "ENT_TYPE_ITEM_EGGSAC",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            eggsac->angle = std::numbers::pi_v<float>;
             if (Entity* top = layer->get_grid_entity_at(x, y + 1.0f))
             {
+                Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+                eggsac->angle = std::numbers::pi_v<float>;
                 attach_entity(top, eggsac);
             }
         },
