@@ -64,7 +64,7 @@ void list_items()
     auto player = state.items()->player(0);
     if (player == nullptr)
         return;
-    for (auto& item : state.layer(player->layer())->items())
+    for (auto& item : state.layer(player->layer)->items())
     {
         DEBUG("Item {} {:x}, {}", item->uid, item->type->search_flags, item->position_self());
     }
@@ -162,7 +162,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     if (player == nullptr)
         return -1;
     std::vector<std::tuple<int, float, Entity*>> found;
-    for (auto& item : state.layer(player->layer())->items())
+    for (auto& item : state.layer(player->layer)->items())
     {
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
@@ -206,7 +206,7 @@ int32_t get_grid_entity_at(float x, float y, int layer)
         auto player = state.items()->player(abs(layer) - 1);
         if (player != nullptr)
         {
-            if (Entity* ent = state.layer(player->layer())->get_grid_entity_at(x, y))
+            if (Entity* ent = state.layer(player->layer)->get_grid_entity_at(x, y))
             {
                 return ent->uid;
             }
@@ -394,7 +394,7 @@ std::vector<uint32_t> get_entities_by_layer(int layer)
     if (!player)
         return {};
     if (layer == -1)
-        layer = player->layer();
+        layer = player->layer;
     std::vector<uint32_t> found;
     for (auto& item : state.layer(layer)->items())
     {
@@ -509,7 +509,7 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int l
     if (!player)
         return {};
     if (layer == -1)
-        layer = player->layer();
+        layer = player->layer;
     if (layer >= 0 && state.layer(layer))
     {
         for (auto& item : state.layer(layer)->items())

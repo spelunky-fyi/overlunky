@@ -113,6 +113,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Entity::x,
         "y",
         &Entity::y,
+        "layer",
+        &Entity::layer,
         "width",
         &Entity::w,
         "height",

@@ -49,12 +49,12 @@ int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, f
     if (!s)
     {
         DEBUG("Spawning {} on {}, {}", entity_type, x + _x, y + _y);
-        return state.layer(player->layer())->spawn_entity(entity_type, x + _x, y + _y, s, vx, vy, snap)->uid;
+        return state.layer(player->layer)->spawn_entity(entity_type, x + _x, y + _y, s, vx, vy, snap)->uid;
     }
     else
     {
         DEBUG("Spawning {} on screen {}, {}", entity_type, x, y);
-        return state.layer(player->layer())->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
+        return state.layer(player->layer)->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
     }
 }
 
@@ -76,7 +76,7 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, floa
             return -1;
         auto [_x, _y] = player->position();
         DEBUG("Spawning {} on {}, {}", entity_type, x + _x, y + _y);
-        return state.layer(player->layer())->spawn_entity(entity_type, x + _x, y + _y, false, vx, vy, false)->uid;
+        return state.layer(player->layer)->spawn_entity(entity_type, x + _x, y + _y, false, vx, vy, false)->uid;
     }
     return -1;
 }
@@ -99,7 +99,7 @@ int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, floa
     Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
         return -1;
-    int layer = overlay->layer();
+    int layer = overlay->layer;
     return state.layer(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
@@ -116,8 +116,8 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
         return -1;
     auto [_x, _y] = player->position();
     DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-    state.layer(player->layer())->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
+    state.layer(player->layer)->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
+    return state.layer(player->layer)->spawn_door(x + _x, y + _y, w, l, t)->uid;
 }
 
 int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t)
@@ -138,7 +138,7 @@ int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_
             return -1;
         auto [_x, _y] = player->position();
         DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-        return state.layer(player->layer())->spawn_door(x + _x, y + _y, w, l, t)->uid;
+        return state.layer(player->layer)->spawn_door(x + _x, y + _y, w, l, t)->uid;
     }
     return -1;
 }
