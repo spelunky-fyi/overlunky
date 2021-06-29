@@ -90,7 +90,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 {
     using SpawnEntityHopefullySynced = Entity* (*)(Layer*, size_t, float, float);
-    SpawnEntityHopefullySynced spawn_entity_snap_to_floor = []
+    static SpawnEntityHopefullySynced spawn_entity_snap_to_floor = []
     {
         auto memory = Memory::get();
         auto exe = memory.exe();
