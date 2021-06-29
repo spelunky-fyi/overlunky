@@ -429,13 +429,50 @@ struct CommunityChance
     };
     ChanceValidPlacementFunc* test_func = [](const CommunityChance& self, float x, float y, Layer* layer)
     {
-        return layer->get_grid_entity_at(x, y - 1.0f) && !layer->get_grid_entity_at(x, y);
+        if (!layer->get_grid_entity_at(x, y))
+        {
+            if (Entity* floor = layer->get_grid_entity_at(x, y - 1.0f))
+            {
+                return (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
+            }
+        }
+        return false;
     };
     std::uint32_t entity_id;
     std::uint32_t chance_id;
 };
 std::array g_community_chances{
+    // wave 1
     CommunityChance{"red_skeleton", "ENT_TYPE_MONS_REDSKELETON"},
+    CommunityChance{
+        "walltorch",
+        "ENT_TYPE_ITEM_WALLTORCH",
+        [](const CommunityChance& self, float x, float y, Layer* layer)
+        {
+            layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, false);
+        },
+        [](const CommunityChance& self, float x, float y, Layer* layer)
+        {
+            return !layer->get_grid_entity_at(x, y);
+        }},
+    CommunityChance{
+        "litwalltorch",
+        "ENT_TYPE_ITEM_LITWALLTORCH",
+        [](const CommunityChance& self, float x, float y, Layer* layer)
+        {
+            layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, false);
+        },
+        [](const CommunityChance& self, float x, float y, Layer* layer)
+        {
+            return !layer->get_grid_entity_at(x, y);
+        }},
+    CommunityChance{"elevator", "ENT_TYPE_ACTIVEFLOOR_ELEVATOR"},
+    CommunityChance{"add_gold_bar", "ENT_TYPE_ITEM_GOLDBAR"},
+    CommunityChance{"add_gold_bars", "ENT_TYPE_ITEM_GOLDBARS"},
+    CommunityChance{"diamond", "ENT_TYPE_ITEM_DIAMOND"},
+    CommunityChance{"emerald", "ENT_TYPE_ITEM_EMERALD"},
+    CommunityChance{"sapphire", "ENT_TYPE_ITEM_SAPPHIRE"},
+    CommunityChance{"ruby", "ENT_TYPE_ITEM_RUBY"},
 };
 
 //#define HOOK_LOAD_ITEM
@@ -549,12 +586,12 @@ bool handle_chance(ThemeInfo* theme, SpawnInfo* spawn_info)
     auto level_gen_data = State::get().ptr()->level_gen->data;
     const auto& level_chances = State::get().ptr()->level_gen->data->level_chances();
 
+    auto* layer_ptr = State::get().ptr_local()->layers[0];
     for (const CommunityChance& community_chance : g_community_chances)
     {
-        if (g_test_chance(&level_gen_data, community_chance.chance_id))
+        if (community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
         {
-            auto* layer_ptr = State::get().ptr_local()->layers[0];
-            if (community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
+            if (g_test_chance(&level_gen_data, community_chance.chance_id))
             {
                 community_chance.spawn_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr);
                 return true;
