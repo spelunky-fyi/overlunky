@@ -11,7 +11,7 @@ SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManage
 }
 SpelunkyScript::~SpelunkyScript()
 {
-    g_all_scripts.erase(std::find(g_all_scripts.begin(), g_all_scripts.end(), this));
+    std::erase(g_all_scripts, this);
 }
 
 std::deque<ScriptMessage>& SpelunkyScript::get_messages()
