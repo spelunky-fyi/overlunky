@@ -23,7 +23,12 @@ std::uint32_t g_last_tile_code_id;
 std::uint32_t g_last_community_tile_code_id;
 std::uint32_t g_current_tile_code_id;
 
-std::unordered_map<std::uint32_t, std::string_view> g_IdToName;
+std::uint32_t g_last_chance_id;
+std::uint32_t g_last_community_chance_id;
+std::uint32_t g_current_chance_id;
+
+std::unordered_map<std::uint32_t, std::string_view> g_tile_code_id_to_name;
+std::unordered_map<std::uint32_t, std::string_view> g_chance_id_to_name;
 
 struct FloorRequiringEntity
 {
@@ -410,6 +415,29 @@ std::array g_community_tile_codes{
     //},
 };
 
+struct CommunityChance;
+using ChanceFunc = void(const CommunityChance& self, float x, float y, Layer* layer);
+using ChanceValidPlacementFunc = bool(const CommunityChance& self, float x, float y, Layer* layer);
+
+struct CommunityChance
+{
+    std::string_view chance;
+    std::string_view entity_type;
+    ChanceFunc* spawn_func = [](const CommunityChance& self, float x, float y, Layer* layer)
+    {
+        layer->spawn_entity_snap_to_floor(self.entity_id, x, y);
+    };
+    ChanceValidPlacementFunc* test_func = [](const CommunityChance& self, float x, float y, Layer* layer)
+    {
+        return layer->get_grid_entity_at(x, y - 1.0f) && !layer->get_grid_entity_at(x, y);
+    };
+    std::uint32_t entity_id;
+    std::uint32_t chance_id;
+};
+std::array g_community_chances{
+    CommunityChance{"red_skeleton", "ENT_TYPE_MONS_REDSKELETON"},
+};
+
 //#define HOOK_LOAD_ITEM
 #ifdef HOOK_LOAD_ITEM
 using LoadItemFun = void*(Layer*, std::uint32_t, float, float, bool);
@@ -424,11 +452,11 @@ using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, fl
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
 {
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN);
+    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
     OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN); }};
+                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_TILE_CODE); }};
 
-    std::string_view tile_code_name = g_IdToName[tile_code];
+    std::string_view tile_code_name = g_tile_code_id_to_name[tile_code];
 
     {
         bool block_spawn = false;
@@ -502,8 +530,43 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
     }
 }
 
+using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
+TestChance* g_test_chance;
+
+struct SpawnInfo
+{
+    void* ptr0;
+    void* ptr1;
+    float x;
+    float y;
+};
+bool handle_chance(ThemeInfo* theme, SpawnInfo* spawn_info)
+{
+    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL); }};
+
+    auto level_gen_data = State::get().ptr()->level_gen->data;
+    const auto& level_chances = State::get().ptr()->level_gen->data->level_chances();
+
+    for (const CommunityChance& community_chance : g_community_chances)
+    {
+        if (g_test_chance(&level_gen_data, community_chance.chance_id))
+        {
+            auto* layer_ptr = State::get().ptr_local()->layers[0];
+            if (community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
+            {
+                community_chance.spawn_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void LevelGenData::init()
 {
+    // Scan tile codes to know what id to start at
     {
         auto& tile_codes_map = tile_codes();
 
@@ -512,16 +575,33 @@ void LevelGenData::init()
         for (auto& [name, def] : tile_codes_map)
         {
             max_id = std::max(def.id, max_id);
-            g_IdToName[def.id] = name;
+            g_tile_code_id_to_name[def.id] = name;
         }
 
         // The game uses last id to check if the tilecode is valid using a != instead of a <
         // So we can safely use anything larger than last tile id
         g_last_tile_code_id = max_id + 1;
+        g_current_tile_code_id = g_last_tile_code_id + 1;
     }
 
-    g_current_tile_code_id = g_last_tile_code_id + 1;
+    // Scan chances to know what id to start at
+    {
+        auto& chances_map = chances();
 
+        // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
+        auto max_id = 0u;
+        for (auto& [name, def] : chances_map)
+        {
+            max_id = std::max(def.id, max_id);
+            g_chance_id_to_name[def.id] = name;
+        }
+
+        // The game doesn't centrally handle chances so we can use whatever id
+        g_current_chance_id = max_id;
+        // Scan tile codes to know what id to start at
+    }
+
+    // Add new community tile codes
     for (auto& community_tile_code : g_community_tile_codes)
     {
         assert(!get_tile_code(std::string{community_tile_code.tile_code}).has_value());
@@ -537,8 +617,25 @@ void LevelGenData::init()
         }
     }
 
+    // Add new community chances
+    for (auto& community_chance : g_community_chances)
+    {
+        assert(!get_chance(std::string{community_chance.chance}).has_value());
+        community_chance.chance_id = define_chance(std::string{community_chance.chance});
+        const auto entity_id = to_id(community_chance.entity_type);
+        if (entity_id < 0)
+        {
+            community_chance.entity_id = to_id("ENT_TYPE_ITEM_BOMB");
+        }
+        else
+        {
+            community_chance.entity_id = entity_id;
+        }
+    }
+
     // Remember this for fast access later
     g_last_community_tile_code_id = g_current_tile_code_id;
+    g_last_community_chance_id = g_current_chance_id;
 
     {
         auto memory = Memory::get();
@@ -569,6 +666,16 @@ void LevelGenData::init()
             DEBUG("Failed hooking HandleTileCode: {}\n", error);
         }
     }
+
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        auto after_bundle = memory.after_bundle;
+
+        auto off = find_inst(exe, "\xba\xee\x00\x00\x00\x48\x8d\x0c\x18"s, after_bundle);
+        auto fun_start = decode_call(find_inst(exe, "\xe8"s, off));
+        g_test_chance = (TestChance*)memory.at_exe(fun_start);
+    }
 }
 
 std::optional<std::uint32_t> LevelGenData::get_tile_code(const std::string& tile_code)
@@ -592,12 +699,72 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
     using map_value_t = std::pair<const string_t, TileCodeDef>;
     using map_allocator_t = game_allocator<map_value_t>;
     using mutable_tile_code_map_t = std::unordered_map<string_t, TileCodeDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
-    auto& tile_code_map = *(mutable_tile_code_map_t*)((size_t)this + 0x88);
+    auto& tile_code_map = (mutable_tile_code_map_t&)tile_codes();
 
-    // TODO: This should be forwarded to the instantiation of this operator in Spel2.exe to avoid CRT mismatch in Debug mode
     auto [it, success] = tile_code_map.emplace(std::move(tile_code), TileCodeDef{g_current_tile_code_id});
     g_current_tile_code_id++;
 
-    g_IdToName[it->second.id] = it->first;
+    g_tile_code_id_to_name[it->second.id] = it->first;
     return it->second.id;
+}
+
+std::optional<std::uint32_t> LevelGenData::get_chance(const std::string& chance)
+{
+    auto& chances_map = chances();
+    auto it = chances_map.find(chance);
+    if (it != chances_map.end())
+    {
+        return it->second.id;
+    }
+    return {};
+}
+std::uint32_t LevelGenData::define_chance(std::string chance)
+{
+    if (auto existing = get_chance(chance))
+    {
+        return existing.value();
+    }
+
+    using string_t = std::basic_string<char, std::char_traits<char>, game_allocator<char>>;
+    using map_value_t = std::pair<const string_t, ChanceDef>;
+    using map_allocator_t = game_allocator<map_value_t>;
+    using mutable_chance_map_t = std::unordered_map<string_t, ChanceDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
+    auto& chance_map = (mutable_chance_map_t&)chances();
+
+    auto [it, success] = chance_map.emplace(std::move(chance), ChanceDef{g_current_chance_id});
+    g_current_chance_id++;
+
+    g_tile_code_id_to_name[it->second.id] = it->first;
+    return it->second.id;
+}
+
+using DoProceduralSpawn = void(ThemeInfo*, SpawnInfo*);
+std::array<std::pair<ThemeInfo*, DoProceduralSpawn*>, 18> g_original_do_procedural_spawn;
+void LevelGenSystem::init()
+{
+    data->init();
+
+    for (size_t i = 0; i < g_original_do_procedural_spawn.size(); i++)
+    {
+        ThemeInfo* theme = themes[i];
+        g_original_do_procedural_spawn[i] = std::pair{
+            theme,
+            (DoProceduralSpawn*)register_hook_function(
+                &theme->__vftable, 0x32, (DoProceduralSpawn*)[](ThemeInfo * self, SpawnInfo * spawn_info)
+                {
+                    if (handle_chance(self, spawn_info))
+                    {
+                        return;
+                    }
+
+                    for (auto [theme, original] : g_original_do_procedural_spawn)
+                    {
+                        if (theme == self)
+                        {
+                            original(self, spawn_info);
+                            return;
+                        }
+                    }
+                })};
+    }
 }
