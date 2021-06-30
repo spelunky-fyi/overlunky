@@ -49,6 +49,8 @@ add_library(spel2_api STATIC
         script/usertypes/entities_mounts_lua.hpp
         script/usertypes/entities_monsters_lua.cpp
         script/usertypes/entities_monsters_lua.hpp
+        script/usertypes/entities_items_lua.cpp
+        script/usertypes/entities_items_lua.hpp
         script/usertypes/particles_lua.cpp
         script/usertypes/particles_lua.hpp
         script/usertypes/level_lua.cpp

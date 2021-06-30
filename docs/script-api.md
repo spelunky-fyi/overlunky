@@ -845,22 +845,11 @@ end
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
 - [`as_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_door) &Entity::as&lt;Door&gt;
-- [`as_container`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_container) &Entity::as&lt;Container&gt;
-- [`as_mattock`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_mattock) &Entity::as&lt;Mattock&gt;
 - [`as_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_player) &Entity::as&lt;Player&gt;
-- [`as_gun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_gun) &Entity::as&lt;Gun&gt;
-- [`as_bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_bomb) &Entity::as&lt;Bomb&gt;
 - [`as_crushtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_crushtrap) &Entity::as&lt;Crushtrap&gt;
 - [`as_arrowtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_arrowtrap) &Entity::as&lt;Arrowtrap&gt;
 - [`as_olmec`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec) &Entity::as&lt;Olmec&gt;
 - [`as_olmec_floater`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec_floater) &Entity::as&lt;OlmecFloater&gt;
-- [`as_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_cape) &Entity::as&lt;Cape&gt;
-- [`as_vlads_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_vlads_cape) &Entity::as&lt;VladsCape&gt;
-- [`as_kapala_powerup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_kapala_powerup) &Entity::as&lt;KapalaPowerup&gt;
-- [`as_backpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_backpack) &Entity::as&lt;Backpack&gt;
-- [`as_jetpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_jetpack) &Entity::as&lt;Jetpack&gt;
-- [`as_hoverpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_hoverpack) &Entity::as&lt;Hoverpack&gt;
-- [`as_walltorchflame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_walltorchflame) &Entity::as&lt;WalltorchFlame&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -909,20 +898,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`get_heart_color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) &Player::get_heart_color
 - [`is_female`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) &Player::is_female
 - [`set_heart_color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
-### `Bomb`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`scale_hor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) &Bomb::scale_hor
-- [`scale_ver`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_ver) &Bomb::scale_ver
-### `Container`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
-- [`timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Container::timer
-### `Gun`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooldown) &Gun::cooldown
-- [`shots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots) &Gun::shots
-- [`shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
-- [`in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
 ### `Crushtrap`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
@@ -945,30 +920,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
-### `Cape`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`floating_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=floating_down) &VladsCape::floating_down
-### `VladsCape`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
-- [`can_double_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_double_jump) &VladsCape::can_double_jump
-### `KapalaPowerup`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`amount_of_blood`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=amount_of_blood) &KapalaPowerup::amount_of_blood
-### `Backpack`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`explosion_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_trigger) &Backpack::explosion_trigger
-- [`explosion_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) &Backpack::explosion_timer
-### `Jetpack`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
-- [`flame_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_on) &Jetpack::flame_on
-- [`fuel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuel) &Jetpack::fuel
-### `Hoverpack`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
-- [`is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &Hoverpack::is_on
-### `WalltorchFlame`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &WalltorchFlame::emitted_light
-- [`flare_up_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flare_up_size) &WalltorchFlame::flare_up_size
 ### `Mount`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
@@ -1464,6 +1415,47 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`rotation_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_angle) &CritterSlime::rotation_angle
 - [`rotation_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_speed) &CritterSlime::rotation_speed
 - [`walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &CritterSlime::walk_pause_timer
+### `Container`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
+- [`timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Container::timer
+### `Bomb`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`scale_hor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) &Bomb::scale_hor
+- [`scale_ver`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_ver) &Bomb::scale_ver
+### `Backpack`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`explosion_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_trigger) &Backpack::explosion_trigger
+- [`explosion_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) &Backpack::explosion_timer
+### `Jetpack`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
+- [`flame_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_on) &Jetpack::flame_on
+- [`fuel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuel) &Jetpack::fuel
+### `Hoverpack`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
+- [`is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &Hoverpack::is_on
+### `Cape`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`floating_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=floating_down) &VladsCape::floating_down
+### `VladsCape`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
+- [`can_double_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_double_jump) &VladsCape::can_double_jump
+### `KapalaPowerup`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`amount_of_blood`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=amount_of_blood) &KapalaPowerup::amount_of_blood
+### `Mattock`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`remaining`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remaining) &Mattock::remaining
+### `Gun`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooldown) &Gun::cooldown
+- [`shots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots) &Gun::shots
+- [`shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
+- [`in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
+### `WalltorchFlame`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &WalltorchFlame::emitted_light
+- [`flare_up_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flare_up_size) &WalltorchFlame::flare_up_size
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
