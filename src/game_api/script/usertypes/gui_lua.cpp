@@ -39,6 +39,11 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     {
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
+        // check for nan in the vectors because this will cause a crash in ImGui
+        if (isnan(a.x) || isnan(a.y) || isnan(b.x) || isnan(b.y))
+        {
+            return;
+        }
         script->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
     };
     /// Draws a circle on screen
@@ -46,6 +51,11 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     {
         ImVec2 a = screenify({x, y});
         float r = screenify(radius);
+        // check for nan in the vectors and radius because this will cause a crash in ImGui
+        if (isnan(a.x) || isnan(a.y) || isnan(r))
+        {
+            return;
+        }
         script->draw_list->AddCircle(a, r, color, 0, thickness);
     };
     /// Draws a filled circle on screen
