@@ -62,7 +62,7 @@ class Mole : public Monster
     ParticleEmitterInfo* burrowing_particle;
     float burrow_dir_x;
     float burrow_dir_y;
-    int32_t burrowing_in;
+    int32_t burrowing_in_uid;
     uint8_t counter_burrowing;
     uint8_t counter_nonburrowing;
     uint8_t countdown_for_appearing;
@@ -152,7 +152,7 @@ class Pet : public Monster
     int16_t yell_counter; // counts up to 400 (6.6 sec); when 0 the pet yells out
     uint16_t padding1;
     uint32_t unknown3;
-    int8_t active; // -1 = sitting and yelling; 0 = either running, dead or picked up
+    int8_t active_state; // -1 = sitting and yelling; 0 = either running, dead or picked up
 };
 
 class Caveman : public Monster
@@ -231,7 +231,7 @@ class Scarab : public Monster
 class Imp : public Monster
 {
   public:
-    int32_t carrying;
+    int32_t carrying_uid;
     float patrol_y_level;
 };
 
@@ -482,7 +482,7 @@ class Crabman : public Monster
     uint8_t poison_attack_timer;
     uint8_t padding4;
     uint8_t padding5;
-    int32_t attacking_claw;
+    int32_t attacking_claw_uid;
     bool at_maximum_attack;
     uint8_t unknown3;
 };
@@ -498,7 +498,7 @@ class Kingu : public Monster
     uint8_t shell_invincibility_timer;
     uint8_t monster_spawn_timer;
     uint8_t initial_shell_health; // excalibur wipes out immediately, bombs take off 11 points; when 0 vulnerable to whip
-    bool seen_by_kingu;
+    bool player_seen_by_kingu;    // unsure if correct
 };
 
 class AnubisTwo : public Monster
@@ -614,8 +614,8 @@ class ApepHead : public ApepPart
 class OsirisHead : public Monster
 {
   public:
-    int32_t right_hand; // right from his perspective
-    int32_t left_hand;
+    int32_t right_hand_uid; // right from his perspective
+    int32_t left_hand_uid;
     bool moving_left;
     uint8_t targeting_timer;
     uint8_t invincibility_timer;

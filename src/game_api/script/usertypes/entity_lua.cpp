@@ -139,12 +139,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Entity::as<Container>,
         "as_mattock",
         &Entity::as<Mattock>,
-        "as_mount",
-        &Entity::as<Mount>,
         "as_player",
         &Entity::as<Player>,
-        "as_monster",
-        &Entity::as<Monster>,
         "as_gun",
         &Entity::as<Gun>,
         "as_bomb",
@@ -161,14 +157,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Entity::as<Cape>,
         "as_vlads_cape",
         &Entity::as<VladsCape>,
-        "as_ghost",
-        &Entity::as<Ghost>,
-        "as_jiangshi",
-        &Entity::as<Jiangshi>,
         "as_kapala_powerup",
         &Entity::as<KapalaPowerup>,
-        "as_caveman",
-        &Entity::as<Caveman>,
         "as_backpack",
         &Entity::as<Backpack>,
         "as_jetpack",
@@ -262,14 +252,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
             bool is_button_held(uint32_t button)
             bool is_button_released(uint32_t button)
         */
-    lua.new_usertype<Monster>(
-        "Monster",
-        "chased_target_uid",
-        &Monster::chased_target_uid,
-        "target_selection_timer",
-        &Monster::target_selection_timer,
-        sol::base_classes,
-        sol::bases<Entity, Movable>());
     lua.new_usertype<Player>(
         "Player",
         "inventory",
@@ -290,24 +272,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Player::is_female,
         "set_heart_color",
         &Player::set_heart_color,
-        sol::base_classes,
-        sol::bases<Entity, Movable>());
-    lua.new_usertype<Mount>(
-        "Mount",
-        "carry",
-        &Mount::carry,
-        "tame",
-        &Mount::tame,
-        "rider_uid",
-        &Mount::rider_uid,
-        "can_doublejump",
-        &Mount::can_doublejump,
-        "tamed",
-        &Mount::tamed,
-        "walk_pause_timer",
-        &Mount::walk_pause_timer,
-        "taming_timer",
-        &Mount::taming_timer,
         sol::base_classes,
         sol::bases<Entity, Movable>());
     lua.new_usertype<Bomb>("Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, sol::base_classes, sol::bases<Entity, Movable>());
@@ -357,34 +321,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "OlmecFloater", "both_floaters_intact", &OlmecFloater::both_floaters_intact, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Cape>("Cape", "floating_down", &VladsCape::floating_down, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Cape>());
-    lua.new_usertype<Ghost>(
-        "Ghost",
-        "split_timer",
-        &Ghost::split_timer,
-        "velocity_multiplier",
-        &Ghost::velocity_multiplier,
-        sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
-    lua.new_usertype<Jiangshi>(
-        "Jiangshi", "wait_timer", &Jiangshi::wait_timer, sol::base_classes, sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<KapalaPowerup>(
         "KapalaPowerup", "amount_of_blood", &KapalaPowerup::amount_of_blood, sol::base_classes, sol::bases<Entity, Movable>());
-    lua.new_usertype<Caveman>(
-        "Caveman",
-        "chatting_to_uid",
-        &Caveman::chatting_to_uid,
-        "walk_pause_timer",
-        &Caveman::walk_pause_timer,
-        "chatting_timer",
-        &Caveman::chatting_timer,
-        "wake_up_timer",
-        &Caveman::wake_up_timer,
-        "can_pick_up_timer",
-        &Caveman::can_pick_up_timer,
-        "aggro_timer",
-        &Caveman::aggro_timer,
-        sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
     lua.new_usertype<Backpack>(
         "Backpack",
         "explosion_trigger",
