@@ -292,7 +292,24 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Player::set_heart_color,
         sol::base_classes,
         sol::bases<Entity, Movable>());
-    lua.new_usertype<Mount>("Mount", "carry", &Mount::carry, "tame", &Mount::tame, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Mount>(
+        "Mount",
+        "carry",
+        &Mount::carry,
+        "tame",
+        &Mount::tame,
+        "rider_uid",
+        &Mount::rider_uid,
+        "can_doublejump",
+        &Mount::can_doublejump,
+        "tamed",
+        &Mount::tamed,
+        "walk_pause_timer",
+        &Mount::walk_pause_timer,
+        "taming_timer",
+        &Mount::taming_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
     lua.new_usertype<Bomb>("Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, sol::base_classes, sol::bases<Entity, Movable>());
     lua.new_usertype<Container>(
         "Container", "inside", &Container::inside, "timer", &Container::timer, sol::base_classes, sol::bases<Entity, Movable>());
