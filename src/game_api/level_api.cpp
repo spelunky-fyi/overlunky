@@ -265,7 +265,8 @@ std::array g_community_tile_codes{
             layer->spawn_entity_over(strand_id, spider, 0.0f, 0.0f);
 
             Entity* web = layer->spawn_entity(web_id, x, y, false, 0.0f, 0.0f, true);
-            layer->spawn_entity_over(anchor_id, web, 0.0f, 0.0f);
+            Entity* anchor = layer->spawn_entity_over(anchor_id, web, 0.0f, 0.0f);
+            *(uint32_t*)((size_t)anchor + sizeof(Movable)) = spider->uid;
         },
     },
     CommunityTileCode{"skull_drop_trap", "ENT_TYPE_ITEM_SKULLDROPTRAP"},
@@ -634,8 +635,7 @@ void LevelGenData::init()
         }
 
         // The game doesn't centrally handle chances so we can use whatever id
-        g_current_chance_id = max_id;
-        // Scan tile codes to know what id to start at
+        g_current_chance_id = max_id + 1;
     }
 
     // Add new community tile codes
