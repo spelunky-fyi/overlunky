@@ -192,6 +192,10 @@ struct State
     {
         return ptr()->layers[index];
     }
+    Layer* layer_local(uint8_t index)
+    {
+        return ptr_local()->layers[index];
+    }
 
     Items* items()
     {
