@@ -29,6 +29,12 @@ struct LevelChanceDef
     std::uint8_t chance;
 };
 
+struct ChanceLogicProvider
+{
+    std::function<bool(float, float, int)> is_valid;
+    std::function<void(float, float, int)> do_spawn;
+};
+
 struct LevelGenData
 {
     void init();
@@ -38,6 +44,9 @@ struct LevelGenData
 
     std::optional<std::uint32_t> get_chance(const std::string& chance);
     std::uint32_t define_chance(std::string chance);
+
+    std::uint32_t register_chance_logic_provider(std::uint32_t chance_id, ChanceLogicProvider provider);
+    void unregister_chance_logic_provider(std::uint32_t provider_id);
 
     // TODO: Get offsets from binary instead of hardcoding them
     const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const

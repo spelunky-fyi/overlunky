@@ -34,6 +34,33 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         script->g_state->level_gen->data->define_tile_code(std::move(tile_code));
     };
 
+    /// Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+    /// The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+    /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
+    /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+    /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+    lua["define_procedural_spawn"] = [script](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid)
+    {
+        LevelGenData* data = script->g_state->level_gen->data;
+        uint32_t chance = data->define_chance(std::move(procedural_spawn));
+        std::function<bool(float, float, int)> is_valid_call{nullptr};
+        if (is_valid)
+        {
+            is_valid_call = [script, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            {
+                std::lock_guard lock{script->gil};
+                return script->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
+            };
+        }
+        std::function<void(float, float, int)> do_spawn_call = [script, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        {
+            std::lock_guard lock{script->gil};
+            return script->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
+        };
+        std::uint32_t id = data->register_chance_logic_provider(chance, ChanceLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
+        script->chance_callbacks.push_back(id);
+    };
+
     lua.new_usertype<QuestsInfo>(
         "QuestsInfo",
         "yang_state",

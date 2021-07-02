@@ -420,6 +420,17 @@ struct CommunityChance;
 using ChanceFunc = void(const CommunityChance& self, float x, float y, Layer* layer);
 using ChanceValidPlacementFunc = bool(const CommunityChance& self, float x, float y, Layer* layer);
 
+auto g_DefaultTestFunc = [](float x, float y, Layer* layer)
+{
+    if (!layer->get_grid_entity_at(x, y))
+    {
+        if (Entity* floor = layer->get_grid_entity_at(x, y - 1.0f))
+        {
+            return (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
+        }
+    }
+    return false;
+};
 struct CommunityChance
 {
     std::string_view chance;
@@ -430,14 +441,7 @@ struct CommunityChance
     };
     ChanceValidPlacementFunc* test_func = [](const CommunityChance& self, float x, float y, Layer* layer)
     {
-        if (!layer->get_grid_entity_at(x, y))
-        {
-            if (Entity* floor = layer->get_grid_entity_at(x, y - 1.0f))
-            {
-                return (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
-            }
-        }
-        return false;
+        return g_DefaultTestFunc(x, y, layer);
     };
     std::uint32_t entity_id;
     std::uint32_t chance_id;
@@ -475,6 +479,16 @@ std::array g_community_chances{
     CommunityChance{"sapphire", "ENT_TYPE_ITEM_SAPPHIRE"},
     CommunityChance{"ruby", "ENT_TYPE_ITEM_RUBY"},
 };
+
+struct ChanceLogicProviderImpl
+{
+    std::uint32_t id;
+    std::uint32_t chance_id;
+    ChanceLogicProvider provider;
+};
+std::mutex g_chance_logic_providers_lock;
+std::uint32_t g_current_chance_logic_provider_id{0};
+std::vector<ChanceLogicProviderImpl> g_chance_logic_providers;
 
 //#define HOOK_LOAD_ITEM
 #ifdef HOOK_LOAD_ITEM
@@ -587,7 +601,8 @@ bool handle_chance(ThemeInfo* theme, SpawnInfo* spawn_info)
     auto level_gen_data = State::get().ptr()->level_gen->data;
     const auto& level_chances = State::get().ptr()->level_gen->data->level_chances();
 
-    auto* layer_ptr = State::get().ptr_local()->layers[0];
+    int layer = 0;
+    auto* layer_ptr = State::get().layer_local(layer);
     for (const CommunityChance& community_chance : g_community_chances)
     {
         if (community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
@@ -596,6 +611,20 @@ bool handle_chance(ThemeInfo* theme, SpawnInfo* spawn_info)
             {
                 community_chance.spawn_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr);
                 return true;
+            }
+        }
+    }
+    {
+        std::lock_guard lock{g_chance_logic_providers_lock};
+        for (const ChanceLogicProviderImpl& chance_provider : g_chance_logic_providers)
+        {
+            if (chance_provider.provider.is_valid(spawn_info->x, spawn_info->y, layer))
+            {
+                if (g_test_chance(&level_gen_data, chance_provider.chance_id))
+                {
+                    chance_provider.provider.do_spawn(spawn_info->x, spawn_info->y, layer);
+                    return true;
+                }
             }
         }
     }
@@ -773,6 +802,30 @@ std::uint32_t LevelGenData::define_chance(std::string chance)
 
     g_tile_code_id_to_name[it->second.id] = it->first;
     return it->second.id;
+}
+
+std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_id, ChanceLogicProvider provider)
+{
+    if (provider.is_valid == nullptr)
+    {
+        provider.is_valid = [](float x, float y, int layer)
+        {
+            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+        };
+    }
+
+    std::uint32_t provider_id = g_current_chance_logic_provider_id++;
+    {
+        std::lock_guard lock{g_chance_logic_providers_lock};
+        g_chance_logic_providers.push_back({provider_id, chance_id, std::move(provider)});
+    }
+    return provider_id;
+}
+void LevelGenData::unregister_chance_logic_provider(std::uint32_t provider_id)
+{
+    std::lock_guard lock{g_chance_logic_providers_lock};
+    std::erase_if(g_chance_logic_providers, [provider_id](const ChanceLogicProviderImpl& provider)
+                  { return provider.id == provider_id; });
 }
 
 using DoProceduralSpawn = void(ThemeInfo*, SpawnInfo*);

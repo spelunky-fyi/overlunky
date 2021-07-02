@@ -93,3 +93,22 @@ set_callback(function()
         draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)
+
+-- Add a chance for powderkeg spawns, needs to be used as `\?sample_powderkeg 120` in a .lvl file
+local function spawn_powderkeg(x, y, l)
+    spawn_entity(ENT_TYPE.ACTIVEFLOOR_POWDERKEG, x, y, l, 0, 0)
+end
+local function is_valid_powderkeg_spawn(x, y, l)
+    -- Only spawn where the powderkeg has floor left or right of it
+    local not_entity_here = get_grid_entity_at(x, y, l) == -1
+    if not_entity_here then
+        local entity_below = get_grid_entity_at(x, y - 1, l) >= 0
+        if entity_below then
+            local entity_left = get_grid_entity_at(x - 1, y, l) >= 0
+            local entity_right = get_grid_entity_at(x + 1, y, l) >= 0
+            return entity_left ~= entity_right
+        end
+    end
+    return false
+end
+define_procedural_spawn("sample_powderkeg", spawn_powderkeg, is_valid_powderkeg_spawn)

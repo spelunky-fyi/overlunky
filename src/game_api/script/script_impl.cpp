@@ -921,6 +921,11 @@ void ScriptImpl::clear()
         sound_manager->clear_callback(id);
     }
     vanilla_sound_callbacks.clear();
+    for (auto id : chance_callbacks)
+    {
+        g_state->level_gen->data->unregister_chance_logic_provider(id);
+    }
+    chance_callbacks.clear();
     for (auto& [ent_uid, id] : entity_hooks)
     {
         if (Entity* ent = get_entity_ptr(ent_uid))
