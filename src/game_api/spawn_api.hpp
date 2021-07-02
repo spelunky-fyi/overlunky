@@ -16,7 +16,7 @@ enum SpawnType : SpawnTypeFlags
     SPAWN_TYPE_ANY = SPAWN_TYPE_LEVEL_GEN | SPAWN_TYPE_SCRIPT | SPAWN_TYPE_SYSTEMIC
 };
 
-Entity* spawn_liquid(uint32_t entity_type, float x, float y);
+void spawn_liquid(uint32_t entity_type, float x, float y);
 int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap);
 int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, float vx, float vy);
 int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, int layer, float vx, float vy);

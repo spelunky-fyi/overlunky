@@ -577,6 +577,13 @@ This is received even if a previous pre-tile-code-callback has returned true
 `nil define_tile_code(string tile_code)`<br/>
 Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
 If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
+### [`define_procedural_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_procedural_spawn)
+`nil define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)`<br/>
+Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+Use for example when you can spawn only on the ceiling, under water or inside a shop.
+Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 `optional<CustomSound> create_sound(string path)`<br/>
 Parameter to force_co_subtheme
@@ -892,9 +899,15 @@ end
 - [`animation_frame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) &Entity::animation_frame
 - [`x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &Entity::x
 - [`y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &Entity::y
+- [`layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Entity::layer
 - [`width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &Entity::w
 - [`height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &Entity::h
-- [`angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Movable::angle
+- [`angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Entity::angle
+- [`color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) &Entity::color
+- [`hitboxx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) &Entity::hitboxx
+- [`hitboxy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) &Entity::hitboxy
+- [`offsetx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) &Entity::offsetx
+- [`offsety`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) &Entity::offsety
 - [`topmost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) &Entity::topmost
 - [`topmost_mount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) &Entity::topmost_mount
 - [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
@@ -943,11 +956,6 @@ Derived from [`Entity`](#entity)
 - [`stun_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_timer) &Movable::stun_timer
 - [`stun_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_state) &Movable::stun_state
 - [`some_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_state) &Movable::some_state
-- [`color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) &Movable::color
-- [`hitboxx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) &Movable::hitboxx
-- [`hitboxy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) &Movable::hitboxy
-- [`offsetx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) &Movable::offsetx
-- [`offsety`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) &Movable::offsety
 - [`airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::airtime
 - [`bool is_poisoned()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) &Movable::is_poisoned
 - [`nil poison(int frames)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) &Movable::poison
@@ -1267,6 +1275,12 @@ Runs as soon as your script is loaded, including reloads, then never again
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \
 For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
+- [`LEVEL_GEN_TILE_CODE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_TILE_CODE) SPAWN_TYPE_LEVEL_GEN_TILE_CODE
+\
+Similar to LEVEL_GEN but only triggers on tile code spawns.
+- [`LEVEL_GEN_PROCEDURAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_PROCEDURAL) SPAWN_TYPE_LEVEL_GEN_PROCEDURAL
+\
+Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
 - [`SCRIPT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.SCRIPT) SPAWN_TYPE_SCRIPT
 \
 Runs for any spawn happening through a call from the Lua API, also during level generation.

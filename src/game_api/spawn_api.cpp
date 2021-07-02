@@ -15,9 +15,9 @@ std::uint32_t g_SpawnNonReplacable;
 SpawnTypeFlags g_SpawnTypeFlags;
 std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
 
-Entity* spawn_liquid(uint32_t entity_type, float x, float y)
+void spawn_liquid(uint32_t entity_type, float x, float y)
 {
-    using spawn_liquid_fun_t = Entity*(void*, float, float, std::uint32_t, bool);
+    using spawn_liquid_fun_t = void(void*, float, float, std::uint32_t, bool);
     static auto spawn_liquid_call = (spawn_liquid_fun_t*)[]()
     {
         auto memory = Memory::get();
@@ -31,7 +31,7 @@ Entity* spawn_liquid(uint32_t entity_type, float x, float y)
     ();
 
     auto state = State::get().ptr();
-    return spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
+    spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
 }
 
 int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap)

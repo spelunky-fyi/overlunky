@@ -887,7 +887,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     // Runs as soon as your script is loaded, including reloads, then never again
     */
 
-    lua.create_named_table("SPAWN_TYPE", "LEVEL_GEN", SPAWN_TYPE_LEVEL_GEN, "LEVEL_GEN_TILE_CODE", SPAWN_TYPE_LEVEL_GEN_TILE_CODE, "LEVEL_GEN", SPAWN_TYPE_LEVEL_GEN, "SCRIPT", SPAWN_TYPE_SCRIPT, "SYSTEMIC", SPAWN_TYPE_SYSTEMIC, "ANY", SPAWN_TYPE_ANY);
+    lua.create_named_table("SPAWN_TYPE", "LEVEL_GEN", SPAWN_TYPE_LEVEL_GEN, "LEVEL_GEN_TILE_CODE", SPAWN_TYPE_LEVEL_GEN_TILE_CODE, "LEVEL_GEN_PROCEDURAL", SPAWN_TYPE_LEVEL_GEN_PROCEDURAL, "SCRIPT", SPAWN_TYPE_SCRIPT, "SYSTEMIC", SPAWN_TYPE_SYSTEMIC, "ANY", SPAWN_TYPE_ANY);
     /* SPAWN_TYPE
     // LEVEL_GEN
     // For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
