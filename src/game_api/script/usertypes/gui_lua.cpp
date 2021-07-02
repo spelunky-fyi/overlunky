@@ -8,8 +8,11 @@
 #include <imgui.h>
 #include <sol/sol.hpp>
 
+#include "logger.h"
+
 namespace NGui
 {
+ImVec4 error_color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f);
 void register_usertypes(sol::state& lua, ScriptImpl* script)
 {
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
@@ -25,25 +28,31 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     /// Draws a rectangle on screen from top-left to bottom-right.
     lua["draw_rect"] = [script](float x1, float y1, float x2, float y2, float thickness, float rounding, ImU32 color)
     {
-        ImVec2 a = screenify({x1, y1});
-        ImVec2 b = screenify({x2, y2});
         // check for nan in the vectors because this will cause a crash in ImGui
-        if (isnan(a.x) || isnan(a.y) || isnan(b.x) || isnan(b.y))
+        if (isnan(x1) || isnan(y1) || isnan(x2) || isnan(y2))
         {
+#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
+            script->messages.push_back({std::format("An argument passed to draw_rect was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
+#endif
             return;
         }
+        ImVec2 a = screenify({x1, y1});
+        ImVec2 b = screenify({x2, y2});
         script->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
     };
     /// Draws a filled rectangle on screen from top-left to bottom-right.
     lua["draw_rect_filled"] = [script](float x1, float y1, float x2, float y2, float rounding, ImU32 color)
     {
+        if (isnan(x1) || isnan(y1) || isnan(x2) || isnan(y2))
+        {
+#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
+            script->messages.push_back({std::format("An argument passed to draw_rect_filled was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
+#endif
+            return;
+        }
         ImVec2 a = screenify({x1, y1});
         ImVec2 b = screenify({x2, y2});
         // check for nan in the vectors because this will cause a crash in ImGui
-        if (isnan(a.x) || isnan(a.y) || isnan(b.x) || isnan(b.y))
-        {
-            return;
-        }
         script->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
     };
     /// Draws a circle on screen
@@ -54,6 +63,9 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         // check for nan in the vectors and radius because this will cause a crash in ImGui
         if (isnan(a.x) || isnan(a.y) || isnan(r))
         {
+#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
+            script->messages.push_back({std::format("An argument passed to draw_circle was not a number: {} {} {}", a.x, a.y, r), std::chrono::system_clock::now(), error_color});
+#endif
             return;
         }
         script->draw_list->AddCircle(a, r, color, 0, thickness);
@@ -109,9 +121,20 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
             }
         }
         ImVec2 textsize = font->CalcTextSizeA(size, 9999.0, 9999.0, text.c_str());
+        ImVec2 res = io.DisplaySize;
+
         auto a = normalize(ImVec2(0, 0));
         auto b = normalize(textsize);
-        return std::make_pair(b.x - a.x, b.y - a.y);
+        auto pair = std::make_pair(b.x - a.x, b.y - a.y);
+        // nan isn't a valid text size so return 0x0 instead
+        if (isnan(pair.first) || isnan(pair.second))
+        {
+            return std::make_pair(0, 0);
+        }
+        else
+        {
+            return pair;
+        }
     };
     /// Create image from file. Returns a tuple containing id, width and height.
     lua["create_image"] = [script](std::string path) -> std::tuple<int, int, int>

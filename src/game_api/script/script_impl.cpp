@@ -153,13 +153,17 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = g_save;
 
+    /// Standard lua print function, prints directly to the console but not to the game
+    lua["lua_print"] = lua["print"];
     /// Print a log message on screen.
     lua["print"] = [this](std::string message) -> void
     {
         messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (messages.size() > 20)
             messages.pop_front();
+        lua["lua_print"](message);
     };
+
     /// Same as `print`
     lua["message"] = [this](std::string message) -> void
     { lua["print"](message); };
