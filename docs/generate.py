@@ -79,6 +79,7 @@ def print_af(lf, af):
         print(com)
 
 for file in header_files:
+    comment = []
     data = open(file, 'r').read().split('\n')
     for line in data:
         line = line.replace('*', '')
@@ -98,6 +99,7 @@ for file in header_files:
             comment = []
 
 for file in api_files:
+    comment = []
     data = open(file, 'r').read().split('\n')
     for line in data:
         line = line.replace('*', '')
@@ -113,6 +115,7 @@ for file in api_files:
             comment = []
 
 for file in api_files:
+    comment = []
     data = open(file, 'r').read().split('\n')
     for line in data:
         line = line.replace('*', '')
@@ -164,6 +167,23 @@ for file in api_files:
                 var_to_mod = next((item for item in type_to_mod['vars'] if item['name'] == var_name), dict())
                 if var_to_mod:
                     var_to_mod['signature'] = sub_match[0] + ' ' + var_name + sub_match[2]
+
+for file in api_files:
+    comment = []
+    data = open(file, 'r').read().split('\n')
+    for line in data:
+        line = line.replace('*', '')
+        m = re.findall(r'new_usertype\<(.*?)\>', line)
+        if m:
+            type = m[0]
+            type_to_mod = next((item for item in types if item['name'] == type), dict())
+            if type_to_mod:
+                type_to_mod['comment'] = comment
+            comment = []
+        if line == '': comment = []
+        c = re.search(r'/// ?(.*)$', line)
+        if c:
+            comment.append(c.group(1))
 
 for file in api_files:
     data = open(file, 'r').read()
@@ -223,6 +243,32 @@ for file in api_files:
                     collected_docs += '\\\n' + var_name
         if current_var_to_mod:
             current_var_to_mod['docs'] = collected_docs
+
+for file in api_files:
+    comment = []
+    name_next = False
+    data = open(file, 'r').read().split('\n')
+    for line in data:
+        line_clean = line.replace(' ', '')
+        a = re.findall(r'create_named_table\s*\(\s*"([^"]*)"\/\/,([^\)]*)', line_clean)
+        b = re.findall(r'create_named_table\s*\(\s*"([^"]*)",([^\)]*)', line_clean)
+        c = re.findall(r'create_named_table\s*\(\s*"([^"]*)"\)', line_clean)
+        m = a or b or ([c] if c else [])
+        if m or name_next:
+            enum = m[0][0] if m else line.strip('", ')
+            enum_to_mod = next((item for item in enums if item['name'] == enum), dict())
+            if enum_to_mod:
+                enum_to_mod['comment'] = comment
+            comment = []
+            name_next = False
+        elif "create_named_table" in line:
+            name_next = True
+        else:
+            name_next = False
+        if line == '': comment = []
+        c = re.search(r'/// ?(.*)$', line)
+        if c:
+            comment.append(c.group(1))
 
 for file in api_files:
     data = open(file, 'r').read()
@@ -382,6 +428,9 @@ end
 ```""")
 for type in types:
     print('### `' + type['name'] + '`')
+    if 'comment' in type:
+        for com in type['comment']:
+            print(com)
     if type['base']:
         print('Derived from', end='')
         bases = type['base'].split(',')
@@ -418,6 +467,9 @@ end, ON.LEVEL)
 ```""")
 for type in enums:
     print('### '+type['name'])
+    if 'comment' in type:
+        for com in type['comment']:
+            print(com)
     for var in type['vars']:
         if var['name']:
             print('- [`'+var['name']+'`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q='+type['name']+'.'+var['name']+') ' + var['type'])
