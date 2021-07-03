@@ -935,9 +935,12 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
 ### `Axolotl`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
 - [`attack_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown) &Axolotl::attack_cooldown
+- [`can_teleport`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_teleport) &Axolotl::can_teleport
 ### `Mech`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
-- [`attack_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown) &Mech::attack_cooldown
+- [`gun_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gun_cooldown) &Mech::gun_cooldown
+- [`walking`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking) &Mech::walking
+- [`breaking_wall`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breaking_wall) &Mech::breaking_wall
 ### `Qilin`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
 - [`attack_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown) &Qilin::attack_cooldown
@@ -1205,7 +1208,13 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 ### `ApepPart`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ApepPart::y
-- [`x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ApepPart::x
+- [`sine_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_angle) &ApepPart::sine_angle
+### `ApepHead`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`ApepPart`](#apeppart)
+- [`distance_traveled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance_traveled) &ApepHead::distance_traveled
+- [`tail_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_uid) &ApepHead::tail_uid
+- [`fx_mouthpiece1_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_mouthpiece1_uid) &ApepHead::fx_mouthpiece1_uid
+- [`fx_mouthpiece2_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_mouthpiece2_uid) &ApepHead::fx_mouthpiece2_uid
 ### `OsirisHead`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`right_hand_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_hand_uid) &OsirisHead::right_hand_uid
@@ -1452,10 +1461,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`shots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots) &Gun::shots
 - [`shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
 - [`in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
-### `WalltorchFlame`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &WalltorchFlame::emitted_light
-- [`flare_up_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flare_up_size) &WalltorchFlame::flare_up_size
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min

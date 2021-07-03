@@ -35,7 +35,7 @@ class Axolotl : public Mount
 {
   public:
     uint8_t attack_cooldown;
-    bool unknown1;
+    bool can_teleport;
 };
 
 class Mech : public Mount
@@ -43,8 +43,11 @@ class Mech : public Mount
   public:
     SoundPosition* sound_pos;
     SoundPosition* explosion_sound_pos;
-    uint64_t unknown2;
-    uint8_t attack_cooldown;
+    uint64_t unknown1;
+    uint8_t gun_cooldown;
+    uint8_t unknown2;
+    bool walking;
+    bool breaking_wall;
 };
 
 class Qilin : public Mount

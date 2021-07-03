@@ -111,11 +111,3 @@ class CookFire : public Movable
     ParticleEmitterInfo* particles_warp;
     size_t unknown10;
 };
-
-class WalltorchFlame : public Movable
-{
-  public:
-    SoundPosition* sound_pos;
-    Illumination* emitted_light;
-    float flare_up_size; // to make it temporarily bigger, flare up
-};

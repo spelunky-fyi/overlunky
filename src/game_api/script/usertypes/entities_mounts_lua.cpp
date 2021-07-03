@@ -47,13 +47,19 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Axolotl",
         "attack_cooldown",
         &Axolotl::attack_cooldown,
+        "can_teleport",
+        &Axolotl::can_teleport,
         sol::base_classes,
         sol::bases<Entity, Movable, Mount>());
 
     lua.new_usertype<Mech>(
         "Mech",
-        "attack_cooldown",
-        &Mech::attack_cooldown,
+        "gun_cooldown",
+        &Mech::gun_cooldown,
+        "walking",
+        &Mech::walking,
+        "breaking_wall",
+        &Mech::breaking_wall,
         sol::base_classes,
         sol::bases<Entity, Movable, Mount>());
 

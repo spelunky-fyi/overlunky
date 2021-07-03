@@ -65,6 +65,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_bee"] = &Entity::as<Bee>;
     lua["Entity"]["as_ammit"] = &Entity::as<Ammit>;
     lua["Entity"]["as_apeppart"] = &Entity::as<ApepPart>;
+    lua["Entity"]["as_apephead"] = &Entity::as<ApepHead>;
     lua["Entity"]["as_osirishead"] = &Entity::as<OsirisHead>;
     lua["Entity"]["as_osirishand"] = &Entity::as<OsirisHand>;
     lua["Entity"]["as_yeti"] = &Entity::as<Yeti>;
@@ -682,10 +683,23 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "ApepPart",
         "y",
         &ApepPart::y,
-        "x",
-        &ApepPart::x,
+        "sine_angle",
+        &ApepPart::sine_angle,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
+
+    lua.new_usertype<ApepHead>(
+        "ApepHead",
+        "distance_traveled",
+        &ApepHead::distance_traveled,
+        "tail_uid",
+        &ApepHead::tail_uid,
+        "fx_mouthpiece1_uid",
+        &ApepHead::fx_mouthpiece1_uid,
+        "fx_mouthpiece2_uid",
+        &ApepHead::fx_mouthpiece2_uid,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster, ApepPart>());
 
     lua.new_usertype<OsirisHead>(
         "OsirisHead",

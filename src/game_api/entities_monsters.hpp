@@ -600,7 +600,7 @@ class ApepPart : public Monster
 {
   public:
     float y;
-    float x;
+    float sine_angle;
 };
 
 class ApepHead : public ApepPart
@@ -609,6 +609,10 @@ class ApepHead : public ApepPart
     uint64_t unknown1;
     SoundPosition* sound_pos1;
     SoundPosition* sound_pos2;
+    float distance_traveled;
+    uint32_t tail_uid;
+    uint32_t fx_mouthpiece1_uid;
+    uint32_t fx_mouthpiece2_uid;
 };
 
 class OsirisHead : public Monster
