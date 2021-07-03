@@ -61,6 +61,20 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         script->chance_callbacks.push_back(id);
     };
 
+    //std::pair<int, int> get_room_index(float x, float y);
+    //std::optional<uint16_t> get_room_code(int x, int y, int l);
+    //bool set_room_code(int x, int y, int l, uint16_t room_code);
+
+    lua["get_room_index"] = [](float x, float y) -> std::pair<int, int> {
+        return State::get().ptr_local()->level_gen->get_room_index(x, y);
+    };
+    lua["get_room_code"] = [](int x, int y, int l) -> std::optional<uint16_t> {
+        return State::get().ptr_local()->level_gen->get_room_code(x, y, l);
+    };
+    lua["get_room_code_name"] = [](int16_t room_code) -> std::string_view {
+        return State::get().ptr_local()->level_gen->get_room_code_name(room_code);
+    };
+
     lua.new_usertype<QuestsInfo>(
         "QuestsInfo",
         "yang_state",

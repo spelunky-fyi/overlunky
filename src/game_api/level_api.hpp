@@ -137,8 +137,13 @@ struct LevelGenSystem
     uint64_t unknown21;
     void* unknown22; // MysteryPointer1
     void* unknown23; // MysteryPointer1
-    LevelGenRooms* rooms_frontlayer;
-    LevelGenRooms* rooms_backlayer;
+    union {
+        LevelGenRooms* rooms[2];
+        struct {
+            LevelGenRooms* rooms_frontlayer;
+            LevelGenRooms* rooms_backlayer;
+        };
+    };
     LevelGenRoomsMeta* rooms_meta_26;
     LevelGenRoomsMeta* rooms_meta_27;
     LevelGenRoomsMeta* rooms_meta_28;
@@ -168,4 +173,10 @@ struct LevelGenSystem
     uint32_t unknown49;
     uint32_t unknown50;
     uint32_t unknown51;
+
+    std::pair<int, int> get_room_index(float x, float y);
+    std::optional<uint16_t> get_room_code(int x, int y, int l);
+    bool set_room_code(int x, int y, int l, uint16_t room_code);
+
+    std::string_view get_room_code_name(uint16_t room_code);
 };

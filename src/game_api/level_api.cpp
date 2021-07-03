@@ -858,3 +858,50 @@ void LevelGenSystem::init()
                 })};
     }
 }
+
+std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
+{
+    return std::pair<int, int>{
+        static_cast<int>(std::ceil(x - 3.5f)) / 10,
+        static_cast<int>(std::ceil(121.5f - y)) / 8
+    };
+}
+std::optional<uint16_t> LevelGenSystem::get_room_code(int x, int y, int l)
+{
+    auto state = State::get();
+    auto* state_ptr = state.ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return std::nullopt;
+
+    if (l < 0)
+    {
+        auto player = state.items()->player(abs(l) - 1);
+        if (player == nullptr)
+            return std::nullopt;
+        l = player->layer;
+    }
+
+    if (l >= 2)
+        return std::nullopt;
+
+    LevelGenRooms* level_rooms = rooms[l];
+    auto templates = data->templates();
+    return level_rooms->rooms[x + y * 8];
+}
+bool LevelGenSystem::set_room_code(int x, int y, int l, uint16_t room_code)
+{
+    return false;
+}
+
+std::string_view LevelGenSystem::get_room_code_name(uint16_t room_code)
+{
+    for (const auto& [name, room_template] : data->templates())
+    {
+        if (room_template.id == room_code)
+        {
+            return name;
+        }
+    }
+    return "invalid";
+}
