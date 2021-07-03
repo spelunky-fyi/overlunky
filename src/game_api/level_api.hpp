@@ -137,9 +137,11 @@ struct LevelGenSystem
     uint64_t unknown21;
     void* unknown22; // MysteryPointer1
     void* unknown23; // MysteryPointer1
-    union {
+    union
+    {
         LevelGenRooms* rooms[2];
-        struct {
+        struct
+        {
             LevelGenRooms* rooms_frontlayer;
             LevelGenRooms* rooms_backlayer;
         };

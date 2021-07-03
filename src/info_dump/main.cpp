@@ -9,11 +9,13 @@
 #include <nlohmann/json.hpp>
 
 #include "entity.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "memory.h"
 #include "particles.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
+#include "state.hpp"
 #include "texture.hpp"
 
 using float_json = nlohmann::basic_json<std::map, std::vector, std::string, bool, std::int64_t, std::uint64_t, float>;
@@ -109,6 +111,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         }
         std::this_thread::sleep_for(100ms);
     }
+    std::this_thread::sleep_for(1s);
 
     auto items = list_entities();
     std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
@@ -273,6 +276,41 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             &sound_mgr,
             true);
         file << api_gen_script.dump_api() << std::endl;
+    }
+
+    if (auto file = std::ofstream("game_data/tile_codes.txt"))
+    {
+        auto tile_codes = State::get().ptr()->level_gen->data->tile_codes();
+        for (const auto& tile_code : tile_codes)
+        {
+            file << tile_code.second.id << ": " << tile_code.first << "\n";
+        }
+    }
+
+    if (auto file = std::ofstream("game_data/spawn_chances.txt"))
+    {
+        auto chances = State::get().ptr()->level_gen->data->chances();
+        for (const auto& chance : chances)
+        {
+            file << chance.second.id << ": " << chance.first << "\n";
+        }
+    }
+
+    if (auto file = std::ofstream("game_data/room_codes.txt"))
+    {
+        auto templates = State::get().ptr()->level_gen->data->templates();
+        std::multimap<std::uint32_t, std::string> ordered_templates;
+        for (const auto& room_template : templates)
+        {
+            std::string clean_room_name = room_template.first;
+            std::transform(
+                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
+                { return std::toupper(c); });
+            std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
+            ordered_templates.insert({room_template.second.id, std::move(clean_room_name)});
+        }
+        for (const auto& [id, name] : ordered_templates)
+            file << name << ": " << id << "\n";
     }
 
     std::exit(0);

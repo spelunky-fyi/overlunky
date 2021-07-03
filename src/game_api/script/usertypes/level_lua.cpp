@@ -61,17 +61,17 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         script->chance_callbacks.push_back(id);
     };
 
-    //std::pair<int, int> get_room_index(float x, float y);
-    //std::optional<uint16_t> get_room_code(int x, int y, int l);
-    //bool set_room_code(int x, int y, int l, uint16_t room_code);
-
+    /// Transform a position to a room index to be used in `get_room_code` and `RoomGen.set_room_code`
     lua["get_room_index"] = [](float x, float y) -> std::pair<int, int> {
         return State::get().ptr_local()->level_gen->get_room_index(x, y);
     };
+    /// Get the room code given a certain index
     lua["get_room_code"] = [](int x, int y, int l) -> std::optional<uint16_t> {
         return State::get().ptr_local()->level_gen->get_room_code(x, y, l);
     };
-    lua["get_room_code_name"] = [](int16_t room_code) -> std::string_view {
+    /// For debugging only, get the name of a tile code
+    lua["get_room_code_name"] = [](int16_t room_code) -> std::string_view
+    {
         return State::get().ptr_local()->level_gen->get_room_code_name(room_code);
     };
 
@@ -198,5 +198,20 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     /// Beg quest states
     lua.create_named_table("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
+
+    lua.create_named_table("ROOM_CODE"
+                           //, "SIDE", 0
+                           //, "", ...check__room_codes.txt__output__by__Overlunky...
+    );
+    lua.create_named_table("ROOM_CODE");
+    for (const auto& [room_name, room_code] : State::get().ptr()->level_gen->data->templates())
+    {
+        std::string clean_room_name = room_name;
+        std::transform(
+            clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
+            { return std::toupper(c); });
+        std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
+        lua["ROOM_CODE"][std::move(clean_room_name)] = room_code.id;
+    };
 }
 }; // namespace NLevel

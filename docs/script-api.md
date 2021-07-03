@@ -583,6 +583,15 @@ The function `bool is_valid(x, y, layer)` determines whether the spawn is legal 
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+### [`get_room_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_index)
+`tuple<int, int> get_room_index(float x, float y)`<br/>
+Transform a position to a room index to be used in `get_room_code` and `RoomGen.set_room_code`
+### [`get_room_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_code)
+`optional<int> get_room_code(int x, int y, int l)`<br/>
+Get the room code given a certain index
+### [`get_room_code_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_code_name)
+`string_view get_room_code_name(int room_code)`<br/>
+For debugging only, get the name of a tile code
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 `optional<CustomSound> create_sound(string path)`<br/>
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -1186,6 +1195,9 @@ end, ON.LEVEL)
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
 - ...check particle_emitters.txt output by Overlunky...
 - [`MINIGAME_BROKENASTEROID_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) 219
+### ROOM_CODE
+- [`SIDE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_CODE.SIDE) 0
+- ...check room_codes.txt output by Overlunky...
 ### VANILLA_SOUND
 - [`BGM_BGM_TITLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.BGM_BGM_TITLE) BGM/BGM_title
 - ...check vanilla_sounds.txt output by Overlunky...

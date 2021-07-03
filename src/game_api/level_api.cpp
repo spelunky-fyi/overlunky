@@ -863,8 +863,7 @@ std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
 {
     return std::pair<int, int>{
         static_cast<int>(std::ceil(x - 3.5f)) / 10,
-        static_cast<int>(std::ceil(121.5f - y)) / 8
-    };
+        static_cast<int>(std::ceil(121.5f - y)) / 8};
 }
 std::optional<uint16_t> LevelGenSystem::get_room_code(int x, int y, int l)
 {
