@@ -132,7 +132,9 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             if (!db)
                 break;
 
-#define HAX_FIX_FLOAT(x) if (std::abs(x) < 1e-20 || std::abs(x) > 1e10) x = 0.0f
+#define HAX_FIX_FLOAT(x)                           \
+    if (std::abs(x) < 1e-20 || std::abs(x) > 1e10) \
+    x = 0.0f
             HAX_FIX_FLOAT(db->width);
             HAX_FIX_FLOAT(db->height);
             HAX_FIX_FLOAT(db->friction);
