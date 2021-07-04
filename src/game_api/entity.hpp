@@ -360,21 +360,6 @@ struct Inventory
 
     uint32_t acquired_powerups[30]; // Used in level transition to transfer to new player entity
     uint32_t collected_money_total;
-
-    uint32_t unknown40; // might be garbage onwards
-    uint8_t unknown41;
-    uint8_t unknown42;
-    int16_t unknown43;
-    uint8_t unknown44;
-    uint8_t unknown45;
-    uint8_t unknown46;
-    uint8_t unknown47;
-    uint32_t unknown48;
-    uint32_t unknown49;
-    uint8_t unknown50;
-    uint8_t unknown51;
-    uint8_t unknown52;
-    uint8_t unknown53;
 };
 
 class SoundPosition

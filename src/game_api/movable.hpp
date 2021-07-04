@@ -150,83 +150,11 @@ class Container : public Movable
     int32_t timer;
 };
 
-class Gun : public Movable
-{
-  public:
-    uint8_t cooldown;
-    uint8_t shots;
-    uint8_t shots2;
-    uint8_t b12b;
-    int32_t in_chamber;
-};
-
 class Crushtrap : public Movable
 {
   public:
     float dirx;
     float diry;
-};
-
-class Mattock : public Movable
-{
-  public:
-    int32_t remaining;
-};
-
-class Mount : public Movable
-{
-  public:
-    size_t unknown1;
-    uint64_t unknown2;
-    int32_t rider_uid; // who rides it
-    uint32_t unknown4;
-    SoundPosition* sound_pos;
-    bool can_doublejump; // whether the doublejump has already occurred or not
-    bool tamed;
-    uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
-    uint8_t unknown9a;
-    uint8_t unknown9b;
-    uint8_t taming_timer; // when 0 it's tame
-    uint8_t unknown9d;
-
-    void carry(Movable* rider);
-
-    void tame(bool value);
-};
-
-class Backpack : public Movable
-{
-  public:
-    bool explosion_trigger;
-    uint8_t explosion_timer; // counts from 0 to 30
-    uint16_t unknown1;
-    uint32_t unknown2;
-};
-
-class Jetpack : public Backpack
-{
-  public:
-    bool flame_on; // Can be used as is_on
-    uint8_t unknown1;
-    uint16_t unknown2;
-    uint32_t fly_time; // it's per level, not even per jatpack lol, it also adds at when it explodes
-    uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
-};
-
-class Hoverpack : public Backpack
-{
-  public:
-    SoundPosition* sound_pos;
-    bool is_on;
-};
-
-class Bomb : public Movable
-{
-  public:
-    size_t unknown1;
-    float scale_hor; // 1.25 = default regular bomb ; 1.875 = default giant bomb ; > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
-    float scale_ver;
-    bool unknown2;
 };
 
 class Olmec : public Movable
@@ -249,29 +177,6 @@ class OlmecFloater : public Movable
 {
   public:
     bool both_floaters_intact; // strangely, this indicates whether both are intact, not just this specific one
-};
-
-class Cape : public Movable
-{
-  public:
-    size_t unknown;
-    bool floating_down;
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    uint32_t floating_count; // increments whenever floating
-};
-
-class VladsCape : public Cape
-{
-  public:
-    bool can_double_jump;
-};
-
-class KapalaPowerup : public Movable
-{
-  public:
-    uint8_t amount_of_blood;
 };
 
 class PlayerTracker

@@ -8,6 +8,9 @@ add_library(spel2_api STATIC
         entity.cpp
         entity.hpp
         entities_monsters.hpp
+        entities_items.hpp
+        entities_mounts.cpp
+        entities_mounts.hpp
         items.cpp
         items.hpp
         layer.cpp
@@ -46,6 +49,12 @@ add_library(spel2_api STATIC
         script/usertypes/state_lua.hpp
         script/usertypes/entity_lua.cpp
         script/usertypes/entity_lua.hpp
+        script/usertypes/entities_mounts_lua.cpp
+        script/usertypes/entities_mounts_lua.hpp
+        script/usertypes/entities_monsters_lua.cpp
+        script/usertypes/entities_monsters_lua.hpp
+        script/usertypes/entities_items_lua.cpp
+        script/usertypes/entities_items_lua.hpp
         script/usertypes/particles_lua.cpp
         script/usertypes/particles_lua.hpp
         script/usertypes/level_lua.cpp
