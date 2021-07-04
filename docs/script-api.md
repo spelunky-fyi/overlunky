@@ -550,9 +550,9 @@ Use this only when no other approach works, this call can be expensive if overus
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
 `bool speechbubble_visible()`<br/>
 ### [`cancel_toast`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cancel_toast)
-`bool cancel_toast()`<br/>
+`nil cancel_toast()`<br/>
 ### [`cancel_speechbubble`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cancel_speechbubble)
-`bool cancel_speechbubble()`<br/>
+`nil cancel_speechbubble()`<br/>
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 `nil get_particle_type()`<br/>
 Get the [ParticleDB](#particledb) details of the specified ID
