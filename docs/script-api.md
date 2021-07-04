@@ -1280,6 +1280,9 @@ Runs as soon as your script is loaded, including reloads, then never again
 \
 Params: `PostRoomGenerationContext room_gen_ctx`\
 Runs right after all rooms are generated before entities are spawned
+- [`POST_LEVEL_GENERATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION) ON::POST_LEVEL_GENERATION
+\
+Runs right level generation is done, before any entities are updated
 - [`SCRIPT_ENABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) ON::SCRIPT_ENABLE
 - [`SCRIPT_DISABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) ON::SCRIPT_DISABLE
 ### SPAWN_TYPE

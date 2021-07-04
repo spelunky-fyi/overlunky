@@ -131,6 +131,10 @@ void SpelunkyScript::post_room_generation()
 {
     m_Impl->post_room_generation();
 }
+void SpelunkyScript::post_level_generation()
+{
+    m_Impl->post_level_generation();
+}
 
 Entity* SpelunkyScript::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
 {

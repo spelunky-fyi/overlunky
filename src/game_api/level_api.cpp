@@ -504,7 +504,15 @@ using LevelGenFun = void(LevelGenSystem*, float);
 LevelGenFun* g_level_gen_trampoline{nullptr};
 void level_gen(LevelGenSystem* level_gen_sys, float param_2)
 {
+    auto state = State::get().ptr();
     g_level_gen_trampoline(level_gen_sys, param_2);
+
+    SpelunkyScript::for_each_script(
+        [&](SpelunkyScript& script)
+        {
+            script.post_level_generation();
+            return true;
+        });
 }
 
 using GenRoomsFun = void(ThemeInfo*);

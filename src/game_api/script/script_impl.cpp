@@ -864,6 +864,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         ON::LOAD,
         "POST_ROOM_GENERATION",
         ON::POST_ROOM_GENERATION,
+        "POST_LEVEL_GENERATION",
+        ON::POST_LEVEL_GENERATION,
         "SCRIPT_ENABLE",
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
@@ -884,6 +886,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     // POST_ROOM_GENERATION
     // Params: `PostRoomGenerationContext room_gen_ctx`
     // Runs right after all rooms are generated before entities are spawned
+    // POST_LEVEL_GENERATION
+    // Runs right level generation is done, before any entities are updated
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -1465,6 +1469,25 @@ void ScriptImpl::post_room_generation()
         if (callback.screen == ON::POST_ROOM_GENERATION)
         {
             handle_function(callback.func, PostRoomGenerationContext{});
+            callback.lastRan = now;
+        }
+    }
+}
+
+void ScriptImpl::post_level_generation()
+{
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    g_players = get_players();
+    lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == ON::POST_LEVEL_GENERATION)
+        {
+            handle_function(callback.func);
             callback.lastRan = now;
         }
     }
