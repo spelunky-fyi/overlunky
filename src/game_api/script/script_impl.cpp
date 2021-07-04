@@ -793,79 +793,81 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua.create_named_table(
         "ON",
         "LOGO",
-        0,
+        ON::LOGO,
         "INTRO",
-        1,
+        ON::INTRO,
         "PROLOGUE",
-        2,
+        ON::PROLOGUE,
         "TITLE",
-        3,
+        ON::TITLE,
         "MENU",
-        4,
+        ON::MENU,
         "OPTIONS",
-        5,
+        ON::OPTIONS,
         "LEADERBOARD",
-        7,
+        ON::LEADERBOARD,
         "SEED_INPUT",
-        8,
+        ON::SEED_INPUT,
         "CHARACTER_SELECT",
-        9,
+        ON::CHARACTER_SELECT,
         "TEAM_SELECT",
-        10,
+        ON::TEAM_SELECT,
         "CAMP",
-        11,
+        ON::CAMP,
         "LEVEL",
-        12,
+        ON::LEVEL,
         "TRANSITION",
-        13,
+        ON::TRANSITION,
         "DEATH",
-        14,
+        ON::DEATH,
         "SPACESHIP",
-        15,
+        ON::SPACESHIP,
         "WIN",
-        16,
+        ON::WIN,
         "CREDITS",
-        17,
+        ON::CREDITS,
         "SCORES",
-        18,
+        ON::SCORES,
         "CONSTELLATION",
-        19,
+        ON::CONSTELLATION,
         "RECAP",
-        20,
+        ON::RECAP,
         "ARENA_MENU",
-        21,
+        ON::ARENA_MENU,
         "ARENA_INTRO",
-        25,
+        ON::ARENA_INTRO,
         "ARENA_MATCH",
-        26,
+        ON::ARENA_MATCH,
         "ARENA_SCORE",
-        27,
+        ON::ARENA_SCORE,
         "ONLINE_LOADING",
-        28,
+        ON::ONLINE_LOADING,
         "ONLINE_LOBBY",
-        29,
+        ON::ONLINE_LOBBY,
         "GUIFRAME",
-        100,
+        ON::GUIFRAME,
         "FRAME",
-        101,
+        ON::FRAME,
         "GAMEFRAME",
-        108,
+        ON::GAMEFRAME,
         "SCREEN",
-        102,
+        ON::SCREEN,
         "START",
-        103,
+        ON::START,
         "LOADING",
-        104,
+        ON::LOADING,
         "RESET",
-        105,
+        ON::RESET,
         "SAVE",
-        106,
+        ON::SAVE,
         "LOAD",
-        107,
+        ON::LOAD,
+        "POST_ROOM_GENERATION",
+        ON::POST_ROOM_GENERATION,
         "SCRIPT_ENABLE",
-        109,
+        ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
-        110);
+        ON::SCRIPT_DISABLE);
     /* ON
     // GUIFRAME
     // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
@@ -879,6 +881,9 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     // Runs on the first ON.SCREEN of a run
     // RESET
     // Runs when resetting a run
+    // POST_ROOM_GENERATION
+    // Params: `PostRoomGenerationContext room_gen_ctx`
+    // Runs right after all rooms are generated before entities are spawned
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -1446,6 +1451,21 @@ void ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float
         if (callback.tile_code == tile_code)
         {
             handle_function(callback.func, x, y, layer);
+        }
+    }
+}
+
+void ScriptImpl::post_room_generation()
+{
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == ON::POST_ROOM_GENERATION)
+        {
+            handle_function(callback.func, PostRoomGenerationContext{});
+            callback.lastRan = now;
         }
     }
 }

@@ -7,6 +7,11 @@
 
 #include <sol/sol.hpp>
 
+void PostRoomGenerationContext::set_room_code(int x, int y, int l, ROOM_CODE room_code)
+{
+    State::get().ptr_local()->level_gen->set_room_code(x, y, l, room_code);
+}
+
 namespace NLevel
 {
 void register_usertypes(sol::state& lua, ScriptImpl* script)
@@ -74,6 +79,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     {
         return State::get().ptr_local()->level_gen->get_room_code_name(room_code);
     };
+
+    // Context received in ON.POST_ROOM_GENERATION
+    // Used to change the room codes in the level
+    lua.new_usertype<PostRoomGenerationContext>("PostRoomGenerationContext", sol::no_constructor, "set_room_code", &PostRoomGenerationContext::set_room_code);
+    /* PostRoomGenerationContext
+        nil set_room_code(int x, int y, int l, ROOM_CODE room_code)
+    */
 
     lua.new_usertype<QuestsInfo>(
         "QuestsInfo",

@@ -52,17 +52,20 @@ enum class ON
     ARENA_SCORE = 27,
     ONLINE_LOADING = 28,
     ONLINE_LOBBY = 29,
+
+    // Custom events
     GUIFRAME = 100,
-    FRAME = 101,
-    SCREEN = 102,
-    START = 103,
-    LOADING = 104,
-    RESET = 105,
-    SAVE = 106,
-    LOAD = 107,
-    GAMEFRAME = 108,
-    SCRIPT_ENABLE = 109,
-    SCRIPT_DISABLE = 110
+    FRAME,
+    SCREEN,
+    START,
+    LOADING,
+    RESET,
+    SAVE,
+    LOAD,
+    GAMEFRAME,
+    POST_ROOM_GENERATION,
+    SCRIPT_ENABLE,
+    SCRIPT_DISABLE
 };
 
 struct IntOption
@@ -231,6 +234,8 @@ class ScriptImpl
 
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+
+    void post_room_generation();
 
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);

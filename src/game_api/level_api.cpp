@@ -500,6 +500,13 @@ void* load_item(Layer* _this, std::uint32_t entity_id, float x, float y, bool so
 }
 #endif
 
+using LevelGenFun = void(LevelGenSystem*, float);
+LevelGenFun* g_level_gen_trampoline{nullptr};
+void level_gen(LevelGenSystem* level_gen_sys, float param_2)
+{
+    g_level_gen_trampoline(level_gen_sys, param_2);
+}
+
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
@@ -583,7 +590,7 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
 }
 
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
-TestChance* g_test_chance;
+TestChance* g_test_chance{nullptr};
 
 struct SpawnInfo
 {
@@ -708,10 +715,18 @@ void LevelGenData::init()
         auto exe = memory.exe();
         auto after_bundle = memory.after_bundle;
 
-        auto off = find_inst(exe, "\x44\x0f\xb7\xc5\xf3\x0f\x11\x7c\x24\x20"s, after_bundle);
-        auto fun_start = decode_pc(exe, find_inst(exe, "\xe8"s, off), 1);
+        {
+            auto fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, after_bundle);
+            fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
+            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
+        }
 
-        g_handle_tile_code_trampoline = (HandleTileCodeFun*)memory.at_exe(fun_start);
+        {
+            auto fun_start = find_inst(exe, "\x44\x0f\xb7\xc5\xf3\x0f\x11\x7c\x24\x20"s, after_bundle);
+            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            g_handle_tile_code_trampoline = (HandleTileCodeFun*)memory.at_exe(fun_start);
+        }
 
         DetourRestoreAfterWith();
 
@@ -724,6 +739,7 @@ void LevelGenData::init()
         DetourAttach((void**)&g_load_item_trampoline, load_item);
 #endif
 
+        DetourAttach((void**)&g_level_gen_trampoline, level_gen);
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
 
         const LONG error = DetourTransactionCommit();
@@ -828,34 +844,36 @@ void LevelGenData::unregister_chance_logic_provider(std::uint32_t provider_id)
                   { return provider.id == provider_id; });
 }
 
-using DoProceduralSpawn = void(ThemeInfo*, SpawnInfo*);
-std::array<std::pair<ThemeInfo*, DoProceduralSpawn*>, 18> g_original_do_procedural_spawn;
+using GenerateRoomsFun = void(ThemeInfo*);
+using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
 void LevelGenSystem::init()
 {
     data->init();
 
-    for (size_t i = 0; i < g_original_do_procedural_spawn.size(); i++)
+    for (ThemeInfo* theme : themes)
     {
-        ThemeInfo* theme = themes[i];
-        g_original_do_procedural_spawn[i] = std::pair{
-            theme,
-            (DoProceduralSpawn*)register_hook_function(
-                &theme->__vftable, 0x32, (DoProceduralSpawn*)[](ThemeInfo * self, SpawnInfo * spawn_info)
+        hook_vtable<GenerateRoomsFun>(
+            theme, [](ThemeInfo* self, GenerateRoomsFun* original)
+            {
+                original(self);
+                SpelunkyScript::for_each_script(
+                    [&](SpelunkyScript& script)
+                    {
+                        script.post_room_generation();
+                        return true;
+                    });
+            },
+            0x6);
+        hook_vtable<DoProceduralSpawnFun>(
+            theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
+            {
+                if (handle_chance(self, spawn_info))
                 {
-                    if (handle_chance(self, spawn_info))
-                    {
-                        return;
-                    }
-
-                    for (auto [theme, original] : g_original_do_procedural_spawn)
-                    {
-                        if (theme == self)
-                        {
-                            original(self, spawn_info);
-                            return;
-                        }
-                    }
-                })};
+                    return;
+                }
+                original(self, spawn_info);
+            },
+            0x32);
     }
 }
 
@@ -885,12 +903,30 @@ std::optional<uint16_t> LevelGenSystem::get_room_code(int x, int y, int l)
         return std::nullopt;
 
     LevelGenRooms* level_rooms = rooms[l];
-    auto templates = data->templates();
     return level_rooms->rooms[x + y * 8];
 }
 bool LevelGenSystem::set_room_code(int x, int y, int l, uint16_t room_code)
 {
-    return false;
+    auto state = State::get();
+    auto* state_ptr = state.ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return false;
+
+    if (l < 0)
+    {
+        auto player = state.items()->player(abs(l) - 1);
+        if (player == nullptr)
+            return false;
+        l = player->layer;
+    }
+
+    if (l >= 2)
+        return false;
+
+    LevelGenRooms* level_rooms = rooms[l];
+    level_rooms->rooms[x + y * 8] = room_code;
+    return true;
 }
 
 std::string_view LevelGenSystem::get_room_code_name(uint16_t room_code)
