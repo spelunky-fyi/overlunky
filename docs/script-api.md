@@ -530,10 +530,6 @@ Read input
 ### [`read_stolen_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
 `nil read_stolen_input(int uid)`<br/>
 Read input that has been previously stolen with steal_input
-### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
-`bool toast_visible()`<br/>
-### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
-`bool speechbubble_visible()`<br/>
 ### [`clear_entity_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_entity_callback)
 `nil clear_entity_callback(int uid, CallbackId cb_id)`<br/>
 Clears a callback that is specific to an entity.
@@ -549,6 +545,14 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
 Use this only when no other approach works, this call can be expensive if overused.
+### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
+`bool toast_visible()`<br/>
+### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
+`bool speechbubble_visible()`<br/>
+### [`cancel_toast`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cancel_toast)
+`bool cancel_toast()`<br/>
+### [`cancel_speechbubble`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cancel_speechbubble)
+`bool cancel_speechbubble()`<br/>
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 `nil get_particle_type()`<br/>
 Get the [ParticleDB](#particledb) details of the specified ID
