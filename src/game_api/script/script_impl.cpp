@@ -16,6 +16,7 @@
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_monsters_lua.hpp"
 #include "usertypes/entities_mounts_lua.hpp"
+#include "usertypes/entity_casting_lua.hpp"
 #include "usertypes/entity_lua.hpp"
 #include "usertypes/flags_lua.hpp"
 #include "usertypes/gui_lua.hpp"
@@ -475,8 +476,28 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_door_target"] = get_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
     lua["set_contents"] = set_contents;
-    /// Get the [Entity](#entity) behind an uid
-    lua["get_entity"] = get_entity_ptr;
+    /// Get the [Entity](#entity) behind an uid (do not use, use `get_entity` instead)
+    lua["get_entity_raw"] = get_entity_ptr;
+    lua.script(R"##(
+        function get_entity(ent_uid)
+            if ent_uid == nil then
+                return nil
+            end
+
+            entity_raw = get_entity_raw(ent_uid)
+            if entity_raw == nil then
+                return nil
+            end
+
+            if TYPE_MAP[entity_raw.type.id] ~= nil then
+                local cast_fun_name = TYPE_MAP[entity_raw.type.id]
+                local cast_fun = load("return entity_raw:" .. cast_fun_name .. "()")
+                return cast_fun()
+            else
+                return entity_raw
+            end
+        end
+        )##");
     /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
     lua["get_type"] = get_type;
     /// Get uids of all entities currently loaded
@@ -777,6 +798,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NGui::register_usertypes(lua, this);
     NTexture::register_usertypes(lua, this);
     NEntity::register_usertypes(lua, this);
+    NEntityCasting::register_usertypes(lua, this);
     NEntitiesMounts::register_usertypes(lua, this);
     NEntitiesMonsters::register_usertypes(lua, this);
     NParticles::register_usertypes(lua);

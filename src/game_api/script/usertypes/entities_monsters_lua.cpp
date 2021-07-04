@@ -79,6 +79,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_tiamat"] = &Entity::as<Tiamat>;
     lua["Entity"]["as_giantfrog"] = &Entity::as<GiantFrog>;
     lua["Entity"]["as_frog"] = &Entity::as<Frog>;
+    lua["Entity"]["as_firefrog"] = &Entity::as<FireFrog>;
     lua["Entity"]["as_grub"] = &Entity::as<Grub>;
     lua["Entity"]["as_tadpole"] = &Entity::as<Tadpole>;
     lua["Entity"]["as_giantfly"] = &Entity::as<GiantFly>;
