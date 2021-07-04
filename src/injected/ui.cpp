@@ -29,6 +29,7 @@
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
+#include "spawn_api.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
 
@@ -41,87 +42,87 @@ std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
 std::map<std::string, int> keys{
-    {"enter", 0x0d},
-    {"escape", 0x1b},
-    {"move_left", 0x25},
-    {"move_up", 0x26},
-    {"move_right", 0x27},
-    {"move_down", 0x28},
-    {"move_pageup", 0x21},
-    {"move_pagedown", 0x22},
-    {"toggle_mouse", 0x14d},
-    {"toggle_godmode", 0x147},
-    {"toggle_noclip", 0x146},
-    {"toggle_snap", 0x153},
-    {"toggle_pause", 0x120},
-    {"toggle_disable_pause", 0x350},
-    {"toggle_grid", 0x347},
-    {"toggle_hitboxes", 0x348},
-    {"frame_advance", 0x20},
-    {"frame_advance_alt", 0x220},
-    {"tool_entity", 0x70},
-    {"tool_door", 0x71},
-    {"tool_camera", 0x72},
-    {"tool_entity_properties", 0x73},
-    {"tool_game_properties", 0x74},
-    {"tool_options", 0x78},
-    {"tool_debug", 0x37b},
-    {"tool_metrics", 0x349},
-    {"tool_style", 0x355},
-    {"tool_script", 0x77},
-    {"tool_save", 0x75},
-    {"reset_windows", 0x352},
-    {"reset_windows_vertical", 0x356},
-    {"tabbed_interface", 0x354},
-    {"detach_tab", 0x344},
-    {"save_settings", 0x353},
-    {"load_settings", 0x34c},
-    {"spawn_entity", 0x10d},
-    {"spawn_kit_1", 0x231},
-    {"spawn_kit_2", 0x232},
-    {"spawn_kit_3", 0x233},
-    {"spawn_kit_4", 0x234},
-    {"spawn_kit_5", 0x235},
-    {"spawn_kit_6", 0x236},
-    {"spawn_kit_7", 0x237},
-    {"spawn_kit_8", 0x238},
-    {"spawn_kit_9", 0x239},
-    {"spawn_layer_door", 0x20d},
-    {"spawn_warp_door", 0x30d},
-    {"warp", 0x357},
-    {"hide_ui", 0x7a},
-    {"zoom_in", 0x1bc},
-    {"zoom_out", 0x1be},
-    {"zoom_default", 0x132},
-    {"zoom_3x", 0x133},
-    {"zoom_4x", 0x134},
-    {"zoom_5x", 0x135},
-    {"zoom_auto", 0x130},
-    {"teleport", 0x320},
-    {"teleport_left", 0x325},
-    {"teleport_up", 0x326},
-    {"teleport_right", 0x327},
-    {"teleport_down", 0x328},
-    {"coordinate_left", 0x125},
-    {"coordinate_up", 0x126},
-    {"coordinate_right", 0x127},
-    {"coordinate_down", 0x128},
-    {"mouse_spawn", 0x401},
-    {"mouse_spawn_throw", 0x401},
-    {"mouse_teleport", 0x402},
-    {"mouse_teleport_throw", 0x402},
-    {"mouse_grab", 0x403},
-    {"mouse_grab_unsafe", 0x603},
-    {"mouse_grab_throw", 0x503},
-    {"mouse_zap", 0x404},
-    {"mouse_blast", 0x504},
+    {"enter", VK_RETURN},
+    {"escape", VK_ESCAPE},
+    {"move_left", VK_LEFT},
+    {"move_up", VK_UP},
+    {"move_right", VK_RIGHT},
+    {"move_down", VK_DOWN},
+    {"move_pageup", VK_PRIOR},
+    {"move_pagedown", VK_NEXT},
+    {"toggle_mouse", OL_KEY_CTRL | 'M'},
+    {"toggle_godmode", OL_KEY_CTRL | 'G'},
+    {"toggle_noclip", OL_KEY_CTRL | 'F'},
+    {"toggle_snap", OL_KEY_CTRL | 'S'},
+    {"toggle_pause", OL_KEY_CTRL | VK_SPACE},
+    {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
+    {"toggle_grid", OL_KEY_CTRL | OL_KEY_SHIFT | 'G'},
+    {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'K'},
+    {"frame_advance", VK_SPACE},
+    {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
+    {"tool_entity", VK_F1},
+    {"tool_door", VK_F2},
+    {"tool_camera", VK_F3},
+    {"tool_entity_properties", VK_F4},
+    {"tool_game_properties", VK_F5},
+    {"tool_options", VK_F9},
+    {"tool_debug", OL_KEY_CTRL | OL_KEY_SHIFT | VK_F12},
+    {"tool_metrics", OL_KEY_CTRL | OL_KEY_SHIFT | 'I'},
+    {"tool_style", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
+    {"tool_script", VK_F8},
+    {"tool_save", VK_F6},
+    {"reset_windows", OL_KEY_CTRL | OL_KEY_SHIFT | 'R'},
+    {"reset_windows_vertical", OL_KEY_CTRL | OL_KEY_SHIFT | 'V'},
+    {"tabbed_interface", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
+    {"detach_tab", OL_KEY_CTRL | OL_KEY_SHIFT | 'D'},
+    {"save_settings", OL_KEY_CTRL | OL_KEY_SHIFT | 'S'},
+    {"load_settings", OL_KEY_CTRL | OL_KEY_SHIFT | 'L'},
+    {"spawn_entity", OL_KEY_CTRL | VK_RETURN},
+    {"spawn_kit_1", OL_KEY_SHIFT | '1'},
+    {"spawn_kit_2", OL_KEY_SHIFT | '2'},
+    {"spawn_kit_3", OL_KEY_SHIFT | '3'},
+    {"spawn_kit_4", OL_KEY_SHIFT | '4'},
+    {"spawn_kit_5", OL_KEY_SHIFT | '5'},
+    {"spawn_kit_6", OL_KEY_SHIFT | '6'},
+    {"spawn_kit_7", OL_KEY_SHIFT | '7'},
+    {"spawn_kit_8", OL_KEY_SHIFT | '8'},
+    {"spawn_kit_9", OL_KEY_SHIFT | '9'},
+    {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
+    {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
+    {"warp", OL_KEY_CTRL | OL_KEY_SHIFT | 'W'},
+    {"hide_ui", VK_F11},
+    {"zoom_in", OL_KEY_CTRL | VK_OEM_COMMA},
+    {"zoom_out", OL_KEY_CTRL | VK_OEM_PERIOD},
+    {"zoom_default", OL_KEY_CTRL | '2'},
+    {"zoom_3x", OL_KEY_CTRL | '3'},
+    {"zoom_4x", OL_KEY_CTRL | '4'},
+    {"zoom_5x", OL_KEY_CTRL | '5'},
+    {"zoom_auto", OL_KEY_CTRL | '0'},
+    {"teleport", OL_KEY_CTRL | OL_KEY_SHIFT | VK_SPACE},
+    {"teleport_left", OL_KEY_CTRL | OL_KEY_SHIFT | VK_LEFT},
+    {"teleport_up", OL_KEY_CTRL | OL_KEY_SHIFT | VK_UP},
+    {"teleport_right", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RIGHT},
+    {"teleport_down", OL_KEY_CTRL | OL_KEY_SHIFT | VK_DOWN},
+    {"coordinate_left", OL_KEY_CTRL | VK_LEFT},
+    {"coordinate_up", OL_KEY_CTRL | VK_UP},
+    {"coordinate_right", OL_KEY_CTRL | VK_RIGHT},
+    {"coordinate_down", OL_KEY_CTRL | VK_DOWN},
+    {"mouse_spawn", OL_BUTTON_MOUSE | 0x01},
+    {"mouse_spawn_throw", OL_BUTTON_MOUSE | 0x01},
+    {"mouse_teleport", OL_BUTTON_MOUSE | 0x02},
+    {"mouse_teleport_throw", OL_BUTTON_MOUSE | 0x02},
+    {"mouse_grab", OL_BUTTON_MOUSE | 0x03},
+    {"mouse_grab_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x03},
+    {"mouse_grab_throw", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x03},
+    {"mouse_zap", OL_BUTTON_MOUSE | 0x04},
+    {"mouse_blast", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x04},
     {"mouse_boom", 0x0},
-    {"mouse_big_boom", 0x604},
-    {"mouse_nuke", 0x704},
-    {"mouse_clone", 0x505},
-    {"mouse_destroy", 0x405},
-    {"mouse_destroy_unsafe", 0x605},
-    {"reload_enabled_scripts", 0x174} // ctrl + f5 same as playlunky
+    {"mouse_big_boom", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x04},
+    {"mouse_nuke", OL_BUTTON_MOUSE | OL_KEY_CTRL | OL_KEY_SHIFT | 0x04},
+    {"mouse_clone", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x05},
+    {"mouse_destroy", OL_BUTTON_MOUSE | 0x05},
+    {"mouse_destroy_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x05},
+    {"reload_enabled_scripts", OL_KEY_CTRL | VK_F5} // ctrl + f5 same as playlunky
     //{ "", 0x },
 };
 
@@ -307,7 +308,7 @@ std::string key_string(int keycode)
     {
         name = "Disabled";
     }
-    else if (!(keycode & 0x400)) // keyboard
+    else if (!(keycode & OL_BUTTON_MOUSE)) // keyboard
     {
         UINT scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
         switch (virtualKey)
@@ -347,11 +348,11 @@ std::string key_string(int keycode)
         name = buttonss.str();
     }
 
-    if (keycode & 0x200)
+    if (keycode & OL_KEY_SHIFT)
     {
         name = "Shift+" + name;
     }
-    if (keycode & 0x100)
+    if (keycode & OL_KEY_CTRL)
     {
         name = "Ctrl+" + name;
     }
@@ -677,9 +678,17 @@ void spawn_entities(bool s, std::string list = "")
     {
         if (g_current_item == 0 && g_filtered_count == g_items.size())
             return;
-        int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
-        if (!lock_entity)
-            g_last_id = spawned;
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
+        {
+            int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
+            if (!lock_entity)
+                g_last_id = spawned;
+        }
+        else
+        {
+            std::pair<float, float> cpos = click_position(g_x, g_y);
+            spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second);
+        }
     }
     else
     {
@@ -866,18 +875,18 @@ bool pressed(std::string keyname, int wParam)
     int keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
-        wParam += 0x100;
+        wParam += OL_KEY_CTRL;
     }
     if (GetAsyncKeyState(VK_SHIFT))
     {
-        wParam += 0x200;
+        wParam += OL_KEY_SHIFT;
     }
     return wParam == keycode;
 }
 
 bool clicked(std::string keyname)
 {
-    int wParam = 0x400;
+    int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -885,11 +894,11 @@ bool clicked(std::string keyname)
     int keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
-        wParam += 0x100;
+        wParam += OL_KEY_CTRL;
     }
     if (GetAsyncKeyState(VK_SHIFT))
     {
-        wParam += 0x200;
+        wParam += OL_KEY_SHIFT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -904,7 +913,7 @@ bool clicked(std::string keyname)
 
 bool held(std::string keyname)
 {
-    int wParam = 0x400;
+    int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -912,11 +921,11 @@ bool held(std::string keyname)
     int keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
-        wParam += 0x100;
+        wParam += OL_KEY_CTRL;
     }
     if (GetAsyncKeyState(VK_SHIFT))
     {
-        wParam += 0x200;
+        wParam += OL_KEY_SHIFT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -931,7 +940,7 @@ bool held(std::string keyname)
 
 bool released(std::string keyname)
 {
-    int wParam = 0x400;
+    int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -939,11 +948,11 @@ bool released(std::string keyname)
     int keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
-        wParam += 0x100;
+        wParam += OL_KEY_CTRL;
     }
     if (GetAsyncKeyState(VK_SHIFT))
     {
-        wParam += 0x200;
+        wParam += OL_KEY_SHIFT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {

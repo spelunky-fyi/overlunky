@@ -2,6 +2,7 @@
 #include "game_manager.hpp"
 #include "level_api.hpp"
 #include "logger.h"
+#include "spawn_api.hpp"
 
 size_t get_dark()
 {
@@ -113,7 +114,7 @@ void do_write_load_opt()
     auto memory = Memory::get();
     auto exe = memory.exe();
     auto start = memory.after_bundle;
-    auto off_send = find_inst(exe, "\x45\x8D\x41\x50"s, start) + 9;
+    auto off_send = find_inst(exe, "\x45\x8D\x41\x50"s, start) + 7;
     write_mem_prot(memory.at_exe(off_send), "\x31\xC0\x31\xD2\x90\x90"s, true);
 }
 bool& get_write_load_opt()
@@ -157,6 +158,7 @@ State& State::get()
         auto addr_dark = get_dark();
         STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
         STATE.ptr()->level_gen->data->init();
+        init_spawn_hooks();
         get_is_init() = true;
     }
     return STATE;

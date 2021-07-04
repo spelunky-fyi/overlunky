@@ -2,9 +2,9 @@
 
 #include "character_def.hpp"
 #include "file_api.hpp"
-#include "rpc.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
+#include "spawn_api.hpp"
 #include "state.hpp"
 #include "window_api.hpp"
 
