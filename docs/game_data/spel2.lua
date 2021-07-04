@@ -1,10 +1,45 @@
+Alien = {
+  __index = "function: 0000000015A0B930",
+  __name = "sol.Alien.user",
+  __newindex = "function: 0000000015A0C230"
+}
+Ammit = {
+  __index = "function: 0000000015A07730",
+  __name = "sol.Ammit.user",
+  __newindex = "function: 0000000015A081B0"
+}
 Animation = {
   __name = "sol.Animation.user"
 }
+Anubis = {
+  __index = "function: 00000000159FC930",
+  __name = "sol.Anubis.user",
+  __newindex = "function: 00000000159FD430"
+}
+AnubisTwo = {
+  __index = "function: 00000000159FB7B0",
+  __name = "sol.AnubisTwo.user",
+  __newindex = "function: 00000000159FC0B0"
+}
+ApepHead = {
+  __index = "function: 0000000015A074B0",
+  __name = "sol.ApepHead.user",
+  __newindex = "function: 0000000015A07530"
+}
+ApepPart = {
+  __index = "function: 0000000015A07F30",
+  __name = "sol.ApepPart.user",
+  __newindex = "function: 0000000015A085B0"
+}
 Arrowtrap = {
-  __index = "function: 0000020E8E230C90",
+  __index = "function: 0000000015BCC980",
   __name = "sol.Arrowtrap.user",
-  __newindex = "function: 0000020E8E230690"
+  __newindex = "function: 0000000015BCAF80"
+}
+Axolotl = {
+  __index = "function: 0000000015BCE600",
+  __name = "sol.Axolotl.user",
+  __newindex = "function: 0000000015BCEB80"
 }
 BEG = {
   ALTAR_DESTROYED = 1,
@@ -22,10 +57,28 @@ BUTTON = {
   RUN = 16,
   WHIP = 2
 }
-Bomb = {
-  __index = "function: 0000028B8CEE6360",
-  __name = "sol.Bomb.user",
-  __newindex = "function: 0000028B8CEE50E0"
+Bee = {
+  __index = "function: 0000000015A05CB0",
+  __name = "sol.Bee.user",
+  __newindex = "function: 0000000015A067B0"
+}
+Beg = {
+  __index = "function: 0000000015BDDB80",
+  __name = "sol.Beg.user",
+  __newindex = "function: 0000000015BDE680"
+}
+Bodyguard = {
+  __index = "function: 0000000015A006B0",
+  __name = "sol.Bodyguard.user",
+  __newindex = "function: 00000000159FF630"
+}
+CAUSE_OF_DEATH = {
+  DEATH = 0,
+  ENTITY = 1,
+  LONG_FALL = 2,
+  MISSED = 4,
+  POISONED = 5,
+  STILL_FALLING = 3
 }
 CHAR_STATE = {
   ATTACKING = 12,
@@ -63,28 +116,93 @@ COSUBTHEME = {
 Camera = {
   __name = "sol.Camera.user"
 }
-Cape = {
-  __index = "function: 0000020E8E22C790",
-  __name = "sol.Cape.user",
-  __newindex = "function: 0000020E8E22C210"
+CatMummy = {
+  __index = "function: 0000000015A01C30",
+  __name = "sol.CatMummy.user",
+  __newindex = "function: 0000000015A00B30"
 }
-ChasingMonster = {
-  __index = "function: 0000020E8E230090",
-  __name = "sol.ChasingMonster.user",
-  __newindex = "function: 0000020E8E231290"
+Caveman = {
+  __index = "function: 0000000015BDE500",
+  __name = "sol.Caveman.user",
+  __newindex = "function: 0000000015BDD000"
+}
+CavemanShopkeeper = {
+  __index = "function: 0000000015BDD780",
+  __name = "sol.CavemanShopkeeper.user",
+  __newindex = "function: 0000000015BDE580"
+}
+Cobra = {
+  __index = "function: 00000000159FFBB0",
+  __name = "sol.Cobra.user",
+  __newindex = "function: 0000000015A007B0"
 }
 Color = {
   __name = "sol.Color.user"
 }
-Container = {
-  __index = "function: 0000020E8E22CE90",
-  __name = "sol.Container.user",
-  __newindex = "function: 0000020E8E22BD90"
+Crabman = {
+  __index = "function: 0000000015A03A30",
+  __name = "sol.Crabman.user",
+  __newindex = "function: 0000000015A032B0"
+}
+Critter = {
+  __index = "function: 0000000015BDD980",
+  __name = "sol.Critter.user",
+  __newindex = "function: 0000000015BDDA00"
+}
+CritterButterfly = {
+  __index = "function: 0000000015BE1200",
+  __name = "sol.CritterButterfly.user",
+  __newindex = "function: 0000000015BE2200"
+}
+CritterCrab = {
+  __index = "function: 0000000015BDF600",
+  __name = "sol.CritterCrab.user",
+  __newindex = "function: 0000000015BDF680"
+}
+CritterDrone = {
+  __index = "function: 0000000015081900",
+  __name = "sol.CritterDrone.user",
+  __newindex = "function: 0000000015081C00"
+}
+CritterFirefly = {
+  __index = "function: 000000001507EB00",
+  __name = "sol.CritterFirefly.user",
+  __newindex = "function: 000000001507F300"
+}
+CritterFish = {
+  __index = "function: 0000000015BE7480",
+  __name = "sol.CritterFish.user",
+  __newindex = "function: 0000000015BE7800"
+}
+CritterLocust = {
+  __index = "function: 0000000015BE4700",
+  __name = "sol.CritterLocust.user",
+  __newindex = "function: 0000000015BE3480"
+}
+CritterPenguin = {
+  __index = "function: 0000000015BEA600",
+  __name = "sol.CritterPenguin.user",
+  __newindex = "function: 0000000015BEAD80"
+}
+CritterSlime = {
+  __index = "function: 0000000048511C40",
+  __name = "sol.CritterSlime.user",
+  __newindex = "function: 0000000048512D40"
+}
+CritterSnail = {
+  __index = "function: 0000000015BE6A00",
+  __name = "sol.CritterSnail.user",
+  __newindex = "function: 0000000015BE5C80"
+}
+Crocman = {
+  __index = "function: 0000000015BEA100",
+  __name = "sol.Crocman.user",
+  __newindex = "function: 0000000015BEA180"
 }
 Crushtrap = {
-  __index = "function: 0000020E8E22F690",
+  __index = "function: 0000000015081F80",
   __name = "sol.Crushtrap.user",
-  __newindex = "function: 0000020E8E22E290"
+  __newindex = "function: 0000000015083300"
 }
 CustomSound = {
   __name = "sol.CustomSound.user"
@@ -1094,6 +1212,11 @@ ENT_TYPE = {
   MOUNT_ROCKDOG = 898,
   MOUNT_TURKEY = 897
 }
+EggplantMinister = {
+  __index = "function: 0000000015A18DB0",
+  __name = "sol.EggplantMinister.user",
+  __newindex = "function: 0000000015A19030"
+}
 Entity = {
   __name = "sol.Entity.user"
 }
@@ -1101,18 +1224,110 @@ EntityDB = {
   __name = "sol.EntityDB.user"
 }
 F = {}
-Ghost = {
-  __index = "function: 0000020E8E231B90",
-  __name = "sol.Ghost.user",
-  __newindex = "function: 0000020E8E22FD10"
+Firebug = {
+  __index = "function: 0000000015BE6400",
+  __name = "sol.Firebug.user",
+  __newindex = "function: 0000000015BE6380"
 }
-Gun = {
-  __index = "function: 0000020E8E22EF90",
-  __name = "sol.Gun.user",
-  __newindex = "function: 0000020E8E22E810"
+FirebugUnchained = {
+  __index = "function: 0000000015BE5480",
+  __name = "sol.FirebugUnchained.user",
+  __newindex = "function: 0000000015BE6980"
+}
+Fish = {
+  __index = "function: 0000000015A020B0",
+  __name = "sol.Fish.user",
+  __newindex = "function: 0000000015A02530"
+}
+ForestSister = {
+  __index = "function: 00000000159FAC30",
+  __name = "sol.ForestSister.user",
+  __newindex = "function: 00000000159FB830"
+}
+Frog = {
+  __index = "function: 0000000015A13330",
+  __name = "sol.Frog.user",
+  __newindex = "function: 0000000015A14130"
+}
+Ghist = {
+  __index = "function: 0000000015A17B30",
+  __name = "sol.Ghist.user",
+  __newindex = "function: 0000000015A17A30"
+}
+GhistShopkeeper = {
+  __index = "function: 0000000015BD9680",
+  __name = "sol.GhistShopkeeper.user",
+  __newindex = "function: 0000000015BD9500"
+}
+Ghost = {
+  __index = "function: 0000000015BD1400",
+  __name = "sol.Ghost.user",
+  __newindex = "function: 0000000015BD1E80"
+}
+GiantFish = {
+  __index = "function: 0000000015A04330",
+  __name = "sol.GiantFish.user",
+  __newindex = "function: 0000000015A03730"
+}
+GiantFly = {
+  __index = "function: 0000000015A18330",
+  __name = "sol.GiantFly.user",
+  __newindex = "function: 0000000015A18530"
+}
+GiantFrog = {
+  __index = "function: 0000000015A13DB0",
+  __name = "sol.GiantFrog.user",
+  __newindex = "function: 0000000015A146B0"
+}
+GoldMonkey = {
+  __index = "function: 0000000015BD6680",
+  __name = "sol.GoldMonkey.user",
+  __newindex = "function: 0000000015BD5980"
+}
+Grub = {
+  __index = "function: 0000000015A15330",
+  __name = "sol.Grub.user",
+  __newindex = "function: 0000000015A149B0"
+}
+HUNDUNFLAGS = {
+  BIRDHEADEMERGED = 2,
+  BIRDHEADSHOTLAST = 16,
+  SNAKEHEADEMERGED = 4,
+  TOPLEVELARENAREACHED = 8,
+  WILLMOVELEFT = 1
+}
+HangSpider = {
+  __index = "function: 0000000015BD7B80",
+  __name = "sol.HangSpider.user",
+  __newindex = "function: 0000000015BD8700"
+}
+Hermitcrab = {
+  __index = "function: 0000000015BD4680",
+  __name = "sol.Hermitcrab.user",
+  __newindex = "function: 0000000015BD6A80"
+}
+HornedLizard = {
+  __index = "function: 0000000015BE0600",
+  __name = "sol.HornedLizard.user",
+  __newindex = "function: 0000000015BE0580"
+}
+Hundun = {
+  __index = "function: 0000000015BCEC80",
+  __name = "sol.Hundun.user",
+  __newindex = "function: 0000000015BCE180"
+}
+HundunHead = {
+  __index = "function: 0000000015BCF600",
+  __name = "sol.HundunHead.user",
+  __newindex = "function: 0000000015BD0E00"
 }
 Illumination = {
   __name = "sol.Illumination.user"
+}
+Imp = {
+  __index = "function: 0000000015BE2F00",
+  __name = "sol.Imp.user",
+  __newindex = "function: 0000000015BE4A80"
 }
 InputMapping = {
   __name = "sol.InputMapping.user"
@@ -1129,9 +1344,19 @@ JUNGLESISTERS = {
   WARNING_ONE_WAY_DOOR = 4
 }
 Jiangshi = {
-  __index = "function: 0000020E8E232510",
+  __index = "function: 0000000015BD4A00",
   __name = "sol.Jiangshi.user",
-  __newindex = "function: 0000020E8E232610"
+  __newindex = "function: 0000000015BD3E00"
+}
+JumpDog = {
+  __index = "function: 0000000015A1A3B0",
+  __name = "sol.JumpDog.user",
+  __newindex = "function: 0000000015A1A1B0"
+}
+Kingu = {
+  __index = "function: 0000000015A05E30",
+  __name = "sol.Kingu.user",
+  __newindex = "function: 0000000015A05130"
 }
 LAYER = {
   BACK = 1,
@@ -1141,6 +1366,26 @@ LAYER = {
   PLAYER2 = -2,
   PLAYER3 = -3,
   PLAYER4 = -4
+}
+Lahamu = {
+  __index = "function: 0000000015A0C8B0",
+  __name = "sol.Lahamu.user",
+  __newindex = "function: 0000000015A0C930"
+}
+Lamassu = {
+  __index = "function: 0000000015A11C30",
+  __name = "sol.Lamassu.user",
+  __newindex = "function: 0000000015A11AB0"
+}
+Lavamander = {
+  __index = "function: 0000000015BE3B00",
+  __name = "sol.Lavamander.user",
+  __newindex = "function: 0000000015BE3C80"
+}
+Leprechaun = {
+  __index = "function: 0000000015BEA380",
+  __name = "sol.Leprechaun.user",
+  __newindex = "function: 0000000015BEA200"
 }
 LightParams = {
   __name = "sol.LightParams.user"
@@ -1165,20 +1410,70 @@ MASK = {
   SHADOW = 2048,
   WATER = 8192
 }
+MadameTusk = {
+  __index = "function: 0000000015A02830",
+  __name = "sol.MadameTusk.user",
+  __newindex = "function: 0000000015A018B0"
+}
+MagmaMan = {
+  __index = "function: 0000000015A063B0",
+  __name = "sol.MagmaMan.user",
+  __newindex = "function: 0000000015A05830"
+}
+Mantrap = {
+  __index = "function: 0000000015BE2E80",
+  __name = "sol.Mantrap.user",
+  __newindex = "function: 0000000015BE2180"
+}
+Mech = {
+  __index = "function: 0000000015BCF580",
+  __name = "sol.Mech.user",
+  __newindex = "function: 0000000015BCF180"
+}
+MegaJellyfish = {
+  __index = "function: 0000000015BD2680",
+  __name = "sol.MegaJellyfish.user",
+  __newindex = "function: 0000000015BD1A80"
+}
+Mole = {
+  __index = "function: 0000000015BD5200",
+  __name = "sol.Mole.user",
+  __newindex = "function: 0000000015BD6580"
+}
+Monkey = {
+  __index = "function: 0000000015BD3A80",
+  __name = "sol.Monkey.user",
+  __newindex = "function: 0000000015BD3C00"
+}
 Monster = {
-  __index = "function: 0000020E8D7A4180",
+  __index = "function: 0000000015BD1800",
   __name = "sol.Monster.user",
-  __newindex = "function: 0000020E8D7A4E80"
+  __newindex = "function: 0000000015BD1200"
+}
+Mosquito = {
+  __index = "function: 0000000015BE0E80",
+  __name = "sol.Mosquito.user",
+  __newindex = "function: 0000000015BE0900"
 }
 Mount = {
-  __index = "function: 0000020E8D7A4580",
+  __index = "function: 0000000015BCB180",
   __name = "sol.Mount.user",
-  __newindex = "function: 0000020E8D79CA80"
+  __newindex = "function: 0000000015BCB200"
 }
 Movable = {
-  __index = "function: 0000020E8D7A2280",
+  __index = "function: 000000001507F580",
   __name = "sol.Movable.user",
-  __newindex = "function: 0000020E8D7A2300"
+  __newindex = "function: 000000001507F600"
+}
+Mummy = {
+  __index = "function: 000000001507CB00",
+  __name = "sol.Mummy.user",
+  __newindex = "function: 000000001507CB80"
+}
+Necromancer = {
+  __index = "function: 0000000015BD5380",
+  __name = "sol.Necromancer.user",
+  __newindex = "function: 0000000015BD5080"
 }
 ON = {
   ARENA_INTRO = 25,
@@ -1219,15 +1514,35 @@ ON = {
   TRANSITION = 13,
   WIN = 16
 }
+Octopus = {
+  __index = "function: 0000000015A005B0",
+  __name = "sol.Octopus.user",
+  __newindex = "function: 00000000159FFB30"
+}
 Olmec = {
-  __index = "function: 0000020E8E231C10",
+  __index = "function: 0000000015BCC280",
   __name = "sol.Olmec.user",
-  __newindex = "function: 0000020E8E230B90"
+  __newindex = "function: 0000000015BCCE80"
 }
 OlmecFloater = {
-  __index = "function: 0000020E8E232F10",
+  __index = "function: 0000000015BCE900",
   __name = "sol.OlmecFloater.user",
-  __newindex = "function: 0000020E8E232290"
+  __newindex = "function: 0000000015BCE400"
+}
+Olmite = {
+  __index = "function: 0000000015A11030",
+  __name = "sol.Olmite.user",
+  __newindex = "function: 0000000015A10BB0"
+}
+OsirisHand = {
+  __index = "function: 0000000015A09530",
+  __name = "sol.OsirisHand.user",
+  __newindex = "function: 0000000015A09730"
+}
+OsirisHead = {
+  __index = "function: 0000000015A09B30",
+  __name = "sol.OsirisHead.user",
+  __newindex = "function: 0000000015A09AB0"
 }
 PARTICLEEMITTER = {
   ACIDBUBBLEBURST_BUBBLES = 101,
@@ -1453,10 +1768,15 @@ PARTICLEEMITTER = {
 ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
+Pet = {
+  __index = "function: 0000000015BDC000",
+  __name = "sol.Pet.user",
+  __newindex = "function: 0000000015BDC780"
+}
 Player = {
-  __index = "function: 0000020E8D7A3B80",
+  __index = "function: 0000000015081A00",
   __name = "sol.Player.user",
-  __newindex = "function: 0000020E8D7A4C80"
+  __newindex = "function: 0000000015082A00"
 }
 PlayerInputs = {
   __name = "sol.PlayerInputs.user"
@@ -1470,8 +1790,33 @@ PlayerSlotSettings = {
 PlayingSound = {
   __name = "sol.PlayingSound.user"
 }
+ProtoShopkeeper = {
+  __index = "function: 0000000015BD7F00",
+  __name = "sol.ProtoShopkeeper.user",
+  __newindex = "function: 0000000015BD7B00"
+}
+Qilin = {
+  __index = "function: 0000000015BD0900",
+  __name = "sol.Qilin.user",
+  __newindex = "function: 0000000015BCF880"
+}
 QuestsInfo = {
   __name = "sol.QuestsInfo.user"
+}
+Quillback = {
+  __index = "function: 0000000015BE7D00",
+  __name = "sol.Quillback.user",
+  __newindex = "function: 0000000015BE7180"
+}
+Robot = {
+  __index = "function: 0000000015BE7E00",
+  __name = "sol.Robot.user",
+  __newindex = "function: 0000000015BE8980"
+}
+Rockdog = {
+  __index = "function: 0000000015BCE080",
+  __name = "sol.Rockdog.user",
+  __newindex = "function: 0000000015BCDD00"
 }
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
@@ -1504,6 +1849,46 @@ SaveContext = {
 }
 SaveData = {
   __name = "sol.SaveData.user"
+}
+Scarab = {
+  __index = "function: 0000000015BE1580",
+  __name = "sol.Scarab.user",
+  __newindex = "function: 0000000015BE1600"
+}
+Scorpion = {
+  __index = "function: 0000000015BD3500",
+  __name = "sol.Scorpion.user",
+  __newindex = "function: 0000000015BD4300"
+}
+Shopkeeper = {
+  __index = "function: 0000000015BD8D00",
+  __name = "sol.Shopkeeper.user",
+  __newindex = "function: 0000000015BD6F80"
+}
+ShopkeeperClone = {
+  __index = "function: 0000000015BD9380",
+  __name = "sol.ShopkeeperClone.user",
+  __newindex = "function: 0000000015BD9580"
+}
+Skeleton = {
+  __index = "function: 0000000015BE1C00",
+  __name = "sol.Skeleton.user",
+  __newindex = "function: 0000000015BE2800"
+}
+Sorceress = {
+  __index = "function: 0000000015A047B0",
+  __name = "sol.Sorceress.user",
+  __newindex = "function: 0000000015A03DB0"
+}
+Sparrow = {
+  __index = "function: 0000000015BDCA80",
+  __name = "sol.Sparrow.user",
+  __newindex = "function: 0000000015BDCB00"
+}
+Spider = {
+  __index = "function: 0000000015BD8080",
+  __name = "sol.Spider.user",
+  __newindex = "function: 0000000015BD7480"
 }
 StateMemory = {
   __name = "sol.StateMemory.user"
@@ -1926,8 +2311,28 @@ TUSK = {
   PALACE_WELCOME_MESSAGE = 3,
   QUEST_NOT_STARTED = 0
 }
+Tadpole = {
+  __index = "function: 0000000015A15630",
+  __name = "sol.Tadpole.user",
+  __newindex = "function: 0000000015A15A30"
+}
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
+}
+Tiamat = {
+  __index = "function: 0000000015A10CB0",
+  __name = "sol.Tiamat.user",
+  __newindex = "function: 0000000015A10D30"
+}
+Tun = {
+  __index = "function: 0000000015BDB200",
+  __name = "sol.Tun.user",
+  __newindex = "function: 0000000015BDC700"
+}
+UFO = {
+  __index = "function: 0000000015A0DFB0",
+  __name = "sol.UFO.user",
+  __newindex = "function: 0000000015A0E030"
 }
 VANHORSING = {
   FIRST_ENCOUNTER_DIAMOND_THROWN = 2,
@@ -2523,16 +2928,41 @@ VANILLA_SOUND_PARAM = {
   VALUE = 8,
   VELOCITY = 15
 }
-VladsCape = {
-  __index = "function: 0000020E8E22F310",
-  __name = "sol.VladsCape.user",
-  __newindex = "function: 0000020E8E22EE10"
+Vampire = {
+  __index = "function: 00000000159FB530",
+  __name = "sol.Vampire.user",
+  __newindex = "function: 00000000159FB5B0"
+}
+VanHorsing = {
+  __index = "function: 0000000015080B00",
+  __name = "sol.VanHorsing.user",
+  __newindex = "function: 000000001507FD80"
+}
+Vlad = {
+  __index = "function: 00000000159FCDB0",
+  __name = "sol.Vlad.user",
+  __newindex = "function: 00000000159FD230"
 }
 WIN_STATE = {
   COSMIC_OCEAN_WIN = 3,
   HUNDUN_WIN = 2,
   NO_WIN = 0,
   TIAMAT_WIN = 1
+}
+Waddler = {
+  __index = "function: 00000000159FCBB0",
+  __name = "sol.Waddler.user",
+  __newindex = "function: 00000000159FE730"
+}
+WitchDoctor = {
+  __index = "function: 0000000015082E80",
+  __name = "sol.WitchDoctor.user",
+  __newindex = "function: 0000000015081E00"
+}
+WitchDoctorSkull = {
+  __index = "function: 00000000159FA8B0",
+  __name = "sol.WitchDoctorSkull.user",
+  __newindex = "function: 00000000159FB2B0"
 }
 YANG = {
   ANGRY = -1,
@@ -2544,7 +2974,34 @@ YANG = {
   TURKEY_SHOP_SPAWNED = 4,
   TWO_TURKEYS_BOUGHT = 6
 }
+Yama = {
+  __index = "function: 0000000015BCC380",
+  __name = "sol.Yama.user",
+  __newindex = "function: 0000000015BCCD00"
+}
+Yang = {
+  __index = "function: 0000000015BD9400",
+  __name = "sol.Yang.user",
+  __newindex = "function: 0000000015BD9480"
+}
+Yeti = {
+  __index = "function: 0000000015A0B5B0",
+  __name = "sol.Yeti.user",
+  __newindex = "function: 0000000015A0A930"
+}
+YetiKing = {
+  __index = "function: 0000000015A10030",
+  __name = "sol.YetiKing.user",
+  __newindex = "function: 0000000015A102B0"
+}
+YetiQueen = {
+  __index = "function: 0000000015A0FE30",
+  __name = "sol.YetiQueen.user",
+  __newindex = "function: 0000000015A0FF30"
+}
 apply_entity_db = function(...) end
+cancel_speechbubble = function(...) end
+cancel_toast = function(...) end
 carry = function(...) end
 clear_callback = function(...) end
 clear_entity_callback = function(...) end
@@ -2610,12 +3067,12 @@ inspect = {
   _LICENSE = "    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, modify, merge, publish,\n    distribute, sublicense, and/or sell copies of the Software, and to\n    permit persons to whom the Software is furnished to do so, subject to\n    the following conditions:\n\n    The above copyright notice and this permission notice shall be included\n    in all copies or substantial portions of the Software.\n\n    THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n  ",
   _URL = "http://github.com/kikito/inspect.lua",
   _VERSION = "inspect.lua 3.1.0",
-  inspect = ((loadstring or load)("\27LuaT\0\25ÔøΩ\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4ÔøΩ\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2ÔøΩ\2ÔøΩ\2\0\11ÔøΩ¬Ä\0\0008\1\0ÔøΩ\19\1\0\0R\0\0\0ÔøΩ\0\2\0\14\1\1\0BÔøΩ\0\0ÔøΩ\0\0ÔøΩ\11\1\0\1\14\1\2\2ÔøΩ\1\1\3¬Å\0\0008\0\0ÔøΩÔøΩ\1\2\0\14\2\1\5BÔøΩ\0\0008\0\0ÔøΩ\3\2\3\0ÔøΩ\2\1\7ÔøΩ\2\0\0008\4\0ÔøΩ\9\3\1\0ÔøΩ\3\5\0\0\4\0\0ÔøΩ\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8ÔøΩ\3\4\0R\0\0\0ÔøΩ\3\0\2ÔøΩÔøΩ\9\n\19\4\0\0R\0\0\0ÔøΩ\3\11\8\19\4\0\0R\0\0\0ÔøΩ\3\12\8\19\4\0\0R\0\0\0ÔøΩ\3\13\8ÔøΩ\3\3\3ÔøΩ\3\5\4\9\4\2\0ÔøΩ\4\0\0D\4\2\2ÔøΩ\3\14\8\9\4\3\0D\3\3\2ÔøΩÔøΩ\6\15ÔøΩ\4\0\0ÔøΩ\3\3\1ÔøΩ\3\0\16ÔøΩ\3\7\17\14\4\6\11ÔøΩ\3\2\0ÔøΩ\3\0\0ÔøΩ\3\1\0ÔøΩ\4ÔøΩdepth\4ÔøΩmath\4ÔøΩhuge\4ÔøΩnewline\4ÔøΩ\n\4ÔøΩindent\4ÔøΩ  \4ÔøΩprocess\4ÔøΩsetmetatable\4ÔøΩlevel\3\0\0\0\0\0\0\0\0\4ÔøΩbuffer\4ÔøΩids\4ÔøΩmaxIds\4ÔøΩtableAppearances\4ÔøΩputValue\4ÔøΩtable\4ÔøΩconcatÔøΩ\0\0\0\1\16\0\1\13\0\1\18\0ÔøΩÔøΩ\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1ÔøΩ\11\0\0\2\0\0\0\0\1ÔøΩÔøΩÔøΩrootÔøΩÔøΩÔøΩoptionsÔøΩÔøΩÔøΩdepthÔøΩÔøΩÔøΩnewlineÔøΩÔøΩÔøΩindentÔøΩÔøΩÔøΩprocessÔøΩÔøΩÔøΩinspectorÔøΩÔøΩÔøΩÔøΩ_ENVÔøΩprocessRecursiveÔøΩcountTableAppearancesÔøΩInspector_mt",'@serialized'))
+  inspect = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4Ä\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2∞\2 \2\0\11Ω¬Ä\0\0008\1\0Ä\19\1\0\0R\0\0\0Ä\0\2\0\14\1\1\0BÅ\0\0∏\0\0Ä\11\1\0\1\14\1\2\2é\1\1\3¬Å\0\0008\0\0ÄÉ\1\2\0\14\2\1\5BÇ\0\0008\0\0Ä\3\2\3\0é\2\1\7¬\2\0\0008\4\0Ä\9\3\1\0Ä\3\5\0\0\4\0\0ì\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8ì\3\4\0R\0\0\0í\3\0\2íÉ\9\n\19\4\0\0R\0\0\0í\3\11\8\19\4\0\0R\0\0\0í\3\12\8\19\4\0\0R\0\0\0í\3\13\8í\3\3\3í\3\5\4\9\4\2\0Ä\4\0\0D\4\2\2í\3\14\8\9\4\3\0D\3\3\2îÉ\6\15Ä\4\0\0ƒ\3\3\1ã\3\0\16é\3\7\17\14\4\6\11≈\3\2\0∆\3\0\0«\3\1\0í\4Üdepth\4Ömath\4Öhuge\4ànewline\4Ç\n\4áindent\4É  \4àprocess\4çsetmetatable\4Ülevel\3\0\0\0\0\0\0\0\0\4ábuffer\4Ñids\4ámaxIds\4ëtableAppearances\4âputValue\4Ütable\4áconcatÑ\0\0\0\1\16\0\1\13\0\1\18\0ÄΩ\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1˜\11\0\0\2\0\0\0\0\1ÄáÖrootÄΩàoptionsÄΩÜdepthäΩànewlineéΩáindentíΩàprocessìΩäinspector¥ΩÑÖ_ENVëprocessRecursiveñcountTableAppearancesçInspector_mt",'@serialized'))
 }
 json = {
   _version = "0.1.2",
-  decode = ((loadstring or load)("\27LuaT\0\25ÔøΩ\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4ÔøΩ\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2ÔøΩ\3ÔøΩ\1\0\8ÔøΩÔøΩ\0\0\0\0\1\0\0ÔøΩ\0\2\2ÔøΩÔøΩ\1\0008\3\0ÔøΩÔøΩ\0\0\2\3ÔøΩ\1\0ÔøΩ\1\0\0\0\2\0\0ÔøΩ\1\2\0025\1\2\0ÔøΩ\0\2\1ÔøΩ\0\1\0\0\1\0\0ÔøΩ\1\2\0\0\2\0\0ÔøΩ\2\0ÔøΩ\9\3\3\0ÔøΩ\3\0\0ÔøΩ\1\5\0ÔøΩ\0\0\3ÔøΩ\1\2\0\0\2\0\0ÔøΩ\2\2\0\9\3\3\0ÔøΩ\3\0\0ÔøΩ\1\5\2\0\1\3\0ÔøΩ\1\0\0;\1\3\0008\2\0ÔøΩÔøΩ\1\4\0\0\2\0\0ÔøΩ\2\2\0\3\3\2\0ÔøΩ\1\4\1ÔøΩ\0\2\0ÔøΩ\1\1\0ÔøΩ\4ÔøΩtype\4ÔøΩstring\4ÔøΩerror\4ÔøΩexpected argument of type string, got \4ÔøΩtrailing garbageÔøΩ\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0ÔøΩÔøΩ\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1ÔøΩÔøΩÔøΩstrÔøΩÔøΩÔøΩresÔøΩÔøΩÔøΩidxÔøΩÔøΩÔøΩÔøΩ_ENVÔøΩparseÔøΩnext_charÔøΩspace_charsÔøΩdecode_error",'@serialized')),
-  encode = ((loadstring or load)("\27LuaT\0\25ÔøΩ\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4ÔøΩ\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1ÔøΩ\1ÔøΩ\1\0\3ÔøΩÔøΩ\0\0\0\0\1\0\0ÔøΩ\0\2\2ÔøΩ\0\2\0ÔøΩ\0\1\0ÔøΩÔøΩ\1\1\0ÔøΩÔøΩ\1\0\0\0\1ÔøΩÔøΩÔøΩvalÔøΩÔøΩÔøΩÔøΩencode",'@serialized'))
+  decode = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4Ä\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2¯\3Ç\1\0\8¶ã\0\0\0\0\1\0\0ƒ\0\2\2ºÄ\1\0008\3\0Äã\0\0\2\3Å\1\0ã\1\0\0\0\2\0\0ƒ\1\2\0025\1\2\0ƒ\0\2\1â\0\1\0\0\1\0\0â\1\2\0\0\2\0\0Å\2\0Ä\9\3\3\0á\3\0\0ƒ\1\5\0ƒ\0\0\3â\1\2\0\0\2\0\0Ä\2\2\0\9\3\3\0á\3\0\0ƒ\1\5\2\0\1\3\0¥\1\0\0;\1\3\0008\2\0Äâ\1\4\0\0\2\0\0Ä\2\2\0\3\3\2\0ƒ\1\4\1»\0\2\0«\1\1\0Ö\4Ötype\4ástring\4Üerror\4ßexpected argument of type string, got \4ëtrailing garbageÖ\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0Ä¶\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1ÄÉÑstrÄ¶Ñresï¶Ñidxï¶ÖÖ_ENVÜparseänext_charåspace_charsçdecode_error",'@serialized')),
+  encode = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1á\1â\1\0\3Öâ\0\0\0\0\1\0\0ƒ\0\2\2»\0\2\0«\0\1\0ÄÅ\1\1\0ÄÖ\1\0\0\0\1ÄÅÑvalÄÖÅáencode",'@serialized'))
 }
 kill_entity = function(...) end
 layer_door = function(...) end
@@ -2686,14 +3143,19 @@ spawn_entity_nonreplaceable = function(...) end
 spawn_entity_over = function(...) end
 spawn_layer_door = function(...) end
 spawn_liquid = function(...) end
+speechbubble_visible = function(...) end
 state = 
 steal_input = function(...) end
 test_flag = function(...) end
 testflag = function(...) end
 toast = function(...) end
+toast_visible = function(...) end
 unlock_door_at = function(...) end
 waddler_count_entity = function(...) end
+waddler_entity_type_in_slot = function(...) end
+waddler_get_entity_meta = function(...) end
 waddler_remove_entity = function(...) end
+waddler_set_entity_meta = function(...) end
 waddler_store_entity = function(...) end
 warp = function(...) end
 win_button = function(...) end
