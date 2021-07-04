@@ -17,7 +17,7 @@ struct TileCodeDef
 };
 struct TemplateDef
 {
-    std::uint32_t id;
+    std::uint16_t id;
 };
 struct ChanceDef
 {

@@ -111,7 +111,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         }
         std::this_thread::sleep_for(100ms);
     }
-    std::this_thread::sleep_for(1s);
 
     auto items = list_entities();
     std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
@@ -299,7 +298,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     if (auto file = std::ofstream("game_data/room_codes.txt"))
     {
         auto templates = State::get().ptr()->level_gen->data->templates();
-        std::multimap<std::uint32_t, std::string> ordered_templates;
+        std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {
             std::string clean_room_name = room_template.first;
