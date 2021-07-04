@@ -15,7 +15,7 @@ struct TileCodeDef
 {
     std::uint32_t id;
 };
-struct TemplateDef
+struct RoomTemplateDef
 {
     std::uint16_t id;
 };
@@ -57,9 +57,9 @@ struct LevelGenData
     {
         return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
     }
-    const std::unordered_map<std::string, TemplateDef>& templates() const
+    const std::unordered_map<std::string, RoomTemplateDef>& room_templates() const
     {
-        return *(const std::unordered_map<std::string, TemplateDef>*)((size_t)this + 0xC8);
+        return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
     }
     const std::unordered_map<std::string, ChanceDef>& chances() const
     {
@@ -177,8 +177,8 @@ struct LevelGenSystem
     uint32_t unknown51;
 
     std::pair<int, int> get_room_index(float x, float y);
-    std::optional<uint16_t> get_room_code(int x, int y, int l);
-    bool set_room_code(int x, int y, int l, uint16_t room_code);
+    std::optional<uint16_t> get_room_template(int x, int y, int l);
+    bool set_room_template(int x, int y, int l, uint16_t room_template);
 
-    std::string_view get_room_code_name(uint16_t room_code);
+    std::string_view get_room_template_name(uint16_t room_template);
 };

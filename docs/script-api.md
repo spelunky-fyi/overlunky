@@ -593,13 +593,13 @@ Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor a
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
 ### [`get_room_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_index)
 `tuple<int, int> get_room_index(float x, float y)`<br/>
-Transform a position to a room index to be used in `get_room_code` and `RoomGen.set_room_code`
-### [`get_room_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_code)
-`optional<int> get_room_code(int x, int y, int l)`<br/>
-Get the room code given a certain index
-### [`get_room_code_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_code_name)
-`string_view get_room_code_name(int room_code)`<br/>
-For debugging only, get the name of a tile code
+Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
+### [`get_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template)
+`optional<int> get_room_template(int x, int y, int l)`<br/>
+Get the room template given a certain index
+### [`get_room_template_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
+`string_view get_room_template_name(int room_template)`<br/>
+For debugging only, get the name of a room template
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 `optional<CustomSound> create_sound(string path)`<br/>
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -1563,7 +1563,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`set_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &ParticleDB::set_texture
 ### `PostRoomGenerationContext`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
-- [`nil set_room_code(int x, int y, int l, ROOM_CODE room_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_code) &PostRoomGenerationContext::set_room_code
+- [`nil set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
 ### `QuestsInfo`
 - [`yang_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yang_state) &QuestsInfo::yang_state
 - [`jungle_sisters_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_sisters_flags) &QuestsInfo::jungle_sisters_flags
@@ -1679,9 +1679,9 @@ end, ON.LEVEL)
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
 - ...check particle_emitters.txt output by Overlunky...
 - [`MINIGAME_BROKENASTEROID_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) 219
-### ROOM_CODE
-- [`SIDE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_CODE.SIDE) 0
-- ...check room_codes.txt output by Overlunky...
+### ROOM_TEMPLATE
+- [`SIDE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE.SIDE) 0
+- ...check room_templates.txt output by Overlunky...
 ### VANILLA_SOUND
 - [`BGM_BGM_TITLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.BGM_BGM_TITLE) BGM/BGM_title
 - ...check vanilla_sounds.txt output by Overlunky...

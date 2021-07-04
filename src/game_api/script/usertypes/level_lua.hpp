@@ -4,11 +4,11 @@
 
 class ScriptImpl;
 
-using ROOM_CODE = uint16_t; // NoAlias
+using ROOM_TEMPLATE = uint16_t; // NoAlias
 
 struct PostRoomGenerationContext
 {
-    void set_room_code(int x, int y, int l, ROOM_CODE room_code);
+    void set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template);
 };
 
 namespace NLevel

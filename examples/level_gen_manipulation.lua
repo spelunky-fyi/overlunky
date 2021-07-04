@@ -113,35 +113,35 @@ local function is_valid_powderkeg_spawn(x, y, l)
 end
 define_procedural_spawn("sample_powderkeg", spawn_powderkeg, is_valid_powderkeg_spawn)
 
--- Fill in shops in all the valid ROOM_CODE.SIDE spots
+-- Fill in shops in all the valid ROOM_TEMPLATE.SIDE spots
 local valid_rooms_with_shop_next = {
-    [ROOM_CODE.PATH_NORMAL] = true,
-    [ROOM_CODE.PATH_DROP] = true,
-    [ROOM_CODE.PATH_NOTOP] = true,
-    [ROOM_CODE.PATH_DROP_NOTOP] = true,
-    [ROOM_CODE.EXIT] = true,
-    [ROOM_CODE.EXIT_NOTOP] = true,
-    [ROOM_CODE.ENTRANCE] = true,
-    [ROOM_CODE.ENTRANCE_DROP] = true,
-    [ROOM_CODE.ALTAR] = true,
+    [ROOM_TEMPLATE.PATH_NORMAL] = true,
+    [ROOM_TEMPLATE.PATH_DROP] = true,
+    [ROOM_TEMPLATE.PATH_NOTOP] = true,
+    [ROOM_TEMPLATE.PATH_DROP_NOTOP] = true,
+    [ROOM_TEMPLATE.EXIT] = true,
+    [ROOM_TEMPLATE.EXIT_NOTOP] = true,
+    [ROOM_TEMPLATE.ENTRANCE] = true,
+    [ROOM_TEMPLATE.ENTRANCE_DROP] = true,
+    [ROOM_TEMPLATE.ALTAR] = true,
 }
 set_callback(function(room_gen_ctx)
     for x = 0, state.width do
         for y = 0, state.height do
             -- Check that this is a side
-            local room_code_here = get_room_code(x, y, 0)
-            if room_code_here == ROOM_CODE.SIDE then
+            local room_template_here = get_room_template(x, y, 0)
+            if room_template_here == ROOM_TEMPLATE.SIDE then
                 -- Check if left of this is a valid room
-                local room_code_left = get_room_code(x - 1, y, 0)
-                if not valid_rooms_with_shop_next[room_code_left] then
+                local room_template_left = get_room_template(x - 1, y, 0)
+                if not valid_rooms_with_shop_next[room_template_left] then
                     -- And spawn a shop facing left
-                    room_gen_ctx:set_room_code(x, y, 0, ROOM_CODE.SHOP_LEFT)
+                    room_gen_ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.SHOP_LEFT)
                 else
                     -- Or if right of it is
-                    local room_code_right = get_room_code(x + 1, y, 0)
-                    if valid_rooms_with_shop_next[room_code_right] then
+                    local room_template_right = get_room_template(x + 1, y, 0)
+                    if valid_rooms_with_shop_next[room_template_right] then
                         -- And spawn a shop facing right
-                        room_gen_ctx:set_room_code(x, y, 0, ROOM_CODE.SHOP)
+                        room_gen_ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.SHOP)
                     end
                 end
             end

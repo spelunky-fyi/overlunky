@@ -318,9 +318,9 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         }
     }
 
-    if (auto file = std::ofstream("game_data/room_codes.txt"))
+    if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
-        auto templates = State::get().ptr()->level_gen->data->templates();
+        auto templates = State::get().ptr()->level_gen->data->room_templates();
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {

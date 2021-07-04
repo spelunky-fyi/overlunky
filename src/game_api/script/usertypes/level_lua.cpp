@@ -7,9 +7,9 @@
 
 #include <sol/sol.hpp>
 
-void PostRoomGenerationContext::set_room_code(int x, int y, int l, ROOM_CODE room_code)
+void PostRoomGenerationContext::set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
 {
-    State::get().ptr_local()->level_gen->set_room_code(x, y, l, room_code);
+    State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
 }
 
 namespace NLevel
@@ -66,25 +66,25 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         script->chance_callbacks.push_back(id);
     };
 
-    /// Transform a position to a room index to be used in `get_room_code` and `RoomGen.set_room_code`
+    /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
     lua["get_room_index"] = [](float x, float y) -> std::pair<int, int> {
         return State::get().ptr_local()->level_gen->get_room_index(x, y);
     };
-    /// Get the room code given a certain index
-    lua["get_room_code"] = [](int x, int y, int l) -> std::optional<uint16_t> {
-        return State::get().ptr_local()->level_gen->get_room_code(x, y, l);
+    /// Get the room template given a certain index
+    lua["get_room_template"] = [](int x, int y, int l) -> std::optional<uint16_t> {
+        return State::get().ptr_local()->level_gen->get_room_template(x, y, l);
     };
-    /// For debugging only, get the name of a tile code
-    lua["get_room_code_name"] = [](int16_t room_code) -> std::string_view
+    /// For debugging only, get the name of a room template
+    lua["get_room_template_name"] = [](int16_t room_template) -> std::string_view
     {
-        return State::get().ptr_local()->level_gen->get_room_code_name(room_code);
+        return State::get().ptr_local()->level_gen->get_room_template_name(room_template);
     };
 
     // Context received in ON.POST_ROOM_GENERATION
-    // Used to change the room codes in the level
-    lua.new_usertype<PostRoomGenerationContext>("PostRoomGenerationContext", sol::no_constructor, "set_room_code", &PostRoomGenerationContext::set_room_code);
+    // Used to change the room templates in the level
+    lua.new_usertype<PostRoomGenerationContext>("PostRoomGenerationContext", sol::no_constructor, "set_room_template", &PostRoomGenerationContext::set_room_template);
     /* PostRoomGenerationContext
-        nil set_room_code(int x, int y, int l, ROOM_CODE room_code)
+        nil set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
     */
 
     lua.new_usertype<QuestsInfo>(
@@ -211,19 +211,19 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     /// Beg quest states
     lua.create_named_table("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
 
-    lua.create_named_table("ROOM_CODE"
+    lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0
-                           //, "", ...check__room_codes.txt__output__by__Overlunky...
+                           //, "", ...check__room_templates.txt__output__by__Overlunky...
     );
-    lua.create_named_table("ROOM_CODE");
-    for (const auto& [room_name, room_code] : State::get().ptr()->level_gen->data->templates())
+    lua.create_named_table("ROOM_TEMPLATE");
+    for (const auto& [room_name, room_template] : State::get().ptr()->level_gen->data->room_templates())
     {
         std::string clean_room_name = room_name;
         std::transform(
             clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
             { return std::toupper(c); });
         std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
-        lua["ROOM_CODE"][std::move(clean_room_name)] = room_code.id;
+        lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template.id;
     };
 }
 }; // namespace NLevel

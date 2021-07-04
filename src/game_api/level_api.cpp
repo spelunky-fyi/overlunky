@@ -899,7 +899,7 @@ std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
         static_cast<int>(std::ceil(x - 3.5f)) / 10,
         static_cast<int>(std::ceil(121.5f - y)) / 8};
 }
-std::optional<uint16_t> LevelGenSystem::get_room_code(int x, int y, int l)
+std::optional<uint16_t> LevelGenSystem::get_room_template(int x, int y, int l)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -921,7 +921,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_code(int x, int y, int l)
     LevelGenRooms* level_rooms = rooms[l];
     return level_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::set_room_code(int x, int y, int l, uint16_t room_code)
+bool LevelGenSystem::set_room_template(int x, int y, int l, uint16_t room_template)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -941,15 +941,15 @@ bool LevelGenSystem::set_room_code(int x, int y, int l, uint16_t room_code)
         return false;
 
     LevelGenRooms* level_rooms = rooms[l];
-    level_rooms->rooms[x + y * 8] = room_code;
+    level_rooms->rooms[x + y * 8] = room_template;
     return true;
 }
 
-std::string_view LevelGenSystem::get_room_code_name(uint16_t room_code)
+std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
 {
-    for (const auto& [name, room_template] : data->templates())
+    for (const auto& [name, room_tpl] : data->room_templates())
     {
-        if (room_template.id == room_code)
+        if (room_tpl.id == room_template)
         {
             return name;
         }
