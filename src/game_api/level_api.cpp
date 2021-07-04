@@ -507,6 +507,20 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2)
     g_level_gen_trampoline(level_gen_sys, param_2);
 }
 
+using GenRoomsFun = void(ThemeInfo*);
+GenRoomsFun* g_gen_rooms_trampoline{nullptr};
+void gen_rooms(ThemeInfo* theme)
+{
+    g_gen_rooms_trampoline(theme);
+
+    SpelunkyScript::for_each_script(
+        [&](SpelunkyScript& script)
+        {
+            script.post_room_generation();
+            return true;
+        });
+}
+
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
@@ -720,6 +734,11 @@ void LevelGenData::init()
             fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
             fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
             g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
+
+            fun_start = find_inst(exe, "\x48\x0f\x44\xcf\x48\x8b\x49\x6c"s, fun_start);
+            fun_start = find_inst(exe, "\x48\x0f\x44\xcf\x48\x8b\x49\x6c"s, fun_start + 1);
+            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            g_gen_rooms_trampoline = (GenRoomsFun*)memory.at_exe(fun_start);
         }
 
         {
@@ -740,6 +759,7 @@ void LevelGenData::init()
 #endif
 
         DetourAttach((void**)&g_level_gen_trampoline, level_gen);
+        DetourAttach((void**)&g_gen_rooms_trampoline, gen_rooms);
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
 
         const LONG error = DetourTransactionCommit();
@@ -852,18 +872,6 @@ void LevelGenSystem::init()
 
     for (ThemeInfo* theme : themes)
     {
-        hook_vtable<GenerateRoomsFun>(
-            theme, [](ThemeInfo* self, GenerateRoomsFun* original)
-            {
-                original(self);
-                SpelunkyScript::for_each_script(
-                    [&](SpelunkyScript& script)
-                    {
-                        script.post_room_generation();
-                        return true;
-                    });
-            },
-            0x6);
         hook_vtable<DoProceduralSpawnFun>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {
