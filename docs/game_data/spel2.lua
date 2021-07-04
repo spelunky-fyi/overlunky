@@ -1,9 +1,44 @@
+Alien = {
+  __index = "function:",
+  __name = "sol.Alien.user",
+  __newindex = "function:"
+}
+Ammit = {
+  __index = "function:",
+  __name = "sol.Ammit.user",
+  __newindex = "function:"
+}
 Animation = {
   __name = "sol.Animation.user"
+}
+Anubis = {
+  __index = "function:",
+  __name = "sol.Anubis.user",
+  __newindex = "function:"
+}
+AnubisTwo = {
+  __index = "function:",
+  __name = "sol.AnubisTwo.user",
+  __newindex = "function:"
+}
+ApepHead = {
+  __index = "function:",
+  __name = "sol.ApepHead.user",
+  __newindex = "function:"
+}
+ApepPart = {
+  __index = "function:",
+  __name = "sol.ApepPart.user",
+  __newindex = "function:"
 }
 Arrowtrap = {
   __index = "function:",
   __name = "sol.Arrowtrap.user",
+  __newindex = "function:"
+}
+Axolotl = {
+  __index = "function:",
+  __name = "sol.Axolotl.user",
   __newindex = "function:"
 }
 BEG = {
@@ -25,6 +60,21 @@ BUTTON = {
 Backpack = {
   __index = "function:",
   __name = "sol.Backpack.user",
+  __newindex = "function:"
+}
+Bee = {
+  __index = "function:",
+  __name = "sol.Bee.user",
+  __newindex = "function:"
+}
+Beg = {
+  __index = "function:",
+  __name = "sol.Beg.user",
+  __newindex = "function:"
+}
+Bodyguard = {
+  __index = "function:",
+  __name = "sol.Bodyguard.user",
   __newindex = "function:"
 }
 Bomb = {
@@ -81,9 +131,24 @@ Cape = {
   __name = "sol.Cape.user",
   __newindex = "function:"
 }
+CatMummy = {
+  __index = "function:",
+  __name = "sol.CatMummy.user",
+  __newindex = "function:"
+}
 Caveman = {
   __index = "function:",
   __name = "sol.Caveman.user",
+  __newindex = "function:"
+}
+CavemanShopkeeper = {
+  __index = "function:",
+  __name = "sol.CavemanShopkeeper.user",
+  __newindex = "function:"
+}
+Cobra = {
+  __index = "function:",
+  __name = "sol.Cobra.user",
   __newindex = "function:"
 }
 Color = {
@@ -92,6 +157,66 @@ Color = {
 Container = {
   __index = "function:",
   __name = "sol.Container.user",
+  __newindex = "function:"
+}
+Crabman = {
+  __index = "function:",
+  __name = "sol.Crabman.user",
+  __newindex = "function:"
+}
+Critter = {
+  __index = "function:",
+  __name = "sol.Critter.user",
+  __newindex = "function:"
+}
+CritterButterfly = {
+  __index = "function:",
+  __name = "sol.CritterButterfly.user",
+  __newindex = "function:"
+}
+CritterCrab = {
+  __index = "function:",
+  __name = "sol.CritterCrab.user",
+  __newindex = "function:"
+}
+CritterDrone = {
+  __index = "function:",
+  __name = "sol.CritterDrone.user",
+  __newindex = "function:"
+}
+CritterFirefly = {
+  __index = "function:",
+  __name = "sol.CritterFirefly.user",
+  __newindex = "function:"
+}
+CritterFish = {
+  __index = "function:",
+  __name = "sol.CritterFish.user",
+  __newindex = "function:"
+}
+CritterLocust = {
+  __index = "function:",
+  __name = "sol.CritterLocust.user",
+  __newindex = "function:"
+}
+CritterPenguin = {
+  __index = "function:",
+  __name = "sol.CritterPenguin.user",
+  __newindex = "function:"
+}
+CritterSlime = {
+  __index = "function:",
+  __name = "sol.CritterSlime.user",
+  __newindex = "function:"
+}
+CritterSnail = {
+  __index = "function:",
+  __name = "sol.CritterSnail.user",
+  __newindex = "function:"
+}
+Crocman = {
+  __index = "function:",
+  __name = "sol.Crocman.user",
   __newindex = "function:"
 }
 Crushtrap = {
@@ -1107,6 +1232,11 @@ ENT_TYPE = {
   MOUNT_ROCKDOG = 898,
   MOUNT_TURKEY = 897
 }
+EggplantMinister = {
+  __index = "function:",
+  __name = "sol.EggplantMinister.user",
+  __newindex = "function:"
+}
 Entity = {
   __name = "sol.Entity.user"
 }
@@ -1114,9 +1244,69 @@ EntityDB = {
   __name = "sol.EntityDB.user"
 }
 F = {}
+Firebug = {
+  __index = "function:",
+  __name = "sol.Firebug.user",
+  __newindex = "function:"
+}
+FirebugUnchained = {
+  __index = "function:",
+  __name = "sol.FirebugUnchained.user",
+  __newindex = "function:"
+}
+Fish = {
+  __index = "function:",
+  __name = "sol.Fish.user",
+  __newindex = "function:"
+}
+ForestSister = {
+  __index = "function:",
+  __name = "sol.ForestSister.user",
+  __newindex = "function:"
+}
+Frog = {
+  __index = "function:",
+  __name = "sol.Frog.user",
+  __newindex = "function:"
+}
+Ghist = {
+  __index = "function:",
+  __name = "sol.Ghist.user",
+  __newindex = "function:"
+}
+GhistShopkeeper = {
+  __index = "function:",
+  __name = "sol.GhistShopkeeper.user",
+  __newindex = "function:"
+}
 Ghost = {
   __index = "function:",
   __name = "sol.Ghost.user",
+  __newindex = "function:"
+}
+GiantFish = {
+  __index = "function:",
+  __name = "sol.GiantFish.user",
+  __newindex = "function:"
+}
+GiantFly = {
+  __index = "function:",
+  __name = "sol.GiantFly.user",
+  __newindex = "function:"
+}
+GiantFrog = {
+  __index = "function:",
+  __name = "sol.GiantFrog.user",
+  __newindex = "function:"
+}
+GoldMonkey = {
+  __index = "function:",
+  __name = "sol.GoldMonkey.user",
+  __newindex = "function:"
+}
+Grub = {
+  __index = "function:",
+  __name = "sol.Grub.user",
   __newindex = "function:"
 }
 Gun = {
@@ -1124,13 +1314,50 @@ Gun = {
   __name = "sol.Gun.user",
   __newindex = "function:"
 }
+HUNDUNFLAGS = {
+  BIRDHEADEMERGED = 2,
+  BIRDHEADSHOTLAST = 16,
+  SNAKEHEADEMERGED = 4,
+  TOPLEVELARENAREACHED = 8,
+  WILLMOVELEFT = 1
+}
+HangSpider = {
+  __index = "function:",
+  __name = "sol.HangSpider.user",
+  __newindex = "function:"
+}
+Hermitcrab = {
+  __index = "function:",
+  __name = "sol.Hermitcrab.user",
+  __newindex = "function:"
+}
+HornedLizard = {
+  __index = "function:",
+  __name = "sol.HornedLizard.user",
+  __newindex = "function:"
+}
 Hoverpack = {
   __index = "function:",
   __name = "sol.Hoverpack.user",
   __newindex = "function:"
 }
+Hundun = {
+  __index = "function:",
+  __name = "sol.Hundun.user",
+  __newindex = "function:"
+}
+HundunHead = {
+  __index = "function:",
+  __name = "sol.HundunHead.user",
+  __newindex = "function:"
+}
 Illumination = {
   __name = "sol.Illumination.user"
+}
+Imp = {
+  __index = "function:",
+  __name = "sol.Imp.user",
+  __newindex = "function:"
 }
 InputMapping = {
   __name = "sol.InputMapping.user"
@@ -1156,9 +1383,19 @@ Jiangshi = {
   __name = "sol.Jiangshi.user",
   __newindex = "function:"
 }
+JumpDog = {
+  __index = "function:",
+  __name = "sol.JumpDog.user",
+  __newindex = "function:"
+}
 KapalaPowerup = {
   __index = "function:",
   __name = "sol.KapalaPowerup.user",
+  __newindex = "function:"
+}
+Kingu = {
+  __index = "function:",
+  __name = "sol.Kingu.user",
   __newindex = "function:"
 }
 LAYER = {
@@ -1169,6 +1406,26 @@ LAYER = {
   PLAYER2 = -2,
   PLAYER3 = -3,
   PLAYER4 = -4
+}
+Lahamu = {
+  __index = "function:",
+  __name = "sol.Lahamu.user",
+  __newindex = "function:"
+}
+Lamassu = {
+  __index = "function:",
+  __name = "sol.Lamassu.user",
+  __newindex = "function:"
+}
+Lavamander = {
+  __index = "function:",
+  __name = "sol.Lavamander.user",
+  __newindex = "function:"
+}
+Leprechaun = {
+  __index = "function:",
+  __name = "sol.Leprechaun.user",
+  __newindex = "function:"
 }
 LightParams = {
   __name = "sol.LightParams.user"
@@ -1193,9 +1450,54 @@ MASK = {
   SHADOW = 2048,
   WATER = 8192
 }
+MadameTusk = {
+  __index = "function:",
+  __name = "sol.MadameTusk.user",
+  __newindex = "function:"
+}
+MagmaMan = {
+  __index = "function:",
+  __name = "sol.MagmaMan.user",
+  __newindex = "function:"
+}
+Mantrap = {
+  __index = "function:",
+  __name = "sol.Mantrap.user",
+  __newindex = "function:"
+}
+Mattock = {
+  __index = "function:",
+  __name = "sol.Mattock.user",
+  __newindex = "function:"
+}
+Mech = {
+  __index = "function:",
+  __name = "sol.Mech.user",
+  __newindex = "function:"
+}
+MegaJellyfish = {
+  __index = "function:",
+  __name = "sol.MegaJellyfish.user",
+  __newindex = "function:"
+}
+Mole = {
+  __index = "function:",
+  __name = "sol.Mole.user",
+  __newindex = "function:"
+}
+Monkey = {
+  __index = "function:",
+  __name = "sol.Monkey.user",
+  __newindex = "function:"
+}
 Monster = {
   __index = "function:",
   __name = "sol.Monster.user",
+  __newindex = "function:"
+}
+Mosquito = {
+  __index = "function:",
+  __name = "sol.Mosquito.user",
   __newindex = "function:"
 }
 Mount = {
@@ -1206,6 +1508,16 @@ Mount = {
 Movable = {
   __index = "function:",
   __name = "sol.Movable.user",
+  __newindex = "function:"
+}
+Mummy = {
+  __index = "function:",
+  __name = "sol.Mummy.user",
+  __newindex = "function:"
+}
+Necromancer = {
+  __index = "function:",
+  __name = "sol.Necromancer.user",
   __newindex = "function:"
 }
 ON = {
@@ -1249,6 +1561,11 @@ ON = {
   TRANSITION = 13,
   WIN = 16
 }
+Octopus = {
+  __index = "function:",
+  __name = "sol.Octopus.user",
+  __newindex = "function:"
+}
 Olmec = {
   __index = "function:",
   __name = "sol.Olmec.user",
@@ -1257,6 +1574,21 @@ Olmec = {
 OlmecFloater = {
   __index = "function:",
   __name = "sol.OlmecFloater.user",
+  __newindex = "function:"
+}
+Olmite = {
+  __index = "function:",
+  __name = "sol.Olmite.user",
+  __newindex = "function:"
+}
+OsirisHand = {
+  __index = "function:",
+  __name = "sol.OsirisHand.user",
+  __newindex = "function:"
+}
+OsirisHead = {
+  __index = "function:",
+  __name = "sol.OsirisHead.user",
   __newindex = "function:"
 }
 PARTICLEEMITTER = {
@@ -1483,6 +1815,11 @@ PARTICLEEMITTER = {
 ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
+Pet = {
+  __index = "function:",
+  __name = "sol.Pet.user",
+  __newindex = "function:"
+}
 Player = {
   __index = "function:",
   __name = "sol.Player.user",
@@ -1503,8 +1840,23 @@ PlayingSound = {
 PostRoomGenerationContext = {
   __name = "sol.PostRoomGenerationContext.user"
 }
+ProtoShopkeeper = {
+  __index = "function:",
+  __name = "sol.ProtoShopkeeper.user",
+  __newindex = "function:"
+}
+Qilin = {
+  __index = "function:",
+  __name = "sol.Qilin.user",
+  __newindex = "function:"
+}
 QuestsInfo = {
   __name = "sol.QuestsInfo.user"
+}
+Quillback = {
+  __index = "function:",
+  __name = "sol.Quillback.user",
+  __newindex = "function:"
 }
 ROOM_CODE = {
   ABZU_BACKDOOR = 131,
@@ -1752,6 +2104,16 @@ ROOM_CODE = {
   VLAD_ENTRANCE = 120,
   VLAD_TUNNEL = 123
 }
+Robot = {
+  __index = "function:",
+  __name = "sol.Robot.user",
+  __newindex = "function:"
+}
+Rockdog = {
+  __index = "function:",
+  __name = "sol.Rockdog.user",
+  __newindex = "function:"
+}
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
   LOOP = 1,
@@ -1785,6 +2147,46 @@ SaveContext = {
 }
 SaveData = {
   __name = "sol.SaveData.user"
+}
+Scarab = {
+  __index = "function:",
+  __name = "sol.Scarab.user",
+  __newindex = "function:"
+}
+Scorpion = {
+  __index = "function:",
+  __name = "sol.Scorpion.user",
+  __newindex = "function:"
+}
+Shopkeeper = {
+  __index = "function:",
+  __name = "sol.Shopkeeper.user",
+  __newindex = "function:"
+}
+ShopkeeperClone = {
+  __index = "function:",
+  __name = "sol.ShopkeeperClone.user",
+  __newindex = "function:"
+}
+Skeleton = {
+  __index = "function:",
+  __name = "sol.Skeleton.user",
+  __newindex = "function:"
+}
+Sorceress = {
+  __index = "function:",
+  __name = "sol.Sorceress.user",
+  __newindex = "function:"
+}
+Sparrow = {
+  __index = "function:",
+  __name = "sol.Sparrow.user",
+  __newindex = "function:"
+}
+Spider = {
+  __index = "function:",
+  __name = "sol.Spider.user",
+  __newindex = "function:"
 }
 StateMemory = {
   __name = "sol.StateMemory.user"
@@ -2207,8 +2609,28 @@ TUSK = {
   PALACE_WELCOME_MESSAGE = 3,
   QUEST_NOT_STARTED = 0
 }
+Tadpole = {
+  __index = "function:",
+  __name = "sol.Tadpole.user",
+  __newindex = "function:"
+}
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
+}
+Tiamat = {
+  __index = "function:",
+  __name = "sol.Tiamat.user",
+  __newindex = "function:"
+}
+Tun = {
+  __index = "function:",
+  __name = "sol.Tun.user",
+  __newindex = "function:"
+}
+UFO = {
+  __index = "function:",
+  __name = "sol.UFO.user",
+  __newindex = "function:"
 }
 VANHORSING = {
   FIRST_ENCOUNTER_DIAMOND_THROWN = 2,
@@ -2804,6 +3226,21 @@ VANILLA_SOUND_PARAM = {
   VALUE = 8,
   VELOCITY = 15
 }
+Vampire = {
+  __index = "function:",
+  __name = "sol.Vampire.user",
+  __newindex = "function:"
+}
+VanHorsing = {
+  __index = "function:",
+  __name = "sol.VanHorsing.user",
+  __newindex = "function:"
+}
+Vlad = {
+  __index = "function:",
+  __name = "sol.Vlad.user",
+  __newindex = "function:"
+}
 VladsCape = {
   __index = "function:",
   __name = "sol.VladsCape.user",
@@ -2815,6 +3252,21 @@ WIN_STATE = {
   NO_WIN = 0,
   TIAMAT_WIN = 1
 }
+Waddler = {
+  __index = "function:",
+  __name = "sol.Waddler.user",
+  __newindex = "function:"
+}
+WitchDoctor = {
+  __index = "function:",
+  __name = "sol.WitchDoctor.user",
+  __newindex = "function:"
+}
+WitchDoctorSkull = {
+  __index = "function:",
+  __name = "sol.WitchDoctorSkull.user",
+  __newindex = "function:"
+}
 YANG = {
   ANGRY = -1,
   BOTH_TURKEYS_DELIVERED = 3,
@@ -2825,9 +3277,36 @@ YANG = {
   TURKEY_SHOP_SPAWNED = 4,
   TWO_TURKEYS_BOUGHT = 6
 }
+Yama = {
+  __index = "function:",
+  __name = "sol.Yama.user",
+  __newindex = "function:"
+}
+Yang = {
+  __index = "function:",
+  __name = "sol.Yang.user",
+  __newindex = "function:"
+}
+Yeti = {
+  __index = "function:",
+  __name = "sol.Yeti.user",
+  __newindex = "function:"
+}
+YetiKing = {
+  __index = "function:",
+  __name = "sol.YetiKing.user",
+  __newindex = "function:"
+}
+YetiQueen = {
+  __index = "function:",
+  __name = "sol.YetiQueen.user",
+  __newindex = "function:"
+}
 apply_entity_db = function(...) end
 attach_ball_and_chain = function(...) end
 attach_entity = function(...) end
+cancel_speechbubble = function(...) end
+cancel_toast = function(...) end
 carry = function(...) end
 clear_callback = function(...) end
 clear_entity_callback = function(...) end
@@ -2974,11 +3453,13 @@ spawn_entity_nonreplaceable = function(...) end
 spawn_entity_over = function(...) end
 spawn_layer_door = function(...) end
 spawn_liquid = function(...) end
+speechbubble_visible = function(...) end
 state = 
 steal_input = function(...) end
 test_flag = function(...) end
 testflag = function(...) end
 toast = function(...) end
+toast_visible = function(...) end
 unlock_door_at = function(...) end
 waddler_count_entity = function(...) end
 waddler_entity_type_in_slot = function(...) end

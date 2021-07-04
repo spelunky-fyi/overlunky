@@ -34,9 +34,9 @@ struct ParticleDB
     float ver_deflection_2;
     float hor_velocity;
     float ver_velocity;
-    uint8_t cyan;
-    uint8_t magenta;
-    uint8_t yellow;
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
     uint8_t unknown28;
     Texture* texture;
     size_t unknown29; // code pointer

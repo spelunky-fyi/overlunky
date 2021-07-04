@@ -111,7 +111,13 @@ void register_usertypes(sol::state& lua)
         "cause_of_death",
         &StateMemory::cause_of_death,
         "cause_of_death_entity_type",
-        &StateMemory::cause_of_death_entity_type);
+        &StateMemory::cause_of_death_entity_type,
+        "toast_timer",
+        &StateMemory::toast_timer,
+        "speechbubble_timer",
+        &StateMemory::speechbubble_timer,
+        "speechbubble_owner",
+        &StateMemory::speechbubble_owner);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
@@ -187,8 +193,30 @@ void register_usertypes(sol::state& lua)
         "uniform_shake",
         &Camera::uniform_shake,
         "focused_entity_uid",
-        &Camera::focused_entity_uid);
+        &Camera::focused_entity_uid,
+        "inertia",
+        &Camera::inertia);
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
+
+    lua["toast_visible"] = []() -> bool
+    {
+        return State::get().ptr()->toast != 0;
+    };
+
+    lua["speechbubble_visible"] = []() -> bool
+    {
+        return State::get().ptr()->speechbubble != 0;
+    };
+
+    lua["cancel_toast"] = []()
+    {
+        State::get().ptr()->toast_timer = 1000;
+    };
+
+    lua["cancel_speechbubble"] = []()
+    {
+        State::get().ptr()->speechbubble_timer = 1000;
+    };
 }
 }; // namespace NState
