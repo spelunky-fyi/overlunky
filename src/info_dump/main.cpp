@@ -131,6 +131,26 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             EntityDB* db = get_type(ent.id);
             if (!db)
                 break;
+
+#define HAX_FIX_FLOAT(x) if (std::abs(x) < 1e-20 || std::abs(x) > 1e10) x = 0.0f
+            HAX_FIX_FLOAT(db->width);
+            HAX_FIX_FLOAT(db->height);
+            HAX_FIX_FLOAT(db->friction);
+            HAX_FIX_FLOAT(db->elasticity);
+            HAX_FIX_FLOAT(db->weight);
+            HAX_FIX_FLOAT(db->acceleration);
+            HAX_FIX_FLOAT(db->max_speed);
+            HAX_FIX_FLOAT(db->sprint_factor);
+            HAX_FIX_FLOAT(db->jump);
+            HAX_FIX_FLOAT(db->glow_red);
+            HAX_FIX_FLOAT(db->glow_green);
+            HAX_FIX_FLOAT(db->glow_blue);
+            HAX_FIX_FLOAT(db->glow_alpha);
+            HAX_FIX_FLOAT(db->field_a8);
+            HAX_FIX_FLOAT(db->attachOffsetX);
+            HAX_FIX_FLOAT(db->attachOffsetY);
+#undef HAX_FIX_FLOAT
+
             entities[ent.name] = *db;
         }
 
@@ -146,6 +166,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             EntityDB* db = get_type(ent.id);
             if (!db)
                 break;
+
             entities[ent.name] = float_json{
                 {"id", ent.id},
                 {"texture", db->texture},

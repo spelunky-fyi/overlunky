@@ -1582,5 +1582,9 @@ std::string ScriptImpl::dump_api()
     std::string api;
     for (auto& [key, value] : sorted_output)
         api += fmt::format("{} = {}\n", key, value);
+
+    const static std::regex reg(R"("function:\s[0-9A-F]+")");
+    api = std::regex_replace(api, reg, R"("function:")");
+
     return api;
 }
