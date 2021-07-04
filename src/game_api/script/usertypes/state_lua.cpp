@@ -208,5 +208,15 @@ void register_usertypes(sol::state& lua)
     {
         return State::get().ptr()->speechbubble != 0;
     };
+
+    lua["cancel_toast"] = []()
+    {
+        State::get().ptr()->toast_timer = 1000;
+    };
+
+    lua["cancel_speechbubble"] = []()
+    {
+        State::get().ptr()->speechbubble_timer = 1000;
+    };
 }
 }; // namespace NState

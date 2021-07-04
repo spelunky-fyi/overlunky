@@ -222,7 +222,7 @@ const char* quest_flags[]{
     "6: Shortcut used",
     "7: Seeded mode",
     "8: Daily challenge mode",
-    "9: ",
+    "9: Caveman Shopkeeper aggroed",
     "10: Waddler aggroed",
     "11: ",
     "12: ",
