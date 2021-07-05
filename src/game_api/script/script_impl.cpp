@@ -484,15 +484,14 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
                 return nil
             end
 
-            entity_raw = get_entity_raw(ent_uid)
+            local entity_raw = get_entity_raw(ent_uid)
             if entity_raw == nil then
                 return nil
             end
 
-            if TYPE_MAP[entity_raw.type.id] ~= nil then
-                local cast_fun_name = TYPE_MAP[entity_raw.type.id]
-                local cast_fun = load("return entity_raw:" .. cast_fun_name .. "()")
-                return cast_fun()
+            local cast_fun = TYPE_MAP[entity_raw.type.id]
+            if cast_fun ~= nil then
+                return cast_fun(entity_raw)
             else
                 return entity_raw
             end
@@ -798,7 +797,6 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NGui::register_usertypes(lua, this);
     NTexture::register_usertypes(lua, this);
     NEntity::register_usertypes(lua, this);
-    NEntityCasting::register_usertypes(lua, this);
     NEntitiesMounts::register_usertypes(lua, this);
     NEntitiesMonsters::register_usertypes(lua, this);
     NParticles::register_usertypes(lua);
@@ -808,6 +806,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
     NEntityFlags::register_usertypes(lua);
+    NEntityCasting::register_usertypes(lua, this);
 
     lua.create_named_table(
         "ON",

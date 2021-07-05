@@ -300,9 +300,9 @@ Get door target `world`, `level`, `theme`
 ### [`set_contents`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_contents)
 `nil set_contents(int uid, int item_entity_type)`<br/>
 Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
-### [`get_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
-`Entity get_entity(int uid)`<br/>
-Get the [Entity](#entity) behind an uid
+### [`get_entity_raw`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_raw)
+`Entity get_entity_raw(int uid)`<br/>
+Get the [Entity](#entity) behind an uid (do not use, use `get_entity` instead)
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 `EntityDB get_type(int id)`<br/>
 Get the [EntityDB](#entitydb) behind an ENT_TYPE...

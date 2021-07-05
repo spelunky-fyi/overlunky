@@ -1,45 +1,45 @@
 Alien = {
-  __index = "function: 0000000015A0B930",
+  __index = "function: 00000000180C8810",
   __name = "sol.Alien.user",
-  __newindex = "function: 0000000015A0C230"
+  __newindex = "function: 00000000180C8990"
 }
 Ammit = {
-  __index = "function: 0000000015A07730",
+  __index = "function: 00000000180C6410",
   __name = "sol.Ammit.user",
-  __newindex = "function: 0000000015A081B0"
+  __newindex = "function: 00000000180C4E10"
 }
 Animation = {
   __name = "sol.Animation.user"
 }
 Anubis = {
-  __index = "function: 00000000159FC930",
+  __index = "function: 00000000180BE490",
   __name = "sol.Anubis.user",
-  __newindex = "function: 00000000159FD430"
+  __newindex = "function: 00000000180BCE90"
 }
 AnubisTwo = {
-  __index = "function: 00000000159FB7B0",
+  __index = "function: 00000000180BBD90",
   __name = "sol.AnubisTwo.user",
-  __newindex = "function: 00000000159FC0B0"
+  __newindex = "function: 00000000180BC410"
 }
 ApepHead = {
-  __index = "function: 0000000015A074B0",
+  __index = "function: 00000000180C7890",
   __name = "sol.ApepHead.user",
-  __newindex = "function: 0000000015A07530"
+  __newindex = "function: 00000000180C6E90"
 }
 ApepPart = {
-  __index = "function: 0000000015A07F30",
+  __index = "function: 00000000180C5E10",
   __name = "sol.ApepPart.user",
-  __newindex = "function: 0000000015A085B0"
+  __newindex = "function: 00000000180C5210"
 }
 Arrowtrap = {
-  __index = "function: 0000000015BCC980",
+  __index = "function: 00000000179AE2D0",
   __name = "sol.Arrowtrap.user",
-  __newindex = "function: 0000000015BCAF80"
+  __newindex = "function: 00000000179AEA50"
 }
 Axolotl = {
-  __index = "function: 0000000015BCE600",
+  __index = "function: 00000000179B0C50",
   __name = "sol.Axolotl.user",
-  __newindex = "function: 0000000015BCEB80"
+  __newindex = "function: 00000000179B0E50"
 }
 BEG = {
   ALTAR_DESTROYED = 1,
@@ -58,19 +58,19 @@ BUTTON = {
   WHIP = 2
 }
 Bee = {
-  __index = "function: 0000000015A05CB0",
+  __index = "function: 00000000180C3E10",
   __name = "sol.Bee.user",
-  __newindex = "function: 0000000015A067B0"
+  __newindex = "function: 00000000180C2910"
 }
 Beg = {
-  __index = "function: 0000000015BDDB80",
+  __index = "function: 00000000179C01D0",
   __name = "sol.Beg.user",
-  __newindex = "function: 0000000015BDE680"
+  __newindex = "function: 00000000179C0950"
 }
 Bodyguard = {
-  __index = "function: 0000000015A006B0",
+  __index = "function: 00000000180BD990",
   __name = "sol.Bodyguard.user",
-  __newindex = "function: 00000000159FF630"
+  __newindex = "function: 00000000180BE210"
 }
 CAUSE_OF_DEATH = {
   DEATH = 0,
@@ -117,92 +117,92 @@ Camera = {
   __name = "sol.Camera.user"
 }
 CatMummy = {
-  __index = "function: 0000000015A01C30",
+  __index = "function: 00000000180C0290",
   __name = "sol.CatMummy.user",
-  __newindex = "function: 0000000015A00B30"
+  __newindex = "function: 00000000180C0410"
 }
 Caveman = {
-  __index = "function: 0000000015BDE500",
+  __index = "function: 00000000179BFC50",
   __name = "sol.Caveman.user",
-  __newindex = "function: 0000000015BDD000"
+  __newindex = "function: 00000000179C0E50"
 }
 CavemanShopkeeper = {
-  __index = "function: 0000000015BDD780",
+  __index = "function: 00000000179C1850",
   __name = "sol.CavemanShopkeeper.user",
-  __newindex = "function: 0000000015BDE580"
+  __newindex = "function: 00000000179C1250"
 }
 Cobra = {
-  __index = "function: 00000000159FFBB0",
+  __index = "function: 00000000180BCB90",
   __name = "sol.Cobra.user",
-  __newindex = "function: 0000000015A007B0"
+  __newindex = "function: 00000000180BD690"
 }
 Color = {
   __name = "sol.Color.user"
 }
 Crabman = {
-  __index = "function: 0000000015A03A30",
+  __index = "function: 00000000180C2410",
   __name = "sol.Crabman.user",
-  __newindex = "function: 0000000015A032B0"
+  __newindex = "function: 00000000180C1810"
 }
 Critter = {
-  __index = "function: 0000000015BDD980",
+  __index = "function: 00000000179C2050",
   __name = "sol.Critter.user",
-  __newindex = "function: 0000000015BDDA00"
+  __newindex = "function: 00000000179C2CD0"
 }
 CritterButterfly = {
-  __index = "function: 0000000015BE1200",
+  __index = "function: 00000000179C5BD0",
   __name = "sol.CritterButterfly.user",
-  __newindex = "function: 0000000015BE2200"
+  __newindex = "function: 00000000179C73D0"
 }
 CritterCrab = {
-  __index = "function: 0000000015BDF600",
+  __index = "function: 00000000179C50D0",
   __name = "sol.CritterCrab.user",
-  __newindex = "function: 0000000015BDF680"
+  __newindex = "function: 00000000179C5150"
 }
 CritterDrone = {
-  __index = "function: 0000000015081900",
+  __index = "function: 0000000017CF2ED0",
   __name = "sol.CritterDrone.user",
-  __newindex = "function: 0000000015081C00"
+  __newindex = "function: 0000000017CF2BD0"
 }
 CritterFirefly = {
-  __index = "function: 000000001507EB00",
+  __index = "function: 0000000017337810",
   __name = "sol.CritterFirefly.user",
-  __newindex = "function: 000000001507F300"
+  __newindex = "function: 0000000017337D90"
 }
 CritterFish = {
-  __index = "function: 0000000015BE7480",
+  __index = "function: 00000000179CA650",
   __name = "sol.CritterFish.user",
-  __newindex = "function: 0000000015BE7800"
+  __newindex = "function: 00000000179CA950"
 }
 CritterLocust = {
-  __index = "function: 0000000015BE4700",
+  __index = "function: 00000000179C6A50",
   __name = "sol.CritterLocust.user",
-  __newindex = "function: 0000000015BE3480"
+  __newindex = "function: 00000000179C7BD0"
 }
 CritterPenguin = {
-  __index = "function: 0000000015BEA600",
+  __index = "function: 00000000179AC5D0",
   __name = "sol.CritterPenguin.user",
-  __newindex = "function: 0000000015BEAD80"
+  __newindex = "function: 00000000179AC650"
 }
 CritterSlime = {
-  __index = "function: 0000000048511C40",
+  __index = "function: 0000000017CF2B50",
   __name = "sol.CritterSlime.user",
-  __newindex = "function: 0000000048512D40"
+  __newindex = "function: 0000000017CF3750"
 }
 CritterSnail = {
-  __index = "function: 0000000015BE6A00",
+  __index = "function: 00000000179C9650",
   __name = "sol.CritterSnail.user",
-  __newindex = "function: 0000000015BE5C80"
+  __newindex = "function: 00000000179C7D50"
 }
 Crocman = {
-  __index = "function: 0000000015BEA100",
+  __index = "function: 00000000179AC450",
   __name = "sol.Crocman.user",
-  __newindex = "function: 0000000015BEA180"
+  __newindex = "function: 00000000179AD350"
 }
 Crushtrap = {
-  __index = "function: 0000000015081F80",
+  __index = "function: 000000001732AB90",
   __name = "sol.Crushtrap.user",
-  __newindex = "function: 0000000015083300"
+  __newindex = "function: 0000000017329290"
 }
 CustomSound = {
   __name = "sol.CustomSound.user"
@@ -1213,9 +1213,9 @@ ENT_TYPE = {
   MOUNT_TURKEY = 897
 }
 EggplantMinister = {
-  __index = "function: 0000000015A18DB0",
+  __index = "function: 00000000180B7990",
   __name = "sol.EggplantMinister.user",
-  __newindex = "function: 0000000015A19030"
+  __newindex = "function: 00000000180B7010"
 }
 Entity = {
   __name = "sol.Entity.user"
@@ -1225,69 +1225,69 @@ EntityDB = {
 }
 F = {}
 Firebug = {
-  __index = "function: 0000000015BE6400",
+  __index = "function: 00000000179C92D0",
   __name = "sol.Firebug.user",
-  __newindex = "function: 0000000015BE6380"
+  __newindex = "function: 00000000179C7CD0"
 }
 FirebugUnchained = {
-  __index = "function: 0000000015BE5480",
+  __index = "function: 00000000179C99D0",
   __name = "sol.FirebugUnchained.user",
-  __newindex = "function: 0000000015BE6980"
+  __newindex = "function: 00000000179C8250"
 }
 Fish = {
-  __index = "function: 0000000015A020B0",
+  __index = "function: 00000000180BF990",
   __name = "sol.Fish.user",
-  __newindex = "function: 0000000015A02530"
+  __newindex = "function: 00000000180BFC10"
 }
 ForestSister = {
-  __index = "function: 00000000159FAC30",
+  __index = "function: 00000000180B9E10",
   __name = "sol.ForestSister.user",
-  __newindex = "function: 00000000159FB830"
+  __newindex = "function: 00000000180B8A10"
 }
 Frog = {
-  __index = "function: 0000000015A13330",
+  __index = "function: 00000000180D4090",
   __name = "sol.Frog.user",
-  __newindex = "function: 0000000015A14130"
+  __newindex = "function: 00000000180D3B90"
 }
 Ghist = {
-  __index = "function: 0000000015A17B30",
+  __index = "function: 00000000180D4A10",
   __name = "sol.Ghist.user",
-  __newindex = "function: 0000000015A17A30"
+  __newindex = "function: 00000000180D4A90"
 }
 GhistShopkeeper = {
-  __index = "function: 0000000015BD9680",
+  __index = "function: 00000000179BC950",
   __name = "sol.GhistShopkeeper.user",
-  __newindex = "function: 0000000015BD9500"
+  __newindex = "function: 00000000179BD0D0"
 }
 Ghost = {
-  __index = "function: 0000000015BD1400",
+  __index = "function: 00000000179B5650",
   __name = "sol.Ghost.user",
-  __newindex = "function: 0000000015BD1E80"
+  __newindex = "function: 00000000179B58D0"
 }
 GiantFish = {
-  __index = "function: 0000000015A04330",
+  __index = "function: 00000000180C1890",
   __name = "sol.GiantFish.user",
-  __newindex = "function: 0000000015A03730"
+  __newindex = "function: 00000000180C2490"
 }
 GiantFly = {
-  __index = "function: 0000000015A18330",
+  __index = "function: 00000000180D5210",
   __name = "sol.GiantFly.user",
-  __newindex = "function: 0000000015A18530"
+  __newindex = "function: 00000000180D5490"
 }
 GiantFrog = {
-  __index = "function: 0000000015A13DB0",
+  __index = "function: 00000000180D1590",
   __name = "sol.GiantFrog.user",
-  __newindex = "function: 0000000015A146B0"
+  __newindex = "function: 00000000180D0E90"
 }
 GoldMonkey = {
-  __index = "function: 0000000015BD6680",
+  __index = "function: 00000000179B8BD0",
   __name = "sol.GoldMonkey.user",
-  __newindex = "function: 0000000015BD5980"
+  __newindex = "function: 00000000179B7C50"
 }
 Grub = {
-  __index = "function: 0000000015A15330",
+  __index = "function: 00000000180D3810",
   __name = "sol.Grub.user",
-  __newindex = "function: 0000000015A149B0"
+  __newindex = "function: 00000000180D2F10"
 }
 HUNDUNFLAGS = {
   BIRDHEADEMERGED = 2,
@@ -1297,37 +1297,37 @@ HUNDUNFLAGS = {
   WILLMOVELEFT = 1
 }
 HangSpider = {
-  __index = "function: 0000000015BD7B80",
+  __index = "function: 00000000179BA5D0",
   __name = "sol.HangSpider.user",
-  __newindex = "function: 0000000015BD8700"
+  __newindex = "function: 00000000179B9B50"
 }
 Hermitcrab = {
-  __index = "function: 0000000015BD4680",
+  __index = "function: 00000000179B7F50",
   __name = "sol.Hermitcrab.user",
-  __newindex = "function: 0000000015BD6A80"
+  __newindex = "function: 00000000179B8150"
 }
 HornedLizard = {
-  __index = "function: 0000000015BE0600",
+  __index = "function: 00000000179C2E50",
   __name = "sol.HornedLizard.user",
-  __newindex = "function: 0000000015BE0580"
+  __newindex = "function: 00000000179C1F50"
 }
 Hundun = {
-  __index = "function: 0000000015BCEC80",
+  __index = "function: 00000000179B04D0",
   __name = "sol.Hundun.user",
-  __newindex = "function: 0000000015BCE180"
+  __newindex = "function: 00000000179B0550"
 }
 HundunHead = {
-  __index = "function: 0000000015BCF600",
+  __index = "function: 00000000179B3150",
   __name = "sol.HundunHead.user",
-  __newindex = "function: 0000000015BD0E00"
+  __newindex = "function: 00000000179B1DD0"
 }
 Illumination = {
   __name = "sol.Illumination.user"
 }
 Imp = {
-  __index = "function: 0000000015BE2F00",
+  __index = "function: 00000000179C63D0",
   __name = "sol.Imp.user",
-  __newindex = "function: 0000000015BE4A80"
+  __newindex = "function: 00000000179C61D0"
 }
 InputMapping = {
   __name = "sol.InputMapping.user"
@@ -1344,19 +1344,19 @@ JUNGLESISTERS = {
   WARNING_ONE_WAY_DOOR = 4
 }
 Jiangshi = {
-  __index = "function: 0000000015BD4A00",
+  __index = "function: 00000000179B68D0",
   __name = "sol.Jiangshi.user",
-  __newindex = "function: 0000000015BD3E00"
+  __newindex = "function: 00000000179B5F50"
 }
 JumpDog = {
-  __index = "function: 0000000015A1A3B0",
+  __index = "function: 00000000180B7B10",
   __name = "sol.JumpDog.user",
-  __newindex = "function: 0000000015A1A1B0"
+  __newindex = "function: 00000000180B7B90"
 }
 Kingu = {
-  __index = "function: 0000000015A05E30",
+  __index = "function: 00000000180B8C90",
   __name = "sol.Kingu.user",
-  __newindex = "function: 0000000015A05130"
+  __newindex = "function: 00000000180B9790"
 }
 LAYER = {
   BACK = 1,
@@ -1368,24 +1368,24 @@ LAYER = {
   PLAYER4 = -4
 }
 Lahamu = {
-  __index = "function: 0000000015A0C8B0",
+  __index = "function: 00000000180CAA10",
   __name = "sol.Lahamu.user",
-  __newindex = "function: 0000000015A0C930"
+  __newindex = "function: 00000000180CAA90"
 }
 Lamassu = {
-  __index = "function: 0000000015A11C30",
+  __index = "function: 00000000180CEE90",
   __name = "sol.Lamassu.user",
-  __newindex = "function: 0000000015A11AB0"
+  __newindex = "function: 00000000180CF390"
 }
 Lavamander = {
-  __index = "function: 0000000015BE3B00",
+  __index = "function: 00000000179C7250",
   __name = "sol.Lavamander.user",
-  __newindex = "function: 0000000015BE3C80"
+  __newindex = "function: 00000000179C6B50"
 }
 Leprechaun = {
-  __index = "function: 0000000015BEA380",
+  __index = "function: 00000000179ACA50",
   __name = "sol.Leprechaun.user",
-  __newindex = "function: 0000000015BEA200"
+  __newindex = "function: 00000000179AD050"
 }
 LightParams = {
   __name = "sol.LightParams.user"
@@ -1411,69 +1411,69 @@ MASK = {
   WATER = 8192
 }
 MadameTusk = {
-  __index = "function: 0000000015A02830",
+  __index = "function: 00000000180C0610",
   __name = "sol.MadameTusk.user",
-  __newindex = "function: 0000000015A018B0"
+  __newindex = "function: 00000000180BFB10"
 }
 MagmaMan = {
-  __index = "function: 0000000015A063B0",
+  __index = "function: 00000000180C3590",
   __name = "sol.MagmaMan.user",
-  __newindex = "function: 0000000015A05830"
+  __newindex = "function: 00000000180C3790"
 }
 Mantrap = {
-  __index = "function: 0000000015BE2E80",
+  __index = "function: 00000000179C42D0",
   __name = "sol.Mantrap.user",
-  __newindex = "function: 0000000015BE2180"
+  __newindex = "function: 00000000179C4A50"
 }
 Mech = {
-  __index = "function: 0000000015BCF580",
+  __index = "function: 00000000179B3850",
   __name = "sol.Mech.user",
-  __newindex = "function: 0000000015BCF180"
+  __newindex = "function: 00000000179B39D0"
 }
 MegaJellyfish = {
-  __index = "function: 0000000015BD2680",
+  __index = "function: 00000000179B4F50",
   __name = "sol.MegaJellyfish.user",
-  __newindex = "function: 0000000015BD1A80"
+  __newindex = "function: 00000000179B59D0"
 }
 Mole = {
-  __index = "function: 0000000015BD5200",
+  __index = "function: 00000000179B8A50",
   __name = "sol.Mole.user",
-  __newindex = "function: 0000000015BD6580"
+  __newindex = "function: 00000000179B80D0"
 }
 Monkey = {
-  __index = "function: 0000000015BD3A80",
+  __index = "function: 00000000179B62D0",
   __name = "sol.Monkey.user",
-  __newindex = "function: 0000000015BD3C00"
+  __newindex = "function: 00000000179B6350"
 }
 Monster = {
-  __index = "function: 0000000015BD1800",
+  __index = "function: 00000000179B4850",
   __name = "sol.Monster.user",
-  __newindex = "function: 0000000015BD1200"
+  __newindex = "function: 00000000179B5150"
 }
 Mosquito = {
-  __index = "function: 0000000015BE0E80",
+  __index = "function: 00000000179C34D0",
   __name = "sol.Mosquito.user",
-  __newindex = "function: 0000000015BE0900"
+  __newindex = "function: 00000000179C33D0"
 }
 Mount = {
-  __index = "function: 0000000015BCB180",
+  __index = "function: 00000000179ADF50",
   __name = "sol.Mount.user",
-  __newindex = "function: 0000000015BCB200"
+  __newindex = "function: 00000000179AF150"
 }
 Movable = {
-  __index = "function: 000000001507F580",
+  __index = "function: 0000000017338710",
   __name = "sol.Movable.user",
-  __newindex = "function: 000000001507F600"
+  __newindex = "function: 0000000017337590"
 }
 Mummy = {
-  __index = "function: 000000001507CB00",
+  __index = "function: 0000000017334810",
   __name = "sol.Mummy.user",
-  __newindex = "function: 000000001507CB80"
+  __newindex = "function: 0000000017333790"
 }
 Necromancer = {
-  __index = "function: 0000000015BD5380",
+  __index = "function: 00000000179BA6D0",
   __name = "sol.Necromancer.user",
-  __newindex = "function: 0000000015BD5080"
+  __newindex = "function: 00000000179BA9D0"
 }
 ON = {
   ARENA_INTRO = 25,
@@ -1515,34 +1515,34 @@ ON = {
   WIN = 16
 }
 Octopus = {
-  __index = "function: 0000000015A005B0",
+  __index = "function: 00000000180BE410",
   __name = "sol.Octopus.user",
-  __newindex = "function: 00000000159FFB30"
+  __newindex = "function: 00000000180BD810"
 }
 Olmec = {
-  __index = "function: 0000000015BCC280",
+  __index = "function: 00000000179ADED0",
   __name = "sol.Olmec.user",
-  __newindex = "function: 0000000015BCCE80"
+  __newindex = "function: 00000000179AE450"
 }
 OlmecFloater = {
-  __index = "function: 0000000015BCE900",
+  __index = "function: 00000000179B06D0",
   __name = "sol.OlmecFloater.user",
-  __newindex = "function: 0000000015BCE400"
+  __newindex = "function: 00000000179B14D0"
 }
 Olmite = {
-  __index = "function: 0000000015A11030",
+  __index = "function: 00000000180CFC10",
   __name = "sol.Olmite.user",
-  __newindex = "function: 0000000015A10BB0"
+  __newindex = "function: 00000000180CF690"
 }
 OsirisHand = {
-  __index = "function: 0000000015A09530",
+  __index = "function: 00000000180C8B90",
   __name = "sol.OsirisHand.user",
-  __newindex = "function: 0000000015A09730"
+  __newindex = "function: 00000000180CA410"
 }
 OsirisHead = {
-  __index = "function: 0000000015A09B30",
+  __index = "function: 00000000180C6D90",
   __name = "sol.OsirisHead.user",
-  __newindex = "function: 0000000015A09AB0"
+  __newindex = "function: 00000000180C6E10"
 }
 PARTICLEEMITTER = {
   ACIDBUBBLEBURST_BUBBLES = 101,
@@ -1769,14 +1769,14 @@ ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
 Pet = {
-  __index = "function: 0000000015BDC000",
+  __index = "function: 00000000179BDD50",
   __name = "sol.Pet.user",
-  __newindex = "function: 0000000015BDC780"
+  __newindex = "function: 00000000179BDDD0"
 }
 Player = {
-  __index = "function: 0000000015081A00",
+  __index = "function: 0000000017329910",
   __name = "sol.Player.user",
-  __newindex = "function: 0000000015082A00"
+  __newindex = "function: 000000001732AF90"
 }
 PlayerInputs = {
   __name = "sol.PlayerInputs.user"
@@ -1791,32 +1791,32 @@ PlayingSound = {
   __name = "sol.PlayingSound.user"
 }
 ProtoShopkeeper = {
-  __index = "function: 0000000015BD7F00",
+  __index = "function: 00000000179BD450",
   __name = "sol.ProtoShopkeeper.user",
-  __newindex = "function: 0000000015BD7B00"
+  __newindex = "function: 00000000179BBFD0"
 }
 Qilin = {
-  __index = "function: 0000000015BD0900",
+  __index = "function: 00000000179B2750",
   __name = "sol.Qilin.user",
-  __newindex = "function: 0000000015BCF880"
+  __newindex = "function: 00000000179B27D0"
 }
 QuestsInfo = {
   __name = "sol.QuestsInfo.user"
 }
 Quillback = {
-  __index = "function: 0000000015BE7D00",
+  __index = "function: 00000000179C9C50",
   __name = "sol.Quillback.user",
-  __newindex = "function: 0000000015BE7180"
+  __newindex = "function: 00000000179CAB50"
 }
 Robot = {
-  __index = "function: 0000000015BE7E00",
+  __index = "function: 00000000179CA850",
   __name = "sol.Robot.user",
-  __newindex = "function: 0000000015BE8980"
+  __newindex = "function: 00000000179CA4D0"
 }
 Rockdog = {
-  __index = "function: 0000000015BCE080",
+  __index = "function: 00000000179AFED0",
   __name = "sol.Rockdog.user",
-  __newindex = "function: 0000000015BCDD00"
+  __newindex = "function: 00000000179B1850"
 }
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
@@ -1851,44 +1851,44 @@ SaveData = {
   __name = "sol.SaveData.user"
 }
 Scarab = {
-  __index = "function: 0000000015BE1580",
+  __index = "function: 00000000179C4ED0",
   __name = "sol.Scarab.user",
-  __newindex = "function: 0000000015BE1600"
+  __newindex = "function: 00000000179C4450"
 }
 Scorpion = {
-  __index = "function: 0000000015BD3500",
+  __index = "function: 00000000179B7350",
   __name = "sol.Scorpion.user",
-  __newindex = "function: 0000000015BD4300"
+  __newindex = "function: 00000000179B77D0"
 }
 Shopkeeper = {
-  __index = "function: 0000000015BD8D00",
+  __index = "function: 00000000179BB5D0",
   __name = "sol.Shopkeeper.user",
-  __newindex = "function: 0000000015BD6F80"
+  __newindex = "function: 00000000179BB550"
 }
 ShopkeeperClone = {
-  __index = "function: 0000000015BD9380",
+  __index = "function: 00000000179BF950",
   __name = "sol.ShopkeeperClone.user",
-  __newindex = "function: 0000000015BD9580"
+  __newindex = "function: 00000000179BE0D0"
 }
 Skeleton = {
-  __index = "function: 0000000015BE1C00",
+  __index = "function: 00000000179C52D0",
   __name = "sol.Skeleton.user",
-  __newindex = "function: 0000000015BE2800"
+  __newindex = "function: 00000000179C4E50"
 }
 Sorceress = {
-  __index = "function: 0000000015A047B0",
+  __index = "function: 00000000180C0A10",
   __name = "sol.Sorceress.user",
-  __newindex = "function: 0000000015A03DB0"
+  __newindex = "function: 00000000180C1390"
 }
 Sparrow = {
-  __index = "function: 0000000015BDCA80",
+  __index = "function: 00000000179BF650",
   __name = "sol.Sparrow.user",
-  __newindex = "function: 0000000015BDCB00"
+  __newindex = "function: 00000000179BF7D0"
 }
 Spider = {
-  __index = "function: 0000000015BD8080",
+  __index = "function: 00000000179BB7D0",
   __name = "sol.Spider.user",
-  __newindex = "function: 0000000015BD7480"
+  __newindex = "function: 00000000179BA650"
 }
 StateMemory = {
   __name = "sol.StateMemory.user"
@@ -2311,28 +2311,790 @@ TUSK = {
   PALACE_WELCOME_MESSAGE = 3,
   QUEST_NOT_STARTED = 0
 }
+TYPE_MAP = {
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function: 0000000017CB0AC0",
+  nil,
+  nil,
+  nil,
+  "function: 0000000017CB1150",
+  "function: 0000000017CB11A0",
+  "function: 0000000017CB11F0",
+  nil,
+  nil,
+  nil,
+  "function: 0000000017CB0160",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function: 0000000017CB1240",
+  "function: 0000000017CB03E0",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function: 0000000017CB0A70",
+  "function: 0000000017CB0480",
+  "function: 0000000017CB0980",
+  "function: 0000000017CB06B0",
+  "function: 0000000017CB01B0",
+  "function: 0000000017CB0570",
+  "function: 0000000017CB05C0",
+  "function: 0000000017CB0700",
+  "function: 0000000017CB0750",
+  "function: 0000000017CB07F0",
+  "function: 0000000017CB09D0",
+  "function: 0000000017D34810",
+  "function: 0000000017D335F0",
+  "function: 0000000017D33FA0",
+  "function: 0000000017D34270",
+  "function: 0000000017D33690",
+  "function: 0000000017D33640",
+  "function: 0000000017D33D70",
+  "function: 0000000017D34540",
+  "function: 0000000017D341D0",
+  nil,
+  "function: 0000000017D33C30",
+  "function: 0000000017D33DC0",
+  nil,
+  nil,
+  "function: 0000000017A21CA0",
+  "function: 0000000017A1FEF0",
+  "function: 0000000017A21200",
+  "function: 0000000017A21390",
+  nil,
+  nil,
+  "function: 0000000017A21840",
+  "function: 0000000017A21CF0",
+  "function: 0000000017A20E40",
+  nil,
+  "function: 0000000017A25940",
+  "function: 0000000017A217A0",
+  "function: 0000000017A210C0",
+  "function: 0000000017A22CE0",
+  "function: 0000000017A21BB0",
+  nil,
+  "function: 0000000017A227E0",
+  "function: 0000000017A22D30",
+  "function: 0000000017A21480",
+  "function: 0000000017A20B20",
+  "function: 0000000017A23EB0",
+  "function: 0000000017A225B0",
+  "function: 0000000017A20EE0",
+  "function: 0000000017A21340",
+  "function: 0000000017A21A20",
+  "function: 0000000017A20F30",
+  "function: 0000000017A22330",
+  "function: 0000000017A22150",
+  "function: 0000000017A22A60",
+  "function: 0000000017A24090",
+  "function: 0000000017A21ED0",
+  "function: 0000000017A23A50",
+  "function: 0000000017A233C0",
+  "function: 0000000017A24FE0",
+  "function: 0000000017A22FB0",
+  "function: 0000000017A23F50",
+  "function: 0000000017D344F0",
+  "function: 0000000017A24270",
+  "function: 0000000017A24540",
+  "function: 0000000017A23690",
+  "function: 0000000017A224C0",
+  "function: 0000000017A20A30",
+  nil,
+  "function: 0000000017A22650",
+  "function: 0000000017A22AB0",
+  "function: 0000000017A247C0",
+  "function: 0000000017A23000",
+  "function: 0000000017A240E0",
+  "function: 0000000017A23D20",
+  "function: 0000000017A235F0",
+  "function: 0000000017A23730",
+  "function: 0000000017A232D0",
+  "function: 0000000017A23AA0",
+  "function: 0000000017A251C0",
+  "function: 0000000017A24BD0",
+  "function: 0000000017A23280",
+  "function: 0000000017A23B40",
+  nil,
+  nil,
+  "function: 0000000017A239B0",
+  nil,
+  "function: 0000000017A23E60",
+  "function: 0000000017A22790",
+  "function: 0000000017A234B0",
+  "function: 0000000017A23B90",
+  "function: 0000000017A24720",
+  "function: 0000000017A23910",
+  "function: 0000000017A249F0",
+  "function: 0000000017A24F40",
+  "function: 0000000017A254E0",
+  "function: 0000000017A25710",
+  "function: 0000000017A249A0",
+  "function: 0000000017A25300",
+  "function: 0000000017A24EF0",
+  "function: 0000000017A24CC0",
+  nil,
+  "function: 0000000017A211B0",
+  "function: 0000000017A20FD0",
+  "function: 0000000017A21980",
+  "function: 0000000017A21570",
+  nil,
+  "function: 0000000017A22600",
+  nil,
+  nil,
+  "function: 0000000017A22510",
+  "function: 0000000017A253A0",
+  "function: 0000000017A22B00",
+  "function: 0000000017A23050",
+  "function: 0000000017A25990",
+  "function: 0000000017A22A10",
+  "function: 0000000017A21520",
+  "function: 0000000017A22EC0",
+  "function: 0000000017A22BF0",
+  "function: 0000000017A258A0",
+  nil,
+  "function: 0000000017A24D10",
+  "function: 0000000017A21020",
+  nil,
+  "function: 0000000017A205D0",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function: 0000000017A25620",
+  "function: 0000000017A25DA0",
+  "function: 0000000017A266B0",
+  nil,
+  "function: 0000000017A25440",
+  "function: 0000000017A25AD0",
+  "function: 0000000017A264D0",
+  "function: 0000000017A267A0",
+  "function: 0000000017A26E30",
+  "function: 0000000017A265C0",
+  nil,
+  nil,
+  nil,
+  "function: 0000000017D344A0",
+  "function: 0000000017D34040",
+  nil,
+  nil,
+  "function: 0000000017D336E0",
+  "function: 0000000017D34590",
+  "function: 0000000017D33960",
+  "function: 0000000017D33C80",
+  "function: 0000000017D33E10",
+  "function: 0000000017D345E0",
+  "function: 0000000017D34770",
+  "function: 0000000017D34400",
+  "function: 0000000017D34360",
+  "function: 0000000017D34450",
+  "function: 0000000017D33E60",
+  "function: 0000000017D34630",
+  "function: 0000000017D347C0",
+  "function: 0000000017D33820",
+  "function: 0000000017D342C0",
+  "function: 0000000017D34220",
+  "function: 0000000017D33730",
+  "function: 0000000017D33870",
+  "function: 0000000017D33780",
+  "function: 0000000017D34680",
+  "function: 0000000017D346D0",
+  "function: 0000000017D34310",
+  "function: 0000000017D33AA0",
+  "function: 0000000017D340E0",
+  "function: 0000000017D34720",
+  "function: 0000000017D34860",
+  "function: 0000000017D348B0",
+  "function: 0000000017D337D0",
+  "function: 0000000017D33EB0",
+  "function: 0000000017D33500",
+  "function: 0000000017D33550",
+  "function: 0000000017D335A0",
+  "function: 0000000017D33B90",
+  "function: 0000000017D343B0",
+  "function: 0000000017D33FF0",
+  "function: 0000000017D338C0",
+  "function: 0000000017D33910",
+  "function: 0000000017D339B0",
+  "function: 0000000017D33A00",
+  "function: 0000000017D33A50",
+  "function: 0000000017D33AF0",
+  "function: 0000000017D33B40",
+  "function: 0000000017D33BE0",
+  "function: 0000000017D33CD0",
+  "function: 0000000017D33D20",
+  "function: 0000000017D33F00",
+  "function: 0000000017D33F50",
+  "function: 0000000017D34090",
+  "function: 0000000017D34130",
+  "function: 0000000017D34180",
+  "function: 0000000017D35760",
+  "function: 0000000017D35490",
+  "function: 0000000017D35940",
+  nil,
+  nil,
+  "function: 0000000017D34AE0",
+  "function: 0000000017D35C10",
+  "function: 0000000017D34B30",
+  "function: 0000000017D34900",
+  "function: 0000000017D34A90",
+  "function: 0000000017D34E50",
+  "function: 0000000017D34D60",
+  "function: 0000000017D35800",
+  "function: 0000000017D34E00",
+  "function: 0000000017D353A0",
+  "function: 0000000017D35030",
+  "function: 0000000017D35080",
+  "function: 0000000017D35530",
+  "function: 0000000017D34EA0",
+  "function: 0000000017D354E0",
+  "function: 0000000017D34F40",
+  "function: 0000000017D35440",
+  "function: 0000000017D34B80",
+  nil,
+  nil,
+  "function: 0000000017D35260",
+  "function: 0000000017D35BC0",
+  "function: 0000000017D34BD0",
+  "function: 0000000017D35210",
+  "function: 0000000017D34C20",
+  "function: 0000000017D350D0",
+  "function: 0000000017D34950",
+  "function: 0000000017D352B0",
+  "function: 0000000017D35580",
+  "function: 0000000017D357B0",
+  "function: 0000000017D34DB0",
+  "function: 0000000017D35850",
+  "function: 0000000017D34EF0",
+  "function: 0000000017D349A0",
+  "function: 0000000017D35300",
+  "function: 0000000017D35990",
+  "function: 0000000017D35670",
+  "function: 0000000017D355D0",
+  "function: 0000000017D34F90",
+  "function: 0000000017D35CB0",
+  "function: 0000000017D35B70",
+  "function: 0000000017D349F0",
+  "function: 0000000017D356C0",
+  "function: 0000000017D35620",
+  "function: 0000000017D34FE0",
+  "function: 0000000017D35A80",
+  "function: 0000000017D35170",
+  "function: 0000000017D35B20",
+  "function: 0000000017D353F0",
+  "function: 0000000017D359E0",
+  "function: 0000000017D35710",
+  "function: 0000000017D358A0",
+  "function: 0000000017D35120",
+  "function: 0000000017D34C70",
+  "function: 0000000017D358F0",
+  "function: 0000000017D34A40",
+  "function: 0000000017D35C60",
+  "function: 0000000017D35A30",
+  "function: 0000000017D34CC0",
+  nil,
+  "function: 0000000017D35AD0",
+  "function: 0000000017D351C0",
+  "function: 0000000017D34D10",
+  "function: 0000000017D35350",
+  "function: 0000000017D36BB0",
+  "function: 0000000017D36980",
+  "function: 0000000017D364D0",
+  "function: 0000000017D366B0",
+  "function: 0000000017D36FC0",
+  "function: 0000000017D36160",
+  "function: 0000000017D35FD0",
+  "function: 0000000017D362A0",
+  "function: 0000000017D36520",
+  "function: 0000000017D36C00",
+  "function: 0000000017D36700",
+  nil,
+  "function: 0000000017D36250",
+  "function: 0000000017D36890",
+  "function: 0000000017D35E90",
+  "function: 0000000017D36A70",
+  "function: 0000000017D36F20",
+  "function: 0000000017D35EE0",
+  "function: 0000000017D37010",
+  "function: 0000000017D368E0",
+  "function: 0000000017D36750",
+  "function: 0000000017D36AC0",
+  "function: 0000000017D35F80",
+  "function: 0000000017D36390",
+  "function: 0000000017D36570",
+  nil,
+  nil,
+  "function: 0000000017D361B0",
+  "function: 0000000017D365C0",
+  "function: 0000000017D35DA0",
+  "function: 0000000017D36610",
+  "function: 0000000017D37060",
+  "function: 0000000017D36D90",
+  "function: 0000000017D36430",
+  "function: 0000000017D36CF0",
+  "function: 0000000017D367A0",
+  "function: 0000000017D362F0",
+  "function: 0000000017D36DE0",
+  "function: 0000000017D35F30",
+  nil,
+  nil,
+  "function: 0000000017D367F0",
+  "function: 0000000017D36070",
+  "function: 0000000017D36840",
+  "function: 0000000017D35DF0",
+  "function: 0000000017D36E80",
+  "function: 0000000017D36930",
+  "function: 0000000017D36660",
+  "function: 0000000017D36D40",
+  "function: 0000000017D36020",
+  "function: 0000000017D369D0",
+  "function: 0000000017D36A20",
+  "function: 0000000017D36110",
+  nil,
+  "function: 0000000017D36200",
+  "function: 0000000017D36B10",
+  "function: 0000000017D36B60",
+  "function: 0000000017D360C0",
+  "function: 0000000017D35E40",
+  "function: 0000000017D36C50",
+  "function: 0000000017D36E30",
+  "function: 0000000017D36CA0",
+  "function: 0000000017D36480",
+  "function: 0000000017D36ED0",
+  "function: 0000000017D36F70",
+  "function: 0000000017D370B0",
+  "function: 0000000017D35D00",
+  "function: 0000000017D35D50",
+  "function: 0000000017D36340",
+  "function: 0000000017D363E0",
+  "function: 0000000017D37560",
+  "function: 0000000017D37830",
+  nil,
+  "function: 0000000017D37A10",
+  nil,
+  "function: 0000000017D38190",
+  "function: 0000000017D38370",
+  "function: 0000000017D38000",
+  "function: 0000000017D37F60",
+  nil,
+  "function: 0000000017D37A60",
+  "function: 0000000017D37420",
+  "function: 0000000017D37330",
+  "function: 0000000017D37470",
+  "function: 0000000017D37290",
+  "function: 0000000017D38050",
+  "function: 0000000017D38140",
+  "function: 0000000017D37F10",
+  "function: 0000000017D376A0",
+  "function: 0000000017D37CE0",
+  "function: 0000000017D381E0",
+  "function: 0000000017D380A0",
+  "function: 0000000017D38410",
+  nil,
+  "function: 0000000017D37240",
+  nil,
+  "function: 0000000017D38230",
+  nil,
+  nil,
+  "function: 0000000017D38280",
+  nil,
+  "function: 0000000017D37EC0",
+  nil,
+  "function: 0000000017D383C0",
+  nil,
+  "function: 0000000017D374C0",
+  "function: 0000000017D37100",
+  nil,
+  nil,
+  "function: 0000000017D380F0",
+  nil,
+  "function: 0000000017D38460",
+  nil,
+  "function: 0000000017D376F0",
+  "function: 0000000017D378D0",
+  "function: 0000000017D37920",
+  "function: 0000000017D37970",
+  nil,
+  nil,
+  nil,
+  "function: 0000000017D37510",
+  "function: 0000000017D377E0",
+  "function: 0000000017D37FB0",
+  nil,
+  nil,
+  nil,
+  "function: 0000000017D37C90",
+  "function: 0000000017D382D0",
+  "function: 0000000017D384B0",
+  "function: 0000000017D37380",
+  "function: 0000000017D37150",
+  "function: 0000000017D37650",
+  "function: 0000000017D375B0",
+  "function: 0000000017D38320",
+  "function: 0000000017D37600",
+  "function: 0000000017D37BA0",
+  "function: 0000000017D37880",
+  "function: 0000000017D371A0",
+  "function: 0000000017D37B50",
+  "function: 0000000017D37740",
+  "function: 0000000017D371F0",
+  "function: 0000000017D37C40",
+  "function: 0000000017D372E0",
+  "function: 0000000017D37E20",
+  "function: 0000000017D373D0",
+  "function: 0000000017D37790",
+  "function: 0000000017D379C0",
+  "function: 0000000017D37AB0",
+  "function: 0000000017D37B00",
+  "function: 0000000017D37BF0",
+  "function: 0000000017D37D30",
+  "function: 0000000017D37D80",
+  "function: 0000000017D37DD0",
+  "function: 0000000017D37E70",
+  "function: 0000000017D38780",
+  "function: 0000000017D39720",
+  nil,
+  nil,
+  "function: 0000000017D38910",
+  "function: 0000000017D38A00",
+  "function: 0000000017D39360",
+  "function: 0000000017D38A50",
+  "function: 0000000017D38550",
+  "function: 0000000017D38DC0",
+  "function: 0000000017D38CD0",
+  "function: 0000000017D38F50",
+  "function: 0000000017D38B90",
+  "function: 0000000017D39090",
+  "function: 0000000017D38730",
+  "function: 0000000017D38E10",
+  "function: 0000000017D395E0",
+  "function: 0000000017D38AA0",
+  "function: 0000000017D38F00",
+  "function: 0000000017D38690",
+  "function: 0000000017D38AF0",
+  "function: 0000000017D39860",
+  "function: 0000000017D385A0",
+  "function: 0000000017D38E60",
+  "function: 0000000017D38FA0",
+  "function: 0000000017D38FF0",
+  "function: 0000000017D389B0",
+  "function: 0000000017D39040",
+  "function: 0000000017D39400",
+  "function: 0000000017D38D20",
+  "function: 0000000017D38B40",
+  "function: 0000000017D390E0",
+  "function: 0000000017D38BE0",
+  "function: 0000000017D397C0",
+  "function: 0000000017D39130",
+  "function: 0000000017D38640",
+  "function: 0000000017D392C0",
+  "function: 0000000017D39540",
+  "function: 0000000017D388C0",
+  "function: 0000000017D385F0",
+  "function: 0000000017D39450",
+  "function: 0000000017D39590",
+  "function: 0000000017D38C30",
+  "function: 0000000017D39180",
+  "function: 0000000017D391D0",
+  "function: 0000000017D394A0",
+  "function: 0000000017D38EB0",
+  "function: 0000000017D39220",
+  "function: 0000000017D39630",
+  "function: 0000000017D387D0",
+  "function: 0000000017D39770",
+  "function: 0000000017D38960",
+  "function: 0000000017D38C80",
+  "function: 0000000017D393B0",
+  "function: 0000000017D38D70",
+  "function: 0000000017D386E0",
+  "function: 0000000017D39270",
+  "function: 0000000017D39310",
+  "function: 0000000017D394F0",
+  "function: 0000000017D39680",
+  "function: 0000000017D396D0",
+  "function: 0000000017D38820",
+  "function: 0000000017D39810",
+  "function: 0000000017D398B0",
+  "function: 0000000017D38500",
+  "function: 0000000017D38870",
+  "function: 0000000017D39A90",
+  "function: 0000000017D39EF0",
+  "function: 0000000017D3AC60",
+  "function: 0000000017D399A0",
+  "function: 0000000017D3A260",
+  "function: 0000000017D3A3A0",
+  "function: 0000000017D3A3F0",
+  "function: 0000000017D39DB0",
+  "function: 0000000017D3A300",
+  "function: 0000000017D3A800",
+  "function: 0000000017D3A120",
+  "function: 0000000017D39E50",
+  "function: 0000000017D3A350",
+  "function: 0000000017D39E00",
+  "function: 0000000017D3ABC0",
+  "function: 0000000017D3A440",
+  "function: 0000000017D39A40",
+  "function: 0000000017D3A6C0",
+  "function: 0000000017D3A940",
+  "function: 0000000017D39CC0",
+  "function: 0000000017D399F0",
+  "function: 0000000017D3A850",
+  "function: 0000000017D3A990",
+  "function: 0000000017D39F40",
+  "function: 0000000017D39AE0",
+  "function: 0000000017D3A5D0",
+  "function: 0000000017D3A580",
+  "function: 0000000017D3A490",
+  "function: 0000000017D3A8A0",
+  "function: 0000000017D3A1C0",
+  "function: 0000000017D3A210",
+  "function: 0000000017D3A030",
+  "function: 0000000017D3A530",
+  "function: 0000000017D39EA0",
+  "function: 0000000017D3A4E0",
+  "function: 0000000017D39F90",
+  "function: 0000000017D3A620",
+  "function: 0000000017D39B30",
+  "function: 0000000017D3A2B0",
+  "function: 0000000017D3AC10",
+  "function: 0000000017D39BD0",
+  "function: 0000000017D3A670",
+  "function: 0000000017D39B80",
+  "function: 0000000017D3A0D0",
+  "function: 0000000017D39900",
+  "function: 0000000017D3A710",
+  "function: 0000000017D3A760",
+  "function: 0000000017D3A7B0",
+  "function: 0000000017D39D60",
+  "function: 0000000017D3A8F0",
+  "function: 0000000017D39FE0",
+  "function: 0000000017D39C20",
+  "function: 0000000017D3A9E0",
+  "function: 0000000017D3AA30",
+  "function: 0000000017D3AA80",
+  "function: 0000000017D3AAD0",
+  "function: 0000000017D3A080",
+  "function: 0000000017D3ACB0",
+  "function: 0000000017D3AB70",
+  nil,
+  "function: 0000000017D39C70",
+  "function: 0000000017D3AB20",
+  "function: 0000000017D39950",
+  "function: 0000000017D3A170",
+  "function: 0000000017D39D10",
+  "function: 0000000017D3B570",
+  [897] = "function: 0000000017A1F2C0",
+  [898] = "function: 0000000017A1F0E0",
+  [899] = "function: 0000000017A1F090",
+  [900] = "function: 0000000017A1F310",
+  [901] = "function: 0000000017A1F180",
+  [903] = nil,
+  [904] = nil
+}
 Tadpole = {
-  __index = "function: 0000000015A15630",
+  __index = "function: 00000000180D3190",
   __name = "sol.Tadpole.user",
-  __newindex = "function: 0000000015A15A30"
+  __newindex = "function: 00000000180D3290"
 }
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
 }
 Tiamat = {
-  __index = "function: 0000000015A10CB0",
+  __index = "function: 00000000180D1D10",
   __name = "sol.Tiamat.user",
-  __newindex = "function: 0000000015A10D30"
+  __newindex = "function: 00000000180D1B90"
 }
 Tun = {
-  __index = "function: 0000000015BDB200",
+  __index = "function: 00000000179BDAD0",
   __name = "sol.Tun.user",
-  __newindex = "function: 0000000015BDC700"
+  __newindex = "function: 00000000179BDB50"
 }
 UFO = {
-  __index = "function: 0000000015A0DFB0",
+  __index = "function: 00000000180CC390",
   __name = "sol.UFO.user",
-  __newindex = "function: 0000000015A0E030"
+  __newindex = "function: 00000000180CBD90"
 }
 VANHORSING = {
   FIRST_ENCOUNTER_DIAMOND_THROWN = 2,
@@ -2929,19 +3691,19 @@ VANILLA_SOUND_PARAM = {
   VELOCITY = 15
 }
 Vampire = {
-  __index = "function: 00000000159FB530",
+  __index = "function: 00000000180B9590",
   __name = "sol.Vampire.user",
-  __newindex = "function: 00000000159FB5B0"
+  __newindex = "function: 00000000180B9610"
 }
 VanHorsing = {
-  __index = "function: 0000000015080B00",
+  __index = "function: 0000000017338510",
   __name = "sol.VanHorsing.user",
-  __newindex = "function: 000000001507FD80"
+  __newindex = "function: 0000000017338D10"
 }
 Vlad = {
-  __index = "function: 00000000159FCDB0",
+  __index = "function: 00000000180BB610",
   __name = "sol.Vlad.user",
-  __newindex = "function: 00000000159FD230"
+  __newindex = "function: 00000000180BBE10"
 }
 WIN_STATE = {
   COSMIC_OCEAN_WIN = 3,
@@ -2950,19 +3712,19 @@ WIN_STATE = {
   TIAMAT_WIN = 1
 }
 Waddler = {
-  __index = "function: 00000000159FCBB0",
+  __index = "function: 00000000180BAD10",
   __name = "sol.Waddler.user",
-  __newindex = "function: 00000000159FE730"
+  __newindex = "function: 00000000180BB110"
 }
 WitchDoctor = {
-  __index = "function: 0000000015082E80",
+  __index = "function: 000000001732B210",
   __name = "sol.WitchDoctor.user",
-  __newindex = "function: 0000000015081E00"
+  __newindex = "function: 000000001732A510"
 }
 WitchDoctorSkull = {
-  __index = "function: 00000000159FA8B0",
+  __index = "function: 00000000180B9D90",
   __name = "sol.WitchDoctorSkull.user",
-  __newindex = "function: 00000000159FB2B0"
+  __newindex = "function: 00000000180B9490"
 }
 YANG = {
   ANGRY = -1,
@@ -2975,29 +3737,29 @@ YANG = {
   TWO_TURKEYS_BOUGHT = 6
 }
 Yama = {
-  __index = "function: 0000000015BCC380",
+  __index = "function: 00000000179AE550",
   __name = "sol.Yama.user",
-  __newindex = "function: 0000000015BCCD00"
+  __newindex = "function: 00000000179AE750"
 }
 Yang = {
-  __index = "function: 0000000015BD9400",
+  __index = "function: 00000000179BCBD0",
   __name = "sol.Yang.user",
-  __newindex = "function: 0000000015BD9480"
+  __newindex = "function: 00000000179BD250"
 }
 Yeti = {
-  __index = "function: 0000000015A0B5B0",
+  __index = "function: 00000000180C9E90",
   __name = "sol.Yeti.user",
-  __newindex = "function: 0000000015A0A930"
+  __newindex = "function: 00000000180CA090"
 }
 YetiKing = {
-  __index = "function: 0000000015A10030",
+  __index = "function: 00000000180CCD90",
   __name = "sol.YetiKing.user",
-  __newindex = "function: 0000000015A102B0"
+  __newindex = "function: 00000000180CCE10"
 }
 YetiQueen = {
-  __index = "function: 0000000015A0FE30",
+  __index = "function: 00000000180CD890",
   __name = "sol.YetiQueen.user",
-  __newindex = "function: 0000000015A0FF30"
+  __newindex = "function: 00000000180CE490"
 }
 apply_entity_db = function(...) end
 cancel_speechbubble = function(...) end
@@ -3043,10 +3805,11 @@ get_entities_by_layer = function(...) end
 get_entities_by_mask = function(...) end
 get_entities_by_type = function(...) end
 get_entities_overlapping = function(...) end
-get_entity = function(...) end
+get_entity = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\3à\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_uid)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        ‚’\1\0\5˜<\0\0\0¸\0\0€ˆ\0\0\0È\0\2\0‹\0\0\1\0\1\0\0Ä\0\2\2¼\0\0\0¸\0\0€\8\1\0\0H\1\2\0\11\1\0\2Ž\1\1\3Ž\1\3\4\12\1\2\3<\0\0008\2\0€€\1\2\0\0\2\1\0Å\1\2\0Æ\1\0\0008\0\0€È\0\2\0Ç\1\1\0…\0\4get_entity_raw\4‰TYPE_MAP\4…type\4ƒid\0\0\0€˜\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2€ƒˆent_uid€˜‹entity_raw‡˜‰cast_fun˜…_ENV",'@serialized'))
 get_entity_ai_state = function(...) end
 get_entity_flags = function(...) end
 get_entity_flags2 = function(...) end
+get_entity_raw = function(...) end
 get_entity_type = function(...) end
 get_frame = function(...) end
 get_level_flags = function(...) end
