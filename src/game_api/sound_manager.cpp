@@ -174,20 +174,20 @@ CustomSound::~CustomSound()
 
 PlayingSound CustomSound::play()
 {
-    return play(false, SoundType::Sfx);
+    return play(false, SOUND_TYPE::Sfx);
 }
 PlayingSound CustomSound::play(bool paused)
 {
-    return play(paused, SoundType::Sfx);
+    return play(paused, SOUND_TYPE::Sfx);
 }
-PlayingSound CustomSound::play(bool paused, SoundType sound_type)
+PlayingSound CustomSound::play(bool paused, SOUND_TYPE sound_type)
 {
     return std::visit(
         overloaded{
             [=](FMOD::Sound* sound)
-            { return m_SoundManager->play_sound(sound, paused, sound_type == SoundType::Music); },
+            { return m_SoundManager->play_sound(sound, paused, sound_type == SOUND_TYPE::Music); },
             [=](FMODStudio::EventDescription* event)
-            { return m_SoundManager->play_event(event, paused, sound_type == SoundType::Music); },
+            { return m_SoundManager->play_event(event, paused, sound_type == SOUND_TYPE::Music); },
             [](std::monostate)
             {
                 return PlayingSound{nullptr, nullptr};
@@ -247,7 +247,7 @@ bool PlayingSound::set_volume(float volume)
 {
     return m_SoundManager->set_volume(*this, volume);
 }
-bool PlayingSound::set_looping(LoopMode loop_mode)
+bool PlayingSound::set_looping(SOUND_LOOP_MODE loop_mode)
 {
     return m_SoundManager->set_looping(*this, loop_mode);
 }
@@ -256,15 +256,15 @@ bool PlayingSound::set_callback(SoundCallbackFunction callback)
     return m_SoundManager->set_callback(*this, std::move(callback));
 }
 
-std::unordered_map<std::uint32_t, const char*> PlayingSound::get_parameters()
+std::unordered_map<VANILLA_SOUND_PARAM, const char*> PlayingSound::get_parameters()
 {
     return m_SoundManager->get_parameters(*this);
 }
-std::optional<float> PlayingSound::get_parameter(std::uint32_t parameter_index)
+std::optional<float> PlayingSound::get_parameter(VANILLA_SOUND_PARAM parameter_index)
 {
     return m_SoundManager->get_parameter(*this, parameter_index);
 }
-bool PlayingSound::set_parameter(std::uint32_t parameter_index, float value)
+bool PlayingSound::set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)
 {
     return m_SoundManager->set_parameter(*this, parameter_index, value);
 }
@@ -657,18 +657,18 @@ bool SoundManager::set_volume(PlayingSound playing_sound, float volume)
                    { return false; }},
         playing_sound.m_FmodHandle);
 }
-bool SoundManager::set_looping(PlayingSound playing_sound, LoopMode loop_mode)
+bool SoundManager::set_looping(PlayingSound playing_sound, SOUND_LOOP_MODE loop_mode)
 {
     return std::visit(
         overloaded{[this, loop_mode](FMOD::Channel* channel)
                    {
                        switch (loop_mode)
                        {
-                       case LoopMode::Off:
+                       case SOUND_LOOP_MODE::Off:
                            return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_OFF));
-                       case LoopMode::Loop:
+                       case SOUND_LOOP_MODE::Loop:
                            return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_NORMAL));
-                       case LoopMode::Bidirectional:
+                       case SOUND_LOOP_MODE::Bidirectional:
                            return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_BIDI));
                        }
                        return false;
