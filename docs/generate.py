@@ -28,6 +28,7 @@ rpc = []
 events = []
 funcs = []
 types = []
+known_casts = []
 aliases = []
 lualibs = []
 enums = []
@@ -170,6 +171,16 @@ for file in api_files:
                 var_to_mod = next((item for item in type_to_mod['vars'] if item['name'] == var_name), dict())
                 if var_to_mod:
                     var_to_mod['signature'] = sub_match[0] + ' ' + var_name + sub_match[2]
+
+for file in api_files:
+    with open(file) as fp:
+        line = fp.readline()
+        while line:
+            m = re.search(r'lua\["Entity"\]\["(as_.*)"\]', line)
+            if m != None:
+                known_casts.append(m.group(1))
+            line = fp.readline()
+known_casts.sort()
 
 for file in api_files:
     comment = []
@@ -457,6 +468,12 @@ for type in types:
             name = var['name']
             type_str = var['type'].replace('<', '&lt;').replace('>', '&gt;')
             print(f'- [`{name}`]({search_link}) {type_str}')
+
+print('## Automatic casting of entities')
+print('When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.')
+print('For reference, the available `as_<typename>` functions are listed below:')
+for known_cast in known_casts:
+    print('- ' + known_cast)
 
 print('## Enums')
 print('Enums are like numbers but in text that\'s easier to remember. Example:')
