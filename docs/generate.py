@@ -472,6 +472,9 @@ for type in types:
 
 print('## Automatic casting of entities')
 print('When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.')
+print('')
+print('To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)')
+print('')
 print('For reference, the available `as_<typename>` functions are listed below:')
 for known_cast in known_casts:
     print('- ' + known_cast)

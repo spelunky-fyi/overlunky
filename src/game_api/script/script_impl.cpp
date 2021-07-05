@@ -477,7 +477,9 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_door_target"] = get_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
     lua["set_contents"] = set_contents;
-    /// Get the [Entity](#entity) behind an uid (do not use, use `get_entity` instead)
+    /// Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+    // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
+    /// Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
     lua.script(R"##(
         function get_entity(ent_uid)
