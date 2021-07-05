@@ -93,3 +93,58 @@ set_callback(function()
         draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)
+
+-- Add a chance for powderkeg spawns, needs to be used as `\?sample_powderkeg 120` in a .lvl file
+local function spawn_powderkeg(x, y, l)
+    spawn_entity(ENT_TYPE.ACTIVEFLOOR_POWDERKEG, x, y, l, 0, 0)
+end
+local function is_valid_powderkeg_spawn(x, y, l)
+    -- Only spawn where the powderkeg has floor left or right of it
+    local not_entity_here = get_grid_entity_at(x, y, l) == -1
+    if not_entity_here then
+        local entity_below = get_grid_entity_at(x, y - 1, l) >= 0
+        if entity_below then
+            local entity_left = get_grid_entity_at(x - 1, y, l) >= 0
+            local entity_right = get_grid_entity_at(x + 1, y, l) >= 0
+            return entity_left ~= entity_right
+        end
+    end
+    return false
+end
+define_procedural_spawn("sample_powderkeg", spawn_powderkeg, is_valid_powderkeg_spawn)
+
+-- Fill in shops in all the valid ROOM_TEMPLATE.SIDE spots
+local valid_rooms_with_shop_next = {
+    [ROOM_TEMPLATE.PATH_NORMAL] = true,
+    [ROOM_TEMPLATE.PATH_DROP] = true,
+    [ROOM_TEMPLATE.PATH_NOTOP] = true,
+    [ROOM_TEMPLATE.PATH_DROP_NOTOP] = true,
+    [ROOM_TEMPLATE.EXIT] = true,
+    [ROOM_TEMPLATE.EXIT_NOTOP] = true,
+    [ROOM_TEMPLATE.ENTRANCE] = true,
+    [ROOM_TEMPLATE.ENTRANCE_DROP] = true,
+    [ROOM_TEMPLATE.ALTAR] = true,
+}
+set_callback(function(room_gen_ctx)
+    for x = 0, state.width do
+        for y = 0, state.height do
+            -- Check that this is a side
+            local room_template_here = get_room_template(x, y, 0)
+            if room_template_here == ROOM_TEMPLATE.SIDE then
+                -- Check if left of this is a valid room
+                local room_template_left = get_room_template(x - 1, y, 0)
+                if not valid_rooms_with_shop_next[room_template_left] then
+                    -- And spawn a shop facing left
+                    room_gen_ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.SHOP_LEFT)
+                else
+                    -- Or if right of it is
+                    local room_template_right = get_room_template(x + 1, y, 0)
+                    if valid_rooms_with_shop_next[room_template_right] then
+                        -- And spawn a shop facing right
+                        room_gen_ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.SHOP)
+                    end
+                end
+            end
+        end
+    end
+end, ON.POST_ROOM_GENERATION)

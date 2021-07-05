@@ -65,9 +65,87 @@ void list_items()
     auto player = state.items()->player(0);
     if (player == nullptr)
         return;
-    for (auto& item : state.layer(player->layer())->items())
+    for (auto& item : state.layer(player->layer)->items())
     {
         DEBUG("Item {} {:x}, {}", item->uid, item->type->search_flags, item->position_self());
+    }
+}
+
+void attach_entity(Entity* overlay, Entity* attachee)
+{
+    using AttachEntity = void (*)(Entity*, Entity*);
+    static AttachEntity attach_entity = []()
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x48\x8b\xd0\x48\x8b\xcd\x48\x8b\xd8"s, memory.after_bundle);
+        off = find_inst(memory.exe(), "\xe8"s, off);
+        return (AttachEntity)memory.at_exe(decode_call(off));
+    }();
+    attach_entity(overlay, attachee);
+}
+
+void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
+{
+    if (Entity* overlay = get_entity_ptr(overlay_uid))
+    {
+        if (Entity* attachee = get_entity_ptr(attachee_uid))
+        {
+            attach_entity(overlay, attachee);
+        }
+    }
+}
+
+int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
+{
+    if (Entity* entity = get_entity_ptr(uid))
+    {
+        static const auto ball_entity_type = to_id("ENT_TYPE_ITEM_PUNISHBALL");
+        static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
+
+        auto [x, y, l] = get_position(uid);
+
+        auto* layer_ptr = State::get().layer(l);
+
+        Entity* ball = layer_ptr->spawn_entity(ball_entity_type, x + off_x, y + off_y, false, 0.0f, 0.0f, false);
+
+        // This should use proper types, but I am lazy, info stolen from zapp's tool
+        *(uint32_t*)((size_t)ball + sizeof(Movable)) = uid;
+
+        const uint8_t chain_length = 15;
+        for (uint8_t i = 0; i < chain_length; i++)
+        {
+            Entity* chain = layer_ptr->spawn_entity(chain_entity_type, x, y, false, 0.0f, 0.0f, false);
+            chain->animation_frame -= (i % 2);
+
+            // This too should use proper types
+            *(uint32_t*)((size_t)chain + sizeof(Movable)) = ball->uid;
+            *(float*)((size_t)chain + sizeof(Movable) + 4) = (float)i / chain_length;
+            *(uint8_t*)((size_t)chain + sizeof(Movable) + 8) = i;
+            *(uint8_t*)((size_t)chain + sizeof(Movable) + 12) = (chain_length - i) * 2;
+        }
+
+        return ball->uid;
+    }
+    return -1;
+}
+
+void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
+{
+    using StackEntities = void (*)(Entity*, Entity*, float(&)[2]);
+    static StackEntities stack_entities = []()
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x49\x8b\xc9\xf3\x0f\x11\x5c\x24\x34"s, memory.after_bundle);
+        off = find_inst(memory.exe(), "\xe8"s, off);
+        return (StackEntities)memory.at_exe(decode_call(off));
+    }();
+
+    if (Entity* bottom = get_entity_ptr(bottom_uid))
+    {
+        if (Entity* top = get_entity_ptr(top_uid))
+        {
+            stack_entities(bottom, top, offset);
+        }
     }
 }
 
@@ -85,7 +163,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     if (player == nullptr)
         return -1;
     std::vector<std::tuple<int, float, Entity*>> found;
-    for (auto& item : state.layer(player->layer())->items())
+    for (auto& item : state.layer(player->layer)->items())
     {
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
@@ -111,6 +189,31 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
         DEBUG("{}", (void*)entity);
         return std::get<0>(picked);
     }
+    return -1;
+}
+
+int32_t get_grid_entity_at(float x, float y, int layer)
+{
+    auto state = State::get();
+    if (layer == 0 || layer == 1)
+    {
+        if (Entity* ent = state.layer(layer)->get_grid_entity_at(x, y))
+        {
+            return ent->uid;
+        }
+    }
+    else if (layer < 0)
+    {
+        auto player = state.items()->player(abs(layer) - 1);
+        if (player != nullptr)
+        {
+            if (Entity* ent = state.layer(player->layer)->get_grid_entity_at(x, y))
+            {
+                return ent->uid;
+            }
+        }
+    }
+
     return -1;
 }
 
@@ -292,7 +395,7 @@ std::vector<uint32_t> get_entities_by_layer(int layer)
     if (!player)
         return {};
     if (layer == -1)
-        layer = player->layer();
+        layer = player->layer;
     std::vector<uint32_t> found;
     for (auto& item : state.layer(layer)->items())
     {
@@ -407,7 +510,7 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int l
     if (!player)
         return {};
     if (layer == -1)
-        layer = player->layer();
+        layer = player->layer;
     if (layer >= 0 && state.layer(layer))
     {
         for (auto& item : state.layer(layer)->items())
@@ -463,8 +566,13 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
 {
     auto state = State::get();
+    return get_entities_overlapping_by_pointer(entity_type, mask, sx, sy, sx2, sy2, state.layer(layer));
+}
+
+std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
+{
     std::vector<uint32_t> found;
-    for (auto& item : state.layer(layer)->items())
+    for (auto& item : layer->items())
     {
         if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && item->overlaps_with(sx, sy, sx2, sy2))
         {

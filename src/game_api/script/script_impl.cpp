@@ -368,7 +368,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
             lua["options"][name] = 1;
         });
     /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
-    // lua["register_option_combo"] = [this](std::string name, std::string desc, std::string long_desc, sol::function on_click)
+    // lua["register_option_button"] = [this](std::string name, std::string desc, std::string long_desc, sol::function on_click)
     lua["register_option_button"] = sol::overload(
         [this](std::string name, std::string desc, std::string long_desc, sol::function callback)
         {
@@ -484,6 +484,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_entity"] = get_entity_ptr;
     /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
     lua["get_type"] = get_type;
+    /// Gets a grid entity, such as floor or spikes, at the given position and layer.
+    lua["get_grid_entity_at"] = get_grid_entity_at;
     /// Get uids of all entities currently loaded
     lua["get_entities"] = get_entities;
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
@@ -524,6 +526,9 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_entities_at"] = get_entities_at;
     /// Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_overlapping"] = get_entities_overlapping;
+    /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
+    /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
+    lua["attach_entity"] = attach_entity_by_uid;
     /// Get the `flags` field from entity by uid
     lua["get_entity_flags"] = get_entity_flags;
     /// Set the `flags` field from entity by uid
@@ -555,6 +560,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_render_position"] = get_render_position;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
+    /// Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
+    lua["attach_ball_and_chain"] = attach_ball_and_chain;
     /// Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
     /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
@@ -796,79 +803,83 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua.create_named_table(
         "ON",
         "LOGO",
-        0,
+        ON::LOGO,
         "INTRO",
-        1,
+        ON::INTRO,
         "PROLOGUE",
-        2,
+        ON::PROLOGUE,
         "TITLE",
-        3,
+        ON::TITLE,
         "MENU",
-        4,
+        ON::MENU,
         "OPTIONS",
-        5,
+        ON::OPTIONS,
         "LEADERBOARD",
-        7,
+        ON::LEADERBOARD,
         "SEED_INPUT",
-        8,
+        ON::SEED_INPUT,
         "CHARACTER_SELECT",
-        9,
+        ON::CHARACTER_SELECT,
         "TEAM_SELECT",
-        10,
+        ON::TEAM_SELECT,
         "CAMP",
-        11,
+        ON::CAMP,
         "LEVEL",
-        12,
+        ON::LEVEL,
         "TRANSITION",
-        13,
+        ON::TRANSITION,
         "DEATH",
-        14,
+        ON::DEATH,
         "SPACESHIP",
-        15,
+        ON::SPACESHIP,
         "WIN",
-        16,
+        ON::WIN,
         "CREDITS",
-        17,
+        ON::CREDITS,
         "SCORES",
-        18,
+        ON::SCORES,
         "CONSTELLATION",
-        19,
+        ON::CONSTELLATION,
         "RECAP",
-        20,
+        ON::RECAP,
         "ARENA_MENU",
-        21,
+        ON::ARENA_MENU,
         "ARENA_INTRO",
-        25,
+        ON::ARENA_INTRO,
         "ARENA_MATCH",
-        26,
+        ON::ARENA_MATCH,
         "ARENA_SCORE",
-        27,
+        ON::ARENA_SCORE,
         "ONLINE_LOADING",
-        28,
+        ON::ONLINE_LOADING,
         "ONLINE_LOBBY",
-        29,
+        ON::ONLINE_LOBBY,
         "GUIFRAME",
-        100,
+        ON::GUIFRAME,
         "FRAME",
-        101,
+        ON::FRAME,
         "GAMEFRAME",
-        108,
+        ON::GAMEFRAME,
         "SCREEN",
-        102,
+        ON::SCREEN,
         "START",
-        103,
+        ON::START,
         "LOADING",
-        104,
+        ON::LOADING,
         "RESET",
-        105,
+        ON::RESET,
         "SAVE",
-        106,
+        ON::SAVE,
         "LOAD",
-        107,
+        ON::LOAD,
+        "POST_ROOM_GENERATION",
+        ON::POST_ROOM_GENERATION,
+        "POST_LEVEL_GENERATION",
+        ON::POST_LEVEL_GENERATION,
         "SCRIPT_ENABLE",
-        109,
+        ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
-        110);
+        ON::SCRIPT_DISABLE);
     /* ON
     // GUIFRAME
     // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
@@ -882,6 +893,11 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     // Runs on the first ON.SCREEN of a run
     // RESET
     // Runs when resetting a run
+    // POST_ROOM_GENERATION
+    // Params: `PostRoomGenerationContext room_gen_ctx`
+    // Runs right after all rooms are generated before entities are spawned
+    // POST_LEVEL_GENERATION
+    // Runs right level generation is done, before any entities are updated
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -890,10 +906,14 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     // Runs as soon as your script is loaded, including reloads, then never again
     */
 
-    lua.create_named_table("SPAWN_TYPE", "LEVEL_GEN", SPAWN_TYPE_LEVEL_GEN, "SCRIPT", SPAWN_TYPE_SCRIPT, "SYSTEMIC", SPAWN_TYPE_SYSTEMIC, "ANY", SPAWN_TYPE_ANY);
+    lua.create_named_table("SPAWN_TYPE", "LEVEL_GEN", SPAWN_TYPE_LEVEL_GEN, "LEVEL_GEN_TILE_CODE", SPAWN_TYPE_LEVEL_GEN_TILE_CODE, "LEVEL_GEN_PROCEDURAL", SPAWN_TYPE_LEVEL_GEN_PROCEDURAL, "SCRIPT", SPAWN_TYPE_SCRIPT, "SYSTEMIC", SPAWN_TYPE_SYSTEMIC, "ANY", SPAWN_TYPE_ANY);
     /* SPAWN_TYPE
     // LEVEL_GEN
     // For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
+    // LEVEL_GEN_TILE_CODE
+    // Similar to LEVEL_GEN but only triggers on tile code spawns.
+    // LEVEL_GEN_PROCEDURAL
+    // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
     // SCRIPT
     // Runs for any spawn happening through a call from the Lua API, also during level generation.
     // SYSTEMIC
@@ -920,6 +940,11 @@ void ScriptImpl::clear()
         sound_manager->clear_callback(id);
     }
     vanilla_sound_callbacks.clear();
+    for (auto id : chance_callbacks)
+    {
+        g_state->level_gen->data->unregister_chance_logic_provider(id);
+    }
+    chance_callbacks.clear();
     for (auto& [ent_uid, id] : entity_hooks)
     {
         if (Entity* ent = get_entity_ptr(ent_uid))
@@ -1444,6 +1469,40 @@ void ScriptImpl::post_level_gen_spawn(std::string_view tile_code, float x, float
     }
 }
 
+void ScriptImpl::post_room_generation()
+{
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == ON::POST_ROOM_GENERATION)
+        {
+            handle_function(callback.func, PostRoomGenerationContext{});
+            callback.lastRan = now;
+        }
+    }
+}
+
+void ScriptImpl::post_level_generation()
+{
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    g_players = get_players();
+    lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == ON::POST_LEVEL_GENERATION)
+        {
+            handle_function(callback.func);
+            callback.lastRan = now;
+        }
+    }
+}
+
 Entity* ScriptImpl::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
 {
     if (!enabled)
@@ -1556,5 +1615,9 @@ std::string ScriptImpl::dump_api()
     std::string api;
     for (auto& [key, value] : sorted_output)
         api += fmt::format("{} = {}\n", key, value);
+
+    const static std::regex reg(R"("function:\s[0-9A-F]+")");
+    api = std::regex_replace(api, reg, R"("function:")");
+
     return api;
 }

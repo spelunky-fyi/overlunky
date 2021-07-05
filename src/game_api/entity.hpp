@@ -174,7 +174,7 @@ class Entity
     Texture* texture;
     float tilew;
     float tileh;
-    uint8_t camera_layer;
+    uint8_t layer;
     uint8_t b99;
     uint8_t b9a;
     uint8_t b9b;
@@ -237,10 +237,6 @@ class Entity
         return overlaps_with(other_left, other_bottom, other_right, other_top);
     }
 
-    uint8_t layer()
-    {
-        return read_u8(pointer() + 0x98);
-    }
     std::pair<float, float> position_self() const;
     std::pair<float, float> position_render() const;
     void remove_item(uint32_t id);
