@@ -11,6 +11,7 @@ api_files = [
         '../src/game_api/script/usertypes/save_context.cpp',
         '../src/game_api/script/usertypes/state_lua.cpp',
         '../src/game_api/script/usertypes/entity_lua.cpp',
+        '../src/game_api/script/usertypes/entities_floors_lua.cpp',
         '../src/game_api/script/usertypes/entities_mounts_lua.cpp',
         '../src/game_api/script/usertypes/entities_monsters_lua.cpp',
         '../src/game_api/script/usertypes/entities_items_lua.cpp',

@@ -5,7 +5,8 @@ import urllib.request
 # Parse all Entity::as_xxx functions so we know which ones are currently defined
 entities_files = ["entities_items_lua.cpp",
                   "entities_monsters_lua.cpp", 
-                  "entities_mounts_lua.cpp"]
+                  "entities_mounts_lua.cpp",
+                  "entities_floors_lua.cpp"]
 as_re = re.compile(r'lua\["Entity"\]\["(as_.*)"\]')
 
 # a couple as_xxx functions are predefined, they are either 'global' or haven't been moved into their proper separate file yet
@@ -33,6 +34,9 @@ def is_movable(type):
     if type not in entity_class_hierarchy:
         return False
 
+    if type == "Movable":
+        return True
+
     parent_type = entity_class_hierarchy[type]
     if parent_type == "Movable":
         return True
@@ -40,12 +44,26 @@ def is_movable(type):
         return False
     return is_movable(parent_type)
 
+def linked_type_hierarchy(type, arr):
+    arr.append("[" + type + "](script-api.md#" + type + ")")
+    if type in entity_class_hierarchy:
+        parent_type = entity_class_hierarchy[type]
+        linked_type_hierarchy(parent_type, arr)
+
+# Prepare the doc entry for Movable
+movable_hierarchy = []
+linked_type_hierarchy("Movable", movable_hierarchy)
+movable_hierarchy.reverse()
+movable_hierarchy = " > ".join(movable_hierarchy)
+
 # Process all entities
 mapping = {}
+hierarchy_doc_entries = []
 with open("../../../../docs/game_data/entities.json") as fp:
     j = json.load(fp)
     for entityname, entitydetails in j.items():
         short_entityname = entityname.replace("ENT_TYPE_", "")
+        doc_entry = "- " + f'{entitydetails["id"]:03}' + " " + short_entityname + " = "
 
         # match the entity name against all the regexes in default_entity_types
         regex_match_found = False
@@ -60,17 +78,35 @@ with open("../../../../docs/game_data/entities.json") as fp:
                 if as_function not in known_casts:
                     if is_movable(entityclass):
                         mapping[entitydetails["id"]] = movable_table_def
+                        doc_entry = doc_entry + "[Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) - NOT IMPLEMENTED YET, FORCED TO MOVABLE"
                     else:
                         mapping[entitydetails["id"]] = "// " + table_def + " (NOT IMPLEMENTED YET)"
+                        doc_entry = doc_entry + "[Entity](script-api.md#Entity) - NOT IMPLEMENTED YET"
                 else:
                     mapping[entitydetails["id"]] = table_def
+                    hierarchy = []
+                    linked_type_hierarchy(entityclass, hierarchy)
+                    hierarchy.reverse()
+                    doc_entry = doc_entry + " > ".join(hierarchy)
 
                 break
         if not regex_match_found:
             mapping[entitydetails["id"]] = '// lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["?"]; // '  + short_entityname + ' (UNKNOWN IN PLUGIN)'
+            doc_entry = doc_entry + "[Entity](script-api.md#Entity) - UNKNOWN IN PLUGIN"
+        
+        hierarchy_doc_entries.append(doc_entry)
 
             
 
 sorted_mapping = {k: mapping[k] for k in sorted(mapping)}
 for k in sorted_mapping:
     print(sorted_mapping[k])
+
+
+# Write the hierarchy documentation
+hierarchy_doc_entries.sort()
+with open("../../../../docs/entities-hierarchy.md", 'w') as doc_file:
+    doc_file.write("# Entity hierarchy list\n")
+    doc_file.write("The list below shows the type hierarchy for each entity in the game. This makes it easy to figure out which variables and functions are available for a specific entity.\n")
+    for entry in hierarchy_doc_entries:
+        doc_file.write(entry + "\n")

@@ -961,6 +961,12 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
+### `Floor`
+Derived from [`Entity`](#entity)
+- [`deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
+- [`deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
+- [`deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
+- [`deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
 ### `Mount`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
@@ -1667,6 +1673,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_firebugunchained
 - as_firefrog
 - as_fish
+- as_floor
 - as_forestsister
 - as_frog
 - as_ghist
@@ -1689,7 +1696,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_jetpack
 - as_jiangshi
 - as_jumpdog
-- as_kapala_powerup
+- as_kapalapowerup
 - as_kingu
 - as_lahamu
 - as_lamassu
@@ -1734,7 +1741,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_vampire
 - as_vanhorsing
 - as_vlad
-- as_vlads_cape
+- as_vladscape
 - as_waddler
 - as_witchdoctor
 - as_witchdoctorskull

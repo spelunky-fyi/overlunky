@@ -17,8 +17,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_jetpack"] = &Entity::as<Jetpack>;
     lua["Entity"]["as_hoverpack"] = &Entity::as<Hoverpack>;
     lua["Entity"]["as_cape"] = &Entity::as<Cape>;
-    lua["Entity"]["as_vlads_cape"] = &Entity::as<VladsCape>;
-    lua["Entity"]["as_kapala_powerup"] = &Entity::as<KapalaPowerup>;
+    lua["Entity"]["as_vladscape"] = &Entity::as<VladsCape>;
+    lua["Entity"]["as_kapalapowerup"] = &Entity::as<KapalaPowerup>;
     lua["Entity"]["as_mattock"] = &Entity::as<Mattock>;
     lua["Entity"]["as_gun"] = &Entity::as<Gun>;
 
