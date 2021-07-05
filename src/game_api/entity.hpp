@@ -12,7 +12,7 @@
 struct RenderInfo;
 struct Texture;
 
-enum RepeatType : uint8_t
+enum REPEAT_TYPE : uint8_t
 {
     NoRepeat,
     Linear,
@@ -25,7 +25,7 @@ struct Animation
     int32_t count;
     int32_t interval;
     uint8_t key;
-    RepeatType repeat;
+    REPEAT_TYPE repeat;
 };
 
 struct Rect

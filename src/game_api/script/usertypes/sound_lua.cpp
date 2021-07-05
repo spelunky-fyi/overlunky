@@ -64,7 +64,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     auto play = sol::overload(
         static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
-        static_cast<PlayingSound (CustomSound::*)(bool, SoundType)>(&CustomSound::play));
+        static_cast<PlayingSound (CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
     /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
     /// It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
     lua.new_usertype<CustomSound>("CustomSound", "play", play, "get_parameters", &CustomSound::get_parameters);

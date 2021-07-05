@@ -18,18 +18,20 @@ class PlayingSound;
 using SoundCallbackFunction = std::function<void()>;
 using EventCallbackFunction = std::function<void(PlayingSound)>;
 
-enum class LoopMode
+enum class SOUND_LOOP_MODE
 {
     Off,
     Loop,
     Bidirectional
 };
 
-enum class SoundType
+enum class SOUND_TYPE
 {
     Sfx,
     Music
 };
+
+using VANILLA_SOUND_PARAM = std::uint32_t;
 
 class CustomSound
 {
@@ -49,9 +51,9 @@ class CustomSound
 
     PlayingSound play();
     PlayingSound play(bool paused);
-    PlayingSound play(bool paused, SoundType sound_type);
+    PlayingSound play(bool paused, SOUND_TYPE sound_type);
 
-    std::unordered_map<std::uint32_t, const char*> get_parameters();
+    std::unordered_map<VANILLA_SOUND_PARAM, const char*> get_parameters();
 
   private:
     CustomSound(std::nullptr_t, std::nullptr_t)
@@ -85,12 +87,12 @@ class PlayingSound
     bool set_pitch(float pitch);
     bool set_pan(float pan);
     bool set_volume(float volume);
-    bool set_looping(LoopMode loop_mode);
+    bool set_looping(SOUND_LOOP_MODE loop_mode);
     bool set_callback(SoundCallbackFunction callback);
 
-    std::unordered_map<std::uint32_t, const char*> get_parameters();
-    std::optional<float> get_parameter(std::uint32_t parameter_index);
-    bool set_parameter(std::uint32_t parameter_index, float value);
+    std::unordered_map<VANILLA_SOUND_PARAM, const char*> get_parameters();
+    std::optional<float> get_parameter(VANILLA_SOUND_PARAM parameter_index);
+    bool set_parameter(VANILLA_SOUND_PARAM parameter_index, float value);
 
   private:
     PlayingSound(std::nullptr_t, std::nullptr_t)
@@ -131,7 +133,7 @@ class SoundManager
     bool set_pitch(PlayingSound playing_sound, float pitch);
     bool set_pan(PlayingSound playing_sound, float pan);
     bool set_volume(PlayingSound playing_sound, float volume);
-    bool set_looping(PlayingSound playing_sound, LoopMode loop_mode);
+    bool set_looping(PlayingSound playing_sound, SOUND_LOOP_MODE loop_mode);
     bool set_callback(PlayingSound playing_sound, SoundCallbackFunction callback);
 
     std::uint32_t set_callback(std::string_view event_name, EventCallbackFunction callback, FMODStudio::EventCallbackType types);

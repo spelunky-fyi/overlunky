@@ -1858,6 +1858,11 @@ Quillback = {
   __name = "sol.Quillback.user",
   __newindex = "function:"
 }
+REPEAT_TYPE = {
+  BACK_AND_FORTH = 2,
+  LINEAR = 1,
+  NO_REPEAT = 0
+}
 ROOM_TEMPLATE = {
   ABZU_BACKDOOR = 131,
   ALTAR = 114,
@@ -3388,6 +3393,7 @@ kill_entity = function(...) end
 layer_door = function(...) end
 load_script = function(...) end
 lock_door_at = function(...) end
+lua_print = print
 message = function(...) end
 messpect = function(...) end
 modify_sparktraps = function(...) end
