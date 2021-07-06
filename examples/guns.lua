@@ -9,17 +9,23 @@ set_callback(function()
 
         -- are we holding something
         if player.holding_uid > -1 then
-            gun = get_entity(player.holding_uid):as_gun()
+            gun = get_entity(player.holding_uid)
 
             -- check if it's actually a gun
             if gun.type.id == ENT_TYPE.ITEM_SHOTGUN or gun.type.id == ENT_TYPE.ITEM_WEBGUN or gun.type.id ==
                 ENT_TYPE.ITEM_CLONEGUN or gun.type.id == ENT_TYPE.ITEM_PLASMACANNON then
 
+                --format string
+                text_display = F"Player:{i}, Gun cooldown:{gun.cooldown}, shots:{gun.shots}, shots2:{gun.shots2}"
+                    
+                --if webgun, add the extra info
+                if gun.type.id == ENT_TYPE.ITEM_WEBGUN then
+                    text_display = F"{text_display}, chamber:{gun.in_chamber}"
+                end
+                text_display = F"{text_display}, frame:{gun.animation_frame}"
+                    
                 -- print the gun variables on screen
-                draw_text(-0.67, 0.87, 24,
-                    "Gun cooldown:" .. tostring(gun.cooldown) .. ", shots:" .. tostring(gun.shots) .. ", shots2:" ..
-                        tostring(gun.shots2) .. ", chamber:" .. tostring(gun.in_chamber) .. " frame:" ..
-                        tostring(gun.animation_frame), rgba(255, 0, 255, 255))
+                draw_text(-0.67, (9 - i) / 10.0, 24, text_display, rgba(255, 0, 255, 255))
 
                 -- make all guns super fast and infinite
                 if gun.cooldown > 30 then
