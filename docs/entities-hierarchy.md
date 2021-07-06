@@ -551,7 +551,7 @@ The list below shows the type hierarchy for each entity in the game. This makes 
 - 571 ITEM_PURCHASABLE_HOVERPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
 - 572 ITEM_POWERPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Backpack](script-api.md#Backpack)
 - 573 ITEM_PURCHASABLE_POWERPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
-- 574 ITEM_WEBGUN = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) - NOT IMPLEMENTED YET, FORCED TO MOVABLE
+- 574 ITEM_WEBGUN = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Gun](script-api.md#Gun) > [WebGun](script-api.md#WebGun)
 - 575 ITEM_SHOTGUN = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Gun](script-api.md#Gun)
 - 576 ITEM_FREEZERAY = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Gun](script-api.md#Gun)
 - 577 ITEM_CROSSBOW = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)

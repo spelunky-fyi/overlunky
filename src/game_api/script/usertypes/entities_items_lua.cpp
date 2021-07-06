@@ -21,6 +21,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_kapalapowerup"] = &Entity::as<KapalaPowerup>;
     lua["Entity"]["as_mattock"] = &Entity::as<Mattock>;
     lua["Entity"]["as_gun"] = &Entity::as<Gun>;
+    lua["Entity"]["as_webgun"] = &Entity::as<WebGun>;
 
     lua.new_usertype<Container>(
         "Container",
@@ -84,9 +85,14 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Gun::shots,
         "shots2",
         &Gun::shots2,
-        "in_chamber",
-        &Gun::in_chamber,
         sol::base_classes,
         sol::bases<Entity, Movable>());
+
+    lua.new_usertype<WebGun>(
+        "WebGun",
+        "in_chamber",
+        &WebGun::in_chamber,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Gun>());
 }
 } // namespace NEntitiesItems

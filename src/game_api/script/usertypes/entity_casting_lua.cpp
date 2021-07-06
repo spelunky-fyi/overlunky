@@ -561,7 +561,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][571] = lua["Entity"]["as_movable"];           // ITEM_PURCHASABLE_HOVERPACK
     lua["TYPE_MAP"][572] = lua["Entity"]["as_backpack"];          // ITEM_POWERPACK
     lua["TYPE_MAP"][573] = lua["Entity"]["as_movable"];           // ITEM_PURCHASABLE_POWERPACK
-    lua["TYPE_MAP"][574] = lua["Entity"]["as_movable"];           // ITEM_WEBGUN (NOT IMPLEMENTED YET, FORCED TO MOVABLE)
+    lua["TYPE_MAP"][574] = lua["Entity"]["as_webgun"];            // ITEM_WEBGUN
     lua["TYPE_MAP"][575] = lua["Entity"]["as_gun"];               // ITEM_SHOTGUN
     lua["TYPE_MAP"][576] = lua["Entity"]["as_gun"];               // ITEM_FREEZERAY
     lua["TYPE_MAP"][577] = lua["Entity"]["as_movable"];           // ITEM_CROSSBOW

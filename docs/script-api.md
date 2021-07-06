@@ -1510,7 +1510,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooldown) &Gun::cooldown
 - [`shots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots) &Gun::shots
 - [`shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
-- [`in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
+### `WebGun`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Gun`](#gun)
+- [`in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &WebGun::in_chamber
 ### `ParticleDB`
 - [`id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
@@ -1749,6 +1751,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_vlad
 - as_vladscape
 - as_waddler
+- as_webgun
 - as_witchdoctor
 - as_witchdoctorskull
 - as_yama
