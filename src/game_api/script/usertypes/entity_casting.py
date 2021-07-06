@@ -50,12 +50,6 @@ def linked_type_hierarchy(type, arr):
         parent_type = entity_class_hierarchy[type]
         linked_type_hierarchy(parent_type, arr)
 
-# Prepare the doc entry for Movable
-movable_hierarchy = []
-linked_type_hierarchy("Movable", movable_hierarchy)
-movable_hierarchy.reverse()
-movable_hierarchy = " > ".join(movable_hierarchy)
-
 # Process all entities
 mapping = {}
 hierarchy_doc_entries = []
