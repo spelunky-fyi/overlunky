@@ -97,10 +97,7 @@ struct RenderInfo
     uint32_t unknown35; // changes when climbing
     uint32_t unknown36; // changes when climbing
     uint32_t unknown37; // changes when climbing
-    uint8_t animation_frame;
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
+    uint32_t animation_frame;
     uint32_t unknown38;
     Texture* texture;
     const char** texture_name;
