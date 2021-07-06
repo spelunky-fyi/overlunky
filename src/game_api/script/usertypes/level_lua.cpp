@@ -7,6 +7,11 @@
 
 #include <sol/sol.hpp>
 
+void PostRoomGenerationContext::set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
+{
+    State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
+}
+
 namespace NLevel
 {
 void register_usertypes(sol::state& lua, ScriptImpl* script)
@@ -33,6 +38,54 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     {
         script->g_state->level_gen->data->define_tile_code(std::move(tile_code));
     };
+
+    /// Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+    /// The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+    /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
+    /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+    /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+    lua["define_procedural_spawn"] = [script](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid)
+    {
+        LevelGenData* data = script->g_state->level_gen->data;
+        uint32_t chance = data->define_chance(std::move(procedural_spawn));
+        std::function<bool(float, float, int)> is_valid_call{nullptr};
+        if (is_valid)
+        {
+            is_valid_call = [script, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            {
+                std::lock_guard lock{script->gil};
+                return script->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
+            };
+        }
+        std::function<void(float, float, int)> do_spawn_call = [script, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        {
+            std::lock_guard lock{script->gil};
+            return script->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
+        };
+        std::uint32_t id = data->register_chance_logic_provider(chance, ChanceLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
+        script->chance_callbacks.push_back(id);
+    };
+
+    /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
+    lua["get_room_index"] = [](float x, float y) -> std::pair<int, int> {
+        return State::get().ptr_local()->level_gen->get_room_index(x, y);
+    };
+    /// Get the room template given a certain index
+    lua["get_room_template"] = [](int x, int y, int l) -> std::optional<uint16_t> {
+        return State::get().ptr_local()->level_gen->get_room_template(x, y, l);
+    };
+    /// For debugging only, get the name of a room template
+    lua["get_room_template_name"] = [](int16_t room_template) -> std::string_view
+    {
+        return State::get().ptr_local()->level_gen->get_room_template_name(room_template);
+    };
+
+    // Context received in ON.POST_ROOM_GENERATION
+    // Used to change the room templates in the level
+    lua.new_usertype<PostRoomGenerationContext>("PostRoomGenerationContext", sol::no_constructor, "set_room_template", &PostRoomGenerationContext::set_room_template);
+    /* PostRoomGenerationContext
+        nil set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
+    */
 
     lua.new_usertype<QuestsInfo>(
         "QuestsInfo",
@@ -157,5 +210,20 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     /// Beg quest states
     lua.create_named_table("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
+
+    lua.create_named_table("ROOM_TEMPLATE"
+                           //, "SIDE", 0
+                           //, "", ...check__room_templates.txt__output__by__Overlunky...
+    );
+    lua.create_named_table("ROOM_TEMPLATE");
+    for (const auto& [room_name, room_template] : State::get().ptr()->level_gen->data->room_templates())
+    {
+        std::string clean_room_name = room_name;
+        std::transform(
+            clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
+            { return std::toupper(c); });
+        std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
+        lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template.id;
+    };
 }
 }; // namespace NLevel

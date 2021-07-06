@@ -43,7 +43,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         auto safe_cb = [&, cb = std::move(cb)](PlayingSound sound)
         {
             std::lock_guard gil_guard{script->gil};
-            script->handle_function(cb, sound);
+            if (script->enabled)
+                script->handle_function(cb, sound);
         };
         std::uint32_t id = script->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
         script->vanilla_sound_callbacks.push_back(id);
@@ -63,7 +64,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     auto play = sol::overload(
         static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
         static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
-        static_cast<PlayingSound (CustomSound::*)(bool, SoundType)>(&CustomSound::play));
+        static_cast<PlayingSound (CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
     /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
     /// It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
     lua.new_usertype<CustomSound>("CustomSound", "play", play, "get_parameters", &CustomSound::get_parameters);
@@ -76,7 +77,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         auto safe_cb = [&, callback = std::move(callback)]()
         {
             std::lock_guard gil_guard{script->gil};
-            script->handle_function(callback);
+            if (script->enabled)
+                script->handle_function(callback);
         };
         sound->set_callback(std::move(safe_cb));
     };

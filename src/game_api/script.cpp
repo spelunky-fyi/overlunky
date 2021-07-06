@@ -11,7 +11,7 @@ SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManage
 }
 SpelunkyScript::~SpelunkyScript()
 {
-    g_all_scripts.erase(std::find(g_all_scripts.begin(), g_all_scripts.end(), this));
+    std::erase(g_all_scripts, this);
 }
 
 std::deque<ScriptMessage>& SpelunkyScript::get_messages()
@@ -125,6 +125,15 @@ bool SpelunkyScript::pre_level_gen_spawn(std::string_view tile_code, float x, fl
 void SpelunkyScript::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
 {
     m_Impl->post_level_gen_spawn(tile_code, x, y, layer);
+}
+
+void SpelunkyScript::post_room_generation()
+{
+    m_Impl->post_room_generation();
+}
+void SpelunkyScript::post_level_generation()
+{
+    m_Impl->post_level_generation();
 }
 
 Entity* SpelunkyScript::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)

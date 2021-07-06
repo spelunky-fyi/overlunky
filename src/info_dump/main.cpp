@@ -9,11 +9,13 @@
 #include <nlohmann/json.hpp>
 
 #include "entity.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "memory.h"
 #include "particles.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
+#include "state.hpp"
 #include "texture.hpp"
 
 using float_json = nlohmann::basic_json<std::map, std::vector, std::string, bool, std::int64_t, std::uint64_t, float>;
@@ -129,6 +131,28 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             EntityDB* db = get_type(ent.id);
             if (!db)
                 break;
+
+#define HAX_FIX_FLOAT(x)                           \
+    if (std::abs(x) < 1e-20 || std::abs(x) > 1e10) \
+    x = 0.0f
+            HAX_FIX_FLOAT(db->width);
+            HAX_FIX_FLOAT(db->height);
+            HAX_FIX_FLOAT(db->friction);
+            HAX_FIX_FLOAT(db->elasticity);
+            HAX_FIX_FLOAT(db->weight);
+            HAX_FIX_FLOAT(db->acceleration);
+            HAX_FIX_FLOAT(db->max_speed);
+            HAX_FIX_FLOAT(db->sprint_factor);
+            HAX_FIX_FLOAT(db->jump);
+            HAX_FIX_FLOAT(db->glow_red);
+            HAX_FIX_FLOAT(db->glow_green);
+            HAX_FIX_FLOAT(db->glow_blue);
+            HAX_FIX_FLOAT(db->glow_alpha);
+            HAX_FIX_FLOAT(db->field_a8);
+            HAX_FIX_FLOAT(db->attachOffsetX);
+            HAX_FIX_FLOAT(db->attachOffsetY);
+#undef HAX_FIX_FLOAT
+
             entities[ent.name] = *db;
         }
 
@@ -144,6 +168,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             EntityDB* db = get_type(ent.id);
             if (!db)
                 break;
+
             entities[ent.name] = float_json{
                 {"id", ent.id},
                 {"texture", db->texture},
@@ -273,6 +298,41 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             &sound_mgr,
             true);
         file << api_gen_script.dump_api() << std::endl;
+    }
+
+    if (auto file = std::ofstream("game_data/tile_codes.txt"))
+    {
+        auto tile_codes = State::get().ptr()->level_gen->data->tile_codes();
+        for (const auto& tile_code : tile_codes)
+        {
+            file << tile_code.second.id << ": " << tile_code.first << "\n";
+        }
+    }
+
+    if (auto file = std::ofstream("game_data/spawn_chances.txt"))
+    {
+        auto chances = State::get().ptr()->level_gen->data->chances();
+        for (const auto& chance : chances)
+        {
+            file << chance.second.id << ": " << chance.first << "\n";
+        }
+    }
+
+    if (auto file = std::ofstream("game_data/room_templates.txt"))
+    {
+        auto templates = State::get().ptr()->level_gen->data->room_templates();
+        std::multimap<std::uint16_t, std::string> ordered_templates;
+        for (const auto& room_template : templates)
+        {
+            std::string clean_room_name = room_template.first;
+            std::transform(
+                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
+                { return std::toupper(c); });
+            std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
+            ordered_templates.insert({room_template.second.id, std::move(clean_room_name)});
+        }
+        for (const auto& [id, name] : ordered_templates)
+            file << name << ": " << id << "\n";
     }
 
     std::exit(0);

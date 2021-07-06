@@ -169,6 +169,7 @@ struct StateMemory
     uint32_t special_visibility_flags;
     Camera* camera;
 };
+
 struct State
 {
     size_t location;
@@ -182,11 +183,18 @@ struct State
 
     static State& get();
 
+    // Returns the main-thread version of StateMemory*
     StateMemory* ptr() const;
+    // Returns the local-thread version of StateMemory*
+    StateMemory* ptr_local() const;
 
     Layer* layer(uint8_t index)
     {
         return ptr()->layers[index];
+    }
+    Layer* layer_local(uint8_t index)
+    {
+        return ptr_local()->layers[index];
     }
 
     Items* items()

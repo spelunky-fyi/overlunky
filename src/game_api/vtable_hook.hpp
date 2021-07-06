@@ -41,26 +41,27 @@ struct VTableDetour<RetT(ClassT*, ArgsT...)>
 
     static RetT detour(ClassT* self, ArgsT... args)
     {
+        void** vtable = *(void***)self;
         if constexpr (std::is_void_v<RetT>)
         {
             if (s_Functions.contains(self))
             {
-                s_Functions[self](self, args..., s_Original);
+                s_Functions[self](self, args..., s_Originals[vtable]);
                 return;
             }
-            s_Original(self, std::move(args)...);
+            s_Originals[vtable](self, std::move(args)...);
         }
         else
         {
             if (s_Functions.contains(self))
             {
-                return s_Functions[self](self, args..., s_Original);
+                return s_Functions[self](self, args..., s_Originals[vtable]);
             }
-            return s_Original(self, std::move(args)...);
+            return s_Originals[vtable](self, std::move(args)...);
         }
     }
 
-    inline static VFunT* s_Original = nullptr;
+    inline static std::unordered_map<void**, VFunT*> s_Originals{};
     inline static std::unordered_map<ClassT*, DetourFunT> s_Functions{};
 };
 
@@ -84,7 +85,7 @@ void hook_vtable(T* obj, HookFunT&& hook_fun, std::size_t vtable_index, std::siz
     void*** vtable = (void***)obj;
     if (!get_hook_function(vtable, vtable_index))
     {
-        DetourT::s_Original = (VTableFunT*)register_hook_function(vtable, vtable_index, (void*)&DetourT::detour);
+        DetourT::s_Originals[*vtable] = (VTableFunT*)register_hook_function(vtable, vtable_index, (void*)&DetourT::detour);
     }
     DetourT::s_Functions[obj] = hook_fun;
 

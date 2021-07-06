@@ -12,7 +12,7 @@
 struct RenderInfo;
 struct Texture;
 
-enum RepeatType : uint8_t
+enum REPEAT_TYPE : uint8_t
 {
     NoRepeat,
     Linear,
@@ -25,7 +25,7 @@ struct Animation
     int32_t count;
     int32_t interval;
     uint8_t key;
-    RepeatType repeat;
+    REPEAT_TYPE repeat;
 };
 
 struct Rect
@@ -174,7 +174,7 @@ class Entity
     Texture* texture;
     float tilew;
     float tileh;
-    uint8_t camera_layer;
+    uint8_t layer;
     uint8_t b99;
     uint8_t b9a;
     uint8_t b9b;
@@ -237,10 +237,6 @@ class Entity
         return overlaps_with(other_left, other_bottom, other_right, other_top);
     }
 
-    uint8_t layer()
-    {
-        return read_u8(pointer() + 0x98);
-    }
     std::pair<float, float> position_self() const;
     std::pair<float, float> position_render() const;
     void remove_item(uint32_t id);

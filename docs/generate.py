@@ -4,7 +4,25 @@ import re
 import sys
 sys.stdout = open('script-api.md', 'w')
 
-header_files = ['../src/game_api/rpc.hpp', '../src/game_api/spawn_api.hpp', '../src/game_api/script.hpp', '../src/game_api/entity.hpp']
+header_files = [
+        '../src/game_api/rpc.hpp',
+        '../src/game_api/spawn_api.hpp',
+        '../src/game_api/script.hpp',
+        '../src/game_api/entity.hpp',
+        '../src/game_api/movable.hpp',
+        '../src/game_api/state.hpp',
+        '../src/game_api/state_structs.hpp',
+        '../src/game_api/entities_floors.hpp',
+        '../src/game_api/entities_mounts.hpp',
+        '../src/game_api/entities_monsters.hpp',
+        '../src/game_api/entities_items.hpp',
+        '../src/game_api/sound_manager.hpp',
+        '../src/game_api/render_api.hpp',
+        '../src/game_api/particles.hpp',
+        '../src/game_api/savedata.hpp',
+        '../src/game_api/script/usertypes/level_lua.hpp',
+        '../src/game_api/script/usertypes/save_context.hpp',
+    ]
 api_files = [
         '../src/game_api/script/script_impl.cpp',
         '../src/game_api/script/script_impl.hpp',
@@ -23,9 +41,10 @@ api_files = [
         '../src/game_api/script/usertypes/drops_lua.cpp',
         '../src/game_api/script/usertypes/texture_lua.cpp',
         '../src/game_api/script/usertypes/flags_lua.cpp',
-        '../src/game_api/script/usertypes/char_state.cpp'
+        '../src/game_api/script/usertypes/char_state.cpp',
     ]
 rpc = []
+classes = []
 events = []
 funcs = []
 types = []
@@ -44,7 +63,10 @@ replace = {
     'int64_t': 'int',
     'ImU32': 'int',
     'vector': 'array',
+    'unordered_map': 'map',
+    'const char*': 'string',
     'wstring': 'string',
+    'u16string': 'string',
     'pair': 'tuple',
     'std::': '',
     'sol::': '',
@@ -86,22 +108,60 @@ def print_af(lf, af):
 for file in header_files:
     comment = []
     data = open(file, 'r').read().split('\n')
+    skip = 0
     for line in data:
         line = line.replace('*', '')
-        s = re.search(r'{', line)
-        if s:
-            skip = True
-        s = re.search(r'}', line)
-        if s:
-            skip = False
+        skip += line.count('{') - line.count('}')
         c = re.search(r'/// ?(.*)$', line)
         if c:
             comment.append(c.group(1))
         m = re.search(r'\s*(.*)\s+([^\(]*)\(([^\)]*)', line)
         if m:
-            if not skip or file.endswith('script.hpp'): rpc.append({'return': m.group(1), 'name': m.group(2), 'param': m.group(3), 'comment': comment})
+            if skip == 0 or file.endswith('script.hpp'): rpc.append({'return': m.group(1), 'name': m.group(2), 'param': m.group(3), 'comment': comment})
         else:
             comment = []
+
+for file in header_files:
+    if file.endswith('script.hpp'):
+        continue
+    data = open(file, 'r').read().split('\n')
+    brackets_depth = 0
+    class_name = None
+    comment = []
+    member_funs = {}
+    member_vars = []
+    for line in data:
+        line = replace_all(line, replace)
+        line = line.replace('*', '')
+        if not class_name and ('struct' in line or 'class' in line):
+            m = re.match(r'(struct|class)\s+(\S+)', line)
+            if m:
+                class_name = m[2]
+        elif class_name:
+            brackets_depth += line.count('{') - line.count('}')
+            if brackets_depth == 1:
+                m = re.search(r'/// ?(.*)$', line)
+                if m:
+                    comment += m[1]
+
+                m = re.search(r'\s*(.*)\s+([^\(]*)\(([^\)]*)', line)
+                if m:
+                    name = m[2]
+                    if name not in member_funs:
+                        member_funs[name] = []
+                    member_funs[name].append({'return': m[1], 'name': m[2], 'param': m[3], 'comment': comment})
+                    comment = []
+
+                m = re.search(r'\s*(.*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;', line)
+                if m:
+                    member_vars.append({'type': m[1], 'name': m[2], 'comment': comment})
+                    comment = []
+            elif brackets_depth == 0:
+                classes.append({'name': class_name, 'member_funs': member_funs, 'member_vars': member_vars})
+                class_name = None
+                comment = []
+                member_funs = {}
+                member_vars = []
 
 for file in api_files:
     comment = []
@@ -140,10 +200,11 @@ for file in api_files:
     data = open(file, 'r').read()
     data = data.replace('\n', '')
     data = re.sub(r' ', '', data)
-    m = re.findall(r'new_usertype\<.*?\>\s*\(\s*"([^"]*)",(.*?)\);', data)
+    m = re.findall(r'new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",(.*?)\);', data)
     for type in m:
-        name = type[0]
-        attr = type[1]
+        cpp_type = type[0]
+        name = type[1]
+        attr = type[2]
         base = ""
         bm = re.search(r'sol::bases<([^\]]*)>', attr)
         if bm:
@@ -151,27 +212,34 @@ for file in api_files:
         attr = attr.replace('",', ',')
         attr = attr.split('"')
         vars = []
+
+        underlying_cpp_type = next((item for item in classes if item['name'] == cpp_type), dict())
+        if 'member_funs' not in underlying_cpp_type:
+            raise RuntimeError("No member_funs found. Did you forget to include a header file at the top of the generate script?")
+
         for var in attr:
             if not var: continue
             var = var.split(',')
             if 'table_of' in var[1]:
                 var[1] = var[1].replace('table_of(', '')+'[]'
-            vars.append({ 'name': var[0], 'type': var[1] })
+            var_name = var[0]
+            cpp = var[1]
+            cpp_name = cpp[cpp.find('::')+2:] if cpp.find('::') >= 0 else cpp
+            if cpp_name in underlying_cpp_type['member_funs']:
+                for fun in underlying_cpp_type['member_funs'][cpp_name]:
+                    ret = fun['return'] 
+                    param = fun['param'] 
+                    sig = f'{ret} {var_name}({param})'
+                    vars.append({ 'name': var_name, 'type': cpp, 'signature': sig })
+            else:
+                underlying_cpp_var = next((item for item in underlying_cpp_type['member_vars'] if item['name'] == cpp_name), dict())
+                if underlying_cpp_var:
+                    type = underlying_cpp_var['type']
+                    sig = f'{type} {var_name}'
+                    vars.append({ 'name': var_name, 'type': cpp, 'signature': sig })
+                else:
+                    vars.append({ 'name': var_name, 'type': cpp })
         types.append({'name': name, 'vars': vars, 'base': base})
-    data = open(file, 'r').read()
-    data = data.replace('\n', ' ')
-    m = re.findall(r'/\*(.*?)\*/', data)
-    for extended_type_info in m:
-        extended_type_info = extended_type_info.strip()
-        type = extended_type_info[:extended_type_info.find(' ')]
-        type_to_mod = next((item for item in types if item['name'] == type), dict())
-        if type_to_mod:
-            sub_matches = re.findall(r'([^\s]*?)\s*([^\s]*)(\(.*?\))', extended_type_info.strip())
-            for sub_match in sub_matches:
-                var_name = sub_match[1]
-                var_to_mod = next((item for item in type_to_mod['vars'] if item['name'] == var_name), dict())
-                if var_to_mod:
-                    var_to_mod['signature'] = sub_match[0] + ' ' + var_name + sub_match[2]
 
 for file in api_files:
     with open(file) as fp:

@@ -59,6 +59,7 @@ size_t get_location()
         return res = location;
     }
 }
+
 size_t get_damage()
 {
     ONCE(size_t)
@@ -157,7 +158,7 @@ State& State::get()
         auto addr_zoom_shop = get_zoom_shop();
         auto addr_dark = get_dark();
         STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
-        STATE.ptr()->level_gen->data->init();
+        STATE.ptr()->level_gen->init();
         init_spawn_hooks();
         get_is_init() = true;
     }
@@ -167,8 +168,13 @@ State& State::get()
 StateMemory* State::ptr() const
 {
     OnHeapPointer<StateMemory> p(read_u64(location));
-    // log::debug!("{:x?}" State; p);
     return p.decode();
+}
+
+StateMemory* State::ptr_local() const
+{
+    OnHeapPointer<StateMemory> p(read_u64(location));
+    return p.decode_local();
 }
 
 std::pair<float, float> State::click_position(float x, float y)

@@ -18,6 +18,7 @@ typedef struct _THREAD_BASIC_INFORMATION
 } THREAD_BASIC_INFORMATION, *PTHREAD_BASIC_INFORMATION;
 
 size_t heap_base();
+size_t local_heap_base();
 
 // I found some places that use offset from heap base, so wrote this class
 template <typename T>
@@ -35,6 +36,11 @@ class OnHeapPointer
     T* decode()
     {
         return reinterpret_cast<T*>(ptr_ + heap_base());
+    }
+
+    T* decode_local()
+    {
+        return reinterpret_cast<T*>(ptr_ + local_heap_base());
     }
 
     T* operator->()
