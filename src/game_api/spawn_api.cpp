@@ -81,6 +81,21 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, floa
     return -1;
 }
 
+int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, int layer)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    auto state = State::get();
+    if (layer < 0)
+    {
+        auto player = state.items()->player(abs(layer) - 1);
+        if (player == nullptr)
+            return -1;
+        layer = player->layer;
+    }
+
+    return state.layer_local(layer)->spawn_entity(entity_type, x, y, false, 0.0f, 0.0f, true)->uid;
+}
+
 int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
 {
     g_SpawnNonReplacable++;
@@ -181,6 +196,21 @@ void spawn_backdoor_abs(float x, float y)
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
+}
+
+int32_t spawn_apep(float x, float y, int l, bool right)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    auto state = State::get();
+    if (l < 0)
+    {
+        auto player = state.items()->player(abs(l) - 1);
+        if (player == nullptr)
+            return -1;
+        l = player->layer;
+    }
+
+    return state.layer_local(l)->spawn_apep(x, y, right)->uid;
 }
 
 void push_spawn_type_flags(SpawnTypeFlags flags)

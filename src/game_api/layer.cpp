@@ -2,6 +2,7 @@
 
 #include "entity.hpp"
 #include "logger.h"
+#include "rpc.hpp"
 #include "state.hpp"
 
 using LoadItem = size_t (*)(Layer*, size_t, float, float, bool);
@@ -142,6 +143,49 @@ Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     static_cast<Door*>(door)->set_target(w, l, t);
     spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), round(x), round(y - 1.0), false, 0.0, 0.0, true);
     return door;
+}
+
+Entity* Layer::spawn_apep(float x, float y, bool right)
+{
+    static const auto head_id = to_id("ENT_TYPE_MONS_APEP_HEAD");
+    static const auto body_id = to_id("ENT_TYPE_MONS_APEP_BODY");
+    static const auto facing_left_flag = 1 << 16;
+
+    Entity* apep_head = spawn_entity(head_id, x, y, false, 0.0f, 0.0f, true);
+    const bool facing_left = apep_head->flags & facing_left_flag;
+
+    // Not pointing correct direction
+    if (facing_left == right)
+    {
+        apep_head->flags = right
+                               ? apep_head->flags & ~facing_left_flag
+                               : apep_head->flags | facing_left_flag;
+
+        int current_uid = apep_head->uid;
+        do
+        {
+            auto body_parts = entity_get_items_by(current_uid, 0, 0);
+            int temp = current_uid;
+            for (auto body_part_uid : body_parts)
+            {
+                Entity* body_part = get_entity_ptr(body_part_uid);
+                body_part->flags = right
+                                       ? body_part->flags & ~facing_left_flag
+                                       : body_part->flags | facing_left_flag;
+                body_part->x *= -1.0f;
+                if (body_part->type->id == body_id)
+                {
+                    current_uid = body_part_uid;
+                }
+            }
+            if (temp == current_uid)
+            {
+                break;
+            }
+        } while (true);
+    }
+
+    return apep_head;
 }
 
 std::vector<Entity*> Layer::items() const

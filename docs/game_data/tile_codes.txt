@@ -198,6 +198,7 @@
 146: slidingwall_ceiling
 148: alien
 149: landmine
+376: apep_left
 150: yeti
 151: spring_trap
 313: camera
@@ -210,6 +211,7 @@
 157: eggplant_altar
 158: moai_statue
 160: empress_grave
+377: apep_right
 161: lamassu
 163: spark_trap
 164: olmite
@@ -295,7 +297,7 @@
 263: ghost_med_happy
 264: ghost_small_angry
 265: ghost_small_sad
-376: olmite_naked
+378: olmite_naked
 266: ghost_small_surprised
 270: tutorial_speedrun_sign
 271: tutorial_menu_sign
@@ -328,7 +330,7 @@
 298: crown
 301: tablet
 320: scepter
-377: olmite_helmet
+379: olmite_helmet
 303: playerbag
 306: back_jetpack
 307: back_telepack
@@ -373,4 +375,4 @@
 368: giant_fly
 369: flying_fish
 370: crabman
-378: olmite_armored
+380: olmite_armored

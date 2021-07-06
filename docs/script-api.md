@@ -241,6 +241,9 @@ end, ON.LEVEL)
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
 `int spawn(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Short for [spawn_entity](#spawn_entity).
+### [`spawn_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_grid_entity)
+`int spawn_grid_entity(int entity_type, float x, float y, int layer)`<br/>
+Spawn a grid entity, such as floor or traps, that snaps to the grid.
 ### [`spawn_entity_nonreplaceable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_nonreplaceable)
 `int spawn_entity_nonreplaceable(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
@@ -260,6 +263,9 @@ Spawn a door to backlayer.
 ### [`layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_door)
 `nil layer_door(float x, float y)`<br/>
 Short for [spawn_layer_door](#spawn_layer_door).
+### [`spawn_apep`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_apep)
+`int spawn_apep(float x, float y, int l, bool right)`<br/>
+Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.

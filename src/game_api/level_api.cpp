@@ -348,6 +348,20 @@ std::array g_community_tile_codes{
     },
     CommunityTileCode{"boulder", "ENT_TYPE_ACTIVEFLOOR_BOULDER"},
     CommunityTileCode{"apep", "ENT_TYPE_MONS_APEP_HEAD"},
+    CommunityTileCode{
+        "apep_left",
+        "ENT_TYPE_MONS_APEP_HEAD",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            layer->spawn_apep(x, y, false);
+        }},
+    CommunityTileCode{
+        "apep_right",
+        "ENT_TYPE_MONS_APEP_HEAD",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            layer->spawn_apep(x, y, true);
+        }},
     CommunityTileCode{"olmite_naked", "ENT_TYPE_MONS_OLMITE_NAKED"},
     CommunityTileCode{"olmite_helmet", "ENT_TYPE_MONS_OLMITE_HELMET"},
     CommunityTileCode{
