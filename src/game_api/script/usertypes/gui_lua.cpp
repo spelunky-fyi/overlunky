@@ -32,7 +32,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         if (isnan(x1) || isnan(y1) || isnan(x2) || isnan(y2))
         {
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-            script->messages.push_back({std::format("An argument passed to draw_rect was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
+            script->messages.push_back({fmt::format("An argument passed to draw_rect was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
 #endif
             return;
         }
@@ -46,7 +46,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         if (isnan(x1) || isnan(y1) || isnan(x2) || isnan(y2))
         {
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-            script->messages.push_back({std::format("An argument passed to draw_rect_filled was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
+            script->messages.push_back({fmt::format("An argument passed to draw_rect_filled was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
 #endif
             return;
         }
@@ -64,7 +64,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         if (isnan(a.x) || isnan(a.y) || isnan(r))
         {
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-            script->messages.push_back({std::format("An argument passed to draw_circle was not a number: {} {} {}", a.x, a.y, r), std::chrono::system_clock::now(), error_color});
+            script->messages.push_back({fmt::format("An argument passed to draw_circle was not a number: {} {} {}", a.x, a.y, r), std::chrono::system_clock::now(), error_color});
 #endif
             return;
         }

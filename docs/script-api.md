@@ -306,7 +306,10 @@ Get door target `world`, `level`, `theme`
 Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
 ### [`get_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
 `Entity get_entity(int uid)`<br/>
-Get the [Entity](#entity) behind an uid
+Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+### [`get_entity_raw`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_raw)
+`Entity get_entity_raw(int uid)`<br/>
+Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 `EntityDB get_type(int id)`<br/>
 Get the [EntityDB](#entitydb) behind an ENT_TYPE...
@@ -993,6 +996,12 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
+### `Floor`
+Derived from [`Entity`](#entity)
+- [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
+- [`int deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
+- [`int deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
+- [`int deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
 ### `Mount`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil carry(Movable rider)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
@@ -1533,7 +1542,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooldown) &Gun::cooldown
 - [`int shots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots) &Gun::shots
 - [`int shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
-- [`int in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
+### `WebGun`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Gun`](#gun)
+- [`int in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &WebGun::in_chamber
 ### `ParticleDB`
 - [`int id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`int spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
@@ -1667,6 +1678,124 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 - [`int sub_image_offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_image_offset_y) &TextureDefinition::sub_image_offset_y
 - [`int sub_image_width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_image_width) &TextureDefinition::sub_image_width
 - [`int sub_image_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_image_height) &TextureDefinition::sub_image_height
+## Automatic casting of entities
+When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
+
+To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)
+
+For reference, the available `as_<typename>` functions are listed below:
+- as_alien
+- as_ammit
+- as_anubis
+- as_anubistwo
+- as_apephead
+- as_apeppart
+- as_axolotl
+- as_backpack
+- as_bee
+- as_beg
+- as_bodyguard
+- as_bomb
+- as_cape
+- as_catmummy
+- as_caveman
+- as_cavemanshopkeeper
+- as_cobra
+- as_container
+- as_crabman
+- as_critterbutterfly
+- as_crittercrab
+- as_critterdrone
+- as_critterfirefly
+- as_critterfish
+- as_critterlocust
+- as_critterpenguin
+- as_critterslime
+- as_crittersnail
+- as_crocman
+- as_eggplantminister
+- as_firebug
+- as_firebugunchained
+- as_firefrog
+- as_fish
+- as_floor
+- as_forestsister
+- as_frog
+- as_ghist
+- as_ghistshopkeeper
+- as_ghost
+- as_giantfish
+- as_giantfly
+- as_giantfrog
+- as_goldmonkey
+- as_goldmonkey
+- as_grub
+- as_gun
+- as_hangspider
+- as_hermitcrab
+- as_hornedlizard
+- as_hoverpack
+- as_hundun
+- as_hundunhead
+- as_imp
+- as_jetpack
+- as_jiangshi
+- as_jumpdog
+- as_kapalapowerup
+- as_kingu
+- as_lahamu
+- as_lamassu
+- as_lavamander
+- as_leprechaun
+- as_madametusk
+- as_magmaman
+- as_mantrap
+- as_mattock
+- as_mech
+- as_megajellyfish
+- as_mole
+- as_monkey
+- as_monkey
+- as_monster
+- as_mosquito
+- as_mount
+- as_mummy
+- as_necromancer
+- as_octopus
+- as_olmite
+- as_osirishand
+- as_osirishead
+- as_pet
+- as_protoshopkeeper
+- as_qilin
+- as_quillback
+- as_robot
+- as_rockdog
+- as_scarab
+- as_scorpion
+- as_shopkeeper
+- as_shopkeeperclone
+- as_skeleton
+- as_sorceress
+- as_sparrow
+- as_spider
+- as_tadpole
+- as_tiamat
+- as_tun
+- as_ufo
+- as_vampire
+- as_vanhorsing
+- as_vlad
+- as_vladscape
+- as_waddler
+- as_webgun
+- as_witchdoctor
+- as_witchdoctorskull
+- as_yama
+- as_yang
+- as_yeti
+- as_yetiking
+- as_yetiqueen
 ## Enums
 Enums are like numbers but in text that's easier to remember. Example:
 ```lua

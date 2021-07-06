@@ -12,6 +12,7 @@ header_files = [
         '../src/game_api/movable.hpp',
         '../src/game_api/state.hpp',
         '../src/game_api/state_structs.hpp',
+        '../src/game_api/entities_floors.hpp',
         '../src/game_api/entities_mounts.hpp',
         '../src/game_api/entities_monsters.hpp',
         '../src/game_api/entities_items.hpp',
@@ -28,6 +29,7 @@ api_files = [
         '../src/game_api/script/usertypes/save_context.cpp',
         '../src/game_api/script/usertypes/state_lua.cpp',
         '../src/game_api/script/usertypes/entity_lua.cpp',
+        '../src/game_api/script/usertypes/entities_floors_lua.cpp',
         '../src/game_api/script/usertypes/entities_mounts_lua.cpp',
         '../src/game_api/script/usertypes/entities_monsters_lua.cpp',
         '../src/game_api/script/usertypes/entities_items_lua.cpp',
@@ -46,6 +48,7 @@ classes = []
 events = []
 funcs = []
 types = []
+known_casts = []
 aliases = []
 lualibs = []
 enums = []
@@ -211,6 +214,9 @@ for file in api_files:
         vars = []
 
         underlying_cpp_type = next((item for item in classes if item['name'] == cpp_type), dict())
+        if 'member_funs' not in underlying_cpp_type:
+            raise RuntimeError("No member_funs found. Did you forget to include a header file at the top of the generate script?")
+
         for var in attr:
             if not var: continue
             var = var.split(',')
@@ -234,6 +240,16 @@ for file in api_files:
                 else:
                     vars.append({ 'name': var_name, 'type': cpp })
         types.append({'name': name, 'vars': vars, 'base': base})
+
+for file in api_files:
+    with open(file) as fp:
+        line = fp.readline()
+        while line:
+            m = re.search(r'lua\["Entity"\]\["(as_.*)"\]', line)
+            if m != None:
+                known_casts.append(m.group(1))
+            line = fp.readline()
+known_casts.sort()
 
 for file in api_files:
     comment = []
@@ -521,6 +537,15 @@ for type in types:
             name = var['name']
             type_str = var['type'].replace('<', '&lt;').replace('>', '&gt;')
             print(f'- [`{name}`]({search_link}) {type_str}')
+
+print('## Automatic casting of entities')
+print('When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.')
+print('')
+print('To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)')
+print('')
+print('For reference, the available `as_<typename>` functions are listed below:')
+for known_cast in known_casts:
+    print('- ' + known_cast)
 
 print('## Enums')
 print('Enums are like numbers but in text that\'s easier to remember. Example:')

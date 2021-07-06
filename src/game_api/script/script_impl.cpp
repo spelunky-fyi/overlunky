@@ -14,9 +14,11 @@
 
 #include "usertypes/char_state.hpp"
 #include "usertypes/drops_lua.hpp"
+#include "usertypes/entities_floors_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
 #include "usertypes/entities_monsters_lua.hpp"
 #include "usertypes/entities_mounts_lua.hpp"
+#include "usertypes/entity_casting_lua.hpp"
 #include "usertypes/entity_lua.hpp"
 #include "usertypes/flags_lua.hpp"
 #include "usertypes/gui_lua.hpp"
@@ -480,8 +482,29 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_door_target"] = get_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
     lua["set_contents"] = set_contents;
-    /// Get the [Entity](#entity) behind an uid
-    lua["get_entity"] = get_entity_ptr;
+    /// Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+    // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
+    /// Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
+    lua["get_entity_raw"] = get_entity_ptr;
+    lua.script(R"##(
+        function get_entity(ent_uid)
+            if ent_uid == nil then
+                return nil
+            end
+
+            local entity_raw = get_entity_raw(ent_uid)
+            if entity_raw == nil then
+                return nil
+            end
+
+            local cast_fun = TYPE_MAP[entity_raw.type.id]
+            if cast_fun ~= nil then
+                return cast_fun(entity_raw)
+            else
+                return entity_raw
+            end
+        end
+        )##");
     /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
@@ -789,6 +812,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NGui::register_usertypes(lua, this);
     NTexture::register_usertypes(lua, this);
     NEntity::register_usertypes(lua, this);
+    NEntitiesFloors::register_usertypes(lua, this);
     NEntitiesMounts::register_usertypes(lua, this);
     NEntitiesMonsters::register_usertypes(lua, this);
     NEntitiesItems::register_usertypes(lua, this);
@@ -799,6 +823,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
     NEntityFlags::register_usertypes(lua);
+    NEntityCasting::register_usertypes(lua, this);
 
     lua.create_named_table(
         "ON",

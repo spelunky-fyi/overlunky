@@ -72,9 +72,14 @@ class Gun : public Movable
 {
   public:
     uint8_t cooldown;
-    uint8_t shots;
-    uint8_t shots2;
+    uint8_t shots;  // used only for webgun
+    uint8_t shots2; // used only for clonegun
     uint8_t b12b;
+};
+
+class WebGun : public Gun
+{
+  public:
     int32_t in_chamber;
 };
 
