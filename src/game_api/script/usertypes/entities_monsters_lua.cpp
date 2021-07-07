@@ -20,6 +20,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_goldmonkey"] = &Entity::as<GoldMonkey>;
     lua["Entity"]["as_mole"] = &Entity::as<Mole>;
     lua["Entity"]["as_spider"] = &Entity::as<Spider>;
+    lua["Entity"]["as_bat"] = &Entity::as<Bat>;
     lua["Entity"]["as_hangspider"] = &Entity::as<HangSpider>;
     lua["Entity"]["as_shopkeeper"] = &Entity::as<Shopkeeper>;
     lua["Entity"]["as_ghistshopkeeper"] = &Entity::as<GhistShopkeeper>;
@@ -97,6 +98,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_shopkeeperclone"] = &Entity::as<ShopkeeperClone>;
     lua["Entity"]["as_sparrow"] = &Entity::as<Sparrow>;
     lua["Entity"]["as_beg"] = &Entity::as<Beg>;
+    lua["Entity"]["as_terra"] = &Entity::as<Terra>;
+    lua["Entity"]["as_critter"] = &Entity::as<Critter>;
     lua["Entity"]["as_crittercrab"] = &Entity::as<CritterCrab>;
     lua["Entity"]["as_critterbutterfly"] = &Entity::as<CritterButterfly>;
     lua["Entity"]["as_critterlocust"] = &Entity::as<CritterLocust>;
@@ -106,6 +109,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_critterfirefly"] = &Entity::as<CritterFirefly>;
     lua["Entity"]["as_critterdrone"] = &Entity::as<CritterDrone>;
     lua["Entity"]["as_critterslime"] = &Entity::as<CritterSlime>;
+    lua["Entity"]["as_critterbeetle"] = &Entity::as<CritterBeetle>;
 
     lua.new_usertype<Monster>(
         "Monster",
@@ -174,6 +178,15 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Mole::counter_nonburrowing,
         "countdown_for_appearing",
         &Mole::countdown_for_appearing,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
+
+    lua.new_usertype<Bat>(
+        "Bat",
+        "spawn_x",
+        &Bat::spawn_x,
+        "spawn_y",
+        &Bat::spawn_y,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
@@ -1044,6 +1057,17 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
+    lua.new_usertype<Terra>(
+        "Terra",
+        "fx_button",
+        &Terra::fx_button,
+        "x_pos",
+        &Terra::x_pos,
+        "abuse_speechbubble_timer",
+        &Terra::abuse_speechbubble_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
+
     lua.new_usertype<Critter>( // just for inheritance purposes
         "Critter",
         sol::base_classes,
@@ -1163,6 +1187,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &CritterSlime::rotation_speed,
         "walk_pause_timer",
         &CritterSlime::walk_pause_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster, Critter>());
+
+    lua.new_usertype<CritterBeetle>(
+        "CritterBeetle",
+        "pause",
+        &CritterBeetle::pause,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, Critter>());
 }

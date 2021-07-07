@@ -25,6 +25,56 @@ class Door : public Entity
     std::tuple<uint8_t, uint8_t, uint8_t> get_target();
 };
 
+class ExitDoor : public Door
+{
+  public:
+    bool entered;      // if true entering it does not load the transition, probably for use in multiplayer
+    bool special_door; // use provided world/level/theme
+    uint8_t level;
+    uint8_t timer; // counts from 30 to 0, dunno why
+    uint8_t world;
+    uint8_t theme;
+    uint16_t padding;
+};
+
+class DecoratedDoor : public ExitDoor
+{
+  public:
+    Entity* special_bg;
+};
+
+class LockedDoor : public Door
+{
+  public:
+    bool unlocked;
+};
+
+class CityOfGoldDoor : public DecoratedDoor
+{
+  public:
+    bool unlocked;
+    uint8_t unknown1;
+};
+
+class MainExit : public ExitDoor
+{
+  public:
+    SoundPosition* sound_pos;
+    float top_value; // unsure
+    float value;     // unsure
+};
+
+class EggShipDoor : public Door
+{
+  public:
+    uint16_t unused1;
+    uint8_t unused2;
+    uint8_t timer; // counts from 30 to 0, dunno why
+    uint16_t unknown3;
+    uint16_t unknown4;
+    bool entered; // works only for DOOR_EGGSHIP
+};
+
 class Arrowtrap : public Entity
 {
   public:

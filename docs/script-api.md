@@ -983,6 +983,30 @@ Derived from [`Entity`](#entity)
 Derived from [`Entity`](#entity)
 - [`int counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) &Door::counter
 - [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Door::fx_button
+### `ExitDoor`
+Derived from [`Entity`](#entity) [`Door`](#door)
+- [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &ExitDoor::entered
+- [`bool special_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_door) &ExitDoor::special_door
+- [`int level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) &ExitDoor::level
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ExitDoor::timer
+- [`int world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) &ExitDoor::world
+- [`int theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) &ExitDoor::theme
+### `DecoratedDoor`
+Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
+- [`Entity special_bg`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_bg) &DecoratedDoor::special_bg
+### `LockedDoor`
+Derived from [`Entity`](#entity) [`Door`](#door)
+- [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &LockedDoor::unlocked
+### `CityOfGoldDoor`
+Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor) [`DecoratedDoor`](#decorateddoor)
+- [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &CityOfGoldDoor::unlocked
+### `MainExit`
+Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
+- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
+### `EggShipDoor`
+Derived from [`Entity`](#entity) [`Door`](#door)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggShipDoor::timer
+- [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &EggShipDoor::entered
 ### `Arrowtrap`
 Derived from [`Entity`](#entity)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
@@ -1058,6 +1082,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int counter_burrowing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter_burrowing) &Mole::counter_burrowing
 - [`int counter_nonburrowing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter_nonburrowing) &Mole::counter_nonburrowing
 - [`int countdown_for_appearing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=countdown_for_appearing) &Mole::countdown_for_appearing
+### `Bat`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+- [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &Bat::spawn_x
+- [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &Bat::spawn_y
 ### `Spider`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float ceiling_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_pos_x) &Spider::ceiling_pos_x
@@ -1452,6 +1480,11 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &Beg::walk_pause_timer
 - [`int disappear_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disappear_timer) &Beg::disappear_timer
+### `Terra`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Terra::fx_button
+- [`float x_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x_pos) &Terra::x_pos
+- [`int abuse_speechbubble_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abuse_speechbubble_timer) &Terra::abuse_speechbubble_timer
 ### `CritterCrab`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &CritterCrab::walk_pause_timer
@@ -1506,6 +1539,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`float rotation_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_angle) &CritterSlime::rotation_angle
 - [`float rotation_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_speed) &CritterSlime::rotation_speed
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &CritterSlime::walk_pause_timer
+### `CritterBeetle`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)
+- [`bool pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) &CritterBeetle::pause
 ### `Container`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
@@ -1693,6 +1729,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_arrowtrap
 - as_axolotl
 - as_backpack
+- as_bat
 - as_bee
 - as_beg
 - as_bodyguard
@@ -1701,9 +1738,12 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_catmummy
 - as_caveman
 - as_cavemanshopkeeper
+- as_cityofgolddoor
 - as_cobra
 - as_container
 - as_crabman
+- as_critter
+- as_critterbeetle
 - as_critterbutterfly
 - as_crittercrab
 - as_critterdrone
@@ -1715,8 +1755,11 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_crittersnail
 - as_crocman
 - as_crushtrap
+- as_decorateddoor
 - as_door
 - as_eggplantminister
+- as_eggshipdoor
+- as_exitdoor
 - as_firebug
 - as_firebugunchained
 - as_firefrog
@@ -1750,8 +1793,10 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_lamassu
 - as_lavamander
 - as_leprechaun
+- as_lockeddoor
 - as_madametusk
 - as_magmaman
+- as_mainexit
 - as_mantrap
 - as_mattock
 - as_mech
@@ -1784,6 +1829,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_sparrow
 - as_spider
 - as_tadpole
+- as_terra
 - as_tiamat
 - as_tun
 - as_ufo
