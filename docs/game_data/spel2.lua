@@ -1244,6 +1244,12 @@ EntityDB = {
   __name = "sol.EntityDB.user"
 }
 F = {}
+FLOOR_SIDE = {
+  BOTTOM = 1,
+  LEFT = 2,
+  RIGHT = 3,
+  TOP = 0
+}
 Firebug = {
   __index = "function:",
   __name = "sol.Firebug.user",
@@ -4140,6 +4146,7 @@ get_particle_type = function(...) end
 get_position = function(...) end
 get_render_position = function(...) end
 get_room_index = function(...) end
+get_room_pos = function(...) end
 get_room_template = function(...) end
 get_room_template_name = function(...) end
 get_sound = function(...) end

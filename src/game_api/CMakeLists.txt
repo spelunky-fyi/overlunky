@@ -7,6 +7,8 @@ add_library(spel2_api STATIC
         game_allocator.hpp
         entity.cpp
         entity.hpp
+        entities_floors.hpp
+        entities_floors.cpp
         entities_monsters.hpp
         entities_items.hpp
         entities_mounts.cpp
