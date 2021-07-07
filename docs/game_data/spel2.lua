@@ -328,6 +328,11 @@ DROPCHANCE = {
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
 }
+Door = {
+  __index = "function:",
+  __name = "sol.Door.user",
+  __newindex = "function:"
+}
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
   CLIMBABLE = 9,
@@ -2645,13 +2650,9 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
   nil,
-  "function:",
   nil,
   nil,
   nil,
@@ -2659,7 +2660,10 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
+  nil,
+  nil,
+  nil,
+  nil,
   "function:",
   nil,
   nil,
@@ -2813,6 +2817,7 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3229,7 +3234,7 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",

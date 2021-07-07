@@ -10,6 +10,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 {
     lua.create_named_table("TYPE_MAP");
 
+    // THIS LIST IS AUTO GENERATED
+    // To recreate it, run the entity_casting.py script
+    // It will dump the list to stdout, and overwrite docs/entities-hierarchy.md
+
     lua["TYPE_MAP"][1] = lua["Entity"]["as_floor"];  // FLOOR_BORDERTILE
     lua["TYPE_MAP"][2] = lua["Entity"]["as_floor"];  // FLOOR_BORDERTILE_METAL
     lua["TYPE_MAP"][3] = lua["Entity"]["as_floor"];  // FLOOR_BORDERTILE_OCTOPUS
