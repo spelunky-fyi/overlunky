@@ -1279,6 +1279,11 @@ ExitDoor = {
   __newindex = "function:"
 }
 F = {}
+FireFrog = {
+  __index = "function:",
+  __name = "sol.FireFrog.user",
+  __newindex = "function:"
+}
 Firebug = {
   __index = "function:",
   __name = "sol.Firebug.user",

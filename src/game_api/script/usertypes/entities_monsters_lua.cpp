@@ -850,6 +850,11 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
+    lua.new_usertype<FireFrog>(
+        "FireFrog",
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster, Frog>());
+
     lua.new_usertype<Grub>(
         "Grub",
         "rotation_delta",
