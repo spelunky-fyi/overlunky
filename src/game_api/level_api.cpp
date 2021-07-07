@@ -913,6 +913,12 @@ std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
         static_cast<int>(std::ceil(x - 3.5f)) / 10,
         static_cast<int>(std::ceil(121.5f - y)) / 8};
 }
+std::pair<float, float> LevelGenSystem::get_room_pos(int x, int y)
+{
+    return std::pair<float, float>{
+        static_cast<float>(x * 10) + 2.5f,
+        122.5f - static_cast<float>(y * 8)};
+}
 std::optional<uint16_t> LevelGenSystem::get_room_template(int x, int y, int l)
 {
     auto state = State::get();
@@ -956,6 +962,16 @@ bool LevelGenSystem::set_room_template(int x, int y, int l, uint16_t room_templa
 
     LevelGenRooms* level_rooms = rooms[l];
     level_rooms->rooms[x + y * 8] = room_template;
+
+    static auto udjat_top = data->room_templates().at("udjattop").id;
+    if (l == 1)
+    {
+        backlayer_room_exists->rooms[x + y * 8] = room_template != 0 && room_template != udjat_top;
+        if (room_template == udjat_top)
+        {
+            rooms_meta_26->rooms[x + y * 8] = false;
+        }
+    }
     return true;
 }
 

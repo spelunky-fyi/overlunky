@@ -177,6 +177,7 @@ struct LevelGenSystem
     uint32_t unknown51;
 
     std::pair<int, int> get_room_index(float x, float y);
+    std::pair<float, float> get_room_pos(int x, int y);
     std::optional<uint16_t> get_room_template(int x, int y, int l);
     bool set_room_template(int x, int y, int l, uint16_t room_template);
 

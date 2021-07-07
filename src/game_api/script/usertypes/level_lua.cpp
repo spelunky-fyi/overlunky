@@ -70,6 +70,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["get_room_index"] = [](float x, float y) -> std::pair<int, int> {
         return State::get().ptr_local()->level_gen->get_room_index(x, y);
     };
+    /// Transform a room index into the top left corner position in the room
+    lua["get_room_pos"] = [](int x, int y) -> std::pair<float, float> {
+        return State::get().ptr_local()->level_gen->get_room_pos(x, y);
+    };
     /// Get the room template given a certain index
     lua["get_room_template"] = [](int x, int y, int l) -> std::optional<uint16_t> {
         return State::get().ptr_local()->level_gen->get_room_template(x, y, l);
