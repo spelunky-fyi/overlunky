@@ -1331,3 +1331,26 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     }
     return 0;
 }
+
+void set_max_velocity(float max_positive_velocity, float max_negative_velocity)
+{
+    static size_t positive_offset = 0;
+    if (positive_offset == 0)
+    {
+        auto memory = Memory::get();
+        std::string pattern = "\xF3\x0F\x59\x15\x2A\x2A\x2A\x2A\xF3\x44\x0F\x10\x05\x2A\x2A\x2A\x2A"s;
+        positive_offset = memory.at_exe(find_inst(memory.exe(), pattern, memory.after_bundle) + 4);
+        // add 4 bytes since that's where the thing we want is
+    }
+    // instruction address + relative address thing + 4 bytes since it takes 4 bytes to say the relative address thing = magic
+    write_mem_prot(positive_offset + read_u32(positive_offset) + 4, to_le_bytes(max_positive_velocity), true);
+    // something like `x == NULL ? default_max_velocity : x` would be nice, not sure if that would work though
+    static size_t negative_offset = 0;
+    if (negative_offset == 0)
+    {
+        auto memory = Memory::get();
+        std::string pattern = "\xF3\x0F\x59\x0D\x2A\x2A\x2A\x2A\x41\x0F\x28\xD6\x48\xB8\x00\x00\x00\x00\x80\x01\x00\x00"s;
+        negative_offset = memory.at_exe(find_inst(memory.exe(), pattern, memory.after_bundle) + 4);
+    }
+    write_mem_prot(negative_offset + read_u32(negative_offset) + 4, to_le_bytes(max_negative_velocity), true);
+}

@@ -678,6 +678,10 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// Note: The camera will still try to follow the player and this doesn't actually work at all.
     lua["set_camera_position"] = set_camera_position;
 
+    /// Sets the positive and negative max velocity. Note that the same value is shared for both the x-axis and y-axis.
+    /// Note: Max velocity in water will be exactly 1/5 of what you put in this function.
+    lua["set_max_velocity"] = set_max_velocity;
+
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags
     { return flags | (1U << (bit - 1)); };

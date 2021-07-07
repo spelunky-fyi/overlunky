@@ -84,3 +84,4 @@ void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove = 99);
 int16_t waddler_get_entity_meta(uint8_t slot);
 void waddler_set_entity_meta(uint8_t slot, int16_t meta);
 uint32_t waddler_entity_type_in_slot(uint8_t slot);
+void set_max_velocity(float max_positive_velocity, float max_negative_velocity);
