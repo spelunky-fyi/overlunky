@@ -31,7 +31,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][19] = lua["Entity"]["as_floor"]; // FLOOR_GROWABLE_VINE
     lua["TYPE_MAP"][20] = lua["Entity"]["as_floor"]; // FLOOR_CLIMBING_POLE
     lua["TYPE_MAP"][21] = lua["Entity"]["as_floor"]; // FLOOR_GROWABLE_CLIMBING_POLE
-    lua["TYPE_MAP"][22] = lua["Entity"]["as_floor"];  // FLOOR_DOOR_ENTRANCE
+    lua["TYPE_MAP"][22] = lua["Entity"]["as_floor"]; // FLOOR_DOOR_ENTRANCE
     // lua["TYPE_MAP"][23] = lua["Entity"]["as_exitdoor"];  // FLOOR_DOOR_EXIT (NOT IMPLEMENTED YET)
     // lua["TYPE_MAP"][24] = lua["Entity"]["as_mainexit"];  // FLOOR_DOOR_MAIN_EXIT (NOT IMPLEMENTED YET)
     // lua["TYPE_MAP"][25] = lua["Entity"]["as_exitdoor"];  // FLOOR_DOOR_STARTING_EXIT (NOT IMPLEMENTED YET)
