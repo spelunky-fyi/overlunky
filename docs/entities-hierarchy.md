@@ -869,6 +869,6 @@ The list below shows the type hierarchy for each entity in the game. This makes 
 - 904 MOUNT_BASECAMP_COUCH = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Mount](script-api.md#Mount)
 - 907 LIQUID_WATER = [Entity](script-api.md#Entity) - NOT IMPLEMENTED YET
 - 908 LIQUID_COARSE_WATER = [Entity](script-api.md#Entity) - NOT IMPLEMENTED YET
-- 909 LIQUID_IMPOSTOR_LAKE = [Entity](script-api.md#Entity) - NOT IMPLEMENTED YET
+- 909 LIQUID_IMPOSTOR_LAKE = [Entity](script-api.md#Entity)
 - 910 LIQUID_LAVA = [Entity](script-api.md#Entity) - NOT IMPLEMENTED YET
 - 911 LIQUID_STAGNANT_LAVA = [Entity](script-api.md#Entity) - NOT IMPLEMENTED YET

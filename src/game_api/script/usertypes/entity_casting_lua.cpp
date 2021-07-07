@@ -883,7 +883,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][904] = lua["Entity"]["as_mount"];   // MOUNT_BASECAMP_COUCH
     // lua["TYPE_MAP"][907] = lua["Entity"]["as_liquid"];  // LIQUID_WATER (NOT IMPLEMENTED YET)
     // lua["TYPE_MAP"][908] = lua["Entity"]["as_liquid"];  // LIQUID_COARSE_WATER (NOT IMPLEMENTED YET)
-    // lua["TYPE_MAP"][909] = lua["Entity"]["as_entity"];  // LIQUID_IMPOSTOR_LAKE (NOT IMPLEMENTED YET)
+    // lua["TYPE_MAP"][909] = lua["Entity"]["as_entity"];  // LIQUID_IMPOSTOR_LAKE (plain entity)
     // lua["TYPE_MAP"][910] = lua["Entity"]["as_lava"];  // LIQUID_LAVA (NOT IMPLEMENTED YET)
     // lua["TYPE_MAP"][911] = lua["Entity"]["as_lava"];  // LIQUID_STAGNANT_LAVA (NOT IMPLEMENTED YET)
 }
