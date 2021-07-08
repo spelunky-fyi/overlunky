@@ -236,35 +236,6 @@ void Entity::remove_item(uint32_t id)
     remove_item_ptr(State::get().find(id));
 }
 
-void Door::set_target(uint8_t w, uint8_t l, uint8_t t)
-{
-    uint8_t array[5] = {1, l, 1, w, t};
-    DEBUG("Making door go to {}-{}, {}", w, l, t);
-    write_mem(pointer() + 0xc1, std::string((char*)array, sizeof(array)));
-}
-
-std::tuple<uint8_t, uint8_t, uint8_t> Door::get_target()
-{
-    uint8_t l = read_u8(pointer() + 0xc2);
-    uint8_t w = read_u8(pointer() + 0xc4);
-    uint8_t t = read_u8(pointer() + 0xc5);
-    return std::make_tuple(w, l, t);
-}
-
-void Arrowtrap::rearm()
-{
-    if (arrow_shot)
-    {
-        static auto arrow_trap_trigger_id = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER");
-        arrow_shot = false;
-        auto trigger = get_entity_ptr(spawn_entity_over(arrow_trap_trigger_id, uid, 0., 0.));
-        if ((flags & (1 << 16)) > 0)
-        {
-            trigger->flags |= (1 << 16);
-        }
-    }
-}
-
 void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
@@ -402,25 +373,6 @@ std::uint32_t Movable::set_post_statemachine(std::function<void(Movable*)> post_
     }
     hook_info.post_statemachine.push_back({hook_info.cbcount++, std::move(post_state_machine)});
     return hook_info.post_statemachine.back().id;
-}
-uint8_t Olmec::broken_floaters()
-{
-    static auto olmec_floater_id = to_id("ENT_TYPE_FX_OLMECPART_FLOATER");
-    uint8_t broken = 0;
-    int* pitems = (int*)items.begin;
-    for (uint8_t x = 0; x < items.count; ++x)
-    {
-        auto type = get_entity_type(pitems[x]);
-        if (type == olmec_floater_id)
-        {
-            auto olmec_floater = get_entity_ptr(pitems[x]);
-            if (olmec_floater->animation_frame == 0x27)
-            {
-                broken++;
-            }
-        }
-    }
-    return broken;
 }
 
 void Entity::destroy()

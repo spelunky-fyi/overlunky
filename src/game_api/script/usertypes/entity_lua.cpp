@@ -145,16 +145,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Entity::set_texture,
         "as_movable",
         &Entity::as<Movable>,
-        "as_door",
-        &Entity::as<Door>,
         "as_player",
         &Entity::as<Player>,
-        "as_crushtrap",
-        &Entity::as<Crushtrap>,
-        "as_arrowtrap",
-        &Entity::as<Arrowtrap>,
-        "as_olmec",
-        &Entity::as<Olmec>,
         "as_olmec_floater",
         &Entity::as<OlmecFloater>);
     /* Entity
@@ -254,34 +246,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Player::set_heart_color,
         sol::base_classes,
         sol::bases<Entity, Movable>());
-    lua.new_usertype<Crushtrap>("Crushtrap", "dirx", &Crushtrap::dirx, "diry", &Crushtrap::diry, sol::base_classes, sol::bases<Entity, Movable>());
-    lua.new_usertype<Arrowtrap>(
-        "Arrowtrap", "arrow_shot", &Arrowtrap::arrow_shot, "rearm", &Arrowtrap::rearm, sol::base_classes, sol::bases<Entity>());
-    lua.new_usertype<Olmec>(
-        "Olmec",
-        "target_uid",
-        &Olmec::target_uid,
-        "attack_phase",
-        &Olmec::attack_phase,
-        "attack_timer",
-        &Olmec::attack_timer,
-        "ai_timer",
-        &Olmec::ai_timer,
-        "move_direction",
-        &Olmec::move_direction,
-        "jump_timer",
-        &Olmec::jump_timer,
-        "phase1_amount_of_bomb_salvos",
-        &Olmec::phase1_amount_of_bomb_salvos,
-        "unknown_attack_state",
-        &Olmec::unknown_attack_state,
-        "broken_floaters",
-        &Olmec::broken_floaters,
-        sol::base_classes,
-        sol::bases<Entity, Movable>());
-    /* Olmec
-            int broken_floaters()
-        */
+
     lua.new_usertype<OlmecFloater>(
         "OlmecFloater", "both_floaters_intact", &OlmecFloater::both_floaters_intact, sol::base_classes, sol::bases<Entity, Movable>());
 

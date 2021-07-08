@@ -1,6 +1,7 @@
 #include "rpc.hpp"
 
 #include "drops.hpp"
+#include "entities_floors.hpp"
 #include "entities_mounts.hpp"
 #include "entity.hpp"
 #include "logger.h"

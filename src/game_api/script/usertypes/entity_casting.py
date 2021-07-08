@@ -6,11 +6,12 @@ import urllib.request
 entities_files = ["entities_items_lua.cpp",
                   "entities_monsters_lua.cpp", 
                   "entities_mounts_lua.cpp",
-                  "entities_floors_lua.cpp"]
+                  "entities_floors_lua.cpp",
+                  "entities_activefloors_lua.cpp"]
 as_re = re.compile(r'lua\["Entity"\]\["(as_.*)"\]')
 
 # a couple as_xxx functions are predefined, they are either 'global' or haven't been moved into their proper separate file yet
-known_casts = [ "as_movable", "as_door", "as_player", "as_crushtrap", "as_arrowtrap", "as_olmec", "as_olmec_floater" ]
+known_casts = [ "as_movable", "as_player", "as_olmec_floater" ]
 
 for f in entities_files:
     with open(f) as fp:
@@ -70,7 +71,10 @@ with open("../../../../docs/game_data/entities.json") as fp:
                 movable_table_def = 'lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["as_movable"];  // '  + short_entityname + " (NOT IMPLEMENTED YET, FORCED TO MOVABLE)"
 
                 if as_function not in known_casts:
-                    if is_movable(entityclass):
+                    if as_function == "as_entity":
+                        mapping[entitydetails["id"]] = "// " + table_def + " (plain entity)"
+                        doc_entry = doc_entry + "[Entity](script-api.md#Entity)"
+                    elif is_movable(entityclass):
                         mapping[entitydetails["id"]] = movable_table_def
                         doc_entry = doc_entry + "[Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) - NOT IMPLEMENTED YET, FORCED TO MOVABLE"
                     else:

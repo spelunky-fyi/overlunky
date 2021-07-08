@@ -925,11 +925,7 @@ end
 - [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
-- [`as_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_door) &Entity::as&lt;Door&gt;
 - [`as_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_player) &Entity::as&lt;Player&gt;
-- [`as_crushtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_crushtrap) &Entity::as&lt;Crushtrap&gt;
-- [`as_arrowtrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_arrowtrap) &Entity::as&lt;Arrowtrap&gt;
-- [`as_olmec`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec) &Entity::as&lt;Olmec&gt;
 - [`as_olmec_floater`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec_floater) &Entity::as&lt;OlmecFloater&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
@@ -974,14 +970,51 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Color get_heart_color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) &Player::get_heart_color
 - [`bool is_female()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) &Player::is_female
 - [`nil set_heart_color(Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
-### `Crushtrap`
+### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`float dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
-- [`float diry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diry) &Crushtrap::diry
+- [`bool both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
+### `Floor`
+Derived from [`Entity`](#entity)
+- [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
+- [`int deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
+- [`int deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
+- [`int deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
+### `Door`
+Derived from [`Entity`](#entity)
+- [`int counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) &Door::counter
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Door::fx_button
+### `ExitDoor`
+Derived from [`Entity`](#entity) [`Door`](#door)
+- [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &ExitDoor::entered
+- [`bool special_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_door) &ExitDoor::special_door
+- [`int level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) &ExitDoor::level
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ExitDoor::timer
+- [`int world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) &ExitDoor::world
+- [`int theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) &ExitDoor::theme
+### `DecoratedDoor`
+Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
+- [`Entity special_bg`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_bg) &DecoratedDoor::special_bg
+### `LockedDoor`
+Derived from [`Entity`](#entity) [`Door`](#door)
+- [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &LockedDoor::unlocked
+### `CityOfGoldDoor`
+Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor) [`DecoratedDoor`](#decorateddoor)
+- [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &CityOfGoldDoor::unlocked
+### `MainExit`
+Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
+- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
+### `EggShipDoor`
+Derived from [`Entity`](#entity) [`Door`](#door)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggShipDoor::timer
+- [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &EggShipDoor::entered
 ### `Arrowtrap`
 Derived from [`Entity`](#entity)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
 - [`nil rearm()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rearm) &Arrowtrap::rearm
+### `Crushtrap`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
+- [`float diry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diry) &Crushtrap::diry
 ### `Olmec`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_uid) &Olmec::target_uid
@@ -993,15 +1026,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int phase1_amount_of_bomb_salvos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase1_amount_of_bomb_salvos) &Olmec::phase1_amount_of_bomb_salvos
 - [`int unknown_attack_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_attack_state) &Olmec::unknown_attack_state
 - [`int broken_floaters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=broken_floaters) &Olmec::broken_floaters
-### `OlmecFloater`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`bool both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
-### `Floor`
-Derived from [`Entity`](#entity)
-- [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
-- [`int deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
-- [`int deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
-- [`int deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
 ### `Mount`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil carry(Movable rider)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
@@ -1058,6 +1082,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int counter_burrowing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter_burrowing) &Mole::counter_burrowing
 - [`int counter_nonburrowing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter_nonburrowing) &Mole::counter_nonburrowing
 - [`int countdown_for_appearing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=countdown_for_appearing) &Mole::countdown_for_appearing
+### `Bat`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+- [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &Bat::spawn_x
+- [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &Bat::spawn_y
 ### `Spider`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float ceiling_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_pos_x) &Spider::ceiling_pos_x
@@ -1358,6 +1386,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 ### `Frog`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Frog::jump_timer
+### `FireFrog`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Frog`](#frog)
+- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Grub`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float rotation_delta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_delta) &Grub::rotation_delta
@@ -1452,6 +1483,11 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &Beg::walk_pause_timer
 - [`int disappear_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disappear_timer) &Beg::disappear_timer
+### `Terra`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Terra::fx_button
+- [`float x_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x_pos) &Terra::x_pos
+- [`int abuse_speechbubble_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abuse_speechbubble_timer) &Terra::abuse_speechbubble_timer
 ### `CritterCrab`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &CritterCrab::walk_pause_timer
@@ -1506,6 +1542,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`float rotation_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_angle) &CritterSlime::rotation_angle
 - [`float rotation_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_speed) &CritterSlime::rotation_speed
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &CritterSlime::walk_pause_timer
+### `CritterBeetle`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)
+- [`bool pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) &CritterBeetle::pause
 ### `Container`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
@@ -1690,8 +1729,10 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_anubistwo
 - as_apephead
 - as_apeppart
+- as_arrowtrap
 - as_axolotl
 - as_backpack
+- as_bat
 - as_bee
 - as_beg
 - as_bodyguard
@@ -1700,9 +1741,12 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_catmummy
 - as_caveman
 - as_cavemanshopkeeper
+- as_cityofgolddoor
 - as_cobra
 - as_container
 - as_crabman
+- as_critter
+- as_critterbeetle
 - as_critterbutterfly
 - as_crittercrab
 - as_critterdrone
@@ -1713,7 +1757,12 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_critterslime
 - as_crittersnail
 - as_crocman
+- as_crushtrap
+- as_decorateddoor
+- as_door
 - as_eggplantminister
+- as_eggshipdoor
+- as_exitdoor
 - as_firebug
 - as_firebugunchained
 - as_firefrog
@@ -1747,8 +1796,10 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_lamassu
 - as_lavamander
 - as_leprechaun
+- as_lockeddoor
 - as_madametusk
 - as_magmaman
+- as_mainexit
 - as_mantrap
 - as_mattock
 - as_mech
@@ -1762,6 +1813,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_mummy
 - as_necromancer
 - as_octopus
+- as_olmec
 - as_olmite
 - as_osirishand
 - as_osirishead
@@ -1780,6 +1832,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_sparrow
 - as_spider
 - as_tadpole
+- as_terra
 - as_tiamat
 - as_tun
 - as_ufo
