@@ -22,6 +22,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Floor::deco_left,
         "deco_right",
         &Floor::deco_right,
+        "fix_border_tile_animation",
+        &Floor::fix_border_tile_animation,
         "fix_decorations",
         &Floor::fix_decorations,
         "add_decoration",

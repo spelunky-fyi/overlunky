@@ -30,6 +30,8 @@ class Floor : public Entity
         };
     };
 
+    void fix_border_tile_animation();
+
     /// Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.
     void fix_decorations(bool fix_also_neighbors, bool fix_styled_floor);
     void add_decoration(FLOOR_SIDE side);

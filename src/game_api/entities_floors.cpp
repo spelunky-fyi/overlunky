@@ -5,6 +5,58 @@
 
 #include <numbers>
 
+void Floor::fix_border_tile_animation()
+{
+    if (type->id == 3)
+    {
+        const uint32_t random_idx = rand() % 5;
+        switch (random_idx)
+        {
+        default:
+        case 0:
+            animation_frame = 50;
+            break;
+        case 1:
+            animation_frame = 51;
+            break;
+        case 2:
+            animation_frame = 58;
+            break;
+        case 3:
+            animation_frame = 59;
+            break;
+        case 4:
+            animation_frame = 55;
+            break;
+        }
+    }
+    else
+    {
+        auto [x, y] = position();
+        auto base_x = static_cast<uint32_t>(std::floor(x / 2.0f));
+        auto base_y = static_cast<uint32_t>(std::floor(y / 2.0f));
+        auto sub_index_x = static_cast<uint32_t>(std::floor(x - base_x * 2));
+        auto sub_index_y = static_cast<uint32_t>(std::floor(y - base_y * 2));
+        if (type->id == 1)
+        {
+            auto fake_random = [](uint32_t x)
+            {
+                x = ((x >> 16) ^ x) * 0x45d9f3b;
+                x = ((x >> 16) ^ x) * 0x45d9f3b;
+                x = (x >> 16) ^ x;
+                return x;
+            };
+
+            const uint32_t base = fake_random(base_x + base_y) % 3;
+            animation_frame = base * 16 + sub_index_x + sub_index_y * 8;
+        }
+        else if (type->id == 2)
+        {
+            animation_frame = 48 + sub_index_x + sub_index_y * 8;
+        }
+    }
+}
+
 void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
 {
     if (!fix_styled_floor && is_styled())
@@ -183,9 +235,9 @@ void Floor::add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, 
     {
         if (type->id == 1 || type->id == 3)
         {
-            EntityDB* type = get_type(decoration_entity_type);
-            uint8_t draw_depth_before = type->draw_depth;
-            type->draw_depth = 5;
+            EntityDB* decoration_type = get_type(decoration_entity_type);
+            uint8_t draw_depth_before = decoration_type->draw_depth;
+            decoration_type->draw_depth = 5;
             if (find_corner_decoration(side) == nullptr)
             {
                 static float offsets[4][2]{
@@ -209,7 +261,7 @@ void Floor::add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, 
                 deco->animation_frame = anim;
                 deco->set_texture(get_texture());
             }
-            type->draw_depth = draw_depth_before;
+            decoration_type->draw_depth = draw_depth_before;
         }
     }
     else
