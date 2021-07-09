@@ -62,6 +62,11 @@ Backpack = {
   __name = "sol.Backpack.user",
   __newindex = "function:"
 }
+Bat = {
+  __index = "function:",
+  __name = "sol.Bat.user",
+  __newindex = "function:"
+}
 Bee = {
   __index = "function:",
   __name = "sol.Bee.user",
@@ -146,6 +151,11 @@ CavemanShopkeeper = {
   __name = "sol.CavemanShopkeeper.user",
   __newindex = "function:"
 }
+CityOfGoldDoor = {
+  __index = "function:",
+  __name = "sol.CityOfGoldDoor.user",
+  __newindex = "function:"
+}
 Cobra = {
   __index = "function:",
   __name = "sol.Cobra.user",
@@ -167,6 +177,11 @@ Crabman = {
 Critter = {
   __index = "function:",
   __name = "sol.Critter.user",
+  __newindex = "function:"
+}
+CritterBeetle = {
+  __index = "function:",
+  __name = "sol.CritterBeetle.user",
   __newindex = "function:"
 }
 CritterButterfly = {
@@ -327,6 +342,16 @@ DROPCHANCE = {
   SKELETON_SKELETONKEY = 8,
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
+}
+DecoratedDoor = {
+  __index = "function:",
+  __name = "sol.DecoratedDoor.user",
+  __newindex = "function:"
+}
+Door = {
+  __index = "function:",
+  __name = "sol.Door.user",
+  __newindex = "function:"
 }
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
@@ -1232,6 +1257,11 @@ ENT_TYPE = {
   MOUNT_ROCKDOG = 898,
   MOUNT_TURKEY = 897
 }
+EggShipDoor = {
+  __index = "function:",
+  __name = "sol.EggShipDoor.user",
+  __newindex = "function:"
+}
 EggplantMinister = {
   __index = "function:",
   __name = "sol.EggplantMinister.user",
@@ -1243,12 +1273,26 @@ Entity = {
 EntityDB = {
   __name = "sol.EntityDB.user"
 }
+ExitDoor = {
+  __index = "function:",
+  __name = "sol.ExitDoor.user",
+  __newindex = "function:"
+}
 F = {}
 FLOOR_SIDE = {
   BOTTOM = 1,
+  BOTTOM_LEFT = 6,
+  BOTTOM_RIGHT = 7,
   LEFT = 2,
   RIGHT = 3,
-  TOP = 0
+  TOP = 0,
+  TOP_LEFT = 4,
+  TOP_RIGHT = 5
+}
+FireFrog = {
+  __index = "function:",
+  __name = "sol.FireFrog.user",
+  __newindex = "function:"
 }
 Firebug = {
   __index = "function:",
@@ -1444,6 +1488,11 @@ LightParams = {
 LoadContext = {
   __name = "sol.LoadContext.user"
 }
+LockedDoor = {
+  __index = "function:",
+  __name = "sol.LockedDoor.user",
+  __newindex = "function:"
+}
 MASK = {
   ACTIVEFLOOR = 128,
   BG = 1024,
@@ -1469,6 +1518,11 @@ MadameTusk = {
 MagmaMan = {
   __index = "function:",
   __name = "sol.MagmaMan.user",
+  __newindex = "function:"
+}
+MainExit = {
+  __index = "function:",
+  __name = "sol.MainExit.user",
   __newindex = "function:"
 }
 Mantrap = {
@@ -2648,25 +2702,25 @@ TYPE_MAP = {
   nil,
   nil,
   "function:",
-  nil,
-  nil,
-  nil,
   "function:",
   "function:",
-  "function:",
+  nil,
   nil,
   nil,
   nil,
   "function:",
   nil,
+  "function:",
   nil,
+  "function:",
   nil,
   nil,
+  "function:",
   nil,
   nil,
   nil,
   "function:",
-  "function:",
+  nil,
   nil,
   nil,
   nil,
@@ -2849,7 +2903,7 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  nil,
+  "function:",
   "function:",
   "function:",
   "function:",
@@ -2924,8 +2978,8 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  nil,
   "function:",
+  "function:",
   nil,
   nil,
   "function:",
@@ -2943,7 +2997,6 @@ TYPE_MAP = {
   "function:",
   nil,
   "function:",
-  nil,
   nil,
   nil,
   nil,
@@ -2960,13 +3013,14 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  nil,
+  "function:",
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  "function:",
   nil,
   nil,
   nil,
@@ -3235,7 +3289,7 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3390,6 +3444,11 @@ TYPE_MAP = {
 Tadpole = {
   __index = "function:",
   __name = "sol.Tadpole.user",
+  __newindex = "function:"
+}
+Terra = {
+  __index = "function:",
+  __name = "sol.Terra.user",
   __newindex = "function:"
 }
 TextureDefinition = {

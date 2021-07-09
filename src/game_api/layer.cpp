@@ -1,5 +1,6 @@
 #include "layer.hpp"
 
+#include "entities_floors.hpp"
 #include "entity.hpp"
 #include "logger.h"
 #include "rpc.hpp"
