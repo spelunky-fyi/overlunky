@@ -5,18 +5,6 @@
 
 #include <numbers>
 
-void Floor::add_decoration(FLOOR_SIDE side)
-{
-    int32_t decoration_entity_type = get_decoration_entity_type();
-    if (decoration_entity_type == -1)
-    {
-        return;
-    }
-
-    auto state = State::get();
-    auto layer_ptr = state.layer(layer);
-    add_decoration_opt(side, decoration_entity_type, layer_ptr);
-}
 void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
 {
     if (!fix_styled_floor && is_styled())
@@ -30,6 +18,8 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
         return;
     }
 
+    const bool has_corners = this->has_corners();
+
     const auto [x, y] = position_self();
 
     static float offsets[4][3]{
@@ -38,14 +28,25 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
         {-1.0f, 0.0f, std::numbers::pi_v<float> * 1.0f},
         {+1.0f, 0.0f, std::numbers::pi_v<float> * 0.0f}};
 
+    Floor* neighbours[4]{};
+    bool neighbours_same[4]{};
+
     auto state = State::get();
     auto layer_ptr = state.layer(layer);
+
     for (size_t i = 0; i < 4; i++)
     {
         auto [x_off, y_off, angle] = offsets[i];
-
         auto* floor = layer_ptr->get_grid_entity_at(x + x_off, y + y_off)->as<Floor>();
-        if ((floor != nullptr) && floor->type->id == type->id)
+        neighbours[i] = floor;
+        neighbours_same[i] = floor != nullptr && floor->type->id == type->id;
+    }
+
+    for (size_t i = 0; i < 4; i++)
+    {
+        auto* floor = neighbours[i];
+        bool same = neighbours_same[i];
+        if (floor != nullptr && same)
         {
             remove_decoration(FLOOR_SIDE(i));
         }
@@ -56,56 +57,207 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
 
         if (floor != nullptr && fix_also_neighbors)
         {
-            floor->remove_decoration(FLOOR_SIDE(i % 2 == 0 ? i + 1 : i - 1));
+            if (same)
+            {
+                FLOOR_SIDE opposite = get_opposite_side(FLOOR_SIDE(i));
+                floor->remove_decoration(opposite);
+
+                if (has_corners)
+                {
+                    FLOOR_SIDE perp_sides[2]{};
+                    FLOOR_SIDE corner_sides[2]{};
+                    get_perpendicular_sides(opposite, perp_sides);
+                    get_corner_sides(opposite, corner_sides);
+
+                    for (size_t j = 0; j < 2; j++)
+                    {
+                        if (floor->decos[perp_sides[j]] != -1)
+                        {
+                            floor->remove_decoration(corner_sides[j]);
+                        }
+                        else if (!neighbours_same[perp_sides[j]])
+                        {
+                            floor->add_decoration_opt(corner_sides[j], decoration_entity_type, layer_ptr);
+                        }
+                    }
+                }
+            }
         }
     }
+
+    if (has_corners)
+    {
+        static float corner_offsets[4][2]{
+            {-1.0f, +1.0f},
+            {+1.0f, +1.0f},
+            {-1.0f, -1.0f},
+            {+1.0f, -1.0f}};
+        for (size_t i = 4; i < 8; i++)
+        {
+            FLOOR_SIDE perp_sides[2]{};
+            get_perpendicular_sides(FLOOR_SIDE(i), perp_sides);
+
+            if (!neighbours_same[perp_sides[0]] && !neighbours_same[perp_sides[1]])
+            {
+                add_decoration_opt(FLOOR_SIDE(i), decoration_entity_type, layer_ptr);
+            }
+            else
+            {
+                auto [x_off, y_off] = corner_offsets[i - 4];
+                auto* floor = layer_ptr->get_grid_entity_at(x + x_off, y + y_off)->as<Floor>();
+                bool same = floor != nullptr && floor->type->id == type->id;
+
+                if ((same && !neighbours_same[perp_sides[0]] && !neighbours_same[perp_sides[1]]) || (!same && neighbours_same[perp_sides[0]] && neighbours_same[perp_sides[1]]))
+                {
+                    add_decoration_opt(FLOOR_SIDE(i), decoration_entity_type, layer_ptr);
+                }
+                else
+                {
+                    remove_decoration(FLOOR_SIDE(i));
+                    if (same)
+                    {
+                        floor->remove_decoration(get_opposite_side(FLOOR_SIDE(i)));
+                    }
+                }
+            }
+        }
+    }
+}
+void Floor::add_decoration(FLOOR_SIDE side)
+{
+    int32_t decoration_entity_type = get_decoration_entity_type();
+    if (decoration_entity_type == -1)
+    {
+        return;
+    }
+
+    auto state = State::get();
+    auto layer_ptr = state.layer(layer);
+    add_decoration_opt(side, decoration_entity_type, layer_ptr);
 }
 void Floor::remove_decoration(FLOOR_SIDE side)
 {
-    if (decos[side] >= 0)
+    if (side > RIGHT && has_corners())
     {
-        if (Entity* deco = get_entity_ptr(decos[side]))
+        if (Entity* deco = find_corner_decoration(side))
         {
             deco->kill(false, nullptr);
         }
-        decos[side] = -1;
+    }
+    else
+    {
+        if (decos[side] >= 0)
+        {
+            if (Entity* deco = get_entity_ptr(decos[side]))
+            {
+                deco->kill(false, nullptr);
+            }
+            decos[side] = -1;
+        }
     }
 }
 
+Entity* Floor::find_corner_decoration(FLOOR_SIDE side)
+{
+    static float offsets[4][2]{
+        {-0.42f, +0.39f},
+        {+0.42f, +0.39f},
+        {-0.42f, -0.42f},
+        {+0.42f, -0.42f}};
+
+    int* pitems = (int*)items.begin;
+    for (uint8_t i = 0; i < items.count; ++i)
+    {
+        Entity* item = get_entity_ptr(pitems[i]);
+        auto [x, y] = item->position_self();
+        if (std::abs(x - offsets[side - 4][0]) < 0.0001f && std::abs(y - offsets[side - 4][1]) < 0.0001f)
+        {
+            return item;
+        }
+    }
+    return nullptr;
+}
 void Floor::add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, Layer* layer_ptr)
 {
-    static float offsets[4][3]{
-        {0.0f, +0.5f, std::numbers::pi_v<float> *0.0f},
-        {0.0f, -0.5f, std::numbers::pi_v<float> *0.0f},
-        {-0.5f, 0.0f, std::numbers::pi_v<float> *1.0f},
-        {+0.5f, 0.0f, std::numbers::pi_v<float> *0.0f} };
-
-    if (decos[side] == -1)
+    if (side > RIGHT)
     {
-        auto [x_off, y_off, angle] = offsets[side];
-
-        // TODO: Fix BORDERTILE offsets and corners?
-        if (type->id <= 3)
+        if (type->id == 1 || type->id == 3)
         {
-            if (side == TOP)
+            EntityDB* type = get_type(decoration_entity_type);
+            uint8_t draw_depth_before = type->draw_depth;
+            type->draw_depth = 5;
+            if (find_corner_decoration(side) == nullptr)
             {
-                y_off += 0.1f;
-            }
-            else if (side == BOTTOM)
-            {
-                y_off -= 0.1f;
-            }
-        }
+                static float offsets[4][2]{
+                    {-0.42f, +0.39f},
+                    {+0.42f, +0.39f},
+                    {-0.42f, -0.42f},
+                    {+0.42f, -0.42f}};
 
-        Entity* deco = layer_ptr->spawn_entity_over(decoration_entity_type, this, x_off, y_off);
-        deco->angle = angle;
-        deco->animation_frame = get_decoration_animation_frame(side);
-        deco->set_texture(get_texture());
-        decos[side] = deco->uid;
+                static uint8_t anims[4]{
+                    14, 13, 6, 5};
+
+                auto [x_off, y_off] = offsets[side - 4];
+                auto anim = anims[side - 4];
+
+                if (type->id == 3)
+                {
+                    anim += 24;
+                }
+
+                Entity* deco = layer_ptr->spawn_entity_over(decoration_entity_type, this, x_off, y_off);
+                deco->animation_frame = anim;
+                deco->set_texture(get_texture());
+            }
+            type->draw_depth = draw_depth_before;
+        }
+    }
+    else
+    {
+        static float offsets[4][3]{
+            {0.0f, +0.5f, std::numbers::pi_v<float> * 0.0f},
+            {0.0f, -0.5f, std::numbers::pi_v<float> * 0.0f},
+            {-0.5f, 0.0f, std::numbers::pi_v<float> * 1.0f},
+            {+0.5f, 0.0f, std::numbers::pi_v<float> * 0.0f}};
+
+        if (decos[side] == -1)
+        {
+            auto [x_off, y_off, angle] = offsets[side];
+
+            if (type->id <= 3)
+            {
+                if (side == TOP)
+                {
+                    y_off += 0.05f;
+                }
+                else if (side == BOTTOM)
+                {
+                    y_off -= 0.05f;
+                }
+                else if (side == LEFT)
+                {
+                    x_off += 0.1f;
+                }
+                else if (side == RIGHT)
+                {
+                    x_off -= 0.1f;
+                }
+            }
+
+            Entity* deco = layer_ptr->spawn_entity_over(decoration_entity_type, this, x_off, y_off);
+            deco->angle = angle;
+            deco->animation_frame = get_decoration_animation_frame(side);
+            deco->set_texture(get_texture());
+            decos[side] = deco->uid;
+        }
     }
 }
 
-bool Floor::is_styled()
+bool Floor::has_corners() const
+{
+    return type->id == 1 || type->id == 3;
+}
+bool Floor::is_styled() const
 {
     switch (type->id)
     {
@@ -130,7 +282,7 @@ bool Floor::is_styled()
         return false;
     }
 }
-int32_t Floor::get_decoration_entity_type()
+int32_t Floor::get_decoration_entity_type() const
 {
     [[maybe_unused]] static auto do_once = []()
     {
@@ -202,7 +354,7 @@ int32_t Floor::get_decoration_entity_type()
     }
     return -1;
 }
-uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side)
+uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
 {
     bool has_variants = false;
     bool styled = false;
@@ -306,4 +458,86 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side)
     if (has_variants)
         animation_frame += rand() % 3;
     return animation_frame;
+}
+
+FLOOR_SIDE Floor::get_opposite_side(FLOOR_SIDE side)
+{
+    switch (side)
+    {
+    default:
+    case FLOOR_SIDE::TOP:
+    case FLOOR_SIDE::LEFT:
+        return FLOOR_SIDE(side + 1);
+    case FLOOR_SIDE::BOTTOM:
+    case FLOOR_SIDE::RIGHT:
+        return FLOOR_SIDE(side - 1);
+    case FLOOR_SIDE::TOP_LEFT:
+        return FLOOR_SIDE::BOTTOM_RIGHT;
+    case FLOOR_SIDE::BOTTOM_RIGHT:
+        return FLOOR_SIDE::TOP_LEFT;
+    case FLOOR_SIDE::TOP_RIGHT:
+        return FLOOR_SIDE::BOTTOM_LEFT;
+    case FLOOR_SIDE::BOTTOM_LEFT:
+        return FLOOR_SIDE::TOP_RIGHT;
+    }
+}
+bool Floor::get_perpendicular_sides(FLOOR_SIDE side, FLOOR_SIDE (&perp_sides)[2])
+{
+    switch (side)
+    {
+    default:
+        return false;
+    case FLOOR_SIDE::TOP:
+    case FLOOR_SIDE::BOTTOM:
+        perp_sides[0] = FLOOR_SIDE::LEFT;
+        perp_sides[1] = FLOOR_SIDE::RIGHT;
+        break;
+    case FLOOR_SIDE::LEFT:
+    case FLOOR_SIDE::RIGHT:
+        perp_sides[0] = FLOOR_SIDE::TOP;
+        perp_sides[1] = FLOOR_SIDE::BOTTOM;
+        break;
+    case FLOOR_SIDE::TOP_LEFT:
+        perp_sides[0] = FLOOR_SIDE::TOP;
+        perp_sides[1] = FLOOR_SIDE::LEFT;
+        break;
+    case FLOOR_SIDE::TOP_RIGHT:
+        perp_sides[0] = FLOOR_SIDE::TOP;
+        perp_sides[1] = FLOOR_SIDE::RIGHT;
+        break;
+    case FLOOR_SIDE::BOTTOM_LEFT:
+        perp_sides[0] = FLOOR_SIDE::BOTTOM;
+        perp_sides[1] = FLOOR_SIDE::LEFT;
+        break;
+    case FLOOR_SIDE::BOTTOM_RIGHT:
+        perp_sides[0] = FLOOR_SIDE::BOTTOM;
+        perp_sides[1] = FLOOR_SIDE::RIGHT;
+        break;
+    }
+    return true;
+}
+bool Floor::get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2])
+{
+    switch (side)
+    {
+    default:
+        return false;
+    case FLOOR_SIDE::TOP:
+        corner_sides[0] = FLOOR_SIDE::TOP_LEFT;
+        corner_sides[1] = FLOOR_SIDE::TOP_RIGHT;
+        break;
+    case FLOOR_SIDE::BOTTOM:
+        corner_sides[0] = FLOOR_SIDE::BOTTOM_LEFT;
+        corner_sides[1] = FLOOR_SIDE::BOTTOM_RIGHT;
+        break;
+    case FLOOR_SIDE::LEFT:
+        corner_sides[0] = FLOOR_SIDE::TOP_LEFT;
+        corner_sides[1] = FLOOR_SIDE::BOTTOM_LEFT;
+        break;
+    case FLOOR_SIDE::RIGHT:
+        corner_sides[0] = FLOOR_SIDE::TOP_RIGHT;
+        corner_sides[1] = FLOOR_SIDE::BOTTOM_RIGHT;
+        break;
+    }
+    return true;
 }

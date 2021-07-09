@@ -8,7 +8,11 @@ enum FLOOR_SIDE
     TOP,
     BOTTOM,
     LEFT,
-    RIGHT
+    RIGHT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT,
 };
 
 class Floor : public Entity
@@ -27,13 +31,19 @@ class Floor : public Entity
     };
 
     /// Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.
-    void add_decoration(FLOOR_SIDE side);
     void fix_decorations(bool fix_also_neighbors, bool fix_styled_floor);
+    void add_decoration(FLOOR_SIDE side);
     void remove_decoration(FLOOR_SIDE side);
 
+    Entity* find_corner_decoration(FLOOR_SIDE side);
     void add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, struct Layer* layer_ptr);
 
-    bool is_styled();
-    int32_t get_decoration_entity_type();
-    uint8_t get_decoration_animation_frame(FLOOR_SIDE side);
+    bool has_corners() const;
+    bool is_styled() const;
+    int32_t get_decoration_entity_type() const;
+    uint8_t get_decoration_animation_frame(FLOOR_SIDE side) const;
+
+    static FLOOR_SIDE get_opposite_side(FLOOR_SIDE side);
+    static bool get_perpendicular_sides(FLOOR_SIDE side, FLOOR_SIDE (&perp_sides)[2]);
+    static bool get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2]);
 };
