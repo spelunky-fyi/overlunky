@@ -1002,7 +1002,6 @@ Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor) [`Decor
 - [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &CityOfGoldDoor::unlocked
 ### `MainExit`
 Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `EggShipDoor`
 Derived from [`Entity`](#entity) [`Door`](#door)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggShipDoor::timer
@@ -1035,7 +1034,6 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &SpikeballTrap::timer
 ### `TransferFloor`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `ConveyorBelt`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ConveyorBelt::timer
@@ -1057,7 +1055,6 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &SlidingWallCeiling::state
 ### `QuickSand`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `BigSpearTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int spear_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_uid) &BigSpearTrap::spear_uid
@@ -1479,7 +1476,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Frog::jump_timer
 ### `FireFrog`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Frog`](#frog)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Grub`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float rotation_delta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_delta) &Grub::rotation_delta
@@ -1636,10 +1632,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 ### `CritterBeetle`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)
 - [`bool pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) &CritterBeetle::pause
-### `Container`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`int inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
-- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Container::timer
 ### `Bomb`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`scale_hor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) &Bomb::scale_hor
@@ -1735,7 +1727,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightEmitter`](#lightem
 - [`float target_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_y) &SpecialShot::target_y
 ### `SoundShot`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Spark`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Spark::particle
@@ -1746,7 +1737,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`float next_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_size) &Spark::next_size
 ### `TiamatShot`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightEmitter`](#lightemitter)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Fireball`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot) [`SoundShot`](#soundshot)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Fireball::particle
@@ -1770,6 +1760,230 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int at_end_of_chain_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=at_end_of_chain_uid) &StretchChain::at_end_of_chain_uid
 - [`int position_in_chain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=position_in_chain) &StretchChain::position_in_chain
 - [`bool is_chain_overlapping_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_chain_overlapping_ball) &StretchChain::is_chain_overlapping_ball
+### `Chest`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool leprechaun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leprechaun) &Chest::leprechaun
+- [`bool bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bomb) &Chest::bomb
+### `Treasure`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool cashed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cashed) &Treasure::cashed
+### `HundunChest`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Treasure`](#treasure)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &HundunChest::timer
+### `Boombox`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Boombox::fx_button
+- [`ParticleEmitterInfo music_note1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music_note1) &Boombox::music_note1
+- [`ParticleEmitterInfo music_note2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music_note2) &Boombox::music_note2
+- [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &Boombox::spawn_y
+- [`int station`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=station) &Boombox::station
+- [`int station_change_delay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=station_change_delay) &Boombox::station_change_delay
+- [`int jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Boombox::jump_timer
+- [`int jump_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_state) &Boombox::jump_state
+### `TV`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &TV::fx_button
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &TV::emitted_light
+- [`int station`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=station) &TV::station
+### `Telescope`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Telescope::fx_button
+- [`Entity camera_anchor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_anchor) &Telescope::camera_anchor
+- [`int looked_through_by_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=looked_through_by_uid) &Telescope::looked_through_by_uid
+### `Torch`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int flame_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_uid) &Torch::flame_uid
+- [`bool is_lit`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_lit) &Torch::is_lit
+### `WallTorch`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Torch`](#torch)
+### `TorchFlame`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
+- [`ParticleEmitterInfo smoke_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke_particle) &TorchFlame::smoke_particle
+- [`ParticleEmitterInfo flame_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_particle) &TorchFlame::flame_particle
+- [`ParticleEmitterInfo warp_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=warp_particle) &TorchFlame::warp_particle
+- [`float flame_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) &TorchFlame::flame_size
+### `LampFlame`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
+- [`ParticleEmitterInfo flame_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_particle) &LampFlame::flame_particle
+### `Bullet`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `TimedShot`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &TimedShot::timer
+### `CloneGunShot`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot) [`TimedShot`](#timedshot)
+- [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &CloneGunShot::spawn_y
+### `PunishBall`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int attached_to_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_to_uid) &PunishBall::attached_to_uid
+- [`float x_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x_pos) &PunishBall::x_pos
+- [`float y_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_pos) &PunishBall::y_pos
+### `Chain`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int attached_to_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_to_uid) &Chain::attached_to_uid
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Chain::timer
+### `Container`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
+### `Container`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
+### `Coffin`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Container`](#container)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Coffin::timer
+### `Fly`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Fly::timer
+### `OlmecCannon`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &OlmecCannon::timer
+- [`int bombs_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs_left) &OlmecCannon::bombs_left
+### `Landmine`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightEmitter`](#lightemitter)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Landmine::timer
+### `UdjatSocket`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &UdjatSocket::fx_button
+### `Ushabti`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int wiggle_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggle_timer) &Ushabti::wiggle_timer
+- [`int shine_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shine_timer) &Ushabti::shine_timer
+### `Honey`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int wiggle_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggle_timer) &Honey::wiggle_timer
+### `GiantClamTop`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int close_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=close_timer) &GiantClamTop::close_timer
+- [`int open_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=open_timer) &GiantClamTop::open_timer
+### `PlayerGhost`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightEmitter`](#lightemitter)
+- [`ParticleEmitterInfo sparkles_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sparkles_particle) &PlayerGhost::sparkles_particle
+- [`PlayerInputs player_inputs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) &PlayerGhost::player_inputs
+- [`Inventory inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &PlayerGhost::inventory
+- [`int shake_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_timer) &PlayerGhost::shake_timer
+- [`int boost_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boost_timer) &PlayerGhost::boost_timer
+### `GhostBreath`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &GhostBreath::timer
+- [`bool big_cloud`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=big_cloud) &GhostBreath::big_cloud
+### `LaserBeam`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ParticleEmitterInfo sparks`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sparks) &LaserBeam::sparks
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LaserBeam::emitted_light
+### `TreasureHook`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `AxolotlShot`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int trapped_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trapped_uid) &AxolotlShot::trapped_uid
+- [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &AxolotlShot::size
+- [`float swing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swing) &AxolotlShot::swing
+- [`float swing_periodicity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swing_periodicity) &AxolotlShot::swing_periodicity
+- [`float distance_after_capture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance_after_capture) &AxolotlShot::distance_after_capture
+### `TrapPart`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity ceiling`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling) &TrapPart::ceiling
+### `SkullDropTrap`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int left_skull_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_skull_uid) &SkullDropTrap::left_skull_uid
+- [`int middle_skull_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_skull_uid) &SkullDropTrap::middle_skull_uid
+- [`int right_skull_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_skull_uid) &SkullDropTrap::right_skull_uid
+- [`int left_skull_drop_time`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_skull_drop_time) &SkullDropTrap::left_skull_drop_time
+- [`int middle_skull_drop_time`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_skull_drop_time) &SkullDropTrap::middle_skull_drop_time
+- [`int right_skull_drop_time`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_skull_drop_time) &SkullDropTrap::right_skull_drop_time
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &SkullDropTrap::timer
+### `FrozenLiquid`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `Switch`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Switch::timer
+### `FlyHead`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int vored_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vored_entity_uid) &FlyHead::vored_entity_uid
+### `SnapTrap`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int bait_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bait_uid) &SnapTrap::bait_uid
+- [`int reload_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_timer) &SnapTrap::reload_timer
+### `EmpressGrave`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &EmpressGrave::fx_button
+- [`Entity ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost) &EmpressGrave::ghost
+### `Tentacle`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Chain`](#chain)
+- [`Entity bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) &Tentacle::bottom
+### `MiniGameShip`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float velocity_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_x) &MiniGameShip::velocity_x
+- [`float velocity_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_y) &MiniGameShip::velocity_y
+- [`float swing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swing) &MiniGameShip::swing
+- [`float up_down_normal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up_down_normal) &MiniGameShip::up_down_normal
+### `MiniGameAsteroid`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float spin_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spin_speed) &MiniGameAsteroid::spin_speed
+### `Pot`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool dont_transfer_dmg`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dont_transfer_dmg) &Pot::dont_transfer_dmg
+### `CursedPot`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ParticleEmitterInfo smoke`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke) &CursedPot::smoke
+- [`ParticleEmitterInfo smoke2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke2) &CursedPot::smoke2
+### `CookFire`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool lit`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lit) &CookFire::lit
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &CookFire::emitted_light
+- [`ParticleEmitterInfo particles_smoke`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_smoke) &CookFire::particles_smoke
+- [`ParticleEmitterInfo particles_flames`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_flames) &CookFire::particles_flames
+- [`ParticleEmitterInfo particles_warp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_warp) &CookFire::particles_warp
+### `Orb`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Orb::timer
+### `EggSac`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggSac::timer
+### `Goldbar`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `Coin`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int nominal_price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=nominal_price) &Coin::nominal_price
+### `RollingItem`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float roll_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=roll_speed) &RollingItem::roll_speed
+### `PlayerBag`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &PlayerBag::bombs
+- [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &PlayerBag::ropes
+### `ParachutePowerup`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int falltime_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falltime_deploy) &ParachutePowerup::falltime_deploy
+- [`bool deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deploy) &ParachutePowerup::deploy
+- [`bool after_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=after_deploy) &ParachutePowerup::after_deploy
+### `TrueCrownPowerup`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &TrueCrownPowerup::timer
+### `AnkhPowerup`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &AnkhPowerup::player
+- [`Entity fx_glow`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_glow) &AnkhPowerup::fx_glow
+- [`int timer1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer1) &AnkhPowerup::timer1
+- [`int timer2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer2) &AnkhPowerup::timer2
+- [`int timer3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer3) &AnkhPowerup::timer3
+- [`bool music_on_off`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music_on_off) &AnkhPowerup::music_on_off
+### `YellowCape`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
+### `Teleporter`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int teleport_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teleport_number) &Teleporter::teleport_number
+### `Boomerang`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ParticleEmitterInfo trail`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trail) &Boomerang::trail
+- [`float distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) &Boomerang::distance
+- [`float rotation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation) &Boomerang::rotation
+- [`int owner_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) &Boomerang::owner_uid
+### `Excalibur`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool in_stone`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_stone) &Excalibur::in_stone
+### `Shield`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake) &Shield::shake
 ### `ParticleDB`
 - [`int id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`int spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
@@ -1913,12 +2127,14 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_alien
 - as_altar
 - as_ammit
+- as_ankhpowerup
 - as_anubis
 - as_apephead
 - as_apeppart
 - as_arrow
 - as_arrowtrap
 - as_axolotl
+- as_axolotlshot
 - as_backpack
 - as_bat
 - as_bee
@@ -1926,16 +2142,25 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_bigspeartrap
 - as_bodyguard
 - as_bomb
+- as_boombox
+- as_boomerang
+- as_bullet
 - as_cape
 - as_catmummy
 - as_caveman
 - as_cavemanshopkeeper
+- as_chain
+- as_chest
 - as_cityofgolddoor
 - as_claw
 - as_climbablerope
+- as_clonegunshot
 - as_cobra
+- as_coffin
+- as_coin
 - as_container
 - as_conveyorbelt
+- as_cookfire
 - as_crabman
 - as_critter
 - as_critterbeetle
@@ -1950,10 +2175,14 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_crittersnail
 - as_crocman
 - as_crushtrap
+- as_cursedpot
 - as_decorateddoor
 - as_door
 - as_eggplantminister
+- as_eggsac
 - as_eggshipdoor
+- as_empressgrave
+- as_excalibur
 - as_exitdoor
 - as_fireball
 - as_firebug
@@ -1963,16 +2192,22 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_flame
 - as_flamesize
 - as_floor
+- as_fly
+- as_flyhead
 - as_forcefield
 - as_forestsister
 - as_frog
+- as_frozenliquid
 - as_generator
 - as_ghist
 - as_ghistshopkeeper
 - as_ghost
+- as_ghostbreath
+- as_giantclamtop
 - as_giantfish
 - as_giantfly
 - as_giantfrog
+- as_goldbar
 - as_goldmonkey
 - as_goldmonkey
 - as_grub
@@ -1981,10 +2216,12 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_hangspider
 - as_hangstrand
 - as_hermitcrab
+- as_honey
 - as_horizontalforcefield
 - as_hornedlizard
 - as_hoverpack
 - as_hundun
+- as_hundunchest
 - as_hundunhead
 - as_idol
 - as_imp
@@ -1996,6 +2233,9 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_kingu
 - as_lahamu
 - as_lamassu
+- as_lampflame
+- as_landmine
+- as_laserbeam
 - as_lasertrap
 - as_lavamander
 - as_leaf
@@ -2011,6 +2251,8 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_mattock
 - as_mech
 - as_megajellyfish
+- as_minigameasteroid
+- as_minigameship
 - as_mole
 - as_monkey
 - as_monkey
@@ -2022,25 +2264,36 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_necromancer
 - as_octopus
 - as_olmec
+- as_olmeccannon
 - as_olmite
+- as_orb
 - as_osirishand
 - as_osirishead
+- as_parachutepowerup
 - as_pet
 - as_pipe
+- as_playerbag
+- as_playerghost
 - as_poledeco
+- as_pot
 - as_protoshopkeeper
+- as_punishball
 - as_qilin
 - as_quicksand
 - as_quillback
 - as_robot
 - as_rockdog
+- as_rollingitem
 - as_scarab
 - as_sceptershot
 - as_scorpion
+- as_shield
 - as_shopkeeper
 - as_shopkeeperclone
 - as_skeleton
+- as_skulldroptrap
 - as_slidingwallceiling
+- as_snaptrap
 - as_sorceress
 - as_soundshot
 - as_spark
@@ -2052,28 +2305,44 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_spikeballtrap
 - as_stickytrap
 - as_stretchchain
+- as_switch
 - as_tadpole
+- as_teleporter
 - as_teleportingborder
+- as_telescope
+- as_tentacle
 - as_tentaclebottom
 - as_terra
 - as_tiamat
 - as_tiamatshot
 - as_timedforcefield
+- as_timedshot
+- as_torch
+- as_torchflame
 - as_totemtrap
 - as_transferfloor
+- as_trappart
+- as_treasure
+- as_treasurehook
+- as_truecrownpowerup
 - as_tun
+- as_tv
+- as_udjatsocket
 - as_ufo
+- as_ushabti
 - as_vampire
 - as_vanhorsing
 - as_vlad
 - as_vladscape
 - as_waddler
+- as_walltorch
 - as_webgun
 - as_webshot
 - as_witchdoctor
 - as_witchdoctorskull
 - as_yama
 - as_yang
+- as_yellowcape
 - as_yeti
 - as_yetiking
 - as_yetiqueen

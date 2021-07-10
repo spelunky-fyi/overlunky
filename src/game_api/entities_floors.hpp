@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Entity.hpp"
 #include "entities_items.hpp" // for UnknownPointerGroup
+#include "entity.hpp"
 #include <cstdint>
 
 class Floor : public Entity

@@ -143,13 +143,6 @@ class Player : public Movable
     void set_heart_color(Color color);
 };
 
-class Container : public Movable
-{
-  public:
-    int32_t inside;
-    int32_t timer;
-};
-
 class OlmecFloater : public Movable
 {
   public:
