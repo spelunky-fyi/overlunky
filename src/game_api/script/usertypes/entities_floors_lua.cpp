@@ -19,6 +19,20 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_mainexit"] = &Entity::as<MainExit>;
     lua["Entity"]["as_eggshipdoor"] = &Entity::as<EggShipDoor>;
     lua["Entity"]["as_arrowtrap"] = &Entity::as<Arrowtrap>;
+    lua["Entity"]["as_totemtrap"] = &Entity::as<TotemTrap>;
+    lua["Entity"]["as_lasertrap"] = &Entity::as<LaserTrap>;
+    lua["Entity"]["as_sparktrap"] = &Entity::as<SparkTrap>;
+    lua["Entity"]["as_altar"] = &Entity::as<Altar>;
+    lua["Entity"]["as_spikeballtrap"] = &Entity::as<SpikeballTrap>;
+    lua["Entity"]["as_transferfloor"] = &Entity::as<TransferFloor>;
+    lua["Entity"]["as_conveyorbelt"] = &Entity::as<ConveyorBelt>;
+    lua["Entity"]["as_pipe"] = &Entity::as<Pipe>;
+    lua["Entity"]["as_generator"] = &Entity::as<Generator>;
+    lua["Entity"]["as_slidingwallceiling"] = &Entity::as<SlidingWallCeiling>;
+    lua["Entity"]["as_quicksand"] = &Entity::as<QuickSand>;
+    lua["Entity"]["as_bigspeartrap"] = &Entity::as<BigSpearTrap>;
+    lua["Entity"]["as_stickytrap"] = &Entity::as<StickyTrap>;
+    lua["Entity"]["as_motherstatue"] = &Entity::as<MotherStatue>;
 
     lua.new_usertype<Floor>(
         "Floor",
@@ -101,6 +115,158 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "rearm",
         &Arrowtrap::rearm,
         sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<TotemTrap>(
+        "TotemTrap",
+        "spawn_entity_type",
+        &TotemTrap::spawn_entity_type,
+        "first_sound_id",
+        &TotemTrap::first_sound_id,
+        sol::base_classes,
         sol::bases<Entity>());
+
+    lua.new_usertype<LaserTrap>(
+        "LaserTrap",
+        "emitted_light",
+        &LaserTrap::emitted_light,
+        "reset_timer",
+        &LaserTrap::reset_timer,
+        "phase_2",
+        &LaserTrap::phase_2,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<SparkTrap>(
+        "SparkTrap",
+        "emitted_light",
+        &SparkTrap::emitted_light,
+        "spark_uid",
+        &SparkTrap::spark_uid,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<Altar>(
+        "Altar",
+        "timer",
+        &Altar::timer,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<SpikeballTrap>(
+        "SpikeballTrap",
+        "chain",
+        &SpikeballTrap::chain,
+        "end_piece",
+        &SpikeballTrap::end_piece,
+        "state",
+        &SpikeballTrap::state,
+        "timer",
+        &SpikeballTrap::timer,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<TransferFloor>(
+        "TransferFloor",
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<ConveyorBelt>(
+        "ConveyorBelt",
+        "timer",
+        &ConveyorBelt::timer,
+        sol::base_classes,
+        sol::bases<Entity, Floor, TransferFloor>());
+
+    lua.new_usertype<Pipe>(
+        "Pipe",
+        "type",
+        &Pipe::type,
+        "end_pipe",
+        &Pipe::end_pipe,
+        sol::base_classes,
+        sol::bases<Entity, Floor, TransferFloor>());
+
+    lua.new_usertype<Generator>(
+        "Generator",
+        "spawned_uid",
+        &Generator::spawned_uid,
+        "set_timer",
+        &Generator::set_timer,
+        "timer",
+        &Generator::timer,
+        "start_counter",
+        &Generator::start_counter,
+        "on_off",
+        &Generator::on_off,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<SlidingWallCeiling>(
+        "SlidingWallCeiling",
+        "attached_piece",
+        &SlidingWallCeiling::attached_piece,
+        "active_floor_part_uid",
+        &SlidingWallCeiling::active_floor_part_uid,
+        "state",
+        &SlidingWallCeiling::state,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<QuickSand>(
+        "QuickSand",
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<BigSpearTrap>(
+        "BigSpearTrap",
+        "spear_uid",
+        &BigSpearTrap::spear_uid,
+        "left_part",
+        &BigSpearTrap::left_part,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<StickyTrap>(
+        "StickyTrap",
+        "attached_piece_uid",
+        &StickyTrap::attached_piece_uid,
+        "ball_uid",
+        &StickyTrap::ball_uid,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<MotherStatue>(
+        "MotherStatue",
+        "player1_standing",
+        &MotherStatue::player1_standing,
+        "player2_standing",
+        &MotherStatue::player2_standing,
+        "player3_standing",
+        &MotherStatue::player3_standing,
+        "player4_standing",
+        &MotherStatue::player4_standing,
+        "player1_health_received",
+        &MotherStatue::player1_health_received,
+        "player2_health_received",
+        &MotherStatue::player2_health_received,
+        "player3_health_received",
+        &MotherStatue::player3_health_received,
+        "player4_health_received",
+        &MotherStatue::player4_health_received,
+        "player1_health_timer",
+        &MotherStatue::player1_health_timer,
+        "player2_health_timer",
+        &MotherStatue::player2_health_timer,
+        "player3_health_timer",
+        &MotherStatue::player3_health_timer,
+        "player4_health_timer",
+        &MotherStatue::player4_health_timer,
+        "eggplantchild_timer",
+        &MotherStatue::eggplantchild_timer,
+        "eggplantchild_detected",
+        &MotherStatue::eggplantchild_detected,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
 }
 } // namespace NEntitiesFloors

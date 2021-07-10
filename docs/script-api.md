@@ -1008,9 +1008,80 @@ Derived from [`Entity`](#entity) [`Door`](#door)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggShipDoor::timer
 - [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &EggShipDoor::entered
 ### `Arrowtrap`
-Derived from [`Entity`](#entity)
+Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
 - [`nil rearm()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rearm) &Arrowtrap::rearm
+### `TotemTrap`
+Derived from [`Entity`](#entity)
+- [`int spawn_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) &TotemTrap::spawn_entity_type
+- [`int first_sound_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) &TotemTrap::first_sound_id
+### `LaserTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LaserTrap::emitted_light
+- [`int reset_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_timer) &LaserTrap::reset_timer
+- [`bool phase_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase_2) &LaserTrap::phase_2
+### `SparkTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &SparkTrap::emitted_light
+- [`int spark_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spark_uid) &SparkTrap::spark_uid
+### `Altar`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Altar::timer
+### `SpikeballTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`Entity chain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chain) &SpikeballTrap::chain
+- [`Entity end_piece`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_piece) &SpikeballTrap::end_piece
+- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &SpikeballTrap::state
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &SpikeballTrap::timer
+### `TransferFloor`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
+### `ConveyorBelt`
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ConveyorBelt::timer
+### `Pipe`
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
+- [`int type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Pipe::type
+- [`bool end_pipe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_pipe) &Pipe::end_pipe
+### `Generator`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`int spawned_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawned_uid) &Generator::spawned_uid
+- [`int set_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_timer) &Generator::set_timer
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Generator::timer
+- [`int start_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_counter) &Generator::start_counter
+- [`bool on_off`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_off) &Generator::on_off
+### `SlidingWallCeiling`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`Entity attached_piece`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece) &SlidingWallCeiling::attached_piece
+- [`int active_floor_part_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_floor_part_uid) &SlidingWallCeiling::active_floor_part_uid
+- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &SlidingWallCeiling::state
+### `QuickSand`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
+### `BigSpearTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`int spear_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_uid) &BigSpearTrap::spear_uid
+- [`bool left_part`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_part) &BigSpearTrap::left_part
+### `StickyTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid
+- [`int ball_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ball_uid) &StickyTrap::ball_uid
+### `MotherStatue`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`bool player1_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_standing) &MotherStatue::player1_standing
+- [`bool player2_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_standing) &MotherStatue::player2_standing
+- [`bool player3_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_standing) &MotherStatue::player3_standing
+- [`bool player4_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player4_standing) &MotherStatue::player4_standing
+- [`bool player1_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_health_received) &MotherStatue::player1_health_received
+- [`bool player2_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_health_received) &MotherStatue::player2_health_received
+- [`bool player3_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_health_received) &MotherStatue::player3_health_received
+- [`bool player4_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player4_health_received) &MotherStatue::player4_health_received
+- [`int player1_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_health_timer) &MotherStatue::player1_health_timer
+- [`int player2_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_health_timer) &MotherStatue::player2_health_timer
+- [`int player3_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_health_timer) &MotherStatue::player3_health_timer
+- [`int player4_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player4_health_timer) &MotherStatue::player4_health_timer
+- [`int eggplantchild_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=eggplantchild_timer) &MotherStatue::eggplantchild_timer
+- [`bool eggplantchild_detected`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=eggplantchild_detected) &MotherStatue::eggplantchild_detected
 ### `Crushtrap`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
@@ -1270,13 +1341,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int shell_invincibility_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shell_invincibility_timer) &Kingu::shell_invincibility_timer
 - [`int monster_spawn_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=monster_spawn_timer) &Kingu::monster_spawn_timer
 - [`initial_shell_health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=initial_shell_health) &Kingu::initial_shell_health
-### `AnubisTwo`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
-- [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &AnubisTwo::spawn_x
-- [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &AnubisTwo::spawn_y
-- [`attack_proximity_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_proximity_y) &AnubisTwo::attack_proximity_y
-- [`float attack_proximity_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_proximity_x) &AnubisTwo::attack_proximity_x
-- [`int next_attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_attack_timer) &AnubisTwo::next_attack_timer
 ### `Anubis`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &Anubis::spawn_x
@@ -1724,9 +1788,9 @@ To figure out what type of entity you get back, consult the [entity hierarchy li
 
 For reference, the available `as_<typename>` functions are listed below:
 - as_alien
+- as_altar
 - as_ammit
 - as_anubis
-- as_anubistwo
 - as_apephead
 - as_apeppart
 - as_arrowtrap
@@ -1735,6 +1799,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_bat
 - as_bee
 - as_beg
+- as_bigspeartrap
 - as_bodyguard
 - as_bomb
 - as_cape
@@ -1744,6 +1809,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_cityofgolddoor
 - as_cobra
 - as_container
+- as_conveyorbelt
 - as_crabman
 - as_critter
 - as_critterbeetle
@@ -1770,6 +1836,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_floor
 - as_forestsister
 - as_frog
+- as_generator
 - as_ghist
 - as_ghistshopkeeper
 - as_ghost
@@ -1794,6 +1861,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_kingu
 - as_lahamu
 - as_lamassu
+- as_lasertrap
 - as_lavamander
 - as_leprechaun
 - as_lockeddoor
@@ -1809,6 +1877,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_monkey
 - as_monster
 - as_mosquito
+- as_motherstatue
 - as_mount
 - as_mummy
 - as_necromancer
@@ -1818,8 +1887,10 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_osirishand
 - as_osirishead
 - as_pet
+- as_pipe
 - as_protoshopkeeper
 - as_qilin
+- as_quicksand
 - as_quillback
 - as_robot
 - as_rockdog
@@ -1828,12 +1899,18 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_shopkeeper
 - as_shopkeeperclone
 - as_skeleton
+- as_slidingwallceiling
 - as_sorceress
+- as_sparktrap
 - as_sparrow
 - as_spider
+- as_spikeballtrap
+- as_stickytrap
 - as_tadpole
 - as_terra
 - as_tiamat
+- as_totemtrap
+- as_transferfloor
 - as_tun
 - as_ufo
 - as_vampire

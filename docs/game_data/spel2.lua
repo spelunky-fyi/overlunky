@@ -3,6 +3,11 @@ Alien = {
   __name = "sol.Alien.user",
   __newindex = "function:"
 }
+Altar = {
+  __index = "function:",
+  __name = "sol.Altar.user",
+  __newindex = "function:"
+}
 Ammit = {
   __index = "function:",
   __name = "sol.Ammit.user",
@@ -14,11 +19,6 @@ Animation = {
 Anubis = {
   __index = "function:",
   __name = "sol.Anubis.user",
-  __newindex = "function:"
-}
-AnubisTwo = {
-  __index = "function:",
-  __name = "sol.AnubisTwo.user",
   __newindex = "function:"
 }
 ApepHead = {
@@ -75,6 +75,11 @@ Bee = {
 Beg = {
   __index = "function:",
   __name = "sol.Beg.user",
+  __newindex = "function:"
+}
+BigSpearTrap = {
+  __index = "function:",
+  __name = "sol.BigSpearTrap.user",
   __newindex = "function:"
 }
 Bodyguard = {
@@ -167,6 +172,11 @@ Color = {
 Container = {
   __index = "function:",
   __name = "sol.Container.user",
+  __newindex = "function:"
+}
+ConveyorBelt = {
+  __index = "function:",
+  __name = "sol.ConveyorBelt.user",
   __newindex = "function:"
 }
 Crabman = {
@@ -1314,6 +1324,11 @@ Frog = {
   __name = "sol.Frog.user",
   __newindex = "function:"
 }
+Generator = {
+  __index = "function:",
+  __name = "sol.Generator.user",
+  __newindex = "function:"
+}
 Ghist = {
   __index = "function:",
   __name = "sol.Ghist.user",
@@ -1462,6 +1477,11 @@ Lamassu = {
   __name = "sol.Lamassu.user",
   __newindex = "function:"
 }
+LaserTrap = {
+  __index = "function:",
+  __name = "sol.LaserTrap.user",
+  __newindex = "function:"
+}
 Lavamander = {
   __index = "function:",
   __name = "sol.Lavamander.user",
@@ -1553,6 +1573,11 @@ Monster = {
 Mosquito = {
   __index = "function:",
   __name = "sol.Mosquito.user",
+  __newindex = "function:"
+}
+MotherStatue = {
+  __index = "function:",
+  __name = "sol.MotherStatue.user",
   __newindex = "function:"
 }
 Mount = {
@@ -1875,6 +1900,11 @@ Pet = {
   __name = "sol.Pet.user",
   __newindex = "function:"
 }
+Pipe = {
+  __index = "function:",
+  __name = "sol.Pipe.user",
+  __newindex = "function:"
+}
 Player = {
   __index = "function:",
   __name = "sol.Player.user",
@@ -1907,6 +1937,11 @@ Qilin = {
 }
 QuestsInfo = {
   __name = "sol.QuestsInfo.user"
+}
+QuickSand = {
+  __index = "function:",
+  __name = "sol.QuickSand.user",
+  __newindex = "function:"
 }
 Quillback = {
   __index = "function:",
@@ -2233,9 +2268,19 @@ Skeleton = {
   __name = "sol.Skeleton.user",
   __newindex = "function:"
 }
+SlidingWallCeiling = {
+  __index = "function:",
+  __name = "sol.SlidingWallCeiling.user",
+  __newindex = "function:"
+}
 Sorceress = {
   __index = "function:",
   __name = "sol.Sorceress.user",
+  __newindex = "function:"
+}
+SparkTrap = {
+  __index = "function:",
+  __name = "sol.SparkTrap.user",
   __newindex = "function:"
 }
 Sparrow = {
@@ -2248,8 +2293,18 @@ Spider = {
   __name = "sol.Spider.user",
   __newindex = "function:"
 }
+SpikeballTrap = {
+  __index = "function:",
+  __name = "sol.SpikeballTrap.user",
+  __newindex = "function:"
+}
 StateMemory = {
   __name = "sol.StateMemory.user"
+}
+StickyTrap = {
+  __index = "function:",
+  __name = "sol.StickyTrap.user",
+  __newindex = "function:"
 }
 TEXTURE = {
   DATA_TEXTURES_BASE_EGGSHIP2_0 = 94,
@@ -2928,7 +2983,7 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
+  nil,
   "function:",
   nil,
   "function:",
@@ -3447,6 +3502,16 @@ TextureDefinition = {
 Tiamat = {
   __index = "function:",
   __name = "sol.Tiamat.user",
+  __newindex = "function:"
+}
+TotemTrap = {
+  __index = "function:",
+  __name = "sol.TotemTrap.user",
+  __newindex = "function:"
+}
+TransferFloor = {
+  __index = "function:",
+  __name = "sol.TransferFloor.user",
   __newindex = "function:"
 }
 Tun = {
