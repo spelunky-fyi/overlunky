@@ -543,6 +543,7 @@ for type in types:
             print('<br>')
             for com in var['comment']:
                 print(com)
+            print()
 
 print('## Automatic casting of entities')
 print('When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.')
