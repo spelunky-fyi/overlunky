@@ -222,6 +222,7 @@ for file in api_files:
         for var in attr:
             if not var: continue
             var = var.split(',')
+            if var[0] == 'sol::base_classes': continue
             if 'table_of' in var[1]:
                 var[1] = var[1].replace('table_of(', '')+'[]'
             var_name = var[0]
