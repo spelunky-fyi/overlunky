@@ -33,6 +33,12 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_bigspeartrap"] = &Entity::as<BigSpearTrap>;
     lua["Entity"]["as_stickytrap"] = &Entity::as<StickyTrap>;
     lua["Entity"]["as_motherstatue"] = &Entity::as<MotherStatue>;
+    lua["Entity"]["as_teleportingborder"] = &Entity::as<TeleportingBorder>;
+    lua["Entity"]["as_forcefield"] = &Entity::as<ForceField>;
+    lua["Entity"]["as_timedforcefield"] = &Entity::as<TimedForceField>;
+    lua["Entity"]["as_horizontalforcefield"] = &Entity::as<HorizontalForceField>;
+    lua["Entity"]["as_tentaclebottom"] = &Entity::as<TentacleBottom>;
+    lua["Entity"]["as_poledeco"] = &Entity::as<PoleDeco>;
 
     lua.new_usertype<Floor>(
         "Floor",
@@ -266,6 +272,66 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &MotherStatue::eggplantchild_timer,
         "eggplantchild_detected",
         &MotherStatue::eggplantchild_detected,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<TeleportingBorder>(
+        "TeleportingBorder",
+        "attached_piece_uid",
+        &TeleportingBorder::direction,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<ForceField>(
+        "ForceField",
+        "first_item_beam",
+        &ForceField::first_item_beam,
+        "fx",
+        &ForceField::fx,
+        "emitted_light",
+        &ForceField::emitted_light,
+        "on_off",
+        &ForceField::on_off,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<TimedForceField>(
+        "TimedForceField",
+        "timer",
+        &TimedForceField::timer,
+        "pause",
+        &TimedForceField::pause,
+        sol::base_classes,
+        sol::bases<Entity, Floor, ForceField>());
+
+    lua.new_usertype<HorizontalForceField>(
+        "HorizontalForceField",
+        "first_item_beam",
+        &HorizontalForceField::first_item_beam,
+        "fx",
+        &HorizontalForceField::fx,
+        "timer",
+        &HorizontalForceField::timer,
+        "on_off",
+        &HorizontalForceField::on_off,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<TentacleBottom>(
+        "TentacleBottom",
+        "attached_piece_uid",
+        &TentacleBottom::attached_piece_uid,
+        "tentacle_uid",
+        &TentacleBottom::tentacle_uid,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<PoleDeco>(
+        "PoleDeco",
+        "deco_up",
+        &PoleDeco::deco_up,
+        "deco_down",
+        &PoleDeco::deco_down,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 }

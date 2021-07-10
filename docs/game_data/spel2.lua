@@ -1,3 +1,8 @@
+AcidBubble = {
+  __index = "function:",
+  __name = "sol.AcidBubble.user",
+  __newindex = "function:"
+}
 Alien = {
   __index = "function:",
   __name = "sol.Alien.user",
@@ -29,6 +34,11 @@ ApepHead = {
 ApepPart = {
   __index = "function:",
   __name = "sol.ApepPart.user",
+  __newindex = "function:"
+}
+Arrow = {
+  __index = "function:",
+  __name = "sol.Arrow.user",
   __newindex = "function:"
 }
 Arrowtrap = {
@@ -159,6 +169,16 @@ CavemanShopkeeper = {
 CityOfGoldDoor = {
   __index = "function:",
   __name = "sol.CityOfGoldDoor.user",
+  __newindex = "function:"
+}
+Claw = {
+  __index = "function:",
+  __name = "sol.Claw.user",
+  __newindex = "function:"
+}
+ClimbableRope = {
+  __index = "function:",
+  __name = "sol.ClimbableRope.user",
   __newindex = "function:"
 }
 Cobra = {
@@ -1294,6 +1314,11 @@ FireFrog = {
   __name = "sol.FireFrog.user",
   __newindex = "function:"
 }
+Fireball = {
+  __index = "function:",
+  __name = "sol.Fireball.user",
+  __newindex = "function:"
+}
 Firebug = {
   __index = "function:",
   __name = "sol.Firebug.user",
@@ -1309,9 +1334,24 @@ Fish = {
   __name = "sol.Fish.user",
   __newindex = "function:"
 }
+Flame = {
+  __index = "function:",
+  __name = "sol.Flame.user",
+  __newindex = "function:"
+}
+FlameSize = {
+  __index = "function:",
+  __name = "sol.FlameSize.user",
+  __newindex = "function:"
+}
 Floor = {
   __index = "function:",
   __name = "sol.Floor.user",
+  __newindex = "function:"
+}
+ForceField = {
+  __index = "function:",
+  __name = "sol.ForceField.user",
   __newindex = "function:"
 }
 ForestSister = {
@@ -1381,14 +1421,29 @@ HUNDUNFLAGS = {
   TOPLEVELARENAREACHED = 8,
   WILLMOVELEFT = 1
 }
+HangAnchor = {
+  __index = "function:",
+  __name = "sol.HangAnchor.user",
+  __newindex = "function:"
+}
 HangSpider = {
   __index = "function:",
   __name = "sol.HangSpider.user",
   __newindex = "function:"
 }
+HangStrand = {
+  __index = "function:",
+  __name = "sol.HangStrand.user",
+  __newindex = "function:"
+}
 Hermitcrab = {
   __index = "function:",
   __name = "sol.Hermitcrab.user",
+  __newindex = "function:"
+}
+HorizontalForceField = {
+  __index = "function:",
+  __name = "sol.HorizontalForceField.user",
   __newindex = "function:"
 }
 HornedLizard = {
@@ -1409,6 +1464,11 @@ Hundun = {
 HundunHead = {
   __index = "function:",
   __name = "sol.HundunHead.user",
+  __newindex = "function:"
+}
+Idol = {
+  __index = "function:",
+  __name = "sol.Idol.user",
   __newindex = "function:"
 }
 Illumination = {
@@ -1446,6 +1506,11 @@ Jiangshi = {
 JumpDog = {
   __index = "function:",
   __name = "sol.JumpDog.user",
+  __newindex = "function:"
+}
+JungleSpearCosmetic = {
+  __index = "function:",
+  __name = "sol.JungleSpearCosmetic.user",
   __newindex = "function:"
 }
 KapalaPowerup = {
@@ -1487,13 +1552,33 @@ Lavamander = {
   __name = "sol.Lavamander.user",
   __newindex = "function:"
 }
+Leaf = {
+  __index = "function:",
+  __name = "sol.Leaf.user",
+  __newindex = "function:"
+}
 Leprechaun = {
   __index = "function:",
   __name = "sol.Leprechaun.user",
   __newindex = "function:"
 }
+LightArrow = {
+  __index = "function:",
+  __name = "sol.LightArrow.user",
+  __newindex = "function:"
+}
+LightEmitter = {
+  __index = "function:",
+  __name = "sol.LightEmitter.user",
+  __newindex = "function:"
+}
 LightParams = {
   __name = "sol.LightParams.user"
+}
+LightShot = {
+  __index = "function:",
+  __name = "sol.LightShot.user",
+  __newindex = "function:"
 }
 LoadContext = {
   __name = "sol.LoadContext.user"
@@ -1922,6 +2007,11 @@ PlayerSlotSettings = {
 PlayingSound = {
   __name = "sol.PlayingSound.user"
 }
+PoleDeco = {
+  __index = "function:",
+  __name = "sol.PoleDeco.user",
+  __newindex = "function:"
+}
 PostRoomGenerationContext = {
   __name = "sol.PostRoomGenerationContext.user"
 }
@@ -2248,6 +2338,11 @@ Scarab = {
   __name = "sol.Scarab.user",
   __newindex = "function:"
 }
+ScepterShot = {
+  __index = "function:",
+  __name = "sol.ScepterShot.user",
+  __newindex = "function:"
+}
 Scorpion = {
   __index = "function:",
   __name = "sol.Scorpion.user",
@@ -2278,6 +2373,16 @@ Sorceress = {
   __name = "sol.Sorceress.user",
   __newindex = "function:"
 }
+SoundShot = {
+  __index = "function:",
+  __name = "sol.SoundShot.user",
+  __newindex = "function:"
+}
+Spark = {
+  __index = "function:",
+  __name = "sol.Spark.user",
+  __newindex = "function:"
+}
 SparkTrap = {
   __index = "function:",
   __name = "sol.SparkTrap.user",
@@ -2286,6 +2391,16 @@ SparkTrap = {
 Sparrow = {
   __index = "function:",
   __name = "sol.Sparrow.user",
+  __newindex = "function:"
+}
+Spear = {
+  __index = "function:",
+  __name = "sol.Spear.user",
+  __newindex = "function:"
+}
+SpecialShot = {
+  __index = "function:",
+  __name = "sol.SpecialShot.user",
   __newindex = "function:"
 }
 Spider = {
@@ -2304,6 +2419,11 @@ StateMemory = {
 StickyTrap = {
   __index = "function:",
   __name = "sol.StickyTrap.user",
+  __newindex = "function:"
+}
+StretchChain = {
+  __index = "function:",
+  __name = "sol.StretchChain.user",
   __newindex = "function:"
 }
 TEXTURE = {
@@ -2766,27 +2886,12 @@ TYPE_MAP = {
   nil,
   "function:",
   nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
+  "function:",
   nil,
   nil,
+  "function:",
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
@@ -2799,10 +2904,15 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
+  "function:",
   nil,
   nil,
   nil,
+  "function:",
   nil,
+  "function:",
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
@@ -2812,12 +2922,20 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
+  "function:",
+  "function:",
+  "function:",
+  "function:",
   nil,
   nil,
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
+  "function:",
   nil,
+  "function:",
   nil,
   nil,
   nil,
@@ -2827,6 +2945,8 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
@@ -3073,28 +3193,22 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   "function:",
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3103,14 +3217,20 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
+  nil,
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3137,7 +3257,7 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3148,13 +3268,13 @@ TYPE_MAP = {
   "function:",
   nil,
   nil,
-  "function:",
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3188,11 +3308,11 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3204,12 +3324,12 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  "function:",
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3350,7 +3470,6 @@ TYPE_MAP = {
   "function:",
   nil,
   nil,
-  "function:",
   "function:",
   "function:",
   "function:",
@@ -3381,10 +3500,11 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3491,6 +3611,16 @@ Tadpole = {
   __name = "sol.Tadpole.user",
   __newindex = "function:"
 }
+TeleportingBorder = {
+  __index = "function:",
+  __name = "sol.TeleportingBorder.user",
+  __newindex = "function:"
+}
+TentacleBottom = {
+  __index = "function:",
+  __name = "sol.TentacleBottom.user",
+  __newindex = "function:"
+}
 Terra = {
   __index = "function:",
   __name = "sol.Terra.user",
@@ -3502,6 +3632,16 @@ TextureDefinition = {
 Tiamat = {
   __index = "function:",
   __name = "sol.Tiamat.user",
+  __newindex = "function:"
+}
+TiamatShot = {
+  __index = "function:",
+  __name = "sol.TiamatShot.user",
+  __newindex = "function:"
+}
+TimedForceField = {
+  __index = "function:",
+  __name = "sol.TimedForceField.user",
   __newindex = "function:"
 }
 TotemTrap = {
@@ -4152,6 +4292,11 @@ Waddler = {
 WebGun = {
   __index = "function:",
   __name = "sol.WebGun.user",
+  __newindex = "function:"
+}
+WebShot = {
+  __index = "function:",
+  __name = "sol.WebShot.user",
   __newindex = "function:"
 }
 WitchDoctor = {

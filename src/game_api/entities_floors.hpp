@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.hpp"
+#include "entities_items.hpp" // for UnknownPointerGroup
 #include <cstdint>
 
 class Floor : public Entity
@@ -141,9 +142,7 @@ class TransferFloor : public Floor
 class ConveyorBelt : public TransferFloor
 {
   public:
-    uint32_t* unknown_uid1;
-    uint32_t* unknown_uid2;
-    uint32_t* unknown_uid3;
+    UnknownPointerGroup unknown1;
     uint8_t timer; // 0 to 15
 };
 
@@ -194,9 +193,7 @@ class StickyTrap : public Floor
 {
   public:
     SoundPosition* sound_pos;
-    uint32_t* unknown_uid1;
-    uint32_t* unknown_uid2;
-    uint32_t* unknown_uid3;
+    UnknownPointerGroup unknown1;
     int32_t attached_piece_uid;
     int32_t ball_uid;
     int8_t state;
@@ -221,4 +218,56 @@ class MotherStatue : public Floor
     uint8_t eggplantchild_timer;
     uint8_t unknown;
     bool eggplantchild_detected;
+};
+
+class TeleportingBorder : public Floor
+{
+  public:
+    int8_t direction;
+};
+
+class ForceField : public Floor
+{
+  public:
+    Entity* first_item_beam; // if killed, the whole beam goes out
+    Entity* fx;
+    SoundPosition* sound_pos; // starts at timer 140
+    Illumination* emitted_light;
+    float bounce_force; /* unsure */ // max 1.0 ?
+    bool on_off;                     // starts the sound + first_item_beam but not fx for some reason
+};
+
+class TimedForceField : public ForceField
+{
+  public:
+    uint8_t unused1;
+    uint16_t unused2;
+    uint32_t timer; // max 300? at 100 it's start the proces, changing the animation_frame
+    bool pause;
+};
+
+class HorizontalForceField : public Floor
+{
+  public:
+    Entity* first_item_beam; // if killed, the whole beam goes out
+    Entity* fx;
+    SoundPosition* sound_pos;
+    float laser_bounce; /* unsure */
+    uint16_t timer;     // As opposite to the vertical one, this one counts for the on and the for the off state
+    bool on_off;
+};
+
+class TentacleBottom : public Floor
+{
+  public:
+    UnknownPointerGroup unknown1;
+    int32_t attached_piece_uid;
+    int32_t tentacle_uid;
+};
+
+class PoleDeco : public Floor
+{
+  public:
+    int32_t deco_up;
+    int32_t deco_down;
 };
