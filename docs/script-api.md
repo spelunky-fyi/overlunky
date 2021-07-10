@@ -990,25 +990,20 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil set_jetpack_fuel(int fuel)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) &Player::set_jetpack_fuel
 - [`int kapala_blood_amount()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Player::kapala_blood_amount
 - [`string get_name()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_name) &Player::get_name
-<br>
+\
 Get the full name of the character, this will be the modded name not only the vanilla name.
-
 - [`string get_short_name()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_name) &Player::get_short_name
-<br>
+\
 Get the short name of the character, this will be the modded name not only the vanilla name.
-
 - [`Color get_heart_color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) &Player::get_heart_color
-<br>
+\
 Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
-
 - [`bool is_female()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) &Player::is_female
-<br>
+\
 Check whether the character is female, will be `true` if the character was modded to be female as well.
-
 - [`nil set_heart_color(Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
-<br>
+\
 Set the heart color the character.
-
 ### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
@@ -1019,23 +1014,19 @@ Derived from [`Entity`](#entity)
 - [`deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
 - [`deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
 - [`nil fix_border_tile_animation()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fix_border_tile_animation) &Floor::fix_border_tile_animation
-<br>
+\
 Sets `animation_frame` of the floor for types `FLOOR_BORDERTILE`, `FLOOR_BORDERTILE_METAL` and `FLOOR_BORDERTILE_OCTOPUS`.
-
 - [`nil fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fix_decorations) &Floor::fix_decorations
-<br>
+\
 Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.
 Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.
 Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_` entities, those usually only have decorations when broken.
-
 - [`nil add_decoration(FLOOR_SIDE side)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_decoration) &Floor::add_decoration
-<br>
+\
 Explicitly add a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
-
 - [`nil remove_decoration(FLOOR_SIDE side)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_decoration) &Floor::remove_decoration
-<br>
+\
 Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
-
 ### `Door`
 Derived from [`Entity`](#entity)
 - [`int counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) &Door::counter

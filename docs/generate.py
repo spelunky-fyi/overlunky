@@ -540,10 +540,9 @@ for type in types:
             type_str = var['type'].replace('<', '&lt;').replace('>', '&gt;')
             print(f'- [`{name}`]({search_link}) {type_str}')
         if 'comment' in var and var['comment']:
-            print('<br>')
+            print('\\')
             for com in var['comment']:
                 print(com)
-            print()
 
 print('## Automatic casting of entities')
 print('When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.')
