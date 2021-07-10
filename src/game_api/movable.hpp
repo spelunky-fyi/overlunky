@@ -135,11 +135,16 @@ class Player : public Movable
     void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();
 
+    /// Get the full name of the character, this will be the modded name not only the vanilla name.
     std::u16string get_name();
+    /// Get the short name of the character, this will be the modded name not only the vanilla name.
     std::u16string get_short_name();
+    /// Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
     Color get_heart_color();
+    /// Check whether the character is female, will be `true` if the character was modded to be female as well.
     bool is_female();
 
+    /// Set the heart color the character.
     void set_heart_color(Color color);
 };
 

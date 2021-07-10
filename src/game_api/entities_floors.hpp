@@ -30,11 +30,16 @@ class Floor : public Entity
         };
     };
 
+    /// Sets `animation_frame` of the floor for types `FLOOR_BORDERTILE`, `FLOOR_BORDERTILE_METAL` and `FLOOR_BORDERTILE_OCTOPUS`.
     void fix_border_tile_animation();
 
     /// Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.
+    /// Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.
+    /// Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_*` entities, those usually only have decorations when broken.
     void fix_decorations(bool fix_also_neighbors, bool fix_styled_floor);
+    /// Explicitly add a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
     void add_decoration(FLOOR_SIDE side);
+    /// Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
     void remove_decoration(FLOOR_SIDE side);
 
     Entity* find_corner_decoration(FLOOR_SIDE side);
