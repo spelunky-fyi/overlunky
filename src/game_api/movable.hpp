@@ -148,6 +148,13 @@ class Player : public Movable
     void set_heart_color(Color color);
 };
 
+std::u16string get_character_name(int32_t type_id);
+std::u16string get_character_short_name(int32_t type_id);
+Color get_character_heart_color(int32_t type_id);
+bool is_character_female(int32_t type_id);
+
+void set_character_heart_color(int32_t type_id, Color color);
+
 class Container : public Movable
 {
   public:

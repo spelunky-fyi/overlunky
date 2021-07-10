@@ -270,24 +270,46 @@ uint8_t Player::kapala_blood_amount()
 
 std::u16string Player::get_name()
 {
-    return get_character_full_name(get_character_index(type->id));
+    return ::get_character_name(type->id);
 }
 std::u16string Player::get_short_name()
 {
-    return get_character_short_name(get_character_index(type->id));
+    return ::get_character_short_name(type->id);
 }
 Color Player::get_heart_color()
 {
-    return get_character_heart_color(get_character_index(type->id));
+    return ::get_character_heart_color(type->id);
 }
 bool Player::is_female()
 {
-    return get_character_gender(get_character_index(type->id));
+    return ::is_character_female(type->id);
 }
 
 void Player::set_heart_color(Color color)
 {
-    set_character_heart_color(get_character_index(type->id), color);
+    ::set_character_heart_color(type->id, color);
+}
+
+std::u16string get_character_name(int32_t type_id)
+{
+    return get_character_full_name(get_character_index(type_id));
+}
+std::u16string get_character_short_name(int32_t type_id)
+{
+    return get_character_short_name(get_character_index(type_id));
+}
+Color get_character_heart_color(int32_t type_id)
+{
+    return get_character_heart_color(get_character_index(type_id));
+}
+bool is_character_female(int32_t type_id)
+{
+    return get_character_gender(get_character_index(type_id));
+}
+
+void set_character_heart_color(int32_t type_id, Color color)
+{
+    set_character_heart_color(get_character_index(type_id), color);
 }
 
 void Movable::poison(int16_t frames)

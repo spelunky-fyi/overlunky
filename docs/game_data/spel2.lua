@@ -4183,6 +4183,9 @@ game_position = function(...) end
 generate_particles = function(...) end
 get_bounds = function(...) end
 get_camera_position = function(...) end
+get_character_heart_color = function(...) end
+get_character_name = function(...) end
+get_character_short_name = function(...) end
 get_door_target = function(...) end
 get_entities = function(...) end
 get_entities_at = function(...) end
@@ -4223,6 +4226,7 @@ inspect = {
   _VERSION = "inspect.lua 3.1.0",
   inspect = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4Ä\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2∞\2 \2\0\11Ω¬Ä\0\0008\1\0Ä\19\1\0\0R\0\0\0Ä\0\2\0\14\1\1\0BÅ\0\0∏\0\0Ä\11\1\0\1\14\1\2\2é\1\1\3¬Å\0\0008\0\0ÄÉ\1\2\0\14\2\1\5BÇ\0\0008\0\0Ä\3\2\3\0é\2\1\7¬\2\0\0008\4\0Ä\9\3\1\0Ä\3\5\0\0\4\0\0ì\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8ì\3\4\0R\0\0\0í\3\0\2íÉ\9\n\19\4\0\0R\0\0\0í\3\11\8\19\4\0\0R\0\0\0í\3\12\8\19\4\0\0R\0\0\0í\3\13\8í\3\3\3í\3\5\4\9\4\2\0Ä\4\0\0D\4\2\2í\3\14\8\9\4\3\0D\3\3\2îÉ\6\15Ä\4\0\0ƒ\3\3\1ã\3\0\16é\3\7\17\14\4\6\11≈\3\2\0∆\3\0\0«\3\1\0í\4Üdepth\4Ömath\4Öhuge\4ànewline\4Ç\n\4áindent\4É  \4àprocess\4çsetmetatable\4Ülevel\3\0\0\0\0\0\0\0\0\4ábuffer\4Ñids\4ámaxIds\4ëtableAppearances\4âputValue\4Ütable\4áconcatÑ\0\0\0\1\16\0\1\13\0\1\18\0ÄΩ\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1˜\11\0\0\2\0\0\0\0\1ÄáÖrootÄΩàoptionsÄΩÜdepthäΩànewlineéΩáindentíΩàprocessìΩäinspector¥ΩÑÖ_ENVëprocessRecursiveñcountTableAppearancesçInspector_mt",'@serialized'))
 }
+is_character_female = function(...) end
 json = {
   _version = "0.1.2",
   decode = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4Ä\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2¯\3Ç\1\0\8¶ã\0\0\0\0\1\0\0ƒ\0\2\2ºÄ\1\0008\3\0Äã\0\0\2\3Å\1\0ã\1\0\0\0\2\0\0ƒ\1\2\0025\1\2\0ƒ\0\2\1â\0\1\0\0\1\0\0â\1\2\0\0\2\0\0Å\2\0Ä\9\3\3\0á\3\0\0ƒ\1\5\0ƒ\0\0\3â\1\2\0\0\2\0\0Ä\2\2\0\9\3\3\0á\3\0\0ƒ\1\5\2\0\1\3\0¥\1\0\0;\1\3\0008\2\0Äâ\1\4\0\0\2\0\0Ä\2\2\0\3\3\2\0ƒ\1\4\1»\0\2\0«\1\1\0Ö\4Ötype\4ástring\4Üerror\4ßexpected argument of type string, got \4ëtrailing garbageÖ\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0Ä¶\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1ÄÉÑstrÄ¶Ñresï¶Ñidxï¶ÖÖ_ENVÜparseänext_charåspace_charsçdecode_error",'@serialized')),
@@ -4264,6 +4268,7 @@ set_arrowtrap_projectile = function(...) end
 set_blood_multiplication = function(...) end
 set_callback = function(...) end
 set_camera_position = function(...) end
+set_character_heart_color = function(...) end
 set_contents = function(...) end
 set_door = function(...) end
 set_door_target = function(...) end

@@ -247,6 +247,17 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
+    /// Same as `Player.get_name`
+    lua["get_character_name"] = get_character_name;
+    /// Same as `Player.get_short_name`
+    lua["get_character_short_name"] = get_character_short_name;
+    /// Same as `Player.get_heart_color`
+    lua["get_character_heart_color"] = get_character_heart_color;
+    /// Same as `Player.is_female`
+    lua["is_character_female"] = is_character_female;
+    /// Same as `Player.set_heart_color`
+    lua["set_character_heart_color"] = set_character_heart_color;
+
     lua.new_usertype<OlmecFloater>(
         "OlmecFloater", "both_floaters_intact", &OlmecFloater::both_floaters_intact, sol::base_classes, sol::bases<Entity, Movable>());
 
