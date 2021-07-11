@@ -10,4 +10,4 @@ set_callback(function()
     for i, cape_uid in ipairs(vladscapes) do
         get_entity(cape_uid):as_vlads_cape().can_double_jump = true
     end
-end, ON.GUIFRAME)
+end, ON.GAMEFRAME)
