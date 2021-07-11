@@ -241,6 +241,9 @@ end, ON.LEVEL)
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
 `int spawn(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Short for [spawn_entity](#spawn_entity).
+### [`spawn_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_grid_entity)
+`int spawn_grid_entity(int entity_type, float x, float y, int layer)`<br/>
+Spawn a grid entity, such as floor or traps, that snaps to the grid.
 ### [`spawn_entity_nonreplaceable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_nonreplaceable)
 `int spawn_entity_nonreplaceable(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
@@ -260,6 +263,9 @@ Spawn a door to backlayer.
 ### [`layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_door)
 `nil layer_door(float x, float y)`<br/>
 Short for [spawn_layer_door](#spawn_layer_door).
+### [`spawn_apep`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_apep)
+`int spawn_apep(float x, float y, int l, bool right)`<br/>
+Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
@@ -570,6 +576,21 @@ Use this only when no other approach works, this call can be expensive if overus
 `nil cancel_toast()`<br/>
 ### [`cancel_speechbubble`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cancel_speechbubble)
 `nil cancel_speechbubble()`<br/>
+### [`get_character_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_character_name)
+`string get_character_name(int type_id)`<br/>
+Same as `Player.get_name`
+### [`get_character_short_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_character_short_name)
+`string get_character_short_name(int type_id)`<br/>
+Same as `Player.get_short_name`
+### [`get_character_heart_color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_character_heart_color)
+`Color get_character_heart_color(int type_id)`<br/>
+Same as `Player.get_heart_color`
+### [`is_character_female`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_character_female)
+`bool is_character_female(int type_id)`<br/>
+Same as `Player.is_female`
+### [`set_character_heart_color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_character_heart_color)
+`nil set_character_heart_color(int type_id, Color color)`<br/>
+Same as `Player.set_heart_color`
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 `ParticleDB get_particle_type(int id)`<br/>
 Get the [ParticleDB](#particledb) details of the specified ID
@@ -600,6 +621,9 @@ If a user disables your script but still uses your level mod nothing will be spa
 ### [`get_room_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_index)
 `tuple<int, int> get_room_index(float x, float y)`<br/>
 Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
+### [`get_room_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_pos)
+`tuple<float, float> get_room_pos(int x, int y)`<br/>
+Transform a room index into the top left corner position in the room
 ### [`get_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template)
 `optional<int> get_room_template(int x, int y, int l)`<br/>
 Get the room template given a certain index
@@ -965,16 +989,40 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil set_jetpack_fuel(int fuel)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) &Player::set_jetpack_fuel
 - [`int kapala_blood_amount()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Player::kapala_blood_amount
 - [`string get_name()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_name) &Player::get_name
+\
+Get the full name of the character, this will be the modded name not only the vanilla name.
 - [`string get_short_name()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_name) &Player::get_short_name
+\
+Get the short name of the character, this will be the modded name not only the vanilla name.
 - [`Color get_heart_color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) &Player::get_heart_color
+\
+Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
 - [`bool is_female()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) &Player::is_female
+\
+Check whether the character is female, will be `true` if the character was modded to be female as well.
 - [`nil set_heart_color(Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
+\
+Set the heart color the character.
 ### `Floor`
 Derived from [`Entity`](#entity)
-- [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
-- [`int deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
-- [`int deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
-- [`int deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
+- [`deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
+- [`deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
+- [`deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
+- [`deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
+- [`nil fix_border_tile_animation()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fix_border_tile_animation) &Floor::fix_border_tile_animation
+\
+Sets `animation_frame` of the floor for types `FLOOR_BORDERTILE`, `FLOOR_BORDERTILE_METAL` and `FLOOR_BORDERTILE_OCTOPUS`.
+- [`nil fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fix_decorations) &Floor::fix_decorations
+\
+Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.
+Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.
+Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_` entities, those usually only have decorations when broken.
+- [`nil add_decoration(FLOOR_SIDE side)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_decoration) &Floor::add_decoration
+\
+Explicitly add a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
+- [`nil remove_decoration(FLOOR_SIDE side)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_decoration) &Floor::remove_decoration
+\
+Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
 ### `Door`
 Derived from [`Entity`](#entity)
 - [`int counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) &Door::counter
@@ -998,7 +1046,6 @@ Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor) [`Decor
 - [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &CityOfGoldDoor::unlocked
 ### `MainExit`
 Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `EggShipDoor`
 Derived from [`Entity`](#entity) [`Door`](#door)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggShipDoor::timer
@@ -1031,7 +1078,6 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &SpikeballTrap::timer
 ### `TransferFloor`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `ConveyorBelt`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ConveyorBelt::timer
@@ -1053,7 +1099,6 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &SlidingWallCeiling::state
 ### `QuickSand`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `BigSpearTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int spear_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_uid) &BigSpearTrap::spear_uid
@@ -1135,7 +1180,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float dest_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dest_pos_x) &PushBlock::dest_pos_x
 ### `BoneBlock`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `ChainedPushBlock`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PushBlock`](#pushblock)
 - [`bool is_chained`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_chained) &ChainedPushBlock::is_chained
@@ -1529,7 +1573,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Frog::jump_timer
 ### `FireFrog`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Frog`](#frog)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Grub`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float rotation_delta`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_delta) &Grub::rotation_delta
@@ -1781,7 +1824,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightEmitter`](#lightem
 - [`float target_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_y) &SpecialShot::target_y
 ### `SoundShot`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Spark`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Spark::particle
@@ -1792,7 +1834,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`float next_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_size) &Spark::next_size
 ### `TiamatShot`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightEmitter`](#lightemitter)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Fireball`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot) [`SoundShot`](#soundshot)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Fireball::particle
@@ -1852,7 +1893,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool is_lit`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_lit) &Torch::is_lit
 ### `WallTorch`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Torch`](#torch)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `TorchFlame`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`ParticleEmitterInfo smoke_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke_particle) &TorchFlame::smoke_particle
@@ -1864,7 +1904,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`ParticleEmitterInfo flame_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_particle) &LampFlame::flame_particle
 ### `Bullet`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `TimedShot`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &TimedShot::timer
@@ -1930,7 +1969,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LaserBeam::emitted_light
 ### `TreasureHook`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `AxolotlShot`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int trapped_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trapped_uid) &AxolotlShot::trapped_uid
@@ -1952,7 +1990,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &SkullDropTrap::timer
 ### `FrozenLiquid`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Switch`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Switch::timer
@@ -2001,7 +2038,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggSac::timer
 ### `Goldbar`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Coin`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int nominal_price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=nominal_price) &Coin::nominal_price
@@ -2030,7 +2066,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool music_on_off`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music_on_off) &AnkhPowerup::music_on_off
 ### `YellowCape`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
-- [`sol::base_classes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::base_classes) sol::bases&lt;Entity
 ### `Teleporter`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int teleport_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teleport_number) &Teleporter::teleport_number
@@ -2602,6 +2637,15 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`LOGICAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) 0x1000
 - [`WATER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) 0x2000
 - [`LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) 0x4000
+### FLOOR_SIDE
+- [`TOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.TOP) FLOOR_SIDE::TOP
+- [`BOTTOM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM) FLOOR_SIDE::BOTTOM
+- [`LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.LEFT) FLOOR_SIDE::LEFT
+- [`RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.RIGHT) FLOOR_SIDE::RIGHT
+- [`TOP_LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.TOP_LEFT) FLOOR_SIDE::TOP_LEFT
+- [`TOP_RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.TOP_RIGHT) FLOOR_SIDE::TOP_RIGHT
+- [`BOTTOM_LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_LEFT) FLOOR_SIDE::BOTTOM_LEFT
+- [`BOTTOM_RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_RIGHT) FLOOR_SIDE::BOTTOM_RIGHT
 ### HUNDUNFLAGS
 - [`WILLMOVELEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HUNDUNFLAGS.WILLMOVELEFT) 1
 - [`BIRDHEADEMERGED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HUNDUNFLAGS.BIRDHEADEMERGED) 2

@@ -148,7 +148,7 @@ for file in header_files:
             if brackets_depth == 1:
                 m = re.search(r'/// ?(.*)$', line)
                 if m:
-                    comment += m[1]
+                    comment.append(m[1])
 
                 m = re.search(r'\s*(.*)\s+([^\(]*)\(([^\)]*)', line)
                 if m:
@@ -226,6 +226,7 @@ for file in api_files:
         for var in attr:
             if not var: continue
             var = var.split(',')
+            if var[0] == 'sol::base_classes': continue
             if 'table_of' in var[1]:
                 var[1] = var[1].replace('table_of(', '')+'[]'
             var_name = var[0]
@@ -236,13 +237,13 @@ for file in api_files:
                     ret = fun['return'] 
                     param = fun['param'] 
                     sig = f'{ret} {var_name}({param})'
-                    vars.append({ 'name': var_name, 'type': cpp, 'signature': sig })
+                    vars.append({ 'name': var_name, 'type': cpp, 'signature': sig, 'comment': fun['comment'] })
             else:
                 underlying_cpp_var = next((item for item in underlying_cpp_type['member_vars'] if item['name'] == cpp_name), dict())
                 if underlying_cpp_var:
                     type = underlying_cpp_var['type']
                     sig = f'{type} {var_name}'
-                    vars.append({ 'name': var_name, 'type': cpp, 'signature': sig })
+                    vars.append({ 'name': var_name, 'type': cpp, 'signature': sig, 'comment': underlying_cpp_var['comment'] })
                 else:
                     vars.append({ 'name': var_name, 'type': cpp })
         types.append({'name': name, 'vars': vars, 'base': base})
@@ -543,6 +544,10 @@ for type in types:
             name = var['name']
             type_str = var['type'].replace('<', '&lt;').replace('>', '&gt;')
             print(f'- [`{name}`]({search_link}) {type_str}')
+        if 'comment' in var and var['comment']:
+            print('\\')
+            for com in var['comment']:
+                print(com)
 
 print('## Automatic casting of entities')
 print('When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.')
