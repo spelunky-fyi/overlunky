@@ -147,6 +147,19 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
+    lua.new_usertype<NPC>(
+        "NPC",
+        "climb_direction",
+        &NPC::climb_direction,
+        "target_in_sight_timer",
+        &NPC::target_in_sight_timer,
+        "ai_state",
+        &NPC::ai_state,
+        "aggro",
+        &NPC::aggro,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
+
     lua.new_usertype<Ghost>(
         "Ghost",
         "split_timer",
