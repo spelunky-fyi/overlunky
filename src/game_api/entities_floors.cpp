@@ -75,11 +75,11 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
 
     const auto [x, y] = position_self();
 
-    static float offsets[4][3]{
-        {0.0f, +1.0f, std::numbers::pi_v<float> * 0.0f},
-        {0.0f, -1.0f, std::numbers::pi_v<float> * 0.0f},
-        {-1.0f, 0.0f, std::numbers::pi_v<float> * 1.0f},
-        {+1.0f, 0.0f, std::numbers::pi_v<float> * 0.0f}};
+    static float offsets[4][2]{
+        {0.0f, +1.0f},
+        {0.0f, -1.0f},
+        {-1.0f, 0.0f},
+        {+1.0f, 0.0f}};
 
     Floor* neighbours[4]{};
     bool neighbours_same[4]{};
@@ -89,7 +89,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
 
     for (size_t i = 0; i < 4; i++)
     {
-        auto [x_off, y_off, angle] = offsets[i];
+        auto [x_off, y_off] = offsets[i];
         auto* floor = layer_ptr->get_grid_entity_at(x + x_off, y + y_off)->as<Floor>();
         neighbours[i] = floor;
         neighbours_same[i] = floor != nullptr && floor->type->id == type->id;
@@ -124,7 +124,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
 
                     for (size_t j = 0; j < 2; j++)
                     {
-                        if (floor->decos[perp_sides[j]] != -1)
+                        if (floor->decos[perp_sides[j]] >= 0)
                         {
                             floor->remove_decoration(corner_sides[j]);
                         }
@@ -206,6 +206,24 @@ void Floor::remove_decoration(FLOOR_SIDE side)
                 deco->kill(false, nullptr);
             }
             decos[side] = -1;
+
+            if (side == FLOOR_SIDE::TOP)
+            {
+                if (deco_left >= 0)
+                {
+                    if (Entity* deco = get_entity_ptr(deco_left))
+                    {
+                        deco->animation_frame = get_decoration_animation_frame(FLOOR_SIDE::LEFT);
+                    }
+                }
+                if (deco_right >= 0)
+                {
+                    if (Entity* deco = get_entity_ptr(deco_right))
+                    {
+                        deco->animation_frame = get_decoration_animation_frame(FLOOR_SIDE::RIGHT);
+                    }
+                }
+            }
         }
     }
 }
@@ -268,14 +286,14 @@ void Floor::add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, 
     else
     {
         static float offsets[4][3]{
-            {0.0f, +0.5f, std::numbers::pi_v<float> * 0.0f},
-            {0.0f, -0.5f, std::numbers::pi_v<float> * 0.0f},
-            {-0.5f, 0.0f, std::numbers::pi_v<float> * 1.0f},
-            {+0.5f, 0.0f, std::numbers::pi_v<float> * 0.0f}};
+            {0.0f, +0.5f, +1.0f},
+            {0.0f, -0.5f, +1.0f},
+            {-0.5f, 0.0f, -1.0f},
+            {+0.5f, 0.0f, +1.0f}};
 
         if (decos[side] == -1)
         {
-            auto [x_off, y_off, angle] = offsets[side];
+            auto [x_off, y_off, scale] = offsets[side];
 
             if (type->id <= 3)
             {
@@ -298,7 +316,7 @@ void Floor::add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, 
             }
 
             Entity* deco = layer_ptr->spawn_entity_over(decoration_entity_type, this, x_off, y_off);
-            deco->angle = angle;
+            deco->w *= scale;
             deco->animation_frame = get_decoration_animation_frame(side);
             deco->set_texture(get_texture());
             decos[side] = deco->uid;
@@ -409,7 +427,7 @@ int32_t Floor::get_decoration_entity_type() const
 }
 uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
 {
-    bool has_variants = false;
+    uint8_t num_variants = 0;
     bool styled = false;
 
     switch (type->id)
@@ -476,7 +494,7 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
     case 0x6e: // FLOORSTYLED_COG
     case 0x6f: // FLOORSTYLED_MOTHERSHIP
     case 0x72: // FLOORSTYLED_GUTS
-        has_variants = true;
+        num_variants = 3;
         [[fallthrough]];
     case 0x71: // FLOORSTYLED_PALACE
     case 0x31: // IDOL_TRAP_CEILING
@@ -487,7 +505,7 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
     case 0x4: // FLOOR_GENERIC
     case 0x5: // FLOOR_SURFACE
     case 0xa: // FLOOR_JUNGLE
-        has_variants = true;
+        num_variants = 2;
         break;
     }
 
@@ -498,8 +516,8 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
             animation_frame += 10;
         if (side == BOTTOM)
             animation_frame += 20;
-        if (has_variants)
-            animation_frame += rand() % 3;
+        if (num_variants > 0)
+            animation_frame += rand() % num_variants;
         return animation_frame;
     }
 
@@ -508,8 +526,25 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
         animation_frame += 12;
     if (side == BOTTOM)
         animation_frame += 24;
-    if (has_variants)
-        animation_frame += rand() % 3;
+    if (num_variants > 0)
+    {
+        if (side == FLOOR_SIDE::LEFT || side == FLOOR_SIDE::RIGHT)
+        {
+            if (deco_top >= 0)
+            {
+                animation_frame += 2;
+            }
+            else
+            {
+                num_variants--;
+                animation_frame += rand() % num_variants;
+            }
+        }
+        else
+        {
+            animation_frame += rand() % num_variants;
+        }
+    }
     return animation_frame;
 }
 
