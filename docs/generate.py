@@ -22,6 +22,7 @@ header_files = [
         '../src/game_api/particles.hpp',
         '../src/game_api/savedata.hpp',
         '../src/game_api/script/usertypes/level_lua.hpp',
+        '../src/game_api/script/usertypes/gui_lua.hpp',
         '../src/game_api/script/usertypes/save_context.hpp',
     ]
 api_files = [
@@ -40,6 +41,7 @@ api_files = [
         '../src/game_api/script/usertypes/sound_lua.cpp',
         '../src/game_api/script/usertypes/player_lua.cpp',
         '../src/game_api/script/usertypes/gui_lua.cpp',
+        '../src/game_api/script/usertypes/gui_lua.hpp',
         '../src/game_api/script/usertypes/drops_lua.cpp',
         '../src/game_api/script/usertypes/texture_lua.cpp',
         '../src/game_api/script/usertypes/flags_lua.cpp',
@@ -481,6 +483,8 @@ for lf in funcs:
         for af in rpcfunc(lf['cpp']):
             print_af(lf, af)
     elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']):
+        if lf['comment'] and lf['comment'][0] == 'NoDoc':
+            continue
         m = re.search(r'\(([^\{]*)\)\s*->\s*([^\{]*)', lf['cpp'])
         m2 = re.search(r'\(([^\{]*)\)', lf['cpp'])
         ret = 'nil'

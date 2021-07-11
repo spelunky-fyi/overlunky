@@ -506,11 +506,11 @@ Basically gets the absolute coordinates of the area inside the unbreakable bedro
 inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
 ```lua
 -- Draw the level boundaries
-set_callback(function()
+set_callback(function(draw_ctx)
     xmin, ymin, xmax, ymax = get_bounds()
     sx, sy = screen_position(xmin, ymin) -- top left
     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
-    draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+    draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
 end, ON.GUIFRAME)
 ```
 ### [`get_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_camera_position)
@@ -649,30 +649,12 @@ Clears a previously set callback
 ### [`rgba`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rgba)
 `uColor rgba(int r, int g, int b, int a)`<br/>
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
-### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
-`nil draw_line(float x1, float y1, float x2, float y2, float thickness, int color)`<br/>
-Draws a line on screen
-### [`draw_rect`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect)
-`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, int color)`<br/>
-Draws a rectangle on screen from top-left to bottom-right.
-### [`draw_rect_filled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled)
-`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, int color)`<br/>
-Draws a filled rectangle on screen from top-left to bottom-right.
-### [`draw_circle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle)
-`nil draw_circle(float x, float y, float radius, float thickness, int color)`<br/>
-Draws a circle on screen
-### [`draw_circle_filled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled)
-`nil draw_circle_filled(float x, float y, float radius, int color)`<br/>
-Draws a filled circle on screen
-### [`draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
-`nil draw_text(float x, float y, float size, string text, int color)`<br/>
-Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
 ### [`draw_text_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size)
 `tuple<float, float> draw_text_size(float size, string text)`<br/>
 Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
 Example:
 ```lua
-function on_guiframe()
+function on_guiframe(draw_ctx)
     -- get a random color
     color = math.random(0, 0xffffffff)
     -- zoom the font size based on frame
@@ -681,78 +663,12 @@ function on_guiframe()
     -- calculate size of text
     w, h = draw_text_size(size, text)
     -- draw to the center of screen
-    draw_text(0-w/2, 0-h/2, size, text, color)
+    draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)
 end
 ```
 ### [`create_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
 `tuple<int, int, int> create_image(string path)`<br/>
 Create image from file. Returns a tuple containing id, width and height.
-### [`draw_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
-`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color)`<br/>
-Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-### [`draw_image_rotated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated)
-`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color, float angle, float px, float py)`<br/>
-Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
-`nil window(string title, float x, float y, float w, float h, bool movable, function callback)`<br/>
-Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
-[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
-autosize in center. Use just a `##Label` as title to hide titlebar.
-Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
-give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
-still, this is just the first draft. Felt cute, might delete later!
-Returns false if the window was closed from the X.
-### [`win_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
-`nil win_text(string text)`<br/>
-Add some text to window, automatically wrapped
-### [`win_separator`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator)
-`nil win_separator()`<br/>
-Add a separator line to window
-### [`win_inline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline)
-`nil win_inline()`<br/>
-Add next thing on the same line. This is same as `win_sameline(0, -1)`
-### [`win_sameline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline)
-`nil win_sameline(float offset, float spacing)`<br/>
-Add next thing on the same line, with an offset
-### [`win_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button)
-`bool win_button(string text)`<br/>
-Add a button
-### [`win_input_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text)
-`string win_input_text(string label, string value)`<br/>
-Add a text field
-### [`win_input_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int)
-`int win_input_int(string label, int value)`<br/>
-Add an integer field
-### [`win_input_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float)
-`float win_input_float(string label, float value)`<br/>
-Add a float field
-### [`win_slider_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int)
-`int win_slider_int(string label, int value, int min, int max)`<br/>
-Add an integer slider
-### [`win_drag_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int)
-`int win_drag_int(string label, int value, int min, int max)`<br/>
-Add an integer dragfield
-### [`win_slider_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float)
-`float win_slider_float(string label, float value, float min, float max)`<br/>
-Add an float slider
-### [`win_drag_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float)
-`float win_drag_float(string label, float value, float min, float max)`<br/>
-Add an float dragfield
-### [`win_check`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check)
-`bool win_check(string label, bool value)`<br/>
-Add a checkbox
-### [`win_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo)
-`int win_combo(string label, int selected, string opts)`<br/>
-Add a combo box
-### [`win_pushid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid)
-`nil win_pushid(int id)`<br/>
-Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
-### [`win_popid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid)
-`nil win_popid()`<br/>
-Pop unique identifier from the stack. Put after the input.
-### [`win_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
-`nil win_image(int image, int width, int height)`<br/>
-Draw image to window.
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
@@ -1748,6 +1664,85 @@ You can just discard this handle if you do not need extended control anymore
 - [`player_slot_2_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) sol::readonly(&PlayerInputs::player_slot_2_settings)
 - [`player_slot_3_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) sol::readonly(&PlayerInputs::player_slot_3_settings)
 - [`player_slot_4_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) sol::readonly(&PlayerInputs::player_slot_4_settings)
+### `GuiDrawContext`
+- [`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line) &GuiDrawContext::draw_line
+\
+Draws a line on screen
+- [`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) &GuiDrawContext::draw_rect
+\
+Draws a rectangle on screen from top-left to bottom-right.
+- [`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) &GuiDrawContext::draw_rect_filled
+\
+Draws a filled rectangle on screen from top-left to bottom-right.
+- [`nil draw_circle(float x, float y, float radius, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle) &GuiDrawContext::draw_circle
+\
+Draws a circle on screen
+- [`nil draw_circle_filled(float x, float y, float radius, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled) &GuiDrawContext::draw_circle_filled
+\
+Draws a filled circle on screen
+- [`nil draw_text(float x, float y, float size, string text, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &GuiDrawContext::draw_text
+\
+Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
+- [`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) &GuiDrawContext::draw_image
+\
+Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+- [`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) &GuiDrawContext::draw_image_rotated
+- [`bool window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) &GuiDrawContext::window
+\
+autosize in center. Use just a `##Label` as title to hide titlebar.
+Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
+give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
+still, this is just the first draft. Felt cute, might delete later!
+Returns false if the window was closed from the X.
+- [`nil win_text(string text)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text) &GuiDrawContext::win_text
+\
+Add some text to window, automatically wrapped
+- [`nil win_separator()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator) &GuiDrawContext::win_separator
+\
+Add a separator line to window
+- [`nil win_inline()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) &GuiDrawContext::win_inline
+- [`nil win_sameline(float offset, float spacing)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline) &GuiDrawContext::win_sameline
+\
+Add next thing on the same line, with an offset
+- [`bool win_button(string text)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button) &GuiDrawContext::win_button
+\
+Add a button
+- [`string win_input_text(string label, string value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text) &GuiDrawContext::win_input_text
+\
+Add a text field
+- [`int win_input_int(string label, int value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int) &GuiDrawContext::win_input_int
+\
+Add an integer field
+- [`float win_input_float(string label, float value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float) &GuiDrawContext::win_input_float
+\
+Add a float field
+- [`int win_slider_int(string label, int value, int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int) &GuiDrawContext::win_slider_int
+\
+Add an integer slider
+- [`int win_drag_int(string label, int value, int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int) &GuiDrawContext::win_drag_int
+\
+Add an integer dragfield
+- [`float win_slider_float(string label, float value, float min, float max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float) &GuiDrawContext::win_slider_float
+\
+Add an float slider
+- [`float win_drag_float(string label, float value, float min, float max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float) &GuiDrawContext::win_drag_float
+\
+Add an float dragfield
+- [`bool win_check(string label, bool value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check) &GuiDrawContext::win_check
+\
+Add a checkbox
+- [`int win_combo(string label, int selected, string opts)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo) &GuiDrawContext::win_combo
+\
+Add a combo box
+- [`nil win_pushid(int id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) &GuiDrawContext::win_pushid
+\
+Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+- [`nil win_popid()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) &GuiDrawContext::win_popid
+\
+Pop unique identifier from the stack. Put after the input.
+- [`nil win_image(int image, int width, int height)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) &GuiDrawContext::win_image
+\
+Draw image to window.
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
@@ -1966,7 +1961,8 @@ end, ON.LEVEL)
 - [`ONLINE_LOBBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) ON::ONLINE_LOBBY
 - [`GUIFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GUIFRAME) ON::GUIFRAME
 \
-Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
+Params: `GuiDrawContext draw_ctx`\
+Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a `GuiDrawContext`
 - [`FRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.FRAME) ON::FRAME
 \
 Runs while playing the game while the player is controllable, not in the base camp or the arena mode
