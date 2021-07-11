@@ -234,7 +234,9 @@ class ForceField : public Floor
     SoundPosition* sound_pos; // starts at timer 140
     Illumination* emitted_light;
     float bounce_force; /* unsure */ // max 1.0 ?
-    bool on_off;                     // starts the sound + first_item_beam but not fx for some reason
+    bool is_on;                      // starts the sound + first_item_beam but not fx for some reason
+
+    void activate_laserbeam(bool turn_on);
 };
 
 class TimedForceField : public ForceField
@@ -254,7 +256,7 @@ class HorizontalForceField : public Floor
     SoundPosition* sound_pos;
     float laser_bounce; /* unsure */
     uint16_t timer;     // As opposite to the vertical one, this one counts for the on and the for the off state
-    bool on_off;
+    bool is_on;
 };
 
 class TentacleBottom : public Floor

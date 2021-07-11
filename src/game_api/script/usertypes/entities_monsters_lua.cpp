@@ -16,8 +16,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_jiangshi"] = &Entity::as<Jiangshi>;
     lua["Entity"]["as_monkey"] = &Entity::as<Monkey>;
     lua["Entity"]["as_goldmonkey"] = &Entity::as<GoldMonkey>;
-    lua["Entity"]["as_monkey"] = &Entity::as<Monkey>;
-    lua["Entity"]["as_goldmonkey"] = &Entity::as<GoldMonkey>;
     lua["Entity"]["as_mole"] = &Entity::as<Mole>;
     lua["Entity"]["as_spider"] = &Entity::as<Spider>;
     lua["Entity"]["as_bat"] = &Entity::as<Bat>;

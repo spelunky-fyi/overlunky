@@ -290,8 +290,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &ForceField::fx,
         "emitted_light",
         &ForceField::emitted_light,
-        "on_off",
-        &ForceField::on_off,
+        "is_on",
+        sol::readonly(&ForceField::is_on),
+        "activate_laserbeam",
+        &ForceField::activate_laserbeam,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
@@ -312,8 +314,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &HorizontalForceField::fx,
         "timer",
         &HorizontalForceField::timer,
-        "on_off",
-        &HorizontalForceField::on_off,
+        "is_on",
+        sol::readonly(&HorizontalForceField::is_on),
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
