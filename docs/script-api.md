@@ -926,7 +926,6 @@ end
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
 - [`as_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_player) &Entity::as&lt;Player&gt;
-- [`as_olmec_floater`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_olmec_floater) &Entity::as&lt;OlmecFloater&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -970,9 +969,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Color get_heart_color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) &Player::get_heart_color
 - [`bool is_female()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) &Player::is_female
 - [`nil set_heart_color(Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
-### `OlmecFloater`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`bool both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
 ### `Floor`
 Derived from [`Entity`](#entity)
 - [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
@@ -1121,6 +1117,58 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int phase1_amount_of_bomb_salvos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase1_amount_of_bomb_salvos) &Olmec::phase1_amount_of_bomb_salvos
 - [`int unknown_attack_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_attack_state) &Olmec::unknown_attack_state
 - [`int broken_floaters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=broken_floaters) &Olmec::broken_floaters
+### `WoodenlogTrap`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int ceiling_1_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_1_uid) &WoodenlogTrap::ceiling_1_uid
+- [`int ceiling_2_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_2_uid) &WoodenlogTrap::ceiling_2_uid
+- [`float falling_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falling_speed) &WoodenlogTrap::falling_speed
+### `Boulder`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int is_rolling`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_rolling) &Boulder::is_rolling
+### `PushBlock`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ParticleEmitterInfo dust_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dust_particle) &PushBlock::dust_particle
+- [`float dest_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dest_pos_x) &PushBlock::dest_pos_x
+### `BoneBlock`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `ChainedPushBlock`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`PushBlock`](#pushblock)
+- [`bool is_chained`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_chained) &ChainedPushBlock::is_chained
+### `LightArrowPlatform`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LightArrowPlatform::emitted_light
+### `FallingPlatform`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &FallingPlatform::timer
+- [`float shaking_factor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shaking_factor) &FallingPlatform::shaking_factor
+- [`float y_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_pos) &FallingPlatform::y_pos
+### `UnchainedSpikeBall`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool bounce`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounce) &UnchainedSpikeBall::bounce
+### `Drill`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity top_chain_piece`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_chain_piece) &Drill::top_chain_piece
+### `ThinIce`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int strength`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=strength) &ThinIce::strength
+### `Elevator`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Elevator::emitted_light
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Elevator::timer
+- [`bool moving_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=moving_up) &Elevator::moving_up
+### `ClamBase`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int treasure_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_type) &ClamBase::treasure_type
+- [`int treasure_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_uid) &ClamBase::treasure_uid
+- [`float treasure_x_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_x_pos) &ClamBase::treasure_x_pos
+- [`float treasure_y_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_y_pos) &ClamBase::treasure_y_pos
+- [`int top_part_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_part_uid) &ClamBase::top_part_uid
+### `RegenBlock`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool on_breaking`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_breaking) &RegenBlock::on_breaking
+### `TimedPowderkeg`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`PushBlock`](#pushblock)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &TimedPowderkeg::timer
 ### `Mount`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil carry(Movable rider)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
@@ -1405,7 +1453,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &Ammit::walk_pause_timer
 ### `ApepPart`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
-- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ApepPart::y
+- [`float y_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_pos) &ApepPart::y_pos
 - [`float sine_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_angle) &ApepPart::sine_angle
 ### `ApepHead`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`ApepPart`](#apeppart)
@@ -1977,13 +2025,25 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`ParticleEmitterInfo trail`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trail) &Boomerang::trail
 - [`float distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) &Boomerang::distance
 - [`float rotation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation) &Boomerang::rotation
-- [`int owner_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) &Boomerang::owner_uid
+- [`int returns_to_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=returns_to_uid) &Boomerang::returns_to_uid
 ### `Excalibur`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool in_stone`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_stone) &Excalibur::in_stone
 ### `Shield`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake) &Shield::shake
+### `LavaGlow`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float glow_radius`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_radius) &LavaGlow::glow_radius
+### `OlmecFloater`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
+### `Liquid`
+Derived from [`Entity`](#entity)
+- [`Entity fx_surface`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_surface) &Liquid::fx_surface
+### `Lava`
+Derived from [`Entity`](#entity) [`Liquid`](#liquid)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Lava::emitted_light
 ### `ParticleDB`
 - [`int id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`int spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
@@ -2142,16 +2202,20 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_bigspeartrap
 - as_bodyguard
 - as_bomb
+- as_boneblock
 - as_boombox
 - as_boomerang
+- as_boulder
 - as_bullet
 - as_cape
 - as_catmummy
 - as_caveman
 - as_cavemanshopkeeper
 - as_chain
+- as_chainedpushblock
 - as_chest
 - as_cityofgolddoor
+- as_clambase
 - as_claw
 - as_climbablerope
 - as_clonegunshot
@@ -2178,12 +2242,15 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_cursedpot
 - as_decorateddoor
 - as_door
+- as_drill
 - as_eggplantminister
 - as_eggsac
 - as_eggshipdoor
+- as_elevator
 - as_empressgrave
 - as_excalibur
 - as_exitdoor
+- as_fallingplatform
 - as_fireball
 - as_firebug
 - as_firebugunchained
@@ -2237,12 +2304,16 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_landmine
 - as_laserbeam
 - as_lasertrap
+- as_lava
+- as_lavaglow
 - as_lavamander
 - as_leaf
 - as_leprechaun
 - as_lightarrow
+- as_lightarrowplatform
 - as_lightemitter
 - as_lightshot
+- as_liquid
 - as_lockeddoor
 - as_madametusk
 - as_magmaman
@@ -2265,6 +2336,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_octopus
 - as_olmec
 - as_olmeccannon
+- as_olmecfloater
 - as_olmite
 - as_orb
 - as_osirishand
@@ -2278,9 +2350,11 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_pot
 - as_protoshopkeeper
 - as_punishball
+- as_pushblock
 - as_qilin
 - as_quicksand
 - as_quillback
+- as_regenblock
 - as_robot
 - as_rockdog
 - as_rollingitem
@@ -2313,9 +2387,11 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_tentacle
 - as_tentaclebottom
 - as_terra
+- as_thinice
 - as_tiamat
 - as_tiamatshot
 - as_timedforcefield
+- as_timedpowderkeg
 - as_timedshot
 - as_torch
 - as_torchflame
@@ -2329,6 +2405,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_tv
 - as_udjatsocket
 - as_ufo
+- as_unchainedspikeball
 - as_ushabti
 - as_vampire
 - as_vanhorsing
@@ -2340,6 +2417,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_webshot
 - as_witchdoctor
 - as_witchdoctorskull
+- as_woodenlogtrap
 - as_yama
 - as_yang
 - as_yellowcape

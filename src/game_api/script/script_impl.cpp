@@ -16,7 +16,9 @@
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
+#include "usertypes/entities_fx_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
+#include "usertypes/entities_liquids_lua.hpp"
 #include "usertypes/entities_monsters_lua.hpp"
 #include "usertypes/entities_mounts_lua.hpp"
 #include "usertypes/entity_casting_lua.hpp"
@@ -818,6 +820,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NEntitiesMounts::register_usertypes(lua, this);
     NEntitiesMonsters::register_usertypes(lua, this);
     NEntitiesItems::register_usertypes(lua, this);
+    NEntitiesFX::register_usertypes(lua, this);
+    NEntitiesLiquids::register_usertypes(lua, this);
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);

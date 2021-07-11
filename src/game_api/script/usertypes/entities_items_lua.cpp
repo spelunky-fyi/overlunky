@@ -858,8 +858,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Boomerang::distance,
         "rotation",
         &Boomerang::rotation,
-        "owner_uid",
-        &Boomerang::owner_uid,
+        "returns_to_uid",
+        &Boomerang::returns_to_uid,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 

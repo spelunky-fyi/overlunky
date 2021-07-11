@@ -696,8 +696,8 @@ class Boomerang : public Movable
     uint8_t state;        /* unsure */
     uint8_t unused1;
     uint16_t unused2;
-    int32_t owner_uid; // entity to return to
-    uint16_t unknown1; // something when the boomerang can't get to you
+    int32_t returns_to_uid; // entity to return to
+    uint16_t unknown1;      // something when the boomerang can't get to you
     uint8_t unknown2;
 };
 

@@ -7,11 +7,13 @@ entities_files = ["entities_items_lua.cpp",
                   "entities_monsters_lua.cpp", 
                   "entities_mounts_lua.cpp",
                   "entities_floors_lua.cpp",
-                  "entities_activefloors_lua.cpp"]
+                  "entities_activefloors_lua.cpp",
+                  "entities_fx_lua.cpp",
+                  "entities_liquids_lua.cpp"]
 as_re = re.compile(r'lua\["Entity"\]\["(as_.*)"\]')
 
 # a couple as_xxx functions are predefined, they are either 'global' or haven't been moved into their proper separate file yet
-known_casts = [ "as_movable", "as_player", "as_olmec_floater" ]
+known_casts = [ "as_movable", "as_player" ]
 
 for f in entities_files:
     with open(f) as fp:

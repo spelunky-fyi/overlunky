@@ -594,7 +594,7 @@ class Ammit : public Monster
 class ApepPart : public Monster
 {
   public:
-    float y;
+    float y_pos;
     float sine_angle;
 };
 

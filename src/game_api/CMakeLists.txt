@@ -15,6 +15,8 @@ add_library(spel2_api STATIC
         entities_floors.hpp
         entities_activefloors.cpp
         entities_activefloors.hpp
+        entities_fx.hpp
+        entities_liquids.hpp
         items.cpp
         items.hpp
         layer.cpp
@@ -65,6 +67,10 @@ add_library(spel2_api STATIC
         script/usertypes/entities_floors_lua.hpp
         script/usertypes/entities_activefloors_lua.cpp
         script/usertypes/entities_activefloors_lua.hpp
+        script/usertypes/entities_fx_lua.cpp
+        script/usertypes/entities_fx_lua.hpp
+        script/usertypes/entities_liquids_lua.cpp
+        script/usertypes/entities_liquids_lua.hpp
         script/usertypes/particles_lua.cpp
         script/usertypes/particles_lua.hpp
         script/usertypes/level_lua.cpp

@@ -679,8 +679,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<ApepPart>(
         "ApepPart",
-        "y",
-        &ApepPart::y,
+        "y_pos",
+        &ApepPart::y_pos,
         "sine_angle",
         &ApepPart::sine_angle,
         sol::base_classes,

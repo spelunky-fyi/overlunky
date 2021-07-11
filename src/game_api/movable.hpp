@@ -143,12 +143,6 @@ class Player : public Movable
     void set_heart_color(Color color);
 };
 
-class OlmecFloater : public Movable
-{
-  public:
-    bool both_floaters_intact; // strangely, this indicates whether both are intact, not just this specific one
-};
-
 class PlayerTracker
 {
   public:
