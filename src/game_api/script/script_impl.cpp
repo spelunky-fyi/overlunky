@@ -669,11 +669,11 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
     /// ```lua
     /// -- Draw the level boundaries
-    /// set_callback(function()
+    /// set_callback(function(draw_ctx)
     ///     xmin, ymin, xmax, ymax = get_bounds()
     ///     sx, sy = screen_position(xmin, ymin) -- top left
     ///     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
-    ///     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+    ///     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
     /// end, ON.GUIFRAME)
     /// ```
     lua["get_bounds"] = [this]() -> std::tuple<float, float, float, float> { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
@@ -913,7 +913,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         ON::SCRIPT_DISABLE);
     /* ON
     // GUIFRAME
-    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
+    // Params: `GuiDrawContext draw_ctx`
+    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a `GuiDrawContext`
     // FRAME
     // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
     // GAMEFRAME
@@ -1373,9 +1374,11 @@ void ScriptImpl::draw(ImDrawList* dl)
         /// Runs on every screen frame. You need this to use draw functions.
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 
+        GuiDrawContext draw_ctx(this, dl);
+
         if (on_guiframe)
         {
-            on_guiframe.value()();
+            on_guiframe.value()(draw_ctx);
         }
 
         for (auto& [id, callback] : callbacks)
@@ -1383,7 +1386,7 @@ void ScriptImpl::draw(ImDrawList* dl)
             auto now = get_frame_count();
             if (callback.screen == ON::GUIFRAME)
             {
-                handle_function(callback.func);
+                handle_function(callback.func, draw_ctx);
                 callback.lastRan = now;
             }
         }
