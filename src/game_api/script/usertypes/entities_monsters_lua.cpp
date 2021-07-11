@@ -16,7 +16,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_walkingmonster"] = &Entity::as<WalkingMonster>;
     lua["Entity"]["as_npc"] = &Entity::as<NPC>;
     lua["Entity"]["as_ghost"] = &Entity::as<Ghost>;
-	lua["Entity"]["as_bat"] = &Entity::as<Bat>;
+    lua["Entity"]["as_bat"] = &Entity::as<Bat>;
     lua["Entity"]["as_jiangshi"] = &Entity::as<Jiangshi>;
     lua["Entity"]["as_monkey"] = &Entity::as<Monkey>;
     lua["Entity"]["as_goldmonkey"] = &Entity::as<GoldMonkey>;
@@ -93,7 +93,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_necromancer"] = &Entity::as<Necromancer>;
     lua["Entity"]["as_protoshopkeeper"] = &Entity::as<ProtoShopkeeper>;
     lua["Entity"]["as_beg"] = &Entity::as<Beg>;
-	lua["Entity"]["as_critterbeetle"] = &Entity::as<CritterBeetle>;
+    lua["Entity"]["as_critterbeetle"] = &Entity::as<CritterBeetle>;
     lua["Entity"]["as_crittercrab"] = &Entity::as<CritterCrab>;
     lua["Entity"]["as_critterbutterfly"] = &Entity::as<CritterButterfly>;
     lua["Entity"]["as_critterlocust"] = &Entity::as<CritterLocust>;
@@ -114,37 +114,37 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         sol::bases<Entity, Movable>());
 
     lua.new_usertype<RoomOwner>(
-		"RoomOwner",
-		"room_index",
-		&RoomOwner::room_index,
-		"climb_y_direction",
-		&RoomOwner::climb_y_direction,
-		"ai_state",
-		&RoomOwner::ai_state,
-		"patrol_timer",
-		&RoomOwner::patrol_timer,
-		"lose_interest_timer",
-		&RoomOwner::lose_interest_timer,
-		"countdown_timer",
-		&RoomOwner::countdown_timer,
-		"is_patrolling",
-		&RoomOwner::is_patrolling,
-		"aggro",
-		&RoomOwner::aggro,
-		"was_hurt",
-		&RoomOwner::was_hurt,
-		sol::base_classes,
+        "RoomOwner",
+        "room_index",
+        &RoomOwner::room_index,
+        "climb_y_direction",
+        &RoomOwner::climb_y_direction,
+        "ai_state",
+        &RoomOwner::ai_state,
+        "patrol_timer",
+        &RoomOwner::patrol_timer,
+        "lose_interest_timer",
+        &RoomOwner::lose_interest_timer,
+        "countdown_timer",
+        &RoomOwner::countdown_timer,
+        "is_patrolling",
+        &RoomOwner::is_patrolling,
+        "aggro",
+        &RoomOwner::aggro,
+        "was_hurt",
+        &RoomOwner::was_hurt,
+        sol::base_classes,
         sol::bases<Entity, Movable>());
-	
-	lua.new_usertype<WalkingMonster>(
-		"WalkingMonster",
-		"chatting_to_uid",
-		&WalkingMonster::chatting_to_uid,
-		"walk_pause_timer",
-		&WalkingMonster::walk_pause_timer,
-		"cooldown_timer",
-		&WalkingMonster::cooldown_timer,
-		sol::base_classes,
+    
+    lua.new_usertype<WalkingMonster>(
+        "WalkingMonster",
+        "chatting_to_uid",
+        &WalkingMonster::chatting_to_uid,
+        "walk_pause_timer",
+        &WalkingMonster::walk_pause_timer,
+        "cooldown_timer",
+        &WalkingMonster::cooldown_timer,
+        sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
     lua.new_usertype<Ghost>(
@@ -166,8 +166,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Bat",
         "spawn_x",
         &Bat::spawn_x,
-		"spawn_y",
-		&Bat::spawn_y,
+        "spawn_y",
+        &Bat::spawn_y,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
@@ -175,10 +175,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Jiangshi",
         "wait_timer",
         &Jiangshi::wait_timer,
-		"jump_counter",
-		&Jiangshi::jump_counter,
-		"on_ceiling",
-		&Jiangshi::on_ceiling,
+        "jump_counter",
+        &Jiangshi::jump_counter,
+        "on_ceiling",
+        &Jiangshi::on_ceiling,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
@@ -218,7 +218,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Mole::counter_nonburrowing,
         "countdown_for_appearing",
         &Mole::countdown_for_appearing,
-		"state",
+        "state",
         &Mole::state,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -231,14 +231,14 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Spider::ceiling_pos_y,
         "jump_timer",
         &Spider::jump_timer,
-		"trigger_distance",
+        "trigger_distance",
         &Spider::trigger_distance,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
     lua.new_usertype<HangSpider>(
         "HangSpider",
-		"dangle_jump_timer",
+        "dangle_jump_timer",
         &HangSpider::dangle_jump_timer,
         "ceiling_pos_x",
         &HangSpider::ceiling_pos_x,
@@ -260,11 +260,11 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<Yang>(
         "Yang",
-		"first_message_shown",
+        "first_message_shown",
         &Yang::first_message_shown,
         "quest_incomplete",
         &Yang::quest_incomplete,
-		"special_message_shown",
+        "special_message_shown",
         &Yang::special_message_shown,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, RoomOwner>());
@@ -277,25 +277,25 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Tun::reload_timer,
         "challenge_fee_paid",
         &Tun::challenge_fee_paid,
-		"congrats_challenge",
+        "congrats_challenge",
         &Tun::congrats_challenge,
         "murdered",
         &Tun::murdered,
         "shop_entered",
         &Tun::shop_entered,
-		"tiamat_encounter",
+        "tiamat_encounter",
         &Tun::tiamat_encounter,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, RoomOwner>());
 
     lua.new_usertype<Pet>(
         "Pet",
-		"fx_button",
+        "fx_button",
         &Pet::fx_button,
-		"petting_by_uid",
+        "petting_by_uid",
         &Pet::petting_by_uid,
         "yell_counter",
-		&Pet::yell_counter,
+        &Pet::yell_counter,
         "func_timer",
         &Pet::func_timer,
         "active_state",
@@ -325,7 +325,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<HornedLizard>(
         "HornedLizard",
-		"eaten_uid",
+        "eaten_uid",
         &HornedLizard::eaten_uid,
         "walk_pause_timer",
         &HornedLizard::walk_pause_timer,
@@ -373,7 +373,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Scarab",
         "emitted_light",
         &Scarab::emitted_light,
-		"timer",
+        "timer",
         &Scarab::timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -399,7 +399,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Lavamander::lava_detection_timer,
         "is_hot",
         &Lavamander::is_hot,
-		"player_detect_state",
+        "player_detect_state",
         &Lavamander::player_detect_state,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -419,7 +419,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "FirebugUnchained",
         "max_flight_height",
         &FirebugUnchained::max_flight_height,
-		"ai_timer",
+        "ai_timer",
         &FirebugUnchained::ai_timer,
         "walking_timer",
         &FirebugUnchained::walking_timer,
@@ -446,7 +446,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Leprechaun::hump_timer,
         "target_in_sight_timer",
         &Leprechaun::target_in_sight_timer,
-		"gold",
+        "gold",
         &Leprechaun::gold,
         "timer_after_humping",
         &Leprechaun::timer_after_humping,
@@ -543,7 +543,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Bodyguard",
         "position_state",
         &Bodyguard::position_state,
-		"message_shown",
+        "message_shown",
         &Bodyguard::message_shown,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, NPC>());
@@ -593,7 +593,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Kingu::monster_spawn_timer,
         "initial_shell_health",
         &Kingu::initial_shell_health,
-		"player_seen_by_kingu",
+        "player_seen_by_kingu",
         &Kingu::player_seen_by_kingu,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -608,7 +608,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Anubis::attack_proximity_y,
         "attack_proximity_x",
         &Anubis::attack_proximity_x,
-		"ai_timer",
+        "ai_timer",
         &Anubis::ai_timer,
         "next_attack_timer",
         &Anubis::next_attack_timer,
@@ -628,7 +628,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<CatMummy>(
         "CatMummy",
-		"ai_state",
+        "ai_state",
         &CatMummy::ai_state,
         "attack_timer",
         &CatMummy::attack_timer,
@@ -665,7 +665,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<Bee>(
         "Bee",
-		"can_rest",
+        "can_rest",
         &Bee::can_rest,
         "fly_hang_timer",
         &Bee::fly_hang_timer,
@@ -682,7 +682,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Ammit",
         "walk_pause_timer",
         &Ammit::walk_pause_timer,
-		"particle",
+        "particle",
         &Ammit::particle,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -693,7 +693,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &ApepPart::y_pos,
         "sine_angle",
         &ApepPart::sine_angle,
-		"sync_timer",
+        "sync_timer",
         &ApepPart::sync_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -746,7 +746,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &UFO::patrol_distance,
         "attack_cooldown_timer",
         &UFO::attack_cooldown_timer,
-		"is_falling",
+        "is_falling",
         &UFO::is_falling,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -771,11 +771,11 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &YetiKing::walk_pause_timer,
         "emitted_light",
         &YetiKing::emitted_light,
-		"particle_fog",
+        "particle_fog",
         &YetiKing::particle_fog,
-		"particle_dust",
+        "particle_dust",
         &YetiKing::particle_dust,
-		"particle_sparkles",
+        "particle_sparkles",
         &YetiKing::particle_sparkles,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -805,13 +805,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Olmite::armore_on,
         "in_stack",
         &Olmite::in_stack,
-		"in_stack2",
+        "in_stack2",
         &Olmite::in_stack2,
-		"on_top_uid",
+        "on_top_uid",
         &Olmite::on_top_uid,
-		"y_offset",
+        "y_offset",
         &Olmite::y_offset,
-		"attack_cooldown_timer",
+        "attack_cooldown_timer",
         &Olmite::attack_cooldown_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, WalkingMonster>());
@@ -830,13 +830,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Tiamat::damage_timer,
         "attack_timer",
         &Tiamat::attack_timer,
-		"tail_angle",
+        "tail_angle",
         &Tiamat::tail_angle,
-		"tail_radian",
+        "tail_radian",
         &Tiamat::tail_radian,
-		"tail_move_speed",
+        "tail_move_speed",
         &Tiamat::tail_move_speed,
-		"right_arm_angle",
+        "right_arm_angle",
         &Tiamat::right_arm_angle,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -853,27 +853,27 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &GiantFrog::attack_timer,
         "frogs_ejected_in_cycle",
         &GiantFrog::frogs_ejected_in_cycle,
-		"invincibility_timer",
+        "invincibility_timer",
         &GiantFrog::invincibility_timer,
-		"mouth_close_timer",
+        "mouth_close_timer",
         &GiantFrog::mouth_close_timer,
-		"mouth_open_trigger",
+        "mouth_open_trigger",
         &GiantFrog::mouth_open_trigger,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
     lua.new_usertype<Frog>(
         "Frog",
-		"grub_being_eaten_uid",
+        "grub_being_eaten_uid",
         &Frog::grub_being_eaten_uid,
         "jump_timer",
         &Frog::jump_timer,
-		"pause",
+        "pause",
         &Frog::pause,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
-		
-	lua.new_usertype<FireFrog>(
+        
+    lua.new_usertype<FireFrog>(
         "FireFrog",
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, Frog>());
@@ -884,13 +884,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Grub::rotation_delta,
         "drop",
         &Grub::drop,
-		"looking_for_new_direction_timer",
+        "looking_for_new_direction_timer",
         &Grub::looking_for_new_direction_timer,
         "walk_pause_timer",
         &Grub::walk_pause_timer,
-		"turn_into_fly_timer",
+        "turn_into_fly_timer",
         &Grub::turn_into_fly_timer,
-		"particle",
+        "particle",
         &Grub::particle,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -929,7 +929,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Ghist::idle_timer,
         "transparency",
         &Ghist::transparency,
-		"fadeout",
+        "fadeout",
         &Ghist::fadeout,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -992,13 +992,13 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &HundunHead::attack_position_x,
         "attack_position_y",
         &HundunHead::attack_position_y,
-		"egg_crack_effect_uid",
+        "egg_crack_effect_uid",
         &HundunHead::egg_crack_effect_uid,
-		"targeted_player_uid",
+        "targeted_player_uid",
         &HundunHead::targeted_player_uid,
-		"looking_for_target_timer",
+        "looking_for_target_timer",
         &HundunHead::looking_for_target_timer,
-		"invincibility_timer",
+        "invincibility_timer",
         &HundunHead::invincibility_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
@@ -1035,7 +1035,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<Hermitcrab>(
         "Hermitcrab",
-		"carried_entity_type",
+        "carried_entity_type",
         &Hermitcrab::carried_entity_type,
         "carried_entity_uid",
         &Hermitcrab::carried_entity_uid,
@@ -1043,7 +1043,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Hermitcrab::walk_spit_timer,
         "is_active",
         &Hermitcrab::is_active,
-		"is_inactive",
+        "is_inactive",
         &Hermitcrab::is_inactive,
         "spawn_new_carried_item",
         &Hermitcrab::spawn_new_carried_item,
@@ -1085,19 +1085,19 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<Critter>(
         "Critter",
-		"last_picked_up_by_uid",
-		&Critter::last_picked_up_by_uid,
-		"state",
-		&Critter::state,
+        "last_picked_up_by_uid",
+        &Critter::last_picked_up_by_uid,
+        "state",
+        &Critter::state,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
-		
-	lua.new_usertype<CritterBeetle>(
-		"CritterBeetle",
-		"pause",
-		&CritterBeetle::pause,
-		sol::base_classes,
-		sol::bases<Entity, Movable, Monster>());
+        
+    lua.new_usertype<CritterBeetle>(
+        "CritterBeetle",
+        "pause",
+        &CritterBeetle::pause,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Monster>());
 
     lua.new_usertype<CritterCrab>(
         "CritterCrab",
