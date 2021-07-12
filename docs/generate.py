@@ -175,7 +175,7 @@ for file in header_files:
                     member_funs[name].append({'return': m[1], 'name': m[2], 'param': m[3], 'comment': comment})
                     comment = []
 
-                m = re.search(r'\s*(.*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;', line)
+                m = re.search(r'\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;', line)
                 if m:
                     member_vars.append({'type': m[1], 'name': m[2], 'comment': comment})
                     comment = []
