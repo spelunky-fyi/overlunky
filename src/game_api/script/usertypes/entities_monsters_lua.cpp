@@ -814,7 +814,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<Olmite>(
         "Olmite",
-        "armore_on",
+        "armor_on",
         &Olmite::armor_on,
         "in_stack",
         &Olmite::in_stack,
