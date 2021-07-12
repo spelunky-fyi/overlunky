@@ -2543,14 +2543,14 @@ Rockdog = {
   __name = "sol.Rockdog.user",
   __newindex = "function:"
 }
-RoomOwner = {
-  __index = "function:",
-  __name = "sol.RoomOwner.user",
-  __newindex = "function:"
-}
 RollingItem = {
   __index = "function:",
   __name = "sol.RollingItem.user",
+  __newindex = "function:"
+}
+RoomOwner = {
+  __index = "function:",
+  __name = "sol.RoomOwner.user",
   __newindex = "function:"
 }
 SOUND_LOOP_MODE = {
@@ -2650,11 +2650,6 @@ Spark = {
 SparkTrap = {
   __index = "function:",
   __name = "sol.SparkTrap.user",
-  __newindex = "function:"
-}
-Sparrow = {
-  __index = "function:",
-  __name = "sol.Sparrow.user",
   __newindex = "function:"
 }
 Spear = {
@@ -3346,7 +3341,6 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
   nil,
   "function:",
   "function:",
@@ -3449,11 +3443,11 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
+  "function:",
+  "function:",
+  "function:",
+  "function:",
   "function:",
   "function:",
   "function:",
@@ -4763,7 +4757,7 @@ get_entities_by_layer = function(...) end
 get_entities_by_mask = function(...) end
 get_entities_by_type = function(...) end
 get_entities_overlapping = function(...) end
-get_entity = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\3Ã \n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_uid)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        Â‚Â’\1\0\5Â˜<\0\0\0Â¸\0\0Â€Âˆ\0\0\0Ãˆ\0\2\0Â‹\0\0\1\0\1\0\0Ã„\0\2\2Â¼\0\0\0Â¸\0\0Â€\8\1\0\0H\1\2\0\11\1\0\2ÂŽ\1\1\3ÂŽ\1\3\4\12\1\2\3<Â\0\0008\2\0Â€Â€\1\2\0\0\2\1\0Ã…\1\2\0Ã†\1\0\0008\0\0Â€Ãˆ\0\2\0Ã‡\1\1\0Â…\0\4Âget_entity_raw\4Â‰TYPE_MAP\4Â…type\4ÂƒidÂ\0\0\0Â€Â˜\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2Â€ÂƒÂˆent_uidÂ€Â˜Â‹entity_rawÂ‡Â˜Â‰cast_funÂÂ˜ÂÂ…_ENV",'@serialized'))
+get_entity = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\3à\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_uid)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        ‚’\1\0\5˜<\0\0\0¸\0\0€ˆ\0\0\0È\0\2\0‹\0\0\1\0\1\0\0Ä\0\2\2¼\0\0\0¸\0\0€\8\1\0\0H\1\2\0\11\1\0\2Ž\1\1\3Ž\1\3\4\12\1\2\3<\0\0008\2\0€€\1\2\0\0\2\1\0Å\1\2\0Æ\1\0\0008\0\0€È\0\2\0Ç\1\1\0…\0\4get_entity_raw\4‰TYPE_MAP\4…type\4ƒid\0\0\0€˜\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2€ƒˆent_uid€˜‹entity_raw‡˜‰cast_fun˜…_ENV",'@serialized'))
 get_entity_ai_state = function(...) end
 get_entity_flags = function(...) end
 get_entity_flags2 = function(...) end
@@ -4790,16 +4784,16 @@ inspect = {
   KEY = {},
   METATABLE = {},
   _DESCRIPTION = "human-readable representations of tables",
-  _LICENSE = "    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÃ¯Â¿Â½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, modify, merge, publish,\n    distribute, sublicense, and/or sell copies of the Software, and to\n    permit persons to whom the Software is furnished to do so, subject to\n    the following conditions:\n\n    The above copyright notice and this permission notice shall be included\n    in all copies or substantial portions of the Software.\n\n    THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n  ",
+  _LICENSE = "    MIT LICENSE\n\n    Copyright (c) 2013 Enrique Garcï¿½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, modify, merge, publish,\n    distribute, sublicense, and/or sell copies of the Software, and to\n    permit persons to whom the Software is furnished to do so, subject to\n    the following conditions:\n\n    The above copyright notice and this permission notice shall be included\n    in all copies or substantial portions of the Software.\n\n    THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n  ",
   _URL = "http://github.com/kikito/inspect.lua",
   _VERSION = "inspect.lua 3.1.0",
-  inspect = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4Â€\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÃ¯Â¿Â½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2Â°\2ÃŠ\2\0\11Â½Ã‚Â€\0\0008\1\0Â€\19\1\0\0R\0\0\0Â€\0\2\0\14\1\1\0BÂ\0\0Â¸\0\0Â€\11\1\0\1\14\1\2\2ÂŽ\1\1\3Ã‚Â\0\0008\0\0Â€Âƒ\1\2\0\14\2\1\5BÂ‚\0\0008\0\0Â€\3\2\3\0ÂŽ\2\1\7Ã‚\2\0\0008\4\0Â€\9\3\1\0Â€\3\5\0\0\4\0\0Â“\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8Â“\3\4\0R\0\0\0Â’\3\0\2Â’Âƒ\9\n\19\4\0\0R\0\0\0Â’\3\11\8\19\4\0\0R\0\0\0Â’\3\12\8\19\4\0\0R\0\0\0Â’\3\13\8Â’\3\3\3Â’\3\5\4\9\4\2\0Â€\4\0\0D\4\2\2Â’\3\14\8\9\4\3\0D\3\3\2Â”Âƒ\6\15Â€\4\0\0Ã„\3\3\1Â‹\3\0\16ÂŽ\3\7\17\14\4\6\11Ã…\3\2\0Ã†\3\0\0Ã‡\3\1\0Â’\4Â†depth\4Â…math\4Â…huge\4Âˆnewline\4Â‚\n\4Â‡indent\4Âƒ  \4Âˆprocess\4Âsetmetatable\4Â†level\3\0\0\0\0\0\0\0\0\4Â‡buffer\4Â„ids\4Â‡maxIds\4Â‘tableAppearances\4Â‰putValue\4Â†table\4Â‡concatÂ„\0\0\0\1\16\0\1\13\0\1\18\0Â€Â½\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1Ã·\11\0\0\2\0\0\0\0\1Â€Â‡Â…rootÂ€Â½ÂˆoptionsÂ€Â½Â†depthÂŠÂ½ÂˆnewlineÂŽÂ½Â‡indentÂ’Â½ÂˆprocessÂ“Â½ÂŠinspectorÂ´Â½Â„Â…_ENVÂ‘processRecursiveÂ–countTableAppearancesÂInspector_mt",'@serialized'))
+  inspect = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4€\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique Garcï¿½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2°\2Ê\2\0\11½Â€\0\0008\1\0€\19\1\0\0R\0\0\0€\0\2\0\14\1\1\0B\0\0¸\0\0€\11\1\0\1\14\1\2\2Ž\1\1\3Â\0\0008\0\0€ƒ\1\2\0\14\2\1\5B‚\0\0008\0\0€\3\2\3\0Ž\2\1\7Â\2\0\0008\4\0€\9\3\1\0€\3\5\0\0\4\0\0“\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8“\3\4\0R\0\0\0’\3\0\2’ƒ\9\n\19\4\0\0R\0\0\0’\3\11\8\19\4\0\0R\0\0\0’\3\12\8\19\4\0\0R\0\0\0’\3\13\8’\3\3\3’\3\5\4\9\4\2\0€\4\0\0D\4\2\2’\3\14\8\9\4\3\0D\3\3\2”ƒ\6\15€\4\0\0Ä\3\3\1‹\3\0\16Ž\3\7\17\14\4\6\11Å\3\2\0Æ\3\0\0Ç\3\1\0’\4†depth\4…math\4…huge\4ˆnewline\4‚\n\4‡indent\4ƒ  \4ˆprocess\4setmetatable\4†level\3\0\0\0\0\0\0\0\0\4‡buffer\4„ids\4‡maxIds\4‘tableAppearances\4‰putValue\4†table\4‡concat„\0\0\0\1\16\0\1\13\0\1\18\0€½\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1÷\11\0\0\2\0\0\0\0\1€‡…root€½ˆoptions€½†depthŠ½ˆnewlineŽ½‡indent’½ˆprocess“½Šinspector´½„…_ENV‘processRecursive–countTableAppearancesInspector_mt",'@serialized'))
 }
 is_character_female = function(...) end
 json = {
   _version = "0.1.2",
-  decode = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4Â€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2Ã¸\3Â‚\1\0\8Â¦Â‹\0\0\0\0\1\0\0Ã„\0\2\2Â¼Â€\1\0008\3\0Â€Â‹\0\0\2\3Â\1\0Â‹\1\0\0\0\2\0\0Ã„\1\2\0025\1\2\0Ã„\0\2\1Â‰\0\1\0\0\1\0\0Â‰\1\2\0\0\2\0\0Â\2\0Â€\9\3\3\0Â‡\3\0\0Ã„\1\5\0Ã„\0\0\3Â‰\1\2\0\0\2\0\0Â€\2\2\0\9\3\3\0Â‡\3\0\0Ã„\1\5\2\0\1\3\0Â´\1\0\0;\1\3\0008\2\0Â€Â‰\1\4\0\0\2\0\0Â€\2\2\0\3\3\2\0Ã„\1\4\1Ãˆ\0\2\0Ã‡\1\1\0Â…\4Â…type\4Â‡string\4Â†error\4Â§expected argument of type string, got \4Â‘trailing garbageÂ…\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0Â€Â¦\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1Â€ÂƒÂ„strÂ€Â¦Â„resÂ•Â¦Â„idxÂ•Â¦Â…Â…_ENVÂ†parseÂŠnext_charÂŒspace_charsÂdecode_error",'@serialized')),
-  encode = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Â€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1Â‡\1Â‰\1\0\3Â…Â‰\0\0\0\0\1\0\0Ã„\0\2\2Ãˆ\0\2\0Ã‡\0\1\0Â€Â\1\1\0Â€Â…\1\0\0\0\1Â€ÂÂ„valÂ€Â…ÂÂ‡encode",'@serialized'))
+  decode = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2ø\3‚\1\0\8¦‹\0\0\0\0\1\0\0Ä\0\2\2¼€\1\0008\3\0€‹\0\0\2\3\1\0‹\1\0\0\0\2\0\0Ä\1\2\0025\1\2\0Ä\0\2\1‰\0\1\0\0\1\0\0‰\1\2\0\0\2\0\0\2\0€\9\3\3\0‡\3\0\0Ä\1\5\0Ä\0\0\3‰\1\2\0\0\2\0\0€\2\2\0\9\3\3\0‡\3\0\0Ä\1\5\2\0\1\3\0´\1\0\0;\1\3\0008\2\0€‰\1\4\0\0\2\0\0€\2\2\0\3\3\2\0Ä\1\4\1È\0\2\0Ç\1\1\0…\4…type\4‡string\4†error\4§expected argument of type string, got \4‘trailing garbage…\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0€¦\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1€ƒ„str€¦„res•¦„idx•¦……_ENV†parseŠnext_charŒspace_charsdecode_error",'@serialized')),
+  encode = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1‡\1‰\1\0\3…‰\0\0\0\0\1\0\0Ä\0\2\2È\0\2\0Ç\0\1\0€\1\1\0€…\1\0\0\0\1€„val€…‡encode",'@serialized'))
 }
 kill_entity = function(...) end
 layer_door = function(...) end
