@@ -155,19 +155,6 @@ bool is_character_female(int32_t type_id);
 
 void set_character_heart_color(int32_t type_id, Color color);
 
-class Container : public Movable
-{
-  public:
-    int32_t inside;
-    int32_t timer;
-};
-
-class OlmecFloater : public Movable
-{
-  public:
-    bool both_floaters_intact; // strangely, this indicates whether both are intact, not just this specific one
-};
-
 class PlayerTracker
 {
   public:

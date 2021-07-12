@@ -16,8 +16,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_jiangshi"] = &Entity::as<Jiangshi>;
     lua["Entity"]["as_monkey"] = &Entity::as<Monkey>;
     lua["Entity"]["as_goldmonkey"] = &Entity::as<GoldMonkey>;
-    lua["Entity"]["as_monkey"] = &Entity::as<Monkey>;
-    lua["Entity"]["as_goldmonkey"] = &Entity::as<GoldMonkey>;
     lua["Entity"]["as_mole"] = &Entity::as<Mole>;
     lua["Entity"]["as_spider"] = &Entity::as<Spider>;
     lua["Entity"]["as_bat"] = &Entity::as<Bat>;
@@ -57,7 +55,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_giantfish"] = &Entity::as<GiantFish>;
     lua["Entity"]["as_crabman"] = &Entity::as<Crabman>;
     lua["Entity"]["as_kingu"] = &Entity::as<Kingu>;
-    lua["Entity"]["as_anubistwo"] = &Entity::as<AnubisTwo>;
     lua["Entity"]["as_anubis"] = &Entity::as<Anubis>;
     lua["Entity"]["as_cobra"] = &Entity::as<Cobra>;
     lua["Entity"]["as_catmummy"] = &Entity::as<CatMummy>;
@@ -595,21 +592,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
-    lua.new_usertype<AnubisTwo>(
-        "AnubisTwo",
-        "spawn_x",
-        &AnubisTwo::spawn_x,
-        "spawn_y",
-        &AnubisTwo::spawn_y,
-        "attack_proximity_y",
-        &AnubisTwo::attack_proximity_y,
-        "attack_proximity_x",
-        &AnubisTwo::attack_proximity_x,
-        "next_attack_timer",
-        &AnubisTwo::next_attack_timer,
-        sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
-
     lua.new_usertype<Anubis>(
         "Anubis",
         "spawn_x",
@@ -695,8 +677,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<ApepPart>(
         "ApepPart",
-        "y",
-        &ApepPart::y,
+        "y_pos",
+        &ApepPart::y_pos,
         "sine_angle",
         &ApepPart::sine_angle,
         sol::base_classes,

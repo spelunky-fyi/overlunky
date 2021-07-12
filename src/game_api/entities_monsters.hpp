@@ -508,18 +508,6 @@ class Kingu : public Monster
     bool player_seen_by_kingu;    // unsure if correct
 };
 
-class AnubisTwo : public Monster
-{
-  public:
-    float spawn_x;
-    float spawn_y;
-    uint32_t unknown1;
-    float attack_proximity_y; // how close you have to be to be attacked; set both to 0 for a pet anubis
-    float attack_proximity_x;
-    uint8_t ai_timer;
-    uint8_t next_attack_timer;
-};
-
 class Anubis : public Monster
 {
   public:
@@ -606,7 +594,7 @@ class Ammit : public Monster
 class ApepPart : public Monster
 {
   public:
-    float y;
+    float y_pos;
     float sine_angle;
 };
 

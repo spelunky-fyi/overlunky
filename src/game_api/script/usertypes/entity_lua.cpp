@@ -146,9 +146,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "as_movable",
         &Entity::as<Movable>,
         "as_player",
-        &Entity::as<Player>,
-        "as_olmec_floater",
-        &Entity::as<OlmecFloater>);
+        &Entity::as<Player>);
     /* Entity
             bool overlaps_with(Entity other)
             bool set_texture(uint32_t texture_id)
@@ -257,9 +255,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["is_character_female"] = is_character_female;
     /// Same as `Player.set_heart_color`
     lua["set_character_heart_color"] = set_character_heart_color;
-
-    lua.new_usertype<OlmecFloater>(
-        "OlmecFloater", "both_floaters_intact", &OlmecFloater::both_floaters_intact, sol::base_classes, sol::bases<Entity, Movable>());
 
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1

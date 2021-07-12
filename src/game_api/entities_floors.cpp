@@ -623,3 +623,24 @@ void Arrowtrap::rearm()
         }
     }
 }
+
+void ForceField::activate_laserbeam(bool turn_on)
+{
+    if (turn_on && !is_on)
+    {
+        is_on = true;
+        static auto laserbeam_id = to_id("ENT_TYPE_FX_LASERBEAM");
+        auto laserbeam_uid = spawn_entity_over(laserbeam_id, uid, 0., 0.);
+        fx = get_entity_ptr(laserbeam_uid);
+        animation_frame = 53;
+    }
+    else if (!turn_on && is_on)
+    {
+        is_on = false;
+        kill_entity(first_item_beam->uid);
+        kill_entity(fx->uid);
+        first_item_beam = nullptr;
+        fx = nullptr;
+        animation_frame = 50;
+    }
+}
