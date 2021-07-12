@@ -586,6 +586,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_position"] = get_position;
     /// Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
     lua["get_render_position"] = get_render_position;
+    /// Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
+    lua["get_velocity"] = get_velocity;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
     /// Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`

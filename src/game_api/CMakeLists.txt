@@ -67,6 +67,8 @@ add_library(spel2_api STATIC
         script/usertypes/entities_floors_lua.hpp
         script/usertypes/entities_activefloors_lua.cpp
         script/usertypes/entities_activefloors_lua.hpp
+        script/usertypes/hitbox.cpp
+        script/usertypes/hitbox.hpp
         script/usertypes/particles_lua.cpp
         script/usertypes/particles_lua.hpp
         script/usertypes/level_lua.cpp
