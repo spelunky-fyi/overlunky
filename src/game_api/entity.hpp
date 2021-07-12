@@ -45,6 +45,14 @@ struct Color
     float a;
 };
 
+struct AABB
+{
+    float left;
+    float bottom;
+    float right;
+    float top;
+};
+
 class Entity;
 // Creates an instance of this entity
 using EntityCreate = Entity* (*)();
@@ -213,6 +221,11 @@ class Entity
                 break;
         }
         return topmost;
+    }
+
+    bool overlaps_with(AABB hitbox)
+    {
+        return overlaps_with(hitbox.left, hitbox.bottom, hitbox.right, hitbox.top);
     }
 
     bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)
@@ -394,4 +407,4 @@ std::tuple<float, float, int> get_render_position(uint32_t uid);
 
 std::tuple<float, float> get_velocity(uint32_t uid);
 
-std::tuple<float, float, float, float> get_hitbox(uint32_t uid);
+AABB get_hitbox(uint32_t uid);

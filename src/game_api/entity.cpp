@@ -441,19 +441,19 @@ std::tuple<float, float> get_velocity(uint32_t uid)
     return std::tuple{0.0f, 0.0f};
 }
 
-std::tuple<float, float, float, float> get_hitbox(uint32_t uid)
+AABB get_hitbox(uint32_t uid)
 {
     if (Entity* ent = get_entity_ptr(uid))
     {
         auto [x, y, l] = get_position(uid);
-        return std::tuple{
+        return AABB{
             x - ent->hitboxx * 0.5f + ent->offsetx,
             y - ent->hitboxy * 0.5f + ent->offsety,
             x + ent->hitboxx * 0.5f + ent->offsetx,
             y + ent->hitboxy * 0.5f + ent->offsety,
         };
     }
-    return std::tuple{0.0f, 0.0f, 0.0f, 0.0f};
+    return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
 std::uint32_t Entity::get_texture()
