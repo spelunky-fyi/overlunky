@@ -497,9 +497,40 @@ for lf in events:
         for com in lf['comment']:
             print(com)
 
+deprecated_funcs = [func for func in funcs if func['comment'] and func['comment'][0] == 'Deprecated']
+funcs = [func for func in funcs if not func['comment'] or not func['comment'][0] == 'Deprecated']
+
 print('## Functions')
 print('Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.')
 for lf in funcs:
+    if len(rpcfunc(lf['cpp'])):
+        for af in rpcfunc(lf['cpp']):
+            print_af(lf, af)
+    elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']):
+        if lf['comment'] and lf['comment'][0] == 'NoDoc':
+            continue
+        m = re.search(r'\(([^\{]*)\)\s*->\s*([^\{]*)', lf['cpp'])
+        m2 = re.search(r'\(([^\{]*)\)', lf['cpp'])
+        ret = 'nil'
+        param = ''
+        if m:
+            ret = replace_all(m.group(2), replace).strip() or 'nil'
+        if m or m2:
+            param = (m or m2).group(1)
+            param = replace_all(param, replace).strip()
+        name = lf["name"]
+        fun = f'{ret} {name}({param})'.strip()
+        search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
+        print(f'### [`{name}`]({search_link})')
+        print(f'`{fun}`<br/>')
+        for com in lf['comment']:
+            print(com)
+
+
+print('## Deprecated Functions')
+print('#### These functions still exist but their usage is discouraged, they all have state alternatives so please use those!')
+for lf in deprecated_funcs:
+    lf['comment'].pop(0)
     if len(rpcfunc(lf['cpp'])):
         for af in rpcfunc(lf['cpp']):
             print_af(lf, af)

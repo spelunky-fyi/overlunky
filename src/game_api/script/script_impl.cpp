@@ -552,7 +552,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
-    /// NoDoc
+    /// Deprecated
+    /// Use `get_entities_overlapping_hitbox` instead
     lua["get_entities_overlapping"] = get_entities_overlapping;
     /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_overlapping_hitbox"] = get_entities_overlapping_hitbox;
