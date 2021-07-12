@@ -14,8 +14,11 @@
 
 #include "usertypes/char_state.hpp"
 #include "usertypes/drops_lua.hpp"
+#include "usertypes/entities_activefloors_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
+#include "usertypes/entities_fx_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
+#include "usertypes/entities_liquids_lua.hpp"
 #include "usertypes/entities_monsters_lua.hpp"
 #include "usertypes/entities_mounts_lua.hpp"
 #include "usertypes/entity_casting_lua.hpp"
@@ -403,6 +406,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
+    /// Spawn a grid entity, such as floor or traps, that snaps to the grid.
+    lua["spawn_grid_entity"] = spawn_entity_snap_to_grid;
     /// Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
     lua["spawn_entity_nonreplaceable"] = spawn_entity_abs_nonreplaceable;
     /// Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
@@ -416,6 +421,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["spawn_layer_door"] = spawn_backdoor_abs;
     /// Short for [spawn_layer_door](#spawn_layer_door).
     lua["layer_door"] = spawn_backdoor_abs;
+    /// Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
+    lua["spawn_apep"] = spawn_apep;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
@@ -813,9 +820,12 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NTexture::register_usertypes(lua, this);
     NEntity::register_usertypes(lua, this);
     NEntitiesFloors::register_usertypes(lua, this);
+    NEntitiesActiveFloors::register_usertypes(lua, this);
     NEntitiesMounts::register_usertypes(lua, this);
     NEntitiesMonsters::register_usertypes(lua, this);
     NEntitiesItems::register_usertypes(lua, this);
+    NEntitiesFX::register_usertypes(lua, this);
+    NEntitiesLiquids::register_usertypes(lua, this);
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);

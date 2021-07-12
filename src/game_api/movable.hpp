@@ -135,49 +135,25 @@ class Player : public Movable
     void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();
 
+    /// Get the full name of the character, this will be the modded name not only the vanilla name.
     std::u16string get_name();
+    /// Get the short name of the character, this will be the modded name not only the vanilla name.
     std::u16string get_short_name();
+    /// Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
     Color get_heart_color();
+    /// Check whether the character is female, will be `true` if the character was modded to be female as well.
     bool is_female();
 
+    /// Set the heart color the character.
     void set_heart_color(Color color);
 };
 
-class Container : public Movable
-{
-  public:
-    int32_t inside;
-    int32_t timer;
-};
+std::u16string get_character_name(int32_t type_id);
+std::u16string get_character_short_name(int32_t type_id);
+Color get_character_heart_color(int32_t type_id);
+bool is_character_female(int32_t type_id);
 
-class Crushtrap : public Movable
-{
-  public:
-    float dirx;
-    float diry;
-};
-
-class Olmec : public Movable
-{
-  public:
-    size_t unknown_pointer;
-    uint32_t target_uid;
-    uint8_t attack_phase;  // 0 = stomp ; 1 = bombs ; 2 = stomp+ufos ; 3 = in lava
-    uint8_t attack_timer;  // in phase 0/2: time spent looking for player ; in phase 1: time between bomb salvo
-    uint8_t ai_timer;      // general timer that counts down whenever olmec is active
-    int8_t move_direction; // -1 = left ; 0 = down ; 1 = right (phase 0/2: depends on target, phase 1: travel direction)
-    uint8_t jump_timer;
-    uint8_t phase1_amount_of_bomb_salvos;
-    uint8_t unknown_attack_state; // some attack state in phase 1/2 (changes to 2 when stomping and 3 during ufos)
-
-    uint8_t broken_floaters();
-};
-
-class OlmecFloater : public Movable
-{
-  public:
-    bool both_floaters_intact; // strangely, this indicates whether both are intact, not just this specific one
-};
+void set_character_heart_color(int32_t type_id, Color color);
 
 class PlayerTracker
 {

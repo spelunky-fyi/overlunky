@@ -1,6 +1,16 @@
+AcidBubble = {
+  __index = "function:",
+  __name = "sol.AcidBubble.user",
+  __newindex = "function:"
+}
 Alien = {
   __index = "function:",
   __name = "sol.Alien.user",
+  __newindex = "function:"
+}
+Altar = {
+  __index = "function:",
+  __name = "sol.Altar.user",
   __newindex = "function:"
 }
 Ammit = {
@@ -10,6 +20,11 @@ Ammit = {
 }
 Animation = {
   __name = "sol.Animation.user"
+}
+AnkhPowerup = {
+  __index = "function:",
+  __name = "sol.AnkhPowerup.user",
+  __newindex = "function:"
 }
 Anubis = {
   __index = "function:",
@@ -26,6 +41,11 @@ ApepPart = {
   __name = "sol.ApepPart.user",
   __newindex = "function:"
 }
+Arrow = {
+  __index = "function:",
+  __name = "sol.Arrow.user",
+  __newindex = "function:"
+}
 Arrowtrap = {
   __index = "function:",
   __name = "sol.Arrowtrap.user",
@@ -34,6 +54,11 @@ Arrowtrap = {
 Axolotl = {
   __index = "function:",
   __name = "sol.Axolotl.user",
+  __newindex = "function:"
+}
+AxolotlShot = {
+  __index = "function:",
+  __name = "sol.AxolotlShot.user",
   __newindex = "function:"
 }
 BEG = {
@@ -72,6 +97,11 @@ Beg = {
   __name = "sol.Beg.user",
   __newindex = "function:"
 }
+BigSpearTrap = {
+  __index = "function:",
+  __name = "sol.BigSpearTrap.user",
+  __newindex = "function:"
+}
 Bodyguard = {
   __index = "function:",
   __name = "sol.Bodyguard.user",
@@ -80,6 +110,31 @@ Bodyguard = {
 Bomb = {
   __index = "function:",
   __name = "sol.Bomb.user",
+  __newindex = "function:"
+}
+BoneBlock = {
+  __index = "function:",
+  __name = "sol.BoneBlock.user",
+  __newindex = "function:"
+}
+Boombox = {
+  __index = "function:",
+  __name = "sol.Boombox.user",
+  __newindex = "function:"
+}
+Boomerang = {
+  __index = "function:",
+  __name = "sol.Boomerang.user",
+  __newindex = "function:"
+}
+Boulder = {
+  __index = "function:",
+  __name = "sol.Boulder.user",
+  __newindex = "function:"
+}
+Bullet = {
+  __index = "function:",
+  __name = "sol.Bullet.user",
   __newindex = "function:"
 }
 CAUSE_OF_DEATH = {
@@ -146,9 +201,59 @@ CavemanShopkeeper = {
   __name = "sol.CavemanShopkeeper.user",
   __newindex = "function:"
 }
+Chain = {
+  __index = "function:",
+  __name = "sol.Chain.user",
+  __newindex = "function:"
+}
+ChainedPushBlock = {
+  __index = "function:",
+  __name = "sol.ChainedPushBlock.user",
+  __newindex = "function:"
+}
+Chest = {
+  __index = "function:",
+  __name = "sol.Chest.user",
+  __newindex = "function:"
+}
+CityOfGoldDoor = {
+  __index = "function:",
+  __name = "sol.CityOfGoldDoor.user",
+  __newindex = "function:"
+}
+ClamBase = {
+  __index = "function:",
+  __name = "sol.ClamBase.user",
+  __newindex = "function:"
+}
+Claw = {
+  __index = "function:",
+  __name = "sol.Claw.user",
+  __newindex = "function:"
+}
+ClimbableRope = {
+  __index = "function:",
+  __name = "sol.ClimbableRope.user",
+  __newindex = "function:"
+}
+CloneGunShot = {
+  __index = "function:",
+  __name = "sol.CloneGunShot.user",
+  __newindex = "function:"
+}
 Cobra = {
   __index = "function:",
   __name = "sol.Cobra.user",
+  __newindex = "function:"
+}
+Coffin = {
+  __index = "function:",
+  __name = "sol.Coffin.user",
+  __newindex = "function:"
+}
+Coin = {
+  __index = "function:",
+  __name = "sol.Coin.user",
   __newindex = "function:"
 }
 Color = {
@@ -156,7 +261,16 @@ Color = {
 }
 Container = {
   __index = "function:",
-  __name = "sol.Container.user",
+  __newindex = "function:"
+}
+ConveyorBelt = {
+  __index = "function:",
+  __name = "sol.ConveyorBelt.user",
+  __newindex = "function:"
+}
+CookFire = {
+  __index = "function:",
+  __name = "sol.CookFire.user",
   __newindex = "function:"
 }
 Crabman = {
@@ -227,6 +341,11 @@ Crocman = {
 Crushtrap = {
   __index = "function:",
   __name = "sol.Crushtrap.user",
+  __newindex = "function:"
+}
+CursedPot = {
+  __index = "function:",
+  __name = "sol.CursedPot.user",
   __newindex = "function:"
 }
 CustomSound = {
@@ -332,6 +451,21 @@ DROPCHANCE = {
   SKELETON_SKELETONKEY = 8,
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
+}
+DecoratedDoor = {
+  __index = "function:",
+  __name = "sol.DecoratedDoor.user",
+  __newindex = "function:"
+}
+Door = {
+  __index = "function:",
+  __name = "sol.Door.user",
+  __newindex = "function:"
+}
+Drill = {
+  __index = "function:",
+  __name = "sol.Drill.user",
+  __newindex = "function:"
 }
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
@@ -1237,9 +1371,29 @@ ENT_TYPE = {
   MOUNT_ROCKDOG = 898,
   MOUNT_TURKEY = 897
 }
+EggSac = {
+  __index = "function:",
+  __name = "sol.EggSac.user",
+  __newindex = "function:"
+}
+EggShipDoor = {
+  __index = "function:",
+  __name = "sol.EggShipDoor.user",
+  __newindex = "function:"
+}
 EggplantMinister = {
   __index = "function:",
   __name = "sol.EggplantMinister.user",
+  __newindex = "function:"
+}
+Elevator = {
+  __index = "function:",
+  __name = "sol.Elevator.user",
+  __newindex = "function:"
+}
+EmpressGrave = {
+  __index = "function:",
+  __name = "sol.EmpressGrave.user",
   __newindex = "function:"
 }
 Entity = {
@@ -1248,10 +1402,40 @@ Entity = {
 EntityDB = {
   __name = "sol.EntityDB.user"
 }
+Excalibur = {
+  __index = "function:",
+  __name = "sol.Excalibur.user",
+  __newindex = "function:"
+}
+ExitDoor = {
+  __index = "function:",
+  __name = "sol.ExitDoor.user",
+  __newindex = "function:"
+}
 F = {}
+FLOOR_SIDE = {
+  BOTTOM = 1,
+  BOTTOM_LEFT = 6,
+  BOTTOM_RIGHT = 7,
+  LEFT = 2,
+  RIGHT = 3,
+  TOP = 0,
+  TOP_LEFT = 4,
+  TOP_RIGHT = 5
+}
+FallingPlatform = {
+  __index = "function:",
+  __name = "sol.FallingPlatform.user",
+  __newindex = "function:"
+}
 FireFrog = {
   __index = "function:",
   __name = "sol.FireFrog.user",
+  __newindex = "function:"
+}
+Fireball = {
+  __index = "function:",
+  __name = "sol.Fireball.user",
   __newindex = "function:"
 }
 Firebug = {
@@ -1269,9 +1453,34 @@ Fish = {
   __name = "sol.Fish.user",
   __newindex = "function:"
 }
+Flame = {
+  __index = "function:",
+  __name = "sol.Flame.user",
+  __newindex = "function:"
+}
+FlameSize = {
+  __index = "function:",
+  __name = "sol.FlameSize.user",
+  __newindex = "function:"
+}
 Floor = {
   __index = "function:",
   __name = "sol.Floor.user",
+  __newindex = "function:"
+}
+Fly = {
+  __index = "function:",
+  __name = "sol.Fly.user",
+  __newindex = "function:"
+}
+FlyHead = {
+  __index = "function:",
+  __name = "sol.FlyHead.user",
+  __newindex = "function:"
+}
+ForceField = {
+  __index = "function:",
+  __name = "sol.ForceField.user",
   __newindex = "function:"
 }
 ForestSister = {
@@ -1284,6 +1493,16 @@ Frog = {
   __name = "sol.Frog.user",
   __newindex = "function:"
 }
+FrozenLiquid = {
+  __index = "function:",
+  __name = "sol.FrozenLiquid.user",
+  __newindex = "function:"
+}
+Generator = {
+  __index = "function:",
+  __name = "sol.Generator.user",
+  __newindex = "function:"
+}
 Ghist = {
   __index = "function:",
   __name = "sol.Ghist.user",
@@ -1292,6 +1511,16 @@ Ghist = {
 Ghost = {
   __index = "function:",
   __name = "sol.Ghost.user",
+  __newindex = "function:"
+}
+GhostBreath = {
+  __index = "function:",
+  __name = "sol.GhostBreath.user",
+  __newindex = "function:"
+}
+GiantClamTop = {
+  __index = "function:",
+  __name = "sol.GiantClamTop.user",
   __newindex = "function:"
 }
 GiantFish = {
@@ -1314,6 +1543,11 @@ GoldMonkey = {
   __name = "sol.GoldMonkey.user",
   __newindex = "function:"
 }
+Goldbar = {
+  __index = "function:",
+  __name = "sol.Goldbar.user",
+  __newindex = "function:"
+}
 Grub = {
   __index = "function:",
   __name = "sol.Grub.user",
@@ -1331,14 +1565,34 @@ HUNDUNFLAGS = {
   TOPLEVELARENAREACHED = 8,
   WILLMOVELEFT = 1
 }
+HangAnchor = {
+  __index = "function:",
+  __name = "sol.HangAnchor.user",
+  __newindex = "function:"
+}
 HangSpider = {
   __index = "function:",
   __name = "sol.HangSpider.user",
   __newindex = "function:"
 }
+HangStrand = {
+  __index = "function:",
+  __name = "sol.HangStrand.user",
+  __newindex = "function:"
+}
 Hermitcrab = {
   __index = "function:",
   __name = "sol.Hermitcrab.user",
+  __newindex = "function:"
+}
+Honey = {
+  __index = "function:",
+  __name = "sol.Honey.user",
+  __newindex = "function:"
+}
+HorizontalForceField = {
+  __index = "function:",
+  __name = "sol.HorizontalForceField.user",
   __newindex = "function:"
 }
 HornedLizard = {
@@ -1356,9 +1610,19 @@ Hundun = {
   __name = "sol.Hundun.user",
   __newindex = "function:"
 }
+HundunChest = {
+  __index = "function:",
+  __name = "sol.HundunChest.user",
+  __newindex = "function:"
+}
 HundunHead = {
   __index = "function:",
   __name = "sol.HundunHead.user",
+  __newindex = "function:"
+}
+Idol = {
+  __index = "function:",
+  __name = "sol.Idol.user",
   __newindex = "function:"
 }
 Illumination = {
@@ -1398,6 +1662,11 @@ JumpDog = {
   __name = "sol.JumpDog.user",
   __newindex = "function:"
 }
+JungleSpearCosmetic = {
+  __index = "function:",
+  __name = "sol.JungleSpearCosmetic.user",
+  __newindex = "function:"
+}
 KapalaPowerup = {
   __index = "function:",
   __name = "sol.KapalaPowerup.user",
@@ -1427,9 +1696,44 @@ Lamassu = {
   __name = "sol.Lamassu.user",
   __newindex = "function:"
 }
+LampFlame = {
+  __index = "function:",
+  __name = "sol.LampFlame.user",
+  __newindex = "function:"
+}
+Landmine = {
+  __index = "function:",
+  __name = "sol.Landmine.user",
+  __newindex = "function:"
+}
+LaserBeam = {
+  __index = "function:",
+  __name = "sol.LaserBeam.user",
+  __newindex = "function:"
+}
+LaserTrap = {
+  __index = "function:",
+  __name = "sol.LaserTrap.user",
+  __newindex = "function:"
+}
+Lava = {
+  __index = "function:",
+  __name = "sol.Lava.user",
+  __newindex = "function:"
+}
+LavaGlow = {
+  __index = "function:",
+  __name = "sol.LavaGlow.user",
+  __newindex = "function:"
+}
 Lavamander = {
   __index = "function:",
   __name = "sol.Lavamander.user",
+  __newindex = "function:"
+}
+Leaf = {
+  __index = "function:",
+  __name = "sol.Leaf.user",
   __newindex = "function:"
 }
 Leprechaun = {
@@ -1437,11 +1741,41 @@ Leprechaun = {
   __name = "sol.Leprechaun.user",
   __newindex = "function:"
 }
+LightArrow = {
+  __index = "function:",
+  __name = "sol.LightArrow.user",
+  __newindex = "function:"
+}
+LightArrowPlatform = {
+  __index = "function:",
+  __name = "sol.LightArrowPlatform.user",
+  __newindex = "function:"
+}
+LightEmitter = {
+  __index = "function:",
+  __name = "sol.LightEmitter.user",
+  __newindex = "function:"
+}
 LightParams = {
   __name = "sol.LightParams.user"
 }
+LightShot = {
+  __index = "function:",
+  __name = "sol.LightShot.user",
+  __newindex = "function:"
+}
+Liquid = {
+  __index = "function:",
+  __name = "sol.Liquid.user",
+  __newindex = "function:"
+}
 LoadContext = {
   __name = "sol.LoadContext.user"
+}
+LockedDoor = {
+  __index = "function:",
+  __name = "sol.LockedDoor.user",
+  __newindex = "function:"
 }
 MASK = {
   ACTIVEFLOOR = 128,
@@ -1465,6 +1799,11 @@ MagmaMan = {
   __name = "sol.MagmaMan.user",
   __newindex = "function:"
 }
+MainExit = {
+  __index = "function:",
+  __name = "sol.MainExit.user",
+  __newindex = "function:"
+}
 Mantrap = {
   __index = "function:",
   __name = "sol.Mantrap.user",
@@ -1485,6 +1824,16 @@ MegaJellyfish = {
   __name = "sol.MegaJellyfish.user",
   __newindex = "function:"
 }
+MiniGameAsteroid = {
+  __index = "function:",
+  __name = "sol.MiniGameAsteroid.user",
+  __newindex = "function:"
+}
+MiniGameShip = {
+  __index = "function:",
+  __name = "sol.MiniGameShip.user",
+  __newindex = "function:"
+}
 Mole = {
   __index = "function:",
   __name = "sol.Mole.user",
@@ -1503,6 +1852,11 @@ Monster = {
 Mosquito = {
   __index = "function:",
   __name = "sol.Mosquito.user",
+  __newindex = "function:"
+}
+MotherStatue = {
+  __index = "function:",
+  __name = "sol.MotherStatue.user",
   __newindex = "function:"
 }
 Mount = {
@@ -1581,6 +1935,11 @@ Olmec = {
   __name = "sol.Olmec.user",
   __newindex = "function:"
 }
+OlmecCannon = {
+  __index = "function:",
+  __name = "sol.OlmecCannon.user",
+  __newindex = "function:"
+}
 OlmecFloater = {
   __index = "function:",
   __name = "sol.OlmecFloater.user",
@@ -1589,6 +1948,11 @@ OlmecFloater = {
 Olmite = {
   __index = "function:",
   __name = "sol.Olmite.user",
+  __newindex = "function:"
+}
+Orb = {
+  __index = "function:",
+  __name = "sol.Orb.user",
   __newindex = "function:"
 }
 OsirisHand = {
@@ -1822,6 +2186,11 @@ PARTICLEEMITTER = {
   YETIKING_YELL_SPARKLES = 181,
   YETIQUEEN_LANDING_SNOWDUST = 182
 }
+ParachutePowerup = {
+  __index = "function:",
+  __name = "sol.ParachutePowerup.user",
+  __newindex = "function:"
+}
 ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
@@ -1830,9 +2199,24 @@ Pet = {
   __name = "sol.Pet.user",
   __newindex = "function:"
 }
+Pipe = {
+  __index = "function:",
+  __name = "sol.Pipe.user",
+  __newindex = "function:"
+}
 Player = {
   __index = "function:",
   __name = "sol.Player.user",
+  __newindex = "function:"
+}
+PlayerBag = {
+  __index = "function:",
+  __name = "sol.PlayerBag.user",
+  __newindex = "function:"
+}
+PlayerGhost = {
+  __index = "function:",
+  __name = "sol.PlayerGhost.user",
   __newindex = "function:"
 }
 PlayerInputs = {
@@ -1847,12 +2231,32 @@ PlayerSlotSettings = {
 PlayingSound = {
   __name = "sol.PlayingSound.user"
 }
+PoleDeco = {
+  __index = "function:",
+  __name = "sol.PoleDeco.user",
+  __newindex = "function:"
+}
 PostRoomGenerationContext = {
   __name = "sol.PostRoomGenerationContext.user"
+}
+Pot = {
+  __index = "function:",
+  __name = "sol.Pot.user",
+  __newindex = "function:"
 }
 ProtoShopkeeper = {
   __index = "function:",
   __name = "sol.ProtoShopkeeper.user",
+  __newindex = "function:"
+}
+PunishBall = {
+  __index = "function:",
+  __name = "sol.PunishBall.user",
+  __newindex = "function:"
+}
+PushBlock = {
+  __index = "function:",
+  __name = "sol.PushBlock.user",
   __newindex = "function:"
 }
 Qilin = {
@@ -1862,6 +2266,11 @@ Qilin = {
 }
 QuestsInfo = {
   __name = "sol.QuestsInfo.user"
+}
+QuickSand = {
+  __index = "function:",
+  __name = "sol.QuickSand.user",
+  __newindex = "function:"
 }
 Quillback = {
   __index = "function:",
@@ -2119,6 +2528,11 @@ ROOM_TEMPLATE = {
   VLAD_ENTRANCE = 120,
   VLAD_TUNNEL = 123
 }
+RegenBlock = {
+  __index = "function:",
+  __name = "sol.RegenBlock.user",
+  __newindex = "function:"
+}
 Robot = {
   __index = "function:",
   __name = "sol.Robot.user",
@@ -2132,6 +2546,11 @@ Rockdog = {
 RoomOwner = {
   __index = "function:",
   __name = "sol.RoomOwner.user",
+  __newindex = "function:"
+}
+RollingItem = {
+  __index = "function:",
+  __name = "sol.RollingItem.user",
   __newindex = "function:"
 }
 SOUND_LOOP_MODE = {
@@ -2173,9 +2592,19 @@ Scarab = {
   __name = "sol.Scarab.user",
   __newindex = "function:"
 }
+ScepterShot = {
+  __index = "function:",
+  __name = "sol.ScepterShot.user",
+  __newindex = "function:"
+}
 Scorpion = {
   __index = "function:",
   __name = "sol.Scorpion.user",
+  __newindex = "function:"
+}
+Shield = {
+  __index = "function:",
+  __name = "sol.Shield.user",
   __newindex = "function:"
 }
 Shopkeeper = {
@@ -2188,9 +2617,54 @@ Skeleton = {
   __name = "sol.Skeleton.user",
   __newindex = "function:"
 }
+SkullDropTrap = {
+  __index = "function:",
+  __name = "sol.SkullDropTrap.user",
+  __newindex = "function:"
+}
+SlidingWallCeiling = {
+  __index = "function:",
+  __name = "sol.SlidingWallCeiling.user",
+  __newindex = "function:"
+}
+SnapTrap = {
+  __index = "function:",
+  __name = "sol.SnapTrap.user",
+  __newindex = "function:"
+}
 Sorceress = {
   __index = "function:",
   __name = "sol.Sorceress.user",
+  __newindex = "function:"
+}
+SoundShot = {
+  __index = "function:",
+  __name = "sol.SoundShot.user",
+  __newindex = "function:"
+}
+Spark = {
+  __index = "function:",
+  __name = "sol.Spark.user",
+  __newindex = "function:"
+}
+SparkTrap = {
+  __index = "function:",
+  __name = "sol.SparkTrap.user",
+  __newindex = "function:"
+}
+Sparrow = {
+  __index = "function:",
+  __name = "sol.Sparrow.user",
+  __newindex = "function:"
+}
+Spear = {
+  __index = "function:",
+  __name = "sol.Spear.user",
+  __newindex = "function:"
+}
+SpecialShot = {
+  __index = "function:",
+  __name = "sol.SpecialShot.user",
   __newindex = "function:"
 }
 Spider = {
@@ -2198,8 +2672,28 @@ Spider = {
   __name = "sol.Spider.user",
   __newindex = "function:"
 }
+SpikeballTrap = {
+  __index = "function:",
+  __name = "sol.SpikeballTrap.user",
+  __newindex = "function:"
+}
 StateMemory = {
   __name = "sol.StateMemory.user"
+}
+StickyTrap = {
+  __index = "function:",
+  __name = "sol.StickyTrap.user",
+  __newindex = "function:"
+}
+StretchChain = {
+  __index = "function:",
+  __name = "sol.StretchChain.user",
+  __newindex = "function:"
+}
+Switch = {
+  __index = "function:",
+  __name = "sol.Switch.user",
+  __newindex = "function:"
 }
 TEXTURE = {
   DATA_TEXTURES_BASE_EGGSHIP2_0 = 94,
@@ -2619,6 +3113,11 @@ TUSK = {
   PALACE_WELCOME_MESSAGE = 3,
   QUEST_NOT_STARTED = 0
 }
+TV = {
+  __index = "function:",
+  __name = "sol.TV.user",
+  __newindex = "function:"
+}
 TYPE_MAP = {
   "function:",
   nil,
@@ -2642,46 +3141,31 @@ TYPE_MAP = {
   nil,
   nil,
   "function:",
-  nil,
-  nil,
-  nil,
-  "function:",
-  "function:",
   "function:",
-  nil,
-  nil,
-  nil,
   "function:",
-  nil,
-  nil,
-  nil,
   nil,
   nil,
   nil,
   nil,
   "function:",
-  "function:",
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
   nil,
+  "function:",
   nil,
+  "function:",
   nil,
   nil,
+  "function:",
   nil,
   nil,
   nil,
+  "function:",
   nil,
+  "function:",
   nil,
   nil,
+  "function:",
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
@@ -2694,10 +3178,15 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
+  "function:",
   nil,
   nil,
   nil,
+  "function:",
   nil,
+  "function:",
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
@@ -2707,12 +3196,20 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
+  "function:",
+  "function:",
+  "function:",
+  "function:",
   nil,
   nil,
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
+  "function:",
   nil,
+  "function:",
   nil,
   nil,
   nil,
@@ -2722,6 +3219,8 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
+  "function:",
+  "function:",
   nil,
   nil,
   nil,
@@ -2847,6 +3346,7 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
+  "function:",
   nil,
   "function:",
   "function:",
@@ -2918,8 +3418,8 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  nil,
   "function:",
+  "function:",
   nil,
   nil,
   "function:",
@@ -2949,12 +3449,12 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  nil,
   "function:",
   "function:",
   "function:",
   "function:",
   nil,
+  "function:",
   "function:",
   "function:",
   "function:",
@@ -2968,28 +3468,22 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   "function:",
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
@@ -2998,14 +3492,20 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
+  nil,
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3023,10 +3523,6 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   "function:",
   "function:",
   "function:",
@@ -3036,55 +3532,32 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
+  nil,
   "function:",
+  nil,
   "function:",
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
+  nil,
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
   nil,
-  "function:",
-  "function:",
   "function:",
   "function:",
   "function:",
@@ -3099,15 +3572,7 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3117,22 +3582,29 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
+  nil,
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
   nil,
   nil,
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3141,13 +3613,9 @@ TYPE_MAP = {
   "function:",
   "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3158,8 +3626,40 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
+  nil,
+  nil,
   "function:",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
   nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
   "function:",
   nil,
   "function:",
@@ -3209,14 +3709,10 @@ TYPE_MAP = {
   nil,
   "function:",
   "function:",
-  "function:",
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3224,15 +3720,19 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3245,7 +3745,6 @@ TYPE_MAP = {
   "function:",
   nil,
   nil,
-  "function:",
   "function:",
   "function:",
   "function:",
@@ -3276,10 +3775,11 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3379,19 +3879,118 @@ TYPE_MAP = {
   [900] = "function:",
   [901] = "function:",
   [903] = nil,
-  [904] = nil
+  [904] = nil,
+  [907] = "function:",
+  [908] = nil,
+  [910] = "function:",
+  [911] = nil
 }
 Tadpole = {
   __index = "function:",
   __name = "sol.Tadpole.user",
   __newindex = "function:"
 }
+Teleporter = {
+  __index = "function:",
+  __name = "sol.Teleporter.user",
+  __newindex = "function:"
+}
+TeleportingBorder = {
+  __index = "function:",
+  __name = "sol.TeleportingBorder.user",
+  __newindex = "function:"
+}
+Telescope = {
+  __index = "function:",
+  __name = "sol.Telescope.user",
+  __newindex = "function:"
+}
+Tentacle = {
+  __index = "function:",
+  __name = "sol.Tentacle.user",
+  __newindex = "function:"
+}
+TentacleBottom = {
+  __index = "function:",
+  __name = "sol.TentacleBottom.user",
+  __newindex = "function:"
+}
+Terra = {
+  __index = "function:",
+  __name = "sol.Terra.user",
+  __newindex = "function:"
+}
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
+}
+ThinIce = {
+  __index = "function:",
+  __name = "sol.ThinIce.user",
+  __newindex = "function:"
 }
 Tiamat = {
   __index = "function:",
   __name = "sol.Tiamat.user",
+  __newindex = "function:"
+}
+TiamatShot = {
+  __index = "function:",
+  __name = "sol.TiamatShot.user",
+  __newindex = "function:"
+}
+TimedForceField = {
+  __index = "function:",
+  __name = "sol.TimedForceField.user",
+  __newindex = "function:"
+}
+TimedPowderkeg = {
+  __index = "function:",
+  __name = "sol.TimedPowderkeg.user",
+  __newindex = "function:"
+}
+TimedShot = {
+  __index = "function:",
+  __name = "sol.TimedShot.user",
+  __newindex = "function:"
+}
+Torch = {
+  __index = "function:",
+  __name = "sol.Torch.user",
+  __newindex = "function:"
+}
+TorchFlame = {
+  __index = "function:",
+  __name = "sol.TorchFlame.user",
+  __newindex = "function:"
+}
+TotemTrap = {
+  __index = "function:",
+  __name = "sol.TotemTrap.user",
+  __newindex = "function:"
+}
+TransferFloor = {
+  __index = "function:",
+  __name = "sol.TransferFloor.user",
+  __newindex = "function:"
+}
+TrapPart = {
+  __index = "function:",
+  __name = "sol.TrapPart.user",
+  __newindex = "function:"
+}
+Treasure = {
+  __index = "function:",
+  __name = "sol.Treasure.user",
+  __newindex = "function:"
+}
+TreasureHook = {
+  __index = "function:",
+  __name = "sol.TreasureHook.user",
+  __newindex = "function:"
+}
+TrueCrownPowerup = {
+  __index = "function:",
+  __name = "sol.TrueCrownPowerup.user",
   __newindex = "function:"
 }
 Tun = {
@@ -3402,6 +4001,21 @@ Tun = {
 UFO = {
   __index = "function:",
   __name = "sol.UFO.user",
+  __newindex = "function:"
+}
+UdjatSocket = {
+  __index = "function:",
+  __name = "sol.UdjatSocket.user",
+  __newindex = "function:"
+}
+UnchainedSpikeBall = {
+  __index = "function:",
+  __name = "sol.UnchainedSpikeBall.user",
+  __newindex = "function:"
+}
+Ushabti = {
+  __index = "function:",
+  __name = "sol.Ushabti.user",
   __newindex = "function:"
 }
 VANHORSING = {
@@ -4034,9 +4648,19 @@ WalkingMonster = {
   __name = "sol.WalkingMonster.user",
   __newindex = "function:"
 }
+WallTorch = {
+  __index = "function:",
+  __name = "sol.WallTorch.user",
+  __newindex = "function:"
+}
 WebGun = {
   __index = "function:",
   __name = "sol.WebGun.user",
+  __newindex = "function:"
+}
+WebShot = {
+  __index = "function:",
+  __name = "sol.WebShot.user",
   __newindex = "function:"
 }
 WitchDoctor = {
@@ -4047,6 +4671,11 @@ WitchDoctor = {
 WitchDoctorSkull = {
   __index = "function:",
   __name = "sol.WitchDoctorSkull.user",
+  __newindex = "function:"
+}
+WoodenlogTrap = {
+  __index = "function:",
+  __name = "sol.WoodenlogTrap.user",
   __newindex = "function:"
 }
 YANG = {
@@ -4067,6 +4696,11 @@ Yama = {
 Yang = {
   __index = "function:",
   __name = "sol.Yang.user",
+  __newindex = "function:"
+}
+YellowCape = {
+  __index = "function:",
+  __name = "sol.YellowCape.user",
   __newindex = "function:"
 }
 YetiKing = {
@@ -4118,6 +4752,9 @@ game_position = function(...) end
 generate_particles = function(...) end
 get_bounds = function(...) end
 get_camera_position = function(...) end
+get_character_heart_color = function(...) end
+get_character_name = function(...) end
+get_character_short_name = function(...) end
 get_door_target = function(...) end
 get_entities = function(...) end
 get_entities_at = function(...) end
@@ -4126,7 +4763,7 @@ get_entities_by_layer = function(...) end
 get_entities_by_mask = function(...) end
 get_entities_by_type = function(...) end
 get_entities_overlapping = function(...) end
-get_entity = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\3à\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_uid)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        ‚’\1\0\5˜<\0\0\0¸\0\0€ˆ\0\0\0È\0\2\0‹\0\0\1\0\1\0\0Ä\0\2\2¼\0\0\0¸\0\0€\8\1\0\0H\1\2\0\11\1\0\2Ž\1\1\3Ž\1\3\4\12\1\2\3<\0\0008\2\0€€\1\2\0\0\2\1\0Å\1\2\0Æ\1\0\0008\0\0€È\0\2\0Ç\1\1\0…\0\4get_entity_raw\4‰TYPE_MAP\4…type\4ƒid\0\0\0€˜\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2€ƒˆent_uid€˜‹entity_raw‡˜‰cast_fun˜…_ENV",'@serialized'))
+get_entity = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\3Ã \n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_uid)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        Â‚Â’\1\0\5Â˜<\0\0\0Â¸\0\0Â€Âˆ\0\0\0Ãˆ\0\2\0Â‹\0\0\1\0\1\0\0Ã„\0\2\2Â¼\0\0\0Â¸\0\0Â€\8\1\0\0H\1\2\0\11\1\0\2ÂŽ\1\1\3ÂŽ\1\3\4\12\1\2\3<Â\0\0008\2\0Â€Â€\1\2\0\0\2\1\0Ã…\1\2\0Ã†\1\0\0008\0\0Â€Ãˆ\0\2\0Ã‡\1\1\0Â…\0\4Âget_entity_raw\4Â‰TYPE_MAP\4Â…type\4ÂƒidÂ\0\0\0Â€Â˜\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2Â€ÂƒÂˆent_uidÂ€Â˜Â‹entity_rawÂ‡Â˜Â‰cast_funÂÂ˜ÂÂ…_ENV",'@serialized'))
 get_entity_ai_state = function(...) end
 get_entity_flags = function(...) end
 get_entity_flags2 = function(...) end
@@ -4140,6 +4777,7 @@ get_particle_type = function(...) end
 get_position = function(...) end
 get_render_position = function(...) end
 get_room_index = function(...) end
+get_room_pos = function(...) end
 get_room_template = function(...) end
 get_room_template_name = function(...) end
 get_sound = function(...) end
@@ -4152,15 +4790,16 @@ inspect = {
   KEY = {},
   METATABLE = {},
   _DESCRIPTION = "human-readable representations of tables",
-  _LICENSE = "    MIT LICENSE\n\n    Copyright (c) 2013 Enrique Garcï¿½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, modify, merge, publish,\n    distribute, sublicense, and/or sell copies of the Software, and to\n    permit persons to whom the Software is furnished to do so, subject to\n    the following conditions:\n\n    The above copyright notice and this permission notice shall be included\n    in all copies or substantial portions of the Software.\n\n    THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n  ",
+  _LICENSE = "    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÃ¯Â¿Â½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, modify, merge, publish,\n    distribute, sublicense, and/or sell copies of the Software, and to\n    permit persons to whom the Software is furnished to do so, subject to\n    the following conditions:\n\n    The above copyright notice and this permission notice shall be included\n    in all copies or substantial portions of the Software.\n\n    THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n  ",
   _URL = "http://github.com/kikito/inspect.lua",
   _VERSION = "inspect.lua 3.1.0",
-  inspect = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4€\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique Garcï¿½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2°\2Ê\2\0\11½Â€\0\0008\1\0€\19\1\0\0R\0\0\0€\0\2\0\14\1\1\0B\0\0¸\0\0€\11\1\0\1\14\1\2\2Ž\1\1\3Â\0\0008\0\0€ƒ\1\2\0\14\2\1\5B‚\0\0008\0\0€\3\2\3\0Ž\2\1\7Â\2\0\0008\4\0€\9\3\1\0€\3\5\0\0\4\0\0“\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8“\3\4\0R\0\0\0’\3\0\2’ƒ\9\n\19\4\0\0R\0\0\0’\3\11\8\19\4\0\0R\0\0\0’\3\12\8\19\4\0\0R\0\0\0’\3\13\8’\3\3\3’\3\5\4\9\4\2\0€\4\0\0D\4\2\2’\3\14\8\9\4\3\0D\3\3\2”ƒ\6\15€\4\0\0Ä\3\3\1‹\3\0\16Ž\3\7\17\14\4\6\11Å\3\2\0Æ\3\0\0Ç\3\1\0’\4†depth\4…math\4…huge\4ˆnewline\4‚\n\4‡indent\4ƒ  \4ˆprocess\4setmetatable\4†level\3\0\0\0\0\0\0\0\0\4‡buffer\4„ids\4‡maxIds\4‘tableAppearances\4‰putValue\4†table\4‡concat„\0\0\0\1\16\0\1\13\0\1\18\0€½\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1÷\11\0\0\2\0\0\0\0\1€‡…root€½ˆoptions€½†depthŠ½ˆnewlineŽ½‡indent’½ˆprocess“½Šinspector´½„…_ENV‘processRecursive–countTableAppearancesInspector_mt",'@serialized'))
+  inspect = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4Â€\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÃ¯Â¿Â½a Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2Â°\2ÃŠ\2\0\11Â½Ã‚Â€\0\0008\1\0Â€\19\1\0\0R\0\0\0Â€\0\2\0\14\1\1\0BÂ\0\0Â¸\0\0Â€\11\1\0\1\14\1\2\2ÂŽ\1\1\3Ã‚Â\0\0008\0\0Â€Âƒ\1\2\0\14\2\1\5BÂ‚\0\0008\0\0Â€\3\2\3\0ÂŽ\2\1\7Ã‚\2\0\0008\4\0Â€\9\3\1\0Â€\3\5\0\0\4\0\0Â“\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8Â“\3\4\0R\0\0\0Â’\3\0\2Â’Âƒ\9\n\19\4\0\0R\0\0\0Â’\3\11\8\19\4\0\0R\0\0\0Â’\3\12\8\19\4\0\0R\0\0\0Â’\3\13\8Â’\3\3\3Â’\3\5\4\9\4\2\0Â€\4\0\0D\4\2\2Â’\3\14\8\9\4\3\0D\3\3\2Â”Âƒ\6\15Â€\4\0\0Ã„\3\3\1Â‹\3\0\16ÂŽ\3\7\17\14\4\6\11Ã…\3\2\0Ã†\3\0\0Ã‡\3\1\0Â’\4Â†depth\4Â…math\4Â…huge\4Âˆnewline\4Â‚\n\4Â‡indent\4Âƒ  \4Âˆprocess\4Âsetmetatable\4Â†level\3\0\0\0\0\0\0\0\0\4Â‡buffer\4Â„ids\4Â‡maxIds\4Â‘tableAppearances\4Â‰putValue\4Â†table\4Â‡concatÂ„\0\0\0\1\16\0\1\13\0\1\18\0Â€Â½\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1Ã·\11\0\0\2\0\0\0\0\1Â€Â‡Â…rootÂ€Â½ÂˆoptionsÂ€Â½Â†depthÂŠÂ½ÂˆnewlineÂŽÂ½Â‡indentÂ’Â½ÂˆprocessÂ“Â½ÂŠinspectorÂ´Â½Â„Â…_ENVÂ‘processRecursiveÂ–countTableAppearancesÂInspector_mt",'@serialized'))
 }
+is_character_female = function(...) end
 json = {
   _version = "0.1.2",
-  decode = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2ø\3‚\1\0\8¦‹\0\0\0\0\1\0\0Ä\0\2\2¼€\1\0008\3\0€‹\0\0\2\3\1\0‹\1\0\0\0\2\0\0Ä\1\2\0025\1\2\0Ä\0\2\1‰\0\1\0\0\1\0\0‰\1\2\0\0\2\0\0\2\0€\9\3\3\0‡\3\0\0Ä\1\5\0Ä\0\0\3‰\1\2\0\0\2\0\0€\2\2\0\9\3\3\0‡\3\0\0Ä\1\5\2\0\1\3\0´\1\0\0;\1\3\0008\2\0€‰\1\4\0\0\2\0\0€\2\2\0\3\3\2\0Ä\1\4\1È\0\2\0Ç\1\1\0…\4…type\4‡string\4†error\4§expected argument of type string, got \4‘trailing garbage…\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0€¦\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1€ƒ„str€¦„res•¦„idx•¦……_ENV†parseŠnext_charŒspace_charsdecode_error",'@serialized')),
-  encode = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1‡\1‰\1\0\3…‰\0\0\0\0\1\0\0Ä\0\2\2È\0\2\0Ç\0\1\0€\1\1\0€…\1\0\0\0\1€„val€…‡encode",'@serialized'))
+  decode = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4Â€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2Ã¸\3Â‚\1\0\8Â¦Â‹\0\0\0\0\1\0\0Ã„\0\2\2Â¼Â€\1\0008\3\0Â€Â‹\0\0\2\3Â\1\0Â‹\1\0\0\0\2\0\0Ã„\1\2\0025\1\2\0Ã„\0\2\1Â‰\0\1\0\0\1\0\0Â‰\1\2\0\0\2\0\0Â\2\0Â€\9\3\3\0Â‡\3\0\0Ã„\1\5\0Ã„\0\0\3Â‰\1\2\0\0\2\0\0Â€\2\2\0\9\3\3\0Â‡\3\0\0Ã„\1\5\2\0\1\3\0Â´\1\0\0;\1\3\0008\2\0Â€Â‰\1\4\0\0\2\0\0Â€\2\2\0\3\3\2\0Ã„\1\4\1Ãˆ\0\2\0Ã‡\1\1\0Â…\4Â…type\4Â‡string\4Â†error\4Â§expected argument of type string, got \4Â‘trailing garbageÂ…\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0Â€Â¦\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1Â€ÂƒÂ„strÂ€Â¦Â„resÂ•Â¦Â„idxÂ•Â¦Â…Â…_ENVÂ†parseÂŠnext_charÂŒspace_charsÂdecode_error",'@serialized')),
+  encode = ((loadstring or load)("\27LuaT\0\25Â“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Â€\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1Â‡\1Â‰\1\0\3Â…Â‰\0\0\0\0\1\0\0Ã„\0\2\2Ãˆ\0\2\0Ã‡\0\1\0Â€Â\1\1\0Â€Â…\1\0\0\0\1Â€ÂÂ„valÂ€Â…ÂÂ‡encode",'@serialized'))
 }
 kill_entity = function(...) end
 layer_door = function(...) end
@@ -4198,6 +4837,7 @@ set_arrowtrap_projectile = function(...) end
 set_blood_multiplication = function(...) end
 set_callback = function(...) end
 set_camera_position = function(...) end
+set_character_heart_color = function(...) end
 set_contents = function(...) end
 set_door = function(...) end
 set_door_target = function(...) end
@@ -4225,11 +4865,13 @@ set_timeout = function(...) end
 set_vanilla_sound_callback = function(...) end
 setflag = function(...) end
 spawn = function(...) end
+spawn_apep = function(...) end
 spawn_critical = function(...) end
 spawn_door = function(...) end
 spawn_entity = function(...) end
 spawn_entity_nonreplaceable = function(...) end
 spawn_entity_over = function(...) end
+spawn_grid_entity = function(...) end
 spawn_layer_door = function(...) end
 spawn_liquid = function(...) end
 speechbubble_visible = function(...) end

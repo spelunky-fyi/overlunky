@@ -386,23 +386,6 @@ struct Target
     uint8_t theme;
 };
 
-class Door : public Entity
-{
-  public:
-    void set_target(uint8_t w, uint8_t l, uint8_t t);
-    std::tuple<uint8_t, uint8_t, uint8_t> get_target();
-};
-
-class Arrowtrap : public Entity
-{
-  public:
-    size_t unknown1;
-    size_t unknown2;
-    bool arrow_shot;
-
-    void rearm();
-};
-
 std::vector<EntityItem> list_entities();
 
 std::tuple<float, float, int> get_position(uint32_t id);

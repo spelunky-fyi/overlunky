@@ -7,11 +7,18 @@ add_library(spel2_api STATIC
         game_allocator.hpp
         entity.cpp
         entity.hpp
+        entities_floors.hpp
+        entities_floors.cpp
         entities_monsters.hpp
         entities_items.hpp
         entities_mounts.cpp
         entities_mounts.hpp
+        entities_floors.cpp
         entities_floors.hpp
+        entities_activefloors.cpp
+        entities_activefloors.hpp
+        entities_fx.hpp
+        entities_liquids.hpp
         items.cpp
         items.hpp
         layer.cpp
@@ -60,6 +67,12 @@ add_library(spel2_api STATIC
         script/usertypes/entities_items_lua.hpp
         script/usertypes/entities_floors_lua.cpp
         script/usertypes/entities_floors_lua.hpp
+        script/usertypes/entities_activefloors_lua.cpp
+        script/usertypes/entities_activefloors_lua.hpp
+        script/usertypes/entities_fx_lua.cpp
+        script/usertypes/entities_fx_lua.hpp
+        script/usertypes/entities_liquids_lua.cpp
+        script/usertypes/entities_liquids_lua.hpp
         script/usertypes/particles_lua.cpp
         script/usertypes/particles_lua.hpp
         script/usertypes/level_lua.cpp
