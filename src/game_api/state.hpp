@@ -58,8 +58,7 @@ struct StateMemory
     uint8_t world_next;
     uint8_t level;
     uint8_t level_next;
-    int32_t i6c; // i6c and i70 are a pointer to ThemeInfo (todo)
-    int32_t i70;
+    ThemeInfo* current_theme;
     uint8_t theme;
     uint8_t theme_next;
     uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
