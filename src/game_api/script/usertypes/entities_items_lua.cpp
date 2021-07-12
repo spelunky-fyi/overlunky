@@ -100,7 +100,15 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_excalibur"] = &Entity::as<Excalibur>;
     lua["Entity"]["as_shield"] = &Entity::as<Shield>;
 
-    lua.new_usertype<Bomb>("Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Bomb>(
+        "Bomb", "scale_hor",
+        &Bomb::scale_hor,
+        "scale_ver",
+        &Bomb::scale_ver,
+        "is_big_bomb",
+        &Bomb::is_big_bomb,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
 
     lua.new_usertype<Backpack>(
         "Backpack",

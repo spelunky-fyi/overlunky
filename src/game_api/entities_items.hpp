@@ -36,7 +36,7 @@ class Bomb : public Movable
     size_t unknown1;
     float scale_hor; // 1.25 = default regular bomb ; 1.875 = default giant bomb ; > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     float scale_ver;
-    bool unknown2;
+    bool is_big_bomb; // is bomb from powerpack
 };
 
 class Cape : public Movable

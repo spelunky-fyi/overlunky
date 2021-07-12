@@ -1766,6 +1766,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`scale_hor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) &Bomb::scale_hor
 - [`float scale_ver`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_ver) &Bomb::scale_ver
+- [`bool is_big_bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_big_bomb) &Bomb::is_big_bomb
 ### `Backpack`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool explosion_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_trigger) &Backpack::explosion_trigger
