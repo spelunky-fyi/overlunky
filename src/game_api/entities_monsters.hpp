@@ -121,13 +121,6 @@ class Mole : public Monster
     uint8_t state; // 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
 };
 
-class Bat : public Monster
-{
-  public:
-    float spawn_x;
-    float spawn_y;
-};
-
 class Spider : public Monster
 {
   public:
@@ -985,10 +978,4 @@ class CritterSlime : public Critter
     float rotation_angle;
     float rotation_speed;
     int16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
-};
-
-class CritterBeetle : public Critter
-{
-  public:
-    bool pause; // used when he's getting eaten
 };
