@@ -626,7 +626,7 @@ class Lamassu : public Monster
 class Olmite : public WalkingMonster
 {
   public:
-    bool armore_on; 
+    bool armor_on; 
     bool in_stack; // disables the attack, stun, lock's looking left flag between stack
     bool in_stack2; // is set to false couple frame after being detached from stack
     int8_t padding1;
@@ -771,7 +771,7 @@ class Hundun : public Monster
     uint8_t fireball_timer;
     bool birdhead_defeated;
     bool snakehead_defeated;
-    int8_t hundun_flags;
+    uint8_t hundun_flags;
 
     // hundun_flags:
     //   1: Will move to the left

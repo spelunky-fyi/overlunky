@@ -1031,7 +1031,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int chased_target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chased_target_uid) &Monster::chased_target_uid
 - [`int target_selection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_selection_timer) &Monster::target_selection_timer
 ### `RoomOwner`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int room_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_index) &RoomOwner::room_index
 - [`float climb_y_direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=climb_y_direction) &RoomOwner::climb_y_direction
 - [`int ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_state) &RoomOwner::ai_state
@@ -1352,7 +1352,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float attack_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_angle) &Lamassu::attack_angle
 ### `Olmite`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
-- [`bool armore_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=armore_on) &Olmite::armore_on
+- [`bool armore_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=armore_on) &Olmite::armor_on
 - [`bool in_stack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_stack) &Olmite::in_stack
 - [`bool in_stack2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_stack2) &Olmite::in_stack2
 - [`int on_top_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_top_uid) &Olmite::on_top_uid

@@ -134,7 +134,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "was_hurt",
         &RoomOwner::was_hurt,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Monster>());
     
     lua.new_usertype<WalkingMonster>(
         "WalkingMonster",
@@ -815,7 +815,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua.new_usertype<Olmite>(
         "Olmite",
         "armore_on",
-        &Olmite::armore_on,
+        &Olmite::armor_on,
         "in_stack",
         &Olmite::in_stack,
         "in_stack2",
