@@ -24,6 +24,7 @@ header_files = [
         '../src/game_api/script/usertypes/level_lua.hpp',
         '../src/game_api/script/usertypes/gui_lua.hpp',
         '../src/game_api/script/usertypes/save_context.hpp',
+        '../src/game_api/script/usertypes/hitbox.hpp',
     ]
 api_files = [
         '../src/game_api/script/script_impl.cpp',
@@ -46,6 +47,7 @@ api_files = [
         '../src/game_api/script/usertypes/texture_lua.cpp',
         '../src/game_api/script/usertypes/flags_lua.cpp',
         '../src/game_api/script/usertypes/char_state.cpp',
+        '../src/game_api/script/usertypes/hitbox.cpp',
     ]
 rpc = []
 classes = []
@@ -130,6 +132,8 @@ for file in header_files:
         continue
     data = open(file, 'r').read().split('\n')
     brackets_depth = 0
+    in_union = False
+    in_anonymous_struct = False
     class_name = None
     comment = []
     member_funs = {}
@@ -142,8 +146,23 @@ for file in header_files:
             if m:
                 class_name = m[2]
         elif class_name:
+            prev_brackets_depth = brackets_depth
             brackets_depth += line.count('{') - line.count('}')
+
             if brackets_depth == 1:
+                if line.strip() == 'union':
+                    in_union = True
+            if brackets_depth == 2 and in_union:
+                if line.strip() == 'struct':
+                    in_anonymous_struct = True
+
+            if brackets_depth < prev_brackets_depth:
+                if brackets_depth == 2:
+                    in_anonymous_struct = False
+                if brackets_depth == 1:
+                    in_union = False
+
+            if brackets_depth == 1 or (brackets_depth == 2 and in_union) or (brackets_depth == 3 and in_anonymous_struct):
                 m = re.search(r'/// ?(.*)$', line)
                 if m:
                     comment.append(m[1])
