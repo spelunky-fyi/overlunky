@@ -118,7 +118,7 @@ class Mole : public Monster
     uint8_t counter_nonburrowing;
     uint8_t countdown_for_appearing;
     uint8_t unknown_two_while_burrowed;
-    uint8_t state; // 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+    uint8_t digging_state; // 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
 };
 
 class Spider : public Monster
@@ -877,7 +877,7 @@ class Critter : public Monster
 {
   public:
     int32_t last_picked_up_by_uid;
-    uint8_t state;
+    uint8_t holding_state;
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;

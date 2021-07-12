@@ -1083,7 +1083,7 @@ Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfl
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ConveyorBelt::timer
 ### `Pipe`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
-- [`int type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Pipe::type
+- [`int direction_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_type) &Pipe::direction_type
 - [`bool end_pipe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_pipe) &Pipe::end_pipe
 ### `Generator`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
@@ -1302,7 +1302,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int counter_burrowing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter_burrowing) &Mole::counter_burrowing
 - [`int counter_nonburrowing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter_nonburrowing) &Mole::counter_nonburrowing
 - [`int countdown_for_appearing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=countdown_for_appearing) &Mole::countdown_for_appearing
-- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &Mole::state
+- [`int digging_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=digging_state) &Mole::digging_state
 ### `Spider`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float ceiling_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_pos_x) &Spider::ceiling_pos_x
@@ -1704,7 +1704,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 ### `Critter`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int last_picked_up_by_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_picked_up_by_uid) &Critter::last_picked_up_by_uid
-- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &Critter::state
+- [`int holding_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=holding_state) &Critter::holding_state
 ### `CritterBeetle`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)
 - [`bool pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) &CritterBeetle::pause
@@ -1955,9 +1955,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Container`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
-### `Container`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`int inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
 ### `Coffin`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Container`](#container)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Coffin::timer
@@ -2050,7 +2047,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float spin_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spin_speed) &MiniGameAsteroid::spin_speed
 ### `Pot`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Container`](#container)
 - [`bool dont_transfer_dmg`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dont_transfer_dmg) &Pot::dont_transfer_dmg
 ### `CursedPot`
 Derived from [`Entity`](#entity) [`Movable`](#movable)

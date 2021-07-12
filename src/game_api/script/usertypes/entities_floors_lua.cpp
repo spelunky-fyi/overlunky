@@ -214,8 +214,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<Pipe>(
         "Pipe",
-        "type",
-        &Pipe::type,
+        "direction_type",
+        &Pipe::direction_type,
         "end_pipe",
         &Pipe::end_pipe,
         sol::base_classes,

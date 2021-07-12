@@ -518,13 +518,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
-    lua.new_usertype<Container>(
-        "Container",
-        "inside",
-        &Container::inside,
-        sol::base_classes,
-        sol::bases<Entity, Movable>());
-
     lua.new_usertype<Coffin>(
         "Coffin",
         "timer",
@@ -735,7 +728,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "dont_transfer_dmg",
         &Pot::dont_transfer_dmg,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Container>());
 
     lua.new_usertype<CursedPot>(
         "CursedPot",

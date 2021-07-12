@@ -192,7 +192,7 @@ class ConveyorBelt : public TransferFloor
 class Pipe : public TransferFloor
 {
   public:
-    int8_t type;
+    int8_t direction_type;
     bool end_pipe;
 };
 
