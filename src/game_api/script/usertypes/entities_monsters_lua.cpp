@@ -137,7 +137,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &RoomOwner::was_hurt,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
-    
+
     lua.new_usertype<WalkingMonster>(
         "WalkingMonster",
         "chatting_to_uid",
@@ -887,7 +887,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Frog::pause,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
-        
+
     lua.new_usertype<FireFrog>(
         "FireFrog",
         sol::base_classes,
@@ -1097,7 +1097,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Beg::disappear_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, NPC>());
-  
+
     lua.new_usertype<Terra>(
         "Terra",
         "fx_button",
@@ -1117,7 +1117,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Critter::state,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
-        
+
     lua.new_usertype<CritterBeetle>(
         "CritterBeetle",
         "pause",
@@ -1241,6 +1241,5 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &CritterSlime::walk_pause_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster, Critter>());
-
 }
 } // namespace NEntitiesMonsters
