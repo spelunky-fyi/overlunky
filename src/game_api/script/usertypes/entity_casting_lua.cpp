@@ -242,7 +242,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][231] = lua["Entity"]["as_mole"];                // MONS_MOLE
     lua["TYPE_MAP"][232] = lua["Entity"]["as_quillback"];           // MONS_CAVEMAN_BOSS
     lua["TYPE_MAP"][233] = lua["Entity"]["as_mantrap"];             // MONS_MANTRAP
-    lua["TYPE_MAP"][234] = lua["Entity"]["as_caveman"];             // MONS_TIKIMAN
+    lua["TYPE_MAP"][234] = lua["Entity"]["as_walkingmonster"];      // MONS_TIKIMAN
     lua["TYPE_MAP"][235] = lua["Entity"]["as_witchdoctor"];         // MONS_WITCHDOCTOR
     lua["TYPE_MAP"][236] = lua["Entity"]["as_witchdoctorskull"];    // MONS_WITCHDOCTORSKULL
     lua["TYPE_MAP"][237] = lua["Entity"]["as_mosquito"];            // MONS_MOSQUITO
@@ -263,7 +263,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][252] = lua["Entity"]["as_necromancer"];         // MONS_NECROMANCER
     lua["TYPE_MAP"][253] = lua["Entity"]["as_anubis"];              // MONS_ANUBIS
     lua["TYPE_MAP"][254] = lua["Entity"]["as_apephead"];            // MONS_APEP_HEAD
-    lua["TYPE_MAP"][255] = lua["Entity"]["as_movable"];             // MONS_APEP_BODY (NOT IMPLEMENTED YET, FORCED TO MOVABLE)
+    lua["TYPE_MAP"][255] = lua["Entity"]["as_apeppart"];            // MONS_APEP_BODY
     lua["TYPE_MAP"][256] = lua["Entity"]["as_apeppart"];            // MONS_APEP_TAIL
     lua["TYPE_MAP"][257] = lua["Entity"]["as_osirishead"];          // MONS_OSIRIS_HEAD
     lua["TYPE_MAP"][258] = lua["Entity"]["as_osirishand"];          // MONS_OSIRIS_HAND
@@ -276,12 +276,12 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][265] = lua["Entity"]["as_giantfish"];           // MONS_GIANTFISH
     lua["TYPE_MAP"][266] = lua["Entity"]["as_ufo"];                 // MONS_UFO
     lua["TYPE_MAP"][267] = lua["Entity"]["as_alien"];               // MONS_ALIEN
-    lua["TYPE_MAP"][268] = lua["Entity"]["as_yeti"];                // MONS_YETI
+    lua["TYPE_MAP"][268] = lua["Entity"]["as_walkingmonster"];      // MONS_YETI
     lua["TYPE_MAP"][269] = lua["Entity"]["as_yetiking"];            // MONS_YETIKING
     lua["TYPE_MAP"][270] = lua["Entity"]["as_yetiqueen"];           // MONS_YETIQUEEN
     lua["TYPE_MAP"][271] = lua["Entity"]["as_lahamu"];              // MONS_ALIENQUEEN
     lua["TYPE_MAP"][272] = lua["Entity"]["as_protoshopkeeper"];     // MONS_PROTOSHOPKEEPER
-    lua["TYPE_MAP"][273] = lua["Entity"]["as_shopkeeperclone"];     // MONS_SHOPKEEPERCLONE
+    lua["TYPE_MAP"][273] = lua["Entity"]["as_npc"];                 // MONS_SHOPKEEPERCLONE
     lua["TYPE_MAP"][274] = lua["Entity"]["as_lamassu"];             // MONS_LAMASSU
     lua["TYPE_MAP"][275] = lua["Entity"]["as_olmite"];              // MONS_OLMITE_HELMET
     lua["TYPE_MAP"][276] = lua["Entity"]["as_olmite"];              // MONS_OLMITE_BODYARMORED
@@ -312,8 +312,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][301] = lua["Entity"]["as_forestsister"];        // MONS_SISTER_PARSNIP
     lua["TYPE_MAP"][302] = lua["Entity"]["as_forestsister"];        // MONS_SISTER_PARMESAN
     lua["TYPE_MAP"][303] = lua["Entity"]["as_vanhorsing"];          // MONS_OLD_HUNTER
-    lua["TYPE_MAP"][304] = lua["Entity"]["as_sparrow"];             // MONS_THIEF
-    lua["TYPE_MAP"][305] = lua["Entity"]["as_madametusk"];          // MONS_MADAMETUSK
+    lua["TYPE_MAP"][304] = lua["Entity"]["as_npc"];                 // MONS_THIEF
+    lua["TYPE_MAP"][305] = lua["Entity"]["as_roomowner"];           // MONS_MADAMETUSK
     lua["TYPE_MAP"][306] = lua["Entity"]["as_bodyguard"];           // MONS_BODYGUARD
     lua["TYPE_MAP"][307] = lua["Entity"]["as_beg"];                 // MONS_HUNDUNS_SERVANT
     lua["TYPE_MAP"][308] = lua["Entity"]["as_waddler"];             // MONS_STORAGEGUY
@@ -323,7 +323,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["TYPE_MAP"][312] = lua["Entity"]["as_megajellyfish"];       // MONS_MEGAJELLYFISH
     lua["TYPE_MAP"][313] = lua["Entity"]["as_megajellyfish"];       // MONS_MEGAJELLYFISH_BACKGROUND
     lua["TYPE_MAP"][314] = lua["Entity"]["as_ghist"];               // MONS_GHIST
-    lua["TYPE_MAP"][315] = lua["Entity"]["as_ghistshopkeeper"];     // MONS_GHIST_SHOPKEEPER
+    lua["TYPE_MAP"][315] = lua["Entity"]["as_ghist"];               // MONS_GHIST_SHOPKEEPER
     lua["TYPE_MAP"][317] = lua["Entity"]["as_ghost"];               // MONS_GHOST
     lua["TYPE_MAP"][318] = lua["Entity"]["as_ghost"];               // MONS_GHOST_MEDIUM_SAD
     lua["TYPE_MAP"][319] = lua["Entity"]["as_ghost"];               // MONS_GHOST_MEDIUM_HAPPY

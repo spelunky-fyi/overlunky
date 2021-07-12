@@ -80,6 +80,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         FLOOR_SIDE::BOTTOM_LEFT,
         "BOTTOM_RIGHT",
         FLOOR_SIDE::BOTTOM_RIGHT);
+
     lua.new_usertype<Door>(
         "Door",
         "counter",
@@ -87,7 +88,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "fx_button",
         &Door::fx_button,
         sol::base_classes,
-        sol::bases<Entity>());
+        sol::bases<Entity, Floor>());
 
     lua.new_usertype<ExitDoor>(
         "ExitDoor",
@@ -104,33 +105,33 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "theme",
         &ExitDoor::theme,
         sol::base_classes,
-        sol::bases<Entity, Door>());
+        sol::bases<Entity, Floor, Door>());
 
     lua.new_usertype<DecoratedDoor>(
         "DecoratedDoor",
         "special_bg",
         &DecoratedDoor::special_bg,
         sol::base_classes,
-        sol::bases<Entity, Door, ExitDoor>());
+        sol::bases<Entity, Floor, Door, ExitDoor>());
 
     lua.new_usertype<LockedDoor>(
         "LockedDoor",
         "unlocked",
         &LockedDoor::unlocked,
         sol::base_classes,
-        sol::bases<Entity, Door>());
+        sol::bases<Entity, Floor, Door>());
 
     lua.new_usertype<CityOfGoldDoor>(
         "CityOfGoldDoor",
         "unlocked",
         &CityOfGoldDoor::unlocked,
         sol::base_classes,
-        sol::bases<Entity, Door, ExitDoor, DecoratedDoor>());
+        sol::bases<Entity, Floor, Door, ExitDoor, DecoratedDoor>());
 
     lua.new_usertype<MainExit>(
         "MainExit",
         sol::base_classes,
-        sol::bases<Entity, Door, ExitDoor>());
+        sol::bases<Entity, Floor, Door, ExitDoor>());
 
     lua.new_usertype<EggShipDoor>(
         "EggShipDoor",
@@ -139,7 +140,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "entered",
         &EggShipDoor::entered,
         sol::base_classes,
-        sol::bases<Entity, Door>());
+        sol::bases<Entity, Floor, Door>());
 
     lua.new_usertype<Arrowtrap>(
         "Arrowtrap",
@@ -157,7 +158,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "first_sound_id",
         &TotemTrap::first_sound_id,
         sol::base_classes,
-        sol::bases<Entity>());
+        sol::bases<Entity, Floor>());
 
     lua.new_usertype<LaserTrap>(
         "LaserTrap",

@@ -167,8 +167,7 @@ class PlayerTracker
     uint32_t unknown6;
     uint32_t unknown7;
     int32_t affected_entity_uid;
-    uint8_t animation_frame; // changes the color of the eyeball on Lahamu
-    uint8_t unknown9b;
+    uint16_t animation_frame; // changes the color of the eyeball on Lahamu
     uint8_t unknown9c;
     uint8_t unknown9d;
     float offset_x;

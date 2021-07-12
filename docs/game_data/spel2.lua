@@ -1508,11 +1508,6 @@ Ghist = {
   __name = "sol.Ghist.user",
   __newindex = "function:"
 }
-GhistShopkeeper = {
-  __index = "function:",
-  __name = "sol.GhistShopkeeper.user",
-  __newindex = "function:"
-}
 Ghost = {
   __index = "function:",
   __name = "sol.Ghost.user",
@@ -1799,11 +1794,6 @@ MASK = {
   SHADOW = 2048,
   WATER = 8192
 }
-MadameTusk = {
-  __index = "function:",
-  __name = "sol.MadameTusk.user",
-  __newindex = "function:"
-}
 MagmaMan = {
   __index = "function:",
   __name = "sol.MagmaMan.user",
@@ -1882,6 +1872,11 @@ Movable = {
 Mummy = {
   __index = "function:",
   __name = "sol.Mummy.user",
+  __newindex = "function:"
+}
+NPC = {
+  __index = "function:",
+  __name = "sol.NPC.user",
   __newindex = "function:"
 }
 Necromancer = {
@@ -2553,6 +2548,11 @@ RollingItem = {
   __name = "sol.RollingItem.user",
   __newindex = "function:"
 }
+RoomOwner = {
+  __index = "function:",
+  __name = "sol.RoomOwner.user",
+  __newindex = "function:"
+}
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
   LOOP = 1,
@@ -2612,11 +2612,6 @@ Shopkeeper = {
   __name = "sol.Shopkeeper.user",
   __newindex = "function:"
 }
-ShopkeeperClone = {
-  __index = "function:",
-  __name = "sol.ShopkeeperClone.user",
-  __newindex = "function:"
-}
 Skeleton = {
   __index = "function:",
   __name = "sol.Skeleton.user",
@@ -2655,11 +2650,6 @@ Spark = {
 SparkTrap = {
   __index = "function:",
   __name = "sol.SparkTrap.user",
-  __newindex = "function:"
-}
-Sparrow = {
-  __index = "function:",
-  __name = "sol.Sparrow.user",
   __newindex = "function:"
 }
 Spear = {
@@ -3357,7 +3347,6 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  nil,
   "function:",
   "function:",
   "function:",
@@ -3366,43 +3355,6 @@ TYPE_MAP = {
   "function:",
   "function:",
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  nil,
-  "function:",
-  nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  nil,
-  nil,
-  "function:",
-  nil,
   "function:",
   "function:",
   "function:",
@@ -3420,16 +3372,9 @@ TYPE_MAP = {
   nil,
   "function:",
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  nil,
   nil,
   "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3439,6 +3384,51 @@ TYPE_MAP = {
   nil,
   "function:",
   "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  nil,
+  nil,
+  "function:",
+  nil,
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  nil,
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  nil,
+  nil,
+  "function:",
+  nil,
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  "function:",
+  nil,
+  "function:",
+  nil,
   nil,
   "function:",
   nil,
@@ -4647,6 +4637,11 @@ Waddler = {
   __name = "sol.Waddler.user",
   __newindex = "function:"
 }
+WalkingMonster = {
+  __index = "function:",
+  __name = "sol.WalkingMonster.user",
+  __newindex = "function:"
+}
 WallTorch = {
   __index = "function:",
   __name = "sol.WallTorch.user",
@@ -4700,11 +4695,6 @@ Yang = {
 YellowCape = {
   __index = "function:",
   __name = "sol.YellowCape.user",
-  __newindex = "function:"
-}
-Yeti = {
-  __index = "function:",
-  __name = "sol.Yeti.user",
   __newindex = "function:"
 }
 YetiKing = {

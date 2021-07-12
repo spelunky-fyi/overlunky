@@ -65,7 +65,7 @@ class KapalaPowerup : public Movable
 class Mattock : public Movable
 {
   public:
-    int32_t remaining;
+    uint8_t remaining;
 };
 
 class Gun : public Movable
