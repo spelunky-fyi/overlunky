@@ -34,7 +34,6 @@
 #include "state.hpp"
 #include "window_api.hpp"
 
-
 #include "decode_audio_file.hpp"
 
 SoundManager* g_SoundManager{nullptr};
