@@ -1123,7 +1123,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "pause",
         &CritterBeetle::pause,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, Monster, Critter>());
 
     lua.new_usertype<CritterCrab>(
         "CritterCrab",

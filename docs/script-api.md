@@ -1024,11 +1024,11 @@ Explicitly add a decoration on the given side. Corner decorations only exist for
 \
 Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
 ### `Door`
-Derived from [`Entity`](#entity)
+Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) &Door::counter
 - [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Door::fx_button
 ### `ExitDoor`
-Derived from [`Entity`](#entity) [`Door`](#door)
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door)
 - [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &ExitDoor::entered
 - [`bool special_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_door) &ExitDoor::special_door
 - [`int level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) &ExitDoor::level
@@ -1036,18 +1036,18 @@ Derived from [`Entity`](#entity) [`Door`](#door)
 - [`int world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) &ExitDoor::world
 - [`int theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) &ExitDoor::theme
 ### `DecoratedDoor`
-Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`ExitDoor`](#exitdoor)
 - [`Entity special_bg`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_bg) &DecoratedDoor::special_bg
 ### `LockedDoor`
-Derived from [`Entity`](#entity) [`Door`](#door)
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door)
 - [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &LockedDoor::unlocked
 ### `CityOfGoldDoor`
-Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor) [`DecoratedDoor`](#decorateddoor)
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`ExitDoor`](#exitdoor) [`DecoratedDoor`](#decorateddoor)
 - [`bool unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlocked) &CityOfGoldDoor::unlocked
 ### `MainExit`
-Derived from [`Entity`](#entity) [`Door`](#door) [`ExitDoor`](#exitdoor)
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`ExitDoor`](#exitdoor)
 ### `EggShipDoor`
-Derived from [`Entity`](#entity) [`Door`](#door)
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggShipDoor::timer
 - [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &EggShipDoor::entered
 ### `Arrowtrap`
@@ -1055,7 +1055,7 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
 - [`nil rearm()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rearm) &Arrowtrap::rearm
 ### `TotemTrap`
-Derived from [`Entity`](#entity)
+Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int spawn_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) &TotemTrap::spawn_entity_type
 - [`int first_sound_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) &TotemTrap::first_sound_id
 ### `LaserTrap`
@@ -1706,7 +1706,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int last_picked_up_by_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_picked_up_by_uid) &Critter::last_picked_up_by_uid
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &Critter::state
 ### `CritterBeetle`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)
 - [`bool pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) &CritterBeetle::pause
 ### `CritterCrab`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`Critter`](#critter)

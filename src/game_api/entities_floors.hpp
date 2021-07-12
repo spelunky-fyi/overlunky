@@ -56,7 +56,7 @@ class Floor : public Entity
     static bool get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2]);
 };
 
-class Door : public Entity
+class Door : public Floor
 {
   public:
     uint8_t counter; // counts down as you go thru it
