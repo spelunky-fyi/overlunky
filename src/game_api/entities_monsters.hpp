@@ -24,7 +24,7 @@ class RoomOwner : public Monster
     uint16_t countdown_timer; // counts down to 0 when a value is forced, can't shot when the timer is running
     uint8_t unknown1;
     bool is_patrolling; // to set off a shopkeeper, combine this with state.shoppie_aggro_levels > 0
-    bool aggro;         // setting this makes him angry, if it's shopkeeper you get 2 agrro points
+    bool aggro_trigger; // setting this makes him angry, if it's shopkeeper you get 2 agrro points
     bool was_hurt;      // also is set true if you set aggro to true, get's trigger even when whiping
     uint16_t padding1;
     uint32_t padding2;

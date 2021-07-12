@@ -1255,7 +1255,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int lose_interest_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lose_interest_timer) &RoomOwner::lose_interest_timer
 - [`int countdown_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=countdown_timer) &RoomOwner::countdown_timer
 - [`bool is_patrolling`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_patrolling) &RoomOwner::is_patrolling
-- [`bool aggro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aggro) &RoomOwner::aggro
+- [`bool aggro_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aggro_trigger) &RoomOwner::aggro_trigger
 - [`bool was_hurt`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=was_hurt) &RoomOwner::was_hurt
 ### `WalkingMonster`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
