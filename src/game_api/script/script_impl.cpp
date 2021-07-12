@@ -552,8 +552,10 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
-    /// Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
+    /// NoDoc
     lua["get_entities_overlapping"] = get_entities_overlapping;
+    /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
+    lua["get_entities_overlapping_hitbox"] = get_entities_overlapping_hitbox;
     /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
     /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
     lua["attach_entity"] = attach_entity_by_uid;

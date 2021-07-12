@@ -571,6 +571,12 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
     return found;
 }
 
+std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, int layer)
+{
+    auto state = State::get();
+    return get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(layer));
+}
+
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
 {
     auto state = State::get();

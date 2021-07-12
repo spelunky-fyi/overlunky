@@ -101,6 +101,8 @@ def replace_all(text, dic):
     return text
 
 def print_af(lf, af):
+    if lf['comment'] and lf['comment'][0] == 'NoDoc':
+        return
     ret = replace_all(af['return'], replace) or 'nil'
     name = lf['name']
     param = replace_all(af['param'], replace)

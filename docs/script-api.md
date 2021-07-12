@@ -350,9 +350,9 @@ Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for l
 ### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 `array<int> get_entities_at(int entity_type, int mask, float x, float y, int layer, float radius)`<br/>
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
-### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
-`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
-Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
+### [`get_entities_overlapping_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
+`array<int> get_entities_overlapping_hitbox(int entity_type, int mask, AABB hitbox, int layer)`<br/>
+Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`attach_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach_entity)
 `nil attach_entity(int overlay_uid, int attachee_uid)`<br/>
 Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
