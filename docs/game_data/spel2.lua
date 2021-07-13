@@ -1,3 +1,6 @@
+AABB = {
+  __name = "sol.AABB.user"
+}
 Alien = {
   __index = "function:",
   __name = "sol.Alien.user",
@@ -1363,6 +1366,9 @@ Grub = {
   __index = "function:",
   __name = "sol.Grub.user",
   __newindex = "function:"
+}
+GuiDrawContext = {
+  __name = "sol.GuiDrawContext.user"
 }
 Gun = {
   __index = "function:",
@@ -4194,6 +4200,7 @@ get_entities_by_layer = function(...) end
 get_entities_by_mask = function(...) end
 get_entities_by_type = function(...) end
 get_entities_overlapping = function(...) end
+get_entities_overlapping_hitbox = function(...) end
 get_entity = ((loadstring or load)("\27LuaT\0\25“\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\3à\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_uid)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        ‚’\1\0\5˜<\0\0\0¸\0\0€ˆ\0\0\0È\0\2\0‹\0\0\1\0\1\0\0Ä\0\2\2¼\0\0\0¸\0\0€\8\1\0\0H\1\2\0\11\1\0\2Ž\1\1\3Ž\1\3\4\12\1\2\3<\0\0008\2\0€€\1\2\0\0\2\1\0Å\1\2\0Æ\1\0\0008\0\0€È\0\2\0Ç\1\1\0…\0\4get_entity_raw\4‰TYPE_MAP\4…type\4ƒid\0\0\0€˜\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2€ƒˆent_uid€˜‹entity_raw‡˜‰cast_fun˜…_ENV",'@serialized'))
 get_entity_ai_state = function(...) end
 get_entity_flags = function(...) end
@@ -4202,10 +4209,12 @@ get_entity_raw = function(...) end
 get_entity_type = function(...) end
 get_frame = function(...) end
 get_grid_entity_at = function(...) end
+get_hitbox = function(...) end
 get_level_flags = function(...) end
 get_ms = function(...) end
 get_particle_type = function(...) end
 get_position = function(...) end
+get_render_hitbox = function(...) end
 get_render_position = function(...) end
 get_room_index = function(...) end
 get_room_pos = function(...) end
@@ -4214,6 +4223,7 @@ get_room_template_name = function(...) end
 get_sound = function(...) end
 get_texture_definition = function(...) end
 get_type = function(...) end
+get_velocity = function(...) end
 get_window_size = function(...) end
 get_zoom_level = function(...) end
 god = function(...) end
@@ -4260,6 +4270,7 @@ return_input = function(...) end
 rgba = function(...) end
 savegame = 
 say = function(...) end
+screen_aabb = function(...) end
 screen_distance = function(...) end
 screen_position = function(...) end
 seed_prng = function(...) end

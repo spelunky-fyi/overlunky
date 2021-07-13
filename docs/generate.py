@@ -5,6 +5,7 @@ import sys
 sys.stdout = open('script-api.md', 'w')
 
 header_files = [
+        '../src/game_api/math.hpp',
         '../src/game_api/rpc.hpp',
         '../src/game_api/spawn_api.hpp',
         '../src/game_api/script.hpp',
@@ -24,7 +25,7 @@ header_files = [
         '../src/game_api/script/usertypes/level_lua.hpp',
         '../src/game_api/script/usertypes/gui_lua.hpp',
         '../src/game_api/script/usertypes/save_context.hpp',
-        '../src/game_api/script/usertypes/hitbox.hpp',
+        '../src/game_api/script/usertypes/hitbox_lua.hpp',
     ]
 api_files = [
         '../src/game_api/script/script_impl.cpp',
@@ -46,8 +47,8 @@ api_files = [
         '../src/game_api/script/usertypes/drops_lua.cpp',
         '../src/game_api/script/usertypes/texture_lua.cpp',
         '../src/game_api/script/usertypes/flags_lua.cpp',
-        '../src/game_api/script/usertypes/char_state.cpp',
-        '../src/game_api/script/usertypes/hitbox.cpp',
+        '../src/game_api/script/usertypes/char_state_lua.cpp',
+        '../src/game_api/script/usertypes/hitbox_lua.cpp',
     ]
 rpc = []
 classes = []
@@ -528,7 +529,7 @@ for lf in funcs:
 
 
 print('## Deprecated Functions')
-print('#### These functions still exist but their usage is discouraged, they all have state alternatives so please use those!')
+print('#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!')
 for lf in deprecated_funcs:
     lf['comment'].pop(0)
     if len(rpcfunc(lf['cpp'])):

@@ -390,9 +390,6 @@ Get the game coordinates at the screen position (`x`, `y`)
 ### [`screen_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_position)
 `tuple<float, float> screen_position(float x, float y)`<br/>
 Translate an entity position to screen position to be used in drawing functions
-### [`screen_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_position)
-`tuple<float, float, float, float> screen_position(float x1, float y1, float x2, float y2)`<br/>
-Translate an entity position to screen position to be used in drawing functions
 ### [`screen_distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_distance)
 `float screen_distance(float x)`<br/>
 Translate a distance of `x` tiles to screen distance to be be used in drawing functions
@@ -688,16 +685,19 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 `int define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
 ### [`get_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox)
-`nil get_hitbox(int uid, float extrude, float offsetx, float offsety)`<br/>
+`nil get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)`<br/>
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+### [`get_render_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_hitbox)
+`nil get_render_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)`<br/>
+Same as `get_hitbox` but based on `get_render_position`
 ### [`screen_aabb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_aabb)
 `AABB screen_aabb(AABB box)`<br/>
 Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
 ## Deprecated Functions
-### These functions still exist but their usage is discouraged, they all have state alternatives so please use those!
+#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 `array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
-Use get_entities_overlapping_hitbox instead
+Use `get_entities_overlapping_hitbox` instead
 ### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
 `nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`<br/>
 Use `DrawGuiContext.draw_line` instead
@@ -1764,10 +1764,16 @@ You can just discard this handle if you do not need extended control anymore
 - [`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line) &GuiDrawContext::draw_line
 \
 Draws a line on screen
-- [`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) &GuiDrawContext::draw_rect
+- [`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) draw_rect
 \
 Draws a rectangle on screen from top-left to bottom-right.
-- [`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) &GuiDrawContext::draw_rect_filled
+- [`nil draw_rect(AABB rect, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) draw_rect
+\
+Draws a rectangle on screen from top-left to bottom-right.
+- [`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) draw_rect_filled
+\
+Draws a filled rectangle on screen from top-left to bottom-right.
+- [`nil draw_rect_filled(AABB rect, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) draw_rect_filled
 \
 Draws a filled rectangle on screen from top-left to bottom-right.
 - [`nil draw_circle(float x, float y, float radius, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle) &GuiDrawContext::draw_circle
@@ -1779,10 +1785,14 @@ Draws a filled circle on screen
 - [`nil draw_text(float x, float y, float size, string text, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &GuiDrawContext::draw_text
 \
 Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
-- [`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) &GuiDrawContext::draw_image
+- [`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
 \
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-- [`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) &GuiDrawContext::draw_image_rotated
+- [`nil draw_image(int image, AABB rect, AABB uv_rect, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
+\
+Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+- [`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+- [`nil draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
 - [`bool window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) &GuiDrawContext::window
 \
 autosize in center. Use just a `##Label` as title to hide titlebar.
