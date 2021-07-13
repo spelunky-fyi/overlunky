@@ -650,7 +650,7 @@ class ParachutePowerup : public Movable
     uint16_t unknown2;
     uint16_t unknown3;
     bool deployed;     // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
-    bool deployed2;     /* unsure */
+    bool deployed2;    /* unsure */
     bool after_deploy; // if set to true before deploying, parachute will drop imminently after deploy
 };
 
