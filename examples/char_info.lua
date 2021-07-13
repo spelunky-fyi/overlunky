@@ -24,7 +24,7 @@ set_callback(function(draw_ctx)
 
         local x, y, l = get_render_position(char_uid)
         local sx, sy = screen_position(x, y + char.hitboxy + char.offsety)
-        local tx, ty = draw_ctx:draw_text_size(35, name)
+        local tx, ty = draw_text_size(35, name)
         draw_ctx:draw_text(sx - tx / 2, sy - ty * 2, 35, name, u_color)
     end
 end, ON.GUIFRAME)

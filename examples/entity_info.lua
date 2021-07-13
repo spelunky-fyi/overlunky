@@ -18,7 +18,8 @@ set_callback(function(draw_ctx)
         e = get_entity(v)
         if e ~= nil then
             e = e:as_container()
-            sx, sy = screen_position(ex-e.hitboxx, ey-e.hitboxy+e.offsety)
+            hitbox = get_render_hitbox(v)
+            sx, sy = screen_position(hitbox.left, hitbox.bottom)
             dist = distance(players[1].uid, v)
             c = ""
             if names[e.inside] and (e.type.id == ENT_TYPE.ITEM_CRATE or e.type.id == ENT_TYPE.ITEM_DMCRATE or e.type.id == ENT_TYPE.ITEM_COFFIN or e.type.id == ENT_TYPE.ITEM_PRESENT or e.type.id == ENT_TYPE.ITEM_GHIST_PRESENT or e.type.id == ENT_TYPE.ITEM_POT) then
@@ -39,8 +40,8 @@ set_callback(function(draw_ctx)
         e = get_entity(v)
         if e ~= nil and string.match(names[e.type.id], "TRAP") then
             e = e:as_movable()
-            ex, ey, el = get_render_position(v)
-            sx, sy = screen_position(ex-e.hitboxx, ey-e.hitboxy+e.offsety)
+            hitbox = get_render_hitbox(v)
+            sx, sy = screen_position(hitbox.left, hitbox.bottom)
             dist = distance(players[1].uid, v)
             draw_ctx:draw_text(sx, sy, 0,
                 tostring(v).."\n"..
@@ -58,12 +59,13 @@ set_callback(function(draw_ctx)
     for i,v in ipairs(ents) do
         x, y, l = get_render_position(v)
         e = get_entity(v):as_movable()
-        sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
+        hitbox = get_render_hitbox(v)
+        sx, sy = screen_position(hitbox.left, hitbox.bottom)
         if l == pl then
             draw_ctx:draw_text(sx, sy, 0, tostring(v), rgba(255, 255, 255, 255))
         end
-    sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
-    sx2, sy2 = screen_position(x+e.hitboxx+e.offsetx, y-e.hitboxy+e.offsety) -- bottom right
-    draw_ctx:draw_rect(sx, sy, sx2, sy2, 2, 10, rgba(255, 0, 255, 255))
+    hitbox = get_render_hitbox(v)
+    hitbox = screen_aabb(hitbox)
+    draw_ctx:draw_rect(hitbox, 2, 10, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)
