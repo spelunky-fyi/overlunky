@@ -26,7 +26,18 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     lua["Entity"]["as_regenblock"] = &Entity::as<RegenBlock>;
     lua["Entity"]["as_timedpowderkeg"] = &Entity::as<TimedPowderkeg>;
 
-    lua.new_usertype<Crushtrap>("Crushtrap", "dirx", &Crushtrap::dirx, "diry", &Crushtrap::diry, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Crushtrap>(
+        "Crushtrap",
+        "dirx",
+        &Crushtrap::dirx,
+        "diry",
+        &Crushtrap::diry,
+        "timer",
+        &Crushtrap::timer,
+        "diry",
+        &Crushtrap::bounce_back_timer,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
 
     lua.new_usertype<Olmec>(
         "Olmec",

@@ -247,7 +247,7 @@ class Spark : public Flame
 {
   public:
     ParticleEmitterInfo* particle;
-    Entity* fx;
+    Entity* fx_entity;
     float rotation_center_x;
     float rotation_center_y;
     float angle;
@@ -357,7 +357,7 @@ class Telescope : public Movable
     Entity* fx_button;
     Entity* camera_anchor;
     int32_t looked_through_by_uid;
-    float unknown;
+    float unknown; // seams to be distance between camera_anchor and telescope, but it's off by a little
 };
 
 class Torch : public Movable
@@ -372,7 +372,7 @@ class Torch : public Movable
 class WallTorch : public Torch
 {
   public:
-    bool no_reward; /* unsure */ // if false, it will drop gold when lit up
+    bool dropped_gold; // if false, it will drop gold when lit up
 };
 
 class TorchFlame : public Flame
@@ -649,8 +649,8 @@ class ParachutePowerup : public Movable
     uint8_t unknown1;
     uint16_t unknown2;
     uint16_t unknown3;
-    bool deploy;       // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
-    bool deploy2;      /* unsure */
+    bool deployed;     // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
+    bool deployed2;     /* unsure */
     bool after_deploy; // if set to true before deploying, parachute will drop imminently after deploy
 };
 

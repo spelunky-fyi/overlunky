@@ -10,6 +10,8 @@ class Crushtrap : public Movable
   public:
     float dirx;
     float diry;
+    uint8_t timer;             // counts from 30 to 0 when detecting player, then moves, when stops moving counts from 60 to 0 before it can be triggered again
+    uint8_t bounce_back_timer; // counts from 7 to 0 when it hits the wall and moves away from the wall, then moves back and count's from 255 until it hits the wall again, if needed it will start the counter again for another bounce
 };
 
 class Olmec : public Movable

@@ -986,6 +986,8 @@ Derived from [`Entity`](#entity)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Inventory inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Player::emitted_light
+- [`int linked_companion_parent`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_parent) &Player::linked_companion_parent
+- [`int linked_companion_child`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_child) &Player::linked_companion_child
 - [`nil set_jetpack_fuel(int fuel)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) &Player::set_jetpack_fuel
 - [`int kapala_blood_amount()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Player::kapala_blood_amount
 - [`string get_name()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_name) &Player::get_name
@@ -1107,6 +1109,8 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid
 - [`int ball_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ball_uid) &StickyTrap::ball_uid
+- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &StickyTrap::state
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &StickyTrap::timer
 ### `MotherStatue`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool player1_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_standing) &MotherStatue::player1_standing
@@ -1125,7 +1129,7 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool eggplantchild_detected`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=eggplantchild_detected) &MotherStatue::eggplantchild_detected
 ### `TeleportingBorder`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
-- [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &TeleportingBorder::direction
+- [`int direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction) &TeleportingBorder::direction
 ### `ForceField`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Entity first_item_beam`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_item_beam) &ForceField::first_item_beam
@@ -1155,6 +1159,8 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
 - [`float diry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diry) &Crushtrap::diry
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Crushtrap::timer
+- [`int diry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diry) &Crushtrap::bounce_back_timer
 ### `Olmec`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_uid) &Olmec::target_uid
@@ -1861,6 +1867,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot)
 ### `Spark`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Spark::particle
+- [`Entity fx_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_entity) &Spark::fx_entity
 - [`float rotation_center_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_center_x) &Spark::rotation_center_x
 - [`float rotation_center_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_center_y) &Spark::rotation_center_y
 - [`float angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Spark::angle
@@ -1927,6 +1934,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool is_lit`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_lit) &Torch::is_lit
 ### `WallTorch`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Torch`](#torch)
+- [`bool dropped_gold`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dropped_gold) &WallTorch::dropped_gold
 ### `TorchFlame`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`ParticleEmitterInfo smoke_particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke_particle) &TorchFlame::smoke_particle
@@ -2082,7 +2090,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `ParachutePowerup`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int falltime_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falltime_deploy) &ParachutePowerup::falltime_deploy
-- [`bool deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deploy) &ParachutePowerup::deploy
+- [`deployed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deployed) sol::readonly(&ParachutePowerup::deployed)
 - [`bool after_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=after_deploy) &ParachutePowerup::after_deploy
 ### `TrueCrownPowerup`
 Derived from [`Entity`](#entity) [`Movable`](#movable)

@@ -311,6 +311,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "Spark",
         "particle",
         &Spark::particle,
+        "fx_entity",
+        &Spark::fx_entity,
         "rotation_center_x",
         &Spark::rotation_center_x,
         "rotation_center_y",
@@ -457,6 +459,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<WallTorch>(
         "WallTorch",
+        "dropped_gold",
+        &WallTorch::dropped_gold,
         sol::base_classes,
         sol::bases<Entity, Movable, Torch>());
 
@@ -808,8 +812,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "ParachutePowerup",
         "falltime_deploy",
         &ParachutePowerup::falltime_deploy,
-        "deploy",
-        &ParachutePowerup::deploy,
+        "deployed",
+        sol::readonly(&ParachutePowerup::deployed),
         "after_deploy",
         &ParachutePowerup::after_deploy,
         sol::base_classes,
