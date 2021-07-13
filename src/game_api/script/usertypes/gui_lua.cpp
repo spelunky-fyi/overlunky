@@ -37,6 +37,10 @@ void GuiDrawContext::draw_rect(float x1, float y1, float x2, float y2, float thi
     ImVec2 b = screenify({x2, y2});
     script->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
 };
+void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColor color)
+{
+    draw_rect(rect.left, rect.bottom, rect.right, rect.top, thickness, rounding, color);
+}
 void GuiDrawContext::draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)
 {
     if (isnan(x1) || isnan(y1) || isnan(x2) || isnan(y2))
@@ -51,6 +55,10 @@ void GuiDrawContext::draw_rect_filled(float x1, float y1, float x2, float y2, fl
     // check for nan in the vectors because this will cause a crash in ImGui
     script->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
 };
+void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
+{
+    draw_rect_filled(rect.left, rect.bottom, rect.right, rect.top, rounding, color);
+}
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
     ImVec2 a = screenify({x, y});
@@ -96,6 +104,10 @@ void GuiDrawContext::draw_image(int image, float x1, float y1, float x2, float y
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     script->draw_list->AddImage(script->images[image]->texture, a, b, uva, uvb, color);
 };
+void GuiDrawContext::draw_image(int image, AABB rect, AABB uv_rect, uColor color)
+{
+    draw_image(image, rect.left, rect.bottom, rect.right, rect.top, uv_rect.left, uv_rect.bottom, uv_rect.right, uv_rect.top, color);
+}
 void GuiDrawContext::draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
 {
     if (!script->images.contains(image))
@@ -107,6 +119,10 @@ void GuiDrawContext::draw_image_rotated(int image, float x1, float y1, float x2,
     ImVec2 pivot = {screenify(px), screenify(py)};
     AddImageRotated(script->draw_list, script->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
 };
+void GuiDrawContext::draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)
+{
+    draw_image_rotated(image, rect.left, rect.bottom, rect.right, rect.top, uv_rect.left, uv_rect.bottom, uv_rect.right, uv_rect.top, color, angle, px, py);
+}
 
 bool GuiDrawContext::window(std::string title, float x, float y, float w, float h, bool movable, sol::function callback)
 {
@@ -252,14 +268,26 @@ namespace NGui
 {
 void register_usertypes(sol::state& lua, ScriptImpl* script)
 {
+    auto draw_rect = sol::overload(
+        static_cast<void (GuiDrawContext::*)(float, float, float, float, float, float, uColor)>(&GuiDrawContext::draw_rect),
+        static_cast<void (GuiDrawContext::*)(AABB, float, float, uColor)>(&GuiDrawContext::draw_rect));
+    auto draw_rect_filled = sol::overload(
+        static_cast<void (GuiDrawContext::*)(float, float, float, float, float, uColor)>(&GuiDrawContext::draw_rect_filled),
+        static_cast<void (GuiDrawContext::*)(AABB, float, uColor)>(&GuiDrawContext::draw_rect_filled));
+    auto draw_image = sol::overload(
+        static_cast<void (GuiDrawContext::*)(int, float, float, float, float, float, float, float, float, uColor)>(&GuiDrawContext::draw_image),
+        static_cast<void (GuiDrawContext::*)(int, AABB, AABB, uColor)>(&GuiDrawContext::draw_image));
+    auto draw_image_rotated = sol::overload(
+        static_cast<void (GuiDrawContext::*)(int, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
+        static_cast<void (GuiDrawContext::*)(int, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
     lua.new_usertype<GuiDrawContext>(
         "GuiDrawContext",
         "draw_line",
         &GuiDrawContext::draw_line,
         "draw_rect",
-        &GuiDrawContext::draw_rect,
+        draw_rect,
         "draw_rect_filled",
-        &GuiDrawContext::draw_rect_filled,
+        draw_rect_filled,
         "draw_circle",
         &GuiDrawContext::draw_circle,
         "draw_circle_filled",
@@ -267,9 +295,9 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "draw_text",
         &GuiDrawContext::draw_text,
         "draw_image",
-        &GuiDrawContext::draw_image,
+        draw_image,
         "draw_image_rotated",
-        &GuiDrawContext::draw_image_rotated,
+        draw_image_rotated,
         "window",
         &GuiDrawContext::window,
         "win_text",

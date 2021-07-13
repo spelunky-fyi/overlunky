@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "math.hpp"
 #include "memory.hpp"
 
 struct RenderInfo;
@@ -43,14 +44,6 @@ struct Color
     float g;
     float b;
     float a;
-};
-
-struct AABB
-{
-    float left;
-    float bottom;
-    float right;
-    float top;
 };
 
 class Entity;
@@ -407,4 +400,4 @@ std::tuple<float, float, int> get_render_position(uint32_t uid);
 
 std::tuple<float, float> get_velocity(uint32_t uid);
 
-AABB get_hitbox(uint32_t uid);
+AABB get_hitbox(uint32_t uid, bool use_render_pos);

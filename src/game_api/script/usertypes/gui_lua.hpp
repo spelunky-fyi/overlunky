@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include "math.hpp"
+
 class ScriptImpl;
 
 using uColor = uint32_t;
@@ -17,8 +19,12 @@ class GuiDrawContext
     void draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color);
     /// Draws a rectangle on screen from top-left to bottom-right.
     void draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color);
+    /// Draws a rectangle on screen from top-left to bottom-right.
+    void draw_rect(AABB rect, float thickness, float rounding, uColor color);
     /// Draws a filled rectangle on screen from top-left to bottom-right.
     void draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color);
+    /// Draws a filled rectangle on screen from top-left to bottom-right.
+    void draw_rect_filled(AABB rect, float rounding, uColor color);
     /// Draws a circle on screen
     void draw_circle(float x, float y, float radius, float thickness, uColor color);
     /// Draws a filled circle on screen
@@ -27,8 +33,12 @@ class GuiDrawContext
     void draw_text(float x, float y, float size, std::string text, uColor color);
     /// Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
     void draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color);
+    /// Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+    void draw_image(int image, AABB rect, AABB uv_rect, uColor color);
     /// Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
     void draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py);
+    /// Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
+    void draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py);
 
     /// Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
     /// [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to

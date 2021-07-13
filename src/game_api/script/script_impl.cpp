@@ -12,7 +12,7 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 
-#include "usertypes/char_state.hpp"
+#include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
@@ -23,6 +23,7 @@
 #include "usertypes/entity_lua.hpp"
 #include "usertypes/flags_lua.hpp"
 #include "usertypes/gui_lua.hpp"
+#include "usertypes/hitbox_lua.hpp"
 #include "usertypes/level_lua.hpp"
 #include "usertypes/particles_lua.hpp"
 #include "usertypes/player_lua.hpp"
@@ -817,6 +818,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         return sol::nullopt;
     };
 
+    NHitbox::register_usertypes(lua);
     NSound::register_usertypes(lua, this);
     NLevel::register_usertypes(lua, this);
     NGui::register_usertypes(lua, this);
