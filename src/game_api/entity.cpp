@@ -424,7 +424,7 @@ std::tuple<float, float> get_velocity(uint32_t uid)
     {
         float vx{0.0f};
         float vy{0.0f};
-        if (ent->type->search_flags & 0b1111) // PLAYER | MOUNT | MONSTER | ITEM
+        if (ent->type->search_flags & 0b11001111) // PLAYER | MOUNT | MONSTER | ITEM | FX | ACTIVEFLOOR
         {
             Movable* mov = ent->as<Movable>();
             vx = mov->velocityx;
