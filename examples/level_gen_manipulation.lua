@@ -133,7 +133,7 @@ set_callback(function(room_gen_ctx)
             if room_template_here == ROOM_TEMPLATE.SIDE then
                 -- Check if left of this is a valid room
                 local room_template_left = get_room_template(x - 1, y, 0)
-                if not valid_rooms_with_shop_next[room_template_left] then
+                if valid_rooms_with_shop_next[room_template_left] then
                     -- And spawn a shop facing left
                     room_gen_ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.SHOP_LEFT)
                 else
