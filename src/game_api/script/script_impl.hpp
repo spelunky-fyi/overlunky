@@ -18,7 +18,6 @@
 
 using CallbackId = int;
 using Flags = std::uint32_t;
-using uColor = ImU32;
 using SPAWN_TYPE = int;                  // NoAlias
 using VANILLA_SOUND = std::string;       // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = int; // NoAlias

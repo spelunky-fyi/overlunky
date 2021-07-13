@@ -86,11 +86,11 @@ local lamp_tiles = {}
 set_post_tile_code_callback(function(x, y, layer)
     table.insert(lamp_tiles, { x = x, y = y, layer = layer })
 end, "lamp_hang")
-set_callback(function()
+set_callback(function(draw_ctx)
     for _, tile in pairs(lamp_tiles) do
         local sx, sy = screen_position(tile.x - 0.5, tile.y + 0.5) -- top left
         local sx2, sy2 = screen_position(tile.x + 0.5, tile.y - 0.5) -- bottom right
-        draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
+        draw_ctx:draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)
 

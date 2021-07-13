@@ -4,7 +4,7 @@ meta.description = "Testing guns."
 meta.author = "Dregu"
 
 -- get info on the item the player is holding on every frame
-set_callback(function()
+set_callback(function(draw_ctx)
     for i, player in ipairs(players) do
 
         -- are we holding something
@@ -25,7 +25,7 @@ set_callback(function()
                 text_display = F"{text_display}, frame:{gun.animation_frame}"
                     
                 -- print the gun variables on screen
-                draw_text(-0.67, (9 - i) / 10.0, 24, text_display, rgba(255, 0, 255, 255))
+                draw_ctx:draw_text(-0.67, (9 - i) / 10.0, 24, text_display, rgba(255, 0, 255, 255))
 
                 -- make all guns super fast and infinite
                 if gun.cooldown > 30 then

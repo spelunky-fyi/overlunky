@@ -9,7 +9,7 @@ for i,v in pairs(ENT_TYPE) do
 end
 
 -- entity uid, health, distance
-set_callback(function()
+set_callback(function(draw_ctx)
     if #players < 1 then return end
     x, y, l = get_render_position(players[1].uid)
     ents = get_entities_at(0, 255, x, y, l, 30)
@@ -18,14 +18,15 @@ set_callback(function()
         e = get_entity(v)
         if e ~= nil then
             e = e:as_container()
-            sx, sy = screen_position(ex-e.hitboxx, ey-e.hitboxy+e.offsety)
+            hitbox = get_render_hitbox(v)
+            sx, sy = screen_position(hitbox.left, hitbox.bottom)
             dist = distance(players[1].uid, v)
             c = ""
             if names[e.inside] and (e.type.id == ENT_TYPE.ITEM_CRATE or e.type.id == ENT_TYPE.ITEM_DMCRATE or e.type.id == ENT_TYPE.ITEM_COFFIN or e.type.id == ENT_TYPE.ITEM_PRESENT or e.type.id == ENT_TYPE.ITEM_GHIST_PRESENT or e.type.id == ENT_TYPE.ITEM_POT) then
                 c = " ("..names[e.inside]..")"
             end
             if not string.match(names[e.type.id], "FX") then
-                draw_text(sx, sy, 0,
+                draw_ctx:draw_text(sx, sy, 0,
                     tostring(v).."\n"..
                     names[e.type.id]..c.."\n"..
                     tostring(e.health).." HP\n"..
@@ -39,10 +40,10 @@ set_callback(function()
         e = get_entity(v)
         if e ~= nil and string.match(names[e.type.id], "TRAP") then
             e = e:as_movable()
-            ex, ey, el = get_render_position(v)
-            sx, sy = screen_position(ex-e.hitboxx, ey-e.hitboxy+e.offsety)
+            hitbox = get_render_hitbox(v)
+            sx, sy = screen_position(hitbox.left, hitbox.bottom)
             dist = distance(players[1].uid, v)
-            draw_text(sx, sy, 0,
+            draw_ctx:draw_text(sx, sy, 0,
                 tostring(v).."\n"..
                 names[e.type.id].."\n"..
                 "D: "..string.format("%.3f", dist), rgba(255, 255, 255, 255))
@@ -51,19 +52,20 @@ set_callback(function()
 end, ON.GUIFRAME)
 
 -- door finder
-set_callback(function()
+set_callback(function(draw_ctx)
     if #players < 1 then return end
     px, py, pl = get_render_position(players[1].uid)
     ents = get_entities_by_type(ENT_TYPE.LOGICAL_DOOR)
     for i,v in ipairs(ents) do
         x, y, l = get_render_position(v)
         e = get_entity(v):as_movable()
-        sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
+        hitbox = get_render_hitbox(v)
+        sx, sy = screen_position(hitbox.left, hitbox.bottom)
         if l == pl then
-            draw_text(sx, sy, 0, tostring(v), rgba(255, 255, 255, 255))
+            draw_ctx:draw_text(sx, sy, 0, tostring(v), rgba(255, 255, 255, 255))
         end
-    sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
-    sx2, sy2 = screen_position(x+e.hitboxx+e.offsetx, y-e.hitboxy+e.offsety) -- bottom right
-    draw_rect(sx, sy, sx2, sy2, 2, 10, rgba(255, 0, 255, 255))
+    hitbox = get_render_hitbox(v)
+    hitbox = screen_aabb(hitbox)
+    draw_ctx:draw_rect(hitbox, 2, 10, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)

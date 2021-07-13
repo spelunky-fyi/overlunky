@@ -10,6 +10,7 @@
 const float ZF = 0.737;
 
 struct Layer;
+struct ThemeInfo;
 struct LevelGenSystem;
 
 struct StateMemory

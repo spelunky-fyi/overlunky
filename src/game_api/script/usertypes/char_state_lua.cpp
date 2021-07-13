@@ -1,4 +1,4 @@
-#include "char_state.hpp"
+#include "char_state_lua.hpp"
 
 #include <sol/sol.hpp>
 

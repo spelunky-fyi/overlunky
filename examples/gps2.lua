@@ -73,14 +73,14 @@ set_callback(function()
     end, 15)
 end, ON.LEVEL)
 
-set_callback(function()
+set_callback(function(draw_ctx)
     if state.screen ~= 12 then return end
     if exitpath ~= nil then
         local x, y, l = get_position(players[1].uid)
         local lastx, lasty = screen_position(x, y)
         for node, count in exitpath:nodes() do
             local sx, sy = screen_position(xmin + node:getX() - 0.5, ymin - node:getY() + 0.5)
-            draw_line(lastx, lasty, sx, sy, 2, rgba(0, 255, 0, 255))
+            draw_ctx:draw_line(lastx, lasty, sx, sy, 2, rgba(0, 255, 0, 255))
             lastx = sx
             lasty = sy
         end
