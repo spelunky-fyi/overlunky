@@ -3,7 +3,7 @@ meta.version = "WIP"
 meta.description = "Draws character names and royal title in their respective color"
 meta.author = "Malacath"
 
-set_callback(function()
+set_callback(function(draw_ctx)
     local chars = get_entities_by_mask(MASK.PLAYER)
     for _, char_uid in pairs(chars) do
         local char = get_entity(char_uid):as_player()
@@ -25,6 +25,6 @@ set_callback(function()
         local x, y, l = get_render_position(char_uid)
         local sx, sy = screen_position(x, y + char.hitboxy + char.offsety)
         local tx, ty = draw_text_size(35, name)
-        draw_text(sx - tx / 2, sy - ty * 2, 35, name, u_color)
+        draw_ctx:draw_text(sx - tx / 2, sy - ty * 2, 35, name, u_color)
     end
 end, ON.GUIFRAME)

@@ -5,6 +5,7 @@ import sys
 sys.stdout = open('script-api.md', 'w')
 
 header_files = [
+        '../src/game_api/math.hpp',
         '../src/game_api/rpc.hpp',
         '../src/game_api/spawn_api.hpp',
         '../src/game_api/script.hpp',
@@ -24,7 +25,9 @@ header_files = [
         '../src/game_api/particles.hpp',
         '../src/game_api/savedata.hpp',
         '../src/game_api/script/usertypes/level_lua.hpp',
+        '../src/game_api/script/usertypes/gui_lua.hpp',
         '../src/game_api/script/usertypes/save_context.hpp',
+        '../src/game_api/script/usertypes/hitbox_lua.hpp',
     ]
 api_files = [
         '../src/game_api/script/script_impl.cpp',
@@ -44,10 +47,12 @@ api_files = [
         '../src/game_api/script/usertypes/sound_lua.cpp',
         '../src/game_api/script/usertypes/player_lua.cpp',
         '../src/game_api/script/usertypes/gui_lua.cpp',
+        '../src/game_api/script/usertypes/gui_lua.hpp',
         '../src/game_api/script/usertypes/drops_lua.cpp',
         '../src/game_api/script/usertypes/texture_lua.cpp',
         '../src/game_api/script/usertypes/flags_lua.cpp',
-        '../src/game_api/script/usertypes/char_state.cpp',
+        '../src/game_api/script/usertypes/char_state_lua.cpp',
+        '../src/game_api/script/usertypes/hitbox_lua.cpp',
     ]
 rpc = []
 classes = []
@@ -101,6 +106,8 @@ def replace_all(text, dic):
     return text
 
 def print_af(lf, af):
+    if lf['comment'] and lf['comment'][0] == 'NoDoc':
+        return
     ret = replace_all(af['return'], replace) or 'nil'
     name = lf['name']
     param = replace_all(af['param'], replace)
@@ -132,6 +139,8 @@ for file in header_files:
         continue
     data = open(file, 'r').read().split('\n')
     brackets_depth = 0
+    in_union = False
+    in_anonymous_struct = False
     class_name = None
     comment = []
     member_funs = {}
@@ -144,8 +153,23 @@ for file in header_files:
             if m:
                 class_name = m[2]
         elif class_name:
+            prev_brackets_depth = brackets_depth
             brackets_depth += line.count('{') - line.count('}')
+
             if brackets_depth == 1:
+                if line.strip() == 'union':
+                    in_union = True
+            if brackets_depth == 2 and in_union:
+                if line.strip() == 'struct':
+                    in_anonymous_struct = True
+
+            if brackets_depth < prev_brackets_depth:
+                if brackets_depth == 2:
+                    in_anonymous_struct = False
+                if brackets_depth == 1:
+                    in_union = False
+
+            if brackets_depth == 1 or (brackets_depth == 2 and in_union) or (brackets_depth == 3 and in_anonymous_struct):
                 m = re.search(r'/// ?(.*)$', line)
                 if m:
                     comment.append(m[1])
@@ -158,7 +182,7 @@ for file in header_files:
                     member_funs[name].append({'return': m[1], 'name': m[2], 'param': m[3], 'comment': comment})
                     comment = []
 
-                m = re.search(r'\s*(.*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;', line)
+                m = re.search(r'\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;', line)
                 if m:
                     member_vars.append({'type': m[1], 'name': m[2], 'comment': comment})
                     comment = []
@@ -478,6 +502,9 @@ for lf in events:
         for com in lf['comment']:
             print(com)
 
+deprecated_funcs = [func for func in funcs if func['comment'] and func['comment'][0] == 'Deprecated']
+funcs = [func for func in funcs if not func['comment'] or not func['comment'][0] == 'Deprecated']
+
 print('## Functions')
 print('Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.')
 for lf in funcs:
@@ -485,6 +512,36 @@ for lf in funcs:
         for af in rpcfunc(lf['cpp']):
             print_af(lf, af)
     elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']):
+        if lf['comment'] and lf['comment'][0] == 'NoDoc':
+            continue
+        m = re.search(r'\(([^\{]*)\)\s*->\s*([^\{]*)', lf['cpp'])
+        m2 = re.search(r'\(([^\{]*)\)', lf['cpp'])
+        ret = 'nil'
+        param = ''
+        if m:
+            ret = replace_all(m.group(2), replace).strip() or 'nil'
+        if m or m2:
+            param = (m or m2).group(1)
+            param = replace_all(param, replace).strip()
+        name = lf["name"]
+        fun = f'{ret} {name}({param})'.strip()
+        search_link = 'https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=' + name
+        print(f'### [`{name}`]({search_link})')
+        print(f'`{fun}`<br/>')
+        for com in lf['comment']:
+            print(com)
+
+
+print('## Deprecated Functions')
+print('#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!')
+for lf in deprecated_funcs:
+    lf['comment'].pop(0)
+    if len(rpcfunc(lf['cpp'])):
+        for af in rpcfunc(lf['cpp']):
+            print_af(lf, af)
+    elif not (lf['name'].startswith('on_') or lf['name'] in ['players', 'state', 'savegame', 'options', 'meta']):
+        if lf['comment'] and lf['comment'][0] == 'NoDoc':
+            continue
         m = re.search(r'\(([^\{]*)\)\s*->\s*([^\{]*)', lf['cpp'])
         m2 = re.search(r'\(([^\{]*)\)', lf['cpp'])
         ret = 'nil'

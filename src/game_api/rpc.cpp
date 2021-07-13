@@ -364,6 +364,13 @@ std::pair<float, float> screen_position(float x, float y)
     return State::get().screen_position(x, y);
 }
 
+std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2)
+{
+    auto [sx1, sy1] = screen_position(x1, y1);
+    auto [sx2, sy2] = screen_position(x2, y2);
+    return std::tuple{sx1, sy1, sx2, sy2};
+}
+
 float screen_distance(float x)
 {
     auto a = State::get().screen_position(0, 0);
@@ -562,6 +569,12 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
         }
     }
     return found;
+}
+
+std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, int layer)
+{
+    auto state = State::get();
+    return get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(layer));
 }
 
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)

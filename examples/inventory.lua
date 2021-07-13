@@ -9,7 +9,7 @@ for i,v in pairs(ENT_TYPE) do
 end
 
 -- display the items and the powerups in the player's inventory
-set_callback(function()
+set_callback(function(draw_ctx)
     if players and players[1] then
         x, y, l = get_position(players[1].uid)
         -- you may want to mask only the items and logical (powerups)
@@ -24,13 +24,13 @@ set_callback(function()
             str = str .. " " .. names[entity.type.id]
         end
         sx, sy = screen_position(x, y-1)
-        draw_text(sx, sy, 0, str, rgba(255, 255, 255, 255))
+        draw_ctx:draw_text(sx, sy, 0, str, rgba(255, 255, 255, 255))
     end
 end, ON.GUIFRAME)
 
 
 -- Auto drop broken arrows
-set_callback(function()
+set_callback(function(draw_ctx)
     if players and players[1] then
         local items = entity_get_items_by(players[1].uid, ENT_TYPE.ITEM_BROKEN_ARROW, 0)
         if (#items > 0) then

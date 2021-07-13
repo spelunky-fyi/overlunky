@@ -86,11 +86,11 @@ local lamp_tiles = {}
 set_post_tile_code_callback(function(x, y, layer)
     table.insert(lamp_tiles, { x = x, y = y, layer = layer })
 end, "lamp_hang")
-set_callback(function()
+set_callback(function(draw_ctx)
     for _, tile in pairs(lamp_tiles) do
         local sx, sy = screen_position(tile.x - 0.5, tile.y + 0.5) -- top left
         local sx2, sy2 = screen_position(tile.x + 0.5, tile.y - 0.5) -- bottom right
-        draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
+        draw_ctx:draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)
 
@@ -126,14 +126,14 @@ local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.ALTAR] = true,
 }
 set_callback(function(room_gen_ctx)
-    for x = 0, state.width do
-        for y = 0, state.height do
+    for x = 0, state.width - 1 do
+        for y = 0, state.height - 1 do
             -- Check that this is a side
             local room_template_here = get_room_template(x, y, 0)
             if room_template_here == ROOM_TEMPLATE.SIDE then
                 -- Check if left of this is a valid room
                 local room_template_left = get_room_template(x - 1, y, 0)
-                if not valid_rooms_with_shop_next[room_template_left] then
+                if valid_rooms_with_shop_next[room_template_left] then
                     -- And spawn a shop facing left
                     room_gen_ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.SHOP_LEFT)
                 else

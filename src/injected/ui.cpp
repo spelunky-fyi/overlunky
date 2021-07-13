@@ -19,6 +19,7 @@
 #include <string>
 #include <toml.hpp>
 
+#include "entities_floors.hpp"
 #include "entities_items.hpp"
 #include "entity.hpp"
 #include "file_api.hpp"
@@ -193,6 +194,7 @@ std::map<std::string, bool> options = {
     {"god_mode", false},
     {"noclip", false},
     {"snap_to_grid", false},
+    {"spawn_floor_decorated", true},
     {"stack_horizontally", false},
     {"stack_vertically", false},
     {"disable_pause", false},
@@ -682,6 +684,16 @@ void spawn_entities(bool s, std::string list = "")
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
             int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
+            if (options["spawn_floor_decorated"])
+            {
+                if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
+                {
+                    if (floor->get_decoration_entity_type() != -1)
+                    {
+                        floor->fix_decorations(true, false);
+                    }
+                }
+            }
             if (!lock_entity)
                 g_last_id = spawned;
         }
@@ -2509,6 +2521,7 @@ void render_options()
         }
     }
     ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
+    ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
     {
         force_hud_flags();

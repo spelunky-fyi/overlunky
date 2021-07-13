@@ -12,7 +12,7 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 
-#include "usertypes/char_state.hpp"
+#include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
@@ -25,6 +25,7 @@
 #include "usertypes/entity_lua.hpp"
 #include "usertypes/flags_lua.hpp"
 #include "usertypes/gui_lua.hpp"
+#include "usertypes/hitbox_lua.hpp"
 #include "usertypes/level_lua.hpp"
 #include "usertypes/particles_lua.hpp"
 #include "usertypes/player_lua.hpp"
@@ -554,8 +555,11 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
-    /// Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
+    /// Deprecated
+    /// Use `get_entities_overlapping_hitbox` instead
     lua["get_entities_overlapping"] = get_entities_overlapping;
+    /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
+    lua["get_entities_overlapping_hitbox"] = get_entities_overlapping_hitbox;
     /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
     /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
     lua["attach_entity"] = attach_entity_by_uid;
@@ -588,6 +592,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_position"] = get_position;
     /// Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
     lua["get_render_position"] = get_render_position;
+    /// Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
+    lua["get_velocity"] = get_velocity;
     /// Remove item by uid from entity
     lua["entity_remove_item"] = entity_remove_item;
     /// Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
@@ -671,11 +677,11 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
     /// ```lua
     /// -- Draw the level boundaries
-    /// set_callback(function()
+    /// set_callback(function(draw_ctx)
     ///     xmin, ymin, xmax, ymax = get_bounds()
     ///     sx, sy = screen_position(xmin, ymin) -- top left
     ///     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
-    ///     draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+    ///     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
     /// end, ON.GUIFRAME)
     /// ```
     lua["get_bounds"] = [this]() -> std::tuple<float, float, float, float> { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
@@ -814,6 +820,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         return sol::nullopt;
     };
 
+    NHitbox::register_usertypes(lua);
     NSound::register_usertypes(lua, this);
     NLevel::register_usertypes(lua, this);
     NGui::register_usertypes(lua, this);
@@ -917,7 +924,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         ON::SCRIPT_DISABLE);
     /* ON
     // GUIFRAME
-    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
+    // Params: `GuiDrawContext draw_ctx`
+    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a `GuiDrawContext`
     // FRAME
     // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
     // GAMEFRAME
@@ -1377,9 +1385,11 @@ void ScriptImpl::draw(ImDrawList* dl)
         /// Runs on every screen frame. You need this to use draw functions.
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 
+        GuiDrawContext draw_ctx(this, dl);
+
         if (on_guiframe)
         {
-            on_guiframe.value()();
+            on_guiframe.value()(draw_ctx);
         }
 
         for (auto& [id, callback] : callbacks)
@@ -1387,7 +1397,7 @@ void ScriptImpl::draw(ImDrawList* dl)
             auto now = get_frame_count();
             if (callback.screen == ON::GUIFRAME)
             {
-                handle_function(callback.func);
+                handle_function(callback.func, draw_ctx);
                 callback.lastRan = now;
             }
         }

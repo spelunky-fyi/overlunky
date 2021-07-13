@@ -96,6 +96,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     auto overlaps_with = sol::overload(
         static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
         static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
     lua.new_usertype<Entity>(
         "Entity",
@@ -147,10 +148,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Entity::as<Movable>,
         "as_player",
         &Entity::as<Player>);
-    /* Entity
-            bool overlaps_with(Entity other)
-            bool set_texture(uint32_t texture_id)
-        */
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -215,13 +212,6 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Movable::price,
         sol::base_classes,
         sol::bases<Entity>());
-    /* Movable
-            bool is_poisoned()
-            void poison(int16_t frames)
-            bool is_button_pressed(uint32_t button)
-            bool is_button_held(uint32_t button)
-            bool is_button_released(uint32_t button)
-        */
     lua.new_usertype<Player>(
         "Player",
         "inventory",
