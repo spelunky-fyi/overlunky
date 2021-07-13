@@ -22,7 +22,7 @@ void register_usertypes(sol::state& lua)
     /// Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
     lua["screen_aabb"] = [](AABB box) -> AABB
     {
-        auto [sx1, sy1, sx2, sy2] = screen_position(box.left, box.bottom, box.right, box.top);
+        auto [sx1, sy1, sx2, sy2] = screen_aabb(box.left, box.bottom, box.right, box.top);
         return AABB{ sx1, sy2, sx2, sy1 };
     };
 

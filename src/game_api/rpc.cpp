@@ -364,7 +364,7 @@ std::pair<float, float> screen_position(float x, float y)
     return State::get().screen_position(x, y);
 }
 
-std::tuple<float, float, float, float> screen_position(float x1, float y1, float x2, float y2)
+std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2)
 {
     auto [sx1, sy1] = screen_position(x1, y1);
     auto [sx2, sy2] = screen_position(x2, y2);

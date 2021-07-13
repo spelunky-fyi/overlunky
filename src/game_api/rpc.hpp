@@ -32,7 +32,7 @@ StateMemory* get_state_ptr();
 std::vector<Player*> get_players();
 std::pair<float, float> click_position(float x, float y);
 std::pair<float, float> screen_position(float x, float y);
-std::tuple<float, float, float, float> screen_position(float x1, float y1, float x2, float y2);
+std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2);
 float screen_distance(float x);
 float get_zoom_level();
 std::vector<uint32_t> get_entities();
