@@ -126,8 +126,8 @@ local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.ALTAR] = true,
 }
 set_callback(function(room_gen_ctx)
-    for x = 0, state.width do
-        for y = 0, state.height do
+    for x = 0, state.width - 1 do
+        for y = 0, state.height - 1 do
             -- Check that this is a side
             local room_template_here = get_room_template(x, y, 0)
             if room_template_here == ROOM_TEMPLATE.SIDE then
