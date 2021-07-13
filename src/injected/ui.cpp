@@ -20,6 +20,7 @@
 #include <toml.hpp>
 
 #include "entities_floors.hpp"
+#include "entities_items.hpp"
 #include "entity.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
@@ -3215,7 +3216,7 @@ void render_entity_props()
     {
         if (g_entity_type == to_id("ENT_TYPE_ITEM_COFFIN"))
         {
-            auto coffin = (Container*)g_entity;
+            auto coffin = (Coffin*)g_entity;
             ImGui::Text("Character in coffin:");
             ImGui::SliderInt("##CoffinSpawns", (int*)&coffin->inside, to_id("ENT_TYPE_CHAR_ANA_SPELUNKY"), to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"));
             if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY") + 1)

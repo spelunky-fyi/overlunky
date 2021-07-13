@@ -154,8 +154,7 @@ class Entity
     uint32_t flags;
     uint32_t more_flags;
     int32_t uid;
-    uint8_t animation_frame;
-    uint8_t b3d;
+    uint16_t animation_frame;
     uint8_t draw_depth;
     uint8_t b3f;
     float x;

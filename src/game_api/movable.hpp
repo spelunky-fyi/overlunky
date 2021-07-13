@@ -155,19 +155,6 @@ bool is_character_female(int32_t type_id);
 
 void set_character_heart_color(int32_t type_id, Color color);
 
-class Container : public Movable
-{
-  public:
-    int32_t inside;
-    int32_t timer;
-};
-
-class OlmecFloater : public Movable
-{
-  public:
-    bool both_floaters_intact; // strangely, this indicates whether both are intact, not just this specific one
-};
-
 class PlayerTracker
 {
   public:
@@ -180,8 +167,7 @@ class PlayerTracker
     uint32_t unknown6;
     uint32_t unknown7;
     int32_t affected_entity_uid;
-    uint8_t animation_frame; // changes the color of the eyeball on Lahamu
-    uint8_t unknown9b;
+    uint16_t animation_frame; // changes the color of the eyeball on Lahamu
     uint8_t unknown9c;
     uint8_t unknown9d;
     float offset_x;
