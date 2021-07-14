@@ -2625,19 +2625,19 @@ end, ON.LEVEL)
 - [`LIQUID_STAGNANT_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_STAGNANT_LAVA) 898
 ### PARTICLEEMITTER
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
-- ...check particle_emitters.txt output by Overlunky...
-- [`MINIGAME_BROKENASTEROID_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) 219
+- ...check [particle_emitters.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/particle_emitters.txt
 ### ROOM_TEMPLATE
 - [`SIDE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE.SIDE) 0
-- ...check room_templates.txt output by Overlunky...
+- ...check [room_templates.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/room_templates.txt
+### PROCEDURAL_CHANCE
+- [`SPRINGTRAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.SPRINGTRAP) 73
+- ...check [spawn_chances.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/spawn_chances.txt
 ### VANILLA_SOUND
 - [`BGM_BGM_TITLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.BGM_BGM_TITLE) BGM/BGM_title
-- ...check vanilla_sounds.txt output by Overlunky...
-- [`FX_FX_DM_BANNER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.FX_FX_DM_BANNER) FX/FX_dm_banner
+- ...check [vanilla_sounds.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sounds.txt
 ### VANILLA_SOUND_PARAM
 - [`POS_SCREEN_X`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.POS_SCREEN_X) 0
-- ...check vanilla_sound_params.txt output by Overlunky...
-- [`CURRENT_LAYER2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.CURRENT_LAYER2) 37
+- ...check [vanilla_sound_params.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sound_params.txt
 ### DROPCHANCE
 - [`BONEBLOCK_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) 0
 - ...see drops.hpp for a list of possible dropchances...
@@ -2648,9 +2648,7 @@ end, ON.LEVEL)
 - [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETI_PITCHERSMITT) 85
 ### TEXTURE
 - [`DATA_TEXTURES_PLACEHOLDER_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_PLACEHOLDER_0) 0
-- ...see textures.txt for a list of textures...
-- [`DATA_TEXTURES_SHINE_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_SHINE_0) 388
-- [`DATA_TEXTURES_OLDTEXTURES_AI_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_OLDTEXTURES_AI_0) 389
+- ...see [textures.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/textures.txt
 ### ON
 - [`LOGO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOGO) ON::LOGO
 - [`INTRO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.INTRO) ON::INTRO

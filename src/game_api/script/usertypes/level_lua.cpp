@@ -217,9 +217,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0
-                           //, "", ...check__room_templates.txt__output__by__Overlunky...
+                           //, "", ...check__[room_templates.txt](https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/room_templates.txt)...
     );
-    lua.create_named_table("ROOM_TEMPLATE");
     for (const auto& [room_name, room_template] : State::get().ptr()->level_gen->data->room_templates())
     {
         std::string clean_room_name = room_name;
@@ -228,6 +227,20 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
             { return std::toupper(c); });
         std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
         lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template.id;
+    };
+
+    lua.create_named_table("PROCEDURAL_CHANCE"
+                           //, "SPRINGTRAP", 73
+                           //, "", ...check__[spawn_chances.txt](https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/spawn_chances.txt)...
+    );
+    for (const auto& [chance_name, chance] : State::get().ptr()->level_gen->data->chances())
+    {
+        std::string clean_chance_name = chance_name;
+        std::transform(
+            clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
+            { return std::toupper(c); });
+        std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+        lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
     };
 }
 }; // namespace NLevel

@@ -312,10 +312,18 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     if (auto file = std::ofstream("game_data/spawn_chances.txt"))
     {
         auto chances = State::get().ptr()->level_gen->data->chances();
-        for (const auto& chance : chances)
+        std::multimap<std::uint16_t, std::string> ordered_chances;
+        for (const auto& spawn_chanc : chances)
         {
-            file << chance.second.id << ": " << chance.first << "\n";
+            std::string clean_chance_name = spawn_chanc.first;
+            std::transform(
+                clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
+                { return std::toupper(c); });
+            std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+            ordered_chances.insert({spawn_chanc.second.id, std::move(clean_chance_name)});
         }
+        for (const auto& [id, name] : ordered_chances)
+            file << name << ": " << id << "\n";
     }
 
     if (auto file = std::ofstream("game_data/room_templates.txt"))
