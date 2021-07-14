@@ -2091,7 +2091,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int falltime_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falltime_deploy) &ParachutePowerup::falltime_deploy
 - [`deployed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deployed) sol::readonly(&ParachutePowerup::deployed)
-- [`bool after_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=after_deploy) &ParachutePowerup::after_deploy
+- [`nil deploy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deploy) &ParachutePowerup::deploy
 ### `TrueCrownPowerup`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &TrueCrownPowerup::timer

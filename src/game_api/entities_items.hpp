@@ -649,9 +649,10 @@ class ParachutePowerup : public Movable
     uint8_t unknown1;
     uint16_t unknown2;
     uint16_t unknown3;
-    bool deployed;     // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
-    bool deployed2;    /* unsure */
-    bool after_deploy; // if set to true before deploying, parachute will drop imminently after deploy
+    bool deployed;                  // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
+    bool deployed2;                 /* unsure */
+    bool after_deploy; /* unsure */ // if set to true before deploying, parachute will drop imminently after deploy, not sure if it's even a bool
+    void deploy();
 };
 
 class TrueCrownPowerup : public Movable

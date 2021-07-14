@@ -807,8 +807,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &ParachutePowerup::falltime_deploy,
         "deployed",
         sol::readonly(&ParachutePowerup::deployed),
-        "after_deploy",
-        &ParachutePowerup::after_deploy,
+        "deploy",
+        &ParachutePowerup::deploy,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 

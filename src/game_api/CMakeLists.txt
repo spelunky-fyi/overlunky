@@ -10,6 +10,7 @@ add_library(spel2_api STATIC
         entities_floors.hpp
         entities_floors.cpp
         entities_monsters.hpp
+        entities_items.cpp
         entities_items.hpp
         entities_mounts.cpp
         entities_mounts.hpp
