@@ -25,8 +25,7 @@ struct ChanceDef
 };
 struct LevelChanceDef
 {
-    std::uint32_t id;
-    std::uint8_t chance;
+    std::vector<uint32_t> chances;
 };
 
 struct ChanceLogicProvider
@@ -182,4 +181,7 @@ struct LevelGenSystem
     bool set_room_template(int x, int y, int l, uint16_t room_template);
 
     std::string_view get_room_template_name(uint16_t room_template);
+
+    uint32_t get_procedural_spawn_chance(uint32_t chance_id);
+    bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 };
