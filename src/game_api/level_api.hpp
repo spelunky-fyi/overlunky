@@ -56,17 +56,28 @@ struct LevelGenData
     {
         return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
     }
+
     const std::unordered_map<std::string, RoomTemplateDef>& room_templates() const
     {
         return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
     }
-    const std::unordered_map<std::string, ChanceDef>& chances() const
+
+    const std::unordered_map<std::string, ChanceDef>& monster_chances() const
     {
         return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1330);
     }
-    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_chances() const
+    const std::unordered_map<std::string, ChanceDef>& trap_chances() const
+    {
+        return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x13b0);
+    }
+
+    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_monster_chances() const
     {
         return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1370);
+    }
+    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_trap_chances() const
+    {
+        return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x13f0);
     }
 };
 

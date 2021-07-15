@@ -246,17 +246,21 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     };
 
     lua.create_named_table("PROCEDURAL_CHANCE"
-                           //, "SPRINGTRAP", 73
+                           //, "ARROWTRAP_CHANCE", 0
                            //, "", ...check__[spawn_chances.txt](https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/spawn_chances.txt)...
     );
-    for (const auto& [chance_name, chance] : State::get().ptr()->level_gen->data->chances())
+    auto* state = State::get().ptr();
+    for (auto* chances : {&state->level_gen->data->monster_chances(), &state->level_gen->data->trap_chances()})
     {
-        std::string clean_chance_name = chance_name;
-        std::transform(
-            clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
-            { return std::toupper(c); });
-        std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
-        lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
-    };
+        for (const auto& [chance_name, chance] : *chances)
+        {
+            std::string clean_chance_name = chance_name;
+            std::transform(
+                clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
+                { return std::toupper(c); });
+            std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+            lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
+        }
+    }
 }
 }; // namespace NLevel
