@@ -315,6 +315,8 @@ for file in api_files:
             if not var: continue
             var = var.split(',')
             var[1] = var[1].replace('__', ' ')
+            var[1] = var[1].replace('\\[', '(')
+            var[1] = var[1].replace('\\]', ')')
             vars.append({ 'name': var[0], 'type': var[1] })
         enums.append({'name': name, 'vars': vars})
 
