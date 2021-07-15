@@ -986,18 +986,39 @@ std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
     return "invalid";
 }
 
+struct MutableLevelChanceDef
+{
+    std::vector<uint32_t, game_allocator<uint32_t>> chances;
+};
+MutableLevelChanceDef& get_or_emplace_level_chance(std::unordered_map<std::uint32_t, LevelChanceDef>& level_chances, uint32_t chance_id)
+{
+    struct LevelChanceNode {
+        void* ptr0;
+        void* ptr1;
+        std::pair<uint32_t, MutableLevelChanceDef> value;
+    };
+    using EmplaceLevelChance = LevelChanceNode * *(*)(void*, std::pair<LevelChanceNode*, bool>*, uint32_t*);
+    static EmplaceLevelChance emplace_level_chance = []()
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x49\x8d\x8d\x70\x13\x00\x00"s, memory.after_bundle);
+        off = find_inst(memory.exe(), "\xe8"s, off);
+        return (EmplaceLevelChance)memory.at_exe(decode_call(off));
+    }();
+
+    std::pair<LevelChanceNode*, bool> node;
+    emplace_level_chance((void*)&level_chances, &node, &chance_id);
+
+    return node.first->value.second;
+}
+
 uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 {
     auto& level_chances = data->level_chances();
     if (level_chances.contains(chance_id))
     {
-        auto& this_chances = level_chances.at(chance_id);
-
-        if (this_chances.chances.empty())
-        {
-            return 0;
-        }
-        else
+        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_chances(), chance_id);
+        if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
             if (this_chances.chances.size() >= state->level)
@@ -1016,54 +1037,15 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 {
     if (g_chance_id_to_name.contains(chance_id))
     {
-        struct MutableLevelChanceDef
-        {
-            std::vector<uint32_t, game_allocator<uint32_t>> chances;
-        };
-        struct LevelChanceNode {
-            void* ptr0;
-            void* ptr1;
-            std::pair<uint32_t, MutableLevelChanceDef> value;
-        };
-        using EmplaceLevelChance = LevelChanceNode** (*)(void*, std::pair<LevelChanceNode*, bool>*, uint32_t*);
-        static EmplaceLevelChance emplace_level_chance = []()
-        {
-            auto memory = Memory::get();
-            auto off = find_inst(memory.exe(), "\x49\x8d\x8d\x70\x13\x00\x00"s, memory.after_bundle);
-            off = find_inst(memory.exe(), "\xe8"s, off);
-            return (EmplaceLevelChance)memory.at_exe(decode_call(off));
-        }();
-
-        std::pair<LevelChanceNode*, bool> node;
-        *emplace_level_chance((void*)((size_t)data + 0x1370), &node, &chance_id);
+        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_chances(), chance_id);
         if (inverse_chance == 0)
         {
-            node.first->value.second.chances.clear();
+            this_chances.chances.clear();
         }
         else
         {
-            node.first->value.second.chances = { inverse_chance };
+            this_chances.chances = { inverse_chance };
         }
-
-        // Why does this code not work?
-        //struct MutableLevelChanceDef
-        //{
-        //    std::vector<uint32_t, game_allocator<uint32_t>> chances;
-        //};
-        //using map_value_t = std::pair<const uint32_t, MutableLevelChanceDef>;
-        //using map_allocator_t = game_allocator<map_value_t>;
-        //using mutable_level_chance_map_t = std::unordered_map<uint32_t, MutableLevelChanceDef, std::hash<uint32_t>, std::equal_to<uint32_t>, map_allocator_t>;
-        //auto& level_chances = (mutable_level_chance_map_t&)data->level_chances();
-        // 
-        //auto& this_chances = level_chances[chance_id];
-        //if (inverse_chance == 0)
-        //{
-        //    this_chances.chances.clear();
-        //}
-        //else
-        //{
-        //    this_chances.chances = { inverse_chance };
-        //}
 
         return true;
     }
