@@ -22,7 +22,7 @@ end, "floor")
 
 -- Replaces all spikes with snowmen
 set_pre_tile_code_callback(function(x, y, layer)
-    local ent_uid = spawn_entity(ENT_TYPE.ITEM_ICESPIRE, x, y, layer, 0.0, 0.0);
+    local ent_uid = spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_ICESPIRE, x, y, layer, 0.0, 0.0);
     local ent = get_entity(ent_uid)
     local ent_flags = ent.flags
     ent_flags = clr_flag(ent_flags, 18)
@@ -112,6 +112,32 @@ local function is_valid_powderkeg_spawn(x, y, l)
     return false
 end
 define_procedural_spawn("sample_powderkeg", spawn_powderkeg, is_valid_powderkeg_spawn)
+
+-- Spawn spark traps on every level
+local function spawn_sparktrap(x, y, l)
+    spawn_grid_entity(ENT_TYPE.FLOOR_SPARK_TRAP, x, y, l)
+end
+local function is_valid_sparktrap_spawn(x, y, l)
+    -- Only spawn where there is floor
+    local floor = get_grid_entity_at(x, y, l)
+    if floor ~= -1 then
+        floor = get_entity(floor)
+        return test_flag(floor.flags, 3) 
+    end
+    return false
+end
+local sparktrap_chance = define_procedural_spawn("sample_sparktrap", spawn_sparktrap, is_valid_sparktrap_spawn)
+set_callback(function(room_gen_ctx)
+    local current_sparktrap_chance = get_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE)
+    if current_sparktrap_chance == 0 then
+        current_sparktrap_chance = 20
+    end
+
+    prinspect(current_sparktrap_chance)
+    room_gen_ctx:set_procedural_spawn_chance(sparktrap_chance, current_sparktrap_chance)
+    -- Disable the original sparktrap spawns so we don't get double spawns
+    room_gen_ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE, 0)
+end, ON.POST_ROOM_GENERATION)
 
 -- Fill in shops in all the valid ROOM_TEMPLATE.SIDE spots
 local valid_rooms_with_shop_next = {

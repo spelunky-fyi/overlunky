@@ -7,9 +7,14 @@
 
 #include <sol/sol.hpp>
 
-void PostRoomGenerationContext::set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
+bool PostRoomGenerationContext::set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
 {
-    State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
+    return State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
+}
+
+bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance)
+{
+    return State::get().ptr_local()->level_gen->set_procedural_spawn_chance(chance_id, inverse_chance);
 }
 
 namespace NLevel
@@ -44,7 +49,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
     /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
-    lua["define_procedural_spawn"] = [script](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid)
+    lua["define_procedural_spawn"] = [script](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid) -> PROCEDURAL_CHANCE
     {
         LevelGenData* data = script->g_state->level_gen->data;
         uint32_t chance = data->define_chance(std::move(procedural_spawn));
@@ -64,6 +69,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         };
         std::uint32_t id = data->register_chance_logic_provider(chance, ChanceLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         script->chance_callbacks.push_back(id);
+        return chance;
     };
 
     /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
@@ -84,12 +90,22 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         return State::get().ptr_local()->level_gen->get_room_template_name(room_template);
     };
 
-    // Context received in ON.POST_ROOM_GENERATION
-    // Used to change the room templates in the level
-    lua.new_usertype<PostRoomGenerationContext>("PostRoomGenerationContext", sol::no_constructor, "set_room_template", &PostRoomGenerationContext::set_room_template);
-    /* PostRoomGenerationContext
-        nil set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
-    */
+    /// Get the inverse chance of a procedural spawn for the current level.
+    /// A return value of 0 does not mean the chance is infinite, it means the chance is zero.
+    lua["get_procedural_spawn_chance"] = [](PROCEDURAL_CHANCE chance_id) -> uint32_t
+    {
+        return State::get().ptr_local()->level_gen->get_procedural_spawn_chance(chance_id);
+    };
+
+    // Context received in ON.POST_ROOM_GENERATION.
+    // Used to change the room templates in the level and other shenanigans that affect level gen.
+    lua.new_usertype<PostRoomGenerationContext>(
+        "PostRoomGenerationContext",
+        sol::no_constructor,
+        "set_room_template",
+        &PostRoomGenerationContext::set_room_template,
+        "set_procedural_spawn_chance",
+        &PostRoomGenerationContext::set_procedural_spawn_chance);
 
     lua.new_usertype<QuestsInfo>(
         "QuestsInfo",
@@ -217,9 +233,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0
-                           //, "", ...check__room_templates.txt__output__by__Overlunky...
+                           //, "", ...check__[room_templates.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/room_templates.txt\]...
     );
-    lua.create_named_table("ROOM_TEMPLATE");
     for (const auto& [room_name, room_template] : State::get().ptr()->level_gen->data->room_templates())
     {
         std::string clean_room_name = room_name;
@@ -229,5 +244,23 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
         lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template.id;
     };
+
+    lua.create_named_table("PROCEDURAL_CHANCE"
+                           //, "ARROWTRAP_CHANCE", 0
+                           //, "", ...check__[spawn_chances.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/spawn_chances.txt\]...
+    );
+    auto* state = State::get().ptr();
+    for (auto* chances : {&state->level_gen->data->monster_chances(), &state->level_gen->data->trap_chances()})
+    {
+        for (const auto& [chance_name, chance] : *chances)
+        {
+            std::string clean_chance_name = chance_name;
+            std::transform(
+                clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
+                { return std::toupper(c); });
+            std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+            lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
+        }
+    }
 }
 }; // namespace NLevel

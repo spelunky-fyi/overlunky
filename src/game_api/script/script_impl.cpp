@@ -407,6 +407,11 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
+    /// Spawns an entity directly on the floor below the tile at the given position.
+    /// Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
+    lua["spawn_entity_snapped_to_floor"] = spawn_entity_snap_to_floor;
+    /// Short for [spawn_entity_snapped_to_floor](#spawn_entity_snapped_to_floor).
+    lua["spawn_on_floor"] = spawn_entity_snap_to_floor;
     /// Spawn a grid entity, such as floor or traps, that snaps to the grid.
     lua["spawn_grid_entity"] = spawn_entity_snap_to_grid;
     /// Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script

@@ -81,6 +81,21 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, floa
     return -1;
 }
 
+int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, int layer)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    auto state = State::get();
+    if (layer < 0)
+    {
+        auto player = state.items()->player(abs(layer) - 1);
+        if (player == nullptr)
+            return -1;
+        layer = player->layer;
+    }
+
+    return state.layer_local(layer)->spawn_entity_snap_to_floor(entity_type, x, y)->uid;
+}
+
 int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, int layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);

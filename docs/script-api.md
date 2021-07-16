@@ -615,7 +615,7 @@ This is received even if a previous pre-tile-code-callback has returned true
 Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
 If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
 ### [`define_procedural_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_procedural_spawn)
-`nil define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)`<br/>
+`PROCEDURAL_CHANCE define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)`<br/>
 Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
 The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
@@ -633,6 +633,10 @@ Get the room template given a certain index
 ### [`get_room_template_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 `string_view get_room_template_name(int room_template)`<br/>
 For debugging only, get the name of a room template
+### [`get_procedural_spawn_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
+`int get_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id)`<br/>
+Get the inverse chance of a procedural spawn for the current level.
+A return value of 0 does not mean the chance is infinite, it means the chance is zero.
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 `optional<CustomSound> create_sound(string path)`<br/>
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -2171,7 +2175,14 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &ParticleDB::set_texture
 ### `PostRoomGenerationContext`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
-- [`nil set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
+- [`bool set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
+\
+Set the room template at the given index and layer, returns `false` if the index is outside of the level.
+- [`bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) &PostRoomGenerationContext::set_procedural_spawn_chance
+\
+Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
+Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
+Returns `false` if the given chance is not defined.
 ### `QuestsInfo`
 - [`int yang_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yang_state) &QuestsInfo::yang_state
 - [`int jungle_sisters_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_sisters_flags) &QuestsInfo::jungle_sisters_flags
@@ -2621,22 +2632,25 @@ end, ON.LEVEL)
 ```
 ### ENT_TYPE
 - [`FLOOR_BORDERTILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.FLOOR_BORDERTILE) 1
-- ...blah blah read your entities.txt...
+- ...check [entities.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/entities.txt)...
 - [`LIQUID_STAGNANT_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_STAGNANT_LAVA) 898
 ### PARTICLEEMITTER
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
-- ...check particle_emitters.txt output by Overlunky...
+- ...check [particle_emitters.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/particle_emitters.txt)...
 - [`MINIGAME_BROKENASTEROID_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) 219
 ### ROOM_TEMPLATE
 - [`SIDE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE.SIDE) 0
-- ...check room_templates.txt output by Overlunky...
+- ...check [room_templates.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/room_templates.txt)...
+### PROCEDURAL_CHANCE
+- [`ARROWTRAP_CHANCE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.ARROWTRAP_CHANCE) 0
+- ...check [spawn_chances.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/spawn_chances.txt)...
 ### VANILLA_SOUND
 - [`BGM_BGM_TITLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.BGM_BGM_TITLE) BGM/BGM_title
-- ...check vanilla_sounds.txt output by Overlunky...
+- ...check [vanilla_sounds.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sounds.txt)...
 - [`FX_FX_DM_BANNER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.FX_FX_DM_BANNER) FX/FX_dm_banner
 ### VANILLA_SOUND_PARAM
 - [`POS_SCREEN_X`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.POS_SCREEN_X) 0
-- ...check vanilla_sound_params.txt output by Overlunky...
+- ...check [vanilla_sound_params.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sound_params.txt)...
 - [`CURRENT_LAYER2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.CURRENT_LAYER2) 37
 ### DROPCHANCE
 - [`BONEBLOCK_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) 0
@@ -2648,7 +2662,7 @@ end, ON.LEVEL)
 - [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETI_PITCHERSMITT) 85
 ### TEXTURE
 - [`DATA_TEXTURES_PLACEHOLDER_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_PLACEHOLDER_0) 0
-- ...see textures.txt for a list of textures...
+- ...check [textures.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/textures.txt)...
 - [`DATA_TEXTURES_SHINE_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_SHINE_0) 388
 - [`DATA_TEXTURES_OLDTEXTURES_AI_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_OLDTEXTURES_AI_0) 389
 ### ON
