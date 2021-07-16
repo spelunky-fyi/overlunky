@@ -34,7 +34,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Crushtrap::diry,
         "timer",
         &Crushtrap::timer,
-        "diry",
+        "bounce_back_timer",
         &Crushtrap::bounce_back_timer,
         sol::base_classes,
         sol::bases<Entity, Movable>());
