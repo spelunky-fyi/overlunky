@@ -211,7 +211,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         18);
 
     /// Parameter to force_co_subtheme
-    lua.create_named_table("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDEPOOL", 3, "TEMPLE", 4, "ICECAVES", 5, "NEOBABYLON", 6, "SUNKENCITY", 7);
+    lua.create_named_table("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDE_POOL", 3, "TEMPLE", 4, "ICE_CAVES", 5, "NEO_BABYLON", 6, "SUNKEN_CITY", 7);
 
     /// Yang quest states
     lua.create_named_table("YANG", "ANGRY", -1, "QUEST_NOT_STARTED", 0, "TURKEY_PEN_SPAWNED", 2, "BOTH_TURKEYS_DELIVERED", 3, "TURKEY_SHOP_SPAWNED", 4, "ONE_TURKEY_BOUGHT", 5, "TWO_TURKEYS_BOUGHT", 6, "THREE_TURKEYS_BOUGHT", 7);
