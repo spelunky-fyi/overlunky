@@ -97,6 +97,11 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         return State::get().ptr_local()->level_gen->get_procedural_spawn_chance(chance_id);
     };
 
+    /// Gets the sub theme of the current cosmic ocean level, returns `COSUBTHEME.NONE` if the current level is not a CO level.
+    lua["get_co_subtheme"] = get_co_subtheme;
+    /// Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use `COSUBTHEME.RESET` to reset to default random behaviour)
+    lua["force_co_subtheme"] = force_co_subtheme;
+
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.
     lua.new_usertype<PostRoomGenerationContext>(
@@ -211,7 +216,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         18);
 
     /// Parameter to force_co_subtheme
-    lua.create_named_table("COSUBTHEME", "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDE_POOL", 3, "TEMPLE", 4, "ICE_CAVES", 5, "NEO_BABYLON", 6, "SUNKEN_CITY", 7);
+    lua.create_named_table("COSUBTHEME", "NONE", -1, "RESET", -1, "DWELLING", 0, "JUNGLE", 1, "VOLCANA", 2, "TIDE_POOL", 3, "TEMPLE", 4, "ICE_CAVES", 5, "NEO_BABYLON", 6, "SUNKEN_CITY", 7);
 
     /// Yang quest states
     lua.create_named_table("YANG", "ANGRY", -1, "QUEST_NOT_STARTED", 0, "TURKEY_PEN_SPAWNED", 2, "BOTH_TURKEYS_DELIVERED", 3, "TURKEY_SHOP_SPAWNED", 4, "ONE_TURKEY_BOUGHT", 5, "TWO_TURKEYS_BOUGHT", 6, "THREE_TURKEYS_BOUGHT", 7);

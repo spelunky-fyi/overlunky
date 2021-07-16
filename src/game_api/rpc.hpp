@@ -77,7 +77,6 @@ void set_olmec_phase_y_level(uint8_t phase, float y);
 void set_ghost_spawn_times(uint32_t normal = 10800, uint32_t cursed = 9000);
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance);
 void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type);
-void force_co_subtheme(int8_t subtheme);
 void generate_particles(uint32_t particle_emitter_id, uint32_t uid);
 void set_journal_enabled(bool b);
 uint8_t waddler_count_entity(uint32_t entity_type);

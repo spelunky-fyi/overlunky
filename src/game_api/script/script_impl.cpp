@@ -651,8 +651,6 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
-    /// Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
-    lua["force_co_subtheme"] = force_co_subtheme;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
     /// Returns how many of a specific entity type Waddler has stored

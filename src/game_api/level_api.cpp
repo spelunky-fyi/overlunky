@@ -1111,3 +1111,68 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 
     return false;
 }
+
+int8_t get_co_subtheme()
+{
+    auto state = get_state_ptr();
+    if (state->theme != 10)
+    {
+        return -2;
+    }
+
+    ThemeInfo* theme = state->level_gen->theme_cosmicocean->sub_theme;
+    if (theme == state->level_gen->theme_dwelling)
+    {
+        return 0;
+    }
+    else if (theme == state->level_gen->theme_jungle)
+    {
+        return 1;
+    }
+    else if (theme == state->level_gen->theme_volcana)
+    {
+        return 2;
+    }
+    else if (theme == state->level_gen->theme_tidepool)
+    {
+        return 3;
+    }
+    else if (theme == state->level_gen->theme_temple)
+    {
+        return 4;
+    }
+    else if (theme == state->level_gen->theme_icecaves)
+    {
+        return 5;
+    }
+    else if (theme == state->level_gen->theme_neobabylon)
+    {
+        return 6;
+    }
+    else if (theme == state->level_gen->theme_sunkencity)
+    {
+        return 7;
+    }
+
+    return -2;
+}
+
+void force_co_subtheme(int8_t subtheme)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(find_inst(memory.exe(), " 48 C1 E0 03 48 C1 E8 20 49 89 48 08 48 98"s, memory.after_bundle));
+    }
+    if (subtheme >= 0 && subtheme <= 7)
+    {
+        uint8_t replacement[] = {0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90};
+        std::string replacement_s = std::string((char*)replacement, sizeof(replacement));
+        write_mem_prot(offset, replacement_s, true);
+    }
+    else if (subtheme == -1)
+    {
+        write_mem_prot(offset, "\x48\xC1\xE0\x03\x48\xC1\xE8\x20"s, true);
+    }
+}

@@ -196,3 +196,6 @@ struct LevelGenSystem
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 };
+
+int8_t get_co_subtheme();
+void force_co_subtheme(int8_t subtheme);
