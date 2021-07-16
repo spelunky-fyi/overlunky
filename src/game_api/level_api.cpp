@@ -441,7 +441,8 @@ auto g_DefaultTestFunc = [](float x, float y, Layer* layer)
     {
         if (Entity* floor = layer->get_grid_entity_at(x, y - 1.0f))
         {
-            return (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
+            static auto entrance = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
+            return floor->type->id != entrance && (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
         }
     }
     return false;
