@@ -72,8 +72,10 @@ class Door : public Floor
 class ExitDoor : public Door
 {
   public:
-    bool entered;      // if true entering it does not load the transition, probably for use in multiplayer
-    bool special_door; // use provided world/level/theme
+    /// if true entering it does not load the transition
+    bool entered;
+    /// use provided world/level/theme
+    bool special_door;
     uint8_t level;
     uint8_t timer; // counts from 30 to 0, dunno why
     uint8_t world;
@@ -116,7 +118,8 @@ class EggShipDoor : public Door
     uint8_t timer; // counts from 30 to 0, dunno why
     uint16_t unknown3;
     uint16_t unknown4;
-    bool entered; // works only for DOOR_EGGSHIP
+    /// only for DOOR_EGGSHIP
+    bool entered;
 };
 
 class Arrowtrap : public Floor
@@ -147,7 +150,8 @@ class LaserTrap : public Floor
 {
   public:
     Illumination* emitted_light;
-    uint8_t reset_timer; // after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
+    /// after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
+    uint8_t reset_timer;
     bool phase_2;
 };
 
@@ -161,8 +165,9 @@ class SparkTrap : public Floor
 class Altar : public Floor
 {
   public:
-    uint8_t timer; // counts from 0 to 20 then 0, then 1 then 0 and sacrifice happens
-    bool unknown;  // goes true/false when body is landing on it, when it stops moving it increments timer on true
+    /// for normal altar: counts from 0 to 20 then 0, then 1 then 0 and sacrifice happens
+    uint8_t timer;
+    bool unknown; // goes true/false when body is landing on it, when it stops moving it increments timer on true
 };
 
 class SpikeballTrap : public Floor
@@ -171,8 +176,10 @@ class SpikeballTrap : public Floor
     SoundPosition* sound_pos;
     Entity* chain;
     Entity* end_piece;
-    int8_t state;            // going_up is only right when timer is 0, otherwise it just sits at the bottom
-    uint8_t timer;           // for the start and retract
+    /// 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause | going_up is only right when timer is 0, otherwise it just sits at the bottom
+    int8_t state;
+    /// for the start and retract
+    uint8_t timer;
     uint8_t speed_direction; // i have no clue what this is, goes 255 when detecting something, but when it hits the unbreakable tile it 255 for ever, changing it can teleport it up/down/change speed etc.
 };
 
@@ -192,6 +199,7 @@ class ConveyorBelt : public TransferFloor
 class Pipe : public TransferFloor
 {
   public:
+    /// 3 - straight_horizontal, 4 - blocked, 5 - down_left_turn, 6 - down_right_turn, 8 - blocked, 9 - up_left_turn, 10 - up_right_turn, 12 - straight_vertical
     int8_t direction_type;
     bool end_pipe;
 };
@@ -202,8 +210,10 @@ class Generator : public Floor
     int32_t spawned_uid;
     uint16_t set_timer;
     uint16_t timer;
-    uint8_t start_counter; // works only for star challenge
-    bool on_off;           // works only for star challenge
+    /// works only for star challenge
+    uint8_t start_counter;
+    /// works only for star challenge
+    bool on_off;
 };
 
 class SlidingWallCeiling : public Floor
@@ -211,6 +221,7 @@ class SlidingWallCeiling : public Floor
   public:
     Entity* attached_piece;
     int32_t active_floor_part_uid;
+    /// 1 - top, 2 - pause
     uint8_t state; // i labeled some as wrong_pause cause they are probably not used, they pause the movement but not the sound
     uint8_t unused1;
     uint16_t unused2;
@@ -229,7 +240,8 @@ class BigSpearTrap : public Floor
   public:
     int32_t spear_uid;
     uint8_t active; /*unsure*/ // forced to 1
-    bool left_part;            // setting the left part to 0 or right part to 1 destroys the trap
+    /// setting the left part to 0 or right part to 1 destroys the trap
+    bool left_part;
 };
 
 class StickyTrap : public Floor

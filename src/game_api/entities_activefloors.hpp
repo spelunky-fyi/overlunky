@@ -10,8 +10,10 @@ class Crushtrap : public Movable
   public:
     float dirx;
     float diry;
-    uint8_t timer;             // counts from 30 to 0 when detecting player, then moves, when stops moving counts from 60 to 0 before it can be triggered again
-    uint8_t bounce_back_timer; // counts from 7 to 0 when it hits the wall and moves away from the wall, then moves back and count's from 255 until it hits the wall again, if needed it will start the counter again for another bounce
+    /// counts from 30 to 0 before moving, after it stops, counts from 60 to 0 before it can be triggered again
+    uint8_t timer;
+    /// counts from 7 to 0 after it hits the wall and moves away until the timer hits 0, then moves back and counts from 255 until it hits the wall again, if needed it will start the counter again for another bounce
+    uint8_t bounce_back_timer;
 };
 
 class Olmec : public Movable
@@ -19,10 +21,14 @@ class Olmec : public Movable
   public:
     size_t unknown_pointer;
     uint32_t target_uid;
-    uint8_t attack_phase;  // 0 = stomp ; 1 = bombs ; 2 = stomp+ufos ; 3 = in lava
-    uint8_t attack_timer;  // in phase 0/2: time spent looking for player ; in phase 1: time between bomb salvo
-    uint8_t ai_timer;      // general timer that counts down whenever olmec is active
-    int8_t move_direction; // -1 = left ; 0 = down ; 1 = right (phase 0/2: depends on target, phase 1: travel direction)
+    /// 0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
+    uint8_t attack_phase;
+    /// in phase 0/2: time spent looking for player, in phase 1: time between bomb salvo
+    uint8_t attack_timer;
+    /// general timer that counts down whenever olmec is active
+    uint8_t ai_timer;
+    /// -1 = left, 0 = down, 1 = right | phase 0/2: depends on target, phase 1: travel direction
+    int8_t move_direction;
     uint8_t jump_timer;
     uint8_t phase1_amount_of_bomb_salvos;
     uint8_t unknown_attack_state; // some attack state in phase 1/2 (changes to 2 when stomping and 3 during ufos)
@@ -43,7 +49,8 @@ class Boulder : public Movable
 {
   public:
     size_t unknown1;
-    uint8_t is_rolling; // is set to 1 when the boulder first hits the ground
+    /// is set to 1 when the boulder first hits the ground
+    uint8_t is_rolling;
 };
 
 class PushBlock : public Movable
@@ -102,14 +109,16 @@ class ThinIce : public Movable
 {
   public:
     UnknownPointerGroup unknown1;
-    uint16_t strength; // counts frames when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite
+    /// counts down when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite
+    uint16_t strength;
 };
 
 class Elevator : public Movable
 {
   public:
     Illumination* emitted_light;
-    uint32_t timer; // counts from 60 to 0
+    /// puase timer, counts down 60 to 0
+    uint32_t timer;
     bool moving_up;
 };
 
@@ -133,5 +142,6 @@ class TimedPowderkeg : public PushBlock
 {
   public:
     uint32_t unused;
-    int32_t timer; // timer till explosion, it's paused when negative, can be stooped
+    /// timer till explosion, -1 = pause, counts down
+    int32_t timer;
 };
