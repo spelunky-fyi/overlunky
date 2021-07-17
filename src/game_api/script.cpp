@@ -107,7 +107,7 @@ void SpelunkyScript::set_changed(bool changed)
 
 bool SpelunkyScript::run()
 {
-    return m_Impl->run();
+    return m_Impl->update();
 }
 void SpelunkyScript::draw(ImDrawList* dl)
 {

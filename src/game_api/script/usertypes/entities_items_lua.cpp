@@ -8,7 +8,7 @@
 
 namespace NEntitiesItems
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     lua["Entity"]["as_bomb"] = &Entity::as<Bomb>;
     lua["Entity"]["as_backpack"] = &Entity::as<Backpack>;

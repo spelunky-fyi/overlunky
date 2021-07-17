@@ -13,7 +13,7 @@ using uColor = uint32_t;
 class GuiDrawContext
 {
   public:
-    GuiDrawContext(class ScriptImpl* script, struct ImDrawList* draw_list);
+    GuiDrawContext(class LuaBackend* script, struct ImDrawList* draw_list);
 
     /// Draws a line on screen
     void draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color);
@@ -84,11 +84,11 @@ class GuiDrawContext
     void win_image(int image, int width, int height);
 
   private:
-    class ScriptImpl* script;
+    class LuaBackend* script;
     struct ImDrawList* draw_list;
 };
 
 namespace NGui
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script);
+void register_usertypes(sol::state& lua, LuaBackend* script);
 };

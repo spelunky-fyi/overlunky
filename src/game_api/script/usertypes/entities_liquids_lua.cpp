@@ -8,7 +8,7 @@
 
 namespace NEntitiesLiquids
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     lua["Entity"]["as_liquid"] = &Entity::as<Liquid>;
     lua["Entity"]["as_lava"] = &Entity::as<Lava>;

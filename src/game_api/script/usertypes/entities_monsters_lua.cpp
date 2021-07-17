@@ -8,7 +8,7 @@
 
 namespace NEntitiesMonsters
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     lua["Entity"]["as_monster"] = &Entity::as<Monster>;
 

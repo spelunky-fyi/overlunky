@@ -34,6 +34,10 @@ header_files = [
 api_files = [
     "../src/game_api/script/script_impl.cpp",
     "../src/game_api/script/script_impl.hpp",
+    "../src/game_api/script/lua_vm.cpp",
+    "../src/game_api/script/lua_vm.hpp",
+    "../src/game_api/script/lua_backend.cpp",
+    "../src/game_api/script/lua_backend.hpp",
     "../src/game_api/script/usertypes/save_context.cpp",
     "../src/game_api/script/usertypes/state_lua.cpp",
     "../src/game_api/script/usertypes/entity_lua.cpp",
@@ -466,7 +470,9 @@ for file in api_files:
     if m:
         libs = m.group(1).split(",")
         for lib in libs:
-            lualibs.append(lib.replace("sol::lib::", ""))
+            lib = lib.replace("sol::lib::", "")
+            if lib not in lualibs:
+                lualibs.append(lib)
 
 for file in api_files:
     data = open(file, "r").read().split("\n")

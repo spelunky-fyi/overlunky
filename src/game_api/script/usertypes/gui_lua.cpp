@@ -1,7 +1,7 @@
 #include "gui_lua.hpp"
 
 #include "file_api.hpp"
-#include "script/script_impl.hpp"
+#include "script/lua_backend.hpp"
 #include "script/script_util.hpp"
 #include "state.hpp"
 
@@ -12,7 +12,7 @@
 
 const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
-GuiDrawContext::GuiDrawContext(class ScriptImpl* _script, ImDrawList* _draw_list)
+GuiDrawContext::GuiDrawContext(LuaBackend* _script, ImDrawList* _draw_list)
     : script(_script), draw_list{_draw_list}
 {
 }
@@ -266,7 +266,7 @@ void GuiDrawContext::win_image(int image, int width, int height)
 
 namespace NGui
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     auto draw_rect = sol::overload(
         static_cast<void (GuiDrawContext::*)(float, float, float, float, float, float, uColor)>(&GuiDrawContext::draw_rect),
@@ -376,7 +376,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         // nan isn't a valid text size so return 0x0 instead
         if (isnan(pair.first) || isnan(pair.second))
         {
-            return std::make_pair(0, 0);
+            return {};
         }
         else
         {
@@ -390,7 +390,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         image->width = 0;
         image->height = 0;
         image->texture = NULL;
-        if (create_d3d11_texture_from_file((script->script_folder / path).string().data(), &image->texture, &image->width, &image->height))
+        if (create_d3d11_texture_from_file((std::filesystem::path{script->get_root_path()} / path).string().data(), &image->texture, &image->width, &image->height))
         {
             int id = script->images.size();
             script->images[id] = image;

@@ -7,12 +7,12 @@
 
 namespace NSound
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [script](std::string path) -> sol::optional<CustomSound>
     {
-        if (CustomSound sound = script->sound_manager->get_sound((script->script_folder / path).string()))
+        if (CustomSound sound = script->sound_manager->get_sound((script->get_root_path() / path).string()))
         {
             return sound;
         }
@@ -26,7 +26,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         {
             return event;
         }
-        else if (CustomSound sound = script->sound_manager->get_existing_sound((script->script_folder / path_or_vanilla_sound).string()))
+        else if (CustomSound sound = script->sound_manager->get_existing_sound((script->get_root_path() / path_or_vanilla_sound).string()))
         {
             return sound;
         }
@@ -43,7 +43,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         auto safe_cb = [&, cb = std::move(cb)](PlayingSound sound)
         {
             std::lock_guard gil_guard{script->gil};
-            if (script->enabled)
+            if (script->get_enabled())
                 script->handle_function(cb, sound);
         };
         std::uint32_t id = script->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
@@ -77,7 +77,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         auto safe_cb = [&, callback = std::move(callback)]()
         {
             std::lock_guard gil_guard{script->gil};
-            if (script->enabled)
+            if (script->get_enabled())
                 script->handle_function(callback);
         };
         sound->set_callback(std::move(safe_cb));

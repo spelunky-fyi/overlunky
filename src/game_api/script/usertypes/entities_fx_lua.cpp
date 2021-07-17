@@ -8,7 +8,7 @@
 
 namespace NEntitiesFX
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     lua["Entity"]["as_lavaglow"] = &Entity::as<LavaGlow>;
     lua["Entity"]["as_olmecfloater"] = &Entity::as<OlmecFloater>;

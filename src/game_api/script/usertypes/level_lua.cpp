@@ -19,7 +19,7 @@ bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE ch
 
 namespace NLevel
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.

@@ -8,7 +8,7 @@
 
 namespace NEntitiesMounts
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, LuaBackend* script)
 {
     lua["Entity"]["as_mount"] = &Entity::as<Mount>;
 
