@@ -241,6 +241,13 @@ end, ON.LEVEL)
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
 `int spawn(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
 Short for [spawn_entity](#spawn_entity).
+### [`spawn_entity_snapped_to_floor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_snapped_to_floor)
+`int spawn_entity_snapped_to_floor(int id, float x, float y, int layer)`<br/>
+Spawns an entity directly on the floor below the tile at the given position.
+Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
+### [`spawn_on_floor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_on_floor)
+`int spawn_on_floor(int id, float x, float y, int layer)`<br/>
+Short for [spawn_entity_snapped_to_floor](#spawn_entity_snapped_to_floor).
 ### [`spawn_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_grid_entity)
 `int spawn_grid_entity(int entity_type, float x, float y, int layer)`<br/>
 Spawn a grid entity, such as floor or traps, that snaps to the grid.
@@ -350,9 +357,9 @@ Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for l
 ### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 `array<int> get_entities_at(int entity_type, int mask, float x, float y, int layer, float radius)`<br/>
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
-### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
-`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
-Get uids of matching entities overlapping with the given rect. Set `entity_type` or `mask` to `0` to ignore that.
+### [`get_entities_overlapping_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
+`array<int> get_entities_overlapping_hitbox(int entity_type, int mask, AABB hitbox, int layer)`<br/>
+Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`attach_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach_entity)
 `nil attach_entity(int overlay_uid, int attachee_uid)`<br/>
 Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
@@ -394,12 +401,15 @@ Translate an entity position to screen position to be used in drawing functions
 `float screen_distance(float x)`<br/>
 Translate a distance of `x` tiles to screen distance to be be used in drawing functions
 ### [`get_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_position)
-`tuple<float, float, int> get_position(int id)`<br/>
+`tuple<float, float, int> get_position(int uid)`<br/>
 Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
 you're standing on, not real level coordinates.
 ### [`get_render_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_position)
-`tuple<float, float, int> get_render_position(int id)`<br/>
+`tuple<float, float, int> get_render_position(int uid)`<br/>
 Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
+### [`get_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_velocity)
+`tuple<float, float> get_velocity(int uid)`<br/>
+Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
 ### [`entity_remove_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 `nil entity_remove_item(int id, int item_uid)`<br/>
 Remove item by uid from entity
@@ -473,9 +483,6 @@ Sets the Y-level at which Olmec changes phases
 ### [`set_ghost_spawn_times`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ghost_spawn_times)
 `nil set_ghost_spawn_times(int normal = 10800, int cursed = 9000)`<br/>
 Determines when the ghost appears, either when the player is cursed or not
-### [`force_co_subtheme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_co_subtheme)
-`nil force_co_subtheme(int subtheme)`<br/>
-Forces the theme of the next cosmic ocean level(s) (use e.g. force_co_subtheme(COSUBTHEME.JUNGLE)  Use COSUBTHEME.RESET to reset to default random behaviour)
 ### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
 `nil set_journal_enabled(bool b)`<br/>
 Enables or disables the journal
@@ -506,11 +513,11 @@ Basically gets the absolute coordinates of the area inside the unbreakable bedro
 inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
 ```lua
 -- Draw the level boundaries
-set_callback(function()
+set_callback(function(draw_ctx)
     xmin, ymin, xmax, ymax = get_bounds()
     sx, sy = screen_position(xmin, ymin) -- top left
     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
-    draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+    draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
 end, ON.GUIFRAME)
 ```
 ### [`get_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_camera_position)
@@ -612,7 +619,7 @@ This is received even if a previous pre-tile-code-callback has returned true
 Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
 If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
 ### [`define_procedural_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_procedural_spawn)
-`nil define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)`<br/>
+`PROCEDURAL_CHANCE define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)`<br/>
 Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
 The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
@@ -630,6 +637,16 @@ Get the room template given a certain index
 ### [`get_room_template_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 `string_view get_room_template_name(int room_template)`<br/>
 For debugging only, get the name of a room template
+### [`get_procedural_spawn_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
+`int get_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id)`<br/>
+Get the inverse chance of a procedural spawn for the current level.
+A return value of 0 does not mean the chance is infinite, it means the chance is zero.
+### [`get_co_subtheme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_co_subtheme)
+`int get_co_subtheme()`<br/>
+Gets the sub theme of the current cosmic ocean level, returns `COSUBTHEME.NONE` if the current level is not a CO level.
+### [`force_co_subtheme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_co_subtheme)
+`nil force_co_subtheme(int subtheme)`<br/>
+Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use `COSUBTHEME.RESET` to reset to default random behaviour)
 ### [`create_sound`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 `optional<CustomSound> create_sound(string path)`<br/>
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -649,30 +666,12 @@ Clears a previously set callback
 ### [`rgba`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rgba)
 `uColor rgba(int r, int g, int b, int a)`<br/>
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
-### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
-`nil draw_line(float x1, float y1, float x2, float y2, float thickness, int color)`<br/>
-Draws a line on screen
-### [`draw_rect`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect)
-`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, int color)`<br/>
-Draws a rectangle on screen from top-left to bottom-right.
-### [`draw_rect_filled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled)
-`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, int color)`<br/>
-Draws a filled rectangle on screen from top-left to bottom-right.
-### [`draw_circle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle)
-`nil draw_circle(float x, float y, float radius, float thickness, int color)`<br/>
-Draws a circle on screen
-### [`draw_circle_filled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled)
-`nil draw_circle_filled(float x, float y, float radius, int color)`<br/>
-Draws a filled circle on screen
-### [`draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
-`nil draw_text(float x, float y, float size, string text, int color)`<br/>
-Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
 ### [`draw_text_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size)
 `tuple<float, float> draw_text_size(float size, string text)`<br/>
 Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
 Example:
 ```lua
-function on_guiframe()
+function on_guiframe(draw_ctx)
     -- get a random color
     color = math.random(0, 0xffffffff)
     -- zoom the font size based on frame
@@ -681,78 +680,12 @@ function on_guiframe()
     -- calculate size of text
     w, h = draw_text_size(size, text)
     -- draw to the center of screen
-    draw_text(0-w/2, 0-h/2, size, text, color)
+    draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)
 end
 ```
 ### [`create_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
 `tuple<int, int, int> create_image(string path)`<br/>
 Create image from file. Returns a tuple containing id, width and height.
-### [`draw_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
-`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color)`<br/>
-Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-### [`draw_image_rotated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated)
-`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, int color, float angle, float px, float py)`<br/>
-Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
-`nil window(string title, float x, float y, float w, float h, bool movable, function callback)`<br/>
-Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
-[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
-autosize in center. Use just a `##Label` as title to hide titlebar.
-Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
-give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
-still, this is just the first draft. Felt cute, might delete later!
-Returns false if the window was closed from the X.
-### [`win_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
-`nil win_text(string text)`<br/>
-Add some text to window, automatically wrapped
-### [`win_separator`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator)
-`nil win_separator()`<br/>
-Add a separator line to window
-### [`win_inline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline)
-`nil win_inline()`<br/>
-Add next thing on the same line. This is same as `win_sameline(0, -1)`
-### [`win_sameline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline)
-`nil win_sameline(float offset, float spacing)`<br/>
-Add next thing on the same line, with an offset
-### [`win_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button)
-`bool win_button(string text)`<br/>
-Add a button
-### [`win_input_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text)
-`string win_input_text(string label, string value)`<br/>
-Add a text field
-### [`win_input_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int)
-`int win_input_int(string label, int value)`<br/>
-Add an integer field
-### [`win_input_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float)
-`float win_input_float(string label, float value)`<br/>
-Add a float field
-### [`win_slider_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int)
-`int win_slider_int(string label, int value, int min, int max)`<br/>
-Add an integer slider
-### [`win_drag_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int)
-`int win_drag_int(string label, int value, int min, int max)`<br/>
-Add an integer dragfield
-### [`win_slider_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float)
-`float win_slider_float(string label, float value, float min, float max)`<br/>
-Add an float slider
-### [`win_drag_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float)
-`float win_drag_float(string label, float value, float min, float max)`<br/>
-Add an float dragfield
-### [`win_check`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check)
-`bool win_check(string label, bool value)`<br/>
-Add a checkbox
-### [`win_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo)
-`int win_combo(string label, int selected, string opts)`<br/>
-Add a combo box
-### [`win_pushid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid)
-`nil win_pushid(int id)`<br/>
-Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
-### [`win_popid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid)
-`nil win_popid()`<br/>
-Pop unique identifier from the stack. Put after the input.
-### [`win_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
-`nil win_image(int image, int width, int height)`<br/>
-Draw image to window.
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
@@ -765,6 +698,98 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 ### [`define_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_texture)
 `int define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
+### [`get_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox)
+`nil get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)`<br/>
+Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+### [`get_render_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_hitbox)
+`nil get_render_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)`<br/>
+Same as `get_hitbox` but based on `get_render_position`
+### [`screen_aabb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_aabb)
+`AABB screen_aabb(AABB box)`<br/>
+Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
+## Deprecated Functions
+#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!
+### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
+`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
+Use `get_entities_overlapping_hitbox` instead
+### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
+`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`<br/>
+Use `DrawGuiContext.draw_line` instead
+### [`draw_rect`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect)
+`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`<br/>
+Use `DrawGuiContext.draw_rect` instead
+### [`draw_rect_filled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled)
+`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`<br/>
+Use `DrawGuiContext.draw_rect_filled` instead
+### [`draw_circle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle)
+`nil draw_circle(float x, float y, float radius, float thickness, uColor color)`<br/>
+Use `DrawGuiContext.draw_circle` instead
+### [`draw_circle_filled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled)
+`nil draw_circle_filled(float x, float y, float radius, uColor color)`<br/>
+Use `DrawGuiContext.draw_circle_filled` instead
+### [`draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
+`nil draw_text(float x, float y, float size, string text, uColor color)`<br/>
+Use `DrawGuiContext.draw_text` instead
+### [`draw_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
+`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`<br/>
+Use `DrawGuiContext.draw_image` instead
+### [`draw_image_rotated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated)
+`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`<br/>
+Use `DrawGuiContext.draw_image_rotated` instead
+### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
+`nil window(string title, float x, float y, float w, float h, bool movable, function callback)`<br/>
+Use `DrawGuiContext.window` instead
+### [`win_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
+`nil win_text(string text)`<br/>
+Use `DrawGuiContext.win_text` instead
+### [`win_separator`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator)
+`nil win_separator()`<br/>
+Use `DrawGuiContext.win_separator` instead
+### [`win_inline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline)
+`nil win_inline()`<br/>
+Use `DrawGuiContext.win_inline` instead
+### [`win_sameline`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline)
+`nil win_sameline(float offset, float spacing)`<br/>
+Use `DrawGuiContext.win_sameline` instead
+### [`win_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button)
+`bool win_button(string text)`<br/>
+Use `DrawGuiContext.win_button` instead
+### [`win_input_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text)
+`string win_input_text(string label, string value)`<br/>
+Use `DrawGuiContext.win_input_text` instead
+### [`win_input_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int)
+`int win_input_int(string label, int value)`<br/>
+Use `DrawGuiContext.win_input_int` instead
+### [`win_input_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float)
+`float win_input_float(string label, float value)`<br/>
+Use `DrawGuiContext.win_input_float` instead
+### [`win_slider_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int)
+`int win_slider_int(string label, int value, int min, int max)`<br/>
+Use `DrawGuiContext.win_slider_int` instead
+### [`win_drag_int`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int)
+`int win_drag_int(string label, int value, int min, int max)`<br/>
+Use `DrawGuiContext.win_drag_int` instead
+### [`win_slider_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float)
+`float win_slider_float(string label, float value, float min, float max)`<br/>
+Use `DrawGuiContext.win_slider_float` instead
+### [`win_drag_float`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float)
+`float win_drag_float(string label, float value, float min, float max)`<br/>
+Use `DrawGuiContext.win_drag_float` instead
+### [`win_check`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check)
+`bool win_check(string label, bool value)`<br/>
+Use `DrawGuiContext.win_check` instead
+### [`win_combo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo)
+`int win_combo(string label, int selected, string opts)`<br/>
+Use `DrawGuiContext.win_combo` instead
+### [`win_pushid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid)
+`nil win_pushid(int id)`<br/>
+Use `DrawGuiContext.win_pushid` instead
+### [`win_popid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid)
+`nil win_popid()`<br/>
+Use `DrawGuiContext.win_popid` instead
+### [`win_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
+`nil win_image(int image, int width, int height)`<br/>
+Use `DrawGuiContext.win_image` instead
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
 ```lua
@@ -820,14 +845,14 @@ end
 - [`int loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) &StateMemory::loading
 - [`int quest_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) &StateMemory::quest_flags
 - [`int presence_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=presence_flags) &StateMemory::presence_flags
-- [`fadevalue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadevalue) &StateMemory::fadevalue
+- [`float fadevalue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadevalue) &StateMemory::fadevalue
 - [`int fadeout`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadeout) &StateMemory::fadeout
 - [`int fadein`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadein) &StateMemory::fadein
 - [`int loading_black_screen_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading_black_screen_timer) &StateMemory::loading_black_screen_timer
 - [`int saved_dogs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_dogs) &StateMemory::saved_dogs
 - [`int saved_cats`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_cats) &StateMemory::saved_cats
 - [`int saved_hamsters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_hamsters) &StateMemory::saved_hamsters
-- [`win_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) &StateMemory::win_state
+- [`int win_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) &StateMemory::win_state
 - [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &StateMemory::illumination
 - [`int money_last_levels`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) &StateMemory::money_last_levels
 - [`int money_shop_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) &StateMemory::money_shop_total
@@ -868,17 +893,17 @@ end
 - [`float adjusted_focus_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=adjusted_focus_y) &Camera::adjusted_focus_y
 - [`float focus_offset_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focus_offset_x) &Camera::focus_offset_x
 - [`float focus_offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focus_offset_y) &Camera::focus_offset_y
-- [`focus_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focus_x) &Camera::focus_x
+- [`float focus_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focus_x) &Camera::focus_x
 - [`float focus_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focus_y) &Camera::focus_y
 - [`float vertical_pan`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vertical_pan) &Camera::vertical_pan
 - [`int shake_countdown_start`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_countdown_start) &Camera::shake_countdown_start
 - [`int shake_countdown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_countdown) &Camera::shake_countdown
 - [`float shake_amplitude`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_amplitude) &Camera::shake_amplitude
-- [`shake_multiplier_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_x) &Camera::shake_multiplier_x
-- [`shake_multiplier_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_y) &Camera::shake_multiplier_y
+- [`float shake_multiplier_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_x) &Camera::shake_multiplier_x
+- [`float shake_multiplier_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_y) &Camera::shake_multiplier_y
 - [`bool uniform_shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uniform_shake) &Camera::uniform_shake
 - [`int focused_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) &Camera::focused_entity_uid
-- [`inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
+- [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
 ### `Color`
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
@@ -944,6 +969,7 @@ end
 - [`float offsety`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) &Entity::offsety
 - [`Entity topmost()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) &Entity::topmost
 - [`Entity topmost_mount()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) &Entity::topmost_mount
+- [`bool overlaps_with(AABB hitbox)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
 - [`bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
 - [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
 - [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
@@ -1007,10 +1033,10 @@ Check whether the character is female, will be `true` if the character was modde
 Set the heart color the character.
 ### `Floor`
 Derived from [`Entity`](#entity)
-- [`deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
-- [`deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
-- [`deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
-- [`deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
+- [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
+- [`int deco_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_bottom) &Floor::deco_bottom
+- [`int deco_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_left) &Floor::deco_left
+- [`int deco_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_right) &Floor::deco_right
 - [`nil fix_border_tile_animation()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fix_border_tile_animation) &Floor::fix_border_tile_animation
 \
 Sets `animation_frame` of the floor for types `FLOOR_BORDERTILE`, `FLOOR_BORDERTILE_METAL` and `FLOOR_BORDERTILE_OCTOPUS`.
@@ -1164,10 +1190,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Olmec`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_uid) &Olmec::target_uid
-- [`attack_phase`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_phase) &Olmec::attack_phase
-- [`attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) &Olmec::attack_timer
+- [`int attack_phase`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_phase) &Olmec::attack_phase
+- [`int attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) &Olmec::attack_timer
 - [`int ai_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) &Olmec::ai_timer
-- [`move_direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) &Olmec::move_direction
+- [`int move_direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) &Olmec::move_direction
 - [`int jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Olmec::jump_timer
 - [`int phase1_amount_of_bomb_salvos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase1_amount_of_bomb_salvos) &Olmec::phase1_amount_of_bomb_salvos
 - [`int unknown_attack_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_attack_state) &Olmec::unknown_attack_state
@@ -1278,7 +1304,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int split_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split_timer) &Ghost::split_timer
 - [`float velocity_multiplier`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_multiplier) &Ghost::velocity_multiplier
-- [`ghost_behaviour`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_behaviour) &Ghost::ghost_behaviour
+- [`int ghost_behaviour`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_behaviour) &Ghost::ghost_behaviour
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Ghost::emitted_light
 - [`Entity linked_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_ghost) &Ghost::linked_ghost
 ### `Bat`
@@ -1333,7 +1359,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`R
 ### `Tun`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`RoomOwner`](#roomowner)
 - [`int arrows_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrows_left) &Tun::arrows_left
-- [`reload_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_timer) &Tun::reload_timer
+- [`int reload_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_timer) &Tun::reload_timer
 - [`bool challenge_fee_paid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=challenge_fee_paid) &Tun::challenge_fee_paid
 - [`bool congrats_challenge`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=congrats_challenge) &Tun::congrats_challenge
 - [`bool murdered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=murdered) &Tun::murdered
@@ -1343,13 +1369,13 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`R
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Pet::fx_button
 - [`int petting_by_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=petting_by_uid) &Pet::petting_by_uid
-- [`yell_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yell_counter) &Pet::yell_counter
+- [`int yell_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yell_counter) &Pet::yell_counter
 - [`int func_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=func_timer) &Pet::func_timer
-- [`active_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_state) &Pet::active_state
+- [`int active_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_state) &Pet::active_state
 ### `Caveman`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
 - [`int wake_up_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wake_up_timer) &Caveman::wake_up_timer
-- [`can_pick_up_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_pick_up_timer) &Caveman::can_pick_up_timer
+- [`int can_pick_up_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_pick_up_timer) &Caveman::can_pick_up_timer
 - [`int aggro_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aggro_timer) &Caveman::aggro_timer
 ### `CavemanShopkeeper`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
@@ -1387,8 +1413,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 ### `Lavamander`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Lavamander::emitted_light
-- [`shoot_lava_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoot_lava_timer) &Lavamander::shoot_lava_timer
-- [`jump_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_pause_timer) &Lavamander::jump_pause_timer
+- [`int shoot_lava_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoot_lava_timer) &Lavamander::shoot_lava_timer
+- [`int jump_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_pause_timer) &Lavamander::jump_pause_timer
 - [`int lava_detection_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lava_detection_timer) &Lavamander::lava_detection_timer
 - [`bool is_hot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_hot) &Lavamander::is_hot
 - [`int player_detect_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_detect_state) &Lavamander::player_detect_state
@@ -1400,8 +1426,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 ### `FirebugUnchained`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float max_flight_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_flight_height) &FirebugUnchained::max_flight_height
-- [`ai_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) &FirebugUnchained::ai_timer
-- [`walking_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking_timer) &FirebugUnchained::walking_timer
+- [`int ai_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) &FirebugUnchained::ai_timer
+- [`int walking_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking_timer) &FirebugUnchained::walking_timer
 ### `Robot`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
 - [`Illumination emitted_light_explosion`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light_explosion) &Robot::emitted_light_explosion
@@ -1477,13 +1503,13 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int climb_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=climb_pause_timer) &Kingu::climb_pause_timer
 - [`int shell_invincibility_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shell_invincibility_timer) &Kingu::shell_invincibility_timer
 - [`int monster_spawn_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=monster_spawn_timer) &Kingu::monster_spawn_timer
-- [`initial_shell_health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=initial_shell_health) &Kingu::initial_shell_health
+- [`int initial_shell_health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=initial_shell_health) &Kingu::initial_shell_health
 - [`bool player_seen_by_kingu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_seen_by_kingu) &Kingu::player_seen_by_kingu
 ### `Anubis`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &Anubis::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &Anubis::spawn_y
-- [`attack_proximity_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_proximity_y) &Anubis::attack_proximity_y
+- [`float attack_proximity_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_proximity_y) &Anubis::attack_proximity_y
 - [`float attack_proximity_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_proximity_x) &Anubis::attack_proximity_x
 - [`int ai_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) &Anubis::ai_timer
 - [`int next_attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_attack_timer) &Anubis::next_attack_timer
@@ -1568,8 +1594,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Lamassu::particle
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Lamassu::emitted_light
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &Lamassu::walk_pause_timer
-- [`flight_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flight_timer) &Lamassu::flight_timer
-- [`attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) &Lamassu::attack_timer
+- [`int flight_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flight_timer) &Lamassu::flight_timer
+- [`int attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) &Lamassu::attack_timer
 - [`float attack_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_angle) &Lamassu::attack_angle
 ### `Olmite`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
@@ -1585,7 +1611,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int fx_tiamat_arm_right1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_tiamat_arm_right1) &Tiamat::fx_tiamat_arm_right1_uid
 - [`int fx_tiamat_arm_right2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_tiamat_arm_right2) &Tiamat::fx_tiamat_arm_right2_uid
 - [`int frown_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frown_timer) &Tiamat::invincibility_timer
-- [`damage_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage_timer) &Tiamat::damage_timer
+- [`int damage_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage_timer) &Tiamat::damage_timer
 - [`int attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) &Tiamat::attack_timer
 - [`float tail_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_angle) &Tiamat::tail_angle
 - [`float tail_radian`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_radian) &Tiamat::tail_radian
@@ -1637,7 +1663,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 ### `JumpDog`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &JumpDog::walk_pause_timer
-- [`squish_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=squish_timer) &JumpDog::squish_timer
+- [`int squish_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=squish_timer) &JumpDog::squish_timer
 ### `EggplantMinister`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &EggplantMinister::walk_pause_timer
@@ -1672,7 +1698,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int orb_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=orb_uid) &MegaJellyfish::orb_uid
 - [`int tail_bg_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_bg_uid) &MegaJellyfish::tail_bg_uid
 - [`float applied_velocity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_velocity) &MegaJellyfish::applied_velocity
-- [`wagging_tail_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wagging_tail_counter) &MegaJellyfish::wagging_tail_counter
+- [`float wagging_tail_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wagging_tail_counter) &MegaJellyfish::wagging_tail_counter
 - [`int flipper_distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipper_distance) &MegaJellyfish::flipper_distance
 - [`int velocity_application_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_application_timer) &MegaJellyfish::velocity_application_timer
 ### `Scorpion`
@@ -1696,8 +1722,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`W
 ### `ProtoShopkeeper`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster)
 - [`int movement_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movement_state) &ProtoShopkeeper::movement_state
-- [`walk_pause_explode_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_explode_timer) &ProtoShopkeeper::walk_pause_explode_timer
-- [`walking_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking_speed) &ProtoShopkeeper::walking_speed
+- [`int walk_pause_explode_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_explode_timer) &ProtoShopkeeper::walk_pause_explode_timer
+- [`int walking_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking_speed) &ProtoShopkeeper::walking_speed
 ### `Beg`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`NPC`](#npc)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &Beg::walk_pause_timer
@@ -1770,7 +1796,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Monster`](#monster) [`C
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &CritterSlime::walk_pause_timer
 ### `Bomb`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`scale_hor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) &Bomb::scale_hor
+- [`float scale_hor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) &Bomb::scale_hor
 - [`float scale_ver`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_ver) &Bomb::scale_ver
 - [`bool is_big_bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_big_bomb) &Bomb::is_big_bomb
 ### `Backpack`
@@ -2167,10 +2193,17 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &ParticleDB::set_texture
 ### `PostRoomGenerationContext`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
-- [`nil set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
+- [`bool set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
+\
+Set the room template at the given index and layer, returns `false` if the index is outside of the level.
+- [`bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) &PostRoomGenerationContext::set_procedural_spawn_chance
+\
+Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
+Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
+Returns `false` if the given chance is not defined.
 ### `QuestsInfo`
 - [`int yang_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yang_state) &QuestsInfo::yang_state
-- [`jungle_sisters_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_sisters_flags) &QuestsInfo::jungle_sisters_flags
+- [`int jungle_sisters_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_sisters_flags) &QuestsInfo::jungle_sisters_flags
 - [`int van_horsing_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=van_horsing_state) &QuestsInfo::van_horsing_state
 - [`int sparrow_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sparrow_state) &QuestsInfo::sparrow_state
 - [`int madame_tusk_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=madame_tusk_state) &QuestsInfo::madame_tusk_state
@@ -2252,6 +2285,95 @@ You can just discard this handle if you do not need extended control anymore
 - [`player_slot_2_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) sol::readonly(&PlayerInputs::player_slot_2_settings)
 - [`player_slot_3_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) sol::readonly(&PlayerInputs::player_slot_3_settings)
 - [`player_slot_4_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) sol::readonly(&PlayerInputs::player_slot_4_settings)
+### `GuiDrawContext`
+- [`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line) &GuiDrawContext::draw_line
+\
+Draws a line on screen
+- [`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) draw_rect
+\
+Draws a rectangle on screen from top-left to bottom-right.
+- [`nil draw_rect(AABB rect, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) draw_rect
+\
+Draws a rectangle on screen from top-left to bottom-right.
+- [`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) draw_rect_filled
+\
+Draws a filled rectangle on screen from top-left to bottom-right.
+- [`nil draw_rect_filled(AABB rect, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) draw_rect_filled
+\
+Draws a filled rectangle on screen from top-left to bottom-right.
+- [`nil draw_circle(float x, float y, float radius, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle) &GuiDrawContext::draw_circle
+\
+Draws a circle on screen
+- [`nil draw_circle_filled(float x, float y, float radius, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled) &GuiDrawContext::draw_circle_filled
+\
+Draws a filled circle on screen
+- [`nil draw_text(float x, float y, float size, string text, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &GuiDrawContext::draw_text
+\
+Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
+- [`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
+\
+Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+- [`nil draw_image(int image, AABB rect, AABB uv_rect, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
+\
+Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+- [`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+- [`nil draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+- [`bool window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) &GuiDrawContext::window
+\
+autosize in center. Use just a `##Label` as title to hide titlebar.
+Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
+give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
+still, this is just the first draft. Felt cute, might delete later!
+Returns false if the window was closed from the X.
+- [`nil win_text(string text)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text) &GuiDrawContext::win_text
+\
+Add some text to window, automatically wrapped
+- [`nil win_separator()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator) &GuiDrawContext::win_separator
+\
+Add a separator line to window
+- [`nil win_inline()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) &GuiDrawContext::win_inline
+- [`nil win_sameline(float offset, float spacing)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline) &GuiDrawContext::win_sameline
+\
+Add next thing on the same line, with an offset
+- [`bool win_button(string text)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button) &GuiDrawContext::win_button
+\
+Add a button
+- [`string win_input_text(string label, string value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text) &GuiDrawContext::win_input_text
+\
+Add a text field
+- [`int win_input_int(string label, int value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int) &GuiDrawContext::win_input_int
+\
+Add an integer field
+- [`float win_input_float(string label, float value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float) &GuiDrawContext::win_input_float
+\
+Add a float field
+- [`int win_slider_int(string label, int value, int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int) &GuiDrawContext::win_slider_int
+\
+Add an integer slider
+- [`int win_drag_int(string label, int value, int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int) &GuiDrawContext::win_drag_int
+\
+Add an integer dragfield
+- [`float win_slider_float(string label, float value, float min, float max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float) &GuiDrawContext::win_slider_float
+\
+Add an float slider
+- [`float win_drag_float(string label, float value, float min, float max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float) &GuiDrawContext::win_drag_float
+\
+Add an float dragfield
+- [`bool win_check(string label, bool value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check) &GuiDrawContext::win_check
+\
+Add a checkbox
+- [`int win_combo(string label, int selected, string opts)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo) &GuiDrawContext::win_combo
+\
+Add a combo box
+- [`nil win_pushid(int id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) &GuiDrawContext::win_pushid
+\
+Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+- [`nil win_popid()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) &GuiDrawContext::win_popid
+\
+Pop unique identifier from the stack. Put after the input.
+- [`nil win_image(int image, int width, int height)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) &GuiDrawContext::win_image
+\
+Draw image to window.
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
@@ -2267,6 +2389,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 - [`int sub_image_offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_image_offset_y) &TextureDefinition::sub_image_offset_y
 - [`int sub_image_width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_image_width) &TextureDefinition::sub_image_width
 - [`int sub_image_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_image_height) &TextureDefinition::sub_image_height
+### `AABB`
+Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
+- [`float left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) &AABB::left
+- [`float bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) &AABB::bottom
+- [`float right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) &AABB::right
+- [`float top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top) &AABB::top
 ## Automatic casting of entities
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
 
@@ -2522,22 +2650,25 @@ end, ON.LEVEL)
 ```
 ### ENT_TYPE
 - [`FLOOR_BORDERTILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.FLOOR_BORDERTILE) 1
-- ...blah blah read your entities.txt...
+- ...check [entities.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/entities.txt)...
 - [`LIQUID_STAGNANT_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_STAGNANT_LAVA) 898
 ### PARTICLEEMITTER
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
-- ...check particle_emitters.txt output by Overlunky...
+- ...check [particle_emitters.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/particle_emitters.txt)...
 - [`MINIGAME_BROKENASTEROID_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) 219
 ### ROOM_TEMPLATE
 - [`SIDE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE.SIDE) 0
-- ...check room_templates.txt output by Overlunky...
+- ...check [room_templates.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/room_templates.txt)...
+### PROCEDURAL_CHANCE
+- [`ARROWTRAP_CHANCE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.ARROWTRAP_CHANCE) 0
+- ...check [spawn_chances.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/spawn_chances.txt)...
 ### VANILLA_SOUND
 - [`BGM_BGM_TITLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.BGM_BGM_TITLE) BGM/BGM_title
-- ...check vanilla_sounds.txt output by Overlunky...
+- ...check [vanilla_sounds.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sounds.txt)...
 - [`FX_FX_DM_BANNER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.FX_FX_DM_BANNER) FX/FX_dm_banner
 ### VANILLA_SOUND_PARAM
 - [`POS_SCREEN_X`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.POS_SCREEN_X) 0
-- ...check vanilla_sound_params.txt output by Overlunky...
+- ...check [vanilla_sound_params.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sound_params.txt)...
 - [`CURRENT_LAYER2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.CURRENT_LAYER2) 37
 ### DROPCHANCE
 - [`BONEBLOCK_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) 0
@@ -2549,7 +2680,7 @@ end, ON.LEVEL)
 - [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETI_PITCHERSMITT) 85
 ### TEXTURE
 - [`DATA_TEXTURES_PLACEHOLDER_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_PLACEHOLDER_0) 0
-- ...see textures.txt for a list of textures...
+- ...check [textures.txt](https:github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/textures.txt)...
 - [`DATA_TEXTURES_SHINE_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_SHINE_0) 388
 - [`DATA_TEXTURES_OLDTEXTURES_AI_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_OLDTEXTURES_AI_0) 389
 ### ON
@@ -2581,7 +2712,8 @@ end, ON.LEVEL)
 - [`ONLINE_LOBBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) ON::ONLINE_LOBBY
 - [`GUIFRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GUIFRAME) ON::GUIFRAME
 \
-Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback
+Params: `GuiDrawContext draw_ctx`\
+Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a `GuiDrawContext`
 - [`FRAME`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.FRAME) ON::FRAME
 \
 Runs while playing the game while the player is controllable, not in the base camp or the arena mode
@@ -2720,15 +2852,16 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`ARENA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME.ARENA) 18
 ### COSUBTHEME
 Parameter to force_co_subtheme
+- [`NONE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NONE) -1
 - [`RESET`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.RESET) -1
 - [`DWELLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.DWELLING) 0
 - [`JUNGLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.JUNGLE) 1
 - [`VOLCANA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.VOLCANA) 2
-- [`TIDEPOOL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.TIDEPOOL) 3
+- [`TIDE_POOL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.TIDE_POOL) 3
 - [`TEMPLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.TEMPLE) 4
-- [`ICECAVES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.ICECAVES) 5
-- [`NEOBABYLON`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEOBABYLON) 6
-- [`SUNKENCITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKENCITY) 7
+- [`ICE_CAVES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.ICE_CAVES) 5
+- [`NEO_BABYLON`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEO_BABYLON) 6
+- [`SUNKEN_CITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKEN_CITY) 7
 ### YANG
 Yang quest states
 - [`ANGRY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=YANG.ANGRY) -1

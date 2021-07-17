@@ -22,7 +22,7 @@ end, "floor")
 
 -- Replaces all spikes with snowmen
 set_pre_tile_code_callback(function(x, y, layer)
-    local ent_uid = spawn_entity(ENT_TYPE.ITEM_ICESPIRE, x, y, layer, 0.0, 0.0);
+    local ent_uid = spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_ICESPIRE, x, y, layer, 0.0, 0.0);
     local ent = get_entity(ent_uid)
     local ent_flags = ent.flags
     ent_flags = clr_flag(ent_flags, 18)
@@ -86,11 +86,11 @@ local lamp_tiles = {}
 set_post_tile_code_callback(function(x, y, layer)
     table.insert(lamp_tiles, { x = x, y = y, layer = layer })
 end, "lamp_hang")
-set_callback(function()
+set_callback(function(draw_ctx)
     for _, tile in pairs(lamp_tiles) do
         local sx, sy = screen_position(tile.x - 0.5, tile.y + 0.5) -- top left
         local sx2, sy2 = screen_position(tile.x + 0.5, tile.y - 0.5) -- bottom right
-        draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
+        draw_ctx:draw_rect(sx, sy, sx2, sy2, 2, 0, rgba(255, 0, 255, 255))
     end
 end, ON.GUIFRAME)
 
@@ -113,6 +113,32 @@ local function is_valid_powderkeg_spawn(x, y, l)
 end
 define_procedural_spawn("sample_powderkeg", spawn_powderkeg, is_valid_powderkeg_spawn)
 
+-- Spawn spark traps on every level
+local function spawn_sparktrap(x, y, l)
+    spawn_grid_entity(ENT_TYPE.FLOOR_SPARK_TRAP, x, y, l)
+end
+local function is_valid_sparktrap_spawn(x, y, l)
+    -- Only spawn where there is floor
+    local floor = get_grid_entity_at(x, y, l)
+    if floor ~= -1 then
+        floor = get_entity(floor)
+        return test_flag(floor.flags, 3) 
+    end
+    return false
+end
+local sparktrap_chance = define_procedural_spawn("sample_sparktrap", spawn_sparktrap, is_valid_sparktrap_spawn)
+set_callback(function(room_gen_ctx)
+    local current_sparktrap_chance = get_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE)
+    if current_sparktrap_chance == 0 then
+        current_sparktrap_chance = 20
+    end
+
+    prinspect(current_sparktrap_chance)
+    room_gen_ctx:set_procedural_spawn_chance(sparktrap_chance, current_sparktrap_chance)
+    -- Disable the original sparktrap spawns so we don't get double spawns
+    room_gen_ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE, 0)
+end, ON.POST_ROOM_GENERATION)
+
 -- Fill in shops in all the valid ROOM_TEMPLATE.SIDE spots
 local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.PATH_NORMAL] = true,
@@ -126,14 +152,14 @@ local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.ALTAR] = true,
 }
 set_callback(function(room_gen_ctx)
-    for x = 0, state.width do
-        for y = 0, state.height do
+    for x = 0, state.width - 1 do
+        for y = 0, state.height - 1 do
             -- Check that this is a side
             local room_template_here = get_room_template(x, y, 0)
             if room_template_here == ROOM_TEMPLATE.SIDE then
                 -- Check if left of this is a valid room
                 local room_template_left = get_room_template(x - 1, y, 0)
-                if not valid_rooms_with_shop_next[room_template_left] then
+                if valid_rooms_with_shop_next[room_template_left] then
                     -- And spawn a shop facing left
                     room_gen_ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.SHOP_LEFT)
                 else

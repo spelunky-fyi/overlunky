@@ -70,6 +70,8 @@ add_library(spel2_api STATIC
         script/usertypes/entities_floors_lua.hpp
         script/usertypes/entities_activefloors_lua.cpp
         script/usertypes/entities_activefloors_lua.hpp
+        script/usertypes/hitbox_lua.cpp
+        script/usertypes/hitbox_lua.hpp
         script/usertypes/entities_fx_lua.cpp
         script/usertypes/entities_fx_lua.hpp
         script/usertypes/entities_liquids_lua.cpp
@@ -88,8 +90,8 @@ add_library(spel2_api STATIC
         script/usertypes/drops_lua.hpp
         script/usertypes/texture_lua.cpp
         script/usertypes/texture_lua.hpp
-        script/usertypes/char_state.cpp
-        script/usertypes/char_state.hpp
+        script/usertypes/char_state_lua.cpp
+        script/usertypes/char_state_lua.hpp
         script/usertypes/flags_lua.cpp
         script/usertypes/flags_lua.hpp
         sound_manager.cpp

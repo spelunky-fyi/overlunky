@@ -402,20 +402,58 @@ void Entity::destroy()
     delete this; // TODO
 }
 
-std::tuple<float, float, int> get_position(uint32_t id)
+std::tuple<float, float, int> get_position(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr(id);
+    Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
     return {0.0f, 0.0f, 0};
 }
 
-std::tuple<float, float, int> get_render_position(uint32_t id)
+std::tuple<float, float, int> get_render_position(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr(id);
+    Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer);
     return {0.0f, 0.0f, 0};
+}
+
+std::tuple<float, float> get_velocity(uint32_t uid)
+{
+    if (Entity* ent = get_entity_ptr(uid))
+    {
+        float vx{0.0f};
+        float vy{0.0f};
+        if (ent->type->search_flags & 0b11001111) // PLAYER | MOUNT | MONSTER | ITEM | FX | ACTIVEFLOOR
+        {
+            Movable* mov = ent->as<Movable>();
+            vx = mov->velocityx;
+            vy = mov->velocityy;
+        }
+        if (ent->overlay)
+        {
+            auto [ovx, ovy] = get_velocity(ent->overlay->uid);
+            vx += ovx;
+            vy += ovy;
+        }
+        return std::tuple{vx, vy};
+    }
+    return std::tuple{0.0f, 0.0f};
+}
+
+AABB get_hitbox(uint32_t uid, bool use_render_pos)
+{
+    if (Entity* ent = get_entity_ptr(uid))
+    {
+        auto [x, y, l] = (use_render_pos ? get_render_position : get_position)(uid);
+        return AABB{
+            x - ent->hitboxx + ent->offsetx,
+            y - ent->hitboxy + ent->offsety,
+            x + ent->hitboxx + ent->offsetx,
+            y + ent->hitboxy + ent->offsety,
+        };
+    }
+    return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
 std::uint32_t Entity::get_texture()

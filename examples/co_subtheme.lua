@@ -5,7 +5,7 @@ meta.author = 'Zappatic'
 
 previous_choice = 1
 subtheme_names = {'Reset default behaviour', 'Dwelling', 'Jungle', 'Volcana', 'Tidepool', 'Temple', 'Icecaves', 'Neo Babylon', 'Sunken City'}
-subtheme_themeids = {COSUBTHEME.RESET, COSUBTHEME.DWELLING, COSUBTHEME.JUNGLE, COSUBTHEME.VOLCANA, COSUBTHEME.TIDEPOOL, COSUBTHEME.TEMPLE, COSUBTHEME.ICECAVES, COSUBTHEME.NEOBABYLON, COSUBTHEME.SUNKENCITY}
+subtheme_themeids = {COSUBTHEME.RESET, COSUBTHEME.DWELLING, COSUBTHEME.JUNGLE, COSUBTHEME.VOLCANA, COSUBTHEME.TIDE_POOL, COSUBTHEME.TEMPLE, COSUBTHEME.ICE_CAVES, COSUBTHEME.NEO_BABYLON, COSUBTHEME.SUNKEN_CITY}
 
 register_option_combo('subtheme', 'Theme', table.concat(subtheme_names, '\0')..'\0\0')
 
