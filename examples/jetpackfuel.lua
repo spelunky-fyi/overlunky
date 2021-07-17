@@ -8,4 +8,4 @@ set_callback(function()
     for i, player in ipairs(players) do
         player:set_jetpack_fuel(255)
     end
-end, ON.GUIFRAME)
+end, ON.GAMEFRAME)

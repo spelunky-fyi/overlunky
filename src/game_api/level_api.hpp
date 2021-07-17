@@ -25,8 +25,7 @@ struct ChanceDef
 };
 struct LevelChanceDef
 {
-    std::uint32_t id;
-    std::uint8_t chance;
+    std::vector<uint32_t> chances;
 };
 
 struct ChanceLogicProvider
@@ -57,17 +56,28 @@ struct LevelGenData
     {
         return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
     }
+
     const std::unordered_map<std::string, RoomTemplateDef>& room_templates() const
     {
         return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
     }
-    const std::unordered_map<std::string, ChanceDef>& chances() const
+
+    const std::unordered_map<std::string, ChanceDef>& monster_chances() const
     {
         return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1330);
     }
-    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_chances() const
+    const std::unordered_map<std::string, ChanceDef>& trap_chances() const
+    {
+        return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x13b0);
+    }
+
+    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_monster_chances() const
     {
         return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1370);
+    }
+    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_trap_chances() const
+    {
+        return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x13f0);
     }
 };
 
@@ -182,4 +192,10 @@ struct LevelGenSystem
     bool set_room_template(int x, int y, int l, uint16_t room_template);
 
     std::string_view get_room_template_name(uint16_t room_template);
+
+    uint32_t get_procedural_spawn_chance(uint32_t chance_id);
+    bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 };
+
+int8_t get_co_subtheme();
+void force_co_subtheme(int8_t subtheme);

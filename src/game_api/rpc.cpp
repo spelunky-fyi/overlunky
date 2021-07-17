@@ -364,6 +364,13 @@ std::pair<float, float> screen_position(float x, float y)
     return State::get().screen_position(x, y);
 }
 
+std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2)
+{
+    auto [sx1, sy1] = screen_position(x1, y1);
+    auto [sx2, sy2] = screen_position(x2, y2);
+    return std::tuple{sx1, sy1, sx2, sy2};
+}
+
 float screen_distance(float x)
 {
     auto a = State::get().screen_position(0, 0);
@@ -562,6 +569,12 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
         }
     }
     return found;
+}
+
+std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, int layer)
+{
+    auto state = State::get();
+    return get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(layer));
 }
 
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
@@ -1168,26 +1181,6 @@ void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type)
                 write_mem_prot(entry.offsets[x], to_le_bytes(new_drop_entity_type), true);
             }
         }
-    }
-}
-
-void force_co_subtheme(int8_t subtheme)
-{
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        offset = memory.at_exe(find_inst(memory.exe(), "\x48\xC1\xE0\x03\x48\xC1\xE8\x20\x49\x89\x48\x08\x48\x98"s, memory.after_bundle));
-    }
-    if (subtheme >= 0 && subtheme <= 7)
-    {
-        uint8_t replacement[] = {0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90};
-        std::string replacement_s = std::string((char*)replacement, sizeof(replacement));
-        write_mem_prot(offset, replacement_s, true);
-    }
-    else if (subtheme == -1)
-    {
-        write_mem_prot(offset, "\x48\xC1\xE0\x03\x48\xC1\xE8\x20"s, true);
     }
 }
 

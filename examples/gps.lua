@@ -290,7 +290,7 @@ set_callback(function()
     end, 5)
 end, ON.LEVEL)
 
-set_callback(function()
+set_callback(function(draw_ctx)
     if state.screen ~= 12 then return end
     if exitpath ~= nil and #exitpath > 1 then
         xmin, ymin, xmax, ymax = get_bounds()
@@ -298,7 +298,7 @@ set_callback(function()
         lastx, lasty = screen_position(x, y)
         for i, v in ipairs(exitpath) do
             sx, sy = screen_position(xmin + v.x - 0.5, ymin - v.y + 0.5)
-            draw_line(lastx, lasty, sx, sy, 2, rgba(0, 255, 0, 255))
+            draw_ctx:draw_line(lastx, lasty, sx, sy, 2, rgba(0, 255, 0, 255))
             lastx = sx
             lasty = sy
         end
