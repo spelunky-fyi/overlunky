@@ -1,6 +1,7 @@
 #include "spel2.h"
 
 #include "character_def.hpp"
+#include "console.hpp"
 #include "file_api.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -9,6 +10,7 @@
 #include "window_api.hpp"
 
 SoundManager* g_SoundManager{nullptr};
+SpelunkyConsole* g_Console{nullptr};
 
 void SetWriteLoadOptimization(bool write_load_opt)
 {
@@ -140,7 +142,7 @@ SpelunkyScript* CreateScript(const char* file_path, bool enabled)
     std::string code = read_whole_file(file_path);
     if (!code.empty())
     {
-        return new SpelunkyScript(std::move(code), file_path, g_SoundManager, enabled);
+        return new SpelunkyScript(std::move(code), file_path, g_SoundManager, g_Console, enabled);
     }
     return nullptr;
 }

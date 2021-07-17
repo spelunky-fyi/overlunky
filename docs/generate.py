@@ -470,9 +470,7 @@ for file in api_files:
     if m:
         libs = m.group(1).split(",")
         for lib in libs:
-            lib = lib.replace("sol::lib::", "")
-            if lib not in lualibs:
-                lualibs.append(lib)
+            lualibs.append(lib.replace("sol::lib::", ""))
 
 for file in api_files:
     data = open(file, "r").read().split("\n")

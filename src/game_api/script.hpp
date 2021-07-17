@@ -59,7 +59,7 @@ class ScriptImpl;
 class SpelunkyScript
 {
   public:
-    SpelunkyScript(std::string script, std::string file, class SoundManager* sound_manager, bool enable = true);
+    SpelunkyScript(std::string script, std::string file, class SoundManager* sound_manager, class SpelunkyConsole* console, bool enable = true);
     ~SpelunkyScript();
 
     std::deque<ScriptMessage>& get_messages();

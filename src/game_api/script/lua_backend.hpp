@@ -1,3 +1,5 @@
+#pragma once
+
 #include "drops.hpp"
 #include "entity.hpp"
 #include "script.hpp"
@@ -6,11 +8,11 @@
 #include <algorithm>
 #include <deque>
 #include <filesystem>
-#include <map>
 #include <mutex>
-#include <set>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -159,6 +161,7 @@ struct ScriptState
 struct SaveData;
 struct StateMemory;
 class SoundManager;
+class LuaConsole;
 
 class LuaBackend
 {
@@ -174,10 +177,10 @@ class LuaBackend
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
-    std::map<int, TimerCallback> level_timers;
-    std::map<int, TimerCallback> global_timers;
-    std::map<int, ScreenCallback> callbacks;
-    std::map<int, ScreenCallback> load_callbacks;
+    std::unordered_map<int, TimerCallback> level_timers;
+    std::unordered_map<int, TimerCallback> global_timers;
+    std::unordered_map<int, ScreenCallback> callbacks;
+    std::unordered_map<int, ScreenCallback> load_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_level_gen_callbacks;
     std::vector<LevelGenCallback> post_level_gen_callbacks;
@@ -189,8 +192,9 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
     std::vector<std::string> required_scripts;
-    std::map<int, ScriptInput*> script_input;
-    std::set<std::string> windows;
+    std::unordered_map<int, ScriptInput*> script_input;
+    std::unordered_set<std::string> windows;
+    std::unordered_set<std::string> console_commands;
 
     ImDrawList* draw_list{nullptr};
 
@@ -200,10 +204,11 @@ class LuaBackend
     SaveData* g_save = nullptr;
 
     SoundManager* sound_manager;
+    LuaConsole* console;
 
     std::map<int, ScriptImage*> images;
 
-    LuaBackend(SoundManager* sound_manager);
+    LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend()
     {
         clear_all_callbacks();
@@ -247,8 +252,6 @@ class LuaBackend
 
     void hook_entity_dtor(Entity* entity);
     void pre_entity_destroyed(Entity* entity);
-
-    std::string dump_api();
 };
 
 template <class... Args>

@@ -1,23 +1,6 @@
 #pragma once
 
-#include "drops.hpp"
-#include "entity.hpp"
 #include "lua_backend.hpp"
-#include "script.hpp"
-#include "window_api.hpp"
-
-#include <algorithm>
-#include <deque>
-#include <filesystem>
-#include <map>
-#include <mutex>
-#include <string>
-#include <string_view>
-#include <variant>
-#include <vector>
-
-#include <imgui.h>
-#include <sol/sol.hpp>
 
 class ScriptImpl : public LuaBackend
 {
@@ -34,7 +17,7 @@ class ScriptImpl : public LuaBackend
     ScriptMeta meta = {"", "", "", "", "", "", "", "", "", false};
     std::filesystem::path script_folder;
 
-    ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
+    ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, LuaConsole* con, bool enable = true);
     virtual ~ScriptImpl() override
     {
         set_enabled(false);

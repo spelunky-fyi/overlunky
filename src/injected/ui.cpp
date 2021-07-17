@@ -19,6 +19,7 @@
 #include <string>
 #include <toml.hpp>
 
+#include "console.hpp"
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
 #include "entity.hpp"
@@ -37,7 +38,13 @@
 
 #include "decode_audio_file.hpp"
 
-SoundManager* g_SoundManager{nullptr};
+std::unique_ptr<SoundManager> g_SoundManager;
+
+std::unique_ptr<SpelunkyConsole> g_Console;
+bool g_ConsoleEnabled{false};
+bool g_FocusConsole{false};
+char g_ConsoleInput[2048]{};
+std::vector<std::string> g_ConsoleResults;
 
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -124,7 +131,8 @@ std::map<std::string, int> keys{
     {"mouse_clone", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x05},
     {"mouse_destroy", OL_BUTTON_MOUSE | 0x05},
     {"mouse_destroy_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x05},
-    {"reload_enabled_scripts", OL_KEY_CTRL | VK_F5} // ctrl + f5 same as playlunky
+    {"reload_enabled_scripts", OL_KEY_CTRL | VK_F5}, // ctrl + f5 same as playlunky
+    {"console", VK_OEM_5},                           // "tilde", same as Playlunky
     //{ "", 0x },
 };
 
@@ -295,7 +303,7 @@ void load_script(std::string file, bool enable = true)
         /*size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
             file = file.substr(slash + 1);*/
-        SpelunkyScript* script = new SpelunkyScript(buf.str(), file, g_SoundManager, enable);
+        SpelunkyScript* script = new SpelunkyScript(buf.str(), file, g_SoundManager.get(), g_Console.get(), enable);
         g_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{script};
         data.close();
     }
@@ -1362,6 +1370,11 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     else if (pressed("reload_enabled_scripts", wParam))
     {
         reload_enabled_scripts();
+    }
+    else if (pressed("console", wParam))
+    {
+        g_ConsoleEnabled = !g_ConsoleEnabled;
+        g_FocusConsole = g_ConsoleEnabled;
     }
     else
     {
@@ -2626,7 +2639,8 @@ void render_script_files()
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
             name,
-            g_SoundManager,
+            g_SoundManager.get(),
+            g_Console.get(),
             true);
         g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
     }
@@ -3682,7 +3696,64 @@ void imgui_draw()
     ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
-    if (!hide_script_messages)
+    if (g_ConsoleEnabled)
+    {
+        auto& io = ImGui::GetIO();
+        ImGui::SetNextWindowSize({io.DisplaySize.x - 120, -1});
+        ImGui::Begin(
+            "Console Overlay",
+            NULL,
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+                ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
+                ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+
+        for (const auto& result : g_ConsoleResults)
+        {
+            std::optional<ImVec4> color;
+            if (result.starts_with("sol:"))
+            {
+                color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+            }
+
+            if (color)
+                ImGui::PushStyleColor(ImGuiCol_Text, color.value());
+            ImGui::TextUnformatted(result.c_str());
+            if (color)
+                ImGui::PopStyleColor();
+        }
+
+        if (g_FocusConsole)
+        {
+            ImGui::SetKeyboardFocusHere();
+            g_FocusConsole = false;
+        }
+
+        auto input_callback = [](ImGuiInputTextCallbackData* data)
+        { return 0; };
+
+        ImGui::PushItemWidth(ImGui::GetWindowWidth());
+        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
+        if (ImGui::InputText("", g_ConsoleInput, IM_ARRAYSIZE(g_ConsoleInput), input_text_flags, input_callback))
+        {
+            std::string result = g_Console->execute(g_ConsoleInput);
+            if (!result.empty())
+            {
+                g_ConsoleResults.push_back(std::move(result));
+            }
+
+            g_FocusConsole = true;
+            std::memset(g_ConsoleInput, 0, IM_ARRAYSIZE(g_ConsoleInput));
+        }
+        ImGui::PopItemWidth();
+
+        if (ImGui::GetWindowHeight() > io.DisplaySize.y / 3)
+        {
+            ImGui::SetWindowSize({io.DisplaySize.x - 120, io.DisplaySize.y / 3});
+        }
+        ImGui::SetWindowPos({io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y - ImGui::GetWindowHeight()}, ImGuiCond_Always);
+        ImGui::End();
+    }
+    else if (!hide_script_messages)
         render_messages();
     render_clickhandler();
 
@@ -3943,12 +4014,14 @@ std::string make_save_path(std::string_view script_path, std::string_view script
 
 void init_ui()
 {
-    g_SoundManager = new SoundManager(&LoadAudioFile);
+    g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
     g_state = get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
     g_save = savedata();
     g_save_addr = reinterpret_cast<uintptr_t>(g_save);
+
+    g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
 
     register_on_input(&process_keys);
     register_imgui_init(&imgui_init);

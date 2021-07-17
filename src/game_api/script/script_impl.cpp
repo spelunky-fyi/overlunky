@@ -6,8 +6,8 @@
 
 #include <sol/sol.hpp>
 
-ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, bool enable)
-    : LuaBackend(sound_mgr)
+ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, LuaConsole* con, bool enable)
+    : LuaBackend(sound_mgr, con)
 {
 #ifdef SPEL2_EDITABLE_SCRIPTS
     strcpy(code, script.c_str());
@@ -145,6 +145,7 @@ bool ScriptImpl::pre_update()
             return false;
         }
     }
+    return true;
 }
 
 void ScriptImpl::set_enabled(bool enabled)

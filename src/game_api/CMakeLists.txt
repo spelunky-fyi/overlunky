@@ -45,12 +45,16 @@ add_library(spel2_api STATIC
         movable.hpp
         window_api.cpp
         window_api.hpp
+        console.cpp
+        console.hpp
         script.cpp
         script.hpp
         script/lua_vm.cpp
         script/lua_vm.hpp
         script/lua_backend.cpp
         script/lua_backend.hpp
+        script/lua_console.cpp
+        script/lua_console.hpp
         script/script_impl.cpp
         script/script_impl.hpp
         script/script_util.cpp

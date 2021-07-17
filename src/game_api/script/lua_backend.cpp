@@ -2,7 +2,7 @@
 
 #include "file_api.hpp"
 #include "level_api.hpp"
-#include "lua_libs/lua_libs.hpp"
+#include "lua_console.hpp"
 #include "lua_vm.hpp"
 #include "overloaded.hpp"
 #include "particles.hpp"
@@ -17,11 +17,14 @@
 #include "usertypes/level_lua.hpp"
 #include "usertypes/save_context.hpp"
 
+#include "lua_libs/lua_libs.hpp"
+
 #include <sol/sol.hpp>
 
-LuaBackend::LuaBackend(SoundManager* sound_mgr)
+LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
 {
     sound_manager = sound_mgr;
+    console = con;
 
     g_state = get_state_ptr();
     g_items = list_entities();
@@ -99,11 +102,16 @@ void LuaBackend::clear_all_callbacks()
             ent->unhook(id);
         }
     }
+    for (auto& console_command : console_commands)
+    {
+        console->unregister_command(get_name(), console_command);
+    }
     entity_hooks.clear();
     clear_entity_hooks.clear();
     entity_dtor_hooks.clear();
     options.clear();
     required_scripts.clear();
+    console_commands.clear();
     lua["on_guiframe"] = sol::lua_nil;
     lua["on_frame"] = sol::lua_nil;
     lua["on_camp"] = sol::lua_nil;
@@ -642,60 +650,4 @@ void LuaBackend::pre_entity_destroyed(Entity* entity)
     auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
                                           { return dtor_hook.first == entity->uid; });
     assert(num_erased_dtors == 1);
-}
-
-std::string LuaBackend::dump_api()
-{
-    std::set<std::string> excluded_keys{"meta"};
-
-    sol::state dummy_state;
-    dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
-
-    for (auto& [key, value] : lua["_G"].get<sol::table>())
-    {
-        std::string key_str = key.as<std::string>();
-        if (key_str.starts_with("sol."))
-        {
-            excluded_keys.insert(std::move(key_str));
-        }
-    }
-
-    for (auto& [key, value] : dummy_state["_G"].get<sol::table>())
-    {
-        std::string key_str = key.as<std::string>();
-        excluded_keys.insert(std::move(key_str));
-    }
-
-    require_serpent_lua(dummy_state);
-    sol::table opts = dummy_state.create_table();
-    opts["comment"] = false;
-    sol::function serpent = dummy_state["serpent"]["block"];
-
-    std::map<std::string, std::string> sorted_output;
-    for (auto& [key, value] : lua["_G"].get<sol::table>())
-    {
-        std::string key_str = key.as<std::string>();
-        if (!excluded_keys.contains(key_str))
-        {
-            std::string value_str = serpent(value, opts).get<std::string>();
-            if (value_str.starts_with("\"function"))
-            {
-                value_str = "function(...) end";
-            }
-            else if (value_str.starts_with("\"userdata"))
-            {
-                value_str = {};
-            }
-            sorted_output[std::move(key_str)] = std::move(value_str);
-        }
-    }
-
-    std::string api;
-    for (auto& [key, value] : sorted_output)
-        api += fmt::format("{} = {}\n", key, value);
-
-    const static std::regex reg(R"("function:\s[0-9A-F]+")");
-    api = std::regex_replace(api, reg, R"("function:")");
-
-    return api;
 }

@@ -1,11 +1,13 @@
 #include "script.hpp"
 
+#include "console.hpp"
+
 #include "script/script_impl.hpp"
 
 std::vector<SpelunkyScript*> g_all_scripts;
 
-SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, bool enable)
-    : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, enable)}
+SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, class SpelunkyConsole* console, bool enable)
+    : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, console ? console->get_impl() : nullptr, enable)}
 {
     g_all_scripts.push_back(this);
 }
@@ -143,11 +145,6 @@ Entity* SpelunkyScript::pre_entity_spawn(std::uint32_t entity_type, float x, flo
 void SpelunkyScript::post_entity_spawn(Entity* entity, int spawn_type_flags)
 {
     m_Impl->post_entity_spawn(entity, spawn_type_flags);
-}
-
-std::string SpelunkyScript::dump_api()
-{
-    return m_Impl->dump_api();
 }
 
 void SpelunkyScript::for_each_script(std::function<bool(SpelunkyScript&)> fun)

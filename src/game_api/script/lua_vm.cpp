@@ -1,8 +1,12 @@
 #include "lua_vm.hpp"
 
-#include "lua_backend.hpp"
-#include "lua_libs/lua_libs.hpp"
+#include "entity.hpp"
+#include "rpc.hpp"
+#include "spawn_api.hpp"
+#include "state.hpp"
 
+#include "lua_backend.hpp"
+#include "lua_console.hpp"
 #include "script_util.hpp"
 
 #include "usertypes/char_state_lua.hpp"
@@ -27,10 +31,7 @@
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
 
-#include "entity.hpp"
-#include "rpc.hpp"
-#include "spawn_api.hpp"
-#include "state.hpp"
+#include "lua_libs/lua_libs.hpp"
 
 void load_libraries(LuaBackend* backend)
 {
@@ -150,6 +151,17 @@ void populate_lua_state(LuaBackend* backend)
     /// Same as `prinspect`
     lua["messpect"] = [&lua](sol::variadic_args objects) -> void
     { lua["prinspect"](objects); };
+
+    /// Adds a comm
+    lua["clear_callback"] = [backend](std::string name, sol::function cmd)
+    {
+        if (backend->console)
+        {
+            backend->console_commands.insert(name);
+            backend->console->register_command(backend->get_name(), std::move(name), std::move(cmd));
+        }
+    };
+
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [backend](sol::function cb, int frames) -> CallbackId
