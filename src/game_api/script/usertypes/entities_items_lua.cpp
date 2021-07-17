@@ -312,10 +312,14 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Spark::rotation_center_y,
         "angle",
         &Spark::angle,
+        "size",
+        &Spark::size,
         "size_multiply",
         &Spark::size_multiply,
         "next_size",
         &Spark::next_size,
+        "size_change_timer",
+        &Spark::size_change_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Flame>());
 

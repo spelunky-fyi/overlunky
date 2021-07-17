@@ -251,10 +251,10 @@ class Spark : public Flame
     float rotation_center_x;
     float rotation_center_y;
     float angle;
-    float particle_size; /* unsure */ // slowly goes down to default 1.0, is 0.0 when not on screen
-    float size_multiply;              // 0.0 when not on screen
-    float next_size;                  // width and height will be set to this value * size_multiply next frame
-    uint8_t state;                    /* unsure */
+    float size;                // slowly goes down to default 1.0, is 0.0 when not on screen
+    float size_multiply;       // 0.0 when not on screen
+    float next_size;           // width and height will be set to this value * size_multiply next frame
+    uint8_t size_change_timer; // very short timer before next size change, giving a pulsing effect
 };
 
 class TiamatShot : public LightEmitter
