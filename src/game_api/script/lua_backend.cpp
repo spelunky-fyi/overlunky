@@ -44,8 +44,8 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;
 
-    populate_lua_state(this);
     load_libraries(this);
+    populate_lua_state(this);
 }
 
 void LuaBackend::clear()

@@ -45,6 +45,8 @@ bool g_ConsoleEnabled{false};
 bool g_FocusConsole{false};
 char g_ConsoleInput[2048]{};
 std::vector<std::string> g_ConsoleResults;
+std::optional<std::size_t> g_ConsoleHistoryPos;
+std::vector<std::string> g_ConsoleHistory;
 
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -3729,7 +3731,35 @@ void imgui_draw()
         }
 
         auto input_callback = [](ImGuiInputTextCallbackData* data)
-        { return 0; };
+        {
+            if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
+            {
+                const std::optional<size_t> prev_history_pos = g_ConsoleHistoryPos;
+                if (!g_ConsoleHistoryPos.has_value())
+                {
+                    if (!g_ConsoleHistory.empty())
+                    {
+                        g_ConsoleHistoryPos = g_ConsoleHistory.size() - 1;
+                    }
+                }
+                else if (data->EventKey == ImGuiKey_UpArrow && g_ConsoleHistoryPos.value() > 0)
+                {
+                    g_ConsoleHistoryPos.value()--;
+                }
+                else if (data->EventKey == ImGuiKey_DownArrow && g_ConsoleHistoryPos.value() < g_ConsoleHistory.size() - 1)
+                {
+                    g_ConsoleHistoryPos.value()++;
+                }
+
+                if (prev_history_pos != g_ConsoleHistoryPos)
+                {
+                    data->DeleteChars(0, data->BufTextLen);
+                    data->InsertChars(0, g_ConsoleHistory[g_ConsoleHistoryPos.value()].c_str());
+                }
+            }
+
+            return 0;
+        };
 
         ImGui::PushItemWidth(ImGui::GetWindowWidth());
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
@@ -3742,6 +3772,8 @@ void imgui_draw()
             }
 
             g_FocusConsole = true;
+            g_ConsoleHistoryPos = std::nullopt;
+            g_ConsoleHistory.push_back(g_ConsoleInput);
             std::memset(g_ConsoleInput, 0, IM_ARRAYSIZE(g_ConsoleInput));
         }
         ImGui::PopItemWidth();
