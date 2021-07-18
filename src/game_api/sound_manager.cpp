@@ -458,7 +458,7 @@ CustomSound SoundManager::get_sound(std::string path)
 
     FMOD::CREATESOUNDEXINFO create_sound_exinfo{};
     create_sound_exinfo.cbsize = sizeof(create_sound_exinfo);
-    create_sound_exinfo.length = (std::uint32_t)new_sound.buffer.data_size;
+    create_sound_exinfo.length = (std::uint32_t)new_sound.buffer.data_size - 32;
     create_sound_exinfo.numchannels = new_sound.buffer.num_channels;
     create_sound_exinfo.defaultfrequency = new_sound.buffer.frequency;
     create_sound_exinfo.format = [path](SoundFormat format)
