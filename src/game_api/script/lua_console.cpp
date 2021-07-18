@@ -17,20 +17,54 @@ bool LuaConsole::pre_draw()
     if (enabled)
     {
         auto& io = ImGui::GetIO();
-        ImGui::SetNextWindowSize({ io.DisplaySize.x - 120, -1 });
+        auto& style = ImGui::GetStyle();
+
+        const float window_height = io.DisplaySize.y - style.ItemSpacing.y * 2.0f;
+        ImGui::SetNextWindowSize({ io.DisplaySize.x, window_height });
         ImGui::Begin(
             "Console Overlay",
             NULL,
-            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoCollapse |ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
-        for (const auto& result : results)
+        const float footer_height_to_reserve = style.ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+        ImGui::BeginChild("Results Region", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
+
+        for (size_t i = 0; i < history.size(); i++)
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, result.color);
-            ImGui::TextUnformatted(result.message.c_str());
-            ImGui::PopStyleColor();
+            auto& item = history[i];
+
+            {
+                ImVec4 color{ 0.7f,0.7f,0.7f,1.0f };
+                if (history_pos == i)
+                {
+                    color = ImVec4{ 0.4f,0.8f,0.4f,1.0f };
+                }
+
+                ImGui::TextUnformatted("> ");
+                ImGui::SameLine();
+                ImGui::PushStyleColor(ImGuiCol_Text, color);
+                ImGui::TextUnformatted(item.command.c_str());
+                ImGui::PopStyleColor();
+            }
+
+            for (const auto& result : item.messages)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Text, result.color);
+                ImGui::TextUnformatted(result.message.c_str());
+                ImGui::PopStyleColor();
+            }
         }
+
+        if (set_scroll)
+        {
+            ImGui::SetScrollHereY(set_scroll.value());
+            set_scroll = std::nullopt;
+        }
+
+        ImGui::PopStyleVar();
+        ImGui::EndChild();
 
         if (set_focus)
         {
@@ -63,7 +97,7 @@ bool LuaConsole::pre_draw()
                 if (prev_history_pos != self->history_pos)
                 {
                     data->DeleteChars(0, data->BufTextLen);
-                    data->InsertChars(0, self->history[self->history_pos.value()].c_str());
+                    data->InsertChars(0, self->history[self->history_pos.value()].command.c_str());
                 }
             }
 
@@ -78,7 +112,8 @@ bool LuaConsole::pre_draw()
             {
                 std::string result = execute(console_input);
 
-                std::move(messages.begin(), messages.end(), std::back_inserter(results));
+                std::vector<ScriptMessage> result_message;
+                std::move(messages.begin(), messages.end(), std::back_inserter(result_message));
                 messages.clear();
 
                 if (!result.empty())
@@ -88,27 +123,27 @@ bool LuaConsole::pre_draw()
                     {
                         color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
                     }
-                    results.push_back({
+                    result_message.push_back({
                         std::move(result),
                         {},
                         color
-                        });
+                    });
                 }
 
                 history_pos = std::nullopt;
-                history.push_back(console_input);
+                history.push_back(ConsoleHistoryItem{
+                    console_input,
+                    std::move(result_message)
+                });
                 std::memset(console_input, 0, IM_ARRAYSIZE(console_input));
+
+                set_scroll = 1.0f;
             }
             set_focus = true;
         }
         ImGui::PopItemWidth();
 
-        const float max_height = io.DisplaySize.y / 2;
-        if (ImGui::GetWindowHeight() > max_height)
-        {
-            ImGui::SetWindowSize({ io.DisplaySize.x - 120, max_height }, ImGuiCond_Always);
-        }
-        ImGui::SetWindowPos({ io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y - ImGui::GetWindowHeight() }, ImGuiCond_Always);
+        ImGui::SetWindowPos({ io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y / 2 - window_height / 2 }, ImGuiCond_Always);
         ImGui::End();
     }
 
@@ -199,6 +234,7 @@ void LuaConsole::toggle()
 {
     enabled = !enabled;
     set_focus = enabled;
+    set_scroll = 1.0f;
 }
 
 std::string LuaConsole::dump_api()

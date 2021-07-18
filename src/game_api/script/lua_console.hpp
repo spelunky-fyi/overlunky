@@ -4,6 +4,11 @@
 
 #include <optional>
 
+struct ConsoleHistoryItem {
+    std::string command;
+    std::vector<ScriptMessage> messages;
+};
+
 class LuaConsole : public LuaBackend
 {
 public:
@@ -16,10 +21,10 @@ public:
 
     bool enabled{ false };
     bool set_focus{ false };
+    std::optional<float> set_scroll;
     char console_input[2048]{};
-    std::vector<ScriptMessage> results;
     std::optional<std::size_t> history_pos;
-    std::vector<std::string> history;
+    std::vector<ConsoleHistoryItem> history;
 
     using LuaBackend::reset;
     using LuaBackend::pre_update;
