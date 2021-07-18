@@ -34,9 +34,11 @@ class Bomb : public Movable
 {
   public:
     size_t unknown1;
-    float scale_hor; // 1.25 = default regular bomb ; 1.875 = default giant bomb ; > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
+    /// 1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
+    float scale_hor;
     float scale_ver;
-    bool unknown2;
+    /// is bomb from powerpack
+    bool is_big_bomb;
 };
 
 class Cape : public Movable
@@ -72,8 +74,10 @@ class Gun : public Movable
 {
   public:
     uint8_t cooldown;
-    uint8_t shots;  // used only for webgun
-    uint8_t shots2; // used only for clonegun
+    /// used only for webgun
+    uint8_t shots;
+    /// used only for clonegun
+    uint8_t shots2;
     uint8_t b12b;
 };
 
@@ -127,14 +131,16 @@ class Flame : public Movable
 class FlameSize : public Flame
 {
   public:
-    float flame_size; // if changed, gradually goes down (0.03 per frame) to the default size
+    /// if changed, gradually goes down |0.03 per frame| to the default size
+    float flame_size;
 };
 
 class ClimbableRope : public Movable
 {
   public:
     uint32_t segment_nr_inverse;
-    int32_t burn_timer; // entity is killed after 20
+    /// entity is killed after 20
+    int32_t burn_timer;
     Entity* above_part;
     Entity* below_part;
     uint32_t segment_nr;
@@ -145,8 +151,10 @@ class ClimbableRope : public Movable
 class Idol : public Movable
 {
   public:
-    bool trap_triggered; // if you set it to true for the ice caves or volcano idol, the trap won't trigger
-    int8_t touch;        // changes to 0 when first picked up by player and back to -1 if HH picks it up
+    /// if you set it to true for the ice caves or volcano idol, the trap won't trigger
+    bool trap_triggered;
+    /// changes to 0 when first picked up by player and back to -1 if HH picks it up
+    int8_t touch;
     uint16_t unused;
     float spawn_x;
     float spawn_y;
@@ -177,7 +185,8 @@ class WebShot : public Movable
   public:
     UnknownPointerGroup unknown1;
     float unknown2;
-    bool shot; // if false, it's attached to the gun
+    /// if false, it's attached to the gun
+    bool shot;
 };
 
 class HangStrand : public Movable
@@ -226,8 +235,9 @@ class ScepterShot : public LightEmitter
   public:
     SoundPosition* sound_pos;
     float speed;
-    uint16_t idle_timer; // short timer before it goes after target
-    int16_t unknown;     // setting it low or high can make it last forever, won't matter if you change it back afterwards, anubis is 300 and player 400 by default
+    /// short timer before it goes after target
+    uint16_t idle_timer;
+    int16_t unknown; // setting it low or high can make it last forever, won't matter if you change it back afterwards, anubis is 300 and player 400 by default
 };
 
 class SpecialShot : public LightEmitter
@@ -247,14 +257,18 @@ class Spark : public Flame
 {
   public:
     ParticleEmitterInfo* particle;
-    Entity* fx;
+    Entity* fx_entity;
     float rotation_center_x;
     float rotation_center_y;
     float angle;
-    float particle_size; /* unsure */ // slowly goes down to default 1.0, is 0.0 when not on screen
-    float size_multiply;              // 0.0 when not on screen
-    float next_size;                  // width and height will be set to this value * size_multiply next frame
-    uint8_t state;                    /* unsure */
+    /// slowly goes down to default 1.0, is 0.0 when not on screen
+    float size;
+    /// 0.0 when not on screen
+    float size_multiply;
+    /// width and height will be set to this value * size_multiply next frame
+    float next_size;
+    /// very short timer before next size change, giving a pulsing effect
+    uint8_t size_change_timer;
 };
 
 class TiamatShot : public LightEmitter
@@ -273,7 +287,8 @@ class Leaf : public Movable
 {
   public:
     int64_t unknown1;
-    float fade_away_counter; // counts to 100.0 then the leaf fades away
+    /// counts to 100.0 then the leaf fades away
+    float fade_away_counter;
     int32_t swing_direction;
     bool fade_away_trigger; // if set true, it will fade away after a while
 };
@@ -309,14 +324,16 @@ class Chest : public Movable
 {
   public:
     bool leprechaun;
-    bool bomb; // size of the bomb is random, if set both true only leprechaun spawns
+    /// size of the bomb is random, if set both true only leprechaun spawns
+    bool bomb;
 };
 
 class Treasure : public Movable
 {
   public:
     uint32_t state; /* unsure */
-    bool cashed;    // spawns a dust effect
+    /// spawns a dust effect and adds money for the total
+    bool cashed;
     int8_t unknown1;
     int16_t unknown2;
 };
@@ -357,7 +374,7 @@ class Telescope : public Movable
     Entity* fx_button;
     Entity* camera_anchor;
     int32_t looked_through_by_uid;
-    float unknown;
+    float unknown; // seams to be distance between camera_anchor and telescope, but it's off by a little
 };
 
 class Torch : public Movable
@@ -372,7 +389,8 @@ class Torch : public Movable
 class WallTorch : public Torch
 {
   public:
-    bool no_reward; /* unsure */ // if false, it will drop gold when lit up
+    /// if false, it will drop gold when light up
+    bool dropped_gold;
 };
 
 class TorchFlame : public Flame
@@ -458,7 +476,8 @@ class OlmecCannon : public Movable
 class Landmine : public LightEmitter
 {
   public:
-    int32_t timer; // explodes at 57, if you set it to 58 will count to overflow
+    /// explodes at 57, if you set it to 58 will count to overflow
+    int32_t timer;
 };
 
 class Honey : public Movable
@@ -533,7 +552,8 @@ class SkullDropTrap : public Movable
     uint8_t left_skull_drop_time;
     uint8_t middle_skull_drop_time;
     uint8_t right_skull_drop_time;
-    uint8_t timer; // counts from 60 3 times, the last time dropping the skulls, then random longer timer for reset
+    /// counts from 60 3 times, the last time dropping the skulls, then random longer timer for reset
+    uint8_t timer;
 };
 
 class FrozenLiquid : public Movable
@@ -645,13 +665,15 @@ class PlayerBag : public Movable
 class ParachutePowerup : public Movable
 {
   public:
-    uint8_t falltime_deploy; // this gets compared with users falling_timer
+    /// this gets compared with entity's falling_timer
+    uint8_t falltime_deploy;
     uint8_t unknown1;
     uint16_t unknown2;
     uint16_t unknown3;
-    bool deploy;       // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
-    bool deploy2;      /* unsure */
-    bool after_deploy; // if set to true before deploying, parachute will drop imminently after deploy
+    bool deployed;                  // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
+    bool deployed2;                 /* unsure */
+    bool after_deploy; /* unsure */ // if set to true before deploying, parachute will drop imminently after deploy, not sure if it's even a bool
+    void deploy();
 };
 
 class TrueCrownPowerup : public Movable
