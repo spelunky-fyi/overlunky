@@ -423,6 +423,11 @@ void LuaBackend::draw(ImDrawList* dl)
     {
         std::lock_guard gil_guard{gil};
 
+        if (!pre_draw())
+        {
+            return;
+        }
+
         /// Runs on every screen frame. You need this to use draw functions.
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 

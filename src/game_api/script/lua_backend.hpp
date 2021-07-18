@@ -223,6 +223,10 @@ class LuaBackend
     void clear_all_callbacks();
 
     virtual bool reset();
+    virtual bool pre_draw()
+    {
+        return true;
+    }
     virtual bool pre_update()
     {
         return true;

@@ -38,15 +38,12 @@
 
 #include "decode_audio_file.hpp"
 
+template<class T>
+concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
+
 std::unique_ptr<SoundManager> g_SoundManager;
 
 std::unique_ptr<SpelunkyConsole> g_Console;
-bool g_ConsoleEnabled{false};
-bool g_FocusConsole{false};
-char g_ConsoleInput[2048]{};
-std::vector<std::string> g_ConsoleResults;
-std::optional<std::size_t> g_ConsoleHistoryPos;
-std::vector<std::string> g_ConsoleHistory;
 
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -1375,8 +1372,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("console", wParam))
     {
-        g_ConsoleEnabled = !g_ConsoleEnabled;
-        g_FocusConsole = g_ConsoleEnabled;
+        g_Console->toggle();
     }
     else
     {
@@ -2051,7 +2047,7 @@ void render_hitbox(Movable* ent, bool cross, ImColor color)
     draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 }
 
-void fix_script_requires(SpelunkyScript* script)
+void fix_script_requires(Script auto* script)
 {
     if (!script->is_enabled())
         return;
@@ -2069,14 +2065,14 @@ void fix_script_requires(SpelunkyScript* script)
     }
 }
 
-void update_script(SpelunkyScript* script)
+void update_script(Script auto* script)
 {
     if (!script->is_enabled())
         return;
     script->run();
 }
 
-void render_script(SpelunkyScript* script, ImDrawList* draw_list)
+void render_script(Script auto* script, ImDrawList* draw_list)
 {
     if (!script->is_enabled())
         return;
@@ -2233,12 +2229,18 @@ void render_clickhandler()
     {
         fix_script_requires(script.get());
     }
+    fix_script_requires(g_Console.get());
     auto* draw_list = ImGui::GetBackgroundDrawList();
     for (auto& [name, script] : g_scripts)
     {
         update_script(script.get());
+    }
+    update_script(g_Console.get());
+    for (auto& [name, script] : g_scripts)
+    {
         render_script(script.get(), draw_list);
     }
+    render_script(g_Console.get(), draw_list);
     if (g_state->screen == 29)
     {
         ImDrawList* dl = ImGui::GetBackgroundDrawList();
@@ -3698,94 +3700,7 @@ void imgui_draw()
     ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
     ImGui::End();
 
-    if (g_ConsoleEnabled)
-    {
-        auto& io = ImGui::GetIO();
-        ImGui::SetNextWindowSize({io.DisplaySize.x - 120, -1});
-        ImGui::Begin(
-            "Console Overlay",
-            NULL,
-            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-                ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-                ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-
-        for (const auto& result : g_ConsoleResults)
-        {
-            std::optional<ImVec4> color;
-            if (result.starts_with("sol:"))
-            {
-                color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
-            }
-
-            if (color)
-                ImGui::PushStyleColor(ImGuiCol_Text, color.value());
-            ImGui::TextUnformatted(result.c_str());
-            if (color)
-                ImGui::PopStyleColor();
-        }
-
-        if (g_FocusConsole)
-        {
-            ImGui::SetKeyboardFocusHere();
-            g_FocusConsole = false;
-        }
-
-        auto input_callback = [](ImGuiInputTextCallbackData* data)
-        {
-            if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
-            {
-                const std::optional<size_t> prev_history_pos = g_ConsoleHistoryPos;
-                if (!g_ConsoleHistoryPos.has_value())
-                {
-                    if (!g_ConsoleHistory.empty())
-                    {
-                        g_ConsoleHistoryPos = g_ConsoleHistory.size() - 1;
-                    }
-                }
-                else if (data->EventKey == ImGuiKey_UpArrow && g_ConsoleHistoryPos.value() > 0)
-                {
-                    g_ConsoleHistoryPos.value()--;
-                }
-                else if (data->EventKey == ImGuiKey_DownArrow && g_ConsoleHistoryPos.value() < g_ConsoleHistory.size() - 1)
-                {
-                    g_ConsoleHistoryPos.value()++;
-                }
-
-                if (prev_history_pos != g_ConsoleHistoryPos)
-                {
-                    data->DeleteChars(0, data->BufTextLen);
-                    data->InsertChars(0, g_ConsoleHistory[g_ConsoleHistoryPos.value()].c_str());
-                }
-            }
-
-            return 0;
-        };
-
-        ImGui::PushItemWidth(ImGui::GetWindowWidth());
-        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-        if (ImGui::InputText("", g_ConsoleInput, IM_ARRAYSIZE(g_ConsoleInput), input_text_flags, input_callback))
-        {
-            std::string result = g_Console->execute(g_ConsoleInput);
-            if (!result.empty())
-            {
-                g_ConsoleResults.push_back(std::move(result));
-            }
-
-            g_FocusConsole = true;
-            g_ConsoleHistoryPos = std::nullopt;
-            g_ConsoleHistory.push_back(g_ConsoleInput);
-            std::memset(g_ConsoleInput, 0, IM_ARRAYSIZE(g_ConsoleInput));
-        }
-        ImGui::PopItemWidth();
-
-        if (ImGui::GetWindowHeight() > io.DisplaySize.y / 3)
-        {
-            ImGui::SetWindowSize({io.DisplaySize.x - 120, io.DisplaySize.y / 3});
-        }
-        ImGui::SetWindowPos({io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y - ImGui::GetWindowHeight()}, ImGuiCond_Always);
-        ImGui::End();
-    }
-    else if (!hide_script_messages)
+    if (!hide_script_messages)
         render_messages();
     render_clickhandler();
 

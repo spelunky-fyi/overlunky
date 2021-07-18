@@ -8,13 +8,15 @@ SpelunkyConsole::SpelunkyConsole(SoundManager* sound_manager)
 }
 SpelunkyConsole::~SpelunkyConsole() = default;
 
-std::deque<ScriptMessage>& SpelunkyConsole::get_messages()
-{
-    return m_Impl->messages;
-}
 std::vector<std::string> SpelunkyConsole::consume_requires()
 {
     return std::move(m_Impl->required_scripts);
+}
+
+bool SpelunkyConsole::is_enabled()
+{
+    // Note: Does not mean the console is showing, only that it should get updated
+    return true;
 }
 
 bool SpelunkyConsole::run()
@@ -33,6 +35,11 @@ void SpelunkyConsole::render_options()
 std::string SpelunkyConsole::execute(std::string code)
 {
     return m_Impl->execute(std::move(code));
+}
+
+void SpelunkyConsole::toggle()
+{
+    m_Impl->toggle();
 }
 
 std::string SpelunkyConsole::dump_api()

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "script.hpp"
+#include <string>
+#include <memory>
+#include <vector>
 
 class SpelunkyConsole
 {
@@ -8,12 +10,15 @@ class SpelunkyConsole
     SpelunkyConsole(class SoundManager* sound_manager);
     ~SpelunkyConsole();
 
-    std::deque<ScriptMessage>& get_messages();
     std::vector<std::string> consume_requires();
 
+    bool is_enabled();
+
     bool run();
-    void draw(ImDrawList* dl);
+    void draw(struct ImDrawList* dl);
     void render_options();
+    
+    void toggle();
 
     std::string execute(std::string code);
 

@@ -12,6 +12,109 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
     require_serpent_lua(lua);
 }
 
+bool LuaConsole::pre_draw()
+{
+    if (enabled)
+    {
+        auto& io = ImGui::GetIO();
+        ImGui::SetNextWindowSize({ io.DisplaySize.x - 120, -1 });
+        ImGui::Begin(
+            "Console Overlay",
+            NULL,
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+
+        for (const auto& result : results)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, result.color);
+            ImGui::TextUnformatted(result.message.c_str());
+            ImGui::PopStyleColor();
+        }
+
+        if (set_focus)
+        {
+            ImGui::SetKeyboardFocusHere();
+            set_focus = false;
+        }
+
+        auto input_callback = [](ImGuiInputTextCallbackData* data)
+        {
+            LuaConsole* self = static_cast<LuaConsole*>(data->UserData);
+            if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
+            {
+                const std::optional<size_t> prev_history_pos = self->history_pos;
+                if (!self->history_pos.has_value())
+                {
+                    if (!self->history.empty())
+                    {
+                        self->history_pos = self->history.size() - 1;
+                    }
+                }
+                else if (data->EventKey == ImGuiKey_UpArrow && self->history_pos.value() > 0)
+                {
+                    self->history_pos.value()--;
+                }
+                else if (data->EventKey == ImGuiKey_DownArrow && self->history_pos.value() < self->history.size() - 1)
+                {
+                    self->history_pos.value()++;
+                }
+
+                if (prev_history_pos != self->history_pos)
+                {
+                    data->DeleteChars(0, data->BufTextLen);
+                    data->InsertChars(0, self->history[self->history_pos.value()].c_str());
+                }
+            }
+
+            return 0;
+        };
+
+        ImGui::PushItemWidth(ImGui::GetWindowWidth());
+        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
+        if (ImGui::InputText("", console_input, IM_ARRAYSIZE(console_input), input_text_flags, input_callback, this))
+        {
+            if (console_input[0] != '\0')
+            {
+                std::string result = execute(console_input);
+
+                std::move(messages.begin(), messages.end(), std::back_inserter(results));
+                messages.clear();
+
+                if (!result.empty())
+                {
+                    ImVec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
+                    if (result.starts_with("sol:"))
+                    {
+                        color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+                    }
+                    results.push_back({
+                        std::move(result),
+                        {},
+                        color
+                        });
+                }
+
+                history_pos = std::nullopt;
+                history.push_back(console_input);
+                std::memset(console_input, 0, IM_ARRAYSIZE(console_input));
+            }
+            set_focus = true;
+        }
+        ImGui::PopItemWidth();
+
+        const float max_height = io.DisplaySize.y / 2;
+        if (ImGui::GetWindowHeight() > max_height)
+        {
+            ImGui::SetWindowSize({ io.DisplaySize.x - 120, max_height }, ImGuiCond_Always);
+        }
+        ImGui::SetWindowPos({ io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y - ImGui::GetWindowHeight() }, ImGuiCond_Always);
+        ImGui::End();
+    }
+
+    return true;
+}
+
 void LuaConsole::set_enabled(bool enabled)
 {}
 bool LuaConsole::get_enabled() const
@@ -90,6 +193,12 @@ std::string LuaConsole::execute_raw(std::string code)
         sol::function serpent = lua["serpent"]["block"];
         return serpent(ret);
     }
+}
+
+void LuaConsole::toggle()
+{
+    enabled = !enabled;
+    set_focus = enabled;
 }
 
 std::string LuaConsole::dump_api()

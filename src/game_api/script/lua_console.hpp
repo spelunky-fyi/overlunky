@@ -2,6 +2,8 @@
 
 #include "lua_backend.hpp"
 
+#include <optional>
+
 class LuaConsole : public LuaBackend
 {
 public:
@@ -12,8 +14,16 @@ public:
 
     std::unordered_map<std::string, std::string> console_commands;
 
+    bool enabled{ false };
+    bool set_focus{ false };
+    char console_input[2048]{};
+    std::vector<ScriptMessage> results;
+    std::optional<std::size_t> history_pos;
+    std::vector<std::string> history;
+
     using LuaBackend::reset;
     using LuaBackend::pre_update;
+    virtual bool pre_draw() override;
 
     virtual void set_enabled(bool enabled) override;
     virtual bool get_enabled() const override;
@@ -29,6 +39,8 @@ public:
 
     std::string execute(std::string code);
     std::string execute_raw(std::string code);
+
+    void toggle();
 
     std::string dump_api();
 };
