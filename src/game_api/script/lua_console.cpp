@@ -35,12 +35,6 @@ bool LuaConsole::pre_draw()
         {
             auto& item = history[i];
 
-            if (i == set_scroll_to_history_item)
-            {
-                ImGui::SetScrollHereY(0.0f);
-                set_scroll_to_history_item = std::nullopt;
-            }
-
             {
                 ImVec4 color{ 0.7f,0.7f,0.7f,1.0f };
                 if (history_pos == i)
@@ -53,6 +47,12 @@ bool LuaConsole::pre_draw()
                 ImGui::PushStyleColor(ImGuiCol_Text, color);
                 ImGui::TextUnformatted(item.command.c_str());
                 ImGui::PopStyleColor();
+            }
+
+            if (i == set_scroll_to_history_item)
+            {
+                ImGui::SetScrollHereY(0.0f);
+                set_scroll_to_history_item = std::nullopt;
             }
 
             for (const auto& result : item.messages)
@@ -117,37 +117,45 @@ bool LuaConsole::pre_draw()
         {
             if (console_input[0] != '\0')
             {
-                std::string result = execute(console_input);
-
-                std::vector<ScriptMessage> result_message;
-                std::move(messages.begin(), messages.end(), std::back_inserter(result_message));
-                messages.clear();
-
-                if (!result.empty())
+                using namespace std::string_view_literals;
+                if (console_input == "cls"sv || console_input == "clr"sv || console_input == "clear"sv)
                 {
-                    ImVec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
-                    if (result.starts_with("sol:"))
-                    {
-                        color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
-                    }
-                    result_message.push_back({
-                        std::move(result),
-                        {},
-                        color
-                    });
+                    history_pos = std::nullopt;
+                    history.clear();
                 }
-
-                history_pos = std::nullopt;
-                history.push_back(ConsoleHistoryItem{
-                    console_input,
-                    std::move(result_message)
-                });
-                if (history.size() > max_history)
+                else
                 {
-                    history.erase(history.begin());
+                    std::string result = execute(console_input);
+
+                    std::vector<ScriptMessage> result_message;
+                    std::move(messages.begin(), messages.end(), std::back_inserter(result_message));
+                    messages.clear();
+
+                    if (!result.empty())
+                    {
+                        ImVec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
+                        if (result.starts_with("sol:"))
+                        {
+                            color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+                        }
+                        result_message.push_back({
+                            std::move(result),
+                            {},
+                            color
+                            });
+                    }
+
+                    history_pos = std::nullopt;
+                    history.push_back(ConsoleHistoryItem{
+                        console_input,
+                        std::move(result_message)
+                        });
+                    if (history.size() > max_history)
+                    {
+                        history.erase(history.begin());
+                    }
                 }
                 std::memset(console_input, 0, IM_ARRAYSIZE(console_input));
-
                 scroll_to_bottom = true;
             }
             set_focus = true;
