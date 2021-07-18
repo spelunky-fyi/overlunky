@@ -21,8 +21,11 @@ public:
 
     bool enabled{ false };
     bool set_focus{ false };
-    std::optional<float> set_scroll;
+    bool scroll_to_bottom{ false };
+    std::optional<size_t> set_scroll_to_history_item;
     char console_input[2048]{};
+
+    size_t max_history{ 30 };
     std::optional<std::size_t> history_pos;
     std::vector<ConsoleHistoryItem> history;
 

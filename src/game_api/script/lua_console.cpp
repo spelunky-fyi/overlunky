@@ -35,6 +35,12 @@ bool LuaConsole::pre_draw()
         {
             auto& item = history[i];
 
+            if (i == set_scroll_to_history_item)
+            {
+                ImGui::SetScrollHereY(0.0f);
+                set_scroll_to_history_item = std::nullopt;
+            }
+
             {
                 ImVec4 color{ 0.7f,0.7f,0.7f,1.0f };
                 if (history_pos == i)
@@ -57,10 +63,10 @@ bool LuaConsole::pre_draw()
             }
         }
 
-        if (set_scroll)
+        if (scroll_to_bottom)
         {
-            ImGui::SetScrollHereY(set_scroll.value());
-            set_scroll = std::nullopt;
+            ImGui::SetScrollHereY(1.0f);
+            scroll_to_bottom = false;
         }
 
         ImGui::PopStyleVar();
@@ -98,6 +104,7 @@ bool LuaConsole::pre_draw()
                 {
                     data->DeleteChars(0, data->BufTextLen);
                     data->InsertChars(0, self->history[self->history_pos.value()].command.c_str());
+                    self->set_scroll_to_history_item = self->history_pos.value();
                 }
             }
 
@@ -135,9 +142,13 @@ bool LuaConsole::pre_draw()
                     console_input,
                     std::move(result_message)
                 });
+                if (history.size() > max_history)
+                {
+                    history.erase(history.begin());
+                }
                 std::memset(console_input, 0, IM_ARRAYSIZE(console_input));
 
-                set_scroll = 1.0f;
+                scroll_to_bottom = true;
             }
             set_focus = true;
         }
@@ -234,7 +245,7 @@ void LuaConsole::toggle()
 {
     enabled = !enabled;
     set_focus = enabled;
-    set_scroll = 1.0f;
+    scroll_to_bottom = true;
 }
 
 std::string LuaConsole::dump_api()
