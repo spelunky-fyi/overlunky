@@ -41,43 +41,88 @@ void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
 void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 {
     std::string_view front{ data->Buf, (size_t)data->CursorPos };
-    std::string_view completion_segment{};
+    std::string_view to_complete{};
     {
         auto rit = std::find_if(front.rbegin(), front.rend(), [](auto c) {
             return !std::isalnum(c) && c != '.' && c != ':' && c != '_';
         });
 
         auto it = rit.base();
-        completion_segment = std::string_view{ it, front.end() };
+        to_complete = std::string_view{ it, front.end() };
     }
+
+    const std::vector<std::string_view> to_complete_segments = [](std::string_view str, std::string_view delims = ".:")
+    {
+        std::vector<std::string_view> output;
+        for (auto first = str.data(), second = str.data(), last = first + str.size(); second != last && first != last; first = second + 1) {
+            second = std::find_first_of(first, last, std::cbegin(delims), std::cend(delims));
+
+            if (first != second)
+            {
+                output.emplace_back(first, second - first);
+            }
+        }
+        if (std::count(std::cbegin(delims), std::cend(delims), str.back()))
+        {
+            output.push_back("");
+        }
+        return output;
+    }(to_complete);
 
     completion_options.clear();
 
-    if (completion_segment.size() >= 3)
+    if (to_complete.size() >= 3 || to_complete_segments.size() > 1)
     {
-        std::vector<std::string_view> options;
-        for (auto& [k, v] : lua)
-        {
-            if (k.get_type() == sol::type::string && k.as<std::string_view>().starts_with(completion_segment))
+        std::vector<std::string_view> options = [this](const std::vector<std::string_view>& to_complete_segments) {
+            std::vector<std::string_view> options;
+            sol::table source = lua["_G"].get<sol::table>();
+            for (size_t i = 0; i < to_complete_segments.size() - 1; i++)
             {
-                options.push_back(k.as<std::string_view>());
+                const auto& child = source[to_complete_segments[i]];
+                const auto child_type = child.get_type();
+                if (child_type == sol::type::table)
+                {
+                    source = child.get<sol::table>();
+                }
+                else if (child_type == sol::type::userdata)
+                {
+                    source = child[sol::metatable_key].get<sol::table>();
+                }
+                else
+                {
+                    return options;
+                }
             }
-        }
 
+            for (auto& [k, v] : source)
+            {
+                if (k.get_type() == sol::type::string)
+                {
+                    const std::string_view str = k.as<std::string_view>();
+                    if (str.starts_with(to_complete_segments.back()) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
+                    {
+                        options.push_back(k.as<std::string_view>());
+                    }
+                }
+            }
+            return options;
+        }(to_complete_segments);
+
+        to_complete = to_complete_segments.back();
         if (options.empty())
         {
-            completion_options = fmt::format("No matches found for tab-completion of '{}'...", completion_segment);
+            completion_options = fmt::format("No matches found for tab-completion of '{}'...", to_complete);
         }
         else if (options.size() == 1)
         {
-            data->DeleteChars((int)(completion_segment.data() - data->Buf), (int)completion_segment.size());
+            data->DeleteChars((int)(to_complete.data() - data->Buf), (int)to_complete.size());
 
             std::string_view option = options[0];
             data->InsertChars(data->CursorPos, option.data(), option.data() + option.size());
         }
         else
         {
-            size_t overlap{ 1 };
+            size_t overlap{ 0 };
             auto first = options.front();
 
             while (true)
@@ -101,7 +146,10 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
             std::string_view option_overlap = first.substr(0, overlap);
             if (!option_overlap.empty())
             {
-                data->DeleteChars((int)(completion_segment.data() - data->Buf), (int)completion_segment.size());
+                if (!to_complete.empty())
+                {
+                    data->DeleteChars((int)(to_complete.data() - data->Buf), (int)to_complete.size());
+                }
                 data->InsertChars(data->CursorPos, option_overlap.data(), option_overlap.data() + option_overlap.size());
             }
 
@@ -115,7 +163,14 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
     }
     else
     {
-        completion_options = "Need at least 3 characters for tab-completion...";
+        if (to_complete_segments.empty())
+        {
+            completion_options = fmt::format("Need at least 3 characters for tab-completion...");
+        }
+        else
+        {
+            completion_options = fmt::format("Need at least 3 characters for tab-completion, given {}...", to_complete_segments.back());
+        }
     }
 }
 
