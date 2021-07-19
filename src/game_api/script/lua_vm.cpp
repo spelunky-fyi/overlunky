@@ -152,8 +152,8 @@ void populate_lua_state(LuaBackend* backend)
     lua["messpect"] = [&lua](sol::variadic_args objects) -> void
     { lua["prinspect"](objects); };
 
-    /// Adds a comm
-    lua["clear_callback"] = [backend](std::string name, sol::function cmd)
+    /// Adds a command that can be used in the console.
+    lua["register_console_command"] = [backend](std::string name, sol::function cmd)
     {
         if (backend->console)
         {

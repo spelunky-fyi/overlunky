@@ -29,6 +29,11 @@ public:
     std::optional<std::size_t> history_pos;
     std::vector<ConsoleHistoryItem> history;
 
+    std::string completion_options;
+
+    void on_history_request(struct ImGuiInputTextCallbackData* data);
+    void on_completion(struct ImGuiInputTextCallbackData* data);
+
     using LuaBackend::reset;
     using LuaBackend::pre_update;
     virtual bool pre_draw() override;

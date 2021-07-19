@@ -12,6 +12,113 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
     require_serpent_lua(lua);
 }
 
+void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
+{
+    const std::optional<size_t> prev_history_pos = history_pos;
+    if (!history_pos.has_value())
+    {
+        if (!history.empty())
+        {
+            history_pos = history.size() - 1;
+        }
+    }
+    else if (data->EventKey == ImGuiKey_UpArrow && history_pos.value() > 0)
+    {
+        history_pos.value()--;
+    }
+    else if (data->EventKey == ImGuiKey_DownArrow && history_pos.value() < history.size() - 1)
+    {
+        history_pos.value()++;
+    }
+
+    if (prev_history_pos != history_pos)
+    {
+        data->DeleteChars(0, data->BufTextLen);
+        data->InsertChars(0, history[history_pos.value()].command.c_str());
+        set_scroll_to_history_item = history_pos.value();
+    }
+}
+void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
+{
+    std::string_view front{ data->Buf, (size_t)data->CursorPos };
+    std::string_view completion_segment{};
+    {
+        auto rit = std::find_if(front.rbegin(), front.rend(), [](auto c) {
+            return !std::isalnum(c) && c != '.' && c != ':' && c != '_';
+        });
+
+        auto it = rit.base();
+        completion_segment = std::string_view{ it, front.end() };
+    }
+
+    completion_options.clear();
+
+    if (completion_segment.size() >= 3)
+    {
+        std::vector<std::string_view> options;
+        for (auto& [k, v] : lua)
+        {
+            if (k.get_type() == sol::type::string && k.as<std::string_view>().starts_with(completion_segment))
+            {
+                options.push_back(k.as<std::string_view>());
+            }
+        }
+
+        if (options.empty())
+        {
+            completion_options = fmt::format("No matches found for tab-completion of '{}'...", completion_segment);
+        }
+        else if (options.size() == 1)
+        {
+            data->DeleteChars((int)(completion_segment.data() - data->Buf), (int)completion_segment.size());
+
+            std::string_view option = options[0];
+            data->InsertChars(data->CursorPos, option.data(), option.data() + option.size());
+        }
+        else
+        {
+            size_t overlap{ 1 };
+            auto first = options.front();
+
+            while (true)
+            {
+                bool all_match{ true };
+                for (std::string_view option : options)
+                {
+                    if (overlap >= option.size() || option[overlap] != first[overlap])
+                    {
+                        all_match = false;
+                        break;
+                    }
+                }
+                if (!all_match)
+                {
+                    break;
+                }
+                overlap++;
+            }
+
+            std::string_view option_overlap = first.substr(0, overlap);
+            if (!option_overlap.empty())
+            {
+                data->DeleteChars((int)(completion_segment.data() - data->Buf), (int)completion_segment.size());
+                data->InsertChars(data->CursorPos, option_overlap.data(), option_overlap.data() + option_overlap.size());
+            }
+
+            for (std::string_view option : options)
+            {
+                completion_options += option;
+                completion_options += "; ";
+            }
+            completion_options.pop_back();
+        }
+    }
+    else
+    {
+        completion_options = "Need at least 3 characters for tab-completion...";
+    }
+}
+
 bool LuaConsole::pre_draw()
 {
     if (enabled)
@@ -27,7 +134,8 @@ bool LuaConsole::pre_draw()
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoCollapse |ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
-        const float footer_height_to_reserve = style.ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+        const float completion_size = completion_options.empty() ? 0.0f : style.ItemSpacing.y + ImGui::CalcTextSize(completion_options.c_str(), nullptr, false, io.DisplaySize.x).y;
+        const float footer_height_to_reserve = style.ItemSpacing.y + ImGui::GetFrameHeightWithSpacing() + completion_size;
         ImGui::BeginChild("Results Region", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
@@ -72,6 +180,13 @@ bool LuaConsole::pre_draw()
         ImGui::PopStyleVar();
         ImGui::EndChild();
 
+        if (!completion_options.empty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0.7f,0.7f,0.7f,1.0f });
+            ImGui::TextWrapped(completion_options.c_str());
+            ImGui::PopStyleColor();
+        }
+
         if (set_focus)
         {
             ImGui::SetKeyboardFocusHere();
@@ -83,29 +198,11 @@ bool LuaConsole::pre_draw()
             LuaConsole* self = static_cast<LuaConsole*>(data->UserData);
             if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
             {
-                const std::optional<size_t> prev_history_pos = self->history_pos;
-                if (!self->history_pos.has_value())
-                {
-                    if (!self->history.empty())
-                    {
-                        self->history_pos = self->history.size() - 1;
-                    }
-                }
-                else if (data->EventKey == ImGuiKey_UpArrow && self->history_pos.value() > 0)
-                {
-                    self->history_pos.value()--;
-                }
-                else if (data->EventKey == ImGuiKey_DownArrow && self->history_pos.value() < self->history.size() - 1)
-                {
-                    self->history_pos.value()++;
-                }
-
-                if (prev_history_pos != self->history_pos)
-                {
-                    data->DeleteChars(0, data->BufTextLen);
-                    data->InsertChars(0, self->history[self->history_pos.value()].command.c_str());
-                    self->set_scroll_to_history_item = self->history_pos.value();
-                }
+                self->on_history_request(data);
+            }
+            else if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
+            {
+                self->on_completion(data);
             }
 
             return 0;
