@@ -38,7 +38,7 @@
 
 #include "decode_audio_file.hpp"
 
-template<class T>
+template <class T>
 concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
 
 std::unique_ptr<SoundManager> g_SoundManager;

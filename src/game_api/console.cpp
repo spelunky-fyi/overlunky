@@ -3,7 +3,7 @@
 #include "script/lua_console.hpp"
 
 SpelunkyConsole::SpelunkyConsole(SoundManager* sound_manager)
-    : m_Impl{ new LuaConsole(sound_manager) }
+    : m_Impl{new LuaConsole(sound_manager)}
 {
 }
 SpelunkyConsole::~SpelunkyConsole() = default;

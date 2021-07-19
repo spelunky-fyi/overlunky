@@ -4,14 +4,15 @@
 
 #include <optional>
 
-struct ConsoleHistoryItem {
+struct ConsoleHistoryItem
+{
     std::string command;
     std::vector<ScriptMessage> messages;
 };
 
 class LuaConsole : public LuaBackend
 {
-public:
+  public:
     LuaConsole(SoundManager* sound_manager);
     virtual ~LuaConsole() override
     {
@@ -19,13 +20,13 @@ public:
 
     std::unordered_map<std::string, std::string> console_commands;
 
-    bool enabled{ false };
-    bool set_focus{ false };
-    bool scroll_to_bottom{ false };
+    bool enabled{false};
+    bool set_focus{false};
+    bool scroll_to_bottom{false};
     std::optional<size_t> set_scroll_to_history_item;
     char console_input[2048]{};
 
-    size_t max_history{ 30 };
+    size_t max_history{30};
     std::optional<std::size_t> history_pos;
     std::vector<ConsoleHistoryItem> history;
 
@@ -34,8 +35,8 @@ public:
     void on_history_request(struct ImGuiInputTextCallbackData* data);
     void on_completion(struct ImGuiInputTextCallbackData* data);
 
-    using LuaBackend::reset;
     using LuaBackend::pre_update;
+    using LuaBackend::reset;
     virtual bool pre_draw() override;
 
     virtual void set_enabled(bool enabled) override;

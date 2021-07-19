@@ -40,21 +40,21 @@ void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
 }
 void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 {
-    std::string_view front{ data->Buf, (size_t)data->CursorPos };
+    std::string_view front{data->Buf, (size_t)data->CursorPos};
     std::string_view to_complete{};
     {
-        auto rit = std::find_if(front.rbegin(), front.rend(), [](auto c) {
-            return !std::isalnum(c) && c != '.' && c != ':' && c != '_';
-        });
+        auto rit = std::find_if(front.rbegin(), front.rend(), [](auto c)
+                                { return !std::isalnum(c) && c != '.' && c != ':' && c != '_'; });
 
         auto it = rit.base();
-        to_complete = std::string_view{ it, front.end() };
+        to_complete = std::string_view{it, front.end()};
     }
 
     const std::vector<std::string_view> to_complete_segments = [](std::string_view str, std::string_view delims = ".:")
     {
         std::vector<std::string_view> output;
-        for (auto first = str.data(), second = str.data(), last = first + str.size(); second != last && first != last; first = second + 1) {
+        for (auto first = str.data(), second = str.data(), last = first + str.size(); second != last && first != last; first = second + 1)
+        {
             second = std::find_first_of(first, last, std::cbegin(delims), std::cend(delims));
 
             if (first != second)
@@ -73,7 +73,8 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 
     if (to_complete.size() >= 3 || to_complete_segments.size() > 1)
     {
-        std::vector<std::string_view> options = [this](const std::vector<std::string_view>& to_complete_segments) {
+        std::vector<std::string_view> options = [this](const std::vector<std::string_view>& to_complete_segments)
+        {
             std::vector<std::string_view> options;
             sol::table source = lua["_G"].get<sol::table>();
             for (size_t i = 0; i < to_complete_segments.size() - 1; i++)
@@ -122,12 +123,12 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
         }
         else
         {
-            size_t overlap{ 0 };
+            size_t overlap{0};
             auto first = options.front();
 
             while (true)
             {
-                bool all_match{ true };
+                bool all_match{true};
                 for (std::string_view option : options)
                 {
                     if (overlap >= option.size() || option[overlap] != first[overlap])
@@ -182,12 +183,12 @@ bool LuaConsole::pre_draw()
         auto& style = ImGui::GetStyle();
 
         const float window_height = io.DisplaySize.y - style.ItemSpacing.y * 2.0f;
-        ImGui::SetNextWindowSize({ io.DisplaySize.x, window_height });
+        ImGui::SetNextWindowSize({io.DisplaySize.x, window_height});
         ImGui::Begin(
             "Console Overlay",
             NULL,
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoCollapse |ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
         const float completion_size = completion_options.empty() ? 0.0f : style.ItemSpacing.y + ImGui::CalcTextSize(completion_options.c_str(), nullptr, false, io.DisplaySize.x).y;
         const float footer_height_to_reserve = style.ItemSpacing.y + ImGui::GetFrameHeightWithSpacing() + completion_size;
@@ -199,10 +200,10 @@ bool LuaConsole::pre_draw()
             auto& item = history[i];
 
             {
-                ImVec4 color{ 0.7f,0.7f,0.7f,1.0f };
+                ImVec4 color{0.7f, 0.7f, 0.7f, 1.0f};
                 if (history_pos == i)
                 {
-                    color = ImVec4{ 0.4f,0.8f,0.4f,1.0f };
+                    color = ImVec4{0.4f, 0.8f, 0.4f, 1.0f};
                 }
 
                 ImGui::TextUnformatted("> ");
@@ -237,7 +238,7 @@ bool LuaConsole::pre_draw()
 
         if (!completion_options.empty())
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0.7f,0.7f,0.7f,1.0f });
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.7f, 0.7f, 0.7f, 1.0f});
             ImGui::TextWrapped(completion_options.c_str());
             ImGui::PopStyleColor();
         }
@@ -285,23 +286,18 @@ bool LuaConsole::pre_draw()
 
                     if (!result.empty())
                     {
-                        ImVec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
+                        ImVec4 color{1.0f, 1.0f, 1.0f, 1.0f};
                         if (result.starts_with("sol:"))
                         {
                             color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
                         }
-                        result_message.push_back({
-                            std::move(result),
-                            {},
-                            color
-                            });
+                        result_message.push_back({std::move(result), {}, color});
                     }
 
                     history_pos = std::nullopt;
                     history.push_back(ConsoleHistoryItem{
                         console_input,
-                        std::move(result_message)
-                        });
+                        std::move(result_message)});
                     if (history.size() > max_history)
                     {
                         history.erase(history.begin());
@@ -314,7 +310,7 @@ bool LuaConsole::pre_draw()
         }
         ImGui::PopItemWidth();
 
-        ImGui::SetWindowPos({ io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y / 2 - window_height / 2 }, ImGuiCond_Always);
+        ImGui::SetWindowPos({io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y / 2 - window_height / 2}, ImGuiCond_Always);
         ImGui::End();
     }
 
@@ -322,7 +318,8 @@ bool LuaConsole::pre_draw()
 }
 
 void LuaConsole::set_enabled(bool enabled)
-{}
+{
+}
 bool LuaConsole::get_enabled() const
 {
     return true;
@@ -346,7 +343,7 @@ const char* LuaConsole::get_root() const
 }
 const std::filesystem::path& LuaConsole::get_root_path() const
 {
-    static std::filesystem::path root_path{ "." };
+    static std::filesystem::path root_path{"."};
     return root_path;
 }
 
@@ -366,10 +363,12 @@ void LuaConsole::unregister_command(std::string provider_name, std::string comma
 
 std::string LuaConsole::execute(std::string code)
 {
-    try {
+    try
+    {
         if (!code.starts_with("return"))
         {
-            try {
+            try
+            {
                 return execute_raw("return " + code);
             }
             catch (const sol::error& e)
@@ -410,7 +409,7 @@ void LuaConsole::toggle()
 
 std::string LuaConsole::dump_api()
 {
-    std::set<std::string> excluded_keys{ "meta" };
+    std::set<std::string> excluded_keys{"meta"};
 
     sol::state dummy_state;
     dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
