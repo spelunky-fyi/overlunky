@@ -260,7 +260,7 @@ class Entity
     virtual void kill(bool, Entity* frm) = 0;
     virtual void v2(Entity*) = 0;
     virtual void v3() = 0;
-    virtual void v4(void*) = 0;
+    virtual void apply_texture(Texture*) = 0;
     virtual void hiredhand_description(char*) = 0;
     virtual void v6() = 0;
     virtual void v7() = 0;
