@@ -115,7 +115,7 @@ for k in sorted_mapping:
     print(sorted_mapping[k])
 
 for k in derived_mapping:
-    print(f'lua["DOWNCAST_MAP"]["{k}"] = lua["Entity"]["{derived_mapping[k]}"];')
+    print(f'{{"{k}", "{derived_mapping[k]}"}},')
 
 # Write the hierarchy documentation
 hierarchy_doc_entries.sort()

@@ -30,6 +30,8 @@ class LuaConsole : public LuaBackend
     std::optional<std::size_t> history_pos;
     std::vector<ConsoleHistoryItem> history;
 
+    std::unordered_map<std::string_view, std::string_view> entity_down_cast_map;
+
     std::string completion_options;
     std::string completion_error;
 

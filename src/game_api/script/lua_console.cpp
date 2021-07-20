@@ -10,6 +10,250 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
     : LuaBackend(sound_manager, this)
 {
     require_serpent_lua(lua);
+
+    // THIS LIST IS AUTO GENERATED
+    // To recreate it, run the entity_casting.py script
+    // It will dump the list to stdout, and overwrite docs/entities-hierarchy.md
+    entity_down_cast_map =
+    {
+        {"BoneBlock", "as_movable"},
+        {"Boulder", "as_movable"},
+        {"Movable", "as_entity"},
+        {"ChainedPushBlock", "as_pushblock"},
+        {"TrapPart", "as_movable"},
+        {"CrushTrap", "as_movable"},
+        {"Drill", "as_movable"},
+        {"Elevator", "as_movable"},
+        {"FallingPlatform", "as_movable"},
+        {"ClamBase", "as_movable"},
+        {"LightArrowPlatform", "as_movable"},
+        {"Olmec", "as_movable"},
+        {"PushBlock", "as_movable"},
+        {"RegenBlock", "as_movable"},
+        {"ThinIce", "as_movable"},
+        {"TimedPowderkeg", "as_pushblock"},
+        {"UnchainedSpikeBall", "as_movable"},
+        {"WoodenlogTrap", "as_movable"},
+        {"Player", "as_movable"},
+        {"Floor", "as_entity"},
+        {"PoleDeco", "as_floor"},
+        {"Altar", "as_floor"},
+        {"Arrowtrap", "as_floor"},
+        {"BigSpearTrap", "as_floor"},
+        {"ForceField", "as_floor"},
+        {"ConveyorBelt", "as_transferfloor"},
+        {"CityOfGoldDoor", "as_decorateddoor"},
+        {"DecoratedDoor", "as_exitdoor"},
+        {"EggShipDoor", "as_door"},
+        {"Door", "as_floor"},
+        {"ExitDoor", "as_door"},
+        {"LockedDoor", "as_door"},
+        {"MainExit", "as_exitdoor"},
+        {"Generator", "as_floor"},
+        {"HorizontalForceField", "as_floor"},
+        {"LaserTrap", "as_floor"},
+        {"TotemTrap", "as_floor"},
+        {"MotherStatue", "as_floor"},
+        {"Pipe", "as_transferfloor"},
+        {"QuickSand", "as_floor"},
+        {"SlidingWallCeiling", "as_floor"},
+        {"SparkTrap", "as_floor"},
+        {"SpikeballTrap", "as_floor"},
+        {"StickyTrap", "as_floor"},
+        {"TeleportingBorder", "as_floor"},
+        {"TentacleBottom", "as_floor"},
+        {"TimedForceField", "as_forcefield"},
+        {"LavaGlow", "as_movable"},
+        {"OlmecFloater", "as_movable"},
+        {"Flame", "as_movable"},
+        {"LightEmitter", "as_movable"},
+        {"Container", "as_movable"},
+        {"Coffin", "as_container"},
+        {"WallTorch", "as_torch"},
+        {"AxolotlShot", "as_movable"},
+        {"Spear", "as_movable"},
+        {"Bomb", "as_movable"},
+        {"Boombox", "as_movable"},
+        {"Boomerang", "as_movable"},
+        {"Bullet", "as_movable"},
+        {"Gun", "as_movable"},
+        {"YellowCape", "as_cape"},
+        {"Chain", "as_movable"},
+        {"Chest", "as_movable"},
+        {"ClimbableRope", "as_movable"},
+        {"CloneGunShot", "as_timedshot"},
+        {"CookFire", "as_movable"},
+        {"AcidBubble", "as_movable"},
+        {"Claw", "as_movable"},
+        {"StretchChain", "as_movable"},
+        {"CursedPot", "as_movable"},
+        {"EggSac", "as_movable"},
+        {"TreasureHook", "as_movable"},
+        {"EmpressGrave", "as_movable"},
+        {"HundunChest", "as_treasure"},
+        {"Treasure", "as_movable"},
+        {"Excalibur", "as_movable"},
+        {"Fireball", "as_soundshot"},
+        {"Orb", "as_movable"},
+        {"Fly", "as_movable"},
+        {"TimedShot", "as_lightshot"},
+        {"FrozenLiquid", "as_movable"},
+        {"GiantClamTop", "as_movable"},
+        {"FlyHead", "as_movable"},
+        {"Goldbar", "as_movable"},
+        {"Coin", "as_movable"},
+        {"HangAnchor", "as_movable"},
+        {"HangStrand", "as_movable"},
+        {"Honey", "as_movable"},
+        {"LaserBeam", "as_movable"},
+        {"Hoverpack", "as_backpack"},
+        {"Idol", "as_movable"},
+        {"Jetpack", "as_backpack"},
+        {"JungleSpearCosmetic", "as_movable"},
+        {"SoundShot", "as_lightshot"},
+        {"Torch", "as_movable"},
+        {"LampFlame", "as_flame"},
+        {"Landmine", "as_lightemitter"},
+        {"LightShot", "as_movable"},
+        {"Leaf", "as_movable"},
+        {"LightArrow", "as_arrow"},
+        {"Mattock", "as_movable"},
+        {"Arrow", "as_movable"},
+        {"Shield", "as_movable"},
+        {"MiniGameAsteroid", "as_movable"},
+        {"MiniGameShip", "as_movable"},
+        {"OlmecCannon", "as_movable"},
+        {"RollingItem", "as_movable"},
+        {"PlayerBag", "as_movable"},
+        {"PlayerGhost", "as_lightemitter"},
+        {"GhostBreath", "as_movable"},
+        {"Pot", "as_container"},
+        {"Backpack", "as_movable"},
+        {"AnkhPowerup", "as_movable"},
+        {"KapalaPowerup", "as_movable"},
+        {"ParachutePowerup", "as_movable"},
+        {"TrueCrownPowerup", "as_movable"},
+        {"PunishBall", "as_movable"},
+        {"ScepterShot", "as_lightemitter"},
+        {"SpecialShot", "as_lightemitter"},
+        {"SkullDropTrap", "as_movable"},
+        {"Switch", "as_movable"},
+        {"SnapTrap", "as_movable"},
+        {"Spark", "as_flame"},
+        {"Teleporter", "as_movable"},
+        {"Telescope", "as_movable"},
+        {"Tentacle", "as_chain"},
+        {"TiamatShot", "as_lightemitter"},
+        {"TorchFlame", "as_flame"},
+        {"TV", "as_movable"},
+        {"UdjatSocket", "as_movable"},
+        {"Ushabti", "as_movable"},
+        {"VladsCape", "as_cape"},
+        {"FlameSize", "as_flame"},
+        {"WebGun", "as_gun"},
+        {"WebShot", "as_movable"},
+        {"Liquid", "as_entity"},
+        {"Lava", "as_liquid"},
+        {"Alien", "as_monster"},
+        {"Lahamu", "as_monster"},
+        {"Ammit", "as_monster"},
+        {"Anubis", "as_monster"},
+        {"ApepPart", "as_monster"},
+        {"ApepHead", "as_apeppart"},
+        {"Bat", "as_monster"},
+        {"Bee", "as_monster"},
+        {"Bodyguard", "as_npc"},
+        {"CatMummy", "as_monster"},
+        {"Caveman", "as_walkingmonster"},
+        {"Quillback", "as_walkingmonster"},
+        {"CavemanShopkeeper", "as_walkingmonster"},
+        {"Cobra", "as_monster"},
+        {"Crabman", "as_monster"},
+        {"Critter", "as_monster"},
+        {"CritterButterfly", "as_critter"},
+        {"CritterCrab", "as_critter"},
+        {"CritterDrone", "as_critter"},
+        {"CritterBeetle", "as_critter"},
+        {"CritterFirefly", "as_critter"},
+        {"CritterFish", "as_critter"},
+        {"CritterLocust", "as_critter"},
+        {"CritterPenguin", "as_critter"},
+        {"CritterSlime", "as_critter"},
+        {"CritterSnail", "as_critter"},
+        {"Crocman", "as_walkingmonster"},
+        {"EggplantMinister", "as_monster"},
+        {"Jiangshi", "as_monster"},
+        {"Firebug", "as_monster"},
+        {"FirebugUnchained", "as_monster"},
+        {"FireFrog", "as_frog"},
+        {"Fish", "as_monster"},
+        {"Frog", "as_monster"},
+        {"Ghist", "as_monster"},
+        {"Ghost", "as_monster"},
+        {"GiantFish", "as_monster"},
+        {"GiantFly", "as_monster"},
+        {"GiantFrog", "as_monster"},
+        {"Spider", "as_monster"},
+        {"GoldMonkey", "as_monster"},
+        {"Grub", "as_monster"},
+        {"HangSpider", "as_monster"},
+        {"Hermitcrab", "as_monster"},
+        {"HornedLizard", "as_monster"},
+        {"Hundun", "as_monster"},
+        {"Beg", "as_npc"},
+        {"HundunHead", "as_monster"},
+        {"Imp", "as_monster"},
+        {"JumpDog", "as_monster"},
+        {"Kingu", "as_monster"},
+        {"Lamassu", "as_monster"},
+        {"Lavamander", "as_monster"},
+        {"Leprechaun", "as_walkingmonster"},
+        {"RoomOwner", "as_monster"},
+        {"MagmaMan", "as_monster"},
+        {"Mantrap", "as_monster"},
+        {"Terra", "as_monster"},
+        {"MegaJellyfish", "as_monster"},
+        {"Tun", "as_roomowner"},
+        {"Mole", "as_monster"},
+        {"Monkey", "as_monster"},
+        {"Mosquito", "as_monster"},
+        {"Mummy", "as_monster"},
+        {"Necromancer", "as_walkingmonster"},
+        {"Octopus", "as_walkingmonster"},
+        {"VanHorsing", "as_npc"},
+        {"Olmite", "as_walkingmonster"},
+        {"OsirisHand", "as_monster"},
+        {"OsirisHead", "as_monster"},
+        {"Pet", "as_monster"},
+        {"ProtoShopkeeper", "as_monster"},
+        {"Skeleton", "as_monster"},
+        {"Robot", "as_walkingmonster"},
+        {"Scarab", "as_monster"},
+        {"Scorpion", "as_monster"},
+        {"Shopkeeper", "as_roomowner"},
+        {"NPC", "as_monster"},
+        {"ForestSister", "as_npc"},
+        {"Monster", "as_movable"},
+        {"Sorceress", "as_walkingmonster"},
+        {"Waddler", "as_roomowner"},
+        {"Tadpole", "as_monster"},
+        {"Tiamat", "as_monster"},
+        {"WalkingMonster", "as_monster"},
+        {"UFO", "as_monster"},
+        {"Vampire", "as_monster"},
+        {"Vlad", "as_vampire"},
+        {"WitchDoctor", "as_walkingmonster"},
+        {"WitchDoctorSkull", "as_monster"},
+        {"Yama", "as_monster"},
+        {"Yang", "as_roomowner"},
+        {"YetiKing", "as_monster"},
+        {"YetiQueen", "as_monster"},
+        {"Axolotl", "as_mount"},
+        {"Mount", "as_movable"},
+        {"Mech", "as_mount"},
+        {"Qilin", "as_mount"},
+        {"Rockdog", "as_mount"},
+    };
 }
 
 void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
@@ -78,78 +322,99 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
         std::vector<std::string_view> options;
         try
         {
-            options = [this](const std::vector<std::string_view>& to_complete_segments)
+            options = [const_this = static_cast<const LuaConsole*>(this)](const std::vector<std::string_view>& to_complete_segments)
             {
-                std::vector<std::string_view> options;
-                auto source_obj = lua["_G"];
-                sol::table source = source_obj.get<sol::table>();
-                for (size_t i = 0; i < to_complete_segments.size() - 1; i++)
+                if (to_complete_segments.size() == 1)
                 {
-                    const auto& child = source[to_complete_segments[i]];
-                    const auto child_type = child.get_type();
-                    if (child_type == sol::type::table)
-                    {
-                        source_obj = child;
-                        source = child.get<sol::table>();
-                    }
-                    else if (child_type == sol::type::userdata)
-                    {
-                        source_obj = child;
-                        source = child[sol::metatable_key].get<sol::table>();
-                    }
-                    else
-                    {
-                        return options;
-                    }
-                }
-
-                const bool grab_all = to_complete_segments.back().empty();
-                do
-                {
-                    for (auto& [k, v] : source)
+                    std::vector<std::string_view> options;
+                    for (const auto& [k, v] : const_this->lua)
                     {
                         if (k.get_type() == sol::type::string)
                         {
                             const std::string_view str = k.as<std::string_view>();
-                            if ((grab_all || str.starts_with(to_complete_segments.back())) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
+                            if (str.starts_with(to_complete_segments.back()) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
                             {
                                 options.push_back(k.as<std::string_view>());
                             }
                         }
                     }
+                    return options;
+                }
+                else
+                {
+                    std::vector<std::string_view> options;
 
-                    if (source["__name"] != sol::nil)
+                    // Need to collect these in a vector, otherwise the state somehow breaks
+                    std::vector<sol::userdata> source_obj{};
+                    std::vector<sol::table> source{ const_this->lua["_G"] };
+                    for (size_t i = 0; i < to_complete_segments.size() - 1; i++)
                     {
-                        // Transform e.g. "sol.Player*" to "Player"
-                        std::string_view name = source["__name"].get<std::string_view>();
-                        if (name.starts_with("sol."))
-                        {
-                            name = name.substr(4);
-                        }
-                        if (name.ends_with("*"))
-                        {
-                            name = name.substr(0, name.size() - 1);
-                        }
+                        const auto child = source.back()[to_complete_segments[i]];
+                        const auto child_type = child.get_type();
 
-                        // Should not need to create std::string here, but otherwise we get a nil returned
-                        auto down_cast = lua["DOWNCAST_MAP"][std::string{name}];
-                        if (down_cast != sol::nil)
+                        if (child_type == sol::type::table)
                         {
-                            source_obj = down_cast(source_obj);
-                            source = source_obj[sol::metatable_key].get<sol::table>();
+                            source.push_back(child.get<sol::table>());
+                        }
+                        else if (child_type == sol::type::userdata)
+                        {
+                            source_obj.push_back(child);
+                            source.push_back(child[sol::metatable_key].get<sol::table>());
                         }
                         else
                         {
-                            source = sol::nil;
+                            return options;
                         }
                     }
-                    else
-                    {
-                        source = sol::nil;
-                    }
 
-                } while (source != sol::nil);
-                return options;
+                    const bool grab_all = to_complete_segments.back().empty();
+                    while (true)
+                    {
+                        for (const auto& [k, v] : source.back())
+                        {
+                            if (k.get_type() == sol::type::string)
+                            {
+                                const std::string_view str = k.as<std::string_view>();
+                                if ((grab_all || str.starts_with(to_complete_segments.back())) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
+                                {
+                                    options.push_back(k.as<std::string_view>());
+                                }
+                            }
+                        }
+
+                        auto name_member = source.back()["__name"];
+                        if (name_member != sol::nil)
+                        {
+                            // Transform e.g. "sol.Player*" to "Player"
+                            std::string_view name = name_member.get<std::string_view>();
+                            if (name.starts_with("sol."))
+                            {
+                                name = name.substr(4);
+                            }
+                            if (name.ends_with("*"))
+                            {
+                                name = name.substr(0, name.size() - 1);
+                            }
+
+                            // Should not need to create std::string here, but otherwise we get a nil returned
+                            if (const_this->entity_down_cast_map.contains(name))
+                            {
+                                auto down_cast = const_this->lua["Entity"][const_this->entity_down_cast_map.at(name)];
+                                source_obj.push_back(down_cast(source_obj.back()));
+                                source.push_back(source_obj.back()[sol::metatable_key].get<sol::table>());
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    return options;
+                }
             }(to_complete_segments);
         }
         catch (const sol::error& e)
@@ -215,11 +480,11 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
     {
         if (to_complete_segments.empty())
         {
-            completion_options = fmt::format("Need at least 3 characters for tab-completion...");
+            completion_options = fmt::format("Need at least 1 character for tab-completion...");
         }
         else
         {
-            completion_options = fmt::format("Need at least 3 characters for tab-completion, given {}...", to_complete_segments.back());
+            completion_options = fmt::format("Need at least 1 characters for tab-completion, given {}...", to_complete_segments.back());
         }
     }
 }
