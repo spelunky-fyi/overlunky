@@ -3,7 +3,8 @@ import json
 import urllib.request
 
 # Parse all Entity::as_xxx functions so we know which ones are currently defined
-entities_files = ["entities_items_lua.cpp",
+entities_files = ["entity_lua.cpp",
+                  "entities_items_lua.cpp",
                   "entities_monsters_lua.cpp", 
                   "entities_mounts_lua.cpp",
                   "entities_floors_lua.cpp",
@@ -12,8 +13,7 @@ entities_files = ["entities_items_lua.cpp",
                   "entities_liquids_lua.cpp"]
 as_re = re.compile(r'lua\["Entity"\]\["(as_.*)"\]')
 
-# a couple as_xxx functions are predefined, they are either 'global' or haven't been moved into their proper separate file yet
-known_casts = [ "as_movable", "as_player" ]
+known_casts = []
 
 for f in entities_files:
     with open(f) as fp:
@@ -47,6 +47,10 @@ def is_movable(type):
         return False
     return is_movable(parent_type)
 
+def first_base_class(type):
+    if type in entity_class_hierarchy:
+        return entity_class_hierarchy[type]
+
 def linked_type_hierarchy(type, arr):
     arr.append("[" + type + "](script-api.md#" + type + ")")
     if type in entity_class_hierarchy:
@@ -55,6 +59,7 @@ def linked_type_hierarchy(type, arr):
 
 # Process all entities
 mapping = {}
+derived_mapping = {}
 hierarchy_doc_entries = []
 with open("../../../../docs/game_data/entities.json") as fp:
     j = json.load(fp)
@@ -72,18 +77,25 @@ with open("../../../../docs/game_data/entities.json") as fp:
                 table_def = 'lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["' + as_function + '"];  // '  + short_entityname
                 movable_table_def = 'lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["as_movable"];  // '  + short_entityname + " (NOT IMPLEMENTED YET, FORCED TO MOVABLE)"
 
-                if as_function not in known_casts:
+                if as_function not in known_casts or as_function == "as_entity":
                     if as_function == "as_entity":
                         mapping[entitydetails["id"]] = "// " + table_def + " (plain entity)"
                         doc_entry = doc_entry + "[Entity](script-api.md#Entity)"
                     elif is_movable(entityclass):
                         mapping[entitydetails["id"]] = movable_table_def
+                        derived_mapping[entityclass] = "as_entity"
                         doc_entry = doc_entry + "[Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) - NOT IMPLEMENTED YET, FORCED TO MOVABLE"
                     else:
                         mapping[entitydetails["id"]] = "// " + table_def + " (NOT IMPLEMENTED YET)"
                         doc_entry = doc_entry + "[Entity](script-api.md#Entity) - NOT IMPLEMENTED YET"
                 else:
                     mapping[entitydetails["id"]] = table_def
+
+                    base_class = first_base_class(entityclass)
+                    if base_class:
+                        as_base_function = "as_" + base_class.lower()
+                        derived_mapping[entityclass] = as_base_function
+
                     hierarchy = []
                     linked_type_hierarchy(entityclass, hierarchy)
                     hierarchy.reverse()
@@ -102,6 +114,8 @@ sorted_mapping = {k: mapping[k] for k in sorted(mapping)}
 for k in sorted_mapping:
     print(sorted_mapping[k])
 
+for k in derived_mapping:
+    print(f'lua["DOWNCAST_MAP"]["{k}"] = lua["Entity"]["{derived_mapping[k]}"];')
 
 # Write the hierarchy documentation
 hierarchy_doc_entries.sort()

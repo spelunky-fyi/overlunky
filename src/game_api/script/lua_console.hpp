@@ -31,6 +31,7 @@ class LuaConsole : public LuaBackend
     std::vector<ConsoleHistoryItem> history;
 
     std::string completion_options;
+    std::string completion_error;
 
     void on_history_request(struct ImGuiInputTextCallbackData* data);
     void on_completion(struct ImGuiInputTextCallbackData* data);

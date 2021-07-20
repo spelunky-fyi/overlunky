@@ -143,11 +143,7 @@ void register_usertypes(sol::state& lua, LuaBackend* script)
         "get_texture",
         &Entity::get_texture,
         "set_texture",
-        &Entity::set_texture,
-        "as_movable",
-        &Entity::as<Movable>,
-        "as_player",
-        &Entity::as<Player>);
+        &Entity::set_texture);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -234,6 +230,10 @@ void register_usertypes(sol::state& lua, LuaBackend* script)
         &Player::set_heart_color,
         sol::base_classes,
         sol::bases<Entity, Movable>());
+
+    lua["Entity"]["as_entity"] = &Entity::as<Entity>;
+    lua["Entity"]["as_movable"] = &Entity::as<Movable>;
+    lua["Entity"]["as_player"] = &Entity::as<Player>;
 
     /// Same as `Player.get_name`
     lua["get_character_name"] = get_character_name;

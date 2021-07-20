@@ -70,44 +70,93 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
     }(to_complete);
 
     completion_options.clear();
+    completion_error.clear();
 
-    if (to_complete.size() >= 3 || to_complete_segments.size() > 1)
+    if (!to_complete.empty() || to_complete_segments.size() > 1)
     {
-        std::vector<std::string_view> options = [this](const std::vector<std::string_view>& to_complete_segments)
+        // Gather candidates for completion, this has to actually access variables so it can fail
+        std::vector<std::string_view> options;
+        try
         {
-            std::vector<std::string_view> options;
-            sol::table source = lua["_G"].get<sol::table>();
-            for (size_t i = 0; i < to_complete_segments.size() - 1; i++)
+            options = [this](const std::vector<std::string_view>& to_complete_segments)
             {
-                const auto& child = source[to_complete_segments[i]];
-                const auto child_type = child.get_type();
-                if (child_type == sol::type::table)
+                std::vector<std::string_view> options;
+                auto source_obj = lua["_G"];
+                sol::table source = source_obj.get<sol::table>();
+                for (size_t i = 0; i < to_complete_segments.size() - 1; i++)
                 {
-                    source = child.get<sol::table>();
-                }
-                else if (child_type == sol::type::userdata)
-                {
-                    source = child[sol::metatable_key].get<sol::table>();
-                }
-                else
-                {
-                    return options;
-                }
-            }
-
-            for (auto& [k, v] : source)
-            {
-                if (k.get_type() == sol::type::string)
-                {
-                    const std::string_view str = k.as<std::string_view>();
-                    if (str.starts_with(to_complete_segments.back()) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
+                    const auto& child = source[to_complete_segments[i]];
+                    const auto child_type = child.get_type();
+                    if (child_type == sol::type::table)
                     {
-                        options.push_back(k.as<std::string_view>());
+                        source_obj = child;
+                        source = child.get<sol::table>();
+                    }
+                    else if (child_type == sol::type::userdata)
+                    {
+                        source_obj = child;
+                        source = child[sol::metatable_key].get<sol::table>();
+                    }
+                    else
+                    {
+                        return options;
                     }
                 }
-            }
-            return options;
-        }(to_complete_segments);
+
+                const bool grab_all = to_complete_segments.back().empty();
+                do
+                {
+                    for (auto& [k, v] : source)
+                    {
+                        if (k.get_type() == sol::type::string)
+                        {
+                            const std::string_view str = k.as<std::string_view>();
+                            if ((grab_all || str.starts_with(to_complete_segments.back())) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
+                            {
+                                options.push_back(k.as<std::string_view>());
+                            }
+                        }
+                    }
+
+                    if (source["__name"] != sol::nil)
+                    {
+                        // Transform e.g. "sol.Player*" to "Player"
+                        std::string_view name = source["__name"].get<std::string_view>();
+                        if (name.starts_with("sol."))
+                        {
+                            name = name.substr(4);
+                        }
+                        if (name.ends_with("*"))
+                        {
+                            name = name.substr(0, name.size() - 1);
+                        }
+
+                        // Should not need to create std::string here, but otherwise we get a nil returned
+                        auto down_cast = lua["DOWNCAST_MAP"][std::string{name}];
+                        if (down_cast != sol::nil)
+                        {
+                            source_obj = down_cast(source_obj);
+                            source = source_obj[sol::metatable_key].get<sol::table>();
+                        }
+                        else
+                        {
+                            source = sol::nil;
+                        }
+                    }
+                    else
+                    {
+                        source = sol::nil;
+                    }
+
+                } while (source != sol::nil);
+                return options;
+            }(to_complete_segments);
+        }
+        catch (const sol::error& e)
+        {
+            completion_error = e.what();
+            return;
+        }
 
         to_complete = to_complete_segments.back();
         if (options.empty())
@@ -157,7 +206,7 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
             for (std::string_view option : options)
             {
                 completion_options += option;
-                completion_options += "; ";
+                completion_options += "\n";
             }
             completion_options.pop_back();
         }
@@ -190,7 +239,8 @@ bool LuaConsole::pre_draw()
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
-        const float completion_size = completion_options.empty() ? 0.0f : style.ItemSpacing.y + ImGui::CalcTextSize(completion_options.c_str(), nullptr, false, io.DisplaySize.x).y;
+        const std::string& completion_text = completion_options.empty() ? completion_error : completion_options;
+        const float completion_size = completion_text.empty() ? 0.0f : style.ItemSpacing.y + ImGui::CalcTextSize(completion_text.c_str(), nullptr, false, io.DisplaySize.x).y;
         const float footer_height_to_reserve = style.ItemSpacing.y + ImGui::GetFrameHeightWithSpacing() + completion_size;
         ImGui::BeginChild("Results Region", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
@@ -236,7 +286,13 @@ bool LuaConsole::pre_draw()
         ImGui::PopStyleVar();
         ImGui::EndChild();
 
-        if (!completion_options.empty())
+        if (!completion_error.empty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.7f, 0.3f, 0.3f, 1.0f});
+            ImGui::TextWrapped(completion_error.c_str());
+            ImGui::PopStyleColor();
+        }
+        else if (!completion_options.empty())
         {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.7f, 0.7f, 0.7f, 1.0f});
             ImGui::TextWrapped(completion_options.c_str());
