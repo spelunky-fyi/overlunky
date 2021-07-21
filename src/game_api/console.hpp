@@ -13,6 +13,7 @@ class SpelunkyConsole
     std::vector<std::string> consume_requires();
 
     bool is_enabled();
+    bool is_toggled();
 
     bool run();
     void draw(struct ImDrawList* dl);

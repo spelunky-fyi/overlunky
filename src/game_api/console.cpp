@@ -18,6 +18,10 @@ bool SpelunkyConsole::is_enabled()
     // Note: Does not mean the console is showing, only that it should get updated
     return true;
 }
+bool SpelunkyConsole::is_toggled()
+{
+    return m_Impl->enabled;
+}
 
 bool SpelunkyConsole::run()
 {
