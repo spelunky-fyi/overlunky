@@ -217,6 +217,56 @@ SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script)
     };
 }
 
+SpelunkyConsole* CreateConsole()
+{
+    if (g_Console == nullptr)
+    {
+        g_Console = new SpelunkyConsole(g_SoundManager);
+    }
+    return g_Console;
+}
+void FreeConsole(SpelunkyConsole* console)
+{
+    if (g_Console == console)
+    {
+        g_Console = nullptr;
+    }
+    delete console;
+}
+
+void SpelunkyConsole_Update(SpelunkyConsole* console)
+{
+    console->run();
+}
+void SpelunkyConsole_Draw(SpelunkyConsole* console, struct ImDrawList* draw_list)
+{
+    console->draw(draw_list);
+}
+void SpelunkyConsole_DrawOptions(SpelunkyConsole* console)
+{
+    console->render_options();
+}
+void SpelunkyConsole_Toggle(SpelunkyConsole* console)
+{
+    console->toggle();
+}
+bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* out_buffer, size_t out_buffer_size)
+{
+    std::string result = console->execute(code);
+    if (result.empty())
+    {
+        return false;
+    }
+
+    auto num_written = snprintf(
+        out_buffer,
+        out_buffer_size - 1,
+        "%s",
+        result.c_str());
+    out_buffer[num_written] = '\0';
+    return num_written < out_buffer_size;
+}
+
 StateMemory& get_state()
 {
     static StateMemory* state = State::get().ptr();
