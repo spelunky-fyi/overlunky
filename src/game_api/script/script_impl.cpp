@@ -9,6 +9,9 @@
 ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, LuaConsole* con, bool enable)
     : LuaBackend(sound_mgr, con)
 {
+    // Needs to be populated for reliable cleanup later
+    name = get_name();
+
 #ifdef SPEL2_EDITABLE_SCRIPTS
     strcpy(code, script.c_str());
 #else

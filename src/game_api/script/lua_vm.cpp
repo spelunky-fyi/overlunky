@@ -158,7 +158,7 @@ void populate_lua_state(LuaBackend* backend)
         if (backend->console)
         {
             backend->console_commands.insert(name);
-            backend->console->register_command(backend->get_name(), std::move(name), std::move(cmd));
+            backend->console->register_command(backend, std::move(name), std::move(cmd));
         }
     };
 

@@ -9,6 +9,9 @@
 LuaConsole::LuaConsole(SoundManager* sound_manager)
     : LuaBackend(sound_manager, this)
 {
+    // Needs to be populated for reliable cleanup later
+    name = get_name();
+
     require_serpent_lua(lua);
 
     // THIS LIST IS AUTO GENERATED
@@ -674,14 +677,14 @@ const std::filesystem::path& LuaConsole::get_root_path() const
     return root_path;
 }
 
-void LuaConsole::register_command(std::string provider_name, std::string command_name, sol::function cmd)
+void LuaConsole::register_command(LuaBackend* provider, std::string command_name, sol::function cmd)
 {
     lua[command_name] = std::move(cmd);
-    console_commands[std::move(command_name)] = std::move(provider_name);
+    console_commands[std::move(command_name)] = provider;
 }
-void LuaConsole::unregister_command(std::string provider_name, std::string command_name)
+void LuaConsole::unregister_command(LuaBackend* provider, std::string command_name)
 {
-    if (console_commands[command_name] == provider_name)
+    if (console_commands[command_name] == provider)
     {
         lua[command_name] = sol::nil;
         console_commands.erase(std::move(command_name));

@@ -18,7 +18,7 @@ class LuaConsole : public LuaBackend
     {
     }
 
-    std::unordered_map<std::string, std::string> console_commands;
+    std::unordered_map<std::string, LuaBackend*> console_commands;
 
     bool enabled{false};
     bool set_focus{false};
@@ -51,8 +51,8 @@ class LuaConsole : public LuaBackend
     virtual const char* get_root() const override;
     virtual const std::filesystem::path& get_root_path() const override;
 
-    void register_command(std::string provider_name, std::string command_name, sol::function cmd);
-    void unregister_command(std::string provider_name, std::string command_name);
+    void register_command(LuaBackend* provider, std::string command_name, sol::function cmd);
+    void unregister_command(LuaBackend* provider, std::string command_name);
 
     std::string execute(std::string code);
     std::string execute_raw(std::string code);

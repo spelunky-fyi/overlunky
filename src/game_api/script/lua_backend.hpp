@@ -168,7 +168,8 @@ class LuaBackend
   public:
     sol::state lua;
 
-    std::string result = "";
+    std::string name;
+    std::string result;
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;

@@ -104,7 +104,7 @@ void LuaBackend::clear_all_callbacks()
     }
     for (auto& console_command : console_commands)
     {
-        console->unregister_command(get_name(), console_command);
+        console->unregister_command(this, console_command);
     }
     entity_hooks.clear();
     clear_entity_hooks.clear();
@@ -126,6 +126,7 @@ void LuaBackend::clear_all_callbacks()
 bool LuaBackend::reset()
 {
     clear();
+    name = get_name();
     return true;
 }
 
