@@ -329,7 +329,42 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
             {
                 if (to_complete_segments.size() == 1)
                 {
+                    using namespace std::string_view_literals;
+                    static constexpr std::array additional_options{
+                        "cls"sv,
+                        "and"sv,
+                        "break"sv,
+                        "do"sv,
+                        "else"sv,
+                        "elseif"sv,
+                        "end"sv,
+                        "false"sv,
+                        "for"sv,
+                        "function"sv,
+                        "if"sv,
+                        "in"sv,
+                        "local"sv,
+                        "nil"sv,
+                        "not"sv,
+                        "or"sv,
+                        "repeat"sv,
+                        "return"sv,
+                        "then"sv,
+                        "true"sv,
+                        "until"sv,
+                        "while"sv,
+                    };
+
                     std::vector<std::string_view> options;
+
+                    for (std::string_view opt : additional_options)
+                    {
+                        if (opt.starts_with(to_complete_segments.back()))
+                        {
+                            options.push_back(opt);
+                        }
+                    }
+
                     for (const auto& [k, v] : const_this->lua)
                     {
                         if (k.get_type() == sol::type::string)
@@ -337,7 +372,7 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             const std::string_view str = k.as<std::string_view>();
                             if (str.starts_with(to_complete_segments.back()) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
                             {
-                                options.push_back(k.as<std::string_view>());
+                                options.push_back(str);
                             }
                         }
                     }
@@ -380,7 +415,7 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                                 const std::string_view str = k.as<std::string_view>();
                                 if ((grab_all || str.starts_with(to_complete_segments.back())) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
                                 {
-                                    options.push_back(k.as<std::string_view>());
+                                    options.push_back(str);
                                 }
                             }
                         }
