@@ -258,7 +258,7 @@ class Entity
     virtual ~Entity() = 0;
     virtual void created() = 0;
     virtual void kill(bool, Entity* frm) = 0;
-    virtual void v2(Entity*) = 0;
+    virtual void handle_collision1(Entity* other_entity) = 0; // needs investigating, difference between this and handle_collision2
     virtual void v3() = 0;
     virtual void apply_texture(Texture*) = 0;
     virtual void hiredhand_description(char*) = 0;
@@ -271,18 +271,18 @@ class Entity
     virtual uint32_t get_type_field_60() = 0;
     virtual void set_invisible(bool) = 0;
     virtual void set_initial_facing_left(bool apply) = 0; // called during levelgen, apply must be true or nothing happens
-    virtual void v15(uint8_t a, uint8_t b) = 0;
+    virtual void set_draw_depth(uint8_t draw_depth) = 0;
     virtual void resume_ai() = 0; // works on entities with ai_func != 0; runs when companions are let go from being held
     virtual float friction() = 0;
     virtual void v18() = 0;
     virtual void remove_item_ptr(Entity*) = 0;
-    virtual void v20() = 0;
+    virtual Entity* get_held_entity() = 0;
     virtual void v21() = 0;
-    virtual void v22() = 0;
-    virtual void v23() = 0;
-    virtual void handle_collision(Entity* other_entity) = 0;
-    virtual void v25() = 0;
-    virtual void v26() = 0;
+    virtual bool on_check_is_looking_up_while_thrown(Entity* thrower) = 0; // used for crates and presents: checks whether looking up to open rather than throw
+    virtual void on_attempt_shop_purchase(Entity* buyer) = 0;              // checks if you have sufficient money, performs the sale if so
+    virtual void handle_collision2(Entity* other_entity) = 0;              // needs investigating, difference between this and handle_collision1
+    virtual uint64_t on_save_level_transition_data() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    virtual void on_restore_level_transition_data(uint64_t data) = 0;
     virtual void v27() = 0;
     virtual void v28() = 0;
     virtual void v29() = 0;
