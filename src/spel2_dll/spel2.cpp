@@ -246,6 +246,10 @@ void SpelunkyConsole_DrawOptions(SpelunkyConsole* console)
 {
     console->render_options();
 }
+bool SpelunkyConsole_IsToggled(SpelunkyConsole* console)
+{
+    return console->is_toggled();
+}
 void SpelunkyConsole_Toggle(SpelunkyConsole* console)
 {
     console->toggle();

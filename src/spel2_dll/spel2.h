@@ -109,6 +109,7 @@ void FreeConsole(SpelunkyConsole* console);
 void SpelunkyConsole_Update(SpelunkyConsole* console);
 void SpelunkyConsole_Draw(SpelunkyConsole* console, struct ImDrawList* draw_list);
 void SpelunkyConsole_DrawOptions(SpelunkyConsole* console);
+bool SpelunkyConsole_IsToggled(SpelunkyConsole* console);
 void SpelunkyConsole_Toggle(SpelunkyConsole* console);
 bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* out_buffer, size_t out_buffer_size);
 
