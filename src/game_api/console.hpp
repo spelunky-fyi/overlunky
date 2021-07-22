@@ -1,5 +1,6 @@
 #pragma once
 
+#include <deque>
 #include <memory>
 #include <string>
 #include <vector>
@@ -11,6 +12,8 @@ class SpelunkyConsole
     ~SpelunkyConsole();
 
     std::vector<std::string> consume_requires();
+    std::deque<struct ScriptMessage> consume_messages();
+    const std::deque<ScriptMessage>& get_messages() const;
 
     bool is_enabled();
     bool is_toggled();

@@ -44,6 +44,7 @@ concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, Spelunk
 std::unique_ptr<SoundManager> g_SoundManager;
 
 std::unique_ptr<SpelunkyConsole> g_Console;
+std::deque<ScriptMessage> g_ConsoleMessages;
 
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -2102,32 +2103,6 @@ void set_vel(ImVec2 pos)
     g_vy = 2 * (g_vy - g_y) * 0.5625;
 }
 
-void render_messages(SpelunkyScript* script)
-{
-    auto now = std::chrono::system_clock::now();
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize({-1, -1});
-    ImGui::Begin(
-        "Messages",
-        NULL,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-    using namespace std::chrono_literals;
-    ImGui::PushFont(bigfont);
-    for (auto message : script->get_messages())
-    {
-        if (now - 10s > message.time)
-            continue;
-        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.time).count() / 10000.0f;
-        message.color.w = alpha;
-        ImGui::TextColored(message.color, "[%s] %s", script->get_name().c_str(), message.message.c_str());
-    }
-    ImGui::PopFont();
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
-    ImGui::End();
-}
-
 void render_messages()
 {
     using namespace std::chrono_literals;
@@ -2143,6 +2118,18 @@ void render_messages()
             queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
         }
     }
+    for (auto&& message : g_Console->consume_messages())
+    {
+        g_ConsoleMessages.push_back(std::move(message));
+    }
+    for (auto message : g_ConsoleMessages)
+    {
+        queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
+    }
+    std::erase_if(g_ConsoleMessages, [&](auto message) {
+        return now - 10s > message.time;
+    });
+
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
 

@@ -266,6 +266,23 @@ bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* o
     out_buffer[num_written] = '\0';
     return num_written < out_buffer_size;
 }
+std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console)
+{
+    return console->get_messages().size();
+}
+const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, std::size_t message_idx)
+{
+    const auto& messages = console->get_messages();
+    if (message_idx < messages.size())
+    {
+        return messages[message_idx].message.c_str();
+    }
+    return nullptr;
+}
+void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console)
+{
+    console->consume_messages();
+}
 
 StateMemory& get_state()
 {

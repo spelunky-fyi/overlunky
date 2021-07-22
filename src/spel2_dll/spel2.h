@@ -112,6 +112,10 @@ void SpelunkyConsole_DrawOptions(SpelunkyConsole* console);
 void SpelunkyConsole_Toggle(SpelunkyConsole* console);
 bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* out_buffer, size_t out_buffer_size);
 
+std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console);
+const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, std::size_t message_idx);
+void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console);
+
 enum class SpelunkyScreen
 {
     Logo = 0,

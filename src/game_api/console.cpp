@@ -12,6 +12,14 @@ std::vector<std::string> SpelunkyConsole::consume_requires()
 {
     return std::move(m_Impl->required_scripts);
 }
+std::deque<ScriptMessage> SpelunkyConsole::consume_messages()
+{
+    return std::move(m_Impl->messages);
+}
+const std::deque<ScriptMessage>& SpelunkyConsole::get_messages() const
+{
+    return m_Impl->messages;
+}
 
 bool SpelunkyConsole::is_enabled()
 {

@@ -642,11 +642,13 @@ bool LuaConsole::pre_draw()
                 }
                 else
                 {
+                    std::size_t messages_before = messages.size();
+
                     std::string result = execute(console_input);
 
                     std::vector<ScriptMessage> result_message;
-                    std::move(messages.begin(), messages.end(), std::back_inserter(result_message));
-                    messages.clear();
+                    std::move(messages.begin() + messages_before, messages.end(), std::back_inserter(result_message));
+                    messages.erase(messages.begin() + messages_before, messages.end());
 
                     if (!result.empty())
                     {
