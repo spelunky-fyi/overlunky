@@ -56,6 +56,10 @@ function replace_trap(v)
             newid = floor_item[math.random(#floor_item)]
             if #lava == 0 then
                 spawn(newid, x, y + 0.9, l, 0, 0)
+            elseif #top > 0 and #right > 0 and newid == ENT_TYPE.FLOOR_SPRING_TRAP then
+                return false
+            elseif #top > 0 and #left > 0 and newid == ENT_TYPE.FLOOR_SPRING_TRAP then
+                return false
             end
         end
     elseif #bottom == 0 and
