@@ -79,6 +79,13 @@ function ice_caves_exit()
     end
 end
 
+function tiamat_exit()
+    local tiamat = get_entities_by_type(ENT_TYPE.MONS_TIAMAT)[1]
+    if testflag(tiamat.flags, ENT_FLAG.DEAD) then
+        state.win_state = WIN_STATE.NO_WIN
+    end
+end
+
 function unlock_entrance()
     if #players < 1 then return end
     x, y, l = get_position(players[1].uid)
@@ -234,6 +241,8 @@ set_callback(function()
             set_interval(ice_caves_exit, 30)
         elseif state.theme == THEME.VOLCANA then
             set_interval(give_udjat, 30)
+        elseif state.theme == THEME.TIAMAT then
+            tiamat_exit()
         end
         set_interval(unlock_entrance, 30)
 
