@@ -242,7 +242,7 @@ set_callback(function()
         elseif state.theme == THEME.VOLCANA then
             set_interval(give_udjat, 30)
         elseif state.theme == THEME.TIAMAT then
-            tiamat_exit()
+            set_interval(tiamat_exit, 30)
         end
         set_interval(unlock_entrance, 30)
 
