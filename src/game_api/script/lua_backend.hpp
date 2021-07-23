@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <deque>
 #include <filesystem>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <string_view>
@@ -65,6 +66,7 @@ enum class ON
     SAVE,
     LOAD,
     GAMEFRAME,
+    PRE_LEVEL_GENERATION,
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
     SCRIPT_ENABLE,
@@ -210,10 +212,7 @@ class LuaBackend
     std::map<int, ScriptImage*> images;
 
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
-    virtual ~LuaBackend()
-    {
-        clear_all_callbacks();
-    }
+    virtual ~LuaBackend();
 
     template <class... Args>
     bool handle_function(sol::function func, Args&&... args);
@@ -249,6 +248,7 @@ class LuaBackend
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
 
+    void pre_level_generation();
     void post_room_generation();
     void post_level_generation();
 
@@ -257,6 +257,8 @@ class LuaBackend
 
     void hook_entity_dtor(Entity* entity);
     void pre_entity_destroyed(Entity* entity);
+
+    static void for_each_backend(std::function<bool(LuaBackend&)> fun);
 };
 
 template <class... Args>

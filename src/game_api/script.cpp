@@ -4,17 +4,11 @@
 
 #include "script/script_impl.hpp"
 
-std::vector<SpelunkyScript*> g_all_scripts;
-
 SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, class SpelunkyConsole* console, bool enable)
     : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, console ? console->get_impl() : nullptr, enable)}
 {
-    g_all_scripts.push_back(this);
 }
-SpelunkyScript::~SpelunkyScript()
-{
-    std::erase(g_all_scripts, this);
-}
+SpelunkyScript::~SpelunkyScript() = default;
 
 std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 {
@@ -118,42 +112,4 @@ void SpelunkyScript::draw(ImDrawList* dl)
 void SpelunkyScript::render_options()
 {
     m_Impl->render_options();
-}
-
-bool SpelunkyScript::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
-{
-    return m_Impl->pre_level_gen_spawn(tile_code, x, y, layer);
-}
-void SpelunkyScript::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
-{
-    m_Impl->post_level_gen_spawn(tile_code, x, y, layer);
-}
-
-void SpelunkyScript::post_room_generation()
-{
-    m_Impl->post_room_generation();
-}
-void SpelunkyScript::post_level_generation()
-{
-    m_Impl->post_level_generation();
-}
-
-Entity* SpelunkyScript::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
-{
-    return m_Impl->pre_entity_spawn(entity_type, x, y, layer, overlay, spawn_type_flags);
-}
-void SpelunkyScript::post_entity_spawn(Entity* entity, int spawn_type_flags)
-{
-    m_Impl->post_entity_spawn(entity, spawn_type_flags);
-}
-
-void SpelunkyScript::for_each_script(std::function<bool(SpelunkyScript&)> fun)
-{
-    for (auto* script : g_all_scripts)
-    {
-        if (!fun(*script))
-        {
-            break;
-        }
-    }
 }

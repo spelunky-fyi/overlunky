@@ -21,6 +21,9 @@
 
 #include <sol/sol.hpp>
 
+std::mutex g_all_backends_mutex;
+std::vector<LuaBackend*> g_all_backends;
+
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
 {
     sound_manager = sound_mgr;
@@ -46,6 +49,18 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
 
     load_libraries(this);
     populate_lua_state(this);
+
+    std::lock_guard lock{g_all_backends_mutex};
+    g_all_backends.push_back(this);
+}
+LuaBackend::~LuaBackend()
+{
+    {
+        std::lock_guard lock{g_all_backends_mutex};
+        std::erase(g_all_backends, this);
+    }
+
+    clear_all_callbacks();
 }
 
 void LuaBackend::clear()
@@ -555,6 +570,27 @@ void LuaBackend::post_level_gen_spawn(std::string_view tile_code, float x, float
     }
 }
 
+void LuaBackend::pre_level_generation()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    g_players = get_players();
+    lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == ON::PRE_LEVEL_GENERATION)
+        {
+            handle_function(callback.func);
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::post_room_generation()
 {
     if (!get_enabled())
@@ -572,7 +608,6 @@ void LuaBackend::post_room_generation()
         }
     }
 }
-
 void LuaBackend::post_level_generation()
 {
     if (!get_enabled())
@@ -656,4 +691,16 @@ void LuaBackend::pre_entity_destroyed(Entity* entity)
     auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
                                           { return dtor_hook.first == entity->uid; });
     assert(num_erased_dtors == 1);
+}
+
+void LuaBackend::for_each_backend(std::function<bool(LuaBackend&)> fun)
+{
+    std::lock_guard lock{g_all_backends_mutex};
+    for (auto* script : g_all_backends)
+    {
+        if (!fun(*script))
+        {
+            break;
+        }
+    }
 }

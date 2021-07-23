@@ -5,8 +5,9 @@
 #include "logger.h"
 #include "memory.hpp"
 #include "rpc.hpp"
-#include "script.hpp"
 #include "util.hpp"
+
+#include "script/events.hpp"
 
 #include <Windows.h>
 #include <detours.h>
@@ -277,11 +278,7 @@ Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float
     Entity* spawned_ent{nullptr};
     if (g_SpawnNonReplacable == 0)
     {
-        SpelunkyScript::for_each_script([=, &spawned_ent](SpelunkyScript& script)
-                                        {
-                                            spawned_ent = script.pre_entity_spawn(entity_type, x, y, layer, overlay, g_SpawnTypeFlags);
-                                            return spawned_ent == nullptr;
-                                        });
+        spawned_ent = pre_entity_spawn(entity_type, x, y, layer, overlay, g_SpawnTypeFlags);
     }
 
     if (spawned_ent == nullptr)
@@ -289,11 +286,7 @@ Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float
         spawned_ent = g_spawn_entity_trampoline(entity_store, entity_type, x, y, layer, overlay, some_bool);
     }
 
-    SpelunkyScript::for_each_script([spawned_ent](SpelunkyScript& script)
-                                    {
-                                        script.post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
-                                        return true;
-                                    });
+    post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
     return spawned_ent;
 }
 

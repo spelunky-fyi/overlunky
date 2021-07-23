@@ -841,6 +841,8 @@ void populate_lua_state(LuaBackend* backend)
         ON::SAVE,
         "LOAD",
         ON::LOAD,
+        "PRE_LEVEL_GENERATION",
+        ON::PRE_LEVEL_GENERATION,
         "POST_ROOM_GENERATION",
         ON::POST_ROOM_GENERATION,
         "POST_LEVEL_GENERATION",
@@ -863,6 +865,8 @@ void populate_lua_state(LuaBackend* backend)
     // Runs on the first ON.SCREEN of a run
     // RESET
     // Runs when resetting a run
+    // PRE_LEVEL_GENERATION
+    // Runs before any level generation, no entities should exist at this point
     // POST_ROOM_GENERATION
     // Params: `PostRoomGenerationContext room_gen_ctx`
     // Runs right after all rooms are generated before entities are spawned
@@ -884,6 +888,8 @@ void populate_lua_state(LuaBackend* backend)
         SPAWN_TYPE_LEVEL_GEN_TILE_CODE,
         "LEVEL_GEN_PROCEDURAL",
         SPAWN_TYPE_LEVEL_GEN_PROCEDURAL,
+        "LEVEL_GEN_GENERAL",
+        SPAWN_TYPE_LEVEL_GEN_GENERAL,
         "SCRIPT",
         SPAWN_TYPE_SCRIPT,
         "SYSTEMIC",
@@ -897,6 +903,8 @@ void populate_lua_state(LuaBackend* backend)
     // Similar to LEVEL_GEN but only triggers on tile code spawns.
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+    // LEVEL_GEN_GENERAL
+    // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT
     // Runs for any spawn happening through a call from the Lua API, also during level generation.
     // SYSTEMIC

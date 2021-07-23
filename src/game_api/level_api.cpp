@@ -6,10 +6,11 @@
 #include "logger.h"
 #include "memory.hpp"
 #include "rpc.hpp"
-#include "script.hpp"
 #include "spawn_api.hpp"
 #include "util.hpp"
 #include "vtable_hook.hpp"
+
+#include "script/events.hpp"
 
 #include <array>
 #include <numbers>
@@ -520,15 +521,13 @@ using LevelGenFun = void(LevelGenSystem*, float);
 LevelGenFun* g_level_gen_trampoline{nullptr};
 void level_gen(LevelGenSystem* level_gen_sys, float param_2)
 {
-    auto state = State::get().ptr();
-    g_level_gen_trampoline(level_gen_sys, param_2);
+    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
 
-    SpelunkyScript::for_each_script(
-        [&](SpelunkyScript& script)
-        {
-            script.post_level_generation();
-            return true;
-        });
+    pre_level_generation();
+    g_level_gen_trampoline(level_gen_sys, param_2);
+    post_level_generation();
 }
 
 using GenRoomsFun = void(ThemeInfo*);
@@ -536,13 +535,7 @@ GenRoomsFun* g_gen_rooms_trampoline{nullptr};
 void gen_rooms(ThemeInfo* theme)
 {
     g_gen_rooms_trampoline(theme);
-
-    SpelunkyScript::for_each_script(
-        [&](SpelunkyScript& script)
-        {
-            script.post_room_generation();
-            return true;
-        });
+    post_room_generation();
 }
 
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
@@ -556,15 +549,7 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
     std::string_view tile_code_name = g_tile_code_id_to_name[tile_code];
 
     {
-        bool block_spawn = false;
-        SpelunkyScript::for_each_script(
-            [&](SpelunkyScript& script)
-            {
-                block_spawn = script.pre_level_gen_spawn(tile_code_name, x, y, layer);
-                if (block_spawn)
-                    return false;
-                return true;
-            });
+        const bool block_spawn = pre_tile_code_spawn(tile_code_name, x, y, layer);
         if (block_spawn)
         {
             tile_code = g_last_tile_code_id;
@@ -582,12 +567,7 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
         g_handle_tile_code_trampoline(_this, tile_code, _ull_0, x, y, layer);
     }
 
-    SpelunkyScript::for_each_script(
-        [&](SpelunkyScript& script)
-        {
-            script.post_level_gen_spawn(tile_code_name, x, y, layer);
-            return true;
-        });
+    post_tile_code_spawn(tile_code_name, x, y, layer);
 
     if (!g_floor_requiring_entities.empty())
     {

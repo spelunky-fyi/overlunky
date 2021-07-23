@@ -2126,9 +2126,8 @@ void render_messages()
     {
         queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
     }
-    std::erase_if(g_ConsoleMessages, [&](auto message) {
-        return now - 10s > message.time;
-    });
+    std::erase_if(g_ConsoleMessages, [&](auto message)
+                  { return now - 10s > message.time; });
 
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);

@@ -59,6 +59,8 @@ add_library(spel2_api STATIC
         script/script_impl.hpp
         script/script_util.cpp
         script/script_util.hpp
+        script/events.cpp
+        script/events.hpp
         script/usertypes/save_context.cpp
         script/usertypes/save_context.hpp
         script/usertypes/state_lua.cpp
