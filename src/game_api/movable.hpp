@@ -61,27 +61,27 @@ class Movable : public Entity
     virtual void adjust_health(int8_t amount) = 0;      // called for dealing damage (neg amount) by the game, but not for gaining health (turkey, motherstatue), even though that works too (and there is even a max health check of 0x63)
     virtual void v45() = 0;
     virtual void v46() = 0;
-    virtual void handle_flying_object_collision(Entity* victim) = 0;                                          // stuff like flying rocks, broken arrows hitting the player
-    virtual void handle_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint8_t unknown = 1) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost); unknown param = 2 when hired hand gets hit by player
-    virtual void handle_stun_damage(Entity* damage_dealer) = 0;                                               // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
+    virtual void on_flying_object_collision(Entity* victim) = 0;                                          // stuff like flying rocks, broken arrows hitting the player
+    virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint8_t unknown = 1) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost); unknown param = 2 when hired hand gets hit by player
+    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                               // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
     virtual void v50() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
     virtual void light_on_fire() = 0;
     virtual void set_cursed(bool b) = 0;
-    virtual void handle_spiderweb_collision() = 0;
+    virtual void on_spiderweb_collision() = 0;
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // assigns player as last_owner_uid and also manipulates movable.b127
     virtual uint32_t get_last_owner_uid() = 0;               // for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
     virtual void check_out_of_bounds() = 0;                  // kills with the 'still falling' death cause
     virtual Entity* standing_on() = 0;                       // looks up movable.standing_on_uid in state.instance_id_to_pointer
-    virtual void stomped_on_by(Entity* stomper) = 0;
-    virtual void thrown_by(Entity* thrower) = 0;             // implemented for special cases like hired hand (player with ai_func), horned lizard...
-    virtual void handle_clonegunshot_hit(Entity* clone) = 0; // implemented for player/hired hand: copies health to clone etc
+    virtual void on_stomped_on_by(Entity* stomper) = 0;
+    virtual void on_thrown_by(Entity* thrower) = 0;      // implemented for special cases like hired hand (player with ai_func), horned lizard...
+    virtual void on_clonegunshot_hit(Entity* clone) = 0; // implemented for player/hired hand: copies health to clone etc
     virtual uint32_t get_type_id() = 0;
     virtual bool doesnt_have_spikeshoes() = 0;
     virtual bool is_player_mount_or_monster() = 0;
     virtual void pick_up(Entity* entity_to_pick_up) = 0;
-    virtual void picked_up_by(Entity* entity_picking_up) = 0;
+    virtual void on_picked_up_by(Entity* entity_picking_up) = 0;
     virtual void drop(Entity* entity) = 0; // also used when throwing
     virtual void collect_treasure(uint32_t treasure_value) = 0;
     virtual void apply_movement() = 0;              // disable this function and things can't move, some spin in place
@@ -92,7 +92,7 @@ class Movable : public Entity
     virtual void handle_stun_transition_animation() = 0; // e.g. the wiggle the dog does when waking up from being stunned
     virtual void process_input() = 0;                    // unsure of params
     virtual void post_collision_damage_related() = 0;
-    virtual void picked_up() = 0;                    // gets called after picked_up_by
+    virtual void on_picked_up() = 0;                 // gets called after on_picked_up_by
     virtual void hired_hand_related() = 0;           // checks ai_func, gets triggered just after throwing hired hand
     virtual void generate_fall_poof_particles() = 0; // entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
     virtual void handle_fall_logic() = 0;            // adjusts entity.velocityy when falling
