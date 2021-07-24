@@ -1,8 +1,10 @@
 #include "lua_console.hpp"
 
-#include "lua_libs/lua_libs.hpp"
+#include "lua_vm.hpp"
 #include "rpc.hpp"
 #include "script_util.hpp"
+
+#include "lua_libs/lua_libs.hpp"
 
 #include <sol/sol.hpp>
 
@@ -11,8 +13,7 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
 {
     // Needs to be populated for reliable cleanup later
     name = get_name();
-
-    require_serpent_lua(lua);
+    lua["__script_id"] = "lua_console";
 
     // THIS LIST IS AUTO GENERATED
     // To recreate it, run the entity_casting.py script
@@ -755,7 +756,7 @@ std::string LuaConsole::execute(std::string code)
 }
 std::string LuaConsole::execute_raw(std::string code)
 {
-    auto ret = lua.safe_script(code);
+    auto ret = execute_lua(lua, code);
     if (ret.get_type() == sol::type::nil || ret.get_type() == sol::type::none)
     {
         return "";

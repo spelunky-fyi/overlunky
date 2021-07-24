@@ -25,17 +25,13 @@ std::mutex g_all_backends_mutex;
 std::vector<LuaBackend*> g_all_backends;
 
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
+    : lua{get_lua_vm(sound_mgr), sol::create}, sound_manager{sound_mgr}, console{con}
 {
-    sound_manager = sound_mgr;
-    console = con;
-
     g_state = get_state_ptr();
-    g_items = list_entities();
-    g_players = get_players();
-    g_save = savedata();
 
-    if (!g_players.empty())
-        state.player = g_players.at(0);
+    auto players = get_players();
+    if (!players.empty())
+        state.player = players.at(0);
     else
         state.player = nullptr;
     state.screen = g_state->screen;
@@ -47,8 +43,7 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;
 
-    load_libraries(this);
-    populate_lua_state(this);
+    populate_lua_env(lua);
 
     std::lock_guard lock{g_all_backends_mutex};
     g_all_backends.push_back(this);
@@ -75,13 +70,14 @@ void LuaBackend::clear()
     {
         package["path"] = root_path + "/?.lua;" + root_path + "/?/init.lua";
         package["cpath"] = root_path + "/?.dll;" + root_path + "/?/init.dll";
-        load_unsafe_libraries(this);
+        expose_unsafe_libraries(lua);
     }
     else
     {
         package["path"] = root_path + "/?.lua;" + root_path + "/?/init.lua";
         package["cpath"] = "";
-        package["loadlib"] = sol::lua_nil;
+        package["loadlib"] = sol::nil;
+        hide_unsafe_libraries(lua);
     }
 }
 void LuaBackend::clear_all_callbacks()
@@ -175,8 +171,10 @@ bool LuaBackend::update()
         sol::optional<sol::function> on_win = lua["on_win"];
         /// Runs on any [screen change](#on).
         sol::optional<sol::function> on_screen = lua["on_screen"];
-        g_players = get_players();
-        lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
+
+        std::vector<Player*> players = get_players();
+        lua["players"] = std::vector<Player*>(players);
+
         if (g_state->screen != state.screen && g_state->screen_last != 5)
         {
             level_timers.clear();
@@ -193,8 +191,8 @@ bool LuaBackend::update()
             if (on_camp)
                 on_camp.value()();
         }
-        if (g_state->screen == 12 && g_state->screen_last != 5 && !g_players.empty() &&
-            (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+        if (g_state->screen == 12 && g_state->screen_last != 5 && !players.empty() &&
+            (state.player != players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
         {
             if (g_state->level_count == 0)
             {
@@ -300,7 +298,7 @@ bool LuaBackend::update()
                 handle_function(callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !g_players.empty() && (state.player != g_players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !players.empty() && (state.player != players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
@@ -339,8 +337,8 @@ bool LuaBackend::update()
                 }
                 case ON::START:
                 {
-                    if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !g_players.empty() &&
-                        state.player != g_players.at(0))
+                    if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !players.empty() &&
+                        state.player != players.at(0))
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -408,8 +406,8 @@ bool LuaBackend::update()
             }
         }
 
-        if (!g_players.empty())
-            state.player = g_players.at(0);
+        if (!players.empty())
+            state.player = players.at(0);
         else
             state.player = nullptr;
         state.screen = g_state->screen;
@@ -579,8 +577,7 @@ void LuaBackend::pre_level_generation()
 
     std::lock_guard lock{gil};
 
-    g_players = get_players();
-    lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
+    lua["players"] = std::vector<Player*>(get_players());
 
     for (auto& [id, callback] : callbacks)
     {
@@ -617,8 +614,7 @@ void LuaBackend::post_level_generation()
 
     std::lock_guard lock{gil};
 
-    g_players = get_players();
-    lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
+    lua["players"] = std::vector<Player*>(get_players());
 
     for (auto& [id, callback] : callbacks)
     {
@@ -696,11 +692,37 @@ void LuaBackend::pre_entity_destroyed(Entity* entity)
 void LuaBackend::for_each_backend(std::function<bool(LuaBackend&)> fun)
 {
     std::lock_guard lock{g_all_backends_mutex};
-    for (auto* script : g_all_backends)
+    for (auto* backend : g_all_backends)
     {
-        if (!fun(*script))
+        if (!fun(*backend))
         {
             break;
         }
     }
+}
+LuaBackend* LuaBackend::get_backend(std::string_view id)
+{
+    std::lock_guard lock{g_all_backends_mutex};
+    for (auto* backend : g_all_backends)
+    {
+        if (backend->get_id() == id)
+        {
+            return backend;
+        }
+    }
+    return nullptr;
+}
+LuaBackend* LuaBackend::get_calling_backend()
+{
+    static const sol::state& lua = get_lua_vm();
+    auto get_script_id = lua["get_script_id"];
+    if (get_script_id.get_type() == sol::type::function)
+    {
+        auto script_id = get_script_id();
+        if (script_id.get_type() == sol::type::string)
+        {
+            return LuaBackend::get_backend(script_id.get<std::string_view>());
+        }
+    }
+    return nullptr;
 }

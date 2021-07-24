@@ -2,7 +2,7 @@
 
 #include "level_api.hpp"
 #include "savedata.hpp"
-#include "script/script_impl.hpp"
+#include "script/lua_backend.hpp"
 #include "state.hpp"
 
 #include <sol/sol.hpp>
@@ -19,29 +19,32 @@ bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE ch
 
 namespace NLevel
 {
-void register_usertypes(sol::state& lua, LuaBackend* script)
+void register_usertypes(sol::state& lua)
 {
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
     /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
-    lua["set_pre_tile_code_callback"] = [script](sol::function cb, std::string tile_code) -> CallbackId
+    lua["set_pre_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
-        script->pre_level_gen_callbacks.push_back(LevelGenCallback{script->cbcount, std::move(tile_code), std::move(cb)});
-        return script->cbcount++;
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->pre_level_gen_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
+        return backend->cbcount++;
     };
     /// Add a callback for a specific tile code that is called after the game handles the tile code.
     /// Use this to affect what the game or other scripts spawned in this position.
     /// This is received even if a previous pre-tile-code-callback has returned true
-    lua["set_post_tile_code_callback"] = [script](sol::function cb, std::string tile_code) -> CallbackId
+    lua["set_post_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
-        script->post_level_gen_callbacks.push_back(LevelGenCallback{script->cbcount, std::move(tile_code), std::move(cb)});
-        return script->cbcount++;
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->post_level_gen_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
+        return backend->cbcount++;
     };
     /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
-    lua["define_tile_code"] = [script](std::string tile_code)
+    lua["define_tile_code"] = [](std::string tile_code)
     {
-        script->g_state->level_gen->data->define_tile_code(std::move(tile_code));
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->g_state->level_gen->data->define_tile_code(std::move(tile_code));
     };
 
     /// Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
@@ -49,26 +52,27 @@ void register_usertypes(sol::state& lua, LuaBackend* script)
     /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
     /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
-    lua["define_procedural_spawn"] = [script](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid) -> PROCEDURAL_CHANCE
+    lua["define_procedural_spawn"] = [](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid) -> PROCEDURAL_CHANCE
     {
-        LevelGenData* data = script->g_state->level_gen->data;
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        LevelGenData* data = backend->g_state->level_gen->data;
         uint32_t chance = data->define_chance(std::move(procedural_spawn));
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [script, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            is_valid_call = [backend, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
             {
-                std::lock_guard lock{script->gil};
-                return script->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
+                std::lock_guard lock{backend->gil};
+                return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
             };
         }
-        std::function<void(float, float, int)> do_spawn_call = [script, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        std::function<void(float, float, int)> do_spawn_call = [backend, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
         {
-            std::lock_guard lock{script->gil};
-            return script->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
+            std::lock_guard lock{backend->gil};
+            return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
         };
         std::uint32_t id = data->register_chance_logic_provider(chance, ChanceLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
-        script->chance_callbacks.push_back(id);
+        backend->chance_callbacks.push_back(id);
         return chance;
     };
 
@@ -127,21 +131,18 @@ void register_usertypes(sol::state& lua, LuaBackend* script)
         "beg_state",
         &QuestsInfo::beg_state);
 
-#define table_of(T, name) \
-    sol::property([script]() { return sol::as_table_ref(std::vector<T>(script->g_save->name, script->g_save->name + sizeof script->g_save->name / sizeof script->g_save->name[0])); })
-
     lua.new_usertype<SaveData>(
         "SaveData",
         "places",
-        table_of(bool, places),
+        sol::readonly(&SaveData::places),
         "bestiary",
-        table_of(bool, bestiary),
+        sol::readonly(&SaveData::bestiary),
         "people",
-        table_of(bool, people),
+        sol::readonly(&SaveData::people),
         "items",
-        table_of(bool, items),
+        sol::readonly(&SaveData::items),
         "traps",
-        table_of(bool, traps),
+        sol::readonly(&SaveData::traps),
         "last_daily",
         sol::readonly(&SaveData::last_daily),
         "characters",
@@ -149,13 +150,13 @@ void register_usertypes(sol::state& lua, LuaBackend* script)
         "shortcuts",
         sol::readonly(&SaveData::shortcuts),
         "bestiary_killed",
-        table_of(int, bestiary_killed),
+        sol::readonly(&SaveData::bestiary_killed),
         "bestiary_killed_by",
-        table_of(int, bestiary_killed_by),
+        sol::readonly(&SaveData::bestiary_killed_by),
         "people_killed",
-        table_of(int, people_killed),
+        sol::readonly(&SaveData::people_killed),
         "people_killed_by",
-        table_of(int, people_killed_by),
+        sol::readonly(&SaveData::people_killed_by),
         "plays",
         sol::readonly(&SaveData::plays),
         "deaths",

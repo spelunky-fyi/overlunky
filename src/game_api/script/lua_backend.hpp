@@ -168,7 +168,7 @@ class LuaConsole;
 class LuaBackend
 {
   public:
-    sol::state lua;
+    sol::environment lua;
 
     std::string name;
     std::string result;
@@ -202,9 +202,6 @@ class LuaBackend
     ImDrawList* draw_list{nullptr};
 
     StateMemory* g_state = nullptr;
-    std::vector<EntityItem> g_items;
-    std::vector<Player*> g_players;
-    SaveData* g_save = nullptr;
 
     SoundManager* sound_manager;
     LuaConsole* console;
@@ -259,6 +256,8 @@ class LuaBackend
     void pre_entity_destroyed(Entity* entity);
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
+    static LuaBackend* get_backend(std::string_view id);
+    static LuaBackend* get_calling_backend();
 };
 
 template <class... Args>

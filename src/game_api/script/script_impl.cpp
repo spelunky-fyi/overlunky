@@ -1,6 +1,6 @@
 #include "script_impl.hpp"
 
-#include "lua_libs/lua_libs.hpp"
+#include "lua_vm.hpp"
 #include "rpc.hpp"
 #include "script_util.hpp"
 
@@ -33,7 +33,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// - `meta.version` Version
     /// - `meta.description` Short description of the script
     /// - `meta.author` Your name
-    lua["meta"] = lua.create_named_table("meta");
+    lua["meta"] = get_lua_vm().create_named_table("meta");
 
     try
     {
@@ -69,7 +69,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
                 getmeta = false;
             }
         }
-        auto lua_result = lua.safe_script(metacode.data());
+        auto lua_result = execute_lua(lua, metacode);
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
@@ -81,6 +81,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         meta.author = meta_author.value_or("Anonymous");
         meta.unsafe = meta_unsafe.value_or(false);
         meta.id = script_id();
+        lua["__script_id"] = meta.id;
+
         result = "Got metadata";
     }
     catch (const sol::error& e)
@@ -109,7 +111,7 @@ bool ScriptImpl::reset()
     try
     {
         std::lock_guard gil_guard{gil};
-        auto lua_result = lua.safe_script(code);
+        auto lua_result = execute_lua(lua, code);
 
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
@@ -121,6 +123,7 @@ bool ScriptImpl::reset()
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
         meta.id = script_id();
+        lua["__script_id"] = meta.id;
 
         result = "OK";
         return true;

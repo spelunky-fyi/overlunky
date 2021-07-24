@@ -6,5 +6,5 @@ class LuaBackend;
 
 namespace NEntityCasting
 {
-void register_usertypes(sol::state& lua, LuaBackend* script);
+void register_usertypes(sol::state& lua);
 };

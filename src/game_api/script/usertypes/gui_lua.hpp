@@ -84,11 +84,11 @@ class GuiDrawContext
     void win_image(int image, int width, int height);
 
   private:
-    class LuaBackend* script;
+    class LuaBackend* backend;
     struct ImDrawList* draw_list;
 };
 
 namespace NGui
 {
-void register_usertypes(sol::state& lua, LuaBackend* script);
+void register_usertypes(sol::state& lua);
 };

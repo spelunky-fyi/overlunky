@@ -33,25 +33,20 @@
 
 #include "lua_libs/lua_libs.hpp"
 
-void load_libraries(LuaBackend* backend)
+void load_libraries(sol::state& lua)
 {
-    sol::state& lua = backend->lua;
-
-    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
+    lua.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package);
     require_json_lua(lua);
     require_inspect_lua(lua);
     require_format_lua(lua);
 }
-void load_unsafe_libraries(LuaBackend* backend)
+void load_unsafe_libraries(sol::state& lua)
 {
-    sol::state& lua = backend->lua;
-
-    lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi);
+    lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
+    require_serpent_lua(lua);
 }
-void populate_lua_state(LuaBackend* backend)
+void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
-    sol::state& lua = backend->lua;
-
     auto infinite_loop = [](lua_State* argst, lua_Debug* argdb)
     {
         luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
@@ -60,19 +55,45 @@ void populate_lua_state(LuaBackend* backend)
     lua_sethook(lua.lua_state(), NULL, 0, 0);
     lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 1000000000);
 
+    lua.safe_script(R"(
+-- This function walks up the stack until it finds an _ENV that is not _G
+-- That _ENV has to be the environment of a script where we can look up the scripts id
+get_script_id = function()
+    -- Not available in Lua 5.2+
+    getfenv = getfenv or function(f)
+        f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
+        local name, val
+        local up = 0
+        repeat
+            up = up + 1
+            name, val = debug.getupvalue(f, up)
+        until name == '_ENV' or name == nil
+        return val
+    end
+
+    local env
+    local up = 2
+    repeat
+        env = getfenv(up)
+        up = up + 1
+    until env ~= _G and env ~= nil
+    return env.__script_id
+end
+)");
+
     NHitbox::register_usertypes(lua);
-    NSound::register_usertypes(lua, backend);
-    NLevel::register_usertypes(lua, backend);
-    NGui::register_usertypes(lua, backend);
-    NTexture::register_usertypes(lua, backend);
-    NEntity::register_usertypes(lua, backend);
-    NEntitiesFloors::register_usertypes(lua, backend);
-    NEntitiesActiveFloors::register_usertypes(lua, backend);
-    NEntitiesMounts::register_usertypes(lua, backend);
-    NEntitiesMonsters::register_usertypes(lua, backend);
-    NEntitiesItems::register_usertypes(lua, backend);
-    NEntitiesFX::register_usertypes(lua, backend);
-    NEntitiesLiquids::register_usertypes(lua, backend);
+    NSound::register_usertypes(lua, sound_manager);
+    NLevel::register_usertypes(lua);
+    NGui::register_usertypes(lua);
+    NTexture::register_usertypes(lua);
+    NEntity::register_usertypes(lua);
+    NEntitiesFloors::register_usertypes(lua);
+    NEntitiesActiveFloors::register_usertypes(lua);
+    NEntitiesMounts::register_usertypes(lua);
+    NEntitiesMonsters::register_usertypes(lua);
+    NEntitiesItems::register_usertypes(lua);
+    NEntitiesFX::register_usertypes(lua);
+    NEntitiesLiquids::register_usertypes(lua);
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);
@@ -80,7 +101,7 @@ void populate_lua_state(LuaBackend* backend)
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
     NEntityFlags::register_usertypes(lua);
-    NEntityCasting::register_usertypes(lua, backend);
+    NEntityCasting::register_usertypes(lua);
 
     /// A bunch of [game state](#statememory) variables
     /// Example:
@@ -89,17 +110,18 @@ void populate_lua_state(LuaBackend* backend)
     ///     toast("Congratulations for lasting 5 seconds in Dwelling")
     /// end
     /// ```
-    lua["state"] = backend->g_state;
+    lua["state"] = get_state_ptr();
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
-    lua["players"] = std::vector<Movable*>(backend->g_players.begin(), backend->g_players.end());
+    lua["players"] = std::vector<Player*>(get_players());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
-    lua["savegame"] = backend->g_save;
+    lua["savegame"] = savedata();
 
     /// Standard lua print function, prints directly to the console but not to the game
     lua["lua_print"] = lua["print"];
     /// Print a log message on screen.
-    lua["print"] = [backend](std::string message) -> void
+    lua["print"] = [](std::string message) -> void
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (backend->messages.size() > 20)
             backend->messages.pop_front();
@@ -153,8 +175,9 @@ void populate_lua_state(LuaBackend* backend)
     { lua["prinspect"](objects); };
 
     /// Adds a command that can be used in the console.
-    lua["register_console_command"] = [backend](std::string name, sol::function cmd)
+    lua["register_console_command"] = [](std::string name, sol::function cmd)
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->console)
         {
             backend->console_commands.insert(name);
@@ -164,16 +187,18 @@ void populate_lua_state(LuaBackend* backend)
 
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_interval"] = [backend](sol::function cb, int frames) -> CallbackId
+    lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         auto luaCb = IntervalCallback{cb, frames, -1};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
-    lua["set_timeout"] = [backend](sol::function cb, int frames) -> CallbackId
+    lua["set_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         int now = backend->g_state->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->level_timers[backend->cbcount] = luaCb;
@@ -181,16 +206,18 @@ void populate_lua_state(LuaBackend* backend)
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_interval"] = [backend](sol::function cb, int frames) -> CallbackId
+    lua["set_global_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         auto luaCb = IntervalCallback{cb, frames, -1};
         backend->global_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
-    lua["set_global_timeout"] = [backend](sol::function cb, int frames) -> CallbackId
+    lua["set_global_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->global_timers[backend->cbcount] = luaCb;
@@ -198,8 +225,9 @@ void populate_lua_state(LuaBackend* backend)
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called on an [event](#on).
-    lua["set_callback"] = [backend](sol::function cb, int screen) -> CallbackId
+    lua["set_callback"] = [](sol::function cb, int screen) -> CallbackId
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         auto luaCb = ScreenCallback{cb, (ON)screen, -1};
         if (luaCb.screen == ON::LOAD)
             backend->load_callbacks[backend->cbcount] = luaCb; // Make sure load always runs before other callbacks
@@ -208,16 +236,22 @@ void populate_lua_state(LuaBackend* backend)
         return backend->cbcount++;
     };
     /// Clear previously added callback `id`
-    lua["clear_callback"] = [backend](CallbackId id)
-    { backend->clear_callbacks.push_back(id); };
+    lua["clear_callback"] = [](CallbackId id)
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->clear_callbacks.push_back(id);
+    };
 
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
     /// Load another script by id "author/name"
-    lua["load_script"] = [backend](std::string id)
-    { backend->required_scripts.push_back(sanitize(id)); };
+    lua["load_script"] = [](std::string id)
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->required_scripts.push_back(sanitize(id));
+    };
     /// Seed the game prng.
-    lua["seed_prng"] = [backend](int64_t seed)
+    lua["seed_prng"] = [](int64_t seed)
     {
         auto seed_prng = get_seed_prng();
         seed_prng(seed);
@@ -233,15 +267,15 @@ void populate_lua_state(LuaBackend* backend)
     ///   end
     /// end, ON.LEVEL)
     /// ```
-    lua["read_prng"] = [backend]() -> std::vector<int64_t> { return read_prng(); };
+    lua["read_prng"] = []() -> std::vector<int64_t> { return read_prng(); };
     /// Show a message that looks like a level feeling.
-    lua["toast"] = [backend](std::wstring message)
+    lua["toast"] = [](std::wstring message)
     {
         auto toast = get_toast();
         toast(NULL, message.data());
     };
     /// Show a message coming from an entity
-    lua["say"] = [backend](uint32_t entity_uid, std::wstring message, int unk_type, bool top)
+    lua["say"] = [](uint32_t entity_uid, std::wstring message, int unk_type, bool top)
     {
         auto say = get_say();
         auto entity = get_entity_ptr(entity_uid);
@@ -251,82 +285,94 @@ void populate_lua_state(LuaBackend* backend)
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
-    // lua["register_option_int"] = [backend](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
+    // lua["register_option_int"] = [](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
     lua["register_option_int"] = sol::overload(
-        [backend, &lua](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
+        [&lua](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, IntOption{value, min, max}};
             lua["options"][name] = value;
         },
-        [backend, &lua](std::string name, std::string desc, int value, int min, int max)
+        [&lua](std::string name, std::string desc, int value, int min, int max)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", IntOption{value, min, max}};
             lua["options"][name] = value;
         });
     /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
-    // lua["register_option_float"] = [backend](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
+    // lua["register_option_float"] = [](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
     lua["register_option_float"] = sol::overload(
-        [backend, &lua](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
+        [&lua](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, FloatOption{value, min, max}};
             lua["options"][name] = value;
         },
-        [backend, &lua](std::string name, std::string desc, float value, float min, float max)
+        [&lua](std::string name, std::string desc, float value, float min, float max)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", FloatOption{value, min, max}};
             lua["options"][name] = value;
         });
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
-    // lua["register_option_bool"] = [backend, &lua](std::string name, std::string desc, std::string long_desc, bool value)
+    // lua["register_option_bool"] = [&lua](std::string name, std::string desc, std::string long_desc, bool value)
     lua["register_option_bool"] = sol::overload(
-        [backend, &lua](std::string name, std::string desc, std::string long_desc, bool value)
+        [&lua](std::string name, std::string desc, std::string long_desc, bool value)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, BoolOption{value}};
             lua["options"][name] = value;
         },
-        [backend, &lua](std::string name, std::string desc, bool value)
+        [&lua](std::string name, std::string desc, bool value)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", BoolOption{value}};
             lua["options"][name] = value;
         });
     /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
-    // lua["register_option_string"] = [backend, &lua](std::string name, std::string desc, std::string long_desc, std::string value)
+    // lua["register_option_string"] = [&lua](std::string name, std::string desc, std::string long_desc, std::string value)
     lua["register_option_string"] = sol::overload(
-        [backend, &lua](std::string name, std::string desc, std::string long_desc, std::string value)
+        [&lua](std::string name, std::string desc, std::string long_desc, std::string value)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, StringOption{value}};
             lua["options"][name] = value;
         },
-        [backend, &lua](std::string name, std::string desc, std::string value)
+        [&lua](std::string name, std::string desc, std::string value)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", StringOption{value}};
             lua["options"][name] = value;
         });
     /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
     /// with a double `\0\0` at the end.
-    // lua["register_option_combo"] = [backend, &lua](std::string name, std::string desc, std::string long_desc, std::string opts)
+    // lua["register_option_combo"] = [&lua](std::string name, std::string desc, std::string long_desc, std::string opts)
     lua["register_option_combo"] = sol::overload(
-        [backend, &lua](std::string name, std::string desc, std::string long_desc, std::string opts)
+        [&lua](std::string name, std::string desc, std::string long_desc, std::string opts)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ComboOption{0, opts}};
             lua["options"][name] = 1;
         },
-        [backend, &lua](std::string name, std::string desc, std::string opts)
+        [&lua](std::string name, std::string desc, std::string opts)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ComboOption{0, opts}};
             lua["options"][name] = 1;
         });
     /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
-    // lua["register_option_button"] = [backend, &lua](std::string name, std::string desc, std::string long_desc, sol::function on_click)
+    // lua["register_option_button"] = [&lua](std::string name, std::string desc, std::string long_desc, sol::function on_click)
     lua["register_option_button"] = sol::overload(
-        [backend, &lua](std::string name, std::string desc, std::string long_desc, sol::function callback)
+        [&lua](std::string name, std::string desc, std::string long_desc, sol::function callback)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ButtonOption{callback}};
             lua["options"][name] = -1;
         },
-        [backend, &lua](std::string name, std::string desc, sol::function callback)
+        [&lua](std::string name, std::string desc, sol::function callback)
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ButtonOption{callback}};
             lua["options"][name] = -1;
         });
@@ -377,7 +423,7 @@ void populate_lua_state(LuaBackend* backend)
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
     /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
-    lua["set_pre_entity_spawn"] = [backend, &lua](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
+    lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
         sol::type va_type = entity_types.get_type();
@@ -389,13 +435,15 @@ void populate_lua_state(LuaBackend* backend)
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
         return backend->cbcount++;
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
     /// The callback signature is `nil post_entity_spawn(entity)`
-    lua["set_post_entity_spawn"] = [backend](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
+    lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
         sol::type va_type = entity_types.get_type();
@@ -407,6 +455,8 @@ void populate_lua_state(LuaBackend* backend)
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
         return backend->cbcount++;
     };
@@ -422,7 +472,7 @@ void populate_lua_state(LuaBackend* backend)
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
     /// Enable/disable game engine pause.
-    lua["pause"] = [backend](bool p)
+    lua["pause"] = [](bool p)
     {
         if (p)
             set_pause(0x20);
@@ -611,7 +661,7 @@ void populate_lua_state(LuaBackend* backend)
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
 
     /// Calculate the tile distance of two entities by uid
-    lua["distance"] = [backend](uint32_t uid_a, uint32_t uid_b) -> float
+    lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float
     {
         Entity* ea = get_entity_ptr(uid_a);
         Entity* eb = get_entity_ptr(uid_b);
@@ -631,7 +681,11 @@ void populate_lua_state(LuaBackend* backend)
     ///     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
     /// end, ON.GUIFRAME)
     /// ```
-    lua["get_bounds"] = [backend]() -> std::tuple<float, float, float, float> { return std::make_tuple(2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f); };
+    lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        return std::make_tuple(2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f);
+    };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = get_camera_position;
     /// Sets the current camera position in the level.
@@ -652,11 +706,12 @@ void populate_lua_state(LuaBackend* backend)
     lua["testflag"] = lua["test_flag"];
 
     /// Gets the resolution (width and height) of the screen
-    lua["get_window_size"] = [backend]() -> std::tuple<int, int> { return {(int)ImGui::GetWindowWidth(), (int)ImGui::GetWindowHeight()}; };
+    lua["get_window_size"] = []() -> std::tuple<int, int> { return {(int)ImGui::GetWindowWidth(), (int)ImGui::GetWindowHeight()}; };
 
     /// Steal input from a Player or HH.
-    lua["steal_input"] = [backend](int uid)
+    lua["steal_input"] = [](int uid)
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
@@ -673,8 +728,9 @@ void populate_lua_state(LuaBackend* backend)
         // DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
     };
     /// Return input
-    lua["return_input"] = [backend](int uid)
+    lua["return_input"] = [](int uid)
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
@@ -686,8 +742,9 @@ void populate_lua_state(LuaBackend* backend)
         backend->script_input.erase(uid);
     };
     /// Send input
-    lua["send_input"] = [backend](int uid, BUTTONS buttons)
+    lua["send_input"] = [](int uid, BUTTONS buttons)
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
         {
             backend->script_input[uid]->current = buttons;
@@ -695,7 +752,7 @@ void populate_lua_state(LuaBackend* backend)
         }
     };
     /// Read input
-    lua["read_input"] = [backend](int uid) -> BUTTONS
+    lua["read_input"] = [](int uid) -> BUTTONS
     {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
@@ -708,8 +765,9 @@ void populate_lua_state(LuaBackend* backend)
         return (uint16_t)0;
     };
     /// Read input that has been previously stolen with steal_input
-    lua["read_stolen_input"] = [backend](int uid)
+    lua["read_stolen_input"] = [](int uid)
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
         {
             // this means that the input is attacked to the real input and not stolen so return early
@@ -731,18 +789,20 @@ void populate_lua_state(LuaBackend* backend)
     };
 
     /// Clears a callback that is specific to an entity.
-    lua["clear_entity_callback"] = [backend](int uid, CallbackId cb_id)
+    lua["clear_entity_callback"] = [&lua](int uid, CallbackId cb_id)
     {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->clear_entity_hooks.push_back({uid, cb_id});
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_pre_statemachine"] = [backend](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = movable->set_pre_statemachine(
                 [backend, fun = std::move(fun)](Movable* self)
                 { return backend->handle_function_with_return<bool>(fun, self).value_or(false); });
@@ -755,10 +815,11 @@ void populate_lua_state(LuaBackend* backend)
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_post_statemachine"] = [backend](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = movable->set_post_statemachine(
                 [backend, fun = std::move(fun)](Movable* self)
                 { backend->handle_function(fun, self); });
@@ -924,4 +985,80 @@ void populate_lua_state(LuaBackend* backend)
         2,
         "COSMIC_OCEAN_WIN",
         3);
+}
+
+std::vector<std::string> safe_fields{};
+std::vector<std::string> unsafe_fields{};
+
+sol::state& get_lua_vm(SoundManager* sound_manager)
+{
+    static std::unique_ptr<sol::state> global_vm = [sound_manager]()
+    {
+        assert(sound_manager != nullptr, "SoundManager needs to be passed to first call to get_lua_vm...");
+
+        std::unique_ptr<sol::state> global_vm = std::make_unique<sol::state>();
+        sol::state& lua_vm = *global_vm;
+        load_libraries(lua_vm);
+        populate_lua_state(lua_vm, sound_manager);
+
+        for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
+        {
+            if (k.get_type() == sol::type::string)
+            {
+                std::string_view key = k.as<std::string_view>();
+                if (key != "debug")
+                {
+                    safe_fields.push_back(std::string{key});
+                }
+            }
+        }
+
+        load_unsafe_libraries(lua_vm);
+
+        for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
+        {
+            if (k.get_type() == sol::type::string)
+            {
+                std::string_view key = k.as<std::string_view>();
+                auto it = std::find(safe_fields.begin(), safe_fields.end(), key);
+                if (it == safe_fields.end())
+                {
+                    unsafe_fields.push_back(std::string{key});
+                }
+            }
+        }
+
+        return global_vm;
+    }();
+    return *global_vm;
+}
+
+sol::protected_function_result execute_lua(sol::environment& env, std::string_view code)
+{
+    static sol::state& global_vm = get_lua_vm();
+    return global_vm.safe_script(fmt::format("(function() {} end)()", code), env);
+}
+
+void populate_lua_env(sol::environment& env)
+{
+    static const sol::state& global_vm = get_lua_vm();
+    for (auto& field : safe_fields)
+    {
+        env[field] = global_vm["_G"][field];
+    }
+}
+void hide_unsafe_libraries(sol::environment& env)
+{
+    for (auto& field : unsafe_fields)
+    {
+        env[field] = sol::nil;
+    }
+}
+void expose_unsafe_libraries(sol::environment& env)
+{
+    static const sol::state& global_vm = get_lua_vm();
+    for (auto& field : unsafe_fields)
+    {
+        env[field] = global_vm["_G"][field];
+    }
 }

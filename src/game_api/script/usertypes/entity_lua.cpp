@@ -1,16 +1,12 @@
 #include "entity_lua.hpp"
 
-#include "entities_items.hpp"
-#include "entities_monsters.hpp"
-#include "entities_mounts.hpp"
 #include "entity.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntity
 {
-void register_usertypes(sol::state& lua, LuaBackend* script)
+void register_usertypes(sol::state& lua)
 {
     lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
     lua.new_usertype<Inventory>(
@@ -251,7 +247,7 @@ void register_usertypes(sol::state& lua, LuaBackend* script)
                            //, "", ...check__[entities.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/entities.txt\]...
                            //, "LIQUID_STAGNANT_LAVA", 898
     );
-    for (auto& item : script->g_items)
+    for (auto& item : list_entities())
     {
         auto name = item.name.substr(9, item.name.size());
         lua["ENT_TYPE"][name] = item.id;

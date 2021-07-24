@@ -2,13 +2,12 @@
 
 #include "entities_mounts.hpp"
 #include "entity.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesMounts
 {
-void register_usertypes(sol::state& lua, LuaBackend* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_mount"] = &Entity::as<Mount>;
 

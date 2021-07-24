@@ -1,14 +1,15 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 struct SaveData
 {
-    bool places[16];
-    bool bestiary[78];
-    bool people[38];
-    bool items[54];
-    bool traps[24];
+    std::array<bool, 16> places;
+    std::array<bool, 78> bestiary;
+    std::array<bool, 38> people;
+    std::array<bool, 54> items;
+    std::array<bool, 24> traps;
     int8_t bd2;
     int8_t bd3;
     int32_t best_time_speedrun;
@@ -19,10 +20,10 @@ struct SaveData
     uint8_t shortcuts;
     int8_t bea;
     int8_t beb;
-    int32_t bestiary_killed[78];
-    int32_t bestiary_killed_by[78];
-    int32_t people_killed[38];
-    int32_t people_killed_by[38];
+    std::array<int32_t, 78> bestiary_killed;
+    std::array<int32_t, 78> bestiary_killed_by;
+    std::array<int32_t, 38> people_killed;
+    std::array<int32_t, 38> people_killed_by;
     int32_t plays;
     int32_t deaths;
     int32_t wins_normal;
