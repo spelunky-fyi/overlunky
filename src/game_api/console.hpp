@@ -3,6 +3,7 @@
 #include <deque>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 class SpelunkyConsole
@@ -25,6 +26,11 @@ class SpelunkyConsole
     void toggle();
 
     std::string execute(std::string code);
+
+    bool has_new_history() const;
+    void set_max_history_size(size_t max_history);
+    void save_history(std::string_view path);
+    void load_history(std::string_view path);
 
     std::string dump_api();
 

@@ -137,7 +137,6 @@ void LuaBackend::clear_all_callbacks()
 bool LuaBackend::reset()
 {
     clear();
-    name = get_name();
     return true;
 }
 

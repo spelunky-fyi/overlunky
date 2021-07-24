@@ -2236,6 +2236,10 @@ void render_clickhandler()
         render_script(script.get(), draw_list);
     }
     render_script(g_Console.get(), draw_list);
+    if (g_Console->has_new_history())
+    {
+        g_Console->save_history("console_history.txt");
+    }
     if (g_state->screen == 29)
     {
         ImDrawList* dl = ImGui::GetBackgroundDrawList();
@@ -3964,6 +3968,7 @@ void init_ui()
     g_save_addr = reinterpret_cast<uintptr_t>(g_save);
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
+    g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
     register_imgui_init(&imgui_init);

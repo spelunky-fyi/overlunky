@@ -11,9 +11,9 @@
 LuaConsole::LuaConsole(SoundManager* sound_manager)
     : LuaBackend(sound_manager, this)
 {
-    // Needs to be populated for reliable cleanup later
-    name = get_name();
-    lua["__script_id"] = "lua_console";
+    lua["__script_id"] = "dev/lua_console";
+
+    expose_unsafe_libraries(lua);
 
     // THIS LIST IS AUTO GENERATED
     // To recreate it, run the entity_casting.py script
@@ -535,6 +535,7 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 
 bool LuaConsole::pre_draw()
 {
+    has_new_history = false;
     if (enabled)
     {
         auto& io = ImGui::GetIO();
@@ -548,9 +549,13 @@ bool LuaConsole::pre_draw()
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
+        std::string_view input_view{console_input};
+        const size_t num_lines = std::count(input_view.begin(), input_view.end(), '\n') + 1;
+
         const std::string& completion_text = completion_options.empty() ? completion_error : completion_options;
         const float completion_size = completion_text.empty() ? 0.0f : style.ItemSpacing.y + ImGui::CalcTextSize(completion_text.c_str(), nullptr, false, io.DisplaySize.x).y;
-        const float footer_height_to_reserve = style.ItemSpacing.y + ImGui::GetFrameHeightWithSpacing() + completion_size;
+        const float input_size = style.ItemSpacing.y + num_lines * ImGui::GetTextLineHeight();
+        const float footer_height_to_reserve = input_size + completion_size;
         ImGui::BeginChild("Results Region", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
@@ -630,8 +635,8 @@ bool LuaConsole::pre_draw()
         };
 
         ImGui::PushItemWidth(ImGui::GetWindowWidth());
-        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-        if (ImGui::InputText("", console_input, IM_ARRAYSIZE(console_input), input_text_flags, input_callback, this))
+        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
+        if (ImGui::InputTextMultiline("", console_input, IM_ARRAYSIZE(console_input), ImVec2{-1, num_lines * ImGui::GetTextLineHeight()}, input_text_flags, input_callback, this))
         {
             if (console_input[0] != '\0')
             {
@@ -662,13 +667,7 @@ bool LuaConsole::pre_draw()
                     }
 
                     history_pos = std::nullopt;
-                    history.push_back(ConsoleHistoryItem{
-                        console_input,
-                        std::move(result_message)});
-                    if (history.size() > max_history)
-                    {
-                        history.erase(history.begin());
-                    }
+                    push_history(console_input, std::move(result_message));
                 }
                 std::memset(console_input, 0, IM_ARRAYSIZE(console_input));
                 completion_options.clear();
@@ -703,7 +702,7 @@ const char* LuaConsole::get_name() const
 }
 const char* LuaConsole::get_id() const
 {
-    return "lua_console";
+    return "dev/lua_console";
 }
 const char* LuaConsole::get_root() const
 {
@@ -731,40 +730,34 @@ void LuaConsole::unregister_command(LuaBackend* provider, std::string command_na
 
 std::string LuaConsole::execute(std::string code)
 {
+    if (!code.starts_with("return"))
+    {
+        std::string ret = execute_raw("return " + code);
+        if (!ret.starts_with("sol: "))
+        {
+            return ret;
+        }
+    }
+    return execute_raw(std::move(code));
+}
+std::string LuaConsole::execute_raw(std::string code)
+{
     try
     {
-        if (!code.starts_with("return"))
+        auto ret = execute_lua(lua, code);
+        if (ret.get_type() == sol::type::nil || ret.get_type() == sol::type::none)
         {
-            try
-            {
-                return execute_raw("return " + code);
-            }
-            catch (const sol::error& e)
-            {
-                return execute_raw(std::move(code));
-            }
+            return "";
         }
         else
         {
-            return execute_raw(std::move(code));
+            sol::function serpent = lua["serpent"]["block"];
+            return serpent(ret);
         }
     }
     catch (const sol::error& e)
     {
         return e.what();
-    }
-}
-std::string LuaConsole::execute_raw(std::string code)
-{
-    auto ret = execute_lua(lua, code);
-    if (ret.get_type() == sol::type::nil || ret.get_type() == sol::type::none)
-    {
-        return "";
-    }
-    else
-    {
-        sol::function serpent = lua["serpent"]["block"];
-        return serpent(ret);
     }
 }
 
@@ -775,6 +768,26 @@ void LuaConsole::toggle()
     scroll_to_bottom = true;
 }
 
+void LuaConsole::push_history(std::string history_item, std::vector<ScriptMessage> result_item)
+{
+    while (history_item.ends_with('\n'))
+    {
+        history_item.pop_back();
+    }
+
+    if (!history_item.empty())
+    {
+        has_new_history = true;
+        history.push_back(ConsoleHistoryItem{
+            std::move(history_item),
+            std::move(result_item)});
+        if (history.size() > max_history)
+        {
+            history.erase(history.begin());
+        }
+    }
+}
+
 std::string LuaConsole::dump_api()
 {
     std::set<std::string> excluded_keys{"meta"};
@@ -783,7 +796,7 @@ std::string LuaConsole::dump_api()
     dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
     require_serpent_lua(dummy_state);
 
-    for (auto& [key, value] : lua["_G"].get<sol::table>())
+    for (auto& [key, value] : lua)
     {
         std::string key_str = key.as<std::string>();
         if (key_str.starts_with("sol."))
@@ -803,7 +816,7 @@ std::string LuaConsole::dump_api()
     sol::function serpent = dummy_state["serpent"]["block"];
 
     std::map<std::string, std::string> sorted_output;
-    for (auto& [key, value] : lua["_G"].get<sol::table>())
+    for (auto& [key, value] : lua)
     {
         std::string key_str = key.as<std::string>();
         if (!excluded_keys.contains(key_str))
@@ -826,7 +839,7 @@ std::string LuaConsole::dump_api()
         api += fmt::format("{} = {}\n", key, value);
 
     const static std::regex reg(R"("function:\s[0-9A-F]+")");
-    api = std::regex_replace(api, reg, R"("function:")");
+    api = std::regex_replace(api, reg, R"("function")");
 
     return api;
 }

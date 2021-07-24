@@ -288,6 +288,23 @@ void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console)
     console->consume_messages();
 }
 
+bool SpelunkyConsole_HasNewHistory(SpelunkyConsole* console)
+{
+    return console->has_new_history();
+}
+void SpelunkyConsole_SetMaxHistorySize(SpelunkyConsole* console, size_t max_history)
+{
+    console->set_max_history_size(max_history);
+}
+void SpelunkyConsole_SaveHistory(SpelunkyConsole* console, const char* path)
+{
+    console->save_history(path);
+}
+void SpelunkyConsole_LoadHistory(SpelunkyConsole* console, const char* path)
+{
+    console->load_history(path);
+}
+
 StateMemory& get_state()
 {
     static StateMemory* state = State::get().ptr();

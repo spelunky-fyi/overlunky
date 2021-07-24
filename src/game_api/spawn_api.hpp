@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-struct Entity;
+class Entity;
 
 using SpawnTypeFlags = int;
 enum SpawnType : SpawnTypeFlags

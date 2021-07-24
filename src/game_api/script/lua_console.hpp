@@ -26,6 +26,7 @@ class LuaConsole : public LuaBackend
     std::optional<size_t> set_scroll_to_history_item;
     char console_input[2048]{};
 
+    bool has_new_history{false};
     size_t max_history{30};
     std::optional<std::size_t> history_pos;
     std::vector<ConsoleHistoryItem> history;
@@ -58,6 +59,8 @@ class LuaConsole : public LuaBackend
     std::string execute_raw(std::string code);
 
     void toggle();
+
+    void push_history(std::string history_item, std::vector<ScriptMessage> result_item);
 
     std::string dump_api();
 };

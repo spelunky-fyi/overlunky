@@ -170,7 +170,6 @@ class LuaBackend
   public:
     sol::environment lua;
 
-    std::string name;
     std::string result;
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
 

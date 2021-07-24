@@ -117,6 +117,11 @@ std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console);
 const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, std::size_t message_idx);
 void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console);
 
+bool SpelunkyConsole_HasNewHistory(SpelunkyConsole* console);
+void SpelunkyConsole_SetMaxHistorySize(SpelunkyConsole* console, size_t max_history);
+void SpelunkyConsole_SaveHistory(SpelunkyConsole* console, const char* path);
+void SpelunkyConsole_LoadHistory(SpelunkyConsole* console, const char* path);
+
 enum class SpelunkyScreen
 {
     Logo = 0,

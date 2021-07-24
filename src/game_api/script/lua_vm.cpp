@@ -1036,7 +1036,7 @@ sol::state& get_lua_vm(SoundManager* sound_manager)
 sol::protected_function_result execute_lua(sol::environment& env, std::string_view code)
 {
     static sol::state& global_vm = get_lua_vm();
-    return global_vm.safe_script(fmt::format("(function() {} end)()", code), env);
+    return global_vm.safe_script(code, env);
 }
 
 void populate_lua_env(sol::environment& env)
