@@ -120,7 +120,7 @@ std::map<std::string, int> keys{
     {"mouse_grab", OL_BUTTON_MOUSE | 0x03},
     {"mouse_grab_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x03},
     {"mouse_grab_throw", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x03},
-    {"mouse_zap", OL_BUTTON_MOUSE | 0x04},
+    {"mouse_camera_drag", OL_BUTTON_MOUSE | 0x04},
     {"mouse_blast", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x04},
     {"mouse_boom", 0x0},
     {"mouse_big_boom", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x04},
@@ -1975,10 +1975,13 @@ void render_camera()
     }
     ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2, 1.0);
     ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2, 1.0);
-    ImGui::InputFloat("Camera Bound Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2, 1.0);
-    ImGui::InputFloat("Camera Bound Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2, 1.0);
-    ImGui::InputFloat("Camera Bound Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2, 1.0);
-    ImGui::InputFloat("Camera Bound Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2, 1.0);
+    if (ImGui::CollapsingHeader("Camera Bounds"))
+    {
+        ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2, 1.0);
+        ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2, 1.0);
+        ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2, 1.0);
+        ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2, 1.0);
+    }
 }
 
 void render_arrow()
@@ -2205,7 +2208,8 @@ void render_messages()
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
 
-    std::sort(queue.begin(), queue.end(), [](Message a, Message b) { return std::get<2>(a) < std::get<2>(b); });
+    std::sort(queue.begin(), queue.end(), [](Message a, Message b) 
+        { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
@@ -2480,16 +2484,26 @@ void render_clickhandler()
             g_vx = 0;
             g_vy = 0;
         }
-        else if (held("mouse_zap") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
+        else if (clicked("mouse_camera_drag"))
         {
-            g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
-            set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y + 200));
-            spawn_entity(to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            g_x = 0;
-            g_y = 0;
-            g_vx = 0;
-            g_vy = 0;
+            if (ImGui::IsMousePosValid())
+            {
+                startpos = normalize(io.MousePos);
+                g_state->camera->focused_entity_uid = -1;
+            }
+        }
+        else if (held("mouse_camera_drag"))
+        {
+            if (ImGui::IsMousePosValid())
+            {
+                ImVec2 mpos = normalize(io.MousePos);
+                std::pair<float, float> oryginal_pos = click_position(startpos.x, startpos.y);
+                std::pair<float, float> current_pos = click_position(mpos.x, mpos.y);
+
+                g_state->camera->focus_x -= current_pos.first - oryginal_pos.first;
+                g_state->camera->focus_y -= current_pos.second - oryginal_pos.second;
+                startpos = normalize(io.MousePos);
+            }
         }
         else if (held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 10)
         {

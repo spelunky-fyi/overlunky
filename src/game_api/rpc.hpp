@@ -8,7 +8,7 @@ void teleport(float x, float y, bool s, float vx, float vy, bool snap);
 void godmode(bool g);
 void darkmode(bool g);
 void zoom(float level);
-void list_items();
+//void list_items();
 void attach_entity(Entity* overlay, Entity* attachee);
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid);
 int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y);
