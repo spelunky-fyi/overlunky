@@ -252,7 +252,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1
-                           //, "", ...check__[entities.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/entities.txt\]...
+                           //, "", ...check__[entities.txt]\[game_data/entities.txt\]...
                            //, "LIQUID_STAGNANT_LAVA", 898
     );
     for (auto& item : script->g_items)

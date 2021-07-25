@@ -79,7 +79,7 @@ void register_usertypes(sol::state& lua)
 
     lua.create_named_table("PARTICLEEMITTER"
                            //, "TITLE_TORCHFLAME_SMOKE", 1
-                           //, "", ...check__[particle_emitters.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/particle_emitters.txt\]...
+                           //, "", ...check__[particle_emitters.txt]\[game_data/particle_emitters.txt\]...
                            //, "MINIGAME_BROKENASTEROID_SMOKE", 219
     );
     for (const auto& particle : list_particles())
