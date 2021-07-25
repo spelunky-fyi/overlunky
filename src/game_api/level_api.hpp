@@ -81,6 +81,7 @@ struct DoorCoords
 
 class ThemeInfo
 {
+  public:
     bool unknown1; // gets set to false for the jungle and temple theme in the cosmic ocean
     bool unknown2;
     uint8_t padding1;
@@ -151,6 +152,86 @@ class ThemeInfo
     // hundun: calls sunken city virtual, so has slimy bridges
     // co: does nothing, so no slimy bridges in CO sunken city levels! (forgotten/bug?)
     virtual void post_process_entities() = 0;
+
+    // adds the background, but also the compass indicator at the door
+    virtual void populate_background() = 0;
+
+    // adds random beautification to the background, e.g. the chalk drawings of the three people in dwelling
+    virtual void populate_background_beautification() = 0;
+
+    // adds extra light where needed, e.g. in the udjat chest room, or the top layer of the black market: spawns ENT_TYPE_LOGICAL_ROOM_LIGHT
+    virtual void populate_extra_lighting() = 0;
+
+    virtual void populate_level_transition() = 0;
+
+    // unsets flag 1 (Reset) of state.quest_flags
+    // sets the correct state.screen (0xC)
+    // sets state.ingame to true, adjust fade values and starts loading
+    virtual void on_level_transition() = 0;
+
+    // spawns the player(s) in the world, along with what they were holding
+    virtual void populate_players() = 0;
+
+    // when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail
+    virtual void handle_multiplayer() = 0;
+
+    // the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
+    virtual const char* level_file_to_load() = 0;
+
+    // for co: returns sub_theme->theme_id()
+    virtual uint8_t theme_id() = 0;
+
+    // whereas theme_id() returns a unique id for all ThemeInfo's, this function returns the id of the theme it logically belongs to
+    // e.g. theme_abzu->theme_base_id() = 5 (tide_pool) as opposed to theme_abzu->theme_id() = 13 (abzu)
+    virtual uint8_t theme_base_id() = 0;
+
+    // all themes return 4 (ENT_TYPE_FLOOR_GENERIC), except:
+    // temple: 104 (ENT_TYPE_FLOORSTYLED_TEMPLE)
+    // neobab: 106 (ENT_TYPE_FLOORSTYLED_BABYLON)
+    // sunken: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
+    // cog: 110 (ENT_TYPE_FLOORSTYLED_COG)
+    // duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)
+    // hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
+    // strangely, it's only applied to an odd block here and there
+    virtual uint32_t random_block_floorstyle() = 0;
+
+    // similar to random_block_floorstyle(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)
+    virtual uint32_t random_block_floorstyle_2() = 0;
+
+    // all return false, except olmec, temple, neobab, cog, duat
+    virtual bool unknown_v29() = 0;
+
+    // determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme
+    // returns 85 by default, except for: olmec: 15, cog: 23
+    virtual uint32_t transition_tunnel_block_modifier() = 0;
+
+    virtual uint32_t unknown_v31() = 0;
+
+    // always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
+    virtual uint32_t backwall_entity_id() = 0;
+
+    // returns ENT_TYPE_FLOOR_BORDERTILE by default, except:
+    // neobab ENT_TYPE_FLOOR_BORDERTILE_METAL
+    // sunken ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
+    // duat ENT_TYPE_FLOOR_DUSTWALL
+    // tiamat ENT_TYPE_FLOOR_BORDERTILE_METAL
+    // hundun ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
+    virtual uint32_t bordertile_entity_id() = 0;
+
+    virtual uint32_t transition_tunnel_critter_entity_id() = 0;
+
+    // returns -1.0 (downwards) by default, except for sunken/hundun 1.0 (upwards); applies to both lava and water
+    virtual float liquid_gravity_direction() = 0;
+
+    // used to make the player invincible in basecamp (but does an OOB check)
+    // if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun
+    virtual bool are_players_vulnerable() = 0;
+
+    // returns true by default, except CO, duat
+    virtual bool unknown_37() = 0;
+
+    // returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
+    virtual uint32_t backlayer_lut() = 0;
 };
 static_assert(sizeof(ThemeInfo) == 0x20);
 
