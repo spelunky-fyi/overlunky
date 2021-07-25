@@ -24,10 +24,12 @@ class LuaConsole : public LuaBackend
     bool set_focus{false};
     bool scroll_to_bottom{false};
     std::optional<size_t> set_scroll_to_history_item;
+    std::optional<size_t> last_force_scroll;
     char console_input[2048]{};
 
     bool has_new_history{false};
     size_t max_history{30};
+    bool highlight_history{false};
     std::optional<std::size_t> history_pos;
     std::vector<ConsoleHistoryItem> history;
 
@@ -37,7 +39,7 @@ class LuaConsole : public LuaBackend
     std::string completion_error;
 
     void on_history_request(struct ImGuiInputTextCallbackData* data);
-    void on_completion(struct ImGuiInputTextCallbackData* data);
+    bool on_completion(struct ImGuiInputTextCallbackData* data);
 
     using LuaBackend::pre_update;
     using LuaBackend::reset;

@@ -284,9 +284,10 @@ void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
         data->DeleteChars(0, data->BufTextLen);
         data->InsertChars(0, history[history_pos.value()].command.c_str());
         set_scroll_to_history_item = history_pos.value();
+        highlight_history = true;
     }
 }
-void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
+bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 {
     std::string_view front{data->Buf, (size_t)data->CursorPos};
     std::string_view to_complete{};
@@ -459,7 +460,7 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
         catch (const sol::error& e)
         {
             completion_error = e.what();
-            return;
+            return true;
         }
 
         to_complete = to_complete_segments.back();
@@ -519,18 +520,14 @@ void LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
             }
             completion_options.pop_back();
         }
+        return true;
     }
-    else
+    else if (!to_complete_segments.empty())
     {
-        if (to_complete_segments.empty())
-        {
-            completion_options = fmt::format("Need at least 1 character for tab-completion...");
-        }
-        else
-        {
-            completion_options = fmt::format("Need at least 1 characters for tab-completion, given {}...", to_complete_segments.back());
-        }
+        completion_options = fmt::format("Need at least 1 character for tab-completion, given {}...", to_complete_segments.back());
+        return true;
     }
+    return false;
 }
 
 bool LuaConsole::pre_draw()
@@ -554,8 +551,8 @@ bool LuaConsole::pre_draw()
 
         const std::string& completion_text = completion_options.empty() ? completion_error : completion_options;
         const float completion_size = completion_text.empty() ? 0.0f : style.ItemSpacing.y + ImGui::CalcTextSize(completion_text.c_str(), nullptr, false, io.DisplaySize.x).y;
-        const float input_size = style.ItemSpacing.y + num_lines * ImGui::GetTextLineHeight();
-        const float footer_height_to_reserve = input_size + completion_size;
+        const float input_size = 2.0f * style.ItemSpacing.y + num_lines * ImGui::GetTextLineHeight();
+        const float footer_height_to_reserve = style.ItemSpacing.y + input_size + completion_size;
         ImGui::BeginChild("Results Region", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
@@ -577,9 +574,10 @@ bool LuaConsole::pre_draw()
                 ImGui::PopStyleColor();
             }
 
-            if (i == set_scroll_to_history_item)
+            if (highlight_history && i == set_scroll_to_history_item)
             {
                 ImGui::SetScrollHereY(0.0f);
+                last_force_scroll = set_scroll_to_history_item;
                 set_scroll_to_history_item = std::nullopt;
             }
 
@@ -594,6 +592,7 @@ bool LuaConsole::pre_draw()
         if (scroll_to_bottom)
         {
             ImGui::SetScrollHereY(1.0f);
+            last_force_scroll = static_cast<size_t>(-1);
             scroll_to_bottom = false;
         }
 
@@ -621,22 +620,68 @@ bool LuaConsole::pre_draw()
 
         auto input_callback = [](ImGuiInputTextCallbackData* data)
         {
+            static bool do_tab_completion{false};
+
             LuaConsole* self = static_cast<LuaConsole*>(data->UserData);
-            if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
+            if (data->EventFlag == ImGuiInputTextFlags_CallbackCharFilter)
             {
-                self->on_history_request(data);
+                if (data->EventChar == '\t')
+                {
+                    do_tab_completion = true;
+                }
+                else if (data->EventChar != 0)
+                {
+                    do_tab_completion = false;
+                    if (data->EventChar == '\n' && self->last_force_scroll.has_value())
+                    {
+                        if (self->last_force_scroll.value() < self->history.size())
+                        {
+                            self->set_scroll_to_history_item = self->last_force_scroll;
+                        }
+                        else
+                        {
+                            self->scroll_to_bottom = true;
+                        }
+                    }
+                    self->highlight_history = false;
+                }
             }
-            else if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
+            else
             {
-                self->on_completion(data);
+                if (do_tab_completion && data->Buf[data->CursorPos - 1] == '\t')
+                {
+                    const auto prev_cursor_pos = data->CursorPos;
+                    data->DeleteChars(data->CursorPos - 1, 1);
+                    if (prev_cursor_pos == data->CursorPos)
+                    {
+                        data->CursorPos--;
+                    }
+                    if (!self->on_completion(data))
+                    {
+                        data->InsertChars(data->CursorPos, "\t");
+                        data->CursorPos = prev_cursor_pos;
+                    }
+                    do_tab_completion = false;
+                }
+
+                const bool up_arrow_pressed = ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_UpArrow));
+                const bool down_arrow_pressed = ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_DownArrow));
+
+                if ((up_arrow_pressed || down_arrow_pressed) && (data->CursorPos == 0 || data->CursorPos == data->BufTextLen))
+                {
+                    data->EventKey = up_arrow_pressed
+                                         ? ImGuiKey_UpArrow
+                                         : ImGuiKey_DownArrow;
+                    self->on_history_request(data);
+                }
             }
 
             return 0;
         };
 
         ImGui::PushItemWidth(ImGui::GetWindowWidth());
-        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
-        if (ImGui::InputTextMultiline("", console_input, IM_ARRAYSIZE(console_input), ImVec2{-1, num_lines * ImGui::GetTextLineHeight()}, input_text_flags, input_callback, this))
+        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
+        if (ImGui::InputTextMultiline("", console_input, IM_ARRAYSIZE(console_input), ImVec2{-1, -1}, input_text_flags, input_callback, this))
         {
             if (console_input[0] != '\0')
             {
