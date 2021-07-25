@@ -2209,7 +2209,7 @@ void render_messages()
     ImGui::PushFont(bigfont);
 
     std::sort(queue.begin(), queue.end(), [](Message a, Message b) 
-        { return std::get<2>(a) < std::get<2>(b); });
+              { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
