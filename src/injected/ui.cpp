@@ -105,6 +105,10 @@ std::map<std::string, int> keys{
     {"teleport_up", OL_KEY_CTRL | OL_KEY_SHIFT | VK_UP},
     {"teleport_right", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RIGHT},
     {"teleport_down", OL_KEY_CTRL | OL_KEY_SHIFT | VK_DOWN},
+    {"camera_left", OL_KEY_SHIFT | VK_LEFT},
+    {"camera_up", OL_KEY_SHIFT | VK_UP},
+    {"camera_right", OL_KEY_SHIFT | VK_RIGHT},
+    {"camera_down", OL_KEY_SHIFT | VK_DOWN},
     {"coordinate_left", OL_KEY_CTRL | VK_LEFT},
     {"coordinate_up", OL_KEY_CTRL | VK_UP},
     {"coordinate_right", OL_KEY_CTRL | VK_RIGHT},
@@ -147,7 +151,7 @@ static ImFont *font, *bigfont, *hugefont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0.63, g_sat = 0.66, g_val = 0.66;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = 0, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
+int g_held_id = 0, g_last_id = -1, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
     g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1;
 uint32_t g_held_flags = 0;
@@ -307,7 +311,7 @@ std::string key_string(int keycode)
     CHAR szName[128];
     int result = 0;
     std::string name;
-    if (keycode & 0xff == 0)
+    if ((keycode & 0xff) == 0)
     {
         name = "Disabled";
     }
@@ -334,6 +338,7 @@ std::string key_string(int keycode)
         case VK_DIVIDE:
         case VK_NUMLOCK:
             scanCode |= KF_EXTENDED;
+            [[fallthrough]];
         default:
             result = GetKeyNameTextA(scanCode << 16, szName, 128);
         }
@@ -1153,6 +1158,26 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         teleport(g_x, g_y, false, 0, 0, options["snap_to_grid"]);
     }
+    else if (pressed("camera_left", wParam))
+    {
+        if (g_state->camera->focused_entity_uid == -1)
+            g_state->camera->focus_x -= 0.2f;
+    }
+    else if (pressed("camera_right", wParam))
+    {
+        if (g_state->camera->focused_entity_uid == -1)
+            g_state->camera->focus_x += 0.2f;
+    }
+    else if (pressed("camera_up", wParam))
+    {
+        if (g_state->camera->focused_entity_uid == -1)
+            g_state->camera->focus_y += 0.2f;
+    }
+    else if (pressed("camera_down", wParam))
+    {
+        if (g_state->camera->focused_entity_uid == -1)
+            g_state->camera->focus_y -= 0.2f;
+    }
     else if (pressed("coordinate_left", wParam))
     {
         g_x -= 1;
@@ -1858,6 +1883,37 @@ void render_narnia()
         warp(8, 98, 10);
 }
 
+void render_uid(int uid, const char* section, bool rembtn = false)
+{
+    char uidc[32];
+    itoa(uid, uidc, 10);
+    int ptype = entity_type(uid);
+    if (ptype == 0)
+        return;
+    char typec[32];
+    itoa(ptype, typec, 10);
+    const char* pname = entity_names[ptype].data();
+    ImGui::PushID(section);
+    if (ImGui::Button(uidc))
+    {
+        g_last_id = uid;
+        update_entity();
+    }
+    ImGui::SameLine();
+    ImGui::Text(typec);
+    ImGui::SameLine();
+    ImGui::Text(pname);
+    if (rembtn)
+    {
+        ImGui::SameLine();
+        ImGui::PushID(uid);
+        if (ImGui::Button("X(!)"))
+            g_entity->remove_item(uid);
+        ImGui::PopID();
+    }
+    ImGui::PopID();
+}
+
 void render_camera()
 {
     if (set_focus_zoom)
@@ -1900,6 +1956,29 @@ void render_camera()
         g_zoom = 0.0;
         set_zoom();
     }
+    render_uid(g_state->camera->focused_entity_uid, "FocusedEntity");
+    ImGui::SameLine();
+    if (ImGui::Button("!X"))
+        g_state->camera->focused_entity_uid = -1;
+    ImGui::SameLine();
+    if (ImGui::Button("Focus player"))
+    {
+        if (!g_players.empty())
+        {
+            g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Focus Selected"))
+    {
+        g_state->camera->focused_entity_uid = g_last_id;
+    }
+    ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2, 1.0);
+    ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2, 1.0);
+    ImGui::InputFloat("Camera Bound Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2, 1.0);
+    ImGui::InputFloat("Camera Bound Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2, 1.0);
+    ImGui::InputFloat("Camera Bound Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2, 1.0);
+    ImGui::InputFloat("Camera Bound Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2, 1.0);
 }
 
 void render_arrow()
@@ -2126,8 +2205,7 @@ void render_messages()
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
 
-    std::sort(queue.begin(), queue.end(), [](Message a, Message b)
-              { return std::get<2>(a) < std::get<2>(b); });
+    std::sort(queue.begin(), queue.end(), [](Message a, Message b) { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
     ImGui::Begin(
@@ -2893,37 +2971,6 @@ void render_savegame()
     ImGui::TextWrapped("To be continued...");
 }
 
-void render_uid(int uid, const char* section, bool rembtn = false)
-{
-    char uidc[32];
-    itoa(uid, uidc, 10);
-    int ptype = entity_type(uid);
-    if (ptype == 0)
-        return;
-    char typec[32];
-    itoa(ptype, typec, 10);
-    const char* pname = entity_names[ptype].data();
-    ImGui::PushID(section);
-    if (ImGui::Button(uidc))
-    {
-        g_last_id = uid;
-        update_entity();
-    }
-    ImGui::SameLine();
-    ImGui::Text(typec);
-    ImGui::SameLine();
-    ImGui::Text(pname);
-    if (rembtn)
-    {
-        ImGui::SameLine();
-        ImGui::PushID(uid);
-        if (ImGui::Button("X(!)"))
-            g_entity->remove_item(uid);
-        ImGui::PopID();
-    }
-    ImGui::PopID();
-}
-
 void render_state(const char* label, int state)
 {
     if (state == 0)
@@ -3101,6 +3148,18 @@ void render_entity_props()
         render_state("Current state", g_entity->state);
         render_state("Last state", g_entity->last_state);
         render_ai("AI state", g_entity->move_state);
+        switch (g_entity->layer)
+        {
+        case 0:
+            ImGui::Text("Layer: FRONT");
+            break;
+        case 1:
+            ImGui::Text("Layer: BACK");
+            break;
+        default:
+            ImGui::Text("Layer: UNKNOWN");
+            break;
+        }
         if (g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
@@ -3156,6 +3215,7 @@ void render_entity_props()
         ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0);
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0);
+        ImGui::InputFloat("Angle##EntityAngle", &g_entity->angle, 0.2, 1.0);
         SliderByte("Airtime##EntityAirtime", (char*)&g_entity->airtime, 0, 98);
         uint8_t falldamage = 0;
         if (g_entity->airtime >= 98)
@@ -3172,6 +3232,7 @@ void render_entity_props()
     if (ImGui::CollapsingHeader("Stats"))
     {
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&g_entity->health, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Price##Price", ImGuiDataType_U8, (char*)&g_entity->price, 0.5f, &u32_zero, &u32_max);
         if (g_inventory != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
@@ -3276,6 +3337,7 @@ void render_entity_props()
         ImGui::DragFloat("Box height##EntityBoxHeight", &g_entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset X##EntityOffsetX", &g_entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset Y##EntityOffsetY", &g_entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
+        ImGui::DragScalar("Animation Frame##EntityAnimationFrame", ImGuiDataType_U16, &g_entity->animation_frame, 0.2f, &u16_zero, &u16_max);
     }
     if (ImGui::CollapsingHeader("Flags"))
     {

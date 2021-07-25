@@ -50,6 +50,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+.**: Zoom out
       + **Ctrl+0**: Auto fit level width to screen
       + **Ctrl+2345**: Zoom to X level width
+      + **Shift+ArrowKey**: Move camera in desired direction
   - **F4**: Entity properties
       + See and change a lot of variables of the selected entity
   - **F5**: Game state
