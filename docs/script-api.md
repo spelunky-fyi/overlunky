@@ -428,6 +428,9 @@ Pick up another entity by uid. Make sure you're not already holding something, o
 -- spawn and equip a jetpack
 pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
 ```
+### [`drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop)
+`nil drop(int who_uid, int what_uid)`<br/>
+Drop an entity by uid
 ### [`apply_entity_db`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_entity_db)
 `nil apply_entity_db(int uid)`<br/>
 Apply changes made in [get_type](#get_type)() to entity instance by uid.
@@ -988,6 +991,8 @@ Derived from [`Entity`](#entity)
 - [`virtual  freeze(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freeze) &Movable::freeze
 - [`virtual  light_on_fire()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_on_fire) &Movable::light_on_fire
 - [`virtual  set_cursed(bool b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) &Movable::set_cursed
+- [`virtual  drop(Entity entity_to_drop)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) &Movable::drop
+- [`virtual  pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
 ### `Player`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Inventory inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr

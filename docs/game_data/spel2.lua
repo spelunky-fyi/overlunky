@@ -4734,6 +4734,7 @@ draw_rect = function(...) end
 draw_rect_filled = function(...) end
 draw_text = function(...) end
 draw_text_size = function(...) end
+drop = function(...) end
 entity_get_items_by = function(...) end
 entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end

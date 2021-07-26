@@ -225,6 +225,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Movable::light_on_fire,
         "set_cursed",
         &Movable::set_cursed,
+        "drop",
+        &Movable::drop,
+        "pick_up",
+        &Movable::pick_up,
         sol::base_classes,
         sol::bases<Entity>());
     /* Movable
