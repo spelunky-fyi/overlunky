@@ -994,7 +994,7 @@ sol::state& get_lua_vm(SoundManager* sound_manager)
 {
     static std::unique_ptr<sol::state> global_vm = [sound_manager]()
     {
-        assert(sound_manager != nullptr, "SoundManager needs to be passed to first call to get_lua_vm...");
+        assert(sound_manager != nullptr && "SoundManager needs to be passed to first call to get_lua_vm...");
 
         std::unique_ptr<sol::state> global_vm = std::make_unique<sol::state>();
         sol::state& lua_vm = *global_vm;
