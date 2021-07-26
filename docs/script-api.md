@@ -951,8 +951,8 @@ end
 - [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
 - [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
-- [`virtual  set_draw_depth(int draw_depth)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) &Entity::set_draw_depth
-- [`virtual  liberate_from_shop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) &Entity::liberate_from_shop
+- [`nil set_draw_depth(int draw_depth)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) &Entity::set_draw_depth
+- [`nil liberate_from_shop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) &Entity::liberate_from_shop
 - [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
 - [`as_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_player) &Entity::as&lt;Player&gt;
 ### `Movable`
@@ -987,12 +987,12 @@ Derived from [`Entity`](#entity)
 - [`bool is_button_held(int button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_held) &Movable::is_button_held
 - [`bool is_button_released(int button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_released) &Movable::is_button_released
 - [`int price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) &Movable::price
-- [`virtual  stun(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun) &Movable::stun
-- [`virtual  freeze(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freeze) &Movable::freeze
-- [`virtual  light_on_fire()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_on_fire) &Movable::light_on_fire
-- [`virtual  set_cursed(bool b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) &Movable::set_cursed
-- [`virtual  drop(Entity entity_to_drop)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) &Movable::drop
-- [`virtual  pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
+- [`nil stun(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun) &Movable::stun
+- [`nil freeze(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freeze) &Movable::freeze
+- [`nil light_on_fire()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_on_fire) &Movable::light_on_fire
+- [`nil set_cursed(bool b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) &Movable::set_cursed
+- [`nil drop(Entity entity_to_drop)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) &Movable::drop
+- [`nil pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
 ### `Player`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Inventory inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr
