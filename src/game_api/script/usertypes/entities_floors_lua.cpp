@@ -214,8 +214,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<Pipe>(
         "Pipe",
-        "type",
-        &Pipe::type,
+        "direction_type",
+        &Pipe::direction_type,
         "end_pipe",
         &Pipe::end_pipe,
         sol::base_classes,
@@ -267,6 +267,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &StickyTrap::attached_piece_uid,
         "ball_uid",
         &StickyTrap::ball_uid,
+        "state",
+        &StickyTrap::state,
+        "timer",
+        &StickyTrap::timer,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
@@ -305,7 +309,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.new_usertype<TeleportingBorder>(
         "TeleportingBorder",
-        "attached_piece_uid",
+        "direction",
         &TeleportingBorder::direction,
         sol::base_classes,
         sol::bases<Entity, Floor>());

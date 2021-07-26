@@ -28,7 +28,8 @@ std::uint32_t g_last_community_chance_id;
 std::uint32_t g_current_chance_id;
 
 std::unordered_map<std::uint32_t, std::string_view> g_tile_code_id_to_name;
-std::unordered_map<std::uint32_t, std::string_view> g_chance_id_to_name;
+std::unordered_map<std::uint32_t, std::string_view> g_monster_chance_id_to_name;
+std::unordered_map<std::uint32_t, std::string_view> g_trap_chance_id_to_name;
 
 struct FloorRequiringEntity
 {
@@ -440,7 +441,8 @@ auto g_DefaultTestFunc = [](float x, float y, Layer* layer)
     {
         if (Entity* floor = layer->get_grid_entity_at(x, y - 1.0f))
         {
-            return (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
+            static auto entrance = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
+            return floor->type->id != entrance && (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
         }
     }
     return false;
@@ -642,7 +644,6 @@ bool handle_chance(ThemeInfo* theme, SpawnInfo* spawn_info)
                     { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL); }};
 
     auto level_gen_data = State::get().ptr()->level_gen->data;
-    const auto& level_chances = State::get().ptr()->level_gen->data->level_chances();
 
     int layer = 0;
     auto* layer_ptr = State::get().layer_local(layer);
@@ -696,14 +697,28 @@ void LevelGenData::init()
 
     // Scan chances to know what id to start at
     {
-        auto& chances_map = chances();
-
-        // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
         auto max_id = 0u;
-        for (auto& [name, def] : chances_map)
+
         {
-            max_id = std::max(def.id, max_id);
-            g_chance_id_to_name[def.id] = name;
+            auto& chances_map = monster_chances();
+
+            // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
+            for (auto& [name, def] : chances_map)
+            {
+                max_id = std::max(def.id, max_id);
+                g_monster_chance_id_to_name[def.id] = name;
+            }
+        }
+
+        {
+            auto& chances_map = trap_chances();
+
+            // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
+            for (auto& [name, def] : chances_map)
+            {
+                max_id = std::max(def.id, max_id);
+                g_trap_chance_id_to_name[def.id] = name;
+            }
         }
 
         // The game doesn't centrally handle chances so we can use whatever id
@@ -834,11 +849,21 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
 
 std::optional<std::uint32_t> LevelGenData::get_chance(const std::string& chance)
 {
-    auto& chances_map = chances();
-    auto it = chances_map.find(chance);
-    if (it != chances_map.end())
     {
-        return it->second.id;
+        auto& chances_map = monster_chances();
+        auto it = chances_map.find(chance);
+        if (it != chances_map.end())
+        {
+            return it->second.id;
+        }
+    }
+    {
+        auto& chances_map = trap_chances();
+        auto it = chances_map.find(chance);
+        if (it != chances_map.end())
+        {
+            return it->second.id;
+        }
     }
     return {};
 }
@@ -853,12 +878,14 @@ std::uint32_t LevelGenData::define_chance(std::string chance)
     using map_value_t = std::pair<const string_t, ChanceDef>;
     using map_allocator_t = game_allocator<map_value_t>;
     using mutable_chance_map_t = std::unordered_map<string_t, ChanceDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
-    auto& chance_map = (mutable_chance_map_t&)chances();
+
+    // We use only monster chances to define new stuff, keep an eye out for whether this is dangerous
+    auto& chance_map = (mutable_chance_map_t&)monster_chances();
 
     auto [it, success] = chance_map.emplace(std::move(chance), ChanceDef{g_current_chance_id});
     g_current_chance_id++;
 
-    g_tile_code_id_to_name[it->second.id] = it->first;
+    g_monster_chance_id_to_name[it->second.id] = it->first;
     return it->second.id;
 }
 
@@ -985,4 +1012,167 @@ std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
         }
     }
     return "invalid";
+}
+
+struct MutableLevelChanceDef
+{
+    std::vector<uint32_t, game_allocator<uint32_t>> chances;
+};
+MutableLevelChanceDef& get_or_emplace_level_chance(std::unordered_map<std::uint32_t, LevelChanceDef>& level_chances, uint32_t chance_id)
+{
+    struct LevelChanceNode
+    {
+        void* ptr0;
+        void* ptr1;
+        std::pair<uint32_t, MutableLevelChanceDef> value;
+    };
+    using EmplaceLevelChance = LevelChanceNode** (*)(void*, std::pair<LevelChanceNode*, bool>*, uint32_t*);
+    static EmplaceLevelChance emplace_level_chance = []()
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x49\x8d\x8d\x70\x13\x00\x00"s, memory.after_bundle);
+        off = find_inst(memory.exe(), "\xe8"s, off);
+        return (EmplaceLevelChance)memory.at_exe(decode_call(off));
+    }();
+
+    std::pair<LevelChanceNode*, bool> node;
+    emplace_level_chance((void*)&level_chances, &node, &chance_id);
+
+    return node.first->value.second;
+}
+
+uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
+{
+    if (g_monster_chance_id_to_name.contains(chance_id))
+    {
+        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_monster_chances(), chance_id);
+        if (!this_chances.chances.empty())
+        {
+            auto* state = State::get().ptr();
+            if (this_chances.chances.size() >= state->level)
+            {
+                return this_chances.chances[state->level];
+            }
+            else
+            {
+                return this_chances.chances[0];
+            }
+        }
+    }
+
+    if (g_trap_chance_id_to_name.contains(chance_id))
+    {
+        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_trap_chances(), chance_id);
+        if (!this_chances.chances.empty())
+        {
+            auto* state = State::get().ptr();
+            if (this_chances.chances.size() >= state->level)
+            {
+                return this_chances.chances[state->level];
+            }
+            else
+            {
+                return this_chances.chances[0];
+            }
+        }
+    }
+
+    return 0;
+}
+bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance)
+{
+    if (g_monster_chance_id_to_name.contains(chance_id))
+    {
+        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_monster_chances(), chance_id);
+        if (inverse_chance == 0)
+        {
+            this_chances.chances.clear();
+        }
+        else
+        {
+            this_chances.chances = {inverse_chance};
+        }
+        return true;
+    }
+
+    if (g_trap_chance_id_to_name.contains(chance_id))
+    {
+        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_trap_chances(), chance_id);
+        if (inverse_chance == 0)
+        {
+            this_chances.chances.clear();
+        }
+        else
+        {
+            this_chances.chances = {inverse_chance};
+        }
+        return true;
+    }
+
+    return false;
+}
+
+int8_t get_co_subtheme()
+{
+    auto state = get_state_ptr();
+    if (state->theme != 10)
+    {
+        return -2;
+    }
+
+    ThemeInfo* theme = state->level_gen->theme_cosmicocean->sub_theme;
+    if (theme == state->level_gen->theme_dwelling)
+    {
+        return 0;
+    }
+    else if (theme == state->level_gen->theme_jungle)
+    {
+        return 1;
+    }
+    else if (theme == state->level_gen->theme_volcana)
+    {
+        return 2;
+    }
+    else if (theme == state->level_gen->theme_tidepool)
+    {
+        return 3;
+    }
+    else if (theme == state->level_gen->theme_temple)
+    {
+        return 4;
+    }
+    else if (theme == state->level_gen->theme_icecaves)
+    {
+        return 5;
+    }
+    else if (theme == state->level_gen->theme_neobabylon)
+    {
+        return 6;
+    }
+    else if (theme == state->level_gen->theme_sunkencity)
+    {
+        return 7;
+    }
+
+    return -2;
+}
+
+void force_co_subtheme(int8_t subtheme)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(find_inst(memory.exe(), " 48 C1 E0 03 48 C1 E8 20 49 89 48 08 48 98"s, memory.after_bundle));
+    }
+    if (subtheme >= 0 && subtheme <= 7)
+    {
+        uint8_t replacement[] = {0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90};
+        std::string replacement_s = std::string((char*)replacement, sizeof(replacement));
+        write_mem_prot(offset, replacement_s, true);
+    }
+    else if (subtheme == -1)
+    {
+        write_mem_prot(offset, "\x48\xC1\xE0\x03\x48\xC1\xE8\x20"s, true);
+    }
 }

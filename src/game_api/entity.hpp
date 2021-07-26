@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "math.hpp"
 #include "memory.hpp"
 
 struct RenderInfo;
@@ -214,6 +215,11 @@ class Entity
         return topmost;
     }
 
+    bool overlaps_with(AABB hitbox)
+    {
+        return overlaps_with(hitbox.left, hitbox.bottom, hitbox.right, hitbox.top);
+    }
+
     bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)
     {
         const auto [posx, posy] = position();
@@ -388,5 +394,9 @@ struct Target
 
 std::vector<EntityItem> list_entities();
 
-std::tuple<float, float, int> get_position(uint32_t id);
-std::tuple<float, float, int> get_render_position(uint32_t id);
+std::tuple<float, float, int> get_position(uint32_t uid);
+std::tuple<float, float, int> get_render_position(uint32_t uid);
+
+std::tuple<float, float> get_velocity(uint32_t uid);
+
+AABB get_hitbox(uint32_t uid, bool use_render_pos);

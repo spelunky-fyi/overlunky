@@ -39,8 +39,9 @@ function replace_trap(v)
     tusk = get_entities_at(ENT_TYPE.MONS_MADAMETUSK, 0, x, y, l, 6.0)
     altar = get_entities_at(ENT_TYPE.FLOOR_ALTAR, 0, x, y, l, 3.0)
     plr = get_entities_at(0, 1, x, y, l, 4.0)
+    curse_pot = get_entities_at(ENT_TYPE.ITEM_CURSEDPOT, 0, x, y, l, 2.0)
 
-    if #shop ~= 0 or #shoppie ~= 0 or #tusk ~= 0 or #altar ~= 0 or #plr ~= 0 then
+    if #shop ~= 0 or #shoppie ~= 0 or #tusk ~= 0 or #altar ~= 0 or #plr ~= 0 or #curse_pot ~= 0 then
         return false
     end -- don't put traps around shops, entrance or altars
 
@@ -55,6 +56,10 @@ function replace_trap(v)
             newid = floor_item[math.random(#floor_item)]
             if #lava == 0 then
                 spawn(newid, x, y + 0.9, l, 0, 0)
+            elseif #top > 0 and #right > 0 and newid == ENT_TYPE.FLOOR_SPRING_TRAP then
+                return false
+            elseif #top > 0 and #left > 0 and newid == ENT_TYPE.FLOOR_SPRING_TRAP then
+                return false
             end
         end
     elseif #bottom == 0 and

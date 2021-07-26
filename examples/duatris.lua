@@ -403,23 +403,23 @@ function set_moving_piece_if_valid(piece)
     return is_valid
 end
 
-function call_fn_for_xy_in_piece(piece, callback, param)
+function call_fn_for_xy_in_piece(piece, callback, ...)
     local s = shapes[piece.shape][piece.rot_num]
     for x, row in ipairs(s) do
         for y, val in ipairs(row) do
             if val == 1 then
-                callback(piece.x + x, piece.y + y, param)
+                callback(piece.x + x, piece.y + y, ...)
             end
         end
     end
 end
 
-function call_fn_for_xy_in_next(piece, callback, param)
+function call_fn_for_xy_in_next(piece, callback, ...)
     local s = shapes[piece.shape][piece.rot_num]
     for x, row in ipairs(s) do
         for y, val in ipairs(row) do
             if val == 1 then
-                callback(x, y, param)
+                callback(x, y, ...)
             end
         end
     end
@@ -689,7 +689,7 @@ function draw_point(x, y, color)
     draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
 end
 
-function draw_moving(x, y, color)
+function draw_moving(x, y, color, draw_ctx)
     draw_color = rgba(colors[moving_piece.shape][1], colors[moving_piece.shape][2], colors[moving_piece.shape][3],
                      color_alpha)
     if color then
@@ -711,14 +711,14 @@ function draw_moving(x, y, color)
         sy2 = 0.99
     end
     -- draw_rect(sx, sy, sx2, sy2, 4, 0, draw_color)
-    draw_rect_filled(sx, sy, sx2, sy2, 0, rgba(255, 255, 255, 55))
+    draw_ctx:draw_rect_filled(sx, sy, sx2, sy2, 0, rgba(255, 255, 255, 55))
     if moving_blocks[block_i] and moving_blocks[block_i] > -1 then
         move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
     end
     block_i = block_i + 1
 end
 
-function draw_next(x, y, color)
+function draw_next(x, y, color, draw_ctx)
     draw_color = rgba(colors[moving_piece.shape][1], colors[moving_piece.shape][2], colors[moving_piece.shape][3],
                      color_alpha)
     if color then
@@ -730,10 +730,10 @@ function draw_next(x, y, color)
     sy = 0.95 - y * height
     sx2 = sx+width
     sy2 = sy+height
-    draw_rect_filled(sx, sy, sx2, sy2, 0, draw_color)
+    draw_ctx:draw_rect_filled(sx, sy, sx2, sy2, 0, draw_color)
 end
 
-function draw_screen()
+function draw_screen(draw_ctx)
     if game_state ~= 'playing' or state.pause > 0 then
         return
     end
@@ -748,13 +748,13 @@ function draw_screen()
         end
     end
     block_i = 1
-    call_fn_for_xy_in_piece(moving_piece, draw_moving, moving_piece.shape)
-    call_fn_for_xy_in_next(next_piece, draw_next, next_piece.shape)
+    call_fn_for_xy_in_piece(moving_piece, draw_moving, moving_piece.shape, draw_ctx)
+    call_fn_for_xy_in_next(next_piece, draw_next, next_piece.shape, draw_ctx)
 
     -- draw finishline
     sx, sy = screen_position(2.5, 107)
     sx2, sy2 = screen_position(32.5, 107)
-    draw_line(sx, sy, sx2, sy2, 4, rgba(255, 255, 255, color_alpha))
+    draw_ctx:draw_line(sx, sy, sx2, sy2, 4, rgba(255, 255, 255, color_alpha))
 end
 
 function game_over()
@@ -823,10 +823,10 @@ function clear_stage()
         end, 3*60)
         level_to_board(true)
         check_lines()
-        guicall = set_callback(function()
+        guicall = set_callback(function(draw_ctx)
             handle_input(fall, next_piece)
             lower_piece_at_right_time(fall, next_piece)
-            draw_screen()
+            draw_screen(draw_ctx)
         end, ON.GUIFRAME)
         framecall = set_callback(function()
             if #players < 1 then
