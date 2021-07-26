@@ -147,6 +147,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Entity::set_draw_depth,
         "liberate_from_shop",
         &Entity::liberate_from_shop,
+        "get_held_entity",
+        &Entity::get_held_entity,
         "as_movable",
         &Entity::as<Movable>,
         "as_player",
@@ -229,6 +231,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Movable::drop,
         "pick_up",
         &Movable::pick_up,
+        "can_jump",
+        &Movable::can_jump,
+        "standing_on",
+        &Movable::standing_on,
         sol::base_classes,
         sol::bases<Entity>());
     /* Movable
