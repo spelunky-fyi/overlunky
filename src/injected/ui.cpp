@@ -132,7 +132,8 @@ std::map<std::string, int> keys{
     {"mouse_destroy", OL_BUTTON_MOUSE | 0x05},
     {"mouse_destroy_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x05},
     {"reload_enabled_scripts", OL_KEY_CTRL | VK_F5}, // ctrl + f5 same as playlunky
-    {"console", VK_OEM_5},                           // "tilde", same as Playlunky
+    {"console", VK_OEM_3},                           // ~ for US
+    {"console_alt", VK_OEM_5},                       // \ for US
     {"close_console", VK_ESCAPE},                    // alternative to close it
     //{ "", 0x },
 };
@@ -1001,7 +1002,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
 
     if (g_Console && g_Console->is_toggled())
     {
-        if (pressed("console", wParam) || pressed("close_console", wParam))
+        if (pressed("console", wParam) || pressed("console_alt", wParam) || pressed("close_console", wParam))
         {
             g_Console->toggle();
         }
@@ -1380,7 +1381,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     {
         reload_enabled_scripts();
     }
-    else if (pressed("console", wParam))
+    else if (pressed("console", wParam) || pressed("console_alt", wParam))
     {
         g_Console->toggle();
     }
