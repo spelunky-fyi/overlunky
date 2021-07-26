@@ -232,8 +232,8 @@ void register_usertypes(sol::state& lua)
         &Mole::counter_nonburrowing,
         "countdown_for_appearing",
         &Mole::countdown_for_appearing,
-        "state",
-        &Mole::state,
+        "digging_state",
+        &Mole::digging_state,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 
@@ -1112,8 +1112,8 @@ void register_usertypes(sol::state& lua)
         "Critter",
         "last_picked_up_by_uid",
         &Critter::last_picked_up_by_uid,
-        "state",
-        &Critter::state,
+        "holding_state",
+        &Critter::holding_state,
         sol::base_classes,
         sol::bases<Entity, Movable, Monster>());
 

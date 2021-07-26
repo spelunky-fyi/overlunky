@@ -21,11 +21,14 @@ class RoomOwner : public Monster
     uint8_t patrol_timer;
     uint8_t lose_interest_timer; // delay in-between attacks
     uint8_t unknown_timer1;
-    uint16_t countdown_timer; // counts down to 0 when a value is forced, can't shot when the timer is running
+    /// can't shot when the timer is running
+    uint16_t countdown_timer; // counts down to 0 when a value is forced
     uint8_t unknown1;
     bool is_patrolling; // to set off a shopkeeper, combine this with state.shoppie_aggro_levels > 0
-    bool aggro_trigger; // setting this makes him angry, if it's shopkeeper you get 2 agrro points
-    bool was_hurt;      // also is set true if you set aggro to true, get's trigger even when whiping
+    /// setting this makes him angry, if it's shopkeeper you get 2 agrro points
+    bool aggro_trigger;
+    /// also is set true if you set aggro to true, get's trigger even when whiping
+    bool was_hurt;
     uint16_t padding1;
     uint32_t padding2;
 };
@@ -34,8 +37,10 @@ class WalkingMonster : public Monster
 {
   public:
     int32_t chatting_to_uid;
-    int16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
-    int16_t cooldown_timer;   // used fo chatting with other monsters, attack cooldowns etc.
+    /// alternates between walking and pausing every time it reaches zero
+    int16_t walk_pause_timer;
+    /// used fo chatting with other monsters, attack cooldowns etc.
+    int16_t cooldown_timer;
 };
 
 class NPC : public Monster
@@ -47,7 +52,8 @@ class NPC : public Monster
     uint8_t unknown_timer;
     uint8_t target_in_sight_timer;
     uint8_t ai_state;
-    bool aggro; // for bodyguard and shopkeeperclone it spawns a weapon as well
+    /// for bodyguard and shopkeeperclone it spawns a weapon as well
+    bool aggro;
     uint8_t padding1;
     uint8_t padding2;
     uint32_t padding3;
@@ -56,13 +62,15 @@ class NPC : public Monster
 class Ghost : public Monster
 {
   public:
-    uint16_t split_timer; // for SMALL_HAPPY this is also the sequence timer of its various states
+    /// for SMALL_HAPPY this is also the sequence timer of its various states
+    uint16_t split_timer;
     uint8_t unknown1_timer;
     uint8_t unknown2;
     float velocity_multiplier;
-    uint16_t unknown3;       // layer change related
-    uint8_t ghost_behaviour; // 0 = SMALL_ANGRY aka standard chasing ; 1 = SMALL_SURPRISED; 2 = SMALL_SAD; 3 = SMALL_HAPPY
-    // 4 and above = will move up and down, moving slightly more in one direction
+    uint16_t unknown3; // layer change related
+    /// 0 = SMALL_ANGRY aka standard chasing, 1 = SMALL_SURPRISED, 2 = SMALL_SAD, 3 = SMALL_HAPPY
+    /// 4 and above = will move up and down, moving slightly more in one direction
+    uint8_t ghost_behaviour;
     uint8_t unknown6;
     bool unknown7;
     uint8_t unknown8;
@@ -83,9 +91,12 @@ class Bat : public Monster
 class Jiangshi : public Monster
 {
   public:
-    uint8_t wait_timer;   // wait time between jumps
-    uint8_t jump_counter; // only female aka assassin, when 0 will jump up into ceiling
-    bool on_ceiling;      // only female aka assassin
+    /// wait time between jumps
+    uint8_t wait_timer;
+    /// only female aka assassin: when 0 will jump up into ceiling
+    uint8_t jump_counter;
+    /// only female aka assassin
+    bool on_ceiling;
 };
 
 class Monkey : public Monster
@@ -113,12 +124,14 @@ class Mole : public Monster
     ParticleEmitterInfo* burrowing_particle;
     float burrow_dir_x;
     float burrow_dir_y;
-    int32_t burrowing_in_uid; // stores the last uid as well
+    /// stores the last uid as well
+    int32_t burrowing_in_uid;
     uint8_t counter_burrowing;
     uint8_t counter_nonburrowing;
     uint8_t countdown_for_appearing;
     uint8_t unknown_two_while_burrowed;
-    uint8_t state; // 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+    /// 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+    uint8_t digging_state;
 };
 
 class Spider : public Monster
@@ -129,7 +142,8 @@ class Spider : public Monster
     uint8_t jump_timer;
     uint8_t padding1;
     uint16_t padding2;
-    float trigger_distance; // only in the x coord
+    /// only in the x coord
+    float trigger_distance;
 };
 
 class HangSpider : public Monster
@@ -144,9 +158,11 @@ class HangSpider : public Monster
 class Shopkeeper : public RoomOwner
 {
   public:
-    uint8_t name;                 // 0 - Ali, 1 - Bob, 2 - Comso ... and so one, anything above 28 is just random string, can crash the game
-    uint8_t shotgun_attack_delay; // can't shot when the timer is running
-    uint8_t unknown3;             // accessed on stun/dmg? probably bool
+    /// 0 - Ali, 1 - Bob, 2 - Comso ... and so one, anything above 28 is just random string, can crash the game
+    uint8_t name;
+    /// can't shot when the timer is running
+    uint8_t shotgun_attack_delay;
+    uint8_t unknown3; // accessed on stun/dmg? probably bool
     bool shop_owner;
     bool unknown5a; // sometimes set to true
     uint8_t padding1;
@@ -160,9 +176,12 @@ class Yang : public RoomOwner
     std::map<int64_t, int64_t> unknown2;
     uint8_t unknown4;
     uint8_t unknown5;
-    bool first_message_shown;   // I'm looking for turkeys, wanna help?
-    bool quest_incomplete;      // gets set to false when the quest is over (Yang dead or second turkey delivered)
-    bool special_message_shown; // tusk palace, black market or one way door message shown
+    /// I'm looking for turkeys, wanna help?
+    bool first_message_shown;
+    /// set to false when the quest is over (Yang dead or second turkey delivered)
+    bool quest_incomplete;
+    /// tusk palace/black market/one way door - message shown
+    bool special_message_shown;
     uint8_t padding4;
     uint8_t padding5;
     uint8_t padding6;
@@ -172,12 +191,16 @@ class Tun : public RoomOwner
 {
   public:
     uint8_t arrows_left;
-    uint8_t reload_timer;    // when 0, a new arrow is loaded into the bow; resets when she finds an arrow on the ground
-    bool challenge_fee_paid; // affect only the speech bubble
-    bool congrats_challenge; // congrats message shown after exiting a challenge
-    bool murdered;           // when she disappears in a cloud of smoke
+    /// when 0, a new arrow is loaded into the bow; resets when she finds an arrow on the ground
+    uint8_t reload_timer;
+    /// affect only the speech bubble
+    bool challenge_fee_paid;
+    /// congrats message shown after exiting a challenge
+    bool congrats_challenge;
+    bool murdered; // when she disappears in a cloud of smoke
     bool shop_entered;
-    bool tiamat_encounter; // if set to false, greets you with 'you've done well to reach this place'
+    /// if set to false, greets you with 'you've done well to reach this place'
+    bool tiamat_encounter;
     uint8_t padding;
 };
 
@@ -185,21 +208,27 @@ class Pet : public Monster
 {
   public:
     Entity* fx_button;
-    int32_t petting_by_uid; // person whos petting it, only in the camp
-    int16_t yell_counter;   // counts up to 400 (6.6 sec); when 0 the pet yells out
+    /// person whos petting it, only in the camp
+    int32_t petting_by_uid;
+    /// counts up to 400 (6.6 sec), when 0 the pet yells out
+    int16_t yell_counter;
     uint16_t unknown1;
     uint16_t unknown2;
-    int16_t func_timer;  // used when free running in the camp
-    int8_t active_state; // -1 = sitting and yelling; 0 = either running, dead or picked up
+    /// used when free running in the camp
+    int16_t func_timer;
+    /// -1 = sitting and yelling, 0 = either running, dead or picked up
+    int8_t active_state;
 };
 
 class Caveman : public WalkingMonster
 {
   public:
     uint8_t wake_up_timer;
-    uint8_t can_pick_up_timer;   // 0 = can pick something up; when holding forced to 179; after tripping and regaining consciousness counts down to 0
+    /// 0 = can pick something up, when holding forced to 179, after tripping and regaining consciousness counts down to 0
+    uint8_t can_pick_up_timer;
     int16_t unknown_aggro_timer; // 1 sec timer at the start of getting aggro
-    int16_t aggro_timer;         // keeps resetting when angry and a player is nearby
+    /// keeps resetting when angry and a player is nearby
+    int16_t aggro_timer;
 };
 
 class CavemanShopkeeper : public WalkingMonster
@@ -217,9 +246,12 @@ class CavemanShopkeeper : public WalkingMonster
 class HornedLizard : public Monster
 {
   public:
-    int32_t eaten_uid;             // dungbeetle being eaten
-    uint8_t walk_pause_timer;      // alternates between walking and pausing when timer reaches zero
-    uint8_t attack_cooldown_timer; // won't attack until timer reaches zero
+    /// dungbeetle being eaten
+    int32_t eaten_uid;
+    /// alternates between walking and pausing when timer reaches zero
+    uint8_t walk_pause_timer;
+    /// won't attack until timer reaches zero
+    uint8_t attack_cooldown_timer;
     uint8_t blood_squirt_timer;
     uint8_t unknown3;
     SoundPosition* sound_pos;
@@ -240,8 +272,10 @@ class Mosquito : public Monster
 class Mantrap : public Monster
 {
   public:
-    int32_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
-    int32_t eaten_uid;        // the uid of the entity the mantrap has eaten, in case it can break out, like a shopkeeper
+    /// alternates between walking and pausing every time it reaches zero
+    int32_t walk_pause_timer;
+    /// the uid of the entity the mantrap has eaten, in case it can break out, like a shopkeeper
+    int32_t eaten_uid;
 };
 
 class Skeleton : public Monster
@@ -255,7 +289,8 @@ class Scarab : public Monster
   public:
     SoundPosition* sound_pos;
     Illumination* emitted_light; // set color in sat_vign_0, be sure to make the aperture large enough
-    uint16_t timer;              // how long to stay in that position
+    /// how long to stay in current position
+    uint16_t timer;
 };
 
 class Imp : public Monster
@@ -269,12 +304,14 @@ class Lavamander : public Monster
 {
   public:
     Illumination* emitted_light;
-    uint8_t shoot_lava_timer; // when this timer reaches zero, it appears on the surface/shoots lava; triggers on player proximity
+    /// when this timer reaches zero, it appears on the surface/shoots lava, triggers on player proximity
+    uint8_t shoot_lava_timer;
     uint8_t padding1;
     uint16_t jump_pause_timer; // jump pause when cool; runs continuously when hot
     uint8_t lava_detection_timer;
     bool is_hot;
-    uint8_t player_detect_state; // 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava // used so he won't spit imminently after seeing the player
+    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava | probably used so he won't spit imminently after seeing the player
+    uint8_t player_detect_state;
     uint8_t padding2;
 };
 
@@ -319,7 +356,8 @@ class Leprechaun : public WalkingMonster
     SoundPosition* sound_pos;
     uint8_t hump_timer;
     uint8_t target_in_sight_timer;
-    uint16_t gold; // ammoung of gold he picked up, will be droped on death
+    /// amount of gold he picked up, will be drooped on death
+    uint16_t gold;
     uint8_t timer_after_humping;
     uint8_t unknown;
 };
@@ -339,7 +377,8 @@ class Mummy : public Monster
 class VanHorsing : public NPC
 {
   public:
-    bool show_text; // if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
+    /// if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
+    bool show_text;
 };
 
 class WitchDoctor : public WalkingMonster
@@ -379,8 +418,10 @@ class Vlad : public Vampire
 {
   public:
     uint32_t unknown1;
-    uint8_t teleport_timer; // triggers when Vlad teleports, when timer running he can't teleport and will stun when hit
-    bool aggro;             // or awake
+    /// triggers when Vlad teleports, when timer running he can't teleport and will stun when hit
+    uint8_t teleport_timer;
+    /// or is awake
+    bool aggro;
 };
 
 class Waddler : public RoomOwner
@@ -400,8 +441,9 @@ class Octopus : public WalkingMonster
 class Bodyguard : public NPC
 {
   public:
-    uint8_t position_state; // 0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace
-    bool message_shown;     // entrence and basement entrence
+    /// 0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace
+    uint8_t position_state;
+    bool message_shown; // entrence and basement entrence
 };
 
 class Fish : public Monster
@@ -414,8 +456,10 @@ class GiantFish : public Monster
 {
   public:
     SoundPosition* sound_pos;
-    uint16_t change_direction_timer; // when bouncing into a wall, it changes direction too
-    uint16_t lose_interest_timer;    // delay in-between attacks
+    /// when bouncing into a wall
+    uint16_t change_direction_timer;
+    /// delay in-between attacks
+    uint16_t lose_interest_timer;
     uint16_t unknown_timer;
     uint16_t padding1;
     float unknown1;
@@ -445,8 +489,9 @@ class Kingu : public Monster
     uint16_t climb_pause_timer;
     uint8_t shell_invincibility_timer;
     uint8_t monster_spawn_timer;
-    uint8_t initial_shell_health; // excalibur wipes out immediately, bombs take off 11 points; when 0 vulnerable to whip
-    bool player_seen_by_kingu;    // unsure if correct
+    /// excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
+    uint8_t initial_shell_health;
+    bool player_seen_by_kingu; // unsure if correct
 };
 
 class Anubis : public Monster
@@ -530,7 +575,8 @@ class ApepPart : public Monster
   public:
     float y_pos;
     float sine_angle;
-    uint8_t sync_timer; // or pause timer, used to sync the body parts moving up and down
+    /// or pause timer, used to sync the body parts moving up and down
+    uint8_t sync_timer;
     uint8_t padding1;
     uint16_t padding2;
     uint32_t padding3;
@@ -550,7 +596,8 @@ class ApepHead : public ApepPart
 class OsirisHead : public Monster
 {
   public:
-    int32_t right_hand_uid; // right from his perspective
+    /// right from his perspective
+    int32_t right_hand_uid;
     int32_t left_hand_uid;
     bool moving_left;
     uint8_t targeting_timer;
@@ -627,8 +674,10 @@ class Olmite : public WalkingMonster
 {
   public:
     bool armor_on;
-    bool in_stack;  // disables the attack, stun, lock's looking left flag between stack
-    bool in_stack2; // is set to false couple frame after being detached from stack
+    /// disables the attack, stun, lock's looking left flag between stack
+    bool in_stack;
+    /// is set to false couple frame after being detached from stack
+    bool in_stack2;
     int8_t padding1;
     int32_t on_top_uid;
     float y_offset;                // same as y position when stacked
@@ -665,7 +714,8 @@ class GiantFrog : public Monster
     uint8_t frogs_ejected_in_cycle; // ejects thee frogs in quick succession, then waits a longer time
     uint16_t invincibility_timer;
     uint8_t mouth_close_timer;
-    bool mouth_open_trigger; // opens the mouth and starts mouth_close_timer, used when detecting grub in the mouth area
+    /// opens the mouth and starts mouth_close_timer, used when detecting grub in the mouth area
+    bool mouth_open_trigger;
     uint8_t padding1;
     uint8_t padding2;
 };
@@ -691,7 +741,8 @@ class Grub : public Monster
     float rotation_delta; // is it? i seen it in the code compared as a bit with 1, but not sure when it happens
     bool drop;
     bool unknown3;
-    uint8_t looking_for_new_direction_timer; // used when he touches floor/wall/ceiling
+    /// used when he touches floor/wall/ceiling
+    uint8_t looking_for_new_direction_timer;
     uint8_t padding1;
     uint16_t unknown6_timer;   // paused when not moving
     uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
@@ -771,24 +822,20 @@ class Hundun : public Monster
     uint8_t fireball_timer;
     bool birdhead_defeated;
     bool snakehead_defeated;
+    /// 1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
     uint8_t hundun_flags;
-
-    // hundun_flags:
-    //   1: Will move to the left
-    //   2: Birdhead emerged
-    //   3: Snakehead emerged
-    //   4: Top level arena reached
-    //   5: Birdhead shot last (to alternate the heads shooting fireballs)
 };
 
 class HundunHead : public Monster
 {
   public:
-    float attack_position_x; // Posiotion where the head will move
-    float attack_position_y; // Posiotion where the head will move
+    float attack_position_x;
+    float attack_position_y;
+    /// Posiotion where the head will move on attack
     int32_t egg_crack_effect_uid;
     int32_t targeted_player_uid;
-    uint16_t looking_for_target_timer; // also cooldown before attack
+    /// also cooldown before attack
+    uint16_t looking_for_target_timer;
     uint8_t invincibility_timer;
 };
 
@@ -798,11 +845,13 @@ class MegaJellyfish : public Monster
     Entity* flipper1;
     Entity* flipper2;
     SoundPosition* sound_pos;
-    int32_t orb_uid; // the closest orb, does not gets updated
+    /// the closest orb, does not gets updated
+    int32_t orb_uid;
     int32_t tail_bg_uid;
     float applied_velocity;
     float wagging_tail_counter; // float counter to determine position of wagging tail (0 = right ; pi = left)
-    uint8_t flipper_distance;   // only applies to door-blocking one
+    /// only applies to door-blocking one
+    uint8_t flipper_distance;
     uint8_t velocity_application_timer;
 };
 
@@ -818,11 +867,13 @@ class Hermitcrab : public Monster
   public:
     uint32_t carried_entity_type;
     int32_t carried_entity_uid;
-    uint16_t walk_spit_timer;    // depending on movable.state either the countdown how many acid bubbles spat (3) or walking timer
-    bool is_active;              // whether it is hidden behind the carried block or not, if true you can damage him
-    bool is_inactive;            // must be something else, since we already have is_active (or vice versa), gets triggered about have a second after is_active, maybe something like, can attack
-    bool spawn_new_carried_item; // defaults to true, when toggled to false, a new carried item spawns
-    uint8_t unknown;             // sometimes i see 1 here, didn't get anything with breakpoint
+    uint16_t walk_spit_timer; // depending on movable.state either the countdown how many acid bubbles spat (3) or walking timer
+    /// whether it is hidden behind the carried block or not, if true you can damage him
+    bool is_active;
+    bool is_inactive; // must be something else, since we already have is_active (or vice versa), gets triggered about half a second after is_active, maybe something like, can attack
+    /// defaults to true, when toggled to false, a new carried item spawns
+    bool spawn_new_carried_item;
+    uint8_t unknown; // sometimes i see 1 here, didn't get anything with breakpoint
 };
 
 class Necromancer : public WalkingMonster
@@ -841,18 +892,14 @@ class ProtoShopkeeper : public Monster
   public:
     uint64_t unknown1;
     uint8_t movement_state;
-    //"1": "Headpulse/explosion related",
-    //"2": "Walking",
-    //"3": "Headpulse/explosion related",
-    //"4": "Crawling",
-    //"5": "",
-    //"6": "Headpulse/explosion related",
+    ///1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     uint8_t padding1;
     uint8_t padding2;
     uint8_t blowup_related;
     uint32_t animation_timer;
     uint16_t walk_pause_explode_timer; // alternates between walking and pausing; when stunned: crawl timer;  after crawling: head pulse timer (pulse frequency dependend on timer)
-    uint8_t walking_speed;             // 0 = slow; 4 = fast
+    /// 0 = slow, 4 = fast
+    uint8_t walking_speed;
     uint8_t padding7;
     uint32_t unknown3; // counts down from 10 to 3 in the headpulse phase
 };
@@ -877,7 +924,7 @@ class Critter : public Monster
 {
   public:
     int32_t last_picked_up_by_uid;
-    uint8_t state;
+    uint8_t holding_state;
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
@@ -886,7 +933,8 @@ class Critter : public Monster
 class CritterBeetle : public Critter
 {
   public:
-    bool pause; // used when he's getting eaten
+    /// used when he's getting eaten
+    bool pause;
 };
 
 class CritterCrab : public Critter

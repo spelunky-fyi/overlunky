@@ -99,7 +99,8 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_excalibur"] = &Entity::as<Excalibur>;
     lua["Entity"]["as_shield"] = &Entity::as<Shield>;
 
-    lua.new_usertype<Bomb>("Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Bomb>(
+        "Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, "is_big_bomb", &Bomb::is_big_bomb, sol::base_classes, sol::bases<Entity, Movable>());
 
     lua.new_usertype<Backpack>(
         "Backpack",
@@ -302,16 +303,22 @@ void register_usertypes(sol::state& lua)
         "Spark",
         "particle",
         &Spark::particle,
+        "fx_entity",
+        &Spark::fx_entity,
         "rotation_center_x",
         &Spark::rotation_center_x,
         "rotation_center_y",
         &Spark::rotation_center_y,
         "angle",
         &Spark::angle,
+        "size",
+        &Spark::size,
         "size_multiply",
         &Spark::size_multiply,
         "next_size",
         &Spark::next_size,
+        "size_change_timer",
+        &Spark::size_change_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, Flame>());
 
@@ -448,6 +455,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<WallTorch>(
         "WallTorch",
+        "dropped_gold",
+        &WallTorch::dropped_gold,
         sol::base_classes,
         sol::bases<Entity, Movable, Torch>());
 
@@ -507,13 +516,6 @@ void register_usertypes(sol::state& lua)
         &Chain::attached_to_uid,
         "timer",
         &Chain::timer,
-        sol::base_classes,
-        sol::bases<Entity, Movable>());
-
-    lua.new_usertype<Container>(
-        "Container",
-        "inside",
-        &Container::inside,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -734,7 +736,7 @@ void register_usertypes(sol::state& lua)
         "dont_transfer_dmg",
         &Pot::dont_transfer_dmg,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Container>());
 
     lua.new_usertype<CursedPot>(
         "CursedPot",
@@ -806,10 +808,10 @@ void register_usertypes(sol::state& lua)
         "ParachutePowerup",
         "falltime_deploy",
         &ParachutePowerup::falltime_deploy,
+        "deployed",
+        sol::readonly(&ParachutePowerup::deployed),
         "deploy",
         &ParachutePowerup::deploy,
-        "after_deploy",
-        &ParachutePowerup::after_deploy,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
