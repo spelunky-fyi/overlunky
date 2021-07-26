@@ -619,6 +619,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
     /// ```
     lua["pick_up"] = pick_up;
+    /// Drop an entity by uid
+    lua["drop"] = drop;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates

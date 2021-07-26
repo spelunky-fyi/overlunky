@@ -464,9 +464,7 @@ bool Entity::set_texture(std::uint32_t texture_id)
 {
     if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
     {
-        texture = new_texture;
-        rendering_info->texture = new_texture;
-        rendering_info->texture_name = new_texture->name;
+        apply_texture(new_texture);
         return true;
     }
     return false;
