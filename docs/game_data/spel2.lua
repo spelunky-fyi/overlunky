@@ -2,67 +2,67 @@ AABB = {
   __name = "sol.AABB.user"
 }
 AcidBubble = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.AcidBubble.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Alien = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Alien.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Altar = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Altar.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Ammit = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Ammit.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Animation = {
   __name = "sol.Animation.user"
 }
 AnkhPowerup = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.AnkhPowerup.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Anubis = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Anubis.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ApepHead = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ApepHead.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ApepPart = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ApepPart.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Arrow = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Arrow.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Arrowtrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Arrowtrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Axolotl = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Axolotl.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 AxolotlShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.AxolotlShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 BEG = {
   ALTAR_DESTROYED = 1,
@@ -81,64 +81,64 @@ BUTTON = {
   WHIP = 2
 }
 Backpack = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Backpack.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Bat = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Bat.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Bee = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Bee.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Beg = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Beg.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 BigSpearTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.BigSpearTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Bodyguard = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Bodyguard.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Bomb = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Bomb.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 BoneBlock = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.BoneBlock.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Boombox = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Boombox.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Boomerang = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Boomerang.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Boulder = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Boulder.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Bullet = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Bullet.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CAUSE_OF_DEATH = {
   DEATH = 0,
@@ -186,171 +186,172 @@ Camera = {
   __name = "sol.Camera.user"
 }
 Cape = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Cape.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CatMummy = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CatMummy.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Caveman = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Caveman.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CavemanShopkeeper = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CavemanShopkeeper.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Chain = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Chain.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ChainedPushBlock = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ChainedPushBlock.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Chest = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Chest.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CityOfGoldDoor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CityOfGoldDoor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ClamBase = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ClamBase.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Claw = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Claw.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ClimbableRope = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ClimbableRope.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CloneGunShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CloneGunShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Cobra = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Cobra.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Coffin = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Coffin.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Coin = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Coin.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Color = {
   __name = "sol.Color.user"
 }
 Container = {
-  __index = "function:",
-  __newindex = "function:"
+  __index = "function",
+  __name = "sol.Container.user",
+  __newindex = "function"
 }
 ConveyorBelt = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ConveyorBelt.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CookFire = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CookFire.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Crabman = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Crabman.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Critter = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Critter.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterBeetle = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterBeetle.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterButterfly = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterButterfly.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterCrab = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterCrab.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterDrone = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterDrone.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterFirefly = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterFirefly.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterFish = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterFish.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterLocust = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterLocust.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterPenguin = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterPenguin.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterSlime = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterSlime.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CritterSnail = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CritterSnail.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Crocman = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Crocman.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Crushtrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Crushtrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CursedPot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.CursedPot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 CustomSound = {
   __name = "sol.CustomSound.user"
@@ -457,19 +458,19 @@ DROPCHANCE = {
   YETI_PITCHERSMITT = 10
 }
 DecoratedDoor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.DecoratedDoor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Door = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Door.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Drill = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Drill.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
@@ -1376,29 +1377,29 @@ ENT_TYPE = {
   MOUNT_TURKEY = 897
 }
 EggSac = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.EggSac.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 EggShipDoor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.EggShipDoor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 EggplantMinister = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.EggplantMinister.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Elevator = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Elevator.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 EmpressGrave = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.EmpressGrave.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Entity = {
   __name = "sol.Entity.user"
@@ -1407,14 +1408,14 @@ EntityDB = {
   __name = "sol.EntityDB.user"
 }
 Excalibur = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Excalibur.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ExitDoor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ExitDoor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 F = {}
 FLOOR_SIDE = {
@@ -1428,142 +1429,142 @@ FLOOR_SIDE = {
   TOP_RIGHT = 5
 }
 FallingPlatform = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.FallingPlatform.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 FireFrog = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.FireFrog.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Fireball = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Fireball.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Firebug = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Firebug.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 FirebugUnchained = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.FirebugUnchained.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Fish = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Fish.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Flame = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Flame.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 FlameSize = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.FlameSize.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Floor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Floor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Fly = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Fly.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 FlyHead = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.FlyHead.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ForceField = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ForceField.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ForestSister = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ForestSister.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Frog = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Frog.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 FrozenLiquid = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.FrozenLiquid.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Generator = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Generator.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Ghist = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Ghist.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Ghost = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Ghost.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 GhostBreath = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.GhostBreath.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 GiantClamTop = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.GiantClamTop.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 GiantFish = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.GiantFish.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 GiantFly = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.GiantFly.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 GiantFrog = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.GiantFrog.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 GoldMonkey = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.GoldMonkey.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Goldbar = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Goldbar.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Grub = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Grub.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 GuiDrawContext = {
   __name = "sol.GuiDrawContext.user"
 }
 Gun = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Gun.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 HUNDUNFLAGS = {
   BIRDHEADEMERGED = 2,
@@ -1573,72 +1574,72 @@ HUNDUNFLAGS = {
   WILLMOVELEFT = 1
 }
 HangAnchor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.HangAnchor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 HangSpider = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.HangSpider.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 HangStrand = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.HangStrand.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Hermitcrab = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Hermitcrab.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Honey = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Honey.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 HorizontalForceField = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.HorizontalForceField.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 HornedLizard = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.HornedLizard.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Hoverpack = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Hoverpack.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Hundun = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Hundun.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 HundunChest = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.HundunChest.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 HundunHead = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.HundunHead.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Idol = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Idol.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Illumination = {
   __name = "sol.Illumination.user"
 }
 Imp = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Imp.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 InputMapping = {
   __name = "sol.InputMapping.user"
@@ -1655,34 +1656,34 @@ JUNGLESISTERS = {
   WARNING_ONE_WAY_DOOR = 4
 }
 Jetpack = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Jetpack.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Jiangshi = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Jiangshi.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 JumpDog = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.JumpDog.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 JungleSpearCosmetic = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.JungleSpearCosmetic.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 KapalaPowerup = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.KapalaPowerup.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Kingu = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Kingu.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LAYER = {
   BACK = 1,
@@ -1694,95 +1695,95 @@ LAYER = {
   PLAYER4 = -4
 }
 Lahamu = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Lahamu.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Lamassu = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Lamassu.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LampFlame = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LampFlame.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Landmine = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Landmine.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LaserBeam = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LaserBeam.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LaserTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LaserTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Lava = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Lava.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LavaGlow = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LavaGlow.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Lavamander = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Lavamander.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Leaf = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Leaf.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Leprechaun = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Leprechaun.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LightArrow = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LightArrow.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LightArrowPlatform = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LightArrowPlatform.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LightEmitter = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LightEmitter.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LightParams = {
   __name = "sol.LightParams.user"
 }
 LightShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LightShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Liquid = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Liquid.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 LoadContext = {
   __name = "sol.LoadContext.user"
 }
 LockedDoor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.LockedDoor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 MASK = {
   ACTIVEFLOOR = 128,
@@ -1802,94 +1803,94 @@ MASK = {
   WATER = 8192
 }
 MagmaMan = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.MagmaMan.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 MainExit = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.MainExit.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Mantrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Mantrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Mattock = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Mattock.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Mech = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Mech.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 MegaJellyfish = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.MegaJellyfish.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 MiniGameAsteroid = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.MiniGameAsteroid.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 MiniGameShip = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.MiniGameShip.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Mole = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Mole.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Monkey = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Monkey.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Monster = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Monster.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Mosquito = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Mosquito.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 MotherStatue = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.MotherStatue.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Mount = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Mount.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Movable = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Movable.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Mummy = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Mummy.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 NPC = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.NPC.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Necromancer = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Necromancer.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ON = {
   ARENA_INTRO = 25,
@@ -1914,16 +1915,17 @@ ON = {
   ONLINE_LOADING = 28,
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
-  POST_LEVEL_GENERATION = 110,
-  POST_ROOM_GENERATION = 109,
+  POST_LEVEL_GENERATION = 111,
+  POST_ROOM_GENERATION = 110,
+  PRE_LEVEL_GENERATION = 109,
   PROLOGUE = 2,
   RECAP = 20,
   RESET = 105,
   SAVE = 106,
   SCORES = 18,
   SCREEN = 102,
-  SCRIPT_DISABLE = 112,
-  SCRIPT_ENABLE = 111,
+  SCRIPT_DISABLE = 113,
+  SCRIPT_ENABLE = 112,
   SEED_INPUT = 8,
   SPACESHIP = 15,
   START = 103,
@@ -1933,44 +1935,44 @@ ON = {
   WIN = 16
 }
 Octopus = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Octopus.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Olmec = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Olmec.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 OlmecCannon = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.OlmecCannon.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 OlmecFloater = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.OlmecFloater.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Olmite = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Olmite.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Orb = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Orb.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 OsirisHand = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.OsirisHand.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 OsirisHead = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.OsirisHead.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 PARTICLEEMITTER = {
   ACIDBUBBLEBURST_BUBBLES = 101,
@@ -2275,37 +2277,37 @@ PROCEDURAL_CHANCE = {
   YETI = 268
 }
 ParachutePowerup = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ParachutePowerup.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
 Pet = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Pet.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Pipe = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Pipe.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Player = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Player.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 PlayerBag = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.PlayerBag.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 PlayerGhost = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.PlayerGhost.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 PlayerInputs = {
   __name = "sol.PlayerInputs.user"
@@ -2320,50 +2322,50 @@ PlayingSound = {
   __name = "sol.PlayingSound.user"
 }
 PoleDeco = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.PoleDeco.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 PostRoomGenerationContext = {
   __name = "sol.PostRoomGenerationContext.user"
 }
 Pot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Pot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ProtoShopkeeper = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ProtoShopkeeper.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 PunishBall = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.PunishBall.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 PushBlock = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.PushBlock.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Qilin = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Qilin.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 QuestsInfo = {
   __name = "sol.QuestsInfo.user"
 }
 QuickSand = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.QuickSand.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Quillback = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Quillback.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 REPEAT_TYPE = {
   BACK_AND_FORTH = 2,
@@ -2617,29 +2619,29 @@ ROOM_TEMPLATE = {
   VLAD_TUNNEL = 123
 }
 RegenBlock = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.RegenBlock.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Robot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Robot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Rockdog = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Rockdog.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 RollingItem = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.RollingItem.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 RoomOwner = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.RoomOwner.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
@@ -2662,12 +2664,13 @@ SPARROW = {
   TUSK_IDOL_STOLEN = 5
 }
 SPAWN_TYPE = {
-  ANY = 13,
-  LEVEL_GEN = 5,
-  LEVEL_GEN_PROCEDURAL = 4,
+  ANY = 31,
+  LEVEL_GEN = 7,
+  LEVEL_GEN_GENERAL = 4,
+  LEVEL_GEN_PROCEDURAL = 2,
   LEVEL_GEN_TILE_CODE = 1,
-  SCRIPT = 4,
-  SYSTEMIC = 8
+  SCRIPT = 8,
+  SYSTEMIC = 16
 }
 SaveContext = {
   __name = "sol.SaveContext.user"
@@ -2676,107 +2679,107 @@ SaveData = {
   __name = "sol.SaveData.user"
 }
 Scarab = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Scarab.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 ScepterShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ScepterShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Scorpion = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Scorpion.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Shield = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Shield.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Shopkeeper = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Shopkeeper.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Skeleton = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Skeleton.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SkullDropTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.SkullDropTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SlidingWallCeiling = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.SlidingWallCeiling.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SnapTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.SnapTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Sorceress = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Sorceress.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SoundShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.SoundShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Spark = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Spark.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SparkTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.SparkTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Spear = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Spear.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SpecialShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.SpecialShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Spider = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Spider.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 SpikeballTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.SpikeballTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 StateMemory = {
   __name = "sol.StateMemory.user"
 }
 StickyTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.StickyTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 StretchChain = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.StretchChain.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Switch = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Switch.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TEXTURE = {
   DATA_TEXTURES_BASE_EGGSHIP2_0 = 94,
@@ -3197,12 +3200,12 @@ TUSK = {
   QUEST_NOT_STARTED = 0
 }
 TV = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TV.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TYPE_MAP = {
-  "function:",
+  "function",
   nil,
   nil,
   nil,
@@ -3223,32 +3226,32 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
   nil,
   nil,
-  "function:",
+  "function",
   nil,
-  "function:",
+  "function",
   nil,
-  "function:",
+  "function",
   nil,
   nil,
-  "function:",
+  "function",
   nil,
   nil,
   nil,
-  "function:",
+  "function",
   nil,
-  "function:",
+  "function",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
   nil,
@@ -3261,15 +3264,15 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
+  "function",
   nil,
   nil,
   nil,
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
   nil,
@@ -3279,20 +3282,20 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
-  "function:",
-  "function:",
+  "function",
+  "function",
   nil,
   nil,
   nil,
-  "function:",
+  "function",
   nil,
-  "function:",
+  "function",
   nil,
   nil,
   nil,
@@ -3302,8 +3305,8 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
+  "function",
+  "function",
   nil,
   nil,
   nil,
@@ -3395,710 +3398,710 @@ TYPE_MAP = {
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
   nil,
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
   nil,
   nil,
-  "function:",
   nil,
   nil,
   nil,
   nil,
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
+  "function",
   nil,
+  "function",
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
   nil,
-  "function:",
   nil,
-  "function:",
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
   nil,
+  "function",
+  "function",
+  "function",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
   nil,
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
-  "function:",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
   nil,
-  "function:",
   nil,
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
+  "function",
   nil,
   nil,
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
+  "function",
   nil,
   nil,
   nil,
+  "function",
   nil,
   nil,
   nil,
   nil,
   nil,
   nil,
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
   nil,
+  "function",
+  "function",
   nil,
+  "function",
   nil,
+  "function",
   nil,
   nil,
+  "function",
+  "function",
+  "function",
   nil,
   nil,
+  "function",
   nil,
+  "function",
   nil,
   nil,
   nil,
+  "function",
+  "function",
+  "function",
   nil,
+  "function",
   nil,
+  "function",
+  "function",
   nil,
-  "function:",
+  "function",
+  "function",
+  "function",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
   nil,
   nil,
   nil,
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
   nil,
   nil,
+  "function",
   nil,
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  "function",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  [897] = "function:",
-  [898] = "function:",
-  [899] = "function:",
-  [900] = "function:",
-  [901] = "function:",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  "function",
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  "function",
+  nil,
+  nil,
+  nil,
+  "function",
+  "function",
+  nil,
+  "function",
+  nil,
+  nil,
+  "function",
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  "function",
+  "function",
+  nil,
+  nil,
+  nil,
+  "function",
+  "function",
+  "function",
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  "function",
+  "function",
+  "function",
+  nil,
+  nil,
+  "function",
+  nil,
+  "function",
+  "function",
+  nil,
+  "function",
+  "function",
+  "function",
+  nil,
+  "function",
+  "function",
+  nil,
+  "function",
+  "function",
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  "function",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  [897] = "function",
+  [898] = "function",
+  [899] = "function",
+  [900] = "function",
+  [901] = "function",
   [903] = nil,
   [904] = nil,
-  [907] = "function:",
+  [907] = "function",
   [908] = nil,
-  [910] = "function:",
+  [910] = "function",
   [911] = nil
 }
 Tadpole = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Tadpole.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Teleporter = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Teleporter.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TeleportingBorder = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TeleportingBorder.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Telescope = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Telescope.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Tentacle = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Tentacle.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TentacleBottom = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TentacleBottom.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Terra = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Terra.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
 }
 ThinIce = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.ThinIce.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Tiamat = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Tiamat.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TiamatShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TiamatShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TimedForceField = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TimedForceField.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TimedPowderkeg = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TimedPowderkeg.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TimedShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TimedShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Torch = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Torch.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TorchFlame = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TorchFlame.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TotemTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TotemTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TransferFloor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TransferFloor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TrapPart = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TrapPart.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Treasure = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Treasure.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TreasureHook = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TreasureHook.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 TrueCrownPowerup = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.TrueCrownPowerup.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Tun = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Tun.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 UFO = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.UFO.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 UdjatSocket = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.UdjatSocket.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 UnchainedSpikeBall = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.UnchainedSpikeBall.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Ushabti = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Ushabti.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 VANHORSING = {
   FIRST_ENCOUNTER_DIAMOND_THROWN = 2,
@@ -4695,24 +4698,24 @@ VANILLA_SOUND_PARAM = {
   VELOCITY = 15
 }
 Vampire = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Vampire.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 VanHorsing = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.VanHorsing.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Vlad = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Vlad.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 VladsCape = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.VladsCape.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WIN_STATE = {
   COSMIC_OCEAN_WIN = 3,
@@ -4721,44 +4724,44 @@ WIN_STATE = {
   TIAMAT_WIN = 1
 }
 Waddler = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Waddler.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WalkingMonster = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.WalkingMonster.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WallTorch = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.WallTorch.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WebGun = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.WebGun.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WebShot = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.WebShot.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WitchDoctor = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.WitchDoctor.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WitchDoctorSkull = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.WitchDoctorSkull.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 WoodenlogTrap = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.WoodenlogTrap.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 YANG = {
   ANGRY = -1,
@@ -4771,30 +4774,31 @@ YANG = {
   TWO_TURKEYS_BOUGHT = 6
 }
 Yama = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Yama.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 Yang = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.Yang.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 YellowCape = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.YellowCape.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 YetiKing = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.YetiKing.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
 YetiQueen = {
-  __index = "function:",
+  __index = "function",
   __name = "sol.YetiQueen.user",
-  __newindex = "function:"
+  __newindex = "function"
 }
+__script_id = "dev/lua_console"
 apply_entity_db = function(...) end
 attach_ball_and_chain = function(...) end
 attach_entity = function(...) end
@@ -4867,6 +4871,7 @@ get_room_index = function(...) end
 get_room_pos = function(...) end
 get_room_template = function(...) end
 get_room_template_name = function(...) end
+get_script_id = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n-- This function walks up the stack until it finds an _ENV that is not _G\n-- That _ENV has to be the environment of a script where we can look up the scripts id\nget_script_id = function()\n    -- Not available in Lua 5.2+\n    getfenv = getfenv or function(f)\n        f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)\n        local name, val\n        local up = 0\n        repeat\n            up = up + 1\n            name, val = debug.getupvalue(f, up)\n        until name == '_ENV' or name == n...Ñò\0\0\4ï\11\0\0\0BÄ\0\0008\0\0ÄO\0\0\0\15\0\0\0\8\0\0\0ÅÄ\0Ä\11\1\0\0Ä\1\1\0D\1\2\2\0\0\2\0ï\0\1ÄØ\0Ä\6\11\1\0\0019Ä\2\0008˚ˇ\127<Ä\2\0008˙ˇ\127\14\1\0\3H\1\2\0G\1\1\0Ñ\4àgetfenv\4É_G\0\4å__script_idÅ\0\0\0ÅÄÜè\1\0\7üã\0\0\0\0\1\0\0ƒ\0\2\2º\0\1\0∏\0\0ÄBÄ\0\0008\3\0Äã\0\0\2é\0\1\3\21\1\0Ä/\0Ä\6É\1\2\0ƒ\0\3\2\14\0\1\5à\0\1\0ÅÅˇ\127ï\1\3ÄØ\1Ä\6\11\2\0\2\14\2\4\6Ä\2\0\0\0\3\3\0D\2\3\3\0\1\5\0Ä\0\4\0ºÄ\7\0∏\0\0Äº\0\8\0008˘ˇ\127H\1\2\0G\2\1\0â\4Ötype\4âfunction\4Üdebug\4àgetinfo\4Çf\4Öfunc\4ãgetupvalue\4Ö_ENV\0Å\0\0\0Äü\1\0\0\0\0\0\0\0\0\0\0\0\0\0\1\1\2\0\1\0\0\0\0\0\0\1\0\0\0\1\1ÄÑÇfÄüÖnameèüÑvalèüÉupêüÅÖ_ENVï\2\0\0\9\0\2\1\2\0\0\0\1\0\1\0\0\0\0\1\0\1ÄÇÑenvÜïÉupáïÅÖ_ENV",'@serialized'))
 get_sound = function(...) end
 get_texture_definition = function(...) end
 get_type = function(...) end
@@ -4882,6 +4887,22 @@ inspect = {
   _URL = "http://github.com/kikito/inspect.lua",
   _VERSION = "inspect.lua 3.1.0",
   inspect = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4Ä\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2∞\2 \2\0\11Ω¬Ä\0\0008\1\0Ä\19\1\0\0R\0\0\0Ä\0\2\0\14\1\1\0BÅ\0\0∏\0\0Ä\11\1\0\1\14\1\2\2é\1\1\3¬Å\0\0008\0\0ÄÉ\1\2\0\14\2\1\5BÇ\0\0008\0\0Ä\3\2\3\0é\2\1\7¬\2\0\0008\4\0Ä\9\3\1\0Ä\3\5\0\0\4\0\0ì\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8ì\3\4\0R\0\0\0í\3\0\2íÉ\9\n\19\4\0\0R\0\0\0í\3\11\8\19\4\0\0R\0\0\0í\3\12\8\19\4\0\0R\0\0\0í\3\13\8í\3\3\3í\3\5\4\9\4\2\0Ä\4\0\0D\4\2\2í\3\14\8\9\4\3\0D\3\3\2îÉ\6\15Ä\4\0\0ƒ\3\3\1ã\3\0\16é\3\7\17\14\4\6\11≈\3\2\0∆\3\0\0«\3\1\0í\4Üdepth\4Ömath\4Öhuge\4ànewline\4Ç\n\4áindent\4É  \4àprocess\4çsetmetatable\4Ülevel\3\0\0\0\0\0\0\0\0\4ábuffer\4Ñids\4ámaxIds\4ëtableAppearances\4âputValue\4Ütable\4áconcatÑ\0\0\0\1\16\0\1\13\0\1\18\0ÄΩ\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1˜\11\0\0\2\0\0\0\0\1ÄáÖrootÄΩàoptionsÄΩÜdepthäΩànewlineéΩáindentíΩàprocessìΩäinspector¥ΩÑÖ_ENVëprocessRecursiveñcountTableAppearancesçInspector_mt",'@serialized'))
+}
+io = {
+  close = "function",
+  flush = "function",
+  input = "function",
+  lines = "function",
+  open = "function",
+  output = "function",
+  popen = "function",
+  read = "function",
+  stderr = "userdata: 0000020AC8BEF8A0",
+  stdin = "userdata: 0000020AC8BF01D0",
+  stdout = "userdata: 0000020AC8BEEFE0",
+  tmpfile = "function",
+  type = "function",
+  write = "function"
 }
 is_character_female = function(...) end
 json = {
@@ -4899,6 +4920,19 @@ messpect = function(...) end
 modify_sparktraps = function(...) end
 move_entity = function(...) end
 options = {}
+os = {
+  clock = "function",
+  date = "function",
+  difftime = "function",
+  execute = "function",
+  exit = "function",
+  getenv = "function",
+  remove = "function",
+  rename = "function",
+  setlocale = "function",
+  time = "function",
+  tmpname = "function"
+}
 pause = function(...) end
 pick_up = function(...) end
 players = 
@@ -4906,6 +4940,7 @@ prinspect = function(...) end
 read_input = function(...) end
 read_prng = function(...) end
 read_stolen_input = function(...) end
+register_console_command = function(...) end
 register_option_bool = function(...) end
 register_option_button = function(...) end
 register_option_combo = function(...) end
