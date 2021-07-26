@@ -232,6 +232,67 @@ class ThemeInfo
 
     // returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
     virtual uint32_t backlayer_lut() = 0;
+
+    // a value between 0.0 (default) and 1.0 used to illuminate (backlayer) locations
+    // depending on camera level (thus player y-level), the brightness is increased gradually
+    // used in black market, vlad's castle, ice caves backlayer, pleasure palace
+    // for tiamat: the value is always 1.0 for full backlayer global illumination (ship)
+    virtual float backlayer_global_illumination_level() = 0;
+
+    // this is used for CO (checks that player is in the level, not in the transition)
+    // if enabled in another theme, it adds an extra border and if you zoom out, you see the level loop if you move to the side
+    virtual bool enable_camera_loop() = 0;
+
+    // not 100% sure, this is used in a random calculation that determines whether a vault spawns
+    // looks to be the highest level a vault can spawn; it's mostly 3 or 4, but for neobab it's 1, which makes sense
+    virtual uint8_t max_level_for_vault() = 0;
+
+    // index == 0 ? return unknown1 : return unknown2
+    virtual bool get_unknown_1_or_2(uint8_t index) = 0;
+
+    // e.g. for dwelling:
+    // texture_id == -4 -> returns 122 BG_CAVE_0
+    // texture_id == -5 -> returns 115 FLOOR_CAVE_0
+    // texture_id == -6 -> returns 117 FLOOR_CAVE_2
+    // texture_id == -7 -> returns 118 FLOOR_CAVE_3
+    // texture_id == -8 -> returns 120 DECO_CAVE_0
+    // texture_id == -10 -> returns 369 COFFINS_0
+    // ...
+    // the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number
+    // that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
+    virtual uint32_t get_dynamic_floor_texture_id(int8_t texture_id) = 0;
+
+    // manipulates state.level_next, world_next and theme_next; triggers when exiting a level
+    // for dwelling, it just increments level_next because the world/theme choice is made by which door you pick
+    // for jungle/volcana, it checks whether it's on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec
+    // for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game
+    virtual void set_next_world_level_theme() = 0;
+
+    // default = return state.h - 1
+    // for special levels (black market, vlad, ...) fixed heights are returned
+    virtual uint32_t get_zero_based_level_height() = 0;
+
+    // returns a value that appears to affect room generation and is based on current world,level
+    virtual uint32_t unknown_v46() = 0;
+
+    // used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues
+    // also implemented for neobab (i think in the zoos)
+    // might do other things as well
+    virtual void post_process_decoration1() = 0;
+
+    // dwelling: adds the decal above the udjat chest
+    // jungle: adds the colorful jungle flowers on top of the blocks
+    // does lots of other things as well, not sure about difference between this and post_process_decoration1
+    virtual void post_process_decoration2() = 0;
+
+    // dwelling udjat level: adds the key in random place
+    // vlad's castle: adds decorative banners
+    // tidepool: adds hanging seaweed, red lanterns, ...
+    // temple: adds temple sand deco, ...
+    // neobab: adds neon signs, hanging wires, ...
+    virtual void populate_extra_random_entities() = 0;
+
+    virtual void do_procedural_spawn() = 0;
 };
 static_assert(sizeof(ThemeInfo) == 0x20);
 
