@@ -197,16 +197,16 @@ for file in header_files:
                 if m:
                     comment.append(m[1])
 
-                m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", line)
+                m = re.search(r'\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)', line)
                 if m:
-                    name = m[2]
+                    name = m[3]
                     if name not in member_funs:
                         member_funs[name] = []
                     member_funs[name].append(
                         {
-                            "return": m[1],
-                            "name": m[2],
-                            "param": m[3],
+                            "return": m[2],
+                            "name": m[3],
+                            "param": m[4],
                             "comment": comment,
                         }
                     )

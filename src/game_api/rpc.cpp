@@ -1001,18 +1001,21 @@ std::vector<int64_t> read_prng()
 
 void pick_up(uint32_t who_uid, uint32_t what_uid)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        offset = memory.at_exe(find_inst(memory.exe(), "\x48\x89\x5c\x24\x08\x57\x48\x83\xec\x20\x4c\x8b\x5a\x08"s, memory.after_bundle));
-    }
     Movable* ent = (Movable*)get_entity_ptr(who_uid);
     Movable* item = (Movable*)get_entity_ptr(what_uid);
     if (ent != nullptr && item != nullptr)
     {
-        auto pick_up_func = (void (*)(Movable*, Movable*))offset;
-        pick_up_func(ent, item);
+        ent->pick_up(item);
+    }
+}
+
+void drop(uint32_t who_uid, uint32_t what_uid)
+{
+    Movable* ent = (Movable*)get_entity_ptr(who_uid);
+    Movable* item = (Movable*)get_entity_ptr(what_uid);
+    if (ent != nullptr && item != nullptr)
+    {
+        ent->drop(item);
     }
 }
 

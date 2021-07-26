@@ -139,7 +139,13 @@ void register_usertypes(sol::state& lua)
         "get_texture",
         &Entity::get_texture,
         "set_texture",
-        &Entity::set_texture);
+        &Entity::set_texture,
+        "set_draw_depth",
+        &Entity::set_draw_depth,
+        "liberate_from_shop",
+        &Entity::liberate_from_shop,
+        "get_held_entity",
+        &Entity::get_held_entity);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -202,6 +208,22 @@ void register_usertypes(sol::state& lua)
         &Movable::is_button_released,
         "price",
         &Movable::price,
+        "stun",
+        &Movable::stun,
+        "freeze",
+        &Movable::freeze,
+        "light_on_fire",
+        &Movable::light_on_fire,
+        "set_cursed",
+        &Movable::set_cursed,
+        "drop",
+        &Movable::drop,
+        "pick_up",
+        &Movable::pick_up,
+        "can_jump",
+        &Movable::can_jump,
+        "standing_on",
+        &Movable::standing_on,
         sol::base_classes,
         sol::bases<Entity>());
     lua.new_usertype<Player>(
