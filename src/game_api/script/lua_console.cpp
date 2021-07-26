@@ -293,43 +293,37 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
     std::string_view to_complete{};
     {
         auto rit = std::find_if(front.rbegin(), front.rend(), [](auto c)
-                                { return !std::isalnum(c) && c != '.' && c != ':' && c != '_'; });
+                                { return !std::isalnum(c) && c != '.' && c != ':' && c != '_' && c != '[' && c != ']'; });
 
         auto it = rit.base();
         to_complete = std::string_view{it, front.end()};
     }
 
-    const std::vector<std::string_view> to_complete_segments = [](std::string_view str, std::string_view delims = ".:")
+    const auto [to_complete_end, to_complete_base] = [](std::string_view str, std::string_view delims = ".:")
     {
-        std::vector<std::string_view> output;
-        for (auto first = str.data(), second = str.data(), last = first + str.size(); second != last && first != last; first = second + 1)
+        auto last_delim = str.find_last_of(delims);
+        if (last_delim != std::string_view::npos)
         {
-            second = std::find_first_of(first, last, std::cbegin(delims), std::cend(delims));
+            auto pre = str.substr(0, last_delim);
+            str = str.substr(last_delim + 1);
 
-            if (first != second)
-            {
-                output.emplace_back(first, second - first);
-            }
+            return std::pair{str, pre};
         }
-        if (std::count(std::cbegin(delims), std::cend(delims), str.back()))
-        {
-            output.push_back("");
-        }
-        return output;
+        return std::pair{str, std::string_view{}};
     }(to_complete);
 
     completion_options.clear();
     completion_error.clear();
 
-    if (!to_complete.empty() || to_complete_segments.size() > 1)
+    if (!to_complete_end.empty() || !to_complete_base.empty())
     {
         // Gather candidates for completion, this has to actually access variables so it can fail
         std::vector<std::string_view> options;
         try
         {
-            options = [const_this = static_cast<const LuaConsole*>(this)](const std::vector<std::string_view>& to_complete_segments)
+            options = [this](std::string_view to_complete_end, std::string_view to_complete_base)
             {
-                if (to_complete_segments.size() == 1)
+                if (to_complete_base.empty())
                 {
                     using namespace std::string_view_literals;
                     static constexpr std::array additional_options{
@@ -361,18 +355,18 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 
                     for (std::string_view opt : additional_options)
                     {
-                        if (opt.starts_with(to_complete_segments.back()))
+                        if (opt.starts_with(to_complete_end))
                         {
                             options.push_back(opt);
                         }
                     }
 
-                    for (const auto& [k, v] : const_this->lua)
+                    for (const auto& [k, v] : lua)
                     {
                         if (k.get_type() == sol::type::string)
                         {
                             const std::string_view str = k.as<std::string_view>();
-                            if (str.starts_with(to_complete_segments.back()) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
+                            if (str.starts_with(to_complete_end) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                             {
                                 options.push_back(str);
                             }
@@ -386,20 +380,19 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 
                     // Need to collect these in a vector, otherwise the state somehow breaks
                     std::vector<sol::userdata> source_obj{};
-                    std::vector<sol::table> source{const_this->lua["_G"]};
-                    for (size_t i = 0; i < to_complete_segments.size() - 1; i++)
-                    {
-                        const auto child = source.back()[to_complete_segments[i]];
-                        const auto child_type = child.get_type();
+                    std::vector<sol::table> source{};
 
-                        if (child_type == sol::type::table)
+                    {
+                        const auto obj = execute_lua(lua, fmt::format("return {}", to_complete_base));
+                        const auto obj_type = obj.get_type();
+                        if (obj_type == sol::type::table)
                         {
-                            source.push_back(child.get<sol::table>());
+                            source.push_back(obj);
                         }
-                        else if (child_type == sol::type::userdata)
+                        else if (obj_type == sol::type::userdata)
                         {
-                            source_obj.push_back(child);
-                            source.push_back(child[sol::metatable_key].get<sol::table>());
+                            source_obj.push_back(obj);
+                            source.push_back(obj.get<sol::userdata>()[sol::metatable_key]);
                         }
                         else
                         {
@@ -407,7 +400,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         }
                     }
 
-                    const bool grab_all = to_complete_segments.back().empty();
+                    const bool grab_all = to_complete_end.empty();
                     while (true)
                     {
                         for (const auto& [k, v] : source.back())
@@ -415,7 +408,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             if (k.get_type() == sol::type::string)
                             {
                                 const std::string_view str = k.as<std::string_view>();
-                                if ((grab_all || str.starts_with(to_complete_segments.back())) && (!str.starts_with("__") || to_complete_segments.back().starts_with("__")))
+                                if ((grab_all || str.starts_with(to_complete_end)) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                                 {
                                     options.push_back(str);
                                 }
@@ -437,9 +430,9 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             }
 
                             // Should not need to create std::string here, but otherwise we get a nil returned
-                            if (const_this->entity_down_cast_map.contains(name))
+                            if (entity_down_cast_map.contains(name))
                             {
-                                auto down_cast = const_this->lua["Entity"][const_this->entity_down_cast_map.at(name)];
+                                auto down_cast = lua["Entity"][entity_down_cast_map.at(name)];
                                 source_obj.push_back(down_cast(source_obj.back()));
                                 source.push_back(source_obj.back()[sol::metatable_key].get<sol::table>());
                             }
@@ -455,7 +448,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                     }
                     return options;
                 }
-            }(to_complete_segments);
+            }(to_complete_end, to_complete_base);
         }
         catch (const sol::error& e)
         {
@@ -463,7 +456,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
             return true;
         }
 
-        to_complete = to_complete_segments.back();
+        to_complete = to_complete_end;
         if (options.empty())
         {
             completion_options = fmt::format("No matches found for tab-completion of '{}'...", to_complete);
@@ -522,9 +515,9 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
         }
         return true;
     }
-    else if (!to_complete_segments.empty())
+    else if (!to_complete_end.empty() && !to_complete_base.empty())
     {
-        completion_options = fmt::format("Need at least 1 character for tab-completion, given {}...", to_complete_segments.back());
+        completion_options = fmt::format("Need at least 1 character for tab-completion, given {}...", to_complete_end);
         return true;
     }
     return false;
