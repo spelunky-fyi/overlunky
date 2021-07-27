@@ -57,18 +57,6 @@ float get_zoom_level()
     return State::get().get_zoom_level();
 }
 
-//void list_items()
-//{
-//    auto state = State::get();
-//    auto player = state.items()->player(0);
-//    if (player == nullptr)
-//        return;
-//    for (auto& item : state.layer(player->layer)->items())
-//    {
-//        DEBUG("Item {} {:x}, {}", item->uid, item->type->search_flags, item->position_self());
-//    }
-//}
-
 void attach_entity(Entity* overlay, Entity* attachee)
 {
     using AttachEntity = void (*)(Entity*, Entity*);

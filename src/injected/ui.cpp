@@ -2567,7 +2567,7 @@ void render_clickhandler()
             {
                 // move movables to void because they like to explode and drop stuff, but actually destroy blocks and such
                 Entity* to_kill = get_entity_ptr(g_held_id);
-                if (to_kill->type->search_flags < 0x80)
+                if (to_kill->is_movable())
                 {
                     move_entity(g_held_id, 0, -1000, false, 0, 0, true);
                 }
