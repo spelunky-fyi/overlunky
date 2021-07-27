@@ -379,7 +379,7 @@ void hook_movable_state_machine(Movable* self)
 std::uint32_t Movable::set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty() && hook_info.post_statemachine.empty())
+    if (hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
@@ -389,7 +389,7 @@ std::uint32_t Movable::set_pre_statemachine(std::function<bool(Movable*)> pre_st
 std::uint32_t Movable::set_post_statemachine(std::function<void(Movable*)> post_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty() && hook_info.post_statemachine.empty())
+    if (hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
