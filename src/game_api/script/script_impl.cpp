@@ -78,7 +78,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         meta.author = meta_author.value_or("Anonymous");
         meta.unsafe = meta_unsafe.value_or(false);
         meta.id = script_id();
-        lua["__script_id"] = meta.id;
+        lua["__script_id"] = meta.file;
 
         result = "Got metadata";
     }
@@ -120,7 +120,7 @@ bool ScriptImpl::reset()
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
         meta.id = script_id();
-        lua["__script_id"] = meta.id;
+        lua["__script_id"] = meta.file;
 
         result = "OK";
         return true;
@@ -180,6 +180,10 @@ bool ScriptImpl::get_unsafe() const
 const char* ScriptImpl::get_name() const
 {
     return meta.stem.c_str();
+}
+const char* ScriptImpl::get_path() const
+{
+    return meta.file.c_str();
 }
 const char* ScriptImpl::get_id() const
 {

@@ -51,6 +51,7 @@ class LuaConsole : public LuaBackend
     virtual bool get_unsafe() const override;
     virtual const char* get_name() const override;
     virtual const char* get_id() const override;
+    virtual const char* get_path() const override;
     virtual const char* get_root() const override;
     virtual const std::filesystem::path& get_root_path() const override;
 

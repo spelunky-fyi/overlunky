@@ -11,7 +11,7 @@
 LuaConsole::LuaConsole(SoundManager* sound_manager)
     : LuaBackend(sound_manager, this)
 {
-    lua["__script_id"] = "dev/lua_console";
+    lua["__script_id"] = "console_proxy.lua";
 
     expose_unsafe_libraries(lua);
 
@@ -741,6 +741,10 @@ const char* LuaConsole::get_name() const
 const char* LuaConsole::get_id() const
 {
     return "dev/lua_console";
+}
+const char* LuaConsole::get_path() const
+{
+    return "console_proxy.lua";
 }
 const char* LuaConsole::get_root() const
 {

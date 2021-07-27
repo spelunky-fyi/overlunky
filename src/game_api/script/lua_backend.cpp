@@ -704,7 +704,7 @@ LuaBackend* LuaBackend::get_backend(std::string_view id)
     std::lock_guard lock{g_all_backends_mutex};
     for (auto* backend : g_all_backends)
     {
-        if (backend->get_id() == id)
+        if (backend->get_path() == id)
         {
             return backend;
         }

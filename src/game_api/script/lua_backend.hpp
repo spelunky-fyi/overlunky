@@ -234,6 +234,7 @@ class LuaBackend
     virtual bool get_unsafe() const = 0;
     virtual const char* get_name() const = 0;
     virtual const char* get_id() const = 0;
+    virtual const char* get_path() const = 0;
     virtual const char* get_root() const = 0;
     virtual const std::filesystem::path& get_root_path() const = 0;
 
