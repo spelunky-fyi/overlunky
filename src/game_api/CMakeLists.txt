@@ -52,6 +52,8 @@ add_library(spel2_api STATIC
         script.hpp
         script/lua_vm.cpp
         script/lua_vm.hpp
+        script/lua_require.cpp
+        script/lua_require.hpp
         script/lua_backend.cpp
         script/lua_backend.hpp
         script/lua_console.cpp

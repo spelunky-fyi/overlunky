@@ -7,6 +7,7 @@
 
 #include "lua_backend.hpp"
 #include "lua_console.hpp"
+#include "lua_require.hpp"
 #include "script_util.hpp"
 
 #include "usertypes/char_state_lua.hpp"
@@ -39,6 +40,9 @@ void load_libraries(sol::state& lua)
     require_json_lua(lua);
     require_inspect_lua(lua);
     require_format_lua(lua);
+
+    lua.clear_package_loaders();
+    lua.add_package_loader(custom_loader);
 }
 void load_unsafe_libraries(sol::state& lua)
 {
@@ -60,7 +64,7 @@ void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 -- That _ENV has to be the environment of a script where we can look up the scripts id
 get_script_id = function()
     -- Not available in Lua 5.2+
-    getfenv = getfenv or function(f)
+    local getfenv = getfenv or function(f)
         f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
         local name, val
         local up = 0
@@ -72,10 +76,10 @@ get_script_id = function()
     end
 
     local env
-    local up = 2
+    local up = 1
     repeat
-        env = getfenv(up)
         up = up + 1
+        env = getfenv(up)
     until env ~= _G and env ~= nil
     return env.__script_id
 end
@@ -143,29 +147,16 @@ end
     /// ```
     lua["prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
-        std::vector<sol::object> args;
+        if (objects.size() > 0)
         {
-            sol::type va_type = objects.get_type();
-            if (va_type == sol::type::table)
+            std::string message;
+            for (const auto& obj : objects)
             {
-                args = objects.get<std::vector<sol::object>>(0);
-            }
-            else
-            {
-                args = std::vector<sol::object>{objects.begin(), objects.end()};
-            }
-        }
-
-        if (!args.empty())
-        {
-            std::string message = lua["inspect"](args.front());
-            args.erase(args.begin());
-
-            for (const auto& obj : args)
-            {
-                message += ", ";
                 message += lua["inspect"](obj);
+                message += ", ";
             }
+            message.pop_back();
+            message.pop_back();
 
             lua["print"](std::move(message));
         }
@@ -1048,12 +1039,17 @@ void populate_lua_env(sol::environment& env)
     {
         env[field] = global_vm["_G"][field];
     }
+    env["package"]["loaded"]["_G"] = env;
 }
 void hide_unsafe_libraries(sol::environment& env)
 {
     for (auto& field : unsafe_fields)
     {
         env[field] = sol::nil;
+    }
+    for (auto& field : unsafe_fields)
+    {
+        env["package"]["loaded"][field] = sol::nil;
     }
 }
 void expose_unsafe_libraries(sol::environment& env)
@@ -1062,5 +1058,9 @@ void expose_unsafe_libraries(sol::environment& env)
     for (auto& field : unsafe_fields)
     {
         env[field] = global_vm["_G"][field];
+    }
+    for (auto& field : unsafe_fields)
+    {
+        env["package"]["loaded"][field] = global_vm["_G"][field];
     }
 }
