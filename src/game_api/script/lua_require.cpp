@@ -1,19 +1,18 @@
 #include "lua_require.hpp"
 
 #include "lua_backend.hpp"
+#include "lua_vm.hpp"
 
 #include <sol/sol.hpp>
 
-int custom_loader(lua_State* L)
+sol::object custom_require(std::string path)
 {
-    std::string path = sol::stack::get<std::string>(L, 1);
-    if (!path.ends_with(".lua"))
+    if (path.ends_with(".lua"))
     {
-        std::replace(path.begin(), path.end(), '.', '/');
-        path += ".lua";
+        path = path.substr(0, path.size() - 4);
     }
 
-    sol::state_view lua{L};
+    static sol::state& lua = get_lua_vm();
 
     // Walk up the stack until we find an _ENV that is not global, then grab the source from that stack index
     std::pair<std::string_view, std::string_view> sources = lua.safe_script(R"(
@@ -59,12 +58,27 @@ return info.short_src, info.source
         }
     }
 
-    const std::string abs_path = (std::filesystem::absolute(source) / path).string();
-    const sol::load_result res = lua.load_file(abs_path.c_str());
-    if (res.valid())
+    std::string resolved_path = (std::filesystem::path(source) / path).string();
+    std::replace(resolved_path.begin(), resolved_path.end(), '/', '.');
+    std::replace(resolved_path.begin(), resolved_path.end(), '\\', '.');
+    sol::stack::push(lua.lua_state(), resolved_path);
+    return lua["__require"](resolved_path);
+}
+int custom_loader(lua_State* L)
+{
+    std::string path = sol::stack::get<std::string>(L, 1);
+    if (!path.ends_with(".lua"))
+    {
+        std::replace(path.begin(), path.end(), '.', '/');
+        path += ".lua";
+    }
+
+    LuaBackend* backend = LuaBackend::get_calling_backend();
+
+    const auto res = luaL_loadfilex(L, path.c_str(), "bt");
+    if (res == LUA_OK)
     {
         backend->lua.push();
-        // This call has to be done raw, sol provides no wrapper for it
         // The first up-value is always the _ENV of the function
         lua_setupvalue(L, -2, 1);
         return 1;

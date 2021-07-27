@@ -43,6 +43,12 @@ void load_libraries(sol::state& lua)
 
     lua.clear_package_loaders();
     lua.add_package_loader(custom_loader);
+
+    /// NoDocs
+    lua["__require"] = lua["require"];
+    /// NoDocs
+    /// Custom implementation to trick Lua into allowing to `require 'lib.module'` more than once given it was called from a different source
+    lua["require"] = custom_require;
 }
 void load_unsafe_libraries(sol::state& lua)
 {
@@ -1039,17 +1045,12 @@ void populate_lua_env(sol::environment& env)
     {
         env[field] = global_vm["_G"][field];
     }
-    env["package"]["loaded"]["_G"] = env;
 }
 void hide_unsafe_libraries(sol::environment& env)
 {
     for (auto& field : unsafe_fields)
     {
         env[field] = sol::nil;
-    }
-    for (auto& field : unsafe_fields)
-    {
-        env["package"]["loaded"][field] = sol::nil;
     }
 }
 void expose_unsafe_libraries(sol::environment& env)
@@ -1058,9 +1059,5 @@ void expose_unsafe_libraries(sol::environment& env)
     for (auto& field : unsafe_fields)
     {
         env[field] = global_vm["_G"][field];
-    }
-    for (auto& field : unsafe_fields)
-    {
-        env["package"]["loaded"][field] = global_vm["_G"][field];
     }
 }
