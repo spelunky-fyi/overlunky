@@ -253,7 +253,7 @@ class Entity
     void unhook(std::uint32_t id);
     struct EntityHooksInfo& get_hooks();
 
-    bool is_movable ();
+    bool is_movable();
 
     std::uint32_t set_on_destroy(std::function<void(Entity*)> cb);
 
