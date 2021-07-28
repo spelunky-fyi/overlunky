@@ -5,7 +5,6 @@
 #include "particles.hpp"
 #include <cstdint>
 
-
 class Monster : public PowerupCapable
 {
   public:
