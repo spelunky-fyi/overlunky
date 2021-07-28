@@ -41,14 +41,7 @@ void load_libraries(sol::state& lua)
     require_inspect_lua(lua);
     require_format_lua(lua);
 
-    lua.clear_package_loaders();
-    lua.add_package_loader(custom_loader);
-
-    /// NoDocs
-    lua["__require"] = lua["require"];
-    /// NoDocs
-    /// Custom implementation to trick Lua into allowing to `require 'lib.module'` more than once given it was called from a different source
-    lua["require"] = custom_require;
+    register_custom_require(lua);
 }
 void load_unsafe_libraries(sol::state& lua)
 {
@@ -1005,7 +998,7 @@ sol::state& get_lua_vm(SoundManager* sound_manager)
             if (k.get_type() == sol::type::string)
             {
                 std::string_view key = k.as<std::string_view>();
-                if (key != "debug")
+                if (key != "debug" && key != "package")
                 {
                     safe_fields.push_back(std::string{key});
                 }

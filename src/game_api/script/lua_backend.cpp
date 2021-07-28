@@ -64,21 +64,9 @@ void LuaBackend::clear()
 
     clear_all_callbacks();
 
-    const std::string root_path = get_root();
-    auto package = lua["package"];
-    if (get_unsafe())
-    {
-        package["path"] = root_path + "/?.lua;" + root_path + "/?/init.lua";
-        package["cpath"] = root_path + "/?.dll;" + root_path + "/?/init.dll";
-        expose_unsafe_libraries(lua);
-    }
-    else
-    {
-        package["path"] = root_path + "/?.lua;" + root_path + "/?/init.lua";
-        package["cpath"] = "";
-        package["loadlib"] = sol::nil;
-        hide_unsafe_libraries(lua);
-    }
+    (get_unsafe()
+         ? expose_unsafe_libraries
+         : hide_unsafe_libraries)(lua);
 }
 void LuaBackend::clear_all_callbacks()
 {
