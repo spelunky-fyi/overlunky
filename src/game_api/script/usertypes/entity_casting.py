@@ -4,6 +4,7 @@ import urllib.request
 
 # Parse all Entity::as_xxx functions so we know which ones are currently defined
 entities_files = ["entities_items_lua.cpp",
+                  "entities_chars_lua.cpp", 
                   "entities_monsters_lua.cpp", 
                   "entities_mounts_lua.cpp",
                   "entities_floors_lua.cpp",
@@ -13,7 +14,7 @@ entities_files = ["entities_items_lua.cpp",
 as_re = re.compile(r'lua\["Entity"\]\["(as_.*)"\]')
 
 # a couple as_xxx functions are predefined, they are either 'global' or haven't been moved into their proper separate file yet
-known_casts = [ "as_movable", "as_player" ]
+known_casts = [ "as_movable" ]
 
 for f in entities_files:
     with open(f) as fp:

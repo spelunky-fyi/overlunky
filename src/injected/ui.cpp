@@ -3256,7 +3256,7 @@ void render_entity_props()
             ImGui::SameLine();
             ImGui::Text(theme_name(target->theme));
         }
-        else if (g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"))
+        else if ((g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (g_entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && g_entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")))
         {
             for (const auto& [powerup_id, powerup_entity] : g_entity->powerups)
             {

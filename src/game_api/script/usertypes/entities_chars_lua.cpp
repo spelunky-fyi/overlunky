@@ -9,6 +9,20 @@ namespace NEntitiesChars
 {
 void register_usertypes(sol::state& lua, ScriptImpl* script)
 {
+    lua["Entity"]["as_powerupcapable"] = &Entity::as<PowerupCapable>;
+    lua["Entity"]["as_player"] = &Entity::as<Player>;
+
+    lua.new_usertype<PowerupCapable>(
+        "PowerupCapable",
+        "remove_powerup",
+        &PowerupCapable::remove_powerup,
+        "give_powerup",
+        &PowerupCapable::give_powerup,
+        "has_powerup",
+        &PowerupCapable::has_powerup,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
     lua.new_usertype<Inventory>(
         "Inventory",
         "money",
@@ -48,12 +62,8 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         &Player::is_female,
         "set_heart_color",
         &Player::set_heart_color,
-        "remove_powerup",
-        &Player::remove_powerup,
-        "give_powerup",
-        &Player::give_powerup,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, PowerupCapable>());
 
     /// Same as `Player.get_name`
     lua["get_character_name"] = get_character_name;

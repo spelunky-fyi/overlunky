@@ -3,10 +3,24 @@
 #include "movable.hpp"
 #include <cstdint>
 
-class Player : public Movable
+class PowerupCapable : public Movable
 {
   public:
     std::map<uint32_t, Entity*> powerups; // type id -> entity
+
+    /// Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
+    void remove_powerup(uint32_t powerup_type);
+
+    /// Gives the player/monster the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Giving true crown to a monster crashes the game.
+    void give_powerup(uint32_t powerup_type);
+
+    /// Checks whether the player/monster has a certain powerup
+    bool has_powerup(uint32_t powerup_type);
+};
+
+class Player : public PowerupCapable
+{
+  public:
     Inventory* inventory_ptr;
     Illumination* emitted_light;
     int32_t linked_companion_child;  // entity uid
@@ -36,12 +50,6 @@ class Player : public Movable
 
     /// Set the heart color the character.
     void set_heart_color(Color color);
-
-    /// Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
-    void remove_powerup(uint32_t powerup_type);
-
-    /// Gives the player the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`!
-    void give_powerup(uint32_t powerup_type);
 };
 
 std::u16string get_character_name(int32_t type_id);

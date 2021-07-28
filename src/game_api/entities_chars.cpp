@@ -1,7 +1,7 @@
 #include "entities_chars.hpp"
 #include "character_def.hpp"
 
-void Player::remove_powerup(uint32_t powerup_type)
+void PowerupCapable::remove_powerup(uint32_t powerup_type)
 {
     static size_t offset = 0;
     if (offset == 0)
@@ -14,13 +14,13 @@ void Player::remove_powerup(uint32_t powerup_type)
 
     if (offset != 0)
     {
-        typedef void internal_remove_powerup_func(Player*, uint32_t);
+        typedef void internal_remove_powerup_func(PowerupCapable*, uint32_t);
         static internal_remove_powerup_func* irpf = (internal_remove_powerup_func*)(offset);
         irpf(this, powerup_type);
     }
 }
 
-void Player::give_powerup(uint32_t powerup_type)
+void PowerupCapable::give_powerup(uint32_t powerup_type)
 {
     static size_t offset = 0;
     if (offset == 0)
@@ -33,10 +33,15 @@ void Player::give_powerup(uint32_t powerup_type)
 
     if (offset != 0)
     {
-        typedef void internal_give_powerup_func(Player*, uint32_t);
+        typedef void internal_give_powerup_func(PowerupCapable*, uint32_t);
         static internal_give_powerup_func* igpf = (internal_give_powerup_func*)(offset);
         igpf(this, powerup_type);
     }
+}
+
+bool PowerupCapable::has_powerup(uint32_t powerup_type)
+{
+    return powerups.find(powerup_type) != powerups.end();
 }
 
 std::u16string Player::get_name()

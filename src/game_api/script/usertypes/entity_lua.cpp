@@ -137,9 +137,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         "get_held_entity",
         &Entity::get_held_entity,
         "as_movable",
-        &Entity::as<Movable>,
-        "as_player",
-        &Entity::as<Player>);
+        &Entity::as<Movable>);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
