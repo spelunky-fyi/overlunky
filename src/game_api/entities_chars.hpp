@@ -37,12 +37,10 @@ class Player : public Movable
     /// Set the heart color the character.
     void set_heart_color(Color color);
 
-    /// Removes a currently applied powerup. Specify ENT_TYPE.ITEM_POWERUP_xxx, not ENT_TYPE.ITEM_PICKUP_xxx!
-    /// e.g. players[1]:remove_powerup(ENT_TYPE.POWERUP_CLIMBING_GLOVES)
-    /// Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
+    /// Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
     void remove_powerup(uint32_t powerup_type);
 
-    /// Gives the player the specified powerup. Specify ENT_TYPE.ITEM_POWERUP_xxx, not ENT_TYPE.ITEM_PICKUP_xxx!
+    /// Gives the player the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`!
     void give_powerup(uint32_t powerup_type);
 };
 

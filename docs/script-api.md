@@ -1047,10 +1047,10 @@ Check whether the character is female, will be `true` if the character was modde
 Set the heart color the character.
 - [`nil remove_powerup(int powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) &Player::remove_powerup
 \
-Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
+Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
 - [`nil give_powerup(int powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=give_powerup) &Player::give_powerup
 \
-Gives the player the specified powerup. Specify ENT_TYPE.ITEM_POWERUP_xxx, not ENT_TYPE.ITEM_PICKUP_xxx!
+Gives the player the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`!
 ### `Floor`
 Derived from [`Entity`](#entity)
 - [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
