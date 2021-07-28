@@ -2925,6 +2925,36 @@ void render_uid(int uid, const char* section, bool rembtn = false)
     ImGui::PopID();
 }
 
+void render_powerup(int uid, const char* section)
+{
+    char uidc[32];
+    itoa(uid, uidc, 10);
+    int ptype = entity_type(uid);
+    if (ptype == 0)
+        return;
+    char typec[32];
+    itoa(ptype, typec, 10);
+    const char* pname = entity_names[ptype].data();
+    ImGui::PushID(section);
+    if (ImGui::Button(uidc))
+    {
+        g_last_id = uid;
+        update_entity();
+    }
+    ImGui::SameLine();
+    ImGui::Text(typec);
+    ImGui::SameLine();
+    ImGui::Text(pname);
+    ImGui::SameLine();
+    ImGui::PushID(uid);
+    if (ImGui::Button("X(!)"))
+    {
+        g_entity->remove_powerup(ptype);
+    }
+    ImGui::PopID();
+    ImGui::PopID();
+}
+
 void render_state(const char* label, int state)
 {
     if (state == 0)
@@ -3260,7 +3290,68 @@ void render_entity_props()
         {
             for (const auto& [powerup_id, powerup_entity] : g_entity->powerups)
             {
-                render_uid(powerup_entity->uid, "CharPowerups", false);
+                render_powerup(powerup_entity->uid, "CharPowerups");
+            }
+            ImGui::Text("  Add: ");
+            ImGui::SameLine();
+            ImGui::PushItemWidth(160);
+            static const char* chosenPowerup = "";
+            static uint8_t chosenPowerupIndex = 0;
+            static const char* powerupOptions[] = {
+                "Alien compass",
+                "Ankh",
+                "Climbing gloves",
+                "Compass",
+                "Crown",
+                "Eggplant crown",
+                "Hedjet",
+                "Kapala",
+                "Parachute",
+                "Paste",
+                "Pitcher's mitt",
+                "Skeleton key",
+                "Spectacles",
+                "Spike shoes",
+                "Spring shoes",
+                "Tablet of Destiny",
+                "True crown",
+                "Udjat eye"};
+            static int32_t powerupTypeIDOptions[] = {
+                to_id("ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS"),
+                to_id("ENT_TYPE_ITEM_POWERUP_ANKH"),
+                to_id("ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_COMPASS"),
+                to_id("ENT_TYPE_ITEM_POWERUP_CROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_EGGPLANTCROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_HEDJET"),
+                to_id("ENT_TYPE_ITEM_POWERUP_KAPALA"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PARACHUTE"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PASTE"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PITCHERSMITT"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPECTACLES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPIKE_SHOES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPRING_SHOES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_TABLETOFDESTINY"),
+                to_id("ENT_TYPE_ITEM_POWERUP_TRUECROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_UDJATEYE")};
+            if (ImGui::BeginCombo("##AddPowerupCombo", chosenPowerup))
+            {
+                for (auto i = 0; i < IM_ARRAYSIZE(powerupOptions); ++i)
+                {
+                    bool isSelected = (chosenPowerup == powerupOptions[i]);
+                    if (ImGui::Selectable(powerupOptions[i], isSelected))
+                    {
+                        chosenPowerup = powerupOptions[i];
+                        chosenPowerupIndex = i;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Add##AddPowerupButton"))
+            {
+                g_entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
         }
     }
