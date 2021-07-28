@@ -30,10 +30,11 @@ sol::object custom_require(std::string path)
 
     // Could be preloaded by some unsafe script, which can only be fetched by unsafe scripts
     LuaBackend* backend = LuaBackend::get_calling_backend();
-    if (backend->get_unsafe())
+    const bool unsafe = backend->get_unsafe();
+    if (unsafe)
     {
         auto preload = lua["package"]["preload"][path];
-        if (preload)
+        if (preload != sol::nil)
         {
             return preload;
         }
@@ -84,6 +85,13 @@ return info.short_src, info.source
     }
 
     namespace fs = std::filesystem;
+    static auto is_sub_path = [](const std::filesystem::path& base, const std::filesystem::path& path)
+    {
+        const auto first_mismatch = std::mismatch(path.begin(), path.end(), base.begin(), base.end());
+        return first_mismatch.second == base.end();
+    };
+
+    const fs::path& backend_root = backend->get_root_path();
 
     static auto require = [](std::string path)
     {
@@ -95,13 +103,18 @@ return info.short_src, info.source
         std::replace(path.begin(), path.end(), '\\', '.');
         return lua["__require"](path);
     };
-    auto require_if_exists = [backend](fs::path path) -> std::optional<sol::object>
+    auto require_if_exists = [&](fs::path path) -> std::optional<sol::object>
     {
+        if (!unsafe && !is_sub_path(backend_root, path))
+        {
+            return std::nullopt;
+        }
+
         if (fs::exists(path.replace_extension(".lua")))
         {
             return require(path.string());
         }
-        else if (backend->get_unsafe() && fs::exists(path.replace_extension(".dll")))
+        else if (unsafe && fs::exists(path.replace_extension(".dll")))
         {
             return require(path.string());
         }
@@ -128,6 +141,8 @@ return info.short_src, info.source
     // path/to/calling/script/path/to/require.dll
     // path/to/calling/mod/path/to/require.dll
     // path/to/require.dll
+
+    /// Only unsafe backends can require files that are not relative to their root
 
     auto res = require_if_exists(std::filesystem::path(source) / path);
     if (!res && source != backend->get_root())
