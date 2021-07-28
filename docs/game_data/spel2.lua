@@ -265,6 +265,7 @@ Color = {
 }
 Container = {
   __index = "function:",
+  __name = "sol.Container.user",
   __newindex = "function:"
 }
 ConveyorBelt = {
@@ -2332,6 +2333,11 @@ Pot = {
   __name = "sol.Pot.user",
   __newindex = "function:"
 }
+Powerup = {
+  __index = "function:",
+  __name = "sol.Powerup.user",
+  __newindex = "function:"
+}
 ProtoShopkeeper = {
   __index = "function:",
   __name = "sol.ProtoShopkeeper.user",
@@ -3745,23 +3751,23 @@ TYPE_MAP = {
   "function:",
   nil,
   "function:",
+  nil,
+  nil,
+  nil,
+  "function:",
+  nil,
+  nil,
+  nil,
+  "function:",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
   "function:",
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
+  nil,
   nil,
   "function:",
   "function:",

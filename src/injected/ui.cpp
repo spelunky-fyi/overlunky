@@ -19,6 +19,7 @@
 #include <string>
 #include <toml.hpp>
 
+#include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
 #include "entity.hpp"
@@ -3255,16 +3256,12 @@ void render_entity_props()
             ImGui::SameLine();
             ImGui::Text(theme_name(target->theme));
         }
-        else
+        else if (g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"))
         {
-            ImGui::InputScalar(
-                "Data##UnknownSpecialAttribute",
-                ImGuiDataType_U64,
-                (size_t*)&g_entity->inside,
-                0,
-                0,
-                "%p",
-                ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysInsertMode | ImGuiInputTextFlags_CharsHexadecimal);
+            for (const auto& [powerup_id, powerup_entity] : g_entity->powerups)
+            {
+                render_uid(powerup_entity->uid, "CharPowerups", false);
+            }
         }
     }
     if (ImGui::CollapsingHeader("Style"))

@@ -912,13 +912,6 @@ end
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
 - [`float b`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b) &Color::b
 - [`float a`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=a) &Color::a
-### `Inventory`
-- [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
-- [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
-- [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
-- [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
-- [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
-- [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total
 ### `Animation`
 - [`int first_tile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_tile) &Animation::texture
 - [`int num_tiles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=num_tiles) &Animation::count
@@ -1022,6 +1015,13 @@ Derived from [`Entity`](#entity)
 - [`nil pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
 - [`bool can_jump()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) &Movable::can_jump
 - [`Entity standing_on()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on) &Movable::standing_on
+### `Inventory`
+- [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
+- [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
+- [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
+- [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
+- [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
+- [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total
 ### `Player`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Inventory inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) &Player::inventory_ptr
@@ -1045,6 +1045,12 @@ Check whether the character is female, will be `true` if the character was modde
 - [`nil set_heart_color(Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
 \
 Set the heart color the character.
+- [`nil remove_powerup(int powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) &Player::remove_powerup
+\
+Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
+- [`nil give_powerup(int powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=give_powerup) &Player::give_powerup
+\
+Gives the player the specified powerup. Specify ENT_TYPE.ITEM_POWERUP_xxx, not ENT_TYPE.ITEM_PICKUP_xxx!
 ### `Floor`
 Derived from [`Entity`](#entity)
 - [`int deco_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_top) &Floor::deco_top
@@ -1993,9 +1999,6 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `VladsCape`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
 - [`bool can_double_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_double_jump) &VladsCape::can_double_jump
-### `KapalaPowerup`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`int amount_of_blood`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=amount_of_blood) &KapalaPowerup::amount_of_blood
 ### `Mattock`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int remaining`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remaining) &Mattock::remaining
@@ -2328,18 +2331,23 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &PlayerBag::bombs
 - [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &PlayerBag::ropes
-### `ParachutePowerup`
+### `Powerup`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `KapalaPowerup`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Powerup`](#powerup)
+- [`int amount_of_blood`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=amount_of_blood) &KapalaPowerup::amount_of_blood
+### `ParachutePowerup`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Powerup`](#powerup)
 - [`int falltime_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falltime_deploy) &ParachutePowerup::falltime_deploy
 \
 this gets compared with entity's falling_timer
 - [`deployed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deployed) sol::readonly(&ParachutePowerup::deployed)
 - [`nil deploy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deploy) &ParachutePowerup::deploy
 ### `TrueCrownPowerup`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Powerup`](#powerup)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &TrueCrownPowerup::timer
 ### `AnkhPowerup`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Powerup`](#powerup)
 - [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &AnkhPowerup::player
 - [`Entity fx_glow`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_glow) &AnkhPowerup::fx_glow
 - [`int timer1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer1) &AnkhPowerup::timer1
@@ -2778,6 +2786,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_playerghost
 - as_poledeco
 - as_pot
+- as_powerup
 - as_protoshopkeeper
 - as_punishball
 - as_pushblock

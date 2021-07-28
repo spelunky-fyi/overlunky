@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entities_chars.hpp"
 #include "state.hpp"
 #include <cstdint>
 #include <vector>
