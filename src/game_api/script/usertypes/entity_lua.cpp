@@ -212,6 +212,9 @@ void register_usertypes(sol::state& lua)
         &Movable::standing_on,
         sol::base_classes,
         sol::bases<Entity>());
+    
+    lua["Entity"]["as_entity"] = &Entity::as<Entity>;
+    lua["Entity"]["as_movable"] = &Entity::as<Movable>;
 
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1
