@@ -225,7 +225,7 @@ const char* quest_flags[]{
     "9: Caveman Shopkeeper aggroed",
     "10: Waddler aggroed",
     "11: ",
-    "12: ",
+    "12: Eggplant crown picked up",
     "13: ",
     "14: ",
     "15: ",

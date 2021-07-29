@@ -15,6 +15,7 @@
 #include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
+#include "usertypes/entities_chars_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
 #include "usertypes/entities_fx_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
@@ -831,6 +832,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NGui::register_usertypes(lua, this);
     NTexture::register_usertypes(lua, this);
     NEntity::register_usertypes(lua, this);
+    NEntitiesChars::register_usertypes(lua, this);
     NEntitiesFloors::register_usertypes(lua, this);
     NEntitiesActiveFloors::register_usertypes(lua, this);
     NEntitiesMounts::register_usertypes(lua, this);
