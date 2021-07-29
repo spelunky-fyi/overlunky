@@ -98,6 +98,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_boomerang"] = &Entity::as<Boomerang>;
     lua["Entity"]["as_excalibur"] = &Entity::as<Excalibur>;
     lua["Entity"]["as_shield"] = &Entity::as<Shield>;
+    lua["Entity"]["as_powerup"] = &Entity::as<Powerup>;
 
     lua.new_usertype<Bomb>(
         "Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, "is_big_bomb", &Bomb::is_big_bomb, sol::base_classes, sol::bases<Entity, Movable>());
@@ -130,13 +131,6 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<Cape>("Cape", "floating_down", &VladsCape::floating_down, sol::base_classes, sol::bases<Entity, Movable>());
 
     lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Cape>());
-
-    lua.new_usertype<KapalaPowerup>(
-        "KapalaPowerup",
-        "amount_of_blood",
-        &KapalaPowerup::amount_of_blood,
-        sol::base_classes,
-        sol::bases<Entity, Movable>());
 
     lua.new_usertype<Mattock>(
         "Mattock",
@@ -804,6 +798,18 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
+    lua.new_usertype<Powerup>(
+        "Powerup",
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<KapalaPowerup>(
+        "KapalaPowerup",
+        "amount_of_blood",
+        &KapalaPowerup::amount_of_blood,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Powerup>());
+
     lua.new_usertype<ParachutePowerup>(
         "ParachutePowerup",
         "falltime_deploy",
@@ -813,14 +819,14 @@ void register_usertypes(sol::state& lua)
         "deploy",
         &ParachutePowerup::deploy,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Powerup>());
 
     lua.new_usertype<TrueCrownPowerup>(
         "TrueCrownPowerup",
         "timer",
         &TrueCrownPowerup::timer,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Powerup>());
 
     lua.new_usertype<AnkhPowerup>(
         "AnkhPowerup",
@@ -837,7 +843,7 @@ void register_usertypes(sol::state& lua)
         "music_on_off",
         &AnkhPowerup::music_on_off,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Powerup>());
 
     lua.new_usertype<YellowCape>(
         "YellowCape",

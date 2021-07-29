@@ -5,6 +5,7 @@ import urllib.request
 # Parse all Entity::as_xxx functions so we know which ones are currently defined
 entities_files = ["entity_lua.cpp",
                   "entities_items_lua.cpp",
+                  "entities_chars_lua.cpp", 
                   "entities_monsters_lua.cpp", 
                   "entities_mounts_lua.cpp",
                   "entities_floors_lua.cpp",

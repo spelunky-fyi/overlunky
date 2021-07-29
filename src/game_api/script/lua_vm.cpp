@@ -13,6 +13,7 @@
 #include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
+#include "usertypes/entities_chars_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
 #include "usertypes/entities_fx_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
@@ -90,6 +91,7 @@ end
     NGui::register_usertypes(lua);
     NTexture::register_usertypes(lua);
     NEntity::register_usertypes(lua);
+    NEntitiesChars::register_usertypes(lua);
     NEntitiesFloors::register_usertypes(lua);
     NEntitiesActiveFloors::register_usertypes(lua);
     NEntitiesMounts::register_usertypes(lua);

@@ -112,7 +112,7 @@ void register_usertypes(sol::state& lua)
         "target_selection_timer",
         &Monster::target_selection_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, PowerupCapable>());
 
     lua.new_usertype<RoomOwner>(
         "RoomOwner",
@@ -135,7 +135,7 @@ void register_usertypes(sol::state& lua)
         "was_hurt",
         &RoomOwner::was_hurt,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<WalkingMonster>(
         "WalkingMonster",
@@ -146,7 +146,7 @@ void register_usertypes(sol::state& lua)
         "cooldown_timer",
         &WalkingMonster::cooldown_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<NPC>(
         "NPC",
@@ -159,7 +159,7 @@ void register_usertypes(sol::state& lua)
         "aggro",
         &NPC::aggro,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Ghost>(
         "Ghost",
@@ -174,7 +174,7 @@ void register_usertypes(sol::state& lua)
         "linked_ghost",
         &Ghost::linked_ghost,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Bat>(
         "Bat",
@@ -183,7 +183,7 @@ void register_usertypes(sol::state& lua)
         "spawn_y",
         &Bat::spawn_y,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Jiangshi>(
         "Jiangshi",
@@ -194,7 +194,7 @@ void register_usertypes(sol::state& lua)
         "on_ceiling",
         &Jiangshi::on_ceiling,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Monkey>(
         "Monkey",
@@ -203,7 +203,7 @@ void register_usertypes(sol::state& lua)
         "on_vine",
         &Monkey::on_vine,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<GoldMonkey>(
         "GoldMonkey",
@@ -214,7 +214,7 @@ void register_usertypes(sol::state& lua)
         "poop_count",
         &GoldMonkey::poop_count,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Mole>(
         "Mole",
@@ -235,7 +235,7 @@ void register_usertypes(sol::state& lua)
         "digging_state",
         &Mole::digging_state,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Spider>(
         "Spider",
@@ -248,7 +248,7 @@ void register_usertypes(sol::state& lua)
         "trigger_distance",
         &Spider::trigger_distance,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<HangSpider>(
         "HangSpider",
@@ -259,7 +259,7 @@ void register_usertypes(sol::state& lua)
         "ceiling_pos_y",
         &HangSpider::ceiling_pos_y,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Shopkeeper>(
         "Shopkeeper",
@@ -270,7 +270,7 @@ void register_usertypes(sol::state& lua)
         "shop_owner",
         &Shopkeeper::shop_owner,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, RoomOwner>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, RoomOwner>());
 
     lua.new_usertype<Yang>(
         "Yang",
@@ -281,7 +281,7 @@ void register_usertypes(sol::state& lua)
         "special_message_shown",
         &Yang::special_message_shown,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, RoomOwner>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, RoomOwner>());
 
     lua.new_usertype<Tun>(
         "Tun",
@@ -300,7 +300,7 @@ void register_usertypes(sol::state& lua)
         "tiamat_encounter",
         &Tun::tiamat_encounter,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, RoomOwner>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, RoomOwner>());
 
     lua.new_usertype<Pet>(
         "Pet",
@@ -315,7 +315,7 @@ void register_usertypes(sol::state& lua)
         "active_state",
         &Pet::active_state,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Caveman>(
         "Caveman",
@@ -326,7 +326,7 @@ void register_usertypes(sol::state& lua)
         "aggro_timer",
         &Caveman::aggro_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<CavemanShopkeeper>(
         "CavemanShopkeeper",
@@ -335,7 +335,7 @@ void register_usertypes(sol::state& lua)
         "shop_entered",
         &CavemanShopkeeper::shop_entered,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<HornedLizard>(
         "HornedLizard",
@@ -350,7 +350,7 @@ void register_usertypes(sol::state& lua)
         "particle",
         &HornedLizard::particle,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Mosquito>(
         "Mosquito",
@@ -365,7 +365,7 @@ void register_usertypes(sol::state& lua)
         "timer",
         &Mosquito::timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Mantrap>(
         "Mantrap",
@@ -374,14 +374,14 @@ void register_usertypes(sol::state& lua)
         "eaten_uid",
         &Mantrap::eaten_uid,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Skeleton>(
         "Skeleton",
         "explosion_timer",
         &Skeleton::explosion_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Scarab>(
         "Scarab",
@@ -390,7 +390,7 @@ void register_usertypes(sol::state& lua)
         "timer",
         &Scarab::timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Imp>(
         "Imp",
@@ -399,7 +399,7 @@ void register_usertypes(sol::state& lua)
         "patrol_y_level",
         &Imp::patrol_y_level,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Lavamander>(
         "Lavamander",
@@ -416,7 +416,7 @@ void register_usertypes(sol::state& lua)
         "player_detect_state",
         &Lavamander::player_detect_state,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Firebug>(
         "Firebug",
@@ -427,7 +427,7 @@ void register_usertypes(sol::state& lua)
         "detached_from_chain",
         &Firebug::detached_from_chain,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<FirebugUnchained>(
         "FirebugUnchained",
@@ -438,21 +438,21 @@ void register_usertypes(sol::state& lua)
         "walking_timer",
         &FirebugUnchained::walking_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Robot>(
         "Robot",
         "emitted_light_explosion",
         &Robot::emitted_light_explosion,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<Quillback>(
         "Quillback",
         "particle",
         &Quillback::particle,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<Leprechaun>(
         "Leprechaun",
@@ -465,35 +465,35 @@ void register_usertypes(sol::state& lua)
         "timer_after_humping",
         &Leprechaun::timer_after_humping,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<Crocman>(
         "Crocman",
         "teleport_cooldown",
         &Crocman::teleport_cooldown,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<Mummy>(
         "Mummy",
         "walk_pause_timer",
         &Mummy::walk_pause_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<VanHorsing>(
         "VanHorsing",
         "show_text",
         &VanHorsing::show_text,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, NPC>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, NPC>());
 
     lua.new_usertype<WitchDoctor>(
         "WitchDoctor",
         "skull_regen_timer",
         &WitchDoctor::skull_regen_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<WitchDoctorSkull>(
         "WitchDoctorSkull",
@@ -504,14 +504,14 @@ void register_usertypes(sol::state& lua)
         "rotation_angle",
         &WitchDoctorSkull::rotation_angle,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<ForestSister>(
         "ForestSister",
         "walk_pause_timer",
         &ForestSister::walk_pause_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, NPC>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, NPC>());
 
     lua.new_usertype<Vampire>(
         "Vampire",
@@ -526,7 +526,7 @@ void register_usertypes(sol::state& lua)
         "walk_pause_timer",
         &Vampire::walk_pause_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Vlad>(
         "Vlad",
@@ -535,7 +535,7 @@ void register_usertypes(sol::state& lua)
         "aggro",
         &Vlad::aggro,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Vampire>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Vampire>());
 
     lua.new_usertype<Waddler>(
         "Waddler",
@@ -546,12 +546,12 @@ void register_usertypes(sol::state& lua)
         "air_timer",
         &Waddler::air_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, RoomOwner>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, RoomOwner>());
 
     lua.new_usertype<Octopus>(
         "Octopus",
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<Bodyguard>(
         "Bodyguard",
@@ -560,14 +560,14 @@ void register_usertypes(sol::state& lua)
         "message_shown",
         &Bodyguard::message_shown,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, NPC>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, NPC>());
 
     lua.new_usertype<Fish>(
         "Fish",
         "change_direction_timer",
         &Fish::change_direction_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<GiantFish>(
         "GiantFish",
@@ -576,7 +576,7 @@ void register_usertypes(sol::state& lua)
         "lose_interest_timer",
         &GiantFish::lose_interest_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Crabman>(
         "Crabman",
@@ -591,7 +591,7 @@ void register_usertypes(sol::state& lua)
         "at_maximum_attack",
         &Crabman::at_maximum_attack,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Kingu>(
         "Kingu",
@@ -610,7 +610,7 @@ void register_usertypes(sol::state& lua)
         "player_seen_by_kingu",
         &Kingu::player_seen_by_kingu,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Anubis>(
         "Anubis",
@@ -631,14 +631,14 @@ void register_usertypes(sol::state& lua)
         "awake",
         &Anubis::awake,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Cobra>(
         "Cobra",
         "spit_timer",
         &Cobra::spit_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<CatMummy>(
         "CatMummy",
@@ -647,7 +647,7 @@ void register_usertypes(sol::state& lua)
         "attack_timer",
         &CatMummy::attack_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Sorceress>(
         "Sorceress",
@@ -662,7 +662,7 @@ void register_usertypes(sol::state& lua)
         "hover_timer",
         &Sorceress::hover_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<MagmaMan>(
         "MagmaMan",
@@ -675,7 +675,7 @@ void register_usertypes(sol::state& lua)
         "alive_timer",
         &MagmaMan::alive_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Bee>(
         "Bee",
@@ -690,7 +690,7 @@ void register_usertypes(sol::state& lua)
         "wobble_y",
         &Bee::wobble_y,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Ammit>(
         "Ammit",
@@ -699,7 +699,7 @@ void register_usertypes(sol::state& lua)
         "particle",
         &Ammit::particle,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<ApepPart>(
         "ApepPart",
@@ -710,7 +710,7 @@ void register_usertypes(sol::state& lua)
         "sync_timer",
         &ApepPart::sync_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<ApepHead>(
         "ApepHead",
@@ -723,7 +723,7 @@ void register_usertypes(sol::state& lua)
         "fx_mouthpiece2_uid",
         &ApepHead::fx_mouthpiece2_uid,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, ApepPart>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, ApepPart>());
 
     lua.new_usertype<OsirisHead>(
         "OsirisHead",
@@ -738,21 +738,21 @@ void register_usertypes(sol::state& lua)
         "invincibility_timer",
         &OsirisHead::invincibility_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<OsirisHand>(
         "OsirisHand",
         "attack_cooldown_timer",
         &OsirisHand::attack_cooldown_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Alien>(
         "Alien",
         "jump_timer",
         &Alien::jump_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<UFO>(
         "UFO",
@@ -763,21 +763,21 @@ void register_usertypes(sol::state& lua)
         "is_falling",
         &UFO::is_falling,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Lahamu>(
         "Lahamu",
         "attack_cooldown_timer",
         &Lahamu::attack_cooldown_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<YetiQueen>(
         "YetiQueen",
         "walk_pause_timer",
         &YetiQueen::walk_pause_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<YetiKing>(
         "YetiKing",
@@ -792,7 +792,7 @@ void register_usertypes(sol::state& lua)
         "particle_sparkles",
         &YetiKing::particle_sparkles,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Lamassu>(
         "Lamassu",
@@ -811,7 +811,7 @@ void register_usertypes(sol::state& lua)
         "attack_angle",
         &Lamassu::attack_angle,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Olmite>(
         "Olmite",
@@ -828,7 +828,7 @@ void register_usertypes(sol::state& lua)
         "attack_cooldown_timer",
         &Olmite::attack_cooldown_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<Tiamat>(
         "Tiamat",
@@ -853,7 +853,7 @@ void register_usertypes(sol::state& lua)
         "right_arm_angle",
         &Tiamat::right_arm_angle,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<GiantFrog>(
         "GiantFrog",
@@ -874,7 +874,7 @@ void register_usertypes(sol::state& lua)
         "mouth_open_trigger",
         &GiantFrog::mouth_open_trigger,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Frog>(
         "Frog",
@@ -885,12 +885,12 @@ void register_usertypes(sol::state& lua)
         "pause",
         &Frog::pause,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<FireFrog>(
         "FireFrog",
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Frog>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Frog>());
 
     lua.new_usertype<Grub>(
         "Grub",
@@ -907,7 +907,7 @@ void register_usertypes(sol::state& lua)
         "particle",
         &Grub::particle,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Tadpole>(
         "Tadpole",
@@ -916,7 +916,7 @@ void register_usertypes(sol::state& lua)
         "player_spotted",
         &Tadpole::player_spotted,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<GiantFly>(
         "GiantFly",
@@ -933,7 +933,7 @@ void register_usertypes(sol::state& lua)
         "sine_counter",
         &GiantFly::sine_counter,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Ghist>(
         "Ghist",
@@ -946,7 +946,7 @@ void register_usertypes(sol::state& lua)
         "fadeout",
         &Ghist::fadeout,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<JumpDog>(
         "JumpDog",
@@ -955,7 +955,7 @@ void register_usertypes(sol::state& lua)
         "squish_timer",
         &JumpDog::squish_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<EggplantMinister>(
         "EggplantMinister",
@@ -964,14 +964,14 @@ void register_usertypes(sol::state& lua)
         "squish_timer",
         &EggplantMinister::squish_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Yama>(
         "Yama",
         "message_shown",
         &Yama::message_shown,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Hundun>(
         "Hundun",
@@ -996,7 +996,7 @@ void register_usertypes(sol::state& lua)
         "hundun_flags",
         &Hundun::hundun_flags,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.create_named_table("HUNDUNFLAGS", "WILLMOVELEFT", 1, "BIRDHEADEMERGED", 2, "SNAKEHEADEMERGED", 4, "TOPLEVELARENAREACHED", 8, "BIRDHEADSHOTLAST", 16);
 
@@ -1015,7 +1015,7 @@ void register_usertypes(sol::state& lua)
         "invincibility_timer",
         &HundunHead::invincibility_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<MegaJellyfish>(
         "MegaJellyfish",
@@ -1036,7 +1036,7 @@ void register_usertypes(sol::state& lua)
         "velocity_application_timer",
         &MegaJellyfish::velocity_application_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Scorpion>(
         "Scorpion",
@@ -1045,7 +1045,7 @@ void register_usertypes(sol::state& lua)
         "jump_cooldown_timer",
         &Scorpion::jump_cooldown_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Hermitcrab>(
         "Hermitcrab",
@@ -1062,7 +1062,7 @@ void register_usertypes(sol::state& lua)
         "spawn_new_carried_item",
         &Hermitcrab::spawn_new_carried_item,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Necromancer>(
         "Necromancer",
@@ -1075,7 +1075,7 @@ void register_usertypes(sol::state& lua)
         "resurrection_timer",
         &Necromancer::resurrection_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, WalkingMonster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
     lua.new_usertype<ProtoShopkeeper>(
         "ProtoShopkeeper",
@@ -1086,7 +1086,7 @@ void register_usertypes(sol::state& lua)
         "walking_speed",
         &ProtoShopkeeper::walking_speed,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Beg>(
         "Beg",
@@ -1095,7 +1095,7 @@ void register_usertypes(sol::state& lua)
         "disappear_timer",
         &Beg::disappear_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, NPC>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, NPC>());
 
     lua.new_usertype<Terra>(
         "Terra",
@@ -1106,7 +1106,7 @@ void register_usertypes(sol::state& lua)
         "abuse_speechbubble_timer",
         &Terra::abuse_speechbubble_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<Critter>(
         "Critter",
@@ -1115,14 +1115,14 @@ void register_usertypes(sol::state& lua)
         "holding_state",
         &Critter::holding_state,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
     lua.new_usertype<CritterBeetle>(
         "CritterBeetle",
         "pause",
         &CritterBeetle::pause,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterCrab>(
         "CritterCrab",
@@ -1131,7 +1131,7 @@ void register_usertypes(sol::state& lua)
         "walking_left",
         &CritterCrab::walking_left,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterButterfly>(
         "CritterButterfly",
@@ -1140,14 +1140,14 @@ void register_usertypes(sol::state& lua)
         "vertical_flight_direction",
         &CritterButterfly::vertical_flight_direction,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterLocust>(
         "CritterLocust",
         "jump_timer",
         &CritterLocust::jump_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterSnail>(
         "CritterSnail",
@@ -1168,7 +1168,7 @@ void register_usertypes(sol::state& lua)
         "rotation_speed",
         &CritterSnail::rotation_speed,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterFish>(
         "CritterFish",
@@ -1177,7 +1177,7 @@ void register_usertypes(sol::state& lua)
         "player_in_proximity",
         &CritterFish::player_in_proximity,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterPenguin>(
         "CritterPenguin",
@@ -1186,7 +1186,7 @@ void register_usertypes(sol::state& lua)
         "jump_timer",
         &CritterPenguin::jump_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterFirefly>(
         "CritterFirefly",
@@ -1203,7 +1203,7 @@ void register_usertypes(sol::state& lua)
         "sit_cooldown_timer",
         &CritterFirefly::sit_cooldown_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterDrone>(
         "CritterDrone",
@@ -1216,7 +1216,7 @@ void register_usertypes(sol::state& lua)
         "move_timer",
         &CritterDrone::move_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
     lua.new_usertype<CritterSlime>(
         "CritterSlime",
@@ -1239,6 +1239,6 @@ void register_usertypes(sol::state& lua)
         "walk_pause_timer",
         &CritterSlime::walk_pause_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Monster, Critter>());
+        sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 }
 } // namespace NEntitiesMonsters
