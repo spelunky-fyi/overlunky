@@ -545,7 +545,7 @@ The list below shows the type hierarchy for each entity in the game. This makes 
 - 565 ITEM_JETPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Backpack](script-api.md#Backpack) > [Jetpack](script-api.md#Jetpack)
 - 566 ITEM_JETPACK_MECH = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Backpack](script-api.md#Backpack) > [Jetpack](script-api.md#Jetpack)
 - 567 ITEM_PURCHASABLE_JETPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
-- 568 ITEM_TELEPORTER_BACKPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Backpack](script-api.md#Backpack)
+- 568 ITEM_TELEPORTER_BACKPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Backpack](script-api.md#Backpack) > [TeleporterBackpack](script-api.md#TeleporterBackpack)
 - 569 ITEM_PURCHASABLE_TELEPORTER_BACKPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
 - 570 ITEM_HOVERPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Backpack](script-api.md#Backpack) > [Hoverpack](script-api.md#Hoverpack)
 - 571 ITEM_PURCHASABLE_HOVERPACK = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
