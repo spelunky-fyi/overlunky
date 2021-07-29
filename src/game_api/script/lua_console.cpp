@@ -832,7 +832,7 @@ void LuaConsole::push_history(std::string history_item, std::vector<ScriptMessag
 
 std::string LuaConsole::dump_api()
 {
-    std::set<std::string> excluded_keys{"meta"};
+    std::set<std::string> excluded_keys{"meta", "__require", "__script_id", "TYPE_MAP", "get_script_id"};
 
     sol::state dummy_state;
     dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
@@ -880,8 +880,8 @@ std::string LuaConsole::dump_api()
     for (auto& [key, value] : sorted_output)
         api += fmt::format("{} = {}\n", key, value);
 
-    const static std::regex reg(R"("function:\s[0-9A-F]+")");
-    api = std::regex_replace(api, reg, R"("function")");
+    const static std::regex reg(R"("(userdata|function):\s[0-9A-F]+")");
+    api = std::regex_replace(api, reg, "\"$1\"");
 
     return api;
 }
