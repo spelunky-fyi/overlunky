@@ -93,7 +93,7 @@ return info.short_src, info.source
 
     const fs::path& backend_root = backend->get_root_path();
 
-    static auto require = [](std::string path)
+    auto require = [=](std::string path)
     {
         if (path.ends_with(".lua") || path.ends_with(".dll"))
         {
@@ -101,6 +101,7 @@ return info.short_src, info.source
         }
         std::replace(path.begin(), path.end(), '/', '.');
         std::replace(path.begin(), path.end(), '\\', '.');
+        backend->loaded_modules.insert(path);
         return lua["__require"](path);
     };
     auto require_if_exists = [&](fs::path path) -> std::optional<sol::object>

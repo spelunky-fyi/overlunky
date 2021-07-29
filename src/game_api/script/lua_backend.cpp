@@ -21,11 +21,11 @@
 
 #include <sol/sol.hpp>
 
-std::mutex g_all_backends_mutex;
+std::recursive_mutex g_all_backends_mutex;
 std::vector<LuaBackend*> g_all_backends;
 
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
-    : lua{get_lua_vm(sound_mgr), sol::create}, sound_manager{sound_mgr}, console{con}
+    : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
 {
     g_state = get_state_ptr();
 
@@ -53,6 +53,15 @@ LuaBackend::~LuaBackend()
     {
         std::lock_guard lock{g_all_backends_mutex};
         std::erase(g_all_backends, this);
+    }
+
+    {
+        auto& global_vm = *vm;
+        for (const std::string& module : loaded_modules)
+        {
+            global_vm["package"]["loaded"][module] = sol::nil;
+            global_vm["_G"][module] = sol::nil;
+        }
     }
 
     clear_all_callbacks();
@@ -622,7 +631,7 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
     {
         bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
-        if (mask_match)
+        if (mask_match && flags_match)
         {
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
             if (type_match)
@@ -645,7 +654,7 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
     {
         bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
-        if (mask_match)
+        if (mask_match && flags_match)
         {
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
             if (type_match)

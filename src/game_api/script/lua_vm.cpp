@@ -982,13 +982,13 @@ end
 std::vector<std::string> safe_fields{};
 std::vector<std::string> unsafe_fields{};
 
-sol::state& get_lua_vm(SoundManager* sound_manager)
+std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
 {
-    static std::unique_ptr<sol::state> global_vm = [sound_manager]()
+    static std::shared_ptr<sol::state> global_vm = [sound_manager]()
     {
         assert(sound_manager != nullptr && "SoundManager needs to be passed to first call to get_lua_vm...");
 
-        std::unique_ptr<sol::state> global_vm = std::make_unique<sol::state>();
+        std::shared_ptr<sol::state> global_vm = std::make_shared<sol::state>();
         sol::state& lua_vm = *global_vm;
         load_libraries(lua_vm);
         populate_lua_state(lua_vm, sound_manager);
@@ -1022,7 +1022,12 @@ sol::state& get_lua_vm(SoundManager* sound_manager)
 
         return global_vm;
     }();
-    return *global_vm;
+    return global_vm;
+}
+sol::state& get_lua_vm(SoundManager* sound_manager)
+{
+    static sol::state& global_vm = *acquire_lua_vm(sound_manager);
+    return global_vm;
 }
 
 sol::protected_function_result execute_lua(sol::environment& env, std::string_view code)
@@ -1038,6 +1043,7 @@ void populate_lua_env(sol::environment& env)
     {
         env[field] = global_vm["_G"][field];
     }
+    env["_G"] = env;
 }
 void hide_unsafe_libraries(sol::environment& env)
 {

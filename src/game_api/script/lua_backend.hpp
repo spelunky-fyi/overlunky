@@ -169,6 +169,8 @@ class LuaBackend
 {
   public:
     sol::environment lua;
+    std::shared_ptr<sol::state> vm;
+    std::unordered_set<std::string> loaded_modules;
 
     std::string result;
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
