@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entities_chars.hpp"
 #include "movable.hpp"
 #include "particles.hpp"
 #include <cstdint>
@@ -56,12 +57,6 @@ class VladsCape : public Cape
 {
   public:
     bool can_double_jump;
-};
-
-class KapalaPowerup : public Movable
-{
-  public:
-    uint8_t amount_of_blood;
 };
 
 class Mattock : public Movable
@@ -662,7 +657,25 @@ class PlayerBag : public Movable
     uint8_t ropes;
 };
 
-class ParachutePowerup : public Movable
+class Powerup : public Movable
+{
+  public:
+    virtual void unknown_v87() = 0;
+    virtual void unknown_v88() = 0;
+    virtual void unknown_v89() = 0;
+    virtual void unknown_v90() = 0;
+    virtual void unknown_v91() = 0;
+    virtual void apply_effect_to_player(Player* player) = 0;
+    virtual void remove_effect_from_player(Player* player) = 0;
+};
+
+class KapalaPowerup : public Powerup
+{
+  public:
+    uint8_t amount_of_blood;
+};
+
+class ParachutePowerup : public Powerup
 {
   public:
     /// this gets compared with entity's falling_timer
@@ -676,13 +689,13 @@ class ParachutePowerup : public Movable
     void deploy();
 };
 
-class TrueCrownPowerup : public Movable
+class TrueCrownPowerup : public Powerup
 {
   public:
     uint16_t timer;
 };
 
-class AnkhPowerup : public Movable
+class AnkhPowerup : public Powerup
 {
   public:
     SoundPosition* sound_pos;

@@ -823,15 +823,31 @@ void set_arrowtrap_projectile(uint32_t regular_entity_type, uint32_t poison_enti
 
 void modify_sparktraps(float angle_increment, float distance)
 {
-    static size_t angle_instruction_offset = 0;
     static size_t angle_increment_offset = 0;
-    if (angle_instruction_offset == 0)
+    if (angle_increment_offset == 0)
     {
         auto memory = Memory::get();
+        auto exe = memory.exe();
         std::string pattern = "\xF3\x0F\x10\x81\x50\x01\x00\x00\x48\xBE\x4B\x57\x4C\x4F\x80\x3E\x83\xD3"s;
-        angle_instruction_offset = find_inst(memory.exe(), pattern, memory.after_bundle) + 18;
-        angle_increment_offset = memory.at_exe(decode_pc(memory.exe(), angle_instruction_offset, 4));
-        angle_instruction_offset = memory.at_exe(angle_instruction_offset);
+        size_t angle_instruction_offset = find_inst(memory.exe(), pattern, memory.after_bundle) + 18;
+
+        uint8_t cc_counter = 0;
+        size_t op_counter = angle_instruction_offset;
+        uint8_t previous_opcode = 0;
+        while (cc_counter < 8)
+        {
+            unsigned char opcode = exe[op_counter];
+            if (opcode == 0xcc && previous_opcode == 0xcc)
+            {
+                cc_counter++;
+            }
+            previous_opcode = opcode;
+            op_counter++;
+        }
+        angle_increment_offset = memory.at_exe(op_counter);
+
+        uint32_t distance_offset_relative = op_counter - (angle_instruction_offset + 8);
+        write_mem_prot(memory.at_exe(angle_instruction_offset + 4), to_le_bytes(distance_offset_relative), true);
     }
     write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
 
@@ -986,18 +1002,21 @@ std::vector<int64_t> read_prng()
 
 void pick_up(uint32_t who_uid, uint32_t what_uid)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        offset = memory.at_exe(find_inst(memory.exe(), "\x48\x89\x5c\x24\x08\x57\x48\x83\xec\x20\x4c\x8b\x5a\x08"s, memory.after_bundle));
-    }
     Movable* ent = (Movable*)get_entity_ptr(who_uid);
     Movable* item = (Movable*)get_entity_ptr(what_uid);
     if (ent != nullptr && item != nullptr)
     {
-        auto pick_up_func = (void (*)(Movable*, Movable*))offset;
-        pick_up_func(ent, item);
+        ent->pick_up(item);
+    }
+}
+
+void drop(uint32_t who_uid, uint32_t what_uid)
+{
+    Movable* ent = (Movable*)get_entity_ptr(who_uid);
+    Movable* item = (Movable*)get_entity_ptr(what_uid);
+    if (ent != nullptr && item != nullptr)
+    {
+        ent->drop(item);
     }
 }
 

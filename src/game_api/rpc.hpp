@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entities_chars.hpp"
 #include "state.hpp"
 #include <cstdint>
 #include <vector>
@@ -72,6 +73,7 @@ void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_mu
 SaveData* savedata();
 std::vector<int64_t> read_prng();
 void pick_up(uint32_t who_uid, uint32_t what_uid);
+void drop(uint32_t who_uid, uint32_t what_uid);
 void set_olmec_phase_y_level(uint8_t phase, float y);
 void set_ghost_spawn_times(uint32_t normal = 10800, uint32_t cursed = 9000);
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance);

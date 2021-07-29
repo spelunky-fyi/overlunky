@@ -18,6 +18,7 @@ header_files = [
     "../src/game_api/entities_activefloors.hpp",
     "../src/game_api/entities_mounts.hpp",
     "../src/game_api/entities_monsters.hpp",
+    "../src/game_api/entities_chars.hpp",
     "../src/game_api/entities_items.hpp",
     "../src/game_api/entities_fx.hpp",
     "../src/game_api/entities_liquids.hpp",
@@ -37,6 +38,7 @@ api_files = [
     "../src/game_api/script/usertypes/save_context.cpp",
     "../src/game_api/script/usertypes/state_lua.cpp",
     "../src/game_api/script/usertypes/entity_lua.cpp",
+    "../src/game_api/script/usertypes/entities_chars_lua.cpp",
     "../src/game_api/script/usertypes/entities_floors_lua.cpp",
     "../src/game_api/script/usertypes/entities_activefloors_lua.cpp",
     "../src/game_api/script/usertypes/entities_mounts_lua.cpp",
@@ -193,16 +195,16 @@ for file in header_files:
                 if m:
                     comment.append(m[1])
 
-                m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", line)
+                m = re.search(r'\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)', line)
                 if m:
-                    name = m[2]
+                    name = m[3]
                     if name not in member_funs:
                         member_funs[name] = []
                     member_funs[name].append(
                         {
-                            "return": m[1],
-                            "name": m[2],
-                            "param": m[3],
+                            "return": m[2],
+                            "name": m[3],
+                            "param": m[4],
                             "comment": comment,
                         }
                     )

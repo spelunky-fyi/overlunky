@@ -1,4 +1,5 @@
 #include "drops.hpp"
+#include "entities_chars.hpp"
 #include "entity.hpp"
 #include "script.hpp"
 #include "window_api.hpp"

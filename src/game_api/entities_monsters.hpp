@@ -1,13 +1,13 @@
 #pragma once
 
+#include "entities_chars.hpp"
 #include "movable.hpp"
 #include "particles.hpp"
 #include <cstdint>
 
-class Monster : public Movable
+class Monster : public PowerupCapable
 {
   public:
-    std::map<int64_t, int64_t> inside;
     int32_t chased_target_uid;
     uint32_t target_selection_timer;
 };

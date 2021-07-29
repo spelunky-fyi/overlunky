@@ -265,6 +265,7 @@ Color = {
 }
 Container = {
   __index = "function:",
+  __name = "sol.Container.user",
   __newindex = "function:"
 }
 ConveyorBelt = {
@@ -2332,6 +2333,16 @@ Pot = {
   __name = "sol.Pot.user",
   __newindex = "function:"
 }
+Powerup = {
+  __index = "function:",
+  __name = "sol.Powerup.user",
+  __newindex = "function:"
+}
+PowerupCapable = {
+  __index = "function:",
+  __name = "sol.PowerupCapable.user",
+  __newindex = "function:"
+}
 ProtoShopkeeper = {
   __index = "function:",
   __name = "sol.ProtoShopkeeper.user",
@@ -3396,30 +3407,30 @@ TYPE_MAP = {
   nil,
   nil,
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   nil,
-  "function:",
-  "function:",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
   nil,
   nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
   "function:",
   "function:",
   "function:",
@@ -3744,24 +3755,24 @@ TYPE_MAP = {
   nil,
   "function:",
   nil,
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
   "function:",
-  "function:",
-  "function:",
-  "function:",
-  "function:",
+  nil,
+  nil,
+  nil,
   "function:",
+  nil,
+  nil,
+  nil,
   "function:",
+  nil,
+  nil,
+  nil,
+  nil,
+  nil,
   "function:",
   "function:",
+  nil,
+  nil,
   nil,
   "function:",
   "function:",
@@ -4822,6 +4833,7 @@ draw_rect = function(...) end
 draw_rect_filled = function(...) end
 draw_text = function(...) end
 draw_text_size = function(...) end
+drop = function(...) end
 entity_get_items_by = function(...) end
 entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end

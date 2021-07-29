@@ -15,6 +15,7 @@
 #include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
+#include "usertypes/entities_chars_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
 #include "usertypes/entities_fx_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
@@ -619,6 +620,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
     /// ```
     lua["pick_up"] = pick_up;
+    /// Drop an entity by uid
+    lua["drop"] = drop;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates
@@ -829,6 +832,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NGui::register_usertypes(lua, this);
     NTexture::register_usertypes(lua, this);
     NEntity::register_usertypes(lua, this);
+    NEntitiesChars::register_usertypes(lua, this);
     NEntitiesFloors::register_usertypes(lua, this);
     NEntitiesActiveFloors::register_usertypes(lua, this);
     NEntitiesMounts::register_usertypes(lua, this);
@@ -1560,7 +1564,7 @@ Entity* ScriptImpl::pre_entity_spawn(std::uint32_t entity_type, float x, float y
     {
         bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
-        if (mask_match)
+        if (mask_match && flags_match)
         {
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
             if (type_match)
@@ -1583,7 +1587,7 @@ void ScriptImpl::post_entity_spawn(Entity* entity, int spawn_type_flags)
     {
         bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
-        if (mask_match)
+        if (mask_match && flags_match)
         {
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
             if (type_match)
