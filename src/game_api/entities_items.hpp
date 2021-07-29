@@ -26,8 +26,8 @@ class Jetpack : public Backpack
 
 class TeleporterBackpack : public Backpack
 {
-	public:
-		uint16_t teleport_number;
+  public:
+    uint16_t teleport_number;
 };
 
 class Hoverpack : public Backpack
