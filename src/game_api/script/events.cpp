@@ -25,7 +25,7 @@ void post_level_generation()
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.pre_level_generation();
+            backend.post_level_generation();
             return true;
         });
 }
