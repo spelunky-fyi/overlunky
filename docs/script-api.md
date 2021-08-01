@@ -275,6 +275,9 @@ Short for [spawn_layer_door](#spawn_layer_door).
 ### [`spawn_apep`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_apep)
 `int spawn_apep(float x, float y, int l, bool right)`<br/>
 Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
+### [`spawn_tree`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
+`nil spawn_tree(float x, float y, int l)`<br/>
+Spawns and grows a tree
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
@@ -2419,6 +2422,13 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`bool invisible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invisible) &ParticleDB::invisible
 - [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &ParticleDB::get_texture
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &ParticleDB::set_texture
+### `PreLoadLevelFilesContext`
+- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
+- [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
+\
+Block all loading `.lvl` files and instead load the specified `.lvl` files.
+This includes `generic.lvl` so if you need it specify it here.
+Use at your own risk, some themes/levels expect a certain level file to be loaded.
 ### `PostRoomGenerationContext`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`bool set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
@@ -2694,6 +2704,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_eggshipdoor
 - as_elevator
 - as_empressgrave
+- as_entity
 - as_excalibur
 - as_exitdoor
 - as_fallingplatform
@@ -2773,6 +2784,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_mosquito
 - as_motherstatue
 - as_mount
+- as_movable
 - as_mummy
 - as_necromancer
 - as_npc
@@ -2969,6 +2981,10 @@ Runs at the same times as ON.SCREEN, but receives the save_ctx
 \
 Params: `LoadContext load_ctx`\
 Runs as soon as your script is loaded, including reloads, then never again
+- [`PRE_LOAD_LEVEL_FILES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_LEVEL_FILES) ON::PRE_LOAD_LEVEL_FILES
+\
+Params: `PreLoadLevelFilesContext load_level_ctx`\
+Runs right before level files would be loaded
 - [`PRE_LEVEL_GENERATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION) ON::PRE_LEVEL_GENERATION
 \
 Runs before any level generation, no entities should exist at this point
