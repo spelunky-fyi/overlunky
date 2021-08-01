@@ -85,8 +85,8 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, floa
 int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, int layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ []
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
     if (layer < 0)
@@ -103,8 +103,8 @@ int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, int l
 int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, int layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ []
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
     if (layer < 0)
@@ -223,8 +223,8 @@ void spawn_backdoor_abs(float x, float y)
 int32_t spawn_apep(float x, float y, int l, bool right)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ []
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
     if (l < 0)
@@ -241,8 +241,8 @@ int32_t spawn_apep(float x, float y, int l, bool right)
 void spawn_tree(float x, float y, int l)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{ []
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     if (l < 0)
     {

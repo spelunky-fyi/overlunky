@@ -7,6 +7,11 @@
 
 #include <sol/sol.hpp>
 
+void PreLoadLevelFilesContext::override_level_files(std::vector<std::string> levels)
+{
+    override_next_levels(std::move(levels));
+}
+
 bool PostRoomGenerationContext::set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
 {
     return State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
@@ -105,6 +110,13 @@ void register_usertypes(sol::state& lua)
     lua["get_co_subtheme"] = get_co_subtheme;
     /// Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use `COSUBTHEME.RESET` to reset to default random behaviour)
     lua["force_co_subtheme"] = force_co_subtheme;
+
+    // Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
+    lua.new_usertype<PreLoadLevelFilesContext>(
+        "PreLoadLevelFilesContext",
+        sol::no_constructor,
+        "override_level_files",
+        &PreLoadLevelFilesContext::override_level_files);
 
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.

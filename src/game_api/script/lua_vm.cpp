@@ -898,6 +898,8 @@ end
         ON::SAVE,
         "LOAD",
         ON::LOAD,
+        "PRE_LOAD_LEVEL_FILES",
+        ON::PRE_LOAD_LEVEL_FILES,
         "PRE_LEVEL_GENERATION",
         ON::PRE_LEVEL_GENERATION,
         "POST_ROOM_GENERATION",
@@ -922,6 +924,9 @@ end
     // Runs on the first ON.SCREEN of a run
     // RESET
     // Runs when resetting a run
+    // PRE_LOAD_LEVEL_FILES
+    // Params: `PreLoadLevelFilesContext load_level_ctx`
+    // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
     // Runs before any level generation, no entities should exist at this point
     // POST_ROOM_GENERATION

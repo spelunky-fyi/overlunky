@@ -2,6 +2,15 @@
 
 #include "lua_backend.hpp"
 
+void pre_load_level_files()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.pre_load_level_files();
+            return true;
+        });
+}
 void pre_level_generation()
 {
     LuaBackend::for_each_backend(

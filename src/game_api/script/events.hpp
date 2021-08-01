@@ -5,6 +5,7 @@
 
 class Entity;
 
+void pre_load_level_files();
 void pre_level_generation();
 void post_room_generation();
 void post_level_generation();

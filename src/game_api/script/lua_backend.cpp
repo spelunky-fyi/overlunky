@@ -564,6 +564,23 @@ void LuaBackend::post_level_gen_spawn(std::string_view tile_code, float x, float
     }
 }
 
+void LuaBackend::pre_load_level_files()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == ON::POST_ROOM_GENERATION)
+        {
+            handle_function(callback.func, PreLoadLevelFilesContext{});
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::pre_level_generation()
 {
     if (!get_enabled())

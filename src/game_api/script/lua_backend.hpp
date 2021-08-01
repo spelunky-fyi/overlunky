@@ -67,6 +67,7 @@ enum class ON
     SAVE,
     LOAD,
     GAMEFRAME,
+    PRE_LOAD_LEVEL_FILES,
     PRE_LEVEL_GENERATION,
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
@@ -248,6 +249,7 @@ class LuaBackend
     bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
     void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
 
+    void pre_load_level_files();
     void pre_level_generation();
     void post_room_generation();
     void post_level_generation();

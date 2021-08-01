@@ -507,6 +507,9 @@ std::mutex g_chance_logic_providers_lock;
 std::uint32_t g_current_chance_logic_provider_id{0};
 std::vector<ChanceLogicProviderImpl> g_chance_logic_providers;
 
+bool g_replace_level_loads{false};
+std::vector<std::string> g_levels_to_load;
+
 //#define HOOK_LOAD_ITEM
 #ifdef HOOK_LOAD_ITEM
 using LoadItemFun = void*(Layer*, std::uint32_t, float, float, bool);
@@ -528,6 +531,8 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2)
     pre_level_generation();
     g_level_gen_trampoline(level_gen_sys, param_2);
     post_level_generation();
+
+    g_replace_level_loads = false;
 }
 
 using GenRoomsFun = void(ThemeInfo*);
@@ -604,6 +609,32 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
         g_floor_requiring_entities.erase(std::remove_if(g_floor_requiring_entities.begin(), g_floor_requiring_entities.end(), [](const FloorRequiringEntity& ent)
                                                         { return ent.handled || get_entity_ptr(ent.uid) == nullptr; }),
                                          g_floor_requiring_entities.end());
+    }
+}
+
+using SetupLevelFiles = void(LevelGenData*, const char*, bool);
+SetupLevelFiles* g_setup_level_files_trampoline{nullptr};
+void setup_level_files(LevelGenData* level_gen_data, const char* level_file_name, bool load_generic)
+{
+    pre_load_level_files();
+    g_setup_level_files_trampoline(level_gen_data, level_file_name, load_generic);
+}
+
+using LoadLevelFile = void(LevelGenData*, const char*);
+LoadLevelFile* g_load_level_file_trampoline{nullptr};
+void load_level_file(LevelGenData* level_gen_data, const char* level_file_name)
+{
+    if (g_replace_level_loads)
+    {
+        for (const std::string& level_file : g_levels_to_load)
+        {
+            g_load_level_file_trampoline(level_gen_data, level_file.c_str());
+        }
+        g_levels_to_load.clear();
+    }
+    else
+    {
+        g_load_level_file_trampoline(level_gen_data, level_file_name);
     }
 }
 
@@ -764,6 +795,18 @@ void LevelGenData::init()
             g_handle_tile_code_trampoline = (HandleTileCodeFun*)memory.at_exe(fun_start);
         }
 
+        {
+            auto fun_start = find_inst(exe, "\x4c\x8b\xf1\xc6\x81\x40\x01\x00\x00\x01"s, after_bundle);
+            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            g_setup_level_files_trampoline = (SetupLevelFiles*)memory.at_exe(fun_start);
+        }
+
+        {
+            auto fun_start = find_inst(exe, "\x49\x8d\x40\x01\x48\x89\x03"s, after_bundle);
+            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            g_load_level_file_trampoline = (LoadLevelFile*)memory.at_exe(fun_start);
+        }
+
         DetourRestoreAfterWith();
 
         DetourTransactionBegin();
@@ -778,6 +821,8 @@ void LevelGenData::init()
         DetourAttach((void**)&g_level_gen_trampoline, level_gen);
         DetourAttach((void**)&g_gen_rooms_trampoline, gen_rooms);
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
+        DetourAttach((void**)&g_setup_level_files_trampoline, setup_level_files);
+        DetourAttach((void**)&g_load_level_file_trampoline, load_level_file);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)
@@ -1092,6 +1137,12 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
     return false;
 }
 
+void override_next_levels(std::vector<std::string> next_levels)
+{
+    g_replace_level_loads = true;
+    g_levels_to_load = std::move(next_levels);
+}
+
 int8_t get_co_subtheme()
 {
     auto state = get_state_ptr();
@@ -1136,7 +1187,6 @@ int8_t get_co_subtheme()
 
     return -2;
 }
-
 void force_co_subtheme(int8_t subtheme)
 {
     static size_t offset = 0;

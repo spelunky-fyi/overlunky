@@ -1,10 +1,20 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <sol/forward.hpp>
 
 using ROOM_TEMPLATE = uint16_t;     // NoAlias
 using PROCEDURAL_CHANCE = uint32_t; // NoAlias
 
+struct PreLoadLevelFilesContext
+{
+    /// Block all loading `.lvl` files and instead load the specified `.lvl` files.
+    /// This includes `generic.lvl` so if you need it specify it here.
+    /// Use at your own risk, some themes/levels expect a certain level file to be loaded.
+    void override_level_files(std::vector<std::string> levels);
+};
 struct PostRoomGenerationContext
 {
     /// Set the room template at the given index and layer, returns `false` if the index is outside of the level.
