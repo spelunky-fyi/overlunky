@@ -85,6 +85,9 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, floa
 int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, int layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ []
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
     if (layer < 0)
     {
@@ -100,6 +103,9 @@ int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, int l
 int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, int layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ []
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
     if (layer < 0)
     {
@@ -217,6 +223,9 @@ void spawn_backdoor_abs(float x, float y)
 int32_t spawn_apep(float x, float y, int l, bool right)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ []
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
     auto state = State::get();
     if (l < 0)
     {
@@ -227,6 +236,39 @@ int32_t spawn_apep(float x, float y, int l, bool right)
     }
 
     return state.layer_local(l)->spawn_apep(x, y, right)->uid;
+}
+
+void spawn_tree(float x, float y, int l)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{ []
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); } };
+
+    if (l < 0)
+    {
+        auto state = State::get();
+        auto player = state.items()->player(abs(l) - 1);
+        if (player == nullptr)
+            return;
+        l = player->layer;
+        auto [delta_x, delta_y] = player->position();
+        x += delta_x;
+        y += delta_y;
+    }
+
+    using spawn_tree_fun_t = void(void*, int, float, float);
+    static auto spawn_tree_call = (spawn_tree_fun_t*)[]()
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        auto start = memory.after_bundle;
+        auto location = find_inst(exe, "\x0f\x28\xd7\x40\x0f\xb6\xd7"s, start);
+        location = find_inst(exe, "\xe8"s, location);
+        location = decode_pc(exe, location, 1);
+        return memory.at_exe(location);
+    }
+    ();
+    spawn_tree_call(nullptr, l, x, y);
 }
 
 void push_spawn_type_flags(SpawnTypeFlags flags)

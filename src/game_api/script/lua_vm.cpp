@@ -411,6 +411,8 @@ end
     lua["layer_door"] = spawn_backdoor_abs;
     /// Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
     lua["spawn_apep"] = spawn_apep;
+    /// Spawns and grows a tree
+    lua["spawn_tree"] = spawn_tree;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.

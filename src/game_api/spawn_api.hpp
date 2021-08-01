@@ -31,6 +31,8 @@ void spawn_backdoor_abs(float x, float y);
 
 int32_t spawn_apep(float x, float y, int l, bool right);
 
+void spawn_tree(float x, float y, int l);
+
 void push_spawn_type_flags(SpawnTypeFlags flags);
 void pop_spawn_type_flags(SpawnTypeFlags flags);
 
