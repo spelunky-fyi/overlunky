@@ -11,6 +11,10 @@ void PreLoadLevelFilesContext::override_level_files(std::vector<std::string> lev
 {
     override_next_levels(std::move(levels));
 }
+void PreLoadLevelFilesContext::add_level_files(std::vector<std::string> levels)
+{
+    add_next_levels(std::move(levels));
+}
 
 bool PostRoomGenerationContext::set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
 {
@@ -125,7 +129,9 @@ void register_usertypes(sol::state& lua)
         "PreLoadLevelFilesContext",
         sol::no_constructor,
         "override_level_files",
-        &PreLoadLevelFilesContext::override_level_files);
+        &PreLoadLevelFilesContext::override_level_files,
+        "add_level_files",
+        &PreLoadLevelFilesContext::add_level_files);
 
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.

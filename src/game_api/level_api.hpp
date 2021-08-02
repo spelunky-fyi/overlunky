@@ -403,6 +403,7 @@ struct LevelGenSystem
 };
 
 void override_next_levels(std::vector<std::string> next_levels);
+void add_next_levels(std::vector<std::string> next_levels);
 
 int8_t get_co_subtheme();
 void force_co_subtheme(int8_t subtheme);

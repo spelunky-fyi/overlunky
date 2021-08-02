@@ -535,6 +535,7 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2)
     post_level_generation();
 
     g_replace_level_loads = false;
+    g_levels_to_load.clear();
 }
 
 using GenRoomsFun = void(ThemeInfo*);
@@ -631,7 +632,7 @@ using LoadLevelFile = void(LevelGenData*, const char*);
 LoadLevelFile* g_load_level_file_trampoline{nullptr};
 void load_level_file(LevelGenData* level_gen_data, const char* level_file_name)
 {
-    if (g_replace_level_loads)
+    if (!g_levels_to_load.empty())
     {
         for (const std::string& level_file : g_levels_to_load)
         {
@@ -639,7 +640,8 @@ void load_level_file(LevelGenData* level_gen_data, const char* level_file_name)
         }
         g_levels_to_load.clear();
     }
-    else
+
+    if (!g_replace_level_loads)
     {
         g_load_level_file_trampoline(level_gen_data, level_file_name);
     }
@@ -1180,8 +1182,12 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 
 void override_next_levels(std::vector<std::string> next_levels)
 {
-    g_replace_level_loads = true;
     g_levels_to_load = std::move(next_levels);
+    g_replace_level_loads = true;
+}
+void add_next_levels(std::vector<std::string> next_levels)
+{
+    std::move(next_levels.begin(), next_levels.end(), std::back_inserter(g_levels_to_load));
 }
 
 int8_t get_co_subtheme()

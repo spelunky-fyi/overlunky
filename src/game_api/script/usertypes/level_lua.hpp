@@ -14,6 +14,9 @@ struct PreLoadLevelFilesContext
     /// This includes `generic.lvl` so if you need it specify it here.
     /// Use at your own risk, some themes/levels expect a certain level file to be loaded.
     void override_level_files(std::vector<std::string> levels);
+    /// Load additional levels files other than the ones that would usually be loaded.
+    /// Stacks with `override_level_files` if that was called first.
+    void add_level_files(std::vector<std::string> levels);
 };
 struct PostRoomGenerationContext
 {
