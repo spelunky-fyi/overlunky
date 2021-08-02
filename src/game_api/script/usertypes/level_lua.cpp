@@ -99,6 +99,13 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->get_room_template_name(room_template);
     };
 
+    /// Define a new room remplate to use with `set_room_template`
+    lua["define_room_template"] = [](std::string room_template, bool contains_entrance) -> uint16_t
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        return backend->g_state->level_gen->data->define_room_template(std::move(room_template), contains_entrance);
+    };
+
     /// Get the inverse chance of a procedural spawn for the current level.
     /// A return value of 0 does not mean the chance is infinite, it means the chance is zero.
     lua["get_procedural_spawn_chance"] = [](PROCEDURAL_CHANCE chance_id) -> uint32_t

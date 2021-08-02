@@ -44,6 +44,10 @@ struct LevelGenData
     std::optional<std::uint32_t> get_chance(const std::string& chance);
     std::uint32_t define_chance(std::string chance);
 
+    std::optional<std::uint16_t> get_room_template(const std::string& room_template);
+    std::uint16_t define_room_template(std::string room_template, bool contains_entrance);
+    bool does_room_template_contain_entrance(std::uint16_t room_template);
+
     std::uint32_t register_chance_logic_provider(std::uint32_t chance_id, ChanceLogicProvider provider);
     void unregister_chance_logic_provider(std::uint32_t provider_id);
 

@@ -507,6 +507,8 @@ std::mutex g_chance_logic_providers_lock;
 std::uint32_t g_current_chance_logic_provider_id{0};
 std::vector<ChanceLogicProviderImpl> g_chance_logic_providers;
 
+std::vector<uint16_t> g_room_templates_with_entrance;
+
 bool g_replace_level_loads{false};
 std::vector<std::string> g_levels_to_load;
 
@@ -545,13 +547,18 @@ void gen_rooms(ThemeInfo* theme)
 
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
-void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint64_t _ull_0, float x, float y, std::uint8_t layer)
+void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16_t room_template, float x, float y, std::uint8_t layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_TILE_CODE); }};
 
     std::string_view tile_code_name = g_tile_code_id_to_name[tile_code];
+
+    if (self->data->does_room_template_contain_entrance(room_template))
+    {
+        room_template = 5;
+    }
 
     {
         const bool block_spawn = pre_tile_code_spawn(tile_code_name, x, y, layer);
@@ -569,7 +576,7 @@ void handle_tile_code(LevelGenSystem* _this, std::uint32_t tile_code, std::uint6
     }
     else
     {
-        g_handle_tile_code_trampoline(_this, tile_code, _ull_0, x, y, layer);
+        g_handle_tile_code_trampoline(self, tile_code, room_template, x, y, layer);
     }
 
     post_tile_code_spawn(tile_code_name, x, y, layer);
@@ -912,6 +919,40 @@ std::uint32_t LevelGenData::define_chance(std::string chance)
 
     g_monster_chance_id_to_name[it->second.id] = it->first;
     return it->second.id;
+}
+
+std::optional<std::uint16_t> LevelGenData::get_room_template(const std::string& room_template)
+{
+    {
+        auto& room_templates_map = room_templates();
+        auto it = room_templates_map.find(room_template);
+        if (it != room_templates_map.end())
+        {
+            return it->second.id;
+        }
+    }
+    return {};
+}
+std::uint16_t LevelGenData::define_room_template(std::string room_template, bool contains_entrance)
+{
+    if (auto existing = get_tile_code(room_template))
+    {
+        return existing.value();
+    }
+
+    using string_t = std::basic_string<char, std::char_traits<char>, game_allocator<char>>;
+    using map_value_t = std::pair<const string_t, RoomTemplateDef>;
+    using map_allocator_t = game_allocator<map_value_t>;
+    using mutable_room_template_map_t = std::unordered_map<string_t, RoomTemplateDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
+    auto& room_template_map = (mutable_room_template_map_t&)room_templates();
+
+    auto [it, success] = room_template_map.emplace(std::move(room_template), RoomTemplateDef{(uint16_t)room_template_map.size()});
+    g_room_templates_with_entrance.push_back(it->second.id);
+    return it->second.id;
+}
+bool LevelGenData::does_room_template_contain_entrance(std::uint16_t room_template)
+{
+    return std::count(g_room_templates_with_entrance.begin(), g_room_templates_with_entrance.end(), room_template);
 }
 
 std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_id, ChanceLogicProvider provider)
