@@ -24,6 +24,12 @@ class Jetpack : public Backpack
     uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
 };
 
+class TeleporterBackpack : public Backpack
+{
+  public:
+    uint16_t teleport_number;
+};
+
 class Hoverpack : public Backpack
 {
   public:

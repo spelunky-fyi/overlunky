@@ -33,7 +33,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Mouse middle**: Select or drag entities around (not stuff like walls)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
-      + **(Ctrl/Shift+)Mouse 4**: Zap / Boom / Big Boom / Nuke!
+      + **(Ctrl/Shift+)Mouse 4**: Boom / Big Boom / Nuke!
       + **Mouse 5**: Destroy entity (not stuff like walls)
       + **Ctrl+Mouse 5**: Clone entity
       + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
@@ -50,6 +50,8 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+.**: Zoom out
       + **Ctrl+0**: Auto fit level width to screen
       + **Ctrl+2345**: Zoom to X level width
+      + **Shift+ArrowKey**: Move camera in desired direction
+      + **Mouse 4**: drag the level around (move camera)
   - **F4**: Entity properties
       + See and change a lot of variables of the selected entity
   - **F5**: Game state

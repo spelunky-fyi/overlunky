@@ -12,6 +12,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_bomb"] = &Entity::as<Bomb>;
     lua["Entity"]["as_backpack"] = &Entity::as<Backpack>;
     lua["Entity"]["as_jetpack"] = &Entity::as<Jetpack>;
+    lua["Entity"]["as_teleporterbackpack"] = &Entity::as<TeleporterBackpack>;
     lua["Entity"]["as_hoverpack"] = &Entity::as<Hoverpack>;
     lua["Entity"]["as_cape"] = &Entity::as<Cape>;
     lua["Entity"]["as_vladscape"] = &Entity::as<VladsCape>;
@@ -118,6 +119,13 @@ void register_usertypes(sol::state& lua)
         &Jetpack::flame_on,
         "fuel",
         &Jetpack::fuel,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Backpack>());
+
+    lua.new_usertype<TeleporterBackpack>(
+        "TeleporterBackpack",
+        "teleport_number",
+        &TeleporterBackpack::teleport_number,
         sol::base_classes,
         sol::bases<Entity, Movable, Backpack>());
 

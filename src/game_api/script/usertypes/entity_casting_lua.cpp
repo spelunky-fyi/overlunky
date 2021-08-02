@@ -560,7 +560,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][565] = lua["Entity"]["as_jetpack"];             // ITEM_JETPACK
     lua["TYPE_MAP"][566] = lua["Entity"]["as_jetpack"];             // ITEM_JETPACK_MECH
     lua["TYPE_MAP"][567] = lua["Entity"]["as_movable"];             // ITEM_PURCHASABLE_JETPACK
-    lua["TYPE_MAP"][568] = lua["Entity"]["as_backpack"];            // ITEM_TELEPORTER_BACKPACK
+    lua["TYPE_MAP"][568] = lua["Entity"]["as_teleporterbackpack"];  // ITEM_TELEPORTER_BACKPACK
     lua["TYPE_MAP"][569] = lua["Entity"]["as_movable"];             // ITEM_PURCHASABLE_TELEPORTER_BACKPACK
     lua["TYPE_MAP"][570] = lua["Entity"]["as_hoverpack"];           // ITEM_HOVERPACK
     lua["TYPE_MAP"][571] = lua["Entity"]["as_movable"];             // ITEM_PURCHASABLE_HOVERPACK

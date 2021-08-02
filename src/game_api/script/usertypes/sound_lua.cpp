@@ -137,7 +137,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Paramater to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`,
     lua.create_named_table("VANILLA_SOUND"
                            //, "BGM_BGM_TITLE", BGM/BGM_title
-                           //, "", ...check__[vanilla_sounds.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sounds.txt\]...
+                           //, "", ...check__[vanilla_sounds.txt]\[game_data/vanilla_sounds.txt\]...
                            //, "FX_FX_DM_BANNER", FX/FX_dm_banner
     );
     sound_manager->for_each_event_name(
@@ -182,7 +182,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Paramater to `PlayingSound:get_parameter()` and `PlayingSound:set_parameter()`
     lua.create_named_table("VANILLA_SOUND_PARAM"
                            //, "POS_SCREEN_X", 0
-                           //, "", ...check__[vanilla_sound_params.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/vanilla_sound_params.txt\]...
+                           //, "", ...check__[/vanilla_sound_params.txt]\[game_data/vanilla_sound_params.txt\]...
                            //, "CURRENT_LAYER2", 37
     );
     sound_manager->for_each_parameter_name(

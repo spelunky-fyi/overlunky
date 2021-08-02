@@ -1,9 +1,8 @@
 #pragma once
 
 #define FMOD_CHECK_CALL(x)                          \
-    [](auto err)                                    \
-    {                                               \
-        if (err != FMOD::OK)                        \
+    [](auto err) {                                  \
+        if (err != FMOD::FMOD_RESULT::OK)           \
         {                                           \
             DEBUG("{}: {}", #x, FMOD::ErrStr(err)); \
             return false;                           \
@@ -13,7 +12,7 @@
 
 namespace FMOD
 {
-enum FMOD_RESULT
+enum class FMOD_RESULT
 {
     OK,
     ERR_BADCOMMAND,
@@ -101,9 +100,10 @@ enum FMOD_RESULT
 
 inline const char* ErrStr(FMOD_RESULT err)
 {
-#define ERR_CASE(err_enum) \
-    case err_enum:         \
+#define ERR_CASE(err_enum)      \
+    case FMOD_RESULT::err_enum: \
         return #err_enum
+
     switch (err)
     {
         ERR_CASE(OK);
@@ -193,7 +193,7 @@ inline const char* ErrStr(FMOD_RESULT err)
     return "UNKNONW";
 }
 
-enum FMOD_MODE : std::uint32_t
+enum class FMOD_MODE : std::uint32_t
 {
     MODE_DEFAULT = 0x00000000,
     MODE_LOOP_OFF = 0x00000001,
