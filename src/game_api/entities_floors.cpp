@@ -479,7 +479,7 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
             return 0;
         }
 
-        return 14 + rand() % 3;
+        return 16 + rand() % 3;
     }
 
     case 0x47: // FLOOR_DUAT_ALTAR

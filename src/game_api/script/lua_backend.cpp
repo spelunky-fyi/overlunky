@@ -574,7 +574,7 @@ void LuaBackend::pre_load_level_files()
     std::lock_guard lock{gil};
     for (auto& [id, callback] : callbacks)
     {
-        if (callback.screen == ON::POST_ROOM_GENERATION)
+        if (callback.screen == ON::PRE_LOAD_LEVEL_FILES)
         {
             handle_function(callback.func, PreLoadLevelFilesContext{});
             callback.lastRan = now;
