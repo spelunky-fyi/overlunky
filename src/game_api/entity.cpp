@@ -166,11 +166,11 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
         topmost->y = y;
     }
     // set velocity
-    if (topmost->type->search_flags < 0x80)
+    if (topmost->is_movable())
     {
-        auto player = (Player*)topmost;
-        player->velocityx = vx;
-        player->velocityy = vy;
+        auto movable_ent = (Movable*)topmost;
+        movable_ent->velocityx = vx;
+        movable_ent->velocityy = vy;
     }
     return;
 }
@@ -182,11 +182,11 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
     overlay = NULL;
     x = dx;
     y = dy;
-    if (type->search_flags < 0x80)
+    if (is_movable())
     {
-        auto player = (Player*)pointer();
-        player->velocityx = vx;
-        player->velocityy = vy;
+        auto movable_ent = (Movable*)pointer();
+        movable_ent->velocityx = vx;
+        movable_ent->velocityy = vy;
     }
 }
 
@@ -335,7 +335,7 @@ void hook_movable_state_machine(Movable* self)
 std::uint32_t Movable::set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty() && hook_info.post_statemachine.empty())
+    if (hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
@@ -345,7 +345,7 @@ std::uint32_t Movable::set_pre_statemachine(std::function<bool(Movable*)> pre_st
 std::uint32_t Movable::set_post_statemachine(std::function<void(Movable*)> post_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty() && hook_info.post_statemachine.empty())
+    if (hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
@@ -380,7 +380,7 @@ std::tuple<float, float> get_velocity(uint32_t uid)
     {
         float vx{0.0f};
         float vy{0.0f};
-        if (ent->type->search_flags & 0b11001111) // PLAYER | MOUNT | MONSTER | ITEM | FX | ACTIVEFLOOR
+        if (ent->is_movable())
         {
             Movable* mov = ent->as<Movable>();
             vx = mov->velocityx;
@@ -470,4 +470,15 @@ std::uint32_t Entity::set_on_destroy(std::function<void(Entity*)> cb)
     EntityHooksInfo& hook_info = get_hooks();
     hook_info.on_destroy.push_back({hook_info.cbcount++, std::move(cb)});
     return hook_info.on_destroy.back().id;
+}
+
+bool Entity::is_movable()
+{
+    if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
+        return true;
+    else if (type->search_flags & 0x1000) // LOGICAL - as it has some movable entities
+        if (type->id < 842)               // actually check if it's not logical
+            return true;
+
+    return false;
 }

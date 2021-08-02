@@ -238,7 +238,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0
-                           //, "", ...check__[room_templates.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/room_templates.txt\]...
+                           //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
     for (const auto& [room_name, room_template] : State::get().ptr()->level_gen->data->room_templates())
     {
@@ -252,7 +252,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
 
     lua.create_named_table("PROCEDURAL_CHANCE"
                            //, "ARROWTRAP_CHANCE", 0
-                           //, "", ...check__[spawn_chances.txt]\[https://github.com/spelunky-fyi/overlunky/tree/main/docs/game_data/spawn_chances.txt\]...
+                           //, "", ...check__[spawn_chances.txt]\[game_data/spawn_chances.txt\]...
     );
     auto* state = State::get().ptr();
     for (auto* chances : {&state->level_gen->data->monster_chances(), &state->level_gen->data->trap_chances()})

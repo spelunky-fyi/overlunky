@@ -12,6 +12,13 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol/function.hpp>
 
+FMOD::FMOD_MODE operator|(FMOD::FMOD_MODE lhs, FMOD::FMOD_MODE rhs)
+{
+    return static_cast<FMOD::FMOD_MODE>(
+        static_cast<std::underlying_type<FMOD::FMOD_MODE>::type>(lhs) |
+        static_cast<std::underlying_type<FMOD::FMOD_MODE>::type>(rhs));
+}
+
 struct SoundCallbackData
 {
     FMOD::Channel* handle;
@@ -52,7 +59,7 @@ FMOD::FMOD_RESULT ChannelControlCallback(
         }
     }
     // TODO: Cleanup old channels?
-    return FMOD::OK;
+    return FMOD::FMOD_RESULT::OK;
 }
 
 struct EventCallbackData
@@ -125,7 +132,7 @@ FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_t
             snd_callback();
         }
     }
-    return FMOD::OK;
+    return FMOD::FMOD_RESULT::OK;
 }
 
 CustomSound::CustomSound(const CustomSound& rhs)
@@ -303,7 +310,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
         auto get_core_system = reinterpret_cast<FMODStudio::GetCoreSystem*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetCoreSystem"));
         {
             auto err = get_core_system(fmod_studio_system, &m_FmodSystem);
-            if (err != FMOD::OK)
+            if (err != FMOD::FMOD_RESULT::OK)
             {
                 DEBUG("Could not get Fmod System, custom audio won't work...");
             }
@@ -318,21 +325,21 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
         {
             FMODStudio::Bus* bus{nullptr};
             auto err = get_bus(fmod_studio_system, bus_name, &bus);
-            if (err != FMOD::OK)
+            if (err != FMOD::FMOD_RESULT::OK)
             {
                 DEBUG("Could not get bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
             }
             else
             {
                 err = lock_channel_group(bus);
-                if (err != FMOD::OK)
+                if (err != FMOD::FMOD_RESULT::OK)
                 {
                     DEBUG("Could not lock channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
                 }
                 else
                 {
                     err = flush_commands(fmod_studio_system);
-                    if (err != FMOD::OK)
+                    if (err != FMOD::FMOD_RESULT::OK)
                     {
                         DEBUG(
                             "Could not flush commands after locking channel group for bus '{}', custom audio volume won't be synced with game volume "
@@ -342,7 +349,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
                     else
                     {
                         err = get_channel_group(bus, channel_group);
-                        if (err != FMOD::OK)
+                        if (err != FMOD::FMOD_RESULT::OK)
                         {
                             DEBUG(
                                 "Could not obtain channel group for bus '{}', custom audio volume won't be synced with game volume properly...",
@@ -454,7 +461,7 @@ CustomSound SoundManager::get_sound(std::string path)
     new_sound.path = std::move(path);
 
     FMOD::FMOD_MODE mode =
-        (FMOD::FMOD_MODE)(FMOD::MODE_CREATESAMPLE | FMOD::MODE_OPENMEMORY_POINT | FMOD::MODE_OPENRAW | FMOD::MODE_IGNORETAGS | FMOD::MODE_LOOP_OFF);
+        (FMOD::FMOD_MODE)(FMOD::FMOD_MODE::MODE_CREATESAMPLE | FMOD::FMOD_MODE::MODE_OPENMEMORY_POINT | FMOD::FMOD_MODE::MODE_OPENRAW | FMOD::FMOD_MODE::MODE_IGNORETAGS | FMOD::FMOD_MODE::MODE_LOOP_OFF);
 
     FMOD::CREATESOUNDEXINFO create_sound_exinfo{};
     create_sound_exinfo.cbsize = sizeof(create_sound_exinfo);
@@ -483,7 +490,7 @@ CustomSound SoundManager::get_sound(std::string path)
 
     auto data = (const char*)new_sound.buffer.data.get() + 16; // 16 bytes padding in front
     FMOD::FMOD_RESULT err = m_CreateSound(m_FmodSystem, data, mode, &create_sound_exinfo, &new_sound.fmod_sound);
-    if (err != FMOD::OK)
+    if (err != FMOD::FMOD_RESULT::OK)
     {
         return CustomSound{nullptr, nullptr};
     }
@@ -665,11 +672,11 @@ bool SoundManager::set_looping(PlayingSound playing_sound, SOUND_LOOP_MODE loop_
                        switch (loop_mode)
                        {
                        case SOUND_LOOP_MODE::Off:
-                           return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_OFF));
+                           return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::FMOD_MODE::MODE_LOOP_OFF));
                        case SOUND_LOOP_MODE::Loop:
-                           return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_NORMAL));
+                           return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::FMOD_MODE::MODE_LOOP_NORMAL));
                        case SOUND_LOOP_MODE::Bidirectional:
-                           return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::MODE_LOOP_BIDI));
+                           return FMOD_CHECK_CALL(m_ChannelSetMode(channel, FMOD::FMOD_MODE::MODE_LOOP_BIDI));
                        }
                        return false;
                    },

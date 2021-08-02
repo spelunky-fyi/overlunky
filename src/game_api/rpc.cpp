@@ -23,10 +23,7 @@ bool testflag(uint32_t flags, int bit)
 }
 uint32_t flipflag(uint32_t flags, int bit)
 {
-    if (testflag(flags, bit))
-        return clrflag(flags, bit);
-    else
-        return setflag(flags, bit);
+    return (flags ^ (1U << (bit - 1)));
 }
 
 void teleport(float x, float y, bool s, float vx, float vy, bool snap)
@@ -58,18 +55,6 @@ void zoom(float level)
 float get_zoom_level()
 {
     return State::get().get_zoom_level();
-}
-
-void list_items()
-{
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    for (auto& item : state.layer(player->layer)->items())
-    {
-        DEBUG("Item {} {:x}, {}", item->uid, item->type->search_flags, item->position_self());
-    }
 }
 
 void attach_entity(Entity* overlay, Entity* attachee)
@@ -337,7 +322,7 @@ int32_t get_entity_type(uint32_t uid)
 
 StateMemory* get_state_ptr()
 {
-    auto state = State::get();
+    const auto& state = State::get();
     return state.ptr();
 }
 
@@ -598,7 +583,7 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, 
 
 void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 {
-    auto state = State::get();
+    const auto& state = State::get();
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return;
@@ -607,7 +592,7 @@ void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
-    auto state = State::get();
+    const auto& state = State::get();
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return std::make_tuple(0, 0, 0);
@@ -869,7 +854,7 @@ void modify_sparktraps(float angle_increment, float distance)
     static size_t distance_offset = 0;
     if (distance_offset == 0)
     {
-        auto state = State::get();
+        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
@@ -936,7 +921,7 @@ void set_kapala_hud_icon(int8_t icon_index)
 
     if (instruction_offset == 0)
     {
-        auto state = State::get();
+        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
@@ -1048,7 +1033,7 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     static size_t phase2_offset = 0;
     if (phase1_offset == 0)
     {
-        auto state = State::get();
+        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
@@ -1110,7 +1095,7 @@ void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
     static size_t cursed_offset = 0;
     if (normal_offset == 0)
     {
-        auto state = State::get();
+        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
