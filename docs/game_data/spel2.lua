@@ -3228,6 +3228,11 @@ Teleporter = {
   __name = "sol.Teleporter.user",
   __newindex = "function"
 }
+TeleporterBackpack = {
+  __index = "function",
+  __name = "sol.TeleporterBackpack.user",
+  __newindex = "function"
+}
 TeleportingBorder = {
   __index = "function",
   __name = "sol.TeleportingBorder.user",
@@ -4060,6 +4065,7 @@ clrflag = function(...) end
 create_image = function(...) end
 create_sound = function(...) end
 define_procedural_spawn = function(...) end
+define_room_template = function(...) end
 define_texture = function(...) end
 define_tile_code = function(...) end
 distance = function(...) end

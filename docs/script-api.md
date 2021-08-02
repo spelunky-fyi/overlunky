@@ -615,11 +615,13 @@ Generate particles of the specified type around the specified entity uid (use e.
 ### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
 `CallbackId set_pre_tile_code_callback(function cb, string tile_code)`<br/>
 Add a callback for a specific tile code that is called before the game handles the tile code.
+The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
 Return true in order to stop the game or scripts loaded after this script from handling this tile code.
 For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
 ### [`set_post_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_tile_code_callback)
 `CallbackId set_post_tile_code_callback(function cb, string tile_code)`<br/>
 Add a callback for a specific tile code that is called after the game handles the tile code.
+The callback signature is `nil post_tile_code(x, y, layer, room_template)`
 Use this to affect what the game or other scripts spawned in this position.
 This is received even if a previous pre-tile-code-callback has returned true
 ### [`define_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_tile_code)
@@ -645,6 +647,9 @@ Get the room template given a certain index
 ### [`get_room_template_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 `string_view get_room_template_name(int room_template)`<br/>
 For debugging only, get the name of a room template
+### [`define_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_room_template)
+`int define_room_template(string room_template, bool contains_entrance)`<br/>
+Define a new room remplate to use with `set_room_template`
 ### [`get_procedural_spawn_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
 `int get_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id)`<br/>
 Get the inverse chance of a procedural spawn for the current level.
@@ -1998,6 +2003,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 - [`bool flame_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_on) &Jetpack::flame_on
 - [`int fuel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuel) &Jetpack::fuel
+### `TeleporterBackpack`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
+- [`int teleport_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teleport_number) &TeleporterBackpack::teleport_number
 ### `Hoverpack`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 - [`bool is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &Hoverpack::is_on
@@ -2429,6 +2437,10 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 Block all loading `.lvl` files and instead load the specified `.lvl` files.
 This includes `generic.lvl` so if you need it specify it here.
 Use at your own risk, some themes/levels expect a certain level file to be loaded.
+- [`nil add_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_level_files) &PreLoadLevelFilesContext::add_level_files
+\
+Load additional levels files other than the ones that would usually be loaded.
+Stacks with `override_level_files` if that was called first.
 ### `PostRoomGenerationContext`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`bool set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
@@ -2839,6 +2851,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_switch
 - as_tadpole
 - as_teleporter
+- as_teleporterbackpack
 - as_teleportingborder
 - as_telescope
 - as_tentacle
