@@ -27,21 +27,23 @@ namespace NLevel
 void register_usertypes(sol::state& lua)
 {
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
+    /// The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
     /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
     lua["set_pre_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->pre_level_gen_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
+        backend->pre_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
         return backend->cbcount++;
     };
     /// Add a callback for a specific tile code that is called after the game handles the tile code.
+    /// The callback signature is `nil post_tile_code(x, y, layer, room_template)`
     /// Use this to affect what the game or other scripts spawned in this position.
     /// This is received even if a previous pre-tile-code-callback has returned true
     lua["set_post_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->post_level_gen_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
+        backend->post_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
         return backend->cbcount++;
     };
     /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.

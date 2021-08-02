@@ -188,8 +188,8 @@ class LuaBackend
     std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
-    std::vector<LevelGenCallback> pre_level_gen_callbacks;
-    std::vector<LevelGenCallback> post_level_gen_callbacks;
+    std::vector<LevelGenCallback> pre_tile_code_callbacks;
+    std::vector<LevelGenCallback> post_tile_code_callbacks;
     std::vector<EntitySpawnCallback> pre_entity_spawn_callbacks;
     std::vector<EntitySpawnCallback> post_entity_spawn_callbacks;
     std::vector<std::uint32_t> chance_callbacks;
@@ -246,8 +246,8 @@ class LuaBackend
     void draw(ImDrawList* dl);
     void render_options();
 
-    bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
-    void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+    bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
+    void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 
     void pre_load_level_files();
     void pre_level_generation();

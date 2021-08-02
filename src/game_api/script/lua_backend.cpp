@@ -221,9 +221,9 @@ bool LuaBackend::update()
             callbacks.erase(id);
             load_callbacks.erase(id);
 
-            std::erase_if(pre_level_gen_callbacks, [id](auto& cb)
+            std::erase_if(pre_tile_code_callbacks, [id](auto& cb)
                           { return cb.id == id; });
-            std::erase_if(post_level_gen_callbacks, [id](auto& cb)
+            std::erase_if(post_tile_code_callbacks, [id](auto& cb)
                           { return cb.id == id; });
             std::erase_if(pre_entity_spawn_callbacks, [id](auto& cb)
                           { return cb.id == id; });
@@ -533,16 +533,16 @@ void LuaBackend::render_options()
     ImGui::PopID();
 }
 
-bool LuaBackend::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
     if (!get_enabled())
         return false;
 
-    for (auto& callback : pre_level_gen_callbacks)
+    for (auto& callback : pre_tile_code_callbacks)
     {
         if (callback.tile_code == tile_code)
         {
-            if (handle_function_with_return<bool>(callback.func, x, y, layer).value_or(false))
+            if (handle_function_with_return<bool>(callback.func, x, y, layer, room_template).value_or(false))
             {
                 return true;
             }
@@ -550,16 +550,16 @@ bool LuaBackend::pre_level_gen_spawn(std::string_view tile_code, float x, float 
     }
     return false;
 }
-void LuaBackend::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+void LuaBackend::post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
     if (!get_enabled())
         return;
 
-    for (auto& callback : post_level_gen_callbacks)
+    for (auto& callback : post_tile_code_callbacks)
     {
         if (callback.tile_code == tile_code)
         {
-            handle_function(callback.func, x, y, layer);
+            handle_function(callback.func, x, y, layer, room_template);
         }
     }
 }

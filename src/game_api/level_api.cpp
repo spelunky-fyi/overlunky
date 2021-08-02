@@ -555,13 +555,8 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
 
     std::string_view tile_code_name = g_tile_code_id_to_name[tile_code];
 
-    if (self->data->does_room_template_contain_entrance(room_template))
     {
-        room_template = 5;
-    }
-
-    {
-        const bool block_spawn = pre_tile_code_spawn(tile_code_name, x, y, layer);
+        const bool block_spawn = pre_tile_code_spawn(tile_code_name, x, y, layer, room_template);
         if (block_spawn)
         {
             tile_code = g_last_tile_code_id;
@@ -576,10 +571,15 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
     }
     else
     {
-        g_handle_tile_code_trampoline(self, tile_code, room_template, x, y, layer);
+        uint16_t pretend_room_template = room_template;
+        if (self->data->does_room_template_contain_entrance(pretend_room_template))
+        {
+            pretend_room_template = 5;
+        }
+        g_handle_tile_code_trampoline(self, tile_code, pretend_room_template, x, y, layer);
     }
 
-    post_tile_code_spawn(tile_code_name, x, y, layer);
+    post_tile_code_spawn(tile_code_name, x, y, layer, room_template);
 
     if (!g_floor_requiring_entities.empty())
     {
