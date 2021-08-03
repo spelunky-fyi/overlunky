@@ -18,7 +18,9 @@
 #include <map>
 #include <regex>
 #include <string>
+#pragma warning(push, 0)
 #include <toml.hpp>
+#pragma warning(pop)
 
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
