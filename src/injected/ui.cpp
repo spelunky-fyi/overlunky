@@ -2251,7 +2251,7 @@ void render_clickhandler()
         NULL,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
     if (options["draw_grid"])
     {
         render_grid();
@@ -3868,7 +3868,7 @@ void imgui_draw()
     }
     float lastwidth = 0;
     float lastheight = 0;
-    float toolwidth = 0.128 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
+    float toolwidth = 0.12 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
         if (options["tabbed_interface"])
@@ -4043,12 +4043,18 @@ void imgui_draw()
             ImGui::Begin(windows["tool_script"]->name.c_str());
             render_scripts();
             ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+            ImGui::Begin(windows["tool_save"]->name.c_str());
+            render_savegame();
+            ImGui::End();
         }
 
         if (show_debug && !options["tabbed_interface"])
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 4, 0}, win_condition);
             ImGui::Begin(windows["tool_debug"]->name.c_str(), &show_debug);
             render_debug();
             ImGui::End();
@@ -4057,10 +4063,10 @@ void imgui_draw()
         if (change_colors && !options["tabbed_interface"])
         {
             ImGui::Begin(windows["tool_style"]->name.c_str(), &change_colors);
-            ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
+            ImGui::SetWindowSize({-1, -1}, win_condition);
             render_style_editor();
             ImGui::SetWindowPos(
-                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2});
+                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
             ImGui::End();
         }
     }
