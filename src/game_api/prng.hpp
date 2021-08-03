@@ -7,7 +7,8 @@ struct PRNG
     static PRNG& get();
     static PRNG& get_local();
 
-    enum PRNG_CLASS {
+    enum PRNG_CLASS
+    {
         LEVEL_GEN = 0
     };
 
