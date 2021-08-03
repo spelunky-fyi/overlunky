@@ -635,6 +635,20 @@ The function `bool is_valid(x, y, layer)` determines whether the spawn is legal 
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+### [`define_extra_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_extra_spawn)
+`int define_extra_spawn(function do_spawn, function is_valid, int num_spawns_frontlayer, int num_spawns_backlayer)`<br/>
+Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
+The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+Use for example when you can spawn only on the ceiling, under water or inside a shop.
+Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+### [`get_missing_extra_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_missing_extra_spawns)
+`tuple<int, int> get_missing_extra_spawns(int extra_spawn_chance_id)`<br/>
+Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
+Returns missing spawns in the front layer and missing spawns in the back layer in that order.
+The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
 ### [`get_room_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_index)
 `tuple<int, int> get_room_index(float x, float y)`<br/>
 Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
@@ -2451,6 +2465,9 @@ Set the room template at the given index and layer, returns `false` if the index
 Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
 Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
 Returns `false` if the given chance is not defined.
+- [`nil set_num_extra_spawns(int extra_spawn_id, int num_spawns_front_layer, int num_spawns_back_layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_num_extra_spawns) &PostRoomGenerationContext::set_num_extra_spawns
+\
+Change the amount of extra spawns for the given `extra_spawn_id`.
 ### `QuestsInfo`
 - [`int yang_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yang_state) &QuestsInfo::yang_state
 - [`int jungle_sisters_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_sisters_flags) &QuestsInfo::jungle_sisters_flags
