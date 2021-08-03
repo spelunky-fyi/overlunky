@@ -7,7 +7,7 @@
 
 namespace NEntitiesActiveFloors
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, [[maybe_unused]] ScriptImpl* script)
 {
     lua["Entity"]["as_crushtrap"] = &Entity::as<Crushtrap>;
     lua["Entity"]["as_olmec"] = &Entity::as<Olmec>;

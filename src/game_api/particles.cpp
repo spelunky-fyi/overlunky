@@ -15,7 +15,7 @@ size_t particle_db_ptr()
     }
 }
 
-std::uint32_t ParticleDB::get_texture()
+std::uint64_t ParticleDB::get_texture()
 {
     return texture->id;
 }
@@ -31,7 +31,7 @@ bool ParticleDB::set_texture(std::uint32_t texture_id)
 
 ParticleDB* get_particle_type(uint32_t id)
 {
-    static std::unordered_map<uint16_t, ParticleDB*> mapping = {};
+    static std::unordered_map<uint32_t, ParticleDB*> mapping = {};
     if (mapping.size() == 0)
     {
         uint32_t current_id = 0;

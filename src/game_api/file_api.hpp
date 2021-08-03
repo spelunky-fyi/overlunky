@@ -14,7 +14,7 @@ struct FileInfo
     void* Data{nullptr};
     int _member_1{0};
     int DataSize{0};
-    int AllocationSize{0};
+    long long int AllocationSize{0};
     int _member_4{0};
 };
 using LoadFileCallback = FileInfo*(const char* file_path, AllocFun alloc_fun);

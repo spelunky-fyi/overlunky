@@ -15,7 +15,7 @@ Carry get_carry()
         } while (read_u8(memory.at_exe(off - 5)) != 0xE8);
         off = find_inst(memory.exe(), "\xE8"s, off + 1);
 
-        return res = (Carry)memory.at_exe(decode_call(off));
+        return res = (Carry)memory.at_exe(Memory::decode_call(off));
     }
 }
 

@@ -179,27 +179,27 @@ StateMemory* State::ptr_local() const
 
 std::pair<float, float> State::click_position(float x, float y)
 {
-    uint8_t screen = ptr()->screen;
+    uint32_t screen = ptr()->screen;
     float cz = read_f32(get_zoom());
     if (screen < 12 || screen == 13 || screen > 14)
         cz = 13.5;
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = cx + ZF * cz * x;
-    float ry = cy + (ZF / 16.0 * 9.0) * cz * y;
+    float ry = cy + (ZF / 16.0f * 9.0f) * cz * y;
     return {rx, ry};
 }
 
 std::pair<float, float> State::screen_position(float x, float y)
 {
-    uint8_t screen = ptr()->screen;
+    auto screen = ptr()->screen;
     float cz = read_f32(get_zoom());
     if (screen < 12 || screen == 13 || screen > 14)
         cz = 13.5;
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = (x - cx) / cz / ZF;
-    float ry = (y - cy) / cz / (ZF / 16.0 * 9.0);
+    float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
 }
 

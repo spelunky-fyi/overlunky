@@ -89,7 +89,7 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             };
 
             auto image_data_size = image_width * image_height * 4;
-            auto data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
+            int data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
             auto allocation_size = sizeof(FileInfo) + data_size;
             auto file_buffer = (char*)alloc_fun(allocation_size);
 

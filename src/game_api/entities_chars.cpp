@@ -61,9 +61,9 @@ bool Player::is_female()
     return ::is_character_female(type->id);
 }
 
-void Player::set_heart_color(Color color)
+void Player::set_heart_color(Color hcolor)
 {
-    ::set_character_heart_color(type->id, color);
+    ::set_character_heart_color(type->id, hcolor);
 }
 
 std::u16string get_character_name(int32_t type_id)

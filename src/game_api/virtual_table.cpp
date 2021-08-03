@@ -17,6 +17,6 @@ size_t get_virtual_function_address(VTABLE_OFFSET tableEntry, uint32_t relativeO
     {
         return 0;
     }
-    size_t* func_address = reinterpret_cast<size_t*>(firstTableEntry + ((static_cast<uint32_t>(tableEntry) + relativeOffset) * sizeof(size_t)));
+    size_t* func_address = reinterpret_cast<size_t*>(firstTableEntry + ((static_cast<size_t>(tableEntry) + relativeOffset) * sizeof(size_t)));
     return *func_address - mem.exe_ptr;
 }

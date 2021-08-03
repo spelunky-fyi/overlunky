@@ -17,12 +17,12 @@
 #include <imgui.h>
 #include <sol/sol.hpp>
 
-using CallbackId = int;
+using CallbackId = unsigned int;
 using Flags = std::uint32_t;
-using SPAWN_TYPE = int;                  // NoAlias
-using VANILLA_SOUND = std::string;       // NoAlias
-using VANILLA_SOUND_CALLBACK_TYPE = int; // NoAlias
-using BUTTONS = std::uint16_t;           // NoAlias
+using SPAWN_TYPE = int;                           // NoAlias
+using VANILLA_SOUND = std::string;                // NoAlias
+using VANILLA_SOUND_CALLBACK_TYPE = unsigned int; // NoAlias
+using BUTTONS = std::uint16_t;                    // NoAlias
 
 enum class ON
 {
@@ -166,10 +166,10 @@ class ScriptImpl
     sol::state lua;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    char code[204800];
+    std::string code;
 #else
     std::string code_storage;
-    const char* code;
+    const std::string code;
 #endif
     std::string result = "";
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
@@ -210,7 +210,7 @@ class ScriptImpl
 
     SoundManager* sound_manager;
 
-    std::map<int, ScriptImage*> images;
+    std::map<size_t, ScriptImage*> images;
 
     ScriptImpl(std::string script, std::string file, SoundManager* sound_manager, bool enable = true);
     ~ScriptImpl()
@@ -227,7 +227,7 @@ class ScriptImpl
 
     void clear();
     bool reset();
-    void set_enabled(bool enabled);
+    void set_enabled(bool enabl);
 
     bool run();
     void draw(ImDrawList* dl);

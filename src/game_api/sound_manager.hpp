@@ -124,7 +124,7 @@ class SoundManager
     PlayingSound play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music);
 
     CustomSound get_event(std::string_view event_name);
-    PlayingSound play_event(FMODStudio::EventDescription* fmod_event, bool paused, bool as_music);
+    PlayingSound play_event(FMODStudio::EventDescription* fmod_event, bool paused);
 
     bool is_playing(PlayingSound playing_sound);
     bool stop(PlayingSound playing_sound);
@@ -140,10 +140,10 @@ class SoundManager
     std::uint32_t set_callback(FMODStudio::EventDescription* fmod_event, EventCallbackFunction callback, FMODStudio::EventCallbackType types);
     void clear_callback(std::uint32_t id);
 
-    std::unordered_map<std::uint32_t, const char*> get_parameters(PlayingSound playing_sound);
-    std::unordered_map<std::uint32_t, const char*> get_parameters(FMODStudio::EventDescription* fmod_event);
-    std::optional<float> get_parameter(PlayingSound playing_sound, std::uint32_t parameter_index);
-    bool set_parameter(PlayingSound playing_sound, std::uint32_t parameter_index, float value);
+    std::unordered_map<VANILLA_SOUND_PARAM, const char*> get_parameters(PlayingSound playing_sound);
+    std::unordered_map<VANILLA_SOUND_PARAM, const char*> get_parameters(FMODStudio::EventDescription* fmod_event);
+    std::optional<float> get_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM parameter_index);
+    bool set_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM parameter_index, float value);
 
     template <class FunT>
     void for_each_event_name(FunT&& fun)
@@ -159,7 +159,7 @@ class SoundManager
         for (size_t i = 0; i < m_SoundData.Parameters->ParameterNames.size(); i++)
         {
             const auto& parameter_name = m_SoundData.Parameters->ParameterNames[i];
-            fun(parameter_name, i);
+            fun(parameter_name, static_cast<uint32_t>(i));
         }
     }
 

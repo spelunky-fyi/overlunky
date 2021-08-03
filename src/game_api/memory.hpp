@@ -62,7 +62,7 @@ size_t function_start(size_t off)
 }
 
 template <class FunT, typename T>
-FunT& vtable_find(T* obj, int index)
+FunT& vtable_find(T* obj, size_t index)
 {
     void*** ptr = reinterpret_cast<void***>(obj);
     if (!ptr[0])
@@ -106,13 +106,12 @@ struct Memory
     {
         return (char*)exe_ptr;
     }
+    static size_t decode_call(size_t off)
+    {
+        auto memory = get();
+        return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
+    }
 };
-
-static size_t decode_call(size_t off)
-{
-    auto memory = Memory::get();
-    return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
-}
 
 #define ONCE(type)            \
     static bool once = false; \

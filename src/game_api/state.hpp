@@ -7,10 +7,9 @@
 #include "state_structs.hpp"
 #include "thread_utils.hpp"
 
-const float ZF = 0.737;
+const float ZF = 0.737f;
 
 struct Layer;
-struct ThemeInfo;
 struct LevelGenSystem;
 
 struct StateMemory
@@ -239,37 +238,37 @@ struct State
         // memory.after_bundle); write_mem_prot(memory.at_exe(addr_zoom + 6),
         // to_le_bytes(level), true); addr_zoom = memory.after_bundle;
 
-        uint8_t roomx = ptr()->w;
+        auto roomx = ptr()->w;
         if (level == 0.0)
         {
             switch (roomx)
             {
             case 1:
-                level = 9.50;
+                level = 9.50f;
                 break;
             case 2:
-                level = 16.29;
+                level = 16.29f;
                 break;
             case 3:
-                level = 23.08;
+                level = 23.08f;
                 break;
             case 4:
-                level = 29.87;
+                level = 29.87f;
                 break;
             case 5:
-                level = 36.66;
+                level = 36.66f;
                 break;
             case 6:
-                level = 43.45;
+                level = 43.45f;
                 break;
             case 7:
-                level = 50.24;
+                level = 50.24f;
                 break;
             case 8:
-                level = 57.03;
+                level = 57.03f;
                 break;
             default:
-                level = 13.5;
+                level = 13.5f;
             }
         }
         write_mem_prot(addr_zoom, to_le_bytes(level), true);
@@ -305,7 +304,7 @@ struct State
         std::vector<int64_t> prng;
         for (int i = 0; i < 20; ++i)
         {
-            prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * i));
+            prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
         }
         return prng;
     }

@@ -261,7 +261,7 @@ void GuiDrawContext::win_image(int image, int width, int height)
         width = image_ptr->width;
     if (height < 1)
         height = image_ptr->height;
-    ImGui::Image(image_ptr->texture, ImVec2(width, height));
+    ImGui::Image(image_ptr->texture, ImVec2(static_cast<float>(width), static_cast<float>(height)));
 };
 
 namespace NGui
@@ -376,7 +376,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         // nan isn't a valid text size so return 0x0 instead
         if (isnan(pair.first) || isnan(pair.second))
         {
-            return std::make_pair(0, 0);
+            return std::make_pair(0.0f, 0.0f);
         }
         else
         {
@@ -384,7 +384,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         }
     };
     /// Create image from file. Returns a tuple containing id, width and height.
-    lua["create_image"] = [script](std::string path) -> std::tuple<int, int, int>
+    lua["create_image"] = [script](std::string path) -> std::tuple<size_t, int, int>
     {
         ScriptImage* image = new ScriptImage;
         image->width = 0;
@@ -392,7 +392,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         image->texture = NULL;
         if (create_d3d11_texture_from_file((script->script_folder / path).string().data(), &image->texture, &image->width, &image->height))
         {
-            int id = script->images.size();
+            size_t id = script->images.size();
             script->images[id] = image;
             return std::make_tuple(id, image->width, image->height);
         }

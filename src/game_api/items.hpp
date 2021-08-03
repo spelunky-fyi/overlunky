@@ -13,5 +13,5 @@ struct Items
     Inventory player_inventories[MAX_PLAYERS];
     SelectPlayerSlot player_select_slots[MAX_PLAYERS];
 
-    Player* player(size_t index);
+    Player* player(uint8_t index);
 };

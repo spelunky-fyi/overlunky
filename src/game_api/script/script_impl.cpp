@@ -37,7 +37,7 @@
 
 #include <sol/sol.hpp>
 
-void infinite_loop(lua_State* argst, lua_Debug* argdb)
+void infinite_loop(lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
 {
     luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
 };
@@ -47,10 +47,10 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     sound_manager = sound_mgr;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    strcpy(code, script.c_str());
+    code = script;
 #else
     code_storage = std::move(script);
-    code = code_storage.c_str();
+    code = code_storage;
 #endif
     meta.file = std::move(file);
     meta.path = std::filesystem::path(meta.file).parent_path().string();
@@ -159,7 +159,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     /// ```
     lua["state"] = g_state;
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
-    lua["players"] = std::vector<Movable*>(g_players.begin(), g_players.end());
+    lua["players"] = std::vector<Player*>(g_players.begin(), g_players.end());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = g_save;
 
@@ -523,7 +523,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
-    /// Get uids of all entities currently loaded
+    /// Deprecated
+    /// Use get_entities_by(0, 0, LAYER.BOTH)
     lua["get_entities"] = get_entities;
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
@@ -555,9 +556,11 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         }
         return std::vector<uint32_t>({});
     };
-    /// Get uids of entities by some search_flags
+    /// Deprecated
+    /// Use get_entities_by(0, mask, LAYER.BOTH)
     lua["get_entities_by_mask"] = get_entities_by_mask;
-    /// Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
+    /// Deprecated
+    /// Use get_entities_by(0, 0, layer)
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
@@ -693,8 +696,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     lua["get_bounds"] = [this]() -> std::tuple<float, float, float, float> { return std::make_tuple(2.5f, 122.5f, g_state->w * 10.0f + 2.5f, 122.5f - g_state->h * 8.0f); };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = get_camera_position;
-    /// Sets the current camera position in the level.
-    /// Note: The camera will still try to follow the player and this doesn't actually work at all.
+    /// Deprecated
+    /// this doesn't actually work at all. See State -> Camera the for proper camera handling
     lua["set_camera_position"] = set_camera_position;
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
@@ -832,7 +835,6 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     NGui::register_usertypes(lua, this);
     NTexture::register_usertypes(lua, this);
     NEntity::register_usertypes(lua, this);
-    NEntitiesChars::register_usertypes(lua, this);
     NEntitiesFloors::register_usertypes(lua, this);
     NEntitiesActiveFloors::register_usertypes(lua, this);
     NEntitiesMounts::register_usertypes(lua, this);
@@ -1062,11 +1064,11 @@ bool ScriptImpl::reset()
     }
 }
 
-void ScriptImpl::set_enabled(bool enabled)
+void ScriptImpl::set_enabled(bool enabl)
 {
-    if (enabled != this->enabled)
+    if (enabl != this->enabled)
     {
-        auto cb_type = enabled ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
+        auto cb_type = enabl ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
         auto now = get_frame_count();
         for (auto& [id, callback] : callbacks)
         {
@@ -1077,7 +1079,7 @@ void ScriptImpl::set_enabled(bool enabled)
             }
         }
     }
-    this->enabled = enabled;
+    this->enabled = enabl;
 }
 
 bool ScriptImpl::run()
@@ -1205,7 +1207,7 @@ bool ScriptImpl::run()
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
-            auto now = get_frame_count();
+            int now = get_frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now >= cb->lastRan + cb->interval)
@@ -1215,11 +1217,11 @@ bool ScriptImpl::run()
                 }
                 ++it;
             }
-            else if (auto cb = std::get_if<TimeoutCallback>(&it->second))
+            else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cb->timeout)
+                if (now >= cbt->timeout)
                 {
-                    handle_function(cb->func);
+                    handle_function(cbt->func);
                     it = global_timers.erase(it);
                 }
                 else
@@ -1241,7 +1243,6 @@ bool ScriptImpl::run()
                 handle_function(callback.func, LoadContext{meta.path, meta.stem});
                 callback.lastRan = now;
             }
-            break;
         }
 
         for (auto& [id, callback] : callbacks)
@@ -1331,21 +1332,21 @@ bool ScriptImpl::run()
 
         for (auto it = level_timers.begin(); it != level_timers.end();)
         {
-            auto now = g_state->time_level;
+            int level_now = g_state->time_level;
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
-                if (now >= cb->lastRan + cb->interval)
+                if (level_now >= cb->lastRan + cb->interval)
                 {
                     handle_function(cb->func);
-                    cb->lastRan = now;
+                    cb->lastRan = level_now;
                 }
                 ++it;
             }
-            else if (auto cb = std::get_if<TimeoutCallback>(&it->second))
+            else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cb->timeout)
+                if (level_now >= cbt->timeout)
                 {
-                    handle_function(cb->func);
+                    handle_function(cbt->func);
                     it = level_timers.erase(it);
                 }
                 else

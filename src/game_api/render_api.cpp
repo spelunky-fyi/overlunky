@@ -64,7 +64,7 @@ TextureDefinition RenderAPI::get_texture_definition(std::uint32_t texture_id)
     return {};
 }
 
-Texture* RenderAPI::get_texture(std::uint32_t texture_id)
+Texture* RenderAPI::get_texture(std::uint64_t texture_id)
 {
     auto* textures = get_textures();
     if (texture_id >= textures->texture_map.size())
@@ -74,7 +74,7 @@ Texture* RenderAPI::get_texture(std::uint32_t texture_id)
     return textures->texture_map[texture_id];
 }
 
-std::uint32_t RenderAPI::define_texture(TextureDefinition data)
+std::uint64_t RenderAPI::define_texture(TextureDefinition data)
 {
 
     if (data.sub_image_width == 0 || data.sub_image_height == 0)
@@ -125,7 +125,7 @@ std::uint32_t RenderAPI::define_texture(TextureDefinition data)
     }
 
     new_texture.name = load_texture(std::move(data.texture_path));
-    custom_textures[new_texture.id] = new_texture;
+    custom_textures[(unsigned int)new_texture.id] = new_texture;
 
     return new_texture.id;
 }

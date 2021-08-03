@@ -221,7 +221,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
         }
         else if (g_LastRegisteredRawInputWindow != nullptr)
         {
-            static std::uint32_t s_RecoverRawInputFrame{0};
+            static std::int32_t s_RecoverRawInputFrame{0};
             if (s_RecoverRawInputFrame == 0)
             {
                 s_RecoverRawInputFrame = ImGui::GetFrameCount() + 10;

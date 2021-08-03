@@ -13,13 +13,13 @@
 
 using namespace std::chrono_literals;
 
-BOOL WINAPI DllMain(
-    HINSTANCE hinstDLL, // handle to DLL module
-    DWORD fdwReason,    // reason for calling function
-    LPVOID lpReserved)  // reserved
-{
-    return TRUE; // Successful DLL_PROCESS_ATTACH.
-}
+//BOOL WINAPI DllMain(
+//    HINSTANCE hinstDLL, // handle to DLL module
+//    DWORD fdwReason,    // reason for calling function
+//    LPVOID lpReserved)  // reserved
+//{
+//    return TRUE; // Successful DLL_PROCESS_ATTACH.
+//}
 
 BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 {
@@ -39,22 +39,26 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 
 void attach_stdout(DWORD pid)
 {
-    if (std::getenv("OL_DEBUG"))
+    size_t requiredSize;
+    getenv_s(&requiredSize, NULL, 0, "OL_DEBUG");
+    if (requiredSize != 0)
     {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
 
-        freopen("CONOUT$", "w", stdout);
-        freopen("CONOUT$", "w", stderr);
-        freopen("CONIN$", "r", stdin);
+        FILE* stream;
+        freopen_s(&stream, "CONOUT$", "w", stdout);
+        freopen_s(&stream, "CONOUT$", "w", stderr);
+        freopen_s(&stream, "CONIN$", "r", stdin);
     }
 }
 
 extern "C" __declspec(dllexport) void run(DWORD pid)
 {
     attach_stdout(pid);
-    FILE* fp = fopen("spelunky.log", "a");
-    if (fp)
+    FILE* fp;
+    auto err = fopen_s(&fp, "spelunky.log", "a");
+    if (err == 0)
     {
         fputs("Overlunky loaded\n", fp);
         fclose(fp);
@@ -82,7 +86,9 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     auto api = RenderAPI::get();
     init_ui();
     init_hooks((void*)api.swap_chain());
-    if (std::getenv("OL_DEBUG"))
+    size_t requiredSize;
+    getenv_s(&requiredSize, NULL, 0, "OL_DEBUG");
+    if (requiredSize != 0)
     {
         DEBUG("Running in debug mode.");
         do

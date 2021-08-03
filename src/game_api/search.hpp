@@ -39,7 +39,7 @@ size_t find_inst(char* exe, std::string_view needle, size_t start)
             return j;
         }
     }
-    return -1;
+    return SIZE_MAX;
 }
 
 size_t find_after_bundle(size_t exe)

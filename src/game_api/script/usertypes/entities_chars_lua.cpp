@@ -7,7 +7,7 @@
 
 namespace NEntitiesChars
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, [[maybe_unused]] ScriptImpl* script)
 {
     lua["Entity"]["as_powerupcapable"] = &Entity::as<PowerupCapable>;
     lua["Entity"]["as_player"] = &Entity::as<Player>;

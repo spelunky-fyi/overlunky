@@ -352,14 +352,14 @@ std::array g_community_tile_codes{
     CommunityTileCode{
         "apep_left",
         "ENT_TYPE_MONS_APEP_HEAD",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
         {
             layer->spawn_apep(x, y, false);
         }},
     CommunityTileCode{
         "apep_right",
         "ENT_TYPE_MONS_APEP_HEAD",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
         {
             layer->spawn_apep(x, y, true);
         }},
@@ -455,7 +455,7 @@ struct CommunityChance
     {
         layer->spawn_entity_snap_to_floor(self.entity_id, x, y);
     };
-    ChanceValidPlacementFunc* test_func = [](const CommunityChance& self, float x, float y, Layer* layer)
+    ChanceValidPlacementFunc* test_func = []([[maybe_unused]] const CommunityChance& self, float x, float y, Layer* layer)
     {
         return g_DefaultTestFunc(x, y, layer);
     };
@@ -472,7 +472,7 @@ std::array g_community_chances{
         {
             layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, false);
         },
-        [](const CommunityChance& self, float x, float y, Layer* layer)
+        []([[maybe_unused]] const CommunityChance& self, float x, float y, Layer* layer)
         {
             return !layer->get_grid_entity_at(x, y);
         }},
@@ -483,7 +483,7 @@ std::array g_community_chances{
         {
             layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, false);
         },
-        [](const CommunityChance& self, float x, float y, Layer* layer)
+        []([[maybe_unused]] const CommunityChance& self, float x, float y, Layer* layer)
         {
             return !layer->get_grid_entity_at(x, y);
         }},
@@ -520,7 +520,7 @@ using LevelGenFun = void(LevelGenSystem*, float);
 LevelGenFun* g_level_gen_trampoline{nullptr};
 void level_gen(LevelGenSystem* level_gen_sys, float param_2)
 {
-    auto state = State::get().ptr();
+    //auto state = State::get().ptr();
     g_level_gen_trampoline(level_gen_sys, param_2);
 
     SpelunkyScript::for_each_script(
@@ -637,7 +637,7 @@ struct SpawnInfo
     float x;
     float y;
 };
-bool handle_chance(ThemeInfo* theme, SpawnInfo* spawn_info)
+bool handle_chance(SpawnInfo* spawn_info)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
     OnScopeExit pop{[]
@@ -645,7 +645,7 @@ bool handle_chance(ThemeInfo* theme, SpawnInfo* spawn_info)
 
     auto level_gen_data = State::get().ptr()->level_gen->data;
 
-    int layer = 0;
+    uint8_t layer = 0;
     auto* layer_ptr = State::get().layer_local(layer);
     for (const CommunityChance& community_chance : g_community_chances)
     {
@@ -769,18 +769,18 @@ void LevelGenData::init()
         {
             auto fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, after_bundle);
             fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
-            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
             g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
 
             fun_start = find_inst(exe, "\x48\x0f\x44\xcf\x48\x8b\x49\x6c"s, fun_start);
             fun_start = find_inst(exe, "\x48\x0f\x44\xcf\x48\x8b\x49\x6c"s, fun_start + 1);
-            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
             g_gen_rooms_trampoline = (GenRoomsFun*)memory.at_exe(fun_start);
         }
 
         {
             auto fun_start = find_inst(exe, "\x44\x0f\xb7\xc5\xf3\x0f\x11\x7c\x24\x20"s, after_bundle);
-            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
             g_handle_tile_code_trampoline = (HandleTileCodeFun*)memory.at_exe(fun_start);
         }
 
@@ -812,7 +812,7 @@ void LevelGenData::init()
         auto after_bundle = memory.after_bundle;
 
         auto off = find_inst(exe, "\xba\xee\x00\x00\x00\x48\x8d\x0c\x18"s, after_bundle);
-        auto fun_start = decode_call(find_inst(exe, "\xe8"s, off));
+        auto fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, off));
         g_test_chance = (TestChance*)memory.at_exe(fun_start);
     }
 }
@@ -893,7 +893,7 @@ std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_
 {
     if (provider.is_valid == nullptr)
     {
-        provider.is_valid = [](float x, float y, int layer)
+        provider.is_valid = [](float x, float y, uint8_t layer)
         {
             return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
         };
@@ -924,7 +924,7 @@ void LevelGenSystem::init()
         hook_vtable<DoProceduralSpawnFun>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {
-                if (handle_chance(self, spawn_info))
+                if (handle_chance(spawn_info))
                 {
                     return;
                 }
@@ -940,13 +940,13 @@ std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
         static_cast<int>(std::ceil(x - 3.5f)) / 10,
         static_cast<int>(std::ceil(121.5f - y)) / 8};
 }
-std::pair<float, float> LevelGenSystem::get_room_pos(int x, int y)
+std::pair<float, float> LevelGenSystem::get_room_pos(unsigned int x, unsigned int y)
 {
     return std::pair<float, float>{
         static_cast<float>(x * 10) + 2.5f,
         122.5f - static_cast<float>(y * 8)};
 }
-std::optional<uint16_t> LevelGenSystem::get_room_template(int x, int y, int l)
+std::optional<uint16_t> LevelGenSystem::get_room_template(unsigned int x, unsigned int y, int l)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -956,7 +956,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(int x, int y, int l)
 
     if (l < 0)
     {
-        auto player = state.items()->player(abs(l) - 1);
+        auto player = state.items()->player(static_cast<uint8_t>(abs(l) - 1));
         if (player == nullptr)
             return std::nullopt;
         l = player->layer;
@@ -968,7 +968,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(int x, int y, int l)
     LevelGenRooms* level_rooms = rooms[l];
     return level_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::set_room_template(int x, int y, int l, uint16_t room_template)
+bool LevelGenSystem::set_room_template(unsigned int x, unsigned int y, int l, uint16_t room_template)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -978,7 +978,7 @@ bool LevelGenSystem::set_room_template(int x, int y, int l, uint16_t room_templa
 
     if (l < 0)
     {
-        auto player = state.items()->player(abs(l) - 1);
+        auto player = state.items()->player(static_cast<uint8_t>(abs(l) - 1));
         if (player == nullptr)
             return false;
         l = player->layer;
@@ -1032,7 +1032,7 @@ MutableLevelChanceDef& get_or_emplace_level_chance(std::unordered_map<std::uint3
         auto memory = Memory::get();
         auto off = find_inst(memory.exe(), "\x49\x8d\x8d\x70\x13\x00\x00"s, memory.after_bundle);
         off = find_inst(memory.exe(), "\xe8"s, off);
-        return (EmplaceLevelChance)memory.at_exe(decode_call(off));
+        return (EmplaceLevelChance)memory.at_exe(Memory::decode_call(off));
     }();
 
     std::pair<LevelChanceNode*, bool> node;

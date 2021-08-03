@@ -30,8 +30,8 @@ struct LevelChanceDef
 
 struct ChanceLogicProvider
 {
-    std::function<bool(float, float, int)> is_valid;
-    std::function<void(float, float, int)> do_spawn;
+    std::function<bool(float, float, uint8_t)> is_valid;
+    std::function<void(float, float, uint8_t)> do_spawn;
 };
 
 struct LevelGenData
@@ -388,9 +388,9 @@ struct LevelGenSystem
     uint32_t unknown51;
 
     std::pair<int, int> get_room_index(float x, float y);
-    std::pair<float, float> get_room_pos(int x, int y);
-    std::optional<uint16_t> get_room_template(int x, int y, int l);
-    bool set_room_template(int x, int y, int l, uint16_t room_template);
+    std::pair<float, float> get_room_pos(unsigned int x, unsigned int y);
+    std::optional<uint16_t> get_room_template(unsigned int x, unsigned int y, int l);
+    bool set_room_template(unsigned int x, unsigned int y, int l, uint16_t room_template);
 
     std::string_view get_room_template_name(uint16_t room_template);
 

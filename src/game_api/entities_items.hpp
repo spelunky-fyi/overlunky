@@ -451,7 +451,7 @@ class Chain : public Movable
 class Container : public Movable
 {
   public:
-    int32_t inside;
+    uint32_t inside;
 };
 
 class Coffin : public Container

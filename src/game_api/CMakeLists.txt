@@ -128,5 +128,11 @@ target_precompile_headers(spel2_api PRIVATE
         <d3d11.h>)
 
 if (MSVC)
-        target_compile_options(spel2_api PRIVATE /bigobj)
+    target_compile_options(spel2_api PRIVATE 
+    /W4 /WX
+    /bigobj
+    /wd4201 #nonstandard extension used : nameless struct/union 
+    )
+else()
+    target_compile_options(spel2_api PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
