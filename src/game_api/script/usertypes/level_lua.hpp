@@ -26,6 +26,8 @@ struct PostRoomGenerationContext
     /// Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
     /// Returns `false` if the given chance is not defined.
     bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance);
+    /// Change the amount of extra spawns for the given `extra_spawn_id`.
+    void set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer);
 };
 
 namespace NLevel

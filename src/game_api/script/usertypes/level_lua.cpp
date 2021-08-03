@@ -26,6 +26,11 @@ bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE ch
     return State::get().ptr_local()->level_gen->set_procedural_spawn_chance(chance_id, inverse_chance);
 }
 
+void PostRoomGenerationContext::set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer)
+{
+    State::get().ptr_local()->level_gen->data->set_num_extra_spawns(extra_spawn_id, num_spawns_front_layer, num_spawns_back_layer);
+}
+
 namespace NLevel
 {
 void register_usertypes(sol::state& lua)
@@ -82,9 +87,45 @@ void register_usertypes(sol::state& lua)
             std::lock_guard lock{backend->gil};
             return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
         };
-        std::uint32_t id = data->register_chance_logic_provider(chance, ChanceLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
+        std::uint32_t id = data->register_chance_logic_provider(chance, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         backend->chance_callbacks.push_back(id);
         return chance;
+    };
+
+    /// Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
+    /// The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+    /// The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+    /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
+    /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+    /// To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+    /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+    lua["define_extra_spawn"] = [](sol::function do_spawn, sol::function is_valid, std::uint32_t num_spawns_frontlayer, std::uint32_t num_spawns_backlayer) -> std::uint32_t
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        std::function<bool(float, float, int)> is_valid_call{nullptr};
+        if (is_valid)
+        {
+            is_valid_call = [backend, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            {
+                std::lock_guard lock{backend->gil};
+                return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
+            };
+        }
+        std::function<void(float, float, int)> do_spawn_call = [backend, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        {
+            std::lock_guard lock{backend->gil};
+            return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
+        };
+        LevelGenData* data = backend->g_state->level_gen->data;
+        std::uint32_t extra_spawn_id = data->define_extra_spawn(num_spawns_frontlayer, num_spawns_backlayer, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
+        backend->chance_callbacks.push_back(extra_spawn_id);
+        return extra_spawn_id;
+    };
+    /// Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
+    /// Returns missing spawns in the front layer and missing spawns in the back layer in that order.
+    /// The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
+    lua["get_missing_extra_spawns"] = [](std::uint32_t extra_spawn_chance_id) -> std::pair<std::uint32_t, std::uint32_t> {
+        return State::get().ptr()->level_gen->data->get_missing_extra_spawns(extra_spawn_chance_id);
     };
 
     /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
@@ -141,7 +182,9 @@ void register_usertypes(sol::state& lua)
         "set_room_template",
         &PostRoomGenerationContext::set_room_template,
         "set_procedural_spawn_chance",
-        &PostRoomGenerationContext::set_procedural_spawn_chance);
+        &PostRoomGenerationContext::set_procedural_spawn_chance,
+        "set_num_extra_spawns",
+        &PostRoomGenerationContext::set_num_extra_spawns);
 
     lua.new_usertype<QuestsInfo>(
         "QuestsInfo",

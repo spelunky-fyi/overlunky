@@ -193,6 +193,7 @@ class LuaBackend
     std::vector<EntitySpawnCallback> pre_entity_spawn_callbacks;
     std::vector<EntitySpawnCallback> post_entity_spawn_callbacks;
     std::vector<std::uint32_t> chance_callbacks;
+    std::vector<std::uint32_t> extra_spawn_callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::pair<int, std::uint32_t>> entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;

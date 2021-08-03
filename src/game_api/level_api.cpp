@@ -5,6 +5,7 @@
 #include "layer.hpp"
 #include "logger.h"
 #include "memory.hpp"
+#include "prng.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "util.hpp"
@@ -501,11 +502,33 @@ struct ChanceLogicProviderImpl
 {
     std::uint32_t id;
     std::uint32_t chance_id;
-    ChanceLogicProvider provider;
+    SpawnLogicProvider provider;
 };
 std::mutex g_chance_logic_providers_lock;
 std::uint32_t g_current_chance_logic_provider_id{0};
 std::vector<ChanceLogicProviderImpl> g_chance_logic_providers;
+
+struct ExtraSpawnLogicProviderImpl
+{
+    std::uint32_t extra_spawn_id;
+    std::uint32_t num_extra_spawns_frontlayer;
+    std::uint32_t num_extra_spawns_backlayer;
+    SpawnLogicProvider provider;
+
+    union
+    {
+        std::uint32_t transient_num_remaining_spawns[2];
+        struct
+        {
+            std::uint32_t transient_num_remaining_spawns_frontlayer;
+            std::uint32_t transient_num_remaining_spawns_backlayer;
+        };
+    };
+    std::vector<std::pair<float, float>> transient_valid_positions;
+};
+std::mutex g_extra_spawn_logic_providers_lock;
+std::uint32_t g_current_extra_spawn_id{0};
+std::vector<ExtraSpawnLogicProviderImpl> g_extra_spawn_logic_providers;
 
 std::vector<uint16_t> g_room_templates_with_entrance;
 
@@ -544,6 +567,15 @@ void gen_rooms(ThemeInfo* theme)
 {
     g_gen_rooms_trampoline(theme);
     post_room_generation();
+
+    {
+        std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+        for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+        {
+            provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
+            provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
+        }
+    }
 }
 
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
@@ -644,6 +676,58 @@ void load_level_file(LevelGenData* level_gen_data, const char* level_file_name)
     if (!g_replace_level_loads)
     {
         g_load_level_file_trampoline(level_gen_data, level_file_name);
+    }
+}
+
+using DoExtraSpawns = void(ThemeInfo*, std::uint32_t, std::uint32_t, std::uint32_t, std::uint32_t, std::uint8_t);
+DoExtraSpawns* g_do_extra_spawns_trampoline{nullptr};
+void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_width, std::uint32_t border_height, std::uint32_t level_width, std::uint32_t level_height, std::uint8_t layer)
+{
+    g_do_extra_spawns_trampoline(theme, border_width, border_height, level_width, level_height, layer);
+
+    PRNG& prng = PRNG::get_local();
+
+    std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+    if (!g_extra_spawn_logic_providers.empty())
+    {
+        for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+        {
+            provider.transient_valid_positions.clear();
+        }
+
+        for (std::uint32_t ix = border_width; ix != level_width; ix++)
+        {
+            const float x = static_cast<float>(ix);
+            for (std::uint32_t iy = border_height; iy != level_height; iy++)
+            {
+                const float y = 122.0f - static_cast<float>(iy);
+                for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+                {
+                    if (provider.transient_num_remaining_spawns[layer] > 0)
+                    {
+                        if (provider.provider.is_valid(x, y, layer))
+                        {
+                            provider.transient_valid_positions.push_back({x, y});
+                        }
+                    }
+                }
+            }
+        }
+
+        for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+        {
+            auto& valid_pos = provider.transient_valid_positions;
+            while (!valid_pos.empty() && provider.transient_num_remaining_spawns[layer] > 0)
+            {
+                const auto random_idx = prng.random_index(valid_pos.size(), PRNG::LEVEL_GEN);
+                const auto idx = random_idx < valid_pos.size() ? random_idx : 0;
+                const auto [x, y] = valid_pos[idx];
+                provider.provider.do_spawn(x, y, layer);
+
+                valid_pos.erase(valid_pos.begin() + idx);
+                provider.transient_num_remaining_spawns[layer]--;
+            }
+        }
     }
 }
 
@@ -816,6 +900,13 @@ void LevelGenData::init()
             g_load_level_file_trampoline = (LoadLevelFile*)memory.at_exe(fun_start);
         }
 
+        {
+            auto fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, after_bundle);
+            fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, fun_start + 1);
+            fun_start = decode_call(find_inst(exe, "\xe8"s, fun_start));
+            g_do_extra_spawns_trampoline = (DoExtraSpawns*)memory.at_exe(fun_start);
+        }
+
         DetourRestoreAfterWith();
 
         DetourTransactionBegin();
@@ -832,6 +923,7 @@ void LevelGenData::init()
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
         DetourAttach((void**)&g_setup_level_files_trampoline, setup_level_files);
         DetourAttach((void**)&g_load_level_file_trampoline, load_level_file);
+        DetourAttach((void**)&g_do_extra_spawns_trampoline, do_extra_spawns);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)
@@ -923,6 +1015,79 @@ std::uint32_t LevelGenData::define_chance(std::string chance)
     return it->second.id;
 }
 
+std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_id, SpawnLogicProvider provider)
+{
+    if (provider.is_valid == nullptr)
+    {
+        provider.is_valid = [](float x, float y, int layer)
+        {
+            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+        };
+    }
+
+    std::uint32_t provider_id = g_current_chance_logic_provider_id++;
+    {
+        std::lock_guard lock{g_chance_logic_providers_lock};
+        g_chance_logic_providers.push_back({provider_id, chance_id, std::move(provider)});
+    }
+    return provider_id;
+}
+void LevelGenData::unregister_chance_logic_provider(std::uint32_t provider_id)
+{
+    std::lock_guard lock{g_chance_logic_providers_lock};
+    std::erase_if(g_chance_logic_providers, [provider_id](const ChanceLogicProviderImpl& provider)
+                  { return provider.id == provider_id; });
+}
+
+std::uint32_t LevelGenData::define_extra_spawn(std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer, SpawnLogicProvider provider)
+{
+    if (provider.is_valid == nullptr)
+    {
+        provider.is_valid = [](float x, float y, int layer)
+        {
+            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+        };
+    }
+
+    std::uint32_t extra_spawn_id = g_current_extra_spawn_id++;
+    {
+        std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+        g_extra_spawn_logic_providers.push_back({extra_spawn_id, num_spawns_front_layer, num_spawns_back_layer, std::move(provider)});
+    }
+    return extra_spawn_id;
+}
+void LevelGenData::set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer)
+{
+    std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+    auto it = std::find_if(g_extra_spawn_logic_providers.begin(), g_extra_spawn_logic_providers.end(), [extra_spawn_id](const ExtraSpawnLogicProviderImpl& provider)
+                           { return provider.extra_spawn_id == extra_spawn_id; });
+    if (it != g_extra_spawn_logic_providers.end())
+    {
+        it->num_extra_spawns_frontlayer = num_spawns_front_layer;
+        it->num_extra_spawns_backlayer = num_spawns_back_layer;
+    }
+}
+std::pair<std::uint32_t, std::uint32_t> LevelGenData::get_missing_extra_spawns(std::uint32_t extra_spawn_id)
+{
+    std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+    auto it = std::find_if(g_extra_spawn_logic_providers.begin(), g_extra_spawn_logic_providers.end(), [extra_spawn_id](const ExtraSpawnLogicProviderImpl& provider)
+                           { return provider.extra_spawn_id == extra_spawn_id; });
+    if (it != g_extra_spawn_logic_providers.end())
+    {
+        return {
+            it->num_extra_spawns_frontlayer - it->transient_num_remaining_spawns_frontlayer,
+            it->num_extra_spawns_backlayer - it->transient_num_remaining_spawns_backlayer,
+        };
+    }
+    return {};
+}
+void LevelGenData::undefine_extra_spawn(std::uint32_t extra_spawn_id)
+{
+    std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+    std::erase_if(g_extra_spawn_logic_providers, [extra_spawn_id](const ExtraSpawnLogicProviderImpl& provider)
+                  { return provider.extra_spawn_id == extra_spawn_id; });
+}
+
 std::optional<std::uint16_t> LevelGenData::get_room_template(const std::string& room_template)
 {
     {
@@ -955,30 +1120,6 @@ std::uint16_t LevelGenData::define_room_template(std::string room_template, bool
 bool LevelGenData::does_room_template_contain_entrance(std::uint16_t room_template)
 {
     return std::count(g_room_templates_with_entrance.begin(), g_room_templates_with_entrance.end(), room_template);
-}
-
-std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_id, ChanceLogicProvider provider)
-{
-    if (provider.is_valid == nullptr)
-    {
-        provider.is_valid = [](float x, float y, int layer)
-        {
-            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
-        };
-    }
-
-    std::uint32_t provider_id = g_current_chance_logic_provider_id++;
-    {
-        std::lock_guard lock{g_chance_logic_providers_lock};
-        g_chance_logic_providers.push_back({provider_id, chance_id, std::move(provider)});
-    }
-    return provider_id;
-}
-void LevelGenData::unregister_chance_logic_provider(std::uint32_t provider_id)
-{
-    std::lock_guard lock{g_chance_logic_providers_lock};
-    std::erase_if(g_chance_logic_providers, [provider_id](const ChanceLogicProviderImpl& provider)
-                  { return provider.id == provider_id; });
 }
 
 using GenerateRoomsFun = void(ThemeInfo*);

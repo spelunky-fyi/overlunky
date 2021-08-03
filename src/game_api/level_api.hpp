@@ -28,7 +28,7 @@ struct LevelChanceDef
     std::vector<uint32_t> chances;
 };
 
-struct ChanceLogicProvider
+struct SpawnLogicProvider
 {
     std::function<bool(float, float, int)> is_valid;
     std::function<void(float, float, int)> do_spawn;
@@ -44,12 +44,17 @@ struct LevelGenData
     std::optional<std::uint32_t> get_chance(const std::string& chance);
     std::uint32_t define_chance(std::string chance);
 
+    std::uint32_t register_chance_logic_provider(std::uint32_t chance_id, SpawnLogicProvider provider);
+    void unregister_chance_logic_provider(std::uint32_t provider_id);
+
+    std::uint32_t define_extra_spawn(std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer, SpawnLogicProvider provider);
+    void set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer);
+    std::pair<std::uint32_t, std::uint32_t> get_missing_extra_spawns(std::uint32_t extra_spawn_id);
+    void undefine_extra_spawn(std::uint32_t extra_spawn_id);
+
     std::optional<std::uint16_t> get_room_template(const std::string& room_template);
     std::uint16_t define_room_template(std::string room_template, bool contains_entrance);
     bool does_room_template_contain_entrance(std::uint16_t room_template);
-
-    std::uint32_t register_chance_logic_provider(std::uint32_t chance_id, ChanceLogicProvider provider);
-    void unregister_chance_logic_provider(std::uint32_t provider_id);
 
     // TODO: Get offsets from binary instead of hardcoding them
     const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const
