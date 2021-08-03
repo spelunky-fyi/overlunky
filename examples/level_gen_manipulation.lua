@@ -174,3 +174,15 @@ set_callback(function(room_gen_ctx)
         end
     end
 end, ON.POST_ROOM_GENERATION)
+
+-- Spawn exactly 3 radios in each dwelling level in the front layer and one in the back layer
+local radio_spawns = define_extra_spawn(function(x, y, l)
+    spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_BOOMBOX, x, y, l)
+end, nil, 3, 1)
+set_callback(function(ctx)
+    if state.theme == THEME.DWELLING then
+        ctx:set_num_extra_spawns(radio_spawns, 3, 1)
+    else
+        ctx:set_num_extra_spawns(radio_spawns, 0, 0)
+    end
+end, ON.POST_ROOM_GENERATION)
