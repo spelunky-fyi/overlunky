@@ -2,13 +2,12 @@
 
 #include "entities_monsters.hpp"
 #include "entity.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesMonsters
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_monster"] = &Entity::as<Monster>;
 

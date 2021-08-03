@@ -2,8 +2,6 @@
 
 #include <sol/forward.hpp>
 
-class ScriptImpl;
-
 using ROOM_TEMPLATE = uint16_t;     // NoAlias
 using PROCEDURAL_CHANCE = uint32_t; // NoAlias
 
@@ -19,5 +17,5 @@ struct PostRoomGenerationContext
 
 namespace NLevel
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script);
+void register_usertypes(sol::state& lua);
 };

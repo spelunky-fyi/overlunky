@@ -39,7 +39,7 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 
 void attach_stdout(DWORD pid)
 {
-    if (std::getenv("OL_DEBUG"))
+    //if (std::getenv("OL_DEBUG"))
     {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
@@ -82,7 +82,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     auto api = RenderAPI::get();
     init_ui();
     init_hooks((void*)api.swap_chain());
-    if (std::getenv("OL_DEBUG"))
+    //if (std::getenv("OL_DEBUG"))
     {
         DEBUG("Running in debug mode.");
         do

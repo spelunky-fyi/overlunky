@@ -1,6 +1,7 @@
 #include "spel2.h"
 
 #include "character_def.hpp"
+#include "console.hpp"
 #include "file_api.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -9,6 +10,7 @@
 #include "window_api.hpp"
 
 SoundManager* g_SoundManager{nullptr};
+SpelunkyConsole* g_Console{nullptr};
 
 void SetWriteLoadOptimization(bool write_load_opt)
 {
@@ -140,7 +142,7 @@ SpelunkyScript* CreateScript(const char* file_path, bool enabled)
     std::string code = read_whole_file(file_path);
     if (!code.empty())
     {
-        return new SpelunkyScript(std::move(code), file_path, g_SoundManager, enabled);
+        return new SpelunkyScript(std::move(code), file_path, g_SoundManager, g_Console, enabled);
     }
     return nullptr;
 }
@@ -213,6 +215,94 @@ SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script)
         script->get_filename().c_str(),
         script->get_unsafe(),
     };
+}
+
+SpelunkyConsole* CreateConsole()
+{
+    if (g_Console == nullptr)
+    {
+        g_Console = new SpelunkyConsole(g_SoundManager);
+    }
+    return g_Console;
+}
+void FreeConsole(SpelunkyConsole* console)
+{
+    if (g_Console == console)
+    {
+        g_Console = nullptr;
+    }
+    delete console;
+}
+
+void SpelunkyConsole_Update(SpelunkyConsole* console)
+{
+    console->run();
+}
+void SpelunkyConsole_Draw(SpelunkyConsole* console, struct ImDrawList* draw_list)
+{
+    console->draw(draw_list);
+}
+void SpelunkyConsole_DrawOptions(SpelunkyConsole* console)
+{
+    console->render_options();
+}
+bool SpelunkyConsole_IsToggled(SpelunkyConsole* console)
+{
+    return console->is_toggled();
+}
+void SpelunkyConsole_Toggle(SpelunkyConsole* console)
+{
+    console->toggle();
+}
+bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* out_buffer, size_t out_buffer_size)
+{
+    std::string result = console->execute(code);
+    if (result.empty())
+    {
+        return false;
+    }
+
+    auto num_written = snprintf(
+        out_buffer,
+        out_buffer_size - 1,
+        "%s",
+        result.c_str());
+    out_buffer[num_written] = '\0';
+    return num_written < out_buffer_size;
+}
+std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console)
+{
+    return console->get_messages().size();
+}
+const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, std::size_t message_idx)
+{
+    const auto& messages = console->get_messages();
+    if (message_idx < messages.size())
+    {
+        return messages[message_idx].message.c_str();
+    }
+    return nullptr;
+}
+void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console)
+{
+    console->consume_messages();
+}
+
+bool SpelunkyConsole_HasNewHistory(SpelunkyConsole* console)
+{
+    return console->has_new_history();
+}
+void SpelunkyConsole_SetMaxHistorySize(SpelunkyConsole* console, size_t max_history)
+{
+    console->set_max_history_size(max_history);
+}
+void SpelunkyConsole_SaveHistory(SpelunkyConsole* console, const char* path)
+{
+    console->save_history(path);
+}
+void SpelunkyConsole_LoadHistory(SpelunkyConsole* console, const char* path)
+{
+    console->load_history(path);
 }
 
 StateMemory& get_state()

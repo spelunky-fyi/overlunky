@@ -2,14 +2,14 @@
 
 #include "file_api.hpp"
 #include "render_api.hpp"
-#include "script/script_impl.hpp"
+#include "script/lua_backend.hpp"
 #include "texture.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NTexture
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     /// Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
     lua["get_texture_definition"] = [](uint32_t texture_id) -> TextureDefinition
@@ -17,9 +17,10 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         return RenderAPI::get().get_texture_definition(texture_id);
     };
     /// Defines a new texture that can be used in Entity::set_texture
-    lua["define_texture"] = [script](TextureDefinition texture_data) -> uint32_t
+    lua["define_texture"] = [](TextureDefinition texture_data) -> uint32_t
     {
-        texture_data.texture_path = get_image_file_path(script->meta.path, std::move(texture_data.texture_path));
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
         return RenderAPI::get().define_texture(std::move(texture_data));
     };
 

@@ -1,6 +1,5 @@
 #include "decode_audio_file.hpp"
 
-#include <cassert>
 #include <memory>
 
 #pragma warning(push, 0)

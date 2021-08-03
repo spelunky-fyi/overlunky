@@ -13,7 +13,6 @@ The following Lua libraries and their functions are available. You can read more
 ### `table`
 ### `coroutine`
 ### `package`
-### `debug`
 ### `json`
 To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
 ```Lua
@@ -149,6 +148,9 @@ prinspect(some_stuff_in_a_table)
 ### [`messpect`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=messpect)
 `nil messpect(variadic_args objects)`<br/>
 Same as `prinspect`
+### [`register_console_command`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_console_command)
+`nil register_console_command(string name, function cmd)`<br/>
+Adds a command that can be used in the console.
 ### [`set_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_interval)
 `CallbackId set_interval(function cb, int frames)`<br/>
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
@@ -859,7 +861,7 @@ end
 - [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &StateMemory::illumination
 - [`int money_last_levels`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) &StateMemory::money_last_levels
 - [`int money_shop_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) &StateMemory::money_shop_total
-- [`player_inputs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) sol::readonly(&StateMemory::player_inputs)
+- [`PlayerInputs player_inputs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) &StateMemory::player_inputs
 - [`QuestsInfo quests`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quests) &StateMemory::quests
 - [`Camera camera`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) &StateMemory::camera
 - [`int special_visibility_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_visibility_flags) &StateMemory::special_visibility_flags
@@ -973,7 +975,6 @@ end
 - [`nil set_draw_depth(int draw_depth)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) &Entity::set_draw_depth
 - [`nil liberate_from_shop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) &Entity::liberate_from_shop
 - [`Entity get_held_entity()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) &Entity::get_held_entity
-- [`as_movable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_movable) &Entity::as&lt;Movable&gt;
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -1209,7 +1210,7 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Entity first_item_beam`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_item_beam) &ForceField::first_item_beam
 - [`Entity fx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx) &ForceField::fx
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &ForceField::emitted_light
-- [`is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) sol::readonly(&ForceField::is_on)
+- [`bool is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &ForceField::is_on
 - [`nil activate_laserbeam(bool turn_on)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_laserbeam) &ForceField::activate_laserbeam
 ### `TimedForceField`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`ForceField`](#forcefield)
@@ -1220,7 +1221,7 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Entity first_item_beam`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_item_beam) &HorizontalForceField::first_item_beam
 - [`Entity fx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx) &HorizontalForceField::fx
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &HorizontalForceField::timer
-- [`is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) sol::readonly(&HorizontalForceField::is_on)
+- [`bool is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &HorizontalForceField::is_on
 ### `TentacleBottom`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &TentacleBottom::attached_piece_uid
@@ -2345,7 +2346,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Powerup`](#powerup)
 - [`int falltime_deploy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falltime_deploy) &ParachutePowerup::falltime_deploy
 \
 this gets compared with entity's falling_timer
-- [`deployed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deployed) sol::readonly(&ParachutePowerup::deployed)
+- [`bool deployed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deployed) &ParachutePowerup::deployed
 - [`nil deploy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deploy) &ParachutePowerup::deploy
 ### `TrueCrownPowerup`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Powerup`](#powerup)
@@ -2436,27 +2437,27 @@ Returns `false` if the given chance is not defined.
 - [`int madame_tusk_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=madame_tusk_state) &QuestsInfo::madame_tusk_state
 - [`int beg_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=beg_state) &QuestsInfo::beg_state
 ### `SaveData`
-- [`places`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=places) bool[]
-- [`bestiary`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary) bool[]
-- [`people`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people) bool[]
-- [`items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) bool[]
-- [`traps`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=traps) bool[]
-- [`last_daily`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) sol::readonly(&SaveData::last_daily)
-- [`characters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) sol::readonly(&SaveData::characters)
-- [`shortcuts`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) sol::readonly(&SaveData::shortcuts)
-- [`bestiary_killed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed) int[]
-- [`bestiary_killed_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed_by) int[]
-- [`people_killed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_killed) int[]
-- [`people_killed_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_killed_by) int[]
-- [`plays`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=plays) sol::readonly(&SaveData::plays)
-- [`deaths`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deaths) sol::readonly(&SaveData::deaths)
-- [`wins_normal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_normal) sol::readonly(&SaveData::wins_normal)
-- [`wins_hard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_hard) sol::readonly(&SaveData::wins_hard)
-- [`wins_special`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_special) sol::readonly(&SaveData::wins_special)
-- [`score_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_total) sol::readonly(&SaveData::score_total)
-- [`score_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_top) sol::readonly(&SaveData::score_top)
-- [`deepest_area`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_area) sol::readonly(&SaveData::deepest_area)
-- [`deepest_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level) sol::readonly(&SaveData::deepest_level)
+- [`array<bool, 16> places`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=places) &SaveData::places
+- [`array<bool, 78> bestiary`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary) &SaveData::bestiary
+- [`array<bool, 38> people`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people) &SaveData::people
+- [`array<bool, 54> items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) &SaveData::items
+- [`array<bool, 24> traps`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=traps) &SaveData::traps
+- [`last_daily`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) &SaveData::last_daily
+- [`int characters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) &SaveData::characters
+- [`int shortcuts`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) &SaveData::shortcuts
+- [`array<int, 78> bestiary_killed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed) &SaveData::bestiary_killed
+- [`array<int, 78> bestiary_killed_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed_by) &SaveData::bestiary_killed_by
+- [`array<int, 38> people_killed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_killed) &SaveData::people_killed
+- [`array<int, 38> people_killed_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_killed_by) &SaveData::people_killed_by
+- [`int plays`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=plays) &SaveData::plays
+- [`int deaths`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deaths) &SaveData::deaths
+- [`int wins_normal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_normal) &SaveData::wins_normal
+- [`int wins_hard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_hard) &SaveData::wins_hard
+- [`int wins_special`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_special) &SaveData::wins_special
+- [`int score_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_total) &SaveData::score_total
+- [`int score_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_top) &SaveData::score_top
+- [`int deepest_area`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_area) &SaveData::deepest_area
+- [`int deepest_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level) &SaveData::deepest_level
 ### `CustomSound`
 Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
 It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
@@ -2480,38 +2481,38 @@ You can just discard this handle if you do not need extended control anymore
 - [`optional<float> get_parameter(VANILLA_SOUND_PARAM parameter_index)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) &PlayingSound::get_parameter
 - [`bool set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) &PlayingSound::set_parameter
 ### `PlayerSlotSettings`
-- [`controller_vibration`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller_vibration) sol::readonly(&PlayerSlotSettings::controller_vibration)
-- [`auto_run_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=auto_run_enabled) sol::readonly(&PlayerSlotSettings::auto_run_enabled)
-- [`controller_right_stick`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller_right_stick) sol::readonly(&PlayerSlotSettings::controller_right_stick)
+- [`bool controller_vibration`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller_vibration) &PlayerSlotSettings::controller_vibration
+- [`bool auto_run_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=auto_run_enabled) &PlayerSlotSettings::auto_run_enabled
+- [`bool controller_right_stick`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller_right_stick) &PlayerSlotSettings::controller_right_stick
 ### `PlayerSlot`
-- [`buttons_gameplay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_gameplay) sol::readonly(&PlayerSlot::buttons_gameplay)
-- [`buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) sol::readonly(&PlayerSlot::buttons)
-- [`input_mapping_keyboard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_keyboard) sol::readonly(&PlayerSlot::input_mapping_keyboard)
-- [`input_mapping_controller`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_controller) sol::readonly(&PlayerSlot::input_mapping_controller)
-- [`player_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_id) sol::readonly(&PlayerSlot::player_id)
-- [`is_participating`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_participating) sol::readonly(&PlayerSlot::is_participating)
+- [`int buttons_gameplay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_gameplay) &PlayerSlot::buttons_gameplay
+- [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &PlayerSlot::buttons
+- [`InputMapping input_mapping_keyboard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_keyboard) &PlayerSlot::input_mapping_keyboard
+- [`InputMapping input_mapping_controller`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_controller) &PlayerSlot::input_mapping_controller
+- [`int player_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_id) &PlayerSlot::player_id
+- [`bool is_participating`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_participating) &PlayerSlot::is_participating
 ### `InputMapping`
-- [`jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump) sol::readonly(&InputMapping::jump)
-- [`attack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack) sol::readonly(&InputMapping::attack)
-- [`bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bomb) sol::readonly(&InputMapping::bomb)
-- [`rope`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rope) sol::readonly(&InputMapping::rope)
-- [`walk_run`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_run) sol::readonly(&InputMapping::walk_run)
-- [`use_door_buy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=use_door_buy) sol::readonly(&InputMapping::use_door_buy)
-- [`pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) sol::readonly(&InputMapping::pause_menu)
-- [`journal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal) sol::readonly(&InputMapping::journal)
-- [`left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) sol::readonly(&InputMapping::left)
-- [`right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) sol::readonly(&InputMapping::right)
-- [`up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) sol::readonly(&InputMapping::up)
-- [`down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) sol::readonly(&InputMapping::down)
+- [`int jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump) &InputMapping::jump
+- [`int attack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack) &InputMapping::attack
+- [`int bomb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bomb) &InputMapping::bomb
+- [`int rope`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rope) &InputMapping::rope
+- [`int walk_run`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_run) &InputMapping::walk_run
+- [`int use_door_buy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=use_door_buy) &InputMapping::use_door_buy
+- [`int pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) &InputMapping::pause_menu
+- [`int journal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal) &InputMapping::journal
+- [`int left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) &InputMapping::left
+- [`int right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) &InputMapping::right
+- [`int up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) &InputMapping::up
+- [`int down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) &InputMapping::down
 ### `PlayerInputs`
-- [`player_slot_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1) sol::readonly(&PlayerInputs::player_slot_1)
-- [`player_slot_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2) sol::readonly(&PlayerInputs::player_slot_2)
-- [`player_slot_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3) sol::readonly(&PlayerInputs::player_slot_3)
-- [`player_slot_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4) sol::readonly(&PlayerInputs::player_slot_4)
-- [`player_slot_1_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1_settings) sol::readonly(&PlayerInputs::player_slot_1_settings)
-- [`player_slot_2_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) sol::readonly(&PlayerInputs::player_slot_2_settings)
-- [`player_slot_3_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) sol::readonly(&PlayerInputs::player_slot_3_settings)
-- [`player_slot_4_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) sol::readonly(&PlayerInputs::player_slot_4_settings)
+- [`PlayerSlot player_slot_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1) &PlayerInputs::player_slot_1
+- [`PlayerSlot player_slot_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2) &PlayerInputs::player_slot_2
+- [`PlayerSlot player_slot_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3) &PlayerInputs::player_slot_3
+- [`PlayerSlot player_slot_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4) &PlayerInputs::player_slot_4
+- [`PlayerSlotSettings player_slot_1_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1_settings) &PlayerInputs::player_slot_1_settings
+- [`PlayerSlotSettings player_slot_2_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) &PlayerInputs::player_slot_2_settings
+- [`PlayerSlotSettings player_slot_3_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) &PlayerInputs::player_slot_3_settings
+- [`PlayerSlotSettings player_slot_4_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) &PlayerInputs::player_slot_4_settings
 ### `GuiDrawContext`
 - [`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line) &GuiDrawContext::draw_line
 \
@@ -2968,6 +2969,9 @@ Runs at the same times as ON.SCREEN, but receives the save_ctx
 \
 Params: `LoadContext load_ctx`\
 Runs as soon as your script is loaded, including reloads, then never again
+- [`PRE_LEVEL_GENERATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION) ON::PRE_LEVEL_GENERATION
+\
+Runs before any level generation, no entities should exist at this point
 - [`POST_ROOM_GENERATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_ROOM_GENERATION) ON::POST_ROOM_GENERATION
 \
 Params: `PostRoomGenerationContext room_gen_ctx`\
@@ -2987,6 +2991,9 @@ Similar to LEVEL_GEN but only triggers on tile code spawns.
 - [`LEVEL_GEN_PROCEDURAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_PROCEDURAL) SPAWN_TYPE_LEVEL_GEN_PROCEDURAL
 \
 Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+- [`LEVEL_GEN_GENERAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_GENERAL) SPAWN_TYPE_LEVEL_GEN_GENERAL
+\
+Covers all spawns during level gen that are not covered by the other two.
 - [`SCRIPT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.SCRIPT) SPAWN_TYPE_SCRIPT
 \
 Runs for any spawn happening through a call from the Lua API, also during level generation.

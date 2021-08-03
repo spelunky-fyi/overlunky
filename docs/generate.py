@@ -35,6 +35,10 @@ header_files = [
 api_files = [
     "../src/game_api/script/script_impl.cpp",
     "../src/game_api/script/script_impl.hpp",
+    "../src/game_api/script/lua_vm.cpp",
+    "../src/game_api/script/lua_vm.hpp",
+    "../src/game_api/script/lua_backend.cpp",
+    "../src/game_api/script/lua_backend.hpp",
     "../src/game_api/script/usertypes/save_context.cpp",
     "../src/game_api/script/usertypes/state_lua.cpp",
     "../src/game_api/script/usertypes/entity_lua.cpp",
@@ -250,13 +254,13 @@ for file in api_files:
         line = line.replace("*", "")
         a = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*);', line)
         b = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*)$', line)
-        if a:
+        if a and not a.group(1).startswith("__"):
             if not getfunc(a.group(1)):
                 funcs.append(
                     {"name": a.group(1), "cpp": a.group(2), "comment": comment}
                 )
             comment = []
-        elif b:
+        elif b and not b.group(1).startswith("__"):
             if not getfunc(b.group(1)):
                 funcs.append(
                     {"name": b.group(1), "cpp": b.group(2), "comment": comment}
@@ -299,6 +303,10 @@ for file in api_files:
                 continue
             if "table_of" in var[1]:
                 var[1] = var[1].replace("table_of(", "") + "[]"
+            if var[1].startswith("sol::readonly"):
+                var[1] = var[1].replace("sol::readonly(", "")
+                var[1] = var[1][:-1]
+
             var_name = var[0]
             cpp = var[1]
             cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp

@@ -2,13 +2,12 @@
 
 #include "entities_fx.hpp"
 #include "entity.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesFX
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_lavaglow"] = &Entity::as<LavaGlow>;
     lua["Entity"]["as_olmecfloater"] = &Entity::as<OlmecFloater>;

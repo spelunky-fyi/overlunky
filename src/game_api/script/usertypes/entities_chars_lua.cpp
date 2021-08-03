@@ -1,13 +1,12 @@
 #include "entities_chars_lua.hpp"
 
 #include "entities_chars.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesChars
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_powerupcapable"] = &Entity::as<PowerupCapable>;
     lua["Entity"]["as_player"] = &Entity::as<Player>;

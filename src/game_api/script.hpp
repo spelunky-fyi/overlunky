@@ -3,7 +3,6 @@
 #include <chrono>
 #include <deque>
 #include <filesystem>
-#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -59,7 +58,7 @@ class ScriptImpl;
 class SpelunkyScript
 {
   public:
-    SpelunkyScript(std::string script, std::string file, class SoundManager* sound_manager, bool enable = true);
+    SpelunkyScript(std::string script, std::string file, class SoundManager* sound_manager, class SpelunkyConsole* console, bool enable = true);
     ~SpelunkyScript();
 
     std::deque<ScriptMessage>& get_messages();
@@ -93,19 +92,6 @@ class SpelunkyScript
     bool run();
     void draw(ImDrawList* dl);
     void render_options();
-
-    bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
-    void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
-
-    void post_room_generation();
-    void post_level_generation();
-
-    Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
-    void post_entity_spawn(Entity* entity, int spawn_type_flags);
-
-    std::string dump_api();
-
-    static void for_each_script(std::function<bool(SpelunkyScript&)> fun);
 
   private:
     std::unique_ptr<ScriptImpl> m_Impl;

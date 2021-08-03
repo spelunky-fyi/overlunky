@@ -2,13 +2,12 @@
 
 #include "entities_floors.hpp"
 #include "entity.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesFloors
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_floor"] = &Entity::as<Floor>;
     lua["Entity"]["as_door"] = &Entity::as<Door>;
