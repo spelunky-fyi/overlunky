@@ -47,6 +47,7 @@ using Spelunky_LoadFileFunc = SpelunkyFileInfo* (*)(const char* file_path, Spelu
 using Spelunky_GetImageFilePathFunc = bool (*)(const char* root_path, const char* relative_path, char* out_buffer, size_t out_buffer_size);
 
 class SpelunkyScript;
+class SpelunkyConsole;
 
 void SetWriteLoadOptimization(bool write_load_opt);
 
@@ -101,6 +102,25 @@ struct SpelunkyScriptMeta
     bool unsafe;
 };
 SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script);
+
+SpelunkyConsole* CreateConsole();
+void FreeConsole(SpelunkyConsole* console);
+
+void SpelunkyConsole_Update(SpelunkyConsole* console);
+void SpelunkyConsole_Draw(SpelunkyConsole* console, struct ImDrawList* draw_list);
+void SpelunkyConsole_DrawOptions(SpelunkyConsole* console);
+bool SpelunkyConsole_IsToggled(SpelunkyConsole* console);
+void SpelunkyConsole_Toggle(SpelunkyConsole* console);
+bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* out_buffer, size_t out_buffer_size);
+
+std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console);
+const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, std::size_t message_idx);
+void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console);
+
+bool SpelunkyConsole_HasNewHistory(SpelunkyConsole* console);
+void SpelunkyConsole_SetMaxHistorySize(SpelunkyConsole* console, size_t max_history);
+void SpelunkyConsole_SaveHistory(SpelunkyConsole* console, const char* path);
+void SpelunkyConsole_LoadHistory(SpelunkyConsole* console, const char* path);
 
 enum class SpelunkyScreen
 {

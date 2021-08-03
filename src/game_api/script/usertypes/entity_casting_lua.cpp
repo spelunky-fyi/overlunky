@@ -6,7 +6,7 @@
 
 namespace NEntityCasting
 {
-void register_usertypes(sol::state& lua, [[maybe_unused]] ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua.create_named_table("TYPE_MAP");
 

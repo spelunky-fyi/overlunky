@@ -2,13 +2,12 @@
 
 #include "entities_liquids.hpp"
 #include "entity.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesLiquids
 {
-void register_usertypes(sol::state& lua, [[maybe_unused]] ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_liquid"] = &Entity::as<Liquid>;
     lua["Entity"]["as_lava"] = &Entity::as<Lava>;

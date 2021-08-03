@@ -1,13 +1,12 @@
 #include "entities_activefloors_lua.hpp"
 
 #include "entities_activefloors.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesActiveFloors
 {
-void register_usertypes(sol::state& lua, [[maybe_unused]] ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_crushtrap"] = &Entity::as<Crushtrap>;
     lua["Entity"]["as_olmec"] = &Entity::as<Olmec>;

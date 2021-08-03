@@ -8,12 +8,12 @@
 
 #include <nlohmann/json.hpp>
 
+#include "console.hpp"
 #include "entity.hpp"
 #include "level_api.hpp"
 #include "logger.h"
 #include "memory.h"
 #include "particles.hpp"
-#include "script.hpp"
 #include "sound_manager.hpp"
 #include "state.hpp"
 #include "texture.hpp"
@@ -291,11 +291,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
 
     if (auto file = std::ofstream("game_data/spel2.lua"))
     {
-        SpelunkyScript api_gen_script(
-            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'",
-            "api_gen",
-            &sound_mgr,
-            true);
+        SpelunkyConsole api_gen_script(&sound_mgr);
         file << api_gen_script.dump_api() << std::endl;
     }
 

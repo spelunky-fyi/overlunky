@@ -1,18 +1,19 @@
 #include "sound_lua.hpp"
 
-#include "script/script_impl.hpp"
+#include "script/lua_backend.hpp"
 #include "sound_manager.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NSound
 {
-void register_usertypes(sol::state& lua, ScriptImpl* script)
+void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 {
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
-    lua["create_sound"] = [script](std::string path) -> sol::optional<CustomSound>
+    lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
     {
-        if (CustomSound sound = script->sound_manager->get_sound((script->script_folder / path).string()))
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        if (CustomSound sound = backend->sound_manager->get_sound((backend->get_root_path() / path).string()))
         {
             return sound;
         }
@@ -20,13 +21,14 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     };
 
     /// Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
-    lua["get_sound"] = [script](std::string path_or_vanilla_sound) -> sol::optional<CustomSound>
+    lua["get_sound"] = [](std::string path_or_vanilla_sound) -> sol::optional<CustomSound>
     {
-        if (CustomSound event = script->sound_manager->get_event(path_or_vanilla_sound))
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        if (CustomSound event = backend->sound_manager->get_event(path_or_vanilla_sound))
         {
             return event;
         }
-        else if (CustomSound sound = script->sound_manager->get_existing_sound((script->script_folder / path_or_vanilla_sound).string()))
+        else if (CustomSound sound = backend->sound_manager->get_existing_sound((backend->get_root_path() / path_or_vanilla_sound).string()))
         {
             return sound;
         }
@@ -38,26 +40,28 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
     /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
     /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
     /// properties on the sound. Otherwise you may cause a deadlock.
-    lua["set_vanilla_sound_callback"] = [script](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
+    lua["set_vanilla_sound_callback"] = [](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
     {
-        auto safe_cb = [&, cb = std::move(cb)](PlayingSound sound)
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto safe_cb = [backend, cb = std::move(cb)](PlayingSound sound)
         {
-            std::lock_guard gil_guard{script->gil};
-            if (script->enabled)
-                script->handle_function(cb, sound);
+            std::lock_guard gil_guard{backend->gil};
+            if (backend->get_enabled())
+                backend->handle_function(cb, sound);
         };
-        std::uint32_t id = script->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
-        script->vanilla_sound_callbacks.push_back(id);
+        std::uint32_t id = backend->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
+        backend->vanilla_sound_callbacks.push_back(id);
         return id;
     };
     /// Clears a previously set callback
-    lua["clear_vanilla_sound_callback"] = [script](CallbackId id)
+    lua["clear_vanilla_sound_callback"] = [](CallbackId id)
     {
-        script->sound_manager->clear_callback(id);
-        auto it = std::find(script->vanilla_sound_callbacks.begin(), script->vanilla_sound_callbacks.end(), id);
-        if (it != script->vanilla_sound_callbacks.end())
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->sound_manager->clear_callback(id);
+        auto it = std::find(backend->vanilla_sound_callbacks.begin(), backend->vanilla_sound_callbacks.end(), id);
+        if (it != backend->vanilla_sound_callbacks.end())
         {
-            script->vanilla_sound_callbacks.erase(it);
+            backend->vanilla_sound_callbacks.erase(it);
         }
     };
 
@@ -72,13 +76,14 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
         PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
         map<VANILLA_SOUND_PARAM,string> get_parameters()
         */
-    auto sound_set_callback = [script](PlayingSound* sound, sol::function callback)
+    auto sound_set_callback = [](PlayingSound* sound, sol::function callback)
     {
-        auto safe_cb = [&, callback = std::move(callback)]()
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto safe_cb = [backend, callback = std::move(callback)]()
         {
-            std::lock_guard gil_guard{script->gil};
-            if (script->enabled)
-                script->handle_function(callback);
+            std::lock_guard gil_guard{backend->gil};
+            if (backend->get_enabled())
+                backend->handle_function(callback);
         };
         sound->set_callback(std::move(safe_cb));
     };
@@ -135,7 +140,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
                            //, "", ...check__[vanilla_sounds.txt]\[game_data/vanilla_sounds.txt\]...
                            //, "FX_FX_DM_BANNER", FX/FX_dm_banner
     );
-    script->sound_manager->for_each_event_name(
+    sound_manager->for_each_event_name(
         [&lua](std::string event_name)
         {
             std::string clean_event_name = event_name;
@@ -180,7 +185,7 @@ void register_usertypes(sol::state& lua, ScriptImpl* script)
                            //, "", ...check__[vanilla_sound_params.txt]\[game_data/vanilla_sound_params.txt\]...
                            //, "CURRENT_LAYER2", 37
     );
-    script->sound_manager->for_each_parameter_name(
+    sound_manager->for_each_parameter_name(
         [&lua](std::string parameter_name, std::uint32_t id)
         {
             std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)

@@ -22,6 +22,7 @@
 #include <toml.hpp>
 #pragma warning(pop)
 
+#include "console.hpp"
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
@@ -41,7 +42,13 @@
 
 #include "decode_audio_file.hpp"
 
-SoundManager* g_SoundManager{nullptr};
+template <class T>
+concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
+
+std::unique_ptr<SoundManager> g_SoundManager;
+
+std::unique_ptr<SpelunkyConsole> g_Console;
+std::deque<ScriptMessage> g_ConsoleMessages;
 
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -132,7 +139,10 @@ std::map<std::string, int64_t> keys{
     {"mouse_clone", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x05},
     {"mouse_destroy", OL_BUTTON_MOUSE | 0x05},
     {"mouse_destroy_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x05},
-    {"reload_enabled_scripts", OL_KEY_CTRL | VK_F5} // ctrl + f5 same as playlunky
+    {"reload_enabled_scripts", OL_KEY_CTRL | VK_F5}, // ctrl + f5 same as playlunky
+    {"console", VK_OEM_3},                           // ~ for US
+    {"console_alt", VK_OEM_5},                       // \ for US
+    {"close_console", VK_ESCAPE},                    // alternative to close it
     //{ "", 0x },
 };
 
@@ -318,7 +328,7 @@ void load_script(std::string file, bool enable = true)
         /*size_t slash = file.find_last_of("/\\");
         if (slash != std::string::npos)
             file = file.substr(slash + 1);*/
-        SpelunkyScript* script = new SpelunkyScript(buf.str(), file, g_SoundManager, enable);
+        SpelunkyScript* script = new SpelunkyScript(buf.str(), file, g_SoundManager.get(), g_Console.get(), enable);
         g_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{script};
         data.close();
     }
@@ -999,7 +1009,17 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     if (ImGui::GetIO().WantCaptureKeyboard && active("tool_script"))
         return false;
 
-    if (pressed("hide_ui", wParam))
+    //int repeat = (lParam >> 30) & 1U;
+
+    if (g_Console && g_Console->is_toggled())
+    {
+        if (pressed("console", wParam) || pressed("console_alt", wParam) || pressed("close_console", wParam))
+        {
+            g_Console->toggle();
+        }
+        return false;
+    }
+    else if (pressed("hide_ui", wParam))
     {
         hide_ui = !hide_ui;
     }
@@ -1391,6 +1411,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("reload_enabled_scripts", wParam))
     {
         reload_enabled_scripts();
+    }
+    else if (pressed("console", wParam) || pressed("console_alt", wParam))
+    {
+        g_Console->toggle();
     }
     else
     {
@@ -2116,7 +2140,7 @@ void render_hitbox(Movable* ent, bool cross, ImColor color)
     draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 }
 
-void fix_script_requires(SpelunkyScript* script)
+void fix_script_requires(Script auto* script)
 {
     if (!script->is_enabled())
         return;
@@ -2134,14 +2158,14 @@ void fix_script_requires(SpelunkyScript* script)
     }
 }
 
-void update_script(SpelunkyScript* script)
+void update_script(Script auto* script)
 {
     if (!script->is_enabled())
         return;
     script->run();
 }
 
-void render_script(SpelunkyScript* script, ImDrawList* draw_list)
+void render_script(Script auto* script, ImDrawList* draw_list)
 {
     if (!script->is_enabled())
         return;
@@ -2162,32 +2186,6 @@ void set_vel(ImVec2 pos)
     g_vy = 2 * (g_vy - g_y) * 0.5625f;
 }
 
-void render_messages(SpelunkyScript* script)
-{
-    auto now = std::chrono::system_clock::now();
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize({-1, -1});
-    ImGui::Begin(
-        "Messages",
-        NULL,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-    using namespace std::chrono_literals;
-    ImGui::PushFont(bigfont);
-    for (auto message : script->get_messages())
-    {
-        if (now - 10s > message.time)
-            continue;
-        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - message.time).count() / 10000.0f;
-        message.color.w = alpha;
-        ImGui::TextColored(message.color, "[%s] %s", script->get_name().c_str(), message.message.c_str());
-    }
-    ImGui::PopFont();
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - ImGui::GetWindowHeight() - 20});
-    ImGui::End();
-}
-
 void render_messages()
 {
     using namespace std::chrono_literals;
@@ -2203,6 +2201,17 @@ void render_messages()
             queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
         }
     }
+    for (auto&& message : g_Console->consume_messages())
+    {
+        g_ConsoleMessages.push_back(std::move(message));
+    }
+    for (auto message : g_ConsoleMessages)
+    {
+        queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
+    }
+    std::erase_if(g_ConsoleMessages, [&](auto message)
+                  { return now - 10s > message.time; });
+
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
 
@@ -2296,11 +2305,21 @@ void render_clickhandler()
     {
         fix_script_requires(script.get());
     }
+    fix_script_requires(g_Console.get());
     auto* draw_list = ImGui::GetBackgroundDrawList();
     for (auto& [name, script] : g_scripts)
     {
         update_script(script.get());
+    }
+    update_script(g_Console.get());
+    for (auto& [name, script] : g_scripts)
+    {
         render_script(script.get(), draw_list);
+    }
+    render_script(g_Console.get(), draw_list);
+    if (g_Console->has_new_history())
+    {
+        g_Console->save_history("console_history.txt");
     }
     if (g_state->screen == 29)
     {
@@ -2714,7 +2733,8 @@ void render_script_files()
             "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
             "end\nend, 60)",
             name,
-            g_SoundManager,
+            g_SoundManager.get(),
+            g_Console.get(),
             true);
         g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
     }
@@ -4100,12 +4120,15 @@ std::string make_save_path(std::string_view script_path, std::string_view script
 
 void init_ui()
 {
-    g_SoundManager = new SoundManager(&LoadAudioFile);
+    g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
     g_state = get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
     g_save = savedata();
     g_save_addr = reinterpret_cast<uintptr_t>(g_save);
+
+    g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
+    g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
     register_imgui_init(&imgui_init);

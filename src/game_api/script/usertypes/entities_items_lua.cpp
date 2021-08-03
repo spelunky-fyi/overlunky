@@ -2,13 +2,12 @@
 
 #include "entities_items.hpp"
 #include "entity.hpp"
-#include "script/script_impl.hpp"
 
 #include <sol/sol.hpp>
 
 namespace NEntitiesItems
 {
-void register_usertypes(sol::state& lua, [[maybe_unused]] ScriptImpl* script)
+void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_bomb"] = &Entity::as<Bomb>;
     lua["Entity"]["as_backpack"] = &Entity::as<Backpack>;

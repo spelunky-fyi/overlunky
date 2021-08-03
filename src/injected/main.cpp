@@ -39,9 +39,9 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 
 void attach_stdout(DWORD pid)
 {
-    size_t requiredSize;
-    getenv_s(&requiredSize, NULL, 0, "OL_DEBUG");
-    if (requiredSize != 0)
+    //size_t requiredSize;
+    //getenv_s(&requiredSize, NULL, 0, "OL_DEBUG");
+    //if (requiredSize != 0)
     {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
