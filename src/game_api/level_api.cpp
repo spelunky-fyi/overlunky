@@ -1058,15 +1058,6 @@ bool LevelGenSystem::set_room_template(int x, int y, int l, uint16_t room_templa
     LevelGenRooms* level_rooms = rooms[l];
     level_rooms->rooms[x + y * 8] = room_template;
 
-    static auto udjat_top = data->room_templates().at("udjattop").id;
-    if (l == 1)
-    {
-        backlayer_room_exists->rooms[x + y * 8] = room_template != 0 && room_template != udjat_top;
-        if (room_template == udjat_top)
-        {
-            rooms_meta_26->rooms[x + y * 8] = false;
-        }
-    }
     return true;
 }
 
