@@ -2251,7 +2251,14 @@ void render_messages()
 void render_clickhandler()
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize(io.DisplaySize);
+    if (g_Console->is_toggled())
+    {
+        ImGui::SetNextWindowSize({io.DisplaySize.x, io.DisplaySize.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
+    }
+    else
+    {
+        ImGui::SetNextWindowSize(io.DisplaySize);
+    }
     ImGui::SetNextWindowPos({0, 0});
     ImGui::Begin(
         "Clickhandler",
