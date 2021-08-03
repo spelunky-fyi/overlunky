@@ -1316,20 +1316,6 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
         if (!lock_entity)
             g_last_id = spawned;
     }
-    else if (pressed("move_up", wParam) && active("tool_camera"))
-    {
-        g_zoom -= 1.0;
-        set_zoom();
-    }
-    else if (pressed("move_down", wParam) && active("tool_camera"))
-    {
-        g_zoom += 1.0;
-        set_zoom();
-    }
-    else if (pressed("enter", wParam) && active("tool_camera"))
-    {
-        set_zoom();
-    }
     else if (pressed("tool_debug", wParam))
     {
         if (!options["tabbed_interface"])
