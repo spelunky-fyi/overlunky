@@ -67,19 +67,19 @@ void* register_hook_function(void*** vtable, size_t index, void* hook_function)
         return original_function;
     }
 }
-//void unregister_hook_function(void*** vtable, size_t index)
-//{
-//    if (VTableHook* vtable_hook = get_vtable_hook(*vtable))
-//    {
-//        if (VFunctionHook* vfunction_hook = get_vfunction_hook(*vtable_hook, index))
-//        {
-//            void*& vtable_ptr = vtable_find<void*>(vtable, index);
-//            vtable_ptr = vfunction_hook->original_function;
-//            vtable_hook->functions.erase(vtable_hook->functions.begin() + (vfunction_hook - &vtable_hook->functions.front()));
-//            return;
-//        }
-//    }
-//}
+void unregister_hook_function(void*** vtable, size_t index)
+{
+    if (VTableHook* vtable_hook = get_vtable_hook(*vtable))
+    {
+        if (VFunctionHook* vfunction_hook = get_vfunction_hook(*vtable_hook, index))
+        {
+            void*& vtable_ptr = vtable_find<void*>(vtable, index);
+            vtable_ptr = vfunction_hook->original_function;
+            vtable_hook->functions.erase(vtable_hook->functions.begin() + (vfunction_hook - &vtable_hook->functions.front()));
+            return;
+        }
+    }
+}
 void* get_hook_function(void*** vtable, size_t index)
 {
     if (VTableHook* vtable_hook = get_vtable_hook(*vtable))

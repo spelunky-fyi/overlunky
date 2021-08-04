@@ -96,7 +96,7 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             FileInfo* file_info = new (file_buffer) FileInfo{};
             file_info->Data = file_buffer + sizeof(FileInfo);
             file_info->DataSize = data_size;
-            file_info->AllocationSize = allocation_size;
+            file_info->AllocationSize = static_cast<int>(allocation_size);
 
             auto dds_image_data = file_buffer + sizeof(FileInfo);
             memcpy(dds_image_data, "DDS ", 4);

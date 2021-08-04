@@ -194,7 +194,7 @@ PlayingSound CustomSound::play(bool paused, SOUND_TYPE sound_type)
             [=](FMOD::Sound* sound)
             { return m_SoundManager->play_sound(sound, paused, sound_type == SOUND_TYPE::Music); },
             [=](FMODStudio::EventDescription* event)
-            { return m_SoundManager->play_event(event, paused); },
+            { return m_SoundManager->play_event(event, paused, sound_type == SOUND_TYPE::Music); },
             [](std::monostate)
             {
                 return PlayingSound{nullptr, nullptr};
@@ -562,7 +562,7 @@ CustomSound SoundManager::get_event(std::string_view event_name)
     }
     return CustomSound{nullptr, nullptr};
 }
-PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, bool paused)
+PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, bool paused, [[maybe_unused]] bool as_music) //TODO: fix as_music being not used
 {
     FMODStudio::EventInstance* instance{nullptr};
     m_EventCreateInstance(fmod_event, &instance);

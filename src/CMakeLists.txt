@@ -70,9 +70,8 @@ if (BUILD_INFO_DUMP)
 
         if(MSVC)
                 target_compile_options(info_dump PRIVATE 
-                /W4 /WX
-                /wd4201 #nonstandard extension used : nameless struct/union 
-                )
+                        /W4 /WX
+                        /wd4201) #nonstandard extension used : nameless struct/union 
         else()
                 target_compile_options(info_dump PRIVATE -Wall -Wextra -pedantic -Werror)
         endif()
@@ -82,10 +81,7 @@ if(BUILD_SPEL2_DLL)
         add_subdirectory(spel2_dll)
 
         if(MSVC)
-                target_compile_options(spel2_dll PRIVATE 
-                /W4 /WX
-                /wd4201 #nonstandard extension used : nameless struct/union
-                )
+                target_compile_options(spel2_dll PRIVATE /W4 /WX)
         else()
                 target_compile_options(spel2_dll PRIVATE -Wall -Wextra -pedantic -Werror)
         endif()
@@ -139,16 +135,8 @@ if(BUILD_OVERLUNKY)
         add_subdirectory(injector)
         
         if(MSVC)
-                target_compile_options(injected PRIVATE 
-                /W4 /WX
-                /wd4201 #nonstandard extension used : nameless struct/union
-                )
-                target_compile_definitions(injected PRIVATE
-	            _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-                target_compile_options(injector PRIVATE 
-                /W4 /WX
-                /wd4201 #nonstandard extension used : nameless struct/union
-                )
+                target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
+                target_compile_options(injector PRIVATE /W4 /WX)
                 if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
                         find_package(Python3 COMPONENTS Interpreter)
                         if(Python3_FOUND)
@@ -157,19 +145,16 @@ if(BUILD_OVERLUNKY)
                                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${SPELUNKY_INSTALL_DIR}/game_data ./docs/game_data
                                         COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
                                         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                                        COMMENT "Update docs, including collecting all game data."
-                                )
+                                        COMMENT "Update docs, including collecting all game data.")
                                 add_custom_target(update_auto_docs_overlunky
                                         COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
                                         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                                        COMMENT "Update only auto-docs."
-                                )
+                                        COMMENT "Update only auto-docs.")
                         else()
                                 message("You need python 3 for auto-docs.")
                         endif()
                 endif()
         else()
-                target_compile_options(injected PRIVATE -Wall -Wextra -pedantic -Werror)
                 target_compile_options(injector PRIVATE -Wall -Wextra -pedantic -Werror)
         endif()
 endif()

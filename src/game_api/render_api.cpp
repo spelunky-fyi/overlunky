@@ -125,7 +125,7 @@ std::uint64_t RenderAPI::define_texture(TextureDefinition data)
     }
 
     new_texture.name = load_texture(std::move(data.texture_path));
-    custom_textures[(unsigned int)new_texture.id] = new_texture;
+    custom_textures[new_texture.id] = new_texture;
 
     return new_texture.id;
 }

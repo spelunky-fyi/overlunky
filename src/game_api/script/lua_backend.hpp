@@ -23,10 +23,10 @@
 
 using CallbackId = uint32_t;
 using Flags = std::uint32_t;
-using SPAWN_TYPE = int;                  // NoAlias
-using VANILLA_SOUND = std::string;       // NoAlias
+using SPAWN_TYPE = int;                       // NoAlias
+using VANILLA_SOUND = std::string;            // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
-using BUTTONS = std::uint16_t;           // NoAlias
+using BUTTONS = std::uint16_t;                // NoAlias
 
 enum class ON
 {

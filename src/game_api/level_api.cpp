@@ -920,13 +920,13 @@ std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
         static_cast<int>(std::ceil(x - 3.5f)) / 10,
         static_cast<int>(std::ceil(121.5f - y)) / 8};
 }
-std::pair<float, float> LevelGenSystem::get_room_pos(unsigned int x, unsigned int y)
+std::pair<float, float> LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
 {
     return std::pair<float, float>{
         static_cast<float>(x * 10) + 2.5f,
         122.5f - static_cast<float>(y * 8)};
 }
-std::optional<uint16_t> LevelGenSystem::get_room_template(unsigned int x, unsigned int y, int l)
+std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, int l)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -948,7 +948,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(unsigned int x, unsign
     LevelGenRooms* level_rooms = rooms[l];
     return level_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::set_room_template(unsigned int x, unsigned int y, int l, uint16_t room_template)
+bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();

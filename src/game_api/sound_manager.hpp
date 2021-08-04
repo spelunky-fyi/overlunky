@@ -124,7 +124,7 @@ class SoundManager
     PlayingSound play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music);
 
     CustomSound get_event(std::string_view event_name);
-    PlayingSound play_event(FMODStudio::EventDescription* fmod_event, bool paused);
+    PlayingSound play_event(FMODStudio::EventDescription* fmod_event, bool paused, bool as_music);
 
     bool is_playing(PlayingSound playing_sound);
     bool stop(PlayingSound playing_sound);
