@@ -338,7 +338,6 @@ void register_usertypes(sol::state& lua)
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor
     {
-        //LuaBackend* backend = LuaBackend::get_calling_backend(); //???
         return (uColor)(a << 24) + (b << 16) + (g << 8) + (r);
     };
     /// Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
