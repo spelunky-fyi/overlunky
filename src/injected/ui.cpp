@@ -413,6 +413,24 @@ void refresh_script_files()
             }
         }
     }
+    else if (!load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    {
+        std::vector<std::string> unload_scripts;
+        for (const auto& script : g_scripts)
+        {
+            if(!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()), std::filesystem::path(scriptpath)))
+            {
+                unload_scripts.push_back(script.second->get_file());
+            }
+        }
+        for (auto id : unload_scripts)
+        {
+            auto it = g_scripts.find(id);
+            if (it != g_scripts.end())
+                g_scripts.erase(id);
+        }
+    }
+
     if (load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         for (const auto& file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
@@ -423,6 +441,24 @@ void refresh_script_files()
             }
         }
     }
+    else if (!load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    {
+        std::vector<std::string> unload_scripts;
+        for (const auto& script : g_scripts)
+        {
+            if(!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()).parent_path(), std::filesystem::path("Mods/Packs")))
+            {
+                unload_scripts.push_back(script.second->get_file());
+            }
+        }
+        for (auto id : unload_scripts)
+        {
+            auto it = g_scripts.find(id);
+            if (it != g_scripts.end())
+                g_scripts.erase(id);
+        }
+    }
+
     for (auto file : g_script_files)
     {
         load_script(file.string().data(), false);
@@ -1315,20 +1351,6 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
         int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
         if (!lock_entity)
             g_last_id = spawned;
-    }
-    else if (pressed("move_up", wParam) && active("tool_camera"))
-    {
-        g_zoom -= 1.0;
-        set_zoom();
-    }
-    else if (pressed("move_down", wParam) && active("tool_camera"))
-    {
-        g_zoom += 1.0;
-        set_zoom();
-    }
-    else if (pressed("enter", wParam) && active("tool_camera"))
-    {
-        set_zoom();
     }
     else if (pressed("tool_debug", wParam))
     {
@@ -2251,14 +2273,21 @@ void render_messages()
 void render_clickhandler()
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize(io.DisplaySize);
+    if (g_Console->is_toggled())
+    {
+        ImGui::SetNextWindowSize({io.DisplaySize.x, io.DisplaySize.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
+    }
+    else
+    {
+        ImGui::SetNextWindowSize(io.DisplaySize);
+    }
     ImGui::SetNextWindowPos({0, 0});
     ImGui::Begin(
         "Clickhandler",
         NULL,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
     if (options["draw_grid"])
     {
         render_grid();
@@ -3875,7 +3904,7 @@ void imgui_draw()
     }
     float lastwidth = 0;
     float lastheight = 0;
-    float toolwidth = 0.128 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
+    float toolwidth = 0.12 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
         if (options["tabbed_interface"])
@@ -4050,12 +4079,18 @@ void imgui_draw()
             ImGui::Begin(windows["tool_script"]->name.c_str());
             render_scripts();
             ImGui::End();
+
+            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+            ImGui::Begin(windows["tool_save"]->name.c_str());
+            render_savegame();
+            ImGui::End();
         }
 
         if (show_debug && !options["tabbed_interface"])
         {
             ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 4, 0}, win_condition);
             ImGui::Begin(windows["tool_debug"]->name.c_str(), &show_debug);
             render_debug();
             ImGui::End();
@@ -4064,10 +4099,10 @@ void imgui_draw()
         if (change_colors && !options["tabbed_interface"])
         {
             ImGui::Begin(windows["tool_style"]->name.c_str(), &change_colors);
-            ImGui::SetWindowSize({-1, -1}, ImGuiCond_Always);
+            ImGui::SetWindowSize({-1, -1}, win_condition);
             render_style_editor();
             ImGui::SetWindowPos(
-                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2});
+                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
             ImGui::End();
         }
     }

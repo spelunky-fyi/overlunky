@@ -262,13 +262,21 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
 
 void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
 {
-    const std::optional<size_t> prev_history_pos = history_pos;
+    std::optional<size_t> prev_history_pos = history_pos;
     if (!history_pos.has_value())
     {
         if (!history.empty())
         {
             history_pos = history.size() - 1;
         }
+    }
+    else if (data->EventKey == ImGuiKey_UpArrow && history_pos.value() == history.size() - 1 && data->BufTextLen == 0)
+    {
+        prev_history_pos = -1;
+    }
+    else if (data->EventKey == ImGuiKey_DownArrow && history_pos.value() == history.size() - 1)
+    {
+        data->DeleteChars(0, data->BufTextLen);
     }
     else if (data->EventKey == ImGuiKey_UpArrow && history_pos.value() > 0)
     {
@@ -536,8 +544,8 @@ bool LuaConsole::pre_draw()
         ImGui::Begin(
             "Console Overlay",
             NULL,
-            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking |
+                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
         std::string_view input_view{console_input};
         const size_t num_lines = std::count(input_view.begin(), input_view.end(), '\n') + 1;
