@@ -97,6 +97,8 @@ An array of [Player](#player) of the current players. Pro tip: You need `players
 Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
 ### [`options`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 Table of options set in the UI, added with the [register_option_functions](#register_option_int).
+### [`prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prng)
+The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
 ## Event functions
 Define these in your script to be called on an event. For example:
 ```lua
@@ -931,6 +933,13 @@ end
 - [`bool uniform_shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uniform_shake) &Camera::uniform_shake
 - [`int focused_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) &Camera::focused_entity_uid
 - [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
+### `PRNG`
+- [`int random_index(int size, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_index) &PRNG::random_index
+\
+Generate a random integer in the range `[0, size)`
+- [`int random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
+\
+Generate a random integer in the range `[min, size)`
 ### `Color`
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
@@ -3064,6 +3073,9 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`STILL_FALLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.STILL_FALLING) 3
 - [`MISSED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.MISSED) 4
 - [`POISONED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.POISONED) 5
+### PRNG_CLASS
+Determines what class of prng is used, for example when choosing `PRNG_CLASS.LEVEL_GEN` to generate a random number random Tiamat spawns will not be affected.
+- [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_GEN) PRNG::LEVEL_GEN
 ### REPEAT_TYPE
 - [`NO_REPEAT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.NO_REPEAT) REPEAT_TYPE::NoRepeat
 - [`LINEAR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.LINEAR) REPEAT_TYPE::Linear

@@ -28,6 +28,7 @@
 #include "usertypes/level_lua.hpp"
 #include "usertypes/particles_lua.hpp"
 #include "usertypes/player_lua.hpp"
+#include "usertypes/prng_lua.hpp"
 #include "usertypes/save_context.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
@@ -102,6 +103,7 @@ end
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);
+    NPRNG::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);

@@ -15,9 +15,10 @@ PRNG& PRNG::get_local()
     return *prng;
 }
 
-std::size_t PRNG::random_index(std::size_t size, PRNG_CLASS type)
+PRNG::prng_pair PRNG::get_and_advance(PRNG_CLASS type)
 {
     prng_pair& pair = pairs[type];
+    prng_pair copy = pair;
 
     const std::uint64_t lower = pair.first;
     const std::uint64_t upper = pair.second;
@@ -29,5 +30,16 @@ std::size_t PRNG::random_index(std::size_t size, PRNG_CLASS type)
         pair.second = rest * 0x8000000 | rest >> 0x25,
     };
 
-    return (lower & 0xffffffff) * size >> 0x20;
+    return copy;
+}
+
+std::uint64_t PRNG::random_index(std::uint64_t size, PRNG_CLASS type)
+{
+    prng_pair pair = get_and_advance(type);
+    return pair.first % size;
+}
+std::uint64_t PRNG::random_int(std::uint64_t min, std::uint64_t max, PRNG_CLASS type)
+{
+    const std::uint64_t diff = min - max;
+    return min + random_index(diff, type);
 }
