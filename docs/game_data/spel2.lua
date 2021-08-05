@@ -2196,6 +2196,12 @@ PARTICLEEMITTER = {
   YETIKING_YELL_SPARKLES = 181,
   YETIQUEEN_LANDING_SNOWDUST = 182
 }
+PRNG = {
+  __name = "sol.PRNG.user"
+}
+PRNG_CLASS = {
+  LEVEL_GEN = 0
+}
 PROCEDURAL_CHANCE = {
   ADD_GOLD_BAR = 444,
   ADD_GOLD_BARS = 445,
@@ -4190,8 +4196,9 @@ os = {
 }
 pause = function(...) end
 pick_up = function(...) end
-players = 
+players = {}
 prinspect = function(...) end
+prng = {}
 read_input = function(...) end
 read_prng = function(...) end
 read_stolen_input = function(...) end
@@ -4205,7 +4212,7 @@ register_option_string = function(...) end
 replace_drop = function(...) end
 return_input = function(...) end
 rgba = function(...) end
-savegame = 
+savegame = {}
 say = function(...) end
 screen_aabb = function(...) end
 screen_distance = function(...) end
@@ -4257,7 +4264,7 @@ spawn_liquid = function(...) end
 spawn_on_floor = function(...) end
 spawn_tree = function(...) end
 speechbubble_visible = function(...) end
-state = 
+state = {}
 steal_input = function(...) end
 test_flag = function(...) end
 testflag = function(...) end
