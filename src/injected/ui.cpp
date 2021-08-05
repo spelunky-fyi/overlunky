@@ -418,7 +418,7 @@ void refresh_script_files()
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
         {
-            if(!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()), std::filesystem::path(scriptpath)))
+            if (!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()), std::filesystem::path(scriptpath)))
             {
                 unload_scripts.push_back(script.second->get_file());
             }
@@ -446,7 +446,7 @@ void refresh_script_files()
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
         {
-            if(!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()).parent_path(), std::filesystem::path("Mods/Packs")))
+            if (!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()).parent_path(), std::filesystem::path("Mods/Packs")))
             {
                 unload_scripts.push_back(script.second->get_file());
             }
