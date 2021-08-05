@@ -421,6 +421,24 @@ void refresh_script_files()
             }
         }
     }
+    else if (!load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    {
+        std::vector<std::string> unload_scripts;
+        for (const auto& script : g_scripts)
+        {
+            if(!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()), std::filesystem::path(scriptpath)))
+            {
+                unload_scripts.push_back(script.second->get_file());
+            }
+        }
+        for (auto id : unload_scripts)
+        {
+            auto it = g_scripts.find(id);
+            if (it != g_scripts.end())
+                g_scripts.erase(id);
+        }
+    }
+
     if (load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         for (const auto& file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
@@ -431,6 +449,24 @@ void refresh_script_files()
             }
         }
     }
+    else if (!load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    {
+        std::vector<std::string> unload_scripts;
+        for (const auto& script : g_scripts)
+        {
+            if(!script.second->is_enabled() && std::filesystem::equivalent(std::filesystem::path(script.second->get_path()).parent_path(), std::filesystem::path("Mods/Packs")))
+            {
+                unload_scripts.push_back(script.second->get_file());
+            }
+        }
+        for (auto id : unload_scripts)
+        {
+            auto it = g_scripts.find(id);
+            if (it != g_scripts.end())
+                g_scripts.erase(id);
+        }
+    }
+
     for (auto file : g_script_files)
     {
         load_script(file.string().data(), false);

@@ -1,6 +1,6 @@
-meta.name = "Randomizer"
+meta.name = "Old Randomizer"
 meta.version = "1.2"
-meta.description = "The Randomizer from Overlunky in one Playlunky compatible mod."
+meta.description = "The Randomizer from Overlunky in one Playlunky compatible mod. This is the old janky one."
 meta.author = "Dregu"
 
 -- This is a horrible module example btw, don't take any notes.
