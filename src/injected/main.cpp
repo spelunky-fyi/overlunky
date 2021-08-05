@@ -39,9 +39,9 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 
 void attach_stdout(DWORD pid)
 {
-    //size_t requiredSize;
-    //getenv_s(&requiredSize, NULL, 0, "OL_DEBUG");
-    //if (requiredSize != 0)
+    size_t env_var_size;
+    getenv_s(&env_var_size, NULL, 0, "OL_DEBUG");
+    if (env_var_size > 0)
     {
         AttachConsole(pid);
         SetConsoleCtrlHandler(ctrl_handler, 1);
@@ -86,9 +86,9 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     auto api = RenderAPI::get();
     init_ui();
     init_hooks((void*)api.swap_chain());
-    size_t requiredSize;
-    getenv_s(&requiredSize, NULL, 0, "OL_DEBUG");
-    if (requiredSize != 0)
+    size_t env_var_size;
+    getenv_s(&env_var_size, NULL, 0, "OL_DEBUG");
+    if (env_var_size > 0)
     {
         DEBUG("Running in debug mode.");
         do
