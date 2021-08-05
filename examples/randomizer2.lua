@@ -784,10 +784,11 @@ end, ON.CAMP)
 --[[DOORS]]
 register_option_int("door_min_levels", "door_min_levels", 3, 1, 100)
 register_option_int("door_max_levels", "door_max_levels", 6, 1, 100)
-register_option_int("door_bosses", "door_bosses", 5, 1, 5)
+register_option_int("door_bosses", "door_bosses", 4, 1, 4)
 
 local theme = {1,2,3,5,6,7,8,9,10,11}
-local bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
+--local bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
+local bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.HUNDUN}
 local bosses_left = {}
 local world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
 local normal_levels = 0
@@ -813,16 +814,14 @@ for i,v in ipairs(bosses) do
     critters[v] = ENT_TYPE.ITEM_LITWALLTORCH
 end
 
-local function set_doors(set_target)
+local function set_doors()
     if #players > 0 then
         local px, py, pl = get_position(players[1].uid)
         local doors = get_entities_at(ENT_TYPE.FLOOR_DOOR_EXIT, 0, px, py, pl, 15)
         for i,v in ipairs(doors) do
             local x, y, layer = get_position(v)
-            if state.theme == THEME.TIAMAT or state.theme == THEME.HUNDUN then
-                if set_target then
-                    set_door_target(v, nextworld, nextlevel, nexttheme)
-                end
+            if state.theme == THEME.HUNDUN then
+                --set_door_target(v, nextworld, nextlevel, nexttheme)
                 unlock_door_at(x, y)
             end
             if not critters_spawned and critters[realtheme] ~= nil then
@@ -849,11 +848,11 @@ local function random_level()
             nextlevel = 1
         end
 
-    -- all bosses killed, go to 7-98
+    -- all bosses killed, go to tiamat
     elseif #bosses_left <= #bosses-options.door_bosses and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
-        nexttheme = THEME.COSMIC_OCEAN
-        nextlevel = 98
-        toast("Lets get out of here!")
+        nexttheme = THEME.TIAMAT
+        nextworld = 6
+        nextlevel = 4
 
     -- pick a regular level
     else
@@ -897,7 +896,7 @@ local function remove_boss(boss)
     for k,v in ipairs(bosses_left) do
         if v == boss then
             table.remove(bosses_left, k)
-            toast("Boss defeated!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)))
+            toast("Boss defeated!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)+1))
             return
         end
     end
@@ -905,12 +904,11 @@ end
 
 local function dead_olmec()
     if state.theme == THEME.OLMEC then
-        olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
+        local olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
         if #olmecs > 0 then
             x, y, l = get_position(olmecs[1])
             if y < 71 then -- this olmec is low enough
                 remove_boss(THEME.OLMEC)
-                normal_levels = options.door_max_levels
             end
         end
     end
@@ -923,10 +921,7 @@ local function dead_tiamat()
             local tiamat = get_entity(tiamats[1])
             if testflag(tiamat.flags, 29) then -- this tiamat is dead
                 remove_boss(THEME.TIAMAT)
-                set_doors(true)
-                normal_levels = options.door_max_levels
             end
-            state.win_state = WIN_STATE.NO_WIN
         end
     end
 end
@@ -937,10 +932,7 @@ local function dead_hundun()
         if #hunduns > 0 then
             if get_entity_ai_state(hunduns[1]) == 4 then -- this hundun is just chillin on the floor
                 remove_boss(THEME.HUNDUN)
-                set_doors(true)
-                normal_levels = options.door_max_levels
             end
-            state.win_state = WIN_STATE.NO_WIN
         end
     end
 end
@@ -948,14 +940,12 @@ end
 local function dead_kingu()
     if test_flag(state.journal_flags, 16) then
         remove_boss(THEME.ABZU)
-        normal_levels = options.door_max_levels
     end
 end
 
 local function dead_osiris()
     if test_flag(state.journal_flags, 17) then
         remove_boss(THEME.DUAT)
-        normal_levels = options.door_max_levels
     end
 end
 
@@ -988,7 +978,7 @@ set_callback(function()
         dead_osiris()
     end, 15)
 
-    if state.theme == THEME.TIAMAT or state.theme == THEME.HUNDUN then
+    if state.theme == THEME.HUNDUN then
         local doors = get_entities_by_type(ENT_TYPE.FLOOR_DOOR_EXIT)
         for i,v in ipairs(doors) do
             local x, y, l = get_position(v)
@@ -1000,24 +990,19 @@ end, ON.LEVEL)
 
 set_callback(function()
     --message("Transition")
-    toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)))
-    if state.level < 98 then
-        --message("Transition - Setting next level")
-        state.theme_next = realtheme
-        state.world_next = world[state.theme_next]
-        state.level_next = reallevel
-        state.quest_flags = 0
-    end
+    toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)+1))
+    --message("Transition - Setting next level")
+    state.theme_next = realtheme
+    state.world_next = world[state.theme_next]
+    state.level_next = reallevel
+    state.quest_flags = 0
 end, ON.TRANSITION)
 
 set_callback(function()
     --message("Loading")
-    if dead == true and state.level < 98 then
-        --message("Loading - Setting next level")
-        state.theme_next = realtheme
-        state.world_next = world[state.theme_next]
-        state.level_next = reallevel
-    end
+    state.theme_next = realtheme
+    state.world_next = world[state.theme_next]
+    state.level_next = reallevel
 end, ON.LOADING)
 
 set_callback(function()
@@ -1034,7 +1019,7 @@ end, ON.CAMP)
 
 set_callback(function()
     --message("Death - Init")
-    toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)))
+    toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)+1))
     init_run()
     dead = true
 end, ON.DEATH)
