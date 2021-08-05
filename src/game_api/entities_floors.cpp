@@ -361,6 +361,8 @@ int32_t Floor::get_decoration_entity_type() const
         assert(0x2 == to_id("ENT_TYPE_FLOOR_BORDERTILE_METAL"));
         assert(0x3 == to_id("ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS"));
         assert(0x4 == to_id("ENT_TYPE_FLOOR_GENERIC"));
+        assert(0xb == to_id("ENT_TYPE_FLOOR_TUNNEL_CURRENT"));
+        assert(0xc == to_id("ENT_TYPE_FLOOR_TUNNEL_NEXT"));
         assert(0x5 == to_id("ENT_TYPE_FLOOR_SURFACE"));
         assert(0x6 == to_id("ENT_TYPE_FLOOR_SURFACE_COVER"));
         assert(0xa == to_id("ENT_TYPE_FLOOR_JUNGLE"));
@@ -386,6 +388,8 @@ int32_t Floor::get_decoration_entity_type() const
     case 0x3: // FLOOR_BORDERTILE_OCTOPUS
         return 0x73;
     case 0x4: // FLOOR_GENERIC
+    case 0xb: // ENT_TYPE_FLOOR_TUNNEL_CURRENT
+    case 0xc: // ENT_TYPE_FLOOR_TUNNEL_NEXT
         return 0x75;
     case 0x5: // FLOOR_SURFACE
         return 0x76;
@@ -505,6 +509,8 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
     case 0x4: // FLOOR_GENERIC
     case 0x5: // FLOOR_SURFACE
     case 0xa: // FLOOR_JUNGLE
+    case 0xb: // ENT_TYPE_FLOOR_TUNNEL_CURRENT
+    case 0xc: // ENT_TYPE_FLOOR_TUNNEL_NEXT
         num_variants = 2;
         break;
     }
