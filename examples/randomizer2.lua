@@ -186,13 +186,58 @@ local function trap_totem_valid(x, y, l)
     box.top = y+3
     box.bottom = y+1
     local air = get_entities_overlapping_hitbox(0, MASK.FLOOR, box, l)
-    if floor ~= -1 and #air == 0 then
+    local left = get_grid_entity_at(x-1, y, l)
+    local right = get_grid_entity_at(x+1, y, l)
+    if floor ~= -1 and #air == 0 and left ~= -1 and right ~= -1 then
         floor = get_entity(floor)
-        return has(valid_floors, floor.type.id)
+        left = get_entity(left)
+        right = get_entity(right)
+        return has(valid_floors, floor.type.id) and has(valid_floors, left.type.id) and has(valid_floors, right.type.id)
     end
     return false
 end
 local trap_totem_chance = define_procedural_spawn("trap_totem", trap_totem_spawn, trap_totem_valid)
+
+local function trap_frog_spawn(x, y, l)
+    local id = ENT_TYPE.FLOOR_BIGSPEAR_TRAP
+    local uid = get_grid_entity_at(x, y, l)
+    if uid ~= -1 then
+        kill_entity(uid)
+    end
+    uid = get_grid_entity_at(x+1, y, l)
+    if uid ~= -1 then
+        kill_entity(uid)
+    end
+    spawn_grid_entity(ENT_TYPE.FLOOR_BIGSPEAR_TRAP, x, y, l)
+    spawn_grid_entity(ENT_TYPE.FLOOR_BIGSPEAR_TRAP, x+1, y, l)
+end
+local function trap_frog_valid(x, y, l)
+    local floor = get_grid_entity_at(x, y, l)
+    local box = AABB:new()
+    box.left = x-1
+    box.right = x+2
+    box.top = y+1
+    box.bottom = y
+    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR, box, l)
+    local left = get_grid_entity_at(x-1, y-1, l)
+    local right = get_grid_entity_at(x+2, y-1, l)
+    if floor ~= -1 and #air == 0 and left ~= -1 and right ~= -1 then
+        floor = get_entity(floor)
+        return has(valid_floors, floor.type.id)
+    end
+
+    floor = get_grid_entity_at(x, y, l)
+    local floor2 = get_grid_entity_at(x+1, y, l)
+    local left = get_grid_entity_at(x-1, y, l)
+    local right = get_grid_entity_at(x+2, y, l)
+    if floor ~= -1 and floor2 ~= -1 and (left == -1 or right == -1) then
+        floor = get_entity(floor)
+        floor2 = get_entity(floor2)
+        return has(valid_floors, floor.type.id) and has(valid_floors, floor2.type.id)
+    end
+    return false
+end
+local trap_frog_chance = define_procedural_spawn("trap_frog", trap_frog_spawn, trap_frog_valid)
 
 set_callback(function(ctx)
     math.randomseed(read_prng()[1])
@@ -202,6 +247,7 @@ set_callback(function(ctx)
     ctx:set_procedural_spawn_chance(trap_generic_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_item_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_totem_chance, get_chance(options.trap_min, options.trap_max))
+    ctx:set_procedural_spawn_chance(trap_frog_chance, get_chance(options.trap_min, options.trap_max))
 end, ON.POST_ROOM_GENERATION)
 
 set_callback(function()
@@ -219,7 +265,7 @@ local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
     ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_MANTRAP, ENT_TYPE.MONS_TIKIMAN, ENT_TYPE.MONS_WITCHDOCTOR,
     ENT_TYPE.MONS_MONKEY, ENT_TYPE.MONS_MAGMAMAN, ENT_TYPE.MONS_ROBOT,
-    ENT_TYPE.MONS_FIREBUG_UNCHAINED, ENT_TYPE.MONS_IMP,
+    ENT_TYPE.MONS_FIREBUG_UNCHAINED,
     ENT_TYPE.MONS_CROCMAN, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS,
     ENT_TYPE.MONS_CATMUMMY, ENT_TYPE.MONS_NECROMANCER, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI,
     ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_UFO, ENT_TYPE.MONS_ALIEN,
