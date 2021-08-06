@@ -692,6 +692,10 @@ bool LuaConsole::pre_draw()
                     history_pos = std::nullopt;
                     history.clear();
                 }
+                else if (console_input == "reset"sv || console_input == "reload"sv)
+                {
+                    LuaBackend::clear();
+                }
                 else
                 {
                     std::size_t messages_before = messages.size();
