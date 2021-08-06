@@ -2638,6 +2638,11 @@ ROOM_TEMPLATE = {
   VLAD_ENTRANCE = 120,
   VLAD_TUNNEL = 123
 }
+ROOM_TEMPLATE_TYPE = {
+  ENTRANCE = 1,
+  EXIT = 2,
+  NONE = 0
+}
 RegenBlock = {
   __index = "function",
   __name = "sol.RegenBlock.user",

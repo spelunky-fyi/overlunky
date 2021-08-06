@@ -664,7 +664,7 @@ Get the room template given a certain index
 `string_view get_room_template_name(int room_template)`<br/>
 For debugging only, get the name of a room template
 ### [`define_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_room_template)
-`int define_room_template(string room_template, bool contains_entrance)`<br/>
+`int define_room_template(string room_template, ROOM_TEMPLATE_TYPE type)`<br/>
 Define a new room remplate to use with `set_room_template`
 ### [`get_procedural_spawn_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
 `int get_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id)`<br/>
@@ -3212,6 +3212,11 @@ Beg quest states
 - [`BOMBBAG_THROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.BOMBBAG_THROWN) 3
 - [`SPAWNED_WITH_TRUECROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.SPAWNED_WITH_TRUECROWN) 4
 - [`TRUECROWN_THROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.TRUECROWN_THROWN) 5
+### ROOM_TEMPLATE_TYPE
+Use in `define_room_template` to declare whether a room template has any special behavior
+- [`NONE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.NONE) 0
+- [`ENTRANCE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.ENTRANCE) 1
+- [`EXIT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.EXIT) 2
 ### SOUND_TYPE
 Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
 - [`SFX`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SOUND_TYPE.SFX) 0

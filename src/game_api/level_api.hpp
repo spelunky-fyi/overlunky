@@ -34,6 +34,13 @@ struct SpawnLogicProvider
     std::function<void(float, float, int)> do_spawn;
 };
 
+enum class RoomTemplateType
+{
+    None = 0,
+    Entrance = 1,
+    Exit = 2
+};
+
 struct LevelGenData
 {
     void init();
@@ -53,8 +60,8 @@ struct LevelGenData
     void undefine_extra_spawn(std::uint32_t extra_spawn_id);
 
     std::optional<std::uint16_t> get_room_template(const std::string& room_template);
-    std::uint16_t define_room_template(std::string room_template, bool contains_entrance);
-    bool does_room_template_contain_entrance(std::uint16_t room_template);
+    std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
+    RoomTemplateType get_room_template_type(std::uint16_t room_template);
 
     // TODO: Get offsets from binary instead of hardcoding them
     const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const

@@ -147,10 +147,10 @@ void register_usertypes(sol::state& lua)
     };
 
     /// Define a new room remplate to use with `set_room_template`
-    lua["define_room_template"] = [](std::string room_template, bool contains_entrance) -> uint16_t
+    lua["define_room_template"] = [](std::string room_template, ROOM_TEMPLATE_TYPE type) -> uint16_t
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return backend->g_state->level_gen->data->define_room_template(std::move(room_template), contains_entrance);
+        return backend->g_state->level_gen->data->define_room_template(std::move(room_template), static_cast<RoomTemplateType>(type));
     };
 
     /// Get the inverse chance of a procedural spawn for the current level.
@@ -306,6 +306,9 @@ void register_usertypes(sol::state& lua)
 
     /// Beg quest states
     lua.create_named_table("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
+
+    /// Use in `define_room_template` to declare whether a room template has any special behavior
+    lua.create_named_table("ROOM_TEMPLATE_TYPE", "NONE", 0, "ENTRANCE", 1, "EXIT", 2);
 
     lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0

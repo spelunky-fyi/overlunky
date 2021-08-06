@@ -530,7 +530,7 @@ std::mutex g_extra_spawn_logic_providers_lock;
 std::uint32_t g_current_extra_spawn_id{0};
 std::vector<ExtraSpawnLogicProviderImpl> g_extra_spawn_logic_providers;
 
-std::vector<uint16_t> g_room_templates_with_entrance;
+std::vector<std::pair<uint16_t, RoomTemplateType>> g_room_template_types;
 
 bool g_replace_level_loads{false};
 std::vector<std::string> g_levels_to_load;
@@ -605,9 +605,17 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
     else
     {
         uint16_t pretend_room_template = room_template;
-        if (self->data->does_room_template_contain_entrance(pretend_room_template))
+        switch (self->data->get_room_template_type(room_template))
         {
+        default:
+        case RoomTemplateType::None:
+            break;
+        case RoomTemplateType::Entrance:
             pretend_room_template = 5;
+            break;
+        case RoomTemplateType::Exit:
+            pretend_room_template = 7;
+            break;
         }
         g_handle_tile_code_trampoline(self, tile_code, pretend_room_template, x, y, layer);
     }
@@ -1100,7 +1108,7 @@ std::optional<std::uint16_t> LevelGenData::get_room_template(const std::string& 
     }
     return {};
 }
-std::uint16_t LevelGenData::define_room_template(std::string room_template, bool contains_entrance)
+std::uint16_t LevelGenData::define_room_template(std::string room_template, RoomTemplateType type)
 {
     if (auto existing = get_tile_code(room_template))
     {
@@ -1114,12 +1122,22 @@ std::uint16_t LevelGenData::define_room_template(std::string room_template, bool
     auto& room_template_map = (mutable_room_template_map_t&)room_templates();
 
     auto [it, success] = room_template_map.emplace(std::move(room_template), RoomTemplateDef{(uint16_t)room_template_map.size()});
-    g_room_templates_with_entrance.push_back(it->second.id);
+
+    if (type != RoomTemplateType::None)
+    {
+        g_room_template_types.push_back({it->second.id, type});
+    }
     return it->second.id;
 }
-bool LevelGenData::does_room_template_contain_entrance(std::uint16_t room_template)
+RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_template)
 {
-    return std::count(g_room_templates_with_entrance.begin(), g_room_templates_with_entrance.end(), room_template);
+    auto it = std::find_if(g_room_template_types.begin(), g_room_template_types.end(), [room_template](auto& t)
+                           { return t.first == room_template; });
+    if (it != g_room_template_types.end())
+    {
+        return it->second;
+    }
+    return RoomTemplateType::None;
 }
 
 using GenerateRoomsFun = void(ThemeInfo*);
