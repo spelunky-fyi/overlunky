@@ -564,12 +564,17 @@ set_callback(function(ctx)
     math.randomseed(read_prng()[5])
     local orig_width = state.width
     local orig_height = state.height
-    local exit_x = 0
+    local exit_x = 1
     local exit_y = 3
+    local big_ocean = false
     if state.world < 7 and not (state.world == 6 and state.level == 2) and state.width == 4 and state.height == 4 and math.random() < options.room_big_chance/100 then
         state.width = math.random(4,5)
         state.height = math.random(math.max(8, options.room_big_min), math.min(15, options.room_big_max))
         toast("My voice REALLY echoes in here!")
+    elseif state.theme == THEME.COSMIC_OCEAN and math.random() < options.room_big_chance/100 then
+        state.width = math.random(4, 8)
+        state.height = math.random(3, 8)
+        big_ocean = true
     end
     for x = 0, state.width - 1 do
         for y = 0, state.height - 1 do
@@ -581,7 +586,7 @@ set_callback(function(ctx)
             end
         end
     end
-    if state.height > orig_height then
+    if state.height > orig_height and state.world < 7 then
         local no_exit = true
         local x = exit_x
         local y = exit_y
@@ -630,6 +635,24 @@ set_callback(function(ctx)
                 no_exit = false
             end
         end
+    elseif big_ocean then
+        for x = 0, state.width - 1 do
+            for y = 0, state.height - 1 do
+                if x == 0 or y == 0 or x == state.width - 1 or y == state.height - 1 then
+                    ctx:set_room_template(x, y, 0, 9)
+                else
+                    ctx:set_room_template(x, y, 0, 0)
+                end
+            end
+        end
+        local spawn_x = math.random(1, state.width-2)
+        local spawn_y = math.random(1, state.height-2)
+        repeat
+            exit_x = math.random(1, state.width-2)
+            exit_y = math.random(1, state.height-2)
+        until(spawn_x ~= exit_x or spawn_y ~= exit_y)
+        ctx:set_room_template(spawn_x, spawn_y, 0, ROOM_TEMPLATE.ENTRANCE)
+        ctx:set_room_template(exit_x, exit_y, 0, ROOM_TEMPLATE.EXIT)
     end
     for x = 0, state.width - 1 do
         for y = 0, state.height - 1 do
@@ -862,8 +885,7 @@ register_option_int("door_bosses", "Amount of midbosses", 4, 0, 4)
 
 local level_order = {}
 
-local theme = {1,2,3,5,6,7,8,9,10,11}
---local bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
+local theme = {1,1,2,2,3,3,5,5,6,6,7,8,8,9,10,10,11}
 local bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.HUNDUN}
 local world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
 local dead = true
@@ -1139,7 +1161,7 @@ end, ON.TRANSITION)
 
 set_callback(function()
     --message("Loading")
-    if state.screen_next ~= ON.LEVEL then return end
+    if state.screen_next ~= ON.LEVEL and state.screen_next ~= ON.TRANSITION then return end
     if (#level_order == 0 or test_flag(state.quest_flags, 1)) then
         --message("Running init")
         init_run()

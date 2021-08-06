@@ -1,6 +1,7 @@
 #include "state_lua.hpp"
 
 #include "state.hpp"
+#include "level_api.hpp"
 
 #include <sol/sol.hpp>
 
@@ -117,7 +118,9 @@ void register_usertypes(sol::state& lua)
         "speechbubble_timer",
         &StateMemory::speechbubble_timer,
         "speechbubble_owner",
-        &StateMemory::speechbubble_owner);
+        &StateMemory::speechbubble_owner,
+        "level_gen",
+        &StateMemory::level_gen);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
