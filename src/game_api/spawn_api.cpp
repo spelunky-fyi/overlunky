@@ -282,8 +282,10 @@ void push_spawn_type_flags(SpawnTypeFlags flags)
     }
 
     g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
     g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
 }
 void pop_spawn_type_flags(SpawnTypeFlags flags)
@@ -297,8 +299,10 @@ void pop_spawn_type_flags(SpawnTypeFlags flags)
     }
 
     g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
     g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
 }
 
