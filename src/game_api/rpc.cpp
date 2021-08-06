@@ -207,8 +207,6 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 
 uint32_t get_entity_flags(uint32_t uid)
 {
-    if (uid < 1)
-        return 0;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -218,8 +216,6 @@ uint32_t get_entity_flags(uint32_t uid)
 
 void set_entity_flags(uint32_t uid, uint32_t flags)
 {
-    if (uid < 1)
-        return;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -228,8 +224,6 @@ void set_entity_flags(uint32_t uid, uint32_t flags)
 
 uint32_t get_entity_flags2(uint32_t uid)
 {
-    if (uid < 1)
-        return 0;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -239,8 +233,6 @@ uint32_t get_entity_flags2(uint32_t uid)
 
 void set_entity_flags2(uint32_t uid, uint32_t flags)
 {
-    if (uid < 1)
-        return;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -249,8 +241,6 @@ void set_entity_flags2(uint32_t uid, uint32_t flags)
 
 int get_entity_ai_state(uint32_t uid)
 {
-    if (uid < 1)
-        return 0;
     auto state = State::get();
     auto ent = state.find(uid)->as<Movable>();
     if (ent)
