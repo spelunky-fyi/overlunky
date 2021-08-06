@@ -1,6 +1,6 @@
 meta.name = "Rando Two"
-meta.description = "Second incarnation of The Randomizer with new api shenannigans. I didn't really test everything and not everything is done and definitely not balanced. The door stuff is also old news. I still have dreams to make a better random chain progression system some day."
-meta.version = "1.999"
+meta.description = "Second incarnation of The Randomizer with new api shenannigans. Everything is now rewritten from scratch and I tuned the crazyness down a notch. Still needs some balancing and less CoGs. There's a kinda new progression system forming with a high probability to be able to do chain (not finished), with multiple endings. It's still hard AF, good luck getting true ending!"
+meta.version = "1.9999"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
@@ -872,12 +872,52 @@ local function kill_boss(boss)
     end
 end
 
+local function insert_chain(t, l)
+    for i,v in ipairs(level_order) do
+        if v.t == t then
+            table.insert(level_order, i - math.random(0, options.door_min_levels), l)
+            break
+        end
+    end
+end
+
+local function fix_chain()
+    math.randomseed(read_prng()[1])
+    insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
+    insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
+end
+
+local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY}
+local chain_items = {}
+local function get_chain_item()
+    return table.remove(chain_items, 1)
+end
+
+set_post_entity_spawn(function(ent)
+    if state.theme ~= THEME.OLMEC then return end
+    if #chain_items > 0 then
+        local x, y, l = get_position(ent.uid)
+        kill_entity(ent.uid)
+        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
+    end
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_ANKH)
+
+set_post_entity_spawn(function(ent)
+    if state.theme ~= THEME.ABZU and state.theme ~= THEME.DUAT then return end
+    if #chain_items > 0 then
+        local x, y, l = get_position(ent.uid)
+        kill_entity(ent.uid)
+        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
+    end
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY)
+
 local function init_run()
-    message("Started new run")
+    --message("Started new run")
     state.level_count = 0
     math.randomseed(read_prng()[1])
     level_order = {}
     insert_bosses = {table.unpack(bosses)}
+    chain_items = {table.unpack(orig_chain_items)}
     bosses_killed = {}
     bosses_added = 0
     local normal_levels = 0
@@ -917,6 +957,12 @@ local function init_run()
             add_level(w, l, t)
         end
     end
+    fix_chain()
+    --[[level_order = {
+        { w = 2, l = 4, t = THEME.JUNGLE, b = false },
+        { w = 8, l = 42, t = THEME.COSMIC_OCEAN, b = false },
+        { w = 6, l = 4, t = THEME.TIAMAT, b = true }
+    }]]
 end
 
 local function dead_olmec()
@@ -1011,7 +1057,7 @@ set_callback(function()
     end
 
     if #level_order > state.level_count+1 then
-        prinspect("next level", level_order[state.level_count+2].w, level_order[state.level_count+2].l, theme_name[level_order[state.level_count+2].t])
+        --prinspect("next level", level_order[state.level_count+2].w, level_order[state.level_count+2].l, theme_name[level_order[state.level_count+2].t])
     end
 end, ON.LEVEL)
 
@@ -1035,7 +1081,7 @@ set_callback(function()
     --message("Loading")
     if state.screen_next ~= ON.LEVEL then return end
     if (#level_order == 0 or test_flag(state.quest_flags, 1)) then
-        message("Running init")
+        --message("Running init")
         init_run()
     end
     local num = state.level_count+1
@@ -1049,9 +1095,9 @@ set_callback(function()
         state.world_next = level_order[num].w
         state.level_next = level_order[num].l
         state.theme_next = level_order[num].t
-        prinspect("going to", level_order[num].w, level_order[num].l, theme_name[level_order[num].t])
+        --prinspect("going to", level_order[num].w, level_order[num].l, theme_name[level_order[num].t])
     elseif #level_order <= state.level_count and state.theme_next ~= THEME.COSMIC_OCEAN then
-        prinspect("last level, going to", co_level)
+        --prinspect("last level, going to", co_level)
         state.world_next = 8
         state.level_next = co_level
         state.theme_next = THEME.COSMIC_OCEAN
