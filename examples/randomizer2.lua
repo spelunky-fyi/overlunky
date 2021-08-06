@@ -37,9 +37,14 @@ local function has(arr, item)
     return false
 end
 
+local theme_name = {}
+for i,v in pairs(THEME) do
+    theme_name[v] = i
+end
+
 --[[TRAPS]]
-register_option_float("trap_max", "trap_max", 6, 0, 100)
-register_option_float("trap_min", "trap_min", 2, 0, 100)
+register_option_float("trap_max", "Max trap chance", 5, 0, 100)
+register_option_float("trap_min", "Min trap chance", 1.5, 0, 100)
 
 local traps_ceiling = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
 local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
@@ -49,7 +54,6 @@ local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TR
 local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
 local trap_arrows = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
-local poison_arrows = {ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
 local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE}
 
 local function trap_ceiling_spawn(x, y, l)
@@ -198,9 +202,9 @@ set_callback(function()
 end, ON.LEVEL)
 
 --[[ENEMIES]]
-register_option_float("enemy_max", "enemy_max", 15, 0, 100)
-register_option_float("enemy_min", "enemy_min", 5, 0, 100)
-register_option_float("enemy_curse_chance", "enemy_curse_chance", 5, 0, 100)
+register_option_float("enemy_max", "Max enemy chance", 12, 0, 100)
+register_option_float("enemy_min", "Min enemy chance", 4, 0, 100)
+register_option_float("enemy_curse_chance", "Enemy handicap chance", 5, 0, 100)
 
 local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
@@ -340,10 +344,10 @@ local enemy_air_chance = define_procedural_spawn("enemy_air", enemy_air_spawn, e
 set_callback(function(ctx)
     math.randomseed(read_prng()[2])
     ctx:set_procedural_spawn_chance(enemy_small_chance, get_chance(options.enemy_min, options.enemy_max))
-    ctx:set_procedural_spawn_chance(enemy_big_chance, get_chance(options.enemy_min, options.enemy_max) * 4)
-    ctx:set_procedural_spawn_chance(enemy_climb_chance, math.ceil(get_chance(options.enemy_min, options.enemy_max) / 2))
-    ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 2)
-    ctx:set_procedural_spawn_chance(enemy_air_chance, get_chance(options.enemy_min, options.enemy_max) * 10)
+    ctx:set_procedural_spawn_chance(enemy_big_chance, get_chance(options.enemy_min, options.enemy_max) * 6)
+    ctx:set_procedural_spawn_chance(enemy_climb_chance, get_chance(options.enemy_min, options.enemy_max) * 2)
+    ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 4)
+    ctx:set_procedural_spawn_chance(enemy_air_chance, get_chance(options.enemy_min, options.enemy_max) * 12)
 
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SNAKE, 0)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPIDER, 0)
@@ -421,6 +425,8 @@ set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.OLMEC then return end
     ent = ent:as_movable()
     local x, y, l = get_position(ent.uid)
+    local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
+    if #players > 0 then return end
     spawn_entity_nonreplaceable(pick(olmec_ammo), x, y, l, math.random()*0.5-0.25, math.random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_BOMB)
 
@@ -480,8 +486,10 @@ set_callback(function()
 end, ON.LEVEL)
 
 --[[ROOMS]]
-register_option_float("room_shop_chance", "room_shop_chance", 20, 0, 100)
-register_option_float("room_big_chance", "room_big_chance", 20, 0, 100)
+register_option_float("room_shop_chance", "Extra shop chance", 15, 0, 100)
+register_option_float("room_big_chance", "Huge level chance", 15, 0, 100)
+register_option_int("room_big_min", "Huge level min height", 8, 8, 15)
+register_option_int("room_big_max", "Huge level max height", 15, 8, 15)
 
 local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.PATH_NORMAL] = true,
@@ -504,7 +512,9 @@ set_callback(function(ctx)
     local exit_x = 0
     local exit_y = 3
     if state.world < 7 and not (state.world == 6 and state.level == 2) and state.width == 4 and state.height == 4 and math.random() < options.room_big_chance/100 then
-        state.height = math.random(5, 12)
+        state.width = math.random(4,5)
+        state.height = math.random(math.max(8, options.room_big_min), math.min(15, options.room_big_max))
+        toast("My voice REALLY echoes in here!")
     end
     for x = 0, state.width - 1 do
         for y = 0, state.height - 1 do
@@ -592,7 +602,7 @@ end, ON.POST_ROOM_GENERATION)
 
 --[[SHOPS]]
 local shop_items = {ENT_TYPE.ITEM_PICKUP_ROPEPILE, ENT_TYPE.ITEM_PICKUP_BOMBBAG, ENT_TYPE.ITEM_PICKUP_BOMBBOX, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_SPECTACLES, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_COMPASS, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_MATTOCK, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_PURCHASABLE_CAPE, ENT_TYPE.ITEM_PURCHASABLE_HOVERPACK, ENT_TYPE.ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ENT_TYPE.ITEM_PURCHASABLE_POWERPACK, ENT_TYPE.ITEM_PURCHASABLE_JETPACK, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY}
-local extra_shop_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD_SHIELD, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP} --scepter, vlads cape and the swords don't work
+local extra_shop_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP} --scepter, vlads cape and the swords don't work
 local all_shop_items = join(shop_items, extra_shop_items)
 local shop_guns = {ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_CROSSBOW}
 local extra_shop_guns = {ENT_TYPE.ITEM_CLONEGUN}
@@ -656,7 +666,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
 
 --[[CONTAINERS]]
-register_option_float("pot_chance", "pot_chance", 20, 0, 100)
+register_option_float("pot_chance", "Pot contents chance", 20, 0, 100)
 local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_GIANTSPIDER,
          ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_REDSKELETON,
          ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD, ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_MANTRAP,
@@ -753,9 +763,9 @@ set_callback(function()
 end, ON.POST_LEVEL_GENERATION)
 
 --[[STATS]]
-register_option_int("stats_health_max", "stats_health_max", 20, 4, 99)
-register_option_int("stats_bombs_max", "stats_bombs_max", 20, 4, 99)
-register_option_int("stats_ropes_max", "stats_ropes_max", 20, 4, 99)
+register_option_int("stats_health_max", "Max starting health", 20, 4, 99)
+register_option_int("stats_bombs_max", "Max starting bombs", 20, 4, 99)
+register_option_int("stats_ropes_max", "Max starting ropes", 20, 4, 99)
 
 set_callback(function()
     math.randomseed(read_prng()[1])
@@ -786,24 +796,20 @@ set_callback(function()
 end, ON.CAMP)
 
 --[[DOORS]]
-register_option_int("door_min_levels", "door_min_levels", 3, 1, 100)
-register_option_int("door_max_levels", "door_max_levels", 6, 1, 100)
-register_option_int("door_bosses", "door_bosses", 4, 1, 4)
+register_option_int("door_min_levels", "Min levels between midbosses", 3, 0, 100)
+register_option_int("door_max_levels", "Max levels between midbosses", 6, 0, 100)
+register_option_int("door_bosses", "Amount of midbosses", 4, 0, 4)
+
+local level_order = {}
 
 local theme = {1,2,3,5,6,7,8,9,10,11}
 --local bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.TIAMAT, THEME.HUNDUN}
 local bosses = {THEME.OLMEC, THEME.ABZU, THEME.DUAT, THEME.HUNDUN}
-local bosses_left = {}
 local world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
-local normal_levels = 0
-local nextworld = 1
-local nextlevel = 1
-local nexttheme = 1
-local reallevel = 1
-local realtheme = 1
-local dead = false
-local critters_spawned = true
+local dead = true
+local co_level = 5
 
+local critters_spawned = true
 local critters = {}
 critters[THEME.DWELLING] = ENT_TYPE.MONS_CRITTERDUNGBEETLE
 critters[THEME.JUNGLE] = ENT_TYPE.MONS_CRITTERBUTTERFLY
@@ -828,81 +834,87 @@ local function set_doors()
                 --set_door_target(v, nextworld, nextlevel, nexttheme)
                 unlock_door_at(x, y)
             end
-            if not critters_spawned and critters[realtheme] ~= nil then
+            --[[if not critters_spawned and critters[realtheme] ~= nil then
                 spawn(critters[realtheme], x-0.7, y+0.5, layer, 0, 0)
                 spawn(critters[realtheme], x+0.7, y+0.5, layer, 0, 0)
                 critters_spawned = true
-            end
+            end]]
         end
     end
 end
 
-local function random_level()
-    math.randomseed(read_prng()[1])
-    -- rare eggplant world
-    if math.random(120) == 1 then
-        nexttheme = THEME.EGGPLANT_WORLD
-        nextlevel = 2
+local function add_level(w, l, t)
+    level_order[#level_order+1] = { w = w, l = l, t = t, b = has(bosses, t) or t == THEME.TIAMAT }
+end
 
-    -- pick a boss level from the remaining
-    elseif #bosses_left > #bosses-options.door_bosses and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
-        normal_levels = 0
-        nexttheme = bosses_left[math.random(#bosses_left)]
-        nextlevel = 4
-        if nexttheme == THEME.OLMEC then
-            nextlevel = 1
-        end
+local insert_bosses = {}
+local bosses_killed = {}
+local bosses_added = 0
 
-    -- all bosses killed, go to tiamat
-    elseif #bosses_left <= #bosses-options.door_bosses and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
-        nexttheme = THEME.TIAMAT
-        nextworld = 6
-        nextlevel = 4
+local function bosses_left()
+    return options.door_bosses+1-#bosses_killed
+end
 
-    -- pick a regular level
-    else
-        normal_levels = normal_levels+1
-        nexttheme = theme[math.random(#theme)]
-        if nexttheme == THEME.NEO_BABYLON then
-            nextlevel = math.random(3)
-        elseif nexttheme == THEME.CITY_OF_GOLD then
-            nextlevel = 3
-        elseif nexttheme == THEME.COSMIC_OCEAN then
-            nextlevel = math.random(5, 97)
-        elseif nexttheme == THEME.ICE_CAVES then
-            nextlevel = 1
-        else
-            nextlevel = math.random(4)
+local function add_boss(boss)
+    for k,v in ipairs(insert_bosses) do
+        if v == boss then
+            table.remove(insert_bosses, k)
+            bosses_added = bosses_added + 1
+            return
         end
     end
-    nextworld = state.world
-    reallevel = nextlevel
-    nextlevel = 1
-    if nexttheme == THEME.COSMIC_OCEAN then
-        nextlevel = 5
+end
+
+local function kill_boss(boss)
+    if not has(bosses_killed, boss) then
+        bosses_killed[#bosses_killed+1] = boss
+        toast("Boss defeated!\nBosses remaining: "..tostring(bosses_left()))
     end
-    realtheme = nexttheme
-    if state.theme ~= THEME.OLMEC then
-        nexttheme = state.theme
-    else
-        nexttheme = 1
-    end
-    --message("Going to "..tostring(nextworld).."-"..tostring(reallevel)..", theme "..tostring(realtheme))
 end
 
 local function init_run()
-    --message("Started new run")
-    bosses_left = {table.unpack(bosses)}
-    normal_levels = 0
-    random_level()
-end
-
-local function remove_boss(boss)
-    for k,v in ipairs(bosses_left) do
-        if v == boss then
-            table.remove(bosses_left, k)
-            toast("Boss defeated!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)+1))
-            return
+    message("Started new run")
+    state.level_count = 0
+    math.randomseed(read_prng()[1])
+    level_order = {}
+    insert_bosses = {table.unpack(bosses)}
+    bosses_killed = {}
+    bosses_added = 0
+    local normal_levels = 0
+    local done = false
+    while not done do
+        if math.random(120) == 1 then
+            add_level(7, 2, THEME.EGGPLANT_WORLD)
+        elseif bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
+            normal_levels = 0
+            local t = insert_bosses[math.random(#insert_bosses)]
+            local l = 4
+            if t == THEME.OLMEC then
+                l = 1
+            end
+            local w = world[t]
+            add_level(w, l, t)
+            add_boss(t)
+        elseif (bosses_added >= options.door_bosses or #insert_bosses == 0) and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
+            add_level(6, 4, THEME.TIAMAT)
+            done = true
+        else
+            normal_levels = normal_levels+1
+            local t = theme[math.random(#theme)]
+            local l = 1
+            if t == THEME.NEO_BABYLON or t == THEME.SUNKEN_CITY then
+                l = math.random(3)
+            elseif t == THEME.CITY_OF_GOLD then
+                l = 3
+            elseif t == THEME.COSMIC_OCEAN then
+                l = math.random(5, 97)
+            elseif t == THEME.ICE_CAVES then
+                l = 1
+            else
+                l = math.random(4)
+            end
+            local w = world[t]
+            add_level(w, l, t)
         end
     end
 end
@@ -913,7 +925,7 @@ local function dead_olmec()
         if #olmecs > 0 then
             local x, y, l = get_position(olmecs[1])
             if y < 71 then -- this olmec is low enough
-                remove_boss(THEME.OLMEC)
+                kill_boss(THEME.OLMEC)
             end
         end
     end
@@ -925,7 +937,7 @@ local function dead_tiamat()
         if #tiamats > 0 then
             local tiamat = get_entity(tiamats[1])
             if testflag(tiamat.flags, 29) then -- this tiamat is dead
-                remove_boss(THEME.TIAMAT)
+                kill_boss(THEME.TIAMAT)
             end
         end
     end
@@ -936,7 +948,7 @@ local function dead_hundun()
         local hunduns = get_entities_by_type(ENT_TYPE.MONS_HUNDUN)
         if #hunduns > 0 then
             if get_entity_ai_state(hunduns[1]) == 4 then -- this hundun is just chillin on the floor
-                remove_boss(THEME.HUNDUN)
+                kill_boss(THEME.HUNDUN)
             end
         end
     end
@@ -944,19 +956,19 @@ end
 
 local function dead_kingu()
     if test_flag(state.journal_flags, 16) then
-        remove_boss(THEME.ABZU)
+        kill_boss(THEME.ABZU)
     end
 end
 
 local function dead_osiris()
     if test_flag(state.journal_flags, 17) then
-        remove_boss(THEME.DUAT)
+        kill_boss(THEME.DUAT)
     end
 end
 
 local function duat_door()
     -- spawn duat skip door
-    spawn_door(17, 106, 0, nextworld, nextlevel, nexttheme)
+    spawn_door(17, 106, 0, level_order[state.level_count+1].w, level_order[state.level_count+1].l, level_order[state.level_count+1].t)
     spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
 end
 
@@ -964,15 +976,10 @@ set_callback(function()
     --message("Level")
     critters_spawned = false
     dead = false
-    if state.level_count == 0 then
-        init_run()
-    end
 
     if state.theme == THEME.DUAT then
         set_timeout(duat_door, 60)
     end
-
-    random_level()
 
     set_interval(function()
         set_doors()
@@ -991,47 +998,107 @@ set_callback(function()
             spawn_door(x, y, l, state.world, state.level, state.theme)
         end
     end
+    if state.theme == THEME.TIAMAT then
+        set_interval(function()
+            if bosses_left() <= 0 then
+                local hp = 0
+                for i,p in pairs(players) do
+                    hp = hp + p.health
+                end
+                co_level = math.max(5, math.min(98, hp))
+            end
+        end, 15)
+    end
+
+    if #level_order > state.level_count+1 then
+        prinspect("next level", level_order[state.level_count+2].w, level_order[state.level_count+2].l, theme_name[level_order[state.level_count+2].t])
+    end
 end, ON.LEVEL)
 
 set_callback(function()
     --message("Transition")
-    toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)+1))
+    toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(bosses_left()))
     --message("Transition - Setting next level")
-    state.theme_next = realtheme
-    state.world_next = world[state.theme_next]
-    state.level_next = reallevel
-    state.quest_flags = 0
+    local num = state.level_count+1
+    if test_flag(state.quest_flags, 1) then
+        num = 1
+    end
+    if #level_order > state.level_count then
+        state.world_next = level_order[num].w
+        state.level_next = level_order[num].l
+        state.theme_next = level_order[num].t
+        --state.quest_flags = 0
+    end
 end, ON.TRANSITION)
 
 set_callback(function()
     --message("Loading")
-    state.theme_next = realtheme
-    state.world_next = world[state.theme_next]
-    state.level_next = reallevel
+    if state.screen_next ~= ON.LEVEL then return end
+    if (#level_order == 0 or test_flag(state.quest_flags, 1)) then
+        message("Running init")
+        init_run()
+    end
+    local num = state.level_count+1
+    if test_flag(state.quest_flags, 1) then
+        num = 1
+    end
+    if num > 1 and #level_order >= num and level_order[num].t == THEME.COSMIC_OCEAN and level_order[num-1].t == THEME.JUNGLE then
+        return
+    end
+    if #level_order > state.level_count then
+        state.world_next = level_order[num].w
+        state.level_next = level_order[num].l
+        state.theme_next = level_order[num].t
+        prinspect("going to", level_order[num].w, level_order[num].l, theme_name[level_order[num].t])
+    elseif #level_order <= state.level_count and state.theme_next ~= THEME.COSMIC_OCEAN then
+        prinspect("last level, going to", co_level)
+        state.world_next = 8
+        state.level_next = co_level
+        state.theme_next = THEME.COSMIC_OCEAN
+    end
 end, ON.LOADING)
 
 set_callback(function()
     --message("Reset - Init, state.reset == "..tostring(state.reset))
-    init_run()
-    dead = true
+    --init_run()
 end, ON.RESET)
 
 set_callback(function()
     --message("Camp - Init")
-    init_run()
-    dead = true
+    --init_run()
 end, ON.CAMP)
 
 set_callback(function()
     --message("Death - Init")
-    toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(#bosses_left-(#bosses-options.door_bosses)+1))
-    init_run()
-    dead = true
+    toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(bosses_left()))
+    --dead = true
 end, ON.DEATH)
+
+local ending_timer = 0
+local ending_cb = -1
+set_callback(function()
+    if state.theme == THEME.TIAMAT and bosses_left() > 0 then
+        ending_timer = 0
+        ending_cb = set_global_interval(function()
+            ending_timer = ending_timer + 1
+            if ending_timer == 768 then
+                players[1]:light_on_fire()
+            elseif ending_timer == 930 then
+                kill_entity(players[1].uid)
+                clear_callback(ending_cb)
+            end
+            local ships = get_entities_by_type(ENT_TYPE.ITEM_PARENTSSHIP)
+            if #ships > 0 then
+                local ship = get_entity(ships[1])
+                ship.x = 35
+            end
+        end, 1)
+    end
+end, ON.WIN)
 
 --[[
 TODO:
-own bombs in olmec spawn enemies
 mount & hh prices in shops
+duat snaptraps
 chain
 ]]
