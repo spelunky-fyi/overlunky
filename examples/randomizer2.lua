@@ -73,7 +73,7 @@ local function trap_ceiling_spawn(x, y, l)
     spawn_grid_entity(item, x, y, l)
 end
 local function trap_ceiling_valid(x, y, l)
-    if has({THEME.CITY_OF_GOLD, THEME.ICE_CAVES, THEME.TIAMAT}, state.theme) then
+    if has({THEME.CITY_OF_GOLD, THEME.ICE_CAVES, THEME.TIAMAT, THEME.OLMEC}, state.theme) then
         return false
     end
     local floor = get_grid_entity_at(x, y, l)
@@ -879,8 +879,8 @@ set_callback(function()
 end, ON.CAMP)
 
 --[[DOORS]]
-register_option_int("door_min_levels", "Min levels between midbosses", 3, 0, 100)
-register_option_int("door_max_levels", "Max levels between midbosses", 6, 0, 100)
+register_option_int("door_min_levels", "Min levels between midbosses", 4, 1, 100)
+register_option_int("door_max_levels", "Max levels between midbosses", 7, 1, 100)
 register_option_int("door_bosses", "Amount of midbosses", 4, 0, 4)
 
 local level_order = {}
@@ -913,14 +913,16 @@ local function set_doors()
         for i,v in ipairs(doors) do
             local x, y, layer = get_position(v)
             if state.theme == THEME.HUNDUN then
-                --set_door_target(v, nextworld, nextlevel, nexttheme)
                 unlock_door_at(x, y)
             end
-            --[[if not critters_spawned and critters[realtheme] ~= nil then
-                spawn(critters[realtheme], x-0.7, y+0.5, layer, 0, 0)
-                spawn(critters[realtheme], x+0.7, y+0.5, layer, 0, 0)
-                critters_spawned = true
-            end]]
+            if #level_order >= state.level_count+2 then
+                local nexttheme = level_order[state.level_count+2].t
+                if not critters_spawned and critters[nexttheme] ~= nil then
+                    spawn(critters[nexttheme], x-0.7, y+0.5, layer, 0, 0)
+                    spawn(critters[nexttheme], x+0.7, y+0.5, layer, 0, 0)
+                    critters_spawned = true
+                end
+            end
         end
     end
 end
@@ -969,27 +971,56 @@ local function fix_chain()
     insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
 end
 
-local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY}
+local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_ANKH}
 local chain_items = {}
-local function get_chain_item()
-    return table.remove(chain_items, 1)
+local block_hook = false
+
+local function get_chain_item(x, y)
+    if #chain_items > 0 then
+        return table.remove(chain_items, 1)
+    end
+    return pick(crate_items)
 end
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.OLMEC then return end
-    if #chain_items > 0 then
-        local x, y, l = get_position(ent.uid)
+    if state.theme ~= THEME.VOLCANA then return end
+    local x, y, l = get_position(ent.uid)
+    local rx, ry = get_room_index(x, y)
+    local room = get_room_template(rx, ry, l)
+    if room == ROOM_TEMPLATE.OLDHUNTER_REWARDROOM then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
+        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
     end
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_ANKH)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_DIAMOND)
+
+set_callback(function()
+    if state.theme == THEME.VOLCANA then
+        local crowns = get_entities_by(ENT_TYPE.ITEM_PICKUP_CROWN, 0, LAYER.BACK)
+        for i,v in ipairs(crowns) do
+            local x, y, l = get_position(v)
+            kill_entity(v)
+            local item = spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+            item = get_entity(item)
+            item.flags = set_flag(item.flags, ENT_FLAG.NO_GRAVITY)
+        end
+    elseif state.theme == THEME.OLMEC then
+        local ankhs = get_entities_by(ENT_TYPE.ITEM_PICKUP_ANKH, 0, LAYER.BACK)
+        for i,v in ipairs(ankhs) do
+            local x, y, l = get_position(v)
+            kill_entity(v)
+            local item = spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+        end
+    end
+end, ON.LEVEL)
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU and state.theme ~= THEME.DUAT then return end
-    if #chain_items > 0 then
+    if #chain_items > 0 and not block_hook then
         local x, y, l = get_position(ent.uid)
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
+        block_hook = true
+        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+        block_hook = false
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY)
 
@@ -1141,6 +1172,7 @@ set_callback(function()
     if #level_order > state.level_count+1 then
         --prinspect("next level", level_order[state.level_count+2].w, level_order[state.level_count+2].l, theme_name[level_order[state.level_count+2].t])
     end
+
 end, ON.LEVEL)
 
 set_callback(function()
@@ -1226,7 +1258,6 @@ end, ON.WIN)
 
 --[[
 TODO:
-totems blocking bubblewrap and shouldn't spawn on edges
 mount & hh prices in shops
 duat snaptraps
 chain
