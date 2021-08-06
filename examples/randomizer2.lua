@@ -185,7 +185,7 @@ local function trap_totem_valid(x, y, l)
     box.right = x+1
     box.top = y+3
     box.bottom = y+1
-    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR, box, l)
+    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, l)
     local left = get_grid_entity_at(x-1, y, l)
     local right = get_grid_entity_at(x+1, y, l)
     if floor ~= -1 and #air == 0 and left ~= -1 and right ~= -1 then
@@ -218,7 +218,7 @@ local function trap_frog_valid(x, y, l)
     box.right = x+2
     box.top = y+1
     box.bottom = y
-    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR, box, l)
+    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, l)
     local left = get_grid_entity_at(x-1, y-1, l)
     local right = get_grid_entity_at(x+2, y-1, l)
     if floor ~= -1 and #air == 0 and left ~= -1 and right ~= -1 then
