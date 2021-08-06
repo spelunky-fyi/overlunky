@@ -1061,7 +1061,7 @@ local function init_run()
             done = true
         else
             normal_levels = normal_levels+1
-            local t = pick(theme, level_order[#level_order])
+            local t = pick(theme, level_order[#level_order].t)
             local l = 1
             if t == THEME.NEO_BABYLON or t == THEME.SUNKEN_CITY then
                 l = math.random(3)
