@@ -9,8 +9,13 @@ local function get_chance(min, max)
     return math.random(max, min)
 end
 
-local function pick(from)
-    return from[math.random(#from)]
+local function pick(from, ignore)
+    for i=1,10 do
+        local item = from[math.random(#from)]
+        if item ~= ignore then
+            return item
+        end
+    end
 end
 
 local function get_money()
@@ -57,11 +62,15 @@ local trap_arrows = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_T
 local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE}
 
 local function trap_ceiling_spawn(x, y, l)
+    local item = pick(traps_ceiling)
+    if #get_entities_by_type(ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR) > 0 then
+        item = pick(traps_ceiling, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR)
+    end
     local floor = get_grid_entity_at(x, y, l)
     if floor ~= -1 then
         kill_entity(floor)
     end
-    spawn_grid_entity(pick(traps_ceiling), x, y, l)
+    spawn_grid_entity(item, x, y, l)
 end
 local function trap_ceiling_valid(x, y, l)
     if has({THEME.CITY_OF_GOLD, THEME.ICE_CAVES, THEME.TIAMAT}, state.theme) then
@@ -734,6 +743,7 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
          ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR,
          ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW,
          ENT_TYPE.ITEM_METAL_SHIELD}
+local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PICKUP_BOMBBOX}
 
 set_post_entity_spawn(function(ent)
     ent = ent:as_container()
@@ -746,7 +756,11 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_POT)
 set_post_entity_spawn(function(ent)
     ent = ent:as_container()
     math.randomseed(read_prng()[6]+ent.uid)
-    ent.inside = pick(crate_items)
+    if state.theme == THEME.ABZU and math.random() < 0.5 then
+        ent.inside = pick(abzu_crate_items)
+    else
+        ent.inside = pick(crate_items)
+    end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CRATE)
 
 set_callback(function()
@@ -927,7 +941,7 @@ local function init_run()
             add_level(7, 2, THEME.EGGPLANT_WORLD)
         elseif bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
             normal_levels = 0
-            local t = insert_bosses[math.random(#insert_bosses)]
+            local t = pick(insert_bosses)
             local l = 4
             if t == THEME.OLMEC then
                 l = 1
@@ -940,7 +954,7 @@ local function init_run()
             done = true
         else
             normal_levels = normal_levels+1
-            local t = theme[math.random(#theme)]
+            local t = pick(theme, level_order[#level_order])
             local l = 1
             if t == THEME.NEO_BABYLON or t == THEME.SUNKEN_CITY then
                 l = math.random(3)
@@ -1144,6 +1158,7 @@ end, ON.WIN)
 
 --[[
 TODO:
+totems blocking bubblewrap and shouldn't spawn on edges
 mount & hh prices in shops
 duat snaptraps
 chain
