@@ -174,7 +174,7 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      show_debug = false, throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false,
-     enable_noclip = false, hide_script_messages = false, load_script_dir = true, load_packs_dir = false;
+     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
 Inventory* g_inventory = 0;
@@ -2219,7 +2219,7 @@ void render_messages()
     {
         for (auto message : script->get_messages())
         {
-            if (now - 10s > message.time)
+            if (fade_script_messages && now - 12s > message.time)
                 continue;
             queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
         }
@@ -2233,7 +2233,7 @@ void render_messages()
         queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
     }
     std::erase_if(g_ConsoleMessages, [&](auto message)
-                  { return now - 10s > message.time; });
+                  { return fade_script_messages && now - 12s > message.time; });
 
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
@@ -2261,7 +2261,11 @@ void render_messages()
     ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * fontsize - 20});
     for (auto message : queue)
     {
-        const float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 10000.0f;
+        float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
+        if (!fade_script_messages)
+        {
+            alpha = 0.8f;
+        }
         ImVec4 color = std::get<3>(message);
         color.w = alpha;
         ImGui::TextColored(color, "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
@@ -2782,6 +2786,7 @@ void render_scripts()
         "your scripts work next week.");
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Hide script messages##HideScriptMessages", &hide_script_messages);
+    ImGui::Checkbox("Fade script messages##FadeScriptMessages", &fade_script_messages);
     if (ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
         refresh_script_files();
     if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
@@ -3851,7 +3856,7 @@ void imgui_init(ImGuiContext*)
         if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
         {
             font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 18.0f);
-            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 36.0f);
+            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 32.0f);
             hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 72.0f);
         }
 
@@ -3880,18 +3885,11 @@ void imgui_init(ImGuiContext*)
 
 void imgui_draw()
 {
-    ImGui::SetNextWindowSize({-1, 20});
-    ImGui::Begin(
-        "Overlay",
-        NULL,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), "Overlunky");
-    ImGui::SameLine();
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, .3f), TOSTRING(GIT_VERSION));
-    ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y - 30}, ImGuiCond_Always);
-    ImGui::End();
+    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    char buf[128];
+    sprintf(buf, "Overlunky %s", TOSTRING(GIT_VERSION));
+    ImVec2 textsize = ImGui::CalcTextSize(buf);
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - 30}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf);
 
     if (!hide_script_messages)
         render_messages();
