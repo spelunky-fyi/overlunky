@@ -2395,16 +2395,16 @@ void render_messages()
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
-    const float fontsize = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
+    const float font_size = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
-    int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / fontsize));
+    int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / font_size));
     if (queue.size() > logsize)
     {
         std::vector<Message> newqueue(queue.end() - logsize, queue.end());
         queue = newqueue;
     }
 
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * fontsize - 20});
+    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 20});
     for (auto message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
