@@ -138,7 +138,6 @@ if(BUILD_OVERLUNKY)
         
         if(MSVC)
                 target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-                target_link_libraries(injector PRIVATE overlunky_warnings)
                 if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
                         find_package(Python3 COMPONENTS Interpreter)
                         if(Python3_FOUND)
