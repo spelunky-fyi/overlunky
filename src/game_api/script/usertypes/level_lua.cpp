@@ -108,7 +108,21 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    lua.new_usertype<LevelGenSystem>("LevelGenSystem", sol::no_constructor, "spawn_x", &LevelGenSystem::spawn_x, "spawn_y", &LevelGenSystem::spawn_y, "spawn_room_x", &LevelGenSystem::spawn_room_x, "spawn_room_y", &LevelGenSystem::spawn_room_y, "exits", &LevelGenSystem::exit_doors_locations);
+    lua.new_usertype<LevelGenSystem>(
+        "LevelGenSystem",
+        sol::no_constructor,
+        "spawn_x",
+        &LevelGenSystem::spawn_x,
+        "spawn_y",
+        &LevelGenSystem::spawn_y,
+        "spawn_room_x",
+        &LevelGenSystem::spawn_room_x,
+        "spawn_room_y",
+        &LevelGenSystem::spawn_room_y,
+        "exits",
+        &LevelGenSystem::exit_doors_locations,
+        "shop_type",
+        &LevelGenSystem::shop_type);
 
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.
@@ -240,6 +254,9 @@ void register_usertypes(sol::state& lua)
 
     /// Beg quest states
     lua.create_named_table("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
+
+    /// Shop types (for LevelGenSystem.shop_type)
+    lua.create_named_table("SHOPTYPE", "GENERAL_STORE", 0, "CLOTHING_SHOP", 1, "WEAPON_SHOP", 2, "SPECIALTY_SHOP", 3, "HIRED_HAND_SHOP", 4, "PET_SHOP", 5, "DICE_SHOP", 6, "TUSK_DICE_SHOP", 13);
 
     lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0

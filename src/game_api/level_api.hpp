@@ -375,7 +375,10 @@ struct LevelGenSystem
     DoorCoords* exit_doors_locations;
     void* unknown37;
     void* unknown38;
-    uint32_t flags;
+    uint8_t flags;
+    uint8_t unknown39;
+    uint8_t unknown40;
+    uint8_t shop_type;
     uint8_t unknown42;
     uint8_t unknown43;
     uint8_t unknown44;
@@ -383,9 +386,10 @@ struct LevelGenSystem
     uint8_t unknown46;
     uint8_t unknown47;
     uint8_t unknown48;
-    uint32_t unknown49;
+    uint8_t unknown49;
     uint32_t unknown50;
     uint32_t unknown51;
+    uint32_t unknown52;
 
     std::pair<int, int> get_room_index(float x, float y);
     std::pair<float, float> get_room_pos(int x, int y);
