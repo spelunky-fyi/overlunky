@@ -42,7 +42,7 @@ std::vector<uint32_t> get_entities_by_type(Args... args);
 std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types);
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask);
 std::vector<uint32_t> get_entities_by_layer(LAYER layer);
-std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, int layer, float radius);
+std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, LAYER layer, float radius);
 std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, LAYER layer);
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer);
 std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer);

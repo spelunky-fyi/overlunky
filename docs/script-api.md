@@ -345,7 +345,7 @@ function on_level()
 end
 ```
 ### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
-`array<int> get_entities_at(int entity_type, int mask, float x, float y, int layer, float radius)`<br/>
+`array<int> get_entities_at(int entity_type, int mask, float x, float y, LAYER layer, float radius)`<br/>
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_overlapping_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 `array<int> get_entities_overlapping_hitbox(int entity_type, int mask, AABB hitbox, LAYER layer)`<br/>
