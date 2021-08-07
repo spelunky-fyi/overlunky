@@ -32,10 +32,10 @@ void write_mem_prot(size_t addr, std::string payload, bool prot)
 {
     write_mem_prot(addr, payload, false);
 }
-#define DEFINE_ACCESSOR(name, type) \
-    [[maybe_unused]] type read_##name(size_t addr)   \
-    {                               \
-        return *(type*)(addr);      \
+#define DEFINE_ACCESSOR(name, type)                \
+    [[maybe_unused]] type read_##name(size_t addr) \
+    {                                              \
+        return *(type*)(addr);                     \
     }
 
 DEFINE_ACCESSOR(u8, uint8_t);
