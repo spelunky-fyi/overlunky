@@ -131,6 +131,7 @@ std::map<std::string, int> keys{
     {"mouse_camera_drag", OL_BUTTON_MOUSE | 0x04},
     {"mouse_blast", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x04},
     {"mouse_boom", 0x0},
+    {"mouse_zap", 0x0},
     {"mouse_big_boom", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x04},
     {"mouse_nuke", OL_BUTTON_MOUSE | OL_KEY_CTRL | OL_KEY_SHIFT | 0x04},
     {"mouse_clone", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x05},
@@ -2530,6 +2531,17 @@ void render_clickhandler()
         {
             set_pos(ImGui::GetMousePos());
             spawn_entity(to_id("ENT_TYPE_ITEM_CLONEGUNSHOT"), g_x, g_y, true, 0, 0, options["snap_to_grid"]);
+            g_x = 0;
+            g_y = 0;
+            g_vx = 0;
+            g_vy = 0;
+        }
+        else if (held("mouse_zap") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
+        {
+            g_last_gun = ImGui::GetFrameCount();
+            set_pos(ImGui::GetMousePos());
+            set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y + 200));
+            spawn_entity(to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
