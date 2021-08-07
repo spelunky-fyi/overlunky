@@ -176,7 +176,7 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    lua.new_usertype<LevelGenSystem>("LevelGenSystem", sol::no_constructor, "spawn_x", &LevelGenSystem::spawn_x, "spawn_y", &LevelGenSystem::spawn_y, "spawn_room_x", &LevelGenSystem::spawn_room_x, "spawn_room_y", &LevelGenSystem::spawn_room_y, "exits", &LevelGenSystem::exit_doors_locations);
+    lua.new_usertype<LevelGenSystem>("LevelGenSystem", sol::no_constructor, "shop_type", &LevelGenSystem::shop_type, "spawn_x", &LevelGenSystem::spawn_x, "spawn_y", &LevelGenSystem::spawn_y, "spawn_room_x", &LevelGenSystem::spawn_room_x, "spawn_room_y", &LevelGenSystem::spawn_room_y, "exits", &LevelGenSystem::exit_doors_locations);
 
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.
@@ -313,6 +313,9 @@ void register_usertypes(sol::state& lua)
 
     /// Use in `define_room_template` to declare whether a room template has any special behavior
     lua.create_named_table("ROOM_TEMPLATE_TYPE", "NONE", 0, "ENTRANCE", 1, "EXIT", 2);
+
+    /// Determines which kind of shop spawns in the level, if any
+    lua.create_named_table("SHOP_TYPE", "GENERAL_STORE", 0, "CLOTHING_SHOP", 1, "WEAPON_SHOP", 2, "SPECIALTY_SHOP", 3, "HIRED_HAND_SJOP", 4, "PET_SHOP", 5, "DICE_SHOP", 6, "TUSK_DICE_SHOP", 7);
 
     lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0

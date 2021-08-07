@@ -391,7 +391,10 @@ struct LevelGenSystem
     DoorCoords* exit_doors_locations;
     void* unknown37;
     void* unknown38;
-    uint32_t flags;
+    uint8_t flags;
+    uint8_t unknown39;
+    uint8_t unknown40;
+    uint8_t shop_type;
     uint8_t unknown42;
     uint8_t unknown43;
     uint8_t unknown44;
