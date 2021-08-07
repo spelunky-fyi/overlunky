@@ -1,8 +1,16 @@
 name: Clang-Format Lint
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      do_formatting:
+        description: "Run clang-format inplace formatting and commit the result"
+        required: true
+        default: "false"
 
 jobs:
   build:
@@ -10,8 +18,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: DoozyX/clang-format-lint-action@v0.12
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.do_formatting != 'true' }}
         with:
-          source: 'src'
-          extensions: 'h,hpp,cpp'
-          exclude: './src/game_api/lua_libs'
+          source: "src"
+          extensions: "h,hpp,cpp"
+          exclude: "./src/game_api/lua_libs"
           clangFormatVersion: 12
+
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.do_formatting == 'true' }}
+        with:
+          source: "source"
+          extensions: "inl,h,hpp,cpp"
+          clangFormatVersion: 12
+          inplace: true
+      - uses: EndBug/add-and-commit@v4
+        if: ${{ success() && github.event_name == 'workflow_dispatch' && github.event.inputs.do_formatting == 'true' }}
+        with:
+          author_name: Clang-Format Bot
+          author_email: fake.user@github.com
+          message: "Automated clang-format changes"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

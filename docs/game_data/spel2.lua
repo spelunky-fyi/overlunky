@@ -467,6 +467,9 @@ Door = {
   __name = "sol.Door.user",
   __newindex = "function"
 }
+DoorCoords = {
+  __name = "sol.DoorCoords.user"
+}
 Drill = {
   __index = "function",
   __name = "sol.Drill.user",
@@ -1748,6 +1751,9 @@ Leprechaun = {
   __index = "function",
   __name = "sol.Leprechaun.user",
   __newindex = "function"
+}
+LevelGenSystem = {
+  __name = "sol.LevelGenSystem.user"
 }
 LightArrow = {
   __index = "function",
