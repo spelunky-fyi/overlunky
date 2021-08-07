@@ -9,7 +9,7 @@
 
 namespace
 {
-size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset = 3)
+[[maybe_unused]] size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset = 3)
 {
     off_t rel = *(int32_t*)(&exe[offset + opcode_offset]);
     return offset + rel + opcode_offset + 4;
