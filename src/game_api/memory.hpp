@@ -32,9 +32,8 @@ void write_mem_prot(size_t addr, std::string payload, bool prot)
 {
     write_mem_prot(addr, payload, false);
 }
-#pragma warning(push, 0) // bug in the clang that treats unused types as unused functions
 #define DEFINE_ACCESSOR(name, type) \
-    type read_##name(size_t addr)   \
+    [[maybe_unused]] type read_##name(size_t addr)   \
     {                               \
         return *(type*)(addr);      \
     }
@@ -50,7 +49,6 @@ DEFINE_ACCESSOR(i32, int32_t);
 DEFINE_ACCESSOR(i64, int64_t);
 
 DEFINE_ACCESSOR(f32, float);
-#pragma warning(pop)
 
 [[maybe_unused]] size_t function_start(size_t off)
 {
