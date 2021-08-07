@@ -15,5 +15,6 @@ target_include_directories(injected PRIVATE
 target_link_libraries(injected PRIVATE overlunky_warnings)
 
 if(MSVC)
+        target_compile_options(injected PRIVATE /Zc:__cplusplus)
         target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 endif()
