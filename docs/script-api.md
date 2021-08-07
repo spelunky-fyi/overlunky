@@ -2138,8 +2138,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `StretchChain`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int at_end_of_chain_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=at_end_of_chain_uid) &StretchChain::at_end_of_chain_uid
+- [`float dot_offset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dot_offset) &StretchChain::dot_offset
 - [`int position_in_chain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=position_in_chain) &StretchChain::position_in_chain
-- [`bool is_chain_overlapping_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_chain_overlapping_ball) &StretchChain::is_chain_overlapping_ball
+- [`int inverse_doubled_position_in_chain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inverse_doubled_position_in_chain) &StretchChain::inverse_doubled_position_in_chain
+- [`bool is_dot_hidden`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_dot_hidden) &StretchChain::is_dot_hidden
 ### `Chest`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool leprechaun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leprechaun) &Chest::leprechaun

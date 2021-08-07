@@ -28,15 +28,15 @@ void write_mem_prot(size_t addr, std::string payload, bool prot)
     }
 }
 
-void write_mem(size_t addr, std::string payload)
+void [[maybe_unused]] write_mem(size_t addr, std::string payload)
 {
     write_mem_prot(addr, payload, false);
 }
 
-#define DEFINE_ACCESSOR(name, type) \
-    type read_##name(size_t addr)   \
-    {                               \
-        return *(type*)(addr);      \
+#define DEFINE_ACCESSOR(name, type)                \
+    type [[maybe_unused]] read_##name(size_t addr) \
+    {                                              \
+        return *(type*)(addr);                     \
     }
 
 DEFINE_ACCESSOR(u8, uint8_t);
@@ -51,7 +51,7 @@ DEFINE_ACCESSOR(i64, int64_t);
 
 DEFINE_ACCESSOR(f32, float);
 
-size_t function_start(size_t off)
+size_t [[maybe_unused]] function_start(size_t off)
 {
     off &= ~0xf;
     while (read_u8(off - 1) != 0xcc)

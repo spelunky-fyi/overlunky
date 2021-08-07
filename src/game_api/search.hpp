@@ -15,7 +15,7 @@ size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset = 3)
     return offset + rel + opcode_offset + 4;
 }
 
-size_t decode_imm(char* exe, size_t offset, uint8_t opcode_offset = 3)
+size_t [[maybe_unused]] decode_imm(char* exe, size_t offset, uint8_t opcode_offset = 3)
 {
     return *(uint32_t*)(&exe[offset + opcode_offset]);
 }

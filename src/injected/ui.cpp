@@ -3893,10 +3893,9 @@ void imgui_init(ImGuiContext*)
 void imgui_draw()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    char buf[128];
-    sprintf(buf, "Overlunky %s", TOSTRING(GIT_VERSION));
-    ImVec2 textsize = ImGui::CalcTextSize(buf);
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - 30}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf);
+    std::string buf = std::format("Overlunky {}", TOSTRING(GIT_VERSION));
+    ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - 30}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
     if (!hide_script_messages)
         render_messages();

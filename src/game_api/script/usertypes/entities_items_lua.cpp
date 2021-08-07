@@ -373,10 +373,14 @@ void register_usertypes(sol::state& lua)
         "StretchChain",
         "at_end_of_chain_uid",
         &StretchChain::at_end_of_chain_uid,
+        "dot_offset",
+        &StretchChain::dot_offset,
         "position_in_chain",
         &StretchChain::position_in_chain,
-        "is_chain_overlapping_ball",
-        &StretchChain::is_chain_overlapping_ball,
+        "inverse_doubled_position_in_chain",
+        &StretchChain::inverse_doubled_position_in_chain,
+        "is_dot_hidden",
+        &StretchChain::is_dot_hidden,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
