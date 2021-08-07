@@ -104,6 +104,10 @@ class Movable : public Entity
     virtual void v84() = 0;                          // triggers when tusk is angered, calls get_last_owner_uid
     virtual void gravity_related() = 0;
     virtual void v86() = 0;
+    virtual void v87() = 0;
+    virtual void stack_plus_28_is_0() = 0;   // unknown; triggers on item_rubble
+    virtual void on_crushed_by(Entity*) = 0; // e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
+    virtual void on_fall_onto(uint32_t unknown, Entity* fell_on_entity) = 0;
 
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
     bool is_poisoned();
