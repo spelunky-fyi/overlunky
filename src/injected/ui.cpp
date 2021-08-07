@@ -205,6 +205,9 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_charmin = 194, u
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
+const unsigned int safe_entity_mask = 0x18f;
+const unsigned int unsafe_entity_mask = 0xffffffff;
+
 std::map<std::string, bool> options = {
     {"mouse_control", true},
     {"god_mode", false},
@@ -817,8 +820,8 @@ const char* entity_name(int id)
 
 bool update_entity()
 {
-    if (!visible("tool_entity_properties"))
-        return false;
+    //if (!visible("tool_entity_properties"))
+    //    return false;
     if (g_last_id != 0)
     {
         g_entity_type = entity_type(g_last_id);
@@ -2327,11 +2330,26 @@ void render_clickhandler()
             std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
             char buf[32];
-            sprintf(buf, "Cursor: %0.2f, %0.2f", cpos.first, cpos.second);
+            sprintf(buf, "%0.2f, %0.2f", cpos.first, cpos.second);
             char buf2[32];
-            sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
+            //sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
             dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
-            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
+            //dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
+            unsigned int mask = safe_entity_mask;
+            if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier from mouse_destroy_unsafe
+            {
+                mask = unsafe_entity_mask;
+            }
+            auto hovered = get_entity_at(cpos.first, cpos.second, false, 2, mask);
+            if (hovered != -1)
+            {
+                render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
+                auto ptype = entity_type(hovered);
+                const char* pname = entity_names[ptype].data();
+                char buf3[128];
+                sprintf(buf3, "%i, %s", hovered, pname);
+                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3);
+            }
         }
     }
     if (options["draw_hitboxes"] && update_entity())
@@ -2456,12 +2474,12 @@ void render_clickhandler()
         {
             startpos = ImGui::GetMousePos();
             set_pos(startpos);
-            unsigned int mask = 0b01111111;
+            unsigned int mask = safe_entity_mask;
             if (held("mouse_grab_unsafe"))
             {
-                mask = 0xffffffff;
+                mask = unsafe_entity_mask;
             }
-            g_held_id = get_entity_at(g_x, g_y, true, 1, mask);
+            g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
             g_held_entity = entity_ptr(g_held_id);
             if (g_held_entity)
                 g_held_flags = g_held_entity->flags;
@@ -2620,10 +2638,10 @@ void render_clickhandler()
         {
             ImVec2 pos = ImGui::GetMousePos();
             set_pos(pos);
-            unsigned int mask = 0b01111111;
+            unsigned int mask = safe_entity_mask;
             if (released("mouse_destroy_unsafe"))
             {
-                mask = 0xffffffff;
+                mask = unsafe_entity_mask;
             }
             g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_id > 0)
