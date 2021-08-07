@@ -140,7 +140,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
         x = rx;
         y = ry;
     }
-    DEBUG("Items at {}:", (x, y));
+    //DEBUG("Items at {}:", (x, y));
     auto player = state.items()->player(0);
     if (player == nullptr)
         return -1;
@@ -152,13 +152,13 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
         float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
         if (((mask & flags) > 0 || mask == 0) && distance < radius)
         {
-            DEBUG(
+            /*DEBUG(
                 "Item {}, {:x} type, {} position, {} distance, {:x}",
                 item->uid,
                 item->type->search_flags,
                 item->position_self(),
                 distance,
-                item->pointer());
+                item->pointer());*/
             found.push_back({item->uid, distance, item});
         }
     }
@@ -168,7 +168,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
                   { return std::get<1>(a) < std::get<1>(b); });
         auto picked = found[0];
         auto entity = std::get<2>(picked);
-        DEBUG("{}", (void*)entity);
+        //DEBUG("{}", (void*)entity);
         return std::get<0>(picked);
     }
     return -1;

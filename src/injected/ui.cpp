@@ -210,6 +210,9 @@ const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_charmin = 194, u
 const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
+const unsigned int safe_entity_mask = 0x18f;
+const unsigned int unsafe_entity_mask = 0xffffffff;
+
 std::map<std::string, bool> options = {
     {"mouse_control", true},
     {"god_mode", false},
@@ -822,8 +825,8 @@ const char* entity_name(uint32_t id)
 
 bool update_entity()
 {
-    if (!visible("tool_entity_properties"))
-        return false;
+    //if (!visible("tool_entity_properties"))
+    //    return false;
     if (g_last_id != 0)
     {
         g_entity_type = entity_type(g_last_id);
@@ -982,6 +985,33 @@ bool clicked(std::string keyname)
     return wParam == keycode;
 }
 
+bool dblclicked(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if (GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += OL_KEY_CTRL;
+    }
+    if (GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += OL_KEY_SHIFT;
+    }
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (ImGui::IsMouseDoubleClicked(i))
+        {
+            wParam += i + 1;
+            break;
+        }
+    }
+    return wParam == keycode;
+}
+
 bool held(std::string keyname)
 {
     int wParam = OL_BUTTON_MOUSE;
@@ -1034,6 +1064,87 @@ bool released(std::string keyname)
         }
     }
     return wParam == keycode;
+}
+
+bool dragging(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if (GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += OL_KEY_CTRL;
+    }
+    if (GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += OL_KEY_SHIFT;
+    }
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (ImGui::IsMouseDragging(i))
+        {
+            wParam += i + 1;
+            break;
+        }
+    }
+    return wParam == keycode;
+}
+
+bool dragged(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return ImGui::GetMouseDragDelta(i).x > 0 || ImGui::GetMouseDragDelta(i).y > 0;
+        }
+    }
+    return false;
+}
+
+float drag_delta(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return abs(ImGui::GetMouseDragDelta(i).x) + abs(ImGui::GetMouseDragDelta(i).y);
+        }
+    }
+    return false;
+}
+
+float held_duration(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return ImGui::GetIO().MouseDownDuration[i];
+        }
+    }
+    return -1.0;
 }
 
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
@@ -2325,10 +2436,27 @@ void render_clickhandler()
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
             std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
-            std::string buf = std::format("Cursor: {:.2f}, {:.2f}", cpos.first, cpos.second);
-            std::string buf2 = std::format("Camera: {:.2f}, {:.2f}", campos.first, campos.second);
-            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
-            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2.c_str());
+            char buf[32];
+            sprintf(buf, "%0.2f, %0.2f", cpos.first, cpos.second);
+            char buf2[32];
+            //sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
+            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
+            //dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
+            unsigned int mask = safe_entity_mask;
+            if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier from mouse_destroy_unsafe
+            {
+                mask = unsafe_entity_mask;
+            }
+            auto hovered = get_entity_at(cpos.first, cpos.second, false, 2, mask);
+            if (hovered != -1)
+            {
+                render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
+                auto ptype = entity_type(hovered);
+                const char* pname = entity_names[ptype].data();
+                char buf3[128];
+                sprintf(buf3, "%i, %s", hovered, pname);
+                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3);
+            }
         }
     }
     if (options["draw_hitboxes"] && update_entity())
@@ -2453,12 +2581,12 @@ void render_clickhandler()
         {
             startpos = ImGui::GetMousePos();
             set_pos(startpos);
-            unsigned int mask = 0b01111111;
+            unsigned int mask = safe_entity_mask;
             if (held("mouse_grab_unsafe"))
             {
-                mask = 0xffffffff;
+                mask = unsafe_entity_mask;
             }
-            g_held_id = get_entity_at(g_x, g_y, true, 1, mask);
+            g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
             g_held_entity = entity_ptr(g_held_id);
             if (g_held_entity)
                 g_held_flags = g_held_entity->flags;
@@ -2544,18 +2672,29 @@ void render_clickhandler()
             g_vx = 0;
             g_vy = 0;
         }
+
+        else if (dblclicked("mouse_camera_drag"))
+        {
+            if (!g_players.empty())
+            {
+                g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            }
+        }
+
         else if (clicked("mouse_camera_drag"))
         {
             if (ImGui::IsMousePosValid())
             {
                 startpos = normalize(io.MousePos);
-                g_state->camera->focused_entity_uid = -1;
+                g_state->camera->focused_entity_uid = get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
             }
         }
-        else if (held("mouse_camera_drag"))
+
+        else if (dragging("mouse_camera_drag") && drag_delta("mouse_camera_drag") > 10.0f)
         {
             if (ImGui::IsMousePosValid())
             {
+                g_state->camera->focused_entity_uid = -1;
                 ImVec2 mpos = normalize(io.MousePos);
                 std::pair<float, float> oryginal_pos = click_position(startpos.x, startpos.y);
                 std::pair<float, float> current_pos = click_position(mpos.x, mpos.y);
@@ -2565,6 +2704,7 @@ void render_clickhandler()
                 startpos = normalize(io.MousePos);
             }
         }
+
         else if (held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 10)
         {
             g_last_gun = ImGui::GetFrameCount();
@@ -2617,10 +2757,10 @@ void render_clickhandler()
         {
             ImVec2 pos = ImGui::GetMousePos();
             set_pos(pos);
-            unsigned int mask = 0b01111111;
+            unsigned int mask = safe_entity_mask;
             if (released("mouse_destroy_unsafe"))
             {
-                mask = 0xffffffff;
+                mask = unsafe_entity_mask;
             }
             g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_id > 0)
