@@ -195,6 +195,9 @@ const char* inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
 
+std::string fontfile = "segoeuib.ttf";
+std::vector<float> fontsize;
+
 const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
 const short s16_zero = 0, s16_one = 1, s16_min = -32768, s16_max = 32767;
@@ -529,6 +532,19 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
+    writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\"" << std::endl;
+    writeData << "font_size = [";
+    for (int i = 0; i < fontsize.size(); i++)
+    {
+        writeData << std::endl
+                  << fontsize[i];
+        if (i < fontsize.size() - 1)
+            writeData << ",";
+    }
+    if (!fontsize.empty())
+        writeData << std::endl;
+    writeData << "] # [ small/ui, medium/messages, big ]" << std::endl;
+
     writeData << "# Script filenames to load automatically on start. Example: autorun_scripts = [\"foo.lua\", \"bar.lua\"]" << std::endl;
     writeData << "autorun_scripts = [";
     for (int i = 0; i < g_script_autorun.size(); i++)
@@ -600,6 +616,8 @@ void load_config(std::string file)
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
+    fontfile = toml::find_or<std::string>(opts, "font_file", "segoeuib.ttf");
+    fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {18.0f, 32.0f, 72.0f});
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -4024,20 +4042,21 @@ void render_tool(std::string tool)
 void imgui_init(ImGuiContext*)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.FontAllowUserScaling = false;
     show_cursor();
+    load_config(cfgfile);
+    io.FontAllowUserScaling = false;
     PWSTR fontdir;
     if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
     {
         using cvt_type = std::codecvt_utf8<wchar_t>;
         std::wstring_convert<cvt_type, wchar_t> cvt;
 
-        std::string fontpath(cvt.to_bytes(fontdir) + "\\segoeuib.ttf");
+        std::string fontpath(cvt.to_bytes(fontdir) + "\\" + fontfile);
         if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
         {
-            font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 18.0f);
-            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 32.0f);
-            hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), 72.0f);
+            font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[0]);
+            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[1]);
+            hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[2]);
         }
 
         CoTaskMemFree(fontdir);
@@ -4047,7 +4066,6 @@ void imgui_init(ImGuiContext*)
     {
         font = io.Fonts->AddFontDefault();
     }
-    load_config(cfgfile);
     refresh_script_files();
     autorun_scripts();
     set_colors();
