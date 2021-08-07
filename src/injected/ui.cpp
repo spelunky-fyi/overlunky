@@ -4058,6 +4058,17 @@ void imgui_init(ImGuiContext*)
             bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[1]);
             hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[2]);
         }
+        else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
+        {
+            std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
+            DEBUG("{}", localfontpath);
+            if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+            {
+                font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
+                bigfont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[1]);
+                hugefont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[2]);
+            }
+        }
 
         CoTaskMemFree(fontdir);
     }
