@@ -1,7 +1,7 @@
 #include "state_lua.hpp"
 
-#include "state.hpp"
 #include "level_api.hpp"
+#include "state.hpp"
 
 #include <sol/sol.hpp>
 

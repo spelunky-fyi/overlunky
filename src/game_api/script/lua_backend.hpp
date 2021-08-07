@@ -278,7 +278,7 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
         result = e.what();
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
         std::istringstream errors(result);
-        while(!errors.eof())
+        while (!errors.eof())
         {
             std::string eline;
             getline(errors, eline);

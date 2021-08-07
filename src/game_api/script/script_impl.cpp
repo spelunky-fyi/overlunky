@@ -87,7 +87,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         result = e.what();
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
         std::istringstream errors(result);
-        while(!errors.eof())
+        while (!errors.eof())
         {
             std::string eline;
             getline(errors, eline);
@@ -136,7 +136,7 @@ bool ScriptImpl::reset()
         result = e.what();
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
         std::istringstream errors(result);
-        while(!errors.eof())
+        while (!errors.eof())
         {
             std::string eline;
             getline(errors, eline);
