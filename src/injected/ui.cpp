@@ -478,7 +478,7 @@ void refresh_script_files()
 
     for (auto file : g_script_files)
     {
-        load_script(file.string().data(), false);
+        load_script(file.string(), false);
     }
 }
 
@@ -827,7 +827,7 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
         searchss << search << g_items[g_filtered_items[g_current_item]].id << " ";
         search = searchss.str();
         data->DeleteChars(0, data->BufTextLen);
-        data->InsertChars(0, search.data());
+        data->InsertChars(0, search.c_str());
     }
     return 0;
 }
@@ -838,7 +838,7 @@ const char* entity_name(uint32_t id)
     {
         if (g_items[i].id == id)
         {
-            return g_items[i].name.data();
+            return g_items[i].name.c_str();
         }
     }
     return "";
@@ -1623,7 +1623,7 @@ void update_filter(std::string s)
 void render_int(const char* label, int state)
 {
     std::string strstate = std::to_string(state);
-    return ImGui::LabelText(label, strstate.c_str());
+    return ImGui::LabelText(label, "%s", strstate.c_str());
 }
 
 void render_list()
@@ -1647,7 +1647,7 @@ void render_list()
             std::stringstream item_ss;
             item_ss << g_items[g_filtered_items[i]].id;
             std::string item_id = item_ss.str();
-            std::string item_name = g_items[g_filtered_items[i]].name.data();
+            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
             std::string item_concat = item_id + ": " + item_name.substr(9);
             const char* item_text = item_concat.c_str();
             ImGui::PushID(i);
@@ -1707,7 +1707,7 @@ void render_input()
     int n = 0;
     for (auto i : saved_entities)
     {
-        ImGui::PushID(i.data());
+        ImGui::PushID(i.c_str());
         std::string search = "";
         std::stringstream sss(i);
         int item = 0;
@@ -1754,7 +1754,7 @@ void render_input()
         ImGui::Text("%d:", n + 1);
         ImGui::PopID();
         ImGui::SameLine();
-        ImGui::TextWrapped(search.c_str());
+        ImGui::TextWrapped("%s", search.c_str());
         n++;
     }
     if (set_focus_entity)
@@ -2092,9 +2092,9 @@ void render_uid(int uid, const char* section, bool rembtn = false)
         update_entity();
     }
     ImGui::SameLine();
-    ImGui::Text(typec.c_str());
+    ImGui::Text("%s", typec.c_str());
     ImGui::SameLine();
-    ImGui::Text(pname.c_str());
+    ImGui::Text("%s", pname.c_str());
     if (rembtn)
     {
         ImGui::SameLine();
@@ -2411,7 +2411,7 @@ void render_messages()
         }
         ImVec4 color = std::get<3>(message);
         color.w = alpha;
-        ImGui::TextColored(color, "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
+        ImGui::TextColored(color, "[%s] %s", std::get<0>(message).c_str(), std::get<1>(message).c_str());
     }
     ImGui::PopFont();
     ImGui::End();
@@ -2496,7 +2496,7 @@ void render_clickhandler()
             {
                 render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
                 auto ptype = entity_type(hovered);
-                const char* pname = entity_names[ptype].data();
+                const char* pname = entity_names[ptype].c_str();
                 std::string buf3 = std::format("{}, {}", hovered, pname);
                 dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
             }
@@ -2933,9 +2933,9 @@ void render_script_files()
     {
         ImGui::PushID(num++);
         std::string buttstr = file.parent_path().filename().string() + "/" + file.filename().string();
-        if (ImGui::Button(buttstr.data()))
+        if (ImGui::Button(buttstr.c_str()))
         {
-            load_script(file.string().data(), false);
+            load_script(file.string().c_str(), false);
         }
         ImGui::PopID();
     }
@@ -2947,7 +2947,7 @@ void render_script_files()
         {
             abspath = std::filesystem::absolute(path).string();
         }
-        ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.data());
+        ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.c_str());
     }
     if (ImGui::Button("Refresh##RefreshScripts"))
     {
@@ -3237,7 +3237,7 @@ void render_powerup(int uid, const char* section)
     if (ptype == 0)
         return;
     std::string typec = std::to_string(ptype);
-    const char* pname = entity_names[ptype].data();
+    const char* pname = entity_names[ptype].c_str();
     ImGui::PushID(section);
     if (ImGui::Button(uidc.c_str()))
     {
@@ -3245,9 +3245,9 @@ void render_powerup(int uid, const char* section)
         update_entity();
     }
     ImGui::SameLine();
-    ImGui::Text(typec.c_str());
+    ImGui::Text("%s", typec.c_str());
     ImGui::SameLine();
-    ImGui::Text(pname);
+    ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
     if (ImGui::Button("X(!)"))
@@ -3297,7 +3297,7 @@ void render_state(const char* label, int state)
     else
     {
         std::string statec = std::to_string(state);
-        ImGui::LabelText(label, statec.c_str());
+        ImGui::LabelText(label, "%s", statec.c_str());
     }
 }
 
@@ -3322,7 +3322,7 @@ void render_ai(const char* label, int state)
     else
     {
         std::string statec = std::to_string(state);
-        ImGui::LabelText(label, statec.c_str());
+        ImGui::LabelText(label, "%s", statec.c_str());
     }
 }
 
@@ -3383,7 +3383,7 @@ void render_screen(const char* label, int state)
     else
     {
         std::string statec = std::to_string(state);
-        ImGui::LabelText(label, statec.c_str());
+        ImGui::LabelText(label, "%s", statec.c_str());
     }
 }
 
@@ -3567,7 +3567,7 @@ void render_entity_props()
             if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY") + 1)
                 coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
-            ImGui::Text(entity_names[coffin->inside].data());
+            ImGui::Text("%s", entity_names[coffin->inside].c_str());
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int*)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
         else if (
@@ -3580,7 +3580,7 @@ void render_entity_props()
             if (container->inside > 0)
             {
                 ImGui::SameLine();
-                ImGui::Text(entity_names[container->inside].data());
+                ImGui::Text("%s", entity_names[container->inside].c_str());
             }
         }
         else if (g_entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
@@ -3598,7 +3598,7 @@ void render_entity_props()
             ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Theme##DoorThemenumber", ImGuiDataType_U8, &target->theme, 0.2f, &u8_one, &u8_seventeen);
             ImGui::SameLine();
-            ImGui::Text(theme_name(target->theme));
+            ImGui::Text("%s", theme_name(target->theme));
         }
         else if ((g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (g_entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && g_entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")))
         {
@@ -3793,7 +3793,7 @@ void render_timer()
     std::stringstream ss;
     ss << "Total: " << time << "." << std::setfill('0') << std::setw(3) << floor((frames % 60) * (1000.0 / 60.0));
     ImGui::PushFont(bigfont);
-    ImGui::Text(ss.str().data());
+    ImGui::Text("%s", ss.str().c_str());
     ImGui::PopFont();
 }
 
@@ -3825,7 +3825,7 @@ void render_game_props()
             gamestate += "Menu ";
         if (g_state->pause)
             gamestate += "Pause ";
-        ImGui::LabelText("Game state", gamestate.data());
+        ImGui::LabelText("Game state", "%s", gamestate.c_str());
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
         {
             if (paused)
@@ -3870,17 +3870,17 @@ void render_game_props()
         ImGui::DragScalar("Level##Levelnumber", ImGuiDataType_U8, (char*)&g_state->level, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Theme ##Themenumber", ImGuiDataType_U8, (char*)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
-        ImGui::Text(theme_name(g_state->theme));
+        ImGui::Text("%s", theme_name(g_state->theme));
         ImGui::DragScalar("Next World##Worldnext", ImGuiDataType_U8, (char*)&g_state->world_next, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Next Level##Levelnext", ImGuiDataType_U8, (char*)&g_state->level_next, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Next Theme##Themenext", ImGuiDataType_U8, (char*)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
-        ImGui::Text(theme_name(g_state->theme_next));
+        ImGui::Text("%s", theme_name(g_state->theme_next));
         ImGui::DragScalar("Start World##Worldnext", ImGuiDataType_U8, (char*)&g_state->world_start, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Start Level##Levelnext", ImGuiDataType_U8, (char*)&g_state->level_start, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Start Theme##Themenext", ImGuiDataType_U8, (char*)&g_state->theme_start, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
-        ImGui::Text(theme_name(g_state->theme_start));
+        ImGui::Text("%s", theme_name(g_state->theme_start));
         ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char*)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
         if (ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
         {
@@ -3945,7 +3945,7 @@ void render_game_props()
             {
                 continue;
             }
-            ImGui::Text(entity_names[ai_entity->type->id].data());
+            ImGui::Text("%s", entity_names[ai_entity->type->id].c_str());
             ImGui::SameLine();
             ImGui::Text(": ");
             ImGui::SameLine();
@@ -3958,11 +3958,11 @@ void render_game_props()
                 auto target_entity = get_entity_ptr(target);
                 if (target_entity != nullptr)
                 {
-                    ImGui::Text(entity_names[target_entity->type->id].data());
+                    ImGui::Text("%s", entity_names[target_entity->type->id].c_str());
                 }
                 else
                 {
-                    ImGui::Text(("Invalid target uid: " + std::to_string(target)).c_str());
+                    ImGui::Text("Invalid target uid: %s", std::to_string(target).c_str());
                 }
             }
         }
@@ -4122,7 +4122,7 @@ void imgui_draw()
                         activate_tab = "";
                         active_tab = "";
                     }
-                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.data(), &windows[tab]->open, flags))
+                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
                     {
                         active_tab = tab;
                         render_tool(tab);
@@ -4155,7 +4155,7 @@ void imgui_draw()
                 if (!tab.second->detached)
                     continue;
                 ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
-                ImGui::Begin(tab.second->name.data(), &tab.second->detached);
+                ImGui::Begin(tab.second->name.c_str(), &tab.second->detached);
                 render_tool(tab.first);
                 ImGui::SetWindowPos(
                     {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
