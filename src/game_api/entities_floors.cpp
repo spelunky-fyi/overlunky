@@ -92,7 +92,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
         auto [x_off, y_off] = offsets[i];
         auto* floor = layer_ptr->get_grid_entity_at(x + x_off, y + y_off)->as<Floor>();
         neighbours[i] = floor;
-        neighbours_same[i] = floor != nullptr && floor->type->id == type->id;
+        neighbours_same[i] = floor != nullptr && floor->type->id == type->id && floor->texture->id == texture->id;
     }
 
     for (size_t i = 0; i < 4; i++)
