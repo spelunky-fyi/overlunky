@@ -137,7 +137,6 @@ if(BUILD_OVERLUNKY)
         add_subdirectory(injector)
         
         if(MSVC)
-                target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
                 if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
                         find_package(Python3 COMPONENTS Interpreter)
                         if(Python3_FOUND)

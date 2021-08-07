@@ -13,3 +13,7 @@ target_link_libraries(injected PUBLIC
 target_include_directories(injected PRIVATE
         ${LUA_INCLUDE_DIRS})
 target_link_libraries(injected PRIVATE overlunky_warnings)
+
+if(MSVC)
+        target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
+endif()
