@@ -467,6 +467,9 @@ Door = {
   __name = "sol.Door.user",
   __newindex = "function"
 }
+DoorCoords = {
+  __name = "sol.DoorCoords.user"
+}
 Drill = {
   __index = "function",
   __name = "sol.Drill.user",
@@ -1748,6 +1751,9 @@ Leprechaun = {
   __index = "function",
   __name = "sol.Leprechaun.user",
   __newindex = "function"
+}
+LevelGenSystem = {
+  __name = "sol.LevelGenSystem.user"
 }
 LightArrow = {
   __index = "function",
@@ -3222,6 +3228,11 @@ Tadpole = {
 Teleporter = {
   __index = "function",
   __name = "sol.Teleporter.user",
+  __newindex = "function"
+}
+TeleporterBackpack = {
+  __index = "function",
+  __name = "sol.TeleporterBackpack.user",
   __newindex = "function"
 }
 TeleportingBorder = {

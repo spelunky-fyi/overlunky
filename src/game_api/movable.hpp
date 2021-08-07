@@ -83,7 +83,10 @@ class Movable : public Entity
     virtual void pick_up(Entity* entity_to_pick_up) = 0;
     virtual void on_picked_up_by(Entity* entity_picking_up) = 0;
     virtual void drop(Entity* entity_to_drop) = 0; // also used when throwing
-    virtual void collect_treasure(uint32_t treasure_value) = 0;
+
+    /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
+    virtual void adjust_money(uint32_t money) = 0;
+
     virtual void apply_movement() = 0;              // disable this function and things can't move, some spin in place
     virtual void damage_entity(Entity* victim) = 0; // can't trigger, maybe extra params are needed
     virtual bool is_monster_or_player() = 0;

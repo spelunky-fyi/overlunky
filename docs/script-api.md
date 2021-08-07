@@ -1016,6 +1016,7 @@ Derived from [`Entity`](#entity)
 - [`nil pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
 - [`bool can_jump()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) &Movable::can_jump
 - [`Entity standing_on()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on) &Movable::standing_on
+- [`nil adjust_money(int money)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=adjust_money) &Movable::adjust_money
 ### `PowerupCapable`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil remove_powerup(int powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) &PowerupCapable::remove_powerup
