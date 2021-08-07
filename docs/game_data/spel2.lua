@@ -2674,6 +2674,16 @@ RoomOwner = {
   __name = "sol.RoomOwner.user",
   __newindex = "function"
 }
+SHOP_TYPE = {
+  CLOTHING_SHOP = 1,
+  DICE_SHOP = 6,
+  GENERAL_STORE = 0,
+  HIRED_HAND_SJOP = 4,
+  PET_SHOP = 5,
+  SPECIALTY_SHOP = 3,
+  TUSK_DICE_SHOP = 7,
+  WEAPON_SHOP = 2
+}
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
   LOOP = 1,
