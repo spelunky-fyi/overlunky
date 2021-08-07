@@ -172,7 +172,7 @@ CustomSound::~CustomSound()
             overloaded{
                 [this](FMOD::Sound* sound)
                 { m_SoundManager->acquire_sound(sound); },
-                [this](FMODStudio::EventDescription*) {},
+                [](FMODStudio::EventDescription*) {},
                 [](std::monostate) {},
             },
             m_FmodHandle);
@@ -625,7 +625,7 @@ bool SoundManager::set_mute(PlayingSound playing_sound, bool mute)
     return std::visit(
         overloaded{[this, mute](FMOD::Channel* channel)
                    { return FMOD_CHECK_CALL(m_ChannelSetMute(channel, mute)); },
-                   [this](FMODStudio::EventInstance*)
+                   [](FMODStudio::EventInstance*)
                    { return false; }, // Not available on the even interface
                    [](std::monostate)
                    { return false; }},

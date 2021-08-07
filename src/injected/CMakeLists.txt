@@ -12,12 +12,4 @@ target_link_libraries(injected PUBLIC
         Shlwapi)
 target_include_directories(injected PRIVATE
         ${LUA_INCLUDE_DIRS})
-
-if (MSVC)
-        target_compile_options(injected PRIVATE
-                /bigobj /Zc:__cplusplus
-                /W4 /WX
-                /wd4201) #nonstandard extension used : nameless struct/union
-else()
-        target_compile_options(injected PRIVATE -Wall -Wextra -pedantic -Werror)
-endif()
+target_link_libraries(injected PRIVATE overlunky_warnings)

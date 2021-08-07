@@ -61,12 +61,12 @@ DEFINE_ACCESSOR(f32, float);
 }
 
 template <class FunT, typename T>
-FunT& vtable_find(T* obj, size_t index)
+FunT* vtable_find(T* obj, size_t index)
 {
     void*** ptr = reinterpret_cast<void***>(obj);
     if (!ptr[0])
-        return *static_cast<FunT*>(nullptr);
-    return *reinterpret_cast<FunT*>(&ptr[0][index]);
+        return static_cast<FunT*>(nullptr);
+    return reinterpret_cast<FunT*>(&ptr[0][index]);
 }
 }; // namespace
 

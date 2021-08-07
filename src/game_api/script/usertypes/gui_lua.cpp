@@ -175,7 +175,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
 };
 void GuiDrawContext::win_text(std::string text)
 {
-    ImGui::TextWrapped(text.c_str());
+    ImGui::TextWrapped("%s", text.c_str());
 };
 void GuiDrawContext::win_separator()
 {
@@ -368,7 +368,6 @@ void register_usertypes(sol::state& lua)
             }
         }
         ImVec2 textsize = font->CalcTextSizeA(size, 9999.0, 9999.0, text.c_str());
-        ImVec2 res = io.DisplaySize;
 
         auto a = normalize(ImVec2(0, 0));
         auto b = normalize(textsize);

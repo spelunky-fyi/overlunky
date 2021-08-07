@@ -56,6 +56,20 @@ target_compile_options(lib_detours_overlunky PRIVATE /w /Zi /MT /Gy /Gm- /Zl /Od
 target_include_directories(lib_detours_overlunky PUBLIC detours/src)
 
 # --------------------------------------------------
+# warnings interface target
+add_library(overlunky_warnings INTERFACE)
+if(MSVC)
+        target_compile_options(overlunky_warnings INTERFACE /W4 /WX)
+        target_compile_options(overlunky_warnings INTERFACE /wd4201) #nonstandard extension used : nameless struct/union
+        if(CLANG)
+                target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
+        endif()
+else()
+        target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -pedantic -Werror)
+        target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
+endif()
+
+# --------------------------------------------------
 # overlunky spel2_api
 add_subdirectory(shared)
 add_subdirectory(game_api)
@@ -67,24 +81,12 @@ if (BUILD_INFO_DUMP)
         add_subdirectory(json)
 
         add_subdirectory(info_dump)
-
-        if(MSVC)
-                target_compile_options(info_dump PRIVATE 
-                        /W4 /WX
-                        /wd4201) #nonstandard extension used : nameless struct/union 
-        else()
-                target_compile_options(info_dump PRIVATE -Wall -Wextra -pedantic -Werror)
-        endif()
+        target_link_libraries(info_dump PRIVATE overlunky_warnings)
 endif()
 
 if(BUILD_SPEL2_DLL)
         add_subdirectory(spel2_dll)
-
-        if(MSVC)
-                target_compile_options(spel2_dll PRIVATE /W4 /WX)
-        else()
-                target_compile_options(spel2_dll PRIVATE -Wall -Wextra -pedantic -Werror)
-        endif()
+        target_link_libraries(spel2_dll PRIVATE overlunky_warnings)
 endif()
 
 if(BUILD_OVERLUNKY)
@@ -136,7 +138,7 @@ if(BUILD_OVERLUNKY)
         
         if(MSVC)
                 target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-                target_compile_options(injector PRIVATE /W4 /WX)
+                target_link_libraries(injector PRIVATE overlunky_warnings)
                 if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
                         find_package(Python3 COMPONENTS Interpreter)
                         if(Python3_FOUND)
@@ -154,7 +156,5 @@ if(BUILD_OVERLUNKY)
                                 message("You need python 3 for auto-docs.")
                         endif()
                 endif()
-        else()
-                target_compile_options(injector PRIVATE -Wall -Wextra -pedantic -Werror)
         endif()
 endif()

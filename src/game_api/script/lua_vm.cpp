@@ -787,7 +787,7 @@ end
     };
 
     /// Clears a callback that is specific to an entity.
-    lua["clear_entity_callback"] = [&lua](int uid, CallbackId cb_id)
+    lua["clear_entity_callback"] = [](int uid, CallbackId cb_id)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->clear_entity_hooks.push_back({uid, cb_id});
@@ -796,7 +796,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {

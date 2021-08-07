@@ -603,13 +603,13 @@ bool LuaConsole::pre_draw()
         if (!completion_error.empty())
         {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.7f, 0.3f, 0.3f, 1.0f});
-            ImGui::TextWrapped(completion_error.c_str());
+            ImGui::TextWrapped("%s", completion_error.c_str());
             ImGui::PopStyleColor();
         }
         else if (!completion_options.empty())
         {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.7f, 0.7f, 0.7f, 1.0f});
-            ImGui::TextWrapped(completion_options.c_str());
+            ImGui::TextWrapped("%s", completion_options.c_str());
             ImGui::PopStyleColor();
         }
 

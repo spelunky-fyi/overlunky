@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 include(cmake/clang-format.cmake)
 setup_format_target(format_overlunky)
 
+string(COMPARE EQUAL "Clang" "${CMAKE_CXX_COMPILER_ID}" CLANG)
+
 if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../bin)
 endif()

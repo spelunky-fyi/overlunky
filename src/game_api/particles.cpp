@@ -5,7 +5,6 @@
 
 size_t particle_db_ptr()
 {
-    static size_t cached_particledb_ptr;
     ONCE(size_t)
     {
         auto mem = Memory::get();

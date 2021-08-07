@@ -367,6 +367,8 @@ bool LuaBackend::update()
                     }
                     break;
                 }
+                default:
+                    break;
                 }
             }
         }

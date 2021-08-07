@@ -312,8 +312,6 @@ std::array g_community_tile_codes{
         "ENT_TYPE_ITEM_PUNISHBALL",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            static const auto chain_id = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
-
             std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer(0, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
             if (!entities_left.empty())
             {
