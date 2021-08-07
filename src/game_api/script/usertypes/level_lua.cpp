@@ -174,6 +174,10 @@ void register_usertypes(sol::state& lua)
         "add_level_files",
         &PreLoadLevelFilesContext::add_level_files);
 
+    lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
+
+    lua.new_usertype<LevelGenSystem>("LevelGenSystem", sol::no_constructor, "spawn_x", &LevelGenSystem::spawn_x, "spawn_y", &LevelGenSystem::spawn_y, "spawn_room_x", &LevelGenSystem::spawn_room_x, "spawn_room_y", &LevelGenSystem::spawn_room_y, "exits", &LevelGenSystem::exit_doors_locations);
+
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.
     lua.new_usertype<PostRoomGenerationContext>(

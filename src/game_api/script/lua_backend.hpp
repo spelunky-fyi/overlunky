@@ -280,10 +280,16 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
         sol::error e = lua_result;
         result = e.what();
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-        messages.push_back({result, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
-        DEBUG("{}", result);
-        if (messages.size() > 20)
-            messages.pop_front();
+        std::istringstream errors(result);
+        while (!errors.eof())
+        {
+            std::string eline;
+            getline(errors, eline);
+            messages.push_back({eline, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
+            DEBUG("{}", result);
+            if (messages.size() > 30)
+                messages.pop_front();
+        }
 #endif
         return std::nullopt;
     }

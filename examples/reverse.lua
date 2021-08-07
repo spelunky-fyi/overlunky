@@ -80,7 +80,7 @@ function ice_caves_exit()
 end
 
 function tiamat_exit()
-    local tiamat = get_entities_by_type(ENT_TYPE.MONS_TIAMAT)[1]
+    local tiamat = get_entity(get_entities_by_type(ENT_TYPE.MONS_TIAMAT)[1])
     if testflag(tiamat.flags, ENT_FLAG.DEAD) then
         state.win_state = WIN_STATE.NO_WIN
     end
