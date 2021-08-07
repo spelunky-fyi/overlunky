@@ -156,7 +156,7 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
         // log::debug!("Teleporting to screen {}, {}", x, y);
         auto state = State::get();
         auto [x_pos, y_pos] = state.click_position(dx, dy);
-        if (snap && abs(vx) + abs(vy) <= 0.04)
+        if (snap && abs(vx) + abs(vy) <= 0.04f)
         {
             x_pos = round(x_pos);
             y_pos = round(y_pos);
