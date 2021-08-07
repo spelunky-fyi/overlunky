@@ -13,7 +13,9 @@ void register_usertypes(sol::state& lua)
         "random_index",
         &PRNG::random_index,
         "random_int",
-        &PRNG::random_int);
+        &PRNG::random_int,
+        "random_chance",
+        &PRNG::random_chance);
 
     /// The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
     lua["prng"] = &PRNG::get();

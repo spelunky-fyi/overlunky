@@ -33,10 +33,10 @@ PRNG::prng_pair PRNG::get_and_advance(PRNG_CLASS type)
     return copy;
 }
 
-std::uint64_t PRNG::random_index(std::uint64_t size, PRNG_CLASS type)
+std::int64_t PRNG::random_index(std::int64_t size, PRNG_CLASS type)
 {
     prng_pair pair = get_and_advance(type);
-    return (pair.first & 0xffffffff) * size >> 0x20;
+    return static_cast<std::int64_t>((pair.first & 0xffffffff) * size >> 0x20);
 }
 std::int64_t PRNG::random_int(std::int64_t min, std::int64_t max, PRNG_CLASS type)
 {
@@ -55,4 +55,8 @@ std::int64_t PRNG::random_int(std::int64_t min, std::int64_t max, PRNG_CLASS typ
     // Technically not a uniform distribution, but we have 64bit to map to a range that is many orders of magnitude smaller
     // So in the grand scheme this is close enough to a uniform distribution
     return wrap(static_cast<std::int64_t>(pair.first), min, max);
+}
+bool PRNG::random_chance(std::int64_t inverse_chance, PRNG_CLASS type)
+{
+    return random_int(0, inverse_chance, type) == 0;
 }

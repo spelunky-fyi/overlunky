@@ -20,9 +20,11 @@ struct PRNG
     prng_pair get_and_advance(PRNG_CLASS type);
 
     /// Generate a random integer in the range `[0, size)`
-    std::uint64_t random_index(std::uint64_t size, PRNG_CLASS type);
+    std::int64_t random_index(std::int64_t size, PRNG_CLASS type);
     /// Generate a random integer in the range `[min, size)`
     std::int64_t random_int(std::int64_t min, std::int64_t max, PRNG_CLASS type);
+    /// Returns true with a chance of `1/inverse_chance`
+    bool random_chance(std::int64_t inverse_chance, PRNG_CLASS type);
 
     prng_pair pairs[11];
 };

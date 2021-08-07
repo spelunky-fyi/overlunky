@@ -941,6 +941,9 @@ Generate a random integer in the range `[0, size)`
 - [`int random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
 \
 Generate a random integer in the range `[min, size)`
+- [`bool random_chance(int inverse_chance, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_chance) &PRNG::random_chance
+\
+Returns true with a chance of `1/inverse_chance`
 ### `Color`
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
