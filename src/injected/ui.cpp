@@ -529,7 +529,7 @@ void save_config(std::string file)
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
 
     writeData << "kits = [";
-    for (int i = 0; i < saved_entities.size(); i++)
+    for (unsigned int i = 0; i < saved_entities.size(); i++)
     {
         writeData << std::endl
                   << "  \"" << saved_entities[i] << "\"";
@@ -542,7 +542,7 @@ void save_config(std::string file)
 
     writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\"" << std::endl;
     writeData << "font_size = [";
-    for (int i = 0; i < fontsize.size(); i++)
+    for (unsigned int i = 0; i < fontsize.size(); i++)
     {
         writeData << std::endl
                   << "  " << fontsize[i];
@@ -555,7 +555,7 @@ void save_config(std::string file)
 
     writeData << "# Script filenames to load automatically on start. Example: autorun_scripts = [\"foo.lua\", \"bar.lua\"]" << std::endl;
     writeData << "autorun_scripts = [";
-    for (int i = 0; i < g_script_autorun.size(); i++)
+    for (unsigned int i = 0; i < g_script_autorun.size(); i++)
     {
         writeData << std::endl
                   << "  \"" << g_script_autorun[i] << "\"";
@@ -762,7 +762,7 @@ void spawn_entities(bool s, std::string list = "")
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
-        if (g_current_item == 0 && g_filtered_count == g_items.size())
+        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return;
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
@@ -809,7 +809,7 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
     {
         if (g_filtered_count == 0)
             return 1;
-        if (g_current_item == 0 && g_filtered_count == g_items.size())
+        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return 1;
         std::string search(text);
         // while(!search.empty() && std::isspace(search.back()))
@@ -834,7 +834,7 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
 
 const char* entity_name(uint32_t id)
 {
-    for (int i = 0; i < g_items.size(); i++)
+    for (unsigned int i = 0; i < g_items.size(); i++)
     {
         if (g_items[i].id == id)
         {
@@ -1605,8 +1605,8 @@ void update_filter(std::string s)
     int count = 0;
     std::string last = last_word(s);
     uint32_t searchid = 0;
-    auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
-    for (int i = 0; i < g_items.size(); i++)
+    //auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
+    for (unsigned int i = 0; i < g_items.size(); i++)
     {
         if (s[0] == '\0' || std::isspace(s.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
         {
@@ -1622,7 +1622,8 @@ void update_filter(std::string s)
 
 void render_int(const char* label, int state)
 {
-    return ImGui::LabelText(label, std::to_string(state).c_str());
+    std::string strstate = std::to_string(state);
+    return ImGui::LabelText(label, strstate.c_str());
 }
 
 void render_list()
@@ -1753,7 +1754,7 @@ void render_input()
         ImGui::Text("%d:", n + 1);
         ImGui::PopID();
         ImGui::SameLine();
-        ImGui::TextWrapped(search.data());
+        ImGui::TextWrapped(search.c_str());
         n++;
     }
     if (set_focus_entity)
@@ -2083,7 +2084,7 @@ void render_uid(int uid, const char* section, bool rembtn = false)
     if (ptype == 0)
         return;
     std::string typec = std::to_string(ptype);
-    const char* pname = entity_names[ptype].data();
+    std::string pname = entity_names[ptype];
     ImGui::PushID(section);
     if (ImGui::Button(uidc.c_str()))
     {
@@ -2093,7 +2094,7 @@ void render_uid(int uid, const char* section, bool rembtn = false)
     ImGui::SameLine();
     ImGui::Text(typec.c_str());
     ImGui::SameLine();
-    ImGui::Text(pname);
+    ImGui::Text(pname.c_str());
     if (rembtn)
     {
         ImGui::SameLine();
@@ -2177,8 +2178,6 @@ void render_camera()
 
 void render_arrow()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
     ImVec2 pos = ImGui::GetMousePos();
     ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
     float length = sqrt(pow(line.x, 2.0f) + pow(line.y, 2.0f));
@@ -2200,8 +2199,6 @@ void render_arrow()
 
 void render_cross()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
     auto* draw_list = ImGui::GetWindowDrawList();
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y - 9), ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
@@ -2397,7 +2394,7 @@ void render_messages()
 
     const float font_size = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
-    int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / font_size));
+    unsigned int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / font_size));
     if (queue.size() > logsize)
     {
         std::vector<Message> newqueue(queue.end() - logsize, queue.end());
@@ -3016,7 +3013,7 @@ void render_scripts()
                 script->get_version().c_str(),
                 script->get_author().c_str(),
                 script->get_id().c_str());
-            ImGui::TextWrapped(script->get_description().c_str());
+            ImGui::TextWrapped("%s", script->get_description().c_str());
             if (!script->get_unsafe() || options["enable_unsafe_scripts"])
             {
                 static bool run_unsafe = false;
