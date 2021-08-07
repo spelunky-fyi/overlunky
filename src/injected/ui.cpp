@@ -992,7 +992,7 @@ bool dblclicked(std::string keyname)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -1073,7 +1073,7 @@ bool dragging(std::string keyname)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -1095,7 +1095,7 @@ bool dragging(std::string keyname)
 
 bool dragged(std::string keyname)
 {
-    int wParam = OL_BUTTON_MOUSE;
+    //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -1113,7 +1113,7 @@ bool dragged(std::string keyname)
 
 float drag_delta(std::string keyname)
 {
-    int wParam = OL_BUTTON_MOUSE;
+    //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -1131,7 +1131,7 @@ float drag_delta(std::string keyname)
 
 float held_duration(std::string keyname)
 {
-    int wParam = OL_BUTTON_MOUSE;
+    //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -2434,13 +2434,12 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(io.MousePos);
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
-            std::pair<float, float> campos = get_camera_position();
+            //std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
-            char buf[32];
-            sprintf(buf, "%0.2f, %0.2f", cpos.first, cpos.second);
-            char buf2[32];
+            std::string buf = std::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
+            //char buf2[32];
             //sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
-            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
+            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
             //dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
             unsigned int mask = safe_entity_mask;
             if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier from mouse_destroy_unsafe
@@ -2453,9 +2452,8 @@ void render_clickhandler()
                 render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
                 auto ptype = entity_type(hovered);
                 const char* pname = entity_names[ptype].data();
-                char buf3[128];
-                sprintf(buf3, "%i, %s", hovered, pname);
-                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3);
+                std::string buf3 = std::format("{}, {}", hovered, pname);
+                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
             }
         }
     }

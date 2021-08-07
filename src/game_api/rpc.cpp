@@ -167,7 +167,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
         std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool
                   { return std::get<1>(a) < std::get<1>(b); });
         auto picked = found[0];
-        auto entity = std::get<2>(picked);
+        //auto entity = std::get<2>(picked);
         //DEBUG("{}", (void*)entity);
         return std::get<0>(picked);
     }
