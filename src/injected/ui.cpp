@@ -4332,7 +4332,7 @@ void create_box(std::vector<EntityItem> items)
     std::sort(new_items.begin(), new_items.end());
 
     std::vector<int> new_filtered_items(new_items.size());
-    for (int i = 0; i < new_items.size(); i++)
+    for (unsigned int i = 0; i < new_items.size(); i++)
     {
         new_filtered_items[i] = i;
         entity_names[new_items[i].id] = new_items[i].name.substr(9);
