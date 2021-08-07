@@ -537,7 +537,7 @@ void save_config(std::string file)
     for (int i = 0; i < fontsize.size(); i++)
     {
         writeData << std::endl
-                  << fontsize[i];
+                  << "  " << fontsize[i];
         if (i < fontsize.size() - 1)
             writeData << ",";
     }
