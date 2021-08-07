@@ -980,6 +980,33 @@ bool clicked(std::string keyname)
     return wParam == keycode;
 }
 
+bool dblclicked(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if (GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += OL_KEY_CTRL;
+    }
+    if (GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += OL_KEY_SHIFT;
+    }
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (ImGui::IsMouseDoubleClicked(i))
+        {
+            wParam += i + 1;
+            break;
+        }
+    }
+    return wParam == keycode;
+}
+
 bool held(std::string keyname)
 {
     int wParam = OL_BUTTON_MOUSE;
@@ -1032,6 +1059,87 @@ bool released(std::string keyname)
         }
     }
     return wParam == keycode;
+}
+
+bool dragging(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname];
+    if (GetAsyncKeyState(VK_CONTROL))
+    {
+        wParam += OL_KEY_CTRL;
+    }
+    if (GetAsyncKeyState(VK_SHIFT))
+    {
+        wParam += OL_KEY_SHIFT;
+    }
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (ImGui::IsMouseDragging(i))
+        {
+            wParam += i + 1;
+            break;
+        }
+    }
+    return wParam == keycode;
+}
+
+bool dragged(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return ImGui::GetMouseDragDelta(i).x > 0 || ImGui::GetMouseDragDelta(i).y > 0;
+        }
+    }
+    return false;
+}
+
+float drag_delta(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return abs(ImGui::GetMouseDragDelta(i).x) + abs(ImGui::GetMouseDragDelta(i).y);
+        }
+    }
+    return false;
+}
+
+float held_duration(std::string keyname)
+{
+    int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return ImGui::GetIO().MouseDownDuration[i];
+        }
+    }
+    return -1.0;
 }
 
 bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
@@ -2565,18 +2673,29 @@ void render_clickhandler()
             g_vx = 0;
             g_vy = 0;
         }
+
+        else if (dblclicked("mouse_camera_drag"))
+        {
+            if (!g_players.empty())
+            {
+                g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            }
+        }
+
         else if (clicked("mouse_camera_drag"))
         {
             if (ImGui::IsMousePosValid())
             {
                 startpos = normalize(io.MousePos);
-                g_state->camera->focused_entity_uid = -1;
+                g_state->camera->focused_entity_uid = get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
             }
         }
-        else if (held("mouse_camera_drag"))
+
+        else if (dragging("mouse_camera_drag") && drag_delta("mouse_camera_drag") > 10.0f)
         {
             if (ImGui::IsMousePosValid())
             {
+                g_state->camera->focused_entity_uid = -1;
                 ImVec2 mpos = normalize(io.MousePos);
                 std::pair<float, float> oryginal_pos = click_position(startpos.x, startpos.y);
                 std::pair<float, float> current_pos = click_position(mpos.x, mpos.y);
@@ -2586,6 +2705,7 @@ void render_clickhandler()
                 startpos = normalize(io.MousePos);
             }
         }
+
         else if (held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 10)
         {
             g_last_gun = ImGui::GetFrameCount();
