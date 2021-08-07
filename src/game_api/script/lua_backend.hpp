@@ -174,7 +174,7 @@ class LuaBackend
     std::unordered_set<std::string> loaded_modules;
 
     std::string result;
-    ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
+    ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
 
