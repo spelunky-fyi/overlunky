@@ -137,6 +137,8 @@ std::map<std::string, int> keys{
     {"mouse_clone", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x05},
     {"mouse_destroy", OL_BUTTON_MOUSE | 0x05},
     {"mouse_destroy_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x05},
+    {"mouse_zoom_out", OL_BUTTON_MOUSE | OL_KEY_CTRL | OL_WHEEL_DOWN},
+    {"mouse_zoom_in", OL_BUTTON_MOUSE | OL_KEY_CTRL | OL_WHEEL_UP},
     {"reload_enabled_scripts", OL_KEY_CTRL | VK_F5}, // ctrl + f5 same as playlunky
     {"console", VK_OEM_3},                           // ~ for US
     {"console_alt", VK_OEM_5},                       // \ for US
@@ -489,6 +491,7 @@ void save_config(std::string file)
               << "# function = keycode_in_hex" << std::endl
               << "# For modifiers, add 0x100 for Ctrl or 0x200 for Shift" << std::endl
               << "# For mouse buttons, add 0x400" << std::endl
+              << "# For Mouse wheel, 0x11 = down, 0x12 = up" << std::endl
               << "# Set to 0x0 to disable key" << std::endl
               << "# Example: G is 0x47, so Ctrl+G is 0x147, 0x402 is Mouse2 etc" << std::endl
               << "# Get more hex keycodes from https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes" << std::endl
@@ -969,12 +972,26 @@ bool clicked(std::string keyname)
     {
         wParam += OL_KEY_SHIFT;
     }
-    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    if ((keycode & OL_MOUSE_WHEEL) > 0)
     {
-        if (ImGui::IsMouseClicked(i))
+        if (ImGui::GetIO().MouseWheel > 0)
         {
-            wParam += i + 1;
-            break;
+            wParam += OL_WHEEL_UP;
+        }
+        else if (ImGui::GetIO().MouseWheel < 0)
+        {
+            wParam += OL_WHEEL_DOWN;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+        {
+            if (ImGui::IsMouseClicked(i))
+            {
+                wParam += i + 1;
+                break;
+            }
         }
     }
     return wParam == keycode;
@@ -2404,6 +2421,19 @@ void render_clickhandler()
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
+    if (io.MouseWheel != 0 && ImGui::IsWindowHovered())
+    {
+        if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
+        {
+            g_zoom += 1.0;
+            set_zoom();
+        }
+        else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
+        {
+            g_zoom -= 1.0;
+            set_zoom();
+        }
+    }
     if (options["draw_grid"])
     {
         render_grid();
@@ -3994,7 +4024,7 @@ void render_tool(std::string tool)
 void imgui_init(ImGuiContext*)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.FontAllowUserScaling = true;
+    io.FontAllowUserScaling = false;
     show_cursor();
     PWSTR fontdir;
     if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
