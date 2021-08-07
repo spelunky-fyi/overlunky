@@ -926,7 +926,7 @@ std::pair<float, float> LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
         static_cast<float>(x * 10) + 2.5f,
         122.5f - static_cast<float>(y * 8)};
 }
-std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, int l)
+std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, LAYER l)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -934,21 +934,12 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return std::nullopt;
 
-    if (l < 0)
-    {
-        auto player = state.items()->player(static_cast<uint8_t>(abs(l) - 1));
-        if (player == nullptr)
-            return std::nullopt;
-        l = player->layer;
-    }
+    uint8_t layer = enum_to_layer(l);
 
-    if (l >= 2)
-        return std::nullopt;
-
-    LevelGenRooms* level_rooms = rooms[l];
+    LevelGenRooms* level_rooms = rooms[layer];
     return level_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
+bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -956,22 +947,13 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t r
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
-    if (l < 0)
-    {
-        auto player = state.items()->player(static_cast<uint8_t>(abs(l) - 1));
-        if (player == nullptr)
-            return false;
-        l = player->layer;
-    }
+    uint8_t layer = enum_to_layer(l);
 
-    if (l >= 2)
-        return false;
-
-    LevelGenRooms* level_rooms = rooms[l];
+    LevelGenRooms* level_rooms = rooms[layer];
     level_rooms->rooms[x + y * 8] = room_template;
 
     static auto udjat_top = data->room_templates().at("udjattop").id;
-    if (l == 1)
+    if (layer == 1)
     {
         backlayer_room_exists->rooms[x + y * 8] = room_template != 0 && room_template != udjat_top;
         if (room_template == udjat_top)

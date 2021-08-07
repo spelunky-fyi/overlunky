@@ -8,6 +8,7 @@
 #include "thread_utils.hpp"
 
 const float ZF = 0.737f;
+using LAYER = int;
 
 struct Layer;
 struct LevelGenSystem;

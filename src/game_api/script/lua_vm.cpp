@@ -483,6 +483,7 @@ end
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
     // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
+    /// NoDoc
     /// Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
     lua.script(R"##(

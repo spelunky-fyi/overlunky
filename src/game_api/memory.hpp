@@ -32,11 +32,11 @@ void [[maybe_unused]] write_mem(size_t addr, std::string payload)
 {
     write_mem_prot(addr, payload, false);
 }
-
-#define DEFINE_ACCESSOR(name, type)                \
-    type [[maybe_unused]] read_##name(size_t addr) \
-    {                                              \
-        return *(type*)(addr);                     \
+#pragma warning(push, 0) // bug in the clang that treats unused types as unused functions
+#define DEFINE_ACCESSOR(name, type) \
+    type read_##name(size_t addr)   \
+    {                               \
+        return *(type*)(addr);      \
     }
 
 DEFINE_ACCESSOR(u8, uint8_t);
@@ -50,6 +50,7 @@ DEFINE_ACCESSOR(i32, int32_t);
 DEFINE_ACCESSOR(i64, int64_t);
 
 DEFINE_ACCESSOR(f32, float);
+#pragma warning(pop)
 
 size_t [[maybe_unused]] function_start(size_t off)
 {

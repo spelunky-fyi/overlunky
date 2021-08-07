@@ -225,7 +225,7 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.
 Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
-`int spawn_entity(int entity_type, float x, float y, int enum_layer, float vx, float vy)`<br/>
+`int spawn_entity(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Spawn an entity in position with some velocity and return the uid of spawned entity.
 Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
 Example:
@@ -241,30 +241,30 @@ set_callback(function()
 end, ON.LEVEL)
 ```
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
-`int spawn(int entity_type, float x, float y, int enum_layer, float vx, float vy)`<br/>
+`int spawn(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Short for [spawn_entity](#spawn_entity).
 ### [`spawn_entity_snapped_to_floor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_snapped_to_floor)
-`int spawn_entity_snapped_to_floor(int id, float x, float y, int enum_layer)`<br/>
+`int spawn_entity_snapped_to_floor(int id, float x, float y, LAYER layer)`<br/>
 Spawns an entity directly on the floor below the tile at the given position.
 Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
 ### [`spawn_on_floor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_on_floor)
-`int spawn_on_floor(int id, float x, float y, int enum_layer)`<br/>
+`int spawn_on_floor(int id, float x, float y, LAYER layer)`<br/>
 Short for [spawn_entity_snapped_to_floor](#spawn_entity_snapped_to_floor).
 ### [`spawn_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_grid_entity)
-`int spawn_grid_entity(int entity_type, float x, float y, int enum_layer)`<br/>
+`int spawn_grid_entity(int entity_type, float x, float y, LAYER layer)`<br/>
 Spawn a grid entity, such as floor or traps, that snaps to the grid.
 ### [`spawn_entity_nonreplaceable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_nonreplaceable)
-`int spawn_entity_nonreplaceable(int entity_type, float x, float y, int enum_layer, float vx, float vy)`<br/>
+`int spawn_entity_nonreplaceable(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
 ### [`spawn_critical`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_critical)
-`int spawn_critical(int entity_type, float x, float y, int enum_layer, float vx, float vy)`<br/>
+`int spawn_critical(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
 ### [`spawn_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door)
-`int spawn_door(float x, float y, int enum_layer, int w, int l, int t)`<br/>
+`int spawn_door(float x, float y, LAYER layer, int w, int l, int t)`<br/>
 Spawn a door to another world, level and theme and return the uid of spawned entity.
 Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
 ### [`door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door)
-`int door(float x, float y, int enum_layer, int w, int l, int t)`<br/>
+`int door(float x, float y, LAYER layer, int w, int l, int t)`<br/>
 Short for [spawn_door](#spawn_door).
 ### [`spawn_layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_layer_door)
 `nil spawn_layer_door(float x, float y)`<br/>
@@ -273,7 +273,7 @@ Spawn a door to backlayer.
 `nil layer_door(float x, float y)`<br/>
 Short for [spawn_layer_door](#spawn_layer_door).
 ### [`spawn_apep`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_apep)
-`int spawn_apep(float x, float y, int enum_layer, bool right)`<br/>
+`int spawn_apep(float x, float y, LAYER layer, bool right)`<br/>
 Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
@@ -322,17 +322,14 @@ Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFF
 ### [`get_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
 `Entity get_entity(int uid)`<br/>
 Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
-### [`get_entity_raw`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_raw)
-`Entity get_entity_raw(int uid)`<br/>
-Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 `EntityDB get_type(int id)`<br/>
 Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 ### [`get_grid_entity_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_grid_entity_at)
-`int get_grid_entity_at(float x, float y, int enum_layer)`<br/>
+`int get_grid_entity_at(float x, float y, LAYER layer)`<br/>
 Gets a grid entity, such as floor or spikes, at the given position and layer.
 ### [`get_entities_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
-`array<int> get_entities_by(int entity_type, int mask, int enum_layer)`<br/>
+`array<int> get_entities_by(int entity_type, int mask, LAYER layer)`<br/>
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_by_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 `array<int> get_entities_by_type(int, int...)`<br/>
@@ -351,7 +348,7 @@ end
 `array<int> get_entities_at(int entity_type, int mask, float x, float y, int layer, float radius)`<br/>
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_overlapping_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
-`array<int> get_entities_overlapping_hitbox(int entity_type, int mask, AABB hitbox, int enum_layer)`<br/>
+`array<int> get_entities_overlapping_hitbox(int entity_type, int mask, AABB hitbox, LAYER layer)`<br/>
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`attach_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach_entity)
 `nil attach_entity(int overlay_uid, int attachee_uid)`<br/>
@@ -708,10 +705,10 @@ Use get_entities_by(0, 0, LAYER.BOTH)
 `array<int> get_entities_by_mask(int mask)`<br/>
 Use get_entities_by(0, mask, LAYER.BOTH)
 ### [`get_entities_by_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
-`array<int> get_entities_by_layer(int enum_layer)`<br/>
+`array<int> get_entities_by_layer(LAYER layer)`<br/>
 Use get_entities_by(0, 0, layer)
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
-`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int enum_layer)`<br/>
+`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)`<br/>
 Use `get_entities_overlapping_hitbox` instead
 ### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
 `nil set_camera_position(float cx, float cy)`<br/>

@@ -63,43 +63,43 @@ int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, f
     return state.layer_local(player->layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, s, vx, vy, snap)->uid;
 }
 
-int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int enum_layer, float vx, float vy)
+int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, LAYER layer, float vx, float vy)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     std::pair<float, float> offset_position;
-    uint8_t layer = enum_to_layer(enum_layer, offset_position);
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
+    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
 }
 
-int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, int enum_layer)
+int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, LAYER layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     std::pair<float, float> offset_position;
-    uint8_t layer = enum_to_layer(enum_layer, offset_position);
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
+    return State::get().layer_local(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
 }
 
-int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, int enum_layer)
+int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, LAYER layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     std::pair<float, float> offset_position;
-    uint8_t layer = enum_to_layer(enum_layer, offset_position);
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
+    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
 }
 
-int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
+int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, LAYER layer, float vx, float vy)
 {
     g_SpawnNonReplacable++;
     OnScopeExit pop{[]
@@ -139,16 +139,16 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) // ui only
     return layer->spawn_door(x + _x, y + _y, w, l, t)->uid;
 }
 
-int32_t spawn_door_abs(float x, float y, int enum_layer, uint8_t w, uint8_t l, uint8_t t)
+int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint8_t t)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     std::pair<float, float> offset_position;
-    uint8_t layer = enum_to_layer(enum_layer, offset_position);
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
+    return State::get().layer_local(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
 }
 
 void spawn_backdoor(float x, float y) // ui only
@@ -190,16 +190,16 @@ void spawn_backdoor_abs(float x, float y)
     back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
 }
 
-int32_t spawn_apep(float x, float y, int enum_layer, bool right)
+int32_t spawn_apep(float x, float y, LAYER layer, bool right)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     std::pair<float, float> offset_position;
-    uint8_t layer = enum_to_layer(enum_layer, offset_position);
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
+    return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
 void push_spawn_type_flags(SpawnTypeFlags flags)

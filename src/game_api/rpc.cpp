@@ -9,7 +9,7 @@
 #include "virtual_table.hpp"
 #include <cstdarg>
 
-uint32_t setflag(uint32_t flags, int bit)
+uint32_t setflag(uint32_t flags, int bit) //shouldn't we change those to #define ?
 {
     return flags | (1U << (bit - 1));
 }
@@ -26,7 +26,7 @@ uint32_t flipflag(uint32_t flags, int bit)
     return (flags ^ (1U << (bit - 1)));
 }
 
-void teleport(float x, float y, bool s, float vx, float vy, bool snap)
+void teleport(float x, float y, bool s, float vx, float vy, bool snap) //ui only
 {
     auto state = State::get();
 
@@ -131,7 +131,7 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
     }
 }
 
-int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
+int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // ui only
 {
     auto state = State::get();
     if (s)
@@ -174,12 +174,12 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     return -1;
 }
 
-int32_t get_grid_entity_at(float x, float y, int enum_layer)
+int32_t get_grid_entity_at(float x, float y, LAYER layer)
 {
     auto state = State::get();
-    uint8_t layer = enum_to_layer(enum_layer);
+    uint8_t actual_layer = enum_to_layer(layer);
 
-    if (Entity* ent = state.layer(layer)->get_grid_entity_at(x, y))
+    if (Entity* ent = state.layer(actual_layer)->get_grid_entity_at(x, y))
         return ent->uid;
 
     return -1;
@@ -339,9 +339,9 @@ std::vector<uint32_t> get_entities()
     return get_entities_by(0, 0, -128);
 }
 
-std::vector<uint32_t> get_entities_by_layer(int enum_layer)
+std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 {
-    return get_entities_by(0, 0, enum_layer);
+    return get_entities_by(0, 0, layer);
 }
 
 std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types)
@@ -375,17 +375,17 @@ std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
     return get_entities_by(0, mask, -128);
 }
 
-std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int enum_layer)
+std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER layer)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    if (enum_layer == -128) // LAYER.BOTH
+    if (layer == -128) // LAYER.BOTH
     {
-        uint8_t layer = 2;
-        while (layer)
+        uint8_t layeridx = 2;
+        while (layeridx)
         {
-            layer--;
-            for (auto& item : state.layer(layer)->items())
+            layeridx--;
+            for (auto& item : state.layer(layeridx)->items())
             {
                 if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
                 {
@@ -396,9 +396,9 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int e
     }
     else
     {
-        uint8_t layer = enum_to_layer(enum_layer);
+        uint8_t actual_layer = enum_to_layer(layer);
 
-        for (auto& item : state.layer(layer)->items())
+        for (auto& item : state.layer(actual_layer)->items())
         {
             if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
             {
@@ -409,17 +409,17 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int e
     return found;
 }
 
-std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, int enum_layer, float radius)
+std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    if (enum_layer == -128)
+    if (layer == -128)
     {
-        uint8_t layer = 2;
-        while (layer)
+        uint8_t layeridx = 2;
+        while (layeridx)
         {
-            layer--;
-            for (auto& item : state.layer(layer)->items())
+            layeridx--;
+            for (auto& item : state.layer(layeridx)->items())
             {
                 auto [ix, iy] = item->position();
                 float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
@@ -432,9 +432,9 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
     }
     else
     {
-        uint8_t layer = enum_to_layer(enum_layer);
+        uint8_t actual_layer = enum_to_layer(layer);
 
-        for (auto& item : state.layer(layer)->items())
+        for (auto& item : state.layer(actual_layer)->items())
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
@@ -447,11 +447,11 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
     return found;
 }
 
-std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, int enum_layer)
+std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, LAYER layer)
 {
     auto state = State::get();
     std::vector<uint32_t> result;
-    if (enum_layer == -128)
+    if (layer == -128)
     {
         std::vector<uint32_t> result2;
         result = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
@@ -460,15 +460,15 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint
     }
     else
     {
-        uint8_t layer = enum_to_layer(enum_layer);
-        result = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(layer));
+        uint8_t actual_layer = enum_to_layer(layer);
+        result = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
     }
     return result;
 }
 
-std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int enum_layer)
+std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
-    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy, sx2, sy2}, enum_layer);
+    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy, sx2, sy2}, layer);
 }
 
 std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
@@ -502,10 +502,6 @@ std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 
 void set_contents(uint32_t uid, uint32_t item_entity_type)
 {
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
     Entity* container = get_entity_ptr(uid);
     if (container == nullptr)
         return;
@@ -1227,18 +1223,18 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     return 0;
 }
 
-uint8_t enum_to_layer(int enum_layer)
+uint8_t enum_to_layer(LAYER layer)
 {
-    if (enum_layer == 0)
+    if (layer == 0)
         return 0;
-    else if (enum_layer == 1)
+    else if (layer == 1)
         return 1;
-    else if (enum_layer < -MAX_PLAYERS)
+    else if (layer < -MAX_PLAYERS)
         return 0;
-    else if (enum_layer < 0)
+    else if (layer < 0)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs(enum_layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(abs(layer) - 1));
         if (player != nullptr)
         {
             return player->layer;
@@ -1247,24 +1243,24 @@ uint8_t enum_to_layer(int enum_layer)
     return 0;
 }
 
-uint8_t enum_to_layer(int enum_layer, std::pair<float, float>& player_position)
+uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position)
 {
-    if (enum_layer == 0)
+    if (layer == 0)
     {
         player_position = {0.0f, 0.0f};
         return 0;
     }
-    else if (enum_layer == 1)
+    else if (layer == 1)
     {
         player_position = {0.0f, 0.0f};
         return 1;
     }
-    else if (enum_layer < -MAX_PLAYERS)
+    else if (layer < -MAX_PLAYERS)
         return 0;
-    else if (enum_layer < 0)
+    else if (layer < 0)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs(enum_layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(abs(layer) - 1));
         if (player != nullptr)
         {
             player_position = player->position();
