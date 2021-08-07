@@ -28,7 +28,7 @@ void write_mem_prot(size_t addr, std::string payload, bool prot)
     }
 }
 
-void [[maybe_unused]] write_mem(size_t addr, std::string payload)
+[[maybe_unused]] void write_mem(size_t addr, std::string payload)
 {
     write_mem_prot(addr, payload, false);
 }
@@ -52,7 +52,7 @@ DEFINE_ACCESSOR(i64, int64_t);
 DEFINE_ACCESSOR(f32, float);
 #pragma warning(pop)
 
-size_t [[maybe_unused]] function_start(size_t off)
+[[maybe_unused]] size_t function_start(size_t off)
 {
     off &= ~0xf;
     while (read_u8(off - 1) != 0xcc)
