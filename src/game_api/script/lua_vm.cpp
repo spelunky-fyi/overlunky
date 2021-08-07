@@ -802,8 +802,20 @@ end
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = movable->set_pre_statemachine(
-                [backend, fun = std::move(fun)](Movable* self)
-                { return backend->handle_function_with_return<bool>(fun, self).value_or(false); });
+                [backend, &lua, fun = std::move(fun)](Movable* self)
+                {
+                    sol::function cast = lua["TYPE_MAP"][self->type->id];
+                    if (cast)
+                    {
+                        sol::userdata proper_entity = cast(self);
+                        return backend->handle_function_with_return<bool>(fun, proper_entity).value_or(false);
+                        backend->handle_function(fun, proper_entity);
+                    }
+                    else
+                    {
+                        return backend->handle_function_with_return<bool>(fun, self).value_or(false);
+                    }
+                });
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
         }
@@ -813,14 +825,25 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_post_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = movable->set_post_statemachine(
-                [backend, fun = std::move(fun)](Movable* self)
-                { backend->handle_function(fun, self); });
+                [backend, &lua, fun = std::move(fun)](Movable* self)
+                {
+                    sol::function cast = lua["TYPE_MAP"][self->type->id];
+                    if (cast)
+                    {
+                        sol::userdata proper_entity = cast(self);
+                        backend->handle_function(fun, proper_entity);
+                    }
+                    else
+                    {
+                        backend->handle_function(fun, self);
+                    }
+                });
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
             return id;
