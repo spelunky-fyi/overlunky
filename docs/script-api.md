@@ -225,7 +225,7 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.
 Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
-`int spawn_entity(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
+`int spawn_entity(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Spawn an entity in position with some velocity and return the uid of spawned entity.
 Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
 Example:
@@ -241,30 +241,30 @@ set_callback(function()
 end, ON.LEVEL)
 ```
 ### [`spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
-`int spawn(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
+`int spawn(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Short for [spawn_entity](#spawn_entity).
 ### [`spawn_entity_snapped_to_floor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_snapped_to_floor)
-`int spawn_entity_snapped_to_floor(int id, float x, float y, int layer)`<br/>
+`int spawn_entity_snapped_to_floor(int id, float x, float y, LAYER layer)`<br/>
 Spawns an entity directly on the floor below the tile at the given position.
 Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
 ### [`spawn_on_floor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_on_floor)
-`int spawn_on_floor(int id, float x, float y, int layer)`<br/>
+`int spawn_on_floor(int id, float x, float y, LAYER layer)`<br/>
 Short for [spawn_entity_snapped_to_floor](#spawn_entity_snapped_to_floor).
 ### [`spawn_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_grid_entity)
-`int spawn_grid_entity(int entity_type, float x, float y, int layer)`<br/>
+`int spawn_grid_entity(int entity_type, float x, float y, LAYER layer)`<br/>
 Spawn a grid entity, such as floor or traps, that snaps to the grid.
 ### [`spawn_entity_nonreplaceable`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_nonreplaceable)
-`int spawn_entity_nonreplaceable(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
+`int spawn_entity_nonreplaceable(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
 ### [`spawn_critical`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_critical)
-`int spawn_critical(int entity_type, float x, float y, int layer, float vx, float vy)`<br/>
+`int spawn_critical(int entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
 Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
 ### [`spawn_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door)
-`int spawn_door(float x, float y, int layer, int w, int l, int t)`<br/>
+`int spawn_door(float x, float y, LAYER layer, int w, int l, int t)`<br/>
 Spawn a door to another world, level and theme and return the uid of spawned entity.
 Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
 ### [`door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door)
-`int door(float x, float y, int layer, int w, int l, int t)`<br/>
+`int door(float x, float y, LAYER layer, int w, int l, int t)`<br/>
 Short for [spawn_door](#spawn_door).
 ### [`spawn_layer_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_layer_door)
 `nil spawn_layer_door(float x, float y)`<br/>
@@ -273,7 +273,7 @@ Spawn a door to backlayer.
 `nil layer_door(float x, float y)`<br/>
 Short for [spawn_layer_door](#spawn_layer_door).
 ### [`spawn_apep`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_apep)
-`int spawn_apep(float x, float y, int l, bool right)`<br/>
+`int spawn_apep(float x, float y, LAYER layer, bool right)`<br/>
 Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
@@ -322,20 +322,14 @@ Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFF
 ### [`get_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
 `Entity get_entity(int uid)`<br/>
 Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
-### [`get_entity_raw`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_raw)
-`Entity get_entity_raw(int uid)`<br/>
-Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
 ### [`get_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 `EntityDB get_type(int id)`<br/>
 Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 ### [`get_grid_entity_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_grid_entity_at)
-`int get_grid_entity_at(float x, float y, int layer)`<br/>
+`int get_grid_entity_at(float x, float y, LAYER layer)`<br/>
 Gets a grid entity, such as floor or spikes, at the given position and layer.
-### [`get_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
-`array<int> get_entities()`<br/>
-Get uids of all entities currently loaded
 ### [`get_entities_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
-`array<int> get_entities_by(int entity_type, int mask, int layer)`<br/>
+`array<int> get_entities_by(int entity_type, int mask, LAYER layer)`<br/>
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_by_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 `array<int> get_entities_by_type(int, int...)`<br/>
@@ -350,17 +344,11 @@ function on_level()
     message(tostring(#uids).." == "..tostring(#uids2))
 end
 ```
-### [`get_entities_by_mask`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
-`array<int> get_entities_by_mask(int mask)`<br/>
-Get uids of entities by some search_flags
-### [`get_entities_by_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
-`array<int> get_entities_by_layer(int layer)`<br/>
-Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
 ### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
-`array<int> get_entities_at(int entity_type, int mask, float x, float y, int layer, float radius)`<br/>
+`array<int> get_entities_at(int entity_type, int mask, float x, float y, LAYER layer, float radius)`<br/>
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`get_entities_overlapping_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
-`array<int> get_entities_overlapping_hitbox(int entity_type, int mask, AABB hitbox, int layer)`<br/>
+`array<int> get_entities_overlapping_hitbox(int entity_type, int mask, AABB hitbox, LAYER layer)`<br/>
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
 ### [`attach_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach_entity)
 `nil attach_entity(int overlay_uid, int attachee_uid)`<br/>
@@ -528,10 +516,6 @@ end, ON.GUIFRAME)
 ### [`get_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_camera_position)
 `tuple<float, float> get_camera_position()`<br/>
 Gets the current camera position in the level
-### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
-`nil set_camera_position(float cx, float cy)`<br/>
-Sets the current camera position in the level.
-Note: The camera will still try to follow the player and this doesn't actually work at all.
 ### [`set_flag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_flag)
 `Flags set_flag(Flags flags, int bit)`<br/>
 Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
@@ -689,7 +673,7 @@ function on_guiframe(draw_ctx)
 end
 ```
 ### [`create_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
-`tuple<int, int, int> create_image(string path)`<br/>
+`tuple<size_t, int, int> create_image(string path)`<br/>
 Create image from file. Returns a tuple containing id, width and height.
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
@@ -714,9 +698,21 @@ Same as `get_hitbox` but based on `get_render_position`
 Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
 ## Deprecated Functions
 #### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!
+### [`get_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
+`array<int> get_entities()`<br/>
+Use get_entities_by(0, 0, LAYER.BOTH)
+### [`get_entities_by_mask`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
+`array<int> get_entities_by_mask(int mask)`<br/>
+Use get_entities_by(0, mask, LAYER.BOTH)
+### [`get_entities_by_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
+`array<int> get_entities_by_layer(LAYER layer)`<br/>
+Use get_entities_by(0, 0, layer)
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
-`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, int layer)`<br/>
+`array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)`<br/>
 Use `get_entities_overlapping_hitbox` instead
+### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
+`nil set_camera_position(float cx, float cy)`<br/>
+this doesn't actually work at all. See State -> Camera the for proper camera handling
 ### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
 `nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`<br/>
 Use `DrawGuiContext.draw_line` instead
@@ -1054,7 +1050,7 @@ Get the heart color of the character, this will be the modded heart color not on
 - [`bool is_female()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) &Player::is_female
 \
 Check whether the character is female, will be `true` if the character was modded to be female as well.
-- [`nil set_heart_color(Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
+- [`nil set_heart_color(Color hcolor)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) &Player::set_heart_color
 \
 Set the heart color the character.
 ### `Floor`
@@ -2139,8 +2135,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `StretchChain`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int at_end_of_chain_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=at_end_of_chain_uid) &StretchChain::at_end_of_chain_uid
+- [`float dot_offset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dot_offset) &StretchChain::dot_offset
 - [`int position_in_chain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=position_in_chain) &StretchChain::position_in_chain
-- [`bool is_chain_overlapping_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_chain_overlapping_ball) &StretchChain::is_chain_overlapping_ball
+- [`int inverse_doubled_position_in_chain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inverse_doubled_position_in_chain) &StretchChain::inverse_doubled_position_in_chain
+- [`bool is_dot_hidden`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_dot_hidden) &StretchChain::is_dot_hidden
 ### `Chest`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool leprechaun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leprechaun) &Chest::leprechaun
@@ -2919,7 +2917,7 @@ end, ON.LEVEL)
 - [`FX_FX_DM_BANNER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND.FX_FX_DM_BANNER) FX/FX_dm_banner
 ### VANILLA_SOUND_PARAM
 - [`POS_SCREEN_X`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.POS_SCREEN_X) 0
-- ...check [/vanilla_sound_params.txt](game_data/vanilla_sound_params.txt)...
+- ...check [vanilla_sound_params.txt](game_data/vanilla_sound_params.txt)...
 - [`CURRENT_LAYER2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.CURRENT_LAYER2) 37
 ### DROPCHANCE
 - [`BONEBLOCK_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) 0
@@ -3065,6 +3063,7 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`LOGICAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) 0x1000
 - [`WATER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) 0x2000
 - [`LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) 0x4000
+- [`ANY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) 0x0
 ### FLOOR_SIDE
 - [`TOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.TOP) FLOOR_SIDE::TOP
 - [`BOTTOM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM) FLOOR_SIDE::BOTTOM
@@ -3088,6 +3087,7 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`PLAYER2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.PLAYER2) -2
 - [`PLAYER3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.PLAYER3) -3
 - [`PLAYER4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.PLAYER4) -4
+- [`BOTH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LAYER.BOTH) -128
 ### THEME
 - [`DWELLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME.DWELLING) 1
 - [`JUNGLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME.JUNGLE) 2

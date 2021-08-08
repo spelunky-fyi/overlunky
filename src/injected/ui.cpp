@@ -4,6 +4,7 @@
 #include <Shlwapi.h>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <misc\cpp\imgui_stdlib.h>
 
 #include <algorithm>
 #include <array>
@@ -17,7 +18,9 @@
 #include <map>
 #include <regex>
 #include <string>
+#pragma warning(push, 0)
 #include <toml.hpp>
+#pragma warning(pop)
 
 #include "console.hpp"
 #include "entities_chars.hpp"
@@ -51,7 +54,7 @@ std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
-std::map<std::string, int> keys{
+std::map<std::string, int64_t> keys{
     {"enter", VK_RETURN},
     {"escape", VK_ESCAPE},
     {"move_left", VK_LEFT},
@@ -163,11 +166,13 @@ struct EntityCache
 
 static ImFont *font, *bigfont, *hugefont;
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5, g_hue = 0.63, g_sat = 0.66, g_val = 0.66;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = -1, g_current_item = 0, g_filtered_count = 0, g_level = 1, g_world = 1, g_to = 0, g_last_frame = 0, g_last_gun = 0,
-    g_entity_type = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1, g_level_width = 0, g_level_height = 0,
+int g_held_id = 0, g_last_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
+    g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1;
+unsigned int g_entity_type = 0, g_level_width = 0, g_level_height = 0;
+uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0, g_save_addr = 0;
 std::vector<EntityItem> g_items;
@@ -189,7 +194,7 @@ int cache_player = 0;
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_debug"};
 
-static char text[500];
+std::string text;
 
 const char* inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
@@ -198,17 +203,17 @@ std::string scriptpath = "Overlunky/Scripts";
 std::string fontfile = "segoeuib.ttf";
 std::vector<float> fontsize;
 
-const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
-const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
-const short s16_zero = 0, s16_one = 1, s16_min = -32768, s16_max = 32767;
-const ImU16 u16_zero = 0, u16_one = 1, u16_min = 0, u16_max = 65535;
-const ImS32 s32_zero = 0, s32_one = 1, s32_min = INT_MIN / 2, s32_max = INT_MAX / 2, s32_hi_a = INT_MAX / 2 - 100, s32_hi_b = INT_MAX / 2;
-const ImU32 u32_zero = 0, u32_one = 1, u32_min = 0, u32_max = UINT_MAX / 2, u32_hi_a = UINT_MAX / 2 - 100, u32_hi_b = UINT_MAX / 2;
-const ImS64 s64_zero = 0, s64_one = 1, s64_min = LLONG_MIN / 2, s64_max = LLONG_MAX / 2, s64_hi_a = LLONG_MAX / 2 - 100, s64_hi_b = LLONG_MAX / 2;
-const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_charmin = 194, u64_charmax = 216, u64_min = 0, u64_max = ULLONG_MAX / 2,
-            u64_hi_a = ULLONG_MAX / 2 - 100, u64_hi_b = ULLONG_MAX / 2;
-const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
-const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
+[[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
+[[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
+[[maybe_unused]] const short s16_zero = 0, s16_one = 1, s16_min = -32768, s16_max = 32767;
+[[maybe_unused]] const ImU16 u16_zero = 0, u16_one = 1, u16_min = 0, u16_max = 65535;
+[[maybe_unused]] const ImS32 s32_zero = 0, s32_one = 1, s32_min = INT_MIN / 2, s32_max = INT_MAX / 2, s32_hi_a = INT_MAX / 2 - 100, s32_hi_b = INT_MAX / 2;
+[[maybe_unused]] const ImU32 u32_zero = 0, u32_one = 1, u32_min = 0, u32_max = UINT_MAX / 2, u32_hi_a = UINT_MAX / 2 - 100, u32_hi_b = UINT_MAX / 2;
+[[maybe_unused]] const ImS64 s64_zero = 0, s64_one = 1, s64_min = LLONG_MIN / 2, s64_max = LLONG_MAX / 2, s64_hi_a = LLONG_MAX / 2 - 100, s64_hi_b = LLONG_MAX / 2;
+[[maybe_unused]] const ImU64 u64_zero = 0, u64_one = 1, u64_thousand = 1000, u64_charmin = 194, u64_charmax = 216, u64_min = 0, u64_max = ULLONG_MAX / 2,
+                             u64_hi_a = ULLONG_MAX / 2 - 100, u64_hi_b = ULLONG_MAX / 2;
+[[maybe_unused]] const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
+[[maybe_unused]] const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
 const unsigned int safe_entity_mask = 0x18f;
 const unsigned int unsafe_entity_mask = 0xffffffff;
@@ -228,14 +233,27 @@ std::map<std::string, bool> options = {
     {"enable_unsafe_scripts", false},
 };
 
+int int_pow(int base, unsigned int exp)
+{
+    int result = 1;
+    while (exp)
+    {
+        if (exp & 1)
+            result *= base;
+        exp >>= 1;
+        base *= base;
+    }
+    return result;
+}
+
 ImVec4 hue_shift(ImVec4 in, float hue)
 {
-    float U = cos(hue * 3.14159265 / 180);
-    float W = sin(hue * 3.14159265 / 180);
+    float U = cos(hue * 3.14159265f / 180);
+    float W = sin(hue * 3.14159265f / 180);
     ImVec4 out = ImVec4(
-        (.299 + .701 * U + .168 * W) * in.x + (.587 - .587 * U + .330 * W) * in.y + (.114 - .114 * U - .497 * W) * in.z,
-        (.299 - .299 * U - .328 * W) * in.x + (.587 + .413 * U + .035 * W) * in.y + (.114 - .114 * U + .292 * W) * in.z,
-        (.299 - .3 * U + 1.25 * W) * in.x + (.587 - .588 * U - 1.05 * W) * in.y + (.114 + .886 * U - .203 * W) * in.z,
+        (.299f + .701f * U + .168f * W) * in.x + (.587f - .587f * U + .330f * W) * in.y + (.114f - .114f * U - .497f * W) * in.z,
+        (.299f - .299f * U - .328f * W) * in.x + (.587f + .413f * U + .035f * W) * in.y + (.114f - .114f * U + .292f * W) * in.z,
+        (.299f - .3f * U + 1.25f * W) * in.x + (.587f - .588f * U - 1.05f * W) * in.y + (.114f + .886f * U - .203f * W) * in.z,
         in.w); //((float)rand() / RAND_MAX) * 0.5 + 0.5);
     return out;
 }
@@ -244,10 +262,10 @@ void set_colors()
 {
     float col_main_sat = g_sat;
     float col_main_val = g_val;
-    float col_area_sat = g_sat * 0.77;
-    float col_area_val = g_val * 0.60;
-    float col_back_sat = g_sat * 0.33;
-    float col_back_val = g_val * 0.20;
+    float col_area_sat = g_sat * 0.77f;
+    float col_area_val = g_val * 0.60f;
+    float col_back_sat = g_sat * 0.33f;
+    float col_back_val = g_val * 0.20f;
 
     ImGuiStyle& style = ImGui::GetStyle();
 
@@ -325,7 +343,7 @@ void load_script(std::string file, bool enable = true)
     }
 }
 
-std::string key_string(int keycode)
+std::string key_string(int64_t keycode)
 {
     UCHAR virtualKey = keycode & 0xff;
     CHAR szName[128];
@@ -385,16 +403,6 @@ std::string key_string(int keycode)
         name = "Ctrl+" + name;
     }
     return name;
-}
-
-bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags = 0)
-{
-    return ImGui::InputText(label, (char*)str->c_str(), 9, flags);
-}
-
-bool InputStringMultiline(const char* label, std::string* str, const ImVec2& size, ImGuiInputTextFlags flags = 0)
-{
-    return ImGui::InputTextMultiline(label, (char*)str->c_str(), str->capacity() + 1, size, flags);
 }
 
 bool SliderByte(const char* label, char* value, char min = 0, char max = 0, const char* format = "%lld")
@@ -470,7 +478,7 @@ void refresh_script_files()
 
     for (auto file : g_script_files)
     {
-        load_script(file.string().data(), false);
+        load_script(file.string(), false);
     }
 }
 
@@ -521,7 +529,7 @@ void save_config(std::string file)
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
 
     writeData << "kits = [";
-    for (int i = 0; i < saved_entities.size(); i++)
+    for (unsigned int i = 0; i < saved_entities.size(); i++)
     {
         writeData << std::endl
                   << "  \"" << saved_entities[i] << "\"";
@@ -534,7 +542,7 @@ void save_config(std::string file)
 
     writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\"" << std::endl;
     writeData << "font_size = [";
-    for (int i = 0; i < fontsize.size(); i++)
+    for (unsigned int i = 0; i < fontsize.size(); i++)
     {
         writeData << std::endl
                   << "  " << fontsize[i];
@@ -547,7 +555,7 @@ void save_config(std::string file)
 
     writeData << "# Script filenames to load automatically on start. Example: autorun_scripts = [\"foo.lua\", \"bar.lua\"]" << std::endl;
     writeData << "autorun_scripts = [";
-    for (int i = 0; i < g_script_autorun.size(); i++)
+    for (unsigned int i = 0; i < g_script_autorun.size(); i++)
     {
         writeData << std::endl
                   << "  \"" << g_script_autorun[i] << "\"";
@@ -608,11 +616,11 @@ void load_config(std::string file)
         options[kv.first] = (bool)toml::find_or<int>(opts, kv.first, (int)kv.second);
     }
     ImGuiStyle& style = ImGui::GetStyle();
-    g_hue = toml::find_or<float>(opts, "hue", 0.63);
-    g_sat = toml::find_or<float>(opts, "saturation", 0.66);
-    g_val = toml::find_or<float>(opts, "lightness", 0.66);
-    style.Alpha = toml::find_or<float>(opts, "alpha", 0.66);
-    ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0);
+    g_hue = toml::find_or<float>(opts, "hue", 0.63f);
+    g_sat = toml::find_or<float>(opts, "saturation", 0.66f);
+    g_val = toml::find_or<float>(opts, "lightness", 0.66f);
+    style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
+    ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
@@ -713,14 +721,13 @@ void escape()
 
 void save_search()
 {
-    std::string search(text);
-    saved_entities.push_back(search);
+    saved_entities.push_back(text);
     save_config(cfgfile);
 }
 
-int entity_type(int uid)
+uint32_t entity_type(int uid)
 {
-    return (int)get_entity_type(uid);
+    return get_entity_type(uid);
 }
 
 Movable* entity_ptr(int uid)
@@ -752,11 +759,10 @@ bool update_entity_cache()
 
 void spawn_entities(bool s, std::string list = "")
 {
-    std::string search(text);
-    const auto pos = search.find_first_of(" ");
+    const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
-        if (g_current_item == 0 && g_filtered_count == g_items.size())
+        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return;
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
@@ -782,10 +788,9 @@ void spawn_entities(bool s, std::string list = "")
     }
     else
     {
-        std::string texts(text);
+        std::stringstream textss(text);
         if (list != "")
-            texts = list;
-        std::stringstream textss(texts);
+            textss.str(list);
         int id;
         std::vector<int> ents;
         int spawned{-1};
@@ -804,7 +809,7 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
     {
         if (g_filtered_count == 0)
             return 1;
-        if (g_current_item == 0 && g_filtered_count == g_items.size())
+        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return 1;
         std::string search(text);
         // while(!search.empty() && std::isspace(search.back()))
@@ -822,18 +827,18 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
         searchss << search << g_items[g_filtered_items[g_current_item]].id << " ";
         search = searchss.str();
         data->DeleteChars(0, data->BufTextLen);
-        data->InsertChars(0, search.data());
+        data->InsertChars(0, search.c_str());
     }
     return 0;
 }
 
-const char* entity_name(int id)
+const char* entity_name(uint32_t id)
 {
-    for (int i = 0; i < g_items.size(); i++)
+    for (unsigned int i = 0; i < g_items.size(); i++)
     {
         if (g_items[i].id == id)
         {
-            return g_items[i].name.data();
+            return g_items[i].name.c_str();
         }
     }
     return "";
@@ -902,7 +907,7 @@ void set_zoom()
 
 void force_zoom()
 {
-    if (g_zoom == 0.0 && g_state != 0 && (g_state->w != g_level_width))
+    if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width))
     {
         set_zoom();
         g_level_width = g_state->w;
@@ -949,20 +954,20 @@ void force_noclip()
 
 void frame_advance()
 {
-    if (g_state->pause == 0 && g_pause_at != -1 && g_pause_at <= get_frame_count())
+    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= get_frame_count())
     {
         g_state->pause = 0x20;
         g_pause_at = -1;
     }
 }
 
-bool pressed(std::string keyname, int wParam)
+bool pressed(std::string keyname, WPARAM wParam)
 {
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -971,7 +976,7 @@ bool pressed(std::string keyname, int wParam)
     {
         wParam += OL_KEY_SHIFT;
     }
-    return wParam == keycode;
+    return wParam == (unsigned)keycode;
 }
 
 bool clicked(std::string keyname)
@@ -981,7 +986,7 @@ bool clicked(std::string keyname)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -1022,7 +1027,7 @@ bool dblclicked(std::string keyname)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -1049,7 +1054,7 @@ bool held(std::string keyname)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -1076,7 +1081,7 @@ bool released(std::string keyname)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -1103,7 +1108,7 @@ bool dragging(std::string keyname)
     {
         return false;
     }
-    int keycode = keys[keyname];
+    int64_t keycode = keys[keyname];
     if (GetAsyncKeyState(VK_CONTROL))
     {
         wParam += OL_KEY_CTRL;
@@ -1125,7 +1130,7 @@ bool dragging(std::string keyname)
 
 bool dragged(std::string keyname)
 {
-    int wParam = OL_BUTTON_MOUSE;
+    //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -1143,7 +1148,7 @@ bool dragged(std::string keyname)
 
 float drag_delta(std::string keyname)
 {
-    int wParam = OL_BUTTON_MOUSE;
+    //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -1161,7 +1166,7 @@ float drag_delta(std::string keyname)
 
 float held_duration(std::string keyname)
 {
-    int wParam = OL_BUTTON_MOUSE;
+    //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -1177,7 +1182,7 @@ float held_duration(std::string keyname)
     return -1.0;
 }
 
-bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
+bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     if (nCode != WM_KEYDOWN)
     {
@@ -1187,7 +1192,7 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     if (ImGui::GetIO().WantCaptureKeyboard && active("tool_script"))
         return false;
 
-    int repeat = (lParam >> 30) & 1U;
+    //int repeat = (lParam >> 30) & 1U;
 
     if (g_Console && g_Console->is_toggled())
     {
@@ -1236,37 +1241,37 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("zoom_out", wParam))
     {
-        g_zoom += 1.0;
+        g_zoom += 1.0f;
         set_zoom();
     }
     else if (pressed("zoom_in", wParam))
     {
-        g_zoom -= 1.0;
+        g_zoom -= 1.0f;
         set_zoom();
     }
     else if (pressed("zoom_default", wParam))
     {
-        g_zoom = 13.5;
+        g_zoom = 13.5f;
         set_zoom();
     }
     else if (pressed("zoom_3x", wParam))
     {
-        g_zoom = 23.08;
+        g_zoom = 23.08f;
         set_zoom();
     }
     else if (pressed("zoom_4x", wParam))
     {
-        g_zoom = 29.87;
+        g_zoom = 29.87f;
         set_zoom();
     }
     else if (pressed("zoom_5x", wParam))
     {
-        g_zoom = 36.66;
+        g_zoom = 36.66f;
         set_zoom();
     }
     else if (pressed("zoom_auto", wParam))
     {
-        g_zoom = 0.0;
+        g_zoom = 0.0f;
         set_zoom();
     }
     else if (pressed("toggle_godmode", wParam))
@@ -1282,14 +1287,14 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
         {
             if (options["noclip"])
             {
-                player->type->max_speed = 0.3;
+                player->type->max_speed = 0.3f;
             }
             else
             {
                 player->flags &= ~(1U << 9);
                 player->flags |= 1U << 10;
                 player->flags &= ~(1U << 4);
-                player->type->max_speed = 0.0725;
+                player->type->max_speed = 0.0725f;
             }
         }
     }
@@ -1487,11 +1492,11 @@ bool process_keys(UINT nCode, WPARAM wParam, LPARAM lParam)
     }
     else if (pressed("move_up", wParam) && active("tool_door"))
     {
-        g_to = (std::min)((std::max)(g_to - 1, 0), 15);
+        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to - 1, 0), 15));
     }
     else if (pressed("move_down", wParam) && active("tool_door"))
     {
-        g_to = (std::min)((std::max)(g_to + 1, 0), 15);
+        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to + 1, 0), 15));
     }
     else if (pressed("enter", wParam) && active("tool_door"))
     {
@@ -1595,16 +1600,15 @@ std::string last_word(std::string str)
     return pos == std::string::npos ? str : str.substr(pos + 1);
 }
 
-void update_filter(const char* s)
+void update_filter(std::string s)
 {
     int count = 0;
-    std::string search(s);
-    std::string last = last_word(search);
-    int searchid = 0;
-    auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
-    for (int i = 0; i < g_items.size(); i++)
+    std::string last = last_word(s);
+    uint32_t searchid = 0;
+    //auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
+    for (unsigned int i = 0; i < g_items.size(); i++)
     {
-        if (s[0] == '\0' || std::isspace(search.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
+        if (s[0] == '\0' || std::isspace(s.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
         {
             if (g_items[i].id == 0 && s[0] != '\0')
                 continue;
@@ -1618,9 +1622,8 @@ void update_filter(const char* s)
 
 void render_int(const char* label, int state)
 {
-    char statec[15];
-    itoa(state, statec, 10);
-    ImGui::LabelText(label, statec);
+    std::string strstate = std::to_string(state);
+    return ImGui::LabelText(label, "%s", strstate.c_str());
 }
 
 void render_list()
@@ -1644,7 +1647,7 @@ void render_list()
             std::stringstream item_ss;
             item_ss << g_items[g_filtered_items[i]].id;
             std::string item_id = item_ss.str();
-            std::string item_name = g_items[g_filtered_items[i]].name.data();
+            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
             std::string item_concat = item_id + ": " + item_name.substr(9);
             const char* item_text = item_concat.c_str();
             ImGui::PushID(i);
@@ -1674,7 +1677,7 @@ void render_themes()
     if (!ImGui::BeginCombo("Theme##Theme", themes[g_to]))
         return;
     bool value_changed = false;
-    for (int i = 0; i < 17; i++)
+    for (uint8_t i = 0; i < 17; i++)
     {
         const bool item_selected = (i == g_to);
         const char* item_text = themes[i];
@@ -1695,7 +1698,7 @@ void render_themes()
 std::string unique_label(std::string label)
 {
     label += "##";
-    label += rand();
+    label += std::to_string(rand());
     return label;
 }
 
@@ -1704,7 +1707,7 @@ void render_input()
     int n = 0;
     for (auto i : saved_entities)
     {
-        ImGui::PushID(i.data());
+        ImGui::PushID(i.c_str());
         std::string search = "";
         std::stringstream sss(i);
         int item = 0;
@@ -1734,7 +1737,7 @@ void render_input()
         ImGui::PushID(4 * n);
         if (ImGui::Button("Load"))
         {
-            strcpy(text, i.data());
+            text = i;
             update_filter(text);
             // spawn_entities(false);
         }
@@ -1751,7 +1754,7 @@ void render_input()
         ImGui::Text("%d:", n + 1);
         ImGui::PopID();
         ImGui::SameLine();
-        ImGui::TextWrapped(search.data());
+        ImGui::TextWrapped("%s", search.c_str());
         n++;
     }
     if (set_focus_entity)
@@ -1761,7 +1764,7 @@ void render_input()
     }
     ImVec2 region = ImGui::GetContentRegionMax();
     ImGui::PushItemWidth(region.x - 110);
-    if (ImGui::InputText("##Input", text, sizeof(text), ImGuiInputTextFlags_CallbackCompletion, pick_selected_entity))
+    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion, pick_selected_entity))
     {
         update_filter(text);
     }
@@ -1828,11 +1831,11 @@ void render_narnia()
         Target* target = reinterpret_cast<Target*>(&doorent->anim_func);
         if (!target->enabled)
             continue;
-        char buf[64];
-        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+
+        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (n > 0)
             ImGui::SameLine();
-        if (ImGui::Button(buf))
+        if (ImGui::Button(buf.c_str()))
         {
             warp(target->world, target->level, target->theme);
         }
@@ -1845,13 +1848,13 @@ void render_narnia()
         target->world = 4;
         target->level = 4;
         target->theme = 12;
-        char buf[64];
-        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+
+        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (n == 0)
             ImGui::SameLine(100.0f);
         else
             ImGui::SameLine();
-        if (ImGui::Button(buf))
+        if (ImGui::Button(buf.c_str()))
         {
             warp(target->world, target->level, target->theme);
         }
@@ -1934,13 +1937,12 @@ void render_narnia()
     }
     if (target->world > 0)
     {
-        char buf[64];
-        sprintf(buf, "%d-%d %s", target->world, target->level, theme_name(target->theme));
+        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (n == 0)
             ImGui::SameLine(100.0f);
         else
             ImGui::SameLine();
-        if (ImGui::Button(buf))
+        if (ImGui::Button(buf.c_str()))
         {
             warp(target->world, target->level, target->theme);
         }
@@ -2077,24 +2079,22 @@ void render_narnia()
 
 void render_uid(int uid, const char* section, bool rembtn = false)
 {
-    char uidc[32];
-    itoa(uid, uidc, 10);
-    int ptype = entity_type(uid);
+    std::string uidc = std::to_string(uid);
+    auto ptype = entity_type(uid);
     if (ptype == 0)
         return;
-    char typec[32];
-    itoa(ptype, typec, 10);
-    const char* pname = entity_names[ptype].data();
+    std::string typec = std::to_string(ptype);
+    std::string pname = entity_names[ptype];
     ImGui::PushID(section);
-    if (ImGui::Button(uidc))
+    if (ImGui::Button(uidc.c_str()))
     {
         g_last_id = uid;
         update_entity();
     }
     ImGui::SameLine();
-    ImGui::Text(typec);
+    ImGui::Text("%s", typec.c_str());
     ImGui::SameLine();
-    ImGui::Text(pname);
+    ImGui::Text("%s", pname.c_str());
     if (rembtn)
     {
         ImGui::SameLine();
@@ -2121,31 +2121,31 @@ void render_camera()
     ImGui::PopItemWidth();
     if (ImGui::Button("Default"))
     {
-        g_zoom = 13.5;
+        g_zoom = 13.5f;
         set_zoom();
     }
     ImGui::SameLine();
     if (ImGui::Button("3x"))
     {
-        g_zoom = 23.08;
+        g_zoom = 23.08f;
         set_zoom();
     }
     ImGui::SameLine();
     if (ImGui::Button("4x"))
     {
-        g_zoom = 29.87;
+        g_zoom = 29.87f;
         set_zoom();
     }
     ImGui::SameLine();
     if (ImGui::Button("5x"))
     {
-        g_zoom = 36.66;
+        g_zoom = 36.66f;
         set_zoom();
     }
     ImGui::SameLine();
     if (ImGui::Button("Auto"))
     {
-        g_zoom = 0.0;
+        g_zoom = 0.0f;
         set_zoom();
     }
     render_uid(g_state->camera->focused_entity_uid, "FocusedEntity");
@@ -2165,26 +2165,24 @@ void render_camera()
     {
         g_state->camera->focused_entity_uid = g_last_id;
     }
-    ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2, 1.0);
-    ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2, 1.0);
+    ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2f, 1.0f);
+    ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
     if (ImGui::CollapsingHeader("Camera Bounds"))
     {
-        ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2, 1.0);
-        ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2, 1.0);
-        ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2, 1.0);
-        ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2, 1.0);
+        ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2f, 1.0f);
+        ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
+        ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
+        ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
     }
 }
 
 void render_arrow()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
     ImVec2 pos = ImGui::GetMousePos();
     ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
-    float length = sqrt(pow(line.x, 2) + pow(line.y, 2));
-    float theta = 0.7;
-    float width = 10 + length / 15;
+    float length = sqrt(pow(line.x, 2.0f) + pow(line.y, 2.0f));
+    float theta = 0.7f;
+    float width = 10.0f + length / 15.0f;
     float tpoint = width / (2 * (tanf(theta) / 2) * length);
     ImVec2 point = ImVec2(pos.x + (-tpoint * line.x), pos.y + (-tpoint * line.y));
     ImVec2 normal = ImVec2(-line.x, line.y);
@@ -2201,8 +2199,6 @@ void render_arrow()
 
 void render_cross()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
     auto* draw_list = ImGui::GetWindowDrawList();
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y - 9), ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
@@ -2217,7 +2213,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     auto* draw_list = ImGui::GetWindowDrawList();
     for (int x = -1; x < 96; x++)
     {
-        std::pair<float, float> gridline = screen_position((float)x + 0.5, 0);
+        std::pair<float, float> gridline = screen_position(x + 0.5f, 0);
         if (abs(gridline.first) <= 1.0)
         {
             int width = 2;
@@ -2233,12 +2229,12 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 width = 2;
                 color = ImColor(gridcolor.Value.x, gridcolor.Value.y, gridcolor.Value.z, 0.2f);
             }
-            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, width);
+            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, static_cast<float>(width));
         }
     }
     for (int y = -1; y < 128; y++)
     {
-        std::pair<float, float> gridline = screen_position(0, (float)y + 0.5);
+        std::pair<float, float> gridline = screen_position(0, y + 0.5f);
         if (abs(gridline.second) <= 1.0)
         {
             int width = 2;
@@ -2254,20 +2250,20 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 width = 2;
                 color = ImColor(color.Value.x, color.Value.y, color.Value.z, 0.2f);
             }
-            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, width);
+            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, static_cast<float>(width));
         }
     }
     g_players = get_players();
     for (auto player : g_players)
     {
-        std::pair<float, float> gridline = screen_position(round(player->position().first - 0.5) + 0.5, round(player->position().second) - 0.5);
+        std::pair<float, float> gridline = screen_position(round(player->position().first - 0.5f) + 0.5f, round(player->position().second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
     }
     if (update_entity())
     {
-        std::pair<float, float> gridline = screen_position(round(g_entity->position().first - 0.5) + 0.5, round(g_entity->position().second) - 0.5);
+        std::pair<float, float> gridline = screen_position(round(g_entity->position().first - 0.5f) + 0.5f, round(g_entity->position().second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
@@ -2281,16 +2277,16 @@ void render_hitbox(Movable* ent, bool cross, ImColor color)
     if (ent->items.count > 0)
     {
         int* pitems = (int*)ent->items.begin;
-        for (int i = 0; i < ent->items.count; i++)
+        for (unsigned int i = 0; i < ent->items.count; i++)
         {
-            int type = entity_type(pitems[i]);
+            auto type = entity_type(pitems[i]);
             if (type == 0)
                 continue;
             if (entity_names[type].find("FX") == std::string::npos)
                 render_hitbox(entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
         }
     }
-    const int type = entity_type(ent->uid);
+    const auto type = entity_type(ent->uid);
     if (!type || ((type >= to_id("ENT_TYPE_ITEM_POWERUP_PASTE") && type <= to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY")) || type == to_id("ENT_TYPE_FX_PICKUPEFFECT")))
         return; // powerups
     std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
@@ -2353,7 +2349,7 @@ void set_vel(ImVec2 pos)
     g_vx = normalize(pos).x;
     g_vy = normalize(pos).y;
     g_vx = 2 * (g_vx - g_x);
-    g_vy = 2 * (g_vy - g_y) * 0.5625;
+    g_vy = 2 * (g_vy - g_y) * 0.5625f;
 }
 
 void render_messages()
@@ -2396,16 +2392,16 @@ void render_messages()
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
-    const float fontsize = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
+    const float font_size = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
-    int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / fontsize));
+    unsigned int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / font_size));
     if (queue.size() > logsize)
     {
         std::vector<Message> newqueue(queue.end() - logsize, queue.end());
         queue = newqueue;
     }
 
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * fontsize - 20});
+    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 20});
     for (auto message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
@@ -2415,7 +2411,7 @@ void render_messages()
         }
         ImVec4 color = std::get<3>(message);
         color.w = alpha;
-        ImGui::TextColored(color, "[%s] %s", std::get<0>(message).data(), std::get<1>(message).data());
+        ImGui::TextColored(color, "[%s] %s", std::get<0>(message).c_str(), std::get<1>(message).c_str());
     }
     ImGui::PopFont();
     ImGui::End();
@@ -2460,7 +2456,7 @@ void render_clickhandler()
     {
         for (auto entity : get_entities_by(0, 255, -1))
         {
-            int type = entity_type(entity);
+            auto type = entity_type(entity);
             if (type == 0)
                 continue;
             if (entity_names[type].find("FX") == std::string::npos)
@@ -2468,7 +2464,7 @@ void render_clickhandler()
         }
         for (auto entity : get_entities_by(0, 0x100, -1))
         {
-            int type = entity_type(entity);
+            auto type = entity_type(entity);
             if (type == 0)
                 continue;
             if (entity_names[type].find("TRAP") != std::string::npos)
@@ -2483,13 +2479,12 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(io.MousePos);
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
-            std::pair<float, float> campos = get_camera_position();
+            //std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
-            char buf[32];
-            sprintf(buf, "%0.2f, %0.2f", cpos.first, cpos.second);
-            char buf2[32];
+            std::string buf = std::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
+            //char buf2[32];
             //sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
-            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf);
+            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
             //dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
             unsigned int mask = safe_entity_mask;
             if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier from mouse_destroy_unsafe
@@ -2501,10 +2496,9 @@ void render_clickhandler()
             {
                 render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
                 auto ptype = entity_type(hovered);
-                const char* pname = entity_names[ptype].data();
-                char buf3[128];
-                sprintf(buf3, "%i, %s", hovered, pname);
-                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3);
+                const char* pname = entity_names[ptype].c_str();
+                std::string buf3 = std::format("{}, {}", hovered, pname);
+                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
             }
         }
     }
@@ -2789,14 +2783,14 @@ void render_clickhandler()
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
             spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.2, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y - 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y + 0.3, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15, g_y + 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15, g_y - 0.2, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y - 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y + 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -2850,14 +2844,14 @@ void render_options()
         {
             if (options["noclip"])
             {
-                player->type->max_speed = 0.3;
+                player->type->max_speed = 0.3f;
             }
             else
             {
                 player->flags &= ~(1U << 9);
                 player->flags |= 1U << 10;
                 player->flags &= ~(1U << 4);
-                player->type->max_speed = 0.0725;
+                player->type->max_speed = 0.0725f;
             }
         }
     }
@@ -2939,9 +2933,9 @@ void render_script_files()
     {
         ImGui::PushID(num++);
         std::string buttstr = file.parent_path().filename().string() + "/" + file.filename().string();
-        if (ImGui::Button(buttstr.data()))
+        if (ImGui::Button(buttstr.c_str()))
         {
-            load_script(file.string().data(), false);
+            load_script(file.string().c_str(), false);
         }
         ImGui::PopID();
     }
@@ -2953,7 +2947,7 @@ void render_script_files()
         {
             abspath = std::filesystem::absolute(path).string();
         }
-        ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.data());
+        ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.c_str());
     }
     if (ImGui::Button("Refresh##RefreshScripts"))
     {
@@ -2998,12 +2992,11 @@ void render_scripts()
     for (auto& [script_name, script] : g_scripts)
     {
         ImGui::PushID(i);
-        char name[255];
         std::string filename;
         size_t slash = script->get_file().find_last_of("/\\");
         if (slash != std::string::npos)
             filename = script->get_file().substr(slash + 1);
-        sprintf(name, "%s (%s)", script->get_name().c_str(), filename.c_str());
+        std::string name = std::format("{} ({})", script->get_name(), filename);
         if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
@@ -3012,7 +3005,7 @@ void render_scripts()
         {
             ImGui::PushStyleColor(ImGuiCol_Header, origcolor);
         }
-        if (ImGui::CollapsingHeader(name))
+        if (ImGui::CollapsingHeader(name.c_str()))
         {
             ImGui::Text(
                 "%s %s by %s (%s)",
@@ -3020,7 +3013,7 @@ void render_scripts()
                 script->get_version().c_str(),
                 script->get_author().c_str(),
                 script->get_id().c_str());
-            ImGui::TextWrapped(script->get_description().c_str());
+            ImGui::TextWrapped("%s", script->get_description().c_str());
             if (!script->get_unsafe() || options["enable_unsafe_scripts"])
             {
                 static bool run_unsafe = false;
@@ -3063,11 +3056,12 @@ void render_scripts()
                     ImGui::Separator();
                     script->render_options();
                     ImGui::PopItemWidth();
-                    if (ImGui::InputTextMultiline("##LuaScript", script->get_code(), script->get_code_size(), {-1, 300}))
+                    const ImVec2 dump = {-1.0f, 300.0f};
+                    if (ImGui::InputTextMultiline("##LuaScript", &script->get_code(), dump))
                     {
                         script->set_changed(true);
                     }
-                    InputString("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
+                    ImGui::InputText("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
                 }
             }
             else
@@ -3116,20 +3110,20 @@ void render_savegame()
         if (ImGui::CollapsingHeader("People"))
         {
             ImGui::Text("");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
             ImGui::Text("Killed");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
             ImGui::Text("By");
             for (int i = 0; i < 38; ++i)
             {
                 ImGui::PushID(i);
-                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
                 ImGui::Checkbox(people_flags[i], &g_save->people[i]);
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
                 ImGui::PushID("killed");
                 ImGui::DragInt("", &g_save->people_killed[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
                 ImGui::PushID("killed_by");
                 ImGui::DragInt("", &g_save->people_killed_by[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
@@ -3142,20 +3136,20 @@ void render_savegame()
         if (ImGui::CollapsingHeader("Bestiary"))
         {
             ImGui::Text("");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
             ImGui::Text("Killed");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
             ImGui::Text("By");
             for (int i = 0; i < 78; ++i)
             {
                 ImGui::PushID(i);
-                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
                 ImGui::Checkbox(bestiary_flags[i], &g_save->bestiary[i]);
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5);
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
                 ImGui::PushID("killed");
                 ImGui::DragInt("", &g_save->bestiary_killed[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75);
+                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
                 ImGui::PushID("killed_by");
                 ImGui::DragInt("", &g_save->bestiary_killed_by[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
@@ -3196,7 +3190,7 @@ void render_savegame()
         for (int i = 0; i < 20; ++i)
         {
             ImGui::PushID(i);
-            ImGui::CheckboxFlags(people_flags[i], &g_save->characters, pow(2, i));
+            ImGui::CheckboxFlags(people_flags[i], &g_save->characters, int_pow(2, i));
             ImGui::PopID();
         }
     }
@@ -3212,15 +3206,15 @@ void render_savegame()
             ImGui::RadioButton(shortcut_flags[i], &current, i);
             ImGui::PopID();
         }
-        if (g_save->shortcuts != current)
-            g_save->shortcuts = current;
+        if (g_save->shortcuts != static_cast<uint8_t>(current))
+            g_save->shortcuts = static_cast<uint8_t>(current);
     }
     ImGui::PopID();
 
     ImGui::PushID("Profile");
     if (ImGui::CollapsingHeader("Profile"))
     {
-        ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5);
+        ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5f);
         ImGui::DragInt("Plays", &g_save->plays);
         ImGui::DragInt("Deaths", &g_save->deaths);
         ImGui::DragInt("Normal wins", &g_save->wins_normal);
@@ -3238,24 +3232,22 @@ void render_savegame()
 
 void render_powerup(int uid, const char* section)
 {
-    char uidc[32];
-    itoa(uid, uidc, 10);
+    std::string uidc = std::to_string(uid);
     int ptype = entity_type(uid);
     if (ptype == 0)
         return;
-    char typec[32];
-    itoa(ptype, typec, 10);
-    const char* pname = entity_names[ptype].data();
+    std::string typec = std::to_string(ptype);
+    const char* pname = entity_names[ptype].c_str();
     ImGui::PushID(section);
-    if (ImGui::Button(uidc))
+    if (ImGui::Button(uidc.c_str()))
     {
         g_last_id = uid;
         update_entity();
     }
     ImGui::SameLine();
-    ImGui::Text(typec);
+    ImGui::Text("%s", typec.c_str());
     ImGui::SameLine();
-    ImGui::Text(pname);
+    ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
     if (ImGui::Button("X(!)"))
@@ -3304,9 +3296,8 @@ void render_state(const char* label, int state)
         ImGui::LabelText(label, "22 Dying");
     else
     {
-        char statec[10];
-        itoa(state, statec, 10);
-        ImGui::LabelText(label, statec);
+        std::string statec = std::to_string(state);
+        ImGui::LabelText(label, "%s", statec.c_str());
     }
 }
 
@@ -3330,9 +3321,8 @@ void render_ai(const char* label, int state)
         ImGui::LabelText(label, "11 Rolling");
     else
     {
-        char statec[10];
-        itoa(state, statec, 10);
-        ImGui::LabelText(label, statec);
+        std::string statec = std::to_string(state);
+        ImGui::LabelText(label, "%s", statec.c_str());
     }
 }
 
@@ -3392,9 +3382,8 @@ void render_screen(const char* label, int state)
         ImGui::LabelText(label, "29 Lobby");
     else
     {
-        char statec[10];
-        itoa(state, statec, 10);
-        ImGui::LabelText(label, statec);
+        std::string statec = std::to_string(state);
+        ImGui::LabelText(label, "%s", statec.c_str());
     }
 }
 
@@ -3506,11 +3495,11 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Position"))
     {
-        ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2, 1.0);
-        ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2, 1.0);
-        ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2, 1.0);
-        ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2, 1.0);
-        ImGui::InputFloat("Angle##EntityAngle", &g_entity->angle, 0.2, 1.0);
+        ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2f, 1.0f);
+        ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2f, 1.0f);
+        ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2f, 1.0f);
+        ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2f, 1.0f);
+        ImGui::InputFloat("Angle##EntityAngle", &g_entity->angle, 0.2f, 1.0f);
         SliderByte("Airtime##EntityAirtime", (char*)&g_entity->airtime, 0, 98);
         uint8_t falldamage = 0;
         if (g_entity->airtime >= 98)
@@ -3527,7 +3516,7 @@ void render_entity_props()
     if (ImGui::CollapsingHeader("Stats"))
     {
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&g_entity->health, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, &g_entity->price, 0.5f, &s32_min, &s32_max);
+        ImGui::DragScalar("Price##Price", ImGuiDataType_U8, (char*)&g_entity->price, 0.5f, &u32_zero, &u32_max);
         if (g_inventory != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
@@ -3542,7 +3531,7 @@ void render_entity_props()
         if (g_entity->items.count > 0)
         {
             int* pitems = (int*)g_entity->items.begin;
-            for (int i = 0; i < g_entity->items.count; i++)
+            for (unsigned int i = 0; i < g_entity->items.count; i++)
             {
                 render_uid(pitems[i], "EntityItems", true);
             }
@@ -3564,7 +3553,7 @@ void render_entity_props()
         {
             for (int i = 0; i < 32; i++)
             {
-                ImGui::CheckboxFlags(entity_type_properties_flags[i], &g_entity->type->properties_flags, pow(2, i));
+                ImGui::CheckboxFlags(entity_type_properties_flags[i], &g_entity->type->properties_flags, int_pow(2, i));
             }
         }
     }
@@ -3578,7 +3567,7 @@ void render_entity_props()
             if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY") + 1)
                 coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
-            ImGui::Text(entity_names[coffin->inside].data());
+            ImGui::Text("%s", entity_names[coffin->inside].c_str());
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int*)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
         else if (
@@ -3591,7 +3580,7 @@ void render_entity_props()
             if (container->inside > 0)
             {
                 ImGui::SameLine();
-                ImGui::Text(entity_names[container->inside].data());
+                ImGui::Text("%s", entity_names[container->inside].c_str());
             }
         }
         else if (g_entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
@@ -3609,7 +3598,7 @@ void render_entity_props()
             ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Theme##DoorThemenumber", ImGuiDataType_U8, &target->theme, 0.2f, &u8_one, &u8_seventeen);
             ImGui::SameLine();
-            ImGui::Text(theme_name(target->theme));
+            ImGui::Text("%s", theme_name(target->theme));
         }
         else if ((g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (g_entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && g_entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")))
         {
@@ -3641,7 +3630,7 @@ void render_entity_props()
                 "Tablet of Destiny",
                 "True crown",
                 "Udjat eye"};
-            static int32_t powerupTypeIDOptions[] = {
+            static uint32_t powerupTypeIDOptions[] = {
                 to_id("ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS"),
                 to_id("ENT_TYPE_ITEM_POWERUP_ANKH"),
                 to_id("ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES"),
@@ -3662,7 +3651,7 @@ void render_entity_props()
                 to_id("ENT_TYPE_ITEM_POWERUP_UDJATEYE")};
             if (ImGui::BeginCombo("##AddPowerupCombo", chosenPowerup))
             {
-                for (auto i = 0; i < IM_ARRAYSIZE(powerupOptions); ++i)
+                for (uint8_t i = 0; i < IM_ARRAYSIZE(powerupOptions); ++i)
                 {
                     bool isSelected = (chosenPowerup == powerupOptions[i]);
                     if (ImGui::Selectable(powerupOptions[i], isSelected))
@@ -3695,27 +3684,27 @@ void render_entity_props()
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, pow(2, i));
+            ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("More Flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(more_flags[i], &g_entity->more_flags, pow(2, i));
+            ImGui::CheckboxFlags(more_flags[i], &g_entity->more_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Input Display"))
     {
         ImVec2 region = ImGui::GetContentRegionMax();
         bool dirs[4] = {false, false, false, false};
-        if (g_entity->movex < 0.0)
+        if (g_entity->movex < 0.0f)
             dirs[0] = true;
-        if (g_entity->movey < 0.0)
+        if (g_entity->movey < 0.0f)
             dirs[1] = true;
-        if (g_entity->movey > 0.0)
+        if (g_entity->movey > 0.0f)
             dirs[2] = true;
-        if (g_entity->movex > 0.0)
+        if (g_entity->movex > 0.0f)
             dirs[3] = true;
         for (int i = 0; i < 4; i++)
         {
@@ -3725,7 +3714,7 @@ void render_entity_props()
         }
         for (int i = 0; i < 6; i++)
         {
-            ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, pow(2, i));
+            ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, int_pow(2, i));
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }
@@ -3735,10 +3724,12 @@ void render_entity_props()
 
 std::string format_time(int frames)
 {
+    struct tm newtime;
     time_t secs = frames / 60;
     char time[10];
-    std::strftime(time, sizeof(time), "%H:%M:%S", std::gmtime(&secs));
-    return std::string(time);
+    gmtime_s(&newtime, &secs);
+    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    return time;
 }
 
 int parse_time(std::string time)
@@ -3795,12 +3786,14 @@ void render_timer()
 {
     int frames = g_state->time_total;
     time_t secs = frames / 60;
+    struct tm newtime;
     char time[10];
-    std::strftime(time, sizeof(time), "%H:%M:%S", std::gmtime(&secs));
+    gmtime_s(&newtime, &secs);
+    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
     std::stringstream ss;
     ss << "Total: " << time << "." << std::setfill('0') << std::setw(3) << floor((frames % 60) * (1000.0 / 60.0));
     ImGui::PushFont(bigfont);
-    ImGui::Text(ss.str().data());
+    ImGui::Text("%s", ss.str().c_str());
     ImGui::PopFont();
 }
 
@@ -3832,7 +3825,7 @@ void render_game_props()
             gamestate += "Menu ";
         if (g_state->pause)
             gamestate += "Pause ";
-        ImGui::LabelText("Game state", gamestate.data());
+        ImGui::LabelText("Game state", "%s", gamestate.c_str());
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
         {
             if (paused)
@@ -3850,21 +3843,21 @@ void render_game_props()
         ImGui::Text("Frz");
         ImGui::Checkbox("##FreezeLast", &freeze_last);
         ImGui::SameLine();
-        if (InputString("Last level##LastTime", &lasttime))
+        if (ImGui::InputText("Last level##LastTime", &lasttime))
         {
             g_last_time = parse_time(lasttime);
             g_state->time_last_level = parse_time(lasttime);
         }
         ImGui::Checkbox("##FreezeLevel", &freeze_level);
         ImGui::SameLine();
-        if (InputString("Level##LevelTime", &leveltime))
+        if (ImGui::InputText("Level##LevelTime", &leveltime))
         {
             g_level_time = parse_time(leveltime);
             g_state->time_level = parse_time(leveltime);
         }
         ImGui::Checkbox("##FreezeTotal", &freeze_total);
         ImGui::SameLine();
-        if (InputString("Total##TotalTime", &totaltime))
+        if (ImGui::InputText("Total##TotalTime", &totaltime))
         {
             g_total_time = parse_time(totaltime);
             g_state->time_total = g_total_time;
@@ -3877,17 +3870,17 @@ void render_game_props()
         ImGui::DragScalar("Level##Levelnumber", ImGuiDataType_U8, (char*)&g_state->level, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Theme ##Themenumber", ImGuiDataType_U8, (char*)&g_state->theme, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
-        ImGui::Text(theme_name(g_state->theme));
+        ImGui::Text("%s", theme_name(g_state->theme));
         ImGui::DragScalar("Next World##Worldnext", ImGuiDataType_U8, (char*)&g_state->world_next, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Next Level##Levelnext", ImGuiDataType_U8, (char*)&g_state->level_next, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Next Theme##Themenext", ImGuiDataType_U8, (char*)&g_state->theme_next, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
-        ImGui::Text(theme_name(g_state->theme_next));
+        ImGui::Text("%s", theme_name(g_state->theme_next));
         ImGui::DragScalar("Start World##Worldnext", ImGuiDataType_U8, (char*)&g_state->world_start, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Start Level##Levelnext", ImGuiDataType_U8, (char*)&g_state->level_start, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Start Theme##Themenext", ImGuiDataType_U8, (char*)&g_state->theme_start, 0.2f, &u8_one, &u8_seventeen);
         ImGui::SameLine();
-        ImGui::Text(theme_name(g_state->theme_start));
+        ImGui::Text("%s", theme_name(g_state->theme_start));
         ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char*)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
         if (ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
         {
@@ -3912,35 +3905,35 @@ void render_game_props()
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(hud_flags[i], &g_state->hud_flags, pow(2, i));
+            ImGui::CheckboxFlags(hud_flags[i], &g_state->hud_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Quest flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(quest_flags[i], &g_state->quest_flags, pow(2, i));
+            ImGui::CheckboxFlags(quest_flags[i], &g_state->quest_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Journal flags"))
     {
         for (int i = 0; i < 21; i++)
         {
-            ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, pow(2, i));
+            ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Presence flags"))
     {
         for (int i = 0; i < 11; i++)
         {
-            ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, pow(2, i));
+            ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Special visibility flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, pow(2, i));
+            ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("AI targets"))
@@ -3952,7 +3945,7 @@ void render_game_props()
             {
                 continue;
             }
-            ImGui::Text(entity_names[ai_entity->type->id].data());
+            ImGui::Text("%s", entity_names[ai_entity->type->id].c_str());
             ImGui::SameLine();
             ImGui::Text(": ");
             ImGui::SameLine();
@@ -3965,11 +3958,11 @@ void render_game_props()
                 auto target_entity = get_entity_ptr(target);
                 if (target_entity != nullptr)
                 {
-                    ImGui::Text(entity_names[target_entity->type->id].data());
+                    ImGui::Text("%s", entity_names[target_entity->type->id].c_str());
                 }
                 else
                 {
-                    ImGui::Text(("Invalid target uid: " + std::to_string(target)).c_str());
+                    ImGui::Text("Invalid target uid: %s", std::to_string(target).c_str());
                 }
             }
         }
@@ -3981,18 +3974,17 @@ void render_style_editor()
 {
     ImGuiStyle& style = ImGui::GetStyle();
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01, 0.0, 1.0);
-    ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01, 0.0, 1.0);
-    ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01, 0.0, 1.0);
-    ImGui::DragFloat("Alpha##StyleAlpha", &style.Alpha, 0.01, 0.2, 1.0);
-    ImGui::DragFloat("Scale##StyleScale", &io.FontGlobalScale, 0.01, 0.2, 2.0);
+    ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Alpha##StyleAlpha", &style.Alpha, 0.01f, 0.2f, 1.0f);
+    ImGui::DragFloat("Scale##StyleScale", &io.FontGlobalScale, 0.01f, 0.2f, 2.0f);
     if (ImGui::Button("Randomize##StyleRandomize"))
     {
-        ImGuiStyle& style = ImGui::GetStyle();
         g_hue = (float)rand() / RAND_MAX;
         g_sat = (float)rand() / RAND_MAX;
         g_val = (float)rand() / RAND_MAX;
-        style.Alpha = (float)rand() / RAND_MAX * 0.5 + 0.4;
+        style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
     }
     ImGui::SameLine();
     if (ImGui::Button("Save##StyleSave"))
@@ -4095,10 +4087,9 @@ void imgui_init(ImGuiContext*)
 void imgui_draw()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    char buf[128];
-    sprintf(buf, "Overlunky %s", TOSTRING(GIT_VERSION));
-    ImVec2 textsize = ImGui::CalcTextSize(buf);
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - 30}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf);
+    std::string buf = std::format("Overlunky {}", TOSTRING(GIT_VERSION));
+    ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - 30}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
     if (!hide_script_messages)
         render_messages();
@@ -4111,7 +4102,7 @@ void imgui_draw()
     }
     float lastwidth = 0;
     float lastheight = 0;
-    float toolwidth = 0.12 * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
+    float toolwidth = 0.12f * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
         if (options["tabbed_interface"])
@@ -4131,7 +4122,7 @@ void imgui_draw()
                         activate_tab = "";
                         active_tab = "";
                     }
-                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.data(), &windows[tab]->open, flags))
+                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
                     {
                         active_tab = tab;
                         render_tool(tab);
@@ -4164,7 +4155,7 @@ void imgui_draw()
                 if (!tab.second->detached)
                     continue;
                 ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
-                ImGui::Begin(tab.second->name.data(), &tab.second->detached);
+                ImGui::Begin(tab.second->name.c_str(), &tab.second->detached);
                 render_tool(tab.first);
                 ImGui::SetWindowPos(
                     {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
@@ -4341,7 +4332,7 @@ void create_box(std::vector<EntityItem> items)
     std::sort(new_items.begin(), new_items.end());
 
     std::vector<int> new_filtered_items(new_items.size());
-    for (int i = 0; i < new_items.size(); i++)
+    for (unsigned int i = 0; i < new_items.size(); i++)
     {
         new_filtered_items[i] = i;
         entity_names[new_items[i].id] = new_items[i].name.substr(9);
@@ -4352,7 +4343,7 @@ void create_box(std::vector<EntityItem> items)
         g_current_item = 0;
         g_items = new_items;
         g_filtered_items = new_filtered_items;
-        g_filtered_count = g_items.size();
+        g_filtered_count = static_cast<int>(g_items.size());
     }
 }
 

@@ -21,12 +21,12 @@
 #include <imgui.h>
 #include <sol/sol.hpp>
 
-using CallbackId = int;
+using CallbackId = uint32_t;
 using Flags = std::uint32_t;
-using SPAWN_TYPE = int;                  // NoAlias
-using VANILLA_SOUND = std::string;       // NoAlias
-using VANILLA_SOUND_CALLBACK_TYPE = int; // NoAlias
-using BUTTONS = std::uint16_t;           // NoAlias
+using SPAWN_TYPE = int;                       // NoAlias
+using VANILLA_SOUND = std::string;            // NoAlias
+using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
+using BUTTONS = std::uint16_t;                // NoAlias
 
 enum class ON
 {
@@ -174,7 +174,7 @@ class LuaBackend
     std::unordered_set<std::string> loaded_modules;
 
     std::string result;
-    ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0};
+    ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
 
@@ -208,7 +208,7 @@ class LuaBackend
     SoundManager* sound_manager;
     LuaConsole* console;
 
-    std::map<int, ScriptImage*> images;
+    std::map<size_t, ScriptImage*> images;
 
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();

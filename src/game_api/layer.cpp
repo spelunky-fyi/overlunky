@@ -19,7 +19,7 @@ LoadItem get_load_item()
         off = find_inst(exe, needle, off + 5);
         off = find_inst(exe, "\xE8"s, off + 5);
 
-        return res = (LoadItem)memory.at_exe(decode_call(off));
+        return res = (LoadItem)memory.at_exe(Memory::decode_call(off));
     }
 }
 
@@ -32,7 +32,7 @@ LoadItemOver get_load_item_over()
         auto off = find_inst(memory.exe(), "\xBA\x51\x00\x00\x00\x48\x8B"s, memory.after_bundle);
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
         off = find_inst(memory.exe(), "\xE8"s, off + 5);
-        return res = (LoadItemOver)memory.at_exe(decode_call(off));
+        return res = (LoadItemOver)memory.at_exe(Memory::decode_call(off));
     }
 }
 
@@ -44,7 +44,7 @@ GetGridEntityAt get_get_grid_entity_at()
         auto memory = Memory::get();
         auto off = find_inst(memory.exe(), "\x48\x8b\x00\xff\x90\x38\x01\x00\x00"s, memory.after_bundle);
         off = find_inst(memory.exe(), "\xE8"s, off - 0x10);
-        return res = (GetGridEntityAt)memory.at_exe(decode_call(off));
+        return res = (GetGridEntityAt)memory.at_exe(Memory::decode_call(off));
     }
 }
 
@@ -53,6 +53,9 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
     if (id == 0)
         return nullptr;
     auto load_item = get_load_item();
+    size_t addr;
+    Entity* spawned;
+    float min_speed_check = 0.01f;
     if (!screen)
     {
         if (snap)
@@ -60,33 +63,29 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
             x = round(x);
             y = round(y);
         }
-        auto addr = load_item(this, id, x, y, false);
-        if (abs(vx) + abs(vy) > 0.01)
-        {
-            write_mem(addr + 0x100, to_le_bytes(vx));
-            write_mem(addr + 0x104, to_le_bytes(vy));
-        }
-        DEBUG("Spawned {:x}", addr);
-        return (Entity*)(addr);
+        addr = load_item(this, id, x, y, false);
+        spawned = (Entity*)(addr);
     }
     else
     {
         auto state = State::get();
         auto [rx, ry] = state.click_position(x, y);
-        if (snap && abs(vx) + abs(vy) <= 0.04)
+        min_speed_check = 0.04f;
+        if (snap && abs(vx) + abs(vy) <= min_speed_check)
         {
             rx = round(rx);
             ry = round(ry);
         }
-        auto addr = load_item(this, id, rx, ry, false);
-        if (abs(vx) + abs(vy) > 0.04)
-        {
-            write_mem(addr + 0x100, to_le_bytes(vx));
-            write_mem(addr + 0x104, to_le_bytes(vy));
-        }
-        DEBUG("Spawned {:x}", addr);
-        return (Entity*)(addr);
+        addr = load_item(this, id, rx, ry, false);
+        spawned = (Entity*)(addr);
     }
+    if (abs(vx) + abs(vy) > min_speed_check && spawned->is_movable())
+    {
+        write_mem(addr + 0x100, to_le_bytes(vx));
+        write_mem(addr + 0x104, to_le_bytes(vy));
+    }
+    DEBUG("Spawned {:x}", addr);
+    return spawned;
 }
 
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
@@ -99,7 +98,7 @@ Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
         auto off = find_inst(exe, "\x41\x0f\x28\xd8\x49\x8b\xce"s, memory.after_bundle);
         off = find_inst(exe, "\xE8"s, off + 5);
 
-        return (SpawnEntityHopefullySynced)memory.at_exe(decode_call(off));
+        return (SpawnEntityHopefullySynced)memory.at_exe(Memory::decode_call(off));
     }();
 
     return spawn_entity_snap_to_floor(this, id, x, y);
@@ -122,7 +121,7 @@ Entity* Layer::get_grid_entity_at(float x, float y)
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
-    uint8_t screen = State::get().ptr()->screen_next;
+    auto screen = State::get().ptr()->screen_next;
     Entity* door;
     switch (screen)
     {
@@ -142,7 +141,7 @@ Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
         return nullptr;
     };
     static_cast<Door*>(door)->set_target(w, l, t);
-    spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), round(x), round(y - 1.0), false, 0.0, 0.0, true);
+    spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), round(x), round(y - 1.0f), false, 0.0, 0.0, true);
     return door;
 }
 

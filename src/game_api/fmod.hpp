@@ -438,8 +438,8 @@ enum class ParameterFlags
 
 struct ParameterId
 {
-    unsigned int data1;
-    unsigned int data2;
+    uint32_t data1;
+    uint32_t data2;
 };
 struct ParameterDescription
 {

@@ -33,27 +33,27 @@ void Floor::fix_border_tile_animation()
     }
     else
     {
-        auto [x, y] = position();
-        auto base_x = static_cast<uint32_t>(std::floor(x / 2.0f));
-        auto base_y = static_cast<uint32_t>(std::floor(y / 2.0f));
-        auto sub_index_x = static_cast<uint32_t>(std::floor(x - base_x * 2));
-        auto sub_index_y = static_cast<uint32_t>(std::floor(y - base_y * 2));
+        auto [x_pos, y_pos] = position();
+        auto base_x = static_cast<uint32_t>(std::floor(x_pos / 2.0f));
+        auto base_y = static_cast<uint32_t>(std::floor(y_pos / 2.0f));
+        auto sub_index_x = static_cast<uint32_t>(std::floor(x_pos - base_x * 2));
+        auto sub_index_y = static_cast<uint32_t>(std::floor(y_pos - base_y * 2));
         if (type->id == 1)
         {
-            auto fake_random = [](uint32_t x)
+            auto fake_random = [](uint32_t i)
             {
-                x = ((x >> 16) ^ x) * 0x45d9f3b;
-                x = ((x >> 16) ^ x) * 0x45d9f3b;
-                x = (x >> 16) ^ x;
-                return x;
+                i = ((i >> 16) ^ i) * 0x45d9f3b;
+                i = ((i >> 16) ^ i) * 0x45d9f3b;
+                i = (i >> 16) ^ i;
+                return i;
             };
 
             const uint32_t base = fake_random(base_x + base_y) % 3;
-            animation_frame = base * 16 + sub_index_x + sub_index_y * 8;
+            animation_frame = (uint16_t)(base * 16 + sub_index_x + sub_index_y * 8);
         }
         else if (type->id == 2)
         {
-            animation_frame = 48 + sub_index_x + sub_index_y * 8;
+            animation_frame = (uint16_t)(48 + sub_index_x + sub_index_y * 8);
         }
     }
 }
@@ -73,7 +73,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
 
     const bool has_corners = this->has_corners();
 
-    const auto [x, y] = position_self();
+    const auto [x_pos, y_pos] = position_self();
 
     static float offsets[4][2]{
         {0.0f, +1.0f},
@@ -90,7 +90,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
     for (size_t i = 0; i < 4; i++)
     {
         auto [x_off, y_off] = offsets[i];
-        auto* floor = layer_ptr->get_grid_entity_at(x + x_off, y + y_off)->as<Floor>();
+        auto* floor = layer_ptr->get_grid_entity_at(x_pos + x_off, y_pos + y_off)->as<Floor>();
         neighbours[i] = floor;
         neighbours_same[i] = floor != nullptr && floor->type->id == type->id;
     }
@@ -157,7 +157,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
             else
             {
                 auto [x_off, y_off] = corner_offsets[i - 4];
-                auto* floor = layer_ptr->get_grid_entity_at(x + x_off, y + y_off)->as<Floor>();
+                auto* floor = layer_ptr->get_grid_entity_at(x_pos + x_off, y_pos + y_off)->as<Floor>();
                 bool same = floor != nullptr && floor->type->id == type->id;
 
                 if ((same && !neighbours_same[perp_sides[0]] && !neighbours_same[perp_sides[1]]) || (!same && neighbours_same[perp_sides[0]] && neighbours_same[perp_sides[1]]))
@@ -240,8 +240,8 @@ Entity* Floor::find_corner_decoration(FLOOR_SIDE side)
     for (uint8_t i = 0; i < items.count; ++i)
     {
         Entity* item = get_entity_ptr(pitems[i]);
-        auto [x, y] = item->position_self();
-        if (std::abs(x - offsets[side - 4][0]) < 0.0001f && std::abs(y - offsets[side - 4][1]) < 0.0001f)
+        auto [x_pos, y_pos] = item->position_self();
+        if (std::abs(x_pos - offsets[side - 4][0]) < 0.0001f && std::abs(y_pos - offsets[side - 4][1]) < 0.0001f)
         {
             return item;
         }
@@ -425,7 +425,7 @@ int32_t Floor::get_decoration_entity_type() const
     }
     return -1;
 }
-uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
+uint16_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
 {
     uint8_t num_variants = 0;
     bool styled = false;
@@ -436,16 +436,16 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
         return 0;
     case 0x1: // FLOOR_BORDERTILE
     {
-        uint8_t animation_frame = 2;
+        uint16_t anim_frame = 2;
         if (side == TOP)
         {
-            animation_frame += 8;
+            anim_frame += 8;
         }
         if (side == BOTTOM)
         {
-            animation_frame += 16;
+            anim_frame += 16;
         }
-        return animation_frame + rand() % 3;
+        return anim_frame + rand() % 3;
     }
     case 0x2: // FLOOR_BORDERTILE_METAL
     {
@@ -461,16 +461,16 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
     }
     case 0x3: // FLOOR_BORDERTILE_OCTOPUS
     {
-        uint8_t animation_frame = 26;
+        uint8_t anim_frame = 26;
         if (side == TOP)
         {
-            animation_frame += 8;
+            anim_frame += 8;
         }
         if (side == BOTTOM)
         {
-            animation_frame += 16;
+            anim_frame += 16;
         }
-        return animation_frame + rand() % 3;
+        return anim_frame + rand() % 3;
     }
     case 0x6: // FLOOR_SURFACE_COVER
     {
@@ -511,41 +511,41 @@ uint8_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
 
     if (styled)
     {
-        uint8_t animation_frame = 55;
+        uint8_t anim_frame = 55;
         if (side == TOP)
-            animation_frame += 10;
+            anim_frame += 10;
         if (side == BOTTOM)
-            animation_frame += 20;
+            anim_frame += 20;
         if (num_variants > 0)
-            animation_frame += rand() % num_variants;
-        return animation_frame;
+            anim_frame += rand() % num_variants;
+        return anim_frame;
     }
 
-    uint8_t animation_frame = 65;
+    uint8_t anim_frame = 65;
     if (side == TOP)
-        animation_frame += 12;
+        anim_frame += 12;
     if (side == BOTTOM)
-        animation_frame += 24;
+        anim_frame += 24;
     if (num_variants > 0)
     {
         if (side == FLOOR_SIDE::LEFT || side == FLOOR_SIDE::RIGHT)
         {
             if (deco_top >= 0)
             {
-                animation_frame += 2;
+                anim_frame += 2;
             }
             else
             {
                 num_variants--;
-                animation_frame += rand() % num_variants;
+                anim_frame += rand() % num_variants;
             }
         }
         else
         {
-            animation_frame += rand() % num_variants;
+            anim_frame += rand() % num_variants;
         }
     }
-    return animation_frame;
+    return anim_frame;
 }
 
 FLOOR_SIDE Floor::get_opposite_side(FLOOR_SIDE side)
@@ -630,19 +630,19 @@ bool Floor::get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2])
     return true;
 }
 
-void Door::set_target(uint8_t w, uint8_t l, uint8_t t)
+void Door::set_target(uint8_t world, uint8_t l, uint8_t t)
 {
-    uint8_t array[5] = {1, l, 1, w, t};
-    DEBUG("Making door go to {}-{}, {}", w, l, t);
+    uint8_t array[5] = {1, l, 1, world, t};
+    DEBUG("Making door go to {}-{}, {}", world, l, t);
     write_mem(pointer() + 0xc1, std::string((char*)array, sizeof(array)));
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> Door::get_target()
 {
     uint8_t l = read_u8(pointer() + 0xc2);
-    uint8_t w = read_u8(pointer() + 0xc4);
+    uint8_t world = read_u8(pointer() + 0xc4);
     uint8_t t = read_u8(pointer() + 0xc5);
-    return std::make_tuple(w, l, t);
+    return std::make_tuple(world, l, t);
 }
 
 void Arrowtrap::rearm()

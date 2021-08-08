@@ -248,7 +248,7 @@ bool LuaBackend::update()
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
-            auto now = get_frame_count();
+            int now = get_frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now >= cb->lastRan + cb->interval)
@@ -258,11 +258,11 @@ bool LuaBackend::update()
                 }
                 ++it;
             }
-            else if (auto cb = std::get_if<TimeoutCallback>(&it->second))
+            else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cb->timeout)
+                if (now >= cbt->timeout)
                 {
-                    handle_function(cb->func);
+                    handle_function(cbt->func);
                     it = global_timers.erase(it);
                 }
                 else
@@ -284,7 +284,6 @@ bool LuaBackend::update()
                 handle_function(callback.func, LoadContext{get_root(), get_name()});
                 callback.lastRan = now;
             }
-            break;
         }
 
         for (auto& [id, callback] : callbacks)
@@ -368,27 +367,28 @@ bool LuaBackend::update()
                     }
                     break;
                 }
+                default:
+                    break;
                 }
             }
         }
-
+        int now_l = g_state->time_level;
         for (auto it = level_timers.begin(); it != level_timers.end();)
         {
-            auto now = g_state->time_level;
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
-                if (now >= cb->lastRan + cb->interval)
+                if (now_l >= cb->lastRan + cb->interval)
                 {
                     handle_function(cb->func);
-                    cb->lastRan = now;
+                    cb->lastRan = now_l;
                 }
                 ++it;
             }
-            else if (auto cb = std::get_if<TimeoutCallback>(&it->second))
+            else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cb->timeout)
+                if (now_l >= cbt->timeout)
                 {
-                    handle_function(cb->func);
+                    handle_function(cbt->func);
                     it = level_timers.erase(it);
                 }
                 else
@@ -677,11 +677,11 @@ void LuaBackend::hook_entity_dtor(Entity* entity)
 }
 void LuaBackend::pre_entity_destroyed(Entity* entity)
 {
-    auto num_erased_hooks = std::erase_if(entity_hooks, [entity](auto& hook)
-                                          { return hook.first == entity->uid; });
+    [[maybe_unused]] auto num_erased_hooks = std::erase_if(entity_hooks, [entity](auto& hook)
+                                                           { return hook.first == entity->uid; });
     assert(num_erased_hooks != 0);
-    auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
-                                          { return dtor_hook.first == entity->uid; });
+    [[maybe_unused]] auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
+                                                           { return dtor_hook.first == entity->uid; });
     assert(num_erased_dtors == 1);
 }
 

@@ -51,7 +51,7 @@ void load_unsafe_libraries(sol::state& lua)
 }
 void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
-    auto infinite_loop = [](lua_State* argst, lua_Debug* argdb)
+    auto infinite_loop = [](lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
     {
         luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
     };
@@ -483,6 +483,7 @@ end
     lua["set_contents"] = set_contents;
     /// Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
     // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
+    /// NoDoc
     /// Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
     lua.script(R"##(
@@ -508,7 +509,8 @@ end
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
-    /// Get uids of all entities currently loaded
+    /// Deprecated
+    /// Use get_entities_by(0, 0, LAYER.BOTH)
     lua["get_entities"] = get_entities;
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
@@ -540,9 +542,11 @@ end
         }
         return std::vector<uint32_t>({});
     };
-    /// Get uids of entities by some search_flags
+    /// Deprecated
+    /// Use get_entities_by(0, mask, LAYER.BOTH)
     lua["get_entities_by_mask"] = get_entities_by_mask;
-    /// Get uids of entities by layer. `0` for main level, `1` for backlayer, `-1` for layer of the player.
+    /// Deprecated
+    /// Use get_entities_by(0, 0, layer)
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
@@ -682,8 +686,8 @@ end
     };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = get_camera_position;
-    /// Sets the current camera position in the level.
-    /// Note: The camera will still try to follow the player and this doesn't actually work at all.
+    /// Deprecated
+    /// this doesn't actually work at all. See State -> Camera the for proper camera handling
     lua["set_camera_position"] = set_camera_position;
 
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
@@ -783,7 +787,7 @@ end
     };
 
     /// Clears a callback that is specific to an entity.
-    lua["clear_entity_callback"] = [&lua](int uid, CallbackId cb_id)
+    lua["clear_entity_callback"] = [](int uid, CallbackId cb_id)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->clear_entity_hooks.push_back({uid, cb_id});
@@ -792,7 +796,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
@@ -990,8 +994,8 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
     {
         assert(sound_manager != nullptr && "SoundManager needs to be passed to first call to get_lua_vm...");
 
-        std::shared_ptr<sol::state> global_vm = std::make_shared<sol::state>();
-        sol::state& lua_vm = *global_vm;
+        std::shared_ptr<sol::state> global_vms = std::make_shared<sol::state>();
+        sol::state& lua_vm = *global_vms;
         load_libraries(lua_vm);
         populate_lua_state(lua_vm, sound_manager);
 
@@ -1022,7 +1026,7 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
             }
         }
 
-        return global_vm;
+        return global_vms;
     }();
     return global_vm;
 }
