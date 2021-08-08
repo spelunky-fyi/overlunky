@@ -48,6 +48,8 @@ for i,v in pairs(THEME) do
     theme_name[v] = i
 end
 
+local level_stuff = {}
+
 --[[TRAPS]]
 register_option_float("trap_max", "Max trap chance", 5, 0, 100)
 register_option_float("trap_min", "Min trap chance", 1.5, 0, 100)
@@ -209,8 +211,8 @@ local function trap_frog_spawn(x, y, l)
     if uid ~= -1 then
         kill_entity(uid)
     end
-    spawn_grid_entity(ENT_TYPE.FLOOR_BIGSPEAR_TRAP, x, y, l)
-    spawn_grid_entity(ENT_TYPE.FLOOR_BIGSPEAR_TRAP, x+1, y, l)
+    spawn_grid_entity(id, x, y, l)
+    spawn_grid_entity(id, x+1, y, l)
 end
 local function trap_frog_valid(x, y, l)
     local floor = get_grid_entity_at(x, y, l)
@@ -229,8 +231,8 @@ local function trap_frog_valid(x, y, l)
 
     floor = get_grid_entity_at(x, y, l)
     local floor2 = get_grid_entity_at(x+1, y, l)
-    local left = get_grid_entity_at(x-1, y, l)
-    local right = get_grid_entity_at(x+2, y, l)
+    left = get_grid_entity_at(x-1, y, l)
+    right = get_grid_entity_at(x+2, y, l)
     if floor ~= -1 and floor2 ~= -1 and (left == -1 or right == -1) then
         floor = get_entity(floor)
         floor2 = get_entity(floor2)
@@ -254,7 +256,8 @@ end, ON.POST_ROOM_GENERATION)
 set_callback(function()
     set_interval(function()
         set_arrowtrap_projectile(pick(trap_arrows), pick(trap_arrows))
-    end, 60)
+    end, 15)
+    level_stuff = {}
 end, ON.LEVEL)
 
 --[[ENEMIES]]
@@ -1205,7 +1208,7 @@ end, ON.TRANSITION)
 
 set_callback(function()
     --message("Loading")
-    if state.screen_next ~= ON.LEVEL and state.screen_next ~= ON.TRANSITION then return end
+    if state.screen_next ~= ON.LEVEL then return end
     if (#level_order == 0 or test_flag(state.quest_flags, 1)) then
         --message("Running init")
         init_run()
@@ -1214,9 +1217,9 @@ set_callback(function()
     if test_flag(state.quest_flags, 1) then
         num = 1
     end
-    if num > 1 and #level_order >= num and level_order[num].t == THEME.COSMIC_OCEAN and level_order[num-1].t == THEME.JUNGLE then
+    --[[if num > 1 and #level_order >= num and level_order[num].t == THEME.COSMIC_OCEAN and level_order[num-1].t == THEME.JUNGLE then
         return
-    end
+    end]]
     if #level_order > state.level_count then
         state.world_next = level_order[num].w
         state.level_next = level_order[num].l
