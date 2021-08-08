@@ -75,7 +75,7 @@ class SpelunkyScript
     bool get_unsafe() const;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    char* get_code() const;
+    std::string& get_code() const;
     std::size_t get_code_size() const;
 #endif
 

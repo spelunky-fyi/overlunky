@@ -57,16 +57,16 @@ struct ParticleDB
     uint8_t unknown41;
     uint32_t unknown42;
 
-    std::uint32_t get_texture();
+    std::uint64_t get_texture();
     bool set_texture(std::uint32_t texture_id);
 };
 
 struct ParticleEmitter
 {
     std::string name;
-    uint16_t id;
+    uint32_t id;
 
-    ParticleEmitter(const std::string& name_, uint64_t id_)
+    ParticleEmitter(const std::string& name_, uint32_t id_)
         : name(name_), id(id_)
     {
     }

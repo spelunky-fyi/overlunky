@@ -6,10 +6,9 @@ class ScriptImpl : public LuaBackend
 {
   public:
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    char code[204800];
+    std::string code;
 #else
-    std::string code_storage;
-    const char* code;
+    std::string code;
 #endif
 
     bool changed = true;

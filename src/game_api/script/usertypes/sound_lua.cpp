@@ -146,7 +146,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
             std::string clean_event_name = event_name;
             std::transform(
                 clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
-                { return std::toupper(c); });
+                { return (unsigned char)std::toupper(c); });
             std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
             lua["VANILLA_SOUND"][std::move(clean_event_name)] = std::move(event_name);
         });
@@ -182,14 +182,14 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Paramater to `PlayingSound:get_parameter()` and `PlayingSound:set_parameter()`
     lua.create_named_table("VANILLA_SOUND_PARAM"
                            //, "POS_SCREEN_X", 0
-                           //, "", ...check__[/vanilla_sound_params.txt]\[game_data/vanilla_sound_params.txt\]...
+                           //, "", ...check__[vanilla_sound_params.txt]\[game_data/vanilla_sound_params.txt\]...
                            //, "CURRENT_LAYER2", 37
     );
     sound_manager->for_each_parameter_name(
         [&lua](std::string parameter_name, std::uint32_t id)
         {
             std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
-                           { return std::toupper(c); });
+                           { return (unsigned char)std::toupper(c); });
             lua["VANILLA_SOUND_PARAM"][std::move(parameter_name)] = id;
         });
 }

@@ -9,7 +9,7 @@
 #include "virtual_table.hpp"
 #include <cstdarg>
 
-uint32_t setflag(uint32_t flags, int bit)
+uint32_t setflag(uint32_t flags, int bit) //shouldn't we change those to #define ?
 {
     return flags | (1U << (bit - 1));
 }
@@ -26,7 +26,7 @@ uint32_t flipflag(uint32_t flags, int bit)
     return (flags ^ (1U << (bit - 1)));
 }
 
-void teleport(float x, float y, bool s, float vx, float vy, bool snap)
+void teleport(float x, float y, bool s, float vx, float vy, bool snap) //ui only
 {
     auto state = State::get();
 
@@ -65,7 +65,7 @@ void attach_entity(Entity* overlay, Entity* attachee)
         auto memory = Memory::get();
         auto off = find_inst(memory.exe(), "\x48\x8b\xd0\x48\x8b\xcd\x48\x8b\xd8"s, memory.after_bundle);
         off = find_inst(memory.exe(), "\xe8"s, off);
-        return (AttachEntity)memory.at_exe(decode_call(off));
+        return (AttachEntity)memory.at_exe(Memory::decode_call(off));
     }();
     attach_entity(overlay, attachee);
 }
@@ -89,27 +89,23 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
         static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
 
         auto [x, y, l] = get_position(uid);
-
         auto* layer_ptr = State::get().layer(l);
 
-        Entity* ball = layer_ptr->spawn_entity(ball_entity_type, x + off_x, y + off_y, false, 0.0f, 0.0f, false);
+        PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, x + off_x, y + off_y, false, 0.0f, 0.0f, false);
 
-        // This should use proper types, but I am lazy, info stolen from zapp's tool
-        *(uint32_t*)((size_t)ball + sizeof(Movable)) = uid;
+        ball->attached_to_uid = uid;
 
         const uint8_t chain_length = 15;
         for (uint8_t i = 0; i < chain_length; i++)
         {
-            Entity* chain = layer_ptr->spawn_entity(chain_entity_type, x, y, false, 0.0f, 0.0f, false);
+            StretchChain* chain = (StretchChain*)layer_ptr->spawn_entity(chain_entity_type, x, y, false, 0.0f, 0.0f, false);
             chain->animation_frame -= (i % 2);
 
-            // This too should use proper types
-            *(uint32_t*)((size_t)chain + sizeof(Movable)) = ball->uid;
-            *(float*)((size_t)chain + sizeof(Movable) + 4) = (float)i / chain_length;
-            *(uint8_t*)((size_t)chain + sizeof(Movable) + 8) = i;
-            *(uint8_t*)((size_t)chain + sizeof(Movable) + 12) = (chain_length - i) * 2;
+            chain->at_end_of_chain_uid = ball->uid;
+            chain->dot_offset = (float)i / chain_length;
+            chain->position_in_chain = i;
+            chain->inverse_doubled_position_in_chain = (chain_length - i) * 2;
         }
-
         return ball->uid;
     }
     return -1;
@@ -123,7 +119,7 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
         auto memory = Memory::get();
         auto off = find_inst(memory.exe(), "\x49\x8b\xc9\xf3\x0f\x11\x5c\x24\x34"s, memory.after_bundle);
         off = find_inst(memory.exe(), "\xe8"s, off);
-        return (StackEntities)memory.at_exe(decode_call(off));
+        return (StackEntities)memory.at_exe(Memory::decode_call(off));
     }();
 
     if (Entity* bottom = get_entity_ptr(bottom_uid))
@@ -135,7 +131,7 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
     }
 }
 
-int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
+int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // ui only
 {
     auto state = State::get();
     if (s)
@@ -144,25 +140,25 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
         x = rx;
         y = ry;
     }
-    DEBUG("Items at {}:", (x, y));
+    //DEBUG("Items at {}:", (x, y));
     auto player = state.items()->player(0);
     if (player == nullptr)
         return -1;
-    std::vector<std::tuple<int, float, Entity*>> found;
+    std::vector<std::tuple<int32_t, float, Entity*>> found;
     for (auto& item : state.layer(player->layer)->items())
     {
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
-        float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
+        float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
         if (((mask & flags) > 0 || mask == 0) && distance < radius)
         {
-            DEBUG(
+            /*DEBUG(
                 "Item {}, {:x} type, {} position, {} distance, {:x}",
                 item->uid,
                 item->type->search_flags,
                 item->position_self(),
                 distance,
-                item->pointer());
+                item->pointer());*/
             found.push_back({item->uid, distance, item});
         }
     }
@@ -171,34 +167,20 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
         std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool
                   { return std::get<1>(a) < std::get<1>(b); });
         auto picked = found[0];
-        auto entity = std::get<2>(picked);
-        DEBUG("{}", (void*)entity);
+        //auto entity = std::get<2>(picked);
+        //DEBUG("{}", (void*)entity);
         return std::get<0>(picked);
     }
     return -1;
 }
 
-int32_t get_grid_entity_at(float x, float y, int layer)
+int32_t get_grid_entity_at(float x, float y, LAYER layer)
 {
     auto state = State::get();
-    if (layer == 0 || layer == 1)
-    {
-        if (Entity* ent = state.layer(layer)->get_grid_entity_at(x, y))
-        {
-            return ent->uid;
-        }
-    }
-    else if (layer < 0)
-    {
-        auto player = state.items()->player(abs(layer) - 1);
-        if (player != nullptr)
-        {
-            if (Entity* ent = state.layer(player->layer)->get_grid_entity_at(x, y))
-            {
-                return ent->uid;
-            }
-        }
-    }
+    uint8_t actual_layer = enum_to_layer(layer);
+
+    if (Entity* ent = state.layer(actual_layer)->get_grid_entity_at(x, y))
+        return ent->uid;
 
     return -1;
 }
@@ -221,8 +203,6 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 
 uint32_t get_entity_flags(uint32_t uid)
 {
-    if (uid == 0)
-        return 0;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -232,8 +212,6 @@ uint32_t get_entity_flags(uint32_t uid)
 
 void set_entity_flags(uint32_t uid, uint32_t flags)
 {
-    if (uid == 0)
-        return;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -242,8 +220,6 @@ void set_entity_flags(uint32_t uid, uint32_t flags)
 
 uint32_t get_entity_flags2(uint32_t uid)
 {
-    if (uid == 0)
-        return 0;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -253,8 +229,6 @@ uint32_t get_entity_flags2(uint32_t uid)
 
 void set_entity_flags2(uint32_t uid, uint32_t flags)
 {
-    if (uid == 0)
-        return;
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
@@ -263,8 +237,6 @@ void set_entity_flags2(uint32_t uid, uint32_t flags)
 
 int get_entity_ai_state(uint32_t uid)
 {
-    if (uid == 0)
-        return 0;
     auto state = State::get();
     auto ent = state.find(uid)->as<Movable>();
     if (ent)
@@ -311,26 +283,25 @@ Entity* get_entity_ptr(uint32_t uid)
     return p;
 }
 
-int32_t get_entity_type(uint32_t uid)
+uint32_t get_entity_type(uint32_t uid)
 {
     auto state = State::get();
     auto p = state.find(uid);
     if (p == nullptr || IsBadWritePtr(p, 0x178))
-        return -1;
+        return UINT32_MAX;
     return p->type->id;
 }
 
 StateMemory* get_state_ptr()
 {
-    const auto& state = State::get();
-    return state.ptr();
+    return State::get().ptr();
 }
 
 std::vector<Player*> get_players()
 {
     auto state = State::get();
     std::vector<Player*> found;
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
     {
         auto player = state.items()->player(i);
         if (player)
@@ -365,57 +336,28 @@ float screen_distance(float x)
 
 std::vector<uint32_t> get_entities()
 {
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (!player)
-        return {};
-    std::vector<uint32_t> found;
-    for (auto& item : state.layer(0)->items())
-    {
-        found.push_back(item->uid);
-    }
-    for (auto& item : state.layer(1)->items())
-    {
-        found.push_back(item->uid);
-    }
-    return found;
+    return get_entities_by(0, 0, -128);
 }
 
-std::vector<uint32_t> get_entities_by_layer(int layer)
+std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 {
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (!player)
-        return {};
-    if (layer == -1)
-        layer = player->layer;
-    std::vector<uint32_t> found;
-    for (auto& item : state.layer(layer)->items())
-    {
-        found.push_back(item->uid);
-    }
-    return found;
+    return get_entities_by(0, 0, layer);
 }
 
 std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types)
 {
     auto state = State::get();
-    auto player = state.items()->player(0);
-    if (!player)
-        return {};
     std::vector<uint32_t> found;
-    for (auto& item : state.layer(0)->items())
+    uint8_t layer = 2;
+    while (layer)
     {
-        if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
+        layer--;
+        for (auto& item : state.layer(layer)->items())
         {
-            found.push_back(item->uid);
-        }
-    }
-    for (auto& item : state.layer(1)->items())
-    {
-        if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
-        {
-            found.push_back(item->uid);
+            if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
+            {
+                found.push_back(item->uid);
+            }
         }
     }
     return found;
@@ -425,88 +367,38 @@ template <typename... Args>
 std::vector<uint32_t> get_entities_by_type(Args... args)
 {
     std::vector<uint32_t> types = {args...};
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (!player)
-        return {};
-    std::vector<uint32_t> found;
-    for (auto& item : state.layer(0)->items())
-    {
-        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
-        {
-            found.push_back(item->uid);
-        }
-    }
-    for (auto& item : state.layer(1)->items())
-    {
-        if (std::find(types.begin(), types.end(), item->type->id) != types.end())
-        {
-            found.push_back(item->uid);
-        }
-    }
-    return found;
+    return get_entities_by_type(types);
 }
-
-/*std::vector<uint32_t> get_entities_by_type(uint32_t type)
-{
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (!player)
-        return {};
-    std::vector<uint32_t> found;
-    for (auto &item : state.layer(0)->items())
-    {
-        if (item->type->id == type)
-        {
-            found.push_back(item->uid);
-        }
-    }
-    for (auto &item : state.layer(1)->items())
-    {
-        if (item->type->id == type)
-        {
-            found.push_back(item->uid);
-        }
-    }
-    return found;
-}*/
 
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
 {
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (!player)
-        return {};
-    std::vector<uint32_t> found;
-    for (auto& item : state.layer(0)->items())
-    {
-        if (item->type->search_flags & mask)
-        {
-            found.push_back(item->uid);
-        }
-    }
-    for (auto& item : state.layer(1)->items())
-    {
-        if (item->type->search_flags & mask)
-        {
-            found.push_back(item->uid);
-        }
-    }
-    return found;
+    return get_entities_by(0, mask, -128);
 }
 
-std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int layer)
+std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER layer)
 {
     auto state = State::get();
-    auto player = state.items()->player(0);
     std::vector<uint32_t> found;
-    if (!player)
-        return {};
-    if (layer == -1)
-        layer = player->layer;
-    if (layer >= 0 && state.layer(layer))
+    if (layer == -128) // LAYER.BOTH
     {
-        for (auto& item : state.layer(layer)->items())
+        uint8_t layeridx = 2;
+        while (layeridx)
+        {
+            layeridx--;
+            for (auto& item : state.layer(layeridx)->items())
+            {
+                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
+                {
+                    found.push_back(item->uid);
+                }
+            }
+        }
+    }
+    else
+    {
+        uint8_t actual_layer = enum_to_layer(layer);
+
+        for (auto& item : state.layer(actual_layer)->items())
         {
             if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
             {
@@ -514,58 +406,69 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, int l
             }
         }
     }
-    else
-    {
-        if (state.layer(0))
-        {
-            for (auto& item : state.layer(0)->items())
-            {
-                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
-                {
-                    found.push_back(item->uid);
-                }
-            }
-        }
-        if (state.layer(1))
-        {
-            for (auto& item : state.layer(1)->items())
-            {
-                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
-                {
-                    found.push_back(item->uid);
-                }
-            }
-        }
-    }
     return found;
 }
 
-std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, int layer, float radius)
+std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    for (auto& item : state.layer(layer)->items())
+    if (layer == -128)
     {
-        auto [ix, iy] = item->position();
-        float distance = sqrt(pow(x - ix, 2) + pow(y - iy, 2));
-        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && distance < radius)
+        uint8_t layeridx = 2;
+        while (layeridx)
         {
-            found.push_back(item->uid);
+            layeridx--;
+            for (auto& item : state.layer(layeridx)->items())
+            {
+                auto [ix, iy] = item->position();
+                float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
+                if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && distance < radius)
+                {
+                    found.push_back(item->uid);
+                }
+            }
+        }
+    }
+    else
+    {
+        uint8_t actual_layer = enum_to_layer(layer);
+
+        for (auto& item : state.layer(actual_layer)->items())
+        {
+            auto [ix, iy] = item->position();
+            float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
+            if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && distance < radius)
+            {
+                found.push_back(item->uid);
+            }
         }
     }
     return found;
 }
 
-std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, int layer)
+std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, LAYER layer)
 {
     auto state = State::get();
-    return get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(layer));
+    std::vector<uint32_t> result;
+    if (layer == -128)
+    {
+        std::vector<uint32_t> result2;
+        result = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
+        result2 = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
+        result.insert(result.end(), result2.begin(), result2.end());
+    }
+    else
+    {
+        uint8_t actual_layer = enum_to_layer(layer);
+        result = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
+    }
+    return result;
 }
 
-std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, int layer)
+std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
-    auto state = State::get();
-    return get_entities_overlapping_by_pointer(entity_type, mask, sx, sy, sx2, sy2, state.layer(layer));
+    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy, sx2, sy2}, layer);
 }
 
 std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
@@ -583,7 +486,6 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, 
 
 void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 {
-    const auto& state = State::get();
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return;
@@ -592,23 +494,18 @@ void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
-    const auto& state = State::get();
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
-        return std::make_tuple(0, 0, 0);
+        return std::make_tuple((uint8_t)0, (uint8_t)0, (uint8_t)0);
     return static_cast<Door*>(door)->get_target();
 }
 
 void set_contents(uint32_t uid, uint32_t item_entity_type)
 {
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
     Entity* container = get_entity_ptr(uid);
     if (container == nullptr)
         return;
-    int type = container->type->id;
+    uint32_t type = container->type->id;
     if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
         type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
         return;
@@ -630,8 +527,8 @@ bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
         return false;
     if (entity->items.count > 0)
     {
-        int* pitems = (int*)entity->items.begin;
-        for (int i = 0; i < entity->items.count; i++)
+        auto pitems = entity->items.begin;
+        for (unsigned int i = 0; i < entity->items.count; i++)
         {
             if (pitems[i] == item_uid)
                 return true;
@@ -648,7 +545,7 @@ bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
     if (entity->items.count > 0)
     {
         int* pitems = (int*)entity->items.begin;
-        for (int i = 0; i < entity->items.count; i++)
+        for (unsigned int i = 0; i < entity->items.count; i++)
         {
             Entity* item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
@@ -668,8 +565,8 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, ui
         return found;
     if (entity->items.count > 0)
     {
-        int* pitems = (int*)entity->items.begin;
-        for (int i = 0; i < entity->items.count; i++)
+        uint32_t* pitems = entity->items.begin;
+        for (unsigned int i = 0; i < entity->items.count; i++)
         {
             Entity* item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
@@ -770,7 +667,7 @@ void flip_entity(uint32_t uid)
     if (ent->items.count > 0)
     {
         int* items = (int*)ent->items.begin;
-        for (int i = 0; i < ent->items.count; i++)
+        for (unsigned int i = 0; i < ent->items.count; i++)
         {
             Entity* item = get_entity_ptr(items[i]);
             item->flags = flipflag(item->flags, 17);
@@ -846,7 +743,7 @@ void modify_sparktraps(float angle_increment, float distance)
         }
         angle_increment_offset = memory.at_exe(op_counter);
 
-        uint32_t distance_offset_relative = op_counter - (angle_instruction_offset + 8);
+        uint32_t distance_offset_relative = static_cast<uint32_t>(op_counter - (angle_instruction_offset + 8));
         write_mem_prot(memory.at_exe(angle_instruction_offset + 4), to_le_bytes(distance_offset_relative), true);
     }
     write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
@@ -854,7 +751,6 @@ void modify_sparktraps(float angle_increment, float distance)
     static size_t distance_offset = 0;
     if (distance_offset == 0)
     {
-        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
@@ -892,7 +788,7 @@ void modify_sparktraps(float angle_increment, float distance)
         for (auto x = 0; x < 4; ++x)
         {
             auto mulss_offset = find_inst(exe, use_pattern1 ? pattern1 : pattern2, start);
-            uint32_t distance_offset_relative = op_counter - (mulss_offset + 8);
+            uint32_t distance_offset_relative = static_cast<uint32_t>(op_counter - (mulss_offset + 8));
             write_mem_prot(memory.at_exe(mulss_offset + 4), to_le_bytes(distance_offset_relative), true);
             start = mulss_offset + 1;
             use_pattern1 = !use_pattern1;
@@ -921,7 +817,6 @@ void set_kapala_hud_icon(int8_t icon_index)
 
     if (instruction_offset == 0)
     {
-        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
@@ -943,7 +838,7 @@ void set_kapala_hud_icon(int8_t icon_index)
             op_counter++;
         }
         icon_index_offset = memory.at_exe(op_counter);
-        distance = op_counter - (instruction_offset + 7);
+        distance = static_cast<uint32_t>(op_counter - (instruction_offset + 7));
         instruction_offset = memory.at_exe(instruction_offset);
     }
 
@@ -1033,7 +928,6 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     static size_t phase2_offset = 0;
     if (phase1_offset == 0)
     {
-        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
@@ -1068,8 +962,8 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
         write_mem_prot(memory.at_exe(phase2_offset), to_le_bytes(83.0f), true);
 
         // calculate the distances between our floats and the movss instructions
-        uint32_t distance_1 = phase1_offset - (offset1 + 8);
-        uint32_t distance_2 = phase2_offset - (offset2 + 8);
+        uint32_t distance_1 = static_cast<uint32_t>(phase1_offset - (offset1 + 8));
+        uint32_t distance_2 = static_cast<uint32_t>(phase2_offset - (offset2 + 8));
 
         // overwrite the movss instructions to load our floats
         write_mem_prot(memory.at_exe(offset1 + 4), to_le_bytes(distance_1), true);
@@ -1095,7 +989,6 @@ void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
     static size_t cursed_offset = 0;
     if (normal_offset == 0)
     {
-        const auto& state = State::get();
         auto memory = Memory::get();
         auto exe = memory.exe();
 
@@ -1131,7 +1024,7 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
             }
             else if (entry.chance_sizeof == 1)
             {
-                uint8_t value = new_drop_chance;
+                uint8_t value = static_cast<uint8_t>(new_drop_chance);
                 write_mem_prot(entry.offset, to_le_bytes(value), true);
             }
         }
@@ -1207,7 +1100,7 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
             auto state = get_state_ptr();
             typedef size_t generate_particles_func(PointerList*, uint32_t, Entity*);
             static generate_particles_func* gpf = (generate_particles_func*)(offset);
-            auto result = gpf(state->particle_emitters, particle_emitter_id, entity);
+            gpf(state->particle_emitters, particle_emitter_id, entity);
         }
     }
 }
@@ -1326,6 +1219,53 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     {
         auto state = get_state_ptr();
         return state->waddler_storage[slot];
+    }
+    return 0;
+}
+
+uint8_t enum_to_layer(LAYER layer)
+{
+    if (layer == 0)
+        return 0;
+    else if (layer == 1)
+        return 1;
+    else if (layer < -MAX_PLAYERS)
+        return 0;
+    else if (layer < 0)
+    {
+        auto state = State::get();
+        auto player = state.items()->player(static_cast<uint8_t>(abs(layer) - 1));
+        if (player != nullptr)
+        {
+            return player->layer;
+        }
+    }
+    return 0;
+}
+
+uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position)
+{
+    if (layer == 0)
+    {
+        player_position = {0.0f, 0.0f};
+        return 0;
+    }
+    else if (layer == 1)
+    {
+        player_position = {0.0f, 0.0f};
+        return 1;
+    }
+    else if (layer < -MAX_PLAYERS)
+        return 0;
+    else if (layer < 0)
+    {
+        auto state = State::get();
+        auto player = state.items()->player(static_cast<uint8_t>(abs(layer) - 1));
+        if (player != nullptr)
+        {
+            player_position = player->position();
+            return player->layer;
+        }
     }
     return 0;
 }

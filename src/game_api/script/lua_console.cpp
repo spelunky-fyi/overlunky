@@ -326,10 +326,10 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
     if (!to_complete_end.empty() || !to_complete_base.empty())
     {
         // Gather candidates for completion, this has to actually access variables so it can fail
-        std::vector<std::string_view> options;
+        std::vector<std::string_view> possible_options;
         try
         {
-            options = [this](std::string_view to_complete_end, std::string_view to_complete_base)
+            possible_options = [this](std::string_view to_complete_end, std::string_view to_complete_base)
             {
                 if (to_complete_base.empty())
                 {
@@ -359,13 +359,13 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         "while"sv,
                     };
 
-                    std::vector<std::string_view> options;
+                    std::vector<std::string_view> possible_options;
 
                     for (std::string_view opt : additional_options)
                     {
                         if (opt.starts_with(to_complete_end))
                         {
-                            options.push_back(opt);
+                            possible_options.push_back(opt);
                         }
                     }
 
@@ -376,15 +376,15 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             const std::string_view str = k.as<std::string_view>();
                             if (str.starts_with(to_complete_end) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                             {
-                                options.push_back(str);
+                                possible_options.push_back(str);
                             }
                         }
                     }
-                    return options;
+                    return possible_options;
                 }
                 else
                 {
-                    std::vector<std::string_view> options;
+                    std::vector<std::string_view> possible_options;
 
                     // Need to collect these in a vector, otherwise the state somehow breaks
                     std::vector<sol::userdata> source_obj{};
@@ -404,7 +404,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         }
                         else
                         {
-                            return options;
+                            return possible_options;
                         }
                     }
 
@@ -418,7 +418,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                                 const std::string_view str = k.as<std::string_view>();
                                 if ((grab_all || str.starts_with(to_complete_end)) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                                 {
-                                    options.push_back(str);
+                                    possible_options.push_back(str);
                                 }
                             }
                         }
@@ -454,7 +454,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             break;
                         }
                     }
-                    return options;
+                    return possible_options;
                 }
             }(to_complete_end, to_complete_base);
         }
@@ -465,26 +465,26 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
         }
 
         to_complete = to_complete_end;
-        if (options.empty())
+        if (possible_options.empty())
         {
             completion_options = fmt::format("No matches found for tab-completion of '{}'...", to_complete);
         }
-        else if (options.size() == 1)
+        else if (possible_options.size() == 1)
         {
             data->DeleteChars((int)(to_complete.data() - data->Buf), (int)to_complete.size());
 
-            std::string_view option = options[0];
+            std::string_view option = possible_options[0];
             data->InsertChars(data->CursorPos, option.data(), option.data() + option.size());
         }
         else
         {
             size_t overlap{0};
-            auto first = options.front();
+            auto first = possible_options.front();
 
             while (true)
             {
                 bool all_match{true};
-                for (std::string_view option : options)
+                for (std::string_view option : possible_options)
                 {
                     if (overlap >= option.size() || option[overlap] != first[overlap])
                     {
@@ -509,12 +509,12 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                 data->InsertChars(data->CursorPos, option_overlap.data(), option_overlap.data() + option_overlap.size());
             }
 
-            if (options.size() > 20)
+            if (possible_options.size() > 20)
             {
-                options.resize(20);
-                options.push_back("More than 20 completion options, output is truncated...");
+                possible_options.resize(20);
+                possible_options.push_back("More than 20 completion options, output is truncated...");
             }
-            for (std::string_view option : options)
+            for (std::string_view option : possible_options)
             {
                 completion_options += option;
                 completion_options += "\n";
@@ -582,10 +582,10 @@ bool LuaConsole::pre_draw()
                 set_scroll_to_history_item = std::nullopt;
             }
 
-            for (const auto& result : item.messages)
+            for (const auto& results : item.messages)
             {
-                ImGui::PushStyleColor(ImGuiCol_Text, result.color);
-                ImGui::TextWrapped("%s", result.message.c_str());
+                ImGui::PushStyleColor(ImGuiCol_Text, results.color);
+                ImGui::TextWrapped("%s", results.message.c_str());
                 ImGui::PopStyleColor();
             }
         }
@@ -603,13 +603,13 @@ bool LuaConsole::pre_draw()
         if (!completion_error.empty())
         {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.7f, 0.3f, 0.3f, 1.0f});
-            ImGui::TextWrapped(completion_error.c_str());
+            ImGui::TextWrapped("%s", completion_error.c_str());
             ImGui::PopStyleColor();
         }
         else if (!completion_options.empty())
         {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{0.7f, 0.7f, 0.7f, 1.0f});
-            ImGui::TextWrapped(completion_options.c_str());
+            ImGui::TextWrapped("%s", completion_options.c_str());
             ImGui::PopStyleColor();
         }
 
@@ -700,20 +700,20 @@ bool LuaConsole::pre_draw()
                 {
                     std::size_t messages_before = messages.size();
 
-                    std::string result = execute(console_input);
+                    std::string results = execute(console_input);
 
                     std::vector<ScriptMessage> result_message;
                     std::move(messages.begin() + messages_before, messages.end(), std::back_inserter(result_message));
                     messages.erase(messages.begin() + messages_before, messages.end());
 
-                    if (!result.empty())
+                    if (!results.empty())
                     {
                         ImVec4 color{1.0f, 1.0f, 1.0f, 1.0f};
-                        if (result.starts_with("sol:"))
+                        if (results.starts_with("sol:"))
                         {
                             color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
                         }
-                        result_message.push_back({std::move(result), {}, color});
+                        result_message.push_back({std::move(results), {}, color});
                     }
 
                     history_pos = std::nullopt;
@@ -734,7 +734,7 @@ bool LuaConsole::pre_draw()
     return true;
 }
 
-void LuaConsole::set_enabled(bool enabled)
+void LuaConsole::set_enabled(bool)
 {
 }
 bool LuaConsole::get_enabled() const

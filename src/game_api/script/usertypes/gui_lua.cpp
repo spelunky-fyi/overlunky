@@ -175,7 +175,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
 };
 void GuiDrawContext::win_text(std::string text)
 {
-    ImGui::TextWrapped(text.c_str());
+    ImGui::TextWrapped("%s", text.c_str());
 };
 void GuiDrawContext::win_separator()
 {
@@ -261,7 +261,7 @@ void GuiDrawContext::win_image(int image, int width, int height)
         width = image_ptr->width;
     if (height < 1)
         height = image_ptr->height;
-    ImGui::Image(image_ptr->texture, ImVec2(width, height));
+    ImGui::Image(image_ptr->texture, ImVec2(static_cast<float>(width), static_cast<float>(height)));
 };
 
 namespace NGui
@@ -338,7 +338,6 @@ void register_usertypes(sol::state& lua)
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
         return (uColor)(a << 24) + (b << 16) + (g << 8) + (r);
     };
     /// Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
@@ -369,7 +368,6 @@ void register_usertypes(sol::state& lua)
             }
         }
         ImVec2 textsize = font->CalcTextSizeA(size, 9999.0, 9999.0, text.c_str());
-        ImVec2 res = io.DisplaySize;
 
         auto a = normalize(ImVec2(0, 0));
         auto b = normalize(textsize);
@@ -385,7 +383,7 @@ void register_usertypes(sol::state& lua)
         }
     };
     /// Create image from file. Returns a tuple containing id, width and height.
-    lua["create_image"] = [](std::string path) -> std::tuple<int, int, int>
+    lua["create_image"] = [](std::string path) -> std::tuple<size_t, int, int>
     {
         ScriptImage* image = new ScriptImage;
         image->width = 0;
@@ -395,7 +393,7 @@ void register_usertypes(sol::state& lua)
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (create_d3d11_texture_from_file((std::filesystem::path{backend->get_root_path()} / path).string().data(), &image->texture, &image->width, &image->height))
         {
-            int id = backend->images.size();
+            size_t id = backend->images.size();
             backend->images[id] = image;
             return std::make_tuple(id, image->width, image->height);
         }
