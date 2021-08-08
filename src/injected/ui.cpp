@@ -841,9 +841,9 @@ const char* entity_name(int id)
 
 bool update_entity()
 {
-    //if (!visible("tool_entity_properties"))
-    //    return false;
-    if (g_last_id != 0)
+    if (!visible("tool_entity_properties") && !options["draw_hitboxes"])
+        return false;
+    if (g_last_id > -1)
     {
         g_entity_type = entity_type(g_last_id);
         g_entity = (Player*)entity_ptr(g_last_id);
