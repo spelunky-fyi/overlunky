@@ -14,11 +14,16 @@ jobs:
       matrix:
         build_type: [Debug, Release]
         toolset_name: [MSVC, Clang]
+        build_dll: [false, true]
         include:
           - toolset_name: MSVC
             toolset: v142
           - toolset_name: Clang
             toolset: ClangCL
+          - build_dll: false
+            additional_opts: -DBUILD_OVERLUNKY=ON -DBUILD_INFO_DUMP=ON -DBUILD_SPEL2_DLL=OFF
+          - build_dll: true
+            additional_opts: -DBUILD_OVERLUNKY=OFF -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=ON
 
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +35,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -A x64 -T ${{ matrix.toolset }}
+          cmake .. -A x64 -T ${{ matrix.toolset }} ${{ matrix.additional_opts }}
 
       - name: Build
         run: |
