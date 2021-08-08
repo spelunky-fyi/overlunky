@@ -2,6 +2,7 @@
 #include "game_manager.hpp"
 #include "level_api.hpp"
 #include "logger.h"
+#include "render_api.hpp"
 #include "spawn_api.hpp"
 
 size_t get_dark()
@@ -160,6 +161,7 @@ State& State::get()
         STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
+        init_render_hud_hook();
         get_is_init() = true;
     }
     return STATE;

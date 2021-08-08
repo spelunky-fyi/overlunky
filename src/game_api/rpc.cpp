@@ -1329,3 +1329,68 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     }
     return 0;
 }
+
+void vanilla_draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
+{
+    static size_t context_offset = 0;
+    static size_t func1_offset = 0;
+    static size_t func2_offset = 0;
+
+    auto& memory = Memory::get();
+    auto exe = memory.exe();
+
+    if (context_offset == 0)
+    {
+        std::string pattern = "\x48\x8D\x0D\x47\x97\x27\x00"s;
+        size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
+
+        pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
+        pattern_pos = find_inst(exe, pattern, memory.after_bundle);
+        context_offset = memory.at_exe(decode_pc(exe, pattern_pos));
+
+        pattern_pos += 7;
+        func1_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
+
+        pattern_pos += 13;
+        func2_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
+    }
+
+    if (context_offset != 0)
+    {
+        auto convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), text.size(), nullptr, 0);
+        if (convert_result <= 0)
+        {
+            return;
+        }
+        std::wstring wide_text;
+        wide_text.resize(convert_result + 10);
+        convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), text.size(), &wide_text[0], wide_text.size());
+
+        struct text_rendering_info
+        {
+            float x;
+            float y;
+            uint32_t text_length;
+            float unknown1;
+            float unknown2;
+            uint32_t unknown3;
+            size_t unknown4;
+            size_t unknown5;
+            size_t unknown6;
+            uint16_t unknown7;
+            uint16_t unknown8;
+            int32_t unknown9;
+            size_t unknown10;
+            size_t unknown11;
+        };
+
+        text_rendering_info tri = {0};
+        typedef void func1(size_t context, uint32_t fontstyle, void* text_to_draw, uint32_t, float x, float y, text_rendering_info*, uint32_t, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
+        static func1* f1 = (func1*)(func1_offset);
+        typedef void func2(text_rendering_info*, Color * color);
+        static func2* f2 = (func2*)(func2_offset);
+
+        f1(context_offset, fontstyle, wide_text.data(), 2, x, y, &tri, 1, scale_x, scale_y, alignment, 2, 0);
+        f2(&tri, &color);
+    }
+}

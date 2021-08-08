@@ -71,7 +71,8 @@ enum class ON
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
     SCRIPT_ENABLE,
-    SCRIPT_DISABLE
+    SCRIPT_DISABLE,
+    VANILLA_RENDER
 };
 
 struct IntOption
@@ -257,6 +258,8 @@ class LuaBackend
 
     void hook_entity_dtor(Entity* entity);
     void pre_entity_destroyed(Entity* entity);
+
+    void vanilla_render();
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);

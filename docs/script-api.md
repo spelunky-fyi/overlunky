@@ -122,6 +122,8 @@ Runs on any ending cutscene.
 Runs on any [screen change](#on).
 ### [`on_guiframe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_guiframe)
 Runs on every screen frame. You need this to use draw functions.
+### [`on_vanilla_render`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_vanilla_render)
+Runs so you can draw text on top of everything. Use with `vanilla_draw_text`
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
@@ -509,6 +511,9 @@ Sets the 16-bit meta-value associated with the entity type in the associated slo
 ### [`waddler_entity_type_in_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_entity_type_in_slot)
 `int waddler_entity_type_in_slot(int slot)`<br/>
 Gets the entity type of the item in the provided slot
+### [`vanilla_draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_draw_text)
+`nil vanilla_draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`<br/>
+Draw text on the screen using the built-in text renderer. Use in combination with ON.VANILLA_RENDER
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 `float distance(int uid_a, int uid_b)`<br/>
 Calculate the tile distance of two entities by uid
@@ -3003,6 +3008,7 @@ Runs right after all rooms are generated before entities are spawned
 Runs right level generation is done, before any entities are updated
 - [`SCRIPT_ENABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) ON::SCRIPT_ENABLE
 - [`SCRIPT_DISABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) ON::SCRIPT_DISABLE
+- [`VANILLA_RENDER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.VANILLA_RENDER) ON::VANILLA_RENDER
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \
@@ -3033,6 +3039,15 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`TIAMAT_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.TIAMAT_WIN) 1
 - [`HUNDUN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.HUNDUN_WIN) 2
 - [`COSMIC_OCEAN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.COSMIC_OCEAN_WIN) 3
+### VANILLA_TEXT_ALIGNMENT
+Used in the `vanilla_draw_text` function
+- [`LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_TEXT_ALIGNMENT.LEFT) 0
+- [`CENTER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_TEXT_ALIGNMENT.CENTER) 1
+- [`RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_TEXT_ALIGNMENT.RIGHT) 2
+### VANILLA_FONT_STYLE
+Used in the `vanilla_draw_text` function
+- [`ITALIC`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.ITALIC) 0
+- [`BOLD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.BOLD) 1
 ### CAUSE_OF_DEATH
 - [`DEATH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.DEATH) 0
 - [`ENTITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.ENTITY) 1

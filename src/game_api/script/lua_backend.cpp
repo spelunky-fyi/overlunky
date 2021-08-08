@@ -129,6 +129,7 @@ void LuaBackend::clear_all_callbacks()
     lua["on_death"] = sol::lua_nil;
     lua["on_win"] = sol::lua_nil;
     lua["on_screen"] = sol::lua_nil;
+    lua["on_vanilla_render"] = sol::lua_nil;
 }
 
 bool LuaBackend::reset()
@@ -661,6 +662,29 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             {
                 handle_function(callback.func, entity);
             }
+        }
+    }
+}
+void LuaBackend::vanilla_render()
+{
+    if (!get_enabled())
+        return;
+
+    /// Runs so you can draw text on top of everything. Use with `vanilla_draw_text`
+    sol::optional<sol::function> on_vanilla_render = lua["on_vanilla_render"];
+
+    if (on_vanilla_render)
+    {
+        on_vanilla_render.value()();
+    }
+
+    for (auto& [id, callback] : callbacks)
+    {
+        auto now = get_frame_count();
+        if (callback.screen == ON::VANILLA_RENDER)
+        {
+            handle_function(callback.func);
+            callback.lastRan = now;
         }
     }
 }

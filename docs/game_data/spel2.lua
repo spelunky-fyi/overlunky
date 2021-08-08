@@ -1938,6 +1938,7 @@ ON = {
   TEAM_SELECT = 10,
   TITLE = 3,
   TRANSITION = 13,
+  VANILLA_RENDER = 114,
   WIN = 16
 }
 Octopus = {
@@ -2659,6 +2660,16 @@ RoomOwner = {
   __name = "sol.RoomOwner.user",
   __newindex = "function"
 }
+SHOPTYPE = {
+  CLOTHING_SHOP = 1,
+  DICE_SHOP = 6,
+  GENERAL_STORE = 0,
+  HIRED_HAND_SHOP = 4,
+  PET_SHOP = 5,
+  SPECIALTY_SHOP = 3,
+  TUSK_DICE_SHOP = 13,
+  WEAPON_SHOP = 2
+}
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
   LOOP = 1,
@@ -3368,6 +3379,10 @@ VANHORSING = {
   TEMPLE_HIDEOUT_SPAWNED = 5,
   TUSK_CELLAR = 7
 }
+VANILLA_FONT_STYLE = {
+  BOLD = 1,
+  ITALIC = 0
+}
 VANILLA_SOUND = {
   BGM_BGM_BASECAMP = "BGM/BGM_basecamp",
   BGM_BGM_CREDITS = "BGM/BGM_credits",
@@ -3952,6 +3967,11 @@ VANILLA_SOUND_PARAM = {
   VALUE = 8,
   VELOCITY = 15
 }
+VANILLA_TEXT_ALIGNMENT = {
+  CENTER = 1,
+  LEFT = 0,
+  RIGHT = 2
+}
 Vampire = {
   __index = "function",
   __name = "sol.Vampire.user",
@@ -4262,6 +4282,7 @@ testflag = function(...) end
 toast = function(...) end
 toast_visible = function(...) end
 unlock_door_at = function(...) end
+vanilla_draw_text = function(...) end
 waddler_count_entity = function(...) end
 waddler_entity_type_in_slot = function(...) end
 waddler_get_entity_meta = function(...) end

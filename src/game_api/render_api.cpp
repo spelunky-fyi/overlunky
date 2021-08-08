@@ -1,9 +1,11 @@
 #include "render_api.hpp"
 
 #include <cstddef>
+#include <detours.h>
 #include <string>
 
 #include "memory.hpp"
+#include "script/lua_backend.hpp"
 #include "texture.hpp"
 
 size_t* find_api(Memory memory)
@@ -136,4 +138,50 @@ const char** RenderAPI::load_texture(std::string file_name)
     void* render_api = (void*)renderer();
     auto load_texture = (LoadTextureFunT*)get_load_texture();
     return load_texture(render_api, &file_name, 1);
+}
+
+using VanillaRenderHudFun = void(void*);
+VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
+void render_hud(void* hud_data)
+{
+    g_render_hud_trampoline(hud_data);
+
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.vanilla_render();
+            return true;
+        });
+}
+
+void init_render_hud_hook()
+{
+    static size_t func_render_hud = 0;
+
+    auto& memory = Memory::get();
+    auto exe = memory.exe();
+
+    if (func_render_hud == 0)
+    {
+        std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
+        size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
+        func_render_hud = function_start(memory.at_exe(pattern_pos));
+    }
+
+    if (func_render_hud != 0)
+    {
+        DetourRestoreAfterWith();
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        g_render_hud_trampoline = (VanillaRenderHudFun*)func_render_hud;
+        DetourAttach((void**)&g_render_hud_trampoline, (VanillaRenderHudFun*)render_hud);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking render_hud: {}\n", error);
+        }
+    }
 }

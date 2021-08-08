@@ -653,6 +653,8 @@ end
     lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
     /// Gets the entity type of the item in the provided slot
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
+    /// Draw text on the screen using the built-in text renderer. Use in combination with ON.VANILLA_RENDER
+    lua["vanilla_draw_text"] = vanilla_draw_text;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float
@@ -905,7 +907,9 @@ end
         "SCRIPT_ENABLE",
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
-        ON::SCRIPT_DISABLE);
+        ON::SCRIPT_DISABLE,
+        "VANILLA_RENDER",
+        ON::VANILLA_RENDER);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -979,6 +983,24 @@ end
         2,
         "COSMIC_OCEAN_WIN",
         3);
+
+    /// Used in the `vanilla_draw_text` function
+    lua.create_named_table(
+        "VANILLA_TEXT_ALIGNMENT",
+        "LEFT",
+        0,
+        "CENTER",
+        1,
+        "RIGHT",
+        2);
+
+    /// Used in the `vanilla_draw_text` function
+    lua.create_named_table(
+        "VANILLA_FONT_STYLE",
+        "ITALIC",
+        0,
+        "BOLD",
+        1);
 }
 
 std::vector<std::string> safe_fields{};

@@ -102,3 +102,5 @@ struct RenderInfo
     Texture* texture;
     const char** texture_name;
 };
+
+void init_render_hud_hook();
