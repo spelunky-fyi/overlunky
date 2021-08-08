@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Continuous Integration ${{ matrix.build_type }} ${{ matrix.toolset_name }}
+    name: Continuous Integration ${{ matrix.target_name }} ${{ matrix.toolset_name }} ${{ matrix.build_type }}
     runs-on: windows-latest
     strategy:
       matrix:
@@ -22,8 +22,10 @@ jobs:
             toolset: ClangCL
           - build_dll: false
             additional_opts: -DBUILD_OVERLUNKY=ON -DBUILD_INFO_DUMP=ON -DBUILD_SPEL2_DLL=OFF
+            target_name: overlunky
           - build_dll: true
             additional_opts: -DBUILD_OVERLUNKY=OFF -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=ON
+            target_name: spel2.dll
 
     steps:
       - uses: actions/checkout@v2
