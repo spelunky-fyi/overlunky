@@ -249,11 +249,11 @@ bool LuaBackend::update()
                 }
                 entity_hooks.erase(it);
 
-                const size_t hooks_left_for_entity = std::count_if(entity_hooks.begin(), entity_hooks.end(), [ent_uid](auto& hook)
+                const size_t hooks_left_for_entity = std::count_if(entity_hooks.begin(), entity_hooks.end(), [=](auto& hook)
                                                                    { return hook.first == ent_uid; });
                 if (hooks_left_for_entity == 0)
                 {
-                    auto dtor_it = std::find_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [ent_uid](auto& dtor_hook)
+                    auto dtor_it = std::find_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [=](auto& dtor_hook)
                                                 { return dtor_hook.first == ent_uid; });
                     if (dtor_it != entity_dtor_hooks.end())
                     {
