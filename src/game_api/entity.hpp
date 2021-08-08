@@ -141,7 +141,7 @@ class Vector
 
     bool empty()
     {
-        return !!size;
+        return !!count;
     }
 };
 
