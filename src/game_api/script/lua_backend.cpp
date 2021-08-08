@@ -249,12 +249,13 @@ bool LuaBackend::update()
                 }
                 entity_hooks.erase(it);
 
-                const size_t hooks_left_for_entity = std::count_if(entity_hooks.begin(), entity_hooks.end(), [=](auto& hook)
-                                                                   { return hook.first == ent_uid; });
+                const int32_t entity_uid = ent_uid; // Clang doesn't let us reference a local binding in a lambda capture
+                const size_t hooks_left_for_entity = std::count_if(entity_hooks.begin(), entity_hooks.end(), [entity_uid](auto& hook)
+                                                                   { return hook.first == entity_uid; });
                 if (hooks_left_for_entity == 0)
                 {
-                    auto dtor_it = std::find_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [=](auto& dtor_hook)
-                                                { return dtor_hook.first == ent_uid; });
+                    auto dtor_it = std::find_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity_uid](auto& dtor_hook)
+                                                { return dtor_hook.first == entity_uid; });
                     if (dtor_it != entity_dtor_hooks.end())
                     {
                         if (entity)
