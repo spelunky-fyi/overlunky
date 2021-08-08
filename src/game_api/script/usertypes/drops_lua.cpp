@@ -19,7 +19,7 @@ void register_usertypes(sol::state& lua)
                            //, "", ...see__drops.hpp__for__a__list__of__possible__dropchances...
                            //, "YETI_PITCHERSMITT", 10
     );
-    for (auto x = 0; x < dropchance_entries.size(); ++x)
+    for (size_t x = 0; x < dropchance_entries.size(); ++x)
     {
         lua["DROPCHANCE"][dropchance_entries.at(x).caption] = x;
     }
@@ -29,7 +29,7 @@ void register_usertypes(sol::state& lua)
                            //, "", ...see__drops.hpp__for__a__list__of__possible__drops...
                            //, "YETI_PITCHERSMITT", 85
     );
-    for (auto x = 0; x < drop_entries.size(); ++x)
+    for (size_t x = 0; x < drop_entries.size(); ++x)
     {
         lua["DROP"][drop_entries.at(x).caption] = x;
     }

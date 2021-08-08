@@ -57,20 +57,20 @@ bool SpelunkyScript::get_unsafe() const
 }
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
-char* SpelunkyScript::get_code() const
+std::string& SpelunkyScript::get_code() const
 {
     return m_Impl->code;
 }
 std::size_t SpelunkyScript::get_code_size() const
 {
-    return sizeof(m_Impl->code);
+    return m_Impl->code.size();
 }
 #endif
 
 void SpelunkyScript::update_code(std::string code)
 {
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    strcpy(m_Impl->code, code.c_str());
+    m_Impl->code = code;
 #else
     m_Impl->code_storage = std::move(code);
     m_Impl->code = m_Impl->code_storage.c_str();

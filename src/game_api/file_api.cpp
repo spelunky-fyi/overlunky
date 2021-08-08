@@ -89,14 +89,14 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             };
 
             auto image_data_size = image_width * image_height * 4;
-            auto data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
+            int data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
             auto allocation_size = sizeof(FileInfo) + data_size;
             auto file_buffer = (char*)alloc_fun(allocation_size);
 
             FileInfo* file_info = new (file_buffer) FileInfo{};
             file_info->Data = file_buffer + sizeof(FileInfo);
             file_info->DataSize = data_size;
-            file_info->AllocationSize = allocation_size;
+            file_info->AllocationSize = static_cast<int>(allocation_size);
 
             auto dds_image_data = file_buffer + sizeof(FileInfo);
             memcpy(dds_image_data, "DDS ", 4);

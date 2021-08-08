@@ -112,14 +112,14 @@ EntityDB* get_type(uint32_t id)
     if (!map_ptr)
         return nullptr;
 
-    auto map = reinterpret_cast<EntityMap*>(map_ptr + entities_offset());
+    //auto map = reinterpret_cast<EntityMap*>(map_ptr + entities_offset());
 
     std::vector<EntityItem> result;
     auto entities = reinterpret_cast<EntityDB*>(map_ptr);
     return &entities[id];
 }
 
-int32_t to_id(std::string_view name)
+uint32_t to_id(std::string_view name)
 {
     size_t map_ptr = *(size_t*)entities_ptr();
     size_t off = entities_offset();
@@ -136,34 +136,34 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
         overlay->remove_item(uid);
     overlay = NULL;
     auto topmost = topmost_mount();
-    auto [x, y] = topmost->position();
     if (!s)
     {
+        auto [x_pos, y_pos] = topmost->position();
         // player relative coordinates
-        x += dx;
-        y += dy;
+        x_pos += dx;
+        y_pos += dy;
         if (snap)
         {
-            x = round(x);
-            y = round(y);
+            x_pos = round(x_pos);
+            y_pos = round(y_pos);
         }
-        topmost->x = x;
-        topmost->y = y;
+        topmost->x = x_pos;
+        topmost->y = y_pos;
     }
     else
     {
         // screen coordinates -1..1
         // log::debug!("Teleporting to screen {}, {}", x, y);
         auto state = State::get();
-        auto [x, y] = state.click_position(dx, dy);
-        if (snap && abs(vx) + abs(vy) <= 0.04)
+        auto [x_pos, y_pos] = state.click_position(dx, dy);
+        if (snap && abs(vx) + abs(vy) <= 0.04f)
         {
-            x = round(x);
-            y = round(y);
+            x_pos = round(x_pos);
+            y_pos = round(y_pos);
         }
         // log::debug!("Teleporting to {}, {}", x, y);
-        topmost->x = x;
-        topmost->y = y;
+        topmost->x = x_pos;
+        topmost->y = y_pos;
     }
     // set velocity
     if (topmost->is_movable())
@@ -194,17 +194,17 @@ std::pair<float, float> Entity::position()
 {
     // Return the resolved position
     // overlay exists if player is riding something / etc
-    auto [x, y] = position_self();
+    auto [x_pos, y_pos] = position_self();
     // log::debug!("Item #{}: Position is {}, {}", unique_id(), x, y);
     switch ((size_t)overlay)
     {
     case NULL:
-        return {x, y};
+        return {x_pos, y_pos};
     default:
     {
         float _x, _y;
         std::tie(_x, _y) = overlay->position();
-        return {x + _x, y + _y};
+        return {x_pos + _x, y_pos + _y};
     }
     }
 }
@@ -217,7 +217,7 @@ std::pair<float, float> Entity::position_self() const
 std::pair<float, float> Entity::position_render() const
 {
     // This isn't perfect but at least it fixes the trigger hitboxes for now
-    auto [x, y] = position_self();
+    auto [x_pos, y_pos] = position_self();
     switch ((size_t)overlay)
     {
     case NULL:
@@ -226,7 +226,7 @@ std::pair<float, float> Entity::position_render() const
     {
         float _x, _y;
         std::tie(_x, _y) = overlay->position();
-        return {x + _x, y + _y};
+        return {x_pos + _x, y_pos + _y};
     }
     }
 }
@@ -240,12 +240,12 @@ void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
     int* pitems = (int*)items.begin;
-    for (uint8_t x = 0; x < items.count; ++x)
+    for (uint8_t idx = 0; idx < items.count; ++idx)
     {
-        auto type = get_entity_type(pitems[x]);
-        if (type == jetpackID)
+        auto ent_type = get_entity_type(pitems[idx]);
+        if (ent_type == jetpackID)
         {
-            auto jetpack = get_entity_ptr(pitems[x])->as<Jetpack>();
+            auto jetpack = get_entity_ptr(pitems[idx])->as<Jetpack>();
             jetpack->fuel = fuel;
             break;
         }
@@ -256,12 +256,12 @@ uint8_t Player::kapala_blood_amount()
 {
     static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
     int* pitems = (int*)items.begin;
-    for (uint8_t x = 0; x < items.count; ++x)
+    for (uint8_t idx = 0; idx < items.count; ++idx)
     {
-        auto type = get_entity_type(pitems[x]);
-        if (type == kapalaPowerupID)
+        auto ent_type = get_entity_type(pitems[idx]);
+        if (ent_type == kapalaPowerupID)
         {
-            auto kapala = get_entity_ptr(pitems[x])->as<KapalaPowerup>();
+            auto kapala = get_entity_ptr(pitems[idx])->as<KapalaPowerup>();
             return kapala->amount_of_blood;
         }
     }
@@ -358,20 +358,20 @@ void Entity::destroy()
     delete this; // TODO
 }
 
-std::tuple<float, float, int> get_position(uint32_t uid)
+std::tuple<float, float, uint8_t> get_position(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
-    return {0.0f, 0.0f, 0};
+    return {0.0f, 0.0f, (uint8_t)0};
 }
 
-std::tuple<float, float, int> get_render_position(uint32_t uid)
+std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer);
-    return {0.0f, 0.0f, 0};
+    return {0.0f, 0.0f, (uint8_t)0};
 }
 
 std::tuple<float, float> get_velocity(uint32_t uid)
@@ -412,11 +412,11 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
     return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
-std::uint32_t Entity::get_texture()
+std::uint64_t Entity::get_texture()
 {
     return texture->id;
 }
-bool Entity::set_texture(std::uint32_t texture_id)
+bool Entity::set_texture(std::uint64_t texture_id)
 {
     if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
     {

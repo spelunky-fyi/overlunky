@@ -180,7 +180,7 @@ void register_usertypes(sol::state& lua)
         "deepest_level",
         sol::readonly(&SaveData::deepest_level));
 
-    lua.create_named_table("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4);
+    lua.create_named_table("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4, "BOTH", -128);
     lua.create_named_table(
         "THEME",
         "DWELLING",
@@ -250,7 +250,7 @@ void register_usertypes(sol::state& lua)
         std::string clean_room_name = room_name;
         std::transform(
             clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
-            { return std::toupper(c); });
+            { return (unsigned char)std::toupper(c); });
         std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
         lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template.id;
     };
@@ -267,7 +267,7 @@ void register_usertypes(sol::state& lua)
             std::string clean_chance_name = chance_name;
             std::transform(
                 clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
-                { return std::toupper(c); });
+                { return (unsigned char)std::toupper(c); });
             std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
             lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
         }

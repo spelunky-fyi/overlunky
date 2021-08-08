@@ -10,10 +10,10 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     : LuaBackend(sound_mgr, con)
 {
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    strcpy(code, script.c_str());
+    code = script;
 #else
     code_storage = std::move(script);
-    code = code_storage.c_str();
+    code = code_storage;
 #endif
 
     meta.file = std::move(file);
@@ -163,11 +163,11 @@ bool ScriptImpl::pre_update()
     return true;
 }
 
-void ScriptImpl::set_enabled(bool enabled)
+void ScriptImpl::set_enabled(bool enbl)
 {
-    if (enabled != this->enabled)
+    if (enbl != enabled)
     {
-        auto cb_type = enabled ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
+        auto cb_type = enbl ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
         auto now = get_frame_count();
         for (auto& [id, callback] : callbacks)
         {
@@ -178,7 +178,7 @@ void ScriptImpl::set_enabled(bool enabled)
             }
         }
     }
-    this->enabled = enabled;
+    enabled = enbl;
 }
 bool ScriptImpl::get_enabled() const
 {

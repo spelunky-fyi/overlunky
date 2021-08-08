@@ -17,7 +17,7 @@ void register_usertypes(sol::state& lua)
         return RenderAPI::get().get_texture_definition(texture_id);
     };
     /// Defines a new texture that can be used in Entity::set_texture
-    lua["define_texture"] = [](TextureDefinition texture_data) -> uint32_t
+    lua["define_texture"] = [](TextureDefinition texture_data) -> uint64_t
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
@@ -65,7 +65,7 @@ void register_usertypes(sol::state& lua)
                 std::string clean_tex_name = *tex->name;
                 std::transform(
                     clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
-                    { return std::toupper(c); });
+                    { return (unsigned char)std::toupper(c); });
                 std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
                 size_t index = clean_tex_name.find(".DDS", 0);
                 if (index != std::string::npos)

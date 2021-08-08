@@ -314,11 +314,11 @@ class StretchChain : public Movable
 {
   public:
     int32_t at_end_of_chain_uid;
-    float stretch;                  /* unsure */
-    uint8_t position_in_chain;      // 0 closest to the end, so if the chain has 15 segments the last one will be 14
-    uint8_t state; /* unsure*/      // only punish chain
-    uint8_t unknown_timer;          // only punish chain
-    bool is_chain_overlapping_ball; // only punish chain
+    float dot_offset;
+    uint8_t position_in_chain;                 // 0 closest to the end, so if the chain has 15 segments the last one will be 14
+    uint8_t inverse_doubled_position_in_chain; // only punish chain
+    uint8_t unknown_timer;                     // only punish chain
+    bool is_dot_hidden;                        // only punish chain
 };
 
 class Chest : public Movable
@@ -451,7 +451,7 @@ class Chain : public Movable
 class Container : public Movable
 {
   public:
-    int32_t inside;
+    uint32_t inside;
 };
 
 class Coffin : public Container
