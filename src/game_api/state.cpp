@@ -199,11 +199,9 @@ float State::get_zoom_level()
     auto memory = Memory::get();
     auto offset = memory.at_exe(0x22334A00); //TODO: patterns or something. Also this pointer is kinda slow, it doesn't work before intro cutscene.
     offset = read_u64(offset);
-    DEBUG("zoom {:x}", offset);
     if (offset != 0)
     {
         offset += 0x804ec;
-        DEBUG("zoom {:x}", offset);
         return read_f32(offset);
     }
     else
@@ -227,7 +225,7 @@ void State::set_camera_position(float cx, float cy)
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
 {
-    if (ptr()->screen < 11 || ptr()->screen > 13)
+    if (ptr()->screen < 11 || ptr()->screen > 20)
         return;
     ptr()->world_next = w;
     ptr()->level_next = l;
@@ -254,7 +252,7 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
 
 void State::set_seed(uint32_t seed)
 {
-    if (ptr()->screen < 11 || ptr()->screen > 13)
+    if (ptr()->screen < 11 || ptr()->screen > 20)
         return;
     ptr()->seed = seed;
     ptr()->world_start = 1;
