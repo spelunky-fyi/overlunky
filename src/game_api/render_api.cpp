@@ -185,3 +185,152 @@ void init_render_hud_hook()
         }
     }
 }
+
+static size_t text_rendering_context_offset = 0;
+static size_t text_rendering_func1_offset = 0;
+static size_t text_rendering_func2_offset = 0;
+bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    auto& memory = Memory::get();
+    auto exe = memory.exe();
+
+    if (text_rendering_context_offset == 0)
+    {
+        std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
+        size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
+        text_rendering_context_offset = memory.at_exe(decode_pc(exe, pattern_pos));
+
+        pattern_pos += 7;
+        text_rendering_func1_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
+
+        pattern_pos += 13;
+        text_rendering_func2_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
+    }
+
+    if (text_rendering_context_offset != 0)
+    {
+        auto convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), nullptr, 0);
+        if (convert_result <= 0)
+        {
+            return false;
+        }
+        std::wstring wide_text;
+        wide_text.resize(convert_result + 10);
+        convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), &wide_text[0], static_cast<int>(wide_text.size()));
+
+        typedef void func1(size_t context, uint32_t fontstyle, void* text_to_draw, uint32_t, float x, float y, TextRenderingInfo*, uint32_t, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
+        static func1* f1 = (func1*)(text_rendering_func1_offset);
+        f1(text_rendering_context_offset, fontstyle, wide_text.data(), 2, x, y, info, 1, scale_x, scale_y, alignment, 2, 0);
+
+        return true;
+    }
+    return false;
+}
+
+void RenderAPI::render_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
+{
+    TextRenderingInfo tri = {0};
+    if (!prepare_text_for_rendering(&tri, text, x, y, scale_x, scale_y, alignment, fontstyle))
+    {
+        return;
+    }
+
+    typedef void func2(TextRenderingInfo*, Color * color);
+    static func2* f2 = (func2*)(text_rendering_func2_offset);
+    f2(&tri, &color);
+}
+
+std::pair<float, float> RenderAPI::measure_text(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
+{
+    TextRenderingInfo tri = {0};
+    if (!prepare_text_for_rendering(&tri, text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle))
+    {
+        return std::make_pair(0.0f, 0.0f);
+    }
+    return std::make_pair(tri.width, tri.height);
+}
+
+void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)
+{
+    static size_t offset = 0;
+
+    auto& memory = Memory::get();
+    auto exe = memory.exe();
+
+    if (offset == 0)
+    {
+        std::string pattern = "\xB2\x29\xE8\xAE\x87\x04\x00"s;
+        offset = memory.at_exe(decode_pc(exe, find_inst(exe, pattern, memory.after_bundle)));
+    }
+
+    if (offset != 0)
+    {
+        struct texture_rendering_info
+        {
+            // where to draw on the screen:
+            float x;
+            float y;
+            // destination is relative to the x,y centerpoint
+            float destination_bottom_left_x;
+            float destination_bottom_left_y;
+            float destination_bottom_right_x;
+            float destination_bottom_right_y;
+            float destination_top_left_x;
+            float destination_top_left_y;
+            float destination_top_right_x;
+            float destination_top_right_y;
+            // source rectangle in the texture to render
+            float source_bottom_left_x;
+            float source_bottom_left_y;
+            float source_bottom_right_x;
+            float source_bottom_right_y;
+            float source_top_left_x;
+            float source_top_left_y;
+            float source_top_right_x;
+            float source_top_right_y;
+        };
+
+        auto texture = RenderAPI::get().get_texture(texture_id);
+        if (texture == nullptr)
+        {
+            return;
+        }
+
+        float aspect_ratio = 16.0f / 9.0f;
+        texture_rendering_info tri = {
+            render_at_x,
+            render_at_y,
+
+            // DESTINATION
+            // bottom left:
+            render_at_x - (render_width / 2.0f),
+            render_at_y - ((render_height * aspect_ratio) / 2.0f),
+            // bottom_right:
+            render_at_x + (render_width / 2.0f),
+            render_at_y - ((render_height * aspect_ratio) / 2.0f),
+            // top left:
+            render_at_x - (render_width / 2.0f),
+            render_at_y + ((render_height * aspect_ratio) / 2.0f),
+            // top right:
+            render_at_x + (render_width / 2.0f),
+            render_at_y + ((render_height * aspect_ratio) / 2.0f),
+
+            // SOURCE
+            // bottom left:
+            texture->tile_width_fraction * column,
+            texture->tile_height_fraction * (row + 1.0f),
+            // bottom_right:
+            texture->tile_width_fraction * (column + 1.0f),
+            texture->tile_height_fraction * (row + 1.0f),
+            // top left:
+            texture->tile_width_fraction * column,
+            texture->tile_height_fraction * row,
+            // top right:
+            texture->tile_width_fraction * (column + 1.0f),
+            texture->tile_height_fraction * row};
+
+        typedef void render_func(texture_rendering_info*, uint8_t, const char**, Color*);
+        static render_func* rf = (render_func*)(offset);
+        rf(&tri, 0x29, texture->name, &color);
+    }
+}

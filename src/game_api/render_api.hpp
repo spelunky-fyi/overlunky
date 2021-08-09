@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity.hpp"
 #include "memory.hpp"
 #include "texture.hpp"
 
@@ -38,6 +39,10 @@ struct RenderAPI
     Texture* get_texture(std::uint64_t texture_id);
     std::uint64_t define_texture(TextureDefinition data);
     const char** load_texture(std::string file_name);
+
+    void render_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
+    std::pair<float, float> measure_text(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
+    void draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color);
 };
 
 // straight out of the x64dbg plugin
@@ -101,6 +106,24 @@ struct RenderInfo
     uint32_t unknown38;
     Texture* texture;
     const char** texture_name;
+};
+
+struct TextRenderingInfo
+{
+    float x;
+    float y;
+    uint32_t text_length;
+    float width;
+    float height;
+    uint32_t unknown3;
+    size_t unknown4;
+    size_t unknown5;
+    size_t unknown6;
+    uint16_t unknown7;
+    uint16_t unknown8;
+    int32_t unknown9;
+    size_t unknown10;
+    size_t unknown11;
 };
 
 void init_render_hud_hook();

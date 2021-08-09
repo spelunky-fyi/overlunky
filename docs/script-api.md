@@ -507,6 +507,9 @@ Gets the entity type of the item in the provided slot
 ### [`vanilla_draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_draw_text)
 `nil vanilla_draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`<br/>
 Draw text on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
+### [`vanilla_measure_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_measure_text)
+`tuple<float, float> vanilla_measure_text(const string& text, float scale_x, float scale_y, int fontstyle)`<br/>
+Measure the provided text using the built-in renderer. Returns the result as if the string was rendered with vanilla_draw_text.
 ### [`vanilla_draw_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_draw_texture)
 `nil vanilla_draw_texture(int texture_id, int row, int column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)`<br/>
 Draw a texture on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER

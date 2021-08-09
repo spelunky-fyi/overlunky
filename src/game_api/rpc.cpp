@@ -1226,149 +1226,17 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
 
 void vanilla_draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
-    static size_t context_offset = 0;
-    static size_t func1_offset = 0;
-    static size_t func2_offset = 0;
+    RenderAPI::get().render_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle);
+}
 
-    auto& memory = Memory::get();
-    auto exe = memory.exe();
-
-    if (context_offset == 0)
-    {
-        std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
-        size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
-        context_offset = memory.at_exe(decode_pc(exe, pattern_pos));
-
-        pattern_pos += 7;
-        func1_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
-
-        pattern_pos += 13;
-        func2_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
-    }
-
-    if (context_offset != 0)
-    {
-        auto convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), nullptr, 0);
-        if (convert_result <= 0)
-        {
-            return;
-        }
-        std::wstring wide_text;
-        wide_text.resize(convert_result + 10);
-        convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), &wide_text[0], static_cast<int>(wide_text.size()));
-
-        struct text_rendering_info
-        {
-            float x;
-            float y;
-            uint32_t text_length;
-            float unknown1;
-            float unknown2;
-            uint32_t unknown3;
-            size_t unknown4;
-            size_t unknown5;
-            size_t unknown6;
-            uint16_t unknown7;
-            uint16_t unknown8;
-            int32_t unknown9;
-            size_t unknown10;
-            size_t unknown11;
-        };
-
-        text_rendering_info tri = {0};
-        typedef void func1(size_t context, uint32_t fontstyle, void* text_to_draw, uint32_t, float x, float y, text_rendering_info*, uint32_t, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
-        static func1* f1 = (func1*)(func1_offset);
-        typedef void func2(text_rendering_info*, Color * color);
-        static func2* f2 = (func2*)(func2_offset);
-
-        f1(context_offset, fontstyle, wide_text.data(), 2, x, y, &tri, 1, scale_x, scale_y, alignment, 2, 0);
-        f2(&tri, &color);
-    }
+std::pair<float, float> vanilla_measure_text(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
+{
+    return RenderAPI::get().measure_text(text, scale_x, scale_y, fontstyle);
 }
 
 void vanilla_draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)
 {
-    static size_t offset = 0;
-
-    auto& memory = Memory::get();
-    auto exe = memory.exe();
-
-    if (offset == 0)
-    {
-        std::string pattern = "\xB2\x29\xE8\xAE\x87\x04\x00"s;
-        offset = memory.at_exe(decode_pc(exe, find_inst(exe, pattern, memory.after_bundle)));
-    }
-
-    if (offset != 0)
-    {
-        struct texture_rendering_info
-        {
-            // where to draw on the screen:
-            float x;
-            float y;
-            // destination is relative to the x,y centerpoint
-            float destination_bottom_left_x;
-            float destination_bottom_left_y;
-            float destination_bottom_right_x;
-            float destination_bottom_right_y;
-            float destination_top_left_x;
-            float destination_top_left_y;
-            float destination_top_right_x;
-            float destination_top_right_y;
-            // source rectangle in the texture to render
-            float source_bottom_left_x;
-            float source_bottom_left_y;
-            float source_bottom_right_x;
-            float source_bottom_right_y;
-            float source_top_left_x;
-            float source_top_left_y;
-            float source_top_right_x;
-            float source_top_right_y;
-        };
-
-        auto texture = RenderAPI::get().get_texture(texture_id);
-        if (texture == nullptr)
-        {
-            return;
-        }
-
-        float aspect_ratio = 16.0f / 9.0f;
-        texture_rendering_info tri = {
-            render_at_x,
-            render_at_y,
-
-            // DESTINATION
-            // bottom left:
-            render_at_x - (render_width / 2.0f),
-            render_at_y - ((render_height * aspect_ratio) / 2.0f),
-            // bottom_right:
-            render_at_x + (render_width / 2.0f),
-            render_at_y - ((render_height * aspect_ratio) / 2.0f),
-            // top left:
-            render_at_x - (render_width / 2.0f),
-            render_at_y + ((render_height * aspect_ratio) / 2.0f),
-            // top right:
-            render_at_x + (render_width / 2.0f),
-            render_at_y + ((render_height * aspect_ratio) / 2.0f),
-
-            // SOURCE
-            // bottom left:
-            texture->tile_width_fraction * column,
-            texture->tile_height_fraction * (row + 1.0f),
-            // bottom_right:
-            texture->tile_width_fraction * (column + 1.0f),
-            texture->tile_height_fraction * (row + 1.0f),
-            // top left:
-            texture->tile_width_fraction * column,
-            texture->tile_height_fraction * row,
-            // top right:
-            texture->tile_width_fraction * (column + 1.0f),
-            texture->tile_height_fraction * row};
-
-        typedef void render_func(texture_rendering_info*, uint8_t, const char**, Color*);
-        static render_func* rf = (render_func*)(offset);
-        rf(&tri, 0x29, texture->name, &color);
-    }
+    RenderAPI::get().draw_texture(texture_id, row, column, render_at_x, render_at_y, render_width, render_height, color);
 }
 
 uint8_t enum_to_layer(LAYER layer)

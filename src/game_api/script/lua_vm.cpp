@@ -663,6 +663,8 @@ end
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
     /// Draw text on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
     lua["vanilla_draw_text"] = vanilla_draw_text;
+    /// Measure the provided text using the built-in renderer. Returns the result as if the string was rendered with vanilla_draw_text.
+    lua["vanilla_measure_text"] = vanilla_measure_text;
     /// Draw a texture on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
     lua["vanilla_draw_texture"] = vanilla_draw_texture;
 

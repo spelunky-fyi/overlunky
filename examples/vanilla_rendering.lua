@@ -27,7 +27,18 @@ blue.g  = 0.0
 blue.b  = 1.0
 blue.a  = 1.0
 
+black = Color:new()
+black.r  = 0.0
+black.g  = 0.0
+black.b  = 0.0
+black.a  = 1.0
+
 font_scale = 0.0006
+
+background_rect_top_left_x = 0.0
+background_rect_top_left_y = 0.0
+background_rect_bottom_right_x = 0.0
+background_rect_bottom_right_y = 0.0
 
 set_callback(function()
     local y = 0.9
@@ -58,7 +69,25 @@ set_callback(function()
     vanilla_draw_text("Green", 0.0, y, scale, scale, green, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
     y = y - 0.11
     vanilla_draw_text("Blue", 0.0, y, scale, scale, blue, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
-    y = y - 0.14
+    y = y - 0.11
 
     vanilla_draw_text("Bold text", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.BOLD)
+    y = y - 0.11
+
+    local text = "Bordered, shadowed text"
+    scale = scale * 0.75
+    vanilla_draw_text(text, 0.0025, y - 0.0025, scale, scale, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    vanilla_draw_text(text, 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    width, height = vanilla_measure_text(text, scale, scale, VANILLA_FONT_STYLE.ITALIC)
+
+    -- because this text is rendered centered, we have to calc the top left relative to the centerpoint we provided to vanilla_draw_text
+    background_rect_top_left_x = 0.0 - (width / 2.0)
+    background_rect_top_left_y = y - (height / 2.0)
+    background_rect_bottom_right_x = background_rect_top_left_x + width
+    background_rect_bottom_right_y = background_rect_top_left_y + height
+    -- these background rect coords are then used below in the GUIFRAME callback to draw the border on the screen
 end, ON.VANILLA_RENDER)
+
+set_callback(function(draw_ctx)
+    draw_ctx:draw_rect(background_rect_top_left_x, background_rect_top_left_y, background_rect_bottom_right_x, background_rect_bottom_right_y, 2, 2, rgba(255, 0, 255, 200))
+end, ON.GUIFRAME)
