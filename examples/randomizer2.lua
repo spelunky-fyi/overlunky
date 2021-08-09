@@ -1,22 +1,28 @@
 meta.name = "Rando Two"
-meta.description = "Second incarnation of The Randomizer with new api shenannigans. Everything is now rewritten from scratch and I tuned the crazyness down a notch. Still needs some balancing and less CoGs. There's a kinda new progression system forming with a high probability to be able to do chain (not finished), with multiple endings. It's still hard AF, good luck getting true ending!"
-meta.version = "1.99999"
+meta.description = "Second incarnation of The Randomizer with new api shenannigans. Everything is now rewritten from scratch and I tuned the crazyness down a notch. Still needs some balancing probably... There's a kinda new progression system forming with a high probability to be able to do chain (not finished), with multiple endings. It's still hard AF, good luck getting true ending!"
+meta.version = "1.999999"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
+    if max == 0 then return 0 end
+    if min >= max then return min end
     min = math.floor(1/(min/100))
     max = math.floor(1/(max/100))
     return math.random(max, min)
+    --return prng:random_int(min, max, PRNG_CLASS.LEVEL_GEN)
 end
 
 local function pick(from, ignore)
+    local item = -1
     for i=1,10 do
-        math.randomseed(read_prng()[1]+i)
-        local item = from[math.random(#from)]
+        --math.randomseed(read_prng()[8]+i)
+        item = from[math.random(#from)]
+        --item = from[prng:random_index(#from, PRNG_CLASS.LEVEL_GEN)]
         if item ~= ignore then
             return item
         end
     end
+    return item
 end
 
 local function get_money()
@@ -51,7 +57,7 @@ end
 local level_stuff = {}
 
 --[[TRAPS]]
-register_option_float("trap_max", "Max trap chance", 5, 0, 100)
+register_option_float("trap_max", "Max trap chance", 4.5, 0, 100)
 register_option_float("trap_min", "Min trap chance", 1.5, 0, 100)
 
 local traps_ceiling = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
@@ -61,7 +67,7 @@ local traps_flip = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRA
 local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
-local trap_arrows = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
+local trap_arrows = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
 local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE}
 
 local function trap_ceiling_spawn(x, y, l)
@@ -119,7 +125,7 @@ local function trap_wall_spawn(x, y, l)
     local right = get_grid_entity_at(x+1, y, l)
     if has(traps_flip, id) then
         if left == -1 and right == -1 then
-            math.randomseed(read_prng()[1])
+            math.randomseed(read_prng()[5])
             if math.random() < 0.5 then
                 flip_entity(ent)
             end
@@ -158,7 +164,9 @@ end
 local trap_generic_chance = define_procedural_spawn("trap_generic", trap_generic_spawn, trap_generic_valid)
 
 local function trap_item_spawn(x, y, l)
-    spawn_entity_snapped_to_floor(pick(traps_item), x, y, l)
+    local id = pick(traps_item)
+    if id == ENT_TYPE.ITEM_SNAP_TRAP and state.theme == THEME.DUAT then return end
+    spawn_entity_snapped_to_floor(id, x, y, l)
 end
 local function trap_item_valid(x, y, l)
     local floor = get_grid_entity_at(x, y-1, l)
@@ -260,9 +268,15 @@ set_callback(function()
     level_stuff = {}
 end, ON.LEVEL)
 
+set_post_entity_spawn(function(ent)
+    if state.theme == THEME.DUAT then
+        kill_entity(ent.uid)
+    end
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_SNAP_TRAP)
+
 --[[ENEMIES]]
 register_option_float("enemy_max", "Max enemy chance", 12, 0, 100)
-register_option_float("enemy_min", "Min enemy chance", 4, 0, 100)
+register_option_float("enemy_min", "Min enemy chance", 5, 0, 100)
 register_option_float("enemy_curse_chance", "Enemy handicap chance", 5, 0, 100)
 
 local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
@@ -503,7 +517,7 @@ local function tiamat_scream()
     if tiamat.move_state == 0 then
         tiamat.move_state = 2
     end
-    math.randomseed(read_prng()[3])
+    math.randomseed(read_prng()[5])
     set_timeout(tiamat_scream, math.random(180, 480))
 end
 
@@ -511,10 +525,10 @@ local function tiamat_attack()
     local tiamat = get_tiamat()
     if not tiamat then return end
     if tiamat.move_state == 6 then
-        math.randomseed(read_prng()[7])
-        local ammo = pick(tiamat_ammo)
+        math.randomseed(read_prng()[6])
         local vx = math.random()*0.8-0.4
         local vy = math.random()*0.8-0.4
+        local ammo = pick(tiamat_ammo)
         local dx = 0
         local dy = 0
         if math.abs(vx) > math.abs(vy) then
@@ -693,17 +707,18 @@ local shop_mounts = {ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.MOUNT_MECH, ENT_TYPE.MOUNT
 local shop_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.CAVEMANSHOP_LEFT}
 
 set_callback(function()
-    local items = get_entities_by_mask(MASK.ITEM)
-    local shop_items = {}
+    local in_shop = {}
+    local items = get_entities_by_mask(MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER)
     for i,v in ipairs(items) do
         local e = get_entity(v)
         if test_flag(e.flags, ENT_FLAG.SHOP_ITEM) then
-            shop_items[#shop_items+1] = e
+            in_shop[#in_shop+1] = e
         end
     end
-    for i,v in ipairs(shop_items) do
+    for i,v in ipairs(in_shop) do
         math.randomseed(read_prng()[8]+i)
         v.price = math.random(1000, math.min(20000, 2*get_money())+math.random(1000, 2000))
+        --v.price = prng:random_int(1000, math.min(20000, 2*get_money())+math.random(1000, 2000), PRNG_CLASS.LEVEL_GEN)
     end
 end, ON.POST_LEVEL_GENERATION)
 
@@ -863,29 +878,11 @@ set_callback(function()
     end
 end, ON.START)
 
-set_callback(function()
-    local ps = {}
-    for i,p in ipairs(players) do
-        ps[#ps+1] = p.uid
-    end
-    local chars = get_entities_by_mask(MASK.PLAYER)
-    for i,v in ipairs(chars) do
-        if not has(ps, v) then
-            attach_ball_and_chain(v, 0.5, -0.5)
-        end
-    end
-    local terras = get_entities_by_type(ENT_TYPE.MONS_MARLA_TUNNEL)
-    for i,v in ipairs(terras) do
-        if not has(ps, v) then
-            attach_ball_and_chain(v, -1.5, -0.5)
-        end
-    end
-end, ON.CAMP)
-
 --[[DOORS]]
-register_option_int("door_min_levels", "Min levels between midbosses", 4, 1, 100)
-register_option_int("door_max_levels", "Max levels between midbosses", 7, 1, 100)
+register_option_int("door_min_levels", "Min levels between midbosses", 3, 1, 100)
+register_option_int("door_max_levels", "Max levels between midbosses", 6, 1, 100)
 register_option_int("door_bosses", "Amount of midbosses", 4, 0, 4)
+register_option_bool("door_transitions", "Neat transitions (unstable)", false)
 
 local level_order = {}
 
@@ -977,7 +974,6 @@ end
 
 local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_ANKH}
 local chain_items = {}
-local block_hook = false
 
 local function get_chain_item(x, y)
     if #chain_items > 0 then
@@ -993,9 +989,20 @@ set_post_entity_spawn(function(ent)
     local room = get_room_template(rx, ry, l)
     if room == ROOM_TEMPLATE.OLDHUNTER_REWARDROOM then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0.3, (math.random()-0.5)*0.3)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_DIAMOND)
+
+set_post_entity_spawn(function(ent)
+    if state.theme ~= THEME.DWELLING then return end
+    local x, y, l = get_position(ent.uid)
+    local rx, ry = get_room_index(x, y)
+    local room = get_room_template(rx, ry, l)
+    if room == ROOM_TEMPLATE.UDJATTOP then
+        kill_entity(ent.uid)
+        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0.3, (math.random()-0.5)*0.3)
+    end
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)
 
 set_callback(function()
     if state.theme == THEME.VOLCANA then
@@ -1026,12 +1033,10 @@ end, ON.LEVEL)
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU and state.theme ~= THEME.DUAT then return end
-    if #chain_items > 0 and not block_hook then
+    if #chain_items > 0 then
         local x, y, l = get_position(ent.uid)
         kill_entity(ent.uid)
-        block_hook = true
         spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
-        block_hook = false
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY)
 
@@ -1086,11 +1091,16 @@ local function init_run()
         end
     end
     fix_chain()
-    --[[level_order = {
-        { w = 2, l = 4, t = THEME.JUNGLE, b = false },
-        { w = 8, l = 42, t = THEME.COSMIC_OCEAN, b = false },
-        { w = 6, l = 4, t = THEME.TIAMAT, b = true }
-    }]]
+    level_order = {
+        { w = 7, l = 1, t = THEME.SUNKEN_CITY, b = false },
+        { w = 4, l = 2, t = THEME.TEMPLE, b = false },
+        { w = 1, l = 1, t = THEME.DWELLING, b = false },
+        { w = 2, l = 1, t = THEME.JUNGLE, b = false },
+        { w = 6, l = 4, t = THEME.TIAMAT, b = true },
+        { w = 1, l = 1, t = THEME.DWELLING, b = false },
+        { w = 2, l = 1, t = THEME.JUNGLE, b = false },
+        { w = 7, l = 4, t = THEME.HUNDUN, b = true },
+    }
 end
 
 local function dead_olmec()
@@ -1206,9 +1216,11 @@ set_callback(function()
     end
 end, ON.TRANSITION)
 
+local boss_warp = false
+
 set_callback(function()
     --message("Loading")
-    if state.screen_next ~= ON.LEVEL then return end
+    if state.screen_next ~= ON.LEVEL and (state.screen_next ~= ON.TRANSITION or not options.door_transitions) then return end
     if (#level_order == 0 or test_flag(state.quest_flags, 1)) then
         --message("Running init")
         init_run()
@@ -1217,9 +1229,15 @@ set_callback(function()
     if test_flag(state.quest_flags, 1) then
         num = 1
     end
-    --[[if num > 1 and #level_order >= num and level_order[num].t == THEME.COSMIC_OCEAN and level_order[num-1].t == THEME.JUNGLE then
+    if boss_warp then
+        while level_order[num].b ~= true and #level_order >= num do
+            num = num + 1
+        end
+        state.level_count = num-1
+    end
+    if num > 1 and #level_order >= num and level_order[num].t == THEME.COSMIC_OCEAN and level_order[num-1].t == THEME.JUNGLE then
         return
-    end]]
+    end
     if #level_order > state.level_count then
         state.world_next = level_order[num].w
         state.level_next = level_order[num].l
@@ -1232,6 +1250,47 @@ set_callback(function()
         state.theme_next = THEME.COSMIC_OCEAN
     end
 end, ON.LOADING)
+
+set_callback(function(ctx)
+    if boss_warp and state.screen == ON.TRANSITION then
+        local color = math.random(0, 0xffffffff)
+        local _, size = get_window_size()
+        size = size / 5
+        local text = 'WARP ZONE'
+        local w, h = draw_text_size(size, text)
+        ctx:draw_text(0-w/2, -0.57-h/2, size, text, color)
+    end
+end, ON.GUIFRAME)
+
+set_callback(function()
+    if state.theme == THEME.TEMPLE then
+        local x, y, l = get_position(players[1].uid)
+        local uids = get_entities_at(ENT_TYPE.BG_DOOR_COG, 0, x, y, l, 2)
+        if #uids > 0 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
+    elseif state.theme == THEME.HUNDUN then
+        local x, y, l = get_position(players[1].uid)
+        local uids = get_entities_at(ENT_TYPE.LOGICAL_PORTAL, 0, x, y, l, 5)
+        if #uids > 0 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
+    elseif state.theme == THEME.SUNKEN_CITY and state.level == 1 then
+        local x, y, l = get_position(players[1].uid)
+        local uids = get_entities_at(ENT_TYPE.BG_DOOR_EGGPLANT_WORLD, 0, x, y, l, 2)
+        if #uids > 0 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
+    else
+        boss_warp = false
+    end
+end, ON.FRAME)
 
 set_callback(function()
     --message("Reset - Init, state.reset == "..tostring(state.reset))
@@ -1270,10 +1329,3 @@ set_callback(function()
         end, 1)
     end
 end, ON.WIN)
-
---[[
-TODO:
-mount & hh prices in shops
-duat snaptraps
-chain
-]]
