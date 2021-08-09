@@ -140,11 +140,11 @@ const char** RenderAPI::load_texture(std::string file_name)
     return load_texture(render_api, &file_name, 1);
 }
 
-using VanillaRenderHudFun = void(void*);
+using VanillaRenderHudFun = void(void*, float, float);
 VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
-void render_hud(void* hud_data)
+void render_hud(void* hud_data, float y, float opacity)
 {
-    g_render_hud_trampoline(hud_data);
+    g_render_hud_trampoline(hud_data, y, opacity);
 
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
