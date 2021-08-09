@@ -49,7 +49,7 @@ class Floor : public Entity
     bool has_corners() const;
     bool is_styled() const;
     int32_t get_decoration_entity_type() const;
-    uint8_t get_decoration_animation_frame(FLOOR_SIDE side) const;
+    uint16_t get_decoration_animation_frame(FLOOR_SIDE side) const;
 
     static FLOOR_SIDE get_opposite_side(FLOOR_SIDE side);
     static bool get_perpendicular_sides(FLOOR_SIDE side, FLOOR_SIDE (&perp_sides)[2]);

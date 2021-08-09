@@ -58,7 +58,7 @@ struct EntityDB
     EntityDestroy destroy_func;
     int32_t field_10;
     /* Entity id (ENT_...) */
-    int32_t id;
+    uint32_t id;
     uint32_t search_flags;
     float width;
     float height;
@@ -110,9 +110,9 @@ struct EntityDB
 struct EntityItem
 {
     std::string name;
-    uint16_t id;
+    uint32_t id;
 
-    EntityItem(const std::string& name_, uint64_t id_)
+    EntityItem(const std::string& name_, uint32_t id_)
         : name(name_), id(id_)
     {
     }
@@ -124,7 +124,7 @@ struct EntityItem
 
 EntityDB* get_type(uint32_t id);
 
-int32_t to_id(std::string_view id);
+uint32_t to_id(std::string_view id);
 
 template <typename T>
 std::string to_le_bytes(T fmt)
@@ -141,7 +141,7 @@ class Vector
 
     bool empty()
     {
-        return !!size;
+        return !!count;
     }
 };
 
@@ -247,8 +247,8 @@ class Entity
     void remove_item(uint32_t id);
     void destroy();
 
-    std::uint32_t get_texture();
-    bool set_texture(std::uint32_t texture_id);
+    std::uint64_t get_texture();
+    bool set_texture(std::uint64_t texture_id);
 
     void unhook(std::uint32_t id);
     struct EntityHooksInfo& get_hooks();
@@ -396,8 +396,8 @@ struct Target
 
 std::vector<EntityItem> list_entities();
 
-std::tuple<float, float, int> get_position(uint32_t uid);
-std::tuple<float, float, int> get_render_position(uint32_t uid);
+std::tuple<float, float, uint8_t> get_position(uint32_t uid);
+std::tuple<float, float, uint8_t> get_render_position(uint32_t uid);
 
 std::tuple<float, float> get_velocity(uint32_t uid);
 

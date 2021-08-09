@@ -2,9 +2,21 @@
 
 #include <memory>
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wall"
+#pragma clang diagnostic ignored "-Wextra"
+#else
 #pragma warning(push, 0)
+#endif
+
 #include <libnyquist/Decoders.h>
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#else
 #pragma warning(pop)
+#endif
 
 DecodedAudioBuffer LoadAudioFile(const char* file_path)
 {

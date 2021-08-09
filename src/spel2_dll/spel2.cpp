@@ -124,12 +124,13 @@ std::string read_whole_file(const char* file_path)
         const std::size_t file_size = ftell(file);
         fseek(file, 0, SEEK_SET);
 
-        std::string code(file_size + 1, '\0');
+        std::string code(file_size, '\0');
 
         const auto size_read = fread(code.data(), 1, file_size, file);
         if (size_read != file_size)
         {
-            return nullptr;
+            code.clear();
+            return code;
         }
 
         return code;
@@ -268,7 +269,7 @@ bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* o
         "%s",
         result.c_str());
     out_buffer[num_written] = '\0';
-    return num_written < out_buffer_size;
+    return static_cast<size_t>(num_written) < out_buffer_size;
 }
 std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console)
 {

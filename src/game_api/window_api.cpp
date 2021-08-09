@@ -222,7 +222,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
         }
         else if (g_LastRegisteredRawInputWindow != nullptr)
         {
-            static std::uint32_t s_RecoverRawInputFrame{0};
+            static std::int32_t s_RecoverRawInputFrame{0};
             if (s_RecoverRawInputFrame == 0)
             {
                 s_RecoverRawInputFrame = ImGui::GetFrameCount() + 10;
@@ -256,21 +256,22 @@ hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT H
 template <class FunT>
 void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index)
 {
-    FunT& vtable_ptr = vtable_find<FunT>(g_SwapChain, vtable_index);
-
-    DWORD oldProtect;
-    if (!VirtualProtect(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(&vtable_ptr) & ~0xFFF), 0x1000, PAGE_READWRITE, &oldProtect))
+    if (FunT* vtable_ptr = vtable_find<FunT>(g_SwapChain, vtable_index))
     {
-        PANIC("VirtualProtect error: {:#x}\n", GetLastError());
-    }
+        DWORD oldProtect;
+        if (!VirtualProtect(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(vtable_ptr) & ~0xFFF), 0x1000, PAGE_READWRITE, &oldProtect))
+        {
+            PANIC("VirtualProtect error: {:#x}\n", GetLastError());
+        }
 
-    if (!vtable_ptr)
-    {
-        PANIC("DirectX 11 is not initialized yet.");
-    }
+        if (*vtable_ptr == nullptr)
+        {
+            PANIC("DirectX 11 is not initialized yet.");
+        }
 
-    orig_fun = vtable_ptr;
-    vtable_ptr = hook_fun;
+        orig_fun = *vtable_ptr;
+        *vtable_ptr = hook_fun;
+    }
 };
 
 bool init_hooks(void* swap_chain_ptr)

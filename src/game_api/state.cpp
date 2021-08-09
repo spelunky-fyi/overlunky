@@ -12,7 +12,6 @@ size_t get_dark()
         auto memory = Memory::get();
         auto addr_dark = memory.after_bundle;
         addr_dark = find_inst(memory.exe(), "\x44\xC5\x80\xA0\x12\x0A\x00\x00\xFD"s, memory.after_bundle);
-        DEBUG("addr_dark: {}", addr_dark);
         return res = memory.at_exe(addr_dark) + 9;
     }
 }
@@ -26,7 +25,6 @@ size_t get_zoom()
         for (int _ = 0; _ < 3; _++)
         {
             addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-            DEBUG("addr_zoom: {}", addr_zoom);
         }
         return res = memory.at_exe(addr_zoom) + 10;
     }
@@ -41,7 +39,6 @@ size_t get_zoom_shop()
         for (int _ = 0; _ < 2; _++)
         {
             addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-            DEBUG("addr_zoom: {}", addr_zoom);
         }
         return res = memory.at_exe(addr_zoom) + 10;
     }
@@ -181,33 +178,40 @@ StateMemory* State::ptr_local() const
 
 std::pair<float, float> State::click_position(float x, float y)
 {
-    uint8_t screen = ptr()->screen;
-    float cz = read_f32(get_zoom());
-    if (screen < 12 || screen == 13 || screen > 14)
-        cz = 13.5;
+    float cz = get_zoom_level();
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = cx + ZF * cz * x;
-    float ry = cy + (ZF / 16.0 * 9.0) * cz * y;
+    float ry = cy + (ZF / 16.0f * 9.0f) * cz * y;
     return {rx, ry};
 }
 
 std::pair<float, float> State::screen_position(float x, float y)
 {
-    uint8_t screen = ptr()->screen;
-    float cz = read_f32(get_zoom());
-    if (screen < 12 || screen == 13 || screen > 14)
-        cz = 13.5;
+    float cz = get_zoom_level();
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = (x - cx) / cz / ZF;
-    float ry = (y - cy) / cz / (ZF / 16.0 * 9.0);
+    float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
 }
 
 float State::get_zoom_level()
 {
-    return read_f32(get_zoom());
+    auto memory = Memory::get();
+    auto offset = memory.at_exe(0x22334A00); //TODO: patterns or something. Also this pointer is kinda slow, it doesn't work before intro cutscene.
+    offset = read_u64(offset);
+    DEBUG("zoom {:x}", offset);
+    if (offset != 0)
+    {
+        offset += 0x804ec;
+        DEBUG("zoom {:x}", offset);
+        return read_f32(offset);
+    }
+    else
+    {
+        return 13.5;
+    }
 }
 
 std::pair<float, float> State::get_camera_position()

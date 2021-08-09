@@ -1,5 +1,6 @@
 #pragma once
 
+#include "state.hpp"
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -28,10 +29,18 @@ struct LevelChanceDef
     std::vector<uint32_t> chances;
 };
 
-struct ChanceLogicProvider
+struct SpawnLogicProvider
 {
-    std::function<bool(float, float, int)> is_valid;
-    std::function<void(float, float, int)> do_spawn;
+    std::function<bool(float, float, uint8_t)> is_valid;
+    std::function<void(float, float, uint8_t)> do_spawn;
+};
+
+enum class RoomTemplateType
+{
+    None = 0,
+    Entrance = 1,
+    Exit = 2,
+    Shop = 3,
 };
 
 struct LevelGenData
@@ -44,8 +53,17 @@ struct LevelGenData
     std::optional<std::uint32_t> get_chance(const std::string& chance);
     std::uint32_t define_chance(std::string chance);
 
-    std::uint32_t register_chance_logic_provider(std::uint32_t chance_id, ChanceLogicProvider provider);
+    std::uint32_t register_chance_logic_provider(std::uint32_t chance_id, SpawnLogicProvider provider);
     void unregister_chance_logic_provider(std::uint32_t provider_id);
+
+    std::uint32_t define_extra_spawn(std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer, SpawnLogicProvider provider);
+    void set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer);
+    std::pair<std::uint32_t, std::uint32_t> get_missing_extra_spawns(std::uint32_t extra_spawn_id);
+    void undefine_extra_spawn(std::uint32_t extra_spawn_id);
+
+    std::optional<std::uint16_t> get_room_template(const std::string& room_template);
+    std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
+    RoomTemplateType get_room_template_type(std::uint16_t room_template);
 
     // TODO: Get offsets from binary instead of hardcoding them
     const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const
@@ -392,15 +410,18 @@ struct LevelGenSystem
     uint32_t unknown52;
 
     std::pair<int, int> get_room_index(float x, float y);
-    std::pair<float, float> get_room_pos(int x, int y);
-    std::optional<uint16_t> get_room_template(int x, int y, int l);
-    bool set_room_template(int x, int y, int l, uint16_t room_template);
+    std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);
+    std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, LAYER l);
+    bool set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template);
 
     std::string_view get_room_template_name(uint16_t room_template);
 
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 };
+
+void override_next_levels(std::vector<std::string> next_levels);
+void add_next_levels(std::vector<std::string> next_levels);
 
 int8_t get_co_subtheme();
 void force_co_subtheme(int8_t subtheme);

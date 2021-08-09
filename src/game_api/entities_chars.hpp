@@ -55,7 +55,7 @@ class Player : public PowerupCapable
     bool is_female();
 
     /// Set the heart color the character.
-    void set_heart_color(Color color);
+    void set_heart_color(Color hcolor);
 };
 
 std::u16string get_character_name(int32_t type_id);

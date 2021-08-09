@@ -2,6 +2,15 @@
 
 #include "lua_backend.hpp"
 
+void pre_load_level_files()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.pre_load_level_files();
+            return true;
+        });
+}
 void pre_level_generation()
 {
     LuaBackend::for_each_backend(
@@ -30,24 +39,24 @@ void post_level_generation()
         });
 }
 
-bool pre_tile_code_spawn(std::string_view tile_code, float x, float y, int layer)
+bool pre_tile_code_spawn(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
     bool block_spawn{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            block_spawn = backend.pre_level_gen_spawn(tile_code, x, y, layer);
+            block_spawn = backend.pre_tile_code(tile_code, x, y, layer, room_template);
             return !block_spawn;
         });
     return block_spawn;
 }
-void post_tile_code_spawn(std::string_view tile_code, float x, float y, int layer)
+void post_tile_code_spawn(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
 
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.post_level_gen_spawn(tile_code, x, y, layer);
+            backend.post_tile_code(tile_code, x, y, layer, room_template);
             return true;
         });
 }

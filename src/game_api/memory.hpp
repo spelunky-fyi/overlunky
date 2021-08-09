@@ -28,15 +28,14 @@ void write_mem_prot(size_t addr, std::string payload, bool prot)
     }
 }
 
-void write_mem(size_t addr, std::string payload)
+[[maybe_unused]] void write_mem(size_t addr, std::string payload)
 {
     write_mem_prot(addr, payload, false);
 }
-
-#define DEFINE_ACCESSOR(name, type) \
-    type read_##name(size_t addr)   \
-    {                               \
-        return *(type*)(addr);      \
+#define DEFINE_ACCESSOR(name, type)                \
+    [[maybe_unused]] type read_##name(size_t addr) \
+    {                                              \
+        return *(type*)(addr);                     \
     }
 
 DEFINE_ACCESSOR(u8, uint8_t);
@@ -51,7 +50,7 @@ DEFINE_ACCESSOR(i64, int64_t);
 
 DEFINE_ACCESSOR(f32, float);
 
-size_t function_start(size_t off)
+[[maybe_unused]] size_t function_start(size_t off)
 {
     off &= ~0xf;
     while (read_u8(off - 1) != 0xcc)
@@ -62,12 +61,12 @@ size_t function_start(size_t off)
 }
 
 template <class FunT, typename T>
-FunT& vtable_find(T* obj, int index)
+FunT* vtable_find(T* obj, size_t index)
 {
     void*** ptr = reinterpret_cast<void***>(obj);
     if (!ptr[0])
-        return *static_cast<FunT*>(nullptr);
-    return *reinterpret_cast<FunT*>(&ptr[0][index]);
+        return static_cast<FunT*>(nullptr);
+    return reinterpret_cast<FunT*>(&ptr[0][index]);
 }
 }; // namespace
 
@@ -106,13 +105,12 @@ struct Memory
     {
         return (char*)exe_ptr;
     }
+    static size_t decode_call(size_t off)
+    {
+        auto memory = get();
+        return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
+    }
 };
-
-static size_t decode_call(size_t off)
-{
-    auto memory = Memory::get();
-    return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
-}
 
 #define ONCE(type)            \
     static bool once = false; \

@@ -43,7 +43,7 @@ float screenify(float dis)
 {
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 res = io.DisplaySize;
-    return dis / (1.0 / (res.x / 2));
+    return dis / (1.0f / (res.x / 2));
 }
 
 ImVec2 screenify(ImVec2 pos)
@@ -61,7 +61,7 @@ ImVec2 screenify(ImVec2 pos)
         bar.y = (res.y - res.x / 16 * 9) / 2;
         res.y = res.x / 16 * 9;
     }
-    ImVec2 screened = ImVec2(pos.x / (1.0 / (res.x / 2)) + res.x / 2 + bar.x, res.y - (res.y / 2 * pos.y) - res.y / 2 + bar.y);
+    ImVec2 screened = ImVec2(pos.x / (1.0f / (res.x / 2)) + res.x / 2 + bar.x, res.y - (res.y / 2 * pos.y) - res.y / 2 + bar.y);
     return screened;
 }
 
@@ -79,7 +79,7 @@ ImVec2 normalize(ImVec2 pos)
         pos.y -= (res.y - res.x / 16 * 9) / 2;
         res.y = res.x / 16 * 9;
     }
-    ImVec2 normal = ImVec2((pos.x - res.x / 2) * (1.0 / (res.x / 2)), -(pos.y - res.y / 2) * (1.0 / (res.y / 2)));
+    ImVec2 normal = ImVec2((pos.x - res.x / 2) * (1.0f / (res.x / 2)), -(pos.y - res.y / 2) * (1.0f / (res.y / 2)));
     return normal;
 }
 
@@ -137,7 +137,7 @@ void AddImageRotated(ImDrawList* draw_list, ImTextureID user_texture_id, const I
 std::string sanitize(std::string data)
 {
     std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c)
-                   { return std::tolower(c); });
+                   { return (unsigned char)std::tolower(c); });
     static std::regex reg("[^a-z/]*", std::regex_constants::optimize);
     data = std::regex_replace(data, reg, "");
     return data;
@@ -170,5 +170,5 @@ bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags,
     cb_user_data.Str = str;
     cb_user_data.ChainCallback = callback;
     cb_user_data.ChainCallbackUserData = user_data;
-    return ImGui::InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
+    return ImGui::InputText(label, str, flags, InputTextCallback, &cb_user_data);
 }

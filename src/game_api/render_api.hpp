@@ -20,7 +20,7 @@ struct RenderAPI
 {
     const size_t* api;
     size_t swap_chain_off;
-    std::unordered_map<std::uint32_t, Texture> custom_textures;
+    std::unordered_map<std::uint64_t, Texture> custom_textures;
 
     static RenderAPI& get();
 
@@ -35,8 +35,8 @@ struct RenderAPI
     }
 
     TextureDefinition get_texture_definition(std::uint32_t texture_id);
-    Texture* get_texture(std::uint32_t texture_id);
-    std::uint32_t define_texture(TextureDefinition data);
+    Texture* get_texture(std::uint64_t texture_id);
+    std::uint64_t define_texture(TextureDefinition data);
     const char** load_texture(std::string file_name);
 };
 

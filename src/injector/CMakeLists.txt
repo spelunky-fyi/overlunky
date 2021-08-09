@@ -4,8 +4,9 @@ add_executable(injector
     cmd_line.h
     injector.cpp
     injector.h)
-target_link_libraries(injector
-    shared)
+target_link_libraries(injector PRIVATE
+    shared
+    overlunky_warnings)
 add_dependencies(injector injected)
 
 if(MSVC AND EXISTS ${SPELUNKY_INSTALL_DIR})

@@ -50,7 +50,7 @@ struct game_allocator
         return static_cast<pointer>(game_malloc(n * sizeof(T)));
     }
 
-    void deallocate(pointer p, size_type n)
+    void deallocate(pointer p, [[maybe_unused]] size_type n)
     {
         game_free(p);
     }

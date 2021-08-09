@@ -30,8 +30,8 @@ FMOD::FMOD_RESULT ChannelControlCallback(
     FMOD::ChannelControl* channel_control,
     FMOD::ChannelControlType channel_control_type,
     FMOD::ChannelControlCallbackType channel_control_callback_type,
-    void* calback_data_1,
-    void* calback_data_2)
+    void*,
+    void*)
 {
     if (channel_control_type == FMOD::ChannelControlType::Channel && channel_control_callback_type == FMOD::ChannelControlCallbackType::End)
     {
@@ -81,7 +81,7 @@ std::mutex s_EventCallbacksMutex;
 std::uint32_t current_callback_id{0};
 std::vector<EventCallbackData> s_EventCallbacks;
 std::unordered_map<std::uint32_t, FMODStudio::EventDescription*> s_EventCallbackIdToEventDescription;
-FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_type, FMODStudio::EventInstance* instance, void* callback_data)
+FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_type, FMODStudio::EventInstance* instance, void*)
 {
     FMODStudio::EventDescription* event;
     if (FMOD_CHECK_CALL(EventCallbackData::EventInstanceGetDescription(instance, &event)))
@@ -172,7 +172,7 @@ CustomSound::~CustomSound()
             overloaded{
                 [this](FMOD::Sound* sound)
                 { m_SoundManager->acquire_sound(sound); },
-                [this](FMODStudio::EventDescription*) {},
+                [](FMODStudio::EventDescription*) {},
                 [](std::monostate) {},
             },
             m_FmodHandle);
@@ -203,16 +203,16 @@ PlayingSound CustomSound::play(bool paused, SOUND_TYPE sound_type)
         m_FmodHandle);
 }
 
-std::unordered_map<std::uint32_t, const char*> CustomSound::get_parameters()
+std::unordered_map<VANILLA_SOUND_PARAM, const char*> CustomSound::get_parameters()
 {
     return std::visit(
         overloaded{
-            [](FMOD::Sound* sound)
-            { return std::unordered_map<std::uint32_t, const char*>{}; },
+            [](FMOD::Sound*)
+            { return std::unordered_map<VANILLA_SOUND_PARAM, const char*>{}; },
             [this](FMODStudio::EventDescription* event)
             { return m_SoundManager->get_parameters(event); },
             [](std::monostate)
-            { return std::unordered_map<std::uint32_t, const char*>{}; },
+            { return std::unordered_map<VANILLA_SOUND_PARAM, const char*>{}; },
         },
         m_FmodHandle);
 }
@@ -562,7 +562,7 @@ CustomSound SoundManager::get_event(std::string_view event_name)
     }
     return CustomSound{nullptr, nullptr};
 }
-PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, bool paused, bool as_music)
+PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, bool paused, [[maybe_unused]] bool as_music) //TODO: fix as_music being not used
 {
     FMODStudio::EventInstance* instance{nullptr};
     m_EventCreateInstance(fmod_event, &instance);
@@ -625,7 +625,7 @@ bool SoundManager::set_mute(PlayingSound playing_sound, bool mute)
     return std::visit(
         overloaded{[this, mute](FMOD::Channel* channel)
                    { return FMOD_CHECK_CALL(m_ChannelSetMute(channel, mute)); },
-                   [this](FMODStudio::EventInstance* event)
+                   [](FMODStudio::EventInstance*)
                    { return false; }, // Not available on the even interface
                    [](std::monostate)
                    { return false; }},
@@ -680,12 +680,11 @@ bool SoundManager::set_looping(PlayingSound playing_sound, SOUND_LOOP_MODE loop_
                        }
                        return false;
                    },
-                   [](FMODStudio::EventInstance* event)
+                   [](FMODStudio::EventInstance*)
                    { return false; },
                    [](std::monostate)
                    { return false; }},
         playing_sound.m_FmodHandle);
-    return false;
 }
 bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunction callback)
 {
@@ -776,11 +775,11 @@ void SoundManager::clear_callback(std::uint32_t id)
     s_EventCallbackIdToEventDescription.erase(id);
 }
 
-std::unordered_map<std::uint32_t, const char*> SoundManager::get_parameters(PlayingSound playing_sound)
+std::unordered_map<VANILLA_SOUND_PARAM, const char*> SoundManager::get_parameters(PlayingSound playing_sound)
 {
     return std::visit(
-        overloaded{[](FMOD::Channel* channel)
-                   { return std::unordered_map<std::uint32_t, const char*>{}; },
+        overloaded{[]([[maybe_unused]] FMOD::Channel* channel)
+                   { return std::unordered_map<VANILLA_SOUND_PARAM, const char*>{}; },
                    [this](FMODStudio::EventInstance* instance)
                    {
                        FMODStudio::EventDescription* event;
@@ -788,32 +787,32 @@ std::unordered_map<std::uint32_t, const char*> SoundManager::get_parameters(Play
                        {
                            return get_parameters(event);
                        }
-                       return std::unordered_map<std::uint32_t, const char*>{};
+                       return std::unordered_map<VANILLA_SOUND_PARAM, const char*>{};
                    },
                    [](std::monostate)
-                   { return std::unordered_map<std::uint32_t, const char*>{}; }},
+                   { return std::unordered_map<VANILLA_SOUND_PARAM, const char*>{}; }},
         playing_sound.m_FmodHandle);
 }
-std::unordered_map<std::uint32_t, const char*> SoundManager::get_parameters(FMODStudio::EventDescription* fmod_event)
+std::unordered_map<VANILLA_SOUND_PARAM, const char*> SoundManager::get_parameters(FMODStudio::EventDescription* fmod_event)
 {
     if (const EventDescription* event = m_SoundData.FmodEventToEvent[fmod_event])
     {
-        std::unordered_map<std::uint32_t, const char*> parameters;
+        std::unordered_map<VANILLA_SOUND_PARAM, const char*> parameters;
         for (size_t i = 0; i < m_SoundData.Parameters->ParameterNames.size(); i++)
         {
             if (event->HasParameter[i])
             {
-                parameters[i] = m_SoundData.Parameters->ParameterNames[i].c_str();
+                parameters[static_cast<uint32_t>(i)] = m_SoundData.Parameters->ParameterNames[i].c_str();
             }
         }
         return parameters;
     }
-    return std::unordered_map<std::uint32_t, const char*>{};
+    return std::unordered_map<VANILLA_SOUND_PARAM, const char*>{};
 }
-std::optional<float> SoundManager::get_parameter(PlayingSound playing_sound, std::uint32_t parameter_index)
+std::optional<float> SoundManager::get_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM parameter_index)
 {
     return std::visit(
-        overloaded{[](FMOD::Channel* channel)
+        overloaded{[]([[maybe_unused]] FMOD::Channel* channel)
                    { return std::optional<float>{}; },
                    [this, parameter_index](FMODStudio::EventInstance* instance)
                    {
@@ -837,10 +836,10 @@ std::optional<float> SoundManager::get_parameter(PlayingSound playing_sound, std
                    { return std::optional<float>{}; }},
         playing_sound.m_FmodHandle);
 }
-bool SoundManager::set_parameter(PlayingSound playing_sound, std::uint32_t parameter_index, float value)
+bool SoundManager::set_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM parameter_index, float value)
 {
     return std::visit(
-        overloaded{[](FMOD::Channel* channel)
+        overloaded{[]([[maybe_unused]] FMOD::Channel* channel)
                    { return false; },
                    [this, parameter_index, value](FMODStudio::EventInstance* instance)
                    {

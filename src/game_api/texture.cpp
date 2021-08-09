@@ -4,7 +4,6 @@
 
 size_t textures_ptr()
 {
-    static size_t cached_textures_ptr;
     ONCE(size_t)
     {
         auto mem = Memory::get();

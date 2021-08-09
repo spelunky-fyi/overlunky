@@ -96,6 +96,11 @@ void LuaBackend::clear_all_callbacks()
         g_state->level_gen->data->unregister_chance_logic_provider(id);
     }
     chance_callbacks.clear();
+    for (auto id : extra_spawn_callbacks)
+    {
+        g_state->level_gen->data->undefine_extra_spawn(id);
+    }
+    extra_spawn_callbacks.clear();
     for (auto& [ent_uid, id] : entity_hooks)
     {
         if (Entity* ent = get_entity_ptr(ent_uid))
@@ -222,9 +227,9 @@ bool LuaBackend::update()
             callbacks.erase(id);
             load_callbacks.erase(id);
 
-            std::erase_if(pre_level_gen_callbacks, [id](auto& cb)
+            std::erase_if(pre_tile_code_callbacks, [id](auto& cb)
                           { return cb.id == id; });
-            std::erase_if(post_level_gen_callbacks, [id](auto& cb)
+            std::erase_if(post_tile_code_callbacks, [id](auto& cb)
                           { return cb.id == id; });
             std::erase_if(pre_entity_spawn_callbacks, [id](auto& cb)
                           { return cb.id == id; });
@@ -238,18 +243,36 @@ bool LuaBackend::update()
             auto it = std::find(entity_hooks.begin(), entity_hooks.end(), std::pair{ent_uid, id});
             if (it != entity_hooks.end())
             {
-                if (Entity* ent = get_entity_ptr(ent_uid))
+                Entity* entity = get_entity_ptr(ent_uid);
+                if (entity)
                 {
-                    ent->unhook(id);
+                    entity->unhook(id);
                 }
                 entity_hooks.erase(it);
+
+                const int32_t entity_uid = ent_uid; // Clang doesn't let us reference a local binding in a lambda capture
+                const size_t hooks_left_for_entity = std::count_if(entity_hooks.begin(), entity_hooks.end(), [entity_uid](auto& hook)
+                                                                   { return hook.first == entity_uid; });
+                if (hooks_left_for_entity == 0)
+                {
+                    auto dtor_it = std::find_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity_uid](auto& dtor_hook)
+                                                { return dtor_hook.first == entity_uid; });
+                    if (dtor_it != entity_dtor_hooks.end())
+                    {
+                        if (entity)
+                        {
+                            entity->unhook(dtor_it->second);
+                        }
+                        entity_dtor_hooks.erase(dtor_it);
+                    }
+                }
             }
         }
         clear_entity_hooks.clear();
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
-            auto now = get_frame_count();
+            int now = get_frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now >= cb->lastRan + cb->interval)
@@ -259,11 +282,11 @@ bool LuaBackend::update()
                 }
                 ++it;
             }
-            else if (auto cb = std::get_if<TimeoutCallback>(&it->second))
+            else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cb->timeout)
+                if (now >= cbt->timeout)
                 {
-                    handle_function(cb->func);
+                    handle_function(cbt->func);
                     it = global_timers.erase(it);
                 }
                 else
@@ -285,7 +308,6 @@ bool LuaBackend::update()
                 handle_function(callback.func, LoadContext{get_root(), get_name()});
                 callback.lastRan = now;
             }
-            break;
         }
 
         for (auto& [id, callback] : callbacks)
@@ -369,27 +391,28 @@ bool LuaBackend::update()
                     }
                     break;
                 }
+                default:
+                    break;
                 }
             }
         }
-
+        int now_l = g_state->time_level;
         for (auto it = level_timers.begin(); it != level_timers.end();)
         {
-            auto now = g_state->time_level;
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
-                if (now >= cb->lastRan + cb->interval)
+                if (now_l >= cb->lastRan + cb->interval)
                 {
                     handle_function(cb->func);
-                    cb->lastRan = now;
+                    cb->lastRan = now_l;
                 }
                 ++it;
             }
-            else if (auto cb = std::get_if<TimeoutCallback>(&it->second))
+            else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cb->timeout)
+                if (now_l >= cbt->timeout)
                 {
-                    handle_function(cb->func);
+                    handle_function(cbt->func);
                     it = level_timers.erase(it);
                 }
                 else
@@ -534,16 +557,16 @@ void LuaBackend::render_options()
     ImGui::PopID();
 }
 
-bool LuaBackend::pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
     if (!get_enabled())
         return false;
 
-    for (auto& callback : pre_level_gen_callbacks)
+    for (auto& callback : pre_tile_code_callbacks)
     {
         if (callback.tile_code == tile_code)
         {
-            if (handle_function_with_return<bool>(callback.func, x, y, layer).value_or(false))
+            if (handle_function_with_return<bool>(callback.func, x, y, layer, room_template).value_or(false))
             {
                 return true;
             }
@@ -551,20 +574,37 @@ bool LuaBackend::pre_level_gen_spawn(std::string_view tile_code, float x, float 
     }
     return false;
 }
-void LuaBackend::post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer)
+void LuaBackend::post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
     if (!get_enabled())
         return;
 
-    for (auto& callback : post_level_gen_callbacks)
+    for (auto& callback : post_tile_code_callbacks)
     {
         if (callback.tile_code == tile_code)
         {
-            handle_function(callback.func, x, y, layer);
+            handle_function(callback.func, x, y, layer, room_template);
         }
     }
 }
 
+void LuaBackend::pre_load_level_files()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == ON::PRE_LOAD_LEVEL_FILES)
+        {
+            handle_function(callback.func, PreLoadLevelFilesContext{});
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::pre_level_generation()
 {
     if (!get_enabled())
@@ -660,7 +700,16 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
             if (type_match)
             {
-                handle_function(callback.func, entity);
+                sol::function cast = lua["TYPE_MAP"][entity->type->id];
+                if (cast)
+                {
+                    sol::userdata proper_entity = cast(entity);
+                    handle_function(callback.func, proper_entity);
+                }
+                else
+                {
+                    handle_function(callback.func, entity);
+                }
             }
         }
     }
@@ -701,11 +750,11 @@ void LuaBackend::hook_entity_dtor(Entity* entity)
 }
 void LuaBackend::pre_entity_destroyed(Entity* entity)
 {
-    auto num_erased_hooks = std::erase_if(entity_hooks, [entity](auto& hook)
-                                          { return hook.first == entity->uid; });
+    [[maybe_unused]] auto num_erased_hooks = std::erase_if(entity_hooks, [entity](auto& hook)
+                                                           { return hook.first == entity->uid; });
     assert(num_erased_hooks != 0);
-    auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
-                                          { return dtor_hook.first == entity->uid; });
+    [[maybe_unused]] auto num_erased_dtors = std::erase_if(entity_dtor_hooks, [entity](auto& dtor_hook)
+                                                           { return dtor_hook.first == entity->uid; });
     assert(num_erased_dtors == 1);
 }
 

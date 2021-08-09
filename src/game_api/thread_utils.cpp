@@ -9,7 +9,8 @@ HANDLE get_main_thread()
 {
     ONCE(HANDLE)
     {
-        HANDLE main_thread;
+        HANDLE main_thread = NULL;
+
         DWORD pid = GetCurrentProcessId();
         auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
         auto entry = THREADENTRY32{
@@ -25,6 +26,12 @@ HANDLE get_main_thread()
             }
             keep = Thread32Next(snapshot, &entry);
         }
+        if (main_thread == NULL)
+        {
+            DEBUG("Didn't not get the thread. Process id: {}", pid);
+            return NULL;
+        }
+
         return res = main_thread;
     }
 }

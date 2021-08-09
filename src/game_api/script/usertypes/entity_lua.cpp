@@ -1,5 +1,4 @@
 #include "entity_lua.hpp"
-
 #include "entity.hpp"
 
 #include <sol/sol.hpp>
@@ -261,6 +260,8 @@ void register_usertypes(sol::state& lua)
         "WATER",
         0x2000,
         "LAVA",
-        0x4000);
+        0x4000,
+        "ANY",
+        0x0);
 }
 }; // namespace NEntity

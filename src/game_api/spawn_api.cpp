@@ -35,84 +35,71 @@ void spawn_liquid(uint32_t entity_type, float x, float y)
     spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
 }
 
-int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap)
+int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap) // ui only
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
     auto state = State::get();
+    Player* player = nullptr;
 
-    auto player = state.items()->player(0);
+    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
+    {
+        if (state.items()->player(i) != nullptr)
+        {
+            player = state.items()->player(i); // maybe spawn offset to camera focus uid then the player itself?
+            break;
+        }
+    }
     if (player == nullptr)
         return -1;
-    auto [_x, _y] = player->position();
+
+    std::pair<float, float> offset_position;
     if (!s)
-    {
-        DEBUG("Spawning {} on {}, {}", entity_type, x + _x, y + _y);
-        return state.layer_local(player->layer)->spawn_entity(entity_type, x + _x, y + _y, s, vx, vy, snap)->uid;
-    }
-    else
-    {
-        DEBUG("Spawning {} on screen {}, {}", entity_type, x, y);
-        return state.layer_local(player->layer)->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
-    }
+        offset_position = player->position();
+
+    DEBUG("Spawning {} on {}, {}", entity_type, x + offset_position.first, y + offset_position.second);
+    return state.layer_local(player->layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, s, vx, vy, snap)->uid;
 }
 
-int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
+int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, LAYER layer, float vx, float vy)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto state = State::get();
-    if (layer == 0 || layer == 1)
-    {
-        return state.layer_local(layer)->spawn_entity(entity_type, x, y, false, vx, vy, false)->uid;
-    }
-    else if (layer < 0)
-    {
-        auto player = state.items()->player(abs(layer) - 1);
-        if (player == nullptr)
-            return -1;
-        auto [_x, _y] = player->position();
-        DEBUG("Spawning {} on {}, {}", entity_type, x + _x, y + _y);
-        return state.layer_local(player->layer)->spawn_entity(entity_type, x + _x, y + _y, false, vx, vy, false)->uid;
-    }
-    return -1;
+    std::pair<float, float> offset_position;
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
 }
 
-int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, int layer)
+int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, LAYER layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    auto state = State::get();
-    if (layer < 0)
-    {
-        auto player = state.items()->player(abs(layer) - 1);
-        if (player == nullptr)
-            return -1;
-        layer = player->layer;
-    }
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    return state.layer_local(layer)->spawn_entity_snap_to_floor(entity_type, x, y)->uid;
+    std::pair<float, float> offset_position;
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+    return State::get().layer_local(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
 }
 
-int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, int layer)
+int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, LAYER layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    auto state = State::get();
-    if (layer < 0)
-    {
-        auto player = state.items()->player(abs(layer) - 1);
-        if (player == nullptr)
-            return -1;
-        layer = player->layer;
-    }
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    return state.layer_local(layer)->spawn_entity(entity_type, x, y, false, 0.0f, 0.0f, true)->uid;
+    std::pair<float, float> offset_position;
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
 }
 
-int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, int layer, float vx, float vy)
+int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, LAYER layer, float vx, float vy)
 {
     g_SpawnNonReplacable++;
     OnScopeExit pop{[]
@@ -130,11 +117,11 @@ int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, floa
     Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
         return -1;
-    int layer = overlay->layer;
+    uint8_t layer = overlay->layer;
     return state.layer_local(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
-int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
+int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) // ui only
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -142,7 +129,7 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 
     auto state = State::get();
 
-    auto player = state.items()->player(0);
+    auto player = state.items()->player(0); //do the same stuff as in spawn_entity?
     if (player == nullptr)
         return -1;
     auto [_x, _y] = player->position();
@@ -152,30 +139,19 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     return layer->spawn_door(x + _x, y + _y, w, l, t)->uid;
 }
 
-int32_t spawn_door_abs(float x, float y, int layer, uint8_t w, uint8_t l, uint8_t t)
+int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint8_t t)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto state = State::get();
-    if (layer == 0 || layer == 1)
-    {
-        return state.layer_local(layer)->spawn_door(x, y, w, l, t)->uid;
-    }
-    else if (layer < 0)
-    {
-        auto player = state.items()->player(abs(layer) - 1);
-        if (player == nullptr)
-            return -1;
-        auto [_x, _y] = player->position();
-        DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-        return state.layer_local(player->layer)->spawn_door(x + _x, y + _y, w, l, t)->uid;
-    }
-    return -1;
+    std::pair<float, float> offset_position;
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+    return State::get().layer_local(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
 }
 
-void spawn_backdoor(float x, float y)
+void spawn_backdoor(float x, float y) // ui only
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -192,8 +168,8 @@ void spawn_backdoor(float x, float y)
     Layer* back_layer = state.layer_local(1);
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
-    back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0, false, 0.0, 0.0, true);
+    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true);
+    back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true);
     front_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
 }
@@ -210,23 +186,44 @@ void spawn_backdoor_abs(float x, float y)
     Layer* back_layer = state.layer_local(1);
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
-    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
-    back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0, false, 0.0, 0.0, true);
+    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
+    back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
 }
 
-int32_t spawn_apep(float x, float y, int l, bool right)
+int32_t spawn_apep(float x, float y, LAYER layer, bool right)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    auto state = State::get();
-    if (l < 0)
-    {
-        auto player = state.items()->player(abs(l) - 1);
-        if (player == nullptr)
-            return -1;
-        l = player->layer;
-    }
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    return state.layer_local(l)->spawn_apep(x, y, right)->uid;
+    std::pair<float, float> offset_position;
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+    return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
+}
+
+void spawn_tree(float x, float y, int layer)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+    std::pair<float, float> offset_position;
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+    using spawn_tree_fun_t = void(void*, int, float, float);
+    static auto spawn_tree_call = (spawn_tree_fun_t*)[]()
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        auto start = memory.after_bundle;
+        auto location = find_inst(exe, "\x0f\x28\xd7\x40\x0f\xb6\xd7"s, start);
+        location = find_inst(exe, "\xe8"s, location);
+        location = decode_pc(exe, location, 1);
+        return memory.at_exe(location);
+    }
+    ();
+    spawn_tree_call(nullptr, actual_layer, x + offset_position.first, y + offset_position.second);
 }
 
 void push_spawn_type_flags(SpawnTypeFlags flags)
@@ -240,8 +237,10 @@ void push_spawn_type_flags(SpawnTypeFlags flags)
     }
 
     g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
     g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
 }
 void pop_spawn_type_flags(SpawnTypeFlags flags)
@@ -255,8 +254,10 @@ void pop_spawn_type_flags(SpawnTypeFlags flags)
     }
 
     g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
     g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
 }
 
@@ -308,9 +309,9 @@ void init_spawn_hooks()
         DetourAttach((void**)&g_load_item_trampoline, load_item);
 #endif
 
-        auto spawn_entity_off = find_inst(memory.exe(), "\xba\x79\x00\x00\x00\x41\x0f\xb6\x06\x88\x44\x24\x20"s, memory.after_bundle);
-        auto spawn_entity_call = find_inst(memory.exe(), "\xE8"s, spawn_entity_off);
-        auto spawn_entity_start = decode_call(spawn_entity_call);
+        auto spawn_entity_off = find_inst(exe, "\xba\x79\x00\x00\x00\x41\x0f\xb6\x06\x88\x44\x24\x20"s, after_bundle);
+        auto spawn_entity_call = find_inst(exe, "\xE8"s, spawn_entity_off);
+        auto spawn_entity_start = Memory::decode_call(spawn_entity_call);
         g_spawn_entity_trampoline = (SpawnEntityFun*)memory.at_exe(spawn_entity_start);
         DetourAttach((void**)&g_spawn_entity_trampoline, (SpawnEntityFun*)spawn_entity);
 

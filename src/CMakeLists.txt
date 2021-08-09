@@ -12,7 +12,8 @@ set(imgui_sources
         imgui/imgui_widgets.cpp
         imgui/imgui_draw.cpp
         imgui/imgui_tables.cpp
-        imgui/imgui_demo.cpp)
+        imgui/imgui_demo.cpp
+        imgui/misc/cpp/imgui_stdlib.cpp)
 add_library(imgui STATIC ${imgui_sources})
 target_include_directories(imgui PUBLIC imgui)
 
@@ -53,6 +54,20 @@ set_property(
 
 target_compile_options(lib_detours_overlunky PRIVATE /w /Zi /MT /Gy /Gm- /Zl /Od)
 target_include_directories(lib_detours_overlunky PUBLIC detours/src)
+
+# --------------------------------------------------
+# warnings interface target
+add_library(overlunky_warnings INTERFACE)
+if(MSVC)
+        target_compile_options(overlunky_warnings INTERFACE /W4 /WX)
+        target_compile_options(overlunky_warnings INTERFACE /wd4201) #nonstandard extension used : nameless struct/union
+        if(CLANG)
+                target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
+        endif()
+else()
+        target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -pedantic -Werror)
+        target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
+endif()
 
 # --------------------------------------------------
 # overlunky spel2_api
@@ -119,23 +134,23 @@ if(BUILD_OVERLUNKY)
         add_subdirectory(injected)
         add_subdirectory(injector)
         
-        if(MSVC AND BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
-                find_package(Python3 COMPONENTS Interpreter)
-                if(Python3_FOUND)
-                        add_custom_target(update_docs_overlunky
-                                COMMAND injector --launch_game ${SPELUNKY_INSTALL_DIR} --info_dump
-                                COMMAND ${CMAKE_COMMAND} -E copy_directory ${SPELUNKY_INSTALL_DIR}/game_data ./docs/game_data
-                                COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
-                                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                                COMMENT "Update docs, including collecting all game data."
-                        )
-                        add_custom_target(update_auto_docs_overlunky
-                                COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
-                                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                                COMMENT "Update only auto-docs."
-                        )
-                else()
-                        message("You need python 3 for auto-docs.")
+        if(MSVC)
+                if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
+                        find_package(Python3 COMPONENTS Interpreter)
+                        if(Python3_FOUND)
+                                add_custom_target(update_docs_overlunky
+                                        COMMAND injector --launch_game ${SPELUNKY_INSTALL_DIR} --info_dump
+                                        COMMAND ${CMAKE_COMMAND} -E copy_directory ${SPELUNKY_INSTALL_DIR}/game_data ./docs/game_data
+                                        COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
+                                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                                        COMMENT "Update docs, including collecting all game data.")
+                                add_custom_target(update_auto_docs_overlunky
+                                        COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
+                                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                                        COMMENT "Update only auto-docs.")
+                        else()
+                                message("You need python 3 for auto-docs.")
+                        endif()
                 endif()
         endif()
 endif()
