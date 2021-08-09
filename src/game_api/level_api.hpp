@@ -39,7 +39,8 @@ enum class RoomTemplateType
 {
     None = 0,
     Entrance = 1,
-    Exit = 2
+    Exit = 2,
+    Shop = 3,
 };
 
 struct LevelGenData

@@ -614,6 +614,9 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
         case RoomTemplateType::Exit:
             pretend_room_template = 7;
             break;
+        case RoomTemplateType::Shop:
+            pretend_room_template = 65;
+            break;
         }
         g_handle_tile_code_trampoline(self, tile_code, pretend_room_template, x, y, layer);
     }
