@@ -653,8 +653,10 @@ end
     lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
     /// Gets the entity type of the item in the provided slot
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
-    /// Draw text on the screen using the built-in text renderer. Use in combination with ON.VANILLA_RENDER
+    /// Draw text on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
     lua["vanilla_draw_text"] = vanilla_draw_text;
+    /// Draw a texture on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
+    lua["vanilla_draw_texture"] = vanilla_draw_texture;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float

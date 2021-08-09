@@ -513,7 +513,10 @@ Sets the 16-bit meta-value associated with the entity type in the associated slo
 Gets the entity type of the item in the provided slot
 ### [`vanilla_draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_draw_text)
 `nil vanilla_draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`<br/>
-Draw text on the screen using the built-in text renderer. Use in combination with ON.VANILLA_RENDER
+Draw text on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
+### [`vanilla_draw_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_draw_texture)
+`nil vanilla_draw_texture(int texture_id, int row, int column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)`<br/>
+Draw a texture on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 `float distance(int uid_a, int uid_b)`<br/>
 Calculate the tile distance of two entities by uid
@@ -1021,7 +1024,7 @@ Derived from [`Entity`](#entity)
 - [`nil pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
 - [`bool can_jump()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) &Movable::can_jump
 - [`Entity standing_on()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on) &Movable::standing_on
-- [`nil adjust_money(int money)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=adjust_money) &Movable::adjust_money
+- [`nil add_money(int money)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) &Movable::add_money
 ### `PowerupCapable`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil remove_powerup(int powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) &PowerupCapable::remove_powerup

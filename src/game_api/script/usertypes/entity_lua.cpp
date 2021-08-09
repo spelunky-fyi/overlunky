@@ -210,8 +210,8 @@ void register_usertypes(sol::state& lua)
         &Movable::can_jump,
         "standing_on",
         &Movable::standing_on,
-        "adjust_money",
-        &Movable::adjust_money,
+        "add_money",
+        &Movable::add_money,
         sol::base_classes,
         sol::bases<Entity>());
 

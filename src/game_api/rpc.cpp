@@ -5,6 +5,7 @@
 #include "entities_mounts.hpp"
 #include "entity.hpp"
 #include "logger.h"
+#include "render_api.hpp"
 #include "state.hpp"
 #include "virtual_table.hpp"
 #include <cstdarg>
@@ -1341,11 +1342,8 @@ void vanilla_draw_text(const std::string& text, float x, float y, float scale_x,
 
     if (context_offset == 0)
     {
-        std::string pattern = "\x48\x8D\x0D\x47\x97\x27\x00"s;
+        std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
         size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
-
-        pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
-        pattern_pos = find_inst(exe, pattern, memory.after_bundle);
         context_offset = memory.at_exe(decode_pc(exe, pattern_pos));
 
         pattern_pos += 7;
@@ -1392,5 +1390,90 @@ void vanilla_draw_text(const std::string& text, float x, float y, float scale_x,
 
         f1(context_offset, fontstyle, wide_text.data(), 2, x, y, &tri, 1, scale_x, scale_y, alignment, 2, 0);
         f2(&tri, &color);
+    }
+}
+
+void vanilla_draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)
+{
+    static size_t offset = 0;
+
+    auto& memory = Memory::get();
+    auto exe = memory.exe();
+
+    if (offset == 0)
+    {
+        std::string pattern = "\xB2\x29\xE8\xAE\x87\x04\x00"s;
+        offset = memory.at_exe(decode_pc(exe, find_inst(exe, pattern, memory.after_bundle)));
+    }
+
+    if (offset != 0)
+    {
+        struct texture_rendering_info
+        {
+            // where to draw on the screen:
+            float x;
+            float y;
+            // destination is relative to the x,y centerpoint
+            float destination_bottom_left_x;
+            float destination_bottom_left_y;
+            float destination_bottom_right_x;
+            float destination_bottom_right_y;
+            float destination_top_left_x;
+            float destination_top_left_y;
+            float destination_top_right_x;
+            float destination_top_right_y;
+            // source rectangle in the texture to render
+            float source_bottom_left_x;
+            float source_bottom_left_y;
+            float source_bottom_right_x;
+            float source_bottom_right_y;
+            float source_top_left_x;
+            float source_top_left_y;
+            float source_top_right_x;
+            float source_top_right_y;
+        };
+
+        auto texture = RenderAPI::get().get_texture(texture_id);
+        if (texture == nullptr)
+        {
+            return;
+        }
+
+        float aspect_ratio = 16.0 / 9.0;
+        texture_rendering_info tri = {
+            render_at_x,
+            render_at_y,
+
+            // DESTINATION
+            // bottom left:
+            render_at_x - (render_width / 2.0f),
+            render_at_y - ((render_height * aspect_ratio) / 2.0f),
+            // bottom_right:
+            render_at_x + (render_width / 2.0f),
+            render_at_y - ((render_height * aspect_ratio) / 2.0f),
+            // top left:
+            render_at_x - (render_width / 2.0f),
+            render_at_y + ((render_height * aspect_ratio) / 2.0f),
+            // top right:
+            render_at_x + (render_width / 2.0f),
+            render_at_y + ((render_height * aspect_ratio) / 2.0f),
+
+            // SOURCE
+            // bottom left:
+            texture->tile_width_fraction * column,
+            texture->tile_height_fraction * (row + 1.0f),
+            // bottom_right:
+            texture->tile_width_fraction * (column + 1.0f),
+            texture->tile_height_fraction * (row + 1.0f),
+            // top left:
+            texture->tile_width_fraction * column,
+            texture->tile_height_fraction * row,
+            // top right:
+            texture->tile_width_fraction * (column + 1.0f),
+            texture->tile_height_fraction * row};
+
+        typedef void render_func(texture_rendering_info*, uint8_t, const char**, Color*);
+        static render_func* rf = (render_func*)(offset);
+        rf(&tri, 0x29, texture->name, &color);
     }
 }

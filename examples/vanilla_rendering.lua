@@ -37,7 +37,14 @@ set_callback(function()
         y = y - 0.1
         scale = scale + 0.0001
     end
-    y = y - 0.15
+    y = y - 0.115
+    
+    local x = -0.12
+    for i = 1, 7 do
+        vanilla_draw_texture(TEXTURE.DATA_TEXTURES_HUD_0, 4, i-1, x, y, 0.08, 0.08, white)
+        x = x + 0.04
+    end
+    y = y - 0.035
 
     vanilla_draw_text("Left aligned", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.LEFT, VANILLA_FONT_STYLE.ITALIC)
     y = y - 0.11

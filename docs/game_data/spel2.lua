@@ -4283,6 +4283,7 @@ toast = function(...) end
 toast_visible = function(...) end
 unlock_door_at = function(...) end
 vanilla_draw_text = function(...) end
+vanilla_draw_texture = function(...) end
 waddler_count_entity = function(...) end
 waddler_entity_type_in_slot = function(...) end
 waddler_get_entity_meta = function(...) end
