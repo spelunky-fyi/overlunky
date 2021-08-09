@@ -11,7 +11,6 @@ size_t get_dark()
         auto memory = Memory::get();
         auto addr_dark = memory.after_bundle;
         addr_dark = find_inst(memory.exe(), "\x44\xC5\x80\xA0\x12\x0A\x00\x00\xFD"s, memory.after_bundle);
-        DEBUG("addr_dark: {}", addr_dark);
         return res = memory.at_exe(addr_dark) + 9;
     }
 }
@@ -25,7 +24,6 @@ size_t get_zoom()
         for (int _ = 0; _ < 3; _++)
         {
             addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-            DEBUG("addr_zoom: {}", addr_zoom);
         }
         return res = memory.at_exe(addr_zoom) + 10;
     }
@@ -40,9 +38,19 @@ size_t get_zoom_shop()
         for (int _ = 0; _ < 2; _++)
         {
             addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-            DEBUG("addr_zoom: {}", addr_zoom);
         }
         return res = memory.at_exe(addr_zoom) + 10;
+    }
+}
+
+size_t get_zoom_real()
+{
+    ONCE(size_t)
+    {
+        auto memory = Memory::get();
+        auto addr_zoom = memory.at_exe(0x22334A00); //TODO: patterns or something
+        addr_zoom = read_u64(addr_zoom) + 0x804ec;
+        return res = addr_zoom;
     }
 }
 
@@ -156,8 +164,9 @@ State& State::get()
         auto addr_insta = get_insta();
         auto addr_zoom = get_zoom();
         auto addr_zoom_shop = get_zoom_shop();
+        auto addr_zoom_real = get_zoom_real();
         auto addr_dark = get_dark();
-        STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
+        STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_zoom_real, addr_dark};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
         get_is_init() = true;
@@ -179,10 +188,7 @@ StateMemory* State::ptr_local() const
 
 std::pair<float, float> State::click_position(float x, float y)
 {
-    uint32_t screen = ptr()->screen;
-    float cz = read_f32(get_zoom());
-    if (screen < 12 || screen == 13 || screen > 14)
-        cz = 13.5;
+    float cz = read_f32(get_zoom_real());
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = cx + ZF * cz * x;
@@ -192,10 +198,7 @@ std::pair<float, float> State::click_position(float x, float y)
 
 std::pair<float, float> State::screen_position(float x, float y)
 {
-    auto screen = ptr()->screen;
-    float cz = read_f32(get_zoom());
-    if (screen < 12 || screen == 13 || screen > 14)
-        cz = 13.5;
+    float cz = read_f32(get_zoom_real());
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = (x - cx) / cz / ZF;
@@ -205,7 +208,7 @@ std::pair<float, float> State::screen_position(float x, float y)
 
 float State::get_zoom_level()
 {
-    return read_f32(get_zoom());
+    return read_f32(get_zoom_real());
 }
 
 std::pair<float, float> State::get_camera_position()
