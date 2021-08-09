@@ -247,6 +247,7 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     }
     ptr()->fadeout = 5;
     ptr()->fadein = 5;
+    ptr()->win_state = 0;
     ptr()->loading = 1;
 }
 
