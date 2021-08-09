@@ -43,17 +43,6 @@ size_t get_zoom_shop()
     }
 }
 
-size_t get_zoom_real()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto addr_zoom = memory.at_exe(0x22334A00); //TODO: patterns or something
-        addr_zoom = read_u64(addr_zoom) + 0x804ec;
-        return res = addr_zoom;
-    }
-}
-
 size_t get_location()
 {
     ONCE(size_t)
@@ -164,9 +153,8 @@ State& State::get()
         auto addr_insta = get_insta();
         auto addr_zoom = get_zoom();
         auto addr_zoom_shop = get_zoom_shop();
-        auto addr_zoom_real = get_zoom_real();
         auto addr_dark = get_dark();
-        STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_zoom_real, addr_dark};
+        STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
         get_is_init() = true;
@@ -188,7 +176,7 @@ StateMemory* State::ptr_local() const
 
 std::pair<float, float> State::click_position(float x, float y)
 {
-    float cz = read_f32(get_zoom_real());
+    float cz = get_zoom_level();
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = cx + ZF * cz * x;
@@ -198,7 +186,7 @@ std::pair<float, float> State::click_position(float x, float y)
 
 std::pair<float, float> State::screen_position(float x, float y)
 {
-    float cz = read_f32(get_zoom_real());
+    float cz = get_zoom_level();
     float cx = read_f32(get_camera());
     float cy = read_f32(get_camera() + 4);
     float rx = (x - cx) / cz / ZF;
@@ -208,7 +196,20 @@ std::pair<float, float> State::screen_position(float x, float y)
 
 float State::get_zoom_level()
 {
-    return read_f32(get_zoom_real());
+    auto memory = Memory::get();
+    auto offset = memory.at_exe(0x22334A00); //TODO: patterns or something. Also this pointer is kinda slow, it doesn't work before intro cutscene.
+    offset = read_u64(offset);
+    DEBUG("zoom {:x}", offset);
+    if (offset != 0)
+    {
+        offset += 0x804ec;
+        DEBUG("zoom {:x}", offset);
+        return read_f32(offset);
+    }
+    else
+    {
+        return 13.5;
+    }
 }
 
 std::pair<float, float> State::get_camera_position()

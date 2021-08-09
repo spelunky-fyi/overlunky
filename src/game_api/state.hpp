@@ -178,7 +178,6 @@ struct State
     size_t addr_insta;
     size_t addr_zoom;
     size_t addr_zoom_shop;
-    size_t addr_zoom_real;
     size_t addr_dark;
 
     static void set_write_load_opt(bool allow);
