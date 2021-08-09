@@ -399,6 +399,12 @@ void register_usertypes(sol::state& lua)
         }
         return std::make_tuple(-1, -1, -1);
     };
+    /// Current mouse cursor position in screen coordinates.
+    lua["mouse_position"] = []() -> std::pair<float, float>
+    {
+        auto pos = normalize(ImGui::GetMousePos());
+        return std::make_pair(pos.x, pos.y);
+    };
 
     /// Deprecated
     /// Use `DrawGuiContext.draw_line` instead
