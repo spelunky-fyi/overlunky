@@ -72,7 +72,7 @@ set_callback(function()
     y = y - 0.11
 
     vanilla_draw_text("Bold text", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.BOLD)
-    y = y - 0.11
+    y = y - 0.13
 
     local text = "Bordered, shadowed text"
     scale = scale * 0.75
@@ -86,6 +86,26 @@ set_callback(function()
     background_rect_bottom_right_x = background_rect_top_left_x + width
     background_rect_bottom_right_y = background_rect_top_left_y + height
     -- these background rect coords are then used below in the GUIFRAME callback to draw the border on the screen
+    y = y - 0.12
+
+    -- jump = \u{83}
+    -- attack = \u{84}
+    -- bomb = \u{85}
+    -- rope = \u{86}
+    -- pause = \u{89}
+    -- journal = \u{8A}
+    -- use door/buy = \u{88}
+    -- walk/run = \u{87}
+    -- left = \u{8B}
+    -- right = \u{8C}
+    -- up = \u{8D}
+    -- down = \u{8E}
+    -- enter/confirm = \u{8F}
+    -- if you combine multiple keys in one string, it might mess up, e.g. "\u{83} and \u{89}"
+    local special_characters = "Press \u{83} to jump"
+    scale = 0.0013
+    vanilla_draw_text(special_characters, 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+
 end, ON.VANILLA_RENDER)
 
 set_callback(function(draw_ctx)
