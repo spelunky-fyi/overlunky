@@ -2268,6 +2268,24 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
     }
+    if (!g_players.empty())
+    {
+        for (unsigned int x = 0; x < g_state->w; ++x)
+        {
+            for (unsigned int y = 0; y < g_state->h; ++y)
+            {
+                auto room_temp = g_state->level_gen->get_room_template(x, y, g_players.at(0)->layer);
+                if (room_temp.has_value())
+                {
+                    auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
+                    auto room_pos = g_state->level_gen->get_room_pos(x, y);
+                    auto pos = screen_position(room_pos.first, room_pos.second);
+                    ImVec2 spos = screenify({pos.first, pos.second});
+                    draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), std::string(room_name).c_str());
+                }
+            }
+        }
+    }
 }
 
 void render_hitbox(Movable* ent, bool cross, ImColor color)
