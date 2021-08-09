@@ -73,7 +73,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **F9**: Options
       + Lots of options. **Check the ini for hotkeys for these and other stuff!**
   - **F11**: Hide overlay
-  - **~ (or your native Console Key)**: Toggle developer console
+  - **\~ (or your native Console Key)**: Toggle developer console
     - The console is its own script environment, where you can run some quick oneliners or paste snippets in.
     - **Enter**: Execute
     - **Ctrl+Enter**: New line
