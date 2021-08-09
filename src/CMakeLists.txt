@@ -81,12 +81,10 @@ if (BUILD_INFO_DUMP)
         add_subdirectory(json)
 
         add_subdirectory(info_dump)
-        target_link_libraries(info_dump PRIVATE overlunky_warnings)
 endif()
 
 if(BUILD_SPEL2_DLL)
         add_subdirectory(spel2_dll)
-        target_link_libraries(spel2_dll PRIVATE overlunky_warnings)
 endif()
 
 if(BUILD_OVERLUNKY)

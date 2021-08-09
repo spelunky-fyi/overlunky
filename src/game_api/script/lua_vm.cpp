@@ -28,6 +28,7 @@
 #include "usertypes/level_lua.hpp"
 #include "usertypes/particles_lua.hpp"
 #include "usertypes/player_lua.hpp"
+#include "usertypes/prng_lua.hpp"
 #include "usertypes/save_context.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
@@ -102,6 +103,7 @@ end
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);
+    NPRNG::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
@@ -411,6 +413,8 @@ end
     lua["layer_door"] = spawn_backdoor_abs;
     /// Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
     lua["spawn_apep"] = spawn_apep;
+    /// Spawns and grows a tree
+    lua["spawn_tree"] = spawn_tree;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
@@ -796,14 +800,25 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_pre_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = movable->set_pre_statemachine(
-                [backend, fun = std::move(fun)](Movable* self)
-                { return backend->handle_function_with_return<bool>(fun, self).value_or(false); });
+                [backend, &lua, fun = std::move(fun)](Movable* self)
+                {
+                    sol::function cast = lua["TYPE_MAP"][self->type->id];
+                    if (cast)
+                    {
+                        sol::userdata proper_entity = cast(self);
+                        return backend->handle_function_with_return<bool>(fun, proper_entity).value_or(false);
+                    }
+                    else
+                    {
+                        return backend->handle_function_with_return<bool>(fun, self).value_or(false);
+                    }
+                });
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
         }
@@ -813,14 +828,25 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_post_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = movable->set_post_statemachine(
-                [backend, fun = std::move(fun)](Movable* self)
-                { backend->handle_function(fun, self); });
+                [backend, &lua, fun = std::move(fun)](Movable* self)
+                {
+                    sol::function cast = lua["TYPE_MAP"][self->type->id];
+                    if (cast)
+                    {
+                        sol::userdata proper_entity = cast(self);
+                        backend->handle_function(fun, proper_entity);
+                    }
+                    else
+                    {
+                        backend->handle_function(fun, self);
+                    }
+                });
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -900,6 +926,8 @@ end
         ON::SAVE,
         "LOAD",
         ON::LOAD,
+        "PRE_LOAD_LEVEL_FILES",
+        ON::PRE_LOAD_LEVEL_FILES,
         "PRE_LEVEL_GENERATION",
         ON::PRE_LEVEL_GENERATION,
         "POST_ROOM_GENERATION",
@@ -924,6 +952,9 @@ end
     // Runs on the first ON.SCREEN of a run
     // RESET
     // Runs when resetting a run
+    // PRE_LOAD_LEVEL_FILES
+    // Params: `PreLoadLevelFilesContext load_level_ctx`
+    // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
     // Runs before any level generation, no entities should exist at this point
     // POST_ROOM_GENERATION

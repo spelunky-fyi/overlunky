@@ -202,6 +202,30 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
+void spawn_tree(float x, float y, int layer)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+    std::pair<float, float> offset_position;
+    uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+    using spawn_tree_fun_t = void(void*, int, float, float);
+    static auto spawn_tree_call = (spawn_tree_fun_t*)[]()
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        auto start = memory.after_bundle;
+        auto location = find_inst(exe, "\x0f\x28\xd7\x40\x0f\xb6\xd7"s, start);
+        location = find_inst(exe, "\xe8"s, location);
+        location = decode_pc(exe, location, 1);
+        return memory.at_exe(location);
+    }
+    ();
+    spawn_tree_call(nullptr, actual_layer, x + offset_position.first, y + offset_position.second);
+}
+
 void push_spawn_type_flags(SpawnTypeFlags flags)
 {
     for (size_t i = 0; i < g_SpawnTypes.size(); i++)
@@ -213,8 +237,10 @@ void push_spawn_type_flags(SpawnTypeFlags flags)
     }
 
     g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
     g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
 }
 void pop_spawn_type_flags(SpawnTypeFlags flags)
@@ -228,8 +254,10 @@ void pop_spawn_type_flags(SpawnTypeFlags flags)
     }
 
     g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_LEVEL_GEN] ? SPAWN_TYPE_LEVEL_GEN : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[SPAWN_TYPE_SCRIPT] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
     g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
 }
 

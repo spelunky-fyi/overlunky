@@ -72,8 +72,7 @@ void SpelunkyScript::update_code(std::string code)
 #ifdef SPEL2_EDITABLE_SCRIPTS
     m_Impl->code = code;
 #else
-    m_Impl->code_storage = std::move(code);
-    m_Impl->code = m_Impl->code_storage.c_str();
+    m_Impl->code = std::move(code);
 #endif
     m_Impl->changed = true;
 }
