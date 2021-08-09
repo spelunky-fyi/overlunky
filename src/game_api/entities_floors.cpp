@@ -92,7 +92,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
         auto [x_off, y_off] = offsets[i];
         auto* floor = layer_ptr->get_grid_entity_at(x_pos + x_off, y_pos + y_off)->as<Floor>();
         neighbours[i] = floor;
-        neighbours_same[i] = floor != nullptr && floor->type->id == type->id;
+        neighbours_same[i] = floor != nullptr && floor->type->id == type->id && floor->texture->id == texture->id;
     }
 
     for (size_t i = 0; i < 4; i++)
@@ -361,6 +361,8 @@ int32_t Floor::get_decoration_entity_type() const
         assert(0x2 == to_id("ENT_TYPE_FLOOR_BORDERTILE_METAL"));
         assert(0x3 == to_id("ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS"));
         assert(0x4 == to_id("ENT_TYPE_FLOOR_GENERIC"));
+        assert(0xb == to_id("ENT_TYPE_FLOOR_TUNNEL_CURRENT"));
+        assert(0xc == to_id("ENT_TYPE_FLOOR_TUNNEL_NEXT"));
         assert(0x5 == to_id("ENT_TYPE_FLOOR_SURFACE"));
         assert(0x6 == to_id("ENT_TYPE_FLOOR_SURFACE_COVER"));
         assert(0xa == to_id("ENT_TYPE_FLOOR_JUNGLE"));
@@ -386,6 +388,8 @@ int32_t Floor::get_decoration_entity_type() const
     case 0x3: // FLOOR_BORDERTILE_OCTOPUS
         return 0x73;
     case 0x4: // FLOOR_GENERIC
+    case 0xb: // ENT_TYPE_FLOOR_TUNNEL_CURRENT
+    case 0xc: // ENT_TYPE_FLOOR_TUNNEL_NEXT
         return 0x75;
     case 0x5: // FLOOR_SURFACE
         return 0x76;
@@ -479,7 +483,7 @@ uint16_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
             return 0;
         }
 
-        return 14 + rand() % 3;
+        return 16 + rand() % 3;
     }
 
     case 0x47: // FLOOR_DUAT_ALTAR
@@ -505,6 +509,8 @@ uint16_t Floor::get_decoration_animation_frame(FLOOR_SIDE side) const
     case 0x4: // FLOOR_GENERIC
     case 0x5: // FLOOR_SURFACE
     case 0xa: // FLOOR_JUNGLE
+    case 0xb: // ENT_TYPE_FLOOR_TUNNEL_CURRENT
+    case 0xc: // ENT_TYPE_FLOOR_TUNNEL_NEXT
         num_variants = 2;
         break;
     }

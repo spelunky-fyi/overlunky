@@ -268,7 +268,7 @@ bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* o
         "%s",
         result.c_str());
     out_buffer[num_written] = '\0';
-    return num_written < out_buffer_size;
+    return static_cast<size_t>(num_written) < out_buffer_size;
 }
 std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console)
 {

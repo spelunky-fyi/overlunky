@@ -12,8 +12,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
 #ifdef SPEL2_EDITABLE_SCRIPTS
     code = script;
 #else
-    code_storage = std::move(script);
-    code = code_storage;
+    code = std::move(script);
 #endif
 
     meta.file = std::move(file);

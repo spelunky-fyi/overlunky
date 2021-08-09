@@ -97,6 +97,8 @@ An array of [Player](#player) of the current players. Pro tip: You need `players
 Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
 ### [`options`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 Table of options set in the UI, added with the [register_option_functions](#register_option_int).
+### [`prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prng)
+The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
 ## Event functions
 Define these in your script to be called on an event. For example:
 ```lua
@@ -275,6 +277,9 @@ Short for [spawn_layer_door](#spawn_layer_door).
 ### [`spawn_apep`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_apep)
 `int spawn_apep(float x, float y, LAYER layer, bool right)`<br/>
 Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
+### [`spawn_tree`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
+`nil spawn_tree(float x, float y, int l)`<br/>
+Spawns and grows a tree
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
@@ -596,11 +601,13 @@ Generate particles of the specified type around the specified entity uid (use e.
 ### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
 `CallbackId set_pre_tile_code_callback(function cb, string tile_code)`<br/>
 Add a callback for a specific tile code that is called before the game handles the tile code.
+The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
 Return true in order to stop the game or scripts loaded after this script from handling this tile code.
 For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
 ### [`set_post_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_tile_code_callback)
 `CallbackId set_post_tile_code_callback(function cb, string tile_code)`<br/>
 Add a callback for a specific tile code that is called after the game handles the tile code.
+The callback signature is `nil post_tile_code(x, y, layer, room_template)`
 Use this to affect what the game or other scripts spawned in this position.
 This is received even if a previous pre-tile-code-callback has returned true
 ### [`define_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_tile_code)
@@ -614,6 +621,20 @@ The function `bool is_valid(x, y, layer)` determines whether the spawn is legal 
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+### [`define_extra_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_extra_spawn)
+`int define_extra_spawn(function do_spawn, function is_valid, int num_spawns_frontlayer, int num_spawns_backlayer)`<br/>
+Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
+The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+Use for example when you can spawn only on the ceiling, under water or inside a shop.
+Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+### [`get_missing_extra_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_missing_extra_spawns)
+`tuple<int, int> get_missing_extra_spawns(int extra_spawn_chance_id)`<br/>
+Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
+Returns missing spawns in the front layer and missing spawns in the back layer in that order.
+The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
 ### [`get_room_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_index)
 `tuple<int, int> get_room_index(float x, float y)`<br/>
 Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
@@ -626,6 +647,9 @@ Get the room template given a certain index
 ### [`get_room_template_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 `string_view get_room_template_name(int room_template)`<br/>
 For debugging only, get the name of a room template
+### [`define_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_room_template)
+`int define_room_template(string room_template, ROOM_TEMPLATE_TYPE type)`<br/>
+Define a new room remplate to use with `set_room_template`
 ### [`get_procedural_spawn_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
 `int get_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id)`<br/>
 Get the inverse chance of a procedural spawn for the current level.
@@ -906,6 +930,16 @@ end
 - [`bool uniform_shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uniform_shake) &Camera::uniform_shake
 - [`int focused_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) &Camera::focused_entity_uid
 - [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
+### `PRNG`
+- [`int random_index(int size, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_index) &PRNG::random_index
+\
+Generate a random integer in the range `[0, size)`
+- [`int random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
+\
+Generate a random integer in the range `[min, size)`
+- [`bool random_chance(int inverse_chance, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_chance) &PRNG::random_chance
+\
+Returns true with a chance of `1/inverse_chance`
 ### `Color`
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
@@ -2421,6 +2455,17 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`bool invisible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invisible) &ParticleDB::invisible
 - [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &ParticleDB::get_texture
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &ParticleDB::set_texture
+### `PreLoadLevelFilesContext`
+- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
+- [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
+\
+Block all loading `.lvl` files and instead load the specified `.lvl` files.
+This includes `generic.lvl` so if you need it specify it here.
+Use at your own risk, some themes/levels expect a certain level file to be loaded.
+- [`nil add_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_level_files) &PreLoadLevelFilesContext::add_level_files
+\
+Load additional levels files other than the ones that would usually be loaded.
+Stacks with `override_level_files` if that was called first.
 ### `DoorCoords`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`float door1_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_x) &DoorCoords::door1_x
@@ -2429,6 +2474,7 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
+- [`int shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &LevelGenSystem::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
 - [`int spawn_room_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) &LevelGenSystem::spawn_room_x
@@ -2444,6 +2490,9 @@ Set the room template at the given index and layer, returns `false` if the index
 Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
 Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
 Returns `false` if the given chance is not defined.
+- [`nil set_num_extra_spawns(int extra_spawn_id, int num_spawns_front_layer, int num_spawns_back_layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_num_extra_spawns) &PostRoomGenerationContext::set_num_extra_spawns
+\
+Change the amount of extra spawns for the given `extra_spawn_id`.
 ### `QuestsInfo`
 - [`int yang_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yang_state) &QuestsInfo::yang_state
 - [`int jungle_sisters_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_sisters_flags) &QuestsInfo::jungle_sisters_flags
@@ -2987,6 +3036,10 @@ Runs at the same times as ON.SCREEN, but receives the save_ctx
 \
 Params: `LoadContext load_ctx`\
 Runs as soon as your script is loaded, including reloads, then never again
+- [`PRE_LOAD_LEVEL_FILES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_LEVEL_FILES) ON::PRE_LOAD_LEVEL_FILES
+\
+Params: `PreLoadLevelFilesContext load_level_ctx`\
+Runs right before level files would be loaded
 - [`PRE_LEVEL_GENERATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION) ON::PRE_LEVEL_GENERATION
 \
 Runs before any level generation, no entities should exist at this point
@@ -3036,6 +3089,9 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`STILL_FALLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.STILL_FALLING) 3
 - [`MISSED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.MISSED) 4
 - [`POISONED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.POISONED) 5
+### PRNG_CLASS
+Determines what class of prng is used, for example when choosing `PRNG_CLASS.LEVEL_GEN` to generate a random number random Tiamat spawns will not be affected.
+- [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_GEN) PRNG::LEVEL_GEN
 ### REPEAT_TYPE
 - [`NO_REPEAT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.NO_REPEAT) REPEAT_TYPE::NoRepeat
 - [`LINEAR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.LINEAR) REPEAT_TYPE::Linear
@@ -3174,6 +3230,21 @@ Beg quest states
 - [`BOMBBAG_THROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.BOMBBAG_THROWN) 3
 - [`SPAWNED_WITH_TRUECROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.SPAWNED_WITH_TRUECROWN) 4
 - [`TRUECROWN_THROWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG.TRUECROWN_THROWN) 5
+### ROOM_TEMPLATE_TYPE
+Use in `define_room_template` to declare whether a room template has any special behavior
+- [`NONE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.NONE) 0
+- [`ENTRANCE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.ENTRANCE) 1
+- [`EXIT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.EXIT) 2
+### SHOP_TYPE
+Determines which kind of shop spawns in the level, if any
+- [`GENERAL_STORE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.GENERAL_STORE) 0
+- [`CLOTHING_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CLOTHING_SHOP) 1
+- [`WEAPON_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.WEAPON_SHOP) 2
+- [`SPECIALTY_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.SPECIALTY_SHOP) 3
+- [`HIRED_HAND_SJOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.HIRED_HAND_SJOP) 4
+- [`PET_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.PET_SHOP) 5
+- [`DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.DICE_SHOP) 6
+- [`TUSK_DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.TUSK_DICE_SHOP) 7
 ### SOUND_TYPE
 Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
 - [`SFX`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SOUND_TYPE.SFX) 0

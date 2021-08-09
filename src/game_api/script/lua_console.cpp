@@ -882,7 +882,7 @@ std::string LuaConsole::dump_api()
             }
             else if (value_str.starts_with("\"userdata"))
             {
-                value_str = {};
+                value_str = "{}";
             }
             sorted_output[std::move(key_str)] = std::move(value_str);
         }

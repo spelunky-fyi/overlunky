@@ -67,6 +67,7 @@ enum class ON
     SAVE,
     LOAD,
     GAMEFRAME,
+    PRE_LOAD_LEVEL_FILES,
     PRE_LEVEL_GENERATION,
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
@@ -187,11 +188,12 @@ class LuaBackend
     std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
-    std::vector<LevelGenCallback> pre_level_gen_callbacks;
-    std::vector<LevelGenCallback> post_level_gen_callbacks;
+    std::vector<LevelGenCallback> pre_tile_code_callbacks;
+    std::vector<LevelGenCallback> post_tile_code_callbacks;
     std::vector<EntitySpawnCallback> pre_entity_spawn_callbacks;
     std::vector<EntitySpawnCallback> post_entity_spawn_callbacks;
     std::vector<std::uint32_t> chance_callbacks;
+    std::vector<std::uint32_t> extra_spawn_callbacks;
     std::vector<int> clear_callbacks;
     std::vector<std::pair<int, std::uint32_t>> entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
@@ -245,9 +247,10 @@ class LuaBackend
     void draw(ImDrawList* dl);
     void render_options();
 
-    bool pre_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
-    void post_level_gen_spawn(std::string_view tile_code, float x, float y, int layer);
+    bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
+    void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 
+    void pre_load_level_files();
     void pre_level_generation();
     void post_room_generation();
     void post_level_generation();
@@ -306,7 +309,7 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
         catch (...)
         {
             result = "Unexpected return type from function.";
+            return std::nullopt;
         }
     }
-    return std::nullopt;
 }

@@ -467,6 +467,9 @@ Door = {
   __name = "sol.Door.user",
   __newindex = "function"
 }
+DoorCoords = {
+  __name = "sol.DoorCoords.user"
+}
 Drill = {
   __index = "function",
   __name = "sol.Drill.user",
@@ -1749,6 +1752,9 @@ Leprechaun = {
   __name = "sol.Leprechaun.user",
   __newindex = "function"
 }
+LevelGenSystem = {
+  __name = "sol.LevelGenSystem.user"
+}
 LightArrow = {
   __index = "function",
   __name = "sol.LightArrow.user",
@@ -1915,17 +1921,18 @@ ON = {
   ONLINE_LOADING = 28,
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
-  POST_LEVEL_GENERATION = 111,
-  POST_ROOM_GENERATION = 110,
-  PRE_LEVEL_GENERATION = 109,
+  POST_LEVEL_GENERATION = 112,
+  POST_ROOM_GENERATION = 111,
+  PRE_LEVEL_GENERATION = 110,
+  PRE_LOAD_LEVEL_FILES = 109,
   PROLOGUE = 2,
   RECAP = 20,
   RESET = 105,
   SAVE = 106,
   SCORES = 18,
   SCREEN = 102,
-  SCRIPT_DISABLE = 113,
-  SCRIPT_ENABLE = 112,
+  SCRIPT_DISABLE = 114,
+  SCRIPT_ENABLE = 113,
   SEED_INPUT = 8,
   SPACESHIP = 15,
   START = 103,
@@ -2195,6 +2202,12 @@ PARTICLEEMITTER = {
   YETIKING_YELL_SPARKLES = 181,
   YETIQUEEN_LANDING_SNOWDUST = 182
 }
+PRNG = {
+  __name = "sol.PRNG.user"
+}
+PRNG_CLASS = {
+  LEVEL_GEN = 0
+}
 PROCEDURAL_CHANCE = {
   ADD_GOLD_BAR = 444,
   ADD_GOLD_BARS = 445,
@@ -2343,6 +2356,9 @@ PowerupCapable = {
   __index = "function",
   __name = "sol.PowerupCapable.user",
   __newindex = "function"
+}
+PreLoadLevelFilesContext = {
+  __name = "sol.PreLoadLevelFilesContext.user"
 }
 ProtoShopkeeper = {
   __index = "function",
@@ -2628,6 +2644,11 @@ ROOM_TEMPLATE = {
   VLAD_ENTRANCE = 120,
   VLAD_TUNNEL = 123
 }
+ROOM_TEMPLATE_TYPE = {
+  ENTRANCE = 1,
+  EXIT = 2,
+  NONE = 0
+}
 RegenBlock = {
   __index = "function",
   __name = "sol.RegenBlock.user",
@@ -2652,6 +2673,16 @@ RoomOwner = {
   __index = "function",
   __name = "sol.RoomOwner.user",
   __newindex = "function"
+}
+SHOP_TYPE = {
+  CLOTHING_SHOP = 1,
+  DICE_SHOP = 6,
+  GENERAL_STORE = 0,
+  HIRED_HAND_SJOP = 4,
+  PET_SHOP = 5,
+  SPECIALTY_SHOP = 3,
+  TUSK_DICE_SHOP = 7,
+  WEAPON_SHOP = 2
 }
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
@@ -3222,6 +3253,11 @@ Tadpole = {
 Teleporter = {
   __index = "function",
   __name = "sol.Teleporter.user",
+  __newindex = "function"
+}
+TeleporterBackpack = {
+  __index = "function",
+  __name = "sol.TeleporterBackpack.user",
   __newindex = "function"
 }
 TeleportingBorder = {
@@ -4055,7 +4091,9 @@ clr_flag = function(...) end
 clrflag = function(...) end
 create_image = function(...) end
 create_sound = function(...) end
+define_extra_spawn = function(...) end
 define_procedural_spawn = function(...) end
+define_room_template = function(...) end
 define_texture = function(...) end
 define_tile_code = function(...) end
 distance = function(...) end
@@ -4105,6 +4143,7 @@ get_frame = function(...) end
 get_grid_entity_at = function(...) end
 get_hitbox = function(...) end
 get_level_flags = function(...) end
+get_missing_extra_spawns = function(...) end
 get_ms = function(...) end
 get_particle_type = function(...) end
 get_position = function(...) end
@@ -4178,8 +4217,9 @@ os = {
 }
 pause = function(...) end
 pick_up = function(...) end
-players = 
+players = {}
 prinspect = function(...) end
+prng = {}
 read_input = function(...) end
 read_prng = function(...) end
 read_stolen_input = function(...) end
@@ -4193,7 +4233,7 @@ register_option_string = function(...) end
 replace_drop = function(...) end
 return_input = function(...) end
 rgba = function(...) end
-savegame = 
+savegame = {}
 say = function(...) end
 screen_aabb = function(...) end
 screen_distance = function(...) end
@@ -4243,8 +4283,9 @@ spawn_grid_entity = function(...) end
 spawn_layer_door = function(...) end
 spawn_liquid = function(...) end
 spawn_on_floor = function(...) end
+spawn_tree = function(...) end
 speechbubble_visible = function(...) end
-state = 
+state = {}
 steal_input = function(...) end
 test_flag = function(...) end
 testflag = function(...) end

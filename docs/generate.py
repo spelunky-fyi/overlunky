@@ -14,6 +14,7 @@ header_files = [
     "../src/game_api/movable.hpp",
     "../src/game_api/state.hpp",
     "../src/game_api/state_structs.hpp",
+    "../src/game_api/prng.hpp",
     "../src/game_api/entities_floors.hpp",
     "../src/game_api/entities_activefloors.hpp",
     "../src/game_api/entities_mounts.hpp",
@@ -41,6 +42,7 @@ api_files = [
     "../src/game_api/script/lua_backend.hpp",
     "../src/game_api/script/usertypes/save_context.cpp",
     "../src/game_api/script/usertypes/state_lua.cpp",
+    "../src/game_api/script/usertypes/prng_lua.cpp",
     "../src/game_api/script/usertypes/entity_lua.cpp",
     "../src/game_api/script/usertypes/entities_chars_lua.cpp",
     "../src/game_api/script/usertypes/entities_floors_lua.cpp",
@@ -93,6 +95,7 @@ replace = {
     "variadic_args va": "int, int...",
 }
 comment = []
+not_functions = ["players", "state", "savegame", "options", "meta", "prng"]
 skip = False
 
 
@@ -199,7 +202,7 @@ for file in header_files:
                 if m:
                     comment.append(m[1])
 
-                m = re.search(r'\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)', line)
+                m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
                 if m:
                     name = m[3]
                     if name not in member_funs:
@@ -592,7 +595,7 @@ Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples 
 print("## Global variables")
 print("""These variables are always there to use.""")
 for lf in funcs:
-    if lf["name"] in ["players", "state", "savegame", "options", "meta"]:
+    if lf["name"] in not_functions:
         print(
             "### [`"
             + lf["name"]
@@ -641,10 +644,7 @@ for lf in funcs:
     if len(rpcfunc(lf["cpp"])):
         for af in rpcfunc(lf["cpp"]):
             print_af(lf, af)
-    elif not (
-        lf["name"].startswith("on_")
-        or lf["name"] in ["players", "state", "savegame", "options", "meta"]
-    ):
+    elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
         if lf["comment"] and lf["comment"][0] == "NoDoc":
             continue
         m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
@@ -674,10 +674,7 @@ for lf in deprecated_funcs:
     if len(rpcfunc(lf["cpp"])):
         for af in rpcfunc(lf["cpp"]):
             print_af(lf, af)
-    elif not (
-        lf["name"].startswith("on_")
-        or lf["name"] in ["players", "state", "savegame", "options", "meta"]
-    ):
+    elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
         if lf["comment"] and lf["comment"][0] == "NoDoc":
             continue
         m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
