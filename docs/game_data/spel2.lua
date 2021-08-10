@@ -1690,6 +1690,7 @@ Kingu = {
 }
 LAYER = {
   BACK = 1,
+  BOTH = -128,
   FRONT = 0,
   PLAYER = -1,
   PLAYER1 = -1,
@@ -1793,6 +1794,7 @@ LockedDoor = {
 }
 MASK = {
   ACTIVEFLOOR = 128,
+  ANY = 0,
   BG = 1024,
   DECORATION = 512,
   EXPLOSION = 16,
@@ -2206,7 +2208,11 @@ PRNG = {
   __name = "sol.PRNG.user"
 }
 PRNG_CLASS = {
-  LEVEL_GEN = 0
+  ENTITY_VARIATION = 3,
+  EXTRA_SPAWNS = 5,
+  LEVEL_DECO = 8,
+  PARTICLES = 2,
+  PROCEDURAL_SPAWNS = 0
 }
 PROCEDURAL_CHANCE = {
   ADD_GOLD_BAR = 444,
@@ -2647,7 +2653,8 @@ ROOM_TEMPLATE = {
 ROOM_TEMPLATE_TYPE = {
   ENTRANCE = 1,
   EXIT = 2,
-  NONE = 0
+  NONE = 0,
+  SHOP = 3
 }
 RegenBlock = {
   __index = "function",
@@ -2678,10 +2685,10 @@ SHOP_TYPE = {
   CLOTHING_SHOP = 1,
   DICE_SHOP = 6,
   GENERAL_STORE = 0,
-  HIRED_HAND_SJOP = 4,
+  HIRED_HAND_SHOP = 4,
   PET_SHOP = 5,
   SPECIALTY_SHOP = 3,
-  TUSK_DICE_SHOP = 7,
+  TUSK_DICE_SHOP = 13,
   WEAPON_SHOP = 2
 }
 SOUND_LOOP_MODE = {
@@ -4200,6 +4207,7 @@ lua_print = print
 message = function(...) end
 messpect = function(...) end
 modify_sparktraps = function(...) end
+mouse_position = function(...) end
 move_entity = function(...) end
 options = {}
 os = {

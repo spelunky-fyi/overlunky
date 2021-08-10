@@ -934,9 +934,6 @@ end
 - [`int focused_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) &Camera::focused_entity_uid
 - [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
 ### `PRNG`
-- [`int random_index(int size, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_index) &PRNG::random_index
-\
-Generate a random integer in the range `[0, size)`
 - [`optional<int> random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
 \
 Generate a random integer in the range `[min, size)`, returns `nil` if `min == max`
@@ -945,16 +942,22 @@ Generate a random integer in the range `[min, size)`, returns `nil` if `min == m
 Returns true with a chance of `1/inverse_chance`
 - [`float random(PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
-Drop-in replacement for `math.random()`
 Generate a random floating point number in the range `[0, 1)`
+- [`float random()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random()`
 - [`optional<int> random(int i, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
-Drop-in replacement for `math.random(i)`
 Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
+- [`optional<int> random(int i)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random(i)`
 - [`optional<int> random(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
-Drop-in replacement for `math.random(min, max)`
 Generate a integer number in the range `[min, max]` or `nil` if `max < min`
+- [`optional<int> random(int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random(min, max)`
 ### `Color`
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
@@ -3120,7 +3123,11 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`POISONED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.POISONED) 5
 ### PRNG_CLASS
 Determines what class of prng is used, for example when choosing `PRNG_CLASS.LEVEL_GEN` to generate a random number random Tiamat spawns will not be affected.
-- [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_GEN) PRNG::LEVEL_GEN
+- [`PROCEDURAL_SPAWNS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) PRNG::PROCEDURAL_SPAWNS
+- [`PARTICLES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) PRNG::PARTICLES
+- [`ENTITY_VARIATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) PRNG::ENTITY_VARIATION
+- [`EXTRA_SPAWNS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.EXTRA_SPAWNS) PRNG::EXTRA_SPAWNS
+- [`LEVEL_DECO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) PRNG::LEVEL_DECO
 ### REPEAT_TYPE
 - [`NO_REPEAT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.NO_REPEAT) REPEAT_TYPE::NoRepeat
 - [`LINEAR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.LINEAR) REPEAT_TYPE::Linear

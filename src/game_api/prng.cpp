@@ -69,7 +69,7 @@ bool PRNG::random_chance(std::int64_t inverse_chance, PRNG_CLASS type)
 float PRNG::random(PRNG_CLASS type)
 {
     prng_pair pair = get_and_advance(type);
-    return static_cast<float>(pair.first) / std::numeric_limits<std::uint64_t>::max();
+    return static_cast<float>(pair.first) / static_cast<float>(std::numeric_limits<std::uint64_t>::max());
 }
 std::optional<std::int64_t> PRNG::random(std::int64_t i, PRNG_CLASS type)
 {
