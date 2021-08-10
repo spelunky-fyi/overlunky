@@ -140,49 +140,47 @@ const char** RenderAPI::load_texture(std::string file_name)
     return load_texture(render_api, &file_name, 1);
 }
 
-using VanillaRenderHudFun = void(void*, float, float);
+using VanillaRenderHudFun = void(size_t, float, float, size_t);
 VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
-void render_hud(void* hud_data, float y, float opacity)
+void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
 {
-    g_render_hud_trampoline(hud_data, y, opacity);
+    // hud_data and hud_data2 are the same pointer, but the second one is actually used (displays garbage if not passed)
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.pre_render_hud();
+            return true;
+        });
+
+    g_render_hud_trampoline(hud_data, y, opacity, hud_data2);
 
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.vanilla_render();
+            backend.post_render_hud();
             return true;
         });
 }
 
 void init_render_hud_hook()
 {
-    static size_t func_render_hud = 0;
-
     auto& memory = Memory::get();
     auto exe = memory.exe();
 
-    if (func_render_hud == 0)
+    std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
+    size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
+    size_t func_render_hud = function_start(memory.at_exe(pattern_pos));
+
+    DetourRestoreAfterWith();
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    g_render_hud_trampoline = (VanillaRenderHudFun*)func_render_hud;
+    DetourAttach((void**)&g_render_hud_trampoline, (VanillaRenderHudFun*)render_hud);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
     {
-        std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
-        size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
-        func_render_hud = function_start(memory.at_exe(pattern_pos));
-    }
-
-    if (func_render_hud != 0)
-    {
-        DetourRestoreAfterWith();
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-
-        g_render_hud_trampoline = (VanillaRenderHudFun*)func_render_hud;
-        DetourAttach((void**)&g_render_hud_trampoline, (VanillaRenderHudFun*)render_hud);
-
-        const LONG error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            DEBUG("Failed hooking render_hud: {}\n", error);
-        }
+        DEBUG("Failed hooking render_hud: {}\n", error);
     }
 }
 
@@ -227,7 +225,7 @@ bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text
     return false;
 }
 
-void RenderAPI::render_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
+void RenderAPI::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
     TextRenderingInfo tri = {0};
     if (!prepare_text_for_rendering(&tri, text, x, y, scale_x, scale_y, alignment, fontstyle))
@@ -240,7 +238,7 @@ void RenderAPI::render_text(const std::string& text, float x, float y, float sca
     f2(&tri, &color);
 }
 
-std::pair<float, float> RenderAPI::measure_text(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
+std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
 {
     TextRenderingInfo tri = {0};
     if (!prepare_text_for_rendering(&tri, text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle))

@@ -124,8 +124,10 @@ Runs on any ending cutscene.
 Runs on any [screen change](#on).
 ### [`on_guiframe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_guiframe)
 Runs on every screen frame. You need this to use draw functions.
-### [`on_vanilla_render`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_vanilla_render)
-Runs so you can draw text on top of everything. Use with `vanilla_draw_text`
+### [`on_render_pre_hud`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_pre_hud)
+Runs before the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+### [`on_render_post_hud`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_hud)
+Runs after the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
@@ -504,15 +506,6 @@ Sets the 16-bit meta-value associated with the entity type in the associated slo
 ### [`waddler_entity_type_in_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_entity_type_in_slot)
 `int waddler_entity_type_in_slot(int slot)`<br/>
 Gets the entity type of the item in the provided slot
-### [`vanilla_draw_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_draw_text)
-`nil vanilla_draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`<br/>
-Draw text on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
-### [`vanilla_measure_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_measure_text)
-`tuple<float, float> vanilla_measure_text(const string& text, float scale_x, float scale_y, int fontstyle)`<br/>
-Measure the provided text using the built-in renderer. Returns the result as if the string was rendered with vanilla_draw_text.
-### [`vanilla_draw_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vanilla_draw_texture)
-`nil vanilla_draw_texture(int texture_id, int row, int column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)`<br/>
-Draw a texture on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 `float distance(int uid_a, int uid_b)`<br/>
 Calculate the tile distance of two entities by uid
@@ -2681,6 +2674,16 @@ Pop unique identifier from the stack. Put after the input.
 - [`nil win_image(int image, int width, int height)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) &GuiDrawContext::win_image
 \
 Draw image to window.
+### `VanillaRenderContext`
+- [`nil draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &VanillaRenderContext::draw_text
+\
+Draw text using the built-in renderer. Use in combination with ON.RENDER_PRE_HUD or ON.RENDER_POST_HUD. See vanilla_rendering.lua in the example scripts.
+- [`tuple<float, float> draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) &VanillaRenderContext::draw_text_size
+\
+Measure the provided text using the built-in renderer
+- [`nil draw_texture(int texture_id, int row, int column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_texture) &VanillaRenderContext::draw_texture
+\
+Draw a texture in screen coordinates `x`, `y` using the built-in renderer. Use in combination with ON.RENDER_PRE_HUD or ON.RENDER_POST_HUD
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
@@ -3067,7 +3070,8 @@ Runs right after all rooms are generated before entities are spawned
 Runs right level generation is done, before any entities are updated
 - [`SCRIPT_ENABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) ON::SCRIPT_ENABLE
 - [`SCRIPT_DISABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) ON::SCRIPT_DISABLE
-- [`VANILLA_RENDER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.VANILLA_RENDER) ON::VANILLA_RENDER
+- [`RENDER_PRE_HUD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) ON::RENDER_PRE_HUD
+- [`RENDER_POST_HUD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) ON::RENDER_POST_HUD
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \

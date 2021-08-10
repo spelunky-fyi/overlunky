@@ -86,8 +86,5 @@ void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove = 99);
 int16_t waddler_get_entity_meta(uint8_t slot);
 void waddler_set_entity_meta(uint8_t slot, int16_t meta);
 uint32_t waddler_entity_type_in_slot(uint8_t slot);
-void vanilla_draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
-std::pair<float, float> vanilla_measure_text(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-void vanilla_draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color);
 uint8_t enum_to_layer(LAYER layer);
 uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position);

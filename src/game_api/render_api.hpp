@@ -40,8 +40,8 @@ struct RenderAPI
     std::uint64_t define_texture(TextureDefinition data);
     const char** load_texture(std::string file_name);
 
-    void render_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
-    std::pair<float, float> measure_text(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
+    void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
+    std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
     void draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color);
 };
 

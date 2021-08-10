@@ -33,6 +33,7 @@
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
+#include "usertypes/vanilla_render_lua.hpp"
 
 #include "lua_libs/lua_libs.hpp"
 
@@ -90,6 +91,7 @@ end
     NSound::register_usertypes(lua, sound_manager);
     NLevel::register_usertypes(lua);
     NGui::register_usertypes(lua);
+    NVanillaRender::register_usertypes(lua);
     NTexture::register_usertypes(lua);
     NEntity::register_usertypes(lua);
     NEntitiesChars::register_usertypes(lua);
@@ -661,12 +663,6 @@ end
     lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
     /// Gets the entity type of the item in the provided slot
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
-    /// Draw text on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
-    lua["vanilla_draw_text"] = vanilla_draw_text;
-    /// Measure the provided text using the built-in renderer. Returns the result as if the string was rendered with vanilla_draw_text.
-    lua["vanilla_measure_text"] = vanilla_measure_text;
-    /// Draw a texture on the screen using the built-in renderer. Use in combination with ON.VANILLA_RENDER
-    lua["vanilla_draw_texture"] = vanilla_draw_texture;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float
@@ -944,8 +940,10 @@ end
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
         ON::SCRIPT_DISABLE,
-        "VANILLA_RENDER",
-        ON::VANILLA_RENDER);
+        "RENDER_PRE_HUD",
+        ON::RENDER_PRE_HUD,
+        "RENDER_POST_HUD",
+        ON::RENDER_POST_HUD);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`

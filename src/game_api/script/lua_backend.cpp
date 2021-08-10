@@ -16,6 +16,7 @@
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/level_lua.hpp"
 #include "usertypes/save_context.hpp"
+#include "usertypes/vanilla_render_lua.hpp"
 
 #include "lua_libs/lua_libs.hpp"
 
@@ -134,7 +135,8 @@ void LuaBackend::clear_all_callbacks()
     lua["on_death"] = sol::lua_nil;
     lua["on_win"] = sol::lua_nil;
     lua["on_screen"] = sol::lua_nil;
-    lua["on_vanilla_render"] = sol::lua_nil;
+    lua["on_render_pre_hud"] = sol::lua_nil;
+    lua["on_render_post_hud"] = sol::lua_nil;
 }
 
 bool LuaBackend::reset()
@@ -714,25 +716,52 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
         }
     }
 }
-void LuaBackend::vanilla_render()
+void LuaBackend::pre_render_hud()
 {
     if (!get_enabled())
         return;
 
-    /// Runs so you can draw text on top of everything. Use with `vanilla_draw_text`
-    sol::optional<sol::function> on_vanilla_render = lua["on_vanilla_render"];
+    /// Runs before the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+    sol::optional<sol::function> on_render_pre_hud = lua["on_render_pre_hud"];
 
-    if (on_vanilla_render)
+    VanillaRenderContext render_ctx(this);
+
+    if (on_render_pre_hud)
     {
-        on_vanilla_render.value()();
+        on_render_pre_hud.value()(render_ctx);
     }
 
     for (auto& [id, callback] : callbacks)
     {
         auto now = get_frame_count();
-        if (callback.screen == ON::VANILLA_RENDER)
+        if (callback.screen == ON::RENDER_PRE_HUD)
         {
-            handle_function(callback.func);
+            handle_function(callback.func, render_ctx);
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_render_hud()
+{
+    if (!get_enabled())
+        return;
+
+    /// Runs after the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+    sol::optional<sol::function> on_render_post_hud = lua["on_render_post_hud"];
+
+    VanillaRenderContext render_ctx(this);
+
+    if (on_render_post_hud)
+    {
+        on_render_post_hud.value()(render_ctx);
+    }
+
+    for (auto& [id, callback] : callbacks)
+    {
+        auto now = get_frame_count();
+        if (callback.screen == ON::RENDER_POST_HUD)
+        {
+            handle_function(callback.func, render_ctx);
             callback.lastRan = now;
         }
     }

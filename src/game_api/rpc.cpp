@@ -5,7 +5,6 @@
 #include "entities_mounts.hpp"
 #include "entity.hpp"
 #include "logger.h"
-#include "render_api.hpp"
 #include "state.hpp"
 #include "virtual_table.hpp"
 #include <cstdarg>
@@ -1222,21 +1221,6 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
         return state->waddler_storage[slot];
     }
     return 0;
-}
-
-void vanilla_draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
-{
-    RenderAPI::get().render_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle);
-}
-
-std::pair<float, float> vanilla_measure_text(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
-{
-    return RenderAPI::get().measure_text(text, scale_x, scale_y, fontstyle);
-}
-
-void vanilla_draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)
-{
-    RenderAPI::get().draw_texture(texture_id, row, column, render_at_x, render_at_y, render_width, render_height, color);
 }
 
 uint8_t enum_to_layer(LAYER layer)

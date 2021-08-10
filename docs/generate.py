@@ -30,6 +30,7 @@ header_files = [
     "../src/game_api/level_api.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/save_context.hpp",
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
 ]
@@ -58,6 +59,8 @@ api_files = [
     "../src/game_api/script/usertypes/player_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.cpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/drops_lua.cpp",
     "../src/game_api/script/usertypes/texture_lua.cpp",
     "../src/game_api/script/usertypes/flags_lua.cpp",
