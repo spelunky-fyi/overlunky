@@ -943,7 +943,11 @@ end
         "RENDER_PRE_HUD",
         ON::RENDER_PRE_HUD,
         "RENDER_POST_HUD",
-        ON::RENDER_POST_HUD);
+        ON::RENDER_POST_HUD,
+        "RENDER_PRE_PAUSE_MENU",
+        ON::RENDER_PRE_PAUSE_MENU,
+        "RENDER_POST_PAUSE_MENU",
+        ON::RENDER_POST_PAUSE_MENU);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -974,6 +978,18 @@ end
     // LOAD
     // Params: `LoadContext load_ctx`
     // Runs as soon as your script is loaded, including reloads, then never again
+    // RENDER_PRE_HUD
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs before the HUD is drawn on screen
+    // RENDER_POST_HUD
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs after the HUD is drawn on screen
+    // RENDER_PRE_PAUSE_MENU
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs before the pause menu is drawn on screen
+    // RENDER_POST_PAUSE_MENU
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs after the pause menu is drawn on screen
     */
 
     lua.create_named_table(
@@ -1021,7 +1037,7 @@ end
         "COSMIC_OCEAN_WIN",
         3);
 
-    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_HUD event
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
     lua.create_named_table(
         "VANILLA_TEXT_ALIGNMENT",
         "LEFT",
@@ -1031,7 +1047,7 @@ end
         "RIGHT",
         2);
 
-    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_HUD event
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
     lua.create_named_table(
         "VANILLA_FONT_STYLE",
         "ITALIC",

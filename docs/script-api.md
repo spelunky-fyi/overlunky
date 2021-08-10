@@ -128,6 +128,10 @@ Runs on every screen frame. You need this to use draw functions.
 Runs before the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
 ### [`on_render_post_hud`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_hud)
 Runs after the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+### [`on_render_pre_pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_pre_pause_menu)
+Runs before the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+### [`on_render_post_pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_pause_menu)
+Runs after the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
@@ -3083,7 +3087,21 @@ Runs right level generation is done, before any entities are updated
 - [`SCRIPT_ENABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) ON::SCRIPT_ENABLE
 - [`SCRIPT_DISABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) ON::SCRIPT_DISABLE
 - [`RENDER_PRE_HUD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) ON::RENDER_PRE_HUD
+\
+Params: `VanillaRenderContext render_ctx`\
+Runs before the HUD is drawn on screen
 - [`RENDER_POST_HUD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) ON::RENDER_POST_HUD
+\
+Params: `VanillaRenderContext render_ctx`\
+Runs after the HUD is drawn on screen
+- [`RENDER_PRE_PAUSE_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) ON::RENDER_PRE_PAUSE_MENU
+\
+Params: `VanillaRenderContext render_ctx`\
+Runs before the pause menu is drawn on screen
+- [`RENDER_POST_PAUSE_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_PAUSE_MENU) ON::RENDER_POST_PAUSE_MENU
+\
+Params: `VanillaRenderContext render_ctx`\
+Runs after the pause menu is drawn on screen
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \
@@ -3115,12 +3133,12 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`HUNDUN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.HUNDUN_WIN) 2
 - [`COSMIC_OCEAN_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.COSMIC_OCEAN_WIN) 3
 ### VANILLA_TEXT_ALIGNMENT
-Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_HUD event
+Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
 - [`LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_TEXT_ALIGNMENT.LEFT) 0
 - [`CENTER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_TEXT_ALIGNMENT.CENTER) 1
 - [`RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_TEXT_ALIGNMENT.RIGHT) 2
 ### VANILLA_FONT_STYLE
-Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_HUD event
+Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
 - [`ITALIC`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.ITALIC) 0
 - [`BOLD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.BOLD) 1
 ### CAUSE_OF_DEATH

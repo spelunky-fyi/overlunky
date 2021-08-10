@@ -165,6 +165,27 @@ void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
         });
 }
 
+using VanillaRenderPauseMenuFun = void(float*);
+VanillaRenderPauseMenuFun* g_render_pause_menu_trampoline{nullptr};
+void render_pause_menu(float* drawing_info)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.pre_render_pause_menu();
+            return true;
+        });
+
+    g_render_pause_menu_trampoline(drawing_info);
+
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.post_render_pause_menu();
+            return true;
+        });
+}
+
 static size_t text_rendering_context_offset = 0;
 static size_t text_rendering_func1_offset = 0;
 static size_t text_rendering_func2_offset = 0;
@@ -244,31 +265,6 @@ void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, f
 
     if (offset != 0)
     {
-        struct texture_rendering_info
-        {
-            // where to draw on the screen:
-            float x;
-            float y;
-            // destination is relative to the x,y centerpoint
-            float destination_bottom_left_x;
-            float destination_bottom_left_y;
-            float destination_bottom_right_x;
-            float destination_bottom_right_y;
-            float destination_top_left_x;
-            float destination_top_left_y;
-            float destination_top_right_x;
-            float destination_top_right_y;
-            // source rectangle in the texture to render
-            float source_bottom_left_x;
-            float source_bottom_left_y;
-            float source_bottom_right_x;
-            float source_bottom_right_y;
-            float source_top_left_x;
-            float source_top_left_y;
-            float source_top_right_x;
-            float source_top_right_y;
-        };
-
         auto texture = RenderAPI::get().get_texture(texture_id);
         if (texture == nullptr)
         {
@@ -276,7 +272,7 @@ void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, f
         }
 
         float aspect_ratio = 16.0f / 9.0f;
-        texture_rendering_info tri = {
+        TextureRenderingInfo tri = {
             render_at_x,
             render_at_y,
 
@@ -308,7 +304,7 @@ void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, f
             texture->tile_width_fraction * (column + 1.0f),
             texture->tile_height_fraction * row};
 
-        typedef void render_func(texture_rendering_info*, uint8_t, const char**, Color*);
+        typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
         rf(&tri, 0x29, texture->name, &color);
     }
@@ -352,6 +348,11 @@ void init_render_api_hooks()
         g_render_hud_trampoline = (VanillaRenderHudFun*)fun_start;
     }
 
+    {
+        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x48\x8B\x58\x10\x48\x8B\x83\xA8\x00\x00\x00"s, after_bundle)));
+        g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)fun_start;
+    }
+
     DetourRestoreAfterWith();
 
     DetourTransactionBegin();
@@ -359,6 +360,7 @@ void init_render_api_hooks()
 
     DetourAttach((void**)&g_fetch_texture_trampoline, &fetch_texture);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
+    DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)

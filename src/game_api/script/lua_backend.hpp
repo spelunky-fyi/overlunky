@@ -74,7 +74,9 @@ enum class ON
     SCRIPT_ENABLE,
     SCRIPT_DISABLE,
     RENDER_PRE_HUD,
-    RENDER_POST_HUD
+    RENDER_POST_HUD,
+    RENDER_PRE_PAUSE_MENU,
+    RENDER_POST_PAUSE_MENU,
 };
 
 struct IntOption
@@ -265,6 +267,8 @@ class LuaBackend
 
     void pre_render_hud();
     void post_render_hud();
+    void pre_render_pause_menu();
+    void post_render_pause_menu();
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);

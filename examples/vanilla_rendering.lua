@@ -1,6 +1,6 @@
 meta.name = "Vanilla rendering"
 meta.version = "WIP"
-meta.description = "Demonstrates drawing of in-game text"
+meta.description = "Demonstrates drawing of in-game text and textures"
 meta.author = "Zappatic"
 
 white = Color:new(1.0, 1.0, 1.0, 1.0)

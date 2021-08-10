@@ -128,4 +128,29 @@ struct TextRenderingInfo
     size_t unknown11;
 };
 
+struct TextureRenderingInfo
+{
+    // where to draw on the screen:
+    float x;
+    float y;
+    // destination is relative to the x,y centerpoint
+    float destination_bottom_left_x;
+    float destination_bottom_left_y;
+    float destination_bottom_right_x;
+    float destination_bottom_right_y;
+    float destination_top_left_x;
+    float destination_top_left_y;
+    float destination_top_right_x;
+    float destination_top_right_y;
+    // source rectangle in the texture to render
+    float source_bottom_left_x;
+    float source_bottom_left_y;
+    float source_bottom_right_x;
+    float source_bottom_right_y;
+    float source_top_left_x;
+    float source_top_left_y;
+    float source_top_right_x;
+    float source_top_right_y;
+};
+
 void init_render_api_hooks();

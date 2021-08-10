@@ -766,6 +766,56 @@ void LuaBackend::post_render_hud()
         }
     }
 }
+void LuaBackend::pre_render_pause_menu()
+{
+    if (!get_enabled())
+        return;
+
+    /// Runs before the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+    sol::optional<sol::function> on_render_pre_pause_menu = lua["on_render_pre_pause_menu"];
+
+    VanillaRenderContext render_ctx;
+
+    if (on_render_pre_pause_menu)
+    {
+        on_render_pre_pause_menu.value()(render_ctx);
+    }
+
+    for (auto& [id, callback] : callbacks)
+    {
+        auto now = get_frame_count();
+        if (callback.screen == ON::RENDER_PRE_PAUSE_MENU)
+        {
+            handle_function(callback.func, render_ctx);
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_render_pause_menu()
+{
+    if (!get_enabled())
+        return;
+
+    /// Runs after the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+    sol::optional<sol::function> on_render_post_pause_menu = lua["on_render_post_pause_menu"];
+
+    VanillaRenderContext render_ctx;
+
+    if (on_render_post_pause_menu)
+    {
+        on_render_post_pause_menu.value()(render_ctx);
+    }
+
+    for (auto& [id, callback] : callbacks)
+    {
+        auto now = get_frame_count();
+        if (callback.screen == ON::RENDER_POST_PAUSE_MENU)
+        {
+            handle_function(callback.func, render_ctx);
+            callback.lastRan = now;
+        }
+    }
+}
 
 void LuaBackend::hook_entity_dtor(Entity* entity)
 {
