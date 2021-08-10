@@ -1,6 +1,6 @@
 meta.name = "Rando Two"
 meta.description = "Second incarnation of The Randomizer with new api shenannigans. Everything is now rewritten from scratch and I tuned the crazyness down a notch. Still needs some balancing probably... There's a kinda new progression system forming with a high probability to be able to do chain (not finished), with multiple endings. It's still hard AF, good luck getting true ending!"
-meta.version = "1.999999"
+meta.version = "1.9999999"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
@@ -68,7 +68,7 @@ local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TR
 local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
 local trap_arrows = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
-local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE}
+local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_BEEHIVE}
 
 local function trap_ceiling_spawn(x, y, l)
     local item = pick(traps_ceiling)
@@ -272,7 +272,7 @@ set_post_entity_spawn(function(ent)
     if state.theme == THEME.DUAT then
         kill_entity(ent.uid)
     end
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_SNAP_TRAP)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
 
 --[[ENEMIES]]
 register_option_float("enemy_max", "Max enemy chance", 12, 0, 100)
@@ -475,7 +475,7 @@ end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANG
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme ~= THEME.OLMEC then
-        return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
+        return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_UFO)
@@ -485,14 +485,21 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_YETI)
+end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.MONS_YETI)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme ~= THEME.ICE_CAVES or l ~= LAYER.BACK then
         return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
     end
-    return spawn_entity_nonreplaceable(pick(enemies_big), x, y, l, 0, 0)
-end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_YETIQUEEN, ENT_TYPE.MONS_YETIKING})
+    return spawn_entity_nonreplaceable(pick(enemies_big, ENT_TYPE.MOUNT_MECH), x, y, l, 0, 0)
+end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_YETIQUEEN, ENT_TYPE.MONS_YETIKING})
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if state.theme ~= THEME.DWELLING or state.level ~= 4 then
+        return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
+    end
+    return spawn_entity_nonreplaceable(pick(enemies_big, ENT_TYPE.MOUNT_MECH), x, y, l, 0, 0)
+end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_CAVEMAN_BOSS})
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.OLMEC then return end
@@ -892,6 +899,13 @@ local world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
 local dead = true
 local co_level = 5
 
+local insert_bosses = {}
+local bosses_killed = {}
+local bosses_added = 0
+local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_ANKH}
+local chain_items = {}
+local boss_warp = false
+
 local critters_spawned = true
 local critters = {}
 critters[THEME.DWELLING] = ENT_TYPE.MONS_CRITTERDUNGBEETLE
@@ -932,10 +946,6 @@ local function add_level(w, l, t)
     level_order[#level_order+1] = { w = w, l = l, t = t, b = has(bosses, t) or t == THEME.TIAMAT }
 end
 
-local insert_bosses = {}
-local bosses_killed = {}
-local bosses_added = 0
-
 local function bosses_left()
     return options.door_bosses+1-#bosses_killed
 end
@@ -971,9 +981,6 @@ local function fix_chain()
     insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
     insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
 end
-
-local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_ANKH}
-local chain_items = {}
 
 local function get_chain_item(x, y)
     if #chain_items > 0 then
@@ -1049,6 +1056,7 @@ local function init_run()
     chain_items = {table.unpack(orig_chain_items)}
     bosses_killed = {}
     bosses_added = 0
+    boss_warp = false
     local normal_levels = 0
     local done = false
     while not done do
@@ -1091,16 +1099,19 @@ local function init_run()
         end
     end
     fix_chain()
-    level_order = {
+    --[[level_order = {
+        { w = 2, l = 3, t = THEME.VOLCANA, b = false },
+        { w = 4, l = 4, t = THEME.ABZU, b = false },
+        { w = 5, l = 1, t = THEME.ICE_CAVES, b = false },
+        { w = 4, l = 3, t = THEME.CITY_OF_GOLD, b = false },
         { w = 7, l = 1, t = THEME.SUNKEN_CITY, b = false },
         { w = 4, l = 2, t = THEME.TEMPLE, b = false },
-        { w = 1, l = 1, t = THEME.DWELLING, b = false },
         { w = 2, l = 1, t = THEME.JUNGLE, b = false },
         { w = 6, l = 4, t = THEME.TIAMAT, b = true },
         { w = 1, l = 1, t = THEME.DWELLING, b = false },
         { w = 2, l = 1, t = THEME.JUNGLE, b = false },
         { w = 7, l = 4, t = THEME.HUNDUN, b = true },
-    }
+    }]]
 end
 
 local function dead_olmec()
@@ -1216,8 +1227,6 @@ set_callback(function()
     end
 end, ON.TRANSITION)
 
-local boss_warp = false
-
 set_callback(function()
     --message("Loading")
     if state.screen_next ~= ON.LEVEL and (state.screen_next ~= ON.TRANSITION or not options.door_transitions) then return end
@@ -1286,6 +1295,16 @@ set_callback(function()
             boss_warp = true
         else
             boss_warp = false
+        end
+    elseif state.theme == THEME.CITY_OF_GOLD then
+        if players[1] then
+            local x, y, l = get_position(players[1].uid)
+            local uids = get_entities_at(ENT_TYPE.FLOOR_ALTAR, 0, x, y, l, 2)
+            if #uids > 0 then
+                boss_warp = true
+            else
+                boss_warp = false
+            end
         end
     else
         boss_warp = false
