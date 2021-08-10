@@ -724,7 +724,7 @@ void LuaBackend::pre_render_hud()
     /// Runs before the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
     sol::optional<sol::function> on_render_pre_hud = lua["on_render_pre_hud"];
 
-    VanillaRenderContext render_ctx(this);
+    VanillaRenderContext render_ctx;
 
     if (on_render_pre_hud)
     {
@@ -749,7 +749,7 @@ void LuaBackend::post_render_hud()
     /// Runs after the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
     sol::optional<sol::function> on_render_post_hud = lua["on_render_post_hud"];
 
-    VanillaRenderContext render_ctx(this);
+    VanillaRenderContext render_ctx;
 
     if (on_render_post_hud)
     {

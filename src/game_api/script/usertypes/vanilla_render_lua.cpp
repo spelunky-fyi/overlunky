@@ -3,11 +3,6 @@
 #include "render_api.hpp"
 #include "script/lua_backend.hpp"
 
-VanillaRenderContext::VanillaRenderContext(LuaBackend* _backend)
-    : backend(_backend)
-{
-}
-
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
     RenderAPI::get().draw_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle);

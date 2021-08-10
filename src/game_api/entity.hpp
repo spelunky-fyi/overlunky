@@ -40,6 +40,18 @@ struct Rect
 
 struct Color
 {
+    /// Create a new color - defaults to black
+    constexpr Color()
+        : r(0.0f), g(0.0f), b(0.0f), a(1.0f)
+    {
+    }
+
+    /// Create a new color by specifying its values
+    constexpr Color(float r_, float g_, float b_, float a_)
+        : r(r_), g(g_), b(b_), a(a_)
+    {
+    }
+
     float r;
     float g;
     float b;

@@ -948,6 +948,12 @@ Generate a random integer in the range `[min, size)`
 \
 Returns true with a chance of `1/inverse_chance`
 ### `Color`
+- [`Color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
+\
+Create a new color - defaults to black
+- [`Color(float r_, float g_, float b_, float a_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
+\
+Create a new color by specifying its values
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
 - [`float b`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b) &Color::b
@@ -2701,6 +2707,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 - [`int sub_image_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_image_height) &TextureDefinition::sub_image_height
 ### `AABB`
 Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
+- [`AABB()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
+\
+Create a new axis aligned bounding box - defaults to all zeroes
+- [`AABB(float left_, float bottom_, float right_, float top_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
+\
+Create a new axis aligned bounding box by specifying its values
 - [`float left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) &AABB::left
 - [`float bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) &AABB::bottom
 - [`float right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) &AABB::right

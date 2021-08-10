@@ -95,6 +95,7 @@ replace = {
     "std::": "",
     "sol::": "",
     "void": "",
+    "constexpr": "",
     "variadic_args va": "int, int...",
 }
 comment = []
@@ -204,6 +205,10 @@ for file in header_files:
                 m = re.search(r"/// ?(.*)$", line)
                 if m:
                     comment.append(m[1])
+
+                m = re.search(r"^\s*:.*$", line) # skip lines that start with a colon (constructor parameter initialization)
+                if m:
+                    continue
 
                 m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
                 if m:
@@ -316,7 +321,20 @@ for file in api_files:
             var_name = var[0]
             cpp = var[1]
             cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
-            if cpp_name in underlying_cpp_type["member_funs"]:
+
+            if var[0].startswith("sol::constructors"):
+                for fun in underlying_cpp_type["member_funs"][cpp_type]:
+                    param = fun["param"]
+                    sig = f"{cpp_type}({param})"
+                    vars.append(
+                        {
+                            "name": cpp_type,
+                            "type": "",
+                            "signature": sig,
+                            "comment": fun["comment"],
+                        }
+                    )
+            elif cpp_name in underlying_cpp_type["member_funs"]:
                 for fun in underlying_cpp_type["member_funs"][cpp_name]:
                     ret = fun["return"]
                     param = fun["param"]
