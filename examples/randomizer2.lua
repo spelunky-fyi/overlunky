@@ -736,7 +736,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         return spawn_entity_nonreplaceable(pick(all_shop_items), x, y, l, 0, 0)
     end
-end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_items)
+end, SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, shop_items)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
@@ -745,7 +745,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         return spawn_entity_nonreplaceable(pick(shop_mounts), x, y, l, 0, 0)
     end
-end, SPAWN_TYPE.SYSTEMIC, MASK.MOUNT, shop_mounts)
+end, SPAWN_TYPE.LEVEL_GEN, MASK.MOUNT, shop_mounts)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
@@ -758,7 +758,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         end
         return spawn_entity_nonreplaceable(item, x, y, l, 0, 0)
     end
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.CHAR_HIREDHAND)
+end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.CHAR_HIREDHAND)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
@@ -1100,6 +1100,7 @@ local function init_run()
     end
     fix_chain()
     --[[level_order = {
+        { w = 4, l = 3, t = THEME.CITY_OF_GOLD, b = false },
         { w = 2, l = 3, t = THEME.VOLCANA, b = false },
         { w = 4, l = 4, t = THEME.ABZU, b = false },
         { w = 5, l = 1, t = THEME.ICE_CAVES, b = false },
@@ -1272,6 +1273,7 @@ set_callback(function(ctx)
 end, ON.GUIFRAME)
 
 set_callback(function()
+    if not players[1] then return end
     if state.theme == THEME.TEMPLE then
         local x, y, l = get_position(players[1].uid)
         local uids = get_entities_at(ENT_TYPE.BG_DOOR_COG, 0, x, y, l, 2)
@@ -1297,14 +1299,12 @@ set_callback(function()
             boss_warp = false
         end
     elseif state.theme == THEME.CITY_OF_GOLD then
-        if players[1] then
-            local x, y, l = get_position(players[1].uid)
-            local uids = get_entities_at(ENT_TYPE.FLOOR_ALTAR, 0, x, y, l, 2)
-            if #uids > 0 then
-                boss_warp = true
-            else
-                boss_warp = false
-            end
+        local x, y, l = get_position(players[1].uid)
+        local uids = get_entities_at(ENT_TYPE.FLOOR_ALTAR, 0, x, y, l, 2)
+        if #uids > 0 then
+            boss_warp = true
+        else
+            boss_warp = false
         end
     else
         boss_warp = false
