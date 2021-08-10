@@ -21,22 +21,22 @@ You are strongly discouraged from using any modding tools in your actual online 
 
 **Overlunky does NOT work online!** I thought the disclaimer was clear on this... Now I'm not going to stop you from trying, but you'll just find yourself in a world of desync and crashes.
 
-Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check `Spelunky 2/entities.txt` for a list of numerical entity IDs.
+Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check [entities.txt](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.txt) for a list of numerical entity IDs.
 
 ## Features
 Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans.
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
-      + **Tab**: Add selected itemid to list
+      + **Tab**: Add selected item id to list when making a kit
       + **Mouse left**: Spawn entity at mouse cursor
       + **Mouse right**: Teleport to mouse cursor
-      + **Mouse middle**: Select or drag entities around (not stuff like walls)
-      + **Ctrl+Mouse middle**: Launch dragged entity with velocity
+      + **Mouse middle**: Select or drag safe entities around
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
+      + **Ctrl+Mouse middle**: Launch dragged entity with velocity
       + **(Ctrl/Shift+)Mouse 4**: Boom / Big Boom / Nuke!
-      + **Mouse 5**: Destroy entity (not stuff like walls)
-      + **Ctrl+Mouse 5**: Clone entity
+      + **Mouse 5**: Destroy safe entities
       + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
+      + **Ctrl+Mouse 5**: Clone entity
       + **Shift+123...**: Spawn saved kit number
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
@@ -51,9 +51,15 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+0**: Auto fit level width to screen
       + **Ctrl+2345**: Zoom to X level width
       + **Shift+ArrowKey**: Move camera in desired direction
-      + **Mouse 4**: drag the level around (move camera)
+      + **Mouse 4**: Drag camera around or focus on an entity
+      + **Mouse 4 doubleclick**: Reset camera focus to player
+      + **Mouse 4+Wheel**: Zoom
+      + **Ctrl+Wheel**: Zoom
   - **F4**: Entity properties
       + See and change a lot of variables of the selected entity
+      + **Mouse middle**: Select or drag safe entities around
+      + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
+      + **Ctrl+Mouse middle**: Launch dragged entity with velocity
   - **F5**: Game state
       + See and change a lot of variables from the game state
       + **Ctrl+Space**: Toggle game engine pause
@@ -65,9 +71,15 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + You can load, edit and set options for Lua scripts here
       + **Ctrl+F5**: Reload enabled scripts
   - **F9**: Options
-      + Lots of options. **Check the ini for hotkeys, I'm tired of updating this.**
+      + Lots of options. **Check the ini for hotkeys for these and other stuff!**
   - **F11**: Hide overlay
-  - **Ctrl+Shift+U**: Change UI color
+  - **\~ (or your native Console Key)**: Toggle developer console
+    - The console is its own script environment, where you can run some quick oneliners or paste snippets in.
+    - **Enter**: Execute
+    - **Ctrl+Enter**: New line
+    - **"clear/clr/cls"**: Clear history
+    - **"reset"**: Clear all callbacks made in the console
+  - **Ctrl+Shift+U**: Change UI color. You can also change the font in the ini.
   - **Ctrl+Shift+I**: ImGui internal metrics and settings
   - **Ctrl+Shift+S**: Save options, hotkeys and UI colors
   - **Ctrl+Shift+L**: Load options, hotkeys and UI colors
@@ -76,9 +88,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Escape**: Return focus to game from an input
 
 ### Scripts
-Lua scripting is buggy and unfinished and the **API will change**, so don't go around making and releasing huge things. They will break. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started though. The examples should be considered [Unlicensed](https://unlicense.org/), so please DO NOT credit the author when copying them. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`.
+Lua scripting is still buggy and unfinished and the **API might change**, although we will try to deprecate old stuff without breaking anything. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md), [internal details](https://github.com/spelunky-fyi/overlunky/tree/main/docs) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started. The examples should be considered [Unlicensed](https://unlicense.org/), so please DO NOT credit the author when copying them. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`. Check the [Playlunky documentation](https://github.com/spelunky-fyi/Playlunky/wiki#script-mods) on how to run your scripts as PL mods.
 
-**Scripts don't work online either!** While technically they can work, yours truly has no interest in making any online features. If you want an online rando, make and test it yourself. Or use Parsec.
+**Scripts don't work online either!** While technically they can work, and there's some work being done on this, yours truly has little interest in making any online features.
 
 ## Troubleshooting
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:

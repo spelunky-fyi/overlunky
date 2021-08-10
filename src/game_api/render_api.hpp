@@ -21,6 +21,8 @@ struct RenderAPI
 {
     const size_t* api;
     size_t swap_chain_off;
+
+    mutable std::mutex custom_textures_lock;
     std::unordered_map<std::uint64_t, Texture> custom_textures;
 
     static RenderAPI& get();
@@ -126,4 +128,4 @@ struct TextRenderingInfo
     size_t unknown11;
 };
 
-void init_render_hud_hook();
+void init_render_api_hooks();

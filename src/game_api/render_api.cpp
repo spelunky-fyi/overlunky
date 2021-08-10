@@ -71,6 +71,7 @@ Texture* RenderAPI::get_texture(std::uint64_t texture_id)
     auto* textures = get_textures();
     if (texture_id >= textures->texture_map.size())
     {
+        std::lock_guard lock{custom_textures_lock};
         return &custom_textures[texture_id];
     }
     return textures->texture_map[texture_id];
@@ -84,6 +85,8 @@ std::uint64_t RenderAPI::define_texture(TextureDefinition data)
         data.sub_image_width = data.width;
         data.sub_image_height = data.height;
     }
+
+    std::lock_guard lock{custom_textures_lock};
 
     auto* textures = get_textures();
     Texture new_texture{
@@ -160,28 +163,6 @@ void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
             backend.post_render_hud();
             return true;
         });
-}
-
-void init_render_hud_hook()
-{
-    auto& memory = Memory::get();
-    auto exe = memory.exe();
-
-    std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
-    size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
-    size_t func_render_hud = function_start(memory.at_exe(pattern_pos));
-
-    DetourRestoreAfterWith();
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    g_render_hud_trampoline = (VanillaRenderHudFun*)func_render_hud;
-    DetourAttach((void**)&g_render_hud_trampoline, (VanillaRenderHudFun*)render_hud);
-
-    const LONG error = DetourTransactionCommit();
-    if (error != NO_ERROR)
-    {
-        DEBUG("Failed hooking render_hud: {}\n", error);
-    }
 }
 
 static size_t text_rendering_context_offset = 0;
@@ -330,5 +311,58 @@ void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, f
         typedef void render_func(texture_rendering_info*, uint8_t, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
         rf(&tri, 0x29, texture->name, &color);
+    }
+}
+
+using FetchTexture = const Texture*(class Entity*, uint32_t);
+FetchTexture* g_fetch_texture_trampoline{nullptr};
+const Texture* fetch_texture(class Entity* source_entity, uint32_t texture_id)
+{
+    auto* textures = get_textures();
+    if (texture_id >= textures->texture_map.size())
+    {
+        const auto& render_api = RenderAPI::get();
+        std::lock_guard lock{render_api.custom_textures_lock};
+        const auto& custom_textures = render_api.custom_textures;
+        auto it = custom_textures.find(texture_id);
+        if (it != custom_textures.end())
+        {
+            return &it->second;
+        }
+    }
+
+    return g_fetch_texture_trampoline(source_entity, texture_id);
+}
+
+void init_render_api_hooks()
+{
+    auto& memory = Memory::get();
+    auto exe = memory.exe();
+    auto after_bundle = memory.after_bundle;
+
+    {
+        auto fun_start = find_inst(exe, "\x48\x83\xec\x20\x48\x8b\x01\x48\x8b\xf9\x48\x8b\x58\x28"s, after_bundle);
+        fun_start = find_inst(exe, "\xe8"s, fun_start);
+        fun_start = Memory::decode_call(fun_start);
+        g_fetch_texture_trampoline = (FetchTexture*)memory.at_exe(fun_start);
+    }
+
+    {
+        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x48\x8D\x0D\x56\x05\x16\x00"s, after_bundle)));
+        g_render_hud_trampoline = (VanillaRenderHudFun*)fun_start;
+    }
+
+    DetourRestoreAfterWith();
+
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+
+    DetourAttach((void**)&g_fetch_texture_trampoline, &fetch_texture);
+    DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking render_api: {}\n", error);
     }
 }
