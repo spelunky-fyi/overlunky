@@ -83,7 +83,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         std::this_thread::sleep_for(100ms);
     }
 
-    auto api = RenderAPI::get();
+    auto& api = RenderAPI::get();
     init_ui();
     init_hooks((void*)api.swap_chain());
     size_t env_var_size;
