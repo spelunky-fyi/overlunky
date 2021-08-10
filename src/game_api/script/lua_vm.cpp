@@ -1021,7 +1021,7 @@ end
         "COSMIC_OCEAN_WIN",
         3);
 
-    /// Used in the `vanilla_draw_text` function
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_HUD event
     lua.create_named_table(
         "VANILLA_TEXT_ALIGNMENT",
         "LEFT",
@@ -1031,7 +1031,7 @@ end
         "RIGHT",
         2);
 
-    /// Used in the `vanilla_draw_text` function
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_HUD event
     lua.create_named_table(
         "VANILLA_FONT_STYLE",
         "ITALIC",
