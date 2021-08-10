@@ -201,26 +201,30 @@ for file in header_files:
                 m = re.search(r"/// ?(.*)$", line)
                 if m:
                     comment.append(m[1])
+                else:
+                    m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
+                    if m:
+                        name = m[3]
+                        if name not in member_funs:
+                            member_funs[name] = []
+                        member_funs[name].append(
+                            {
+                                "return": m[2],
+                                "name": m[3],
+                                "param": m[4],
+                                "comment": comment,
+                            }
+                        )
+                        comment = []
 
-                m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
-                if m:
-                    name = m[3]
-                    if name not in member_funs:
-                        member_funs[name] = []
-                    member_funs[name].append(
-                        {
-                            "return": m[2],
-                            "name": m[3],
-                            "param": m[4],
-                            "comment": comment,
-                        }
+                    m = re.search(
+                        r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
                     )
-                    comment = []
-
-                m = re.search(r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line)
-                if m:
-                    member_vars.append({"type": m[1], "name": m[2], "comment": comment})
-                    comment = []
+                    if m:
+                        member_vars.append(
+                            {"type": m[1], "name": m[2], "comment": comment}
+                        )
+                        comment = []
             elif brackets_depth == 0:
                 classes.append(
                     {

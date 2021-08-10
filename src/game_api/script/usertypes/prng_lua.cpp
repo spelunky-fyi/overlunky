@@ -8,14 +8,15 @@ namespace NPRNG
 {
 void register_usertypes(sol::state& lua)
 {
+    auto random = sol::overload(static_cast<float (PRNG::*)(PRNG::PRNG_CLASS)>(&PRNG::random), static_cast<std::optional<std::int64_t> (PRNG::*)(std::int64_t, PRNG::PRNG_CLASS)>(&PRNG::random), static_cast<std::optional<std::int64_t> (PRNG::*)(std::int64_t, std::int64_t, PRNG::PRNG_CLASS)>(&PRNG::random));
     lua.new_usertype<PRNG>(
         "PRNG",
-        "random_index",
-        &PRNG::random_index,
         "random_int",
         &PRNG::random_int,
         "random_chance",
-        &PRNG::random_chance);
+        &PRNG::random_chance,
+        "random",
+        random);
 
     /// The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
     lua["prng"] = &PRNG::get();

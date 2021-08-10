@@ -278,7 +278,7 @@ Short for [spawn_layer_door](#spawn_layer_door).
 `int spawn_apep(float x, float y, LAYER layer, bool right)`<br/>
 Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
 ### [`spawn_tree`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
-`nil spawn_tree(float x, float y, int l)`<br/>
+`nil spawn_tree(float x, float y, LAYER layer)`<br/>
 Spawns and grows a tree
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
@@ -699,6 +699,9 @@ end
 ### [`create_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
 `tuple<size_t, int, int> create_image(string path)`<br/>
 Create image from file. Returns a tuple containing id, width and height.
+### [`mouse_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouse_position)
+`tuple<float, float> mouse_position()`<br/>
+Current mouse cursor position in screen coordinates.
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
@@ -934,12 +937,24 @@ end
 - [`int random_index(int size, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_index) &PRNG::random_index
 \
 Generate a random integer in the range `[0, size)`
-- [`int random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
+- [`optional<int> random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
 \
-Generate a random integer in the range `[min, size)`
+Generate a random integer in the range `[min, size)`, returns `nil` if `min == max`
 - [`bool random_chance(int inverse_chance, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_chance) &PRNG::random_chance
 \
 Returns true with a chance of `1/inverse_chance`
+- [`float random(PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random()`
+Generate a random floating point number in the range `[0, 1)`
+- [`optional<int> random(int i, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random(i)`
+Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
+- [`optional<int> random(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random(min, max)`
+Generate a integer number in the range `[min, max]` or `nil` if `max < min`
 ### `Color`
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
@@ -1490,6 +1505,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 \
 I'm looking for turkeys, wanna help?
 - [`bool quest_incomplete`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_incomplete) &Yang::quest_incomplete
+\
+set to false when the quest is over (Yang dead or second turkey delivered)
 - [`bool special_message_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_message_shown) &Yang::special_message_shown
 \
 tusk palace/black market/one way door - message shown
@@ -1497,6 +1514,8 @@ tusk palace/black market/one way door - message shown
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`RoomOwner`](#roomowner)
 - [`int arrows_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrows_left) &Tun::arrows_left
 - [`int reload_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_timer) &Tun::reload_timer
+\
+when 0, a new arrow is loaded into the bow; resets when she finds an arrow on the ground
 - [`bool challenge_fee_paid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=challenge_fee_paid) &Tun::challenge_fee_paid
 \
 affect only the speech bubble
@@ -1515,6 +1534,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 \
 person whos petting it, only in the camp
 - [`int yell_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yell_counter) &Pet::yell_counter
+\
+counts up to 400 (6.6 sec), when 0 the pet yells out
 - [`int func_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=func_timer) &Pet::func_timer
 \
 used when free running in the camp
@@ -2609,9 +2630,15 @@ Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0
 \
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 - [`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+\
+Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 - [`nil draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+\
+Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 - [`bool window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) &GuiDrawContext::window
 \
+Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
+[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
 autosize in center. Use just a `##Label` as title to hide titlebar.
 Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
 give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
@@ -2624,6 +2651,8 @@ Add some text to window, automatically wrapped
 \
 Add a separator line to window
 - [`nil win_inline()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) &GuiDrawContext::win_inline
+\
+Add next thing on the same line. This is same as `win_sameline(0, -1)`
 - [`nil win_sameline(float offset, float spacing)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline) &GuiDrawContext::win_sameline
 \
 Add next thing on the same line, with an offset
@@ -3235,16 +3264,17 @@ Use in `define_room_template` to declare whether a room template has any special
 - [`NONE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.NONE) 0
 - [`ENTRANCE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.ENTRANCE) 1
 - [`EXIT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.EXIT) 2
+- [`SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.SHOP) 3
 ### SHOP_TYPE
 Determines which kind of shop spawns in the level, if any
 - [`GENERAL_STORE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.GENERAL_STORE) 0
 - [`CLOTHING_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CLOTHING_SHOP) 1
 - [`WEAPON_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.WEAPON_SHOP) 2
 - [`SPECIALTY_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.SPECIALTY_SHOP) 3
-- [`HIRED_HAND_SJOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.HIRED_HAND_SJOP) 4
+- [`HIRED_HAND_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.HIRED_HAND_SHOP) 4
 - [`PET_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.PET_SHOP) 5
 - [`DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.DICE_SHOP) 6
-- [`TUSK_DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.TUSK_DICE_SHOP) 7
+- [`TUSK_DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.TUSK_DICE_SHOP) 13
 ### SOUND_TYPE
 Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
 - [`SFX`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SOUND_TYPE.SFX) 0
