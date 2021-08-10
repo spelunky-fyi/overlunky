@@ -1,6 +1,7 @@
 #include "render_api.hpp"
 
 #include <cstddef>
+#include <detours.h>
 #include <string>
 
 #include "memory.hpp"
@@ -69,6 +70,7 @@ Texture* RenderAPI::get_texture(std::uint64_t texture_id)
     auto* textures = get_textures();
     if (texture_id >= textures->texture_map.size())
     {
+        std::lock_guard lock{custom_textures_lock};
         return &custom_textures[texture_id];
     }
     return textures->texture_map[texture_id];
@@ -82,6 +84,8 @@ std::uint64_t RenderAPI::define_texture(TextureDefinition data)
         data.sub_image_width = data.width;
         data.sub_image_height = data.height;
     }
+
+    std::lock_guard lock{custom_textures_lock};
 
     auto* textures = get_textures();
     Texture new_texture{
@@ -136,4 +140,51 @@ const char** RenderAPI::load_texture(std::string file_name)
     void* render_api = (void*)renderer();
     auto load_texture = (LoadTextureFunT*)get_load_texture();
     return load_texture(render_api, &file_name, 1);
+}
+
+using FetchTexture = const Texture*(class Entity*, uint32_t);
+FetchTexture* g_fetch_texture_trampoline{nullptr};
+const Texture* fetch_texture(class Entity* source_entity, uint32_t texture_id)
+{
+    auto* textures = get_textures();
+    if (texture_id >= textures->texture_map.size())
+    {
+        const auto& render_api = RenderAPI::get();
+        std::lock_guard lock{render_api.custom_textures_lock};
+        const auto& custom_textures = render_api.custom_textures;
+        auto it = custom_textures.find(texture_id);
+        if (it != custom_textures.end())
+        {
+            return &it->second;
+        }
+    }
+
+    return g_fetch_texture_trampoline(source_entity, texture_id);
+}
+
+void init_render_api_hooks()
+{
+    auto& memory = Memory::get();
+    auto exe = memory.exe();
+    auto after_bundle = memory.after_bundle;
+
+    {
+        auto fun_start = find_inst(exe, "\x48\x83\xec\x20\x48\x8b\x01\x48\x8b\xf9\x48\x8b\x58\x28"s, after_bundle);
+        fun_start = find_inst(exe, "\xe8"s, fun_start);
+        fun_start = Memory::decode_call(fun_start);
+        g_fetch_texture_trampoline = (FetchTexture*)memory.at_exe(fun_start);
+    }
+
+    DetourRestoreAfterWith();
+
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+
+    DetourAttach((void**)&g_fetch_texture_trampoline, &fetch_texture);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking render_api: {}\n", error);
+    }
 }
