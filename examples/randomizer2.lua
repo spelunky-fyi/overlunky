@@ -5,7 +5,7 @@ meta.author = "Dregu"
 
 local function get_chance(min, max)
     if max == 0 then return 0 end
-    if min >= max then return min end
+    if min >= max then return math.floor(1/(min/100)) end
     min = math.floor(1/(min/100))
     max = math.floor(1/(max/100))
     return math.random(max, min)
@@ -57,7 +57,7 @@ end
 local level_stuff = {}
 
 --[[TRAPS]]
-register_option_float("trap_max", "Max trap chance", 4.5, 0, 100)
+register_option_float("trap_max", "Max trap chance", 4, 0, 100)
 register_option_float("trap_min", "Min trap chance", 1.5, 0, 100)
 
 local traps_ceiling = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
@@ -155,7 +155,14 @@ local function trap_generic_spawn(x, y, l)
 end
 local function trap_generic_valid(x, y, l)
     local floor = get_grid_entity_at(x, y, l)
+    local above = get_grid_entity_at(x, y+1, l)
     if floor ~= -1 then
+        if above ~= -1 then
+            above = get_entity(above)
+            if above.type.id == ENT_TYPE.FLOOR_ALTAR then
+                return false
+            end
+        end
         floor = get_entity(floor)
         return has(valid_floors, floor.type.id)
     end
@@ -1100,6 +1107,10 @@ local function init_run()
     end
     fix_chain()
     --[[level_order = {
+        { w = 1, l = 1, t = THEME.DWELLING, b = false },
+        { w = 1, l = 2, t = THEME.DWELLING, b = false },
+        { w = 1, l = 3, t = THEME.DWELLING, b = false },
+        { w = 1, l = 4, t = THEME.DWELLING, b = false },
         { w = 4, l = 3, t = THEME.CITY_OF_GOLD, b = false },
         { w = 2, l = 3, t = THEME.VOLCANA, b = false },
         { w = 4, l = 4, t = THEME.ABZU, b = false },
@@ -1272,6 +1283,56 @@ set_callback(function(ctx)
     end
 end, ON.GUIFRAME)
 
+local last_room = -1
+local animals = {
+    [ENT_TYPE.MONS_PET_CAT] = "a cat",
+    [ENT_TYPE.MONS_PET_DOG] = "a dog",
+    [ENT_TYPE.MONS_PET_HAMSTER] = "a hamster",
+    [ENT_TYPE.MOUNT_ROCKDOG] = "a rockdog",
+    [ENT_TYPE.MOUNT_AXOLOTL] = "an axolotl",
+    [ENT_TYPE.MOUNT_QILIN] = "an updog",
+    [ENT_TYPE.MONS_SCORPION] = "a scorpion",
+    [ENT_TYPE.MONS_HORNEDLIZARD] = "a lizard",
+    [ENT_TYPE.MONS_SHOPKEEPER] = "a person",
+    [ENT_TYPE.MONS_SHOPKEEPERCLONE] = "a person",
+    [ENT_TYPE.MONS_PROTOSHOPKEEPER] = "an abomination",
+    [ENT_TYPE.MONS_CAVEMAN] = "a person",
+    [ENT_TYPE.MONS_TIKIMAN] = "a person",
+    [ENT_TYPE.MONS_WITCHDOCTOR] = "a person",
+    [ENT_TYPE.MONS_VAMPIRE] = "a person",
+    [ENT_TYPE.MONS_SORCERESS] = "a person",
+    [ENT_TYPE.MONS_VLAD] = "a person",
+    [ENT_TYPE.MONS_SISTER_PARSLEY] = "a person",
+    [ENT_TYPE.MONS_SISTER_PARSNIP] = "a person",
+    [ENT_TYPE.MONS_SISTER_PARMESAN] = "a person",
+    [ENT_TYPE.MONS_HUNDUNS_SERVANT] = "a person",
+    [ENT_TYPE.MONS_MERCHANT] = "a person",
+    [ENT_TYPE.MONS_OLD_HUNTER] = "a person",
+    [ENT_TYPE.MONS_THIEF] = "a person",
+    [ENT_TYPE.MONS_BODYGUARD] = "a person",
+    [ENT_TYPE.MONS_LEPRECHAUN] = "a person",
+    [ENT_TYPE.MONS_FISH] = "a fish",
+    [ENT_TYPE.MONS_OCTOPUS] = "an octopus",
+    [ENT_TYPE.MONS_HERMITCRAB] = "a crab",
+    [ENT_TYPE.MONS_YETI] = "a yeti",
+    [ENT_TYPE.MONS_MANTRAP] = "a flower",
+    [ENT_TYPE.MONS_MOLE] = "a mole",
+    [ENT_TYPE.MONS_CROCMAN] = "a crocodile",
+}
+
+local function get_animal_name(uid)
+    local ent = get_entity(uid)
+    local name = "not a turkey"
+    if ent then
+        name = animals[ent.type.id]
+        if test_flag(ent.flags, ENT_FLAG.DEAD) then
+            name = name:gsub("an? ", "a dead ")
+        end
+        return name
+    end
+    return nil
+end
+
 set_callback(function()
     if not players[1] then return end
     if state.theme == THEME.TEMPLE then
@@ -1308,6 +1369,27 @@ set_callback(function()
         end
     else
         boss_warp = false
+    end
+    if state.theme == THEME.DWELLING then
+        local x, y, l = get_position(players[1].uid)
+        local rx, ry = get_room_index(x, y)
+        local roomtype = get_room_template(rx, ry, l)
+        if roomtype == ROOM_TEMPLATE.PEN_ROOM and roomtype ~= last_room and players[1].holding_uid ~= -1 then
+            local yang = get_entities_by_type(ENT_TYPE.MONS_YANG)
+            local ent = get_entity(players[1].holding_uid)
+            if ent and animals[ent.type.id] ~= nil and #yang > 0 then
+                local name = get_animal_name(players[1].holding_uid)
+                local gender = "Sir"
+                if players[1]:is_female() then
+                    gender = "Ma'am"
+                end
+                local msg = string.format("%s, I'm looking for turkeys. Thats %s.", gender, name)
+                if name then
+                    say(yang[1], msg, 3, false)
+                end
+            end
+        end
+        last_room = roomtype
     end
 end, ON.FRAME)
 
