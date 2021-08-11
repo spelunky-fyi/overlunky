@@ -186,6 +186,30 @@ void render_pause_menu(float* drawing_info)
         });
 }
 
+using VanillaRenderDrawDepthFun = void(size_t, uint8_t, float, float, float, float);
+VanillaRenderDrawDepthFun* g_render_draw_depth_trampoline{nullptr};
+void render_draw_depth(size_t inside_state_unknown27, uint8_t draw_depth, float bbox1, float bbox2, float bbox3, float bbox4)
+{
+    // I believe the 4 floats are a bounding box so off screen entities can be excluded from drawing
+    // doesn't match up with camera bounds though
+
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.pre_render_draw_depth(draw_depth);
+            return true;
+        });
+
+    g_render_draw_depth_trampoline(inside_state_unknown27, draw_depth, bbox1, bbox2, bbox3, bbox4);
+
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.post_render_draw_depth(draw_depth);
+            return true;
+        });
+}
+
 static size_t text_rendering_context_offset = 0;
 static size_t text_rendering_func1_offset = 0;
 static size_t text_rendering_func2_offset = 0;
@@ -353,6 +377,11 @@ void init_render_api_hooks()
         g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)fun_start;
     }
 
+    {
+        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x44\x8B\xAC\xC1\x14\x3F\x06\x00"s, after_bundle)));
+        g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)fun_start;
+    }
+
     DetourRestoreAfterWith();
 
     DetourTransactionBegin();
@@ -361,6 +390,7 @@ void init_render_api_hooks()
     DetourAttach((void**)&g_fetch_texture_trampoline, &fetch_texture);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
+    DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)

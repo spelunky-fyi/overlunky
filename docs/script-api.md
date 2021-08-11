@@ -132,6 +132,10 @@ Runs after the HUD is drawn on screen. You can draw text and textures on screen 
 Runs before the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
 ### [`on_render_post_pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_pause_menu)
 Runs after the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+### [`on_render_pre_draw_depth`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_pre_draw_depth)
+Runs before the entities of the specified draw_depth are drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
+### [`on_render_post_draw_depth`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_draw_depth)
+Runs after the entities of the specified draw_depth are drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
@@ -3102,6 +3106,14 @@ Runs before the pause menu is drawn on screen
 \
 Params: `VanillaRenderContext render_ctx`\
 Runs after the pause menu is drawn on screen
+- [`RENDER_PRE_DRAW_DEPTH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) ON::RENDER_PRE_DRAW_DEPTH
+\
+Params: `VanillaRenderContext render_ctx, int draw_depth`\
+Runs before the entities of the specified draw_depth are drawn on screen
+- [`RENDER_POST_DRAW_DEPTH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_DRAW_DEPTH) ON::RENDER_POST_DRAW_DEPTH
+\
+Params: `VanillaRenderContext render_ctx, int draw_depth`\
+Runs after the entities of the specified draw_depth are drawn on screen
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \

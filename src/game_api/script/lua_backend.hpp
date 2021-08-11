@@ -77,6 +77,8 @@ enum class ON
     RENDER_POST_HUD,
     RENDER_PRE_PAUSE_MENU,
     RENDER_POST_PAUSE_MENU,
+    RENDER_PRE_DRAW_DEPTH,
+    RENDER_POST_DRAW_DEPTH,
 };
 
 struct IntOption
@@ -269,6 +271,8 @@ class LuaBackend
     void post_render_hud();
     void pre_render_pause_menu();
     void post_render_pause_menu();
+    void pre_render_draw_depth(uint8_t draw_depth);
+    void post_render_draw_depth(uint8_t draw_depth);
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);
