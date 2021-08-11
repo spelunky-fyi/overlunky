@@ -703,22 +703,24 @@ set_callback(function(ctx)
         state.level_gen.spawn_room_x = spawn_x
         state.level_gen.spawn_room_y = spawn_y
     end
-    for x = 0, state.width - 1 do
-        for y = 0, state.height - 1 do
-            local here = get_room_template(x, y, 0)
-            if here == ROOM_TEMPLATE.SIDE then
-                local left = get_room_template(x - 1, y, 0)
-                if valid_rooms_with_shop_next[left] then
-                    math.randomseed(read_prng()[6]+x+y)
-                    if math.random() < options.room_shop_chance/100 then
-                        ctx:set_room_template(x, y, 0, pick(new_rooms_left))
-                    end
-                else
-                    local right = get_room_template(x + 1, y, 0)
-                    if valid_rooms_with_shop_next[right] then
+    if state.level_gen.shop_type ~= SHOP_TYPE.DICE_SHOP and state.level_gen.shop_type ~= SHOP_TYPE.TUSK_DICE_SHOP then
+        for x = 0, state.width - 1 do
+            for y = 0, state.height - 1 do
+                local here = get_room_template(x, y, 0)
+                if here == ROOM_TEMPLATE.SIDE then
+                    local left = get_room_template(x - 1, y, 0)
+                    if valid_rooms_with_shop_next[left] then
                         math.randomseed(read_prng()[6]+x+y)
                         if math.random() < options.room_shop_chance/100 then
-                            ctx:set_room_template(x, y, 0, pick(new_rooms))
+                            ctx:set_room_template(x, y, 0, pick(new_rooms_left))
+                        end
+                    else
+                        local right = get_room_template(x + 1, y, 0)
+                        if valid_rooms_with_shop_next[right] then
+                            math.randomseed(read_prng()[6]+x+y)
+                            if math.random() < options.room_shop_chance/100 then
+                                ctx:set_room_template(x, y, 0, pick(new_rooms))
+                            end
                         end
                     end
                 end
@@ -1002,7 +1004,7 @@ end
 
 local function fix_chain()
     math.randomseed(read_prng()[1])
-    insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
+    --insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
     insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
 end
 
@@ -1506,6 +1508,48 @@ end, SPAWN_TYPE.SYSTEMIC, 0, projectiles_arrow)
     end
     return spawn(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
+
+--[[STORAGE]]
+register_option_bool("storage", "Random Waddler caches", true)
+set_callback(function()
+    local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
+    if #storages == 0 and options.storage then
+        local spots = {}
+        for x=3,state.width*10+2 do
+            for y=122,122-state.height*8+1,-1 do
+                local floor = get_grid_entity_at(x, y, LAYER.BACK)
+                local floor2 = get_grid_entity_at(x+1, y, LAYER.BACK)
+                local air = get_grid_entity_at(x, y+1, LAYER.BACK)
+                local air2 = get_grid_entity_at(x+1, y+1, LAYER.BACK)
+                if air == -1 and air2 == -1 and floor ~= -1 and floor2 ~= -1 then
+                    floor = get_entity(floor)
+                    floor2 = get_entity(floor2)
+                    local items = get_entities_at(0, MASK.ITEM | MASK.ACTIVEFLOOR, x+0.5, y+0.5, LAYER.BACK, 2)
+                    if #items == 0 and floor.type.id == ENT_TYPE.FLOOR_GENERIC and floor2.type.id == ENT_TYPE.FLOOR_GENERIC then
+                        spots[#spots+1] = { x = x, y = y }
+                    end
+                end
+            end
+        end
+        if #spots > 0 then
+            local spot = spots[math.random(#spots)]
+            local floor = get_grid_entity_at(spot.x, spot.y, LAYER.BACK)
+            local floor2 = get_grid_entity_at(spot.x+1, spot.y, LAYER.BACK)
+            if floor ~= -1 then kill_entity(floor) end
+            if floor2 ~= -1 then kill_entity(floor2) end
+            spawn_grid_entity(ENT_TYPE.FLOOR_STORAGE, spot.x, spot.y, LAYER.BACK)
+            spawn_grid_entity(ENT_TYPE.FLOOR_STORAGE, spot.x+1, spot.y, LAYER.BACK)
+            for i=0,9 do
+                local type = waddler_entity_type_in_slot(i)
+                if type ~= 0 then
+                    waddler_remove_entity(type, 99)
+                    spawn_critical(type, spot.x+0.5, spot.y+1, LAYER.BACK, 0, 0)
+                end
+            end
+            prinspect("Storage at", spot.x, spot.y)
+        end
+    end
+end, ON.POST_LEVEL_GENERATION)
 
 --[[STUFF]]
 local ending_timer = 0
