@@ -771,7 +771,7 @@ set_callback(function()
     end
     for i,v in ipairs(in_shop) do
         math.randomseed(read_prng()[8]+i)
-        v.price = math.random(1000, math.min(20000, 2*get_money())+math.random(500, 4000))
+        v.price = math.random(500, math.min(20000, 2*get_money())+math.random(500, 4000))
         --v.price = prng:random_int(1000, math.min(20000, 2*get_money())+math.random(1000, 2000), PRNG_CLASS.LEVEL_GEN)
     end
 end, ON.POST_LEVEL_GENERATION)
