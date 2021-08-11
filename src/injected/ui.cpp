@@ -2281,7 +2281,8 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                     auto room_pos = g_state->level_gen->get_room_pos(x, y);
                     auto pos = screen_position(room_pos.first, room_pos.second);
                     ImVec2 spos = screenify({pos.first, pos.second});
-                    draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), std::string(room_name).c_str());
+                    std::string room_text = std::format("{:d},{:d} {:s}", x, y, room_name);
+                    draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
                 }
             }
         }
@@ -4107,7 +4108,7 @@ void imgui_draw()
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
     std::string buf = std::format("Overlunky {}", TOSTRING(GIT_VERSION));
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - 30}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
     if (!hide_script_messages)
         render_messages();
