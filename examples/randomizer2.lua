@@ -67,7 +67,6 @@ local traps_flip = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRA
 local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
-local trap_arrows = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
 local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_BEEHIVE}
 
 local function trap_ceiling_spawn(x, y, l)
@@ -269,9 +268,11 @@ set_callback(function(ctx)
 end, ON.POST_ROOM_GENERATION)
 
 set_callback(function()
-    set_interval(function()
-        set_arrowtrap_projectile(pick(trap_arrows), pick(trap_arrows))
-    end, 15)
+    --[[set_interval(function()
+        if options.projectile then
+            set_arrowtrap_projectile(pick(trap_arrows), pick(trap_arrows))
+        end
+    end, 15)]]
     level_stuff = {}
 end, ON.LEVEL)
 
@@ -1394,21 +1395,61 @@ set_callback(function()
 end, ON.FRAME)
 
 set_callback(function()
-    --message("Reset - Init, state.reset == "..tostring(state.reset))
-    --init_run()
-end, ON.RESET)
-
-set_callback(function()
-    --message("Camp - Init")
-    --init_run()
-end, ON.CAMP)
-
-set_callback(function()
-    --message("Death - Init")
     toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(bosses_left()))
-    --dead = true
 end, ON.DEATH)
 
+--[[PROJECTILES]]
+register_option_bool("projectile", "Random projectiles", true)
+
+local projectiles = {ENT_TYPE.ITEM_BULLET, ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT}
+local projectiles_pc = {ENT_TYPE.ITEM_BULLET, ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_CLONEGUNSHOT, ENT_TYPE.ITEM_PLASMACANNON_SHOT, ENT_TYPE.ITEM_GIANTSPIDER_WEBSHOT}
+local projectiles_clone = {ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_CLONEGUNSHOT, ENT_TYPE.ITEM_GIANTSPIDER_WEBSHOT}
+local projectiles_arrow = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
+
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if options.projectile then
+        return spawn_entity_nonreplaceable(pick(projectiles), x, y, l, 0, 0)
+    end
+    return spawn(type, x, y, l, 0, 0)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_BULLET)
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if options.projectile then
+        return spawn_entity_nonreplaceable(pick(projectiles_pc), x, y, l, 0, 0)
+    end
+    return spawn(type, x, y, l, 0, 0)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PLASMACANNON_SHOT)
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if options.projectile then
+        return spawn_entity_nonreplaceable(pick(projectiles), x, y, l, 0, 0)
+    end
+    return spawn(type, x, y, l, 0, 0)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_FREEZERAYSHOT)
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if options.projectile then
+        return spawn_entity_nonreplaceable(pick(projectiles_clone), x, y, l, 0, 0)
+    end
+    return spawn(type, x, y, l, 0, 0)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUNSHOT)
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if options.projectile then
+        return spawn_entity_nonreplaceable(pick(projectiles_arrow), x, y, l, 0, 0)
+    end
+    return spawn(type, x, y, l, 0, 0)
+end, SPAWN_TYPE.SYSTEMIC, 0, projectiles_arrow)
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if options.projectile then
+        return spawn_entity_nonreplaceable(pick(projectiles_clone), x, y, l, 0, 0)
+    end
+    return spawn(type, x, y, l, 0, 0)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)
+
+--[[STUFF]]
 local ending_timer = 0
 local ending_cb = -1
 set_callback(function()
