@@ -5,7 +5,8 @@ meta.author = "Dregu"
 
 local function get_chance(min, max)
     if max == 0 then return 0 end
-    if min >= max then return math.floor(1/(min/100)) end
+    if min == 0 then min = 0.001 end
+    if min > max then min, max = max, min end
     min = math.floor(1/(min/100))
     max = math.floor(1/(max/100))
     return math.random(max, min)
@@ -64,8 +65,8 @@ end
 local level_stuff = {}
 
 --[[TRAPS]]
-register_option_float("trap_max", "Max trap chance", 4, 0, 100)
-register_option_float("trap_min", "Min trap chance", 1.5, 0, 100)
+register_option_float("trap_max", "Max trap chance", 5, 0, 100)
+register_option_float("trap_min", "Min trap chance", 2, 0, 100)
 
 local traps_ceiling = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
 local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
@@ -92,6 +93,9 @@ local function trap_ceiling_valid(x, y, l)
     if has({THEME.CITY_OF_GOLD, THEME.ICE_CAVES, THEME.TIAMAT, THEME.OLMEC}, state.theme) then
         return false
     end
+    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
+    local rx, ry = get_room_index(x, y)
+    if y == state.level_gen.spawn_y and (ry >= state.level_gen.spawn_room_y and ry <= state.level_gen.spawn_room_y-1) then return false end
     local floor = get_grid_entity_at(x, y, l)
     local below = get_grid_entity_at(x, y-1, l)
     local below2 = get_grid_entity_at(x, y-2, l)
@@ -112,6 +116,7 @@ local function trap_floor_spawn(x, y, l)
 end
 local function trap_floor_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
+    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
     local floor = get_grid_entity_at(x, y, l)
     local above = get_grid_entity_at(x, y+1, l)
     if floor ~= -1 and above == -1 then
@@ -144,6 +149,8 @@ local function trap_wall_spawn(x, y, l)
 end
 local function trap_wall_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
+    local rx, ry = get_room_index(x, y)
+    if y == state.level_gen.spawn_y and (rx >= state.level_gen.spawn_room_x-1 and rx <= state.level_gen.spawn_room_x+1) then return false end
     local floor = get_grid_entity_at(x, y, l)
     local left = get_grid_entity_at(x-1, y, l)
     local right = get_grid_entity_at(x+1, y, l)
@@ -164,6 +171,9 @@ local function trap_generic_spawn(x, y, l)
 end
 local function trap_generic_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
+    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
+    local rx, ry = get_room_index(x, y)
+    if x == state.level_gen.spawn_x and (ry >= state.level_gen.spawn_room_y and ry <= state.level_gen.spawn_room_y-1) then return false end
     local floor = get_grid_entity_at(x, y, l)
     local above = get_grid_entity_at(x, y+1, l)
     if floor ~= -1 then
@@ -187,6 +197,7 @@ local function trap_item_spawn(x, y, l)
 end
 local function trap_item_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
+    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
     local air = get_grid_entity_at(x, y, l)
     if floor ~= -1 and air == -1 then
@@ -277,8 +288,18 @@ set_callback(function(ctx)
     ctx:set_procedural_spawn_chance(trap_wall_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_generic_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_item_chance, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(trap_totem_chance, get_chance(options.trap_min, options.trap_max))
+    ctx:set_procedural_spawn_chance(trap_totem_chance, get_chance(options.trap_min, options.trap_max)*2)
     ctx:set_procedural_spawn_chance(trap_frog_chance, get_chance(options.trap_min, options.trap_max))
+
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ARROWTRAP_CHANCE, 0)
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRUSHER_TRAP_CHANCE, 0)
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE, 0)
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPIKE_BALL_CHANCE, 0)
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.BIGSPEARTRAP_CHANCE, 0)
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.JUNGLE_SPEAR_TRAP_CHANCE, 0)
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.EGGSAC_CHANCE, get_chance(options.trap_min, options.trap_max))
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.STICKYTRAP_CHANCE, get_chance(options.trap_min, options.trap_max))
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SKULLDROP_CHANCE, get_chance(options.trap_min, options.trap_max))
 end, ON.POST_ROOM_GENERATION)
 
 set_callback(function()
@@ -750,7 +771,7 @@ set_callback(function()
     end
     for i,v in ipairs(in_shop) do
         math.randomseed(read_prng()[8]+i)
-        v.price = math.random(1000, math.min(20000, 2*get_money())+math.random(1000, 2000))
+        v.price = math.random(1000, math.min(20000, 2*get_money())+math.random(500, 4000))
         --v.price = prng:random_int(1000, math.min(20000, 2*get_money())+math.random(1000, 2000), PRNG_CLASS.LEVEL_GEN)
     end
 end, ON.POST_LEVEL_GENERATION)
@@ -1546,7 +1567,7 @@ set_callback(function()
                     spawn_critical(type, spot.x+0.5, spot.y+1, LAYER.BACK, 0, 0)
                 end
             end
-            prinspect("Storage at", spot.x, spot.y)
+            --prinspect("Storage at", spot.x, spot.y)
         end
     end
 end, ON.POST_LEVEL_GENERATION)
