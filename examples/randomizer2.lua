@@ -1,6 +1,6 @@
 meta.name = "Rando Two"
 meta.description = "Second incarnation of The Randomizer with new api shenannigans. Everything is now rewritten from scratch and I tuned the crazyness down a notch. Still needs some balancing probably... There's a kinda new progression system forming with a high probability to be able to do chain (not finished), with multiple endings. It's still hard AF, good luck getting true ending!"
-meta.version = "1.9999999"
+meta.version = "2.0-RC1"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
