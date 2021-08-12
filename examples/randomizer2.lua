@@ -1,6 +1,6 @@
 meta.name = "Randomizer Two"
 meta.description = "Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot."
-meta.version = "2.0-RC2"
+meta.version = "2.0-RC3"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
@@ -57,12 +57,57 @@ local function shuffle(tbl)
     end
 end
 
+local function get_ushabti_frame()
+    local x, y
+    if math.random() > options.ushabti_chance/100 or state.correct_ushabti == nil then
+        x = math.random(0,9)
+        y = math.random(0,9)
+    else
+        x = state.correct_ushabti % 10
+        y = math.floor(state.correct_ushabti / 10)
+    end
+    return x + y * 12
+end
+
 local theme_name = {}
 for i,v in pairs(THEME) do
     theme_name[v] = i
 end
 
 local level_stuff = {}
+local level_map = {}
+
+local function map_level()
+    local xmin, ymin, xmax, ymax = get_bounds()
+    xmin = math.ceil(xmin)
+    xmax = math.ceil(xmax)
+    ymin = math.ceil(ymin)
+    ymax = math.ceil(ymax)
+    for x=xmin,xmax,1 do
+        level_map[x] = {}
+        for y=ymin,ymax,-1 do
+            local mask = 0
+            local ents = get_entities_at(0, MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR | MASK.WATER | MASK.LAVA, x, y, LAYER.FRONT, 0.5)
+            for i,v in ipairs(ents) do
+                local ent = get_entity(v)
+                if ent and (mask & ent.type.search_flags) == 0 then
+                    mask = mask + ent.type.search_flags
+                end
+            end
+            level_map[x][y] = mask
+        end
+    end
+end
+
+local function map(x, y)
+    if #level_map == 0 then
+        map_level()
+    end
+    if level_map[x] and level_map[x][y] then
+        return level_map[x][y]
+    end
+    return 0
+end
 
 --[[TRAPS]]
 register_option_float("trap_max", "Max trap chance", 5, 0, 100)
@@ -93,7 +138,7 @@ local function trap_ceiling_valid(x, y, l)
     if has({THEME.CITY_OF_GOLD, THEME.ICE_CAVES, THEME.TIAMAT, THEME.OLMEC}, state.theme) then
         return false
     end
-    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
+    if (map(x, y+1) & MASK.LAVA) > 0 then return false end
     local rx, ry = get_room_index(x, y)
     if y == state.level_gen.spawn_y and (ry >= state.level_gen.spawn_room_y and ry <= state.level_gen.spawn_room_y-1) then return false end
     local floor = get_grid_entity_at(x, y, l)
@@ -116,7 +161,7 @@ local function trap_floor_spawn(x, y, l)
 end
 local function trap_floor_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
-    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
+    if (map(x, y+1) & MASK.LAVA) > 0 then return false end
     local floor = get_grid_entity_at(x, y, l)
     local above = get_grid_entity_at(x, y+1, l)
     if floor ~= -1 and above == -1 then
@@ -171,7 +216,7 @@ local function trap_generic_spawn(x, y, l)
 end
 local function trap_generic_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
-    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
+    if (map(x, y+1) & MASK.LAVA) > 0 then return false end
     local rx, ry = get_room_index(x, y)
     if x == state.level_gen.spawn_x and (ry >= state.level_gen.spawn_room_y and ry <= state.level_gen.spawn_room_y-1) then return false end
     local floor = get_grid_entity_at(x, y, l)
@@ -197,7 +242,7 @@ local function trap_item_spawn(x, y, l)
 end
 local function trap_item_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
-    if #get_entities_at(0, MASK.LAVA, x, y, l, 1) > 0 then return false end
+    if (map(x, y) & MASK.LAVA) > 0 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
     local air = get_grid_entity_at(x, y, l)
     if floor ~= -1 and air == -1 then
@@ -303,6 +348,10 @@ set_callback(function(ctx)
 end, ON.POST_ROOM_GENERATION)
 
 set_callback(function()
+    level_map = {}
+end, ON.PRE_LEVEL_GENERATION)
+
+set_callback(function()
     --[[set_interval(function()
         if options.projectile then
             set_arrowtrap_projectile(pick(trap_arrows), pick(trap_arrows))
@@ -329,7 +378,7 @@ local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_FIREBUG_UNCHAINED,
     ENT_TYPE.MONS_CROCMAN, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS,
     ENT_TYPE.MONS_CATMUMMY, ENT_TYPE.MONS_NECROMANCER, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI,
-    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
+    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
     ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER, ENT_TYPE.MONS_SHOPKEEPERCLONE,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED,
     ENT_TYPE.MONS_AMMIT, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG,
@@ -355,6 +404,7 @@ local enemies_kingu = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
 local random_crap = {ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_PUNISHBALL, ENT_TYPE.ITEM_ROCK}
 local olmec_ammo = join(join(random_crap, enemies_small), traps_item)
 local tiamat_ammo = {ENT_TYPE.ITEM_ACIDSPIT, ENT_TYPE.ITEM_INKSPIT, ENT_TYPE.ITEM_FLY, ENT_TYPE.ITEM_FIREBALL, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_LAMASSU_LASER_SHOT}
+local crab_items = {ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_EGGPLANT, ENT_TYPE.ITEM_IDOL, ENT_TYPE.ITEM_KEY, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ITEM_LAVAPOT, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_USHABTI, ENT_TYPE.MONS_YANG}
 
 local function enemy_small_spawn(x, y, l)
     local uid = spawn_entity_snapped_to_floor(pick(enemies_small), x, y, l)
@@ -507,6 +557,10 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     math.randomseed(read_prng()[1]+state.time_total)
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_REDSKELETON)
+
+set_post_entity_spawn(function(ent)
+    ent.carried_entity_type = pick(crab_items)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU then return end
@@ -771,8 +825,7 @@ set_callback(function()
     end
     for i,v in ipairs(in_shop) do
         math.randomseed(read_prng()[8]+i)
-        v.price = math.random(500, math.min(20000, 2*get_money())+math.random(500, 4000))
-        --v.price = prng:random_int(1000, math.min(20000, 2*get_money())+math.random(1000, 2000), PRNG_CLASS.LEVEL_GEN)
+        v.price = math.random(1000, math.min(20000, 2*get_money())+math.random(1500, 6000))
     end
 end, ON.POST_LEVEL_GENERATION)
 
@@ -818,6 +871,8 @@ end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
 
 --[[CONTAINERS]]
 register_option_float("pot_chance", "Pot contents chance", 25, 0, 100)
+register_option_float("ushabti_chance", "Correct ushabti chance", 25, 0, 100)
+
 local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_GIANTSPIDER,
          ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_REDSKELETON,
          ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD, ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_MANTRAP,
@@ -884,7 +939,7 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
          ENT_TYPE.ITEM_CROSSBOW, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_MATTOCK,
          ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR,
          ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW,
-         ENT_TYPE.ITEM_METAL_SHIELD}
+         ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_USHABTI}
 local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PICKUP_BOMBBOX}
 
 set_post_entity_spawn(function(ent)
@@ -904,6 +959,12 @@ set_post_entity_spawn(function(ent)
         ent.inside = pick(crate_items)
     end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CRATE)
+
+set_post_entity_spawn(function(ent)
+    local _, _, l = get_position(ent.uid)
+    if l == LAYER.BACK and state.theme == THEME.NEO_BABYLON then return end
+    ent.animation_frame = get_ushabti_frame()
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_USHABTI)
 
 set_callback(function()
     local coffins = get_entities_by_type(ENT_TYPE.ITEM_COFFIN)
