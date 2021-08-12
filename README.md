@@ -28,8 +28,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
       + **Tab**: Add selected item id to list when making a kit
-      + **Mouse left**: Spawn entity at mouse cursor
-      + **Mouse right**: Teleport to mouse cursor
+      + **Mouse left**: Spawn entity at mouse cursor (drag to set velocity)
+      + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position)
+      + **Mouse right**: Teleport to mouse cursor (drag to set velocity)
       + **Mouse middle**: Select or drag safe entities around
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
