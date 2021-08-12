@@ -1008,6 +1008,8 @@ Drop-in replacement for `math.random(min, max)`
 - [`int layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Entity::layer
 - [`float width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &Entity::w
 - [`float height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &Entity::h
+- [`float tile_width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_width) &Entity::tilew
+- [`float tile_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_height) &Entity::tileh
 - [`float angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Entity::angle
 - [`Color color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) &Entity::color
 - [`float hitboxx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) &Entity::hitboxx
@@ -2483,13 +2485,13 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
 \
-Block all loading `.lvl` files and instead load the specified `.lvl` files.
-This includes `generic.lvl` so if you need it specify it here.
+Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.
+All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 Use at your own risk, some themes/levels expect a certain level file to be loaded.
 - [`nil add_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_level_files) &PreLoadLevelFilesContext::add_level_files
 \
-Load additional levels files other than the ones that would usually be loaded.
-Stacks with `override_level_files` if that was called first.
+Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.
+All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 ### `DoorCoords`
 - [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`float door1_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_x) &DoorCoords::door1_x
