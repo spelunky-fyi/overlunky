@@ -3,11 +3,11 @@ meta.version = "WIP"
 meta.description = "Demonstrates drawing of in-game text and textures"
 meta.author = "Zappatic"
 
-white = Color:new(1.0, 1.0, 1.0, 1.0)
-red = Color:new(1.0, 0.0, 0.0, 1.0)
-green = Color:new(0.0, 1.0, 0.0, 1.0)
-blue = Color:new(0.0, 0.0, 1.0, 1.0)
-black = Color:new()
+white = Color:white()
+red = Color:red()
+green = Color:green()
+blue = Color:blue()
+black = Color:black()
 
 font_scale = 0.0006
 

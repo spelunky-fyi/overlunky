@@ -10,6 +10,7 @@ header_files = [
     "../src/game_api/rpc.hpp",
     "../src/game_api/spawn_api.hpp",
     "../src/game_api/script.hpp",
+    "../src/game_api/color.hpp",
     "../src/game_api/entity.hpp",
     "../src/game_api/movable.hpp",
     "../src/game_api/state.hpp",
@@ -96,6 +97,7 @@ replace = {
     "sol::": "",
     "void": "",
     "constexpr": "",
+    "static": "",
     "variadic_args va": "int, int...",
 }
 comment = []

@@ -954,6 +954,22 @@ Create a new color by specifying its values
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
 - [`float b`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b) &Color::b
 - [`float a`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=a) &Color::a
+- [`Color white()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=white) &Color::white
+- [`Color silver()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=silver) &Color::silver
+- [`Color gray()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gray) &Color::gray
+- [`Color black()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black) &Color::black
+- [`Color red()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &Color::red
+- [`Color maroon()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maroon) &Color::maroon
+- [`Color yellow()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yellow) &Color::yellow
+- [`Color olive()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olive) &Color::olive
+- [`Color lime()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lime) &Color::lime
+- [`Color green()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &Color::green
+- [`Color aqua()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aqua) &Color::aqua
+- [`Color teal()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teal) &Color::teal
+- [`Color blue()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &Color::blue
+- [`Color navy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=navy) &Color::navy
+- [`Color fuchsia()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuchsia) &Color::fuchsia
+- [`Color purple()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=purple) &Color::purple
 ### `Animation`
 - [`int first_tile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_tile) &Animation::texture
 - [`int num_tiles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=num_tiles) &Animation::count
