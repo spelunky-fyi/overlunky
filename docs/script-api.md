@@ -124,18 +124,6 @@ Runs on any ending cutscene.
 Runs on any [screen change](#on).
 ### [`on_guiframe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_guiframe)
 Runs on every screen frame. You need this to use draw functions.
-### [`on_render_pre_hud`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_pre_hud)
-Runs before the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-### [`on_render_post_hud`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_hud)
-Runs after the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-### [`on_render_pre_pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_pre_pause_menu)
-Runs before the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-### [`on_render_post_pause_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_pause_menu)
-Runs after the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-### [`on_render_pre_draw_depth`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_pre_draw_depth)
-Runs before the entities of the specified draw_depth are drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-### [`on_render_post_draw_depth`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_render_post_draw_depth)
-Runs after the entities of the specified draw_depth are drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
@@ -2691,13 +2679,13 @@ Draw image to window.
 ### `VanillaRenderContext`
 - [`nil draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &VanillaRenderContext::draw_text
 \
-Draw text using the built-in renderer. Use in combination with ON.RENDER_PRE_HUD or ON.RENDER_POST_HUD. See vanilla_rendering.lua in the example scripts.
+Draw text using the built-in renderer. Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
 - [`tuple<float, float> draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) &VanillaRenderContext::draw_text_size
 \
 Measure the provided text using the built-in renderer
 - [`nil draw_texture(int texture_id, int row, int column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_texture) &VanillaRenderContext::draw_texture
 \
-Draw a texture in screen coordinates `x`, `y` using the built-in renderer. Use in combination with ON.RENDER_PRE_HUD or ON.RENDER_POST_HUD
+Draw a texture in screen coordinates `x`, `y` using the built-in renderer. Use in combination with ON.RENDER_✱ events
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.

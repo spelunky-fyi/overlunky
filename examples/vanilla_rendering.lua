@@ -91,3 +91,13 @@ end, ON.RENDER_PRE_HUD)
 set_callback(function(draw_ctx)
     draw_ctx:draw_rect(background_rect_top_left_x, background_rect_top_left_y, background_rect_bottom_right_x, background_rect_bottom_right_y, 2, 2, rgba(255, 0, 255, 200))
 end, ON.GUIFRAME)
+
+-- draw a crown on the player's head
+set_callback(function(render_ctx, draw_depth)
+    if #players < 1 then return end
+    if draw_depth == players[1].type.draw_depth then
+        x, y, l = get_position(players[1].uid)
+        sx, sy = screen_position(x, y + 0.65)
+        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx/2.0, sy/2.0, 0.12, 0.12, white)
+    end
+end, ON.RENDER_POST_DRAW_DEPTH)

@@ -267,12 +267,8 @@ class LuaBackend
     void hook_entity_dtor(Entity* entity);
     void pre_entity_destroyed(Entity* entity);
 
-    void pre_render_hud();
-    void post_render_hud();
-    void pre_render_pause_menu();
-    void post_render_pause_menu();
-    void pre_render_draw_depth(uint8_t draw_depth);
-    void post_render_draw_depth(uint8_t draw_depth);
+    void process_vanilla_render_callbacks(ON event);
+    void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth);
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);

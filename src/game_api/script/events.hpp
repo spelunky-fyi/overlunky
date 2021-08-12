@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lua_backend.hpp"
 #include <cstdint>
 #include <string_view>
 
@@ -15,3 +16,6 @@ void post_tile_code_spawn(std::string_view tile_code, float x, float y, int laye
 
 Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
 void post_entity_spawn(Entity* entity, int spawn_type_flags);
+
+void trigger_vanilla_render_callbacks(ON event);
+void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth);

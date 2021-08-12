@@ -5,6 +5,7 @@
 #include <string>
 
 #include "memory.hpp"
+#include "script/events.hpp"
 #include "script/lua_backend.hpp"
 #include "texture.hpp"
 
@@ -148,42 +149,18 @@ VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
 void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
 {
     // hud_data and hud_data2 are the same pointer, but the second one is actually used (displays garbage if not passed)
-    LuaBackend::for_each_backend(
-        [&](LuaBackend& backend)
-        {
-            backend.pre_render_hud();
-            return true;
-        });
-
+    trigger_vanilla_render_callbacks(ON::RENDER_PRE_HUD);
     g_render_hud_trampoline(hud_data, y, opacity, hud_data2);
-
-    LuaBackend::for_each_backend(
-        [&](LuaBackend& backend)
-        {
-            backend.post_render_hud();
-            return true;
-        });
+    trigger_vanilla_render_callbacks(ON::RENDER_POST_HUD);
 }
 
 using VanillaRenderPauseMenuFun = void(float*);
 VanillaRenderPauseMenuFun* g_render_pause_menu_trampoline{nullptr};
 void render_pause_menu(float* drawing_info)
 {
-    LuaBackend::for_each_backend(
-        [&](LuaBackend& backend)
-        {
-            backend.pre_render_pause_menu();
-            return true;
-        });
-
+    trigger_vanilla_render_callbacks(ON::RENDER_PRE_PAUSE_MENU);
     g_render_pause_menu_trampoline(drawing_info);
-
-    LuaBackend::for_each_backend(
-        [&](LuaBackend& backend)
-        {
-            backend.post_render_pause_menu();
-            return true;
-        });
+    trigger_vanilla_render_callbacks(ON::RENDER_POST_PAUSE_MENU);
 }
 
 using VanillaRenderDrawDepthFun = void(size_t, uint8_t, float, float, float, float);
@@ -193,21 +170,9 @@ void render_draw_depth(size_t inside_state_unknown27, uint8_t draw_depth, float 
     // I believe the 4 floats are a bounding box so off screen entities can be excluded from drawing
     // doesn't match up with camera bounds though
 
-    LuaBackend::for_each_backend(
-        [&](LuaBackend& backend)
-        {
-            backend.pre_render_draw_depth(draw_depth);
-            return true;
-        });
-
+    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth);
     g_render_draw_depth_trampoline(inside_state_unknown27, draw_depth, bbox1, bbox2, bbox3, bbox4);
-
-    LuaBackend::for_each_backend(
-        [&](LuaBackend& backend)
-        {
-            backend.post_render_draw_depth(draw_depth);
-            return true;
-        });
+    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_POST_DRAW_DEPTH, draw_depth);
 }
 
 static size_t text_rendering_context_offset = 0;

@@ -716,150 +716,34 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
         }
     }
 }
-void LuaBackend::pre_render_hud()
+
+void LuaBackend::process_vanilla_render_callbacks(ON event)
 {
     if (!get_enabled())
         return;
 
-    /// Runs before the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-    sol::optional<sol::function> on_render_pre_hud = lua["on_render_pre_hud"];
-
+    auto now = get_frame_count();
     VanillaRenderContext render_ctx;
-
-    if (on_render_pre_hud)
-    {
-        on_render_pre_hud.value()(render_ctx);
-    }
-
     for (auto& [id, callback] : callbacks)
     {
-        auto now = get_frame_count();
-        if (callback.screen == ON::RENDER_PRE_HUD)
+        if (callback.screen == event)
         {
             handle_function(callback.func, render_ctx);
             callback.lastRan = now;
         }
     }
 }
-void LuaBackend::post_render_hud()
+
+void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth)
 {
     if (!get_enabled())
         return;
 
-    /// Runs after the HUD is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-    sol::optional<sol::function> on_render_post_hud = lua["on_render_post_hud"];
-
+    auto now = get_frame_count();
     VanillaRenderContext render_ctx;
-
-    if (on_render_post_hud)
-    {
-        on_render_post_hud.value()(render_ctx);
-    }
-
     for (auto& [id, callback] : callbacks)
     {
-        auto now = get_frame_count();
-        if (callback.screen == ON::RENDER_POST_HUD)
-        {
-            handle_function(callback.func, render_ctx);
-            callback.lastRan = now;
-        }
-    }
-}
-void LuaBackend::pre_render_pause_menu()
-{
-    if (!get_enabled())
-        return;
-
-    /// Runs before the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-    sol::optional<sol::function> on_render_pre_pause_menu = lua["on_render_pre_pause_menu"];
-
-    VanillaRenderContext render_ctx;
-
-    if (on_render_pre_pause_menu)
-    {
-        on_render_pre_pause_menu.value()(render_ctx);
-    }
-
-    for (auto& [id, callback] : callbacks)
-    {
-        auto now = get_frame_count();
-        if (callback.screen == ON::RENDER_PRE_PAUSE_MENU)
-        {
-            handle_function(callback.func, render_ctx);
-            callback.lastRan = now;
-        }
-    }
-}
-void LuaBackend::post_render_pause_menu()
-{
-    if (!get_enabled())
-        return;
-
-    /// Runs after the pause menu is drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-    sol::optional<sol::function> on_render_post_pause_menu = lua["on_render_post_pause_menu"];
-
-    VanillaRenderContext render_ctx;
-
-    if (on_render_post_pause_menu)
-    {
-        on_render_post_pause_menu.value()(render_ctx);
-    }
-
-    for (auto& [id, callback] : callbacks)
-    {
-        auto now = get_frame_count();
-        if (callback.screen == ON::RENDER_POST_PAUSE_MENU)
-        {
-            handle_function(callback.func, render_ctx);
-            callback.lastRan = now;
-        }
-    }
-}
-void LuaBackend::pre_render_draw_depth(uint8_t draw_depth)
-{
-    if (!get_enabled())
-        return;
-
-    /// Runs before the entities of the specified draw_depth are drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-    sol::optional<sol::function> on_render_pre_draw_depth = lua["on_render_pre_draw_depth"];
-
-    VanillaRenderContext render_ctx;
-
-    if (on_render_pre_draw_depth)
-    {
-        on_render_pre_draw_depth.value()(render_ctx, draw_depth);
-    }
-
-    for (auto& [id, callback] : callbacks)
-    {
-        auto now = get_frame_count();
-        if (callback.screen == ON::RENDER_PRE_DRAW_DEPTH)
-        {
-            handle_function(callback.func, render_ctx, draw_depth);
-            callback.lastRan = now;
-        }
-    }
-}
-void LuaBackend::post_render_draw_depth(uint8_t draw_depth)
-{
-    if (!get_enabled())
-        return;
-
-    /// Runs after the entities of the specified draw_depth are drawn on screen. You can draw text and textures on screen by using the provided render_ctx parameter
-    sol::optional<sol::function> on_render_post_draw_depth = lua["on_render_post_draw_depth"];
-
-    VanillaRenderContext render_ctx;
-
-    if (on_render_post_draw_depth)
-    {
-        on_render_post_draw_depth.value()(render_ctx, draw_depth);
-    }
-
-    for (auto& [id, callback] : callbacks)
-    {
-        auto now = get_frame_count();
-        if (callback.screen == ON::RENDER_POST_DRAW_DEPTH)
+        if (callback.screen == event)
         {
             handle_function(callback.func, render_ctx, draw_depth);
             callback.lastRan = now;
