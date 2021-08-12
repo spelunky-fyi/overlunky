@@ -833,10 +833,8 @@ for i,id in ipairs(ids) do
 end
 ```
 ### `SaveContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`bool save(string data)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) &SaveContext::Save
 ### `LoadContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`string load()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load) &LoadContext::Load
 ### `StateMemory`
 - [`int screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
@@ -894,6 +892,7 @@ end
 - [`int speechbubble_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_timer) &StateMemory::speechbubble_timer
 - [`int speechbubble_owner`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_owner) &StateMemory::speechbubble_owner
 - [`LevelGenSystem level_gen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gen) &StateMemory::level_gen
+- [`int correct_ushabti`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) &StateMemory::correct_ushabti
 ### `LightParams`
 - [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &LightParams::red
 - [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &LightParams::green
@@ -2482,7 +2481,6 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &ParticleDB::get_texture
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &ParticleDB::set_texture
 ### `PreLoadLevelFilesContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
 \
 Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.
@@ -2493,13 +2491,11 @@ Use at your own risk, some themes/levels expect a certain level file to be loade
 Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.
 All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 ### `DoorCoords`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`float door1_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_x) &DoorCoords::door1_x
 - [`float door1_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_y) &DoorCoords::door1_y
 - [`float door2_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_x) &DoorCoords::door2_x
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`int shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &LevelGenSystem::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
@@ -2507,7 +2503,6 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`int spawn_room_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) &LevelGenSystem::spawn_room_y
 - [`DoorCoords exits`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exits) &LevelGenSystem::exit_doors_locations
 ### `PostRoomGenerationContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`bool set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
 \
 Set the room template at the given index and layer, returns `false` if the index is outside of the level.

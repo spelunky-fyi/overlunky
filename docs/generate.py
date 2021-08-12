@@ -306,7 +306,7 @@ for file in api_files:
             if not var:
                 continue
             var = var.split(",")
-            if var[0] == "sol::base_classes":
+            if var[0] == "sol::base_classes" or var[0] == "sol::no_constructor":
                 continue
             if "table_of" in var[1]:
                 var[1] = var[1].replace("table_of(", "") + "[]"
