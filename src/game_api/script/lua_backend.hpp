@@ -78,7 +78,6 @@ enum class ON
     RENDER_PRE_PAUSE_MENU,
     RENDER_POST_PAUSE_MENU,
     RENDER_PRE_DRAW_DEPTH,
-    RENDER_POST_DRAW_DEPTH,
 };
 
 struct IntOption

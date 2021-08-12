@@ -172,7 +172,6 @@ void render_draw_depth(size_t inside_state_unknown27, uint8_t draw_depth, float 
 
     trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth);
     g_render_draw_depth_trampoline(inside_state_unknown27, draw_depth, bbox1, bbox2, bbox3, bbox4);
-    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_POST_DRAW_DEPTH, draw_depth);
 }
 
 static size_t text_rendering_context_offset = 0;
@@ -261,6 +260,12 @@ void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, f
         }
 
         float aspect_ratio = 16.0f / 9.0f;
+
+        // the render_at_x/y coordinates given to this function are expected to be in the range [-1.0; 1.0], similar to ImGui
+        // for some reason the native texture rendering function expects them to be in the range [-0.5; 0.5], so we divide by 2 here
+        render_at_x /= 2.0;
+        render_at_y /= 2.0;
+
         TextureRenderingInfo tri = {
             render_at_x,
             render_at_y,

@@ -949,9 +949,7 @@ end
         "RENDER_POST_PAUSE_MENU",
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
-        ON::RENDER_PRE_DRAW_DEPTH,
-        "RENDER_POST_DRAW_DEPTH",
-        ON::RENDER_POST_DRAW_DEPTH);
+        ON::RENDER_PRE_DRAW_DEPTH);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -997,9 +995,6 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen
-    // RENDER_POST_DRAW_DEPTH
-    // Params: `VanillaRenderContext render_ctx, int draw_depth`
-    // Runs after the entities of the specified draw_depth are drawn on screen
     */
 
     lua.create_named_table(

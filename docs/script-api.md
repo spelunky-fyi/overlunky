@@ -3114,10 +3114,6 @@ Runs after the pause menu is drawn on screen
 \
 Params: `VanillaRenderContext render_ctx, int draw_depth`\
 Runs before the entities of the specified draw_depth are drawn on screen
-- [`RENDER_POST_DRAW_DEPTH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_DRAW_DEPTH) ON::RENDER_POST_DRAW_DEPTH
-\
-Params: `VanillaRenderContext render_ctx, int draw_depth`\
-Runs after the entities of the specified draw_depth are drawn on screen
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \

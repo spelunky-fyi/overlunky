@@ -95,9 +95,9 @@ end, ON.GUIFRAME)
 -- draw a crown on the player's head
 set_callback(function(render_ctx, draw_depth)
     if #players < 1 then return end
-    if draw_depth == players[1].type.draw_depth then
+    if draw_depth == players[1].type.draw_depth - 1 then
         x, y, l = get_position(players[1].uid)
         sx, sy = screen_position(x, y + 0.65)
-        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx/2.0, sy/2.0, 0.12, 0.12, white)
+        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx, sy, 0.12, 0.12, white)
     end
-end, ON.RENDER_POST_DRAW_DEPTH)
+end, ON.RENDER_PRE_DRAW_DEPTH)
