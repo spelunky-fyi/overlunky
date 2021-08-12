@@ -1264,13 +1264,15 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("zoom_out", wParam))
     {
-        if (g_zoom == 0.0f) g_zoom = get_zoom_level();
+        if (g_zoom == 0.0f)
+            g_zoom = get_zoom_level();
         g_zoom += 1.0f;
         set_zoom();
     }
     else if (pressed("zoom_in", wParam))
     {
-        if (g_zoom == 0.0f) g_zoom = get_zoom_level();
+        if (g_zoom == 0.0f)
+            g_zoom = get_zoom_level();
         g_zoom -= 1.0f;
         set_zoom();
     }
@@ -2394,8 +2396,8 @@ void set_vel(ImVec2 pos)
     g_vy = normalize(pos).y;
     auto cpos = click_position(g_x, g_y);
     auto cpos2 = click_position(g_vx, g_vy);
-    g_dx = floor(cpos2.first+0.5f) - floor(cpos.first+0.5f);
-    g_dy = floor(cpos2.second+0.5f) - floor(cpos.second+0.5f);
+    g_dx = floor(cpos2.first + 0.5f) - floor(cpos.first + 0.5f);
+    g_dy = floor(cpos2.second + 0.5f) - floor(cpos.second + 0.5f);
     g_vx = 2 * (g_vx - g_x);
     g_vy = 2 * (g_vy - g_y) * 0.5625f;
 }
@@ -2487,13 +2489,15 @@ void render_clickhandler()
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
         {
-            if (g_zoom == 0.0f) g_zoom = get_zoom_level();
+            if (g_zoom == 0.0f)
+                g_zoom = get_zoom_level();
             g_zoom += 1.0;
             set_zoom();
         }
         else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
         {
-            if (g_zoom == 0.0f) g_zoom = get_zoom_level();
+            if (g_zoom == 0.0f)
+                g_zoom = get_zoom_level();
             g_zoom -= 1.0;
             set_zoom();
         }
