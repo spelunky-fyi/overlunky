@@ -120,7 +120,9 @@ void register_usertypes(sol::state& lua)
         "speechbubble_owner",
         &StateMemory::speechbubble_owner,
         "level_gen",
-        &StateMemory::level_gen);
+        &StateMemory::level_gen,
+        "correct_ushabti",
+        &StateMemory::correct_ushabti);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",

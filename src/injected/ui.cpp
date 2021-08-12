@@ -126,6 +126,7 @@ std::map<std::string, int64_t> keys{
     {"coordinate_down", OL_KEY_CTRL | VK_DOWN},
     {"mouse_spawn", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_throw", OL_BUTTON_MOUSE | 0x01},
+    {"mouse_spawn_over", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x01},
     {"mouse_teleport", OL_BUTTON_MOUSE | 0x02},
     {"mouse_teleport_throw", OL_BUTTON_MOUSE | 0x02},
     {"mouse_grab", OL_BUTTON_MOUSE | 0x03},
@@ -166,9 +167,9 @@ struct EntityCache
 
 static ImFont *font, *bigfont, *hugefont;
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f;
 ImVec2 startpos;
-int g_held_id = 0, g_last_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
+int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1;
 unsigned int g_entity_type = 0, g_level_width = 0, g_level_height = 0;
@@ -766,7 +767,14 @@ void spawn_entities(bool s, std::string list = "")
             return;
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
-            int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
+            bool snap = options["snap_to_grid"];
+            if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_FLOOR") != std::string::npos)
+            {
+                snap = true;
+                g_vx = 0;
+                g_vy = 0;
+            }
+            int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
             if (options["spawn_floor_decorated"])
             {
                 if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
@@ -800,6 +808,21 @@ void spawn_entities(bool s, std::string list = "")
         }
         if (!lock_entity)
             g_last_id = spawned;
+    }
+}
+
+void spawn_entity_over()
+{
+    if (g_filtered_count > 0)
+    {
+        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
+            return;
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
+        {
+            int spawned = spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
+            if (!lock_entity)
+                g_last_id = spawned;
+        }
     }
 }
 
@@ -1241,11 +1264,15 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("zoom_out", wParam))
     {
+        if (g_zoom == 0.0f)
+            g_zoom = get_zoom_level();
         g_zoom += 1.0f;
         set_zoom();
     }
     else if (pressed("zoom_in", wParam))
     {
+        if (g_zoom == 0.0f)
+            g_zoom = get_zoom_level();
         g_zoom -= 1.0f;
         set_zoom();
     }
@@ -2367,6 +2394,10 @@ void set_vel(ImVec2 pos)
 {
     g_vx = normalize(pos).x;
     g_vy = normalize(pos).y;
+    auto cpos = click_position(g_x, g_y);
+    auto cpos2 = click_position(g_vx, g_vy);
+    g_dx = floor(cpos2.first + 0.5f) - floor(cpos.first + 0.5f);
+    g_dy = floor(cpos2.second + 0.5f) - floor(cpos.second + 0.5f);
     g_vx = 2 * (g_vx - g_x);
     g_vy = 2 * (g_vy - g_y) * 0.5625f;
 }
@@ -2458,11 +2489,15 @@ void render_clickhandler()
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
         {
+            if (g_zoom == 0.0f)
+                g_zoom = get_zoom_level();
             g_zoom += 1.0;
             set_zoom();
         }
         else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
         {
+            if (g_zoom == 0.0f)
+                g_zoom = get_zoom_level();
             g_zoom -= 1.0;
             set_zoom();
         }
@@ -2579,11 +2614,18 @@ void render_clickhandler()
             io.MouseDrawCursor = false;
             startpos = ImGui::GetMousePos();
         }
-        else if ((held("mouse_spawn_throw") || held("mouse_teleport_throw")) && ImGui::IsWindowFocused())
+        else if (clicked("mouse_spawn_over") && ImGui::IsWindowFocused())
+        {
+            io.MouseDrawCursor = false;
+            startpos = ImGui::GetMousePos();
+            set_pos(startpos);
+            g_over_id = get_entity_at(g_x, g_y, true, 2, safe_entity_mask);
+        }
+        else if ((held("mouse_spawn_throw") || held("mouse_teleport_throw") || held("mouse_spawn_over")) && ImGui::IsWindowFocused())
         {
             render_arrow();
         }
-        else if ((held("mouse_spawn") || held("mouse_teleport")) && ImGui::IsWindowFocused())
+        else if ((held("mouse_spawn") || held("mouse_teleport") || held("mouse_spawn_over")) && ImGui::IsWindowFocused())
         {
             startpos = ImGui::GetMousePos();
             render_cross();
@@ -2606,6 +2648,19 @@ void render_clickhandler()
             g_y = 0;
             g_vx = 0;
             g_vy = 0;
+        }
+        else if (released("mouse_spawn_over") && ImGui::IsWindowFocused())
+        {
+            set_pos(startpos);
+            set_vel(ImGui::GetMousePos());
+            spawn_entity_over();
+            g_x = 0;
+            g_y = 0;
+            g_dx = 0;
+            g_dy = 0;
+            g_vx = 0;
+            g_vy = 0;
+            g_over_id = -1;
         }
         else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
         {
