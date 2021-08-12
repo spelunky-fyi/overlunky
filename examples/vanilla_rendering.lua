@@ -24,34 +24,38 @@ set_callback(function(render_ctx)
         y = y - 0.1
         scale = scale + 0.0001
     end
-    y = y - 0.115
+    y = y + 0.05
     
-    local x = -0.12
+    local x = -0.28
     for i = 1, 7 do
-        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_HUD_0, 4, i-1, x, y, 0.08, 0.08, white)
-        x = x + 0.04
+        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_HUD_0, 4, i-1, x, y, x + 0.08, y - (0.08 * (16.0/9.0)), white)
+        x = x + 0.08
     end
-    y = y - 0.035
+    y = y - 0.20
 
+    scale = 0.0008
     render_ctx:draw_text("Left aligned", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.LEFT, VANILLA_FONT_STYLE.ITALIC)
-    y = y - 0.11
+    y = y - 0.07
     render_ctx:draw_text("Center aligned", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
-    y = y - 0.11
+    y = y - 0.07
     render_ctx:draw_text("Right aligned", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.ITALIC)
-    y = y - 0.11
+    y = y - 0.07
 
-    render_ctx:draw_text("Red", 0.0, y, scale, scale, red, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
-    y = y - 0.11
-    render_ctx:draw_text("Green", 0.0, y, scale, scale, green, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
-    y = y - 0.11
-    render_ctx:draw_text("Blue", 0.0, y, scale, scale, blue, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
-    y = y - 0.11
+    red_width, _ = render_ctx:draw_text_size("Red ", scale, scale, VANILLA_FONT_STYLE.ITALIC)
+    green_width, _ = render_ctx:draw_text_size("Green ", scale, scale, VANILLA_FONT_STYLE.ITALIC)
+    blue_width, _ = render_ctx:draw_text_size("Blue ", scale, scale, VANILLA_FONT_STYLE.ITALIC)
+    space_width = 0.01
+    total_width = red_width + green_width + blue_width + (space_width * 2.0)
+
+    render_ctx:draw_text("Red", (total_width / 2.0) * -1.0, y, scale, scale, red, VANILLA_TEXT_ALIGNMENT.LEFT, VANILLA_FONT_STYLE.ITALIC)
+    render_ctx:draw_text("Green", ((total_width / 2.0) * -1.0) + red_width + space_width, y, scale, scale, green, VANILLA_TEXT_ALIGNMENT.LEFT, VANILLA_FONT_STYLE.ITALIC)
+    render_ctx:draw_text("Blue", ((total_width / 2.0) * -1.0) + red_width + space_width + green_width + space_width, y, scale, scale, blue, VANILLA_TEXT_ALIGNMENT.LEFT, VANILLA_FONT_STYLE.ITALIC)
+    y = y - 0.07
 
     render_ctx:draw_text("Bold text", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.BOLD)
-    y = y - 0.13
+    y = y - 0.07
 
     local text = "Bordered, shadowed text"
-    scale = scale * 0.75
     render_ctx:draw_text(text, 0.0025, y - 0.0025, scale, scale, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
     render_ctx:draw_text(text, 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
     width, height = render_ctx:draw_text_size(text, scale, scale, VANILLA_FONT_STYLE.ITALIC)
@@ -95,9 +99,15 @@ end, ON.GUIFRAME)
 -- draw a crown on the player's head
 set_callback(function(render_ctx, draw_depth)
     if #players < 1 then return end
+    -- the event is PRE draw depth, so if we want to draw it in front of the player, we have to
+    -- draw it 'pre' the next draw_depth, which is one closer towards draw_depth 1 (so subtract 1 instead of add 1)
     if draw_depth == players[1].type.draw_depth - 1 then
         x, y, l = get_position(players[1].uid)
-        sx, sy = screen_position(x, y + 0.65)
-        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx, sy, 0.12, 0.12, white)
+        -- reposition the crown on top of the head, starting from the center point of the player: bit to the left, bit upwards
+        x = x - 0.5
+        y = y + 1.15
+        sx, sy = screen_position(x, y)
+        sx2, sy2 = screen_position(x + 1.0, y - 1.0)
+        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx, sy, sx2, sy2, white)
     end
 end, ON.RENDER_PRE_DRAW_DEPTH)

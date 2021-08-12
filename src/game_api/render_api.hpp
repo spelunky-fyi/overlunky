@@ -44,7 +44,7 @@ struct RenderAPI
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color);
+    void draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float x1, float y1, float x2, float y2, Color color);
 };
 
 // straight out of the x64dbg plugin
@@ -134,23 +134,23 @@ struct TextureRenderingInfo
     float x;
     float y;
     // destination is relative to the x,y centerpoint
-    float destination_bottom_left_x;
-    float destination_bottom_left_y;
-    float destination_bottom_right_x;
-    float destination_bottom_right_y;
     float destination_top_left_x;
     float destination_top_left_y;
     float destination_top_right_x;
     float destination_top_right_y;
+    float destination_bottom_left_x;
+    float destination_bottom_left_y;
+    float destination_bottom_right_x;
+    float destination_bottom_right_y;
     // source rectangle in the texture to render
-    float source_bottom_left_x;
-    float source_bottom_left_y;
-    float source_bottom_right_x;
-    float source_bottom_right_y;
     float source_top_left_x;
     float source_top_left_y;
     float source_top_right_x;
     float source_top_right_y;
+    float source_bottom_left_x;
+    float source_bottom_left_y;
+    float source_bottom_right_x;
+    float source_bottom_right_y;
 };
 
 void init_render_api_hooks();

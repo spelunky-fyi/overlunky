@@ -2699,9 +2699,12 @@ Draw text using the built-in renderer. Use in combination with ON.RENDER_✱ eve
 - [`tuple<float, float> draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) &VanillaRenderContext::draw_text_size
 \
 Measure the provided text using the built-in renderer
-- [`nil draw_texture(int texture_id, int row, int column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_texture) &VanillaRenderContext::draw_texture
+- [`nil draw_texture(int texture_id, int row, int column, float x1, float y1, float x2, float y2, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_texture) draw_texture
 \
-Draw a texture in screen coordinates `x`, `y` using the built-in renderer. Use in combination with ON.RENDER_✱ events
+Draw a texture on screen from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
+- [`nil draw_texture(int texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_texture) draw_texture
+\
+Draw a texture on screen from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.

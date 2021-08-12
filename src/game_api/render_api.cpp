@@ -238,7 +238,7 @@ std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float
     return std::make_pair(tri.width, tri.height);
 }
 
-void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float render_at_x, float render_at_y, float render_width, float render_height, Color color)
+void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float x1, float y1, float x2, float y2, Color color)
 {
     static size_t offset = 0;
 
@@ -259,42 +259,42 @@ void RenderAPI::draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, f
             return;
         }
 
-        float aspect_ratio = 16.0f / 9.0f;
-
-        // the render_at_x/y coordinates given to this function are expected to be in the range [-1.0; 1.0], similar to ImGui
-        // for some reason the native texture rendering function expects them to be in the range [-0.5; 0.5], so we divide by 2 here
-        render_at_x /= 2.0;
-        render_at_y /= 2.0;
+        float width = x2 - x1;
+        float height = y2 - y1;
+        float half_width = width / 2.0f;
+        float half_height = height / 2.0f;
+        float center_x = x1 + half_width;
+        float center_y = y1 + half_height;
 
         TextureRenderingInfo tri = {
-            render_at_x,
-            render_at_y,
+            center_x,
+            center_y,
 
             // DESTINATION
-            // bottom left:
-            render_at_x - (render_width / 2.0f),
-            render_at_y - ((render_height * aspect_ratio) / 2.0f),
-            // bottom_right:
-            render_at_x + (render_width / 2.0f),
-            render_at_y - ((render_height * aspect_ratio) / 2.0f),
             // top left:
-            render_at_x - (render_width / 2.0f),
-            render_at_y + ((render_height * aspect_ratio) / 2.0f),
+            -half_width,
+            half_height,
             // top right:
-            render_at_x + (render_width / 2.0f),
-            render_at_y + ((render_height * aspect_ratio) / 2.0f),
+            half_width,
+            half_height,
+            // bottom left:
+            -half_width,
+            -half_height,
+            // bottom right:
+            half_width,
+            -half_height,
 
             // SOURCE
-            // bottom left:
-            texture->tile_width_fraction * column,
-            texture->tile_height_fraction * (row + 1.0f),
-            // bottom_right:
-            texture->tile_width_fraction * (column + 1.0f),
-            texture->tile_height_fraction * (row + 1.0f),
             // top left:
             texture->tile_width_fraction * column,
-            texture->tile_height_fraction * row,
+            texture->tile_height_fraction * (row + 1.0f),
             // top right:
+            texture->tile_width_fraction * (column + 1.0f),
+            texture->tile_height_fraction * (row + 1.0f),
+            // bottom left:
+            texture->tile_width_fraction * column,
+            texture->tile_height_fraction * row,
+            // bottom right:
             texture->tile_width_fraction * (column + 1.0f),
             texture->tile_height_fraction * row};
 
