@@ -699,16 +699,7 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
             if (type_match)
             {
-                sol::function cast = lua["TYPE_MAP"][entity->type->id];
-                if (cast)
-                {
-                    sol::userdata proper_entity = cast(entity);
-                    handle_function(callback.func, proper_entity);
-                }
-                else
-                {
-                    handle_function(callback.func, entity);
-                }
+                handle_function(callback.func, lua["cast_entity"](entity));
             }
         }
     }
