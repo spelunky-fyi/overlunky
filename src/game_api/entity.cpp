@@ -30,7 +30,7 @@ struct EntityHooksInfo
     std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
     std::vector<HookWithId<void(Movable*)>> post_statemachine;
-    std::vector<HookWithId<void(Container*)>> on_open;
+    std::vector<HookWithId<void(Container*, Movable*)>> on_open;
 };
 std::vector<EntityHooksInfo> g_entity_hooks;
 
@@ -510,7 +510,7 @@ bool Entity::is_movable()
     return false;
 }
 
-std::uint32_t Container::set_on_open(std::function<void(Container*)> on_open)
+std::uint32_t Container::set_on_open(std::function<void(Container*, Movable*)> on_open)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_open.empty())
@@ -524,7 +524,7 @@ std::uint32_t Container::set_on_open(std::function<void(Container*)> on_open)
                     EntityHooksInfo& hook_info = self->get_hooks();
                     for (auto& [id, on_open] : hook_info.on_open)
                     {
-                        on_open(self);
+                        on_open(self, opener);
                     }
                 }
                 original(self, opener);

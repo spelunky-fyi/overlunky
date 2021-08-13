@@ -580,7 +580,7 @@ Use this only when no other approach works, this call can be expensive if overus
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 `uid` has to be the uid of a `Container` or else stuff will break.
 Sets a callback that is called right when a container is opened via up+door.
-The callback signature is `nil on_open(Entity self)`
+The callback signature is `nil on_open(Entity self, Entity opener)`
 Use this only when no other approach works, this call can be expensive if overused.
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
