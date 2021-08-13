@@ -130,7 +130,11 @@ void register_usertypes(sol::state& lua)
         "liberate_from_shop",
         &Entity::liberate_from_shop,
         "get_held_entity",
-        &Entity::get_held_entity);
+        &Entity::get_held_entity,
+        "set_layer",
+        &Entity::set_layer,
+        "remove",
+        &Entity::remove);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",

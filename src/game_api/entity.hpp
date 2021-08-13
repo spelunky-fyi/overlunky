@@ -51,6 +51,8 @@ class Entity;
 using EntityCreate = Entity* (*)();
 using EntityDestroy = void (*)(Entity*);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
+using AddLayer = void (*)(void*, Entity*);
+using RemoveLayer = void (*)(void*, Entity*);
 
 struct EntityDB
 {
@@ -189,6 +191,8 @@ class Entity
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
+    void set_layer(unsigned int layer);
+    void remove();
 
     Entity* topmost()
     {
