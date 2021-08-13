@@ -214,8 +214,10 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
 
 void Entity::set_layer(LAYER layer_to)
 {
-    if (layer == layer_to || layer_to > 1 || layer_to < 0)
+    uint8_t dest_layer = enum_to_layer(layer_to);
+    if (layer == dest_layer)
         return;
+
     auto state = State::get();
 
     if (layer == 0 || layer == 1)
@@ -225,7 +227,7 @@ void Entity::set_layer(LAYER layer_to)
         remove_layer_func(ptr_from, this);
     }
 
-    auto ptr_to = state.ptr()->layers[layer_to];
+    auto ptr_to = state.ptr()->layers[dest_layer];
     auto add_layer_func = get_add_layer();
     add_layer_func(ptr_to, this);
 }
