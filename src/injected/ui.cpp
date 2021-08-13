@@ -147,6 +147,7 @@ std::map<std::string, int64_t> keys{
     {"console", VK_OEM_3},                           // ~ for US
     {"console_alt", VK_OEM_5},                       // \ for US
     {"close_console", VK_ESCAPE},                    // alternative to close it
+    {"change_layer", OL_KEY_SHIFT | VK_TAB},
     //{ "", 0x },
 };
 
@@ -1612,6 +1613,16 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         g_Console->toggle();
     }
+    else if (pressed("change_layer", wParam))
+    {
+        if (g_players.size() > 0)
+        {
+            unsigned int layer_to = 0;
+            if (g_players.at(0)->layer == 0)
+                layer_to = 1;
+            g_players.at(0)->set_layer(layer_to);
+        }
+    }
     else
     {
         return false;
@@ -2126,7 +2137,7 @@ void render_uid(int uid, const char* section, bool rembtn = false)
     {
         ImGui::SameLine();
         ImGui::PushID(uid);
-        if (ImGui::Button("X(!)"))
+        if (ImGui::Button("X"))
             g_entity->remove_item(uid);
         ImGui::PopID();
     }
@@ -3324,7 +3335,7 @@ void render_powerup(int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("X(!)"))
+    if (ImGui::Button("X"))
     {
         g_entity->remove_powerup(ptype);
     }
@@ -3483,7 +3494,7 @@ void render_entity_props()
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(g_entity->uid, "EntityGeneral");
     ImGui::SameLine();
-    if (ImGui::Button("Void(!)##VoidEntity"))
+    if (ImGui::Button("Void##VoidEntity"))
     {
         if (g_entity->overlay)
         {
@@ -3497,15 +3508,28 @@ void render_entity_props()
         g_entity->y -= 1000.0;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Kill(!)##KillEntity"))
+    if (ImGui::Button("Kill##KillEntity"))
     {
         g_entity->kill(true, nullptr);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Remove##RemoveEntity"))
+    {
+        g_entity->remove();
     }
     if (ImGui::CollapsingHeader("State"))
     {
         render_state("Current state", g_entity->state);
         render_state("Last state", g_entity->last_state);
         render_ai("AI state", g_entity->move_state);
+        if (ImGui::Button("Change"))
+        {
+            unsigned int layer_to = 0;
+            if (g_entity->layer == 0)
+                layer_to = 1;
+            g_entity->set_layer(layer_to);
+        }
+        ImGui::SameLine();
         switch (g_entity->layer)
         {
         case 0:
@@ -3527,7 +3551,7 @@ void render_entity_props()
         {
             ImGui::Text("Holding:");
             ImGui::SameLine();
-            if (ImGui::Button("Drop(!)##DropHolding"))
+            if (ImGui::Button("Drop##DropHolding"))
             {
                 Movable* holding = entity_ptr(g_entity->holding_uid);
                 holding->x = g_entity->x;

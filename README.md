@@ -39,6 +39,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
       + **Ctrl+Mouse 5**: Clone entity
       + **Shift+123...**: Spawn saved kit number
+      + **Shift+Tab**: Change P1 layer
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can `Save` for later use with a single click.
