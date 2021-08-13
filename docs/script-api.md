@@ -906,6 +906,8 @@ end
 - [`int correct_ushabti`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) &StateMemory::correct_ushabti
 - [`Items items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) &StateMemory::items
 - [`int camera_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) &StateMemory::camera_layer
+- [`int get_correct_ushabti_af()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti_af) &StateMemory::get_correct_ushabti_af
+- [`nil set_correct_ushabti_af(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti_af) &StateMemory::set_correct_ushabti_af
 ### `LightParams`
 - [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &LightParams::red
 - [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &LightParams::green

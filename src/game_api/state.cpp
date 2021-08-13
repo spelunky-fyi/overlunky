@@ -5,6 +5,15 @@
 #include "render_api.hpp"
 #include "spawn_api.hpp"
 
+uint16_t StateMemory::get_correct_ushabti_af()
+{
+    return (correct_ushabti % 10 + (correct_ushabti / 10) * 12);
+}
+void StateMemory::set_correct_ushabti_af(uint16_t animation_frame)
+{
+    correct_ushabti = static_cast<uint8_t>(animation_frame - 2 * (animation_frame / 12));
+}
+
 size_t get_dark()
 {
     ONCE(size_t)
