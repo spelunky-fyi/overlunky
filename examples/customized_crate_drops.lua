@@ -4,7 +4,7 @@ meta.description = "Makes all crates drop items in the color of the opening play
 meta.author = "Malacath"
 
 set_post_entity_spawn(function(crate)
-    local function purplify_drop(crate, killer_or_opener)
+    local function customize_drop(crate, killer_or_opener)
         if killer_or_opener.get_heart_color then
             -- declaration is seperate from definition because otherwise it can not become an upvalue of the function
             local cb
@@ -15,6 +15,6 @@ set_post_entity_spawn(function(crate)
             end, SPAWN_TYPE.ANY, MASK.ANY, crate.inside)
         end
     end
-    set_on_kill(crate.uid, purplify_drop)
-    set_on_open(crate.uid, purplify_drop)
+    set_on_kill(crate.uid, customize_drop)
+    set_on_open(crate.uid, customize_drop)
 end, SPAWN_TYPE.ANY, MASK.ANY, ENT_TYPE.ITEM_CRATE)
