@@ -213,6 +213,8 @@ class Entity
         return overlaps_with(hitbox.left, hitbox.bottom, hitbox.right, hitbox.top);
     }
 
+    /// Deprecated
+    /// Use `overlaps_with(AABB hitbox)` instead
     bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)
     {
         const auto [posx, posy] = position();

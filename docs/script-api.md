@@ -2607,13 +2607,13 @@ You can just discard this handle if you do not need extended control anymore
 - [`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line) &GuiDrawContext::draw_line
 \
 Draws a line on screen
-- [`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) draw_rect
+- [`nil draw_rect(float left, float top, float right, float bottom, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) draw_rect
 \
 Draws a rectangle on screen from top-left to bottom-right.
 - [`nil draw_rect(AABB rect, float thickness, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) draw_rect
 \
 Draws a rectangle on screen from top-left to bottom-right.
-- [`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) draw_rect_filled
+- [`nil draw_rect_filled(float left, float top, float right, float bottom, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) draw_rect_filled
 \
 Draws a filled rectangle on screen from top-left to bottom-right.
 - [`nil draw_rect_filled(AABB rect, float rounding, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) draw_rect_filled
@@ -2628,13 +2628,13 @@ Draws a filled circle on screen
 - [`nil draw_text(float x, float y, float size, string text, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &GuiDrawContext::draw_text
 \
 Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
-- [`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
+- [`nil draw_image(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
 \
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 - [`nil draw_image(int image, AABB rect, AABB uv_rect, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
 \
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-- [`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+- [`nil draw_image_rotated(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
 - [`nil draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
 - [`bool window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) &GuiDrawContext::window
 \
@@ -2725,7 +2725,7 @@ Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the s
 - [`AABB()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
 \
 Create a new axis aligned bounding box - defaults to all zeroes
-- [`AABB(float left_, float bottom_, float right_, float top_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
+- [`AABB(float left_, float top_, float right_, float bottom_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
 \
 Create a new axis aligned bounding box by specifying its values
 - [`float left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) &AABB::left
