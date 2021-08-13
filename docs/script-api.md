@@ -412,7 +412,7 @@ Remove item by uid from entity
 `int attach_ball_and_chain(int uid, float off_x, float off_y)`<br/>
 Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
 ### [`spawn_entity_over`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_over)
-`int spawn_entity_over(int item_uid, int over_uid, float x, float y)`<br/>
+`int spawn_entity_over(int entity_type, int over_uid, float x, float y)`<br/>
 Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
 ### [`entity_has_item_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_uid)
 `bool entity_has_item_uid(int uid, int item_uid)`<br/>
@@ -727,13 +727,13 @@ Convert an `AABB` to a screen `AABB` that can be directly passed to draw functio
 #### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!
 ### [`get_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 `array<int> get_entities()`<br/>
-Use get_entities_by(0, 0, LAYER.BOTH)
+Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 ### [`get_entities_by_mask`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
 `array<int> get_entities_by_mask(int mask)`<br/>
-Use get_entities_by(0, mask, LAYER.BOTH)
+Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 ### [`get_entities_by_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
 `array<int> get_entities_by_layer(LAYER layer)`<br/>
-Use get_entities_by(0, 0, layer)
+Use `get_entities_by(0, MASK.ANY, layer)` instead
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 `array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)`<br/>
 Use `get_entities_overlapping_hitbox` instead

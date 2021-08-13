@@ -514,7 +514,7 @@ end
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
     /// Deprecated
-    /// Use get_entities_by(0, 0, LAYER.BOTH)
+    /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
@@ -547,10 +547,10 @@ end
         return std::vector<uint32_t>({});
     };
     /// Deprecated
-    /// Use get_entities_by(0, mask, LAYER.BOTH)
+    /// Use `get_entities_by(0, mask, LAYER.BOTH)` instead
     lua["get_entities_by_mask"] = get_entities_by_mask;
     /// Deprecated
-    /// Use get_entities_by(0, 0, layer)
+    /// Use `get_entities_by(0, MASK.ANY, layer)` instead
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
