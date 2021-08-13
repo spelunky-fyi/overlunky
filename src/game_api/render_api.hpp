@@ -75,35 +75,40 @@ struct RenderInfo
     bool unknown18;
     uint32_t unknown19;
     uint32_t unknown20;
-    float bottom_left_x; // entity.x - (entity.w/2)
-    float bottom_left_y; // entity.y - (entity.h/2)
-    float bottom_left_unknown;
-    float bottom_right_x;
-    float bottom_right_y;
-    float bottom_right_unknown;
-    float top_right_x;
-    float top_right_y;
-    float top_right_unknown;
-    float top_left_x;
-    float top_left_y;
-    float top_left_unknown;
-    float unknown21; // unknown 21-28 are related to the texture pointer info (see below in entity.p80.texture)
-    float unknown22;
-    float unknown23;
-    float unknown24;
-    float unknown25;
-    float unknown26;
-    float unknown27;
-    float unknown28;
-    float unknown29;
-    float unknown30;
-    float unknown31;
-    float unknown32;
-    float unknown33;
-    float unknown34;
-    uint32_t unknown35; // changes when climbing
-    uint32_t unknown36; // changes when climbing
-    uint32_t unknown37; // changes when climbing
+
+    // destination in world coords
+    float destination_bottom_left_x; // entity.x - (entity.w/2)
+    float destination_bottom_left_y; // entity.y - (entity.h/2)
+    float destination_bottom_left_unknown;
+    float destination_bottom_right_x;
+    float destination_bottom_right_y;
+    float destination_bottom_right_unknown;
+    float destination_top_right_x;
+    float destination_top_right_y;
+    float destination_top_right_unknown;
+    float destination_top_left_x;
+    float destination_top_left_y;
+    float destination_top_left_unknown;
+
+    // source in sprite sheet coords (multiply the floats by TextureDB.width and height)
+    float source_bottom_left_x;
+    float source_bottom_left_y;
+    float source_bottom_right_x;
+    float source_bottom_right_y;
+    float source_top_right_x;
+    float source_top_right_y;
+    float source_top_left_x;
+    float source_top_left_y;
+
+    float tilew;
+    float tileh;
+    float x_dupe3;
+    float y_dupe3;
+    float x_dupe4;
+    float y_dupe4;
+    float angle1;
+    float angle2;
+    float angle_related;
     uint32_t animation_frame;
     uint32_t unknown38;
     Texture* texture;
