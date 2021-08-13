@@ -39,6 +39,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
       + **Ctrl+Mouse 5**: Clone entity
       + **Shift+123...**: Spawn saved kit number
+      + **Shift+Tab**: Change P1 layer
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can `Save` for later use with a single click.
@@ -87,6 +88,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Ctrl+Shift+D**: Detach active tab in tabbed interface
   - **Enter**: Run active tool
   - **Escape**: Return focus to game from an input
+  - **Q**: Quick start from the intro or menu
+  - **Ctrl+Q**: Quick restart from anywhere
+  - **Ctrl+C**: Quick return to camp from anywhere
 
 ### Scripts
 Lua scripting is still buggy and unfinished and the **API might change**, although we will try to deprecate old stuff without breaking anything. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md), [internal details](https://github.com/spelunky-fyi/overlunky/tree/main/docs) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started. The examples should be considered [Unlicensed](https://unlicense.org/), so please DO NOT credit the author when copying them. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`. Check the [Playlunky documentation](https://github.com/spelunky-fyi/Playlunky/wiki#script-mods) on how to run your scripts as PL mods.

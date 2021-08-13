@@ -81,6 +81,28 @@ size_t entities_ptr()
     return cache_entities_ptr;
 }
 
+AddLayer get_add_layer()
+{
+    ONCE(AddLayer)
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x40\x56\x41\x54\x48\x83\xec\x58\x4c\x8b\xe1\x48\x8b\xf2\x48\x83\xc1\x08\xe8\xd9\xe1\xff\xff"s, memory.after_bundle);
+        off = function_start(memory.at_exe(off));
+        return res = (AddLayer)off;
+    }
+}
+
+RemoveLayer get_remove_layer()
+{
+    ONCE(RemoveLayer)
+    {
+        auto memory = Memory::get();
+        auto off = find_inst(memory.exe(), "\x40\x53\x56\x41\x55\x48\x83\xec\x50\x4c\x8b\xe9\x48\x8b\xf2\x48\x83\xc1\x08"s, memory.after_bundle);
+        off = function_start(memory.at_exe(off));
+        return res = (RemoveLayer)off;
+    }
+}
+
 std::vector<EntityItem> list_entities()
 {
     size_t map_ptr = *(size_t*)entities_ptr();
@@ -190,6 +212,32 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
         movable_ent->velocityx = vx;
         movable_ent->velocityy = vy;
     }
+}
+
+void Entity::set_layer(LAYER layer_to)
+{
+    if (layer == layer_to || layer_to > 1 || layer_to < 0)
+        return;
+    auto state = State::get();
+
+    if (layer == 0 || layer == 1)
+    {
+        auto ptr_from = state.ptr()->layers[layer];
+        auto remove_layer_func = get_remove_layer();
+        remove_layer_func(ptr_from, this);
+    }
+
+    auto ptr_to = state.ptr()->layers[layer_to];
+    auto add_layer_func = get_add_layer();
+    add_layer_func(ptr_to, this);
+}
+
+void Entity::remove()
+{
+    auto state = State::get();
+    auto ptr_from = state.ptr()->layers[layer];
+    auto remove_layer_func = get_remove_layer();
+    remove_layer_func(ptr_from, this);
 }
 
 std::pair<float, float> Entity::position()
