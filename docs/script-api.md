@@ -300,9 +300,6 @@ Set seed and reset run.
 ### [`god`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=god)
 `nil god(bool g)`<br/>
 Enable/disable godmode.
-### [`force_dark_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_dark_level)
-`nil force_dark_level(bool g)`<br/>
-Try to force next levels to be dark.
 ### [`zoom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoom)
 `nil zoom(float level)`<br/>
 Set the zoom level used in levels and shops. 13.5 is the default.
@@ -738,6 +735,14 @@ Same as `get_hitbox` but based on `get_render_position`
 Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
 ## Deprecated Functions
 #### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!
+### [`force_dark_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_dark_level)
+`nil force_dark_level(bool g)`<br/>
+Set level flag 18 on post room generation instead, to properly force every level to dark
+```lua
+set_callback(function()
+    state.level_flags = set_flag(state.level_flags, 18)
+end, ON.POST_ROOM_GENERATION)
+```
 ### [`get_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 `array<int> get_entities()`<br/>
 Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead

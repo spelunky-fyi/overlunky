@@ -464,7 +464,13 @@ end
     lua["set_seed"] = set_seed;
     /// Enable/disable godmode.
     lua["god"] = godmode;
-    /// Try to force next levels to be dark.
+    /// Deprecated
+    /// Set level flag 18 on post room generation instead, to properly force every level to dark
+    /// ```lua
+    /// set_callback(function()
+    ///     state.level_flags = set_flag(state.level_flags, 18)
+    /// end, ON.POST_ROOM_GENERATION)
+    /// ```
     lua["force_dark_level"] = darkmode;
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
