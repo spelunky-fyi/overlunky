@@ -1,6 +1,7 @@
 #include "lua_vm.hpp"
 
 #include "entity.hpp"
+#include "entities_items.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -870,6 +871,28 @@ end
                 });
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// `uid` has to be the uid of a `Container` or else stuff will break.
+    /// Sets a callback that is called right when a container is opened via up+door.
+    /// The callback signature is `nil on_open(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Container* entity = get_entity_ptr(uid)->as<Container>())
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->set_on_open(
+                [backend, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    // A little less efficient but much simpler to write down so less errors
+                    backend->handle_function(fun, lua["get_entity"](self->uid));
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({ uid, id });
             return id;
         }
         return sol::nullopt;

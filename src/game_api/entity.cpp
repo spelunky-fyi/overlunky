@@ -30,6 +30,7 @@ struct EntityHooksInfo
     std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
     std::vector<HookWithId<void(Movable*)>> post_statemachine;
+    std::vector<HookWithId<void(Container*)>> on_open;
 };
 std::vector<EntityHooksInfo> g_entity_hooks;
 
@@ -441,6 +442,8 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->on_destroy, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->on_open, [id](auto& hook)
+                      { return hook.id == id; });
     }
 }
 EntityHooksInfo& Entity::get_hooks()
@@ -505,4 +508,29 @@ bool Entity::is_movable()
             return true;
 
     return false;
+}
+
+std::uint32_t Container::set_on_open(std::function<void(Container*)> on_open)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.on_open.empty())
+    {
+        hook_vtable<void(Container*, Movable*)>(
+            this,
+            [](Container* self, Movable* opener, void (*original)(Container*, Movable*))
+            {
+                if (opener->movey > 0)
+                {
+                    EntityHooksInfo& hook_info = self->get_hooks();
+                    for (auto& [id, on_open] : hook_info.on_open)
+                    {
+                        on_open(self);
+                    }
+                }
+                original(self, opener);
+            },
+            0x17);
+    }
+    hook_info.on_open.push_back({hook_info.cbcount++, std::move(on_open)});
+    return hook_info.on_open.back().id;
 }

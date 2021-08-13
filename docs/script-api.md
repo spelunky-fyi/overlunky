@@ -575,6 +575,13 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
 The callback signature is `nil on_kill(Entity self, Entity killer)`
 Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_open`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
+`optional<CallbackId> set_on_open(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Container` or else stuff will break.
+Sets a callback that is called right when a container is opened via up+door.
+The callback signature is `nil on_open(Entity self)`
+Use this only when no other approach works, this call can be expensive if overused.
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
