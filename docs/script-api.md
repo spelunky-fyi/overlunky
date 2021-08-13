@@ -569,6 +569,19 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
 Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_kill`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_kill)
+`optional<CallbackId> set_on_kill(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+The callback signature is `nil on_kill(Entity self, Entity killer)`
+Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_open`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
+`optional<CallbackId> set_on_open(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Container` or else stuff will break.
+Sets a callback that is called right when a container is opened via up+door.
+The callback signature is `nil on_open(Entity self, Entity opener)`
+Use this only when no other approach works, this call can be expensive if overused.
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
@@ -833,10 +846,8 @@ for i,id in ipairs(ids) do
 end
 ```
 ### `SaveContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`bool save(string data)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) &SaveContext::Save
 ### `LoadContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`string load()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load) &LoadContext::Load
 ### `SelectPlayerSlot`
 - [`bool activated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activated) &SelectPlayerSlot::activated
@@ -943,15 +954,30 @@ end
 - [`int focused_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) &Camera::focused_entity_uid
 - [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
 ### `PRNG`
-- [`int random_index(int size, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_index) &PRNG::random_index
+- [`optional<int> random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
 \
-Generate a random integer in the range `[0, size)`
-- [`int random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
-\
-Generate a random integer in the range `[min, size)`
+Generate a random integer in the range `[min, size)`, returns `nil` if `min == max`
 - [`bool random_chance(int inverse_chance, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_chance) &PRNG::random_chance
 \
 Returns true with a chance of `1/inverse_chance`
+- [`float random(PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Generate a random floating point number in the range `[0, 1)`
+- [`float random()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random()`
+- [`optional<int> random(int i, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
+- [`optional<int> random(int i)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random(i)`
+- [`optional<int> random(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Generate a integer number in the range `[min, max]` or `nil` if `max < min`
+- [`optional<int> random(int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+\
+Drop-in replacement for `math.random(min, max)`
 ### `Color`
 - [`float r`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) &Color::r
 - [`float g`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) &Color::g
@@ -1002,6 +1028,8 @@ Returns true with a chance of `1/inverse_chance`
 - [`int layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Entity::layer
 - [`float width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &Entity::w
 - [`float height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &Entity::h
+- [`float tile_width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_width) &Entity::tilew
+- [`float tile_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_height) &Entity::tileh
 - [`float angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Entity::angle
 - [`Color color`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) &Entity::color
 - [`float hitboxx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) &Entity::hitboxx
@@ -1504,6 +1532,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 \
 I'm looking for turkeys, wanna help?
 - [`bool quest_incomplete`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_incomplete) &Yang::quest_incomplete
+\
+set to false when the quest is over (Yang dead or second turkey delivered)
 - [`bool special_message_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_message_shown) &Yang::special_message_shown
 \
 tusk palace/black market/one way door - message shown
@@ -1511,6 +1541,8 @@ tusk palace/black market/one way door - message shown
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`RoomOwner`](#roomowner)
 - [`int arrows_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrows_left) &Tun::arrows_left
 - [`int reload_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_timer) &Tun::reload_timer
+\
+when 0, a new arrow is loaded into the bow; resets when she finds an arrow on the ground
 - [`bool challenge_fee_paid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=challenge_fee_paid) &Tun::challenge_fee_paid
 \
 affect only the speech bubble
@@ -1529,6 +1561,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 \
 person whos petting it, only in the camp
 - [`int yell_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yell_counter) &Pet::yell_counter
+\
+counts up to 400 (6.6 sec), when 0 the pet yells out
 - [`int func_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=func_timer) &Pet::func_timer
 \
 used when free running in the camp
@@ -2470,24 +2504,21 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &ParticleDB::get_texture
 - [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &ParticleDB::set_texture
 ### `PreLoadLevelFilesContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
 \
-Block all loading `.lvl` files and instead load the specified `.lvl` files.
-This includes `generic.lvl` so if you need it specify it here.
+Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.
+All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 Use at your own risk, some themes/levels expect a certain level file to be loaded.
 - [`nil add_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_level_files) &PreLoadLevelFilesContext::add_level_files
 \
-Load additional levels files other than the ones that would usually be loaded.
-Stacks with `override_level_files` if that was called first.
+Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.
+All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 ### `DoorCoords`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`float door1_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_x) &DoorCoords::door1_x
 - [`float door1_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_y) &DoorCoords::door1_y
 - [`float door2_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_x) &DoorCoords::door2_x
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`int shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &LevelGenSystem::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
@@ -2495,7 +2526,6 @@ Stacks with `override_level_files` if that was called first.
 - [`int spawn_room_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) &LevelGenSystem::spawn_room_y
 - [`DoorCoords exits`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exits) &LevelGenSystem::exit_doors_locations
 ### `PostRoomGenerationContext`
-- [`sol::no_constructor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sol::no_constructor) 
 - [`bool set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
 \
 Set the room template at the given index and layer, returns `false` if the index is outside of the level.
@@ -2624,9 +2654,15 @@ Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0
 \
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 - [`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+\
+Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 - [`nil draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+\
+Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 - [`bool window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) &GuiDrawContext::window
 \
+Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
+[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
 autosize in center. Use just a `##Label` as title to hide titlebar.
 Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
 give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
@@ -2639,6 +2675,8 @@ Add some text to window, automatically wrapped
 \
 Add a separator line to window
 - [`nil win_inline()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) &GuiDrawContext::win_inline
+\
+Add next thing on the same line. This is same as `win_sameline(0, -1)`
 - [`nil win_sameline(float offset, float spacing)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline) &GuiDrawContext::win_sameline
 \
 Add next thing on the same line, with an offset
@@ -3106,7 +3144,11 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`POISONED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.POISONED) 5
 ### PRNG_CLASS
 Determines what class of prng is used, for example when choosing `PRNG_CLASS.LEVEL_GEN` to generate a random number random Tiamat spawns will not be affected.
-- [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_GEN) PRNG::LEVEL_GEN
+- [`PROCEDURAL_SPAWNS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) PRNG::PROCEDURAL_SPAWNS
+- [`PARTICLES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) PRNG::PARTICLES
+- [`ENTITY_VARIATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) PRNG::ENTITY_VARIATION
+- [`EXTRA_SPAWNS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.EXTRA_SPAWNS) PRNG::EXTRA_SPAWNS
+- [`LEVEL_DECO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) PRNG::LEVEL_DECO
 ### REPEAT_TYPE
 - [`NO_REPEAT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.NO_REPEAT) REPEAT_TYPE::NoRepeat
 - [`LINEAR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=REPEAT_TYPE.LINEAR) REPEAT_TYPE::Linear

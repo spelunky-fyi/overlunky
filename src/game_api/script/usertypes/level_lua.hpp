@@ -11,12 +11,12 @@ using ROOM_TEMPLATE_TYPE = int32_t; // NoAlias
 
 struct PreLoadLevelFilesContext
 {
-    /// Block all loading `.lvl` files and instead load the specified `.lvl` files.
-    /// This includes `generic.lvl` so if you need it specify it here.
+    /// Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.
+    /// All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
     /// Use at your own risk, some themes/levels expect a certain level file to be loaded.
     void override_level_files(std::vector<std::string> levels);
-    /// Load additional levels files other than the ones that would usually be loaded.
-    /// Stacks with `override_level_files` if that was called first.
+    /// Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.
+    /// All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
     void add_level_files(std::vector<std::string> levels);
 };
 struct PostRoomGenerationContext
