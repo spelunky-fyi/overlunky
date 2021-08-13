@@ -27,6 +27,7 @@ struct EntityHooksInfo
     void* entity;
     std::uint32_t cbcount;
     std::vector<HookWithId<void(Entity*)>> on_destroy;
+    std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
     std::vector<HookWithId<void(Movable*)>> post_statemachine;
 };
@@ -432,6 +433,8 @@ void Entity::unhook(std::uint32_t id)
                            { return hook.entity == this; });
     if (it != g_entity_hooks.end())
     {
+        std::erase_if(it->on_kill, [id](auto& hook)
+                      { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->post_statemachine, [id](auto& hook)
@@ -470,6 +473,27 @@ std::uint32_t Entity::set_on_destroy(std::function<void(Entity*)> cb)
     EntityHooksInfo& hook_info = get_hooks();
     hook_info.on_destroy.push_back({hook_info.cbcount++, std::move(cb)});
     return hook_info.on_destroy.back().id;
+}
+std::uint32_t Entity::set_on_kill(std::function<void(Entity*, Entity*)> on_kill)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.on_kill.empty())
+    {
+        hook_vtable<void(Entity*, bool, Entity*)>(
+            this,
+            [](Entity* self, bool _some_bool, Entity* from, void (*original)(Entity*, bool, Entity*))
+            {
+                EntityHooksInfo& hook_info = self->get_hooks();
+                for (auto& [id, on_kill] : hook_info.on_kill)
+                {
+                    on_kill(self, from);
+                }
+                original(self, _some_bool, from);
+            },
+            0x2);
+    }
+    hook_info.on_kill.push_back({hook_info.cbcount++, std::move(on_kill)});
+    return hook_info.on_kill.back().id;
 }
 
 bool Entity::is_movable()

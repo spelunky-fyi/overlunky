@@ -853,6 +853,27 @@ end
         }
         return sol::nullopt;
     };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+    /// The callback signature is `nil on_kill(Entity self, Entity killer)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_kill"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->set_on_kill(
+                [backend, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
+                {
+                    // A little less efficient but much simpler to write down so less errors
+                    backend->handle_function(fun, lua["get_entity"](self->uid), lua["get_entity"](killer->uid));
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
 
     lua.create_named_table(
         "ON",

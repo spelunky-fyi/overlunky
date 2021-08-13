@@ -4269,6 +4269,7 @@ set_kapala_blood_threshold = function(...) end
 set_kapala_hud_icon = function(...) end
 set_level_flags = function(...) end
 set_olmec_phase_y_level = function(...) end
+set_on_kill = function(...) end
 set_post_entity_spawn = function(...) end
 set_post_statemachine = function(...) end
 set_post_tile_code_callback = function(...) end
