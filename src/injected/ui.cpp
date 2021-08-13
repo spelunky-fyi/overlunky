@@ -1002,7 +1002,7 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->world_next = world;
     g_state->level_next = level;
     g_state->theme_next = theme;
-    g_state->quest_flags = 1;
+    g_state->quest_flags = g_state->quest_flags | 1;
     g_state->fadein = 1;
     g_state->fadeout = 1;
     g_state->loading = 1;
