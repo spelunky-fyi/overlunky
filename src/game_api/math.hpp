@@ -4,18 +4,18 @@ struct AABB
 {
     /// Create a new axis aligned bounding box - defaults to all zeroes
     AABB()
-        : left(0.0), bottom(0.0), right(0.0), top(0.0)
+        : left(0.0), top(0.0), right(0.0), bottom(0.0)
     {
     }
 
     /// Create a new axis aligned bounding box by specifying its values
-    AABB(float left_, float bottom_, float right_, float top_)
-        : left(left_), bottom(bottom_), right(right_), top(top_)
+    AABB(float left_, float top_, float right_, float bottom_)
+        : left(left_), top(top_), right(right_), bottom(bottom_)
     {
     }
 
     float left;
-    float bottom;
-    float right;
     float top;
+    float right;
+    float bottom;
 };

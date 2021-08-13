@@ -23,35 +23,35 @@ void GuiDrawContext::draw_line(float x1, float y1, float x2, float y2, float thi
     ImVec2 b = screenify({x2, y2});
     backend->draw_list->AddLine(a, b, color, thickness);
 };
-void GuiDrawContext::draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)
+void GuiDrawContext::draw_rect(float left, float top, float right, float bottom, float thickness, float rounding, uColor color)
 {
     // check for nan in the vectors because this will cause a crash in ImGui
-    if (isnan(x1) || isnan(y1) || isnan(x2) || isnan(y2))
+    if (isnan(left) || isnan(top) || isnan(right) || isnan(bottom))
     {
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-        backend->messages.push_back({fmt::format("An argument passed to draw_rect was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
+        backend->messages.push_back({fmt::format("An argument passed to draw_rect was not a number: {} {} {} {}", left, top, right, bottom), std::chrono::system_clock::now(), error_color});
 #endif
         return;
     }
-    ImVec2 a = screenify({x1, y1});
-    ImVec2 b = screenify({x2, y2});
+    ImVec2 a = screenify({left, top});
+    ImVec2 b = screenify({right, bottom});
     backend->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
 };
 void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColor color)
 {
-    draw_rect(rect.left, rect.bottom, rect.right, rect.top, thickness, rounding, color);
+    draw_rect(rect.left, rect.top, rect.right, rect.bottom, thickness, rounding, color);
 }
-void GuiDrawContext::draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)
+void GuiDrawContext::draw_rect_filled(float left, float top, float right, float bottom, float rounding, uColor color)
 {
-    if (isnan(x1) || isnan(y1) || isnan(x2) || isnan(y2))
+    if (isnan(left) || isnan(top) || isnan(right) || isnan(bottom))
     {
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-        backend->messages.push_back({fmt::format("An argument passed to draw_rect_filled was not a number: {} {} {} {}", x1, y1, x2, y2), std::chrono::system_clock::now(), error_color});
+        backend->messages.push_back({fmt::format("An argument passed to draw_rect_filled was not a number: {} {} {} {}", left, top, right, bottom), std::chrono::system_clock::now(), error_color});
 #endif
         return;
     }
-    ImVec2 a = screenify({x1, y1});
-    ImVec2 b = screenify({x2, y2});
+    ImVec2 a = screenify({left, top});
+    ImVec2 b = screenify({right, bottom});
     // check for nan in the vectors because this will cause a crash in ImGui
     backend->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
 };
@@ -108,12 +108,12 @@ void GuiDrawContext::draw_image(int image, AABB rect, AABB uv_rect, uColor color
 {
     draw_image(image, rect.left, rect.bottom, rect.right, rect.top, uv_rect.left, uv_rect.bottom, uv_rect.right, uv_rect.top, color);
 }
-void GuiDrawContext::draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
+void GuiDrawContext::draw_image_rotated(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
 {
     if (!backend->images.contains(image))
         return;
-    ImVec2 a = screenify({x1, y1});
-    ImVec2 b = screenify({x2, y2});
+    ImVec2 a = screenify({left, top});
+    ImVec2 b = screenify({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     ImVec2 pivot = {screenify(px), screenify(py)};

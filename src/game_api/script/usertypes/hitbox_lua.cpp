@@ -46,8 +46,8 @@ void register_usertypes(sol::state& lua)
     /// Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
     lua["screen_aabb"] = [](AABB box) -> AABB
     {
-        auto [sx1, sy1, sx2, sy2] = screen_aabb(box.left, box.bottom, box.right, box.top);
-        return AABB{sx1, sy2, sx2, sy1};
+        auto [sx1, sy1, sx2, sy2] = screen_aabb(box.left, box.top, box.right, box.bottom);
+        return AABB{sx1, sy1, sx2, sy2};
     };
 
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
