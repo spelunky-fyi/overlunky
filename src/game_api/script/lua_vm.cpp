@@ -570,7 +570,8 @@ end
     lua["get_entity_flags2"] = get_entity_flags2;
     /// Set the `more_flags` field from entity by uid
     lua["set_entity_flags2"] = set_entity_flags2;
-    /// Get the `move_state` field from entity by uid
+    /// Deprecated
+    /// As the name is misleading. use entity `move_state` field instead
     lua["get_entity_ai_state"] = get_entity_ai_state;
     /// Get `state.level_flags`
     lua["get_level_flags"] = get_hud_flags;
@@ -599,6 +600,8 @@ end
     lua["attach_ball_and_chain"] = attach_ball_and_chain;
     /// Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
+    /// Short for [spawn_entity_over](#spawn_entity_over)
+    lua["spawn_over"] = spawn_entity_over;
     /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
     /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory

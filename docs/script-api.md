@@ -371,9 +371,6 @@ Get the `more_flags` field from entity by uid
 ### [`set_entity_flags2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_entity_flags2)
 `nil set_entity_flags2(int uid, int flags)`<br/>
 Set the `more_flags` field from entity by uid
-### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
-`int get_entity_ai_state(int uid)`<br/>
-Get the `move_state` field from entity by uid
 ### [`get_level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_flags)
 `int get_level_flags()`<br/>
 Get `state.level_flags`
@@ -414,6 +411,9 @@ Spawns and attaches ball and chain to `uid`, the initial position of the ball is
 ### [`spawn_entity_over`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_over)
 `int spawn_entity_over(int entity_type, int over_uid, float x, float y)`<br/>
 Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
+### [`spawn_over`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_over)
+`int spawn_over(int entity_type, int over_uid, float x, float y)`<br/>
+Short for [spawn_entity_over](#spawn_entity_over)
 ### [`entity_has_item_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_uid)
 `bool entity_has_item_uid(int uid, int item_uid)`<br/>
 Check if the entity `uid` has some specific `item_uid` by uid in their inventory
@@ -737,6 +737,9 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 `array<int> get_entities_overlapping(int entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)`<br/>
 Use `get_entities_overlapping_hitbox` instead
+### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
+`int get_entity_ai_state(int uid)`<br/>
+As the name is misleading. use entity `move_state` field instead
 ### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
 `nil set_camera_position(float cx, float cy)`<br/>
 this doesn't actually work at all. See State -> Camera the for proper camera handling
