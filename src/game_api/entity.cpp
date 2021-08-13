@@ -212,9 +212,9 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
     }
 }
 
-void Entity::set_layer(unsigned int layer_to)
+void Entity::set_layer(LAYER layer_to)
 {
-    if (layer == layer_to || layer_to > 1)
+    if (layer == layer_to || layer_to > 1 || layer_to < 0)
         return;
     auto state = State::get();
 
