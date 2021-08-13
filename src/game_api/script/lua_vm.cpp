@@ -1,7 +1,7 @@
 #include "lua_vm.hpp"
 
-#include "entity.hpp"
 #include "entities_items.hpp"
+#include "entity.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -879,7 +879,7 @@ end
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
                 });
             backend->hook_entity_dtor(entity);
-            backend->entity_hooks.push_back({ uid, id });
+            backend->entity_hooks.push_back({uid, id});
             return id;
         }
         return sol::nullopt;
