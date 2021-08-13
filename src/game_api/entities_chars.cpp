@@ -46,24 +46,24 @@ bool PowerupCapable::has_powerup(uint32_t powerup_type)
 
 std::u16string Player::get_name()
 {
-    return ::get_character_name(type->id);
+    return ::get_character_name(get_character_index(type->id));
 }
 std::u16string Player::get_short_name()
 {
-    return ::get_character_short_name(type->id);
+    return ::get_character_short_name(get_character_index(type->id));
 }
 Color Player::get_heart_color()
 {
-    return ::get_character_heart_color(type->id);
+    return ::get_character_heart_color(get_character_index(type->id));
 }
 bool Player::is_female()
 {
-    return ::is_character_female(type->id);
+    return ::is_character_female(get_character_index(type->id));
 }
 
 void Player::set_heart_color(Color hcolor)
 {
-    ::set_character_heart_color(type->id, hcolor);
+    ::set_character_heart_color(get_character_index(type->id), hcolor);
 }
 
 std::u16string get_character_name(int32_t type_id)
