@@ -11,7 +11,7 @@ uint16_t StateMemory::get_correct_ushabti_af()
 }
 void StateMemory::set_correct_ushabti_af(uint16_t animation_frame)
 {
-    correct_ushabti = static_cast<uint8_t>(animation_frame - 2 * (animation_frame / 12));
+    correct_ushabti = static_cast<uint8_t>(animation_frame % 12 + (animation_frame / 12) * 10);
 }
 
 size_t get_dark()
