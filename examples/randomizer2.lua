@@ -669,6 +669,7 @@ register_option_float("room_shop_chance", "Extra shop chance", 15, 0, 100)
 register_option_float("room_big_chance", "Huge level chance", 15, 0, 100)
 register_option_int("room_big_min", "Huge level min height", 8, 8, 15)
 register_option_int("room_big_max", "Huge level max height", 15, 8, 15)
+register_option_float("room_dark", "Dark level chance", 4, 0, 100)
 
 local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.PATH_NORMAL] = true,
@@ -803,6 +804,9 @@ set_callback(function(ctx)
                 end
             end
         end
+    end
+    if math.random() < options.room_dark/100 then
+        state.level_flags = set_flag(state.level_flags, 18)
     end
 end, ON.POST_ROOM_GENERATION)
 
@@ -1012,7 +1016,7 @@ local co_level = 5
 local insert_bosses = {}
 local bosses_killed = {}
 local bosses_added = 0
-local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY}
+local orig_chain_items = {ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY}
 local chain_items = {}
 local boss_warp = false
 
