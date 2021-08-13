@@ -9,6 +9,22 @@ namespace NState
 {
 void register_usertypes(sol::state& lua)
 {
+    lua.new_usertype<SelectPlayerSlot>(
+        "SelectPlayerSlot",
+        "activated",
+        &SelectPlayerSlot::activated,
+        "character",
+        &SelectPlayerSlot::character,
+        "texture",
+        &SelectPlayerSlot::texture_id);
+    lua.new_usertype<Items>(
+        "Items",
+        "player_select",
+        sol::property([](Items& s) {
+            return std::ref(s.player_select_slots);
+        }),
+        "player_count",
+        &Items::player_count);
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -122,7 +138,11 @@ void register_usertypes(sol::state& lua)
         "level_gen",
         &StateMemory::level_gen,
         "correct_ushabti",
-        &StateMemory::correct_ushabti);
+        &StateMemory::correct_ushabti,
+        "items",
+        &StateMemory::items,
+        "camera_layer",
+        &StateMemory::camera_layer);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
