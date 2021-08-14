@@ -1290,6 +1290,8 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 ### `TeleportingBorder`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction) &TeleportingBorder::direction
+\
+0 - right, 1 - left, 2 - bottom, 3 - top, 4 - disable
 ### `ForceField`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Entity first_item_beam`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_item_beam) &ForceField::first_item_beam

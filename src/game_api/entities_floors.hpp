@@ -278,6 +278,7 @@ class MotherStatue : public Floor
 class TeleportingBorder : public Floor
 {
   public:
+    /// 0 - right, 1 - left, 2 - bottom, 3 - top, 4 - disable
     int8_t direction;
 };
 
