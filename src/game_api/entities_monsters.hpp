@@ -39,7 +39,7 @@ class WalkingMonster : public Monster
     int32_t chatting_to_uid;
     /// alternates between walking and pausing every time it reaches zero
     int16_t walk_pause_timer;
-    /// used fo chatting with other monsters, attack cooldowns etc.
+    /// used for chatting with other monsters, attack cooldowns etc.
     int16_t cooldown_timer;
 };
 
