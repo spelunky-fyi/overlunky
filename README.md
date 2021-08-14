@@ -24,7 +24,7 @@ You are strongly discouraged from using any modding tools in your actual online 
 Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check [entities.txt](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.txt) for a list of numerical entity IDs.
 
 ## Features
-Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans.
+Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans. The default keys are also changed from time to time to make room for better features, so check the ini for your current keys, or delete it to revert to default keys.
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
       + **Tab**: Add selected item id to list when making a kit
@@ -46,7 +46,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **F2**: Warp and make doors to many places
       + **Shift+Enter**: Spawn back layer door
       + **Ctrl+Shift+Enter**: Spawn warp door
-      + **Ctrl+Shift+W**: Warp to set level
+      + **Ctrl+W**: Warp to set level
+      + **Ctrl+A**: Warp to next level (first/normal exit)
+      + **Ctrl+B**: Warp to next level (second/special exit)
   - **F3**: Camera controls
       + **Ctrl+,**: Zoom in
       + **Ctrl+.**: Zoom out
@@ -80,7 +82,8 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
     - **Enter**: Execute
     - **Ctrl+Enter**: New line
     - **"clear/clr/cls"**: Clear history
-    - **"reset"**: Clear all callbacks made in the console
+    - **"reset/reload"**: Clear all callbacks made in the console
+    - **"quit"**: Ragequit
   - **Ctrl+Shift+U**: Change UI color. You can also change the font in the ini.
   - **Ctrl+Shift+I**: ImGui internal metrics and settings
   - **Ctrl+Shift+S**: Save options, hotkeys and UI colors

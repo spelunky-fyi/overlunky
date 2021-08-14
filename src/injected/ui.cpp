@@ -102,7 +102,9 @@ std::map<std::string, int64_t> keys{
     {"spawn_kit_9", OL_KEY_SHIFT | '9'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
-    {"warp", OL_KEY_CTRL | OL_KEY_SHIFT | 'W'},
+    {"warp", OL_KEY_CTRL | 'W'},
+    {"warp_next_level_a", OL_KEY_CTRL | 'A'},
+    {"warp_next_level_b", OL_KEY_CTRL | 'B'},
     {"hide_ui", VK_F11},
     {"zoom_in", OL_KEY_CTRL | VK_OEM_COMMA},
     {"zoom_out", OL_KEY_CTRL | VK_OEM_PERIOD},
@@ -111,19 +113,19 @@ std::map<std::string, int64_t> keys{
     {"zoom_4x", OL_KEY_CTRL | '4'},
     {"zoom_5x", OL_KEY_CTRL | '5'},
     {"zoom_auto", OL_KEY_CTRL | '0'},
-    {"teleport", OL_KEY_CTRL | OL_KEY_SHIFT | VK_SPACE},
-    {"teleport_left", OL_KEY_CTRL | OL_KEY_SHIFT | VK_LEFT},
-    {"teleport_up", OL_KEY_CTRL | OL_KEY_SHIFT | VK_UP},
-    {"teleport_right", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RIGHT},
-    {"teleport_down", OL_KEY_CTRL | OL_KEY_SHIFT | VK_DOWN},
+    {"teleport", 0x0},
+    {"teleport_left", 0x0},
+    {"teleport_up", 0x0},
+    {"teleport_right", 0x0},
+    {"teleport_down", 0x0},
     {"camera_left", OL_KEY_SHIFT | VK_LEFT},
     {"camera_up", OL_KEY_SHIFT | VK_UP},
     {"camera_right", OL_KEY_SHIFT | VK_RIGHT},
     {"camera_down", OL_KEY_SHIFT | VK_DOWN},
-    {"coordinate_left", OL_KEY_CTRL | VK_LEFT},
-    {"coordinate_up", OL_KEY_CTRL | VK_UP},
-    {"coordinate_right", OL_KEY_CTRL | VK_RIGHT},
-    {"coordinate_down", OL_KEY_CTRL | VK_DOWN},
+    {"coordinate_left", 0x0},
+    {"coordinate_up", 0x0},
+    {"coordinate_right", 0x0},
+    {"coordinate_down", 0x0},
     {"mouse_spawn", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_throw", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_over", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x01},
@@ -236,6 +238,7 @@ std::map<std::string, bool> options = {
     {"draw_hitboxes", false},
     {"tabbed_interface", true},
     {"enable_unsafe_scripts", false},
+    {"warp_increments_level_count", true},
 };
 
 int int_pow(int base, unsigned int exp)
@@ -1008,6 +1011,128 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->loading = 1;
 }
 
+void warp_inc(uint8_t w, uint8_t l, uint8_t t)
+{
+    if (options["warp_increments_level_count"])
+        g_state->level_count += 1;
+    warp(w, l, t);
+}
+
+void warp_next_level(size_t num)
+{
+    std::vector<Target*> targets;
+    Target* target = new Target;
+    target->world = 0;
+    int tnum = g_state->world * 100 + g_state->level;
+    switch (tnum)
+    {
+    case 104:
+    case 301:
+        break;
+    case 501:
+        target->world = 6;
+        target->level = 1;
+        target->theme = 8;
+        break;
+    case 204:
+        target->world = 3;
+        target->level = 1;
+        target->theme = 4;
+        break;
+    case 403:
+        if (g_state->theme == 11)
+        {
+            target->world = 4;
+            target->level = 4;
+            target->theme = 6;
+        }
+        else
+        {
+            target->world = 4;
+            target->level = 4;
+            target->theme = 5;
+        }
+        break;
+    case 404:
+        target->world = 5;
+        target->level = 1;
+        target->theme = 7;
+        break;
+    case 603:
+        target->world = 6;
+        target->level = 4;
+        target->theme = 14;
+        break;
+    case 604:
+        target->world = 7;
+        target->level = 1;
+        target->theme = 9;
+        break;
+    case 702:
+        target->world = 7;
+        target->level = 3;
+        target->theme = 9;
+        break;
+    case 703:
+        target->world = 7;
+        target->level = 4;
+        target->theme = 16;
+        break;
+    case 704:
+        target->world = 8;
+        target->level = 5;
+        target->theme = 10;
+        break;
+    default:
+        target->world = g_state->world;
+        target->level = g_state->level + 1;
+        target->theme = g_state->theme;
+        break;
+    }
+    if (g_state->theme == 17)
+    {
+        target->world = 1;
+        target->level = 1;
+        target->theme = 1;
+    }
+    if (target->world > 0)
+    {
+        targets.push_back(target);
+    }
+
+    std::vector<uint32_t> doortypes;
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
+    auto doors = get_entities_by_type(doortypes);
+    for (auto doorid : doors)
+    {
+        uint8_t world, level, theme;
+        ExitDoor* doorent = (ExitDoor*)get_entity_ptr(doorid);
+        std::tie(world, level, theme) = doorent->get_target();
+        if (!doorent->special_door)
+            continue;
+        target = new Target;
+        target->world = world;
+        target->level = level;
+        target->theme = theme;
+        targets.push_back(target);
+    }
+
+    if (g_state->theme == 11)
+    {
+        target = new Target;
+        target->world = 4;
+        target->level = 4;
+        target->theme = 12;
+        targets.push_back(target);
+    }
+    if (num > targets.size() - 1 && targets.size() > 0)
+        num = targets.size() - 1;
+    if (targets.size() > num)
+        warp_inc(targets.at(num)->world, targets.at(num)->level, targets.at(num)->theme);
+}
+
 bool pressed(std::string keyname, WPARAM wParam)
 {
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1509,7 +1634,15 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("warp", wParam))
     {
-        warp(g_world, g_level, g_to + 1);
+        warp_inc(g_world, g_level, g_to + 1);
+    }
+    else if (pressed("warp_next_level_a", wParam))
+    {
+        warp_next_level(0);
+    }
+    else if (pressed("warp_next_level_b", wParam))
+    {
+        warp_next_level(1);
     }
     else if (pressed("move_up", wParam) && active("tool_entity"))
     {
@@ -1883,7 +2016,7 @@ void render_narnia()
     ImGui::PopItemWidth();
     if (ImGui::Button("Instant warp##InstantWarp"))
     {
-        warp(g_world, g_level, g_to + 1);
+        warp_inc(g_world, g_level, g_to + 1);
     }
     ImGui::SameLine();
     if (ImGui::Button("Warp door##SpawnWarpDoor"))
@@ -1897,50 +2030,10 @@ void render_narnia()
     {
         spawn_backdoor(g_x, g_y);
     }
-    ImGui::Text("Instant warp to level:");
-    std::vector<uint32_t> doortypes;
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
-    auto doors = get_entities_by_type(doortypes);
+    ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
     ImGui::Text("Next level");
     ImGui::SameLine(100.0f);
     int n = 0;
-    for (auto doorid : doors)
-    {
-        Movable* doorent = (Movable*)get_entity_ptr(doorid);
-        Target* target = reinterpret_cast<Target*>(&doorent->anim_func);
-        if (!target->enabled)
-            continue;
-
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
-        if (n > 0)
-            ImGui::SameLine();
-        if (ImGui::Button(buf.c_str()))
-        {
-            warp(target->world, target->level, target->theme);
-        }
-        n++;
-    }
-
-    if (g_state->theme == 11)
-    {
-        Target* target = new Target;
-        target->world = 4;
-        target->level = 4;
-        target->theme = 12;
-
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
-        if (n == 0)
-            ImGui::SameLine(100.0f);
-        else
-            ImGui::SameLine();
-        if (ImGui::Button(buf.c_str()))
-        {
-            warp(target->world, target->level, target->theme);
-        }
-        n++;
-    }
 
     Target* target = new Target;
     target->world = 0;
@@ -2019,143 +2112,183 @@ void render_narnia()
     if (target->world > 0)
     {
         std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
-        if (n == 0)
-            ImGui::SameLine(100.0f);
-        else
+        if (ImGui::Button(buf.c_str()))
+        {
+            warp_inc(target->world, target->level, target->theme);
+        }
+        n++;
+    }
+
+    std::vector<uint32_t> doortypes;
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
+    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
+    auto doors = get_entities_by_type(doortypes);
+    for (auto doorid : doors)
+    {
+        Movable* doorent = (Movable*)get_entity_ptr(doorid);
+        target = reinterpret_cast<Target*>(&doorent->anim_func);
+        if (!target->enabled)
+            continue;
+
+        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        if (n > 0)
             ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
         {
-            warp(target->world, target->level, target->theme);
+            warp_inc(target->world, target->level, target->theme);
         }
+        n++;
+    }
+
+    if (g_state->theme == 11)
+    {
+        target = new Target;
+        target->world = 4;
+        target->level = 4;
+        target->theme = 12;
+
+        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        ImGui::SameLine();
+        if (ImGui::Button(buf.c_str()))
+        {
+            warp_inc(target->world, target->level, target->theme);
+        }
+        n++;
     }
 
     ImGui::Text("Dwelling");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("1-1##Warp1-1"))
-        warp(1, 1, 1);
+        warp_inc(1, 1, 1);
     ImGui::SameLine();
     if (ImGui::Button("1-2##Warp1-2"))
-        warp(1, 2, 1);
+        warp_inc(1, 2, 1);
     ImGui::SameLine();
     if (ImGui::Button("1-3##Warp1-3"))
-        warp(1, 3, 1);
+        warp_inc(1, 3, 1);
     ImGui::SameLine();
     if (ImGui::Button("1-4##Warp1-4"))
-        warp(1, 4, 1);
+        warp_inc(1, 4, 1);
 
     ImGui::Text("Jungle");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("2-1##WarpJ2-1"))
-        warp(2, 1, 2);
+        warp_inc(2, 1, 2);
     ImGui::SameLine();
     if (ImGui::Button("2-2##WarpJ2-2"))
-        warp(2, 2, 2);
+        warp_inc(2, 2, 2);
     ImGui::SameLine();
     if (ImGui::Button("2-3##WarpJ2-3"))
-        warp(2, 3, 2);
+        warp_inc(2, 3, 2);
     ImGui::SameLine();
     if (ImGui::Button("2-4##WarpJ2-4"))
-        warp(2, 4, 2);
+        warp_inc(2, 4, 2);
 
     ImGui::Text("Volcana");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("2-1##WarpV2-1"))
-        warp(2, 1, 3);
+        warp_inc(2, 1, 3);
     ImGui::SameLine();
     if (ImGui::Button("2-2##WarpV2-2"))
-        warp(2, 2, 3);
+        warp_inc(2, 2, 3);
     ImGui::SameLine();
     if (ImGui::Button("2-3##WarpV2-3"))
-        warp(2, 3, 3);
+        warp_inc(2, 3, 3);
     ImGui::SameLine();
     if (ImGui::Button("2-4##WarpV2-4"))
-        warp(2, 4, 3);
+        warp_inc(2, 4, 3);
 
     ImGui::Text("Olmec");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("3-1##Warp3-1"))
-        warp(3, 1, 4);
+        warp_inc(3, 1, 4);
 
     ImGui::Text("Tide Pool");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("4-1##WarpP4-1"))
-        warp(4, 1, 5);
+        warp_inc(4, 1, 5);
     ImGui::SameLine();
     if (ImGui::Button("4-2##WarpP4-2"))
-        warp(4, 2, 5);
+        warp_inc(4, 2, 5);
     ImGui::SameLine();
     if (ImGui::Button("4-3##WarpP4-3"))
-        warp(4, 3, 5);
+        warp_inc(4, 3, 5);
     ImGui::SameLine();
     if (ImGui::Button("4-4##WarpP4-4"))
-        warp(4, 4, 5);
+        warp_inc(4, 4, 5);
     ImGui::SameLine();
     if (ImGui::Button("Abzu##WarpAbzu"))
-        warp(4, 4, 13);
+        warp_inc(4, 4, 13);
 
     ImGui::Text("Temple");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("4-1##WarpT4-1"))
-        warp(4, 1, 6);
+        warp_inc(4, 1, 6);
     ImGui::SameLine();
     if (ImGui::Button("4-2##WarpT4-2"))
-        warp(4, 2, 6);
+        warp_inc(4, 2, 6);
     ImGui::SameLine();
     if (ImGui::Button("4-3##WarpT4-3"))
-        warp(4, 3, 6);
+        warp_inc(4, 3, 6);
     ImGui::SameLine();
     if (ImGui::Button("4-4##WarpT4-4"))
-        warp(4, 4, 6);
+        warp_inc(4, 4, 6);
     ImGui::SameLine();
     if (ImGui::Button("CoG##WarpCoG"))
-        warp(4, 3, 11);
+        warp_inc(4, 3, 11);
     ImGui::SameLine();
     if (ImGui::Button("Duat##WarpDuat"))
-        warp(4, 4, 12);
+        warp_inc(4, 4, 12);
 
     ImGui::Text("Ice Caves");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("5-1##Warp5-1"))
-        warp(5, 1, 7);
+        warp_inc(5, 1, 7);
 
     ImGui::Text("Neo Babylon");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("6-1##Warp6-1"))
-        warp(6, 1, 8);
+        warp_inc(6, 1, 8);
     ImGui::SameLine();
     if (ImGui::Button("6-2##Warp6-2"))
-        warp(6, 2, 8);
+        warp_inc(6, 2, 8);
     ImGui::SameLine();
     if (ImGui::Button("6-3##Warp6-3"))
-        warp(6, 3, 8);
+        warp_inc(6, 3, 8);
     ImGui::SameLine();
     if (ImGui::Button("Tiamat##WarpTiamat"))
-        warp(6, 4, 14);
+        warp_inc(6, 4, 14);
 
     ImGui::Text("Sunken City");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("7-1##Warp7-1"))
-        warp(7, 1, 9);
+        warp_inc(7, 1, 9);
     ImGui::SameLine();
     if (ImGui::Button("7-2##Warp7-2"))
-        warp(7, 2, 9);
+        warp_inc(7, 2, 9);
     ImGui::SameLine();
     if (ImGui::Button("7-3##Warp7-3"))
-        warp(7, 3, 9);
+        warp_inc(7, 3, 9);
     ImGui::SameLine();
     if (ImGui::Button("Hundun##WarpHundun"))
-        warp(7, 4, 16);
+        warp_inc(7, 4, 16);
     ImGui::SameLine();
     if (ImGui::Button("EW##WarpEW"))
-        warp(7, 2, 15);
+        warp_inc(7, 2, 15);
 
     ImGui::Text("Cosmic Ocean");
     ImGui::SameLine(100.0f);
     if (ImGui::Button("7-5##Warp7-5"))
-        warp(8, 5, 10);
+        warp_inc(8, 5, 10);
     ImGui::SameLine();
     if (ImGui::Button("7-98##Warp7-98"))
-        warp(8, 98, 10);
+        warp_inc(8, 98, 10);
+
+    ImGui::Text("Base Camp");
+    ImGui::SameLine(100.0f);
+    if (ImGui::Button("Camp##WarpCamp"))
+        warp_inc(1, 1, 17);
 }
 
 void render_uid(int uid, const char* section, bool rembtn = false)

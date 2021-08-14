@@ -11,15 +11,15 @@ local function get_chance(min, max)
     if min > max then min, max = max, min end
     min = math.floor(1/(min/100))
     max = math.floor(1/(max/100))
-    return math.random(max, min)
+    return prng:random(max, min)
     --return prng:random_int(min, max, PRNG_CLASS.LEVEL_GEN)
 end
 
 local function pick(from, ignore)
     local item = -1
     for i=1,10 do
-        --math.randomseed(read_prng()[8]+i)
-        item = from[math.random(#from)]
+        ----math.randomseed(read_prng()[8]+i)
+        item = from[prng:random(#from)]
         --item = from[prng:random_index(#from, PRNG_CLASS.LEVEL_GEN)]
         if item ~= ignore then
             return item
@@ -54,16 +54,16 @@ end
 
 local function shuffle(tbl)
     for i = #tbl, 2, -1 do
-        local j = math.random(i)
+        local j = prng:random(i)
         tbl[i], tbl[j] = tbl[j], tbl[i]
     end
 end
 
 local function get_ushabti_frame()
     local x, y
-    if math.random() > options.ushabti_chance/100 or state.correct_ushabti == nil then
-        x = math.random(0,9)
-        y = math.random(0,9)
+    if prng:random() > options.ushabti_chance/100 or state.correct_ushabti == nil then
+        x = prng:random(0,9)
+        y = prng:random(0,9)
     else
         x = state.correct_ushabti % 10
         y = math.floor(state.correct_ushabti / 10)
@@ -185,8 +185,8 @@ local function trap_wall_spawn(x, y, l)
     local right = get_grid_entity_at(x+1, y, l)
     if has(traps_flip, id) then
         if left == -1 and right == -1 then
-            math.randomseed(read_prng()[5])
-            if math.random() < 0.5 then
+            --math.randomseed(read_prng()[5])
+            if prng:random() < 0.5 then
                 flip_entity(ent)
             end
         elseif left == -1 then
@@ -329,7 +329,7 @@ end
 local trap_frog_chance = define_procedural_spawn("trap_frog", trap_frog_spawn, trap_frog_valid)
 
 set_callback(function(ctx)
-    math.randomseed(read_prng()[1])
+    --math.randomseed(read_prng()[1])
     ctx:set_procedural_spawn_chance(trap_ceiling_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_floor_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_wall_chance, get_chance(options.trap_min, options.trap_max))
@@ -411,10 +411,10 @@ local crab_items = {ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, EN
 local function enemy_small_spawn(x, y, l)
     local uid = spawn_entity_snapped_to_floor(pick(enemies_small), x, y, l)
     local ent = get_entity(uid)
-    if math.random() < options.enemy_curse_chance/100 then
+    if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
     end
-    if math.random() < options.enemy_curse_chance/100 then
+    if prng:random() < options.enemy_curse_chance/100 then
         attach_ball_and_chain(uid, 0.5, 0)
     end
 end
@@ -436,7 +436,7 @@ local function enemy_big_spawn(x, y, l)
     if id == ENT_TYPE.MOUNT_MECH then
         local rider = spawn_entity(pick({ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_ALIEN}), x, y, l, 0, 0)
         carry(uid, rider)
-    elseif math.random() < options.enemy_curse_chance/100 then
+    elseif prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
     end
 end
@@ -463,7 +463,7 @@ local function enemy_climb_spawn(x, y, l)
         end
         local uid = spawn_entity_over(pick(enemies_climb), ladder.uid, 0, 0)
         local ent = get_entity(uid)
-        if math.random() < options.enemy_curse_chance/100 then
+        if prng:random() < options.enemy_curse_chance/100 then
             ent:set_cursed(true)
         end
     end
@@ -481,7 +481,7 @@ local enemy_climb_chance = define_procedural_spawn("enemy_climb", enemy_climb_sp
 local function enemy_ceiling_spawn(x, y, l)
     local uid = spawn_entity(pick(enemies_ceiling), x, y, l, 0, 0)
     local ent = get_entity(uid)
-    if math.random() < options.enemy_curse_chance/100 then
+    if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
     end
 end
@@ -499,7 +499,7 @@ local enemy_ceiling_chance = define_procedural_spawn("enemy_ceiling", enemy_ceil
 local function enemy_air_spawn(x, y, l)
     local uid = spawn_entity(pick(enemies_air), x, y, l, 0, 0)
     local ent = get_entity(uid)
-    if math.random() < options.enemy_curse_chance/100 then
+    if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
     end
 end
@@ -510,7 +510,7 @@ end
 local enemy_air_chance = define_procedural_spawn("enemy_air", enemy_air_spawn, enemy_air_valid)
 
 set_callback(function(ctx)
-    math.randomseed(read_prng()[2])
+    --math.randomseed(read_prng()[2])
     ctx:set_procedural_spawn_chance(enemy_small_chance, get_chance(options.enemy_min, options.enemy_max))
     ctx:set_procedural_spawn_chance(enemy_big_chance, get_chance(options.enemy_min, options.enemy_max) * 6)
     ctx:set_procedural_spawn_chance(enemy_climb_chance, get_chance(options.enemy_min, options.enemy_max) * 2)
@@ -556,7 +556,7 @@ set_callback(function(ctx)
 end, ON.POST_ROOM_GENERATION)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    math.randomseed(read_prng()[1]+state.time_total)
+    --math.randomseed(read_prng()[1]+state.time_total)
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_REDSKELETON)
 
@@ -568,8 +568,8 @@ set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU then return end
     ent = ent:as_movable()
     local x, y, l = get_position(ent.uid)
-    math.randomseed(read_prng()[1]+state.time_total)
-    spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, math.random()*0.3-0.15, math.random()*0.1+0.1)
+    --math.randomseed(read_prng()[1]+state.time_total)
+    spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS})
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
@@ -606,7 +606,7 @@ set_post_entity_spawn(function(ent)
     local x, y, l = get_position(ent.uid)
     local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
     if #players > 0 then return end
-    spawn_entity_nonreplaceable(pick(olmec_ammo), x, y, l, math.random()*0.5-0.25, math.random()*0.1+0.1)
+    spawn_entity_nonreplaceable(pick(olmec_ammo), x, y, l, prng:random()*0.5-0.25, prng:random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_BOMB)
 
 local function get_tiamat()
@@ -623,17 +623,17 @@ local function tiamat_scream()
     if tiamat.move_state == 0 then
         tiamat.move_state = 2
     end
-    math.randomseed(read_prng()[5])
-    set_timeout(tiamat_scream, math.random(180, 480))
+    --math.randomseed(read_prng()[5])
+    set_timeout(tiamat_scream, prng:random(180, 480))
 end
 
 local function tiamat_attack()
     local tiamat = get_tiamat()
     if not tiamat then return end
     if tiamat.move_state == 6 then
-        math.randomseed(read_prng()[6])
-        local vx = math.random()*0.8-0.4
-        local vy = math.random()*0.8-0.4
+        --math.randomseed(read_prng()[6])
+        local vx = prng:random()*0.8-0.4
+        local vy = prng:random()*0.8-0.4
         local ammo = pick(tiamat_ammo)
         local dx = 0
         local dy = 0
@@ -659,7 +659,7 @@ end
 
 set_callback(function()
     if state.theme ~= THEME.TIAMAT then return end
-    math.randomseed(read_prng()[5])
+    --math.randomseed(read_prng()[5])
     set_timeout(tiamat_scream, 60)
     set_interval(tiamat_attack, 2)
 end, ON.LEVEL)
@@ -686,19 +686,19 @@ local new_rooms = {ROOM_TEMPLATE.SHOP}
 local new_rooms_left = {ROOM_TEMPLATE.SHOP_LEFT}
 
 set_callback(function(ctx)
-    math.randomseed(read_prng()[5])
+    --math.randomseed(read_prng()[5])
     local orig_width = state.width
     local orig_height = state.height
     local exit_x = 1
     local exit_y = 3
     local big_ocean = false
-    if state.world < 7 and not (state.world == 6 and state.level == 2) and state.width == 4 and state.height == 4 and math.random() < options.room_big_chance/100 then
-        state.width = math.random(4,5)
-        state.height = math.random(math.max(8, options.room_big_min), math.min(15, options.room_big_max))
+    if state.world < 7 and not (state.world == 6 and state.level == 2) and state.width == 4 and state.height == 4 and prng:random() < options.room_big_chance/100 then
+        state.width = prng:random(4,5)
+        state.height = prng:random(math.max(8, options.room_big_min), math.min(15, options.room_big_max))
         toast("My voice REALLY echoes in here!")
-    elseif state.theme == THEME.COSMIC_OCEAN and math.random() < options.room_big_chance/100 then
-        state.width = math.random(4, 8)
-        state.height = math.random(3, 8)
+    elseif state.theme == THEME.COSMIC_OCEAN and prng:random() < options.room_big_chance/100 then
+        state.width = prng:random(4, 8)
+        state.height = prng:random(3, 8)
         big_ocean = true
     end
     for x = 0, state.width - 1 do
@@ -721,11 +721,11 @@ set_callback(function(ctx)
         while no_exit do
             last_dir = dir
             if last_dir == "left" then
-                dir = dirs[math.random(1, 2)]
+                dir = dirs[prng:random(1, 2)]
             elseif last_dir == "right" then
-                dir = dirs[math.random(2, 3)]
+                dir = dirs[prng:random(2, 3)]
             else
-                dir = dirs[math.random(3)]
+                dir = dirs[prng:random(3)]
             end
             if (dir == "left" and x == 0) or (dir == "right" and x == state.width - 1) then
                 dir = "down"
@@ -770,11 +770,11 @@ set_callback(function(ctx)
                 end
             end
         end
-        local spawn_x = math.random(1, state.width-2)
-        local spawn_y = math.random(1, state.height-2)
+        local spawn_x = prng:random(1, state.width-2)
+        local spawn_y = prng:random(1, state.height-2)
         repeat
-            exit_x = math.random(1, state.width-2)
-            exit_y = math.random(1, state.height-2)
+            exit_x = prng:random(1, state.width-2)
+            exit_y = prng:random(1, state.height-2)
         until(spawn_x ~= exit_x or spawn_y ~= exit_y)
         ctx:set_room_template(spawn_x, spawn_y, 0, ROOM_TEMPLATE.ENTRANCE)
         ctx:set_room_template(exit_x, exit_y, 0, ROOM_TEMPLATE.EXIT)
@@ -788,15 +788,15 @@ set_callback(function(ctx)
                 if here == ROOM_TEMPLATE.SIDE then
                     local left = get_room_template(x - 1, y, 0)
                     if valid_rooms_with_shop_next[left] then
-                        math.randomseed(read_prng()[6]+x+y)
-                        if math.random() < options.room_shop_chance/100 then
+                        --math.randomseed(read_prng()[6]+x+y)
+                        if prng:random() < options.room_shop_chance/100 then
                             ctx:set_room_template(x, y, 0, pick(new_rooms_left))
                         end
                     else
                         local right = get_room_template(x + 1, y, 0)
                         if valid_rooms_with_shop_next[right] then
-                            math.randomseed(read_prng()[6]+x+y)
-                            if math.random() < options.room_shop_chance/100 then
+                            --math.randomseed(read_prng()[6]+x+y)
+                            if prng:random() < options.room_shop_chance/100 then
                                 ctx:set_room_template(x, y, 0, pick(new_rooms))
                             end
                         end
@@ -805,7 +805,7 @@ set_callback(function(ctx)
             end
         end
     end
-    if math.random() < options.room_dark/100 then
+    if prng:random() < options.room_dark/100 then
         state.level_flags = set_flag(state.level_flags, 18)
     end
 end, ON.POST_ROOM_GENERATION)
@@ -830,8 +830,8 @@ set_callback(function()
         end
     end
     for i,v in ipairs(in_shop) do
-        math.randomseed(read_prng()[8]+i)
-        v.price = math.random(1000, math.min(20000, 2*get_money())+math.random(1500, 6000))
+        --math.randomseed(read_prng()[8]+i)
+        v.price = prng:random(1000, math.min(20000, 2*get_money())+prng:random(1500, 6000))
     end
 end, ON.POST_LEVEL_GENERATION)
 
@@ -839,7 +839,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) then
-        math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
+        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         return spawn_entity_nonreplaceable(pick(all_shop_items), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, shop_items)
@@ -848,7 +848,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) then
-        math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
+        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         return spawn_entity_nonreplaceable(pick(shop_mounts), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.LEVEL_GEN, MASK.MOUNT, shop_mounts)
@@ -857,8 +857,8 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) then
-        math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
-        local item = math.random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
+        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
+        local item = prng:random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
         if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
             item = ENT_TYPE.CHAR_EGGPLANT_CHILD
         end
@@ -870,7 +870,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) then
-        math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
+        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         return spawn_entity_nonreplaceable(pick(all_shop_guns), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
@@ -950,16 +950,16 @@ local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, E
 
 set_post_entity_spawn(function(ent)
     ent = ent:as_container()
-    math.randomseed(read_prng()[5]+ent.uid)
-    if math.random() < options.pot_chance/100 then
+    --math.randomseed(read_prng()[5]+ent.uid)
+    if prng:random() < options.pot_chance/100 then
         ent.inside = pick(pot_items)
     end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_POT)
 
 set_post_entity_spawn(function(ent)
     ent = ent:as_container()
-    math.randomseed(read_prng()[6]+ent.uid)
-    if state.theme == THEME.ABZU and math.random() < 0.5 then
+    --math.randomseed(read_prng()[6]+ent.uid)
+    if state.theme == THEME.ABZU and prng:random() < 0.5 then
         ent.inside = pick(abzu_crate_items)
     else
         ent.inside = pick(crate_items)
@@ -976,8 +976,8 @@ set_callback(function()
     local coffins = get_entities_by_type(ENT_TYPE.ITEM_COFFIN)
     for i,v in ipairs(coffins) do
         local ent = get_entity(v)
-        math.randomseed(read_prng()[7]+ent.uid)
-        local item = math.random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
+        --math.randomseed(read_prng()[7]+ent.uid)
+        local item = prng:random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
         if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
             item = ENT_TYPE.CHAR_HIREDHAND
         end
@@ -991,11 +991,11 @@ register_option_int("stats_bombs_max", "Max starting bombs", 20, 4, 99)
 register_option_int("stats_ropes_max", "Max starting ropes", 20, 4, 99)
 
 set_callback(function()
-    math.randomseed(read_prng()[1])
+    --math.randomseed(read_prng()[1])
     for i,p in ipairs(players) do
-        p.health = math.random(4, options.stats_health_max)
-        p.inventory.bombs = math.random(4, options.stats_bombs_max)
-        p.inventory.ropes = math.random(4, options.stats_ropes_max)
+        p.health = prng:random_int(4, options.stats_health_max, 1)
+        p.inventory.bombs = prng:random_int(4, options.stats_bombs_max, 1)
+        p.inventory.ropes = prng:random_int(4, options.stats_ropes_max, 1)
     end
 end, ON.START)
 
@@ -1084,14 +1084,14 @@ end
 local function insert_chain(t, l)
     for i,v in ipairs(level_order) do
         if v.t == t then
-            table.insert(level_order, i - math.random(0, options.door_min_levels), l)
+            table.insert(level_order, i - prng:random_int(0, options.door_min_levels, 0), l)
             break
         end
     end
 end
 
 local function fix_chain()
-    math.randomseed(read_prng()[1])
+    --math.randomseed(read_prng()[1])
     --insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
     insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
 end
@@ -1110,7 +1110,7 @@ set_post_entity_spawn(function(ent)
     local room = get_room_template(rx, ry, l)
     if room == ROOM_TEMPLATE.OLDHUNTER_REWARDROOM then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, (math.random()-0.5)*0.2, 0.2)
+        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, (prng:random()-0.5)*0.2, 0.2)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_DIAMOND)
 
@@ -1121,7 +1121,7 @@ set_post_entity_spawn(function(ent)
     local room = get_room_template(rx, ry, l)
     if room == ROOM_TEMPLATE.UDJATTOP then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, (math.random()-0.5)*0.2, 0.2)
+        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, (prng:random()-0.5)*0.2, 0.2)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)
 
@@ -1196,9 +1196,12 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
 
 local function init_run()
+    if test_flag(state.quest_flags, 7) then
+        seed_prng(state.seed)
+    end
     --message("Started new run")
     state.level_count = 0
-    math.randomseed(read_prng()[1])
+    --math.randomseed(read_prng()[1])
     level_order = {}
     insert_bosses = {table.unpack(bosses)}
     chain_items = {table.unpack(orig_chain_items)}
@@ -1209,9 +1212,9 @@ local function init_run()
     local normal_levels = 0
     local done = false
     while not done do
-        if math.random(120) == 1 then
+        if prng:random_int(1, 120, 0) == 1 then
             add_level(7, 2, THEME.EGGPLANT_WORLD)
-        elseif bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
+        elseif bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and prng:random_int(1, options.door_max_levels, 0) <= normal_levels then
             normal_levels = 0
             local t = pick(insert_bosses)
             local l = 4
@@ -1221,7 +1224,7 @@ local function init_run()
             local w = world[t]
             add_level(w, l, t)
             add_boss(t)
-        elseif (bosses_added >= options.door_bosses or #insert_bosses == 0) and normal_levels >= options.door_min_levels and math.random(options.door_max_levels) <= normal_levels then
+        elseif (bosses_added >= options.door_bosses or #insert_bosses == 0) and normal_levels >= options.door_min_levels and prng:random(1, options.door_max_levels, 0) <= normal_levels then
             add_level(6, 4, THEME.TIAMAT)
             done = true
         else
@@ -1233,15 +1236,15 @@ local function init_run()
             local t = pick(theme, lasttheme)
             local l = 1
             if t == THEME.NEO_BABYLON or t == THEME.SUNKEN_CITY then
-                l = math.random(3)
+                l = prng:random_int(1, 3, 0)
             elseif t == THEME.CITY_OF_GOLD then
                 l = 3
             elseif t == THEME.COSMIC_OCEAN then
-                l = math.random(5, 97)
+                l = prng:random_int(5, 97, 0)
             elseif t == THEME.ICE_CAVES then
                 l = 1
             else
-                l = math.random(4)
+                l = prng:random(1, 4, 0)
             end
             local w = world[t]
             add_level(w, l, t)
@@ -1416,7 +1419,7 @@ end, ON.LOADING)
 
 set_callback(function(ctx)
     if boss_warp and state.screen == ON.TRANSITION then
-        local color = math.random(0, 0xffffffff)
+        local color = prng:random(0, 0xffffffff)
         local _, size = get_window_size()
         size = size / 5
         local text = 'WARP ZONE'
@@ -1620,7 +1623,7 @@ set_callback(function()
             end
         end
         if #spots > 0 then
-            local spot = spots[math.random(#spots)]
+            local spot = spots[prng:random(#spots)]
             local floor = get_grid_entity_at(spot.x, spot.y, LAYER.BACK)
             local floor2 = get_grid_entity_at(spot.x+1, spot.y, LAYER.BACK)
             if floor ~= -1 then kill_entity(floor) end
