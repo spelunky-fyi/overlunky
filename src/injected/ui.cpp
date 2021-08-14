@@ -4360,7 +4360,7 @@ void render_keyconfig()
         ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         ImGui::PushFont(bigfont);
-        std::string buf = std::format("        Press new binding for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
+        std::string buf = std::format("Enter new key/button combo for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
         ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
         dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
         ImGui::PopFont();
@@ -4386,9 +4386,9 @@ void render_keyconfig()
         {
             size_t keycode = 0x400;
             if (io.MouseWheel < 0)
-                keycode += 0x11;
+                keycode += OL_WHEEL_DOWN;
             else if (io.MouseWheel > 0)
-                keycode += 0x10;
+                keycode += OL_WHEEL_UP;
             if (io.KeysDown[VK_CONTROL])
                 keycode += 0x100;
             if (io.KeysDown[VK_SHIFT])

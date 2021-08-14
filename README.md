@@ -24,7 +24,7 @@ You are strongly discouraged from using any modding tools in your actual online 
 Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check [entities.txt](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.txt) for a list of numerical entity IDs.
 
 ## Features
-Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans. The default keys are also changed from time to time to make room for better features, so check the ini for your current keys, or delete it to revert to default keys.
+Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans. The default keys are also changed from time to time to make room for better features, so check the key config for your current keys, or delete the ini (section) to revert to default keys.
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
       + **Tab**: Add selected item id to list when making a kit
@@ -75,7 +75,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + You can load, edit and set options for Lua scripts here
       + **Ctrl+F5**: Reload enabled scripts
   - **F9**: Options
-      + Lots of options. **Check the ini for hotkeys for these and other stuff!**
+      + Lots of options. **Check the key config for hotkeys for these and other stuff!**
   - **F11**: Hide overlay
   - **\~ (or your native Console Key)**: Toggle developer console
     - The console is its own script environment, where you can run some quick oneliners or paste snippets in.
@@ -84,6 +84,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
     - **"clear/clr/cls"**: Clear history
     - **"reset/reload"**: Clear all callbacks made in the console
     - **"quit"**: Ragequit
+  - **Ctrl+Shift+K**: Edit keybindings
   - **Ctrl+Shift+U**: Change UI color. You can also change the font in the ini.
   - **Ctrl+Shift+I**: ImGui internal metrics and settings
   - **Ctrl+Shift+S**: Save options, hotkeys and UI colors
