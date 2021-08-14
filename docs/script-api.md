@@ -543,13 +543,13 @@ Steal input from a Player or HH.
 `nil return_input(int uid)`<br/>
 Return input
 ### [`send_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
-`nil send_input(int uid, BUTTONS buttons)`<br/>
+`nil send_input(int uid, INPUTS buttons)`<br/>
 Send input
 ### [`read_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
-`BUTTONS read_input(int uid)`<br/>
+`INPUTS read_input(int uid)`<br/>
 Read input
 ### [`read_stolen_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
-`BUTTONS read_stolen_input(int uid)`<br/>
+`INPUTS read_stolen_input(int uid)`<br/>
 Read input that has been previously stolen with steal_input
 ### [`clear_entity_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_entity_callback)
 `nil clear_entity_callback(int uid, CallbackId cb_id)`<br/>
@@ -922,8 +922,10 @@ end
 - [`int correct_ushabti`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) &StateMemory::correct_ushabti
 - [`Items items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) &StateMemory::items
 - [`int camera_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) &StateMemory::camera_layer
-- [`int get_correct_ushabti_af()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti_af) &StateMemory::get_correct_ushabti_af
-- [`nil set_correct_ushabti_af(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti_af) &StateMemory::set_correct_ushabti_af
+- [`int get_correct_ushabti()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti) &StateMemory::get_correct_ushabti
+\
+Returns animation_frame of the correct ushabti
+- [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 ### `LightParams`
 - [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &LightParams::red
 - [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &LightParams::green
@@ -3044,20 +3046,20 @@ end, ON.LEVEL)
 - ...check [textures.txt](game_data/textures.txt)...
 - [`DATA_TEXTURES_SHINE_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_SHINE_0) 388
 - [`DATA_TEXTURES_OLDTEXTURES_AI_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_OLDTEXTURES_AI_0) 389
-### BUTTONS
-- [`NONE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.NONE) 0
-- [`JUMP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.JUMP) 1
-- [`WHIP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.WHIP) 2
-- [`BOMB`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.BOMB) 4
-- [`ROPE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.ROPE) 8
-- [`RUN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.RUN) 16
-- [`DOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.DOOR) 32
-- [`MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.MENU) 64
-- [`JOURNAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.JOURNAL) 128
-- [`LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.LEFT) 256
-- [`RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.RIGHT) 512
-- [`UP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.UP) 1024
-- [`DOWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.DOWN) 2048
+### INPUTS
+- [`NONE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.NONE) 0
+- [`JUMP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JUMP) 1
+- [`WHIP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.WHIP) 2
+- [`BOMB`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.BOMB) 4
+- [`ROPE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.ROPE) 8
+- [`RUN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RUN) 16
+- [`DOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOOR) 32
+- [`MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.MENU) 64
+- [`JOURNAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JOURNAL) 128
+- [`LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.LEFT) 256
+- [`RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RIGHT) 512
+- [`UP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.UP) 1024
+- [`DOWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOWN) 2048
 ### ON
 - [`LOGO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOGO) ON::LOGO
 - [`INTRO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.INTRO) ON::INTRO

@@ -761,7 +761,7 @@ end
         backend->script_input.erase(uid);
     };
     /// Send input
-    lua["send_input"] = [](int uid, BUTTONS buttons)
+    lua["send_input"] = [](int uid, INPUTS buttons)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
@@ -771,7 +771,7 @@ end
         }
     };
     /// Read input
-    lua["read_input"] = [](int uid) -> BUTTONS
+    lua["read_input"] = [](int uid) -> INPUTS
     {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
@@ -784,7 +784,7 @@ end
         return (uint16_t)0;
     };
     /// Read input that has been previously stolen with steal_input
-    lua["read_stolen_input"] = [](int uid) -> BUTTONS
+    lua["read_stolen_input"] = [](int uid) -> INPUTS
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
@@ -894,7 +894,7 @@ end
         return sol::nullopt;
     };
 
-    lua.create_named_table("BUTTONS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
+    lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
         "ON",

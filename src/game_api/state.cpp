@@ -5,11 +5,11 @@
 #include "render_api.hpp"
 #include "spawn_api.hpp"
 
-uint16_t StateMemory::get_correct_ushabti_af()
+uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
     return (correct_ushabti + (correct_ushabti / 10) * 2);
 }
-void StateMemory::set_correct_ushabti_af(uint16_t animation_frame)
+void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 {
     correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
 }

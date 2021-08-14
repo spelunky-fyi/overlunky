@@ -170,8 +170,9 @@ struct StateMemory
     uint32_t special_visibility_flags;
     Camera* camera;
 
-    uint16_t get_correct_ushabti_af();
-    void set_correct_ushabti_af(uint16_t animation_frame);
+    /// Returns animation_frame of the correct ushabti
+    uint16_t get_correct_ushabti();
+    void set_correct_ushabti(uint16_t animation_frame);
 };
 
 struct State

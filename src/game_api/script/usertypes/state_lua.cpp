@@ -142,10 +142,10 @@ void register_usertypes(sol::state& lua)
         &StateMemory::items,
         "camera_layer",
         &StateMemory::camera_layer,
-        "get_correct_ushabti_af",
-        &StateMemory::get_correct_ushabti_af,
-        "set_correct_ushabti_af",
-        &StateMemory::set_correct_ushabti_af);
+        "get_correct_ushabti",
+        &StateMemory::get_correct_ushabti,
+        "set_correct_ushabti",
+        &StateMemory::set_correct_ushabti);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
