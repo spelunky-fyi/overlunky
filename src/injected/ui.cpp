@@ -4586,7 +4586,8 @@ void imgui_draw()
         }
         else if (options["stack_vertically"])
         {
-            if (windows["tool_options"]->open) {
+            if (windows["tool_options"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
                 render_options();
@@ -4596,7 +4597,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_camera"]->open) {
+            if (windows["tool_camera"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
                 render_camera();
@@ -4606,7 +4608,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_door"]->open) {
+            if (windows["tool_door"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
                 render_narnia();
@@ -4616,7 +4619,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_entity"]->open) {
+            if (windows["tool_entity"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
                 ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
                 render_spawner();
@@ -4626,7 +4630,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_entity_properties"]->open) {
+            if (windows["tool_entity_properties"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
                 ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
                 render_entity_props();
@@ -4636,7 +4641,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_game_properties"]->open) {
+            if (windows["tool_game_properties"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
                 ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
                 render_game_props();
@@ -4646,7 +4652,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_script"]->open) {
+            if (windows["tool_script"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
                 ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
                 render_scripts();
@@ -4656,7 +4663,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_save"]->open) {
+            if (windows["tool_save"]->open)
+            {
                 ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
                 render_savegame();
                 ImGui::End();
@@ -4664,7 +4672,8 @@ void imgui_draw()
         }
         else
         {
-            if (windows["tool_entity"]->open) {
+            if (windows["tool_entity"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
                 ImGui::SetNextWindowPos({0, 0}, win_condition);
                 ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
@@ -4674,7 +4683,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_door"]->open) {
+            if (windows["tool_door"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
                 ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
@@ -4684,7 +4694,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_camera"]->open) {
+            if (windows["tool_camera"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
                 ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
@@ -4694,7 +4705,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_entity_properties"]->open) {
+            if (windows["tool_entity_properties"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
                 ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
@@ -4704,7 +4716,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_game_properties"]->open) {
+            if (windows["tool_game_properties"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
                 ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
@@ -4714,7 +4727,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_options"]->open) {
+            if (windows["tool_options"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
                 ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
@@ -4724,7 +4738,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_script"]->open) {
+            if (windows["tool_script"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
                 ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
@@ -4732,7 +4747,8 @@ void imgui_draw()
                 ImGui::End();
             }
 
-            if (windows["tool_save"]->open) {
+            if (windows["tool_save"]->open)
+            {
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
                 ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
