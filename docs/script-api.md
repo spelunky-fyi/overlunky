@@ -3044,6 +3044,20 @@ end, ON.LEVEL)
 - ...check [textures.txt](game_data/textures.txt)...
 - [`DATA_TEXTURES_SHINE_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_SHINE_0) 388
 - [`DATA_TEXTURES_OLDTEXTURES_AI_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_OLDTEXTURES_AI_0) 389
+### BUTTONS
+- [`NONE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.NONE) 0
+- [`JUMP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.JUMP) 1
+- [`WHIP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.WHIP) 2
+- [`BOMB`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.BOMB) 4
+- [`ROPE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.ROPE) 8
+- [`RUN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.RUN) 16
+- [`DOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.DOOR) 32
+- [`MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.MENU) 64
+- [`JOURNAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.JOURNAL) 128
+- [`LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.LEFT) 256
+- [`RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.RIGHT) 512
+- [`UP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.UP) 1024
+- [`DOWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTONS.DOWN) 2048
 ### ON
 - [`LOGO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOGO) ON::LOGO
 - [`INTRO`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.INTRO) ON::INTRO
