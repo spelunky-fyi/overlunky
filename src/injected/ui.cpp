@@ -4327,9 +4327,9 @@ void render_keyconfig()
         ImGui::PushID(kv.first.c_str());
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        ImGui::Text(kv.first.c_str());
+        ImGui::Text("%s", kv.first.c_str());
         ImGui::TableNextColumn();
-        ImGui::Text(key_string(keys[kv.first]).c_str());
+        ImGui::Text("%s", key_string(keys[kv.first]).c_str());
         ImGui::TableNextColumn();
         ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X");
         ImGui::TableNextColumn();
