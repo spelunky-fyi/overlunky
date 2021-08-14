@@ -70,7 +70,7 @@ std::map<std::string, int64_t> keys{
     {"toggle_pause", OL_KEY_CTRL | VK_SPACE},
     {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
     {"toggle_grid", OL_KEY_CTRL | OL_KEY_SHIFT | 'G'},
-    {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'K'},
+    {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
     {"tool_entity", VK_F1},
@@ -82,6 +82,7 @@ std::map<std::string, int64_t> keys{
     {"tool_debug", OL_KEY_CTRL | OL_KEY_SHIFT | VK_F12},
     {"tool_metrics", OL_KEY_CTRL | OL_KEY_SHIFT | 'I'},
     {"tool_style", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
+    {"tool_keys", OL_KEY_CTRL | OL_KEY_SHIFT | 'K'},
     {"tool_script", VK_F8},
     {"tool_save", VK_F6},
     {"reset_windows", OL_KEY_CTRL | OL_KEY_SHIFT | 'R'},
@@ -187,8 +188,8 @@ std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
-     show_debug = false, throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
-     freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, change_colors = false, dark_mode = false,
+     throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
+     freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, dark_mode = false,
      enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
@@ -199,9 +200,10 @@ std::map<int, std::string> entity_names;
 std::map<int, EntityCache> entity_cache;
 int cache_player = 0;
 std::string active_tab = "", activate_tab = "";
-std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_debug"};
+std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 
 std::string text;
+std::string g_change_key = "";
 
 const char* inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
@@ -398,7 +400,12 @@ std::string key_string(int64_t keycode)
     else // mouse
     {
         std::stringstream buttonss;
-        buttonss << "Mouse" << (keycode & 0xff);
+        if (!(keycode & OL_MOUSE_WHEEL))
+            buttonss << "Mouse" << (keycode & 0xff);
+        else if ((keycode & 0xff) == OL_WHEEL_DOWN)
+            buttonss << "WheelDown";
+        else if ((keycode & 0xff) == OL_WHEEL_UP)
+            buttonss << "WheelUp";
         name = buttonss.str();
     }
 
@@ -640,6 +647,8 @@ void load_config(std::string file)
 
 bool detached(std::string window)
 {
+    if (windows.find(window) == windows.end())
+        return false;
     return windows[window]->detached;
 }
 
@@ -647,6 +656,7 @@ bool toggle(std::string tool)
 {
     if (!options["tabbed_interface"] || detached(tool))
     {
+        windows[tool]->open = true;
         const char* name = windows[tool]->name.c_str();
         ImGuiContext& g = *GImGui;
         ImGuiWindow* current = g.NavWindow;
@@ -689,6 +699,8 @@ bool active(std::string window)
     ImGuiWindow* current = g.NavWindow;
     if (!options["tabbed_interface"] || detached(window))
     {
+        if (windows.find(window) == windows.end())
+            return false;
         return current == ImGui::FindWindowByName(windows[window]->name.c_str());
     }
     else
@@ -699,16 +711,22 @@ bool active(std::string window)
 
 void detach(std::string window)
 {
+    if (windows.find(window) == windows.end())
+        return;
     windows[window]->detached = true;
 }
 
 void attach(std::string window)
 {
+    if (windows.find(window) == windows.end())
+        return;
     windows[window]->detached = false;
 }
 
 bool visible(std::string window)
 {
+    if (windows.find(window) == windows.end())
+        return false;
     if (!options["tabbed_interface"] || detached(window))
     {
         ImGuiWindow* win = ImGui::FindWindowByName(windows[window]->name.c_str());
@@ -1361,10 +1379,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         return false;
     }
 
-    if (ImGui::GetIO().WantCaptureKeyboard && active("tool_script"))
-        return false;
+    auto& io = ImGui::GetIO();
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* current = g.NavWindow;
 
-    //int repeat = (lParam >> 30) & 1U;
+    if (current != nullptr && current == ImGui::FindWindowByName("KeyCapture"))
+        return false;
 
     if (g_Console && g_Console->is_toggled())
     {
@@ -1374,7 +1394,19 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
         return false;
     }
-    else if (pressed("hide_ui", wParam))
+    else if (pressed("escape", wParam))
+    {
+        if (current != nullptr)
+        {
+            escape();
+            return false;
+        }
+        return true;
+    }
+
+    //int repeat = (lParam >> 30) & 1U;
+
+    if (pressed("hide_ui", wParam))
     {
         hide_ui = !hide_ui;
     }
@@ -1394,10 +1426,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("tool_camera", wParam))
     {
-        if (toggle("tool_camera"))
-        {
-            set_focus_zoom = true;
-        }
+        toggle("tool_camera");
     }
     else if (pressed("tool_entity_properties", wParam))
     {
@@ -1411,7 +1440,76 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         toggle("tool_options");
     }
-    else if (pressed("zoom_out", wParam))
+    else if (pressed("tool_debug", wParam))
+    {
+        toggle("tool_debug");
+    }
+    else if (pressed("tool_script", wParam))
+    {
+        toggle("tool_script");
+    }
+    else if (pressed("tool_save", wParam))
+    {
+        toggle("tool_save");
+    }
+    else if (pressed("tool_keys", wParam))
+    {
+        toggle("tool_keys");
+    }
+    else if (pressed("tool_style", wParam))
+    {
+        toggle("tool_style");
+    }
+    else if (pressed("tool_metrics", wParam))
+    {
+        show_app_metrics = !show_app_metrics;
+    }
+    else if (pressed("move_up", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
+    {
+        g_current_item = (std::min)((std::max)(g_current_item - 1, 0), g_filtered_count - 1);
+        scroll_to_entity = true;
+    }
+    else if (pressed("move_down", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
+    {
+        g_current_item = (std::min)((std::max)(g_current_item + 1, 0), g_filtered_count - 1);
+        scroll_to_entity = true;
+    }
+    else if (pressed("move_pageup", wParam) && active("tool_entity"))
+    {
+        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = (std::min)((std::max)(g_current_item - page, 0), g_filtered_count - 1);
+        scroll_to_entity = true;
+    }
+    else if (pressed("move_pagedown", wParam) && active("tool_entity"))
+    {
+        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = (std::min)((std::max)(g_current_item + page, 0), g_filtered_count - 1);
+        scroll_to_entity = true;
+    }
+    else if (pressed("enter", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
+    {
+        spawn_entities(false);
+        return true;
+    }
+    else if (pressed("move_up", wParam) && active("tool_door") && io.WantCaptureKeyboard)
+    {
+        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to - 1, 0), 15));
+    }
+    else if (pressed("move_down", wParam) && active("tool_door") && io.WantCaptureKeyboard)
+    {
+        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to + 1, 0), 15));
+    }
+    else if (pressed("enter", wParam) && active("tool_door") && io.WantCaptureKeyboard)
+    {
+        int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
+        if (!lock_entity)
+            g_last_id = spawned;
+    }
+
+    if (io.WantCaptureKeyboard)
+        return false;
+
+    if (pressed("zoom_out", wParam))
     {
         if (g_zoom == 0.0f)
             g_zoom = get_zoom_level();
@@ -1644,65 +1742,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         warp_next_level(1);
     }
-    else if (pressed("move_up", wParam) && active("tool_entity"))
-    {
-        g_current_item = (std::min)((std::max)(g_current_item - 1, 0), g_filtered_count - 1);
-        scroll_to_entity = true;
-    }
-    else if (pressed("move_down", wParam) && active("tool_entity"))
-    {
-        g_current_item = (std::min)((std::max)(g_current_item + 1, 0), g_filtered_count - 1);
-        scroll_to_entity = true;
-    }
-    else if (pressed("move_pageup", wParam) && active("tool_entity"))
-    {
-        ImGuiContext& g = *GImGui;
-        ImGuiWindow* current = g.NavWindow;
-        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = (std::min)((std::max)(g_current_item - page, 0), g_filtered_count - 1);
-        scroll_to_entity = true;
-    }
-    else if (pressed("move_pagedown", wParam) && active("tool_entity"))
-    {
-        ImGuiContext& g = *GImGui;
-        ImGuiWindow* current = g.NavWindow;
-        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = (std::min)((std::max)(g_current_item + page, 0), g_filtered_count - 1);
-        scroll_to_entity = true;
-    }
-    else if (pressed("enter", wParam) && active("tool_entity"))
-    {
-        spawn_entities(false);
-    }
-    else if (pressed("move_up", wParam) && active("tool_door"))
-    {
-        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to - 1, 0), 15));
-    }
-    else if (pressed("move_down", wParam) && active("tool_door"))
-    {
-        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to + 1, 0), 15));
-    }
-    else if (pressed("enter", wParam) && active("tool_door"))
-    {
-        int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
-        if (!lock_entity)
-            g_last_id = spawned;
-    }
-    else if (pressed("tool_debug", wParam))
-    {
-        if (!options["tabbed_interface"])
-            show_debug = !show_debug;
-        else
-            toggle("tool_debug");
-    }
-    else if (pressed("tool_script", wParam))
-    {
-        toggle("tool_script");
-    }
-    else if (pressed("tool_save", wParam))
-    {
-        toggle("tool_save");
-    }
     else if (pressed("reset_windows", wParam))
     {
         options["stack_horizontally"] = !options["stack_horizontally"];
@@ -1732,7 +1771,8 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("detach_tab", wParam))
     {
-        detach(active_tab);
+        if (options["tabbed_interface"])
+            detach(active_tab);
     }
     else if (pressed("save_settings", wParam))
     {
@@ -1745,21 +1785,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         load_config(cfgfile);
         refresh_script_files();
         set_colors();
-    }
-    else if (pressed("tool_style", wParam))
-    {
-        if (!options["tabbed_interface"])
-            change_colors = !change_colors;
-        else
-            toggle("tool_style");
-    }
-    else if (pressed("tool_metrics", wParam))
-    {
-        show_app_metrics = !show_app_metrics;
-    }
-    else if (pressed("escape", wParam))
-    {
-        escape();
     }
     else if (pressed("reload_enabled_scripts", wParam))
     {
@@ -3139,6 +3164,20 @@ void render_options()
     }
     ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
     ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
+    if (ImGui::Button("Edit style"))
+    {
+        toggle("tool_style");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Edit keys"))
+    {
+        toggle("tool_keys");
+    }
+    if (ImGui::Button("Save config"))
+        save_config(cfgfile);
+    ImGui::SameLine();
+    if (ImGui::Button("Load config"))
+        load_config(cfgfile);
 }
 
 void render_debug()
@@ -4274,6 +4313,110 @@ void render_style_editor()
     set_colors();
 }
 
+void render_keyconfig()
+{
+    ImGui::PushID("keyconfig");
+    ImGui::BeginTable("##keyconfig", 4);
+    ImGui::TableSetupColumn("Tool");
+    ImGui::TableSetupColumn("Keys");
+    ImGui::TableSetupColumn("Keycode");
+    ImGui::TableSetupColumn("");
+    ImGui::TableHeadersRow();
+    for (const auto& kv : keys)
+    {
+        ImGui::PushID(kv.first.c_str());
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::Text(kv.first.c_str());
+        ImGui::TableNextColumn();
+        ImGui::Text(key_string(keys[kv.first]).c_str());
+        ImGui::TableNextColumn();
+        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X");
+        ImGui::TableNextColumn();
+        if (ImGui::Button("Capture"))
+        {
+            g_change_key = kv.first;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Disable"))
+        {
+            keys[kv.first] = 0;
+        }
+        ImGui::PopID();
+    }
+    ImGui::EndTable();
+    ImGui::PopID();
+
+    if (g_change_key != "")
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui::SetNextWindowSize(io.DisplaySize);
+        ImGui::SetNextWindowPos({0, 0});
+        ImGui::SetNextWindowBgAlpha(0.75);
+        ImGui::Begin(
+            "KeyCapture",
+            NULL,
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking);
+        ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
+        ImDrawList* dl = ImGui::GetForegroundDrawList();
+        ImGui::PushFont(bigfont);
+        std::string buf = std::format("        Press new binding for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
+        ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
+        ImGui::PopFont();
+
+        // Buttons
+        for (size_t i = 0; i < 5; ++i)
+        {
+            if (io.MouseDown[i])
+            {
+                size_t keycode = 0x400 + i + 1;
+                if (io.KeysDown[VK_CONTROL])
+                    keycode += 0x100;
+                if (io.KeysDown[VK_SHIFT])
+                    keycode += 0x200;
+                keys[g_change_key] = keycode;
+                save_config(cfgfile);
+                g_change_key = "";
+            }
+        }
+
+        // Wheel
+        if (io.MouseWheel != 0)
+        {
+            size_t keycode = 0x400;
+            if (io.MouseWheel < 0)
+                keycode += 0x11;
+            else if (io.MouseWheel > 0)
+                keycode += 0x10;
+            if (io.KeysDown[VK_CONTROL])
+                keycode += 0x100;
+            if (io.KeysDown[VK_SHIFT])
+                keycode += 0x200;
+            keys[g_change_key] = keycode;
+            save_config(cfgfile);
+            g_change_key = "";
+        }
+
+        // Keys
+        for (size_t i = 0; i < 512; ++i)
+        {
+            if (io.KeysDown[i] && i != VK_CONTROL && i != VK_SHIFT)
+            {
+                size_t keycode = i;
+                if (io.KeysDown[VK_CONTROL])
+                    keycode += 0x100;
+                if (io.KeysDown[VK_SHIFT])
+                    keycode += 0x200;
+                keys[g_change_key] = keycode;
+                save_config(cfgfile);
+                g_change_key = "";
+            }
+        }
+        ImGui::End();
+    }
+}
+
 void render_spawner()
 {
     ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
@@ -4303,6 +4446,8 @@ void render_tool(std::string tool)
         render_debug();
     else if (tool == "tool_save")
         render_savegame();
+    else if (tool == "tool_keys")
+        render_keyconfig();
 }
 
 void imgui_init(ImGuiContext*)
@@ -4356,6 +4501,7 @@ void imgui_init(ImGuiContext*)
     windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", false, false});
     windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
     windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
+    windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", false, false});
 }
 
 void imgui_draw()
@@ -4440,142 +4586,191 @@ void imgui_draw()
         }
         else if (options["stack_vertically"])
         {
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::Begin(windows["tool_options"]->name.c_str());
-            render_options();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-            ImGui::End();
+            if (windows["tool_options"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
+                render_options();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::Begin(windows["tool_camera"]->name.c_str());
-            render_camera();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-            ImGui::End();
+            if (windows["tool_camera"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
+                render_camera();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::Begin(windows["tool_door"]->name.c_str());
-            render_narnia();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-            ImGui::End();
+            if (windows["tool_door"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
+                render_narnia();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-            ImGui::Begin(windows["tool_entity"]->name.c_str());
-            render_spawner();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({0, 0}, win_condition);
-            ImGui::End();
+            if (windows["tool_entity"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
+                ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
+                render_spawner();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::SetWindowPos({0, 0}, win_condition);
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-            ImGui::Begin(windows["tool_entity_properties"]->name.c_str());
-            render_entity_props();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
-            ImGui::End();
+            if (windows["tool_entity_properties"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+                ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
+                render_entity_props();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-            ImGui::Begin(windows["tool_game_properties"]->name.c_str());
-            render_game_props();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-            ImGui::End();
+            if (windows["tool_game_properties"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+                ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
+                render_game_props();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-            ImGui::Begin(windows["tool_script"]->name.c_str());
-            render_scripts();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-            ImGui::End();
+            if (windows["tool_script"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+                ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
+                render_scripts();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3}, win_condition);
+                ImGui::End();
+            }
+
+            if (windows["tool_save"]->open) {
+                ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
+                render_savegame();
+                ImGui::End();
+            }
         }
         else
         {
-            ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
-            ImGui::SetNextWindowPos({0, 0}, win_condition);
-            ImGui::Begin(windows["tool_entity"]->name.c_str());
-            render_spawner();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::End();
+            if (windows["tool_entity"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
+                ImGui::SetNextWindowPos({0, 0}, win_condition);
+                ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
+                render_spawner();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-            ImGui::Begin(windows["tool_door"]->name.c_str());
-            render_narnia();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::End();
+            if (windows["tool_door"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+                ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
+                render_narnia();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-            ImGui::Begin(windows["tool_camera"]->name.c_str());
-            render_camera();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::End();
+            if (windows["tool_camera"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+                ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
+                render_camera();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-            ImGui::Begin(windows["tool_entity_properties"]->name.c_str());
-            render_entity_props();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::End();
+            if (windows["tool_entity_properties"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+                ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
+                render_entity_props();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-            ImGui::Begin(windows["tool_game_properties"]->name.c_str());
-            render_game_props();
-            lastwidth += ImGui::GetWindowWidth();
-            lastheight += ImGui::GetWindowHeight();
-            ImGui::End();
+            if (windows["tool_game_properties"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
+                ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
+                render_game_props();
+                lastwidth += ImGui::GetWindowWidth();
+                lastheight += ImGui::GetWindowHeight();
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
-            ImGui::Begin(windows["tool_options"]->name.c_str());
-            render_options();
-            lastwidth = ImGui::GetWindowWidth();
-            lastheight = ImGui::GetWindowHeight();
-            ImGui::End();
+            if (windows["tool_options"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
+                ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
+                render_options();
+                lastwidth = ImGui::GetWindowWidth();
+                lastheight = ImGui::GetWindowHeight();
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
-            ImGui::Begin(windows["tool_script"]->name.c_str());
-            render_scripts();
-            ImGui::End();
+            if (windows["tool_script"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
+                ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
+                render_scripts();
+                ImGui::End();
+            }
 
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
-            ImGui::Begin(windows["tool_save"]->name.c_str());
-            render_savegame();
-            ImGui::End();
+            if (windows["tool_save"]->open) {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+                ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
+                render_savegame();
+                ImGui::End();
+            }
         }
 
-        if (show_debug && !options["tabbed_interface"])
+        if (!options["tabbed_interface"])
         {
-            ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-            ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 4, 0}, win_condition);
-            ImGui::Begin(windows["tool_debug"]->name.c_str(), &show_debug);
-            render_debug();
-            ImGui::End();
-        }
+            if (windows["tool_debug"]->open)
+            {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 4, 0}, win_condition);
+                ImGui::Begin(windows["tool_debug"]->name.c_str(), &windows["tool_debug"]->open);
+                render_debug();
+                ImGui::End();
+            }
 
-        if (change_colors && !options["tabbed_interface"])
-        {
-            ImGui::Begin(windows["tool_style"]->name.c_str(), &change_colors);
-            ImGui::SetWindowSize({-1, -1}, win_condition);
-            render_style_editor();
-            ImGui::SetWindowPos(
-                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
-            ImGui::End();
+            if (windows["tool_style"]->open)
+            {
+                ImGui::Begin(windows["tool_style"]->name.c_str(), &windows["tool_style"]->open);
+                ImGui::SetWindowSize({-1, -1}, win_condition);
+                render_style_editor();
+                ImGui::SetWindowPos(
+                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
+                ImGui::End();
+            }
+
+            if (windows["tool_keys"]->open)
+            {
+                ImGui::Begin(windows["tool_keys"]->name.c_str(), &windows["tool_keys"]->open);
+                ImGui::SetWindowSize({-1, -1}, win_condition);
+                render_keyconfig();
+                ImGui::SetWindowPos(
+                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
+                ImGui::End();
+            }
         }
     }
 
