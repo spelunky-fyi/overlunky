@@ -784,7 +784,7 @@ end
         return (uint16_t)0;
     };
     /// Read input that has been previously stolen with steal_input
-    lua["read_stolen_input"] = [](int uid)
+    lua["read_stolen_input"] = [](int uid) -> BUTTONS
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())

@@ -549,7 +549,7 @@ Send input
 `BUTTONS read_input(int uid)`<br/>
 Read input
 ### [`read_stolen_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
-`nil read_stolen_input(int uid)`<br/>
+`BUTTONS read_stolen_input(int uid)`<br/>
 Read input that has been previously stolen with steal_input
 ### [`clear_entity_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_entity_callback)
 `nil clear_entity_callback(int uid, CallbackId cb_id)`<br/>
