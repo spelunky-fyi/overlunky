@@ -39,10 +39,10 @@ RenderAPI& RenderAPI::get()
     static RenderAPI render_api = []()
     {
         auto memory = Memory::get();
-        auto api = (find_api(memory));
+        auto _api = (find_api(memory));
         auto off = decode_imm(memory.exe(), find_inst(memory.exe(), "\xBA\xF0\xFF\xFF\xFF\x41\xB8\x00\x00\x00\x90"s, memory.after_bundle) + 17);
 
-        return RenderAPI{api, off};
+        return RenderAPI{_api, off};
     }();
     return render_api;
 }
