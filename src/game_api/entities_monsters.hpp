@@ -165,9 +165,9 @@ class Shopkeeper : public RoomOwner
     uint8_t unknown3; // accessed on stun/dmg? probably bool
     bool shop_owner;
     bool unknown5a; // sometimes set to true
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
+    uint8_t padding11;
+    uint8_t padding21;
+    uint8_t padding31;
 };
 
 class Yang : public RoomOwner
