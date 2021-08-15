@@ -416,7 +416,7 @@ end
     lua["spawn_apep"] = spawn_apep;
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
-    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
     /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
@@ -437,7 +437,7 @@ end
         backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
         return backend->cbcount++;
     };
-    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
     /// The callback signature is `nil post_entity_spawn(entity)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
