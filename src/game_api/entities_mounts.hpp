@@ -43,9 +43,9 @@ class Mech : public Mount
   public:
     SoundPosition* _sound_pos;
     SoundPosition* explosion_sound_pos;
-    uint64_t unknown1;
+    uint64_t unknown11;
     uint8_t gun_cooldown;
-    uint8_t unknown2;
+    uint8_t unknown21;
     bool walking;
     bool breaking_wall;
 };
