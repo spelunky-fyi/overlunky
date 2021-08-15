@@ -2203,7 +2203,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Flame`](#flame)
 - [`Entity fx_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_entity) &Spark::fx_entity
 - [`float rotation_center_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_center_x) &Spark::rotation_center_x
 - [`float rotation_center_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_center_y) &Spark::rotation_center_y
-- [`float angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Spark::angle
+- [`float rotation_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_angle) &Spark::rotation_angle
 - [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &Spark::size
 \
 slowly goes down to default 1.0, is 0.0 when not on screen
