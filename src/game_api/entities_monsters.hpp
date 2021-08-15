@@ -526,7 +526,7 @@ class Sorceress : public WalkingMonster
 {
   public:
     uint32_t inbetween_attack_timer;
-    float airtime;                    // why float?
+    float in_air_timer;                    // why float?
     Illumination* halo_emitted_light; // not the shot but the halo, try putting a color at 10
     Entity* fx_entity;
     SoundPosition* sound_pos;

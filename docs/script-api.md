@@ -1081,7 +1081,12 @@ Derived from [`Entity`](#entity)
 - [`int stun_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_timer) &Movable::stun_timer
 - [`int stun_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_state) &Movable::stun_state
 - [`int some_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_state) &Movable::some_state
-- [`int airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::airtime
+- [`int airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::falling_timer
+\
+airtime = falling_timer
+- [`int falling_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falling_timer) &Movable::falling_timer
+\
+airtime = falling_timer
 - [`bool is_poisoned()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) &Movable::is_poisoned
 - [`nil poison(int frames)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) &Movable::poison
 - [`int dark_shadow_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_shadow_timer) &Movable::dark_shadow_timer
@@ -1772,7 +1777,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 ### `Sorceress`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
 - [`int inbetween_attack_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inbetween_attack_timer) &Sorceress::inbetween_attack_timer
-- [`float airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Sorceress::airtime
+- [`float in_air_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_air_timer) &Sorceress::in_air_timer
 - [`Illumination halo_emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_emitted_light) &Sorceress::halo_emitted_light
 - [`Entity fx_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_entity) &Sorceress::fx_entity
 - [`int hover_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hover_timer) &Sorceress::hover_timer

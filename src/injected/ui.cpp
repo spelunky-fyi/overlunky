@@ -3641,15 +3641,15 @@ void render_entity_props()
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2f, 1.0f);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2f, 1.0f);
         ImGui::InputFloat("Angle##EntityAngle", &g_entity->angle, 0.2f, 1.0f);
-        SliderByte("Airtime##EntityAirtime", (char*)&g_entity->airtime, 0, 98);
+        SliderByte("Falling timer##EntityFallingTimer", (char*)&g_entity->falling_timer, 0, 98);
         uint8_t falldamage = 0;
-        if (g_entity->airtime >= 98)
+        if (g_entity->falling_timer >= 98)
             falldamage = 4;
-        else if (g_entity->airtime >= 78)
+        else if (g_entity->falling_timer >= 78)
             falldamage = 3;
-        else if (g_entity->airtime >= 58)
+        else if (g_entity->falling_timer >= 58)
             falldamage = 2;
-        else if (g_entity->airtime >= 38)
+        else if (g_entity->falling_timer >= 38)
             falldamage = 1;
         const char* damagenum[] = {"0", "1", "2", "4", "99"};
         SliderByte("Fall damage##EntityFallDamage", (char*)&falldamage, 0, 4, damagenum[falldamage]);
