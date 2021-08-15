@@ -1224,7 +1224,7 @@ local function init_run()
             local w = world[t]
             add_level(w, l, t)
             add_boss(t)
-        elseif (bosses_added >= options.door_bosses or #insert_bosses == 0) and normal_levels >= options.door_min_levels and prng:random(1, options.door_max_levels, 0) <= normal_levels then
+        elseif (bosses_added >= options.door_bosses or #insert_bosses == 0) and normal_levels >= options.door_min_levels and prng:random_int(1, options.door_max_levels, 0) <= normal_levels then
             add_level(6, 4, THEME.TIAMAT)
             done = true
         else
@@ -1244,7 +1244,7 @@ local function init_run()
             elseif t == THEME.ICE_CAVES then
                 l = 1
             else
-                l = prng:random(1, 4, 0)
+                l = prng:random_int(1, 4, 0)
             end
             local w = world[t]
             add_level(w, l, t)
