@@ -113,8 +113,8 @@ class MainExit : public ExitDoor
 class EggShipDoor : public Door
 {
   public:
-    uint16_t unused1;
-    uint8_t unused2;
+    uint16_t unused11;
+    uint8_t unused21;
     uint8_t timer; // counts from 30 to 0, dunno why
     uint16_t unknown3;
     uint16_t unknown4;
