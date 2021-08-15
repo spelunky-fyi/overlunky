@@ -355,10 +355,10 @@ bool Movable::is_button_released(uint32_t button)
     return (buttons & button) == 0 && (buttons & (button << 8)) != 0;
 }
 
-void hook_movable_state_machine(Movable* self)
+void hook_movable_state_machine(Movable* _self)
 {
     hook_vtable<void(Movable*)>(
-        self,
+        _self,
         [](Movable* self, void (*original)(Movable*))
         {
             EntityHooksInfo& hook_info = self->get_hooks();
@@ -504,15 +504,15 @@ EntityHooksInfo& Entity::get_hooks()
     {
         hook_dtor(this, [](void* self)
                   {
-                      auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
+                      auto _it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
                                              { return hook.entity == self; });
-                      if (it != g_entity_hooks.end())
+                      if (_it != g_entity_hooks.end())
                       {
-                          for (auto& cb : it->on_destroy)
+                          for (auto& cb : _it->on_destroy)
                           {
                               cb.fun((Entity*)self);
                           }
-                          g_entity_hooks.erase(it);
+                          g_entity_hooks.erase(_it);
                       }
                   });
         g_entity_hooks.push_back({this});
@@ -536,8 +536,8 @@ std::uint32_t Entity::set_on_kill(std::function<void(Entity*, Entity*)> on_kill)
             this,
             [](Entity* self, bool _some_bool, Entity* from, void (*original)(Entity*, bool, Entity*))
             {
-                EntityHooksInfo& hook_info = self->get_hooks();
-                for (auto& [id, on_kill] : hook_info.on_kill)
+                EntityHooksInfo& _hook_info = self->get_hooks();
+                for (auto& [id, on_kill] : _hook_info.on_kill)
                 {
                     on_kill(self, from);
                 }
@@ -571,8 +571,8 @@ std::uint32_t Container::set_on_open(std::function<void(Container*, Movable*)> o
             {
                 if (opener->movey > 0)
                 {
-                    EntityHooksInfo& hook_info = self->get_hooks();
-                    for (auto& [id, on_open] : hook_info.on_open)
+                    EntityHooksInfo& _hook_info = self->get_hooks();
+                    for (auto& [id, on_open] : _hook_info.on_open)
                     {
                         on_open(self, opener);
                     }
