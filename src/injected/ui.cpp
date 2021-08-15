@@ -4331,7 +4331,7 @@ void render_keyconfig()
         ImGui::TableNextColumn();
         ImGui::Text("%s", key_string(keys[kv.first]).c_str());
         ImGui::TableNextColumn();
-        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X");
+        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X", ImGuiInputTextFlags_CharsHexadecimal);
         ImGui::TableNextColumn();
         if (ImGui::Button("Capture"))
         {
