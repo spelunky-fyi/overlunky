@@ -73,18 +73,22 @@ struct PlayerSlotSettings
 
 struct PlayerInputs
 {
-    union {
+    union
+    {
         std::array<PlayerSlot, MAX_PLAYERS> player_slots;
-        struct {
+        struct
+        {
             PlayerSlot player_slot_1;
             PlayerSlot player_slot_2;
             PlayerSlot player_slot_3;
             PlayerSlot player_slot_4;
         };
     };
-    union {
+    union
+    {
         std::array<PlayerSlotSettings, MAX_PLAYERS> player_settings;
-        struct {
+        struct
+        {
             PlayerSlotSettings player_slot_1_settings;
             PlayerSlotSettings player_slot_2_settings;
             PlayerSlotSettings player_slot_3_settings;
