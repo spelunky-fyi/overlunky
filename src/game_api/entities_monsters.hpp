@@ -531,7 +531,6 @@ class Sorceress : public WalkingMonster
     Entity* fx_entity;
     SoundPosition* sound_pos;
     uint8_t hover_timer;
-    uint8_t state;
 };
 
 class MagmaMan : public Monster
