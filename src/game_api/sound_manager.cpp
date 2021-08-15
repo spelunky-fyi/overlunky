@@ -708,8 +708,8 @@ bool SoundManager::set_callback(PlayingSound playing_sound, SoundCallbackFunctio
                 auto it = std::find_if(
                     s_EventCallbacks.begin(),
                     s_EventCallbacks.end(),
-                    [event](const EventCallbackData& callback)
-                    { return callback.handle == event; });
+                    [event](const EventCallbackData& _callback)
+                    { return _callback.handle == event; });
                 if (it != s_EventCallbacks.end())
                 {
                     it->specific_callbacks[*instance] = std::move(callback);
@@ -734,8 +734,8 @@ SoundManager::set_callback(FMODStudio::EventDescription* fmod_event, EventCallba
 {
     std::lock_guard lock{s_EventCallbacksMutex};
     auto it = std::find_if(
-        s_EventCallbacks.begin(), s_EventCallbacks.end(), [fmod_event](const EventCallbackData& callback)
-        { return callback.handle == fmod_event; });
+        s_EventCallbacks.begin(), s_EventCallbacks.end(), [fmod_event](const EventCallbackData& _callback)
+        { return _callback.handle == fmod_event; });
     if (it == s_EventCallbacks.end())
     {
         s_EventCallbacks.push_back(EventCallbackData{fmod_event, {}, {}, this});
