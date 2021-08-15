@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <cstdlib>
 
 #define MAX_PLAYERS 4
 

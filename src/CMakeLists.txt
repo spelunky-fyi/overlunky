@@ -65,7 +65,7 @@ if(MSVC)
                 target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
         endif()
 else()
-        target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -pedantic -Werror)
+        target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -Wshadow-all -pedantic -Werror)
         target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
 endif()
 

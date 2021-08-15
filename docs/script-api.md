@@ -2638,16 +2638,16 @@ You can just discard this handle if you do not need extended control anymore
 - [`int up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) &InputMapping::up
 - [`int down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) &InputMapping::down
 ### `PlayerInputs`
-- [`player_slots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slots) &PlayerInputs::player_slots
-- [`player_slot_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1) &PlayerInputs::player_slot_1
-- [`player_slot_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2) &PlayerInputs::player_slot_2
-- [`player_slot_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3) &PlayerInputs::player_slot_3
-- [`player_slot_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4) &PlayerInputs::player_slot_4
-- [`player_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_settings) &PlayerInputs::player_settings
-- [`player_slot_1_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1_settings) &PlayerInputs::player_slot_1_settings
-- [`player_slot_2_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) &PlayerInputs::player_slot_2_settings
-- [`player_slot_3_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) &PlayerInputs::player_slot_3_settings
-- [`player_slot_4_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) &PlayerInputs::player_slot_4_settings
+- [`array<PlayerSlot, MAX_PLAYERS> player_slots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slots) &PlayerInputs::player_slots
+- [`PlayerSlot player_slot_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1) &PlayerInputs::player_slot_1
+- [`PlayerSlot player_slot_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2) &PlayerInputs::player_slot_2
+- [`PlayerSlot player_slot_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3) &PlayerInputs::player_slot_3
+- [`PlayerSlot player_slot_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4) &PlayerInputs::player_slot_4
+- [`array<PlayerSlotSettings, MAX_PLAYERS> player_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_settings) &PlayerInputs::player_settings
+- [`PlayerSlotSettings player_slot_1_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1_settings) &PlayerInputs::player_slot_1_settings
+- [`PlayerSlotSettings player_slot_2_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) &PlayerInputs::player_slot_2_settings
+- [`PlayerSlotSettings player_slot_3_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) &PlayerInputs::player_slot_3_settings
+- [`PlayerSlotSettings player_slot_4_settings`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) &PlayerInputs::player_slot_4_settings
 ### `GuiDrawContext`
 - [`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line) &GuiDrawContext::draw_line
 \
