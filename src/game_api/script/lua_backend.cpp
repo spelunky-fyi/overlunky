@@ -710,8 +710,8 @@ void LuaBackend::hook_entity_dtor(Entity* entity)
     if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)
                       { return dtor_hook.first == entity->uid; }) == 0)
     {
-        std::uint32_t dtor_hook_id = entity->set_on_destroy([this](Entity* entity)
-                                                            { pre_entity_destroyed(entity); });
+        std::uint32_t dtor_hook_id = entity->set_on_destroy([this](Entity* _entity)
+                                                            { pre_entity_destroyed(_entity); });
         entity_dtor_hooks.push_back({entity->uid, dtor_hook_id});
     }
 }
