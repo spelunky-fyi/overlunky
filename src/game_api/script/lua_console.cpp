@@ -775,14 +775,14 @@ const std::filesystem::path& LuaConsole::get_root_path() const
 void LuaConsole::register_command(LuaBackend* provider, std::string command_name, sol::function cmd)
 {
     lua[command_name] = std::move(cmd);
-    console_commands[std::move(command_name)] = provider;
+    console_commands_list[std::move(command_name)] = provider;
 }
 void LuaConsole::unregister_command(LuaBackend* provider, std::string command_name)
 {
-    if (console_commands[command_name] == provider)
+    if (console_commands_list[command_name] == provider)
     {
         lua[command_name] = sol::nil;
-        console_commands.erase(std::move(command_name));
+        console_commands_list.erase(std::move(command_name));
     }
 }
 
