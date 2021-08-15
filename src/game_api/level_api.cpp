@@ -728,7 +728,7 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_width, std::uint32_t
             auto& valid_pos = provider.transient_valid_positions;
             while (!valid_pos.empty() && provider.transient_num_remaining_spawns[layer] > 0)
             {
-                const auto random_idx = static_cast<std::size_t>(prng.random_index(valid_pos.size(), PRNG::EXTRA_SPAWNS));
+                const auto random_idx = static_cast<std::size_t>(prng.internal_random_index(valid_pos.size(), PRNG::EXTRA_SPAWNS));
                 const auto idx = random_idx < valid_pos.size() ? random_idx : 0;
                 const auto [x, y] = valid_pos[idx];
                 provider.provider.do_spawn(x, y, layer);

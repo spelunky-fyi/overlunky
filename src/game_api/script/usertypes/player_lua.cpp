@@ -58,6 +58,8 @@ void register_usertypes(sol::state& lua)
         sol::readonly(&InputMapping::down));
     lua.new_usertype<PlayerInputs>(
         "PlayerInputs",
+        "player_slots",
+        sol::readonly(&PlayerInputs::player_slots),
         "player_slot_1",
         sol::readonly(&PlayerInputs::player_slot_1),
         "player_slot_2",
@@ -66,6 +68,8 @@ void register_usertypes(sol::state& lua)
         sol::readonly(&PlayerInputs::player_slot_3),
         "player_slot_4",
         sol::readonly(&PlayerInputs::player_slot_4),
+        "player_settings",
+        sol::readonly(&PlayerInputs::player_settings),
         "player_slot_1_settings",
         sol::readonly(&PlayerInputs::player_slot_1_settings),
         "player_slot_2_settings",
