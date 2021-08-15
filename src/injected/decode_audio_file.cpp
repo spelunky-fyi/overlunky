@@ -6,6 +6,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wall"
 #pragma clang diagnostic ignored "-Wextra"
+#pragma clang diagnostic ignored "-Wshadow-all"
 #else
 #pragma warning(push, 0)
 #endif
