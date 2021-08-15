@@ -620,7 +620,7 @@ end
     lua["entity_has_item_uid"] = entity_has_item_uid;
     /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
     lua["entity_has_item_type"] = entity_has_item_type;
-    /// Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
+    /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
     lua["entity_get_items_by"] = entity_get_items_by;
     /// Kills an entity by uid.
     lua["kill_entity"] = kill_entity;

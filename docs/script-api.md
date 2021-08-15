@@ -419,7 +419,7 @@ Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
 ### [`entity_get_items_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 `array<int> entity_get_items_by(int uid, int entity_type, int mask)`<br/>
-Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
+Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
 ### [`kill_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_entity)
 `nil kill_entity(int uid)`<br/>
 Kills an entity by uid.
