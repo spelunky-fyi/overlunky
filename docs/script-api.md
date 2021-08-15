@@ -98,6 +98,10 @@ Provides a read-only access to the save data, updated as soon as something chang
 ### [`options`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 Table of options set in the UI, added with the [register_option_functions](#register_option_int).
 ### [`prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prng)
+PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
+The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
+The used buffer is determined by [`PRNG_CLASS`](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
+If you don't care what part of the game you affect just use `prng.random`.
 The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
 ## Event functions
 Define these in your script to be called on an event. For example:
@@ -954,27 +958,28 @@ end
 - [`int focused_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) &Camera::focused_entity_uid
 - [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
 ### `PRNG`
-- [`optional<int> random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
+PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
+The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
+The used buffer is determined by [`PRNG_CLASS`](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
+If you don't care what part of the game you affect just use `prng.random`.
+- [`float random_float(PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_float) &PRNG::random_float
 \
-Generate a random integer in the range `[min, size)`, returns `nil` if `min == max`
+Generate a random floating point number in the range `[0, 1)`
 - [`bool random_chance(int inverse_chance, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_chance) &PRNG::random_chance
 \
 Returns true with a chance of `1/inverse_chance`
-- [`float random(PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
+- [`optional<int> random_index(int i, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_index) &PRNG::random_index
 \
-Generate a random floating point number in the range `[0, 1)`
+Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
+- [`optional<int> random_int(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) &PRNG::random_int
+\
+Generate a integer number in the range `[min, max]` or `nil` if `max < min`
 - [`float random()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
 Drop-in replacement for `math.random()`
-- [`optional<int> random(int i, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
-\
-Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
 - [`optional<int> random(int i)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
 Drop-in replacement for `math.random(i)`
-- [`optional<int> random(int min, int max, PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
-\
-Generate a integer number in the range `[min, max]` or `nil` if `max < min`
 - [`optional<int> random(int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
 Drop-in replacement for `math.random(min, max)`
@@ -3145,7 +3150,9 @@ After setting the WIN_STATE, the exit door on the current level will lead to the
 - [`MISSED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.MISSED) 4
 - [`POISONED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.POISONED) 5
 ### PRNG_CLASS
-Determines what class of prng is used, for example when choosing `PRNG_CLASS.LEVEL_GEN` to generate a random number random Tiamat spawns will not be affected.
+Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at (`PRNG`)[#PRNG]
+For example when choosing `PRNG_CLASS.PROCEDURAL_SPAWNS` to generate a random number, random Tiamat spawns will not be affected.
+Any integer in the range [0, 9] is a valid class, some are however not documented because of missing information.
 - [`PROCEDURAL_SPAWNS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) PRNG::PROCEDURAL_SPAWNS
 - [`PARTICLES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) PRNG::PARTICLES
 - [`ENTITY_VARIATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) PRNG::ENTITY_VARIATION

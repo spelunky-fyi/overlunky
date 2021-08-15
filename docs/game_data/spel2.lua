@@ -1650,6 +1650,9 @@ InputMapping = {
 Inventory = {
   __name = "sol.Inventory.user"
 }
+Items = {
+  __name = "sol.Items.user"
+}
 JUNGLESISTERS = {
   GREAT_PARTY_HUH = 5,
   I_WISH_BROUGHT_A_JACKET = 6,
@@ -2740,6 +2743,9 @@ Scorpion = {
   __index = "function",
   __name = "sol.Scorpion.user",
   __newindex = "function"
+}
+SelectPlayerSlot = {
+  __name = "sol.SelectPlayerSlot.user"
 }
 Shield = {
   __index = "function",
@@ -4091,6 +4097,7 @@ attach_entity = function(...) end
 cancel_speechbubble = function(...) end
 cancel_toast = function(...) end
 carry = function(...) end
+cast_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n        function cast_entity(entity_raw)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_u...Çç\1\0\4ë<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\14\1\0\2\14\1\2\3å\0\1\2ºÄ\0\0008\2\0Ä\0\1\1\0Ä\1\0\0E\1\2\0F\1\0\0008\0\0ÄH\0\2\0G\1\1\0Ñ\0\4âTYPE_MAP\4Ötype\4ÉidÅ\0\0\0Äë\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2ÄÇãentity_rawÄëâcast_funàëÅÖ_ENV",'@serialized'))
 clear_callback = function(...) end
 clear_entity_callback = function(...) end
 clear_vanilla_sound_callback = function(...) end
@@ -4140,7 +4147,7 @@ get_entities_by_mask = function(...) end
 get_entities_by_type = function(...) end
 get_entities_overlapping = function(...) end
 get_entities_overlapping_hitbox = function(...) end
-get_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\3‡\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_uid)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        Çí\1\0\5ò<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\0\1\0\0ƒ\0\2\2º\0\0\0∏\0\0Ä\8\1\0\0H\1\2\0\11\1\0\2é\1\1\3é\1\3\4\12\1\2\3<Å\0\0008\2\0ÄÄ\1\2\0\0\2\1\0≈\1\2\0∆\1\0\0008\0\0Ä»\0\2\0«\1\1\0Ö\0\4èget_entity_raw\4âTYPE_MAP\4Ötype\4ÉidÅ\0\0\0Äò\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2ÄÉàent_uidÄòãentity_rawáòâcast_funèòÅÖ_ENV",'@serialized'))
+get_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n        function cast_entity(entity_raw)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_u...éô\1\0\4ê<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\0\1\0\0ƒ\0\2\2º\0\0\0∏\0\0Ä\8\1\0\0H\1\2\0\11\1\0\2Ä\1\1\0E\1\2\0F\1\0\0G\1\1\0É\0\4èget_entity_raw\4åcast_entityÅ\0\0\0Äê\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1ÄÇàent_uidÄêãentity_rawáêÅÖ_ENV",'@serialized'))
 get_entity_ai_state = function(...) end
 get_entity_flags = function(...) end
 get_entity_flags2 = function(...) end
