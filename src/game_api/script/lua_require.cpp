@@ -85,47 +85,47 @@ return info.short_src, info.source
     }
 
     namespace fs = std::filesystem;
-    static auto is_sub_path = [](const std::filesystem::path& base, const std::filesystem::path& path)
+    static auto is_sub_path = [](const std::filesystem::path& base, const std::filesystem::path& _path)
     {
-        const auto first_mismatch = std::mismatch(path.begin(), path.end(), base.begin(), base.end());
+        const auto first_mismatch = std::mismatch(_path.begin(), _path.end(), base.begin(), base.end());
         return first_mismatch.second == base.end();
     };
 
     const fs::path& backend_root = backend->get_root_path();
 
-    auto require = [=](std::string path)
+    auto require = [=](std::string _path)
     {
-        if (path.ends_with(".lua") || path.ends_with(".dll"))
+        if (_path.ends_with(".lua") || _path.ends_with(".dll"))
         {
-            path = path.substr(0, path.size() - 4);
+            _path = _path.substr(0, _path.size() - 4);
         }
-        std::replace(path.begin(), path.end(), '.', '$'); // Need to be able to recover periods in folder names, curses garebear
-        std::replace(path.begin(), path.end(), '/', '.');
-        std::replace(path.begin(), path.end(), '\\', '.');
-        backend->loaded_modules.insert(path);
-        return lua["__require"](path);
+        std::replace(_path.begin(), _path.end(), '.', '$'); // Need to be able to recover periods in folder names, curses garebear
+        std::replace(_path.begin(), _path.end(), '/', '.');
+        std::replace(_path.begin(), _path.end(), '\\', '.');
+        backend->loaded_modules.insert(_path);
+        return lua["__require"](_path);
     };
-    auto require_if_exists = [&](fs::path path) -> std::optional<sol::object>
+    auto require_if_exists = [&](fs::path _path) -> std::optional<sol::object>
     {
-        if (!unsafe && !is_sub_path(backend_root, path))
+        if (!unsafe && !is_sub_path(backend_root, _path))
         {
             return std::nullopt;
         }
 
-        if (fs::exists(path.replace_extension(".lua")))
+        if (fs::exists(_path.replace_extension(".lua")))
         {
-            return require(path.string());
+            return require(_path.string());
         }
-        else if (unsafe && fs::exists(path.replace_extension(".dll")))
+        else if (unsafe && fs::exists(_path.replace_extension(".dll")))
         {
-            return require(path.string());
+            return require(_path.string());
         }
         else
         {
-            path.replace_extension() /= "init";
-            if (fs::exists(path.replace_extension(".lua")))
+            _path.replace_extension() /= "init";
+            if (fs::exists(_path.replace_extension(".lua")))
             {
-                return require(path.string());
+                return require(_path.string());
             }
         }
         return std::nullopt;
@@ -165,10 +165,10 @@ int custom_loader(lua_State* L)
     std::replace(path.begin(), path.end(), '$', '.');
     LuaBackend* backend = LuaBackend::get_calling_backend();
 
-    auto try_load = [=](std::string& path, std::string_view ext)
+    auto try_load = [=](std::string& _path, std::string_view ext)
     {
-        path += ext;
-        const auto res = luaL_loadfilex(L, path.c_str(), "bt");
+        _path += ext;
+        const auto res = luaL_loadfilex(L, _path.c_str(), "bt");
         if (res == LUA_OK)
         {
             backend->lua.push();
@@ -176,7 +176,7 @@ int custom_loader(lua_State* L)
             lua_setupvalue(L, -2, 1);
             return true;
         }
-        path = path.substr(0, path.size() - 1);
+        _path = _path.substr(0, _path.size() - 1);
         return false;
     };
 
