@@ -505,7 +505,7 @@ EntityHooksInfo& Entity::get_hooks()
         hook_dtor(this, [](void* self)
                   {
                       auto _it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
-                                             { return hook.entity == self; });
+                                              { return hook.entity == self; });
                       if (_it != g_entity_hooks.end())
                       {
                           for (auto& cb : _it->on_destroy)
