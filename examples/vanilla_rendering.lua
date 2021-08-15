@@ -28,7 +28,7 @@ set_callback(function(render_ctx)
     
     local x = -0.28
     for i = 1, 7 do
-        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_HUD_0, 4, i-1, x, y, x + 0.08, y - (0.08 * (16.0/9.0)), white)
+        render_ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_HUD_0, 4, i-1, x, y, x + 0.08, y - (0.08 * (16.0/9.0)), white)
         x = x + 0.08
     end
     y = y - 0.20
@@ -108,6 +108,6 @@ set_callback(function(render_ctx, draw_depth)
         y = y + 1.15
         sx, sy = screen_position(x, y)
         sx2, sy2 = screen_position(x + 1.0, y - 1.0)
-        render_ctx:draw_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx, sy, sx2, sy2, white)
+        render_ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx, sy, sx2, sy2, white)
     end
 end, ON.RENDER_PRE_DRAW_DEPTH)

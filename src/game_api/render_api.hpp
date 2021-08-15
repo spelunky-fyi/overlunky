@@ -44,7 +44,8 @@ struct RenderAPI
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_texture(uint32_t texture_id, uint8_t row, uint8_t column, float x1, float y1, float x2, float y2, Color color);
+    void draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
+    void draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
 };
 
 // straight out of the x64dbg plugin
@@ -113,6 +114,27 @@ struct RenderInfo
     uint32_t unknown38;
     Texture* texture;
     const char** texture_name;
+
+    size_t unknown39;
+    size_t unknown40;
+    size_t unknown41;
+    size_t unknown42;
+    size_t unknown43;
+    size_t unknown44;
+    size_t unknown45;
+    bool render_as_non_liquid; // for liquids, forced to false, for non-liquids: sprite goes crazy when moving about
+    uint8_t unknown47;
+    uint8_t unknown48;
+    uint8_t unknown49;
+    uint32_t unknown50;
+    size_t entity_offset; // the offset of the associated entity in memory, starting from the memory segment that State resides in
+    bool flip_horizontal; // facing left
+    uint8_t unknown52;
+    uint8_t unknown53;
+    uint8_t unknown54;
+    uint32_t unknown55;
+    float darkness; // 0.0 = completely black ; 1.0 = normal (dark effect like when on fire)
+    uint32_t unknown56;
 };
 
 struct TextRenderingInfo
