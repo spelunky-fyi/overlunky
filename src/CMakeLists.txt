@@ -62,10 +62,10 @@ if(MSVC)
         target_compile_options(overlunky_warnings INTERFACE /W4 /WX)
         target_compile_options(overlunky_warnings INTERFACE /wd4201) #nonstandard extension used : nameless struct/union
         if(CLANG)
-                target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
+                target_compile_options(overlunky_warnings INTERFACE -Wshadow-all -Wno-missing-field-initializers -Wno-microsoft-cast)
         endif()
 else()
-        target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -Wshadow-all -pedantic -Werror)
+        target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -pedantic -Werror)
         target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
 endif()
 
