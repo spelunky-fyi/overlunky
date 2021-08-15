@@ -8,8 +8,8 @@
 
 #include <sol/sol.hpp>
 
-LuaConsole::LuaConsole(SoundManager* sound_manager)
-    : LuaBackend(sound_manager, this)
+LuaConsole::LuaConsole(SoundManager* soundmanager)
+    : LuaBackend(soundmanager, this)
 {
     lua["__script_id"] = "console_proxy.lua";
 
