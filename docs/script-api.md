@@ -2638,7 +2638,7 @@ You can just discard this handle if you do not need extended control anymore
 - [`int up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) &InputMapping::up
 - [`int down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) &InputMapping::down
 ### `PlayerInputs`
-- [`array<PlayerSlot, MAX_PLAYERS> player_slots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slots) &PlayerInputs::player_slots
+- [`player_slots`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slots) &PlayerInputs::player_slots
 - [`PlayerSlot player_slot_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1) &PlayerInputs::player_slot_1
 - [`PlayerSlot player_slot_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2) &PlayerInputs::player_slot_2
 - [`PlayerSlot player_slot_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3) &PlayerInputs::player_slot_3

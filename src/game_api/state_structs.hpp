@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdlib>
+#include <cstdint>
 
 #define MAX_PLAYERS 4
 
@@ -75,7 +75,7 @@ struct PlayerInputs
 {
     union
     {
-        std::array<PlayerSlot, MAX_PLAYERS> player_slots;
+        PlayerSlot player_slots[MAX_PLAYERS];
         struct
         {
             PlayerSlot player_slot_1;
