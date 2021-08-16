@@ -90,12 +90,12 @@ void trigger_vanilla_render_callbacks(ON event)
         });
 }
 
-void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth)
+void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.process_vanilla_render_draw_depth_callbacks(event, draw_depth);
+            backend.process_vanilla_render_draw_depth_callbacks(event, draw_depth, bbox);
             return true;
         });
 }

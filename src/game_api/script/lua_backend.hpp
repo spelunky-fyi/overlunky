@@ -267,7 +267,7 @@ class LuaBackend
     void pre_entity_destroyed(Entity* entity);
 
     void process_vanilla_render_callbacks(ON event);
-    void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth);
+    void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);

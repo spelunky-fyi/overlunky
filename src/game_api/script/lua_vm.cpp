@@ -993,8 +993,8 @@ end
     // Params: `VanillaRenderContext render_ctx`
     // Runs after the pause menu is drawn on screen
     // RENDER_PRE_DRAW_DEPTH
-    // Params: `VanillaRenderContext render_ctx, int draw_depth`
-    // Runs before the entities of the specified draw_depth are drawn on screen
+    // Params: `VanillaRenderContext render_ctx, int draw_depth, AABB bounding_box`
+    // Runs before the entities of the specified draw_depth are drawn on screen. You can determine whether or not to draw based on whether your element intersects with the given bounding box
     */
 
     lua.create_named_table(

@@ -4,6 +4,7 @@
 #include <detours.h>
 #include <string>
 
+#include "layer.hpp"
 #include "memory.hpp"
 #include "script/events.hpp"
 #include "script/lua_backend.hpp"
@@ -163,15 +164,12 @@ void render_pause_menu(float* drawing_info)
     trigger_vanilla_render_callbacks(ON::RENDER_POST_PAUSE_MENU);
 }
 
-using VanillaRenderDrawDepthFun = void(size_t, uint8_t, float, float, float, float);
+using VanillaRenderDrawDepthFun = void(Layer*, uint8_t, float, float, float, float);
 VanillaRenderDrawDepthFun* g_render_draw_depth_trampoline{nullptr};
-void render_draw_depth(size_t inside_state_unknown27, uint8_t draw_depth, float bbox1, float bbox2, float bbox3, float bbox4)
+void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float bbox_bottom, float bbox_right, float bbox_top)
 {
-    // I believe the 4 floats are a bounding box so off screen entities can be excluded from drawing
-    // doesn't match up with camera bounds though
-
-    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth);
-    g_render_draw_depth_trampoline(inside_state_unknown27, draw_depth, bbox1, bbox2, bbox3, bbox4);
+    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
+    g_render_draw_depth_trampoline(layer, draw_depth, bbox_left, bbox_bottom, bbox_right, bbox_top);
 }
 
 static size_t text_rendering_context_offset = 0;

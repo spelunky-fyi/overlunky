@@ -2699,12 +2699,18 @@ Draw text using the built-in renderer. Use in combination with ON.RENDER_✱ eve
 - [`tuple<float, float> draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) &VanillaRenderContext::draw_text_size
 \
 Measure the provided text using the built-in renderer
-- [`nil draw_texture(int texture_id, int row, int column, float x1, float y1, float x2, float y2, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_texture) draw_texture
+- [`nil draw_screen_texture(int texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture on screen from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
-- [`nil draw_texture(int texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_texture) draw_texture
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
+- [`nil draw_screen_texture(int texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture on screen from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
+- [`nil draw_world_texture(int texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
+\
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
+- [`nil draw_world_texture(int texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
+\
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
@@ -3115,8 +3121,8 @@ Params: `VanillaRenderContext render_ctx`\
 Runs after the pause menu is drawn on screen
 - [`RENDER_PRE_DRAW_DEPTH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) ON::RENDER_PRE_DRAW_DEPTH
 \
-Params: `VanillaRenderContext render_ctx, int draw_depth`\
-Runs before the entities of the specified draw_depth are drawn on screen
+Params: `VanillaRenderContext render_ctx, int draw_depth, AABB bounding_box`\
+Runs before the entities of the specified draw_depth are drawn on screen. You can determine whether or not to draw based on whether your element intersects with the given bounding box
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \

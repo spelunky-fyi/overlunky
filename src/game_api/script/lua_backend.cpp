@@ -734,7 +734,7 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
     }
 }
 
-void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth)
+void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
 {
     if (!get_enabled())
         return;
@@ -745,7 +745,7 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     {
         if (callback.screen == event)
         {
-            handle_function(callback.func, render_ctx, draw_depth);
+            handle_function(callback.func, render_ctx, draw_depth, bbox);
             callback.lastRan = now;
         }
     }
