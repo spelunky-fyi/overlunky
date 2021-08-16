@@ -382,11 +382,11 @@ void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t col
             // bottom right:
             uv_right,
             uv_bottom,
-            // top left:
-            uv_left,
-            uv_top,
             // top right:
             uv_right,
+            uv_top,
+            // top left:
+            uv_left,
             uv_top,
         };
 
