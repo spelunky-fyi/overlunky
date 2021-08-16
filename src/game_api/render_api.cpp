@@ -266,6 +266,11 @@ void RenderAPI::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t co
         float center_x = left + half_width;
         float center_y = top + half_height;
 
+        float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
+        float uv_right = uv_left + texture->tile_width_fraction;
+        float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
+        float uv_bottom = uv_top + texture->tile_height_fraction;
+
         TextureRenderingInfo tri = {
             center_x,
             center_y,
@@ -285,18 +290,19 @@ void RenderAPI::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t co
             -half_height,
 
             // SOURCE
-            // top left:
-            texture->tile_width_fraction * column,
-            texture->tile_height_fraction * (row + 1.0f),
-            // top right:
-            texture->tile_width_fraction * (column + 1.0f),
-            texture->tile_height_fraction * (row + 1.0f),
             // bottom left:
-            texture->tile_width_fraction * column,
-            texture->tile_height_fraction * row,
+            uv_left,
+            uv_bottom,
             // bottom right:
-            texture->tile_width_fraction * (column + 1.0f),
-            texture->tile_height_fraction * row};
+            uv_right,
+            uv_bottom,
+            // top left:
+            uv_left,
+            uv_top,
+            // top right:
+            uv_right,
+            uv_top,
+        };
 
         typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
@@ -323,7 +329,6 @@ void RenderAPI::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t co
 void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
     static size_t func_offset = 0;
-    static size_t rcx = 0;
     static size_t param_7 = 0;
     uint8_t rdx = 0x7; // this comes from RenderInfo->unknown20 (which might just be 8 bit instead of 32)
 
@@ -337,7 +342,6 @@ void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t col
 
         auto offset = find_inst(exe, "\x4C\x8D\x0D\x59\xAF\x0F\x00"s, memory.after_bundle);
         param_7 = memory.at_exe(decode_pc(exe, offset));
-        rcx = read_u64(memory.at_exe(decode_pc(exe, offset + 29)));
     }
 
     if (func_offset != 0)
@@ -367,24 +371,31 @@ void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t col
             left,
             top,
             unknown};
+
+        float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
+        float uv_right = uv_left + texture->tile_width_fraction;
+        float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
+        float uv_bottom = uv_top + texture->tile_height_fraction;
+
         float source[8] = {
             // bottom left:
-            texture->tile_width_fraction * column,
-            texture->tile_height_fraction * row,
+            uv_left,
+            uv_bottom,
             // bottom right:
-            texture->tile_width_fraction * (column + 1.0f),
-            texture->tile_height_fraction * row,
-            // top right:
-            texture->tile_width_fraction * (column + 1.0f),
-            texture->tile_height_fraction * (row + 1.0f),
+            uv_right,
+            uv_bottom,
             // top left:
-            texture->tile_width_fraction * column,
-            texture->tile_height_fraction * (row + 1.0f)};
+            uv_left,
+            uv_top,
+            // top right:
+            uv_right,
+            uv_top,
+        };
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, bool render_as_non_liquid, float* source, float* destination, void*, void*, void*, void*, Color*);
+        typedef void render_func(size_t, uint8_t, const char*** texture_name, bool render_as_non_liquid, float* destination, float* source, void*, void*, void*, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         size_t stack_filler = 0;
-        rf(rcx, rdx, &texture->name, true, source, destination, (void*)stack_filler, (void*)stack_filler, (void*)param_7, (void*)stack_filler, &color);
+        rf(renderer(), rdx, &texture->name, true, destination, source, (void*)stack_filler, (void*)stack_filler, (void*)param_7, (void*)stack_filler, &color, nullptr);
     }
 }
 

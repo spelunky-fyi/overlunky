@@ -259,7 +259,7 @@ class Entity
     }
 
     virtual ~Entity() = 0;
-    virtual void created() = 0;
+    virtual void create_rendering_info() = 0;
     virtual void kill(bool, Entity* frm) = 0;
     virtual void on_collision1(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision2
     virtual void v3() = 0;
