@@ -34,6 +34,7 @@ endif()
 add_subdirectory(src)
 
 if(MSVC)
+  set(CMAKE_CXX_STANDARD 23)
   add_definitions(/bigobj)
   if(BUILD_OVERLUNKY)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT injector)
