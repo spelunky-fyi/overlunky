@@ -33,13 +33,18 @@ PRNG::prng_pair PRNG::get_and_advance(PRNG_CLASS type)
     return copy;
 }
 
-std::int64_t PRNG::random_index(std::int64_t size, PRNG_CLASS type)
+std::int64_t PRNG::internal_random_index(std::int64_t size, PRNG_CLASS type)
 {
     prng_pair pair = get_and_advance(type);
     return static_cast<std::int64_t>((pair.first & 0xffffffff) * size >> 0x20);
 }
-std::int64_t PRNG::random_int(std::int64_t min, std::int64_t max, PRNG_CLASS type)
+std::optional<std::int64_t> PRNG::internal_random_int(std::int64_t min, std::int64_t max, PRNG_CLASS type)
 {
+    if (max <= min)
+    {
+        return std::nullopt;
+    }
+
     static auto wrap = [](std::int64_t val, std::int64_t min, std::int64_t max)
     {
         const auto diff = max - min;
@@ -56,7 +61,26 @@ std::int64_t PRNG::random_int(std::int64_t min, std::int64_t max, PRNG_CLASS typ
     // So in the grand scheme this is close enough to a uniform distribution
     return wrap(static_cast<std::int64_t>(pair.first), min, max);
 }
+
 bool PRNG::random_chance(std::int64_t inverse_chance, PRNG_CLASS type)
 {
     return random_int(0, inverse_chance, type) == 0;
+}
+
+float PRNG::random_float(PRNG_CLASS type)
+{
+    prng_pair pair = get_and_advance(type);
+    return static_cast<float>(pair.first) / static_cast<float>(std::numeric_limits<std::uint64_t>::max());
+}
+std::optional<std::int64_t> PRNG::random_index(std::int64_t i, PRNG_CLASS type)
+{
+    return random_int(1, i, type);
+}
+std::optional<std::int64_t> PRNG::random_int(std::int64_t min, std::int64_t max, PRNG_CLASS type)
+{
+    if (min <= max)
+    {
+        return internal_random_int(min, max + 1, type);
+    }
+    return std::nullopt;
 }

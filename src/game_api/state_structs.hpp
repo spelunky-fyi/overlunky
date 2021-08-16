@@ -1,6 +1,9 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
+
+#define MAX_PLAYERS 4
 
 class Entity;
 
@@ -71,14 +74,28 @@ struct PlayerSlotSettings
 
 struct PlayerInputs
 {
-    PlayerSlot player_slot_1;
-    PlayerSlot player_slot_2;
-    PlayerSlot player_slot_3;
-    PlayerSlot player_slot_4;
-    PlayerSlotSettings player_slot_1_settings;
-    PlayerSlotSettings player_slot_2_settings;
-    PlayerSlotSettings player_slot_3_settings;
-    PlayerSlotSettings player_slot_4_settings;
+    union
+    {
+        std::array<PlayerSlot, MAX_PLAYERS> player_slots;
+        struct
+        {
+            PlayerSlot player_slot_1;
+            PlayerSlot player_slot_2;
+            PlayerSlot player_slot_3;
+            PlayerSlot player_slot_4;
+        };
+    };
+    union
+    {
+        std::array<PlayerSlotSettings, MAX_PLAYERS> player_settings;
+        struct
+        {
+            PlayerSlotSettings player_slot_1_settings;
+            PlayerSlotSettings player_slot_2_settings;
+            PlayerSlotSettings player_slot_3_settings;
+            PlayerSlotSettings player_slot_4_settings;
+        };
+    };
 };
 
 struct QuestsInfo

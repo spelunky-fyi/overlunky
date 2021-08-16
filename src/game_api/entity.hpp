@@ -44,6 +44,10 @@ class Entity;
 using EntityCreate = Entity* (*)();
 using EntityDestroy = void (*)(Entity*);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
+using AddLayer = void (*)(void*, Entity*);
+using RemoveLayer = void (*)(void*, Entity*);
+
+using LAYER = int;
 
 struct EntityDB
 {
@@ -182,6 +186,8 @@ class Entity
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
+    void set_layer(LAYER layer);
+    void remove();
 
     Entity* topmost()
     {
@@ -251,6 +257,7 @@ class Entity
     bool is_movable();
 
     std::uint32_t set_on_destroy(std::function<void(Entity*)> cb);
+    std::uint32_t set_on_kill(std::function<void(Entity*, Entity*)> on_kill);
 
     template <typename T>
     T* as()

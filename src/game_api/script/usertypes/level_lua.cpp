@@ -248,7 +248,9 @@ void register_usertypes(sol::state& lua)
         "deepest_area",
         sol::readonly(&SaveData::deepest_area),
         "deepest_level",
-        sol::readonly(&SaveData::deepest_level));
+        sol::readonly(&SaveData::deepest_level),
+        "players",
+        sol::readonly(&SaveData::players));
 
     lua.create_named_table("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4, "BOTH", -128);
     lua.create_named_table(

@@ -29,6 +29,7 @@ header_files = [
     "../src/game_api/particles.hpp",
     "../src/game_api/savedata.hpp",
     "../src/game_api/level_api.hpp",
+    "../src/game_api/items.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
@@ -207,30 +208,34 @@ for file in header_files:
                 m = re.search(r"/// ?(.*)$", line)
                 if m:
                     comment.append(m[1])
+                else:
+                    m = re.search(r"^\s*:.*$", line) # skip lines that start with a colon (constructor parameter initialization)
+                    if m:
+                        continue
+                    
+                    m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
+                    if m:
+                        name = m[3]
+                        if name not in member_funs:
+                            member_funs[name] = []
+                        member_funs[name].append(
+                            {
+                                "return": m[2],
+                                "name": m[3],
+                                "param": m[4],
+                                "comment": comment,
+                            }
+                        )
+                        comment = []
 
-                m = re.search(r"^\s*:.*$", line) # skip lines that start with a colon (constructor parameter initialization)
-                if m:
-                    continue
-
-                m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
-                if m:
-                    name = m[3]
-                    if name not in member_funs:
-                        member_funs[name] = []
-                    member_funs[name].append(
-                        {
-                            "return": m[2],
-                            "name": m[3],
-                            "param": m[4],
-                            "comment": comment,
-                        }
+                    m = re.search(
+                        r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
                     )
-                    comment = []
-
-                m = re.search(r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line)
-                if m:
-                    member_vars.append({"type": m[1], "name": m[2], "comment": comment})
-                    comment = []
+                    if m:
+                        member_vars.append(
+                            {"type": m[1], "name": m[2], "comment": comment}
+                        )
+                        comment = []
             elif brackets_depth == 0:
                 classes.append(
                     {
@@ -312,7 +317,7 @@ for file in api_files:
             if not var:
                 continue
             var = var.split(",")
-            if var[0] == "sol::base_classes":
+            if var[0] == "sol::base_classes" or var[0] == "sol::no_constructor":
                 continue
             if "table_of" in var[1]:
                 var[1] = var[1].replace("table_of(", "") + "[]"

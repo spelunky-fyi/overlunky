@@ -145,6 +145,10 @@ void register_usertypes(sol::state& lua)
         &Entity::w,
         "height",
         &Entity::h,
+        "tile_width",
+        &Entity::tilew,
+        "tile_height",
+        &Entity::tileh,
         "angle",
         &Entity::angle,
         "color",
@@ -172,7 +176,11 @@ void register_usertypes(sol::state& lua)
         "liberate_from_shop",
         &Entity::liberate_from_shop,
         "get_held_entity",
-        &Entity::get_held_entity);
+        &Entity::get_held_entity,
+        "set_layer",
+        &Entity::set_layer,
+        "remove",
+        &Entity::remove);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",

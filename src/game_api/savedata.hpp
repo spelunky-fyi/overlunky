@@ -33,4 +33,6 @@ struct SaveData
     int32_t score_top;
     uint8_t deepest_area;
     uint8_t deepest_level;
+    uint8_t skip1[9674]; //TODO: there's still a lot of stuff here, but I just wanted to get to the player selections
+    std::array<uint8_t, 4> players;
 };

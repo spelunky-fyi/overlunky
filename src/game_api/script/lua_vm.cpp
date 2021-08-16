@@ -1,5 +1,6 @@
 #include "lua_vm.hpp"
 
+#include "entities_items.hpp"
 #include "entity.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
@@ -493,12 +494,7 @@ end
     /// Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
     lua.script(R"##(
-        function get_entity(ent_uid)
-            if ent_uid == nil then
-                return nil
-            end
-
-            local entity_raw = get_entity_raw(ent_uid)
+        function cast_entity(entity_raw)
             if entity_raw == nil then
                 return nil
             end
@@ -509,6 +505,18 @@ end
             else
                 return entity_raw
             end
+        end
+        function get_entity(ent_uid)
+            if ent_uid == nil then
+                return nil
+            end
+
+            local entity_raw = get_entity_raw(ent_uid)
+            if entity_raw == nil then
+                return nil
+            end
+
+            return cast_entity(entity_raw)
         end
         )##");
     /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
@@ -810,16 +818,7 @@ end
             std::uint32_t id = movable->set_pre_statemachine(
                 [backend, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    sol::function cast = lua["TYPE_MAP"][self->type->id];
-                    if (cast)
-                    {
-                        sol::userdata proper_entity = cast(self);
-                        return backend->handle_function_with_return<bool>(fun, proper_entity).value_or(false);
-                    }
-                    else
-                    {
-                        return backend->handle_function_with_return<bool>(fun, self).value_or(false);
-                    }
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
                 });
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
@@ -838,18 +837,50 @@ end
             std::uint32_t id = movable->set_post_statemachine(
                 [backend, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    sol::function cast = lua["TYPE_MAP"][self->type->id];
-                    if (cast)
-                    {
-                        sol::userdata proper_entity = cast(self);
-                        backend->handle_function(fun, proper_entity);
-                    }
-                    else
-                    {
-                        backend->handle_function(fun, self);
-                    }
+                    backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(movable);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+    /// The callback signature is `nil on_kill(Entity self, Entity killer)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_kill"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->set_on_kill(
+                [backend, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
+                {
+                    backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// `uid` has to be the uid of a `Container` or else stuff will break.
+    /// Sets a callback that is called right when a container is opened via up+door.
+    /// The callback signature is `nil on_open(Entity self, Entity opener)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Container* entity = get_entity_ptr(uid)->as<Container>())
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->set_on_open(
+                [backend, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
+                {
+                    backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
+                });
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }

@@ -696,6 +696,10 @@ bool LuaConsole::pre_draw()
                 {
                     LuaBackend::clear();
                 }
+                else if (console_input == "quit"sv)
+                {
+                    std::exit(0);
+                }
                 else
                 {
                     std::size_t messages_before = messages.size();
