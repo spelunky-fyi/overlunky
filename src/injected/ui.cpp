@@ -977,8 +977,9 @@ void force_noclip()
     g_players = get_players();
     if (options["noclip"])
     {
-        for (auto player : g_players)
+        for (auto ent : g_players)
         {
+            auto player = (Movable*)(ent->topmost_mount());
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
             player->flags &= ~(1U << 10);
@@ -1557,8 +1558,9 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["noclip"] = !options["noclip"];
         g_players = get_players();
-        for (auto player : g_players)
+        for (auto ent : g_players)
         {
+            auto player = (Movable*)ent->topmost_mount();
             if (options["noclip"])
             {
                 player->type->max_speed = 0.3f;
@@ -2884,7 +2886,8 @@ void render_clickhandler()
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
-            move_entity_abs(g_players.at(0)->uid, cpos.first, cpos.second, g_vx, g_vy);
+            auto player = (Movable*)g_players.at(0)->topmost_mount();
+            move_entity_abs(player->uid, cpos.first, cpos.second, g_vx, g_vy);
             // set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
@@ -2900,7 +2903,8 @@ void render_clickhandler()
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
-            move_entity_abs(g_players.at(0)->uid, cpos.first, cpos.second, g_vx, g_vy);
+            auto player = (Movable*)g_players.at(0)->topmost_mount();
+            move_entity_abs(player->uid, cpos.first, cpos.second, g_vx, g_vy);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3126,8 +3130,9 @@ void render_options()
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {
         g_players = get_players();
-        for (auto player : g_players)
+        for (auto ent : g_players)
         {
+            auto player = (Movable*)ent->topmost_mount();
             if (options["noclip"])
             {
                 player->type->max_speed = 0.3f;

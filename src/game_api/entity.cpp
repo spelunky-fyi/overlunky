@@ -219,6 +219,8 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == layer_to || layer_to > 1 || layer_to < 0)
         return;
     auto state = State::get();
+    if (this != this->topmost_mount())
+        this->topmost_mount()->set_layer(layer_to);
 
     if (layer == 0 || layer == 1)
     {
