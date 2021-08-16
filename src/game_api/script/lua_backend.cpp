@@ -741,11 +741,12 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
+    render_ctx.bounding_box = bbox;
     for (auto& [id, callback] : callbacks)
     {
         if (callback.screen == event)
         {
-            handle_function(callback.func, render_ctx, draw_depth, bbox);
+            handle_function(callback.func, render_ctx, draw_depth);
             callback.lastRan = now;
         }
     }

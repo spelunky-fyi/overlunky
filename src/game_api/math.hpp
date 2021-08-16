@@ -14,6 +14,16 @@ struct AABB
     {
     }
 
+    bool overlaps_with(const AABB& other) const
+    {
+        return left < other.right && other.left < right && bottom < other.top && other.bottom < top;
+    }
+
+    bool is_valid() const
+    {
+        return !(left == 0.0f && right == 0.0f && top == 0.0f && bottom == 0.0f);
+    }
+
     float left;
     float top;
     float right;

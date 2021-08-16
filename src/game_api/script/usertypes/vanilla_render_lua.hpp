@@ -26,6 +26,8 @@ class VanillaRenderContext
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
     void draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color);
+
+    AABB bounding_box;
 };
 
 namespace NVanillaRender

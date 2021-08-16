@@ -13,9 +13,9 @@ std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& 
     return RenderAPI::get().draw_text_size(text, scale_x, scale_y, fontstyle);
 }
 
-void VanillaRenderContext::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t column, float x1, float y1, float x2, float y2, Color color)
+void VanillaRenderContext::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    RenderAPI::get().draw_screen_texture(texture_id, row, column, x1, y1, x2, y2, color);
+    RenderAPI::get().draw_screen_texture(texture_id, row, column, left, top, right, bottom, color);
 }
 
 void VanillaRenderContext::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
@@ -23,13 +23,17 @@ void VanillaRenderContext::draw_screen_texture(uint32_t texture_id, uint8_t row,
     RenderAPI::get().draw_screen_texture(texture_id, row, column, rect.left, rect.top, rect.right, rect.bottom, color);
 }
 
-void VanillaRenderContext::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, float x1, float y1, float x2, float y2, Color color)
+void VanillaRenderContext::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    RenderAPI::get().draw_world_texture(texture_id, row, column, x1, y1, x2, y2, color);
+    draw_world_texture(texture_id, row, column, {left, top, right, bottom}, color);
 }
 
 void VanillaRenderContext::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
+    if (bounding_box.is_valid() && !rect.overlaps_with(bounding_box))
+    {
+        return;
+    }
     RenderAPI::get().draw_world_texture(texture_id, row, column, rect.left, rect.top, rect.right, rect.bottom, color);
 }
 

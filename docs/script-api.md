@@ -2734,6 +2734,7 @@ Create a new axis aligned bounding box - defaults to all zeroes
 - [`AABB(float left_, float top_, float right_, float bottom_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
 \
 Create a new axis aligned bounding box by specifying its values
+- [`bool overlaps_with(const AABB& other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) &AABB::overlaps_with
 - [`float left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) &AABB::left
 - [`float bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) &AABB::bottom
 - [`float right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) &AABB::right

@@ -302,7 +302,7 @@ void RenderAPI::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t co
             uv_top,
         };
 
-        typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
+        typedef void render_func(TextureRenderingInfo*, uint8_t shader, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
         rf(&tri, 0x29, texture->name, &color);
         // < 0x27: invisible
@@ -328,7 +328,7 @@ void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t col
 {
     static size_t func_offset = 0;
     static size_t param_7 = 0;
-    uint8_t rdx = 0x7; // this comes from RenderInfo->unknown20 (which might just be 8 bit instead of 32)
+    uint8_t shader = 0x7; // this comes from RenderInfo->shader (which might just be 8 bit instead of 32)
 
     auto& memory = Memory::get();
     auto exe = memory.exe();
@@ -393,7 +393,7 @@ void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t col
         typedef void render_func(size_t, uint8_t, const char*** texture_name, bool render_as_non_liquid, float* destination, float* source, void*, void*, void*, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         size_t stack_filler = 0;
-        rf(renderer(), rdx, &texture->name, true, destination, source, (void*)stack_filler, (void*)stack_filler, (void*)param_7, (void*)stack_filler, &color, nullptr);
+        rf(renderer(), shader, &texture->name, true, destination, source, (void*)stack_filler, (void*)stack_filler, (void*)param_7, (void*)stack_filler, &color, nullptr);
     }
 }
 

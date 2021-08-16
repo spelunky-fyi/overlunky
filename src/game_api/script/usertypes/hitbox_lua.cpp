@@ -54,6 +54,8 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<AABB>(
         "AABB",
         sol::constructors<AABB(), AABB(float, float, float, float)>{},
+        "overlaps_with",
+        &AABB::overlaps_with,
         "left",
         &AABB::left,
         "bottom",
