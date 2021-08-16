@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.17)
 project(overlunky)
 
 set(CMAKE_CXX_STANDARD 20)
+if(MSVC)
+  set(CMAKE_CXX_STANDARD 23)
+endif()
 
 include(cmake/clang-format.cmake)
 setup_format_target(format_overlunky)
@@ -34,7 +37,6 @@ endif()
 add_subdirectory(src)
 
 if(MSVC)
-  set(CMAKE_CXX_STANDARD 23)
   add_definitions(/bigobj)
   if(BUILD_OVERLUNKY)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT injector)
