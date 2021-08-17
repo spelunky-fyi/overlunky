@@ -176,10 +176,13 @@ bool LuaBackend::update()
         std::vector<Player*> players = get_players();
         lua["players"] = std::vector<Player*>(players);
 
-        if (g_state->screen != state.screen && g_state->screen_last != 5)
+        if (g_state->loading == 1 && g_state->loading != state.loading)
         {
             level_timers.clear();
             script_input.clear();
+        }
+        if (g_state->screen != state.screen && g_state->screen_last != 5)
+        {
             if (on_screen)
                 on_screen.value()();
         }
@@ -311,12 +314,12 @@ bool LuaBackend::update()
 
         for (auto& [id, callback] : callbacks)
         {
-            if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != 5) // game screens
+            if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != (int)ON::OPTIONS) // game screens
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && !players.empty() && (state.player != players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && state.loading != g_state->loading && g_state->loading == 3)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
@@ -355,8 +358,7 @@ bool LuaBackend::update()
                 }
                 case ON::START:
                 {
-                    if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && !players.empty() &&
-                        state.player != players.at(0))
+                    if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && state.loading != g_state->loading && g_state->loading == 3)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
