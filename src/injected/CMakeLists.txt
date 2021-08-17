@@ -9,7 +9,8 @@ target_link_libraries(injected PUBLIC
         imgui
         toml11::toml11
         libnyquist
-        Shlwapi)
+        Shlwapi
+        sockpp-static)
 target_include_directories(injected PRIVATE
         ${LUA_INCLUDE_DIRS})
 target_link_libraries(injected PRIVATE overlunky_warnings)

@@ -154,3 +154,6 @@ if(BUILD_OVERLUNKY)
                 endif()
         endif()
 endif()
+
+add_subdirectory(sockpp)
+target_include_directories(spel2_api PUBLIC sockpp/include)

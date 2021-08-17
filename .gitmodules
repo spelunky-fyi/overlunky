@@ -19,3 +19,6 @@
 [submodule "src/Detours"]
 	path = src/Detours
 	url = https://github.com/microsoft/Detours.git
+[submodule "src/sockpp"]
+	path = src/sockpp
+	url = https://github.com/fpagliughi/sockpp

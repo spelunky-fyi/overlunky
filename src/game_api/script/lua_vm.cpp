@@ -34,6 +34,7 @@
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
+#include "usertypes/socket_lua.hpp"
 
 #include "lua_libs/lua_libs.hpp"
 
@@ -50,6 +51,7 @@ void load_unsafe_libraries(sol::state& lua)
 {
     lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
     require_serpent_lua(lua);
+    NSocket::register_usertypes(lua);
 }
 void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
