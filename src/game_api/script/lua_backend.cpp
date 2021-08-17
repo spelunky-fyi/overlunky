@@ -283,7 +283,7 @@ bool LuaBackend::update()
                     cb->lastRan = now;
                     if (clear_me && clear_me.value() == false)
                     {
-                        it = level_timers.erase(it);
+                        it = global_timers.erase(it);
                         continue;
                     }
                 }
