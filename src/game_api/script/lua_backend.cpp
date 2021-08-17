@@ -279,8 +279,13 @@ bool LuaBackend::update()
             {
                 if (now >= cb->lastRan + cb->interval)
                 {
-                    handle_function(cb->func);
+                    std::optional<bool> clear_me = handle_function_with_return<bool>(cb->func);
                     cb->lastRan = now;
+                    if (clear_me && clear_me.value() == false)
+                    {
+                        it = level_timers.erase(it);
+                        continue;
+                    }
                 }
                 ++it;
             }
@@ -404,8 +409,13 @@ bool LuaBackend::update()
             {
                 if (now_l >= cb->lastRan + cb->interval)
                 {
-                    handle_function(cb->func);
+                    std::optional<bool> clear_me = handle_function_with_return<bool>(cb->func);
                     cb->lastRan = now_l;
+                    if (clear_me && clear_me.value() == false)
+                    {
+                        it = level_timers.erase(it);
+                        continue;
+                    }
                 }
                 ++it;
             }
