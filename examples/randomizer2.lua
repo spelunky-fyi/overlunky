@@ -1674,22 +1674,27 @@ end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
 register_option_bool("storage", "Random Waddler caches", true)
+local storage_bad_rooms = {ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM}
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
-    if #storages == 0 and options.storage then
+    if #storages == 0 and options.storage and not (state.world == 6 and state.level == 3) then
         local spots = {}
         for x=3,state.width*10+2 do
             for y=122,122-state.height*8+1,-1 do
-                local floor = get_grid_entity_at(x, y, LAYER.BACK)
-                local floor2 = get_grid_entity_at(x+1, y, LAYER.BACK)
-                local air = get_grid_entity_at(x, y+1, LAYER.BACK)
-                local air2 = get_grid_entity_at(x+1, y+1, LAYER.BACK)
-                if air == -1 and air2 == -1 and floor ~= -1 and floor2 ~= -1 then
-                    floor = get_entity(floor)
-                    floor2 = get_entity(floor2)
-                    local items = get_entities_at(0, MASK.ITEM | MASK.ACTIVEFLOOR, x+0.5, y+0.5, LAYER.BACK, 2)
-                    if #items == 0 and floor.type.id == ENT_TYPE.FLOOR_GENERIC and floor2.type.id == ENT_TYPE.FLOOR_GENERIC then
-                        spots[#spots+1] = { x = x, y = y }
+                local rx, ry = get_room_index(x, y)
+                local roomtype = get_room_template(rx, ry, LAYER.BACK)
+                if not has(storage_bad_rooms, roomtype) then
+                    local floor = get_grid_entity_at(x, y, LAYER.BACK)
+                    local floor2 = get_grid_entity_at(x+1, y, LAYER.BACK)
+                    local air = get_grid_entity_at(x, y+1, LAYER.BACK)
+                    local air2 = get_grid_entity_at(x+1, y+1, LAYER.BACK)
+                    if air == -1 and air2 == -1 and floor ~= -1 and floor2 ~= -1 then
+                        floor = get_entity(floor)
+                        floor2 = get_entity(floor2)
+                        local items = get_entities_at(0, MASK.ITEM | MASK.ACTIVEFLOOR, x+0.5, y+0.5, LAYER.BACK, 2)
+                        if #items == 0 and has(valid_floors, floor.type.id) and has(valid_floors, floor2.type.id) then
+                            spots[#spots+1] = { x = x, y = y }
+                        end
                     end
                 end
             end
