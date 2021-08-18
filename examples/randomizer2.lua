@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.0b"
+meta.version = "2.0c"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
@@ -112,11 +112,9 @@ local function map(x, y)
 end
 
 --[[TILECODES]]
-register_option_bool("tilecode", "Randomize floor styles", true)
-local floor_types = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOOR_JUNGLE, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_SUNKEN, ENT_TYPE.FLOORSTYLED_BEEHIVE, ENT_TYPE.FLOORSTYLED_VLAD, ENT_TYPE.FLOORSTYLED_MOTHERSHIP, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_PALACE, ENT_TYPE.FLOORSTYLED_GUTS}
-local floor_tilecodes = {floor=-1, minewood_floor=-1, stone_floor=-1, pagoda_floor=-1, babylon_floor=-1, beehive_floor=-1, cog_floor=-1, duat_floor=-1, sunken_floor=-1, icefloor=-1, palace_floor=-1, temple_floor=-1, vlad_floor=-1, shop_wall=-1, shop_woodwall=-1, shop_pagodawall=-1, pen_floor=-1}
-local falling_types = {ENT_TYPE.ACTIVEFLOOR_FALLING_PLATFORM, ENT_TYPE.ACTIVEFLOOR_THINICE, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
-local falling_tilecodes = {falling_platform=-1, thinice=-1, elevator=-1}
+register_option_bool("tilecode", "Random floor styles", true)
+local floor_types = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOOR_JUNGLE, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_SUNKEN, ENT_TYPE.FLOORSTYLED_BEEHIVE, ENT_TYPE.FLOORSTYLED_VLAD, ENT_TYPE.FLOORSTYLED_MOTHERSHIP, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_PALACE, ENT_TYPE.FLOORSTYLED_GUTS, ENT_TYPE.FLOOR_SURFACE}
+local floor_tilecodes = {floor=-1, minewood_floor=-1, stone_floor=-1, pagoda_floor=-1, babylon_floor=-1, beehive_floor=-1, cog_floor=-1, duat_floor=-1, sunken_floor=-1, icefloor=-1, palace_floor=-1, temple_floor=-1, vlad_floor=-1, shop_wall=-1, shop_woodwall=-1, shop_pagodawall=-1, pen_floor=-1, shop_sign=-1}
 
 --[[TRAPS]]
 register_option_float("trap_max", "Max trap chance", 5, 0, 100)
@@ -464,6 +462,7 @@ local function enemy_small_spawn(x, y, l)
     end
 end
 local function enemy_small_valid(x, y, l)
+    if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
     local air = get_grid_entity_at(x, y, l)
     if floor ~= -1 and air == -1 then
@@ -486,6 +485,7 @@ local function enemy_big_spawn(x, y, l)
     end
 end
 local function enemy_big_valid(x, y, l)
+    if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
     local air = get_grid_entity_at(x, y, l)
     local air2 = get_grid_entity_at(x-1, y, l)
@@ -549,6 +549,7 @@ local function enemy_air_spawn(x, y, l)
     end
 end
 local function enemy_air_valid(x, y, l)
+    if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
     local air = get_grid_entity_at(x, y, l)
     return air == -1
 end
@@ -601,7 +602,6 @@ set_callback(function(ctx)
 end, ON.POST_ROOM_GENERATION)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    --math.randomseed(read_prng()[1]+state.time_total)
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_REDSKELETON)
 
@@ -613,7 +613,6 @@ set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU then return end
     ent = ent:as_movable()
     local x, y, l = get_position(ent.uid)
-    --math.randomseed(read_prng()[1]+state.time_total)
     spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS})
 
@@ -919,12 +918,6 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         return spawn_entity_nonreplaceable(pick(all_shop_guns), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
-
-set_post_entity_spawn(function(ent)
-    set_timeout(function()
-        ent.animation_frame = pick({19, 28, 29, 39, 64, 74, 86, 87, 88, 89, 96, 97, 98, 99})
-    end, 1)
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.DECORATION_SHOPSIGNICON)
 
 --[[CONTAINERS]]
 register_option_float("pot_chance", "Pot contents chance", 25, 0, 100)
@@ -1246,23 +1239,29 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
 
+local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
 local function shuffle_tile_codes()
     for k,v in pairs(floor_tilecodes) do
         floor_tilecodes[k] = pick(floor_types, ENT_TYPE.FLOORSTYLED_COG)
+        if prng:random() < 0.15 and has(ice_themes, state.theme_next) then
+            floor_tilecodes[k] = ENT_TYPE.FLOOR_ICE
+        end
         local type = k
         set_pre_tile_code_callback(function(x, y, layer)
+            --if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
+            local above = get_grid_entity_at(x, y+1, layer)
+            if above ~= -1 then
+                above = get_entity(above)
+                if above.type.id == ENT_TYPE.FLOOR_SPIKES then
+                    return
+                end
+            end
             spawn_grid_entity(floor_tilecodes[type], x, y, layer);
             return true
         end, type)
     end
-    --[[for k,v in pairs(falling_tilecodes) do
-        falling_tilecodes[k] = pick(falling_types)
-        local type = k
-        set_pre_tile_code_callback(function(x, y, layer)
-            spawn_grid_entity(falling_tilecodes[type], x, y, layer);
-            return true
-        end, type)
-    end]]
+    floor_tilecodes["shop_wall"] = floor_tilecodes["floor"]
+    floor_tilecodes["shop_sign"] = floor_tilecodes["floor"]
 end
 
 local function init_run()
@@ -1458,6 +1457,7 @@ end, ON.TRANSITION)
 set_callback(function()
     --message("Loading")
     if state.screen_next ~= ON.LEVEL and (state.screen_next ~= ON.TRANSITION or not options.door_transitions) then return end
+    --if state.loading ~= 1 then return end
     if (#level_order == 0 or test_flag(state.quest_flags, 1)) then
         --message("Running init")
         init_run()
