@@ -176,12 +176,12 @@ bool LuaBackend::update()
         std::vector<Player*> players = get_players();
         lua["players"] = std::vector<Player*>(players);
 
-        if (g_state->loading == 1 && g_state->loading != state.loading)
+        if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
         {
             level_timers.clear();
             script_input.clear();
         }
-        if (g_state->screen != state.screen && g_state->screen_last != 5)
+        if (g_state->screen != state.screen)
         {
             if (on_screen)
                 on_screen.value()();
@@ -195,8 +195,7 @@ bool LuaBackend::update()
             if (on_camp)
                 on_camp.value()();
         }
-        if (g_state->screen == 12 && g_state->screen_last != 5 && !players.empty() &&
-            (state.player != players.at(0) || ((g_state->quest_flags & 1) == 0 && state.reset > 0)))
+        if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3)
         {
             if (g_state->level_count == 0)
             {
@@ -279,9 +278,9 @@ bool LuaBackend::update()
             {
                 if (now >= cb->lastRan + cb->interval)
                 {
-                    std::optional<bool> clear_me = handle_function_with_return<bool>(cb->func);
+                    std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
                     cb->lastRan = now;
-                    if (clear_me && clear_me.value() == false)
+                    if (!keep_going.value_or(true))
                     {
                         it = global_timers.erase(it);
                         continue;
@@ -324,7 +323,7 @@ bool LuaBackend::update()
                 handle_function(callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && state.loading != g_state->loading && g_state->loading == 3)
+            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
@@ -363,7 +362,7 @@ bool LuaBackend::update()
                 }
                 case ON::START:
                 {
-                    if (g_state->screen == (int)ON::LEVEL && g_state->level_count == 0 && state.loading != g_state->loading && g_state->loading == 3)
+                    if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->level_count == 0 && g_state->loading != state.loading && g_state->loading == 3)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -409,9 +408,9 @@ bool LuaBackend::update()
             {
                 if (now_l >= cb->lastRan + cb->interval)
                 {
-                    std::optional<bool> clear_me = handle_function_with_return<bool>(cb->func);
+                    std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
                     cb->lastRan = now_l;
-                    if (clear_me && clear_me.value() == false)
+                    if (!keep_going.value_or(true))
                     {
                         it = level_timers.erase(it);
                         continue;
