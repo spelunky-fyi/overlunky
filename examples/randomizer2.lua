@@ -111,6 +111,13 @@ local function map(x, y)
     return 0
 end
 
+--[[TILECODES]]
+register_option_bool("tilecode", "Randomize floor styles", true)
+local floor_types = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOOR_JUNGLE, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_SUNKEN, ENT_TYPE.FLOORSTYLED_BEEHIVE, ENT_TYPE.FLOORSTYLED_VLAD, ENT_TYPE.FLOORSTYLED_MOTHERSHIP, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_PALACE, ENT_TYPE.FLOORSTYLED_GUTS}
+local floor_tilecodes = {floor=-1, minewood_floor=-1, stone_floor=-1, pagoda_floor=-1, babylon_floor=-1, beehive_floor=-1, cog_floor=-1, duat_floor=-1, sunken_floor=-1, icefloor=-1, palace_floor=-1, temple_floor=-1, vlad_floor=-1, shop_wall=-1, shop_woodwall=-1, shop_pagodawall=-1, pen_floor=-1}
+local falling_types = {ENT_TYPE.ACTIVEFLOOR_FALLING_PLATFORM, ENT_TYPE.ACTIVEFLOOR_THINICE, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
+local falling_tilecodes = {falling_platform=-1, thinice=-1, elevator=-1}
+
 --[[TRAPS]]
 register_option_float("trap_max", "Max trap chance", 5, 0, 100)
 register_option_float("trap_min", "Min trap chance", 2, 0, 100)
@@ -123,6 +130,7 @@ local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TR
 local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
 local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_BEEHIVE}
+valid_floors = floor_types
 
 local function trap_ceiling_spawn(x, y, l)
     local item = pick(traps_ceiling)
@@ -912,6 +920,12 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     end
 end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
 
+set_post_entity_spawn(function(ent)
+    set_timeout(function()
+        ent.animation_frame = pick({19, 28, 29, 39, 64, 74, 86, 87, 88, 89, 96, 97, 98, 99})
+    end, 1)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.DECORATION_SHOPSIGNICON)
+
 --[[CONTAINERS]]
 register_option_float("pot_chance", "Pot contents chance", 25, 0, 100)
 register_option_float("ushabti_chance", "Correct ushabti chance", 25, 0, 100)
@@ -1232,6 +1246,25 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
 
+local function shuffle_tile_codes()
+    for k,v in pairs(floor_tilecodes) do
+        floor_tilecodes[k] = pick(floor_types, ENT_TYPE.FLOORSTYLED_COG)
+        local type = k
+        set_pre_tile_code_callback(function(x, y, layer)
+            spawn_grid_entity(floor_tilecodes[type], x, y, layer);
+            return true
+        end, type)
+    end
+    --[[for k,v in pairs(falling_tilecodes) do
+        falling_tilecodes[k] = pick(falling_types)
+        local type = k
+        set_pre_tile_code_callback(function(x, y, layer)
+            spawn_grid_entity(falling_tilecodes[type], x, y, layer);
+            return true
+        end, type)
+    end]]
+end
+
 local function init_run()
     if test_flag(state.quest_flags, 7) then
         seed_prng(state.seed)
@@ -1306,6 +1339,7 @@ local function init_run()
         { w = 2, l = 1, t = THEME.JUNGLE, b = false },
         { w = 7, l = 4, t = THEME.HUNDUN, b = true },
     }]]
+    if options.tilecode == true then shuffle_tile_codes() end
 end
 
 local function dead_olmec()
@@ -1452,6 +1486,7 @@ set_callback(function()
         state.level_next = co_level
         state.theme_next = THEME.COSMIC_OCEAN
     end
+    if options.tilecode == true then shuffle_tile_codes() end
 end, ON.LOADING)
 
 set_callback(function(ctx)
