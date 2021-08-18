@@ -186,11 +186,11 @@ bool LuaBackend::update()
             if (on_screen)
                 on_screen.value()();
         }
-        if (on_frame && g_state->time_level != state.time_level && g_state->screen == 12)
+        if (on_frame && g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
         {
             on_frame.value()();
         }
-        if (g_state->screen == 11 && state.screen != 11)
+        if (g_state->screen == (int)ON::CAMP && state.screen != (int)ON::CAMP)
         {
             if (on_camp)
                 on_camp.value()();
@@ -205,17 +205,17 @@ bool LuaBackend::update()
             if (on_level)
                 on_level.value()();
         }
-        if (g_state->screen == 13 && state.screen != 13)
+        if (g_state->screen == (int)ON::TRANSITION && state.screen != (int)ON::TRANSITION)
         {
             if (on_transition)
                 on_transition.value()();
         }
-        if (g_state->screen == 14 && state.screen != 14)
+        if (g_state->screen == (int)ON::DEATH && state.screen != (int)ON::DEATH)
         {
             if (on_death)
                 on_death.value()();
         }
-        if ((g_state->screen == 16 && state.screen != 16) || (g_state->screen == 19 && state.screen != 19))
+        if ((g_state->screen == (int)ON::WIN && state.screen != (int)ON::WIN) || (g_state->screen == (int)ON::CONSTELLATION && state.screen != (int)ON::CONSTELLATION))
         {
             if (on_win)
                 on_win.value()();
