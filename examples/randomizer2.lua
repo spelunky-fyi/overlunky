@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.0c"
+meta.version = "2.0d"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
@@ -114,21 +114,20 @@ end
 --[[TILECODES]]
 register_option_bool("tilecode", "Random floor styles", true)
 local floor_types = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOOR_JUNGLE, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_SUNKEN, ENT_TYPE.FLOORSTYLED_BEEHIVE, ENT_TYPE.FLOORSTYLED_VLAD, ENT_TYPE.FLOORSTYLED_MOTHERSHIP, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_PALACE, ENT_TYPE.FLOORSTYLED_GUTS, ENT_TYPE.FLOOR_SURFACE}
-local floor_tilecodes = {floor=-1, minewood_floor=-1, stone_floor=-1, pagoda_floor=-1, babylon_floor=-1, beehive_floor=-1, cog_floor=-1, duat_floor=-1, sunken_floor=-1, icefloor=-1, palace_floor=-1, temple_floor=-1, vlad_floor=-1, shop_wall=-1, shop_woodwall=-1, shop_pagodawall=-1, pen_floor=-1, shop_sign=-1}
+local floor_tilecodes = {floor=-1, minewood_floor=-1, stone_floor=-1, pagoda_floor=-1, babylon_floor=-1, beehive_floor=-1, cog_floor=-1, duat_floor=-1, sunken_floor=-1, icefloor=-1, palace_floor=-1, temple_floor=-1, vlad_floor=-1, shop_wall=-1, shop_pagodawall=-1, pen_floor=-1, shop_sign=-1}
 
 --[[TRAPS]]
-register_option_float("trap_max", "Max trap chance", 5, 0, 100)
+register_option_float("trap_max", "Max trap chance", 4, 0, 100)
 register_option_float("trap_min", "Min trap chance", 2, 0, 100)
 
-local traps_ceiling = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
-local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
-local traps_wall = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP}
+local traps_ceiling = {ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
+local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
+local traps_wall = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP}
 local traps_flip = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_LASER_TRAP}
-local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
+local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
-local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_BEEHIVE}
-valid_floors = floor_types
+local valid_floors = join(floor_types, {ENT_TYPE.FLOOR_ICE})
 
 local function trap_ceiling_spawn(x, y, l)
     local item = pick(traps_ceiling)
@@ -336,7 +335,7 @@ local trap_frog_chance = define_procedural_spawn("trap_frog", trap_frog_spawn, t
 
 set_callback(function(ctx)
     --math.randomseed(read_prng()[1])
-    ctx:set_procedural_spawn_chance(trap_ceiling_chance, get_chance(options.trap_min, options.trap_max))
+    ctx:set_procedural_spawn_chance(trap_ceiling_chance, math.floor(get_chance(options.trap_min, options.trap_max)*1.5))
     ctx:set_procedural_spawn_chance(trap_floor_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_wall_chance, get_chance(options.trap_min, options.trap_max))
     ctx:set_procedural_spawn_chance(trap_generic_chance, get_chance(options.trap_min, options.trap_max))
@@ -434,7 +433,7 @@ local enemies_big = {ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_LAVAMANDER, ENT_T
     ENT_TYPE.MONS_LAMASSU, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY, ENT_TYPE.MONS_CRABMAN,
     ENT_TYPE.MOUNT_MECH}
 local enemies_climb = {ENT_TYPE.MONS_FIREBUG, ENT_TYPE.MONS_MONKEY}
-local enemies_ceiling = {ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_VLAD, ENT_TYPE.MONS_HANGSPIDER}
+local enemies_ceiling = {ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_VLAD, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_HANGSPIDER}
 local enemies_air = {ENT_TYPE.MONS_MOSQUITO, ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_GRUB, ENT_TYPE.MONS_IMP, ENT_TYPE.MONS_UFO, ENT_TYPE.MONS_SCARAB}
 local enemies_kingu = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
@@ -560,7 +559,7 @@ set_callback(function(ctx)
     ctx:set_procedural_spawn_chance(enemy_small_chance, get_chance(options.enemy_min, options.enemy_max))
     ctx:set_procedural_spawn_chance(enemy_big_chance, get_chance(options.enemy_min, options.enemy_max) * 6)
     ctx:set_procedural_spawn_chance(enemy_climb_chance, get_chance(options.enemy_min, options.enemy_max) * 2)
-    ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 4)
+    ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 5)
     ctx:set_procedural_spawn_chance(enemy_air_chance, get_chance(options.enemy_min, options.enemy_max) * 12)
 
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SNAKE, 0)
@@ -1674,7 +1673,7 @@ end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
 register_option_bool("storage", "Random Waddler caches", true)
-local storage_bad_rooms = {ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM}
+local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM}
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
     if #storages == 0 and options.storage and not (state.world == 6 and state.level == 3) then
