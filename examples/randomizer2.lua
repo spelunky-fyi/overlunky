@@ -76,7 +76,6 @@ for i,v in pairs(THEME) do
     theme_name[v] = i
 end
 
-local level_stuff = {}
 local level_map = {}
 
 local function map_level()
@@ -358,15 +357,6 @@ set_callback(function()
     level_map = {}
 end, ON.PRE_LEVEL_GENERATION)
 
-set_callback(function()
-    --[[set_interval(function()
-        if options.projectile then
-            set_arrowtrap_projectile(pick(trap_arrows), pick(trap_arrows))
-        end
-    end, 15)]]
-    level_stuff = {}
-end, ON.LEVEL)
-
 set_post_entity_spawn(function(ent)
     if state.theme == THEME.DUAT then
         kill_entity(ent.uid)
@@ -474,7 +464,7 @@ local enemy_small_chance = define_procedural_spawn("enemy_small", enemy_small_sp
 
 local function enemy_big_spawn(x, y, l)
     local id = pick(enemies_big)
-    local uid = spawn_entity_snapped_to_floor(id, x-0.5, y+0.5, l)
+    local uid = spawn_entity_snapped_to_floor(id, x, y, l)
     local ent = get_entity(uid)
     if id == ENT_TYPE.MOUNT_MECH then
         local rider = spawn_entity(pick({ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_ALIEN}), x, y, l, 0, 0)
@@ -1745,3 +1735,32 @@ set_callback(function()
         end, 1)
     end
 end, ON.WIN)
+
+register_option_bool("status", "Show level progress", true)
+FakeWorld = 1
+FakeLevel = 1
+LevelNum = 1
+set_callback(function()
+    if not options.status then return end
+    local worldcount = 1
+    local levelcount = 1
+    for i,v in ipairs(level_order) do
+        if v.b and state.level_count+1 > i then
+            levelcount = 1
+            worldcount = worldcount + 1
+        elseif state.level_count+1 == i then
+            FakeWorld = worldcount
+            FakeLevel = levelcount
+        else
+            levelcount = levelcount + 1
+        end
+    end
+    LevelNum = state.level_count+1
+end, ON.LEVEL)
+
+set_callback(function(ctx)
+    if options.status and state.screen >= ON.LEVEL and state.level_count+1 <= #level_order and state.loading == 0 then
+        --ctx:draw_text(-0.065, 0.98, 28, F"{FakeWorld}-{FakeLevel}   {LevelNum}/{#level_order}", 0x44FFFFFF)
+        ctx:draw_text(0.9, 0.81, 32, F"{LevelNum}/{#level_order}", 0xBBFFFFFF)
+    end
+end, ON.GUIFRAME)
