@@ -600,7 +600,6 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU then return end
-    ent = ent:as_movable()
     local x, y, l = get_position(ent.uid)
     spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS})
@@ -635,7 +634,6 @@ end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_CAVEMAN_BOSS})
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.OLMEC then return end
-    ent = ent:as_movable()
     local x, y, l = get_position(ent.uid)
     local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
     if #players > 0 then return end
@@ -982,7 +980,6 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
 local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PICKUP_BOMBBOX}
 
 set_post_entity_spawn(function(ent)
-    ent = ent:as_container()
     --math.randomseed(read_prng()[5]+ent.uid)
     if prng:random() < options.pot_chance/100 then
         ent.inside = pick(pot_items)
@@ -990,7 +987,6 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_POT)
 
 set_post_entity_spawn(function(ent)
-    ent = ent:as_container()
     --math.randomseed(read_prng()[6]+ent.uid)
     if state.theme == THEME.ABZU and prng:random() < 0.5 then
         ent.inside = pick(abzu_crate_items)
