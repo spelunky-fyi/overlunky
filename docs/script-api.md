@@ -726,10 +726,10 @@ Alters the drop chance for the provided monster-item combination (use e.g. set_d
 `nil replace_drop(int drop_id, int new_drop_entity_type)`<br/>
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
 ### [`get_texture_definition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture_definition)
-`TextureDefinition get_texture_definition(int texture_id)`<br/>
+`TextureDefinition get_texture_definition(TEXTURE texture_id)`<br/>
 Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
 ### [`define_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_texture)
-`int define_texture(TextureDefinition texture_data)`<br/>
+`TEXTURE define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
 ### [`get_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox)
 `nil get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)`<br/>
@@ -1071,8 +1071,8 @@ Create a new color by specifying its values
 Deprecated
 Use `overlaps_with(AABB hitbox)` instead
 - [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
-- [`int get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
-- [`bool set_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
+- [`TEXTURE get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
+- [`bool set_texture(TEXTURE texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
 - [`nil set_draw_depth(int draw_depth)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) &Entity::set_draw_depth
 - [`nil liberate_from_shop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) &Entity::liberate_from_shop
 - [`Entity get_held_entity()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) &Entity::get_held_entity
@@ -2761,18 +2761,18 @@ Draw text using the built-in renderer. Use in combination with ON.RENDER_✱ eve
 - [`tuple<float, float> draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) &VanillaRenderContext::draw_text_size
 \
 Measure the provided text using the built-in renderer
-- [`nil draw_screen_texture(int texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
+- [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
-- [`nil draw_screen_texture(int texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU events
+- [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
-- [`nil draw_world_texture(int texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU events
+- [`nil draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
 \
-Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
-- [`nil draw_world_texture(int texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+- [`nil draw_world_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
 \
-Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱ events
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
@@ -3169,23 +3169,23 @@ Runs right level generation is done, before any entities are updated
 - [`RENDER_PRE_HUD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) ON::RENDER_PRE_HUD
 \
 Params: `VanillaRenderContext render_ctx`\
-Runs before the HUD is drawn on screen
+Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
 - [`RENDER_POST_HUD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) ON::RENDER_POST_HUD
 \
 Params: `VanillaRenderContext render_ctx`\
-Runs after the HUD is drawn on screen
+Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
 - [`RENDER_PRE_PAUSE_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) ON::RENDER_PRE_PAUSE_MENU
 \
 Params: `VanillaRenderContext render_ctx`\
-Runs before the pause menu is drawn on screen
+Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
 - [`RENDER_POST_PAUSE_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_PAUSE_MENU) ON::RENDER_POST_PAUSE_MENU
 \
 Params: `VanillaRenderContext render_ctx`\
-Runs after the pause menu is drawn on screen
+Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
 - [`RENDER_PRE_DRAW_DEPTH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) ON::RENDER_PRE_DRAW_DEPTH
 \
-Params: `VanillaRenderContext render_ctx, int draw_depth, AABB bounding_box`\
-Runs before the entities of the specified draw_depth are drawn on screen. You can determine whether or not to draw based on whether your element intersects with the given bounding box
+Params: `VanillaRenderContext render_ctx, int draw_depth`\
+Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \

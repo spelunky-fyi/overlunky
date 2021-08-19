@@ -462,11 +462,11 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
     return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
-std::uint64_t Entity::get_texture()
+TEXTURE Entity::get_texture()
 {
     return texture->id;
 }
-bool Entity::set_texture(std::uint64_t texture_id)
+bool Entity::set_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
     {

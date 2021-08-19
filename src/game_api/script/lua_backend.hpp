@@ -27,6 +27,7 @@ using SPAWN_TYPE = int;                       // NoAlias
 using VANILLA_SOUND = std::string;            // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
 using BUTTONS = std::uint16_t;                // NoAlias
+using TEXTURE = std::int64_t;                 // NoAlias
 
 enum class ON
 {

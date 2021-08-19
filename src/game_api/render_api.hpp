@@ -4,6 +4,8 @@
 #include "memory.hpp"
 #include "texture.hpp"
 
+using TEXTURE = std::int64_t;
+
 struct TextureDefinition
 {
     std::string texture_path;
@@ -23,7 +25,7 @@ struct RenderAPI
     size_t swap_chain_off;
 
     mutable std::mutex custom_textures_lock;
-    std::unordered_map<std::uint64_t, Texture> custom_textures;
+    std::unordered_map<TEXTURE, Texture> custom_textures;
 
     static RenderAPI& get();
 
@@ -37,15 +39,15 @@ struct RenderAPI
         return read_u64(renderer() + swap_chain_off);
     }
 
-    TextureDefinition get_texture_definition(std::uint32_t texture_id);
-    Texture* get_texture(std::uint64_t texture_id);
-    std::uint64_t define_texture(TextureDefinition data);
+    TextureDefinition get_texture_definition(TEXTURE texture_id);
+    Texture* get_texture(TEXTURE texture_id);
+    TEXTURE define_texture(TextureDefinition data);
     const char** load_texture(std::string file_name);
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
-    void draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
+    void draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
+    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
 };
 
 // straight out of the x64dbg plugin
@@ -75,7 +77,7 @@ struct RenderInfo
     bool unknown17;
     bool unknown18;
     uint32_t unknown19;
-    uint32_t unknown20;
+    uint32_t shader;
 
     // destination in world coords
     float destination_bottom_left_x; // entity.x - (entity.w/2)

@@ -48,6 +48,7 @@ using AddLayer = void (*)(void*, Entity*);
 using RemoveLayer = void (*)(void*, Entity*);
 
 using LAYER = int;
+using TEXTURE = std::int64_t;
 
 struct EntityDB
 {
@@ -248,8 +249,8 @@ class Entity
     void remove_item(uint32_t id);
     void destroy();
 
-    std::uint64_t get_texture();
-    bool set_texture(std::uint64_t texture_id);
+    TEXTURE get_texture();
+    bool set_texture(TEXTURE texture_id);
 
     void unhook(std::uint32_t id);
     struct EntityHooksInfo& get_hooks();

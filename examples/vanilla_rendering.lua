@@ -106,8 +106,7 @@ set_callback(function(render_ctx, draw_depth)
         -- reposition the crown on top of the head, starting from the center point of the player: bit to the left, bit upwards
         x = x - 0.5
         y = y + 1.15
-        sx, sy = screen_position(x, y)
-        sx2, sy2 = screen_position(x + 1.0, y - 1.0)
-        render_ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, sx, sy, sx2, sy2, white)
+        rect = AABB:new(x, y, x + 1.0, y - 1.0)
+        render_ctx:draw_world_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, rect, white)
     end
 end, ON.RENDER_PRE_DRAW_DEPTH)

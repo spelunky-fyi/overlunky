@@ -1013,19 +1013,19 @@ end
     // Runs as soon as your script is loaded, including reloads, then never again
     // RENDER_PRE_HUD
     // Params: `VanillaRenderContext render_ctx`
-    // Runs before the HUD is drawn on screen
+    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_POST_HUD
     // Params: `VanillaRenderContext render_ctx`
-    // Runs after the HUD is drawn on screen
+    // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_PAUSE_MENU
     // Params: `VanillaRenderContext render_ctx`
-    // Runs before the pause menu is drawn on screen
+    // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_POST_PAUSE_MENU
     // Params: `VanillaRenderContext render_ctx`
-    // Runs after the pause menu is drawn on screen
+    // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_DRAW_DEPTH
-    // Params: `VanillaRenderContext render_ctx, int draw_depth, AABB bounding_box`
-    // Runs before the entities of the specified draw_depth are drawn on screen. You can determine whether or not to draw based on whether your element intersects with the given bounding box
+    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     */
 
     lua.create_named_table(

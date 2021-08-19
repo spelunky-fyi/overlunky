@@ -50,7 +50,7 @@ RenderAPI& RenderAPI::get()
     return render_api;
 }
 
-TextureDefinition RenderAPI::get_texture_definition(std::uint32_t texture_id)
+TextureDefinition RenderAPI::get_texture_definition(TEXTURE texture_id)
 {
     if (Texture* tex = get_texture(texture_id))
     {
@@ -68,10 +68,10 @@ TextureDefinition RenderAPI::get_texture_definition(std::uint32_t texture_id)
     return {};
 }
 
-Texture* RenderAPI::get_texture(std::uint64_t texture_id)
+Texture* RenderAPI::get_texture(TEXTURE texture_id)
 {
     auto* textures = get_textures();
-    if (texture_id >= textures->texture_map.size())
+    if (texture_id >= static_cast<int64_t>(textures->texture_map.size()))
     {
         std::lock_guard lock{custom_textures_lock};
         return &custom_textures[texture_id];
@@ -79,7 +79,7 @@ Texture* RenderAPI::get_texture(std::uint64_t texture_id)
     return textures->texture_map[texture_id];
 }
 
-std::uint64_t RenderAPI::define_texture(TextureDefinition data)
+TEXTURE RenderAPI::define_texture(TextureDefinition data)
 {
 
     if (data.sub_image_width == 0 || data.sub_image_height == 0)
@@ -92,7 +92,7 @@ std::uint64_t RenderAPI::define_texture(TextureDefinition data)
 
     auto* textures = get_textures();
     Texture new_texture{
-        textures->texture_map.size() + custom_textures.size() + 1,
+        static_cast<int64_t>(textures->texture_map.size() + custom_textures.size() + 1),
         nullptr,
         data.width,
         data.height,
@@ -236,7 +236,7 @@ std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float
     return std::make_pair(tri.width, tri.height);
 }
 
-void RenderAPI::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
+void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
     static size_t offset = 0;
 
@@ -305,30 +305,14 @@ void RenderAPI::draw_screen_texture(uint32_t texture_id, uint8_t row, uint8_t co
         typedef void render_func(TextureRenderingInfo*, uint8_t shader, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
         rf(&tri, 0x29, texture->name, &color);
-        // < 0x27: invisible
-        // 0x27: all white
-        // 0x28: normal but a bit transparent
-        // 0x29: normal but a bit transparent
-        // 0x2a: normal but a lot transparent
-        // 0x2b: normal but a bit transparent
-        // 0x2c: all white
-        // 0x2d: everything red and blurry
-        // 0x2e: normal but a bit transparent
-        // 0x2f: grayscale and a bit transparent
-        // 0x30: everything red and blurry
-        // 0x31: normal but a bit transparent
-        // 0x32: grayscale and a lot transparent
-        // 0x33: all white
-        // 0x34: transparent parts become black
-        // > 0x36: crash
     }
 }
 
-void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
+void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
     static size_t func_offset = 0;
-    static size_t param_7 = 0;
-    uint8_t shader = 0x7; // this comes from RenderInfo->shader (which might just be 8 bit instead of 32)
+    static size_t param_9 = 0;
+    uint8_t shader = 0x7; // this comes from RenderInfo->shader
 
     auto& memory = Memory::get();
     auto exe = memory.exe();
@@ -339,7 +323,7 @@ void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t col
         func_offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
 
         auto offset = find_inst(exe, "\x4C\x8D\x0D\x59\xAF\x0F\x00"s, memory.after_bundle);
-        param_7 = memory.at_exe(decode_pc(exe, offset));
+        param_9 = memory.at_exe(decode_pc(exe, offset));
     }
 
     if (func_offset != 0)
@@ -390,19 +374,20 @@ void RenderAPI::draw_world_texture(uint32_t texture_id, uint8_t row, uint8_t col
             uv_top,
         };
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, bool render_as_non_liquid, float* destination, float* source, void*, void*, void*, void*, Color*, float*);
+        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, float* source, void*, void*, void*, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         size_t stack_filler = 0;
-        rf(renderer(), shader, &texture->name, true, destination, source, (void*)stack_filler, (void*)stack_filler, (void*)param_7, (void*)stack_filler, &color, nullptr);
+        auto texture_name = texture->name;
+        rf(renderer(), shader, &texture_name, 1, destination, source, (void*)stack_filler, (void*)stack_filler, (void*)param_9, (void*)stack_filler, &color, nullptr);
     }
 }
 
-using FetchTexture = const Texture*(class Entity*, uint32_t);
+using FetchTexture = const Texture*(class Entity*, TEXTURE);
 FetchTexture* g_fetch_texture_trampoline{nullptr};
-const Texture* fetch_texture(class Entity* source_entity, uint32_t texture_id)
+const Texture* fetch_texture(class Entity* source_entity, TEXTURE texture_id)
 {
     auto* textures = get_textures();
-    if (texture_id >= textures->texture_map.size())
+    if (texture_id >= static_cast<int64_t>(textures->texture_map.size()))
     {
         const auto& render_api = RenderAPI::get();
         std::lock_guard lock{render_api.custom_textures_lock};

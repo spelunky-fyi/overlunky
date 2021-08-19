@@ -5,7 +5,7 @@
 
 struct Texture
 {
-    std::uint64_t id;
+    std::int64_t id;
     const char** name;
     std::uint32_t width;
     std::uint32_t height;
