@@ -376,7 +376,7 @@ function set_moving_piece_if_valid(piece)
     end
     local is_valid = true
     call_fn_for_xy_in_piece(piece, function(x, y)
-        ents = get_entities_at(0, 0x180, x+2, 124-y, LAYER.FRONT, 0.65)
+        ents = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x+2, 124-y, LAYER.FRONT, 0.65)
         if #ents > 0 then
             local is_moving = false
             for i,v in ipairs(ents) do
@@ -458,7 +458,7 @@ function update_moving_piece(fall, next_piece)
     if not set_moving_piece_if_valid(moving_piece) then
         ex = moving_piece.x + 4 + math.random(-1, 1)
         ey = 124 - moving_piece.y - 2 + math.random(-1, 1)
-        trash = get_entities_at(0, 0x180, ex, ey, LAYER.FRONT, 8)
+        trash = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, ex, ey, LAYER.FRONT, 8)
         for i,v in ipairs(trash) do
             ent = get_entity(v)
             ent.flags = clr_flag(ent.flags, 6)
@@ -546,7 +546,7 @@ function check_lines()
         if is_full_line then
             local really_full = true
             for x = 1, board_size.x do
-                ent = get_entities_at(0, 0x180, x+2, 124-line_y, LAYER.FRONT, 0.5)
+                ent = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x+2, 124-line_y, LAYER.FRONT, 0.5)
                 if #ent == 0 then
                     board[x][line_y] = val.empty
                     really_full = false
@@ -635,7 +635,7 @@ function level_to_board(all)
             for y = board_size.y - 10, board_size.y, 1 do
                 gx = x + 2
                 gy = 124 - y
-                block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                block = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, gx, gy, LAYER.FRONT, 0.5)
                 if #block > 0 then
                     board[x][y] = 8
                 end
@@ -649,14 +649,14 @@ function level_to_board(all)
                 if board[nx][ny] > 0 then
                     gx = nx + 2
                     gy = 124 - ny
-                    block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                    block = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, gx, gy, LAYER.FRONT, 0.5)
                     if #block == 0 then
                         board[nx][ny] = 0
                     end
                 --[[elseif board[nx][ny] == 0 then
                     gx = nx + 2
                     gy = 124 - ny
-                    block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                    block = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, gx, gy, LAYER.FRONT, 0.5)
                     if #block == 0 then
                         is_moving = false
                         for i,v in ipairs(block) do
@@ -859,7 +859,7 @@ function clear_stage()
             osiris = get_entities_by_type(ENT_TYPE.MONS_OSIRIS_HEAD)
             for i,v in ipairs(osiris) do
                 x, y, l = get_position(v)
-                blocks = get_entities_at(0, 0x180, x, y, l, 2.4)
+                blocks = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x, y, l, 2.4)
                 for j,w in ipairs(blocks) do
                     kill_entity(w)
                 end

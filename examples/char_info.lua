@@ -4,7 +4,7 @@ meta.description = "Draws character names and royal title in their respective co
 meta.author = "Malacath"
 
 set_callback(function(draw_ctx)
-    local chars = get_entities_by_mask(MASK.PLAYER)
+    local chars = get_entities_by(0, MASK.PLAYER, LAYER.BOTH)
     for _, char_uid in pairs(chars) do
         local char = get_entity(char_uid)
         local royal_title = nil

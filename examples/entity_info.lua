@@ -12,7 +12,8 @@ end
 set_callback(function(draw_ctx)
     if #players < 1 then return end
     x, y, l = get_render_position(players[1].uid)
-    ents = get_entities_at(0, 255, x, y, l, 30)
+    mask = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.EXPLOSION | MASK.ROPE | MASK.FX | MASK.ACTIVEFLOOR
+    ents = get_entities_at(0, mask, x, y, l, 30)
     for i,v in ipairs(ents) do
         ex, ey, el = get_render_position(v)
         e = get_entity(v)
@@ -34,7 +35,7 @@ set_callback(function(draw_ctx)
         end
     end
 
-    ents = get_entities_at(0, 0x100, x, y, l, 30)
+    ents = get_entities_at(0, MASK.FLOOR, x, y, l, 30)
     for i,v in ipairs(ents) do
         e = get_entity(v)
         if e ~= nil and string.match(names[e.type.id], "TRAP") then

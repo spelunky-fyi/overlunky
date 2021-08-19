@@ -37,7 +37,8 @@ end, ON.GUIFRAME)
 set_callback(function(draw_ctx)
     if #players < 1 then return end
     x, y, l = get_position(players[1].uid)
-    ents = get_entities_at(0, 255, x, y, l, 30)
+    mask = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.EXPLOSION | MASK.ROPE | MASK.FX | MASK.ACTIVEFLOOR
+    ents = get_entities_at(0, mask, x, y, l, 30)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
         e = get_entity(v)
@@ -70,7 +71,7 @@ end, ON.GUIFRAME)
 set_callback(function(draw_ctx)
     if #players < 1 then return end
     px, py, pl = get_position(players[1].uid)
-    ents = get_entities_by_mask(0x100)
+    ents = get_entities_by(0, MASK.FLOOR, LAYER.BOTH)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
         e = get_entity(v)
