@@ -567,6 +567,15 @@ void LuaBackend::render_options()
     ImGui::PopID();
 }
 
+bool LuaBackend::is_callback_cleared(int32_t callback_id)
+{
+    return std::count(clear_callbacks.begin(), clear_callbacks.end(), callback_id);
+}
+bool LuaBackend::is_entity_callback_cleared(std::pair<int, uint32_t> callback_id)
+{
+    return std::count(clear_entity_hooks.begin(), clear_entity_hooks.end(), callback_id);
+}
+
 bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
     if (!get_enabled())
@@ -574,6 +583,9 @@ bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int
 
     for (auto& callback : pre_tile_code_callbacks)
     {
+        if (is_callback_cleared(callback.id))
+            continue;
+
         if (callback.tile_code == tile_code)
         {
             if (handle_function_with_return<bool>(callback.func, x, y, layer, room_template).value_or(false))
@@ -591,6 +603,9 @@ void LuaBackend::post_tile_code(std::string_view tile_code, float x, float y, in
 
     for (auto& callback : post_tile_code_callbacks)
     {
+        if (is_callback_cleared(callback.id))
+            continue;
+
         if (callback.tile_code == tile_code)
         {
             handle_function(callback.func, x, y, layer, room_template);
@@ -608,6 +623,9 @@ void LuaBackend::pre_load_level_files()
     std::lock_guard lock{gil};
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == ON::PRE_LOAD_LEVEL_FILES)
         {
             handle_function(callback.func, PreLoadLevelFilesContext{});
@@ -628,6 +646,9 @@ void LuaBackend::pre_level_generation()
 
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == ON::PRE_LEVEL_GENERATION)
         {
             handle_function(callback.func);
@@ -645,6 +666,9 @@ void LuaBackend::post_room_generation()
     std::lock_guard lock{gil};
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == ON::POST_ROOM_GENERATION)
         {
             handle_function(callback.func, PostRoomGenerationContext{});
@@ -665,6 +689,9 @@ void LuaBackend::post_level_generation()
 
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == ON::POST_LEVEL_GENERATION)
         {
             handle_function(callback.func);
@@ -680,6 +707,9 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
 
     for (auto& callback : pre_entity_spawn_callbacks)
     {
+        if (is_callback_cleared(callback.id))
+            continue;
+
         bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
         if (mask_match && flags_match)
@@ -703,6 +733,9 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
 
     for (auto& callback : post_entity_spawn_callbacks)
     {
+        if (is_callback_cleared(callback.id))
+            continue;
+
         bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
         if (mask_match && flags_match)

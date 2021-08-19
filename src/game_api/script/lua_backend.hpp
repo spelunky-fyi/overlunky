@@ -247,6 +247,9 @@ class LuaBackend
     void draw(ImDrawList* dl);
     void render_options();
 
+    bool is_callback_cleared(int32_t callback_id);
+    bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
+
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 
