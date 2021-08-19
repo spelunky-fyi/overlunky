@@ -21,6 +21,7 @@
 #pragma warning(push, 0)
 #include <toml.hpp>
 #pragma warning(pop)
+#include <fmt/core.h>
 
 #include "console.hpp"
 #include "entities_chars.hpp"
@@ -2138,7 +2139,7 @@ void render_narnia()
     }
     if (target->world > 0)
     {
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (ImGui::Button(buf.c_str()))
         {
             warp_inc(target->world, target->level, target->theme);
@@ -2158,7 +2159,7 @@ void render_narnia()
         if (!target->enabled)
             continue;
 
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (n > 0)
             ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
@@ -2175,7 +2176,7 @@ void render_narnia()
         target->level = 4;
         target->theme = 12;
 
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
         {
@@ -2522,7 +2523,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                     auto room_pos = g_state->level_gen->get_room_pos(x, y);
                     auto pos = screen_position(room_pos.first, room_pos.second);
                     ImVec2 spos = screenify({pos.first, pos.second});
-                    std::string room_text = std::format("{:d},{:d} {:s}", x, y, room_name);
+                    std::string room_text = fmt::format("{:d},{:d} {:s}", x, y, room_name);
                     draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
                 }
             }
@@ -2749,7 +2750,7 @@ void render_clickhandler()
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
             //std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
-            std::string buf = std::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
+            std::string buf = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
             //char buf2[32];
             //sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
             dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
@@ -2765,7 +2766,7 @@ void render_clickhandler()
                 render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
                 auto ptype = entity_type(hovered);
                 const char* pname = entity_names[ptype].c_str();
-                std::string buf3 = std::format("{}, {}", hovered, pname);
+                std::string buf3 = fmt::format("{}, {}", hovered, pname);
                 dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
             }
         }
@@ -3301,7 +3302,7 @@ void render_scripts()
         size_t slash = script->get_file().find_last_of("/\\");
         if (slash != std::string::npos)
             filename = script->get_file().substr(slash + 1);
-        std::string name = std::format("{} ({})", script->get_name(), filename);
+        std::string name = fmt::format("{} ({})", script->get_name(), filename);
         if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
@@ -4365,7 +4366,7 @@ void render_keyconfig()
         ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         ImGui::PushFont(bigfont);
-        std::string buf = std::format("Enter new key/button combo for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
+        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
         ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
         dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
         ImGui::PopFont();
@@ -4512,7 +4513,7 @@ void imgui_init(ImGuiContext*)
 void imgui_draw()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    std::string buf = std::format("Overlunky {}", TOSTRING(GIT_VERSION));
+    std::string buf = fmt::format("Overlunky {}", TOSTRING(GIT_VERSION));
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
