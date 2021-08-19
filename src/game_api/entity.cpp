@@ -219,6 +219,8 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == layer_to || layer_to > 1 || layer_to < 0)
         return;
     auto state = State::get();
+    if (this != this->topmost_mount())
+        this->topmost_mount()->set_layer(layer_to);
 
     if (layer == 0 || layer == 1)
     {
@@ -230,6 +232,13 @@ void Entity::set_layer(LAYER layer_to)
     auto ptr_to = state.ptr()->layers[layer_to];
     auto add_layer_func = get_add_layer();
     add_layer_func(ptr_to, this);
+
+    int* pitems = (int*)items.begin;
+    for (uint8_t idx = 0; idx < items.count; ++idx)
+    {
+        auto item = get_entity_ptr(pitems[idx]);
+        item->set_layer(layer_to);
+    }
 }
 
 void Entity::remove()
@@ -238,6 +247,13 @@ void Entity::remove()
     auto ptr_from = state.ptr()->layers[layer];
     auto remove_layer_func = get_remove_layer();
     remove_layer_func(ptr_from, this);
+
+    int* pitems = (int*)items.begin;
+    for (uint8_t idx = 0; idx < items.count; ++idx)
+    {
+        auto item = get_entity_ptr(pitems[idx]);
+        item->remove();
+    }
 }
 
 std::pair<float, float> Entity::position()
