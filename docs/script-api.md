@@ -159,7 +159,7 @@ Same as `prinspect`
 Adds a command that can be used in the console.
 ### [`set_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_interval)
 `CallbackId set_interval(function cb, int frames)`<br/>
-Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
 Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
 ### [`set_timeout`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_timeout)
 `CallbackId set_timeout(function cb, int frames)`<br/>
@@ -167,7 +167,7 @@ Returns unique id for the callback to be used in [clear_callback](#clear_callbac
 Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
 ### [`set_global_interval`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_interval)
 `CallbackId set_global_interval(function cb, int frames)`<br/>
-Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
 Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
 ### [`set_global_timeout`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_timeout)
 `CallbackId set_global_timeout(function cb, int frames)`<br/>
