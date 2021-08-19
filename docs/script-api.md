@@ -103,31 +103,6 @@ The game uses specific buffers for specific scenarios, for example the third buf
 The used buffer is determined by [`PRNG_CLASS`](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
 If you don't care what part of the game you affect just use `prng.random`.
 The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
-## Event functions
-Define these in your script to be called on an event. For example:
-```lua
-function on_level()
-    toast("Welcome to the level")
-end
-```
-### [`on_frame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_frame)
-Runs on every game engine frame.
-### [`on_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_camp)
-Runs on entering the camp.
-### [`on_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_level)
-Runs on the start of every level.
-### [`on_start`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_start)
-Runs on the start of first level.
-### [`on_transition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_transition)
-Runs on the start of level transition.
-### [`on_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_death)
-Runs on the death screen.
-### [`on_win`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_win)
-Runs on any ending cutscene.
-### [`on_screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_screen)
-Runs on any [screen change](#on).
-### [`on_guiframe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_guiframe)
-Runs on every screen frame. You need this to use draw functions.
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
@@ -739,6 +714,24 @@ Same as `get_hitbox` but based on `get_render_position`
 Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
 ## Deprecated Functions
 #### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!
+### [`on_frame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_frame)
+Use `set_callback(function, ON.FRAME)` instead
+### [`on_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_camp)
+Use `set_callback(function, ON.CAMP)` instead
+### [`on_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_level)
+Use `set_callback(function, ON.LEVEL)` instead
+### [`on_start`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_start)
+Use `set_callback(function, ON.START)` instead
+### [`on_transition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_transition)
+Use `set_callback(function, ON.TRANSITION)` instead
+### [`on_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_death)
+Use `set_callback(function, ON.DEATH)` instead
+### [`on_win`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_win)
+Use `set_callback(function, ON.WIN)` instead
+### [`on_screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_screen)
+Use `set_callback(function, ON.SCREEN)` instead
+### [`on_guiframe`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_guiframe)
+Use `set_callback(function, ON.GUIFRAME)` instead
 ### [`force_dark_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_dark_level)
 `nil force_dark_level(bool g)`<br/>
 Set level flag 18 on post room generation instead, to properly force every level to dark
