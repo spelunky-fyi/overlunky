@@ -176,7 +176,7 @@ bool LuaBackend::update()
         std::vector<Player*> players = get_players();
         lua["players"] = std::vector<Player*>(players);
 
-        if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
+        if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
         {
             level_timers.clear();
             script_input.clear();
