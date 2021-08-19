@@ -180,7 +180,7 @@ end
         }
     };
 
-    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
@@ -199,7 +199,7 @@ end
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
-    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
