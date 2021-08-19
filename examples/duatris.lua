@@ -186,7 +186,7 @@ function init()
         gy = 124 - y
         id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
         newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
-        ent = get_entity(newid):as_movable()
+        ent = get_entity(newid)
         newflags = set_flag(ent.flags, 10) -- disable gravity
         newflags = set_flag(newflags, 6) -- disable damage
         newflags = clr_flag(newflags, 13) -- disable push
@@ -460,7 +460,7 @@ function update_moving_piece(fall, next_piece)
         ey = 124 - moving_piece.y - 2 + math.random(-1, 1)
         trash = get_entities_at(0, 0x180, ex, ey, LAYER.FRONT, 8)
         for i,v in ipairs(trash) do
-            ent = get_entity(v):as_movable()
+            ent = get_entity(v)
             ent.flags = clr_flag(ent.flags, 6)
         end
         spawn(ENT_TYPE.FX_POWEREDEXPLOSION, ex, ey, LAYER.FRONT, 0, 0)
@@ -473,7 +473,7 @@ function update_moving_piece(fall, next_piece)
             gy = 124 - y
             id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
             newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
-            ent = get_entity(newid):as_movable()
+            ent = get_entity(newid)
             newflags = set_flag(ent.flags, 10) -- disable gravity
             newflags = set_flag(newflags, 6) -- disable damage
             newflags = clr_flag(newflags, 13) -- disable push
@@ -507,14 +507,14 @@ function replace_with_trap(blockid)
     set_timeout(function()
         x, y, l = get_position(blockid)
         if x > 0 then
-            ent = get_entity(blockid):as_movable()
+            ent = get_entity(blockid)
             r = ent.color.r
             g = ent.color.g
             b = ent.color.b
             trapid = generic_to[math.random(#generic_to)]
             kill_entity(blockid)
             newid = spawn(trapid, x, y, l, 0, 0)
-            trap = get_entity(newid):as_movable()
+            trap = get_entity(newid)
             if trapid == ENT_TYPE.ACTIVEFLOOR_POWDERKEG then
                 trap.color.r = 0.5
                 trap.color.g = 0
@@ -559,7 +559,7 @@ function check_lines()
                 local apep_x = -1
                 if math.random() < 0.5 then apep_x = 36 end
                 apepid = spawn(ENT_TYPE.MONS_APEP_HEAD, apep_x, 124-line_y, LAYER.FRONT, 0, 0)
-                ent = get_entity(apepid):as_movable()
+                ent = get_entity(apepid)
                 ent.hitboxy = 0.1
                 give_gift = true
                 toast('The gods bestow a gift upon you!')
@@ -581,7 +581,6 @@ function lock_and_update_moving_piece(fall, next_piece)
             move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
             ent = get_entity(moving_blocks[block_i])
             if ent == nil then return end
-            ent = ent:as_movable()
             if ent then
                 ent.flags = clr_flag(ent.flags, 6) -- enable damage
                 -- ent.color.a = 1
@@ -775,7 +774,6 @@ function game_over()
     for i,v in ipairs(moving_blocks) do
         ent = get_entity(v)
         if ent then
-            ent = ent:as_movable()
             ent.flags = clr_flag(ent.flags, 6) -- enable damage
         end
     end

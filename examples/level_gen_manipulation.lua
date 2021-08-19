@@ -31,8 +31,7 @@ set_pre_tile_code_callback(function(x, y, layer)
     end
     ent.flags = ent_flags
     ent.animation_frame = 13 * 16 + 13
-    local mov = ent:as_movable()
-    mov.offsety = mov.offsety + 0.1
+    ent.offsety = ent.offsety + 0.1
     return true
 end, "spikes")
 

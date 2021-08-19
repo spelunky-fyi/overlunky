@@ -7,7 +7,7 @@ set_callback(function(draw_ctx)
     olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
     x = -0.95
     for i, olmec_uid in ipairs(olmecs) do
-        olmec = get_entity(olmec_uid):as_olmec()
+        olmec = get_entity(olmec_uid)
         y = -0.50
         white = rgba(255, 255, 255, 255)
 

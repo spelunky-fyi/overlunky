@@ -40,7 +40,7 @@ set_callback(function(draw_ctx)
     ents = get_entities_at(0, 255, x, y, l, 30)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v):as_movable()
+        e = get_entity(v)
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if e.health > 0 then
             draw_ctx:draw_text(sx, sy, 0, tostring(v).."\n"..tostring(e.health).." HP", rgba(255, 255, 255, 255))
@@ -55,7 +55,7 @@ set_callback(function(draw_ctx)
     ents = get_entities_by_type(ENT_TYPE.LOGICAL_DOOR)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v):as_movable()
+        e = get_entity(v)
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if l == pl then
             draw_ctx:draw_text(sx, sy, 0, tostring(v), rgba(255, 255, 255, 255))
@@ -73,7 +73,7 @@ set_callback(function(draw_ctx)
     ents = get_entities_by_mask(0x100)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v):as_movable()
+        e = get_entity(v)
         if test_flag(e.flags, 24) and l == pl then
             sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
             sx2, sy2 = screen_position(x+e.hitboxx+e.offsetx, y-e.hitboxy+e.offsety) -- bottom right

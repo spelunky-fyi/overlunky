@@ -6,7 +6,7 @@ meta.author = "Malacath"
 set_callback(function(draw_ctx)
     local chars = get_entities_by_mask(MASK.PLAYER)
     for _, char_uid in pairs(chars) do
-        local char = get_entity(char_uid):as_player()
+        local char = get_entity(char_uid)
         local royal_title = nil
         if char:is_female() then
             royal_title = 'Queen'
