@@ -262,7 +262,8 @@ class Entity
     bool is_movable();
 
     std::uint32_t set_on_destroy(std::function<void(Entity*)> cb);
-    std::uint32_t set_on_kill(std::function<void(Entity*, Entity*)> on_kill);
+    std::uint32_t reserve_callback_id();
+    void set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill);
 
     template <typename T>
     T* as()
