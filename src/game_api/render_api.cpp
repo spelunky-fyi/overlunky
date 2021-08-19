@@ -265,9 +265,9 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
         float center_y = top + half_height;
 
         float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
-        float uv_right = (texture->tile_width_fraction * (column + 1)) - texture->offset_x_weird_math;
+        float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
         float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
-        float uv_bottom = (texture->tile_height_fraction * (row + 1)) - texture->offset_y_weird_math;
+        float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
 
         TextureRenderingInfo tri = {
             center_x,
@@ -355,9 +355,9 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
             unknown};
 
         float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
-        float uv_right = (texture->tile_width_fraction * (column + 1)) - texture->offset_x_weird_math;
+        float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
         float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
-        float uv_bottom = (texture->tile_height_fraction * (row + 1)) - texture->offset_y_weird_math;
+        float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
 
         float source[8] = {
             // bottom left:
