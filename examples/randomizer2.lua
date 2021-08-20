@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.0d"
+meta.version = "2.0e"
 meta.author = "Dregu"
 
 local function get_chance(min, max)
@@ -364,7 +364,7 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
 
 set_callback(function()
-    if state.theme ~= THEME.DUAT then return end
+    if state.theme ~= THEME.DUAT or state.level_gen.spawn_y < 47 then return end
     local box = AABB:new()
     box.top = state.level_gen.spawn_y - 2
     box.bottom = state.level_gen.spawn_y - 3
