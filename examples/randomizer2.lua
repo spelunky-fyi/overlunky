@@ -2,8 +2,78 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.0d"
+meta.version = "2.0e"
 meta.author = "Dregu"
+
+--[[OPTIONS]]
+local real_default_options = {
+    tilecode = true,
+    trap_max = 4,
+    trap_min = 2,
+    enemy_max = 12,
+    enemy_min = 5,
+    enemy_curse_chance = 5,
+    room_shop_chance = 15,
+    room_big_chance = 15,
+    room_big_min = 8,
+    room_big_max = 15,
+    room_dark = 4,
+    pot_chance = 25,
+    ushabti_chance = 25,
+    stats_health_max = 20,
+    stats_bombs_max = 20,
+    stats_ropes_max = 20,
+    door_min_levels = 3,
+    door_max_levels = 6,
+    door_bosses = 4,
+    door_transitions = false,
+    projectile = true,
+    storage = true,
+    status = true
+}
+local default_options = table.unpack({real_default_options})
+local function register_options()
+    register_option_bool("tilecode", "Random floor styles", default_options.tilecode)
+    register_option_float("trap_max", "Max trap chance", default_options.trap_max, 0, 100)
+    register_option_float("trap_min", "Min trap chance", default_options.trap_min, 0, 100)
+    register_option_float("enemy_max", "Max enemy chance", default_options.enemy_max, 0, 100)
+    register_option_float("enemy_min", "Min enemy chance", default_options.enemy_min, 0, 100)
+    register_option_float("enemy_curse_chance", "Enemy handicap chance", default_options.enemy_curse_chance, 0, 100)
+    register_option_float("room_shop_chance", "Extra shop chance", default_options.room_shop_chance, 0, 100)
+    register_option_float("room_big_chance", "Huge level chance", default_options.room_big_chance, 0, 100)
+    register_option_int("room_big_min", "Huge level min height", default_options.room_big_min, 8, 15)
+    register_option_int("room_big_max", "Huge level max height", default_options.room_big_max, 8, 15)
+    register_option_float("room_dark", "Dark level chance", default_options.room_dark, 0, 100)
+    register_option_float("pot_chance", "Pot contents chance", default_options.pot_chance, 0, 100)
+    register_option_float("ushabti_chance", "Correct ushabti chance", default_options.ushabti_chance, 0, 100)
+    register_option_int("stats_health_max", "Max starting health", default_options.stats_health_max, 4, 99)
+    register_option_int("stats_bombs_max", "Max starting bombs", default_options.stats_bombs_max, 4, 99)
+    register_option_int("stats_ropes_max", "Max starting ropes", default_options.stats_ropes_max, 4, 99)
+    register_option_int("door_min_levels", "Min levels between midbosses", default_options.door_min_levels, 1, 100)
+    register_option_int("door_max_levels", "Max levels between midbosses", default_options.door_max_levels, 1, 100)
+    register_option_int("door_bosses", "Amount of midbosses", default_options.door_bosses, 0, 4)
+    register_option_bool("door_transitions", "Neat transitions (maybe crashy)", default_options.door_transitions)
+    register_option_bool("projectile", "Random projectiles", default_options.projectile)
+    register_option_bool("storage", "Random Waddler caches", default_options.storage)
+    register_option_bool("status", "Show level progress", default_options.status)
+    register_option_button("zreset", "Reset to defaults", function()
+        default_options = table.unpack({real_default_options})
+        register_options()
+    end)
+end
+
+set_callback(function(ctx)
+    local save_str = json.encode(options)
+    ctx:save(save_str)
+end, ON.SAVE)
+
+set_callback(function(ctx)
+    local load_str = ctx:load()
+    if load_str ~= "" then
+        default_options = json.decode(load_str)
+    end
+    register_options()
+end, ON.LOAD)
 
 local function get_chance(min, max)
     if max == 0 then return 0 end
@@ -111,14 +181,10 @@ local function map(x, y)
 end
 
 --[[TILECODES]]
-register_option_bool("tilecode", "Random floor styles", true)
 local floor_types = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOOR_JUNGLE, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_SUNKEN, ENT_TYPE.FLOORSTYLED_BEEHIVE, ENT_TYPE.FLOORSTYLED_VLAD, ENT_TYPE.FLOORSTYLED_MOTHERSHIP, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_PALACE, ENT_TYPE.FLOORSTYLED_GUTS, ENT_TYPE.FLOOR_SURFACE}
 local floor_tilecodes = {floor=-1, minewood_floor=-1, stone_floor=-1, pagoda_floor=-1, babylon_floor=-1, beehive_floor=-1, cog_floor=-1, duat_floor=-1, sunken_floor=-1, icefloor=-1, palace_floor=-1, temple_floor=-1, vlad_floor=-1, shop_wall=-1, pen_floor=-1, shop_sign=-1}
 
 --[[TRAPS]]
-register_option_float("trap_max", "Max trap chance", 4, 0, 100)
-register_option_float("trap_min", "Min trap chance", 2, 0, 100)
-
 local traps_ceiling = {ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
 local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
 local traps_wall = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP}
@@ -364,7 +430,7 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
 
 set_callback(function()
-    if state.theme ~= THEME.DUAT then return end
+    if state.theme ~= THEME.DUAT or state.level_gen.spawn_y < 47 then return end
     local box = AABB:new()
     box.top = state.level_gen.spawn_y - 2
     box.bottom = state.level_gen.spawn_y - 3
@@ -401,9 +467,6 @@ set_callback(function()
 end, ON.FRAME)
 
 --[[ENEMIES]]
-register_option_float("enemy_max", "Max enemy chance", 12, 0, 100)
-register_option_float("enemy_min", "Min enemy chance", 5, 0, 100)
-register_option_float("enemy_curse_chance", "Enemy handicap chance", 5, 0, 100)
 
 local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
@@ -600,7 +663,6 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU then return end
-    ent = ent:as_movable()
     local x, y, l = get_position(ent.uid)
     spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS})
@@ -635,7 +697,6 @@ end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_CAVEMAN_BOSS})
 
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.OLMEC then return end
-    ent = ent:as_movable()
     local x, y, l = get_position(ent.uid)
     local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
     if #players > 0 then return end
@@ -698,11 +759,6 @@ set_callback(function()
 end, ON.LEVEL)
 
 --[[ROOMS]]
-register_option_float("room_shop_chance", "Extra shop chance", 15, 0, 100)
-register_option_float("room_big_chance", "Huge level chance", 15, 0, 100)
-register_option_int("room_big_min", "Huge level min height", 8, 8, 15)
-register_option_int("room_big_max", "Huge level max height", 15, 8, 15)
-register_option_float("room_dark", "Dark level chance", 4, 0, 100)
 
 local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.PATH_NORMAL] = true,
@@ -909,8 +965,6 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
 
 --[[CONTAINERS]]
-register_option_float("pot_chance", "Pot contents chance", 25, 0, 100)
-register_option_float("ushabti_chance", "Correct ushabti chance", 25, 0, 100)
 
 local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_GIANTSPIDER,
          ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_REDSKELETON,
@@ -982,7 +1036,6 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
 local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PICKUP_BOMBBOX}
 
 set_post_entity_spawn(function(ent)
-    ent = ent:as_container()
     --math.randomseed(read_prng()[5]+ent.uid)
     if prng:random() < options.pot_chance/100 then
         ent.inside = pick(pot_items)
@@ -990,7 +1043,6 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_POT)
 
 set_post_entity_spawn(function(ent)
-    ent = ent:as_container()
     --math.randomseed(read_prng()[6]+ent.uid)
     if state.theme == THEME.ABZU and prng:random() < 0.5 then
         ent.inside = pick(abzu_crate_items)
@@ -1019,9 +1071,6 @@ set_callback(function()
 end, ON.POST_LEVEL_GENERATION)
 
 --[[STATS]]
-register_option_int("stats_health_max", "Max starting health", 20, 4, 99)
-register_option_int("stats_bombs_max", "Max starting bombs", 20, 4, 99)
-register_option_int("stats_ropes_max", "Max starting ropes", 20, 4, 99)
 
 set_callback(function()
     --math.randomseed(read_prng()[1])
@@ -1033,10 +1082,6 @@ set_callback(function()
 end, ON.START)
 
 --[[DOORS]]
-register_option_int("door_min_levels", "Min levels between midbosses", 3, 1, 100)
-register_option_int("door_max_levels", "Max levels between midbosses", 6, 1, 100)
-register_option_int("door_bosses", "Amount of midbosses", 4, 0, 4)
-register_option_bool("door_transitions", "Neat transitions (maybe crashy)", false)
 
 local level_order = {}
 
@@ -1611,7 +1656,6 @@ set_callback(function()
 end, ON.DEATH)
 
 --[[PROJECTILES]]
-register_option_bool("projectile", "Random projectiles", true)
 
 local projectiles = {ENT_TYPE.ITEM_BULLET, ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT}
 local projectiles_pc = {ENT_TYPE.ITEM_BULLET, ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_CLONEGUNSHOT, ENT_TYPE.ITEM_PLASMACANNON_SHOT}
@@ -1662,7 +1706,6 @@ end, SPAWN_TYPE.SYSTEMIC, 0, projectiles_arrow)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
-register_option_bool("storage", "Random Waddler caches", true)
 local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM}
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
@@ -1736,7 +1779,6 @@ set_callback(function()
     end
 end, ON.WIN)
 
-register_option_bool("status", "Show level progress", true)
 FakeWorld = 1
 FakeLevel = 1
 LevelNum = 1

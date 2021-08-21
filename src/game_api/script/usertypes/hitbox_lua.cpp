@@ -63,6 +63,16 @@ void register_usertypes(sol::state& lua)
         "right",
         &AABB::right,
         "top",
-        &AABB::top);
+        &AABB::top,
+        "extrude",
+        &AABB::extrude,
+        "offset",
+        &AABB::offset,
+        "area",
+        &AABB::area,
+        "width",
+        &AABB::width,
+        "height",
+        &AABB::height);
 }
 } // namespace NHitbox

@@ -182,7 +182,7 @@ end
         }
     };
 
-    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
@@ -201,7 +201,7 @@ end
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
-    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
@@ -817,9 +817,14 @@ end
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = movable->set_pre_statemachine(
-                [backend, &lua, fun = std::move(fun)](Movable* self)
+            std::uint32_t id = movable->reserve_callback_id();
+            movable->set_pre_statemachine(
+                id,
+                [=, &lua, fun = std::move(fun)](Movable* self)
                 {
+                    if (backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
                 });
             backend->hook_entity_dtor(movable);
@@ -836,9 +841,14 @@ end
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = movable->set_post_statemachine(
-                [backend, &lua, fun = std::move(fun)](Movable* self)
+            std::uint32_t id = movable->reserve_callback_id();
+            movable->set_post_statemachine(
+                id,
+                [=, &lua, fun = std::move(fun)](Movable* self)
                 {
+                    if (backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
                     backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(movable);
@@ -856,9 +866,14 @@ end
         if (Entity* entity = get_entity_ptr(uid))
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = entity->set_on_kill(
-                [backend, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_kill(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
                 {
+                    if (backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
                 });
             backend->hook_entity_dtor(entity);
@@ -877,9 +892,14 @@ end
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = entity->set_on_open(
-                [backend, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_open(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
                 {
+                    if (backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
                 });
             backend->hook_entity_dtor(entity);
