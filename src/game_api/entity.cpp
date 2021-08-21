@@ -468,19 +468,19 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
         auto [x, y, l] = (use_render_pos ? get_render_position : get_position)(uid);
         return AABB{
             x - ent->hitboxx + ent->offsetx,
-            y - ent->hitboxy + ent->offsety,
-            x + ent->hitboxx + ent->offsetx,
             y + ent->hitboxy + ent->offsety,
+            x + ent->hitboxx + ent->offsetx,
+            y - ent->hitboxy + ent->offsety,
         };
     }
     return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
-std::uint64_t Entity::get_texture()
+TEXTURE Entity::get_texture()
 {
     return texture->id;
 }
-bool Entity::set_texture(std::uint64_t texture_id)
+bool Entity::set_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
     {

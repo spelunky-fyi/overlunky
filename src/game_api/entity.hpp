@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "color.hpp"
 #include "math.hpp"
 #include "memory.hpp"
 
@@ -38,14 +39,6 @@ struct Rect
     uint16_t field_12;
 };
 
-struct Color
-{
-    float r;
-    float g;
-    float b;
-    float a;
-};
-
 class Entity;
 // Creates an instance of this entity
 using EntityCreate = Entity* (*)();
@@ -55,6 +48,7 @@ using AddLayer = void (*)(void*, Entity*);
 using RemoveLayer = void (*)(void*, Entity*);
 
 using LAYER = int;
+using TEXTURE = std::int64_t;
 
 struct EntityDB
 {
@@ -226,6 +220,8 @@ class Entity
         return overlaps_with(hitbox.left, hitbox.bottom, hitbox.right, hitbox.top);
     }
 
+    /// Deprecated
+    /// Use `overlaps_with(AABB hitbox)` instead
     bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)
     {
         const auto [posx, posy] = position();
@@ -253,8 +249,8 @@ class Entity
     void remove_item(uint32_t id);
     void destroy();
 
-    std::uint64_t get_texture();
-    bool set_texture(std::uint64_t texture_id);
+    TEXTURE get_texture();
+    bool set_texture(TEXTURE texture_id);
 
     void unhook(std::uint32_t id);
     struct EntityHooksInfo& get_hooks();
@@ -272,7 +268,7 @@ class Entity
     }
 
     virtual ~Entity() = 0;
-    virtual void created() = 0;
+    virtual void create_rendering_info() = 0;
     virtual void kill(bool, Entity* frm) = 0;
     virtual void on_collision1(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision2
     virtual void v3() = 0;

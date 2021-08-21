@@ -404,9 +404,10 @@ struct LevelGenSystem
     uint8_t unknown46;
     uint8_t unknown47;
     uint8_t unknown48;
-    uint32_t unknown49;
+    uint8_t unknown49;
     uint32_t unknown50;
     uint32_t unknown51;
+    uint32_t unknown52;
 
     std::pair<int, int> get_room_index(float x, float y);
     std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);

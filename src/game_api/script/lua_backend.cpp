@@ -16,6 +16,7 @@
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/level_lua.hpp"
 #include "usertypes/save_context.hpp"
+#include "usertypes/vanilla_render_lua.hpp"
 
 #include "lua_libs/lua_libs.hpp"
 
@@ -134,6 +135,8 @@ void LuaBackend::clear_all_callbacks()
     lua["on_death"] = sol::lua_nil;
     lua["on_win"] = sol::lua_nil;
     lua["on_screen"] = sol::lua_nil;
+    lua["on_render_pre_hud"] = sol::lua_nil;
+    lua["on_render_post_hud"] = sol::lua_nil;
 }
 
 bool LuaBackend::reset()
@@ -745,6 +748,41 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             {
                 handle_function(callback.func, lua["cast_entity"](entity));
             }
+        }
+    }
+}
+
+void LuaBackend::process_vanilla_render_callbacks(ON event)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == event)
+        {
+            handle_function(callback.func, render_ctx);
+            callback.lastRan = now;
+        }
+    }
+}
+
+void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    render_ctx.bounding_box = bbox;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == event)
+        {
+            handle_function(callback.func, render_ctx, draw_depth);
+            callback.lastRan = now;
         }
     }
 }

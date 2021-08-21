@@ -34,6 +34,7 @@
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
+#include "usertypes/vanilla_render_lua.hpp"
 
 #include "lua_libs/lua_libs.hpp"
 
@@ -91,6 +92,7 @@ end
     NSound::register_usertypes(lua, sound_manager);
     NLevel::register_usertypes(lua);
     NGui::register_usertypes(lua);
+    NVanillaRender::register_usertypes(lua);
     NTexture::register_usertypes(lua);
     NEntity::register_usertypes(lua);
     NEntitiesChars::register_usertypes(lua);
@@ -669,6 +671,8 @@ end
     lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
     /// Gets the entity type of the item in the provided slot
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
+    /// Spawn a companion (hired hand, player character, eggplant child)
+    lua["spawn_companion"] = spawn_companion;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float
@@ -988,7 +992,17 @@ end
         "SCRIPT_ENABLE",
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
-        ON::SCRIPT_DISABLE);
+        ON::SCRIPT_DISABLE,
+        "RENDER_PRE_HUD",
+        ON::RENDER_PRE_HUD,
+        "RENDER_POST_HUD",
+        ON::RENDER_POST_HUD,
+        "RENDER_PRE_PAUSE_MENU",
+        ON::RENDER_PRE_PAUSE_MENU,
+        "RENDER_POST_PAUSE_MENU",
+        ON::RENDER_POST_PAUSE_MENU,
+        "RENDER_PRE_DRAW_DEPTH",
+        ON::RENDER_PRE_DRAW_DEPTH);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -1019,6 +1033,21 @@ end
     // LOAD
     // Params: `LoadContext load_ctx`
     // Runs as soon as your script is loaded, including reloads, then never again
+    // RENDER_PRE_HUD
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_POST_HUD
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_PAUSE_MENU
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_POST_PAUSE_MENU
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_DRAW_DEPTH
+    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     */
 
     lua.create_named_table(
@@ -1065,6 +1094,24 @@ end
         2,
         "COSMIC_OCEAN_WIN",
         3);
+
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    lua.create_named_table(
+        "VANILLA_TEXT_ALIGNMENT",
+        "LEFT",
+        0,
+        "CENTER",
+        1,
+        "RIGHT",
+        2);
+
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    lua.create_named_table(
+        "VANILLA_FONT_STYLE",
+        "ITALIC",
+        0,
+        "BOLD",
+        1);
 }
 
 std::vector<std::string> safe_fields{};

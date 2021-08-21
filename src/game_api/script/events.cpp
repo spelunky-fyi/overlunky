@@ -1,7 +1,5 @@
 #include "events.hpp"
 
-#include "lua_backend.hpp"
-
 void pre_load_level_files()
 {
     LuaBackend::for_each_backend(
@@ -78,6 +76,26 @@ void post_entity_spawn(Entity* entity, int spawn_type_flags)
         [=](LuaBackend& backend)
         {
             backend.post_entity_spawn(entity, spawn_type_flags);
+            return true;
+        });
+}
+
+void trigger_vanilla_render_callbacks(ON event)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.process_vanilla_render_callbacks(event);
+            return true;
+        });
+}
+
+void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.process_vanilla_render_draw_depth_callbacks(event, draw_depth, bbox);
             return true;
         });
 }
