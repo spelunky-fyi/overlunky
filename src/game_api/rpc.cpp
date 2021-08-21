@@ -1223,6 +1223,26 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     return 0;
 }
 
+Player* spawn_companion(float x, float y, LAYER layer, uint32_t companion_type)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        std::string pattern = "\xBA\xD7\x00\x00\x00\x8B\x44\x24\x60"s;
+        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+    }
+    if (offset != 0)
+    {
+        auto state = get_state_ptr();
+        typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
+        static spawn_companion_func* sc = (spawn_companion_func*)(offset);
+        return sc(state, x, y, enum_to_layer(layer), companion_type);
+    }
+    return nullptr;
+}
+
 uint8_t enum_to_layer(LAYER layer)
 {
     if (layer == 0)

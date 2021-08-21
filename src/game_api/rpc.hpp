@@ -86,5 +86,6 @@ void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove = 99);
 int16_t waddler_get_entity_meta(uint8_t slot);
 void waddler_set_entity_meta(uint8_t slot, int16_t meta);
 uint32_t waddler_entity_type_in_slot(uint8_t slot);
+Player* spawn_companion(float x, float y, LAYER layer, uint32_t companion_type);
 uint8_t enum_to_layer(LAYER layer);
 uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position);

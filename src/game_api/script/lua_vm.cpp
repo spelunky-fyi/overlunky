@@ -671,6 +671,8 @@ end
     lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
     /// Gets the entity type of the item in the provided slot
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
+    /// Spawn a companion (hired hand, player character, eggplant child)
+    lua["spawn_companion"] = spawn_companion;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float

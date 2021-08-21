@@ -506,6 +506,9 @@ Sets the 16-bit meta-value associated with the entity type in the associated slo
 ### [`waddler_entity_type_in_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_entity_type_in_slot)
 `int waddler_entity_type_in_slot(int slot)`<br/>
 Gets the entity type of the item in the provided slot
+### [`spawn_companion`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_companion)
+`Player spawn_companion(float x, float y, LAYER layer, int companion_type)`<br/>
+Spawn a companion (hired hand, player character, eggplant child)
 ### [`distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 `float distance(int uid_a, int uid_b)`<br/>
 Calculate the tile distance of two entities by uid
