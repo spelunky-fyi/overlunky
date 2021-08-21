@@ -16,7 +16,8 @@ end
 -- replace random floor tiles with the new texture
 -- this looks like shit, but it proves that both textures still exist
 set_post_tile_code_callback(function(x, y, l)
-    local ents = get_entities_overlapping(0, MASK.FLOOR, x - 0.45, y - 0.45, x + 0.45, y + 0.45, l);
+    local aabb = AABB:new():offset(x, y):extrude(0.45)
+    local ents = get_entities_overlapping_hitbox(0, MASK.FLOOR, aabb, l);
     for _, uid in pairs(ents) do
         if math.random() > 0.5 then
             local ent = get_entity(uid)
