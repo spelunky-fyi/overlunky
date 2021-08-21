@@ -102,7 +102,7 @@ set_callback(function(render_ctx, draw_depth)
     -- the event is PRE draw depth, so if we want to draw it in front of the player, we have to
     -- draw it 'pre' the next draw_depth, which is one closer towards draw_depth 1 (so subtract 1 instead of add 1)
     if draw_depth == players[1].type.draw_depth - 1 then
-        x, y, l = get_position(players[1].uid)
+        x, y, l = get_render_position(players[1].uid)
         -- reposition the crown on top of the head, starting from the center point of the player: bit to the left, bit upwards
         x = x - 0.5
         y = y + 1.15
