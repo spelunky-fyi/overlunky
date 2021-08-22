@@ -468,7 +468,7 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint
 
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
-    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy, sx2, sy2}, layer);
+    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy2, sx2, sy}, layer);
 }
 
 std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
