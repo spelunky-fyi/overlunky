@@ -320,10 +320,10 @@ std::pair<float, float> screen_position(float x, float y)
     return State::get().screen_position(x, y);
 }
 
-std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2)
+std::tuple<float, float, float, float> screen_aabb(float left, float top, float right, float bottom)
 {
-    auto [sx1, sy1] = screen_position(x1, y1);
-    auto [sx2, sy2] = screen_position(x2, y2);
+    auto [sx1, sy1] = screen_position(left, top);
+    auto [sx2, sy2] = screen_position(right, bottom);
     return std::tuple{sx1, sy1, sx2, sy2};
 }
 
@@ -468,7 +468,7 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint
 
 std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
-    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy, sx2, sy2}, layer);
+    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy2, sx2, sy}, layer);
 }
 
 std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
@@ -1221,6 +1221,27 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
         return state->waddler_storage[slot];
     }
     return 0;
+}
+
+int32_t spawn_companion(uint32_t companion_type, float x, float y, LAYER layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+        std::string pattern = "\xBA\xD7\x00\x00\x00\x8B\x44\x24\x60"s;
+        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+    }
+    if (offset != 0)
+    {
+        auto state = get_state_ptr();
+        typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
+        static spawn_companion_func* sc = (spawn_companion_func*)(offset);
+        Player* spawned = sc(state, x, y, enum_to_layer(layer), companion_type);
+        return spawned->uid;
+    }
+    return -1;
 }
 
 uint8_t enum_to_layer(LAYER layer)

@@ -16,6 +16,12 @@ class PowerupCapable : public Movable
 
     /// Checks whether the player/monster has a certain powerup
     bool has_powerup(uint32_t powerup_type);
+
+    virtual void on_instakill_death() = 0; // seems to only trigger for enemies that die in one hit
+
+    virtual void on_blood_collision() = 0; // only triggers when player has kapala
+
+    virtual void unknown_v93() = 0;
 };
 
 class Player : public PowerupCapable

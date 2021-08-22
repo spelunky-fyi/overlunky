@@ -12,7 +12,7 @@ set_callback(function(draw_ctx)
     x, y, l = get_position(players[1].uid)
     sx, sy = screen_position(x, y)
     radius = screen_distance(1) -- one tile
-    draw_ctx:raw_circle(sx, sy, radius, 3, rgba(255, 0, 0, 255))
+    draw_ctx:draw_circle(sx, sy, radius, 3, rgba(255, 0, 0, 255))
 end, ON.GUIFRAME)
 
 -- no players allowed

@@ -26,6 +26,7 @@ using Flags = std::uint32_t;
 using SPAWN_TYPE = int;                       // NoAlias
 using VANILLA_SOUND = std::string;            // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
+using TEXTURE = std::int64_t;                 // NoAlias
 using INPUTS = std::uint16_t;                 // NoAlias
 
 enum class ON
@@ -72,7 +73,12 @@ enum class ON
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
     SCRIPT_ENABLE,
-    SCRIPT_DISABLE
+    SCRIPT_DISABLE,
+    RENDER_PRE_HUD,
+    RENDER_POST_HUD,
+    RENDER_PRE_PAUSE_MENU,
+    RENDER_POST_PAUSE_MENU,
+    RENDER_PRE_DRAW_DEPTH,
 };
 
 struct IntOption
@@ -247,6 +253,9 @@ class LuaBackend
     void draw(ImDrawList* dl);
     void render_options();
 
+    bool is_callback_cleared(int32_t callback_id);
+    bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
+
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 
@@ -260,6 +269,9 @@ class LuaBackend
 
     void hook_entity_dtor(Entity* entity);
     void pre_entity_destroyed(Entity* entity);
+
+    void process_vanilla_render_callbacks(ON event);
+    void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);

@@ -453,7 +453,7 @@ class Container : public Movable
   public:
     uint32_t inside;
 
-    std::uint32_t set_on_open(std::function<void(Container*, Movable*)> on_open);
+    void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
 class Coffin : public Container

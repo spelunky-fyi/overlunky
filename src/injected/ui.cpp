@@ -791,7 +791,14 @@ void spawn_entities(bool s, std::string list = "")
     {
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_CHAR") != std::string::npos)
+        {
+            std::pair<float, float> cpos = click_position(g_x, g_y);
+            int spawned = spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, g_state->camera_layer);
+            if (!lock_entity)
+                g_last_id = spawned;
+        }
+        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
             bool snap = options["snap_to_grid"];
             if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_FLOOR") != std::string::npos)

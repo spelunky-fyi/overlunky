@@ -46,13 +46,16 @@ void register_usertypes(sol::state& lua)
     /// Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
     lua["screen_aabb"] = [](AABB box) -> AABB
     {
-        auto [sx1, sy1, sx2, sy2] = screen_aabb(box.left, box.bottom, box.right, box.top);
-        return AABB{sx1, sy2, sx2, sy1};
+        auto [sx1, sy1, sx2, sy2] = screen_aabb(box.left, box.top, box.right, box.bottom);
+        return AABB{sx1, sy1, sx2, sy2};
     };
 
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
         "AABB",
+        sol::constructors<AABB(), AABB(float, float, float, float)>{},
+        "overlaps_with",
+        &AABB::overlaps_with,
         "left",
         &AABB::left,
         "bottom",
@@ -60,6 +63,16 @@ void register_usertypes(sol::state& lua)
         "right",
         &AABB::right,
         "top",
-        &AABB::top);
+        &AABB::top,
+        "extrude",
+        &AABB::extrude,
+        "offset",
+        &AABB::offset,
+        "area",
+        &AABB::area,
+        "width",
+        &AABB::width,
+        "height",
+        &AABB::height);
 }
 } // namespace NHitbox

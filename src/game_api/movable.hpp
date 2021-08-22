@@ -84,7 +84,10 @@ class Movable : public Entity
     virtual void pick_up(Entity* entity_to_pick_up) = 0;
     virtual void on_picked_up_by(Entity* entity_picking_up) = 0;
     virtual void drop(Entity* entity_to_drop) = 0; // also used when throwing
-    virtual void collect_treasure(uint32_t treasure_value) = 0;
+
+    /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
+    virtual void add_money(uint32_t money) = 0;
+
     virtual void apply_movement() = 0;              // disable this function and things can't move, some spin in place
     virtual void damage_entity(Entity* victim) = 0; // can't trigger, maybe extra params are needed
     virtual bool is_monster_or_player() = 0;
@@ -102,6 +105,10 @@ class Movable : public Entity
     virtual void v84() = 0;                          // triggers when tusk is angered, calls get_last_owner_uid
     virtual void gravity_related() = 0;
     virtual void v86() = 0;
+    virtual void v87() = 0;
+    virtual void stack_plus_28_is_0() = 0;   // unknown; triggers on item_rubble
+    virtual void on_crushed_by(Entity*) = 0; // e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
+    virtual void on_fall_onto(uint32_t unknown, Entity* fell_on_entity) = 0;
 
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
     bool is_poisoned();
@@ -110,8 +117,8 @@ class Movable : public Entity
     bool is_button_held(uint32_t button);
     bool is_button_released(uint32_t button);
 
-    std::uint32_t set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine);
-    std::uint32_t set_post_statemachine(std::function<void(Movable*)> post_state_machine);
+    void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
+    void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
 };
 
 class PlayerTracker

@@ -31,6 +31,41 @@ class RoomOwner : public Monster
     bool was_hurt;
     uint16_t padding1;
     uint32_t padding2;
+
+    virtual void increase_killcount() = 0; // increases state.kills_npc
+
+    virtual void on_aggro() = 0; // updates state.quests in case of npc
+
+    virtual void unknown_v96() = 0;
+
+    virtual void on_shop_entered() = 0;
+
+    virtual void on_player_picked_up_shopitem() = 0; // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
+
+    virtual void on_fire_weapon() = 0; // if deactivated, they can pick up weapons but won't shoot them
+
+    virtual void on_criminal_act_committed() = 0; // shows the appropriate message (vandal, cheater, ...)
+
+    // for shopkeepers: checks state.shoppie_aggro_levels
+    // if you return false, but you have attacked them before, they will be patrolling but won't attack you on sight
+    virtual bool should_attack_on_sight() = 0;
+
+    virtual bool is_angry_flag_set() = 0; // checks state.level_flags 10-16 depending on the monster
+
+    // for shopkeeper: sets shopkeeper.shotgun_attack_delay to 6
+    // triggers only at the start when aggroed
+    // does nothing for yang, waddler, tun
+    virtual void set_initial_attack_delay() = 0;
+
+    virtual Entity* on_spawn_weapon() = 0; // return the weapon entity that will be used to attack the player
+
+    virtual uint32_t weapon_type() = 0; // the entity type of the weapon that will be spawned to attack the player
+
+    virtual void unknown_v106_attack_weapon_related() = 0;
+
+    virtual void unknown_v107() = 0; // for shopkeepers, it loops over (some of) the items for sale
+
+    virtual void on_death_treasure_drop() = 0; // random number calc, e.g. whether the shopkeeper drops gold bars on death
 };
 
 class WalkingMonster : public Monster

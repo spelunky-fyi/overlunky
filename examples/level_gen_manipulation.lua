@@ -46,7 +46,8 @@ end, "diningtable")
 set_post_tile_code_callback(function(x, y, layer)
     local rand = math.random(100)
     if rand > 65 then
-        local ents = get_entities_overlapping(ENT_TYPE.FLOORSTYLED_MINEWOOD, 0, x - 0.45, y - 0.45, x + 0.45, y + 0.45, layer);
+        local aabb = AABB:new():offset(x, y):extrude(0.45)
+        local ents = get_entities_overlapping_hitbox(ENT_TYPE.FLOORSTYLED_MINEWOOD, 0, aabb, layer);
         if #ents == 1 then -- if not 1 then something else was spawned here already
             local entity_type = nil
             local ent_uid = nil

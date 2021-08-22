@@ -10,6 +10,7 @@ header_files = [
     "../src/game_api/rpc.hpp",
     "../src/game_api/spawn_api.hpp",
     "../src/game_api/script.hpp",
+    "../src/game_api/color.hpp",
     "../src/game_api/entity.hpp",
     "../src/game_api/movable.hpp",
     "../src/game_api/state.hpp",
@@ -31,6 +32,7 @@ header_files = [
     "../src/game_api/items.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/save_context.hpp",
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
 ]
@@ -59,6 +61,8 @@ api_files = [
     "../src/game_api/script/usertypes/player_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.cpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/drops_lua.cpp",
     "../src/game_api/script/usertypes/texture_lua.cpp",
     "../src/game_api/script/usertypes/flags_lua.cpp",
@@ -93,6 +97,8 @@ replace = {
     "std::": "",
     "sol::": "",
     "void": "",
+    "constexpr": "",
+    "static": "",
     "variadic_args va": "int, int...",
 }
 comment = []
@@ -203,6 +209,10 @@ for file in header_files:
                 if m:
                     comment.append(m[1])
                 else:
+                    m = re.search(r"^\s*:.*$", line) # skip lines that start with a colon (constructor parameter initialization)
+                    if m:
+                        continue
+                    
                     m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
                     if m:
                         name = m[3]
@@ -318,7 +328,20 @@ for file in api_files:
             var_name = var[0]
             cpp = var[1]
             cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
-            if cpp_name in underlying_cpp_type["member_funs"]:
+
+            if var[0].startswith("sol::constructors"):
+                for fun in underlying_cpp_type["member_funs"][cpp_type]:
+                    param = fun["param"]
+                    sig = f"{cpp_type}({param})"
+                    vars.append(
+                        {
+                            "name": cpp_type,
+                            "type": "",
+                            "signature": sig,
+                            "comment": fun["comment"],
+                        }
+                    )
+            elif cpp_name in underlying_cpp_type["member_funs"]:
                 for fun in underlying_cpp_type["member_funs"][cpp_name]:
                     ret = fun["return"]
                     param = fun["param"]

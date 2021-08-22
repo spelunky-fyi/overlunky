@@ -400,25 +400,23 @@ void hook_movable_state_machine(Movable* _self)
         },
         0x24);
 }
-std::uint32_t Movable::set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine)
+void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
-    hook_info.pre_statemachine.push_back({hook_info.cbcount++, std::move(pre_state_machine)});
-    return hook_info.pre_statemachine.back().id;
+    hook_info.pre_statemachine.push_back({reserved_callback_id, std::move(pre_state_machine)});
 }
-std::uint32_t Movable::set_post_statemachine(std::function<void(Movable*)> post_state_machine)
+void Movable::set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
-    hook_info.post_statemachine.push_back({hook_info.cbcount++, std::move(post_state_machine)});
-    return hook_info.post_statemachine.back().id;
+    hook_info.post_statemachine.push_back({reserved_callback_id, std::move(post_state_machine)});
 }
 
 void Entity::destroy()
@@ -472,19 +470,19 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
         auto [x, y, l] = (use_render_pos ? get_render_position : get_position)(uid);
         return AABB{
             x - ent->hitboxx + ent->offsetx,
-            y - ent->hitboxy + ent->offsety,
-            x + ent->hitboxx + ent->offsetx,
             y + ent->hitboxy + ent->offsety,
+            x + ent->hitboxx + ent->offsetx,
+            y - ent->hitboxy + ent->offsety,
         };
     }
     return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
-std::uint64_t Entity::get_texture()
+TEXTURE Entity::get_texture()
 {
     return texture->id;
 }
-bool Entity::set_texture(std::uint64_t texture_id)
+bool Entity::set_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
     {
@@ -543,7 +541,12 @@ std::uint32_t Entity::set_on_destroy(std::function<void(Entity*)> cb)
     hook_info.on_destroy.push_back({hook_info.cbcount++, std::move(cb)});
     return hook_info.on_destroy.back().id;
 }
-std::uint32_t Entity::set_on_kill(std::function<void(Entity*, Entity*)> on_kill)
+std::uint32_t Entity::reserve_callback_id()
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    return hook_info.cbcount++;
+}
+void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_kill.empty())
@@ -561,8 +564,7 @@ std::uint32_t Entity::set_on_kill(std::function<void(Entity*, Entity*)> on_kill)
             },
             0x2);
     }
-    hook_info.on_kill.push_back({hook_info.cbcount++, std::move(on_kill)});
-    return hook_info.on_kill.back().id;
+    hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
 }
 
 bool Entity::is_movable()
@@ -576,7 +578,7 @@ bool Entity::is_movable()
     return false;
 }
 
-std::uint32_t Container::set_on_open(std::function<void(Container*, Movable*)> on_open)
+void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_open.empty())
@@ -597,6 +599,5 @@ std::uint32_t Container::set_on_open(std::function<void(Container*, Movable*)> o
             },
             0x17);
     }
-    hook_info.on_open.push_back({hook_info.cbcount++, std::move(on_open)});
-    return hook_info.on_open.back().id;
+    hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
 }
