@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.0e"
+meta.version = "2.0f"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -442,12 +442,14 @@ set_callback(function()
         kill_entity(v)
     end
     set_interval(function()
-        if #get_entities_by_mask(MASK.LAVA) <= 1180 then
+        if state.theme ~= THEME.DUAT then return false end
+        if #get_entities_by_mask(MASK.LAVA) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn_liquid(ENT_TYPE.LIQUID_LAVA, state.level_gen.spawn_x, state.level_gen.spawn_y - 2)
         elseif #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 36, LAYER.FRONT, 0, 0)
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 2.5, 36, LAYER.FRONT, 0, 0)
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 32.5, 36, LAYER.FRONT, 0, 0)
+            return false
         end
     end, 10)
 end, ON.LEVEL)
