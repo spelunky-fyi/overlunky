@@ -61,6 +61,7 @@ local function register_options()
         register_options()
     end)
 end
+register_options()
 
 set_callback(function(ctx)
     local save_str = json.encode(options)
