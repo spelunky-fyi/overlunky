@@ -165,7 +165,7 @@ class Mole : public Monster
     uint8_t counter_nonburrowing;
     uint8_t countdown_for_appearing;
     uint8_t unknown_two_while_burrowed;
-    /// 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+    /// 0 - non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
     uint8_t digging_state;
 };
 
@@ -900,7 +900,7 @@ class Scorpion : public Monster
 class Hermitcrab : public Monster
 {
   public:
-    uint32_t carried_entity_type;
+    ENT_TYPE carried_entity_type;
     int32_t carried_entity_uid;
     uint16_t walk_spit_timer; // depending on movable.state either the countdown how many acid bubbles spat (3) or walking timer
     /// whether it is hidden behind the carried block or not, if true you can damage him

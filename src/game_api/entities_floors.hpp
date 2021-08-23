@@ -44,7 +44,7 @@ class Floor : public Entity
     void remove_decoration(FLOOR_SIDE side);
 
     Entity* find_corner_decoration(FLOOR_SIDE side);
-    void add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, struct Layer* layer_ptr);
+    void add_decoration_opt(FLOOR_SIDE side, ENT_TYPE decoration_entity_type, struct Layer* layer_ptr);
 
     bool has_corners() const;
     bool is_styled() const;
@@ -136,7 +136,7 @@ class TotemTrap : public Floor
     uint32_t unknown1;
     float unknown2; // might be sound delay related, cannot reproduce anymore
     float unknown3;
-    uint32_t spawn_entity_type;
+    ENT_TYPE spawn_entity_type;
     uint32_t first_sound_id;
     int32_t counter;  // adds some value depending on trap and with side is triggered, setting to low value pauses it?
     uint8_t unknown4; // forced to 1

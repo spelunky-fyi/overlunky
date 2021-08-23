@@ -451,7 +451,7 @@ class Chain : public Movable
 class Container : public Movable
 {
   public:
-    uint32_t inside;
+    ENT_TYPE inside;
 
     void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };

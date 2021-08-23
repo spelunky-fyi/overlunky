@@ -49,6 +49,7 @@ using RemoveLayer = void (*)(void*, Entity*);
 
 using LAYER = int;
 using TEXTURE = std::int64_t;
+using ENT_TYPE = uint32_t;
 
 struct EntityDB
 {
@@ -56,7 +57,7 @@ struct EntityDB
     EntityDestroy destroy_func;
     int32_t field_10;
     /* Entity id (ENT_...) */
-    uint32_t id;
+    ENT_TYPE id;
     uint32_t search_flags;
     float width;
     float height;

@@ -8,7 +8,6 @@
 #include "thread_utils.hpp"
 
 const float ZF = 0.737f;
-using LAYER = int;
 
 struct Layer;
 struct LevelGenSystem;
@@ -36,7 +35,7 @@ struct StateMemory
     uint8_t i3cb;
     uint8_t i3cc;
     uint8_t i3cd;
-    uint32_t speedrun_character;         // who administers the speedrun in base camp
+    ENT_TYPE speedrun_character;         // who administers the speedrun in base camp
     uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
     uint8_t padding4;
     uint8_t padding5;

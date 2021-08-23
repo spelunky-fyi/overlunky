@@ -9,13 +9,13 @@ class PowerupCapable : public Movable
     std::map<uint32_t, Entity*> powerups; // type id -> entity
 
     /// Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
-    void remove_powerup(uint32_t powerup_type);
+    void remove_powerup(ENT_TYPE powerup_type);
 
     /// Gives the player/monster the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Giving true crown to a monster crashes the game.
-    void give_powerup(uint32_t powerup_type);
+    void give_powerup(ENT_TYPE powerup_type);
 
     /// Checks whether the player/monster has a certain powerup
-    bool has_powerup(uint32_t powerup_type);
+    bool has_powerup(ENT_TYPE powerup_type);
 
     virtual void on_instakill_death() = 0; // seems to only trigger for enemies that die in one hit
 
@@ -58,9 +58,9 @@ class Player : public PowerupCapable
     void set_heart_color(Color hcolor);
 };
 
-std::u16string get_character_name(int32_t type_id);
-std::u16string get_character_short_name(int32_t type_id);
-Color get_character_heart_color(int32_t type_id);
-bool is_character_female(int32_t type_id);
+std::u16string get_character_name(ENT_TYPE type_id);
+std::u16string get_character_short_name(ENT_TYPE type_id);
+Color get_character_heart_color(ENT_TYPE type_id);
+bool is_character_female(ENT_TYPE type_id);
 
-void set_character_heart_color(int32_t type_id, Color color);
+void set_character_heart_color(ENT_TYPE type_id, Color color);

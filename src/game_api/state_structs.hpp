@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #define MAX_PLAYERS 4
+using ENT_TYPE = uint32_t; // NoAlias
 
 class Entity;
 
@@ -717,6 +718,6 @@ struct SelectPlayerSlot
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint32_t character;  // Entity DB ID
+    ENT_TYPE character;  // Entity DB ID
     uint32_t texture_id; // Texture DB ID
 };
