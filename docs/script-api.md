@@ -3228,7 +3228,17 @@ Covers all other spawns, such as items from crates or the player throwing bombs.
 \
 Covers all of the above.
 ### CONST
+Some arbitrary constants of the engine
 - [`ENGINE_FPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ENGINE_FPS) 60
+\
+The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.\
+Independent of rendering framerate, so it does not correlate with the call rate of `ON.GUIFRAME` and similar.
+- [`ROOM_WIDTH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ROOM_WIDTH) 10
+\
+Width of a 1x1 room, both in world coordinates and in tiles.
+- [`ROOM_HEIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ROOM_HEIGHT) 8
+\
+Height of a 1x1 room, both in world coordinates and in tiles.
 ### WIN_STATE
 After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
 - [`NO_WIN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.NO_WIN) 0
