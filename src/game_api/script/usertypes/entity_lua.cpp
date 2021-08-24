@@ -117,17 +117,21 @@ void register_usertypes(sol::state& lua)
         "sound_killed_by_other",
         &EntityDB::sound_killed_by_other);
 
-    auto get_overlay = [&lua](Entity& entity) {
+    auto get_overlay = [&lua](Entity& entity)
+    {
         return lua["cast_entity"](entity.overlay);
     };
-    auto set_overlay = [](Entity& entity, Entity* overlay) {
+    auto set_overlay = [](Entity& entity, Entity* overlay)
+    {
         return entity.overlay = overlay;
     };
     auto overlay = sol::property(get_overlay, set_overlay);
-    auto topmost = [&lua](Entity& entity) {
+    auto topmost = [&lua](Entity& entity)
+    {
         return lua["cast_entity"](entity.topmost());
     };
-    auto topmost_mount = [&lua](Entity& entity) {
+    auto topmost_mount = [&lua](Entity& entity)
+    {
         return lua["cast_entity"](entity.topmost_mount());
     };
     auto overlaps_with = sol::overload(
