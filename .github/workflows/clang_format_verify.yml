@@ -21,15 +21,16 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.do_formatting != 'true' }}
         with:
           source: "src"
-          extensions: "h,hpp,cpp"
+          extensions: "inl,h,hpp,cpp"
           exclude: "./src/game_api/lua_libs"
           clangFormatVersion: 12
 
       - uses: DoozyX/clang-format-lint-action@v0.12
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.do_formatting == 'true' }}
         with:
-          source: "source"
+          source: "src"
           extensions: "inl,h,hpp,cpp"
+          exclude: "./src/game_api/lua_libs"
           clangFormatVersion: 12
           inplace: true
       - uses: EndBug/add-and-commit@v4
