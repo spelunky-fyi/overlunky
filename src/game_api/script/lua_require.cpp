@@ -24,6 +24,7 @@ sol::object custom_require(std::string path)
             path = path.substr(0, path.size() - 4);
         }
         std::replace(path.begin(), path.end(), '.', '/');
+        std::replace(path.begin(), path.end(), ':', '.');
     }
 
     static sol::state& lua = get_lua_vm();
@@ -99,7 +100,7 @@ return info.short_src, info.source
         {
             path = path.substr(0, path.size() - 4);
         }
-        std::replace(path.begin(), path.end(), '.', '$'); // Need to be able to recover periods in folder names, curses garebear
+        std::replace(path.begin(), path.end(), '.', ':'); // Need to be able to recover periods in folder names, curses garebear
         std::replace(path.begin(), path.end(), '/', '.');
         std::replace(path.begin(), path.end(), '\\', '.');
         backend->loaded_modules.insert(path);
@@ -162,7 +163,7 @@ int custom_loader(lua_State* L)
 {
     std::string path = sol::stack::get<std::string>(L, 1);
     std::replace(path.begin(), path.end(), '.', '/');
-    std::replace(path.begin(), path.end(), '$', '.');
+    std::replace(path.begin(), path.end(), ':', '.');
     LuaBackend* backend = LuaBackend::get_calling_backend();
 
     auto try_load = [=](std::string& path, std::string_view ext)
