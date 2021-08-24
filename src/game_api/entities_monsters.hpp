@@ -165,7 +165,7 @@ class Mole : public Monster
     uint8_t counter_nonburrowing;
     uint8_t countdown_for_appearing;
     uint8_t unknown_two_while_burrowed;
-    /// 0 - non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+    /// 0 - non_burrowed, 1 - unknown, 2 - burrowed, 3 - state_change
     uint8_t digging_state;
 };
 
