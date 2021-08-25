@@ -1087,7 +1087,17 @@ end
     // ANY
     // Covers all of the above.
     */
-    lua.create_named_table("CONST", "ENGINE_FPS", 60);
+    /// Some arbitrary constants of the engine
+    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8);
+    /* CONST
+    // ENGINE_FPS
+    // The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.
+    // Independent of rendering framerate, so it does not correlate with the call rate of `ON.GUIFRAME` and similar.
+    // ROOM_WIDTH
+    // Width of a 1x1 room, both in world coordinates and in tiles.
+    // ROOM_HEIGHT
+    // Height of a 1x1 room, both in world coordinates and in tiles.
+    */
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.create_named_table(
         "WIN_STATE",

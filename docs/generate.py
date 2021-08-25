@@ -209,10 +209,12 @@ for file in header_files:
                 if m:
                     comment.append(m[1])
                 else:
-                    m = re.search(r"^\s*:.*$", line) # skip lines that start with a colon (constructor parameter initialization)
+                    m = re.search(
+                        r"^\s*:.*$", line
+                    )  # skip lines that start with a colon (constructor parameter initialization)
                     if m:
                         continue
-                    
+
                     m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
                     if m:
                         name = m[3]
@@ -323,6 +325,9 @@ for file in api_files:
                 var[1] = var[1].replace("table_of(", "") + "[]"
             if var[1].startswith("sol::readonly"):
                 var[1] = var[1].replace("sol::readonly(", "")
+                var[1] = var[1][:-1]
+            if var[1].startswith("std::move"):
+                var[1] = var[1].replace("std::move(", "")
                 var[1] = var[1][:-1]
 
             var_name = var[0]
