@@ -57,6 +57,8 @@ void register_usertypes(sol::state& lua)
         &Floor::add_decoration,
         "remove_decoration",
         &Floor::remove_decoration,
+        "decorate_internal",
+        &Floor::decorate_internal,
         sol::base_classes,
         sol::bases<Entity>());
 

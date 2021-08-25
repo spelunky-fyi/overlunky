@@ -54,6 +54,8 @@ class Floor : public Entity
     static FLOOR_SIDE get_opposite_side(FLOOR_SIDE side);
     static bool get_perpendicular_sides(FLOOR_SIDE side, FLOOR_SIDE (&perp_sides)[2]);
     static bool get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2]);
+
+    virtual void decorate_internal() = 0; // decorates undecorated floor and floorstyled, doesn't remove old decorations
 };
 
 class Door : public Floor
