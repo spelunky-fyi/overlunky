@@ -3842,7 +3842,7 @@ void render_entity_props()
     if (ImGui::CollapsingHeader("Stats"))
     {
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&g_entity->health, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("Price##Price", ImGuiDataType_U8, (char*)&g_entity->price, 0.5f, &u32_zero, &u32_max);
+        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&g_entity->price, 0.5f, &s32_min, &s32_max);
         if (g_inventory != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
