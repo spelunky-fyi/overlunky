@@ -1555,7 +1555,7 @@ stores the last uid as well
 - [`int countdown_for_appearing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=countdown_for_appearing) &Mole::countdown_for_appearing
 - [`int digging_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=digging_state) &Mole::digging_state
 \
-0 - non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+0 - non_burrowed, 1 - unknown, 2 - burrowed, 3 - state_change
 ### `Spider`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster)
 - [`float ceiling_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_pos_x) &Spider::ceiling_pos_x
