@@ -118,7 +118,7 @@ void register_usertypes(sol::state& lua)
         };
         LevelGenData* data = backend->g_state->level_gen->data;
         std::uint32_t extra_spawn_id = data->define_extra_spawn(num_spawns_frontlayer, num_spawns_backlayer, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
-        backend->chance_callbacks.push_back(extra_spawn_id);
+        backend->extra_spawn_callbacks.push_back(extra_spawn_id);
         return extra_spawn_id;
     };
     /// Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
