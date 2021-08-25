@@ -1,5 +1,7 @@
 #include "lua_vm.hpp"
 
+#include <csignal>
+
 #include "entities_items.hpp"
 #include "entity.hpp"
 #include "rpc.hpp"
@@ -917,6 +919,9 @@ end
         }
         return sol::nullopt;
     };
+
+    /// Raise a signal and probably crash the game
+    lua["raise"] = std::raise;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
