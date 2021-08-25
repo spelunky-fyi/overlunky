@@ -7,8 +7,6 @@
 #include <cstring>
 #include <string>
 
-#include "logger.h"
-
 namespace
 {
 [[maybe_unused]] size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset = 3)
@@ -38,7 +36,6 @@ size_t find_inst(char* exe, std::string_view needle, size_t start)
 
         if (found)
         {
-            DEBUG("find_inst: {}", (void*)j);
             return j;
         }
     }
