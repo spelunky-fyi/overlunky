@@ -589,6 +589,9 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when a container is opened via up+door.
 The callback signature is `nil on_open(Entity self, Entity opener)`
 Use this only when no other approach works, this call can be expensive if overused.
+### [`raise`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
+`nil raise()`<br/>
+Raise a signal and probably crash the game
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
@@ -1185,6 +1188,7 @@ Explicitly add a decoration on the given side. Corner decorations only exist for
 - [`nil remove_decoration(FLOOR_SIDE side)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_decoration) &Floor::remove_decoration
 \
 Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
+- [`nil decorate_internal()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=decorate_internal) &Floor::decorate_internal
 ### `Door`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) &Door::counter
