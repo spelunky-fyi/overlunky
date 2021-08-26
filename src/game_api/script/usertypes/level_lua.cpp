@@ -16,9 +16,14 @@ void PreLoadLevelFilesContext::add_level_files(std::vector<std::string> levels)
     add_next_levels(std::move(levels));
 }
 
-bool PostRoomGenerationContext::set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)
+bool PostRoomGenerationContext::set_room_template(uint32_t x, uint32_t y, LAYER l, ROOM_TEMPLATE room_template)
 {
     return State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
+}
+
+bool PostRoomGenerationContext::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l)
+{
+    return State::get().ptr_local()->level_gen->mark_as_machine_room_origin(x, y, l);
 }
 
 bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance)
@@ -35,6 +40,9 @@ namespace NLevel
 {
 void register_usertypes(sol::state& lua)
 {
+    /// Default function in spawn definitions to check whether a spawn is valid or not
+    lua["spawn_default_is_valid"] = default_is_valid_spawn;
+
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
@@ -185,6 +193,8 @@ void register_usertypes(sol::state& lua)
         sol::no_constructor,
         "set_room_template",
         &PostRoomGenerationContext::set_room_template,
+        "mark_as_machine_room_origin",
+        &PostRoomGenerationContext::mark_as_machine_room_origin,
         "set_procedural_spawn_chance",
         &PostRoomGenerationContext::set_procedural_spawn_chance,
         "set_num_extra_spawns",

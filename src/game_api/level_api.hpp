@@ -380,9 +380,9 @@ struct LevelGenSystem
     LevelGenRoomsMeta* rooms_meta_26;
     LevelGenRoomsMeta* rooms_meta_27;
     LevelGenRoomsMeta* rooms_meta_28;
-    LevelGenRoomsMeta* backlayer_room_exists;
     LevelGenRoomsMeta* rooms_meta_29;
-    LevelGenRoomsMeta* rooms_meta_31;
+    LevelGenRoomsMeta* backlayer_room_exists;
+    LevelGenRoomsMeta* machine_room_origin;
     LevelGenRoomsMeta* rooms_meta_32;
     LevelGenRoomsMeta* rooms_meta_33;
     LevelGenRoomsMeta* rooms_meta_34;
@@ -413,12 +413,15 @@ struct LevelGenSystem
     std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);
     std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, LAYER l);
     bool set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template);
+    bool mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l);
 
     std::string_view get_room_template_name(uint16_t room_template);
 
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 };
+
+bool default_is_valid_spawn(float x, float y, uint8_t layer);
 
 void override_next_levels(std::vector<std::string> next_levels);
 void add_next_levels(std::vector<std::string> next_levels);

@@ -1202,6 +1202,21 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t
 
     return true;
 }
+bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER /*l*/)
+{
+    auto state = State::get();
+    auto* state_ptr = state.ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return false;
+
+    //uint8_t layer = enum_to_layer(l);
+
+    LevelGenRoomsMeta* level_rooms = machine_room_origin;
+    level_rooms->rooms[x + y * 8] = true;
+
+    return true;
+}
 
 std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
 {
@@ -1311,6 +1326,11 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
     }
 
     return false;
+}
+
+bool default_is_valid_spawn(float x, float y, uint8_t layer)
+{
+    return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
 }
 
 void override_next_levels(std::vector<std::string> next_levels)
