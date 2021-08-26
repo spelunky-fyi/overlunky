@@ -1393,7 +1393,7 @@ void force_co_subtheme(int8_t subtheme)
     if (offset == 0)
     {
         auto memory = Memory::get();
-        offset = memory.at_exe(find_inst(memory.exe(), " 48 C1 E0 03 48 C1 E8 20 49 89 48 08 48 98"s, memory.after_bundle));
+        offset = memory.at_exe(find_inst(memory.exe(), "\x48\xC1\xE0\x03\x48\xC1\xE8\x20\x49\x89\x48\x08\x48\x98"s, memory.after_bundle));
     }
     if (subtheme >= 0 && subtheme <= 7)
     {
