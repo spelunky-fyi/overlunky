@@ -6,7 +6,7 @@
 class PowerupCapable : public Movable
 {
   public:
-    std::map<uint32_t, Entity*> powerups; // type id -> entity
+    std::map<ENT_TYPE, Entity*> powerups; // type id -> entity
 
     /// Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
     void remove_powerup(ENT_TYPE powerup_type);

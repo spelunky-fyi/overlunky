@@ -329,10 +329,10 @@ struct Inventory
     uint32_t unknown6;
     uint32_t unknown7;
 
-    uint32_t collected_money[512]; // entity types
+    ENT_TYPE collected_money[512]; // entity types
     uint32_t collected_money_values[512];
     uint32_t collected_money_count;
-    uint32_t killed_enemies[256]; // entity types
+    ENT_TYPE killed_enemies[256]; // entity types
     uint32_t kills_level;
     uint32_t kills_total;
 
@@ -345,7 +345,7 @@ struct Inventory
     int32_t unknown14;
     int32_t unknown15;
 
-    uint32_t companions[8]; // hired hands, unlocked chars
+    ENT_TYPE companions[8]; // hired hands, unlocked chars
 
     uint32_t unknown24;
     uint32_t unknown25;

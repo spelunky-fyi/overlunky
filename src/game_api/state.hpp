@@ -64,7 +64,7 @@ struct StateMemory
     uint8_t theme_next;
     uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t b73;
-    uint32_t end_spaceship_character; // who pops out the spaceship for a tiamat/hundun win
+    ENT_TYPE end_spaceship_character; // who pops out the spaceship for a tiamat/hundun win
     uint8_t shoppie_aggro;
     uint8_t shoppie_aggro_levels;
     uint8_t merchant_aggro;
@@ -81,7 +81,7 @@ struct StateMemory
     uint8_t unknown2b;
     uint8_t unknown2c;
     uint8_t unknown2d;
-    uint32_t waddler_storage[99];
+    ENT_TYPE waddler_storage[99];
     int16_t waddler_storage_meta[99]; // to store mattock durability for example
     uint16_t journal_progression_count;
     JournalProgressionSlot journal_progression_slots[40];
@@ -95,7 +95,7 @@ struct StateMemory
     uint8_t unknown5d;
     ArenaState arena;
     uint32_t journal_flags;
-    int32_t first_damage_cause; // entity type that caused first damage, for the journal
+    ENT_TYPE first_damage_cause; // entity type that caused first damage, for the journal
     int8_t first_damage_world;
     int8_t first_damage_level;
     uint8_t i9f4c;
@@ -106,12 +106,12 @@ struct StateMemory
     uint32_t money_last_levels;
     int32_t hud_flags;
     uint32_t presence_flags;
-    uint32_t coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
+    ENT_TYPE coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
     uint8_t cause_of_death;
     uint8_t padding10;
     uint8_t padding11;
     uint8_t padding12;
-    uint32_t cause_of_death_entity_type;
+    ENT_TYPE cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
     size_t toast;
     size_t speechbubble;

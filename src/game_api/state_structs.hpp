@@ -164,7 +164,7 @@ struct JournalProgressionSlot
     int8_t grid_position; // -1 = unassigned, will be assigned when opening the journal and gets the zoom effect
     uint8_t unknown3;
     uint8_t unknown4;
-    uint32_t entity;
+    ENT_TYPE entity;
     float x;
     float y;
     float angle;
