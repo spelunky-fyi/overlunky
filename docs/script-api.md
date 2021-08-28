@@ -1155,9 +1155,9 @@ Checks whether the player/monster has a certain powerup
 - [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
 - [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
 - [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total
-- [`array<int, 512> collected_money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) &Inventory::collected_money
+- [`array<ENT_TYPE, 512> collected_money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) &Inventory::collected_money
 - [`array<int, 512> collected_money_values`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_values) &Inventory::collected_money_values
-- [`array<int, 256> killed_enemies`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) &Inventory::killed_enemies
+- [`array<ENT_TYPE, 256> killed_enemies`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) &Inventory::killed_enemies
 - [`int companion_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_count) &Inventory::companion_count
 \
 Used in level transition to transfer to new player entity

@@ -11,7 +11,7 @@ class Ai
     int32_t unknown2;
     int32_t unknown3; // garbage?
     size_t unknown4;
-    size_t button_sequence;
+    size_t button_sequence; /*unsure*/
     Entity* self_pointer;
     size_t unknown7;
     Entity* target;
