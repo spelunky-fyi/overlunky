@@ -3993,6 +3993,15 @@ void render_entity_props()
             {
                 g_entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
+
+            if (g_entity->ai != 0)
+            {
+                ImGui::Text("Target:");
+                render_uid(g_entity->ai->target_uid, "Ai");
+                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &g_entity->ai->state, &u8_min, &s8_max);
+                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &g_entity->ai->trust, &u8_min, &s8_max);
+                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &g_entity->ai->whipped, &u8_min, &s8_max);
+            }
         }
     }
     if (ImGui::CollapsingHeader("Style"))

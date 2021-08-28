@@ -1,12 +1,13 @@
 #pragma once
 
+#include <array>
 #include <functional>
 #include <map>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <array>
+
 
 #include "color.hpp"
 #include "math.hpp"
