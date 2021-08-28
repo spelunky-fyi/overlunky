@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <functional>
 #include <map>
 #include <string>
@@ -312,10 +313,14 @@ struct Inventory
     uint32_t money;
     uint8_t bombs;
     uint8_t ropes;
-    int16_t poison_tick_timer; // Used in level transition to transfer to new player entity
-    bool cursed;               // Used in level transition to transfer to new player entity
-    uint8_t unknown_state;
-    uint8_t kapala_blood_amount; // Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity
+    int16_t poison_tick_timer;
+    /// Used in level transition to transfer to new player entity
+    bool cursed;
+    /// Used in level transition to transfer to new player entity
+    uint8_t health;
+    /// Used in level transition to transfer to new player entity
+    uint8_t kapala_blood_amount;
 
     uint8_t unknown2;
     uint32_t unknown3;
@@ -329,10 +334,10 @@ struct Inventory
     uint32_t unknown6;
     uint32_t unknown7;
 
-    ENT_TYPE collected_money[512]; // entity types
-    uint32_t collected_money_values[512];
+    std::array<ENT_TYPE, 512> collected_money; // entity types
+    std::array<uint32_t, 512> collected_money_values;
     uint32_t collected_money_count;
-    ENT_TYPE killed_enemies[256]; // entity types
+    std::array<ENT_TYPE, 256> killed_enemies; // entity types
     uint32_t kills_level;
     uint32_t kills_total;
 
@@ -345,7 +350,8 @@ struct Inventory
     int32_t unknown14;
     int32_t unknown15;
 
-    ENT_TYPE companions[8]; // hired hands, unlocked chars
+    /// Companion ENT_TYPEs, used in level transition to transfer to new player entity
+    std::array<uint32_t, 8> companions;
 
     uint32_t unknown24;
     uint32_t unknown25;
@@ -356,9 +362,12 @@ struct Inventory
     uint32_t unknown30;
     uint32_t unknown31;
 
-    uint8_t companion_trust[8];
+    /// 0..3, used in level transition to transfer to new player entity
+    std::array<uint8_t, 8> companion_trust;
+    /// Used in level transition to transfer to new player entity
     uint8_t companion_count;
-    uint8_t companion_unknown_state[8];
+    /// Used in level transition to transfer to new player entity
+    std::array<uint8_t, 8> companion_health;
 
     uint8_t unknown35;
     uint8_t unknown36;
@@ -366,7 +375,8 @@ struct Inventory
     uint32_t unknown38;
     uint32_t unknown39;
 
-    uint32_t acquired_powerups[30]; // Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity
+    std::array<ENT_TYPE, 30> acquired_powerups;
     uint32_t collected_money_total;
 };
 
