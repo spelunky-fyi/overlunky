@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <vector>
 
-
 #include "color.hpp"
 #include "math.hpp"
 #include "memory.hpp"
