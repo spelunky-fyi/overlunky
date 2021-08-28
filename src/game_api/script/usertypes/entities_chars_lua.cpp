@@ -35,7 +35,36 @@ void register_usertypes(sol::state& lua)
         "kills_total",
         &Inventory::kills_total,
         "collected_money_total",
-        &Inventory::collected_money_total);
+        &Inventory::collected_money_total,
+        "collected_money",
+        &Inventory::collected_money,
+        "collected_money_values",
+        &Inventory::collected_money_values,
+        "killed_enemies",
+        &Inventory::killed_enemies,
+        "companion_count",
+        &Inventory::companion_count,
+        "companions",
+        &Inventory::companions,
+        "companion_trust",
+        &Inventory::companion_trust,
+        "companion_health",
+        &Inventory::companion_health);
+
+    lua.new_usertype<Ai>(
+        "Ai",
+        "target",
+        &Ai::target,
+        "target_uid",
+        &Ai::target_uid,
+        "timer",
+        &Ai::timer,
+        "state",
+        &Ai::state,
+        "trust",
+        &Ai::trust,
+        "whipped",
+        &Ai::whipped);
 
     lua.new_usertype<Player>(
         "Player",
@@ -47,6 +76,8 @@ void register_usertypes(sol::state& lua)
         &Player::linked_companion_parent,
         "linked_companion_child",
         &Player::linked_companion_child,
+        "ai",
+        &Player::ai,
         "set_jetpack_fuel",
         &Player::set_jetpack_fuel,
         "kapala_blood_amount",
