@@ -1725,6 +1725,7 @@ for i,v in pairs(projectiles_web) do
     projectiles_web_ids[#projectiles_web_ids+1] = i
 end
 set_post_entity_spawn(function(ent)
+    if not options.projectile then return end
     ent.animation_frame = pick(projectiles_web_ids)
     set_interval(function()
         if ent.overlay == nil and projectiles_web[ent.animation_frame] ~= nil then
