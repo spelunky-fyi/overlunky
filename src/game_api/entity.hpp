@@ -161,8 +161,8 @@ class Entity
     float y;
     float w;
     float h;
-    float f50;
-    float f54;
+    float special_offsetx;
+    float special_offsety;
     Color color;
     float offsetx;
     float offsety;

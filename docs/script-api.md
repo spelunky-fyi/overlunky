@@ -1066,6 +1066,8 @@ Create a new color by specifying its values
 - [`int layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Entity::layer
 - [`float width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &Entity::w
 - [`float height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &Entity::h
+- [`float special_offsetx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_offsetx) &Entity::special_offsetx
+- [`float special_offsety`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_offsety) &Entity::special_offsety
 - [`float tile_width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_width) &Entity::tilew
 - [`float tile_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_height) &Entity::tileh
 - [`float angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) &Entity::angle
