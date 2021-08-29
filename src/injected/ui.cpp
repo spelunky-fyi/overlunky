@@ -2636,7 +2636,13 @@ void render_messages()
         {
             if (fade_script_messages && now - 12s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
+            std::istringstream messages(message.message);
+            while (!messages.eof())
+            {
+                std::string mline;
+                getline(messages, mline);
+                queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
+            }
         }
     }
     for (auto&& message : g_Console->consume_messages())
@@ -2645,7 +2651,13 @@ void render_messages()
     }
     for (auto message : g_ConsoleMessages)
     {
-        queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
+        std::istringstream messages(message.message);
+        while (!messages.eof())
+        {
+            std::string mline;
+            getline(messages, mline);
+            queue.push_back(std::make_tuple("Console", mline, message.time, message.color));
+        }
     }
     std::erase_if(g_ConsoleMessages, [&](auto message)
                   { return fade_script_messages && now - 12s > message.time; });
