@@ -246,13 +246,15 @@ void Entity::remove()
     auto state = State::get();
     auto ptr_from = state.ptr()->layers[layer];
     auto remove_layer_func = get_remove_layer();
-    remove_layer_func(ptr_from, this);
-
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
     {
-        auto item = get_entity_ptr(pitems[idx]);
-        item->remove();
+        remove_layer_func(ptr_from, this);
+        int* pitems = (int*)items.begin;
+        for (uint8_t idx = 0; idx < items.count; ++idx)
+        {
+            auto item = get_entity_ptr(pitems[idx]);
+            item->remove();
+        }
     }
 }
 
