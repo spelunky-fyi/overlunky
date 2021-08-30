@@ -157,8 +157,12 @@ void register_usertypes(sol::state& lua)
     /// Define a new room remplate to use with `set_room_template`
     lua["define_room_template"] = [](std::string room_template, ROOM_TEMPLATE_TYPE type) -> uint16_t
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        return backend->g_state->level_gen->data->define_room_template(std::move(room_template), static_cast<RoomTemplateType>(type));
+        return State::get().ptr_local()->level_gen->data->define_room_template(std::move(room_template), static_cast<RoomTemplateType>(type));
+    };
+    /// Set the size of room template in tiles, the template must be of type `ROOM_TEMPLATE_TYPE.MACHINE_ROOM`.
+    lua["set_room_template_size"] = [](uint16_t room_template, uint16_t width, uint16_t height) -> bool
+    {
+        return State::get().ptr_local()->level_gen->data->set_room_template_size(room_template, width, height);
     };
 
     /// Get the inverse chance of a procedural spawn for the current level.
@@ -324,7 +328,7 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("BEG", "QUEST_NOT_STARTED", 0, "ALTAR_DESTROYED", 1, "SPAWNED_WITH_BOMBBAG", 2, "BOMBBAG_THROWN", 3, "SPAWNED_WITH_TRUECROWN", 4, "TRUECROWN_THROWN", 5);
 
     /// Use in `define_room_template` to declare whether a room template has any special behavior
-    lua.create_named_table("ROOM_TEMPLATE_TYPE", "NONE", 0, "ENTRANCE", 1, "EXIT", 2, "SHOP", 3);
+    lua.create_named_table("ROOM_TEMPLATE_TYPE", "NONE", 0, "ENTRANCE", 1, "EXIT", 2, "SHOP", 3, "MACHINE_ROOM", 4);
 
     /// Determines which kind of shop spawns in the level, if any
     lua.create_named_table("SHOP_TYPE", "GENERAL_STORE", 0, "CLOTHING_SHOP", 1, "WEAPON_SHOP", 2, "SPECIALTY_SHOP", 3, "HIRED_HAND_SHOP", 4, "PET_SHOP", 5, "DICE_SHOP", 6, "TUSK_DICE_SHOP", 13);

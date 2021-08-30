@@ -20,6 +20,23 @@ struct RoomTemplateDef
 {
     std::uint16_t id;
 };
+struct RoomData
+{
+    bool flag0 : 1; // ???
+    bool flag1 : 1; // ???
+    bool flag2 : 1; // ???
+    bool flipped : 1;
+    bool flag4 : 1; // ???
+    // 3-bit padding
+    uint8_t room_width;
+    uint8_t room_height;
+    // padding
+    const char* room_data;
+};
+struct RoomTemplateData
+{
+    std::vector<RoomData> datas;
+};
 struct ChanceDef
 {
     std::uint32_t id;
@@ -41,6 +58,7 @@ enum class RoomTemplateType
     Entrance = 1,
     Exit = 2,
     Shop = 3,
+    MachineRoom = 4,
 };
 
 struct LevelGenData
@@ -63,6 +81,7 @@ struct LevelGenData
 
     std::optional<std::uint16_t> get_room_template(const std::string& room_template);
     std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
+    bool set_room_template_size(std::uint16_t room_template, uint16_t width, uint16_t height);
     RoomTemplateType get_room_template_type(std::uint16_t room_template);
 
     // TODO: Get offsets from binary instead of hardcoding them
@@ -78,6 +97,16 @@ struct LevelGenData
     const std::unordered_map<std::string, RoomTemplateDef>& room_templates() const
     {
         return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
+    }
+
+    using SetRoomDatas = std::array<RoomTemplateData, 8 * 15>;
+    const SetRoomDatas& setroom_datas() const
+    {
+        return *(const SetRoomDatas*)((size_t)this + 0x7f0);
+    }
+    const std::unordered_map<std::uint16_t, RoomTemplateData>& room_template_datas() const
+    {
+        return *(const std::unordered_map<std::uint16_t, RoomTemplateData>*)((size_t)this + 0x108);
     }
 
     const std::unordered_map<std::string, ChanceDef>& monster_chances() const
@@ -383,7 +412,7 @@ struct LevelGenSystem
     LevelGenRoomsMeta* rooms_meta_29;
     LevelGenRoomsMeta* backlayer_room_exists;
     LevelGenRoomsMeta* machine_room_origin;
-    LevelGenRoomsMeta* rooms_meta_32;
+    LevelGenRoomsMeta* dual_room;
     LevelGenRoomsMeta* rooms_meta_33;
     LevelGenRoomsMeta* rooms_meta_34;
     std::uint32_t spawn_room_x;
