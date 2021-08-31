@@ -804,19 +804,20 @@ using GenerateRoom = void(LevelGenSystem*, int, int);
 GenerateRoom* g_generate_room_trampoline{nullptr};
 void generate_room(LevelGenSystem* level_gen, int room_idx_x, int room_idx_y)
 {
-    const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
-    const uint16_t room_template = level_gen->rooms_frontlayer->rooms[flat_room_idx];
-    switch (level_gen->data->get_room_template_type(room_template))
+    if (g_overridden_room_template == std::nullopt)
     {
-    default:
-        break;
-    case RoomTemplateType::MachineRoom:
-        // Revert the roomtemplate the next time room data will be collected
-        g_overridden_room_template = room_template;
-        level_gen->rooms_frontlayer->rooms[flat_room_idx] = 109;
-        break;
+        const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
+        const uint16_t room_template = level_gen->rooms_frontlayer->rooms[flat_room_idx];
+        if (level_gen->data->get_room_template_type(room_template) == RoomTemplateType::MachineRoom)
+        {
+            // Revert the room template the next time room data will be collected
+            g_overridden_room_template = room_template;
+            // Set it to any machine room for now, this will branch in g_generate_room_trampoline to allow for large levels
+            level_gen->rooms_frontlayer->rooms[flat_room_idx] = 109;
+        }
     }
     g_generate_room_trampoline(level_gen, room_idx_x, room_idx_y);
+    g_overridden_room_template.reset();
 }
 
 using GatherRoomData = void(LevelGenData*, byte, int room_x, int, bool, uint8_t*, uint8_t*, size_t, uint8_t*, uint8_t*, uint8_t*, uint8_t*);
@@ -827,7 +828,6 @@ void gather_room_data(LevelGenData* tile_storage, byte param_2, int room_idx_x, 
     {
         const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
         State::get().ptr()->level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_template.value();
-        g_overridden_room_template.reset();
     }
     g_gather_room_data_trampoline(tile_storage, param_2, room_idx_x, room_idx_y, hard_level, param_6, param_7, param_8, param_9, param_10, out_room_width, out_room_height);
 }
