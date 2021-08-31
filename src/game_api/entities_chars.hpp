@@ -3,6 +3,44 @@
 #include "movable.hpp"
 #include <cstdint>
 
+class Ai
+{
+  public:
+    uint32_t unknown1a; // flags?
+    uint32_t unknown1b; // flags?
+    int32_t unknown2;
+    int32_t unknown3; // garbage?
+    size_t unknown4;
+    size_t button_sequence;
+    Entity* self_pointer;
+    size_t unknown7;
+    Entity* target;
+    size_t unknown9;
+    size_t unknown10;
+    int16_t unknown11;
+    int16_t unknown11b;
+    int32_t timer;
+    /// AI state (patrol, sleep, attack, aggro...)
+    int8_t state; // 8 = HH agro
+    int8_t unknown12;
+    /// Levels completed with, 0..3
+    uint8_t trust;
+    /// How many times master has violated us
+    uint8_t whipped;
+    int8_t unknown15;
+    int8_t unknown16;
+    int16_t unknown17;
+    int16_t unknown19;
+    int16_t unknown20; // distance to target?
+    int32_t target_uid;
+    int8_t unknown22;
+    int8_t unknown23;
+    int8_t unknown24;
+    int8_t unknown25;
+    int32_t unknown26;
+    //Map unknown27;
+};
+
 class PowerupCapable : public Movable
 {
   public:
@@ -31,7 +69,7 @@ class Player : public PowerupCapable
     Illumination* emitted_light;
     int32_t linked_companion_child;  // entity uid
     int32_t linked_companion_parent; // entity uid
-    size_t ai_func;
+    Ai* ai;
     size_t input_ptr;
     size_t p160;
     int32_t i168;

@@ -2636,7 +2636,13 @@ void render_messages()
         {
             if (fade_script_messages && now - 12s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
+            std::istringstream messages(message.message);
+            while (!messages.eof())
+            {
+                std::string mline;
+                getline(messages, mline);
+                queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
+            }
         }
     }
     for (auto&& message : g_Console->consume_messages())
@@ -2645,7 +2651,13 @@ void render_messages()
     }
     for (auto message : g_ConsoleMessages)
     {
-        queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
+        std::istringstream messages(message.message);
+        while (!messages.eof())
+        {
+            std::string mline;
+            getline(messages, mline);
+            queue.push_back(std::make_tuple("Console", mline, message.time, message.color));
+        }
     }
     std::erase_if(g_ConsoleMessages, [&](auto message)
                   { return fade_script_messages && now - 12s > message.time; });
@@ -3750,26 +3762,6 @@ void render_entity_props()
         render_state("Current state", g_entity->state);
         render_state("Last state", g_entity->last_state);
         render_ai("AI state", g_entity->move_state);
-        if (ImGui::Button("Change"))
-        {
-            unsigned int layer_to = 0;
-            if (g_entity->layer == 0)
-                layer_to = 1;
-            g_entity->set_layer(layer_to);
-        }
-        ImGui::SameLine();
-        switch (g_entity->layer)
-        {
-        case 0:
-            ImGui::Text("Layer: FRONT");
-            break;
-        case 1:
-            ImGui::Text("Layer: BACK");
-            break;
-        default:
-            ImGui::Text("Layer: UNKNOWN");
-            break;
-        }
         if (g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
@@ -3821,6 +3813,26 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Position"))
     {
+        if (ImGui::Button("Change"))
+        {
+            unsigned int layer_to = 0;
+            if (g_entity->layer == 0)
+                layer_to = 1;
+            g_entity->set_layer(layer_to);
+        }
+        ImGui::SameLine();
+        switch (g_entity->layer)
+        {
+        case 0:
+            ImGui::Text("Layer: FRONT");
+            break;
+        case 1:
+            ImGui::Text("Layer: BACK");
+            break;
+        default:
+            ImGui::Text("Layer: UNKNOWN");
+            break;
+        }
         ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2f, 1.0f);
         ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2f, 1.0f);
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2f, 1.0f);
@@ -3992,6 +4004,18 @@ void render_entity_props()
             if (ImGui::Button("Add##AddPowerupButton"))
             {
                 g_entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
+            }
+
+            if (g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && g_entity->ai != 0)
+            {
+                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &g_entity->ai->state, &u8_min, &s8_max);
+                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &g_entity->ai->trust, &u8_min, &s8_max);
+                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &g_entity->ai->whipped, &u8_min, &s8_max);
+                if (g_entity->ai->target_uid != -1)
+                {
+                    ImGui::Text("Target:");
+                    render_uid(g_entity->ai->target_uid, "Ai");
+                }
             }
         }
     }

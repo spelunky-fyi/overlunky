@@ -737,9 +737,9 @@ end
         newinput->next = 0;
         newinput->current = 0;
         newinput->orig_input = player->input_ptr;
-        newinput->orig_ai = player->ai_func;
+        newinput->orig_ai = player->ai;
         player->input_ptr = reinterpret_cast<size_t>(newinput);
-        player->ai_func = 0;
+        player->ai = 0;
         backend->script_input[uid] = newinput;
         // DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
     };
@@ -754,7 +754,7 @@ end
             return;
         // DEBUG("Return input: {:x} -> {:x}", player->input_ptr, backend->script_input[uid]->orig_input);
         player->input_ptr = backend->script_input[uid]->orig_input;
-        player->ai_func = backend->script_input[uid]->orig_ai;
+        player->ai = backend->script_input[uid]->orig_ai;
         backend->script_input.erase(uid);
     };
     /// Send input
