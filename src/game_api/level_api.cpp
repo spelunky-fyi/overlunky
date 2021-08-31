@@ -1041,6 +1041,8 @@ void LevelGenData::init()
                     ""                             /// Move room width into its expected register
                     "\x48\x8B\x74\x24\x38"         // mov    rsi, QWORD PTR[rsp + 0x38]
                     "\x4c\x8b\x64\x24\x3c"         // mov    r12, QWORD PTR[rsp + 0x3c]
+                    ""                             /// Move room width into a redundant stack variable
+                    "\x48\x89\x74\x24\x48"         // mov    QWORD PTR[rsp + 0x48], rsi
                     ""                             /// Setup some registers for the next loop iteration
                     "\x44\x8b\x74\x24\x48"         // mov    r14d, DWORD PTR[rsp + 0x48]
                     "\x44\x8b\x7c\x24\x4c"         // mov    r15d, DWORD PTR[rsp + 0x4c]
