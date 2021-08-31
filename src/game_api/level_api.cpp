@@ -681,10 +681,16 @@ void get_room_size(uint32_t room_template, uint32_t& room_width, uint32_t& room_
         room_width = 5;
         room_height = 5;
     }
-    // chunk
-    else if (room_template >= 16 && room_template <= 18)
+    // chunk_ground, chunk_air
+    else if (room_template >= 16 && room_template <= 17)
     {
         room_width = 5;
+        room_height = 3;
+    }
+    // chunk_door
+    else if (room_template == 18)
+    {
+        room_width = 6;
         room_height = 3;
     }
     // bigroom
@@ -817,18 +823,6 @@ using GatherRoomData = void(LevelGenData*, byte, int room_x, int, bool, uint8_t*
 GatherRoomData* g_gather_room_data_trampoline{nullptr};
 void gather_room_data(LevelGenData* tile_storage, byte param_2, int room_idx_x, int room_idx_y, bool hard_level, uint8_t* param_6, uint8_t* param_7, size_t param_8, uint8_t* param_9, uint8_t* param_10, uint8_t* out_room_width, uint8_t* out_room_height)
 {
-    // TODO: Remove debugging code
-    //auto datas = tile_storage->room_template_datas();
-    //auto rooms = datas[State::get().ptr()->level_gen->rooms_frontlayer->rooms[room_idx_x + room_idx_y * 8]];
-    //auto rooms_2 = datas[107];
-    //auto rooms_3 = datas[109];
-    //auto rooms_4 = datas[267];
-
-    //auto set_rooms = tile_storage->setroom_datas();
-
-    //auto room_template = State::get().ptr()->level_gen->rooms_frontlayer->rooms[room_idx_x + room_idx_y * 8];
-    //(void)room_template;
-
     if (g_overridden_room_template.has_value())
     {
         const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
@@ -842,10 +836,6 @@ using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, RoomData*, RoomData
 SpawnRoomFromTileCodes* g_spawn_room_from_tile_codes_trampoline{nullptr};
 void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, RoomData* room_data, RoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
 {
-    // TODO: Remove debugging code
-    //const std::string_view name = State::get().ptr()->level_gen->get_room_template_name(room_template);
-    //(void)name;
-
     // TODO: Add hooks to allow manipulating room data
     g_spawn_room_from_tile_codes_trampoline(level_gen_data, room_idx_x, room_idx_y, room_data, back_room_data, param_6, dual_room, room_template);
 }
@@ -1020,58 +1010,60 @@ void LevelGenData::init()
 
             {
                 const void* get_room_size_addr = &get_room_size;
+
+                // Manually assembled code, let's hope it won't have to change ever
                 std::string code = fmt::format(
-                    /// Breakpoint for debugging
-                    //"\xcc"
-                    /// Push all volatile registers
-                    "\x50"     // push   rax
-                    "\x51"     // push   rcx
-                    "\x52"     // push   rdx
-                    "\x41\x50" // push   r8
-                    "\x41\x51" // push   r9
-                    "\x41\x52" // push   r10
-                    "\x41\x53" // push   r11
-                    /// Setup call
+                    //""                             /// Breakpoint for debugging
+                    //"\xcc"                         // int 3
+                    ""                             /// Push all volatile registers
+                    "\x50"                         // push   rax
+                    "\x51"                         // push   rcx
+                    "\x52"                         // push   rdx
+                    "\x41\x50"                     // push   r8
+                    "\x41\x51"                     // push   r9
+                    "\x41\x52"                     // push   r10
+                    "\x41\x53"                     // push   r11
+                    ""                             /// Setup call
                     "\x89\xd9"                     // mov    ecx, ebx
                     "\x48\x8d\x95\x38\xff\xff\xff" // lea    rdx, [rbp-0x100+0x38]
                     "\x4c\x8d\x85\x3c\xff\xff\xff" // lea    r8, [rbp-0x100+0x3c]
-                    /// Do the call with an absolute address
-                    "\x48\xb8{}" // mov    rax, &get_room_size
-                    "\xff\xd0"   // call   rax
-                    /// Recover volatile registers
-                    "\x41\x5b" // pop    r11
-                    "\x41\x5a" // pop    r10
-                    "\x41\x59" // pop    r9
-                    "\x41\x58" // pop    r8
-                    "\x5a"     // pop    rdx
-                    "\x59"     // pop    rcx
-                    "\x58"     // pop    rax
-                    /// Move room width into its expected register
-                    "\x48\x8B\x74\x24\x38" // mov    rsi, QWORD PTR[rsp + 0x38]
-                    /// Setup some registers for the next loop iteration
-                    "\x44\x8b\x74\x24\x48" // mov    r14d, DWORD PTR[rsp + 0x48]
-                    "\x44\x8b\x7c\x24\x4c" // mov    r15d, DWORD PTR[rsp + 0x4c]
-                    "\x48\x8b\x5c\x24\x40" // mov    rbx, QWORD PTR[rsp + 0x40]
-                    "\x4c\x8b\x54\x24\x30" // mov    r10, QWORD PTR[rsp + 0x30]
-                    "\x4c\x8b\x5c\x24\x28" // mov    r11, QWORD PTR[rsp + 0x28]
-                    "\x8b\x7c\x24\x20"     // mov    edi, DWORD PTR[rsp + 0x20]
+                    ""                             /// Do the call with an absolute address
+                    "\x48\xb8{}"                   // mov    rax, &get_room_size
+                    "\xff\xd0"                     // call   rax
+                    ""                             /// Recover volatile registers
+                    "\x41\x5b"                     // pop    r11
+                    "\x41\x5a"                     // pop    r10
+                    "\x41\x59"                     // pop    r9
+                    "\x41\x58"                     // pop    r8
+                    "\x5a"                         // pop    rdx
+                    "\x59"                         // pop    rcx
+                    "\x58"                         // pop    rax
+                    ""                             /// Move room width into its expected register
+                    "\x48\x8B\x74\x24\x38"         // mov    rsi, QWORD PTR[rsp + 0x38]
+                    "\x4c\x8b\x64\x24\x3c"         // mov    r12, QWORD PTR[rsp + 0x3c]
+                    ""                             /// Setup some registers for the next loop iteration
+                    "\x44\x8b\x74\x24\x48"         // mov    r14d, DWORD PTR[rsp + 0x48]
+                    "\x44\x8b\x7c\x24\x4c"         // mov    r15d, DWORD PTR[rsp + 0x4c]
+                    "\x48\x8b\x5c\x24\x40"         // mov    rbx, QWORD PTR[rsp + 0x40]
+                    "\x4c\x8b\x54\x24\x30"         // mov    r10, QWORD PTR[rsp + 0x30]
+                    "\x4c\x8b\x5c\x24\x28"         // mov    r11, QWORD PTR[rsp + 0x28]
+                    "\x8b\x7c\x24\x20"             // mov    edi, DWORD PTR[rsp + 0x20]
                     ,
                     to_le_bytes(get_room_size_addr));
 
                 // function start, expected at 0x220addd0
-                const size_t get_room_size_off = (size_t)g_load_level_file_trampoline + 0x13ad; // at 0x220af17d
-                const size_t get_room_size_size = 0x220af32c - 0x220af17d;                      // until 0x220af32c
+                const size_t get_room_size_off = (size_t)g_load_level_file_trampoline + (0x220af23e - 0x220addd0); // at 0x220af23e
+                const size_t get_room_size_size = 0x220af32c - 0x220af23e;                                         // until 0x220af32c
 
                 // Fill with nop, code is not performance-critical either way
                 code.resize(get_room_size_size, '\x90');
 
                 write_mem_prot(get_room_size_off, std::move(code), true);
 
-                // Replace MessageBox call with a breakpoint
+                // Replace MessageBox call with a breakpoint for debugging
                 std::string breakpoint = "\x90\x90\xcc"s;
                 breakpoint.resize(0x33, '\x90');
                 write_mem_prot(memory.at_exe(0x220af42b), std::move(breakpoint), true);
-                ////write_mem_prot(memory.at_exe(0x220af42b), "\xcc", true);
             }
         }
 
