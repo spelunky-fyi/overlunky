@@ -21,15 +21,6 @@
 #include <imgui.h>
 #include <sol/sol.hpp>
 
-using CallbackId = uint32_t;
-using Flags = std::uint32_t;
-using SPAWN_TYPE = int;                       // NoAlias
-using VANILLA_SOUND = std::string;            // NoAlias
-using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
-using TEXTURE = std::int64_t;                 // NoAlias
-using INPUTS = std::uint16_t;                 // NoAlias
-using LAYER = int;                            // NoAlias
-using ENT_TYPE = uint32_t;                    // NoAlias
 
 enum class ON
 {

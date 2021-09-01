@@ -30,6 +30,7 @@ header_files = [
     "../src/game_api/savedata.hpp",
     "../src/game_api/level_api.hpp",
     "../src/game_api/items.hpp",
+    "../src/game_api/aliases.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",

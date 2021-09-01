@@ -1095,7 +1095,8 @@ Use `overlaps_with(AABB hitbox)` instead
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
 - [`float movey`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movey) &Movable::movey
-- [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &Movable::buttons
+- [`BUTTON buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &Movable::buttons
+- [`BUTTON buttons_previous`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_previous) &Movable::buttons_previous
 - [`int stand_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stand_counter) &Movable::stand_counter
 - [`float jump_height_multiplier`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_height_multiplier) &Movable::jump_height_multiplier
 - [`int owner_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) &Movable::owner_uid
@@ -1124,9 +1125,9 @@ airtime = falling_timer
 - [`int exit_invincibility_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_invincibility_timer) &Movable::exit_invincibility_timer
 - [`int invincibility_frames_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invincibility_frames_timer) &Movable::invincibility_frames_timer
 - [`int frozen_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frozen_timer) &Movable::frozen_timer
-- [`bool is_button_pressed(int button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_pressed) &Movable::is_button_pressed
-- [`bool is_button_held(int button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_held) &Movable::is_button_held
-- [`bool is_button_released(int button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_released) &Movable::is_button_released
+- [`bool is_button_pressed(BUTTON button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_pressed) &Movable::is_button_pressed
+- [`bool is_button_held(BUTTON button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_held) &Movable::is_button_held
+- [`bool is_button_released(BUTTON button)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_released) &Movable::is_button_released
 - [`int price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) &Movable::price
 - [`nil stun(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun) &Movable::stun
 - [`nil freeze(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freeze) &Movable::freeze
@@ -2677,8 +2678,8 @@ You can just discard this handle if you do not need extended control anymore
 - [`bool auto_run_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=auto_run_enabled) &PlayerSlotSettings::auto_run_enabled
 - [`bool controller_right_stick`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller_right_stick) &PlayerSlotSettings::controller_right_stick
 ### `PlayerSlot`
-- [`int buttons_gameplay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_gameplay) &PlayerSlot::buttons_gameplay
-- [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &PlayerSlot::buttons
+- [`INPUTS buttons_gameplay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_gameplay) &PlayerSlot::buttons_gameplay
+- [`INPUTS buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &PlayerSlot::buttons
 - [`InputMapping input_mapping_keyboard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_keyboard) &PlayerSlot::input_mapping_keyboard
 - [`InputMapping input_mapping_controller`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_controller) &PlayerSlot::input_mapping_controller
 - [`int player_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_id) &PlayerSlot::player_id
@@ -3563,8 +3564,5 @@ Params: `PlayingSound vanilla_sound`
 - [`DYING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CHAR_STATE.DYING) 22
 ## Aliases
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
-### CallbackId == int;
-### Flags == int;
-### uColor == int;
 ## External Function Library
 If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting

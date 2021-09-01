@@ -11,6 +11,7 @@
 #include "color.hpp"
 #include "math.hpp"
 #include "memory.hpp"
+#include "aliases.hpp"
 
 struct RenderInfo;
 struct Texture;
@@ -47,10 +48,6 @@ using EntityDestroy = void (*)(Entity*);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
 using AddLayer = void (*)(void*, Entity*);
 using RemoveLayer = void (*)(void*, Entity*);
-
-using LAYER = int;
-using TEXTURE = std::int64_t;
-using ENT_TYPE = uint32_t;
 
 struct EntityDB
 {

@@ -2,10 +2,7 @@
 
 #include <array>
 #include <cstdint>
-
-#define MAX_PLAYERS 4
-using ENT_TYPE = uint32_t;    // NoAlias
-using INPUTS = std::uint16_t; // NoAlias
+#include "aliases.hpp"
 
 class Entity;
 

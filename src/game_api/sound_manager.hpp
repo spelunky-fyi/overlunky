@@ -11,6 +11,7 @@
 
 #include "audio_buffer.hpp"
 #include "fmod.hpp"
+#include "aliases.hpp"
 
 class SoundManager;
 class PlayingSound;
@@ -30,8 +31,6 @@ enum class SOUND_TYPE
     Sfx,
     Music
 };
-
-using VANILLA_SOUND_PARAM = std::uint32_t;
 
 class CustomSound
 {

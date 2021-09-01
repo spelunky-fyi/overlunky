@@ -5,7 +5,6 @@
 
 class Entity;
 
-using SpawnTypeFlags = int;
 enum SpawnType : SpawnTypeFlags
 {
     SPAWN_TYPE_LEVEL_GEN_TILE_CODE = 1 << 0,
