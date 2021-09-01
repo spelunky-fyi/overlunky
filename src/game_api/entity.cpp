@@ -216,8 +216,10 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
 
 void Entity::set_layer(LAYER layer_to)
 {
-    if (layer == layer_to || layer_to > 1 || layer_to < 0)
+    uint8_t dest_layer = enum_to_layer(layer_to);
+    if (layer == dest_layer)
         return;
+
     auto state = State::get();
     if (this != this->topmost_mount())
         this->topmost_mount()->set_layer(layer_to);
@@ -229,7 +231,7 @@ void Entity::set_layer(LAYER layer_to)
         remove_layer_func(ptr_from, this);
     }
 
-    auto ptr_to = state.ptr()->layers[layer_to];
+    auto ptr_to = state.ptr()->layers[dest_layer];
     auto add_layer_func = get_add_layer();
     add_layer_func(ptr_to, this);
 
@@ -371,10 +373,10 @@ bool Movable::is_button_released(uint32_t button)
     return (buttons & button) == 0 && (buttons & (button << 8)) != 0;
 }
 
-void hook_movable_state_machine(Movable* self)
+void hook_movable_state_machine(Movable* _self)
 {
     hook_vtable<void(Movable*)>(
-        self,
+        _self,
         [](Movable* self, void (*original)(Movable*))
         {
             EntityHooksInfo& hook_info = self->get_hooks();
@@ -518,15 +520,15 @@ EntityHooksInfo& Entity::get_hooks()
     {
         hook_dtor(this, [](void* self)
                   {
-                      auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
-                                             { return hook.entity == self; });
-                      if (it != g_entity_hooks.end())
+                      auto _it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
+                                              { return hook.entity == self; });
+                      if (_it != g_entity_hooks.end())
                       {
-                          for (auto& cb : it->on_destroy)
+                          for (auto& cb : _it->on_destroy)
                           {
                               cb.fun((Entity*)self);
                           }
-                          g_entity_hooks.erase(it);
+                          g_entity_hooks.erase(_it);
                       }
                   });
         g_entity_hooks.push_back({this});
@@ -555,8 +557,8 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
             this,
             [](Entity* self, bool _some_bool, Entity* from, void (*original)(Entity*, bool, Entity*))
             {
-                EntityHooksInfo& hook_info = self->get_hooks();
-                for (auto& [id, on_kill] : hook_info.on_kill)
+                EntityHooksInfo& _hook_info = self->get_hooks();
+                for (auto& [id, on_kill] : _hook_info.on_kill)
                 {
                     on_kill(self, from);
                 }
@@ -589,8 +591,8 @@ void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<vo
             {
                 if (opener->movey > 0)
                 {
-                    EntityHooksInfo& hook_info = self->get_hooks();
-                    for (auto& [id, on_open] : hook_info.on_open)
+                    EntityHooksInfo& _hook_info = self->get_hooks();
+                    for (auto& [id, on_open] : _hook_info.on_open)
                     {
                         on_open(self, opener);
                     }

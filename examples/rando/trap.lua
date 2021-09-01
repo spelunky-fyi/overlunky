@@ -29,16 +29,16 @@ function replace_trap(v)
         return false
     end
 
-    top = get_entities_at(0, 0x180, x, y + 1, l, 0.1)
-    bottom = get_entities_at(0, 0x180, x, y - 1.5, l, 0.6)
-    left = get_entities_at(0, 0x180, x - 1, y, l, 0.1)
-    right = get_entities_at(0, 0x180, x + 1, y, l, 0.1)
+    top = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x, y + 1, l, 0.1)
+    bottom = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x, y - 1.5, l, 0.6)
+    left = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x - 1, y, l, 0.1)
+    right = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x + 1, y, l, 0.1)
     lava = get_entities_at(ENT_TYPE.LIQUID_LAVA, 0, x, y, l, 2.0)
     shop = get_entities_at(ENT_TYPE.FX_SALEDIALOG_CONTAINER, 0, x, y, l, 6.0)
     shoppie = get_entities_at(ENT_TYPE.MONS_SHOPKEEPER, 0, x, y, l, 4.0)
     tusk = get_entities_at(ENT_TYPE.MONS_MADAMETUSK, 0, x, y, l, 6.0)
     altar = get_entities_at(ENT_TYPE.FLOOR_ALTAR, 0, x, y, l, 3.0)
-    plr = get_entities_at(0, 1, x, y, l, 4.0)
+    plr = get_entities_at(0, MASK.PLAYER, x, y, l, 4.0)
     curse_pot = get_entities_at(ENT_TYPE.ITEM_CURSEDPOT, 0, x, y, l, 2.0)
 
     if #shop ~= 0 or #shoppie ~= 0 or #tusk ~= 0 or #altar ~= 0 or #plr ~= 0 or #curse_pot ~= 0 then

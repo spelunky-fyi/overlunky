@@ -158,23 +158,26 @@ bool LuaBackend::update()
     try
     {
         std::lock_guard gil_guard{gil};
+        // Deprecated =======
 
-        /// Runs on every game engine frame.
+        /// Use `set_callback(function, ON.FRAME)` instead
         sol::optional<sol::function> on_frame = lua["on_frame"];
-        /// Runs on entering the camp.
+        /// Use `set_callback(function, ON.CAMP)` instead
         sol::optional<sol::function> on_camp = lua["on_camp"];
-        /// Runs on the start of every level.
+        /// Use `set_callback(function, ON.LEVEL)` instead
         sol::optional<sol::function> on_level = lua["on_level"];
-        /// Runs on the start of first level.
+        /// Use `set_callback(function, ON.START)` instead
         sol::optional<sol::function> on_start = lua["on_start"];
-        /// Runs on the start of level transition.
+        /// Use `set_callback(function, ON.TRANSITION)` instead
         sol::optional<sol::function> on_transition = lua["on_transition"];
-        /// Runs on the death screen.
+        /// Use `set_callback(function, ON.DEATH)` instead
         sol::optional<sol::function> on_death = lua["on_death"];
-        /// Runs on any ending cutscene.
+        /// Use `set_callback(function, ON.WIN)` instead
         sol::optional<sol::function> on_win = lua["on_win"];
-        /// Runs on any [screen change](#on).
+        /// Use `set_callback(function, ON.SCREEN)` instead
         sol::optional<sol::function> on_screen = lua["on_screen"];
+
+        // ==========
 
         std::vector<Player*> players = get_players();
         lua["players"] = std::vector<Player*>(players);
@@ -475,7 +478,8 @@ void LuaBackend::draw(ImDrawList* dl)
             return;
         }
 
-        /// Runs on every screen frame. You need this to use draw functions.
+        // Deprecated
+        /// Use `set_callback(function, ON.GUIFRAME)` instead
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 
         GuiDrawContext draw_ctx(this, dl);
@@ -792,8 +796,8 @@ void LuaBackend::hook_entity_dtor(Entity* entity)
     if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)
                       { return dtor_hook.first == entity->uid; }) == 0)
     {
-        std::uint32_t dtor_hook_id = entity->set_on_destroy([this](Entity* entity)
-                                                            { pre_entity_destroyed(entity); });
+        std::uint32_t dtor_hook_id = entity->set_on_destroy([this](Entity* _entity)
+                                                            { pre_entity_destroyed(_entity); });
         entity_dtor_hooks.push_back({entity->uid, dtor_hook_id});
     }
 }

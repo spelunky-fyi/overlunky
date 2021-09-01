@@ -110,10 +110,10 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
     }
     else
     {
-        auto read_file_from_disk = [](const char* file_path, void* (*allocator)(std::size_t)) -> FileInfo*
+        auto read_file_from_disk = [](const char* filepath, void* (*allocator)(std::size_t)) -> FileInfo*
         {
             FILE* file{nullptr};
-            auto error = fopen_s(&file, file_path, "rb");
+            auto error = fopen_s(&file, filepath, "rb");
             if (error == 0 && file != nullptr)
             {
                 auto close_file = OnScopeExit{[file]()
@@ -135,7 +135,7 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
                     const auto size_read = fread(data, 1, file_size, file);
                     if (size_read != file_size)
                     {
-                        DEBUG("Could not read file {}, this will either crash or cause glitches...", file_path);
+                        DEBUG("Could not read file {}, this will either crash or cause glitches...", filepath);
                     }
 
                     FileInfo* file_info = new (buf) FileInfo();

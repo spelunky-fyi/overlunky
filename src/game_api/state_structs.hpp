@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #define MAX_PLAYERS 4
+using ENT_TYPE = uint32_t; // NoAlias
 
 class Entity;
 
@@ -163,7 +164,7 @@ struct JournalProgressionSlot
     int8_t grid_position; // -1 = unassigned, will be assigned when opening the journal and gets the zoom effect
     uint8_t unknown3;
     uint8_t unknown4;
-    uint32_t entity;
+    ENT_TYPE entity;
     float x;
     float y;
     float angle;
@@ -717,6 +718,6 @@ struct SelectPlayerSlot
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint32_t character;  // Entity DB ID
+    ENT_TYPE character;  // Entity DB ID
     uint32_t texture_id; // Texture DB ID
 };

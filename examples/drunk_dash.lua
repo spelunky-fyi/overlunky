@@ -10,7 +10,7 @@ local prev_door = { false, false, false, false }
 function can_use(uid)
   local x, y, l = get_position(uid)
   for i,v in ipairs(get_entities_at(ENT_TYPE.FX_BUTTON, 0, x, y, l, 5)) do
-    local e = get_entity(v):as_movable()
+    local e = get_entity(v)
     if e.color.a > 0 then
       return true
     end

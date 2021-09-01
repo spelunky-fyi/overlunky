@@ -462,7 +462,7 @@ set_callback(function()
     end
     set_interval(function()
         if state.theme ~= THEME.DUAT then return false end
-        if #get_entities_by_mask(MASK.LAVA) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
+        if #get_entities_by(0, MASK.LAVA, LAYER.BOTH) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn_liquid(ENT_TYPE.LIQUID_LAVA, state.level_gen.spawn_x, state.level_gen.spawn_y - 2)
         elseif #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 36, LAYER.FRONT, 0, 0)
@@ -934,7 +934,7 @@ local shop_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.C
 
 set_callback(function()
     local in_shop = {}
-    local items = get_entities_by_mask(MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER)
+    local items = get_entities_by(0, MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER, LAYER.BOTH)
     for i,v in ipairs(items) do
         local e = get_entity(v)
         if test_flag(e.flags, ENT_FLAG.SHOP_ITEM) then
@@ -1436,7 +1436,7 @@ local function dead_hundun()
     if state.theme == THEME.HUNDUN then
         local hunduns = get_entities_by_type(ENT_TYPE.MONS_HUNDUN)
         if #hunduns > 0 then
-            if get_entity_ai_state(hunduns[1]) == 4 then -- this hundun is just chillin on the floor
+            if get_entity(hunduns[1]).move_state == 4 then -- this hundun is just chillin on the floor
                 kill_boss(THEME.HUNDUN)
             end
         end

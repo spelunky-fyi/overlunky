@@ -248,7 +248,7 @@ Entity* Floor::find_corner_decoration(FLOOR_SIDE side)
     }
     return nullptr;
 }
-void Floor::add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, Layer* layer_ptr)
+void Floor::add_decoration_opt(FLOOR_SIDE side, ENT_TYPE decoration_entity_type, Layer* layer_ptr)
 {
     if (side > RIGHT)
     {

@@ -234,7 +234,7 @@ function recalculate()
     if #exits < 1 then
         return
     end
-    tiles = get_entities_by(0, 0x180, 0)
+    tiles = get_entities_by(0, MASK.FLOOR | MASK.ACTIVEFLOOR, LAYER.FRONT)
     board = {}
     xmin, ymin, xmax, ymax = get_bounds()
     for y = ymin - 0.5, ymax + 0.5, -1 do
@@ -252,7 +252,7 @@ function recalculate()
                 tx = math.floor(x - xmin + 1)
                 ty = math.floor(ymin - y + 1)
                 cost = 200
-                if ent.type.id == ENT_TYPE.FLOOR_PIPE or ent.type.search_flags == 0x80 then
+                if ent.type.id == ENT_TYPE.FLOOR_PIPE or ent.type.search_flags == MASK.ACTIVEFLOOR then
                     cost = 5
                 end
                 if tx >= 1 and tx <= #board[1] and ty >= 1 and ty <= #board then
@@ -277,7 +277,7 @@ set_callback(function()
     handler.nodes = {}
     recalculate()
     set_interval(function()
-        tiles = get_entities_by(0, 0x180, 0)
+        tiles = get_entities_by(0, MASK.FLOOR | MASK.ACTIVEFLOOR, LAYER.FRONT)
         if ntiles ~= #tiles and options.update then
             ntiles = #tiles
             recalculate()

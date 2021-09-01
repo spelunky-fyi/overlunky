@@ -8,8 +8,8 @@
 
 #include <sol/sol.hpp>
 
-LuaConsole::LuaConsole(SoundManager* sound_manager)
-    : LuaBackend(sound_manager, this)
+LuaConsole::LuaConsole(SoundManager* soundmanager)
+    : LuaBackend(soundmanager, this)
 {
     lua["__script_id"] = "console_proxy.lua";
 
@@ -359,13 +359,13 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         "while"sv,
                     };
 
-                    std::vector<std::string_view> possible_options;
+                    std::vector<std::string_view> possibleoptions;
 
                     for (std::string_view opt : additional_options)
                     {
                         if (opt.starts_with(to_complete_end))
                         {
-                            possible_options.push_back(opt);
+                            possibleoptions.push_back(opt);
                         }
                     }
 
@@ -376,15 +376,15 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             const std::string_view str = k.as<std::string_view>();
                             if (str.starts_with(to_complete_end) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                             {
-                                possible_options.push_back(str);
+                                possibleoptions.push_back(str);
                             }
                         }
                     }
-                    return possible_options;
+                    return possibleoptions;
                 }
                 else
                 {
-                    std::vector<std::string_view> possible_options;
+                    std::vector<std::string_view> possibleoptions;
 
                     // Need to collect these in a vector, otherwise the state somehow breaks
                     std::vector<sol::userdata> source_obj{};
@@ -404,7 +404,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         }
                         else
                         {
-                            return possible_options;
+                            return possibleoptions;
                         }
                     }
 
@@ -418,7 +418,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                                 const std::string_view str = k.as<std::string_view>();
                                 if ((grab_all || str.starts_with(to_complete_end)) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                                 {
-                                    possible_options.push_back(str);
+                                    possibleoptions.push_back(str);
                                 }
                             }
                         }
@@ -454,7 +454,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             break;
                         }
                     }
-                    return possible_options;
+                    return possibleoptions;
                 }
             }(to_complete_end, to_complete_base);
         }
@@ -775,14 +775,14 @@ const std::filesystem::path& LuaConsole::get_root_path() const
 void LuaConsole::register_command(LuaBackend* provider, std::string command_name, sol::function cmd)
 {
     lua[command_name] = std::move(cmd);
-    console_commands[std::move(command_name)] = provider;
+    console_commands_list[std::move(command_name)] = provider;
 }
 void LuaConsole::unregister_command(LuaBackend* provider, std::string command_name)
 {
-    if (console_commands[command_name] == provider)
+    if (console_commands_list[command_name] == provider)
     {
         lua[command_name] = sol::nil;
-        console_commands.erase(std::move(command_name));
+        console_commands_list.erase(std::move(command_name));
     }
 }
 

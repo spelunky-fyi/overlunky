@@ -125,7 +125,7 @@ class Elevator : public Movable
 class ClamBase : public Movable
 {
   public:
-    uint32_t treasure_type;
+    ENT_TYPE treasure_type;
     int32_t treasure_uid; // set to nothing when spawning in overlunky
     float treasure_x_pos;
     float treasure_y_pos;
