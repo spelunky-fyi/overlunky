@@ -20,7 +20,6 @@ bool PostRoomGenerationContext::set_room_template(uint32_t x, uint32_t y, LAYER 
 {
     return State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
 }
-
 bool PostRoomGenerationContext::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l)
 {
     return State::get().ptr_local()->level_gen->mark_as_machine_room_origin(x, y, l);
@@ -34,6 +33,87 @@ bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE ch
 void PostRoomGenerationContext::set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer)
 {
     State::get().ptr_local()->level_gen->data->set_num_extra_spawns(extra_spawn_id, num_spawns_front_layer, num_spawns_back_layer);
+}
+
+std::optional<SHORT_TILE_CODE> PostRoomGenerationContext::define_short_tile_code(ShortTileCodeDef short_tile_code_def)
+{
+    return State::get().ptr_local()->level_gen->data->define_short_tile_code(short_tile_code_def);
+}
+void PostRoomGenerationContext::change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef short_tile_code_def)
+{
+    State::get().ptr_local()->level_gen->data->change_short_tile_code(short_tile_code, short_tile_code_def);
+}
+
+std::optional<SHORT_TILE_CODE> PreHandleRoomTilesContext::get_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer) const
+{
+    if (tx >= 0 && tx < 10 && ty >= 0 && ty < 8)
+    {
+        layer = layer < 0 ? 0 : layer;
+        if (layer == 0)
+        {
+            return get_room_data().front_layer[tx][ty];
+        }
+        else if (has_back_layer())
+        {
+            return get_room_data().back_layer.value()[tx][ty];
+        }
+    }
+    return std::nullopt;
+}
+bool PreHandleRoomTilesContext::set_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code)
+{
+    if (tx >= 0 && tx < 10 && ty >= 0 && ty < 8)
+    {
+        layer = layer < 0 ? 0 : layer;
+        if (layer == 0)
+        {
+            get_mutable_room_data().front_layer[tx][ty] = short_tile_code;
+            return true;
+        }
+        else if (has_back_layer())
+        {
+            get_mutable_room_data().back_layer.value()[tx][ty] = short_tile_code;
+            return true;
+        }
+    }
+    return false;
+}
+bool PreHandleRoomTilesContext::has_back_layer() const
+{
+    return get_room_data().back_layer.has_value();
+}
+void PreHandleRoomTilesContext::add_empty_back_layer()
+{
+    if (!has_back_layer())
+    {
+        auto& data = get_mutable_room_data();
+        data.back_layer.emplace();
+        std::memset(data.back_layer.value().data(), '0', sizeof(SingleRoomData));
+    }
+}
+void PreHandleRoomTilesContext::add_copied_back_layer()
+{
+    if (!has_back_layer())
+    {
+        auto& data = get_mutable_room_data();
+        data.back_layer.emplace();
+        std::memcpy(data.back_layer.value().data(), data.front_layer.data(), sizeof(SingleRoomData));
+    }
+}
+
+const LevelGenRoomData& PreHandleRoomTilesContext::get_room_data() const
+{
+    return modded_room_data.has_value()
+               ? modded_room_data.value()
+               : room_data;
+}
+LevelGenRoomData& PreHandleRoomTilesContext::get_mutable_room_data()
+{
+    if (!modded_room_data.has_value())
+    {
+        modded_room_data = room_data;
+    }
+    return modded_room_data.value();
 }
 
 namespace NLevel
@@ -69,6 +149,11 @@ void register_usertypes(sol::state& lua)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->g_state->level_gen->data->define_tile_code(std::move(tile_code));
+    };
+
+    /// Gets the definition of a short tile code (if available), will vary depending on which file is loaded
+    lua["get_short_tile_code_definition"] = [](SHORT_TILE_CODE short_tile_code) -> std::optional<ShortTileCodeDef> {
+        return State::get().ptr_local()->level_gen->data->get_short_tile_code_def(short_tile_code);
     };
 
     /// Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
@@ -202,7 +287,36 @@ void register_usertypes(sol::state& lua)
         "set_procedural_spawn_chance",
         &PostRoomGenerationContext::set_procedural_spawn_chance,
         "set_num_extra_spawns",
-        &PostRoomGenerationContext::set_num_extra_spawns);
+        &PostRoomGenerationContext::set_num_extra_spawns,
+        "define_short_tile_code",
+        &PostRoomGenerationContext::define_short_tile_code,
+        "change_short_tile_code",
+        &PostRoomGenerationContext::change_short_tile_code);
+
+    // Context received in ON.PRE_HANDLE_ROOM_TILES.
+    // Used to change the room data as well as add a backlayer room if none is set yet.
+    lua.new_usertype<PreHandleRoomTilesContext>(
+        "PreHandleRoomTilesContext",
+        sol::no_constructor,
+        "get_short_tile_code",
+        &PreHandleRoomTilesContext::get_short_tile_code,
+        "set_tile_code",
+        &PreHandleRoomTilesContext::set_tile_code,
+        "has_back_layer",
+        &PreHandleRoomTilesContext::has_back_layer,
+        "add_empty_back_layer",
+        &PreHandleRoomTilesContext::add_empty_back_layer,
+        "add_copied_back_layer",
+        &PreHandleRoomTilesContext::add_copied_back_layer);
+
+    lua.new_usertype<ShortTileCodeDef>(
+        "ShortTileCodeDef",
+        "tile_code",
+        &ShortTileCodeDef::tile_code,
+        "chance",
+        &ShortTileCodeDef::chance,
+        "alt_tile_code",
+        &ShortTileCodeDef::alt_tile_code);
 
     lua.new_usertype<QuestsInfo>(
         "QuestsInfo",
@@ -332,6 +446,20 @@ void register_usertypes(sol::state& lua)
 
     /// Determines which kind of shop spawns in the level, if any
     lua.create_named_table("SHOP_TYPE", "GENERAL_STORE", 0, "CLOTHING_SHOP", 1, "WEAPON_SHOP", 2, "SPECIALTY_SHOP", 3, "HIRED_HAND_SHOP", 4, "PET_SHOP", 5, "DICE_SHOP", 6, "TUSK_DICE_SHOP", 13);
+
+    lua.create_named_table("TILE_CODE"
+                           //, "EMPTY", 0
+                           //, "", ...check__[tile_codes.txt]\[game_data/tile_codes.txt\]...
+    );
+    for (const auto& [tile_code_name, tile_code] : State::get().ptr()->level_gen->data->tile_codes())
+    {
+        std::string clean_tile_code_name = tile_code_name;
+        std::transform(
+            clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
+            { return (unsigned char)std::toupper(c); });
+        std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+        lua["TILE_CODE"][std::move(clean_tile_code_name)] = tile_code.id;
+    };
 
     lua.create_named_table("ROOM_TEMPLATE"
                            //, "SIDE", 0

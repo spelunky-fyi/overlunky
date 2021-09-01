@@ -994,6 +994,8 @@ end
         ON::POST_ROOM_GENERATION,
         "POST_LEVEL_GENERATION",
         ON::POST_LEVEL_GENERATION,
+        "PRE_HANDLE_ROOM_TILES",
+        ON::PRE_HANDLE_ROOM_TILES,
         "SCRIPT_ENABLE",
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
@@ -1032,6 +1034,10 @@ end
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
     // Runs right level generation is done, before any entities are updated
+    // PRE_HANDLE_ROOM_TILES
+    // Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`
+    // Runs after a random room was selected and right before it would spawn entities for each tile code
+    // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx

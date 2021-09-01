@@ -621,6 +621,9 @@ Get the [ParticleDB](#particledb) details of the specified ID
 ### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 `nil generate_particles(int particle_emitter_id, int uid)`<br/>
 Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
+### [`spawn_default_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_default_is_valid)
+`bool spawn_default_is_valid(float x, float y, int layer)`<br/>
+Default function in spawn definitions to check whether a spawn is valid or not
 ### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
 `CallbackId set_pre_tile_code_callback(function cb, string tile_code)`<br/>
 Add a callback for a specific tile code that is called before the game handles the tile code.
@@ -637,6 +640,9 @@ This is received even if a previous pre-tile-code-callback has returned true
 `nil define_tile_code(string tile_code)`<br/>
 Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
 If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
+### [`get_short_tile_code_definition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code_definition)
+`optional<ShortTileCodeDef> get_short_tile_code_definition(SHORT_TILE_CODE short_tile_code)`<br/>
+Gets the definition of a short tile code (if available), will vary depending on which file is loaded
 ### [`define_procedural_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_procedural_spawn)
 `PROCEDURAL_CHANCE define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)`<br/>
 Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
@@ -673,6 +679,9 @@ For debugging only, get the name of a room template
 ### [`define_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_room_template)
 `int define_room_template(string room_template, ROOM_TEMPLATE_TYPE type)`<br/>
 Define a new room remplate to use with `set_room_template`
+### [`set_room_template_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template_size)
+`bool set_room_template_size(int room_template, int width, int height)`<br/>
+Set the size of room template in tiles, the template must be of type `ROOM_TEMPLATE_TYPE.MACHINE_ROOM`.
 ### [`get_procedural_spawn_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
 `int get_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id)`<br/>
 Get the inverse chance of a procedural spawn for the current level.
@@ -2595,9 +2604,12 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`int spawn_room_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) &LevelGenSystem::spawn_room_y
 - [`DoorCoords exits`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exits) &LevelGenSystem::exit_doors_locations
 ### `PostRoomGenerationContext`
-- [`bool set_room_template(int x, int y, int l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
+- [`bool set_room_template(int x, int y, LAYER l, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
 \
 Set the room template at the given index and layer, returns `false` if the index is outside of the level.
+- [`bool mark_as_machine_room_origin(int x, int y, LAYER l)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mark_as_machine_room_origin) &PostRoomGenerationContext::mark_as_machine_room_origin
+\
+Marks the room as the origin of a machine room, should be the top-left corner of the machine room
 - [`bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) &PostRoomGenerationContext::set_procedural_spawn_chance
 \
 Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
@@ -2606,6 +2618,45 @@ Returns `false` if the given chance is not defined.
 - [`nil set_num_extra_spawns(int extra_spawn_id, int num_spawns_front_layer, int num_spawns_back_layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_num_extra_spawns) &PostRoomGenerationContext::set_num_extra_spawns
 \
 Change the amount of extra spawns for the given `extra_spawn_id`.
+- [`optional<SHORT_TILE_CODE> define_short_tile_code(ShortTileCodeDef short_tile_code_def)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_short_tile_code) &PostRoomGenerationContext::define_short_tile_code
+\
+Defines a new short tile code, automatically picks an unused one
+Returns `nil` if all possible short tile codes are already in use
+- [`nil change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef short_tile_code_def)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_short_tile_code) &PostRoomGenerationContext::change_short_tile_code
+\
+Overrides a specific short tile code
+### `PreHandleRoomTilesContext`
+- [`optional<SHORT_TILE_CODE> get_short_tile_code(int tx, int ty, LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code) &PreHandleRoomTilesContext::get_short_tile_code
+\
+Gets the tile code at the specified tile coordinate
+Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
+Also returns `nil` if `layer == LAYER.BACK` and the room does not have a backrooms
+- [`bool set_tile_code(int tx, int ty, LAYER layer, SHORT_TILE_CODE short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_tile_code) &PreHandleRoomTilesContext::set_tile_code
+\
+Sets the tile code at the specified tile coordinate
+Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
+Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
+- [`bool has_back_layer()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_back_layer) &PreHandleRoomTilesContext::has_back_layer
+\
+Check whether the room has a back layer
+- [`nil add_empty_back_layer()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_empty_back_layer) &PreHandleRoomTilesContext::add_empty_back_layer
+\
+Add a back layer filled with all `0` if there is no back layer yet
+Does nothing if there already is a backlayer
+- [`nil add_copied_back_layer()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_copied_back_layer) &PreHandleRoomTilesContext::add_copied_back_layer
+\
+Add a back layer that is a copy of the front layer
+Does nothing if there already is a backlayer
+### `ShortTileCodeDef`
+- [`TILE_CODE tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_code) &ShortTileCodeDef::tile_code
+\
+Tile code that is used by default when this short tile code is encountered. Defaults to 0.
+- [`int chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chance) &ShortTileCodeDef::chance
+\
+Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
+- [`TILE_CODE alt_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alt_tile_code) &ShortTileCodeDef::alt_tile_code
+\
+Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 ### `QuestsInfo`
 - [`int yang_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yang_state) &QuestsInfo::yang_state
 - [`int jungle_sisters_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_sisters_flags) &QuestsInfo::jungle_sisters_flags
@@ -3120,6 +3171,9 @@ end, ON.LEVEL)
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
 - ...check [particle_emitters.txt](game_data/particle_emitters.txt)...
 - [`MINIGAME_BROKENASTEROID_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) 219
+### TILE_CODE
+- [`EMPTY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TILE_CODE.EMPTY) 0
+- ...check [tile_codes.txt](game_data/tile_codes.txt)...
 ### ROOM_TEMPLATE
 - [`SIDE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE.SIDE) 0
 - ...check [room_templates.txt](game_data/room_templates.txt)...
@@ -3216,6 +3270,11 @@ Runs right after all rooms are generated before entities are spawned
 - [`POST_LEVEL_GENERATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION) ON::POST_LEVEL_GENERATION
 \
 Runs right level generation is done, before any entities are updated
+- [`PRE_HANDLE_ROOM_TILES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) ON::PRE_HANDLE_ROOM_TILES
+\
+Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`\
+Runs after a random room was selected and right before it would spawn entities for each tile code\
+Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
 - [`SCRIPT_ENABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) ON::SCRIPT_ENABLE
 - [`SCRIPT_DISABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) ON::SCRIPT_DISABLE
 - [`RENDER_PRE_HUD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) ON::RENDER_PRE_HUD
@@ -3447,6 +3506,7 @@ Use in `define_room_template` to declare whether a room template has any special
 - [`ENTRANCE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.ENTRANCE) 1
 - [`EXIT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.EXIT) 2
 - [`SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.SHOP) 3
+- [`MACHINE_ROOM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.MACHINE_ROOM) 4
 ### SHOP_TYPE
 Determines which kind of shop spawns in the level, if any
 - [`GENERAL_STORE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.GENERAL_STORE) 0

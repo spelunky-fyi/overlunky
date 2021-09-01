@@ -703,6 +703,33 @@ void LuaBackend::post_level_generation()
     }
 }
 
+LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template)
+{
+    if (!get_enabled())
+        return {false, std::nullopt};
+
+    auto now = get_frame_count();
+
+    PreHandleRoomTilesContext ctx{room_data};
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_HANDLE_ROOM_TILES)
+        {
+            callback.lastRan = now;
+            if (handle_function_with_return<bool>(callback.func, x, y, room_template, ctx).value_or(false))
+            {
+                return {true, ctx.modded_room_data};
+            }
+        }
+    }
+    return {false, ctx.modded_room_data};
+}
+
 Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
 {
     if (!get_enabled())

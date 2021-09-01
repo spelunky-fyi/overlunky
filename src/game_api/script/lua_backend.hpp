@@ -3,6 +3,7 @@
 #include "drops.hpp"
 #include "entities_chars.hpp"
 #include "entity.hpp"
+#include "level_api_types.hpp"
 #include "script.hpp"
 #include "window_api.hpp"
 
@@ -72,6 +73,7 @@ enum class ON
     PRE_LEVEL_GENERATION,
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
+    PRE_HANDLE_ROOM_TILES,
     SCRIPT_ENABLE,
     SCRIPT_DISABLE,
     RENDER_PRE_HUD,
@@ -263,6 +265,13 @@ class LuaBackend
     void pre_level_generation();
     void post_room_generation();
     void post_level_generation();
+
+    struct PreHandleRoomTilesResult
+    {
+        bool stop_callback;
+        std::optional<LevelGenRoomData> modded_room_data;
+    };
+    PreHandleRoomTilesResult pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template);
 
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);

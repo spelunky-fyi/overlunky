@@ -832,12 +832,26 @@ void gather_room_data(LevelGenData* tile_storage, byte param_2, int room_idx_x, 
     g_gather_room_data_trampoline(tile_storage, param_2, room_idx_x, room_idx_y, hard_level, param_6, param_7, param_8, param_9, param_10, out_room_width, out_room_height);
 }
 
-using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, RoomData*, RoomData*, uint16_t, bool, uint16_t);
+using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, SingleRoomData*, SingleRoomData*, uint16_t, bool, uint16_t);
 SpawnRoomFromTileCodes* g_spawn_room_from_tile_codes_trampoline{nullptr};
-void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, RoomData* room_data, RoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
+void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, SingleRoomData* front_room_data, SingleRoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
 {
-    // TODO: Add hooks to allow manipulating room data
-    g_spawn_room_from_tile_codes_trampoline(level_gen_data, room_idx_x, room_idx_y, room_data, back_room_data, param_6, dual_room, room_template);
+    LevelGenRoomData room_data{};
+    std::memcpy(room_data.front_layer.data(), front_room_data, 10 * 8);
+    if (dual_room)
+    {
+        room_data.back_layer.emplace();
+        std::memcpy(room_data.back_layer.value().data(), front_room_data, 10 * 8);
+    }
+    std::optional<LevelGenRoomData> changed_data = pre_handle_room_tiles(room_data, room_idx_x, room_idx_y, room_template);
+    if (changed_data)
+    {
+        front_room_data = &changed_data->front_layer;
+        dual_room = changed_data->back_layer.has_value();
+        back_room_data = dual_room ? &changed_data->back_layer.value() : nullptr;
+    }
+
+    g_spawn_room_from_tile_codes_trampoline(level_gen_data, room_idx_x, room_idx_y, front_room_data, back_room_data, param_6, dual_room, room_template);
 }
 
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
@@ -1156,6 +1170,44 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
 
     g_tile_code_id_to_name[it->second.id] = it->first;
     return it->second.id;
+}
+
+std::optional<ShortTileCodeDef> LevelGenData::get_short_tile_code_def(uint8_t short_tile_code)
+{
+    auto& short_tile_codes_map = short_tile_codes();
+    auto it = short_tile_codes_map.find(short_tile_code);
+    if (it != short_tile_codes_map.end())
+    {
+        return it->second;
+    }
+    return {};
+}
+void LevelGenData::change_short_tile_code(uint8_t short_tile_code, ShortTileCodeDef short_tile_code_def)
+{
+    using map_value_t = std::pair<const uint8_t, ShortTileCodeDef>;
+    using map_allocator_t = game_allocator<map_value_t>;
+    using mutable_short_tile_code_map_t = std::unordered_map<uint8_t, ShortTileCodeDef, std::hash<uint8_t>, std::equal_to<uint8_t>, map_allocator_t>;
+    auto& short_tile_code_map = (mutable_short_tile_code_map_t&)short_tile_codes();
+    short_tile_code_map[short_tile_code] = short_tile_code_def;
+}
+std::optional<uint8_t> LevelGenData::define_short_tile_code(ShortTileCodeDef short_tile_code_def)
+{
+    using map_value_t = std::pair<const uint8_t, ShortTileCodeDef>;
+    using map_allocator_t = game_allocator<map_value_t>;
+    using mutable_short_tile_code_map_t = std::unordered_map<uint8_t, ShortTileCodeDef, std::hash<uint8_t>, std::equal_to<uint8_t>, map_allocator_t>;
+    auto& short_tile_code_map = (mutable_short_tile_code_map_t&)short_tile_codes();
+
+    // Try all printable chars
+    for (uint8_t i = 0x20; i < 0x7f; i++)
+    {
+        if (!short_tile_code_map.contains(i))
+        {
+            short_tile_code_map[i] = short_tile_code_def;
+            return i;
+        }
+    }
+
+    return std::nullopt;
 }
 
 std::optional<std::uint32_t> LevelGenData::get_chance(const std::string& chance)
