@@ -222,7 +222,7 @@ void Entity::set_layer(LAYER layer_to)
 
     auto state = State::get();
     if (this != this->topmost_mount())
-        this->topmost_mount()->set_layer(layer_to);
+        this->topmost_mount()->set_layer(dest_layer);
 
     if (layer == 0 || layer == 1)
     {
@@ -239,7 +239,7 @@ void Entity::set_layer(LAYER layer_to)
     for (uint8_t idx = 0; idx < items.count; ++idx)
     {
         auto item = get_entity_ptr(pitems[idx]);
-        item->set_layer(layer_to);
+        item->set_layer(dest_layer);
     }
 }
 

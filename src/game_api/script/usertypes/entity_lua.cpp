@@ -1,5 +1,6 @@
 #include "entity_lua.hpp"
 #include "entity.hpp"
+#include "movable.hpp"
 
 #include <sol/sol.hpp>
 

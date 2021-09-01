@@ -4,7 +4,8 @@
 #include <cstdint>
 
 #define MAX_PLAYERS 4
-using ENT_TYPE = uint32_t; // NoAlias
+using ENT_TYPE = uint32_t;    // NoAlias
+using INPUTS = std::uint16_t; // NoAlias
 
 class Entity;
 
@@ -54,8 +55,8 @@ struct InputMapping
 
 struct PlayerSlot
 {
-    uint16_t buttons_gameplay;
-    uint16_t buttons;
+    INPUTS buttons_gameplay;
+    INPUTS buttons;
     uint32_t unknown1;
     InputMapping* input_mapping_keyboard;
     InputMapping* input_mapping_controller;

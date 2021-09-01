@@ -397,8 +397,6 @@ class SoundPosition
     float unknown9;
 };
 
-#include "movable.hpp"
-
 struct Target
 {
     uint8_t b00;
