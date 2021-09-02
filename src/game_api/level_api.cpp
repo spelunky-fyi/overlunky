@@ -88,25 +88,37 @@ auto g_spawn_ghost = [](const CommunityTileCode& self, float x, float y, Layer* 
     Ghost* ghost = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true)->as<Ghost>();
     ghost->ghost_behaviour = behavior;
 };
-template <float offset_x, float offset_y, float angle>
-auto g_spawn_eggsac = [](const CommunityTileCode& self, float x, float y, Layer* layer)
+template <int offset_x, int offset_y, int angle_in_multiples_of_pi_halves, bool ignore_flip = false>
+void g_spawn_eggsac(const CommunityTileCode& self, float x, float y, Layer* layer)
 {
-    if (is_room_flipped(x, y))
+    if constexpr (!ignore_flip)
     {
-        g_spawn_eggsac<-offset_x, offset_y, -angle>(self, x, y, layer);
-        return;
+        if (is_room_flipped(x, y))
+        {
+            constexpr int new_angle = []() {
+                switch (angle_in_multiples_of_pi_halves)
+                {
+                case 0: return 2;
+                case 2: return 0;
+                case 1: return -1;
+                case -1: return 1;
+                }
+            }();
+            g_spawn_eggsac<-offset_x, offset_y, new_angle, true>(self, x, y, layer);
+            return;
+        }
     }
 
     auto do_spawn = [=]()
     {
         Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-        eggsac->angle = angle;
-        return eggsac
+        eggsac->angle = angle_in_multiples_of_pi_halves * std::numbers::pi_v<float> / 2.0f;
+        return eggsac;
     };
 
-    const float nx = x + offset_x;
-    const float ny = y + offset_y;
-    if constexpr (offset_x > 0.0 || offset_y < 0.0)
+    const float nx = x + static_cast<float>(offset_x);
+    const float ny = y + static_cast<float>(offset_y);
+    if constexpr (offset_x < 0 || offset_y > 0)
     {
         if (Entity* neighbour = layer->get_grid_entity_at(nx, ny))
         {
@@ -120,29 +132,32 @@ auto g_spawn_eggsac = [](const CommunityTileCode& self, float x, float y, Layer*
         g_floor_requiring_entities.push_back({{{nx, ny}}, eggsac->uid});
     }
 };
-template <float offset_x, float offset_y>
-auto g_spawn_punishball_attach = [](const CommunityTileCode& self, float x, float y, Layer* layer)
+template <int offset_x, int offset_y, bool ignore_flip = false>
+void g_spawn_punishball_attach(const CommunityTileCode& self, float x, float y, Layer* layer)
 {
-    if (is_room_flipped(x, y))
+    if constexpr (!ignore_flip)
     {
-        g_spawn_punishball_attach<-offset_x, offset_y>(self, x, y, layer);
-        return;
+        if (is_room_flipped(x, y))
+        {
+            g_spawn_punishball_attach<-offset_x, offset_y, true>(self, x, y, layer);
+            return;
+        }
     }
 
-    x += offset_x;
-    y += offset_y;
+    x += static_cast<float>(offset_x);
+    y += static_cast<float>(offset_y);
     auto do_spawn = [=]()
     {
         std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer(0, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
         if (!entities_neighbour.empty())
         {
-            get_entity_ptr(attach_ball_and_chain(entities_neighbour.front(), offset_x, offset_y));
+            get_entity_ptr(attach_ball_and_chain(entities_neighbour.front(), -static_cast<float>(offset_x), -static_cast<float>(offset_y)));
             return;
         }
         layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
     };
 
-    if constexpr (offset_x > 0.0 || offset_y < 0.0)
+    if constexpr (offset_x < 0 || offset_y > 0)
     {
         do_spawn();
     }
@@ -298,10 +313,10 @@ std::array g_community_tile_codes{
             }
         },
     },
-    CommunityTileCode{"eggsac_left", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<-1.0f, 0.0f, -std::numbers::pi_v<float> / 2.0f>},
-    CommunityTileCode{"eggsac_top", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<0.0f, 1.0f, std::numbers::pi_v<float>>},
-    CommunityTileCode{"eggsac_right", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<1.0f, 0.0f, std::numbers::pi_v<float> / 2.0f>},
-    CommunityTileCode{"eggsac_bottom", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<0.0f, -1.0f, 0.0f>},
+    CommunityTileCode{"eggsac_left", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<-1, 0, -1>},
+    CommunityTileCode{"eggsac_top", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<0, 1, 2>},
+    CommunityTileCode{"eggsac_right", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<1, 0, 1>},
+    CommunityTileCode{"eggsac_bottom", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<0, -1, 0>},
     CommunityTileCode{"grub", "ENT_TYPE_MONS_GRUB"},
     CommunityTileCode{"spider", "ENT_TYPE_MONS_SPIDER"},
     CommunityTileCode{
@@ -357,7 +372,7 @@ std::array g_community_tile_codes{
     //},
     CommunityTileCode{"bubble_platform", "ENT_TYPE_ACTIVEFLOOR_BUBBLE_PLATFORM"},
     CommunityTileCode{"punishball", "ENT_TYPE_ITEM_PUNISHBALL"},
-    CommunityTileCode{"punishball_attach", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1.0f, 0.0f>},
+    CommunityTileCode{"punishball_attach", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1, 0>},
     CommunityTileCode{"giant_fly", "ENT_TYPE_MONS_GIANTFLY"},
     CommunityTileCode{"flying_fish", "ENT_TYPE_MONS_FISH"},
     CommunityTileCode{"crabman", "ENT_TYPE_MONS_CRABMAN"},
@@ -465,13 +480,12 @@ std::array g_community_tile_codes{
     //    },
     //},
     // Wave 3
-    CommunityTileCode{"punishball_attach_left", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1.0f, 0.0f>},
-    CommunityTileCode{"punishball_attach_right", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<1.0f, 0.0f>},
-    CommunityTileCode{"punishball_attach_top", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0.0f, 1.0f>},
-    CommunityTileCode{"punishball_attach_bottom", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0.0f, -1.0f>},
+    CommunityTileCode{"punishball_attach_left", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1, 0>},
+    CommunityTileCode{"punishball_attach_right", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<1, 0>},
+    CommunityTileCode{"punishball_attach_top", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0, 1>},
+    CommunityTileCode{"punishball_attach_bottom", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0, -1>},
     CommunityTileCode{"critter_slime", "ENT_TYPE_MONS_CRITTERSLIME"},
     CommunityTileCode{"skull", "ENT_TYPE_ITEM_SKULL"},
-
 };
 
 struct CommunityChance;
