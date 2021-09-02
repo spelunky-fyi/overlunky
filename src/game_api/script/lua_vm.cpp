@@ -823,7 +823,7 @@ end
             std::uint32_t id = screen->reserve_callback_id();
             screen->set_pre_render(
                 id,
-                [=, &lua, fun = std::move(fun)](Screen* self)
+                [=, fun = std::move(fun)](Screen* self)
                 {
                     if (backend->is_screen_callback_cleared({screen_id, id}))
                     {
@@ -848,7 +848,7 @@ end
             std::uint32_t id = screen->reserve_callback_id();
             screen->set_post_render(
                 id,
-                [=, &lua, fun = std::move(fun)](Screen* self)
+                [=, fun = std::move(fun)](Screen* self)
                 {
                     if (backend->is_screen_callback_cleared({screen_id, id}))
                     {
