@@ -95,13 +95,18 @@ void g_spawn_eggsac(const CommunityTileCode& self, float x, float y, Layer* laye
     {
         if (is_room_flipped(x, y))
         {
-            constexpr int new_angle = []() {
+            constexpr int new_angle = []()
+            {
                 switch (angle_in_multiples_of_pi_halves)
                 {
-                case 0: return 2;
-                case 2: return 0;
-                case 1: return -1;
-                case -1: return 1;
+                case 0:
+                    return 2;
+                case 2:
+                    return 0;
+                case 1:
+                    return -1;
+                case -1:
+                    return 1;
                 }
             }();
             g_spawn_eggsac<-offset_x, offset_y, new_angle, true>(self, x, y, layer);
