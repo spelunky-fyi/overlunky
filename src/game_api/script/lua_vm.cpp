@@ -815,7 +815,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
-    lua["set_pre_render_screen"] = [&lua](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
         {
@@ -840,7 +840,7 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right after the screen is drawn.
-    lua["set_post_render_screen"] = [&lua](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
         {

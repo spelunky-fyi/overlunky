@@ -10,7 +10,9 @@ class Screen
     float render_timer;
     uint32_t unknown_zero;
 
-    virtual void v0() = 0;
+    // this first virtual does not appear to be the destructor in the game
+    // but is made one here to appease Clang
+    virtual ~Screen() = 0;
     virtual void v1() = 0;
     virtual void v2() = 0;
     virtual void render() = 0;
