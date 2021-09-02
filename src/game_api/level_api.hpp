@@ -442,6 +442,8 @@ struct LevelGenSystem
     std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);
     std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, LAYER l);
     bool set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template);
+
+    bool is_room_flipped(uint32_t x, uint32_t y);
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l);
 
     std::string_view get_room_template_name(uint16_t room_template);

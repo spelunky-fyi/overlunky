@@ -229,11 +229,15 @@ void register_usertypes(sol::state& lua)
     lua["get_room_pos"] = [](int x, int y) -> std::pair<float, float> {
         return State::get().ptr_local()->level_gen->get_room_pos(x, y);
     };
-    /// Get the room template given a certain index
-    lua["get_room_template"] = [](int x, int y, int l) -> std::optional<uint16_t> {
+    /// Get the room template given a certain index, returns `nil` if coordinates are out of bounds
+    lua["get_room_template"] = [](int x, int y, LAYER l) -> std::optional<uint16_t> {
         return State::get().ptr_local()->level_gen->get_room_template(x, y, l);
     };
-    /// For debugging only, get the name of a room template
+    /// Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds
+    lua["is_room_flipped"] = [](int x, int y) -> bool {
+        return State::get().ptr_local()->level_gen->is_room_flipped(x, y);
+    };
+    /// For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
     lua["get_room_template_name"] = [](int16_t room_template) -> std::string_view
     {
         return State::get().ptr_local()->level_gen->get_room_template_name(room_template);

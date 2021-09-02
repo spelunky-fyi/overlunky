@@ -1523,18 +1523,26 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t
 
     return true;
 }
+
+bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y)
+{
+    auto* state_ptr = State::get().ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return false;
+
+    return flipped_rooms->rooms[x + y * 8];
+}
 bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER /*l*/)
 {
-    auto state = State::get();
-    auto* state_ptr = state.ptr_local();
+    auto* state_ptr = State::get().ptr_local();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
     //uint8_t layer = enum_to_layer(l);
 
-    LevelGenRoomsMeta* level_rooms = machine_room_origin;
-    level_rooms->rooms[x + y * 8] = true;
+    machine_room_origin->rooms[x + y * 8] = true;
 
     return true;
 }
