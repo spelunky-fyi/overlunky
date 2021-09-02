@@ -64,6 +64,13 @@ std::vector<PendingEntitySpawn> g_attachee_requiring_entities;
 struct CommunityTileCode;
 using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, Layer* layer);
 
+bool is_room_flipped(float x, float y)
+{
+    thread_local StateMemory* state_ptr = State::get().ptr_local();
+    auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
+    return state_ptr->level_gen->flipped_rooms->rooms[ix + iy * 8];
+}
+
 struct CommunityTileCode
 {
     std::string_view tile_code;
@@ -81,23 +88,61 @@ auto g_spawn_ghost = [](const CommunityTileCode& self, float x, float y, Layer* 
     Ghost* ghost = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true)->as<Ghost>();
     ghost->ghost_behaviour = behavior;
 };
+template <float offset_x, float offset_y, float angle>
+auto g_spawn_eggsac = [](const CommunityTileCode& self, float x, float y, Layer* layer)
+{
+    if (is_room_flipped(x, y))
+    {
+        g_spawn_eggsac<-offset_x, offset_y, -angle>(self, x, y, layer);
+        return;
+    }
+
+    auto do_spawn = [=]()
+    {
+        Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+        eggsac->angle = angle;
+        return eggsac
+    };
+
+    const float nx = x + offset_x;
+    const float ny = y + offset_y;
+    if constexpr (offset_x > 0.0 || offset_y < 0.0)
+    {
+        if (Entity* neighbour = layer->get_grid_entity_at(nx, ny))
+        {
+            Entity* eggsac = do_spawn();
+            attach_entity(neighbour, eggsac);
+        }
+    }
+    else
+    {
+        Entity* eggsac = do_spawn();
+        g_floor_requiring_entities.push_back({{{nx, ny}}, eggsac->uid});
+    }
+};
 template <float offset_x, float offset_y>
 auto g_spawn_punishball_attach = [](const CommunityTileCode& self, float x, float y, Layer* layer)
 {
+    if (is_room_flipped(x, y))
+    {
+        g_spawn_punishball_attach<-offset_x, offset_y>(self, x, y, layer);
+        return;
+    }
+
     x += offset_x;
     y += offset_y;
     auto do_spawn = [=]()
     {
-        std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer(0, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
-        if (!entities_left.empty())
+        std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer(0, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
+        if (!entities_neighbour.empty())
         {
-            get_entity_ptr(attach_ball_and_chain(entities_left.front(), offset_x, offset_y));
+            get_entity_ptr(attach_ball_and_chain(entities_neighbour.front(), offset_x, offset_y));
             return;
         }
         layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
     };
 
-    if constexpr (offset_x > 0.0 || offset_y > 0.0)
+    if constexpr (offset_x > 0.0 || offset_y < 0.0)
     {
         do_spawn();
     }
@@ -253,51 +298,10 @@ std::array g_community_tile_codes{
             }
         },
     },
-    CommunityTileCode{
-        "eggsac_left",
-        "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            if (Entity* left = layer->get_grid_entity_at(x - 1.0f, y))
-            {
-                Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-                eggsac->angle = -std::numbers::pi_v<float> / 2.0f;
-                attach_entity(left, eggsac);
-            }
-        },
-    },
-    CommunityTileCode{
-        "eggsac_top",
-        "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            if (Entity* top = layer->get_grid_entity_at(x, y + 1.0f))
-            {
-                Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-                eggsac->angle = std::numbers::pi_v<float>;
-                attach_entity(top, eggsac);
-            }
-        },
-    },
-    CommunityTileCode{
-        "eggsac_right",
-        "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            eggsac->angle = std::numbers::pi_v<float> / 2.0f;
-            g_floor_requiring_entities.push_back({{{x + 1.0f, y}}, eggsac->uid});
-        },
-    },
-    CommunityTileCode{
-        "eggsac_bottom",
-        "ENT_TYPE_ITEM_EGGSAC",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            Entity* eggsac = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            g_floor_requiring_entities.push_back({{{x, y - 1.0f}}, eggsac->uid});
-        },
-    },
+    CommunityTileCode{"eggsac_left", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<-1.0f, 0.0f, -std::numbers::pi_v<float> / 2.0f>},
+    CommunityTileCode{"eggsac_top", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<0.0f, 1.0f, std::numbers::pi_v<float>>},
+    CommunityTileCode{"eggsac_right", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<1.0f, 0.0f, std::numbers::pi_v<float> / 2.0f>},
+    CommunityTileCode{"eggsac_bottom", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<0.0f, -1.0f, 0.0f>},
     CommunityTileCode{"grub", "ENT_TYPE_MONS_GRUB"},
     CommunityTileCode{"spider", "ENT_TYPE_MONS_SPIDER"},
     CommunityTileCode{
@@ -385,14 +389,14 @@ std::array g_community_tile_codes{
         "ENT_TYPE_MONS_APEP_HEAD",
         []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            layer->spawn_apep(x, y, false);
+            layer->spawn_apep(x, y, is_room_flipped(x, y));
         }},
     CommunityTileCode{
         "apep_right",
         "ENT_TYPE_MONS_APEP_HEAD",
         []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            layer->spawn_apep(x, y, true);
+            layer->spawn_apep(x, y, !is_room_flipped(x, y));
         }},
     CommunityTileCode{"olmite_naked", "ENT_TYPE_MONS_OLMITE_NAKED"},
     CommunityTileCode{"olmite_helmet", "ENT_TYPE_MONS_OLMITE_HELMET"},

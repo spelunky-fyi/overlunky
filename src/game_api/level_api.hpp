@@ -406,7 +406,7 @@ struct LevelGenSystem
             LevelGenRooms* rooms_backlayer;
         };
     };
-    LevelGenRoomsMeta* rooms_meta_26;
+    LevelGenRoomsMeta* flipped_rooms;
     LevelGenRoomsMeta* rooms_meta_27;
     LevelGenRoomsMeta* rooms_meta_28;
     LevelGenRoomsMeta* rooms_meta_29;
