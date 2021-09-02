@@ -4064,16 +4064,18 @@ void render_entity_props()
         }
         for (int i = 0; i < 6; i++)
         {
-            ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, int_pow(2, i));
+            int buttons = g_entity->buttons;
+            ImGui::CheckboxFlags(button_flags[i], &buttons, int_pow(2, i));
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }
-        for (int i = 0; i < 6; i++)
-        {
-            ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons_previous, int_pow(2, i));
-            if (i < 5)
-                ImGui::SameLine(region.x / 6 * (i + 1));
-        }
+        //for (int i = 0; i < 6; i++)
+        //{
+        //    int buttons_previous = g_entity->buttons_previous;
+        //    ImGui::CheckboxFlags(button_flags[i], &buttons_previous, int_pow(2, i));
+        //    if (i < 5)
+        //        ImGui::SameLine(region.x / 6 * (i + 1));
+        //}
     }
     ImGui::PopItemWidth();
 }

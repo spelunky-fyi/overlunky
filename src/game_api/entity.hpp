@@ -8,10 +8,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "aliases.hpp"
 #include "color.hpp"
 #include "math.hpp"
 #include "memory.hpp"
-#include "aliases.hpp"
 
 struct RenderInfo;
 struct Texture;

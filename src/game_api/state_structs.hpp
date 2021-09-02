@@ -1,8 +1,8 @@
 #pragma once
 
+#include "aliases.hpp"
 #include <array>
 #include <cstdint>
-#include "aliases.hpp"
 
 class Entity;
 

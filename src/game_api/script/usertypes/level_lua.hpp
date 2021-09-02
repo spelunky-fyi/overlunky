@@ -1,8 +1,8 @@
 #pragma once
 
+#include "aliases.hpp"
 #include <string>
 #include <vector>
-#include "aliases.hpp"
 
 #include <sol/forward.hpp>
 

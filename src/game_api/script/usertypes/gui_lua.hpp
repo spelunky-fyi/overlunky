@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include "math.hpp"
 #include "aliases.hpp"
+#include "math.hpp"
 
 class ScriptImpl;
 
