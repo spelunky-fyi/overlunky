@@ -1511,6 +1511,12 @@ FrozenLiquid = {
   __name = "sol.FrozenLiquid.user",
   __newindex = "function"
 }
+GHOST_BEHAVIOR = {
+  ANGRY = 0,
+  HAPPY = 4,
+  SAD = 3,
+  SURPRISED = 1
+}
 Generator = {
   __index = "function",
   __name = "sol.Generator.user",

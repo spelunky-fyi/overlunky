@@ -637,7 +637,7 @@ The callback signature is `nil post_tile_code(x, y, layer, room_template)`
 Use this to affect what the game or other scripts spawned in this position.
 This is received even if a previous pre-tile-code-callback has returned true
 ### [`define_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_tile_code)
-`nil define_tile_code(string tile_code)`<br/>
+`TILE_CODE define_tile_code(string tile_code)`<br/>
 Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
 If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
 ### [`get_short_tile_code_definition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code_definition)
@@ -1538,10 +1538,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 \
 for SMALL_HAPPY this is also the sequence timer of its various states
 - [`float velocity_multiplier`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_multiplier) &Ghost::velocity_multiplier
-- [`int ghost_behaviour`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_behaviour) &Ghost::ghost_behaviour
-\
-0 = SMALL_ANGRY aka standard chasing, 1 = SMALL_SURPRISED, 2 = SMALL_SAD, 3 = SMALL_HAPPY
-4 and above = will move up and down, moving slightly more in one direction
+- [`GHOST_BEHAVIOR ghost_behaviour`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_behaviour) &Ghost::ghost_behaviour
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Ghost::emitted_light
 - [`Entity linked_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_ghost) &Ghost::linked_ghost
 ### `Bat`
@@ -2631,7 +2628,7 @@ Overrides a specific short tile code
 Gets the tile code at the specified tile coordinate
 Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
 Also returns `nil` if `layer == LAYER.BACK` and the room does not have a backrooms
-- [`bool set_tile_code(int tx, int ty, LAYER layer, SHORT_TILE_CODE short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_tile_code) &PreHandleRoomTilesContext::set_tile_code
+- [`bool set_short_tile_code(int tx, int ty, LAYER layer, SHORT_TILE_CODE short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_short_tile_code) &PreHandleRoomTilesContext::set_short_tile_code
 \
 Sets the tile code at the specified tile coordinate
 Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
@@ -3399,6 +3396,11 @@ Any integer in the range [0, 9] is a valid class, some are however not documente
 - [`TOP_RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.TOP_RIGHT) FLOOR_SIDE::TOP_RIGHT
 - [`BOTTOM_LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_LEFT) FLOOR_SIDE::BOTTOM_LEFT
 - [`BOTTOM_RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_RIGHT) FLOOR_SIDE::BOTTOM_RIGHT
+### GHOST_BEHAVIOR
+- [`ANGRY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.ANGRY) GHOST_BEHAVIOR::ANGRY
+- [`SURPRISED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SURPRISED) GHOST_BEHAVIOR::SURPRISED
+- [`SAD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SAD) GHOST_BEHAVIOR::SAD
+- [`HAPPY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.HAPPY) GHOST_BEHAVIOR::HAPPY
 ### HUNDUNFLAGS
 - [`WILLMOVELEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HUNDUNFLAGS.WILLMOVELEFT) 1
 - [`BIRDHEADEMERGED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HUNDUNFLAGS.BIRDHEADEMERGED) 2

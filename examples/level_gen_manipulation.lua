@@ -6,7 +6,7 @@ meta = {
 }
 
 -- Adds a new tilecode that just spawns a mech with a caveman
-define_tile_code("cave_mech")
+local cave_mech_tile_code = define_tile_code("cave_mech")
 set_pre_tile_code_callback(function(x, y, layer)
     local mount_id = spawn_entity(ENT_TYPE.MOUNT_MECH, x, y, layer, 0.0, 0.0)
     local rider_id = spawn_entity(ENT_TYPE.MONS_CAVEMAN, x, y, layer, 0.0, 0.0)
@@ -187,3 +187,32 @@ set_callback(function(ctx)
         ctx:set_num_extra_spawns(radio_spawns, 0, 0)
     end
 end, ON.POST_ROOM_GENERATION)
+
+-- Create a caveman_asleep50%cave_mech short tile code
+local random_cave_mech_code
+set_callback(function(ctx)
+    if state.theme == THEME.DWELLING then
+        local short_tile_code = ShortTileCodeDef:new()
+        short_tile_code.tile_code = TILE_CODE.CAVEMAN_ASLEEP
+        short_tile_code.alt_tile_code = cave_mech_tile_code
+        short_tile_code.chance = 50
+        random_cave_mech_code = ctx:define_short_tile_code(short_tile_code)
+    end
+end, ON.POST_ROOM_GENERATION)
+
+-- Replace sleeping caveman tiles with caveman_asleep50%cave_mech
+set_callback(function(x, y, room_template, ctx)
+    if state.theme == THEME.DWELLING then
+        for tx = 0, CONST.ROOM_WIDTH - 1 do
+            for ty = 0, CONST.ROOM_HEIGHT - 1 do
+                local short_tile_code = ctx:get_short_tile_code(tx, ty, LAYER.FRONT)
+                local short_tile_code_def = get_short_tile_code_definition(short_tile_code)
+                if short_tile_code_def then
+                    if short_tile_code_def.tile_code == TILE_CODE.CAVEMAN_ASLEEP then
+                        ctx:set_short_tile_code(x, y, LAYER.FRONT, random_cave_mech_code)
+                    end
+                end
+            end
+        end
+    end
+end, ON.PRE_HANDLE_ROOM_TILES)
