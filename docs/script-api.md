@@ -2649,6 +2649,21 @@ Change the amount of extra spawns for the given `extra_spawn_id`.
 - [`int score_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_top) &SaveData::score_top
 - [`int deepest_area`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_area) &SaveData::deepest_area
 - [`int deepest_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level) &SaveData::deepest_level
+- [`int time_best`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_best) &SaveData::time_best
+- [`int time_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) &SaveData::time_total
+- [`int time_tutorial`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_tutorial) &SaveData::time_tutorial
+- [`array<int, 20> character_deaths`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_deaths) &SaveData::character_deaths
+- [`array<int, 3> pets_rescued`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pets_rescued) &SaveData::pets_rescued
+- [`bool completed_normal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=completed_normal) &SaveData::completed_normal
+- [`bool completed_ironman`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=completed_ironman) &SaveData::completed_ironman
+- [`bool completed_hard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=completed_hard) &SaveData::completed_hard
+- [`bool profile_seen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=profile_seen) &SaveData::profile_seen
+- [`bool seeded_unlocked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seeded_unlocked) &SaveData::seeded_unlocked
+- [`int world_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_last) &SaveData::world_last
+- [`int level_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_last) &SaveData::level_last
+- [`int score_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_last) &SaveData::score_last
+- [`int time_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last) &SaveData::time_last
+- [`array<int, 9> stickers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) &SaveData::stickers
 - [`array<int, 4> players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) &SaveData::players
 ### `CustomSound`
 Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
