@@ -47,6 +47,19 @@ struct FloorRequiringEntity
     bool handled;
 };
 std::vector<FloorRequiringEntity> g_floor_requiring_entities;
+struct PendingEntitySpawn
+{
+    struct Position
+    {
+        float x;
+        float y;
+        std::optional<float> angle;
+    };
+    std::vector<Position> pos;
+    std::function<void()> try_spawn;
+    bool handled;
+};
+std::vector<PendingEntitySpawn> g_attachee_requiring_entities;
 
 struct CommunityTileCode;
 using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, Layer* layer);
@@ -57,7 +70,7 @@ struct CommunityTileCode
     std::string_view entity_type;
     TileCodeFunc* func = [](const CommunityTileCode& self, float x, float y, Layer* layer)
     {
-        layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, false);
+        layer->spawn_entity_snap_to_floor(self.entity_id, x, y);
     };
     std::uint32_t entity_id;
     std::uint32_t tile_code_id;
@@ -67,6 +80,31 @@ auto g_spawn_ghost = [](const CommunityTileCode& self, float x, float y, Layer* 
 {
     Ghost* ghost = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true)->as<Ghost>();
     ghost->ghost_behaviour = behavior;
+};
+template <float offset_x, float offset_y>
+auto g_spawn_punishball_attach = [](const CommunityTileCode& self, float x, float y, Layer* layer)
+{
+    x += offset_x;
+    y += offset_y;
+    auto do_spawn = [=]()
+    {
+        std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer(0, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
+        if (!entities_left.empty())
+        {
+            get_entity_ptr(attach_ball_and_chain(entities_left.front(), offset_x, offset_y));
+            return;
+        }
+        layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+    };
+
+    if constexpr (offset_x > 0.0 || offset_y > 0.0)
+    {
+        do_spawn();
+    }
+    else
+    {
+        g_attachee_requiring_entities.push_back({{{x, y}}, do_spawn});
+    }
 };
 std::array g_community_tile_codes{
     // Wave 1
@@ -113,12 +151,12 @@ std::array g_community_tile_codes{
     CommunityTileCode{"scarab", "ENT_TYPE_MONS_SCARAB"},
     CommunityTileCode{"cosmic_jelly", "ENT_TYPE_MONS_MEGAJELLYFISH"},
     CommunityTileCode{"ghost", "ENT_TYPE_MONS_GHOST", g_spawn_ghost<GHOST_BEHAVIOR::SAD>},
-    CommunityTileCode{"ghost_med_sad", "ENT_TYPE_MONS_GHOST_MEDIUM_SAD", g_spawn_ghost<GHOST_BEHAVIOR::SAD>},
-    CommunityTileCode{"ghost_med_happy", "ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY", g_spawn_ghost<GHOST_BEHAVIOR::HAPPY>},
-    CommunityTileCode{"ghost_small_angry", "ENT_TYPE_MONS_GHOST_SMALL_ANGRY", g_spawn_ghost<GHOST_BEHAVIOR::ANGRY>},
-    CommunityTileCode{"ghost_small_sad", "ENT_TYPE_MONS_GHOST_SMALL_SAD", g_spawn_ghost<GHOST_BEHAVIOR::SAD>},
-    CommunityTileCode{"ghost_small_surprised", "ENT_TYPE_MONS_GHOST_SMALL_SURPRISED", g_spawn_ghost<GHOST_BEHAVIOR::SURPRISED>},
-    CommunityTileCode{"ghost_small_happy", "ENT_TYPE_MONS_GHOST_SMALL_HAPPY", g_spawn_ghost<GHOST_BEHAVIOR::HAPPY>},
+    CommunityTileCode{"ghost_med_sad", "ENT_TYPE_MONS_GHOST_MEDIUM_SAD", g_spawn_ghost<GHOST_BEHAVIOR::MEDIUM_SAD>},
+    CommunityTileCode{"ghost_med_happy", "ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY", g_spawn_ghost<GHOST_BEHAVIOR::MEDIUM_HAPPY>},
+    CommunityTileCode{"ghost_small_angry", "ENT_TYPE_MONS_GHOST_SMALL_ANGRY", g_spawn_ghost<GHOST_BEHAVIOR::SMALL_ANGRY>},
+    CommunityTileCode{"ghost_small_sad", "ENT_TYPE_MONS_GHOST_SMALL_SAD", g_spawn_ghost<GHOST_BEHAVIOR::SMALL_SAD>},
+    CommunityTileCode{"ghost_small_surprised", "ENT_TYPE_MONS_GHOST_SMALL_SURPRISED", g_spawn_ghost<GHOST_BEHAVIOR::SMALL_SURPRISED>},
+    CommunityTileCode{"ghost_small_happy", "ENT_TYPE_MONS_GHOST_SMALL_HAPPY", g_spawn_ghost<GHOST_BEHAVIOR::SMALL_HAPPY>},
     CommunityTileCode{"leaf", "ENT_TYPE_ITEM_LEAF"},
     CommunityTileCode{"udjat_key", "ENT_TYPE_ITEM_LOCKEDCHEST_KEY"},
     CommunityTileCode{"tutorial_speedrun_sign", "ENT_TYPE_ITEM_SPEEDRUN_SIGN"},
@@ -315,21 +353,7 @@ std::array g_community_tile_codes{
     //},
     CommunityTileCode{"bubble_platform", "ENT_TYPE_ACTIVEFLOOR_BUBBLE_PLATFORM"},
     CommunityTileCode{"punishball", "ENT_TYPE_ITEM_PUNISHBALL"},
-    CommunityTileCode{
-        "punishball_attach",
-        "ENT_TYPE_ITEM_PUNISHBALL",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer(0, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
-            if (!entities_left.empty())
-            {
-                get_entity_ptr(attach_ball_and_chain(entities_left.front(), 1.0f, 0.0f));
-                return;
-            }
-
-            layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-        },
-    },
+    CommunityTileCode{"punishball_attach", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1.0f, 0.0f>},
     CommunityTileCode{"giant_fly", "ENT_TYPE_MONS_GIANTFLY"},
     CommunityTileCode{"flying_fish", "ENT_TYPE_MONS_FISH"},
     CommunityTileCode{"crabman", "ENT_TYPE_MONS_CRABMAN"},
@@ -380,7 +404,7 @@ std::array g_community_tile_codes{
             static const auto helmet_id = to_id("ENT_TYPE_MONS_OLMITE_HELMET");
             static const auto naked_id = to_id("ENT_TYPE_MONS_OLMITE_NAKED");
 
-            Entity* olmite = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
+            Entity* olmite = layer->spawn_entity_snap_to_floor(self.entity_id, x, y);
 
             std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer(0, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
@@ -436,6 +460,14 @@ std::array g_community_tile_codes{
     //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 2;
     //    },
     //},
+    // Wave 3
+    CommunityTileCode{"punishball_attach_left", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1.0f, 0.0f>},
+    CommunityTileCode{"punishball_attach_right", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<1.0f, 0.0f>},
+    CommunityTileCode{"punishball_attach_top", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0.0f, 1.0f>},
+    CommunityTileCode{"punishball_attach_bottom", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0.0f, -1.0f>},
+    CommunityTileCode{"critter_slime", "ENT_TYPE_MONS_CRITTERSLIME"},
+    CommunityTileCode{"skull", "ENT_TYPE_ITEM_SKULL"},
+
 };
 
 struct CommunityChance;
@@ -666,9 +698,26 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
             }
         }
 
-        g_floor_requiring_entities.erase(std::remove_if(g_floor_requiring_entities.begin(), g_floor_requiring_entities.end(), [](const FloorRequiringEntity& ent)
-                                                        { return ent.handled || get_entity_ptr(ent.uid) == nullptr; }),
-                                         g_floor_requiring_entities.end());
+        std::erase_if(g_floor_requiring_entities, [](const FloorRequiringEntity& ent)
+                      { return ent.handled || get_entity_ptr(ent.uid) == nullptr; });
+    }
+
+    if (!g_attachee_requiring_entities.empty())
+    {
+        for (auto& pending_spawn : g_attachee_requiring_entities)
+        {
+            for (const auto& pos : pending_spawn.pos)
+            {
+                if (std::abs(pos.x - x) < 0.01f && std::abs(pos.y - y) < 0.01f)
+                {
+                    pending_spawn.try_spawn();
+                    pending_spawn.handled = true;
+                }
+            }
+        }
+
+        std::erase_if(g_attachee_requiring_entities, [](const PendingEntitySpawn& ent)
+                      { return ent.handled; });
     }
 }
 

@@ -96,10 +96,13 @@ class NPC : public Monster
 
 enum class GHOST_BEHAVIOR : uint8_t
 {
-    ANGRY = 0,
-    SURPRISED = 1,
-    SAD = 3,
-    HAPPY = 4
+    SAD = 0,
+    MEDIUM_SAD = 0,
+    MEDIUM_HAPPY = 1,
+    SMALL_ANGRY = 0,
+    SMALL_SURPRISED = 1,
+    SMALL_SAD = 2,
+    SMALL_HAPPY = 3
 };
 
 class Ghost : public Monster

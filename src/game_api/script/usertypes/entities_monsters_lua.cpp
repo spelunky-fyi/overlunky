@@ -161,7 +161,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
-    lua.create_named_table("GHOST_BEHAVIOR", "ANGRY", GHOST_BEHAVIOR::ANGRY, "SURPRISED", GHOST_BEHAVIOR::SURPRISED, "SAD", GHOST_BEHAVIOR::SAD, "HAPPY", GHOST_BEHAVIOR::HAPPY);
+    lua.create_named_table("GHOST_BEHAVIOR", "SAD", GHOST_BEHAVIOR::SAD, "MEDIUM_SAD", GHOST_BEHAVIOR::MEDIUM_SAD, "MEDIUM_HAPPY", GHOST_BEHAVIOR::MEDIUM_HAPPY, "SMALL_ANGRY", GHOST_BEHAVIOR::SMALL_ANGRY, "SMALL_SURPRISED", GHOST_BEHAVIOR::SMALL_SURPRISED, "SMALL_SAD", GHOST_BEHAVIOR::SMALL_SAD, "SMALL_HAPPY", GHOST_BEHAVIOR::SMALL_HAPPY);
 
     lua.new_usertype<Ghost>(
         "Ghost",
