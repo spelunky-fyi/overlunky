@@ -60,7 +60,7 @@ std::optional<SHORT_TILE_CODE> PreHandleRoomTilesContext::get_short_tile_code(ui
     }
     return std::nullopt;
 }
-bool PreHandleRoomTilesContext::set_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code)
+bool PreHandleRoomTilesContext::set_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code)
 {
     if (tx >= 0 && tx < 10 && ty >= 0 && ty < 8)
     {
@@ -145,10 +145,10 @@ void register_usertypes(sol::state& lua)
     };
     /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
-    lua["define_tile_code"] = [](std::string tile_code)
+    lua["define_tile_code"] = [](std::string tile_code) -> TILE_CODE
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->g_state->level_gen->data->define_tile_code(std::move(tile_code));
+        return backend->g_state->level_gen->data->define_tile_code(std::move(tile_code));
     };
 
     /// Gets the definition of a short tile code (if available), will vary depending on which file is loaded
@@ -300,8 +300,8 @@ void register_usertypes(sol::state& lua)
         sol::no_constructor,
         "get_short_tile_code",
         &PreHandleRoomTilesContext::get_short_tile_code,
-        "set_tile_code",
-        &PreHandleRoomTilesContext::set_tile_code,
+        "set_short_tile_code",
+        &PreHandleRoomTilesContext::set_short_tile_code,
         "has_back_layer",
         &PreHandleRoomTilesContext::has_back_layer,
         "add_empty_back_layer",

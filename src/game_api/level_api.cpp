@@ -1,5 +1,6 @@
 #include "level_api.hpp"
 
+#include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "game_allocator.hpp"
 #include "layer.hpp"
@@ -61,6 +62,12 @@ struct CommunityTileCode
     std::uint32_t entity_id;
     std::uint32_t tile_code_id;
 };
+template <GHOST_BEHAVIOR behavior>
+auto g_spawn_ghost = [](const CommunityTileCode& self, float x, float y, Layer* layer)
+{
+    Ghost* ghost = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true)->as<Ghost>();
+    ghost->ghost_behaviour = behavior;
+};
 std::array g_community_tile_codes{
     // Wave 1
     CommunityTileCode{
@@ -105,13 +112,13 @@ std::array g_community_tile_codes{
     CommunityTileCode{"hundun", "ENT_TYPE_MONS_HUNDUN"},
     CommunityTileCode{"scarab", "ENT_TYPE_MONS_SCARAB"},
     CommunityTileCode{"cosmic_jelly", "ENT_TYPE_MONS_MEGAJELLYFISH"},
-    CommunityTileCode{"ghost", "ENT_TYPE_MONS_GHOST"},
-    CommunityTileCode{"ghost_med_sad", "ENT_TYPE_MONS_GHOST_MEDIUM_SAD"},
-    CommunityTileCode{"ghost_med_happy", "ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY"},
-    CommunityTileCode{"ghost_small_angry", "ENT_TYPE_MONS_GHOST_SMALL_ANGRY"},
-    CommunityTileCode{"ghost_small_sad", "ENT_TYPE_MONS_GHOST_SMALL_SAD"},
-    CommunityTileCode{"ghost_small_surprised", "ENT_TYPE_MONS_GHOST_SMALL_SURPRISED"},
-    CommunityTileCode{"ghost_small_happy", "ENT_TYPE_MONS_GHOST_SMALL_HAPPY"},
+    CommunityTileCode{"ghost", "ENT_TYPE_MONS_GHOST", g_spawn_ghost<GHOST_BEHAVIOR::SAD>},
+    CommunityTileCode{"ghost_med_sad", "ENT_TYPE_MONS_GHOST_MEDIUM_SAD", g_spawn_ghost<GHOST_BEHAVIOR::SAD>},
+    CommunityTileCode{"ghost_med_happy", "ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY", g_spawn_ghost<GHOST_BEHAVIOR::HAPPY>},
+    CommunityTileCode{"ghost_small_angry", "ENT_TYPE_MONS_GHOST_SMALL_ANGRY", g_spawn_ghost<GHOST_BEHAVIOR::ANGRY>},
+    CommunityTileCode{"ghost_small_sad", "ENT_TYPE_MONS_GHOST_SMALL_SAD", g_spawn_ghost<GHOST_BEHAVIOR::SAD>},
+    CommunityTileCode{"ghost_small_surprised", "ENT_TYPE_MONS_GHOST_SMALL_SURPRISED", g_spawn_ghost<GHOST_BEHAVIOR::SURPRISED>},
+    CommunityTileCode{"ghost_small_happy", "ENT_TYPE_MONS_GHOST_SMALL_HAPPY", g_spawn_ghost<GHOST_BEHAVIOR::HAPPY>},
     CommunityTileCode{"leaf", "ENT_TYPE_ITEM_LEAF"},
     CommunityTileCode{"udjat_key", "ENT_TYPE_ITEM_LOCKEDCHEST_KEY"},
     CommunityTileCode{"tutorial_speedrun_sign", "ENT_TYPE_ITEM_SPEEDRUN_SIGN"},

@@ -49,7 +49,7 @@ std::optional<LevelGenRoomData> pre_handle_room_tiles(LevelGenRoomData room_data
                 room_data = this_modded_room_data.value();
                 modded_room_data = this_modded_room_data;
             }
-            return stop_callback;
+            return !stop_callback;
         });
     return modded_room_data;
 }

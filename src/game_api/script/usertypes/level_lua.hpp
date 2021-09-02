@@ -46,7 +46,7 @@ struct PreHandleRoomTilesContext
     /// Sets the tile code at the specified tile coordinate
     /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
     /// Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
-    bool set_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code);
+    bool set_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code);
     /// Check whether the room has a back layer
     bool has_back_layer() const;
     /// Add a back layer filled with all `0` if there is no back layer yet

@@ -94,6 +94,14 @@ class NPC : public Monster
     uint32_t padding3;
 };
 
+enum class GHOST_BEHAVIOR : uint8_t
+{
+    ANGRY = 0,
+    SURPRISED = 1,
+    SAD = 3,
+    HAPPY = 4
+};
+
 class Ghost : public Monster
 {
   public:
@@ -103,9 +111,7 @@ class Ghost : public Monster
     uint8_t unknown2;
     float velocity_multiplier;
     uint16_t unknown3; // layer change related
-    /// 0 = SMALL_ANGRY aka standard chasing, 1 = SMALL_SURPRISED, 2 = SMALL_SAD, 3 = SMALL_HAPPY
-    /// 4 and above = will move up and down, moving slightly more in one direction
-    uint8_t ghost_behaviour;
+    GHOST_BEHAVIOR ghost_behaviour;
     uint8_t unknown6;
     bool unknown7;
     uint8_t unknown8;
