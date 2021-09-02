@@ -43,6 +43,8 @@
 
 #include "decode_audio_file.hpp"
 
+#pragma warning(disable : 4366)
+
 template <class T>
 concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
 
@@ -3414,6 +3416,24 @@ void render_scripts()
     ImGui::PopItemWidth();
 }
 
+std::string format_time(int64_t frames)
+{
+    struct tm newtime;
+    time_t secs = frames / 60;
+    char time[10];
+    gmtime_s(&newtime, &secs);
+    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    return time;
+}
+
+int parse_time(std::string time)
+{
+    std::tm tm = {};
+    std::stringstream ss(time);
+    ss >> std::get_time(&tm, "%H:%M:%S");
+    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
+}
+
 void render_savegame()
 {
     ImGui::PushID("Journal");
@@ -3512,10 +3532,19 @@ void render_savegame()
     ImGui::PushID("Characters");
     if (ImGui::CollapsingHeader("Characters"))
     {
+        ImGui::Text("");
+        ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+        ImGui::Text("Deaths");
         for (int i = 0; i < 20; ++i)
         {
             ImGui::PushID(i);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
             ImGui::CheckboxFlags(people_flags[i], &g_save->characters, int_pow(2, i));
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::PushID("character_deaths");
+            ImGui::DragInt("", &g_save->character_deaths[i], 0.5f, 0, INT_MAX);
+            ImGui::PopID();
+            ImGui::PopItemWidth();
             ImGui::PopID();
         }
     }
@@ -3536,8 +3565,8 @@ void render_savegame()
     }
     ImGui::PopID();
 
-    ImGui::PushID("Profile");
-    if (ImGui::CollapsingHeader("Profile"))
+    ImGui::PushID("Player Profile");
+    if (ImGui::CollapsingHeader("Player Profile"))
     {
         ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5f);
         ImGui::DragInt("Plays", &g_save->plays);
@@ -3549,10 +3578,70 @@ void render_savegame()
         ImGui::DragInt("Top score", &g_save->score_top, 1000.0f, 0, INT_MAX);
         SliderByte("Deepest area", (char*)&g_save->deepest_area, 1, 8);
         SliderByte("Deepest level", (char*)&g_save->deepest_level, 1, 99);
+        std::string besttime = format_time(g_save->time_best);
+        if (ImGui::InputText("Best time##BestTime", &besttime))
+        {
+            g_save->time_best = parse_time(besttime);
+        }
+        std::string totaltime = format_time(g_save->time_total); //TODO: these functions are crap for this purpose
+        if (ImGui::InputText("Total time##BestTime", &totaltime))
+        {
+            g_save->time_total = parse_time(totaltime);
+        }
+        ImGui::Checkbox("Completed normal", &g_save->completed_normal);
+        ImGui::Checkbox("Completed ironman", &g_save->completed_ironman);
+        ImGui::Checkbox("Completed hard", &g_save->completed_hard);
         ImGui::PopItemWidth();
     }
     ImGui::PopID();
-    ImGui::TextWrapped("To be continued...");
+
+    ImGui::PushID("Last Game Played");
+    if (ImGui::CollapsingHeader("Last Game Played"))
+    {
+        SliderByte("World##LastWorld", (char*)&g_save->world_last, 1, 8);
+        SliderByte("Level##LastLevel", (char*)&g_save->level_last, 1, 99);
+        ImGui::DragScalar("Score##LastScore", ImGuiDataType_S32, &g_save->score_last, 1000.0f, &s32_zero, &s32_max);
+        std::string lasttime = format_time(g_save->time_last);
+        if (ImGui::InputText("Time##LastTime", &lasttime))
+        {
+            g_save->time_last = parse_time(lasttime);
+        }
+        for (int i = 0; i < 9; ++i)
+        {
+            ImGui::PushID(i);
+            ImGui::InputInt("Sticker", &g_save->stickers[i]);
+            ImGui::PopID();
+        }
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("Miscellaneous");
+    if (ImGui::CollapsingHeader("Miscellaneous"))
+    {
+        ImGui::Checkbox("Seeded runs unlocked", &g_save->seeded_unlocked);
+        ImGui::Checkbox("Profile seen", &g_save->profile_seen);
+        for (int s = 0; s < 4; ++s)
+        {
+            auto lbl = fmt::format("Player {}", s + 1);
+            int plr = g_save->players[s];
+            if (ImGui::BeginCombo(lbl.c_str(), people_flags[plr]))
+            {
+                for (uint8_t i = 0; i < 20; ++i)
+                {
+                    bool isSelected = (plr == g_save->players[s]);
+                    if (ImGui::Selectable(people_flags[i], isSelected))
+                    {
+                        g_save->players[s] = i;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }
+        ImGui::SliderScalar("Rescued dogs", ImGuiDataType_U8, &g_save->pets_rescued[0], &u8_min, &u8_max);
+        ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
+        ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
+    }
+    ImGui::PopID();
 }
 
 void render_powerup(int uid, const char* section)
@@ -4070,24 +4159,6 @@ void render_entity_props()
         }
     }
     ImGui::PopItemWidth();
-}
-
-std::string format_time(int frames)
-{
-    struct tm newtime;
-    time_t secs = frames / 60;
-    char time[10];
-    gmtime_s(&newtime, &secs);
-    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
-    return time;
-}
-
-int parse_time(std::string time)
-{
-    std::tm tm = {};
-    std::stringstream ss(time);
-    ss >> std::get_time(&tm, "%H:%M:%S");
-    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
 }
 
 void force_time()
