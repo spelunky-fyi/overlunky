@@ -39,14 +39,14 @@ void hook_screen_render(Screen* self)
 {
     hook_vtable_no_dtor<void(Screen*)>(
         self,
-        [](Screen* self, void (*original)(Screen*))
+        [](Screen* lmbd_self, void (*original)(Screen*))
         {
-            ScreenHooksInfo& hook_info = self->get_hooks();
+            ScreenHooksInfo& hook_info = lmbd_self->get_hooks();
 
             bool skip_orig = false;
             for (auto& [id, pre] : hook_info.pre_render)
             {
-                if (pre(self))
+                if (pre(lmbd_self))
                 {
                     skip_orig = true;
                 }
@@ -54,12 +54,12 @@ void hook_screen_render(Screen* self)
 
             if (!skip_orig)
             {
-                original(self);
+                original(lmbd_self);
             }
 
             for (auto& [id, post] : hook_info.post_render)
             {
-                post(self);
+                post(lmbd_self);
             }
         },
         0x3);
