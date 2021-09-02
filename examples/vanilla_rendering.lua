@@ -110,3 +110,13 @@ set_callback(function(render_ctx, draw_depth)
         render_ctx:draw_world_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, rect, white)
     end
 end, ON.RENDER_PRE_DRAW_DEPTH)
+
+--move Ana on the title screen
+set_pre_render_screen(SCREEN.TITLE, function(screen, render_ctx)
+    s = screen:as_screen_title()
+    s.ana:set_destination(AABB:new(-0.1, 0, 0.15, -0.4))
+end)
+
+set_post_render_screen(SCREEN.TITLE, function(screen, render_ctx)
+    render_ctx:draw_text("Ana", 0.0, 0.0,  0.0006, 0.0006, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+end)

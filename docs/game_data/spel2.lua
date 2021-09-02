@@ -1488,6 +1488,9 @@ FlyHead = {
   __name = "sol.FlyHead.user",
   __newindex = "function"
 }
+FlyingThing = {
+  __name = "sol.FlyingThing.user"
+}
 ForceField = {
   __index = "function",
   __name = "sol.ForceField.user",
@@ -2313,6 +2316,9 @@ ParachutePowerup = {
 ParticleDB = {
   __name = "sol.ParticleDB.user"
 }
+ParticleEmitterInfo = {
+  __name = "sol.ParticleEmitterInfo.user"
+}
 Pet = {
   __index = "function",
   __name = "sol.Pet.user",
@@ -2691,6 +2697,38 @@ RoomOwner = {
   __name = "sol.RoomOwner.user",
   __newindex = "function"
 }
+SCREEN = {
+  ARENA_INTRO = 25,
+  ARENA_ITEMS = 23,
+  ARENA_LEVEL = 26,
+  ARENA_MENU = 21,
+  ARENA_SCORE = 27,
+  ARENA_SELECT = 24,
+  ARENA_STAGES = 22,
+  CAMP = 11,
+  CHARACTER_SELECT = 9,
+  CONSTELLATION = 19,
+  CREDITS = 17,
+  DEATH = 14,
+  INTRO = 1,
+  LEADERBOARD = 7,
+  LEVEL = 12,
+  LOGO = 0,
+  MENU = 4,
+  ONLINE_LOADING = 28,
+  ONLINE_LOBBY = 29,
+  OPTIONS = 5,
+  PLAYER_PROFILE = 6,
+  PROLOGUE = 2,
+  RECAP = 20,
+  SCORES = 18,
+  SEED_INPUT = 8,
+  SPACESHIP = 15,
+  TEAM_SELECT = 10,
+  TITLE = 3,
+  TRANSITION = 13,
+  WIN = 16
+}
 SHOP_TYPE = {
   CLOTHING_SHOP = 1,
   DICE_SHOP = 6,
@@ -2750,6 +2788,152 @@ Scorpion = {
   __index = "function",
   __name = "sol.Scorpion.user",
   __newindex = "function"
+}
+Screen = {
+  __name = "sol.Screen.user"
+}
+ScreenArenaIntro = {
+  __index = "function",
+  __name = "sol.ScreenArenaIntro.user",
+  __newindex = "function"
+}
+ScreenArenaItems = {
+  __index = "function",
+  __name = "sol.ScreenArenaItems.user",
+  __newindex = "function"
+}
+ScreenArenaLevel = {
+  __index = "function",
+  __name = "sol.ScreenArenaLevel.user",
+  __newindex = "function"
+}
+ScreenArenaMenu = {
+  __index = "function",
+  __name = "sol.ScreenArenaMenu.user",
+  __newindex = "function"
+}
+ScreenArenaScore = {
+  __index = "function",
+  __name = "sol.ScreenArenaScore.user",
+  __newindex = "function"
+}
+ScreenArenaStagesSelect = {
+  __index = "function",
+  __name = "sol.ScreenArenaStagesSelect.user",
+  __newindex = "function"
+}
+ScreenCamp = {
+  __index = "function",
+  __name = "sol.ScreenCamp.user",
+  __newindex = "function"
+}
+ScreenCharacterSelect = {
+  __index = "function",
+  __name = "sol.ScreenCharacterSelect.user",
+  __newindex = "function"
+}
+ScreenConstellation = {
+  __index = "function",
+  __name = "sol.ScreenConstellation.user",
+  __newindex = "function"
+}
+ScreenCredits = {
+  __index = "function",
+  __name = "sol.ScreenCredits.user",
+  __newindex = "function"
+}
+ScreenDeath = {
+  __index = "function",
+  __name = "sol.ScreenDeath.user",
+  __newindex = "function"
+}
+ScreenIntro = {
+  __index = "function",
+  __name = "sol.ScreenIntro.user",
+  __newindex = "function"
+}
+ScreenLeaderboards = {
+  __index = "function",
+  __name = "sol.ScreenLeaderboards.user",
+  __newindex = "function"
+}
+ScreenLevel = {
+  __index = "function",
+  __name = "sol.ScreenLevel.user",
+  __newindex = "function"
+}
+ScreenLogo = {
+  __index = "function",
+  __name = "sol.ScreenLogo.user",
+  __newindex = "function"
+}
+ScreenMenu = {
+  __index = "function",
+  __name = "sol.ScreenMenu.user",
+  __newindex = "function"
+}
+ScreenOnlineLoading = {
+  __index = "function",
+  __name = "sol.ScreenOnlineLoading.user",
+  __newindex = "function"
+}
+ScreenOnlineLobby = {
+  __index = "function",
+  __name = "sol.ScreenOnlineLobby.user",
+  __newindex = "function"
+}
+ScreenOptions = {
+  __index = "function",
+  __name = "sol.ScreenOptions.user",
+  __newindex = "function"
+}
+ScreenPlayerProfile = {
+  __index = "function",
+  __name = "sol.ScreenPlayerProfile.user",
+  __newindex = "function"
+}
+ScreenPrologue = {
+  __index = "function",
+  __name = "sol.ScreenPrologue.user",
+  __newindex = "function"
+}
+ScreenRecap = {
+  __index = "function",
+  __name = "sol.ScreenRecap.user",
+  __newindex = "function"
+}
+ScreenScores = {
+  __index = "function",
+  __name = "sol.ScreenScores.user",
+  __newindex = "function"
+}
+ScreenSeedInput = {
+  __index = "function",
+  __name = "sol.ScreenSeedInput.user",
+  __newindex = "function"
+}
+ScreenTeamSelect = {
+  __index = "function",
+  __name = "sol.ScreenTeamSelect.user",
+  __newindex = "function"
+}
+ScreenTitle = {
+  __index = "function",
+  __name = "sol.ScreenTitle.user",
+  __newindex = "function"
+}
+ScreenTransition = {
+  __index = "function",
+  __name = "sol.ScreenTransition.user",
+  __newindex = "function"
+}
+ScreenWin = {
+  __index = "function",
+  __name = "sol.ScreenWin.user",
+  __newindex = "function"
+}
+ScreenZoomAnimation = {
+  __name = "sol.ScreenZoomAnimation.user"
 }
 SelectPlayerSlot = {
   __name = "sol.SelectPlayerSlot.user"
@@ -3307,6 +3491,9 @@ Terra = {
 }
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
+}
+TextureRenderingInfo = {
+  __name = "sol.TextureRenderingInfo.user"
 }
 ThinIce = {
   __index = "function",
@@ -4119,6 +4306,7 @@ carry = function(...) end
 cast_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n        function cast_entity(entity_raw)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_u...Çç\1\0\4ë<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\14\1\0\2\14\1\2\3å\0\1\2ºÄ\0\0008\2\0Ä\0\1\1\0Ä\1\0\0E\1\2\0F\1\0\0008\0\0ÄH\0\2\0G\1\1\0Ñ\0\4âTYPE_MAP\4Ötype\4ÉidÅ\0\0\0Äë\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2ÄÇãentity_rawÄëâcast_funàëÅÖ_ENV",'@serialized'))
 clear_callback = function(...) end
 clear_entity_callback = function(...) end
+clear_screen_callback = function(...) end
 clear_vanilla_sound_callback = function(...) end
 clr_flag = function(...) end
 clrflag = function(...) end
@@ -4254,6 +4442,7 @@ pick_up = function(...) end
 players = {}
 prinspect = function(...) end
 prng = {}
+raise = function(...) end
 read_input = function(...) end
 read_prng = function(...) end
 read_stolen_input = function(...) end
@@ -4298,9 +4487,11 @@ set_olmec_phase_y_level = function(...) end
 set_on_kill = function(...) end
 set_on_open = function(...) end
 set_post_entity_spawn = function(...) end
+set_post_render_screen = function(...) end
 set_post_statemachine = function(...) end
 set_post_tile_code_callback = function(...) end
 set_pre_entity_spawn = function(...) end
+set_pre_render_screen = function(...) end
 set_pre_statemachine = function(...) end
 set_pre_tile_code_callback = function(...) end
 set_seed = function(...) end

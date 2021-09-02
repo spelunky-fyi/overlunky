@@ -33,6 +33,7 @@
 #include "usertypes/player_lua.hpp"
 #include "usertypes/prng_lua.hpp"
 #include "usertypes/save_context.hpp"
+#include "usertypes/screen_lua.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
@@ -109,6 +110,7 @@ end
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
+    NScreen::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
@@ -802,6 +804,63 @@ end
             }
         }
         return (uint16_t)0;
+    };
+
+    /// Clears a callback that is specific to a screen.
+    lua["clear_screen_callback"] = [](int screen_id, CallbackId cb_id)
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->clear_screen_hooks.push_back({screen_id, cb_id});
+    };
+
+    /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+    /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
+    lua["set_pre_render_screen"] = [&lua](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Screen* screen = get_screen_ptr(screen_id))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = screen->reserve_callback_id();
+            screen->set_pre_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Screen* self)
+                {
+                    if (backend->is_screen_callback_cleared({screen_id, id}))
+                    {
+                        return false;
+                    }
+
+                    VanillaRenderContext render_ctx;
+                    return backend->handle_function_with_return<bool>(fun, self, render_ctx).value_or(false);
+                });
+            backend->screen_hooks.push_back({screen_id, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+    /// Sets a callback that is called right after the screen is drawn.
+    lua["set_post_render_screen"] = [&lua](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Screen* screen = get_screen_ptr(screen_id))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = screen->reserve_callback_id();
+            screen->set_post_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Screen* self)
+                {
+                    if (backend->is_screen_callback_cleared({screen_id, id}))
+                    {
+                        return;
+                    }
+                    VanillaRenderContext render_ctx;
+                    backend->handle_function(fun, self, render_ctx);
+                });
+            backend->screen_hooks.push_back({screen_id, id});
+            return id;
+        }
+        return sol::nullopt;
     };
 
     /// Clears a callback that is specific to an entity.

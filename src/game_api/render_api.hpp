@@ -180,6 +180,8 @@ struct TextureRenderingInfo
     float source_bottom_left_y;
     float source_bottom_right_x;
     float source_bottom_right_y;
+
+    void set_destination(const AABB& bbox);
 };
 
 void init_render_api_hooks();
