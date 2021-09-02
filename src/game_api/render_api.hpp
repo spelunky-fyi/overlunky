@@ -4,6 +4,8 @@
 #include "memory.hpp"
 #include "texture.hpp"
 
+#include <mutex>
+
 using TEXTURE = std::int64_t;
 
 struct TextureDefinition
