@@ -1276,14 +1276,29 @@ std::optional<uint8_t> LevelGenData::define_short_tile_code(ShortTileCodeDef sho
     using mutable_short_tile_code_map_t = std::unordered_map<uint8_t, ShortTileCodeDef, std::hash<uint8_t>, std::equal_to<uint8_t>, map_allocator_t>;
     auto& short_tile_code_map = (mutable_short_tile_code_map_t&)short_tile_codes();
 
-    // Try all printable chars
+    // Try all printable chars, note that all chars are allowed since we won't need to parse this anymore
+    // Might even be allowed to use non-printable chars, TBD
+    // Also check existing short tile codes for an exact match
+    std::optional<uint8_t> smallest_match;
     for (uint8_t i = 0x20; i < 0x7f; i++)
     {
         if (!short_tile_code_map.contains(i))
         {
-            short_tile_code_map[i] = short_tile_code_def;
+            if (!smallest_match.has_value())
+            {
+                smallest_match = i;
+            }
+        }
+        else if (short_tile_code_map[i] == short_tile_code_def)
+        {
             return i;
         }
+    }
+
+    if (smallest_match.has_value())
+    {
+        short_tile_code_map[smallest_match.value()] = short_tile_code_def;
+        return smallest_match;
     }
 
     return std::nullopt;

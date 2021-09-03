@@ -78,6 +78,27 @@ bool PreHandleRoomTilesContext::set_short_tile_code(uint8_t tx, uint8_t ty, LAYE
     }
     return false;
 }
+bool PreHandleRoomTilesContext::replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code)
+{
+    layer = layer < 0 ? 0 : layer;
+    if (layer == 0 || has_back_layer())
+    {
+        LevelGenRoomData& mutable_data = get_mutable_room_data();
+        SingleRoomData& mutable_room_data = layer == 0 ? mutable_data.front_layer : mutable_data.back_layer.value();
+        for (uint8_t tx = 0; tx < 10; tx++)
+        {
+            for (uint8_t ty = 0; ty < 8; ty++)
+            {
+                if (mutable_room_data[tx][ty] == short_tile_code)
+                {
+                    mutable_room_data[tx][ty] = replacement_short_tile_code;
+                }
+            }
+        }
+        return true;
+    }
+    return false;
+}
 bool PreHandleRoomTilesContext::has_back_layer() const
 {
     return get_room_data().back_layer.has_value();
@@ -234,7 +255,8 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->get_room_template(x, y, l);
     };
     /// Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds
-    lua["is_room_flipped"] = [](int x, int y) -> bool {
+    lua["is_room_flipped"] = [](int x, int y) -> bool
+    {
         return State::get().ptr_local()->level_gen->is_room_flipped(x, y);
     };
     /// For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
@@ -306,6 +328,8 @@ void register_usertypes(sol::state& lua)
         &PreHandleRoomTilesContext::get_short_tile_code,
         "set_short_tile_code",
         &PreHandleRoomTilesContext::set_short_tile_code,
+        "replace_short_tile_code",
+        &PreHandleRoomTilesContext::replace_short_tile_code,
         "has_back_layer",
         &PreHandleRoomTilesContext::has_back_layer,
         "add_empty_back_layer",

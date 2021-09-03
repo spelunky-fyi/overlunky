@@ -17,6 +17,8 @@ struct ShortTileCodeDef
     uint8_t chance{100};
     /// Alternative tile code, ignored if `chance == 100`. Defaults to 0.
     TILE_CODE alt_tile_code{0};
+
+    bool operator==(const ShortTileCodeDef&) const = default;
 };
 
 using SingleRoomData = std::array<std::array<char, 10>, 8>;

@@ -31,22 +31,25 @@ struct PostRoomGenerationContext
     bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance);
     /// Change the amount of extra spawns for the given `extra_spawn_id`.
     void set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer);
-    /// Defines a new short tile code, automatically picks an unused one
+    /// Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match
     /// Returns `nil` if all possible short tile codes are already in use
     std::optional<SHORT_TILE_CODE> define_short_tile_code(ShortTileCodeDef short_tile_code_def);
-    /// Overrides a specific short tile code
+    /// Overrides a specific short tile code, this means it will change for the whole level
     void change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef short_tile_code_def);
 };
 struct PreHandleRoomTilesContext
 {
     /// Gets the tile code at the specified tile coordinate
     /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
-    /// Also returns `nil` if `layer == LAYER.BACK` and the room does not have a backrooms
+    /// Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
     std::optional<SHORT_TILE_CODE> get_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer) const;
     /// Sets the tile code at the specified tile coordinate
     /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
     /// Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
     bool set_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code);
+    /// Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`
+    /// Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
+    bool replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code);
     /// Check whether the room has a back layer
     bool has_back_layer() const;
     /// Add a back layer filled with all `0` if there is no back layer yet
