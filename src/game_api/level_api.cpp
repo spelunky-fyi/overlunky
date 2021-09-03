@@ -1251,6 +1251,17 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
     return it->second.id;
 }
 
+std::optional<uint8_t> LevelGenData::get_short_tile_code(ShortTileCodeDef short_tile_code_def)
+{
+    for (auto [i, def] : short_tile_codes())
+    {
+        if (def == short_tile_code_def)
+        {
+            return i;
+        }
+    }
+    return std::nullopt;
+}
 std::optional<ShortTileCodeDef> LevelGenData::get_short_tile_code_def(uint8_t short_tile_code)
 {
     auto& short_tile_codes_map = short_tile_codes();

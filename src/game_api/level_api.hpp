@@ -64,6 +64,7 @@ struct LevelGenData
     std::optional<std::uint32_t> get_tile_code(const std::string& tile_code);
     std::uint32_t define_tile_code(std::string tile_code);
 
+    std::optional<uint8_t> get_short_tile_code(ShortTileCodeDef short_tile_code_def);
     std::optional<ShortTileCodeDef> get_short_tile_code_def(uint8_t short_tile_code);
     void change_short_tile_code(uint8_t short_tile_code, ShortTileCodeDef short_tile_code_def);
     std::optional<uint8_t> define_short_tile_code(ShortTileCodeDef short_tile_code_def);

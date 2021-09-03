@@ -8,6 +8,9 @@
 #include <sol/forward.hpp>
 
 using LAYER = int; // NoAlias
+constexpr LAYER LAYER_FRONT = 0;
+constexpr LAYER LAYER_BACK = 1;
+constexpr LAYER LAYER_BOTH = -128;
 
 struct PreLoadLevelFilesContext
 {
@@ -42,11 +45,14 @@ struct PreHandleRoomTilesContext
     /// Gets the tile code at the specified tile coordinate
     /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
     /// Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
-    std::optional<SHORT_TILE_CODE> get_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer) const;
+    std::optional<SHORT_TILE_CODE> get_short_tile_code(uint32_t tx, uint32_t ty, LAYER layer) const;
     /// Sets the tile code at the specified tile coordinate
     /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
     /// Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
-    bool set_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code);
+    bool set_short_tile_code(uint32_t tx, uint32_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code);
+    /// Finds all places a short tile code is used in the room
+    /// Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
+    std::vector<std::tuple<uint32_t, uint32_t, LAYER>> find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code);
     /// Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`
     /// Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
     bool replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code);

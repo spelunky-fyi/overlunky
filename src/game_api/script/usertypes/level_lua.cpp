@@ -44,54 +44,90 @@ void PostRoomGenerationContext::change_short_tile_code(SHORT_TILE_CODE short_til
     State::get().ptr_local()->level_gen->data->change_short_tile_code(short_tile_code, short_tile_code_def);
 }
 
-std::optional<SHORT_TILE_CODE> PreHandleRoomTilesContext::get_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer) const
+std::optional<SHORT_TILE_CODE> PreHandleRoomTilesContext::get_short_tile_code(uint32_t tx, uint32_t ty, LAYER layer) const
 {
     if (tx >= 0 && tx < 10 && ty >= 0 && ty < 8)
     {
         layer = layer < 0 ? 0 : layer;
-        if (layer == 0)
+        if (layer == LAYER_FRONT)
         {
-            return get_room_data().front_layer[tx][ty];
+            return get_room_data().front_layer[ty][tx];
         }
         else if (has_back_layer())
         {
-            return get_room_data().back_layer.value()[tx][ty];
+            return get_room_data().back_layer.value()[ty][tx];
         }
     }
     return std::nullopt;
 }
-bool PreHandleRoomTilesContext::set_short_tile_code(uint8_t tx, uint8_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code)
+bool PreHandleRoomTilesContext::set_short_tile_code(uint32_t tx, uint32_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code)
 {
     if (tx >= 0 && tx < 10 && ty >= 0 && ty < 8)
     {
-        layer = layer < 0 ? 0 : layer;
-        if (layer == 0)
+        if (layer == LAYER_BOTH)
         {
-            get_mutable_room_data().front_layer[tx][ty] = short_tile_code;
+            set_short_tile_code(tx, ty, 1, short_tile_code);
+            layer = 0;
+        }
+
+        layer = layer < 0 ? 0 : layer;
+        if (layer == LAYER_FRONT)
+        {
+            get_mutable_room_data().front_layer[ty][tx] = short_tile_code;
             return true;
         }
         else if (has_back_layer())
         {
-            get_mutable_room_data().back_layer.value()[tx][ty] = short_tile_code;
+            get_mutable_room_data().back_layer.value()[ty][tx] = short_tile_code;
             return true;
         }
     }
     return false;
 }
+std::vector<std::tuple<uint32_t, uint32_t, LAYER>> PreHandleRoomTilesContext::find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)
+{
+    if (layer == LAYER_BOTH)
+    {
+        std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions = find_all_short_tile_codes(LAYER_FRONT, short_tile_code);
+        std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions_back = find_all_short_tile_codes(LAYER_BACK, short_tile_code);
+        positions.insert(positions.end(), positions_back.begin(), positions_back.end());
+        return positions_back;
+    }
+    layer = layer < 0 ? 0 : layer;
+    if (layer == LAYER_FRONT || has_back_layer())
+    {
+        const LevelGenRoomData& data = get_room_data();
+        const SingleRoomData& mutable_room_data = layer == LAYER_FRONT ? data.front_layer : data.back_layer.value();
+
+        std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions;
+        for (uint32_t tx = 0; tx < 10; tx++)
+        {
+            for (uint32_t ty = 0; ty < 8; ty++)
+            {
+                if (mutable_room_data[ty][tx] == short_tile_code)
+                {
+                    positions.push_back({tx, ty, layer});
+                }
+            }
+        }
+        return positions;
+    }
+    return {};
+}
 bool PreHandleRoomTilesContext::replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code)
 {
     layer = layer < 0 ? 0 : layer;
-    if (layer == 0 || has_back_layer())
+    if (layer == LAYER_FRONT || has_back_layer())
     {
         LevelGenRoomData& mutable_data = get_mutable_room_data();
-        SingleRoomData& mutable_room_data = layer == 0 ? mutable_data.front_layer : mutable_data.back_layer.value();
-        for (uint8_t tx = 0; tx < 10; tx++)
+        SingleRoomData& mutable_room_data = layer == LAYER_FRONT ? mutable_data.front_layer : mutable_data.back_layer.value();
+        for (uint32_t tx = 0; tx < 10; tx++)
         {
-            for (uint8_t ty = 0; ty < 8; ty++)
+            for (uint32_t ty = 0; ty < 8; ty++)
             {
-                if (mutable_room_data[tx][ty] == short_tile_code)
+                if (mutable_room_data[ty][tx] == short_tile_code)
                 {
-                    mutable_room_data[tx][ty] = replacement_short_tile_code;
+                    mutable_room_data[ty][tx] = replacement_short_tile_code;
                 }
             }
         }
@@ -172,6 +208,10 @@ void register_usertypes(sol::state& lua)
         return backend->g_state->level_gen->data->define_tile_code(std::move(tile_code));
     };
 
+    /// Gets a short tile code based on definition, returns `nil` if it can't be found
+    lua["get_short_tile_code"] = [](ShortTileCodeDef short_tile_code_def) -> std::optional<uint8_t> {
+        return State::get().ptr_local()->level_gen->data->get_short_tile_code(short_tile_code_def);
+    };
     /// Gets the definition of a short tile code (if available), will vary depending on which file is loaded
     lua["get_short_tile_code_definition"] = [](SHORT_TILE_CODE short_tile_code) -> std::optional<ShortTileCodeDef> {
         return State::get().ptr_local()->level_gen->data->get_short_tile_code_def(short_tile_code);
@@ -319,6 +359,22 @@ void register_usertypes(sol::state& lua)
         "change_short_tile_code",
         &PostRoomGenerationContext::change_short_tile_code);
 
+    auto find_all_short_tile_codes = [&lua](PreHandleRoomTilesContext& ctx, LAYER layer, SHORT_TILE_CODE short_tile_code)
+    {
+        auto positions = ctx.find_all_short_tile_codes(layer, short_tile_code);
+        sol::table positions_converted = lua.create_table();
+        for (size_t i = 0; i < positions.size(); i++)
+        {
+            auto& tuple = positions[i];
+            sol::table tuple_table = lua.create_table();
+            tuple_table[1] = std::get<0>(tuple);
+            tuple_table[2] = std::get<1>(tuple);
+            tuple_table[3] = std::get<2>(tuple);
+            positions_converted[i + 1] = tuple_table;
+        }
+        return positions_converted;
+    };
+
     // Context received in ON.PRE_HANDLE_ROOM_TILES.
     // Used to change the room data as well as add a backlayer room if none is set yet.
     lua.new_usertype<PreHandleRoomTilesContext>(
@@ -328,6 +384,8 @@ void register_usertypes(sol::state& lua)
         &PreHandleRoomTilesContext::get_short_tile_code,
         "set_short_tile_code",
         &PreHandleRoomTilesContext::set_short_tile_code,
+        "find_all_short_tile_codes",
+        find_all_short_tile_codes,
         "replace_short_tile_code",
         &PreHandleRoomTilesContext::replace_short_tile_code,
         "has_back_layer",
