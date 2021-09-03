@@ -178,7 +178,7 @@ namespace NLevel
 void register_usertypes(sol::state& lua)
 {
     /// Default function in spawn definitions to check whether a spawn is valid or not
-    lua["spawn_default_is_valid"] = default_is_valid_spawn;
+    lua["default_spawn_is_valid"] = default_spawn_is_valid;
 
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// The callback signature is `bool pre_tile_code(x, y, layer, room_template)`

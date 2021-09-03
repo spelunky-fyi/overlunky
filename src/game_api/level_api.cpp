@@ -1683,7 +1683,7 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
     return false;
 }
 
-bool default_is_valid_spawn(float x, float y, uint8_t layer)
+bool default_spawn_is_valid(float x, float y, uint8_t layer)
 {
     return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
 }

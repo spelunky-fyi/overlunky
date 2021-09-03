@@ -453,7 +453,7 @@ struct LevelGenSystem
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 };
 
-bool default_is_valid_spawn(float x, float y, uint8_t layer);
+bool default_spawn_is_valid(float x, float y, uint8_t layer);
 
 void override_next_levels(std::vector<std::string> next_levels);
 void add_next_levels(std::vector<std::string> next_levels);
