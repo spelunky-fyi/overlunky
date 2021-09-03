@@ -213,7 +213,7 @@ const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
 
 std::string fontfile = "segoeuib.ttf";
-std::vector<float> fontsize;
+std::vector<float> fontsize = {18.0f, 32.0f, 72.0f};
 
 [[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 [[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
