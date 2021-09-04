@@ -825,7 +825,7 @@ end
                 id,
                 [=, fun = std::move(fun)](Screen* self)
                 {
-                    if (backend->is_screen_callback_cleared({screen_id, id}))
+                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
                     {
                         return false;
                     }
@@ -850,7 +850,7 @@ end
                 id,
                 [=, fun = std::move(fun)](Screen* self)
                 {
-                    if (backend->is_screen_callback_cleared({screen_id, id}))
+                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
                     {
                         return;
                     }
