@@ -43,6 +43,8 @@
 
 #include "decode_audio_file.hpp"
 
+#pragma warning(disable : 4366)
+
 template <class T>
 concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
 
@@ -211,7 +213,7 @@ const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
 
 std::string fontfile = "segoeuib.ttf";
-std::vector<float> fontsize;
+std::vector<float> fontsize = {18.0f, 32.0f, 72.0f};
 
 [[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 [[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
@@ -2636,7 +2638,13 @@ void render_messages()
         {
             if (fade_script_messages && now - 12s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
+            std::istringstream messages(message.message);
+            while (!messages.eof())
+            {
+                std::string mline;
+                getline(messages, mline);
+                queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
+            }
         }
     }
     for (auto&& message : g_Console->consume_messages())
@@ -2645,7 +2653,13 @@ void render_messages()
     }
     for (auto message : g_ConsoleMessages)
     {
-        queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
+        std::istringstream messages(message.message);
+        while (!messages.eof())
+        {
+            std::string mline;
+            getline(messages, mline);
+            queue.push_back(std::make_tuple("Console", mline, message.time, message.color));
+        }
     }
     std::erase_if(g_ConsoleMessages, [&](auto message)
                   { return fade_script_messages && now - 12s > message.time; });
@@ -3402,6 +3416,24 @@ void render_scripts()
     ImGui::PopItemWidth();
 }
 
+std::string format_time(int64_t frames)
+{
+    struct tm newtime;
+    time_t secs = frames / 60;
+    char time[10];
+    gmtime_s(&newtime, &secs);
+    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    return time;
+}
+
+int parse_time(std::string time)
+{
+    std::tm tm = {};
+    std::stringstream ss(time);
+    ss >> std::get_time(&tm, "%H:%M:%S");
+    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
+}
+
 void render_savegame()
 {
     ImGui::PushID("Journal");
@@ -3500,10 +3532,19 @@ void render_savegame()
     ImGui::PushID("Characters");
     if (ImGui::CollapsingHeader("Characters"))
     {
+        ImGui::Text("");
+        ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+        ImGui::Text("Deaths");
         for (int i = 0; i < 20; ++i)
         {
             ImGui::PushID(i);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
             ImGui::CheckboxFlags(people_flags[i], &g_save->characters, int_pow(2, i));
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::PushID("character_deaths");
+            ImGui::DragInt("", &g_save->character_deaths[i], 0.5f, 0, INT_MAX);
+            ImGui::PopID();
+            ImGui::PopItemWidth();
             ImGui::PopID();
         }
     }
@@ -3524,8 +3565,8 @@ void render_savegame()
     }
     ImGui::PopID();
 
-    ImGui::PushID("Profile");
-    if (ImGui::CollapsingHeader("Profile"))
+    ImGui::PushID("Player Profile");
+    if (ImGui::CollapsingHeader("Player Profile"))
     {
         ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5f);
         ImGui::DragInt("Plays", &g_save->plays);
@@ -3537,10 +3578,70 @@ void render_savegame()
         ImGui::DragInt("Top score", &g_save->score_top, 1000.0f, 0, INT_MAX);
         SliderByte("Deepest area", (char*)&g_save->deepest_area, 1, 8);
         SliderByte("Deepest level", (char*)&g_save->deepest_level, 1, 99);
+        std::string besttime = format_time(g_save->time_best);
+        if (ImGui::InputText("Best time##BestTime", &besttime))
+        {
+            g_save->time_best = parse_time(besttime);
+        }
+        std::string totaltime = format_time(g_save->time_total); //TODO: these functions are crap for this purpose
+        if (ImGui::InputText("Total time##BestTime", &totaltime))
+        {
+            g_save->time_total = parse_time(totaltime);
+        }
+        ImGui::Checkbox("Completed normal", &g_save->completed_normal);
+        ImGui::Checkbox("Completed ironman", &g_save->completed_ironman);
+        ImGui::Checkbox("Completed hard", &g_save->completed_hard);
         ImGui::PopItemWidth();
     }
     ImGui::PopID();
-    ImGui::TextWrapped("To be continued...");
+
+    ImGui::PushID("Last Game Played");
+    if (ImGui::CollapsingHeader("Last Game Played"))
+    {
+        SliderByte("World##LastWorld", (char*)&g_save->world_last, 1, 8);
+        SliderByte("Level##LastLevel", (char*)&g_save->level_last, 1, 99);
+        ImGui::DragScalar("Score##LastScore", ImGuiDataType_S32, &g_save->score_last, 1000.0f, &s32_zero, &s32_max);
+        std::string lasttime = format_time(g_save->time_last);
+        if (ImGui::InputText("Time##LastTime", &lasttime))
+        {
+            g_save->time_last = parse_time(lasttime);
+        }
+        for (int i = 0; i < 9; ++i)
+        {
+            ImGui::PushID(i);
+            ImGui::InputInt("Sticker", &g_save->stickers[i]);
+            ImGui::PopID();
+        }
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("Miscellaneous");
+    if (ImGui::CollapsingHeader("Miscellaneous"))
+    {
+        ImGui::Checkbox("Seeded runs unlocked", &g_save->seeded_unlocked);
+        ImGui::Checkbox("Profile seen", &g_save->profile_seen);
+        for (int s = 0; s < 4; ++s)
+        {
+            auto lbl = fmt::format("Player {}", s + 1);
+            int plr = g_save->players[s];
+            if (ImGui::BeginCombo(lbl.c_str(), people_flags[plr]))
+            {
+                for (uint8_t i = 0; i < 20; ++i)
+                {
+                    bool isSelected = (plr == g_save->players[s]);
+                    if (ImGui::Selectable(people_flags[i], isSelected))
+                    {
+                        g_save->players[s] = i;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }
+        ImGui::SliderScalar("Rescued dogs", ImGuiDataType_U8, &g_save->pets_rescued[0], &u8_min, &u8_max);
+        ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
+        ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
+    }
+    ImGui::PopID();
 }
 
 void render_powerup(int uid, const char* section)
@@ -3750,26 +3851,6 @@ void render_entity_props()
         render_state("Current state", g_entity->state);
         render_state("Last state", g_entity->last_state);
         render_ai("AI state", g_entity->move_state);
-        if (ImGui::Button("Change"))
-        {
-            unsigned int layer_to = 0;
-            if (g_entity->layer == 0)
-                layer_to = 1;
-            g_entity->set_layer(layer_to);
-        }
-        ImGui::SameLine();
-        switch (g_entity->layer)
-        {
-        case 0:
-            ImGui::Text("Layer: FRONT");
-            break;
-        case 1:
-            ImGui::Text("Layer: BACK");
-            break;
-        default:
-            ImGui::Text("Layer: UNKNOWN");
-            break;
-        }
         if (g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
@@ -3821,20 +3902,40 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Position"))
     {
+        if (ImGui::Button("Change"))
+        {
+            unsigned int layer_to = 0;
+            if (g_entity->layer == 0)
+                layer_to = 1;
+            g_entity->set_layer(layer_to);
+        }
+        ImGui::SameLine();
+        switch (g_entity->layer)
+        {
+        case 0:
+            ImGui::Text("Layer: FRONT");
+            break;
+        case 1:
+            ImGui::Text("Layer: BACK");
+            break;
+        default:
+            ImGui::Text("Layer: UNKNOWN");
+            break;
+        }
         ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2f, 1.0f);
         ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2f, 1.0f);
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2f, 1.0f);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2f, 1.0f);
         ImGui::InputFloat("Angle##EntityAngle", &g_entity->angle, 0.2f, 1.0f);
-        SliderByte("Airtime##EntityAirtime", (char*)&g_entity->airtime, 0, 98);
+        SliderByte("Falling timer##EntityFallingTimer", (char*)&g_entity->falling_timer, 0, 98);
         uint8_t falldamage = 0;
-        if (g_entity->airtime >= 98)
+        if (g_entity->falling_timer >= 98)
             falldamage = 4;
-        else if (g_entity->airtime >= 78)
+        else if (g_entity->falling_timer >= 78)
             falldamage = 3;
-        else if (g_entity->airtime >= 58)
+        else if (g_entity->falling_timer >= 58)
             falldamage = 2;
-        else if (g_entity->airtime >= 38)
+        else if (g_entity->falling_timer >= 38)
             falldamage = 1;
         const char* damagenum[] = {"0", "1", "2", "4", "99"};
         SliderByte("Fall damage##EntityFallDamage", (char*)&falldamage, 0, 4, damagenum[falldamage]);
@@ -3842,7 +3943,7 @@ void render_entity_props()
     if (ImGui::CollapsingHeader("Stats"))
     {
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&g_entity->health, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("Price##Price", ImGuiDataType_U8, (char*)&g_entity->price, 0.5f, &u32_zero, &u32_max);
+        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&g_entity->price, 0.5f, &s32_min, &s32_max);
         if (g_inventory != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
@@ -3993,6 +4094,18 @@ void render_entity_props()
             {
                 g_entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
+
+            if (g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && g_entity->ai != 0)
+            {
+                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &g_entity->ai->state, &u8_min, &s8_max);
+                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &g_entity->ai->trust, &u8_min, &s8_max);
+                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &g_entity->ai->whipped, &u8_min, &s8_max);
+                if (g_entity->ai->target_uid != -1)
+                {
+                    ImGui::Text("Target:");
+                    render_uid(g_entity->ai->target_uid, "Ai");
+                }
+            }
         }
     }
     if (ImGui::CollapsingHeader("Style"))
@@ -4046,24 +4159,6 @@ void render_entity_props()
         }
     }
     ImGui::PopItemWidth();
-}
-
-std::string format_time(int frames)
-{
-    struct tm newtime;
-    time_t secs = frames / 60;
-    char time[10];
-    gmtime_s(&newtime, &secs);
-    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
-    return time;
-}
-
-int parse_time(std::string time)
-{
-    std::tm tm = {};
-    std::stringstream ss(time);
-    ss >> std::get_time(&tm, "%H:%M:%S");
-    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
 }
 
 void force_time()

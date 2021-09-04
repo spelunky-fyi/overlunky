@@ -46,7 +46,8 @@ class Movable : public Entity
     uint8_t i120c;
     uint8_t i120d;
     uint8_t b124;
-    uint8_t airtime;
+    /// airtime = falling_timer
+    uint8_t falling_timer;
     uint8_t b126;
     uint8_t b127;
 

@@ -93,7 +93,7 @@ function module.start()
             for i, v in ipairs(pots) do
                 if not pot_replaced(v) then
                     item = items[math.random(#items)]
-                    e = get_entity(v):as_container()
+                    e = get_entity(v)
                     e.inside = item
                 end
                 pot_done[#pot_done + 1] = v
@@ -104,7 +104,7 @@ function module.start()
             for i, v in ipairs(crates) do
                 if not pot_replaced(v) then
                     item = tools[math.random(#tools)]
-                    e = get_entity(v):as_container()
+                    e = get_entity(v)
                     e.inside = item
                 end
                 pot_done[#pot_done + 1] = v
@@ -118,7 +118,7 @@ function module.start()
                     if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
                         item = ENT_TYPE.CHAR_HIREDHAND
                     end
-                    e = get_entity(v):as_container()
+                    e = get_entity(v)
                     e.inside = item
                 end
                 pot_done[#pot_done + 1] = v

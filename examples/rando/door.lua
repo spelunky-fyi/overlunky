@@ -149,7 +149,7 @@ function dead_hundun()
     if state.theme == THEME.HUNDUN then
         hunduns = get_entities_by_type(ENT_TYPE.MONS_HUNDUN)
         if #hunduns > 0 then
-            if get_entity_ai_state(hunduns[1]) == 4 then -- this hundun is just chillin on the floor
+            if get_entity(hunduns[1]).move_state == 4 then -- this hundun is just chillin on the floor
                 remove_boss(THEME.HUNDUN)
             end
         end

@@ -412,7 +412,7 @@ Entity* get_entity_ptr(uint32_t uid)
     return p;
 }
 
-uint32_t get_entity_type(uint32_t uid)
+ENT_TYPE get_entity_type(uint32_t uid)
 {
     auto state = State::get();
     auto p = state.find(uid);
@@ -473,7 +473,7 @@ std::vector<uint32_t> get_entities_by_layer(LAYER layer)
     return get_entities_by(0, 0, layer);
 }
 
-std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types)
+std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
@@ -495,7 +495,7 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types)
 template <typename... Args>
 std::vector<uint32_t> get_entities_by_type(Args... args)
 {
-    std::vector<uint32_t> types = {args...};
+    std::vector<ENT_TYPE> types = {args...};
     return get_entities_by_type(types);
 }
 
@@ -504,7 +504,7 @@ std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
     return get_entities_by(0, mask, -128);
 }
 
-std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER layer)
+std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER layer)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
@@ -538,7 +538,7 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER
     return found;
 }
 
-std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
+std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
@@ -576,7 +576,7 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
     return found;
 }
 
-std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, LAYER layer)
+std::vector<uint32_t> get_entities_overlapping_hitbox(ENT_TYPE entity_type, uint32_t mask, AABB hitbox, LAYER layer)
 {
     auto state = State::get();
     std::vector<uint32_t> result;
@@ -595,12 +595,12 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint
     return result;
 }
 
-std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
     return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy2, sx2, sy}, layer);
 }
 
-std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
+std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
 {
     std::vector<uint32_t> found;
     for (auto& item : layer->items())
@@ -629,7 +629,7 @@ std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
     return static_cast<Door*>(door)->get_target();
 }
 
-void set_contents(uint32_t uid, uint32_t item_entity_type)
+void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
 {
     Entity* container = get_entity_ptr(uid);
     if (container == nullptr)
@@ -666,7 +666,7 @@ bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
     return false;
 };
 
-bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
+bool entity_has_item_type(uint32_t uid, ENT_TYPE entity_type)
 {
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
@@ -686,7 +686,7 @@ bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
     return false;
 };
 
-std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, uint32_t mask)
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask)
 {
     std::vector<uint32_t> found;
     Entity* entity = get_entity_ptr(uid);
@@ -828,7 +828,7 @@ void set_seed(uint32_t seed)
     state.set_seed(seed);
 }
 
-void set_arrowtrap_projectile(uint32_t regular_entity_type, uint32_t poison_entity_type)
+void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
 {
     static size_t offset_poison = 0;
     static size_t offset_regular = 0;
@@ -1160,7 +1160,7 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
     }
 }
 
-void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type)
+void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
 {
     if (new_drop_entity_type == 0)
     {
@@ -1259,7 +1259,7 @@ void set_journal_enabled(bool b)
     }
 }
 
-uint8_t waddler_count_entity(uint32_t entity_type)
+uint8_t waddler_count_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();
     uint8_t count = 0;
@@ -1273,7 +1273,7 @@ uint8_t waddler_count_entity(uint32_t entity_type)
     return count;
 }
 
-int8_t waddler_store_entity(uint32_t entity_type)
+int8_t waddler_store_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();
     int8_t item_stored_in_slot = -1;
@@ -1289,7 +1289,7 @@ int8_t waddler_store_entity(uint32_t entity_type)
     return item_stored_in_slot;
 }
 
-void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove)
+void waddler_remove_entity(ENT_TYPE entity_type, uint8_t amount_to_remove)
 {
     auto state = get_state_ptr();
 
@@ -1352,7 +1352,7 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     return 0;
 }
 
-int32_t spawn_companion(uint32_t companion_type, float x, float y, LAYER layer)
+int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 {
     static size_t offset = 0;
     if (offset == 0)

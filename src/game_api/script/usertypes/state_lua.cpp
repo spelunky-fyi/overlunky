@@ -166,7 +166,11 @@ void register_usertypes(sol::state& lua)
         "screen_arena_level",
         &StateMemory::screen_arena_level,
         "screen_arena_score",
-        &StateMemory::screen_arena_score);
+        &StateMemory::screen_arena_score,
+        "get_correct_ushabti",
+        &StateMemory::get_correct_ushabti,
+        "set_correct_ushabti",
+        &StateMemory::set_correct_ushabti);
     lua.new_usertype<GameManager>(
         "GameManager",
         "screen_logo",

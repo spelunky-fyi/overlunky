@@ -100,11 +100,11 @@ const char16_t* get_character_full_name(std::uint32_t character_index)
 {
     return get_character_definition(character_index).full_name;
 }
-const char16_t* get_character_short_name(std::uint32_t character_index)
+const char16_t* get_character_shortname(std::uint32_t character_index)
 {
     return get_character_definition(character_index).short_name;
 }
-Color get_character_heart_color(std::uint32_t character_index)
+Color get_character_heartcolor(std::uint32_t character_index)
 {
     return get_character_definition(character_index).heart_color;
 }
@@ -135,7 +135,7 @@ void set_character_short_name(std::uint32_t character_index, std::u16string_view
     memset(char_def.short_name, 0, max_size * sizeof(char16_t));
     memcpy(char_def.short_name, name.data(), std::min(name.size(), max_size) * sizeof(char16_t));
 }
-void set_character_heart_color(std::uint32_t character_index, Color color)
+void set_character_heartcolor(std::uint32_t character_index, Color color)
 {
     get_character_definition(character_index).heart_color = color;
 }

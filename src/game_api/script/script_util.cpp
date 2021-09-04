@@ -106,8 +106,8 @@ void AddImageRotated(ImDrawList* draw_list, ImTextureID user_texture_id, const I
     auto rot = [sin_a, cos_a, add, sub](const ImVec2& vec, const ImVec2& pivot)
     {
         const ImVec2 off = sub(vec, pivot);
-        const ImVec2 rot{off.x * cos_a - off.y * sin_a, off.x * sin_a + off.y * cos_a};
-        return add(rot, pivot);
+        const ImVec2 _rot{off.x * cos_a - off.y * sin_a, off.x * sin_a + off.y * cos_a};
+        return add(_rot, pivot);
     };
 
     const ImVec2 center = mul(add(p_min, p_max), 0.5f);

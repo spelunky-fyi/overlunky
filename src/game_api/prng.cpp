@@ -45,14 +45,14 @@ std::optional<std::int64_t> PRNG::internal_random_int(std::int64_t min, std::int
         return std::nullopt;
     }
 
-    static auto wrap = [](std::int64_t val, std::int64_t min, std::int64_t max)
+    static auto wrap = [](std::int64_t val, std::int64_t _min, std::int64_t _max)
     {
-        const auto diff = max - min;
+        const auto diff = _max - _min;
 
-        if (val < min)
-            val += diff * ((min - val) / diff + 1);
+        if (val < _min)
+            val += diff * ((_min - val) / diff + 1);
 
-        return min + (val - min) % diff;
+        return _min + (val - _min) % diff;
     };
 
     prng_pair pair = get_and_advance(type);

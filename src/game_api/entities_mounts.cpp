@@ -28,6 +28,6 @@ void Mount::carry(Movable* rider)
 
 void Mount::tame(bool value)
 {
-    write_mem(pointer() + 0x149, to_le_bytes(value));
+    tamed = value;
     flags = flags | 0x20000;
 }

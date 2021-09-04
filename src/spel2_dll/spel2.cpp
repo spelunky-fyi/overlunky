@@ -328,13 +328,13 @@ const char16_t* Spelunky_GetCharacterFullName(std::uint32_t character_index)
 }
 const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index)
 {
-    return get_character_short_name(character_index);
+    return get_character_shortname(character_index);
 }
 void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
     static_assert(sizeof(Color) == sizeof(color));
 
-    Color col = get_character_heart_color(character_index);
+    Color col = get_character_heartcolor(character_index);
     memcpy(color, &col, sizeof(Color));
 }
 bool Spelunky_GetCharacterGender(std::uint32_t character_index)

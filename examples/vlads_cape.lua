@@ -8,6 +8,6 @@ meta.author = "Zappatic"
 set_callback(function()
     vladscapes = get_entities_by_type(ENT_TYPE.ITEM_VLADS_CAPE)
     for i, cape_uid in ipairs(vladscapes) do
-        get_entity(cape_uid):as_vlads_cape().can_double_jump = true
+        get_entity(cape_uid).can_double_jump = true
     end
 end, ON.GAMEFRAME)

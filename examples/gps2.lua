@@ -22,7 +22,7 @@ function recalculate()
         if #players < 1 then
             return
         end
-        tiles = get_entities_by(0, 0x100, 0)
+        tiles = get_entities_by(0, MASK.FLOOR, LAYER.FRONT)
         if #tiles ~= ntiles then
             board = {}
             xmin, ymin, xmax, ymax = get_bounds()
