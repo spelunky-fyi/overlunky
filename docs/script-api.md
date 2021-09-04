@@ -621,8 +621,8 @@ Get the [ParticleDB](#particledb) details of the specified ID
 ### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 `nil generate_particles(int particle_emitter_id, int uid)`<br/>
 Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
-### [`spawn_default_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_default_is_valid)
-`bool spawn_default_is_valid(float x, float y, int layer)`<br/>
+### [`default_spawn_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
+`bool default_spawn_is_valid(float x, float y, int layer)`<br/>
 Default function in spawn definitions to check whether a spawn is valid or not
 ### [`set_pre_tile_code_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
 `CallbackId set_pre_tile_code_callback(function cb, string tile_code)`<br/>
@@ -640,6 +640,9 @@ This is received even if a previous pre-tile-code-callback has returned true
 `TILE_CODE define_tile_code(string tile_code)`<br/>
 Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
 If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
+### [`get_short_tile_code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code)
+`optional<int> get_short_tile_code(ShortTileCodeDef short_tile_code_def)`<br/>
+Gets a short tile code based on definition, returns `nil` if it can't be found
 ### [`get_short_tile_code_definition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code_definition)
 `optional<ShortTileCodeDef> get_short_tile_code_definition(SHORT_TILE_CODE short_tile_code)`<br/>
 Gets the definition of a short tile code (if available), will vary depending on which file is loaded
@@ -671,11 +674,14 @@ Transform a position to a room index to be used in `get_room_template` and `Post
 `tuple<float, float> get_room_pos(int x, int y)`<br/>
 Transform a room index into the top left corner position in the room
 ### [`get_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template)
-`optional<int> get_room_template(int x, int y, int l)`<br/>
-Get the room template given a certain index
+`optional<int> get_room_template(int x, int y, LAYER l)`<br/>
+Get the room template given a certain index, returns `nil` if coordinates are out of bounds
+### [`is_room_flipped`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_room_flipped)
+`bool is_room_flipped(int x, int y)`<br/>
+Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds
 ### [`get_room_template_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 `string_view get_room_template_name(int room_template)`<br/>
-For debugging only, get the name of a room template
+For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
 ### [`define_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_room_template)
 `int define_room_template(string room_template, ROOM_TEMPLATE_TYPE type)`<br/>
 Define a new room remplate to use with `set_room_template`
@@ -2617,22 +2623,30 @@ Returns `false` if the given chance is not defined.
 Change the amount of extra spawns for the given `extra_spawn_id`.
 - [`optional<SHORT_TILE_CODE> define_short_tile_code(ShortTileCodeDef short_tile_code_def)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_short_tile_code) &PostRoomGenerationContext::define_short_tile_code
 \
-Defines a new short tile code, automatically picks an unused one
+Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match
 Returns `nil` if all possible short tile codes are already in use
 - [`nil change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef short_tile_code_def)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_short_tile_code) &PostRoomGenerationContext::change_short_tile_code
 \
-Overrides a specific short tile code
+Overrides a specific short tile code, this means it will change for the whole level
 ### `PreHandleRoomTilesContext`
 - [`optional<SHORT_TILE_CODE> get_short_tile_code(int tx, int ty, LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code) &PreHandleRoomTilesContext::get_short_tile_code
 \
 Gets the tile code at the specified tile coordinate
 Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
-Also returns `nil` if `layer == LAYER.BACK` and the room does not have a backrooms
+Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
 - [`bool set_short_tile_code(int tx, int ty, LAYER layer, SHORT_TILE_CODE short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_short_tile_code) &PreHandleRoomTilesContext::set_short_tile_code
 \
 Sets the tile code at the specified tile coordinate
 Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
 Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
+- [`array<tuple<int, int, LAYER>> find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=find_all_short_tile_codes) find_all_short_tile_codes
+\
+Finds all places a short tile code is used in the room
+Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
+- [`bool replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_short_tile_code) &PreHandleRoomTilesContext::replace_short_tile_code
+\
+Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`
+Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
 - [`bool has_back_layer()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_back_layer) &PreHandleRoomTilesContext::has_back_layer
 \
 Check whether the room has a back layer
@@ -3397,10 +3411,13 @@ Any integer in the range [0, 9] is a valid class, some are however not documente
 - [`BOTTOM_LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_LEFT) FLOOR_SIDE::BOTTOM_LEFT
 - [`BOTTOM_RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_RIGHT) FLOOR_SIDE::BOTTOM_RIGHT
 ### GHOST_BEHAVIOR
-- [`ANGRY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.ANGRY) GHOST_BEHAVIOR::ANGRY
-- [`SURPRISED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SURPRISED) GHOST_BEHAVIOR::SURPRISED
 - [`SAD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SAD) GHOST_BEHAVIOR::SAD
-- [`HAPPY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.HAPPY) GHOST_BEHAVIOR::HAPPY
+- [`MEDIUM_SAD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.MEDIUM_SAD) GHOST_BEHAVIOR::MEDIUM_SAD
+- [`MEDIUM_HAPPY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.MEDIUM_HAPPY) GHOST_BEHAVIOR::MEDIUM_HAPPY
+- [`SMALL_ANGRY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_ANGRY) GHOST_BEHAVIOR::SMALL_ANGRY
+- [`SMALL_SURPRISED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_SURPRISED) GHOST_BEHAVIOR::SMALL_SURPRISED
+- [`SMALL_SAD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_SAD) GHOST_BEHAVIOR::SMALL_SAD
+- [`SMALL_HAPPY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_HAPPY) GHOST_BEHAVIOR::SMALL_HAPPY
 ### HUNDUNFLAGS
 - [`WILLMOVELEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HUNDUNFLAGS.WILLMOVELEFT) 1
 - [`BIRDHEADEMERGED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HUNDUNFLAGS.BIRDHEADEMERGED) 2
