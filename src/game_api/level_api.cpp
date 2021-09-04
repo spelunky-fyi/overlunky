@@ -1187,7 +1187,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
     LevelGenRooms* level_rooms = rooms[layer];
     return level_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template)
+bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -1195,9 +1195,7 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
-    uint8_t layer = enum_to_layer(l);
-
-    LevelGenRooms* level_rooms = rooms[layer];
+    LevelGenRooms* level_rooms = rooms[l];
     level_rooms->rooms[x + y * 8] = room_template;
 
     return true;

@@ -412,7 +412,7 @@ struct LevelGenSystem
     std::pair<int, int> get_room_index(float x, float y);
     std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);
     std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, LAYER l);
-    bool set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template);
+    bool set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template);
 
     std::string_view get_room_template_name(uint16_t room_template);
 

@@ -637,7 +637,7 @@ Transform a position to a room index to be used in `get_room_template` and `Post
 `tuple<float, float> get_room_pos(int x, int y)`<br/>
 Transform a room index into the top left corner position in the room
 ### [`get_room_template`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template)
-`optional<int> get_room_template(int x, int y, int l)`<br/>
+`optional<int> get_room_template(int x, int y, LAYER l)`<br/>
 Get the room template given a certain index
 ### [`get_room_template_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 `string_view get_room_template_name(int room_template)`<br/>
@@ -1343,14 +1343,17 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &StickyTrap::timer
 ### `MotherStatue`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`array<bool, 4> player_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_standing) &MotherStatue::player_standing
 - [`bool player1_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_standing) &MotherStatue::player1_standing
 - [`bool player2_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_standing) &MotherStatue::player2_standing
 - [`bool player3_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_standing) &MotherStatue::player3_standing
 - [`bool player4_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player4_standing) &MotherStatue::player4_standing
+- [`array<bool, 4> player_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_health_received) &MotherStatue::player_health_received
 - [`bool player1_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_health_received) &MotherStatue::player1_health_received
 - [`bool player2_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_health_received) &MotherStatue::player2_health_received
 - [`bool player3_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_health_received) &MotherStatue::player3_health_received
 - [`bool player4_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player4_health_received) &MotherStatue::player4_health_received
+- [`array<int, 4> player_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_health_timer) &MotherStatue::player_health_timer
 - [`int player1_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_health_timer) &MotherStatue::player1_health_timer
 - [`int player2_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_health_timer) &MotherStatue::player2_health_timer
 - [`int player3_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_health_timer) &MotherStatue::player3_health_timer
