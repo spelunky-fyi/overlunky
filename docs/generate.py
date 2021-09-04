@@ -13,6 +13,7 @@ header_files = [
     "../src/game_api/color.hpp",
     "../src/game_api/entity.hpp",
     "../src/game_api/movable.hpp",
+    "../src/game_api/game_manager.hpp",
     "../src/game_api/state.hpp",
     "../src/game_api/state_structs.hpp",
     "../src/game_api/prng.hpp",

@@ -49,6 +49,8 @@ struct GameManager
     size_t unknown_screen_arena_score;  // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;
+    PauseUI* pause_ui;
+    JournalUI* journal_ui;
 };
 
 GameManager* get_game_manager();

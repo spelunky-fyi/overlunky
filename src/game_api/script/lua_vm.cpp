@@ -4,6 +4,7 @@
 
 #include "entities_items.hpp"
 #include "entity.hpp"
+#include "game_manager.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -125,6 +126,8 @@ end
     /// end
     /// ```
     lua["state"] = get_state_ptr();
+    /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
+    lua["game_manager"] = get_game_manager();
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Player*>(get_players());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)

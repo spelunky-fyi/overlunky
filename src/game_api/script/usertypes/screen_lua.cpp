@@ -1012,6 +1012,54 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Screen>());
 
+    lua.new_usertype<PauseUI>(
+        "PauseUI",
+        "menu_slidein_progress",
+        &PauseUI::menu_slidein_progress,
+        "blurred_background",
+        &PauseUI::blurred_background,
+        "woodpanel_left",
+        &PauseUI::woodpanel_left,
+        "woodpanel_middle",
+        &PauseUI::woodpanel_middle,
+        "woodpanel_right",
+        &PauseUI::woodpanel_right,
+        "woodpanel_top",
+        &PauseUI::woodpanel_top,
+        "scroll",
+        &PauseUI::scroll,
+        "confirmation_panel",
+        &PauseUI::confirmation_panel,
+        "previously_selected_menu_index",
+        &PauseUI::previously_selected_menu_index,
+        "visibility",
+        &PauseUI::visibility);
+
+    lua.new_usertype<JournalUI>(
+        "JournalUI",
+        "state",
+        &JournalUI::state,
+        "page_shown",
+        &JournalUI::page_shown,
+        "current_page",
+        &JournalUI::current_page,
+        "flipping_to_page",
+        &JournalUI::flipping_to_page,
+        "max_page_count",
+        &JournalUI::max_page_count,
+        "book_background",
+        &JournalUI::book_background,
+        "arrow_left",
+        &JournalUI::arrow_left,
+        "arrow_right",
+        &JournalUI::arrow_right,
+        "unknown23",
+        &JournalUI::unknown23,
+        "entire_book",
+        &JournalUI::entire_book,
+        "page_timer",
+        &JournalUI::page_timer);
+
     lua.create_named_table(
         "SCREEN",
         "LOGO",
@@ -1074,5 +1122,54 @@ void register_usertypes(sol::state& lua)
         28,
         "ONLINE_LOBBY",
         29);
+
+    lua.create_named_table(
+        "PAUSEUI_VISIBILITY",
+        "INVISIBLE",
+        0,
+        "SLIDING_DOWN",
+        1,
+        "VISIBLE",
+        2,
+        "SLIDING_UP",
+        3);
+
+    lua.create_named_table(
+        "JOURNALUI_STATE",
+        "INVISIBLE",
+        0,
+        "FADING_IN",
+        1,
+        "STABLE",
+        2,
+        "FLIPPING_LEFT",
+        3,
+        "FLIPPING_RIGHT",
+        4,
+        "FADING_OUT",
+        5);
+
+    lua.create_named_table(
+        "JOURNALUI_PAGE_SHOWN",
+        "PLAYER_PROFILE",
+        1,
+        "JOURNAL",
+        2,
+        "PLACES",
+        3,
+        "PEOPLE",
+        4,
+        "BESTIARY",
+        5,
+        "ITEMS",
+        6,
+        "TRAPS",
+        7,
+        "STORY",
+        8,
+        "RECAP",
+        9,
+        "DEATH",
+        10);
 }
 } // namespace NScreen

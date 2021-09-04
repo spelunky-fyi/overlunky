@@ -130,6 +130,9 @@ Runs on any [screen change](#on).
 Runs on every screen frame. You need this to use draw functions.
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
+### [`game_manager`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_manager)
+`nil game_manager()`<br/>
+The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
 `nil lua_print()`<br/>
 Standard lua print function, prints directly to the console but not to the game
@@ -935,6 +938,37 @@ end
 - [`int correct_ushabti`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) &StateMemory::correct_ushabti
 - [`Items items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) &StateMemory::items
 - [`int camera_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) &StateMemory::camera_layer
+- [`ScreenTeamSelect screen_team_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) &StateMemory::screen_team_select
+- [`ScreenTransition screen_transition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) &StateMemory::screen_transition
+- [`ScreenDeath screen_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_death) &StateMemory::screen_death
+- [`ScreenWin screen_win`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_win) &StateMemory::screen_win
+- [`ScreenCredits screen_credits`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_credits) &StateMemory::screen_credits
+- [`ScreenScores screen_scores`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_scores) &StateMemory::screen_scores
+- [`ScreenConstellation screen_constellation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_constellation) &StateMemory::screen_constellation
+- [`ScreenRecap screen_recap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_recap) &StateMemory::screen_recap
+- [`ScreenArenaStagesSelect screen_arena_stages_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_stages_select) &StateMemory::screen_arena_stages_select1
+- [`ScreenArenaIntro screen_arena_intro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_intro) &StateMemory::screen_arena_intro
+- [`ScreenArenaLevel screen_arena_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_level) &StateMemory::screen_arena_level
+- [`ScreenArenaScore screen_arena_score`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_score) &StateMemory::screen_arena_score
+### `GameManager`
+- [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
+- [`ScreenIntro screen_intro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_intro) &GameManager::screen_intro
+- [`ScreenPrologue screen_prologue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_prologue) &GameManager::screen_prologue
+- [`ScreenTitle screen_title`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_title) &GameManager::screen_title
+- [`ScreenMenu screen_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_menu) &GameManager::screen_menu
+- [`ScreenOptions screen_options`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_options) &GameManager::screen_options
+- [`ScreenPlayerProfile screen_player_profile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_player_profile) &GameManager::screen_player_profile
+- [`ScreenLeaderboards screen_leaderboards`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_leaderboards) &GameManager::screen_leaderboards
+- [`ScreenSeedInput screen_seed_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_seed_input) &GameManager::screen_seed_input
+- [`ScreenCharacterSelect screen_character_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) &GameManager::screen_character_select
+- [`ScreenCamp screen_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) &GameManager::screen_camp
+- [`ScreenLevel screen_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) &GameManager::screen_level
+- [`ScreenArenaMenu screen_arena_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_menu) &GameManager::screen_arena_menu
+- [`ScreenArenaItems screen_arena_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_items) &GameManager::screen_arena_items
+- [`ScreenOnlineLoading screen_online_loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_loading) &GameManager::screen_online_loading
+- [`ScreenOnlineLobby screen_online_lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_lobby) &GameManager::screen_online_lobby
+- [`PauseUI pause_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) &GameManager::pause_ui
+- [`JournalUI journal_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) &GameManager::journal_ui
 ### `LightParams`
 - [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &LightParams::red
 - [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &LightParams::green
@@ -3332,6 +3366,29 @@ Derived from [`Screen`](#screen)
 - [`float ouroboros_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ouroboros_angle) &ScreenOnlineLoading::ouroboros_angle
 ### `ScreenOnlineLobby`
 Derived from [`Screen`](#screen)
+### `PauseUI`
+- [`float menu_slidein_progress`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_slidein_progress) &PauseUI::menu_slidein_progress
+- [`TextureRenderingInfo blurred_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blurred_background) &PauseUI::blurred_background
+- [`TextureRenderingInfo woodpanel_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_left) &PauseUI::woodpanel_left
+- [`TextureRenderingInfo woodpanel_middle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_middle) &PauseUI::woodpanel_middle
+- [`TextureRenderingInfo woodpanel_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_right) &PauseUI::woodpanel_right
+- [`TextureRenderingInfo woodpanel_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top) &PauseUI::woodpanel_top
+- [`TextureRenderingInfo scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll) &PauseUI::scroll
+- [`TextureRenderingInfo confirmation_panel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=confirmation_panel) &PauseUI::confirmation_panel
+- [`int previously_selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=previously_selected_menu_index) &PauseUI::previously_selected_menu_index
+- [`int visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &PauseUI::visibility
+### `JournalUI`
+- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &JournalUI::state
+- [`int page_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_shown) &JournalUI::page_shown
+- [`int current_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_page) &JournalUI::current_page
+- [`int flipping_to_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipping_to_page) &JournalUI::flipping_to_page
+- [`int max_page_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_page_count) &JournalUI::max_page_count
+- [`TextureRenderingInfo book_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=book_background) &JournalUI::book_background
+- [`TextureRenderingInfo arrow_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_left) &JournalUI::arrow_left
+- [`TextureRenderingInfo arrow_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_right) &JournalUI::arrow_right
+- [`TextureRenderingInfo unknown23`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) &JournalUI::unknown23
+- [`TextureRenderingInfo entire_book`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) &JournalUI::entire_book
+- [`int page_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) &JournalUI::page_timer
 ## Automatic casting of entities
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
 
@@ -4043,6 +4100,29 @@ Params: `PlayingSound vanilla_sound`
 - [`ARENA_SCORE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ARENA_SCORE) 27
 - [`ONLINE_LOADING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ONLINE_LOADING) 28
 - [`ONLINE_LOBBY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ONLINE_LOBBY) 29
+### PAUSEUI_VISIBILITY
+- [`INVISIBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.INVISIBLE) 0
+- [`SLIDING_DOWN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.SLIDING_DOWN) 1
+- [`VISIBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.VISIBLE) 2
+- [`SLIDING_UP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.SLIDING_UP) 3
+### JOURNALUI_STATE
+- [`INVISIBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.INVISIBLE) 0
+- [`FADING_IN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FADING_IN) 1
+- [`STABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.STABLE) 2
+- [`FLIPPING_LEFT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FLIPPING_LEFT) 3
+- [`FLIPPING_RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FLIPPING_RIGHT) 4
+- [`FADING_OUT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FADING_OUT) 5
+### JOURNALUI_PAGE_SHOWN
+- [`PLAYER_PROFILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.PLAYER_PROFILE) 1
+- [`JOURNAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.JOURNAL) 2
+- [`PLACES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.PLACES) 3
+- [`PEOPLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.PEOPLE) 4
+- [`BESTIARY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.BESTIARY) 5
+- [`ITEMS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.ITEMS) 6
+- [`TRAPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.TRAPS) 7
+- [`STORY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.STORY) 8
+- [`RECAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.RECAP) 9
+- [`DEATH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.DEATH) 10
 ## Aliases
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 ### CallbackId == int;

@@ -662,3 +662,77 @@ class ScreenOnlineLobby : public Screen // ID: 29
 {
   public: // not reverse engineered
 };
+
+struct PauseUI
+{
+    float menu_slidein_progress;
+    TextureRenderingInfo blurred_background;
+    TextureRenderingInfo woodpanel_left;
+    TextureRenderingInfo woodpanel_middle;
+    TextureRenderingInfo woodpanel_right;
+    TextureRenderingInfo woodpanel_top;
+    TextureRenderingInfo scroll;
+
+    uint32_t unknown2;
+    size_t unknown3;
+
+    TextureRenderingInfo confirmation_panel;
+
+    uint32_t unknown5;
+    uint32_t unknown6;
+    size_t unknown7;
+    uint32_t unknown8;
+
+    uint32_t previously_selected_menu_index;
+    uint32_t buttons_actions;
+    uint32_t buttons_movement;
+    uint8_t unknown11a;
+    int8_t unknown11b;
+    uint16_t unknown12;
+    uint32_t visibility;
+};
+
+struct JournalUI
+{
+    uint32_t state;
+    uint8_t page_shown;
+
+    uint8_t unknown1;
+    uint16_t unknown2;
+    size_t unknown3; // this and below: pointer list of Page objects/contents of the pages
+    size_t unknown4;
+    size_t unknown5;
+    size_t unknown6;
+    size_t unknown7;
+    size_t unknown8;
+
+    uint32_t current_page;
+    uint32_t flipping_to_page;
+    uint32_t unknown10;
+    int32_t max_page_count; // influences the right arrow shown and being able to move to the next page
+
+    size_t unknown12;
+    size_t unknown13;
+    size_t unknown14;
+    size_t unknown15; // ptr
+    size_t unknown16;
+    size_t unknown17;
+    size_t unknown18;
+    size_t unknown19; // ptr
+
+    TextureRenderingInfo book_background;
+    TextureRenderingInfo arrow_left;
+    TextureRenderingInfo arrow_right;
+    TextureRenderingInfo unknown23;
+    TextureRenderingInfo entire_book;
+
+    float unknown25;
+    float unknown26;
+
+    uint32_t page_timer;
+
+    uint32_t unknown28;
+    size_t unknown29;
+    float unknown31;
+    uint32_t unknown30;
+};

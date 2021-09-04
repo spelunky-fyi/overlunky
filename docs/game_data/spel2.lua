@@ -1511,6 +1511,9 @@ FrozenLiquid = {
   __name = "sol.FrozenLiquid.user",
   __newindex = "function"
 }
+GameManager = {
+  __name = "sol.GameManager.user"
+}
 Generator = {
   __index = "function",
   __name = "sol.Generator.user",
@@ -1658,6 +1661,26 @@ Inventory = {
 Items = {
   __name = "sol.Items.user"
 }
+JOURNALUI_PAGE_SHOWN = {
+  BESTIARY = 5,
+  DEATH = 10,
+  ITEMS = 6,
+  JOURNAL = 2,
+  PEOPLE = 4,
+  PLACES = 3,
+  PLAYER_PROFILE = 1,
+  RECAP = 9,
+  STORY = 8,
+  TRAPS = 7
+}
+JOURNALUI_STATE = {
+  FADING_IN = 1,
+  FADING_OUT = 5,
+  FLIPPING_LEFT = 3,
+  FLIPPING_RIGHT = 4,
+  INVISIBLE = 0,
+  STABLE = 2
+}
 JUNGLESISTERS = {
   GREAT_PARTY_HUH = 5,
   I_WISH_BROUGHT_A_JACKET = 6,
@@ -1675,6 +1698,9 @@ Jiangshi = {
   __index = "function",
   __name = "sol.Jiangshi.user",
   __newindex = "function"
+}
+JournalUI = {
+  __name = "sol.JournalUI.user"
 }
 JumpDog = {
   __index = "function",
@@ -2217,6 +2243,12 @@ PARTICLEEMITTER = {
   YETIKING_YELL_SPARKLES = 181,
   YETIQUEEN_LANDING_SNOWDUST = 182
 }
+PAUSEUI_VISIBILITY = {
+  INVISIBLE = 0,
+  SLIDING_DOWN = 1,
+  SLIDING_UP = 3,
+  VISIBLE = 2
+}
 PRNG = {
   __name = "sol.PRNG.user"
 }
@@ -2318,6 +2350,9 @@ ParticleDB = {
 }
 ParticleEmitterInfo = {
   __name = "sol.ParticleEmitterInfo.user"
+}
+PauseUI = {
+  __name = "sol.PauseUI.user"
 }
 Pet = {
   __index = "function",
@@ -4337,6 +4372,7 @@ f = {}
 flip_entity = function(...) end
 force_co_subtheme = function(...) end
 force_dark_level = function(...) end
+game_manager = {}
 game_position = function(...) end
 generate_particles = function(...) end
 get_bounds = function(...) end
