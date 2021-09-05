@@ -1169,17 +1169,22 @@ void LevelGenData::init()
             g_do_extra_spawns_trampoline = (DoExtraSpawns*)memory.at_exe(fun_start);
         }
 
-        // TODO: Get offsets from patterns
         {
-            g_generate_room_trampoline = (GenerateRoom*)memory.at_exe(0x220cb640);
+            auto fun_start = find_inst(exe, "\x48\x89\x85\xd0\x02\x00\x00\x48\x8b\x81\xb8\x00\x00\x00"s, after_bundle);
+            fun_start = function_start(memory.at_exe(fun_start));
+            g_generate_room_trampoline = (GenerateRoom*)fun_start;
         }
 
         {
-            g_gather_room_data_trampoline = (GatherRoomData*)memory.at_exe(0x220acc70);
+            auto fun_start = find_inst(exe, "\x42\x0f\xbf\x0c\x40\x66\x89\x8c\x24\x98\x00\x00\x00"s, after_bundle);
+            fun_start = function_start(memory.at_exe(fun_start));
+            g_gather_room_data_trampoline = (GatherRoomData*)fun_start;
         }
 
         {
-            g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)memory.at_exe(0x220cb460);
+            auto fun_start = find_inst(exe, "\x8b\xc7\xf3\x48\x0f\x2a\xf0\xf3\x41\x0f\x58\xf0"s, after_bundle);
+            fun_start = function_start(memory.at_exe(fun_start));
+            g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)fun_start;
         }
 
         DetourRestoreAfterWith();
