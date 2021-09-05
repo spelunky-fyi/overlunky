@@ -17,7 +17,7 @@ using SpawnTypeFlags = int;                   // NoAlias
 
 constexpr uint8_t MAX_PLAYERS = 4;
 
-enum class LAYER
+enum class LAYER : int
 {
     FRONT = 0,
     BACK = 1,

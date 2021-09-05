@@ -16,10 +16,18 @@ struct LightParams
 
 struct Illumination
 {
-    LightParams light1;
-    LightParams light2;
-    LightParams light3;
-    LightParams light4;
+    union
+    {
+        std::array<LightParams, 4> light;
+        struct
+        {
+            LightParams light1;
+            LightParams light2;
+            LightParams light3;
+            ///It's rendered on objects around, not as an actual bright spot
+            LightParams light4;
+        };
+    };
     float brightness;
     float brightness_multiplier;
     float light_pos_x;
@@ -29,7 +37,8 @@ struct Illumination
     float distortion;
     int32_t entity_uid;
     uint32_t timer;
-    uint32_t flags; // see flags.hpp illumination_flags
+    /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+    uint32_t flags;
     uint32_t unknown1;
     uint32_t unknown2;
 };

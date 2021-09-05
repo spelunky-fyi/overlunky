@@ -935,10 +935,13 @@ Returns animation_frame of the correct ushabti
 - [`float blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &LightParams::blue
 - [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &LightParams::size
 ### `Illumination`
+- [`array<LightParams, 4> light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light) &Illumination::light
 - [`LightParams light1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light1) &Illumination::light1
 - [`LightParams light2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light2) &Illumination::light2
 - [`LightParams light3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light3) &Illumination::light3
 - [`LightParams light4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light4) &Illumination::light4
+\
+It's rendered on objects around, not as an actual bright spot
 - [`float brightness`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brightness) &Illumination::brightness
 - [`float brightness_multiplier`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brightness_multiplier) &Illumination::brightness_multiplier
 - [`float light_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_pos_x) &Illumination::light_pos_x
@@ -948,6 +951,8 @@ Returns animation_frame of the correct ushabti
 - [`float distortion`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distortion) &Illumination::distortion
 - [`int entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) &Illumination::entity_uid
 - [`int flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) &Illumination::flags
+\
+see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
 ### `Camera`
 - [`float bounds_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_left) &Camera::bounds_left
 - [`float bounds_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_right) &Camera::bounds_right
