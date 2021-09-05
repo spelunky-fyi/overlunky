@@ -643,7 +643,9 @@ void load_config(std::string file)
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
     fontfile = toml::find_or<std::string>(opts, "font_file", "segoeuib.ttf");
-    fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {18.0f, 32.0f, 72.0f});
+    auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {18.0f, 32.0f, 72.0f});
+    if (ini_fontsize.size() >= 3)
+        fontsize = ini_fontsize;
     godmode(options["god_mode"]);
     save_config(file);
 }
