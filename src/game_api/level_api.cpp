@@ -1547,9 +1547,10 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t
     LevelGenRooms* level_rooms = rooms[layer];
     level_rooms->rooms[x + y * 8] = room_template;
 
+    // Unset machine room origin flag if it is a machine room so there's no accidental origins left within the machine room
     if (data->get_room_template_type(room_template) == RoomTemplateType::MachineRoom)
     {
-        machine_room_origin[x + y * 8] = false;
+        machine_room_origin->rooms[x + y * 8] = false;
     }
 
     return true;
