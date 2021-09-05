@@ -2613,6 +2613,7 @@ Set the room template at the given index and layer, returns `false` if the index
 - [`bool mark_as_machine_room_origin(int x, int y, LAYER l)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mark_as_machine_room_origin) &PostRoomGenerationContext::mark_as_machine_room_origin
 \
 Marks the room as the origin of a machine room, should be the top-left corner of the machine room
+Run this after setting the room template for the room, otherwise the machine room will not spawn correctly
 - [`bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) &PostRoomGenerationContext::set_procedural_spawn_chance
 \
 Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
@@ -2632,20 +2633,20 @@ Overrides a specific short tile code, this means it will change for the whole le
 - [`optional<SHORT_TILE_CODE> get_short_tile_code(int tx, int ty, LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code) &PreHandleRoomTilesContext::get_short_tile_code
 \
 Gets the tile code at the specified tile coordinate
-Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
+Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`
 Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
 - [`bool set_short_tile_code(int tx, int ty, LAYER layer, SHORT_TILE_CODE short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_short_tile_code) &PreHandleRoomTilesContext::set_short_tile_code
 \
 Sets the tile code at the specified tile coordinate
-Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
+Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`
 Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
 - [`array<tuple<int, int, LAYER>> find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=find_all_short_tile_codes) find_all_short_tile_codes
 \
-Finds all places a short tile code is used in the room
+Finds all places a short tile code is used in the room, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`
 Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
 - [`bool replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_short_tile_code) &PreHandleRoomTilesContext::replace_short_tile_code
 \
-Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`
+Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`
 Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
 - [`bool has_back_layer()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_back_layer) &PreHandleRoomTilesContext::has_back_layer
 \

@@ -27,6 +27,7 @@ struct PostRoomGenerationContext
     /// Set the room template at the given index and layer, returns `false` if the index is outside of the level.
     bool set_room_template(uint32_t x, uint32_t y, LAYER l, ROOM_TEMPLATE room_template);
     /// Marks the room as the origin of a machine room, should be the top-left corner of the machine room
+    /// Run this after setting the room template for the room, otherwise the machine room will not spawn correctly
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l);
     /// Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
     /// Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
@@ -43,17 +44,17 @@ struct PostRoomGenerationContext
 struct PreHandleRoomTilesContext
 {
     /// Gets the tile code at the specified tile coordinate
-    /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
+    /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`
     /// Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
     std::optional<SHORT_TILE_CODE> get_short_tile_code(uint32_t tx, uint32_t ty, LAYER layer) const;
     /// Sets the tile code at the specified tile coordinate
-    /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH` and `0 <= ty < CONST.ROOM_HEIGHT`
+    /// Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`
     /// Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
     bool set_short_tile_code(uint32_t tx, uint32_t ty, LAYER layer, SHORT_TILE_CODE short_tile_code);
-    /// Finds all places a short tile code is used in the room
+    /// Finds all places a short tile code is used in the room, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`
     /// Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
     std::vector<std::tuple<uint32_t, uint32_t, LAYER>> find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code);
-    /// Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`
+    /// Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`
     /// Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
     bool replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code);
     /// Check whether the room has a back layer
