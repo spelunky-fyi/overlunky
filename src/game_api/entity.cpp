@@ -403,7 +403,7 @@ void hook_movable_state_machine(Movable* self)
 void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty())
+    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
@@ -412,7 +412,7 @@ void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::func
 void Movable::set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty())
+    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }

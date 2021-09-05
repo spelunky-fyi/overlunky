@@ -824,7 +824,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (backend->get_enabled() && backend->is_entity_callback_cleared({uid, id}))
                         return false;
 
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
@@ -848,7 +848,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (backend->get_enabled() && backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self));
