@@ -1662,6 +1662,20 @@ set_callback(function()
         else
             boss_warp = false
         end
+    elseif state.theme == THEME.VOLCANA and test_flag(state.presence_flags, 3) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
+    elseif state.theme == THEME.JUNGLE and test_flag(state.presence_flags, 2) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
     else
         boss_warp = false
     end
