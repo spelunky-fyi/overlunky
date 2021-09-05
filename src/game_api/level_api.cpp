@@ -367,14 +367,6 @@ std::array g_community_tile_codes{
     CommunityTileCode{"critter_penguin", "ENT_TYPE_MONS_CRITTERPENGUIN"},
     CommunityTileCode{"critter_firefly", "ENT_TYPE_MONS_CRITTERFIREFLY"},
     CommunityTileCode{"critter_drone", "ENT_TYPE_MONS_CRITTERDRONE"},
-    //CommunityTileCode{
-    //    "lake_imposter",
-    //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
-    //    [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] Layer* layer)
-    //    {
-    //        layer->spawn_entity(self.entity_id, x, y, false, 0, 0, true);
-    //    },
-    //},
     CommunityTileCode{"bubble_platform", "ENT_TYPE_ACTIVEFLOOR_BUBBLE_PLATFORM"},
     CommunityTileCode{"punishball", "ENT_TYPE_ITEM_PUNISHBALL"},
     CommunityTileCode{"punishball_attach", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1, 0>},
@@ -448,42 +440,6 @@ std::array g_community_tile_codes{
             }
         },
     },
-    //CommunityTileCode{
-    //    "telefloor_left",
-    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
-    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
-    //    {
-    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 1;
-    //    },
-    //},
-    //CommunityTileCode{
-    //    "telefloor_top",
-    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
-    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
-    //    {
-    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 3;
-    //    },
-    //},
-    //CommunityTileCode{
-    //    "telefloor_right",
-    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
-    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
-    //    {
-    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 0;
-    //    },
-    //},
-    //CommunityTileCode{
-    //    "telefloor_bottom",
-    //    "ENT_TYPE_FLOOR_TELEPORTINGBORDER",
-    //    [](const CommunityTileCode& self, float x, float y, Layer* layer)
-    //    {
-    //        Entity* telefloor = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-    //        *(uint8_t*)((size_t)telefloor + sizeof(Entity) + sizeof(uint32_t[4])) = 2;
-    //    },
-    //},
     // Wave 3
     CommunityTileCode{"punishball_attach_left", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<-1, 0>},
     CommunityTileCode{"punishball_attach_right", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<1, 0>},
@@ -491,6 +447,14 @@ std::array g_community_tile_codes{
     CommunityTileCode{"punishball_attach_bottom", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0, -1>},
     CommunityTileCode{"critter_slime", "ENT_TYPE_MONS_CRITTERSLIME"},
     CommunityTileCode{"skull", "ENT_TYPE_ITEM_SKULL"},
+    //CommunityTileCode{
+    //    "lake_imposter",
+    //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
+    //    [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] Layer* layer)
+    //    {
+    //        layer->spawn_entity(self.entity_id, x, y, false, 0, 0, true);
+    //    },
+    //},
 };
 
 struct CommunityChance;
@@ -950,10 +914,6 @@ struct SpawnInfo
 };
 bool handle_chance(SpawnInfo* spawn_info)
 {
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL); }};
-
     auto level_gen_data = State::get().ptr()->level_gen->data;
 
     uint8_t layer = 0;
@@ -1509,6 +1469,10 @@ void LevelGenSystem::init()
         hook_vtable<DoProceduralSpawnFun>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {
+                push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
+                OnScopeExit pop{[]
+                                { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL); }};
+
                 if (handle_chance(spawn_info))
                 {
                     return;

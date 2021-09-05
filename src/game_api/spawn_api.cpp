@@ -202,7 +202,7 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
-void spawn_tree(float x, float y, int layer)
+void spawn_tree(float x, float y, LAYER layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -235,7 +235,7 @@ void update_spawn_type_flags()
     g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING : 0;
 
     // LEVEL_GEN_GENERAL only covers level gen spawns not covered by the others
-    if (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN)
+    if ((g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) == 0)
     {
         g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
     }
@@ -243,7 +243,10 @@ void update_spawn_type_flags()
     g_SpawnTypeFlags |= g_SpawnTypes[4] ? SPAWN_TYPE_SCRIPT : 0;
 
     // SYSTEMIC covers everything that isn't covered above
-    g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
+    if (g_SpawnTypeFlags == 0)
+    {
+        g_SpawnTypeFlags |= SPAWN_TYPE_SYSTEMIC;
+    }
 }
 void push_spawn_type_flags(SpawnTypeFlags flags)
 {
