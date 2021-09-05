@@ -226,6 +226,21 @@ void spawn_tree(float x, float y, int layer)
     spawn_tree_call(nullptr, actual_layer, x + offset_position.first, y + offset_position.second);
 }
 
+void update_spawn_type_flags()
+{
+    g_SpawnTypeFlags = 0;
+
+    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+
+    // LEVEL_GEN_GENERAL only covers level gen spawns not covered by the others
+    g_SpawnTypeFlags |= (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) ? 0 : g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+
+    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
+
+    // SYSTEMIC covers everything that isn't covered above
+    g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
+}
 void push_spawn_type_flags(SpawnTypeFlags flags)
 {
     for (size_t i = 0; i < g_SpawnTypes.size(); i++)
@@ -235,13 +250,7 @@ void push_spawn_type_flags(SpawnTypeFlags flags)
             g_SpawnTypes[i]++;
         }
     }
-
-    g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
-    g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
+    update_spawn_type_flags();
 }
 void pop_spawn_type_flags(SpawnTypeFlags flags)
 {
@@ -252,13 +261,7 @@ void pop_spawn_type_flags(SpawnTypeFlags flags)
             g_SpawnTypes[i]--;
         }
     }
-
-    g_SpawnTypeFlags = 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
-    g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
+    update_spawn_type_flags();
 }
 
 //#define HOOK_LOAD_ITEM
