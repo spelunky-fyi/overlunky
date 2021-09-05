@@ -1456,6 +1456,7 @@ local function dead_osiris()
 end
 
 local function duat_door()
+    if not options.door then return end
     -- spawn duat skip door
     spawn_door(17, 106, 0, level_order[state.level_count+1].w, level_order[state.level_count+1].l, level_order[state.level_count+1].t)
     spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
