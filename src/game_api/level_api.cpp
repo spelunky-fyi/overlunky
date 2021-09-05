@@ -896,7 +896,12 @@ void generate_room(LevelGenSystem* level_gen, int room_idx_x, int room_idx_y)
         }
     }
     g_generate_room_trampoline(level_gen, room_idx_x, room_idx_y);
-    g_overridden_room_template.reset();
+    if (g_overridden_room_template)
+    {
+        const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
+        State::get().ptr()->level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_template.value();
+        g_overridden_room_template.reset();
+    }
 }
 
 using GatherRoomData = void(LevelGenData*, byte, int room_x, int, bool, uint8_t*, uint8_t*, size_t, uint8_t*, uint8_t*, uint8_t*, uint8_t*);
