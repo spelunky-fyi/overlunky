@@ -747,7 +747,7 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
             if (type_match)
             {
-                if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay))
+                if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay, spawn_type_flags))
                 {
                     return get_entity_ptr(spawn_replacement.value());
                 }
@@ -773,7 +773,7 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
             if (type_match)
             {
-                handle_function(callback.func, lua["cast_entity"](entity));
+                handle_function(callback.func, lua["cast_entity"](entity), spawn_type_flags);
             }
         }
     }

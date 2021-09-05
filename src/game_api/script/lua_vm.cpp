@@ -423,7 +423,7 @@ end
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
-    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
@@ -443,7 +443,7 @@ end
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
-    /// The callback signature is `nil post_entity_spawn(entity)`
+    /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
