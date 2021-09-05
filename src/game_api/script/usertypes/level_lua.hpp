@@ -7,7 +7,8 @@
 
 #include <sol/forward.hpp>
 
-using LAYER = int; // NoAlias
+using LEVEL_CONFIG = int; // NoAlias
+using LAYER = int;        // NoAlias
 constexpr LAYER LAYER_FRONT = 0;
 constexpr LAYER LAYER_BACK = 1;
 constexpr LAYER LAYER_BOTH = -128;

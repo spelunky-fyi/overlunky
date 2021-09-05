@@ -101,6 +101,7 @@ struct LevelGenData
     }
 
     using SetRoomDatas = std::array<RoomTemplateData, 8 * 15>;
+
     const SetRoomDatas& setroom_datas() const
     {
         return *(const SetRoomDatas*)((size_t)this + 0x7f0);
@@ -127,6 +128,32 @@ struct LevelGenData
     {
         return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x13f0);
     }
+
+    union
+    {
+        uint32_t level_config[18];
+        struct
+        {
+            uint32_t back_room_chance;
+            uint32_t back_room_interconnection_chance;
+            uint32_t back_room_hidden_door_chance;
+            uint32_t back_room_hidden_door_cache_chance;
+            uint32_t mount_chance;
+            uint32_t altar_room_chance;
+            uint32_t idol_room_chance;
+            uint32_t floor_side_spread_chance;
+            uint32_t floor_bottom_spread_chance;
+            uint32_t background_chance;
+            uint32_t ground_background_chance;
+            uint32_t machine_bigroom_chance;
+            uint32_t machine_wideroom_chance;
+            uint32_t machine_tallroom_chance;
+            uint32_t machine_rewardroom_chance;
+            uint32_t max_liquid_particles;
+            uint32_t flagged_liquid_rooms;
+            uint32_t unknown_config;
+        };
+    };
 };
 
 struct DoorCoords

@@ -328,6 +328,12 @@ void register_usertypes(sol::state& lua)
     /// Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use `COSUBTHEME.RESET` to reset to default random behaviour)
     lua["force_co_subtheme"] = force_co_subtheme;
 
+    /// Gets the value for the specified config
+    lua["get_level_config"] = [](LEVEL_CONFIG config) -> uint32_t
+    {
+        return State::get().ptr_local()->level_gen->data->level_config[config];
+    };
+
     // Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
     lua.new_usertype<PreLoadLevelFilesContext>(
         "PreLoadLevelFilesContext",
@@ -532,6 +538,9 @@ void register_usertypes(sol::state& lua)
 
     /// Determines which kind of shop spawns in the level, if any
     lua.create_named_table("SHOP_TYPE", "GENERAL_STORE", 0, "CLOTHING_SHOP", 1, "WEAPON_SHOP", 2, "SPECIALTY_SHOP", 3, "HIRED_HAND_SHOP", 4, "PET_SHOP", 5, "DICE_SHOP", 6, "TUSK_DICE_SHOP", 13);
+
+    /// Use with `get_level_config`
+    lua.create_named_table("LEVEL_CONFIG", "BACK_ROOM_CHANCE", 0, "BACK_ROOM_INTERCONNECTION_CHANCE", 1, "BACK_ROOM_HIDDEN_DOOR_CHANCE", 2, "BACK_ROOM_HIDDEN_DOOR_CACHE_CHANCE", 3, "MOUNT_CHANCE", 4, "ALTAR_ROOM_CHANCE", 5, "IDOL_ROOM_CHANCE", 6, "FLOOR_SIDE_SPREAD_CHANCE", 7, "FLOOR_BOTTOM_SPREAD_CHANCE", 8, "BACKGROUND_CHANCE", 9, "GROUND_BACKGROUND_CHANCE", 10, "MACHINE_BIGROOM_CHANCE", 11, "MACHINE_WIDEROOM_CHANCE", 12, "MACHINE_TALLROOM_CHANCE", 13, "MACHINE_REWARDROOM_CHANCE", 14, "MAX_LIQUID_PARTICLES", 15, "FLAGGED_LIQUID_ROOMS", 16);
 
     lua.create_named_table("TILE_CODE"
                            //, "EMPTY", 0
