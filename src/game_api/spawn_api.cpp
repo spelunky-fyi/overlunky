@@ -232,11 +232,15 @@ void update_spawn_type_flags()
 
     g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
     g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING : 0;
 
     // LEVEL_GEN_GENERAL only covers level gen spawns not covered by the others
-    g_SpawnTypeFlags |= (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) ? 0 : g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    if (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN)
+    {
+        g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+    }
 
-    g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_SCRIPT : 0;
+    g_SpawnTypeFlags |= g_SpawnTypes[4] ? SPAWN_TYPE_SCRIPT : 0;
 
     // SYSTEMIC covers everything that isn't covered above
     g_SpawnTypeFlags |= g_SpawnTypeFlags == 0 ? SPAWN_TYPE_SYSTEMIC : 0;
@@ -294,6 +298,16 @@ Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float
     return spawned_ent;
 }
 
+using FloorSpreadingFun = Entity*();
+FloorSpreadingFun* g_floor_spreading_trampoline{nullptr};
+Entity* floor_spreading()
+{
+    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING); }};
+    return g_floor_spreading_trampoline();
+}
+
 void init_spawn_hooks()
 {
     {
@@ -312,11 +326,21 @@ void init_spawn_hooks()
         DetourAttach((void**)&g_load_item_trampoline, load_item);
 #endif
 
-        auto spawn_entity_off = find_inst(exe, "\xba\x79\x00\x00\x00\x41\x0f\xb6\x06\x88\x44\x24\x20"s, after_bundle);
-        auto spawn_entity_call = find_inst(exe, "\xE8"s, spawn_entity_off);
-        auto spawn_entity_start = Memory::decode_call(spawn_entity_call);
-        g_spawn_entity_trampoline = (SpawnEntityFun*)memory.at_exe(spawn_entity_start);
+        {
+            auto spawn_entity_off = find_inst(exe, "\xba\x79\x00\x00\x00\x41\x0f\xb6\x06\x88\x44\x24\x20"s, after_bundle);
+            auto spawn_entity_call = find_inst(exe, "\xE8"s, spawn_entity_off);
+            auto spawn_entity_start = Memory::decode_call(spawn_entity_call);
+            g_spawn_entity_trampoline = (SpawnEntityFun*)memory.at_exe(spawn_entity_start);
+        }
+
+        {
+            auto floor_spreading_off = find_inst(exe, "\x45\x0f\x57\xe4\x44\x88\x94\x24\x20\x01\x00\x00\x44\x89\x4c\x24\x44"s, after_bundle);
+            auto floor_spreading_start = function_start(memory.at_exe(floor_spreading_off));
+            g_floor_spreading_trampoline = (FloorSpreadingFun*)floor_spreading_start;
+        }
+
         DetourAttach((void**)&g_spawn_entity_trampoline, (SpawnEntityFun*)spawn_entity);
+        DetourAttach((void**)&g_floor_spreading_trampoline, floor_spreading);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)

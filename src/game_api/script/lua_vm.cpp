@@ -1069,6 +1069,8 @@ end
         SPAWN_TYPE_LEVEL_GEN_TILE_CODE,
         "LEVEL_GEN_PROCEDURAL",
         SPAWN_TYPE_LEVEL_GEN_PROCEDURAL,
+        "LEVEL_GEN_FLOOR_SPREADING",
+        SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING,
         "LEVEL_GEN_GENERAL",
         SPAWN_TYPE_LEVEL_GEN_GENERAL,
         "SCRIPT",
@@ -1084,6 +1086,8 @@ end
     // Similar to LEVEL_GEN but only triggers on tile code spawns.
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+    // LEVEL_GEN_FLOOR_SPREADING
+    // Only procs during floor spreading, both horizontal and vertical
     // LEVEL_GEN_GENERAL
     // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT

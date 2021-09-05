@@ -3319,6 +3319,9 @@ Similar to LEVEL_GEN but only triggers on tile code spawns.
 - [`LEVEL_GEN_PROCEDURAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_PROCEDURAL) SPAWN_TYPE_LEVEL_GEN_PROCEDURAL
 \
 Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+- [`LEVEL_GEN_FLOOR_SPREADING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_FLOOR_SPREADING) SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING
+\
+Only procs during floor spreading, both horizontal and vertical
 - [`LEVEL_GEN_GENERAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_GENERAL) SPAWN_TYPE_LEVEL_GEN_GENERAL
 \
 Covers all spawns during level gen that are not covered by the other two.
