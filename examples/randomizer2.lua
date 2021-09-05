@@ -1562,7 +1562,7 @@ set_callback(function()
 end, ON.LOADING)
 
 set_callback(function(ctx)
-    if boss_warp and state.screen == ON.TRANSITION then
+    if boss_warp and state.screen == ON.TRANSITION and options.door then
         local color = prng:random(0, 0xffffffff)
         local _, size = get_window_size()
         size = size / 5
