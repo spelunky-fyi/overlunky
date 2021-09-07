@@ -1101,7 +1101,17 @@ Use `overlaps_with(AABB hitbox)` instead
 - [`nil liberate_from_shop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) &Entity::liberate_from_shop
 - [`Entity get_held_entity()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) &Entity::get_held_entity
 - [`nil set_layer(LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) &Entity::set_layer
+\
+Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
 - [`nil remove()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove) &Entity::remove
+\
+Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
+- [`nil respawn(LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=respawn) &Entity::respawn
+\
+Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
+- [`nil destroy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy) &Entity::destroy
+\
+Completely removes the entity from existence
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex

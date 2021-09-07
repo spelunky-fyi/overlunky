@@ -188,8 +188,13 @@ class Entity
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
+
+    /// Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
     void set_layer(LAYER layer);
+    /// Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
     void remove();
+    /// Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
+    void respawn(LAYER layer);
 
     Entity* topmost()
     {
@@ -248,7 +253,6 @@ class Entity
     std::pair<float, float> position_self() const;
     std::pair<float, float> position_render() const;
     void remove_item(uint32_t id);
-    void destroy();
 
     TEXTURE get_texture();
     bool set_texture(TEXTURE texture_id);
@@ -270,9 +274,11 @@ class Entity
 
     virtual ~Entity() = 0;
     virtual void create_rendering_info() = 0;
+    /// Kills the entity in the most violent way possible, for example cavemen turn into gibs
     virtual void kill(bool, Entity* frm) = 0;
     virtual void on_collision1(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision2
-    virtual void v3() = 0;
+    /// Completely removes the entity from existence
+    virtual void destroy() = 0;
     virtual void apply_texture(Texture*) = 0;
     virtual void hiredhand_description(char*) = 0;
     virtual void generate_stomp_damage_particles(Entity* victim) = 0; // particles when jumping on top of enemy
@@ -303,6 +309,7 @@ class Entity
     virtual void toggle_backlayer_illumination() = 0; // for the player: when going to the backlayer, turns on player emitted light
     virtual void v32() = 0;
     virtual void liberate_from_shop() = 0; // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
+    /// Applies changes made in `entity.type`
     virtual void apply_db() = 0;
     virtual void v35() = 0;
 };

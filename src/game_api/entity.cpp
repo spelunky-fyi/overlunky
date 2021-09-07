@@ -256,6 +256,12 @@ void Entity::remove()
             item->remove();
         }
     }
+    layer = 2;
+}
+
+void Entity::respawn(LAYER layer_to)
+{
+    set_layer(layer_to);
 }
 
 std::pair<float, float> Entity::position()
@@ -417,11 +423,6 @@ void Movable::set_post_statemachine(std::uint32_t reserved_callback_id, std::fun
         hook_movable_state_machine(this);
     }
     hook_info.post_statemachine.push_back({reserved_callback_id, std::move(post_state_machine)});
-}
-
-void Entity::destroy()
-{
-    delete this; // TODO
 }
 
 std::tuple<float, float, uint8_t> get_position(uint32_t uid)
