@@ -36,6 +36,9 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right);
 
 void spawn_tree(float x, float y, LAYER layer);
 
+Entity* spawn_impostor_lake(AABB aabb, LAYER layer);
+void setup_impostor_lake(Entity* lake_imposter, AABB aabb);
+
 void push_spawn_type_flags(SpawnTypeFlags flags);
 void pop_spawn_type_flags(SpawnTypeFlags flags);
 

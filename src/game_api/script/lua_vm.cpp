@@ -420,6 +420,9 @@ end
     lua["spawn_apep"] = spawn_apep;
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
+    /// NoDoc
+    /// Spawns an impostor [sic] lake, `top_threshold` determines how much space on top is going to be filled with real liquid
+    lua["spawn_impostor_lake"] = spawn_impostor_lake;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
@@ -617,7 +620,7 @@ end
     lua["entity_has_item_type"] = entity_has_item_type;
     /// Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
     lua["entity_get_items_by"] = entity_get_items_by;
-    /// Kills an entity by uid.
+    /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
     /// ```lua
@@ -824,7 +827,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->get_enabled() && backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
 
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
@@ -848,12 +851,37 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->get_enabled() && backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(movable);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+    /// The callback signature is `nil on_destroy(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_destroy"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_destroy(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
+                    backend->handle_function(fun, lua["cast_entity"](self));
+                });
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -873,7 +901,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
@@ -899,7 +927,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
