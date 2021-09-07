@@ -2923,6 +2923,9 @@ Offsets the AABB by the given offset.
 - [`float area()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) &AABB::area
 \
 Compute area of the AABB, can be zero if one dimension is zero or negative if one dimension is inverted.
+- [`tuple<float, float> center()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) &AABB::center
+\
+Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
 - [`float width()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &AABB::width
 \
 Short for `aabb.right - aabb.left`.

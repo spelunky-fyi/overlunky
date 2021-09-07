@@ -56,6 +56,11 @@ struct AABB
     {
         return width() * height();
     }
+    /// Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
+    std::pair<float, float> center() const
+    {
+        return {(left + right) / 2.0f, (top + bottom) / 2.0f};
+    }
     /// Short for `aabb.right - aabb.left`.
     float width() const
     {
