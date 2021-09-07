@@ -637,11 +637,11 @@ void carry(uint32_t mount_uid, uint32_t rider_uid)
     mount->carry(rider);
 }
 
-void kill_entity(uint32_t uid)
+void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
-        ent->kill(true, nullptr);
+        ent->kill(destroy_corpse.value_or(true), nullptr);
 }
 
 void destroy_entity(uint32_t uid)
