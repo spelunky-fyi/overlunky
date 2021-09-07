@@ -11,6 +11,16 @@ struct Layer
         int cap;
         int size;
     } items_;
+    char stuff[0x643F0]; // Just wanna get to expired_items_
+    // List of items that were destroyed and are waiting to have the dtor called
+    // and then be returned to the entity pool
+    struct
+    {
+        Entity** begin;
+        size_t b;
+        int cap;
+        int size;
+    } expired_items_;
 
     Entity* spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap);
 
