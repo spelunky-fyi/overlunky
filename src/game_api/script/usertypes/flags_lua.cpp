@@ -63,8 +63,16 @@ void register_usertypes(sol::state& lua)
         "DEAD",
         29,
         "HAS_BACKITEM",
-        32
-
-    );
+        32);
+    lua.create_named_table(
+        "ENT_MORE_FLAG",
+        "SWIMMING",
+        11,
+        "FALLING",
+        14,
+        "CURSED_EFFECT",
+        15,
+        "DISABLE_INPUT",
+        16);
 }
 }; // namespace NEntityFlags
