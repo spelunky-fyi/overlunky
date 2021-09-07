@@ -428,8 +428,8 @@ Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
 `array<int> entity_get_items_by(int uid, int entity_type, int mask)`<br/>
 Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
 ### [`kill_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_entity)
-`nil kill_entity(int uid)`<br/>
-Kills an entity by uid.
+`nil kill_entity(int uid, optional<bool> destroy_corpse = nullopt)`<br/>
+Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
 ### [`pick_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up)
 `nil pick_up(int who_uid, int what_uid)`<br/>
 Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
@@ -575,6 +575,12 @@ Use this only when no other approach works, this call can be expensive if overus
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_destroy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_destroy)
+`optional<CallbackId> set_on_destroy(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+The callback signature is `nil on_destroy(Entity self)`
 Use this only when no other approach works, this call can be expensive if overused.
 ### [`set_on_kill`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_kill)
 `optional<CallbackId> set_on_kill(int uid, function fun)`<br/>
@@ -3633,6 +3639,11 @@ Params: `PlayingSound vanilla_sound`
 - [`PAUSE_AI_AND_PHYSICS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_FLAG.PAUSE_AI_AND_PHYSICS) 28
 - [`DEAD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_FLAG.DEAD) 29
 - [`HAS_BACKITEM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_FLAG.HAS_BACKITEM) 32
+### ENT_MORE_FLAG
+- [`SWIMMING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.SWIMMING) 11
+- [`FALLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.FALLING) 14
+- [`CURSED_EFFECT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.CURSED_EFFECT) 15
+- [`DISABLE_INPUT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.DISABLE_INPUT) 16
 ### CHAR_STATE
 - [`FLAILING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CHAR_STATE.FLAILING) 0
 - [`STANDING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CHAR_STATE.STANDING) 1
