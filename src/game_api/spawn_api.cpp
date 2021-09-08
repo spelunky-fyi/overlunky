@@ -226,7 +226,7 @@ void spawn_tree(float x, float y, LAYER layer)
     spawn_tree_call(nullptr, actual_layer, x + offset_position.first, y + offset_position.second);
 }
 
-Entity* spawn_impostor_lake(AABB aabb, LAYER layer)
+Entity* spawn_impostor_lake(AABB aabb, LAYER layer, float top_threshold)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -244,10 +244,10 @@ Entity* spawn_impostor_lake(AABB aabb, LAYER layer)
 
     static auto impostor_lake_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAKE");
     Entity* impostor_lake = get_entity_ptr(spawn_entity_abs(impostor_lake_id, x, y, (LAYER)actual_layer, 0.0f, 0.0f));
-    setup_impostor_lake(impostor_lake, aabb);
+    setup_impostor_lake(impostor_lake, aabb, top_threshold);
     return impostor_lake;
 }
-void setup_impostor_lake(Entity* lake_impostor, AABB aabb)
+void setup_impostor_lake(Entity* lake_impostor, AABB aabb, float top_threshold)
 {
     auto layer = State::get().layer(0);
     (void)layer;
@@ -262,7 +262,7 @@ void setup_impostor_lake(Entity* lake_impostor, AABB aabb)
         return function_start(memory.at_exe(location));
     }
     ();
-    setup_lake_impostor(lake_impostor, aabb.width() / 2.0f, aabb.height() / 2.0f, 1.0f);
+    setup_lake_impostor(lake_impostor, aabb.width() / 2.0f, aabb.height() / 2.0f, top_threshold);
 }
 
 void update_spawn_type_flags()

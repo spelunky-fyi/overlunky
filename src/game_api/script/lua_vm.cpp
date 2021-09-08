@@ -421,7 +421,8 @@ end
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
     /// NoDoc
-    /// Spawns an impostor [sic] lake, `top_threshold` determines how much space on top is going to be filled with real liquid
+    /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
+    /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
     lua["spawn_impostor_lake"] = spawn_impostor_lake;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
