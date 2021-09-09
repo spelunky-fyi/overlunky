@@ -447,6 +447,21 @@ std::array g_community_tile_codes{
     CommunityTileCode{"punishball_attach_bottom", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0, -1>},
     CommunityTileCode{"critter_slime", "ENT_TYPE_MONS_CRITTERSLIME"},
     CommunityTileCode{"skull", "ENT_TYPE_ITEM_SKULL"},
+    CommunityTileCode{
+        "movable_spikes",
+        "ENT_TYPE_ITEM_SPIKES",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            auto do_spawn = [=]()
+            {
+                std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer(0, 0, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
+                if (!entities_neighbour.empty())
+                {
+                    layer->spawn_entity_over(self.entity_id, get_entity_ptr(entities_neighbour.front()), 0.0f, 1.0f);
+                }
+            };
+            g_attachee_requiring_entities.push_back({{{x, y - 1}}, do_spawn});
+        }},
     //CommunityTileCode{
     //    "lake_imposter",
     //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
