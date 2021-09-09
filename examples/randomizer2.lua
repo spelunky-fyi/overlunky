@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.1a"
+meta.version = "2.1b"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -462,7 +462,7 @@ set_callback(function()
     end
     set_interval(function()
         if state.theme ~= THEME.DUAT then return false end
-        if #get_entities_by_mask(MASK.LAVA) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
+        if #get_entities_by(0, MASK.LAVA, LAYER.BOTH) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn_liquid(ENT_TYPE.LIQUID_LAVA, state.level_gen.spawn_x, state.level_gen.spawn_y - 2)
         elseif #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 36, LAYER.FRONT, 0, 0)
@@ -934,7 +934,7 @@ local shop_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.C
 
 set_callback(function()
     local in_shop = {}
-    local items = get_entities_by_mask(MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER)
+    local items = get_entities_by(0, MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER, LAYER.BOTH)
     for i,v in ipairs(items) do
         local e = get_entity(v)
         if test_flag(e.flags, ENT_FLAG.SHOP_ITEM) then
@@ -1436,7 +1436,7 @@ local function dead_hundun()
     if state.theme == THEME.HUNDUN then
         local hunduns = get_entities_by_type(ENT_TYPE.MONS_HUNDUN)
         if #hunduns > 0 then
-            if get_entity_ai_state(hunduns[1]) == 4 then -- this hundun is just chillin on the floor
+            if get_entity(hunduns[1]).move_state == 4 then -- this hundun is just chillin on the floor
                 kill_boss(THEME.HUNDUN)
             end
         end
@@ -1456,6 +1456,7 @@ local function dead_osiris()
 end
 
 local function duat_door()
+    if not options.door then return end
     -- spawn duat skip door
     spawn_door(17, 106, 0, level_order[state.level_count+1].w, level_order[state.level_count+1].l, level_order[state.level_count+1].t)
     spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
@@ -1561,7 +1562,7 @@ set_callback(function()
 end, ON.LOADING)
 
 set_callback(function(ctx)
-    if boss_warp and state.screen == ON.TRANSITION then
+    if boss_warp and state.screen == ON.TRANSITION and options.door then
         local color = prng:random(0, 0xffffffff)
         local _, size = get_window_size()
         size = size / 5
@@ -1662,6 +1663,20 @@ set_callback(function()
         else
             boss_warp = false
         end
+    elseif state.theme == THEME.VOLCANA and test_flag(state.presence_flags, 3) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
+    elseif state.theme == THEME.JUNGLE and test_flag(state.presence_flags, 2) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
     else
         boss_warp = false
     end
@@ -1734,8 +1749,11 @@ set_post_entity_spawn(function(ent)
             local x, y, l = get_position(webshot)
             local vx, vy = webshot_ent.velocityx, webshot_ent.velocityy
             local af = webshot_ent.animation_frame
+            local owner = webshot_ent.last_owner_uid
             move_entity(webshot, 0, 0, 0, 0)
-            spawn(projectiles_web[af], x, y, l, vx, vy)
+            local newshot = spawn(projectiles_web[af], x, y, l, vx, vy)
+            local newent = get_entity(newshot)
+            newent.last_owner_uid = owner
             return false
         elseif get_entity(webshot) == nil then
             return false

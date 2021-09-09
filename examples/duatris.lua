@@ -186,7 +186,7 @@ function init()
         gy = 124 - y
         id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
         newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
-        ent = get_entity(newid):as_movable()
+        ent = get_entity(newid)
         newflags = set_flag(ent.flags, 10) -- disable gravity
         newflags = set_flag(newflags, 6) -- disable damage
         newflags = clr_flag(newflags, 13) -- disable push
@@ -376,7 +376,7 @@ function set_moving_piece_if_valid(piece)
     end
     local is_valid = true
     call_fn_for_xy_in_piece(piece, function(x, y)
-        ents = get_entities_at(0, 0x180, x+2, 124-y, LAYER.FRONT, 0.65)
+        ents = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x+2, 124-y, LAYER.FRONT, 0.65)
         if #ents > 0 then
             local is_moving = false
             for i,v in ipairs(ents) do
@@ -458,9 +458,9 @@ function update_moving_piece(fall, next_piece)
     if not set_moving_piece_if_valid(moving_piece) then
         ex = moving_piece.x + 4 + math.random(-1, 1)
         ey = 124 - moving_piece.y - 2 + math.random(-1, 1)
-        trash = get_entities_at(0, 0x180, ex, ey, LAYER.FRONT, 8)
+        trash = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, ex, ey, LAYER.FRONT, 8)
         for i,v in ipairs(trash) do
-            ent = get_entity(v):as_movable()
+            ent = get_entity(v)
             ent.flags = clr_flag(ent.flags, 6)
         end
         spawn(ENT_TYPE.FX_POWEREDEXPLOSION, ex, ey, LAYER.FRONT, 0, 0)
@@ -473,7 +473,7 @@ function update_moving_piece(fall, next_piece)
             gy = 124 - y
             id = ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK
             newid = spawn(id, gx, gy, LAYER.FRONT, 0, 0)
-            ent = get_entity(newid):as_movable()
+            ent = get_entity(newid)
             newflags = set_flag(ent.flags, 10) -- disable gravity
             newflags = set_flag(newflags, 6) -- disable damage
             newflags = clr_flag(newflags, 13) -- disable push
@@ -507,14 +507,14 @@ function replace_with_trap(blockid)
     set_timeout(function()
         x, y, l = get_position(blockid)
         if x > 0 then
-            ent = get_entity(blockid):as_movable()
+            ent = get_entity(blockid)
             r = ent.color.r
             g = ent.color.g
             b = ent.color.b
             trapid = generic_to[math.random(#generic_to)]
             kill_entity(blockid)
             newid = spawn(trapid, x, y, l, 0, 0)
-            trap = get_entity(newid):as_movable()
+            trap = get_entity(newid)
             if trapid == ENT_TYPE.ACTIVEFLOOR_POWDERKEG then
                 trap.color.r = 0.5
                 trap.color.g = 0
@@ -546,7 +546,7 @@ function check_lines()
         if is_full_line then
             local really_full = true
             for x = 1, board_size.x do
-                ent = get_entities_at(0, 0x180, x+2, 124-line_y, LAYER.FRONT, 0.5)
+                ent = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x+2, 124-line_y, LAYER.FRONT, 0.5)
                 if #ent == 0 then
                     board[x][line_y] = val.empty
                     really_full = false
@@ -559,7 +559,7 @@ function check_lines()
                 local apep_x = -1
                 if math.random() < 0.5 then apep_x = 36 end
                 apepid = spawn(ENT_TYPE.MONS_APEP_HEAD, apep_x, 124-line_y, LAYER.FRONT, 0, 0)
-                ent = get_entity(apepid):as_movable()
+                ent = get_entity(apepid)
                 ent.hitboxy = 0.1
                 give_gift = true
                 toast('The gods bestow a gift upon you!')
@@ -581,7 +581,6 @@ function lock_and_update_moving_piece(fall, next_piece)
             move_entity(moving_blocks[block_i], x + 2, 124 - y, LAYER.FRONT, 0, 0)
             ent = get_entity(moving_blocks[block_i])
             if ent == nil then return end
-            ent = ent:as_movable()
             if ent then
                 ent.flags = clr_flag(ent.flags, 6) -- enable damage
                 -- ent.color.a = 1
@@ -636,7 +635,7 @@ function level_to_board(all)
             for y = board_size.y - 10, board_size.y, 1 do
                 gx = x + 2
                 gy = 124 - y
-                block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                block = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, gx, gy, LAYER.FRONT, 0.5)
                 if #block > 0 then
                     board[x][y] = 8
                 end
@@ -650,14 +649,14 @@ function level_to_board(all)
                 if board[nx][ny] > 0 then
                     gx = nx + 2
                     gy = 124 - ny
-                    block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                    block = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, gx, gy, LAYER.FRONT, 0.5)
                     if #block == 0 then
                         board[nx][ny] = 0
                     end
                 --[[elseif board[nx][ny] == 0 then
                     gx = nx + 2
                     gy = 124 - ny
-                    block = get_entities_at(0, 0x180, gx, gy, LAYER.FRONT, 0.5)
+                    block = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, gx, gy, LAYER.FRONT, 0.5)
                     if #block == 0 then
                         is_moving = false
                         for i,v in ipairs(block) do
@@ -775,7 +774,6 @@ function game_over()
     for i,v in ipairs(moving_blocks) do
         ent = get_entity(v)
         if ent then
-            ent = ent:as_movable()
             ent.flags = clr_flag(ent.flags, 6) -- enable damage
         end
     end
@@ -861,7 +859,7 @@ function clear_stage()
             osiris = get_entities_by_type(ENT_TYPE.MONS_OSIRIS_HEAD)
             for i,v in ipairs(osiris) do
                 x, y, l = get_position(v)
-                blocks = get_entities_at(0, 0x180, x, y, l, 2.4)
+                blocks = get_entities_at(0, MASK.FLOOR | MASK.ACTIVEFLOOR, x, y, l, 2.4)
                 for j,w in ipairs(blocks) do
                     kill_entity(w)
                 end

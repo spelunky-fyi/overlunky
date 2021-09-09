@@ -105,6 +105,7 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
+    + Try deleting `Spelunky 2/overlunky.ini` or `Spelunky 2/imgui.ini`.
     + Try the WHIP build, it might have already fixed the problem.
   - If your game **crashes** when actually trying to use the tools:
     + See previous section.

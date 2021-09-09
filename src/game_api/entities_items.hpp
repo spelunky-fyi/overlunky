@@ -18,8 +18,8 @@ class Jetpack : public Backpack
 {
   public:
     bool flame_on; // Can be used as is_on
-    uint8_t unknown1;
-    uint16_t unknown2;
+    uint8_t unknown11;
+    uint16_t unknown21;
     uint32_t fly_time; // it's per level, not even per jetpack lol, it also adds at when it explodes
     uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
 };
@@ -261,7 +261,7 @@ class Spark : public Flame
     Entity* fx_entity;
     float rotation_center_x;
     float rotation_center_y;
-    float angle;
+    float rotation_angle;
     /// slowly goes down to default 1.0, is 0.0 when not on screen
     float size;
     /// 0.0 when not on screen
@@ -332,7 +332,7 @@ class Chest : public Movable
 class Treasure : public Movable
 {
   public:
-    uint32_t state; /* unsure */
+    uint32_t unknown_state; /* unsure */
     /// spawns a dust effect and adds money for the total
     bool cashed;
     int8_t unknown1;
@@ -434,7 +434,7 @@ class PunishBall : public Movable
 {
   public:
     int32_t attached_to_uid;
-    uint8_t state; /* unsure */
+    uint8_t unknown_state; /* unsure */
     uint8_t unused1;
     uint16_t unused2;
     float x_pos;
@@ -451,7 +451,7 @@ class Chain : public Movable
 class Container : public Movable
 {
   public:
-    uint32_t inside;
+    ENT_TYPE inside;
 
     void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
@@ -735,8 +735,8 @@ class Boomerang : public Movable
     ParticleEmitterInfo* trail;
     float distance;
     float rotation;
-    float wall_collision; /* unsure */
-    uint8_t state;        /* unsure */
+    float wall_collision;  /* unsure */
+    uint8_t unknown_state; /* unsure */
     uint8_t unused1;
     uint16_t unused2;
     int32_t returns_to_uid; // entity to return to

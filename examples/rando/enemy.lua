@@ -52,7 +52,7 @@ function enemy_replaced(id)
 end
 
 function move_or_kill(v)
-    e = get_entity(v):as_movable()
+    e = get_entity(v)
     if e.health == 0 then
         return
     end
@@ -89,7 +89,7 @@ end
 
 function replace_projectile(id, from)
     local x, y, l = get_position(id)
-    local ent = get_entity(id):as_movable()
+    local ent = get_entity(id)
     local vx = ent.velocityx
     local vy = ent.velocityy
     move_entity(id, 0, 0, 0, 0)
@@ -100,12 +100,12 @@ end
 
 function replace_kingu(id, from)
     local x, y, l = get_position(id)
-    local ent = get_entity(id):as_movable()
+    local ent = get_entity(id)
     local vx = ent.velocityx
     local vy = ent.velocityy
     local new = from[math.random(#from)]
     local newid = spawn(new, x + math.random() * 4 - 2, y, l, vx, vy)
-    local newent = get_entity(newid):as_movable()
+    local newent = get_entity(newid)
     newent.velocityx = math.random() * 0.2 - 0.1
     newent.velocityy = math.random() * 0.25
     enemy_done[#enemy_done + 1] = newid
@@ -151,7 +151,7 @@ function module.start()
                 local bombs = get_entities_by_type(ENT_TYPE.ITEM_BOMB)
                 for i, v in ipairs(bombs) do
                     x, y, l = get_position(v)
-                    ent = get_entity(v):as_movable()
+                    ent = get_entity(v)
                     if math.abs(y - oy) < 1 and math.abs(x - ox) < 2.5 and not enemy_replaced(v) then
                         replace_projectile(v, olmec_ammo)
                         enemy_done[#enemy_done + 1] = v

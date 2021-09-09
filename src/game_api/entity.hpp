@@ -50,6 +50,7 @@ using RemoveLayer = void (*)(void*, Entity*);
 
 using LAYER = int;
 using TEXTURE = std::int64_t;
+using ENT_TYPE = uint32_t;
 
 struct EntityDB
 {
@@ -57,7 +58,7 @@ struct EntityDB
     EntityDestroy destroy_func;
     int32_t field_10;
     /* Entity id (ENT_...) */
-    uint32_t id;
+    ENT_TYPE id;
     uint32_t search_flags;
     float width;
     float height;
@@ -160,8 +161,8 @@ class Entity
     float y;
     float w;
     float h;
-    float f50;
-    float f54;
+    float special_offsetx;
+    float special_offsety;
     Color color;
     float offsetx;
     float offsety;
@@ -341,10 +342,10 @@ struct Inventory
     uint32_t unknown6;
     uint32_t unknown7;
 
-    std::array<uint32_t, 512> collected_money; // entity types
+    std::array<ENT_TYPE, 512> collected_money; // entity types
     std::array<uint32_t, 512> collected_money_values;
     uint32_t collected_money_count;
-    std::array<uint32_t, 256> killed_enemies; // entity types
+    std::array<ENT_TYPE, 256> killed_enemies; // entity types
     uint32_t kills_level;
     uint32_t kills_total;
 
@@ -383,7 +384,7 @@ struct Inventory
     uint32_t unknown39;
 
     /// Used in level transition to transfer to new player entity
-    std::array<uint32_t, 30> acquired_powerups;
+    std::array<ENT_TYPE, 30> acquired_powerups;
     uint32_t collected_money_total;
 };
 

@@ -4,8 +4,6 @@
 #include "entity.hpp"
 #include "state_structs.hpp"
 
-#define MAX_PLAYERS 4
-
 struct Items
 {
     void* __vftable;

@@ -25,7 +25,7 @@ function replace_projectiles()
     for i, ent in ipairs(ents) do
         if not projectile_replaced(ent) then
             x, y, l = get_position(ent)
-            e = get_entity(ent):as_movable()
+            e = get_entity(ent)
             vx = e.velocityx
             vy = e.velocityy
             kill_entity(ent)

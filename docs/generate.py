@@ -640,27 +640,6 @@ for lf in funcs:
         for com in lf["comment"]:
             print(com)
 
-print("## Event functions")
-print(
-    """Define these in your script to be called on an event. For example:
-```lua
-function on_level()
-    toast("Welcome to the level")
-end
-```"""
-)
-for lf in events:
-    if lf["name"].startswith("on_"):
-        print(
-            "### [`"
-            + lf["name"]
-            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
-            + lf["name"]
-            + ")"
-        )
-        for com in lf["comment"]:
-            print(com)
-
 deprecated_funcs = [
     func for func in funcs if func["comment"] and func["comment"][0] == "Deprecated"
 ]
@@ -703,6 +682,19 @@ print("## Deprecated Functions")
 print(
     "#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!"
 )
+
+for lf in events:
+    if lf["name"].startswith("on_"):
+        print(
+            "### [`"
+            + lf["name"]
+            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
+            + lf["name"]
+            + ")"
+        )
+        for com in lf["comment"]:
+            print(com)
+
 for lf in deprecated_funcs:
     lf["comment"].pop(0)
     if len(rpcfunc(lf["cpp"])):

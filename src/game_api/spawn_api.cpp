@@ -16,7 +16,7 @@ std::uint32_t g_SpawnNonReplacable;
 SpawnTypeFlags g_SpawnTypeFlags;
 std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
 
-void spawn_liquid(uint32_t entity_type, float x, float y)
+void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 {
     using spawn_liquid_fun_t = void(void*, float, float, std::uint32_t, bool);
     static auto spawn_liquid_call = (spawn_liquid_fun_t*)[]()
@@ -35,7 +35,7 @@ void spawn_liquid(uint32_t entity_type, float x, float y)
     spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
 }
 
-int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, float vy, bool snap) // ui only
+int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap) // ui only
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -63,7 +63,7 @@ int32_t spawn_entity(uint32_t entity_type, float x, float y, bool s, float vx, f
     return state.layer_local(player->layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, s, vx, vy, snap)->uid;
 }
 
-int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, LAYER layer, float vx, float vy)
+int32_t spawn_entity_abs(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -75,7 +75,7 @@ int32_t spawn_entity_abs(uint32_t entity_type, float x, float y, LAYER layer, fl
     return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
 }
 
-int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, LAYER layer)
+int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -87,7 +87,7 @@ int32_t spawn_entity_snap_to_floor(uint32_t entity_type, float x, float y, LAYER
     return State::get().layer_local(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
 }
 
-int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, LAYER layer)
+int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER layer)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -99,7 +99,7 @@ int32_t spawn_entity_snap_to_grid(uint32_t entity_type, float x, float y, LAYER 
     return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
 }
 
-int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, LAYER layer, float vx, float vy)
+int32_t spawn_entity_abs_nonreplaceable(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
 {
     g_SpawnNonReplacable++;
     OnScopeExit pop{[]
@@ -107,7 +107,7 @@ int32_t spawn_entity_abs_nonreplaceable(uint32_t entity_type, float x, float y, 
     return spawn_entity_abs(entity_type, x, y, layer, vx, vy);
 }
 
-int32_t spawn_entity_over(uint32_t entity_type, uint32_t over_uid, float x, float y)
+int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, float y)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]

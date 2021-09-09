@@ -72,20 +72,20 @@ int main(int argc, char** argv)
 
             const auto child_env = []()
             {
-                std::string child_env = "SteamAppId=418530";
+                std::string childenv = "SteamAppId=418530";
 
                 const auto this_env = GetEnvironmentStrings();
                 auto lpszVariable = this_env;
                 while (*lpszVariable)
                 {
-                    child_env += '\0';
-                    child_env += lpszVariable;
+                    childenv += '\0';
+                    childenv += lpszVariable;
                     lpszVariable += strlen(lpszVariable) + 1;
                 }
                 FreeEnvironmentStrings(this_env);
 
-                child_env += '\0';
-                return child_env;
+                childenv += '\0';
+                return childenv;
             }();
 
             PROCESS_INFORMATION pi{};

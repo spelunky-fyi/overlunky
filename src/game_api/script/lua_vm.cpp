@@ -424,7 +424,7 @@ end
     /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
     /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
     lua["spawn_impostor_lake"] = spawn_impostor_lake;
-    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
     /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
@@ -445,7 +445,7 @@ end
         backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
         return backend->cbcount++;
     };
-    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
     /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
@@ -472,7 +472,13 @@ end
     lua["set_seed"] = set_seed;
     /// Enable/disable godmode.
     lua["god"] = godmode;
-    /// Try to force next levels to be dark.
+    /// Deprecated
+    /// Set level flag 18 on post room generation instead, to properly force every level to dark
+    /// ```lua
+    /// set_callback(function()
+    ///     state.level_flags = set_flag(state.level_flags, 18)
+    /// end, ON.POST_ROOM_GENERATION)
+    /// ```
     lua["force_dark_level"] = darkmode;
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
@@ -530,7 +536,7 @@ end
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
     /// Deprecated
-    /// Use get_entities_by(0, 0, LAYER.BOTH)
+    /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_by"] = get_entities_by;
@@ -563,10 +569,10 @@ end
         return std::vector<uint32_t>({});
     };
     /// Deprecated
-    /// Use get_entities_by(0, mask, LAYER.BOTH)
+    /// Use `get_entities_by(0, mask, LAYER.BOTH)` instead
     lua["get_entities_by_mask"] = get_entities_by_mask;
     /// Deprecated
-    /// Use get_entities_by(0, 0, layer)
+    /// Use `get_entities_by(0, MASK.ANY, layer)` instead
     lua["get_entities_by_layer"] = get_entities_by_layer;
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
     lua["get_entities_at"] = get_entities_at;
@@ -586,7 +592,8 @@ end
     lua["get_entity_flags2"] = get_entity_flags2;
     /// Set the `more_flags` field from entity by uid
     lua["set_entity_flags2"] = set_entity_flags2;
-    /// Get the `move_state` field from entity by uid
+    /// Deprecated
+    /// As the name is misleading. use entity `move_state` field instead
     lua["get_entity_ai_state"] = get_entity_ai_state;
     /// Get `state.level_flags`
     lua["get_level_flags"] = get_hud_flags;
@@ -615,11 +622,13 @@ end
     lua["attach_ball_and_chain"] = attach_ball_and_chain;
     /// Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
+    /// Short for [spawn_entity_over](#spawn_entity_over)
+    lua["spawn_over"] = spawn_entity_over;
     /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
     /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
     lua["entity_has_item_type"] = entity_has_item_type;
-    /// Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
+    /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
     lua["entity_get_items_by"] = entity_get_items_by;
     /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
@@ -762,7 +771,7 @@ end
         backend->script_input.erase(uid);
     };
     /// Send input
-    lua["send_input"] = [](int uid, BUTTONS buttons)
+    lua["send_input"] = [](int uid, INPUTS buttons)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
@@ -772,7 +781,7 @@ end
         }
     };
     /// Read input
-    lua["read_input"] = [](int uid) -> BUTTONS
+    lua["read_input"] = [](int uid) -> INPUTS
     {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
@@ -785,7 +794,7 @@ end
         return (uint16_t)0;
     };
     /// Read input that has been previously stolen with steal_input
-    lua["read_stolen_input"] = [](int uid)
+    lua["read_stolen_input"] = [](int uid) -> INPUTS
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
@@ -942,6 +951,8 @@ end
 
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
+
+    lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
         "ON",

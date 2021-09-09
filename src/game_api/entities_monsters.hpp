@@ -74,7 +74,7 @@ class WalkingMonster : public Monster
     int32_t chatting_to_uid;
     /// alternates between walking and pausing every time it reaches zero
     int16_t walk_pause_timer;
-    /// used fo chatting with other monsters, attack cooldowns etc.
+    /// used for chatting with other monsters, attack cooldowns etc.
     int16_t cooldown_timer;
 };
 
@@ -174,7 +174,7 @@ class Mole : public Monster
     uint8_t counter_nonburrowing;
     uint8_t countdown_for_appearing;
     uint8_t unknown_two_while_burrowed;
-    /// 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+    /// 0 - non_burrowed, 1 - unknown, 2 - burrowed, 3 - state_change
     uint8_t digging_state;
 };
 
@@ -209,9 +209,9 @@ class Shopkeeper : public RoomOwner
     uint8_t unknown3; // accessed on stun/dmg? probably bool
     bool shop_owner;
     bool unknown5a; // sometimes set to true
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
+    uint8_t padding11;
+    uint8_t padding21;
+    uint8_t padding31;
 };
 
 class Yang : public RoomOwner
@@ -570,7 +570,7 @@ class Sorceress : public WalkingMonster
 {
   public:
     uint32_t inbetween_attack_timer;
-    float airtime;                    // why float?
+    float in_air_timer;               // why float?
     Illumination* halo_emitted_light; // not the shot but the halo, try putting a color at 10
     Entity* fx_entity;
     SoundPosition* sound_pos;
@@ -909,7 +909,7 @@ class Scorpion : public Monster
 class Hermitcrab : public Monster
 {
   public:
-    uint32_t carried_entity_type;
+    ENT_TYPE carried_entity_type;
     int32_t carried_entity_uid;
     uint16_t walk_spit_timer; // depending on movable.state either the countdown how many acid bubbles spat (3) or walking timer
     /// whether it is hidden behind the carried block or not, if true you can damage him
