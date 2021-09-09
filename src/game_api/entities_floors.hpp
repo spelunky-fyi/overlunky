@@ -263,7 +263,8 @@ class MotherStatue : public Floor
   public:
     union
     {
-        std::array<bool, 4> player_standing;
+        /// Table of player1_standing, player2_standing, ... etc.
+        std::array<bool, 4> players_standing;
         struct
         {
             bool player1_standing;
@@ -274,7 +275,8 @@ class MotherStatue : public Floor
     };
     union
     {
-        std::array<bool, 4> player_health_received;
+        /// Table of player1_health_received, player2_health_received, ... etc.
+        std::array<bool, 4> players_health_received;
         struct
         {
             bool player1_health_received;
@@ -285,7 +287,8 @@ class MotherStatue : public Floor
     };
     union
     {
-        std::array<uint16_t, 4> player_health_timer;
+        /// Table of player1_health_timer, player2_health_timer, ... etc.
+        std::array<uint16_t, 4> players_health_timer;
         struct
         {
             uint16_t player1_health_timer;

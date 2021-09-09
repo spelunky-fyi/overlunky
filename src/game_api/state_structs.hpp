@@ -18,7 +18,8 @@ struct Illumination
 {
     union
     {
-        std::array<LightParams, 4> light;
+        /// Table of light1, light2, ... etc.
+        std::array<LightParams, 4> lights;
         struct
         {
             LightParams light1;

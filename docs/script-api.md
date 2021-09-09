@@ -935,7 +935,9 @@ Returns animation_frame of the correct ushabti
 - [`float blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &LightParams::blue
 - [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &LightParams::size
 ### `Illumination`
-- [`array<LightParams, 4> light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light) &Illumination::light
+- [`array<LightParams, 4> lights`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lights) &Illumination::lights
+\
+Table of light1, light2, ... etc.
 - [`LightParams light1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light1) &Illumination::light1
 - [`LightParams light2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light2) &Illumination::light2
 - [`LightParams light3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light3) &Illumination::light3
@@ -1348,17 +1350,23 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &StickyTrap::timer
 ### `MotherStatue`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
-- [`array<bool, 4> player_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_standing) &MotherStatue::player_standing
+- [`array<bool, 4> players_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_standing) &MotherStatue::players_standing
+\
+Table of player1_standing, player2_standing, ... etc.
 - [`bool player1_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_standing) &MotherStatue::player1_standing
 - [`bool player2_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_standing) &MotherStatue::player2_standing
 - [`bool player3_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_standing) &MotherStatue::player3_standing
 - [`bool player4_standing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player4_standing) &MotherStatue::player4_standing
-- [`array<bool, 4> player_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_health_received) &MotherStatue::player_health_received
+- [`array<bool, 4> players_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_health_received) &MotherStatue::players_health_received
+\
+Table of player1_health_received, player2_health_received, ... etc.
 - [`bool player1_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_health_received) &MotherStatue::player1_health_received
 - [`bool player2_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_health_received) &MotherStatue::player2_health_received
 - [`bool player3_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_health_received) &MotherStatue::player3_health_received
 - [`bool player4_health_received`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player4_health_received) &MotherStatue::player4_health_received
-- [`array<int, 4> player_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_health_timer) &MotherStatue::player_health_timer
+- [`array<int, 4> players_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_health_timer) &MotherStatue::players_health_timer
+\
+Table of player1_health_timer, player2_health_timer, ... etc.
 - [`int player1_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player1_health_timer) &MotherStatue::player1_health_timer
 - [`int player2_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player2_health_timer) &MotherStatue::player2_health_timer
 - [`int player3_health_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player3_health_timer) &MotherStatue::player3_health_timer
