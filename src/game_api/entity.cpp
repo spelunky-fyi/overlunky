@@ -528,7 +528,7 @@ EntityHooksInfo& Entity::get_hooks()
                                               { return hook.entity == self; });
                       if (_it != g_entity_hooks.end())
                       {
-                          for (auto& cb : _it->on_destroy)
+                          for (auto& cb : _it->on_dtor)
                           {
                               cb.fun((Entity*)self);
                           }
@@ -561,8 +561,8 @@ void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<vo
             this,
             [](Entity* self, void (*original)(Entity*))
             {
-                EntityHooksInfo& hook_info = self->get_hooks();
-                for (auto& [id, on_destroy] : hook_info.on_destroy)
+                EntityHooksInfo& _hook_info = self->get_hooks();
+                for (auto& [id, on_destroy] : _hook_info.on_destroy)
                 {
                     on_destroy(self);
                 }
