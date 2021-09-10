@@ -30,6 +30,10 @@ struct PostRoomGenerationContext
     /// Marks the room as the origin of a machine room, should be the top-left corner of the machine room
     /// Run this after setting the room template for the room, otherwise the machine room will not spawn correctly
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l);
+    /// Marks the room as a set-room, a corresponding `setroomy-x` template must be loaded, else the game will crash
+    bool mark_as_set_room(uint32_t x, uint32_t y, LAYER l);
+    /// Unmarks the room as a set-room
+    bool unmark_as_set_room(uint32_t x, uint32_t y, LAYER l);
     /// Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
     /// Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
     /// Returns `false` if the given chance is not defined.

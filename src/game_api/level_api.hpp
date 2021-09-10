@@ -436,8 +436,8 @@ struct LevelGenSystem
     };
     LevelGenRoomsMeta* flipped_rooms;
     LevelGenRoomsMeta* rooms_meta_27;
-    LevelGenRoomsMeta* rooms_meta_28;
-    LevelGenRoomsMeta* rooms_meta_29;
+    LevelGenRoomsMeta* set_room_front_layer;
+    LevelGenRoomsMeta* set_room_back_layer;
     LevelGenRoomsMeta* backlayer_room_exists;
     LevelGenRoomsMeta* machine_room_origin;
     LevelGenRoomsMeta* dual_room;
@@ -473,6 +473,7 @@ struct LevelGenSystem
 
     bool is_room_flipped(uint32_t x, uint32_t y);
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l);
+    bool mark_as_set_room(uint32_t x, uint32_t y, LAYER l, bool is_set_room);
 
     std::string_view get_room_template_name(uint16_t room_template);
 

@@ -18,11 +18,23 @@ void PreLoadLevelFilesContext::add_level_files(std::vector<std::string> levels)
 
 bool PostRoomGenerationContext::set_room_template(uint32_t x, uint32_t y, LAYER l, ROOM_TEMPLATE room_template)
 {
+    l = l < 0 ? 0 : l;
     return State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
 }
 bool PostRoomGenerationContext::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l)
 {
+    l = l < 0 ? 0 : l;
     return State::get().ptr_local()->level_gen->mark_as_machine_room_origin(x, y, l);
+}
+bool PostRoomGenerationContext::mark_as_set_room(uint32_t x, uint32_t y, LAYER l)
+{
+    l = l < 0 ? 0 : l;
+    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, l, true);
+}
+bool PostRoomGenerationContext::unmark_as_set_room(uint32_t x, uint32_t y, LAYER l)
+{
+    l = l < 0 ? 0 : l;
+    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, l, false);
 }
 
 bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance)
@@ -356,6 +368,10 @@ void register_usertypes(sol::state& lua)
         &PostRoomGenerationContext::set_room_template,
         "mark_as_machine_room_origin",
         &PostRoomGenerationContext::mark_as_machine_room_origin,
+        "mark_as_set_room",
+        &PostRoomGenerationContext::mark_as_set_room,
+        "unmark_as_set_room",
+        &PostRoomGenerationContext::unmark_as_set_room,
         "set_procedural_spawn_chance",
         &PostRoomGenerationContext::set_procedural_spawn_chance,
         "set_num_extra_spawns",

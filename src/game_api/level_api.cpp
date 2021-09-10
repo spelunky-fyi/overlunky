@@ -1567,6 +1567,24 @@ bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER /
 
     return true;
 }
+bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, LAYER l, bool is_set_room)
+{
+    auto* state_ptr = State::get().ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return false;
+
+    if (l == 0)
+    {
+        set_room_front_layer->rooms[x + y * 8] = is_set_room;
+    }
+    else
+    {
+        set_room_back_layer->rooms[x + y * 8] = is_set_room;
+    }
+
+    return true;
+}
 
 std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
 {
