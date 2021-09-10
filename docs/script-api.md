@@ -1474,6 +1474,11 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `FallingPlatform`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &FallingPlatform::timer
+\
+The name `emitted_light` is false here, don't use it, it should be called `timer`
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FallingPlatform::timer
+\
+The name `emitted_light` is false here, don't use it, it should be called `timer`
 - [`float shaking_factor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shaking_factor) &FallingPlatform::shaking_factor
 - [`float y_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_pos) &FallingPlatform::y_pos
 ### `UnchainedSpikeBall`

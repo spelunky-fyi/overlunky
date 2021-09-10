@@ -85,6 +85,7 @@ class LightArrowPlatform : public Movable
 class FallingPlatform : public Movable
 {
   public:
+    /// The name `emitted_light` is false here, don't use it, it should be called `timer`
     int32_t timer;
     float shaking_factor;
     float y_pos;
