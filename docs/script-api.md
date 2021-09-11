@@ -2652,6 +2652,12 @@ Set the room template at the given index and layer, returns `false` if the index
 \
 Marks the room as the origin of a machine room, should be the top-left corner of the machine room
 Run this after setting the room template for the room, otherwise the machine room will not spawn correctly
+- [`bool mark_as_set_room(int x, int y, LAYER l)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mark_as_set_room) &PostRoomGenerationContext::mark_as_set_room
+\
+Marks the room as a set-room, a corresponding `setroomy-x` template must be loaded, else the game will crash
+- [`bool unmark_as_set_room(int x, int y, LAYER l)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unmark_as_set_room) &PostRoomGenerationContext::unmark_as_set_room
+\
+Unmarks the room as a set-room
 - [`bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) &PostRoomGenerationContext::set_procedural_spawn_chance
 \
 Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
@@ -3352,9 +3358,17 @@ Runs right after all rooms are generated before entities are spawned
 - [`POST_LEVEL_GENERATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION) ON::POST_LEVEL_GENERATION
 \
 Runs right level generation is done, before any entities are updated
+- [`PRE_GET_RANDOM_ROOM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_RANDOM_ROOM) ON::PRE_GET_RANDOM_ROOM
+\
+Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`\
+Return: `string room_data`\
+Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.\
+If the size of the string returned does not match with the room templates expected size the room is discarded.\
+White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
 - [`PRE_HANDLE_ROOM_TILES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) ON::PRE_HANDLE_ROOM_TILES
 \
 Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`\
+Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this\
 Runs after a random room was selected and right before it would spawn entities for each tile code\
 Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
 - [`SCRIPT_ENABLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) ON::SCRIPT_ENABLE

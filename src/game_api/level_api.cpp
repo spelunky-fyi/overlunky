@@ -1202,7 +1202,9 @@ void LevelGenData::init()
         }
 
         {
-            g_get_random_room_data_trampoline = (GetRandomRoomData*)memory.at_exe(0x220ad4d0);
+            auto fun_start = find_inst(exe, "\x4d\x8d\x48\x7f\x40\xb5\x01"s, after_bundle);
+            fun_start = function_start(memory.at_exe(fun_start));
+            g_get_random_room_data_trampoline = (GetRandomRoomData*)fun_start;
         }
 
         {

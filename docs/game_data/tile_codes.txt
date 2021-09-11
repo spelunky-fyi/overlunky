@@ -382,3 +382,4 @@
 382: punishball_attach_right
 385: critter_slime
 386: skull
+387: movable_spikes
