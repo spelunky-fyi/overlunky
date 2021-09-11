@@ -575,6 +575,14 @@ std::vector<std::pair<uint16_t, std::pair<uint32_t, uint32_t>>> g_room_template_
 // Used for making custom machine rooms work
 std::optional<uint16_t> g_overridden_room_template;
 
+// Stores manually created rooms for the duration of level gen
+struct ManualRoomData
+{
+    std::string room_data;
+    RoomData template_data;
+};
+std::vector<std::unique_ptr<ManualRoomData>> g_manual_room_datas;
+
 bool g_replace_level_loads{false};
 std::vector<std::string> g_levels_to_load;
 
@@ -595,6 +603,8 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2)
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
+
+    g_manual_room_datas.clear();
 
     pre_level_generation();
     g_level_gen_trampoline(level_gen_sys, param_2);
@@ -895,6 +905,36 @@ void gather_room_data(LevelGenData* tile_storage, byte param_2, int room_idx_x, 
     g_gather_room_data_trampoline(tile_storage, param_2, room_idx_x, room_idx_y, hard_level, param_6, param_7, param_8, param_9, param_10, out_room_width, out_room_height);
 }
 
+using GetRandomRoomData = RoomData*(LevelGenData*, uint16_t, bool, bool, bool, int32_t, int32_t);
+GetRandomRoomData* g_get_random_room_data_trampoline{nullptr};
+RoomData* get_random_room_data(LevelGenData* tile_storage, uint16_t room_template, bool hard_level, bool can_not_have, uint8_t layer, int room_idx_x, int room_idx_y)
+{
+    std::string room_override = pre_get_random_room(room_idx_x, room_idx_y, layer, room_template);
+    if (!room_override.empty())
+    {
+        room_override = std::string{trim(room_override)};
+        std::erase(room_override, '\n');
+        std::erase(room_override, '\r');
+
+        uint32_t width, height;
+        get_room_size(room_template, width, height);
+        if (width * height == room_override.size())
+        {
+            auto template_data = std::make_unique<ManualRoomData>();
+            template_data->room_data = std::move(room_override);
+            template_data->template_data = RoomData{
+                .room_width{static_cast<uint8_t>(width)},
+                .room_height{static_cast<uint8_t>(height)},
+                .room_data{template_data->room_data.c_str()}};
+            g_manual_room_datas.push_back(std::move(template_data));
+            return &g_manual_room_datas.back()->template_data;
+        }
+    }
+
+    RoomData* room_data = g_get_random_room_data_trampoline(tile_storage, room_template, hard_level, can_not_have, layer, room_idx_x, room_idx_y);
+    return room_data;
+}
+
 using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, SingleRoomData*, SingleRoomData*, uint16_t, bool, uint16_t);
 SpawnRoomFromTileCodes* g_spawn_room_from_tile_codes_trampoline{nullptr};
 void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, SingleRoomData* front_room_data, SingleRoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
@@ -1162,6 +1202,10 @@ void LevelGenData::init()
         }
 
         {
+            g_get_random_room_data_trampoline = (GetRandomRoomData*)memory.at_exe(0x220ad4d0);
+        }
+
+        {
             auto fun_start = find_inst(exe, "\x8b\xc7\xf3\x48\x0f\x2a\xf0\xf3\x41\x0f\x58\xf0"s, after_bundle);
             fun_start = function_start(memory.at_exe(fun_start));
             g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)fun_start;
@@ -1186,6 +1230,7 @@ void LevelGenData::init()
         DetourAttach((void**)&g_do_extra_spawns_trampoline, do_extra_spawns);
         DetourAttach((void**)&g_generate_room_trampoline, generate_room);
         DetourAttach((void**)&g_gather_room_data_trampoline, gather_room_data);
+        DetourAttach((void**)&g_get_random_room_data_trampoline, get_random_room_data);
         DetourAttach((void**)&g_spawn_room_from_tile_codes_trampoline, spawn_room_from_tile_codes);
 
         const LONG error = DetourTransactionCommit();

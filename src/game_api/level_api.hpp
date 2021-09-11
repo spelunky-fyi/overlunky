@@ -22,7 +22,7 @@ struct RoomData
     bool flag1 : 1; // ???
     bool flag2 : 1; // ???
     bool flipped : 1;
-    bool flag4 : 1; // ???
+    bool dual : 1;
     // 3-bit padding
     uint8_t room_width;
     uint8_t room_height;

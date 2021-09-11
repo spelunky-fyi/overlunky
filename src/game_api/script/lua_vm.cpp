@@ -1034,6 +1034,8 @@ end
         ON::POST_ROOM_GENERATION,
         "POST_LEVEL_GENERATION",
         ON::POST_LEVEL_GENERATION,
+        "PRE_GET_RANDOM_ROOM",
+        ON::PRE_GET_RANDOM_ROOM,
         "PRE_HANDLE_ROOM_TILES",
         ON::PRE_HANDLE_ROOM_TILES,
         "SCRIPT_ENABLE",
@@ -1074,8 +1076,15 @@ end
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
     // Runs right level generation is done, before any entities are updated
+    // PRE_GET_RANDOM_ROOM
+    // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
+    // Return: `string room_data`
+    // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
+    // If the size of the string returned does not match with the room templates expected size the room is discarded.
+    // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
     // PRE_HANDLE_ROOM_TILES
     // Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`
+    // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
     // Runs after a random room was selected and right before it would spawn entities for each tile code
     // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
     // SAVE

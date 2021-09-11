@@ -37,6 +37,22 @@ void post_level_generation()
         });
 }
 
+std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
+{
+    std::string manual_room_data{};
+    LuaBackend::for_each_backend(
+        [=, &manual_room_data](LuaBackend& backend)
+        {
+            auto this_data = backend.pre_get_random_room(x, y, layer, room_template);
+            if (!this_data.empty())
+            {
+                manual_room_data = std::move(this_data);
+                return false;
+            }
+            return true;
+        });
+    return manual_room_data;
+}
 std::optional<LevelGenRoomData> pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template)
 {
     std::optional<LevelGenRoomData> modded_room_data{std::nullopt};

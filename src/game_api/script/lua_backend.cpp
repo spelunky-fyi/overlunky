@@ -707,6 +707,32 @@ void LuaBackend::post_level_generation()
     }
 }
 
+std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
+{
+    if (!get_enabled())
+        return std::string{};
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_GET_RANDOM_ROOM)
+        {
+            callback.lastRan = now;
+
+            std::string return_value = handle_function_with_return<std::string>(callback.func, x, y, layer, room_template).value_or(std::string{});
+            if (!return_value.empty())
+            {
+                return return_value;
+            }
+        }
+    }
+    return std::string{};
+}
 LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template)
 {
     if (!get_enabled())
