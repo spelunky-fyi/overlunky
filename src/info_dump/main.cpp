@@ -328,6 +328,15 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
     if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
         auto templates = state->level_gen->data->room_templates();
+        templates["empty_backlayer"] = {9};
+        templates["boss_arena"] = {22};
+        templates["shop_jail_backlayer"] = {44};
+        templates["waddler"] = {86};
+        templates["ghistshop_backlayer"] = {87};
+        templates["challange_entrance_backlayer"] = {90};
+        templates["blackmarket"] = {118};
+        templates["mothership_room"] = {125};
+
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {

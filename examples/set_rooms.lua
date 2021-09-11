@@ -21,8 +21,14 @@ set_callback(function(ctx)
         for x = 0, state.width - 1 do
             for y = 0, state.height - 1 do
                 ctx:mark_as_set_room(x, y, LAYER.FRONT)
+                ctx:set_room_template(x, y, LAYER.FRONT, ROOM_TEMPLATE.PATH_NORMAL)
             end
         end
+
+        -- set the boss arena rooms, only avoids monster spawns in there
+        ctx:set_room_template(2, 2, LAYER.FRONT, ROOM_TEMPLATE.BOSS_ARENA)
+        ctx:set_room_template(3, 2, LAYER.FRONT, ROOM_TEMPLATE.BOSS_ARENA)
+        ctx:set_room_template(4, 2, LAYER.FRONT, ROOM_TEMPLATE.BOSS_ARENA)
 
         -- place the coffin manually in the middle instead of the shortcut, this does not use a setroom
         ctx:unmark_as_set_room(2, state.height - 1, LAYER.FRONT)
@@ -36,8 +42,8 @@ set_callback(function(ctx)
         ctx:set_room_template(2, 0, LAYER.FRONT, ROOM_TEMPLATE.ENTRANCE)
 
         -- place the exits in the corners, still uses a setroom but makes sure that the room spawns an entrance door
-        ctx:set_room_template(0, 0, LAYER.FRONT, ROOM_TEMPLATE.EXIT)
-        ctx:set_room_template(state.width - 1, 0, LAYER.FRONT, ROOM_TEMPLATE.EXIT)
+        ctx:set_room_template(0, state.height - 1, LAYER.FRONT, ROOM_TEMPLATE.EXIT)
+        ctx:set_room_template(state.width - 1, state.height - 1, LAYER.FRONT, ROOM_TEMPLATE.EXIT)
     end
 end, ON.POST_ROOM_GENERATION)
 

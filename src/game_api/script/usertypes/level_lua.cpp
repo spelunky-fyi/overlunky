@@ -641,7 +641,17 @@ void register_usertypes(sol::state& lua)
                            //, "SIDE", 0
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
-    for (const auto& [room_name, room_template] : State::get().ptr()->level_gen->data->room_templates())
+
+    auto room_templates = State::get().ptr()->level_gen->data->room_templates();
+    room_templates["empty_backlayer"] = {9};
+    room_templates["boss_arena"] = {22};
+    room_templates["shop_jail_backlayer"] = {44};
+    room_templates["waddler"] = {86};
+    room_templates["ghistshop_backlayer"] = {87};
+    room_templates["challange_entrance_backlayer"] = {90};
+    room_templates["blackmarket"] = {118};
+    room_templates["mothership_room"] = {125};
+    for (const auto& [room_name, room_template] : room_templates)
     {
         std::string clean_room_name = room_name;
         std::transform(
