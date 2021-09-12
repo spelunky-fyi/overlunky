@@ -313,7 +313,7 @@ std::array g_community_tile_codes{
         "ENT_TYPE_ITEM_PUNISHBALL",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer(0, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
+            std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer({0}, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
             if (!entities_left.empty())
             {
                 get_entity_ptr(attach_ball_and_chain(entities_left.front(), 1.0f, 0.0f));
@@ -375,7 +375,7 @@ std::array g_community_tile_codes{
 
             Entity* olmite = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
 
-            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer(0, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
+            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({0}, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
             {
                 if (Entity* ent = get_entity_ptr(uid))
