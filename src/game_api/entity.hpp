@@ -326,7 +326,7 @@ struct Inventory
     uint8_t unknown5b;
     uint8_t unknown5c;
 
-    uint8_t player_slot;
+    int8_t player_slot;
 
     uint32_t unknown6;
     uint32_t unknown7;
