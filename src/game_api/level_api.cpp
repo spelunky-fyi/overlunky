@@ -923,9 +923,9 @@ RoomData* get_random_room_data(LevelGenData* tile_storage, uint16_t room_templat
             auto template_data = std::make_unique<ManualRoomData>();
             template_data->room_data = std::move(room_override);
             template_data->template_data = RoomData{
-                .room_width{static_cast<uint8_t>(width)},
-                .room_height{static_cast<uint8_t>(height)},
-                .room_data{template_data->room_data.c_str()}};
+                .room_width = static_cast<uint8_t>(width),
+                .room_height = static_cast<uint8_t>(height),
+                .room_data = template_data->room_data.c_str()};
             g_manual_room_datas.push_back(std::move(template_data));
             return &g_manual_room_datas.back()->template_data;
         }
