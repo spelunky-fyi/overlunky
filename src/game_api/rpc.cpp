@@ -1244,7 +1244,7 @@ int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
     return -1;
 }
 
-uint8_t enum_to_layer(LAYER layer)
+uint8_t enum_to_layer(const LAYER layer)
 {
     if (layer == LAYER::FRONT)
         return 0;
@@ -1264,7 +1264,7 @@ uint8_t enum_to_layer(LAYER layer)
     return 0;
 }
 
-uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position)
+uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)
 {
     if (layer == LAYER::FRONT)
     {
@@ -1291,7 +1291,7 @@ uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position)
     return 0;
 }
 
-bool entity_type_check(std::vector<ENT_TYPE> types_array, ENT_TYPE find)
+bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE find)
 {
     if (types_array.empty() || types_array[0] == 0 || std::find(types_array.begin(), types_array.end(), find) != types_array.end())
         return true;
