@@ -89,3 +89,4 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot);
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer);
 uint8_t enum_to_layer(LAYER layer);
 uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position);
+bool entity_type_check(std::vector<ENT_TYPE> types_array, ENT_TYPE find);

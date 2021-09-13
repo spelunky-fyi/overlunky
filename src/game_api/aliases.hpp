@@ -22,5 +22,9 @@ enum class LAYER : int
     FRONT = 0,
     BACK = 1,
     PLAYER = -1,
+    PLAYER1 = -1,
+    PLAYER2 = -2,
+    PLAYER3 = -3,
+    PLAYER4 = -4,
     BOTH = -128
 };

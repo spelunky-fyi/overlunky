@@ -387,7 +387,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
             layeridx--;
             for (auto& item : state.layer(layeridx)->items())
             {
-                if (((item->type->search_flags & mask) || mask == 0) && (entity_types[0] == 0 || std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end()))
+                if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
                 {
                     found.push_back(item->uid);
                 }
@@ -400,7 +400,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
 
         for (auto& item : state.layer(actual_layer)->items())
         {
-            if (((item->type->search_flags & mask) || mask == 0) && (entity_types[0] == 0 || std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end()))
+            if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -423,7 +423,7 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
             {
                 auto [ix, iy] = item->position();
                 float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-                if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && (entity_types[0] == 0 || std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end()))
+                if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && entity_type_check(entity_types, item->type->id))
                 {
                     found.push_back(item->uid);
                 }
@@ -438,7 +438,7 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-            if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && (entity_types[0] == 0 || std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end()))
+            if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && entity_type_check(entity_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -476,7 +476,7 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
     std::vector<uint32_t> found;
     for (auto& item : layer->items())
     {
-        if (((item->type->search_flags & mask) > 0 || mask == 0) && (entity_types[0] == 0 || std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end()) && item->overlaps_with(sx, sy, sx2, sy2))
+        if (((item->type->search_flags & mask) > 0 || mask == 0) && entity_type_check(entity_types, item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
         {
             found.push_back(item->uid);
         }
@@ -573,7 +573,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
             {
                 continue;
             }
-            if (((item->type->search_flags & mask) || mask == 0) && (entity_types[0] == 0 || std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end()))
+            if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -1289,4 +1289,12 @@ uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position)
         }
     }
     return 0;
+}
+
+bool entity_type_check(std::vector<ENT_TYPE> types_array, ENT_TYPE find)
+{
+    if (types_array.empty() || types_array[0] == 0 || std::find(types_array.begin(), types_array.end(), find) != types_array.end())
+        return true;
+
+    return false;
 }
