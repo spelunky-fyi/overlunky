@@ -19,6 +19,8 @@ void register_usertypes(sol::state& lua)
         &PowerupCapable::give_powerup,
         "has_powerup",
         &PowerupCapable::has_powerup,
+        "get_powerups",
+        &PowerupCapable::get_powerups,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 

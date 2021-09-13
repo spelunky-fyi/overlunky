@@ -44,6 +44,16 @@ bool PowerupCapable::has_powerup(ENT_TYPE powerup_type)
     return powerups.find(powerup_type) != powerups.end();
 }
 
+std::vector<ENT_TYPE> PowerupCapable::get_powerups()
+{
+    std::vector<ENT_TYPE> return_powerups;
+    for (auto it = powerups.begin(); it != powerups.end(); ++it)
+    {
+        return_powerups.push_back(it->first);
+    }
+    return return_powerups;
+}
+
 std::u16string Player::get_name()
 {
     return ::get_character_full_name(get_character_index(type->id));
