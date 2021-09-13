@@ -1,17 +1,12 @@
 #pragma once
 
+#include "aliases.hpp"
 #include "level_api_types.hpp"
 
 #include <string>
 #include <vector>
 
 #include <sol/forward.hpp>
-
-using LEVEL_CONFIG = int; // NoAlias
-using LAYER = int;        // NoAlias
-constexpr LAYER LAYER_FRONT = 0;
-constexpr LAYER LAYER_BACK = 1;
-constexpr LAYER LAYER_BOTH = -128;
 
 struct PreLoadLevelFilesContext
 {
@@ -26,14 +21,14 @@ struct PreLoadLevelFilesContext
 struct PostRoomGenerationContext
 {
     /// Set the room template at the given index and layer, returns `false` if the index is outside of the level.
-    bool set_room_template(uint32_t x, uint32_t y, LAYER l, ROOM_TEMPLATE room_template);
+    bool set_room_template(uint32_t x, uint32_t y, LAYER layer, ROOM_TEMPLATE room_template);
     /// Marks the room as the origin of a machine room, should be the top-left corner of the machine room
     /// Run this after setting the room template for the room, otherwise the machine room will not spawn correctly
-    bool mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l);
+    bool mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER layer);
     /// Marks the room as a set-room, a corresponding `setroomy-x` template must be loaded, else the game will crash
-    bool mark_as_set_room(uint32_t x, uint32_t y, LAYER l);
+    bool mark_as_set_room(uint32_t x, uint32_t y, LAYER layer);
     /// Unmarks the room as a set-room
-    bool unmark_as_set_room(uint32_t x, uint32_t y, LAYER l);
+    bool unmark_as_set_room(uint32_t x, uint32_t y, LAYER layer);
     /// Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
     /// Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
     /// Returns `false` if the given chance is not defined.

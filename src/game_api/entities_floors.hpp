@@ -2,6 +2,7 @@
 
 #include "entities_items.hpp" // for UnknownPointerGroup
 #include "entity.hpp"
+#include <array>
 #include <cstdint>
 
 enum FLOOR_SIDE
@@ -21,7 +22,7 @@ class Floor : public Entity
   public:
     union
     {
-        int32_t decos[4];
+        std::array<int32_t, 4> decos;
         struct
         {
             int32_t deco_top;
@@ -260,18 +261,42 @@ class StickyTrap : public Floor
 class MotherStatue : public Floor
 {
   public:
-    bool player1_standing;
-    bool player2_standing;
-    bool player3_standing;
-    bool player4_standing;
-    bool player1_health_received;
-    bool player2_health_received;
-    bool player3_health_received;
-    bool player4_health_received;
-    uint16_t player1_health_timer;
-    uint16_t player2_health_timer;
-    uint16_t player3_health_timer;
-    uint16_t player4_health_timer;
+    union
+    {
+        /// Table of player1_standing, player2_standing, ... etc.
+        std::array<bool, 4> players_standing;
+        struct
+        {
+            bool player1_standing;
+            bool player2_standing;
+            bool player3_standing;
+            bool player4_standing;
+        };
+    };
+    union
+    {
+        /// Table of player1_health_received, player2_health_received, ... etc.
+        std::array<bool, 4> players_health_received;
+        struct
+        {
+            bool player1_health_received;
+            bool player2_health_received;
+            bool player3_health_received;
+            bool player4_health_received;
+        };
+    };
+    union
+    {
+        /// Table of player1_health_timer, player2_health_timer, ... etc.
+        std::array<uint16_t, 4> players_health_timer;
+        struct
+        {
+            uint16_t player1_health_timer;
+            uint16_t player2_health_timer;
+            uint16_t player3_health_timer;
+            uint16_t player4_health_timer;
+        };
+    };
     uint8_t eggplantchild_timer;
     uint8_t unknown;
     bool eggplantchild_detected;

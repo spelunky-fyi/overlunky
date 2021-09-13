@@ -13,7 +13,7 @@
 #include <detours.h>
 
 std::uint32_t g_SpawnNonReplacable;
-SpawnTypeFlags g_SpawnTypeFlags;
+SPAWN_TYPE g_SpawnTypeFlags;
 std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
 
 void spawn_liquid(ENT_TYPE entity_type, float x, float y)
@@ -287,7 +287,7 @@ void update_spawn_type_flags()
         g_SpawnTypeFlags |= SPAWN_TYPE_SYSTEMIC;
     }
 }
-void push_spawn_type_flags(SpawnTypeFlags flags)
+void push_spawn_type_flags(SPAWN_TYPE flags)
 {
     for (size_t i = 0; i < g_SpawnTypes.size(); i++)
     {
@@ -298,7 +298,7 @@ void push_spawn_type_flags(SpawnTypeFlags flags)
     }
     update_spawn_type_flags();
 }
-void pop_spawn_type_flags(SpawnTypeFlags flags)
+void pop_spawn_type_flags(SPAWN_TYPE flags)
 {
     for (size_t i = 0; i < g_SpawnTypes.size(); i++)
     {

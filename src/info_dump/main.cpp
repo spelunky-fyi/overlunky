@@ -133,7 +133,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
                 break;
 
 #define HAX_FIX_FLOAT(x)                           \
-    if (std::abs(x) < 1e-20 || std::abs(x) > 1e10) \
+    if (std::abs(x) < 1e-10 || std::abs(x) > 1e10) \
     x = 0.0f
             HAX_FIX_FLOAT(db->width);
             HAX_FIX_FLOAT(db->height);

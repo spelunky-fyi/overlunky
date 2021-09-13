@@ -1,13 +1,13 @@
 #pragma once
 
+#include "aliases.hpp"
 #include "state.hpp"
 
 #include <cstdint>
 
 class Entity;
 
-using SpawnTypeFlags = int;
-enum SpawnType : SpawnTypeFlags
+enum SpawnType : SPAWN_TYPE
 {
     SPAWN_TYPE_LEVEL_GEN_TILE_CODE = 1 << 0,
     SPAWN_TYPE_LEVEL_GEN_PROCEDURAL = 1 << 1,
@@ -39,7 +39,7 @@ void spawn_tree(float x, float y, LAYER layer);
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, float top_threshold);
 void setup_impostor_lake(Entity* lake_imposter, AABB aabb, float top_threshold);
 
-void push_spawn_type_flags(SpawnTypeFlags flags);
-void pop_spawn_type_flags(SpawnTypeFlags flags);
+void push_spawn_type_flags(SPAWN_TYPE flags);
+void pop_spawn_type_flags(SPAWN_TYPE flags);
 
 void init_spawn_hooks();

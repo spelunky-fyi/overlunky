@@ -1,6 +1,7 @@
 #include "level_lua.hpp"
 
 #include "level_api.hpp"
+#include "rpc.hpp"
 #include "savedata.hpp"
 #include "script/lua_backend.hpp"
 #include "state.hpp"
@@ -16,25 +17,25 @@ void PreLoadLevelFilesContext::add_level_files(std::vector<std::string> levels)
     add_next_levels(std::move(levels));
 }
 
-bool PostRoomGenerationContext::set_room_template(uint32_t x, uint32_t y, LAYER l, ROOM_TEMPLATE room_template)
+bool PostRoomGenerationContext::set_room_template(uint32_t x, uint32_t y, LAYER layer, ROOM_TEMPLATE room_template)
 {
-    l = l < 0 ? 0 : l;
-    return State::get().ptr_local()->level_gen->set_room_template(x, y, l, room_template);
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    return State::get().ptr_local()->level_gen->set_room_template(x, y, real_layer, room_template);
 }
-bool PostRoomGenerationContext::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER l)
+bool PostRoomGenerationContext::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER layer)
 {
-    l = l < 0 ? 0 : l;
-    return State::get().ptr_local()->level_gen->mark_as_machine_room_origin(x, y, l);
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    return State::get().ptr_local()->level_gen->mark_as_machine_room_origin(x, y, real_layer);
 }
-bool PostRoomGenerationContext::mark_as_set_room(uint32_t x, uint32_t y, LAYER l)
+bool PostRoomGenerationContext::mark_as_set_room(uint32_t x, uint32_t y, LAYER layer)
 {
-    l = l < 0 ? 0 : l;
-    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, l, true);
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, real_layer, true);
 }
-bool PostRoomGenerationContext::unmark_as_set_room(uint32_t x, uint32_t y, LAYER l)
+bool PostRoomGenerationContext::unmark_as_set_room(uint32_t x, uint32_t y, LAYER layer)
 {
-    l = l < 0 ? 0 : l;
-    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, l, false);
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, real_layer, false);
 }
 
 bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance)
@@ -60,8 +61,8 @@ std::optional<SHORT_TILE_CODE> PreHandleRoomTilesContext::get_short_tile_code(ui
 {
     if (tx >= 0 && tx < 10 && ty >= 0 && ty < 8)
     {
-        layer = layer < 0 ? 0 : layer;
-        if (layer == LAYER_FRONT)
+        const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+        if (real_layer == static_cast<uint8_t>(LAYER::FRONT))
         {
             return get_room_data().front_layer[ty][tx];
         }
@@ -76,14 +77,14 @@ bool PreHandleRoomTilesContext::set_short_tile_code(uint32_t tx, uint32_t ty, LA
 {
     if (tx >= 0 && tx < 10 && ty >= 0 && ty < 8)
     {
-        if (layer == LAYER_BOTH)
+        if (layer == LAYER::BOTH)
         {
-            set_short_tile_code(tx, ty, 1, short_tile_code);
-            layer = 0;
+            set_short_tile_code(tx, ty, LAYER::BACK, short_tile_code);
+            layer = LAYER::FRONT;
         }
 
-        layer = layer < 0 ? 0 : layer;
-        if (layer == LAYER_FRONT)
+        const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+        if (real_layer == static_cast<uint8_t>(LAYER::FRONT))
         {
             get_mutable_room_data().front_layer[ty][tx] = short_tile_code;
             return true;
@@ -98,18 +99,20 @@ bool PreHandleRoomTilesContext::set_short_tile_code(uint32_t tx, uint32_t ty, LA
 }
 std::vector<std::tuple<uint32_t, uint32_t, LAYER>> PreHandleRoomTilesContext::find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)
 {
-    if (layer == LAYER_BOTH)
+    if (layer == LAYER::BOTH)
     {
-        std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions = find_all_short_tile_codes(LAYER_FRONT, short_tile_code);
-        std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions_back = find_all_short_tile_codes(LAYER_BACK, short_tile_code);
+        std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions = find_all_short_tile_codes(LAYER::FRONT, short_tile_code);
+        std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions_back = find_all_short_tile_codes(LAYER::BACK, short_tile_code);
         positions.insert(positions.end(), positions_back.begin(), positions_back.end());
         return positions_back;
     }
-    layer = layer < 0 ? 0 : layer;
-    if (layer == LAYER_FRONT || has_back_layer())
+
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    const bool front_layer = real_layer == static_cast<uint8_t>(LAYER::FRONT);
+    if (front_layer || has_back_layer())
     {
         const LevelGenRoomData& data = get_room_data();
-        const SingleRoomData& mutable_room_data = layer == LAYER_FRONT ? data.front_layer : data.back_layer.value();
+        const SingleRoomData& mutable_room_data = front_layer ? data.front_layer : data.back_layer.value();
 
         std::vector<std::tuple<uint32_t, uint32_t, LAYER>> positions;
         for (uint32_t tx = 0; tx < 10; tx++)
@@ -128,11 +131,12 @@ std::vector<std::tuple<uint32_t, uint32_t, LAYER>> PreHandleRoomTilesContext::fi
 }
 bool PreHandleRoomTilesContext::replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code)
 {
-    layer = layer < 0 ? 0 : layer;
-    if (layer == LAYER_FRONT || has_back_layer())
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    const bool front_layer = real_layer == static_cast<uint8_t>(LAYER::FRONT);
+    if (front_layer || has_back_layer())
     {
         LevelGenRoomData& mutable_data = get_mutable_room_data();
-        SingleRoomData& mutable_room_data = layer == LAYER_FRONT ? mutable_data.front_layer : mutable_data.back_layer.value();
+        SingleRoomData& mutable_room_data = front_layer ? mutable_data.front_layer : mutable_data.back_layer.value();
         for (uint32_t tx = 0; tx < 10; tx++)
         {
             for (uint32_t ty = 0; ty < 8; ty++)
@@ -303,8 +307,10 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->get_room_pos(x, y);
     };
     /// Get the room template given a certain index, returns `nil` if coordinates are out of bounds
-    lua["get_room_template"] = [](int x, int y, LAYER l) -> std::optional<uint16_t> {
-        return State::get().ptr_local()->level_gen->get_room_template(x, y, l);
+    lua["get_room_template"] = [](int x, int y, LAYER layer) -> std::optional<uint16_t>
+    {
+        const uint8_t real_layer = enum_to_layer(layer);
+        return State::get().ptr_local()->level_gen->get_room_template(x, y, real_layer);
     };
     /// Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds
     lua["is_room_flipped"] = [](int x, int y) -> bool

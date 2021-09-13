@@ -3,11 +3,7 @@
 #include <array>
 #include <optional>
 
-using SHORT_TILE_CODE = uint8_t;
-using TILE_CODE = uint32_t;         // NoAlias
-using ROOM_TEMPLATE = uint16_t;     // NoAlias
-using PROCEDURAL_CHANCE = uint32_t; // NoAlias
-using ROOM_TEMPLATE_TYPE = int32_t; // NoAlias
+#include "aliases.hpp"
 
 struct ShortTileCodeDef
 {

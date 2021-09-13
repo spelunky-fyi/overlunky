@@ -15,7 +15,9 @@ class Movable : public Entity
     int32_t icc;
     float movex;
     float movey;
-    uint32_t buttons;
+    BUTTON buttons;
+    BUTTON buttons_previous;
+    int16_t unknown_padding; // garbage?
     uint32_t stand_counter;
     float jump_height_multiplier;
     int32_t price;
@@ -113,9 +115,9 @@ class Movable : public Entity
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
     bool is_poisoned();
 
-    bool is_button_pressed(uint32_t button);
-    bool is_button_held(uint32_t button);
-    bool is_button_released(uint32_t button);
+    bool is_button_pressed(BUTTON button);
+    bool is_button_held(BUTTON button);
+    bool is_button_released(BUTTON button);
 
     void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
     void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);

@@ -159,7 +159,10 @@ struct StateMemory
     size_t unknown29;
     size_t unknown30;
     uint32_t layer_transition_effect_timer;
-    uint32_t camera_layer;
+    uint8_t camera_layer;
+    uint8_t unknowk31a;
+    uint8_t unknowk31b;
+    uint8_t unknowk31c;
     size_t unknown32;
     size_t unknown33;
     size_t unknown34;

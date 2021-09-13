@@ -9,6 +9,7 @@
 #include <variant>
 #include <vector>
 
+#include "aliases.hpp"
 #include "audio_buffer.hpp"
 #include "fmod.hpp"
 
@@ -30,8 +31,6 @@ enum class SOUND_TYPE
     Sfx,
     Music
 };
-
-using VANILLA_SOUND_PARAM = std::uint32_t;
 
 class CustomSound
 {

@@ -153,7 +153,7 @@ void g_spawn_punishball_attach(const CommunityTileCode& self, float x, float y, 
     y += static_cast<float>(offset_y);
     auto do_spawn = [=]()
     {
-        std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer(0, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
+        std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
         if (!entities_neighbour.empty())
         {
             get_entity_ptr(attach_ball_and_chain(entities_neighbour.front(), -static_cast<float>(offset_x), -static_cast<float>(offset_y)));
@@ -422,7 +422,7 @@ std::array g_community_tile_codes{
 
             Entity* olmite = layer->spawn_entity_snap_to_floor(self.entity_id, x, y);
 
-            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer(0, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
+            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({}, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
             {
                 if (Entity* ent = get_entity_ptr(uid))
@@ -454,7 +454,7 @@ std::array g_community_tile_codes{
         {
             auto do_spawn = [=]()
             {
-                std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer(0, 0, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
+                std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
                 if (!entities_neighbour.empty())
                 {
                     layer->spawn_entity_over(self.entity_id, get_entity_ptr(entities_neighbour.front()), 0.0f, 1.0f);
@@ -1557,7 +1557,7 @@ std::pair<float, float> LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
         static_cast<float>(x * 10) + 2.5f,
         122.5f - static_cast<float>(y * 8)};
 }
-std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, LAYER l)
+std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, uint8_t l)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -1565,12 +1565,10 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return std::nullopt;
 
-    uint8_t layer = enum_to_layer(l);
-
-    LevelGenRooms* level_rooms = rooms[layer];
+    LevelGenRooms* level_rooms = rooms[l];
     return level_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template)
+bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -1578,9 +1576,7 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
-    uint8_t layer = enum_to_layer(l);
-
-    LevelGenRooms* level_rooms = rooms[layer];
+    LevelGenRooms* level_rooms = rooms[l];
     level_rooms->rooms[x + y * 8] = room_template;
 
     // Unset machine room origin flag if it is a machine room so there's no accidental origins left within the machine room
@@ -1601,20 +1597,18 @@ bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y)
 
     return flipped_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER /*l*/)
+bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t /*l*/)
 {
     auto* state_ptr = State::get().ptr_local();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
-    //uint8_t layer = enum_to_layer(l);
-
     machine_room_origin->rooms[x + y * 8] = true;
 
     return true;
 }
-bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, LAYER l, bool is_set_room)
+bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room)
 {
     auto* state_ptr = State::get().ptr_local();
 

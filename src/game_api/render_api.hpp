@@ -4,8 +4,6 @@
 #include "memory.hpp"
 #include "texture.hpp"
 
-using TEXTURE = std::int64_t;
-
 struct TextureDefinition
 {
     std::string texture_path;
