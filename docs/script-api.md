@@ -1208,7 +1208,7 @@ Used in level transition to transfer to new player entity, is wrong during the l
 - [`int kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Inventory::kapala_blood_amount
 \
 Used in level transition to transfer to new player entity, is wrong during the level
-- [`int player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) &Inventory::player_slot
+- [`player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) sol::property([](Inventory&i)-&gt;int8_t{if(i.player_slot&gt;=0)returni.player_slot+1;elsereturni.player_slot;}
 - [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
 - [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
 - [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total

@@ -39,7 +39,20 @@ void register_usertypes(sol::state& lua)
         "kapala_blood_amount",
         &Inventory::kapala_blood_amount,
         "player_slot",
-        &Inventory::player_slot,
+        sol::property([](Inventory& i) -> int8_t
+                      {
+                          if (i.player_slot >= 0)
+                              return i.player_slot + 1;
+                          else
+                              return i.player_slot;
+                      },
+                      [](Inventory& i, int8_t s)
+                      {
+                          if (s > 0)
+                              i.player_slot = s - 1;
+                          else
+                              i.player_slot = -1;
+                      }),
         "kills_level",
         &Inventory::kills_level,
         "kills_total",
