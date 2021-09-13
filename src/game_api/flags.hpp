@@ -75,7 +75,7 @@ const char* entity_flags[]{
 
 const char* more_flags[]{
     "1: ",
-    "2: ",
+    "2: Revived (HH)",
     "3: ",
     "4: ",
     "5: ",
@@ -85,8 +85,8 @@ const char* more_flags[]{
     "9: ",
     "10: ",
     "11: Swimming",
-    "12: ",
-    "13: ",
+    "12: Hit ground (bomb)",
+    "13: Hit wall (bomb)",
     "14: Falling",
     "15: Cursed effect",
     "16: Disable input",

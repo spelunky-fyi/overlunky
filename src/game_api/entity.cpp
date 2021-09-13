@@ -26,6 +26,7 @@ struct EntityHooksInfo
 {
     void* entity;
     std::uint32_t cbcount;
+    std::vector<HookWithId<void(Entity*)>> on_dtor;
     std::vector<HookWithId<void(Entity*)>> on_destroy;
     std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
@@ -258,6 +259,12 @@ void Entity::remove()
             item->remove();
         }
     }
+    layer = 2;
+}
+
+void Entity::respawn(LAYER layer_to)
+{
+    set_layer(layer_to);
 }
 
 std::pair<float, float> Entity::position()
@@ -405,7 +412,7 @@ void hook_movable_state_machine(Movable* _self)
 void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty())
+    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
@@ -414,16 +421,11 @@ void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::func
 void Movable::set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty())
+    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
     hook_info.post_statemachine.push_back({reserved_callback_id, std::move(post_state_machine)});
-}
-
-void Entity::destroy()
-{
-    delete this; // TODO
 }
 
 std::tuple<float, float, uint8_t> get_position(uint32_t uid)
@@ -500,13 +502,15 @@ void Entity::unhook(std::uint32_t id)
                            { return hook.entity == this; });
     if (it != g_entity_hooks.end())
     {
+        std::erase_if(it->on_dtor, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->on_destroy, [id](auto& hook)
+                      { return hook.id == id; });
         std::erase_if(it->on_kill, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->post_statemachine, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->on_destroy, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->on_open, [id](auto& hook)
                       { return hook.id == id; });
@@ -524,7 +528,7 @@ EntityHooksInfo& Entity::get_hooks()
                                               { return hook.entity == self; });
                       if (_it != g_entity_hooks.end())
                       {
-                          for (auto& cb : _it->on_destroy)
+                          for (auto& cb : _it->on_dtor)
                           {
                               cb.fun((Entity*)self);
                           }
@@ -537,16 +541,36 @@ EntityHooksInfo& Entity::get_hooks()
     return *it;
 }
 
-std::uint32_t Entity::set_on_destroy(std::function<void(Entity*)> cb)
+std::uint32_t Entity::set_on_dtor(std::function<void(Entity*)> cb)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    hook_info.on_destroy.push_back({hook_info.cbcount++, std::move(cb)});
-    return hook_info.on_destroy.back().id;
+    hook_info.on_dtor.push_back({hook_info.cbcount++, std::move(cb)});
+    return hook_info.on_dtor.back().id;
 }
 std::uint32_t Entity::reserve_callback_id()
 {
     EntityHooksInfo& hook_info = get_hooks();
     return hook_info.cbcount++;
+}
+void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.on_destroy.empty())
+    {
+        hook_vtable<void(Entity*)>(
+            this,
+            [](Entity* self, void (*original)(Entity*))
+            {
+                EntityHooksInfo& _hook_info = self->get_hooks();
+                for (auto& [id, on_destroy] : _hook_info.on_destroy)
+                {
+                    on_destroy(self);
+                }
+                original(self);
+            },
+            0x4);
+    }
+    hook_info.on_destroy.push_back({reserved_callback_id, std::move(on_destroy)});
 }
 void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill)
 {

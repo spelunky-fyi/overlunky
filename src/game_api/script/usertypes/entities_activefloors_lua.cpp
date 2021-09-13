@@ -111,6 +111,8 @@ void register_usertypes(sol::state& lua)
         "FallingPlatform",
         "emitted_light",
         &FallingPlatform::timer,
+        "timer",
+        &FallingPlatform::timer,
         "shaking_factor",
         &FallingPlatform::shaking_factor,
         "y_pos",

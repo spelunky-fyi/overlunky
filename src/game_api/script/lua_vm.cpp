@@ -420,10 +420,14 @@ end
     lua["spawn_apep"] = spawn_apep;
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
+    /// NoDoc
+    /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
+    /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
+    lua["spawn_impostor_lake"] = spawn_impostor_lake;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
-    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
@@ -443,7 +447,7 @@ end
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
-    /// The callback signature is `nil post_entity_spawn(entity)`
+    /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
@@ -664,7 +668,7 @@ end
         [](uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask) -> std::vector<uint32_t> {
             return entity_get_items_by(uid, entity_types, mask);
         });
-    /// Kills an entity by uid.
+    /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
     /// ```lua
@@ -871,7 +875,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
 
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
@@ -895,12 +899,37 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(movable);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+    /// The callback signature is `nil on_destroy(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_destroy"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_destroy(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
+                    backend->handle_function(fun, lua["cast_entity"](self));
+                });
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -920,7 +949,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
@@ -946,7 +975,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
@@ -1043,6 +1072,10 @@ end
         ON::POST_ROOM_GENERATION,
         "POST_LEVEL_GENERATION",
         ON::POST_LEVEL_GENERATION,
+        "PRE_GET_RANDOM_ROOM",
+        ON::PRE_GET_RANDOM_ROOM,
+        "PRE_HANDLE_ROOM_TILES",
+        ON::PRE_HANDLE_ROOM_TILES,
         "SCRIPT_ENABLE",
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
@@ -1081,6 +1114,17 @@ end
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
     // Runs right level generation is done, before any entities are updated
+    // PRE_GET_RANDOM_ROOM
+    // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
+    // Return: `string room_data`
+    // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
+    // If the size of the string returned does not match with the room templates expected size the room is discarded.
+    // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
+    // PRE_HANDLE_ROOM_TILES
+    // Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`
+    // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
+    // Runs after a random room was selected and right before it would spawn entities for each tile code
+    // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -1112,6 +1156,8 @@ end
         SPAWN_TYPE_LEVEL_GEN_TILE_CODE,
         "LEVEL_GEN_PROCEDURAL",
         SPAWN_TYPE_LEVEL_GEN_PROCEDURAL,
+        "LEVEL_GEN_FLOOR_SPREADING",
+        SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING,
         "LEVEL_GEN_GENERAL",
         SPAWN_TYPE_LEVEL_GEN_GENERAL,
         "SCRIPT",
@@ -1127,6 +1173,8 @@ end
     // Similar to LEVEL_GEN but only triggers on tile code spawns.
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+    // LEVEL_GEN_FLOOR_SPREADING
+    // Only procs during floor spreading, both horizontal and vertical
     // LEVEL_GEN_GENERAL
     // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT

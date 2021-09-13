@@ -202,7 +202,11 @@ void register_usertypes(sol::state& lua)
         "set_layer",
         &Entity::set_layer,
         "remove",
-        &Entity::remove);
+        &Entity::remove,
+        "respawn",
+        &Entity::respawn,
+        "destroy",
+        &Entity::destroy);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",

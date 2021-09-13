@@ -336,12 +336,12 @@ float screen_distance(float x)
 
 std::vector<uint32_t> get_entities()
 {
-    return get_entities_by({0}, 0, LAYER::BOTH);
+    return get_entities_by({}, 0, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 {
-    return get_entities_by({0}, 0, layer);
+    return get_entities_by({}, 0, layer);
 }
 
 std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
@@ -372,7 +372,7 @@ std::vector<uint32_t> get_entities_by_type(Args... args)
 
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
 {
-    return get_entities_by({0}, mask, LAYER::BOTH);
+    return get_entities_by({}, mask, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
@@ -584,7 +584,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
 
 void lock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at({0}, 0, x, y, LAYER::FRONT, 1);
+    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);
@@ -604,7 +604,7 @@ void lock_door_at(float x, float y)
 
 void unlock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at({0}, 0, x, y, LAYER::FRONT, 1);
+    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);
@@ -637,11 +637,11 @@ void carry(uint32_t mount_uid, uint32_t rider_uid)
     mount->carry(rider);
 }
 
-void kill_entity(uint32_t uid)
+void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
-        ent->kill(true, nullptr);
+        ent->kill(destroy_corpse.value_or(true), nullptr);
 }
 
 void destroy_entity(uint32_t uid)

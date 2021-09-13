@@ -71,6 +71,7 @@
 110: haunted_corpse
 39: pagoda_platform
 90: potofgold
+384: punishball_attach_bottom
 33: ladder_plat
 315: boomerang
 34: vine
@@ -84,6 +85,7 @@
 44: starting_exit
 46: door2_secret
 48: ghist_door2
+383: punishball_attach_top
 55: arrow_trap
 49: locked_door
 206: lightarrow
@@ -301,6 +303,7 @@
 266: ghost_small_surprised
 270: tutorial_speedrun_sign
 271: tutorial_menu_sign
+381: punishball_attach_left
 272: eggplant
 273: gold_bar
 274: diamond
@@ -376,3 +379,7 @@
 369: flying_fish
 370: crabman
 380: olmite_armored
+382: punishball_attach_right
+385: critter_slime
+386: skull
+387: movable_spikes

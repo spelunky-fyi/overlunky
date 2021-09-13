@@ -2527,7 +2527,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         {
             for (unsigned int y = 0; y < g_state->h; ++y)
             {
-                auto room_temp = g_state->level_gen->get_room_template(x, y, (LAYER)g_players.at(0)->layer);
+                auto room_temp = g_state->level_gen->get_room_template(x, y, g_players.at(0)->layer);
                 if (room_temp.has_value())
                 {
                     auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
@@ -3838,16 +3838,29 @@ void render_entity_props()
         g_entity->overlay = nullptr;
         g_entity->y -= 1000.0;
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Move the entity under the level,\nlike it just fell in to the void.");
     ImGui::SameLine();
     if (ImGui::Button("Kill##KillEntity"))
     {
         g_entity->kill(true, nullptr);
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Kill the entity,\nlike it received damage and died.");
     ImGui::SameLine();
-    if (ImGui::Button("Remove##RemoveEntity"))
+    if (ImGui::Button("Rem##RemoveEntity"))
     {
         g_entity->remove();
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Move the entity to limbo layer,\nlike it exists but doesn't do anything.");
+    ImGui::SameLine();
+    if (ImGui::Button("Dstr##DestroyEntity"))
+    {
+        g_entity->destroy();
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
     if (ImGui::CollapsingHeader("State"))
     {
         render_state("Current state", g_entity->state);

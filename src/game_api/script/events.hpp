@@ -1,7 +1,10 @@
 #pragma once
 
+#include "level_api_types.hpp"
 #include "lua_backend.hpp"
+
 #include <cstdint>
+#include <optional>
 #include <string_view>
 
 class Entity;
@@ -10,6 +13,9 @@ void pre_load_level_files();
 void pre_level_generation();
 void post_room_generation();
 void post_level_generation();
+
+std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
+std::optional<LevelGenRoomData> pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template);
 
 bool pre_tile_code_spawn(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 void post_tile_code_spawn(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
