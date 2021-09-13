@@ -362,7 +362,7 @@ bool Movable::is_poisoned()
 
 bool Movable::is_button_pressed(BUTTON button)
 {
-    return (buttons & button) == button && (buttons_previous & button) != button;
+    return (buttons & button) == button && (buttons_previous & button) == 0;
 }
 bool Movable::is_button_held(BUTTON button)
 {
@@ -370,7 +370,7 @@ bool Movable::is_button_held(BUTTON button)
 }
 bool Movable::is_button_released(BUTTON button)
 {
-    return (buttons & button) != button && (buttons_previous & button) == button;
+    return (buttons & button) == 0 && (buttons_previous & button) == button;
 }
 
 void hook_movable_state_machine(Movable* _self)
