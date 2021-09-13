@@ -137,7 +137,7 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->get_room_pos(x, y);
     };
     /// Get the room template given a certain index
-    lua["get_room_template"] = [](int x, int y, int l) -> std::optional<uint16_t> {
+    lua["get_room_template"] = [](int x, int y, LAYER l) -> std::optional<uint16_t> {
         return State::get().ptr_local()->level_gen->get_room_template(x, y, l);
     };
     /// For debugging only, get the name of a room template

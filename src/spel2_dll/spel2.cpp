@@ -319,7 +319,7 @@ SpelunkyScreen SpelunkyState_GetScreen()
 
 std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, float x, float y, float vel_x, float vel_y)
 {
-    return spawn_entity_abs(entity_id, x, y, layer, vel_x, vel_y);
+    return spawn_entity_abs(entity_id, x, y, (LAYER)layer, vel_x, vel_y);
 }
 
 const char16_t* Spelunky_GetCharacterFullName(std::uint32_t character_index)

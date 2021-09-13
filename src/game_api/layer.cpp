@@ -164,7 +164,7 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
         int current_uid = apep_head->uid;
         do
         {
-            auto body_parts = entity_get_items_by(current_uid, 0, 0);
+            auto body_parts = entity_get_items_by(current_uid, {0}, 0);
             int temp = current_uid;
             for (auto body_part_uid : body_parts)
             {

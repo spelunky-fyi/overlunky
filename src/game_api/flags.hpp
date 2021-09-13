@@ -287,7 +287,7 @@ const char* illumination_flags[]{
     "1: Disable light1",
     "2: Enable light2",
     "3: Enable light3",
-    "4: ",
+    "4: Enable light4",
     "5: ",
     "6: ",
     "7: Modulate brightness_multiplier",

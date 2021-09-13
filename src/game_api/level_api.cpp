@@ -313,7 +313,7 @@ std::array g_community_tile_codes{
         "ENT_TYPE_ITEM_PUNISHBALL",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer(0, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
+            std::vector<uint32_t> entities_left = get_entities_overlapping_by_pointer({0}, 0, x - 1.5f, y - 0.5f, x - 0.5f, y + 0.5f, layer);
             if (!entities_left.empty())
             {
                 get_entity_ptr(attach_ball_and_chain(entities_left.front(), 1.0f, 0.0f));
@@ -375,7 +375,7 @@ std::array g_community_tile_codes{
 
             Entity* olmite = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
 
-            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer(0, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
+            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({0}, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
             {
                 if (Entity* ent = get_entity_ptr(uid))
@@ -1187,7 +1187,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
     LevelGenRooms* level_rooms = rooms[layer];
     return level_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template)
+bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
 {
     auto state = State::get();
     auto* state_ptr = state.ptr_local();
@@ -1195,9 +1195,7 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
-    uint8_t layer = enum_to_layer(l);
-
-    LevelGenRooms* level_rooms = rooms[layer];
+    LevelGenRooms* level_rooms = rooms[l];
     level_rooms->rooms[x + y * 8] = room_template;
 
     return true;

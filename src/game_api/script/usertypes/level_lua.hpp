@@ -1,13 +1,10 @@
 #pragma once
 
+#include "aliases.hpp"
 #include <string>
 #include <vector>
 
 #include <sol/forward.hpp>
-
-using ROOM_TEMPLATE = uint16_t;     // NoAlias
-using PROCEDURAL_CHANCE = uint32_t; // NoAlias
-using ROOM_TEMPLATE_TYPE = int32_t; // NoAlias
 
 struct PreLoadLevelFilesContext
 {

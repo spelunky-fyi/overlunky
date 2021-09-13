@@ -277,6 +277,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<MotherStatue>(
         "MotherStatue",
+        "players_standing",
+        &MotherStatue::players_standing,
         "player1_standing",
         &MotherStatue::player1_standing,
         "player2_standing",
@@ -285,6 +287,8 @@ void register_usertypes(sol::state& lua)
         &MotherStatue::player3_standing,
         "player4_standing",
         &MotherStatue::player4_standing,
+        "players_health_received",
+        &MotherStatue::players_health_received,
         "player1_health_received",
         &MotherStatue::player1_health_received,
         "player2_health_received",
@@ -293,6 +297,8 @@ void register_usertypes(sol::state& lua)
         &MotherStatue::player3_health_received,
         "player4_health_received",
         &MotherStatue::player4_health_received,
+        "players_health_timer",
+        &MotherStatue::players_health_timer,
         "player1_health_timer",
         &MotherStatue::player1_health_timer,
         "player2_health_timer",

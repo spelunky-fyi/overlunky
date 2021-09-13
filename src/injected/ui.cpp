@@ -798,7 +798,7 @@ void spawn_entities(bool s, std::string list = "")
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_CHAR") != std::string::npos)
         {
             std::pair<float, float> cpos = click_position(g_x, g_y);
-            int spawned = spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, g_state->camera_layer);
+            int spawned = spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, LAYER::PLAYER);
             if (!lock_entity)
                 g_last_id = spawned;
         }
@@ -1812,9 +1812,9 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (g_players.size() > 0)
         {
-            unsigned int layer_to = 0;
+            auto layer_to = LAYER::FRONT;
             if (g_players.at(0)->layer == 0)
-                layer_to = 1;
+                layer_to = LAYER::BACK;
             g_players.at(0)->set_layer(layer_to);
         }
     }
@@ -2527,7 +2527,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         {
             for (unsigned int y = 0; y < g_state->h; ++y)
             {
-                auto room_temp = g_state->level_gen->get_room_template(x, y, g_players.at(0)->layer);
+                auto room_temp = g_state->level_gen->get_room_template(x, y, (LAYER)g_players.at(0)->layer);
                 if (room_temp.has_value())
                 {
                     auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
@@ -2746,7 +2746,7 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto entity : get_entities_by(0, 255, -1))
+        for (auto entity : get_entities_by({0}, 255, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)
@@ -2754,7 +2754,7 @@ void render_clickhandler()
             if (entity_names[type].find("FX") == std::string::npos)
                 render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
         }
-        for (auto entity : get_entities_by(0, 0x100, -1))
+        for (auto entity : get_entities_by({0}, 0x100, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)
@@ -3906,9 +3906,9 @@ void render_entity_props()
     {
         if (ImGui::Button("Change"))
         {
-            unsigned int layer_to = 0;
+            auto layer_to = LAYER::FRONT;
             if (g_entity->layer == 0)
-                layer_to = 1;
+                layer_to = LAYER::BACK;
             g_entity->set_layer(layer_to);
         }
         ImGui::SameLine();
@@ -4155,7 +4155,8 @@ void render_entity_props()
         }
         for (int i = 0; i < 6; i++)
         {
-            ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, int_pow(2, i));
+            int buttons = g_entity->buttons;
+            ImGui::CheckboxFlags(button_flags[i], &buttons, int_pow(2, i));
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }

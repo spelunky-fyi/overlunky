@@ -4,11 +4,10 @@
 
 #include <string>
 
+#include "aliases.hpp"
 #include "math.hpp"
 
 class ScriptImpl;
-
-using uColor = uint32_t;
 
 class GuiDrawContext
 {
