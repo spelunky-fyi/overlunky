@@ -56,5 +56,48 @@ void register_usertypes(sol::state& lua)
         draw_screen_texture,
         "draw_world_texture",
         draw_world_texture);
+
+    lua.new_usertype<TextureRenderingInfo>(
+        "TextureRenderingInfo",
+        "x",
+        &TextureRenderingInfo::x,
+        "y",
+        &TextureRenderingInfo::y,
+
+        "destination_top_left_x",
+        &TextureRenderingInfo::destination_top_left_x,
+        "destination_top_left_y",
+        &TextureRenderingInfo::destination_top_left_y,
+        "destination_top_right_x",
+        &TextureRenderingInfo::destination_top_right_x,
+        "destination_top_right_y",
+        &TextureRenderingInfo::destination_top_right_y,
+        "destination_bottom_left_x",
+        &TextureRenderingInfo::destination_bottom_left_x,
+        "destination_bottom_left_y",
+        &TextureRenderingInfo::destination_bottom_left_y,
+        "destination_bottom_right_x",
+        &TextureRenderingInfo::destination_bottom_right_x,
+        "destination_bottom_right_y",
+        &TextureRenderingInfo::destination_bottom_right_y,
+        "set_destination",
+        &TextureRenderingInfo::set_destination,
+
+        "source_top_left_x",
+        &TextureRenderingInfo::source_top_left_x,
+        "source_top_left_y",
+        &TextureRenderingInfo::source_top_left_y,
+        "source_top_right_x",
+        &TextureRenderingInfo::source_top_right_x,
+        "source_top_right_y",
+        &TextureRenderingInfo::source_top_right_y,
+        "source_bottom_left_x",
+        &TextureRenderingInfo::source_bottom_left_x,
+        "source_bottom_left_y",
+        &TextureRenderingInfo::source_bottom_left_y,
+        "source_bottom_right_x",
+        &TextureRenderingInfo::source_bottom_right_x,
+        "source_bottom_right_y",
+        &TextureRenderingInfo::source_bottom_right_y);
 };
 } // namespace NVanillaRender

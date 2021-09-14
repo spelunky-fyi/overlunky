@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entities_chars.hpp"
+#include "screen.hpp"
 #include "state.hpp"
 #include <cstdint>
 #include <vector>
@@ -25,6 +26,7 @@ void set_hud_flags(uint32_t flags);
 uint32_t get_hud_flags();
 void set_pause(uint8_t pause);
 void player_status();
+Screen* get_screen_ptr(uint32_t screen_id);
 Entity* get_entity_ptr(uint32_t uid);
 ENT_TYPE get_entity_type(uint32_t uid);
 int get_entity_ai_state(uint32_t uid);

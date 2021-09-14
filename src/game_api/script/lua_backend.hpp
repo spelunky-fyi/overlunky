@@ -199,6 +199,8 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
+    std::vector<std::pair<int, std::uint32_t>> screen_hooks;
+    std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<std::string> required_scripts;
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
@@ -250,6 +252,7 @@ class LuaBackend
 
     bool is_callback_cleared(int32_t callback_id);
     bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
+    bool is_screen_callback_cleared(std::pair<int, uint32_t> callback_id);
 
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);

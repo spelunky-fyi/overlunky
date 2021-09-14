@@ -367,6 +367,24 @@ bool Movable::is_poisoned()
     return (poison_tick_timer != -1);
 }
 
+void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y)
+{
+    if ((flags & (1 << 28)) > 0)
+    {
+        return;
+    }
+
+    auto dealer = get_entity_ptr(damage_dealer_uid);
+    if (dealer == nullptr)
+    {
+        return;
+    }
+
+    float velocities[] = {velocity_x, velocity_y};
+    float unknown[] = {0.0f, 0.0f};
+    on_regular_damage(dealer, damage_amount, 0x1000, velocities, unknown, stun_time);
+}
+
 bool Movable::is_button_pressed(BUTTON button)
 {
     return (buttons & button) != 0 && (buttons_previous & button) == 0;

@@ -8,6 +8,7 @@
 #include "particles.hpp"
 #include "render_api.hpp"
 #include "rpc.hpp"
+#include "screen.hpp"
 #include "script_util.hpp"
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
@@ -116,6 +117,13 @@ void LuaBackend::clear_all_callbacks()
             ent->unhook(id);
         }
     }
+    for (auto& [screen_id, id] : screen_hooks)
+    {
+        if (Screen* screen = get_screen_ptr(screen_id))
+        {
+            screen->unhook(id);
+        }
+    }
     for (auto& console_command : console_commands)
     {
         console->unregister_command(this, console_command);
@@ -123,6 +131,8 @@ void LuaBackend::clear_all_callbacks()
     entity_hooks.clear();
     clear_entity_hooks.clear();
     entity_dtor_hooks.clear();
+    screen_hooks.clear();
+    clear_screen_hooks.clear();
     options.clear();
     required_scripts.clear();
     console_commands.clear();
@@ -276,6 +286,20 @@ bool LuaBackend::update()
             }
         }
         clear_entity_hooks.clear();
+        for (auto& [screen_id, id] : clear_screen_hooks)
+        {
+            auto it = std::find(screen_hooks.begin(), screen_hooks.end(), std::pair{screen_id, id});
+            if (it != screen_hooks.end())
+            {
+                auto screen = get_screen_ptr(screen_id);
+                if (screen != nullptr)
+                {
+                    screen->unhook(id);
+                }
+                screen_hooks.erase(it);
+            }
+        }
+        clear_screen_hooks.clear();
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
@@ -581,6 +605,10 @@ bool LuaBackend::is_callback_cleared(int32_t callback_id)
 bool LuaBackend::is_entity_callback_cleared(std::pair<int, uint32_t> callback_id)
 {
     return std::count(clear_entity_hooks.begin(), clear_entity_hooks.end(), callback_id);
+}
+bool LuaBackend::is_screen_callback_cleared(std::pair<int, uint32_t> callback_id)
+{
+    return std::count(clear_screen_hooks.begin(), clear_screen_hooks.end(), callback_id);
 }
 
 bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)

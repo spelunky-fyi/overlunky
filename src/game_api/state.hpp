@@ -4,6 +4,8 @@
 #include "layer.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"
+#include "screen.hpp"
+#include "screen_arena.hpp"
 #include "state_structs.hpp"
 #include "thread_utils.hpp"
 
@@ -119,26 +121,30 @@ struct StateMemory
     uint32_t toast_timer;
     int32_t speechbubble_owner;
     Dialogue basecamp_dialogue;
-    size_t arena_choose_teams_screen;
-    size_t unknown8_during_basecamp;
-    size_t unknown9_during_level;
-    size_t level_transition_screen;
-    size_t unknown11;
-    size_t unknown12;
-    size_t victory_walk_screen;
-    size_t credits_screen;
-    size_t final_score_screen;
-    size_t cosmic_ocean_win_screen;
-    size_t dear_journal_screen;
-    size_t unknown13;
-    size_t unknown14_screen;
-    size_t unknown15;
-    size_t unknown16_screen;
-    size_t arena_lineup_screen;
-    size_t arena_gameplay_screen;
-    size_t arena_scorepillars_screen;
-    size_t unknown17;
-    size_t unknown18;
+
+    // screen pointers below are most likely in an array and indexed through the screen ID (-10), hence the nullptrs for
+    // screens that are available in GameManager
+    ScreenTeamSelect* screen_team_select;
+    ScreenCamp* screen_camp;
+    ScreenLevel* screen_level;
+    ScreenTransition* screen_transition;
+    ScreenDeath* screen_death;
+    size_t unknown_screen_spaceship; // potentially ScreenSpaceship, but is nullptr (there is no UI rendering on spaceship anyway)
+    ScreenWin* screen_win;
+    ScreenCredits* screen_credits;
+    ScreenScores* screen_scores;
+    ScreenConstellation* screen_constellation;
+    ScreenRecap* screen_recap;
+    size_t unknown_screen_arena_menu; // potentially ScreenArenaMenu, available in GameManager
+    ScreenArenaStagesSelect* screen_arena_stages_select1;
+    size_t unknown_screen_arena_intro; // potentially ScreenArenaIntro, available in GameManager
+    ScreenArenaStagesSelect* screen_arena_stages_select2;
+    ScreenArenaIntro* screen_arena_intro;
+    ScreenArenaLevel* screen_arena_level;
+    ScreenArenaScore* screen_arena_score;
+    size_t unknown_screen_online_loading; // potentially ScreenOnlineLoading, available in GameManager
+    size_t unknown_screen_online_lobby;   // potentially ScreenOnlineLobby, available in GameManager
+
     uint32_t next_entity_uid;
     uint16_t unknown20;
     uint16_t screen_change_counter; // increments every time screen changes; used in online sync together with next_entity_uid and unknown20 as a 64bit number

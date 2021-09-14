@@ -4,6 +4,7 @@
 #include "entities_floors.hpp"
 #include "entities_mounts.hpp"
 #include "entity.hpp"
+#include "game_manager.hpp"
 #include "logger.h"
 #include "state.hpp"
 #include "virtual_table.hpp"
@@ -272,6 +273,134 @@ void player_status()
     DEBUG("Player {}", (void*)status, status->ropes, status->bombs);
     status->ropes = (99);
     status->bombs = (99);
+}
+
+Screen* get_screen_ptr(uint32_t screen_id)
+{
+    auto game_manager = get_game_manager();
+    auto state = get_state_ptr();
+    switch (screen_id)
+    {
+    case 0:
+    {
+        return game_manager->screen_logo;
+    }
+    case 1:
+    {
+        return game_manager->screen_intro;
+    }
+    case 2:
+    {
+        return game_manager->screen_prologue;
+    }
+    case 3:
+    {
+        return game_manager->screen_title;
+    }
+    case 4:
+    {
+        return game_manager->screen_menu;
+    }
+    case 5:
+    {
+        return game_manager->screen_options;
+    }
+    case 6:
+    {
+        return game_manager->screen_player_profile;
+    }
+    case 7:
+    {
+        return game_manager->screen_leaderboards;
+    }
+    case 8:
+    {
+        return game_manager->screen_seed_input;
+    }
+    case 9:
+    {
+        return game_manager->screen_character_select;
+    }
+    case 10:
+    {
+        return state->screen_team_select;
+    }
+    case 11:
+    {
+        // a screen_camp also exists in State, but its buttons flags do not work, so we use GameManager's one
+        return game_manager->screen_camp;
+    }
+    case 12:
+    {
+        // a screen_level also exists in State
+        return game_manager->screen_level;
+    }
+    case 13:
+    {
+        return state->screen_transition;
+    }
+    case 14:
+    {
+        return state->screen_death;
+    }
+    // 15 = spaceship -> the spots in State and GameManager where this should be are both nullptr -> has no UI
+    case 16:
+    {
+        return state->screen_win;
+    }
+    case 17:
+    {
+        return state->screen_credits;
+    }
+    case 18:
+    {
+        return state->screen_scores;
+    }
+    case 19:
+    {
+        return state->screen_constellation;
+    }
+    case 20:
+    {
+        return state->screen_recap;
+    }
+    case 21:
+    {
+        return game_manager->screen_arena_menu;
+    }
+    case 22:
+    case 24:
+    {
+        return state->screen_arena_stages_select1;
+    }
+    case 23:
+    {
+        return game_manager->screen_arena_items;
+    }
+    case 25:
+    {
+        return state->screen_arena_intro;
+    }
+    case 26:
+    {
+        // the one in GameManager has no UI entries
+        return state->screen_arena_level;
+    }
+    case 27:
+    {
+        return state->screen_arena_score;
+    }
+    case 28:
+    {
+        return game_manager->screen_online_loading;
+    }
+    case 29:
+    {
+        return game_manager->screen_online_lobby;
+    }
+    }
+    DEBUG("Screen pointer requested for unknown screen ID: {}", screen_id);
+    return nullptr;
 }
 
 Entity* get_entity_ptr(uint32_t uid)
@@ -1108,25 +1237,26 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
 void set_journal_enabled(bool b)
 {
     static size_t offset = 0;
-    static char original_call_instruction[5] = {0};
+    static char original_instruction[2] = {0};
     if (offset == 0)
     {
         auto memory = Memory::get();
         auto exe = memory.exe();
-        std::string pattern = "\x75\x1F\xF6\xC1\x08"s;
-        offset = memory.at_exe(find_inst(exe, pattern, memory.after_bundle) + 14);
-        for (uint8_t x = 0; x < 5; ++x)
+
+        std::string pattern = "\x45\x33\xC9\x48\x8B\xCB\x45\x33\xC0"s;
+        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        for (uint8_t x = 0; x < 2; ++x)
         {
-            original_call_instruction[x] = read_u8(offset + x);
+            original_instruction[x] = read_u8(offset + x);
         }
     }
     if (b)
     {
-        write_mem_prot(offset, std::string(original_call_instruction, 5), true);
+        write_mem_prot(offset, std::string(original_instruction, 2), true);
     }
     else
     {
-        write_mem_prot(offset, "\x90\x90\x90\x90\x90"s, true);
+        write_mem_prot(offset, "\xC3\x90"s, true);
     }
 }
 

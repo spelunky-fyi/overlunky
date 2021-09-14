@@ -446,3 +446,23 @@ void init_render_api_hooks()
         DEBUG("Failed hooking render_api: {}\n", error);
     }
 }
+
+void TextureRenderingInfo::set_destination(const AABB& bbox)
+{
+    auto w = bbox.width();
+    auto h = bbox.bottom - bbox.top;
+    auto half_w = w / 2.0f;
+    auto half_h = h / 2.0f;
+
+    x = bbox.left + half_w;
+    y = bbox.top + half_h;
+
+    destination_top_left_x = -half_w;
+    destination_top_left_y = half_h;
+    destination_top_right_x = half_w;
+    destination_top_right_y = half_h;
+    destination_bottom_left_x = -half_w;
+    destination_bottom_left_y = -half_h;
+    destination_bottom_right_x = half_w;
+    destination_bottom_right_y = -half_h;
+}

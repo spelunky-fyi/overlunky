@@ -291,6 +291,8 @@ void register_usertypes(sol::state& lua)
         &Movable::standing_on,
         "add_money",
         &Movable::add_money,
+        "damage",
+        &Movable::damage,
         sol::base_classes,
         sol::bases<Entity>());
 
