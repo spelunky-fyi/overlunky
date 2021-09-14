@@ -147,6 +147,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
         ImGui::SetNextWindowPos(spos, cond);
         ImGui::SetNextWindowSize(ssize, cond);
     }
+    flag |= ImGuiWindowFlags_NoDocking;
     ImGui::Begin(title.c_str(), &win_open, flag);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
     backend->handle_function(callback);
