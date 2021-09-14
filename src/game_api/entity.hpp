@@ -152,6 +152,7 @@ class Entity
     uint32_t more_flags;
     int32_t uid;
     uint16_t animation_frame;
+    /// Don't edit this dirrectly, use `set_draw_depth`
     uint8_t draw_depth;
     uint8_t b3f;
     float x;
