@@ -2746,7 +2746,7 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto entity : get_entities_by({0}, 255, LAYER::PLAYER))
+        for (auto entity : get_entities_by(0, 255, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)
@@ -2754,7 +2754,7 @@ void render_clickhandler()
             if (entity_names[type].find("FX") == std::string::npos)
                 render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
         }
-        for (auto entity : get_entities_by({0}, 0x100, LAYER::PLAYER))
+        for (auto entity : get_entities_by(0, 0x100, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)

@@ -313,7 +313,10 @@ Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 `int get_grid_entity_at(float x, float y, LAYER layer)`<br/>
 Gets a grid entity, such as floor or spikes, at the given position and layer.
 ### [`get_entities_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
-`nil get_entities_by()`<br/>
+`array<int> get_entities_by(array<ENT_TYPE> entity_types, int mask, LAYER layer)`<br/>
+Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+### [`get_entities_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
+`array<int> get_entities_by(ENT_TYPE entity_type, int mask, LAYER layer)`<br/>
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 ### [`get_entities_by_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 `array<int> get_entities_by_type(int, int...)`<br/>
@@ -329,10 +332,16 @@ function on_level()
 end
 ```
 ### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
-`nil get_entities_at()`<br/>
+`array<int> get_entities_at(array<ENT_TYPE> entity_types, int mask, float x, float y, LAYER layer, float radius)`<br/>
+Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+### [`get_entities_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
+`array<int> get_entities_at(ENT_TYPE entity_type, int mask, float x, float y, LAYER layer, float radius)`<br/>
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 ### [`get_entities_overlapping_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
-`nil get_entities_overlapping_hitbox()`<br/>
+`array<int> get_entities_overlapping_hitbox(array<ENT_TYPE> entity_types, int mask, AABB hitbox, LAYER layer)`<br/>
+Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+### [`get_entities_overlapping_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
+`array<int> get_entities_overlapping_hitbox(ENT_TYPE entity_type, int mask, AABB hitbox, LAYER layer)`<br/>
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 ### [`attach_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach_entity)
 `nil attach_entity(int overlay_uid, int attachee_uid)`<br/>
@@ -397,10 +406,16 @@ Short for [spawn_entity_over](#spawn_entity_over)
 `bool entity_has_item_uid(int uid, int item_uid)`<br/>
 Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 ### [`entity_has_item_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
-`nil entity_has_item_type()`<br/>
+`bool entity_has_item_type(int uid, array<ENT_TYPE> entity_types)`<br/>
+Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
+### [`entity_has_item_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
+`bool entity_has_item_type(int uid, ENT_TYPE entity_type)`<br/>
 Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
 ### [`entity_get_items_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
-`nil entity_get_items_by()`<br/>
+`array<int> entity_get_items_by(int uid, array<ENT_TYPE> entity_types, int mask)`<br/>
+Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
+### [`entity_get_items_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
+`array<int> entity_get_items_by(int uid, ENT_TYPE entity_type, int mask)`<br/>
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
 ### [`kill_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_entity)
 `nil kill_entity(int uid, optional<bool> destroy_corpse = nullopt)`<br/>
@@ -794,7 +809,10 @@ Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 `array<int> get_entities_by_layer(LAYER layer)`<br/>
 Use `get_entities_by(0, MASK.ANY, layer)` instead
 ### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
-`nil get_entities_overlapping()`<br/>
+`array<int> get_entities_overlapping(array<ENT_TYPE> entity_types, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)`<br/>
+Use `get_entities_overlapping_hitbox` instead
+### [`get_entities_overlapping`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
+`array<int> get_entities_overlapping(ENT_TYPE entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)`<br/>
 Use `get_entities_overlapping_hitbox` instead
 ### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
 `int get_entity_ai_state(int uid)`<br/>
