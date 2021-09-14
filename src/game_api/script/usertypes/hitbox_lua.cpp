@@ -70,6 +70,8 @@ void register_usertypes(sol::state& lua)
         &AABB::offset,
         "area",
         &AABB::area,
+        "center",
+        &AABB::center,
         "width",
         &AABB::width,
         "height",

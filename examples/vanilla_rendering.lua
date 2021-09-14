@@ -89,7 +89,7 @@ set_callback(function(render_ctx)
 end, ON.RENDER_POST_HUD)
 
 set_callback(function(render_ctx)
-    render_ctx:draw_text("Rendered below the HUD", 0.95, 0.86,  0.0006, 0.0006, red, VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.ITALIC)
+    render_ctx:draw_text("Rendered below the HUD", 0.95, 0.86, 0.0006, 0.0006, red, VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.ITALIC)
 end, ON.RENDER_PRE_HUD)
 
 set_callback(function(draw_ctx)
@@ -111,12 +111,21 @@ set_callback(function(render_ctx, draw_depth)
     end
 end, ON.RENDER_PRE_DRAW_DEPTH)
 
---move Ana on the title screen
+-- move Ana on the title screen
 set_pre_render_screen(SCREEN.TITLE, function(screen, render_ctx)
     s = screen:as_screen_title()
     s.ana:set_destination(AABB:new(-0.1, 0, 0.15, -0.4))
 end)
 
+-- drawing text on top of the screen should be done in the post_render_screen callback:
 set_post_render_screen(SCREEN.TITLE, function(screen, render_ctx)
-    render_ctx:draw_text("Ana", 0.0, 0.0,  0.0006, 0.0006, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    render_ctx:draw_text("Ana", 0.0, 0.0, 0.0006, 0.0006, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+end)
+
+-- put the journal in the bottom right corner
+set_pre_render_screen(SCREEN.LEVEL, function(screen, render_ctx)
+    -- the journal (and pause screen) UI is available through the game manager, it's not a property of a particular screen
+    if game_manager.journal_ui.state > 0 then -- checks if the journal is visible
+        game_manager.journal_ui.entire_book:set_destination(AABB:new(0, 0, 0.95, -0.95))
+    end
 end)

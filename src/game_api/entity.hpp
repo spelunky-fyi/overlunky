@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "aliases.hpp"
 #include "color.hpp"
 #include "math.hpp"
 #include "memory.hpp"
@@ -47,10 +48,6 @@ using EntityDestroy = void (*)(Entity*);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
 using AddLayer = void (*)(void*, Entity*);
 using RemoveLayer = void (*)(void*, Entity*);
-
-using LAYER = int;
-using TEXTURE = std::int64_t;
-using ENT_TYPE = uint32_t;
 
 struct EntityDB
 {
@@ -189,8 +186,13 @@ class Entity
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
+
+    /// Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
     void set_layer(LAYER layer);
+    /// Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
     void remove();
+    /// Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
+    void respawn(LAYER layer);
 
     Entity* topmost()
     {
@@ -249,7 +251,6 @@ class Entity
     std::pair<float, float> position_self() const;
     std::pair<float, float> position_render() const;
     void remove_item(uint32_t id);
-    void destroy();
 
     TEXTURE get_texture();
     bool set_texture(TEXTURE texture_id);
@@ -259,8 +260,9 @@ class Entity
 
     bool is_movable();
 
-    std::uint32_t set_on_destroy(std::function<void(Entity*)> cb);
+    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb);
     std::uint32_t reserve_callback_id();
+    void set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy);
     void set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill);
 
     template <typename T>
@@ -271,9 +273,11 @@ class Entity
 
     virtual ~Entity() = 0;
     virtual void create_rendering_info() = 0;
+    /// Kills the entity in the most violent way possible, for example cavemen turn into gibs
     virtual void kill(bool, Entity* frm) = 0;
     virtual void on_collision1(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision2
-    virtual void v3() = 0;
+    /// Completely removes the entity from existence
+    virtual void destroy() = 0;
     virtual void apply_texture(Texture*) = 0;
     virtual void hiredhand_description(char*) = 0;
     virtual void generate_stomp_damage_particles(Entity* victim) = 0; // particles when jumping on top of enemy
@@ -304,6 +308,7 @@ class Entity
     virtual void toggle_backlayer_illumination() = 0; // for the player: when going to the backlayer, turns on player emitted light
     virtual void v32() = 0;
     virtual void liberate_from_shop() = 0; // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
+    /// Applies changes made in `entity.type`
     virtual void apply_db() = 0;
     virtual void v35() = 0;
 };
@@ -313,13 +318,13 @@ struct Inventory
     uint32_t money;
     uint8_t bombs;
     uint8_t ropes;
-    /// Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity, is wrong during the level
     int16_t poison_tick_timer;
-    /// Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity, is wrong during the level
     bool cursed;
-    /// Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity, is wrong during the level
     uint8_t health;
-    /// Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity, is wrong during the level
     uint8_t kapala_blood_amount;
 
     uint8_t unknown2;
@@ -329,7 +334,7 @@ struct Inventory
     uint8_t unknown5b;
     uint8_t unknown5c;
 
-    uint8_t player_slot;
+    int8_t player_slot;
 
     uint32_t unknown6;
     uint32_t unknown7;
@@ -350,8 +355,8 @@ struct Inventory
     int32_t unknown14;
     int32_t unknown15;
 
-    /// Companion ENT_TYPEs, used in level transition to transfer to new player entity
-    std::array<uint32_t, 8> companions;
+    /// Companion ENT_TYPEs, used in level transition to transfer to new player entity, is wrong during the level
+    std::array<ENT_TYPE, 8> companions;
 
     uint32_t unknown24;
     uint32_t unknown25;
@@ -362,11 +367,11 @@ struct Inventory
     uint32_t unknown30;
     uint32_t unknown31;
 
-    /// 0..3, used in level transition to transfer to new player entity
+    /// 0..3, used in level transition to transfer to new player entity, is wrong during the level
     std::array<uint8_t, 8> companion_trust;
-    /// Used in level transition to transfer to new player entity
+    /// Number of companions, this is always up to date, can be edited
     uint8_t companion_count;
-    /// Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity, is wrong during the level
     std::array<uint8_t, 8> companion_health;
 
     uint8_t unknown35;
@@ -375,7 +380,7 @@ struct Inventory
     uint32_t unknown38;
     uint32_t unknown39;
 
-    /// Used in level transition to transfer to new player entity
+    /// Used in level transition to transfer to new player entity, is wrong during the level
     std::array<ENT_TYPE, 30> acquired_powerups;
     uint32_t collected_money_total;
 };
@@ -396,8 +401,6 @@ class SoundPosition
     float unknown8;
     float unknown9;
 };
-
-#include "movable.hpp"
 
 struct Target
 {

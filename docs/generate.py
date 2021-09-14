@@ -30,6 +30,7 @@ header_files = [
     "../src/game_api/particles.hpp",
     "../src/game_api/savedata.hpp",
     "../src/game_api/level_api.hpp",
+    "../src/game_api/level_api_types.hpp",
     "../src/game_api/items.hpp",
     "../src/game_api/screen.hpp",
     "../src/game_api/screen_arena.hpp",
@@ -518,15 +519,14 @@ for file in api_files:
         for lib in libs:
             lualibs.append(lib.replace("sol::lib::", ""))
 
-for file in api_files:
-    data = open(file, "r").read().split("\n")
-    for line in data:
-        if not line.endswith("NoAlias"):
-            m = re.search(r"using\s*(\S*)\s*=\s*(\S*)", line)
-            if m:
-                name = m.group(1)
-                type = replace_all(m.group(2), replace)
-                aliases.append({"name": name, "type": type})
+data = open("../src/game_api/aliases.hpp", "r").read().split("\n")
+for line in data:
+    if not line.endswith("NoAlias"):
+        m = re.search(r"using\s*(\S*)\s*=\s*(\S*)", line)
+        if m:
+            name = m.group(1)
+            type = replace_all(m.group(2), replace)
+            aliases.append({"name": name, "type": type})
 
 print("# Overlunky Lua API")
 print(

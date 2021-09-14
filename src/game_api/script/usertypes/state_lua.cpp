@@ -221,6 +221,8 @@ void register_usertypes(sol::state& lua)
         &LightParams::size);
     lua.new_usertype<Illumination>(
         "Illumination",
+        "lights",
+        &Illumination::lights,
         "light1",
         &Illumination::light1,
         "light2",

@@ -6,6 +6,9 @@ AcidBubble = {
   __name = "sol.AcidBubble.user",
   __newindex = "function"
 }
+Ai = {
+  __name = "sol.Ai.user"
+}
 Alien = {
   __index = "function",
   __name = "sol.Alien.user",

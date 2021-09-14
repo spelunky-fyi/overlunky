@@ -6,8 +6,6 @@
 
 #include <mutex>
 
-using TEXTURE = std::int64_t;
-
 struct TextureDefinition
 {
     std::string texture_path;

@@ -1,5 +1,6 @@
 #include "entity_lua.hpp"
 #include "entity.hpp"
+#include "movable.hpp"
 
 #include <sol/sol.hpp>
 
@@ -201,7 +202,11 @@ void register_usertypes(sol::state& lua)
         "set_layer",
         &Entity::set_layer,
         "remove",
-        &Entity::remove);
+        &Entity::remove,
+        "respawn",
+        &Entity::respawn,
+        "destroy",
+        &Entity::destroy);
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -210,6 +215,8 @@ void register_usertypes(sol::state& lua)
         &Movable::movey,
         "buttons",
         &Movable::buttons,
+        "buttons_previous",
+        &Movable::buttons_previous,
         "stand_counter",
         &Movable::stand_counter,
         "jump_height_multiplier",

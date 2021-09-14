@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.1a"
+meta.version = "2.1b"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -1456,6 +1456,7 @@ local function dead_osiris()
 end
 
 local function duat_door()
+    if not options.door then return end
     -- spawn duat skip door
     spawn_door(17, 106, 0, level_order[state.level_count+1].w, level_order[state.level_count+1].l, level_order[state.level_count+1].t)
     spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
@@ -1561,7 +1562,7 @@ set_callback(function()
 end, ON.LOADING)
 
 set_callback(function(ctx)
-    if boss_warp and state.screen == ON.TRANSITION then
+    if boss_warp and state.screen == ON.TRANSITION and options.door then
         local color = prng:random(0, 0xffffffff)
         local _, size = get_window_size()
         size = size / 5
@@ -1662,6 +1663,20 @@ set_callback(function()
         else
             boss_warp = false
         end
+    elseif state.theme == THEME.VOLCANA and test_flag(state.presence_flags, 3) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
+    elseif state.theme == THEME.JUNGLE and test_flag(state.presence_flags, 2) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
     else
         boss_warp = false
     end
@@ -1734,8 +1749,11 @@ set_post_entity_spawn(function(ent)
             local x, y, l = get_position(webshot)
             local vx, vy = webshot_ent.velocityx, webshot_ent.velocityy
             local af = webshot_ent.animation_frame
+            local owner = webshot_ent.last_owner_uid
             move_entity(webshot, 0, 0, 0, 0)
-            spawn(projectiles_web[af], x, y, l, vx, vy)
+            local newshot = spawn(projectiles_web[af], x, y, l, vx, vy)
+            local newent = get_entity(newshot)
+            newent.last_owner_uid = owner
             return false
         elseif get_entity(webshot) == nil then
             return false

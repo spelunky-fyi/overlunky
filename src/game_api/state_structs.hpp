@@ -1,10 +1,8 @@
 #pragma once
 
+#include "aliases.hpp"
 #include <array>
 #include <cstdint>
-
-#define MAX_PLAYERS 4
-using ENT_TYPE = uint32_t; // NoAlias
 
 class Entity;
 
@@ -18,10 +16,19 @@ struct LightParams
 
 struct Illumination
 {
-    LightParams light1;
-    LightParams light2;
-    LightParams light3;
-    LightParams light4;
+    union
+    {
+        /// Table of light1, light2, ... etc.
+        std::array<LightParams, 4> lights;
+        struct
+        {
+            LightParams light1;
+            LightParams light2;
+            LightParams light3;
+            ///It's rendered on objects around, not as an actual bright spot
+            LightParams light4;
+        };
+    };
     float brightness;
     float brightness_multiplier;
     float light_pos_x;
@@ -31,7 +38,8 @@ struct Illumination
     float distortion;
     int32_t entity_uid;
     uint32_t timer;
-    uint32_t flags; // see flags.hpp illumination_flags
+    /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+    uint32_t flags;
     uint32_t unknown1;
     uint32_t unknown2;
 };
@@ -54,8 +62,8 @@ struct InputMapping
 
 struct PlayerSlot
 {
-    uint16_t buttons_gameplay;
-    uint16_t buttons;
+    INPUTS buttons_gameplay;
+    INPUTS buttons;
     uint32_t unknown1;
     InputMapping* input_mapping_keyboard;
     InputMapping* input_mapping_controller;

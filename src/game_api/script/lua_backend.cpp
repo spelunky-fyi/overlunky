@@ -735,6 +735,59 @@ void LuaBackend::post_level_generation()
     }
 }
 
+std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
+{
+    if (!get_enabled())
+        return std::string{};
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_GET_RANDOM_ROOM)
+        {
+            callback.lastRan = now;
+
+            std::string return_value = handle_function_with_return<std::string>(callback.func, x, y, layer, room_template).value_or(std::string{});
+            if (!return_value.empty())
+            {
+                return return_value;
+            }
+        }
+    }
+    return std::string{};
+}
+LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template)
+{
+    if (!get_enabled())
+        return {false, std::nullopt};
+
+    auto now = get_frame_count();
+
+    PreHandleRoomTilesContext ctx{room_data};
+
+    std::lock_guard lock{gil};
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_HANDLE_ROOM_TILES)
+        {
+            callback.lastRan = now;
+            if (handle_function_with_return<bool>(callback.func, x, y, room_template, ctx).value_or(false))
+            {
+                return {true, ctx.modded_room_data};
+            }
+        }
+    }
+    return {false, ctx.modded_room_data};
+}
+
 Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
 {
     if (!get_enabled())
@@ -752,7 +805,7 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
             if (type_match)
             {
-                if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay))
+                if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay, spawn_type_flags))
                 {
                     return get_entity_ptr(spawn_replacement.value());
                 }
@@ -778,7 +831,7 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
             if (type_match)
             {
-                handle_function(callback.func, lua["cast_entity"](entity));
+                handle_function(callback.func, lua["cast_entity"](entity), spawn_type_flags);
             }
         }
     }
@@ -824,8 +877,8 @@ void LuaBackend::hook_entity_dtor(Entity* entity)
     if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)
                       { return dtor_hook.first == entity->uid; }) == 0)
     {
-        std::uint32_t dtor_hook_id = entity->set_on_destroy([this](Entity* _entity)
-                                                            { pre_entity_destroyed(_entity); });
+        std::uint32_t dtor_hook_id = entity->set_on_dtor([this](Entity* _entity)
+                                                         { pre_entity_destroyed(_entity); });
         entity_dtor_hooks.push_back({entity->uid, dtor_hook_id});
     }
 }

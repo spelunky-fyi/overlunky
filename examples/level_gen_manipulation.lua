@@ -6,7 +6,7 @@ meta = {
 }
 
 -- Adds a new tilecode that just spawns a mech with a caveman
-define_tile_code("cave_mech")
+local cave_mech_tile_code = define_tile_code("cave_mech")
 set_pre_tile_code_callback(function(x, y, layer)
     local mount_id = spawn_entity(ENT_TYPE.MOUNT_MECH, x, y, layer, 0.0, 0.0)
     local rider_id = spawn_entity(ENT_TYPE.MONS_CAVEMAN, x, y, layer, 0.0, 0.0)
@@ -186,3 +186,89 @@ set_callback(function(ctx)
         ctx:set_num_extra_spawns(radio_spawns, 0, 0)
     end
 end, ON.POST_ROOM_GENERATION)
+
+-- Create a caveman_asleep50%cave_mech short tile code
+local random_cave_mech_code
+set_callback(function(ctx)
+    if state.theme == THEME.DWELLING then
+        local short_tile_code = ShortTileCodeDef:new()
+        short_tile_code.tile_code = TILE_CODE.CAVEMAN_ASLEEP
+        short_tile_code.alt_tile_code = cave_mech_tile_code
+        short_tile_code.chance = 50
+        random_cave_mech_code = ctx:define_short_tile_code(short_tile_code)
+    end
+end, ON.POST_ROOM_GENERATION)
+
+-- Replace sleeping caveman tiles with caveman_asleep50%cave_mech
+set_callback(function(x, y, room_template, ctx)
+    if state.theme == THEME.DWELLING then
+        -- Note: Don't do this! There is a specific function for replacing short tile codes, use that instead.
+        -- This is just an example for using `ctx:get_short_tile_code` and `ctx:set_short_tile_code`
+        for tx = 0, CONST.ROOM_WIDTH - 1 do
+            for ty = 0, CONST.ROOM_HEIGHT - 1 do
+                local short_tile_code = ctx:get_short_tile_code(tx, ty, LAYER.FRONT)
+                local short_tile_code_def = get_short_tile_code_definition(short_tile_code)
+                if short_tile_code_def then
+                    if short_tile_code_def.tile_code == TILE_CODE.CAVEMAN_ASLEEP then
+                        ctx:set_short_tile_code(x, y, LAYER.FRONT, random_cave_mech_code)
+                    end
+                end
+            end
+        end
+    end
+end, ON.PRE_HANDLE_ROOM_TILES)
+
+-- Add a backroom to the altar room that contains an altar, front layer only contains a idol altar
+set_callback(function(x, y, room_template, ctx)
+    if room_template == ROOM_TEMPLATE.ALTAR and not ctx:has_back_layer() then
+        local altar_short_code
+        local bone_altar_short_code
+        local floor_short_code
+        local floor_50_short_code
+        local floor_hard_short_code
+        local door2_short_code
+
+        do
+            local short_code_def = ShortTileCodeDef:new()
+            short_code_def.tile_code = TILE_CODE.ALTAR
+            altar_short_code = get_short_tile_code(short_code_def)
+            short_code_def.tile_code = TILE_CODE.IDOL_FLOOR
+            bone_altar_short_code = get_short_tile_code(short_code_def)
+            short_code_def.tile_code = TILE_CODE.FLOOR
+            floor_short_code = get_short_tile_code(short_code_def)
+            short_code_def.chance = 50
+            floor_50_short_code = get_short_tile_code(short_code_def)
+            short_code_def.tile_code = TILE_CODE.FLOOR_HARD
+            short_code_def.chance = 100
+            floor_hard_short_code = get_short_tile_code(short_code_def)
+            short_code_def.tile_code = TILE_CODE.DOOR2
+            door2_short_code = get_short_tile_code(short_code_def)
+        end
+
+        -- All of this should be available in generic.lvl but who knows
+        if not altar_short_code or
+            not floor_short_code or
+            not floor_50_short_code or
+            not floor_hard_short_code or
+            not door2_short_code then
+
+            print("Did not find some of the required short tile codes")
+            return
+        end
+
+        ctx:add_copied_back_layer()
+        ctx:replace_short_tile_code(LAYER.BACK, floor_short_code, floor_hard_short_code)
+        ctx:replace_short_tile_code(LAYER.BACK, floor_50_short_code, floor_hard_short_code)
+        ctx:replace_short_tile_code(LAYER.FRONT, altar_short_code, bone_altar_short_code)
+
+        local altar_positions = ctx:find_all_short_tile_codes(LAYER.BACK, altar_short_code)
+        for _, pos in pairs(altar_positions) do
+            local tx, ty, _ = table.unpack(pos)
+            if ctx:get_short_tile_code(tx + 1, ty, LAYER.BACK) == altar_short_code then
+                ctx:set_short_tile_code(tx - 1, ty, LAYER.BOTH, door2_short_code)
+            else
+                ctx:set_short_tile_code(tx + 1, ty, LAYER.BOTH, door2_short_code)
+            end
+        end
+    end
+end, ON.PRE_HANDLE_ROOM_TILES)
