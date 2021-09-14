@@ -1068,6 +1068,7 @@ Create a new color by specifying its values
 - [`int more_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) &Entity::more_flags
 - [`int uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) &Entity::uid
 - [`int animation_frame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) &Entity::animation_frame
+- [`int draw_depth`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) &Entity::draw_depth
 - [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &Entity::x
 - [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &Entity::y
 - [`int layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Entity::layer

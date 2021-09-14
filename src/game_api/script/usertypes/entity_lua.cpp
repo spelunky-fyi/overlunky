@@ -153,6 +153,8 @@ void register_usertypes(sol::state& lua)
         &Entity::uid,
         "animation_frame",
         &Entity::animation_frame,
+        "draw_depth",
+        &Entity::draw_depth,
         "x",
         &Entity::x,
         "y",
