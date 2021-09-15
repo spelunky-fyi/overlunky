@@ -4,6 +4,7 @@
 
 #include "entities_items.hpp"
 #include "entity.hpp"
+#include "game_manager.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -33,6 +34,7 @@
 #include "usertypes/player_lua.hpp"
 #include "usertypes/prng_lua.hpp"
 #include "usertypes/save_context.hpp"
+#include "usertypes/screen_lua.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
@@ -109,6 +111,7 @@ end
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
+    NScreen::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
@@ -123,6 +126,8 @@ end
     /// end
     /// ```
     lua["state"] = get_state_ptr();
+    /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
+    lua["game_manager"] = get_game_manager();
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Player*>(get_players());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
@@ -420,10 +425,14 @@ end
     lua["spawn_apep"] = spawn_apep;
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
+    /// NoDoc
+    /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
+    /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
+    lua["spawn_impostor_lake"] = spawn_impostor_lake;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
-    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
@@ -443,7 +452,7 @@ end
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
-    /// The callback signature is `nil post_entity_spawn(entity)`
+    /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
@@ -534,14 +543,12 @@ end
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
+
+    auto get_entities_by = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, LAYER)>(::get_entities_by),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, LAYER)>(::get_entities_by));
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
-    lua["get_entities_by"] = sol::overload(
-        [](ENT_TYPE entity_type, uint32_t mask, LAYER layer) -> std::vector<uint32_t> {
-            return get_entities_by({entity_type}, mask, layer);
-        },
-        [](std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer) -> std::vector<uint32_t> {
-            return get_entities_by(entity_types, mask, layer);
-        });
+    lua["get_entities_by"] = get_entities_by;
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
     /// You can even pass a table! Example:
     /// ```lua
@@ -576,31 +583,25 @@ end
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, layer)` instead
     lua["get_entities_by_layer"] = get_entities_by_layer;
+
+    auto get_entities_at = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, float, float, LAYER, float)>(::get_entities_at),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, float, float, LAYER, float)>(::get_entities_at));
     /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
-    lua["get_entities_at"] = sol::overload(
-        [](ENT_TYPE entity_type, uint32_t mask, float x, float y, LAYER layer, float radius) -> std::vector<uint32_t> {
-            return get_entities_at({entity_type}, mask, x, y, layer, radius);
-        },
-        [](std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius) -> std::vector<uint32_t> {
-            return get_entities_at(entity_types, mask, x, y, layer, radius);
-        });
+    lua["get_entities_at"] = get_entities_at;
+
+    auto get_entities_overlapping = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, float, float, float, float, LAYER)>(::get_entities_overlapping),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, float, float, float, float, LAYER)>(::get_entities_overlapping));
     /// Deprecated
     /// Use `get_entities_overlapping_hitbox` instead
-    lua["get_entities_overlapping"] = sol::overload(
-        [](ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer) -> std::vector<uint32_t> {
-            return get_entities_overlapping({entity_type}, mask, sx, sy, sx2, sy2, layer);
-        },
-        [](std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer) -> std::vector<uint32_t> {
-            return get_entities_overlapping(entity_types, mask, sx, sy, sx2, sy2, layer);
-        });
+    lua["get_entities_overlapping"] = get_entities_overlapping;
+
+    auto get_entities_overlapping_hitbox = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, AABB, LAYER)>(::get_entities_overlapping_hitbox),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, AABB, LAYER)>(::get_entities_overlapping_hitbox));
     /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
-    lua["get_entities_overlapping_hitbox"] = sol::overload(
-        [](ENT_TYPE entity_type, uint32_t mask, AABB hitbox, LAYER layer) -> std::vector<uint32_t> {
-            return get_entities_overlapping_hitbox({entity_type}, mask, hitbox, layer);
-        },
-        [](std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer) -> std::vector<uint32_t> {
-            return get_entities_overlapping_hitbox(entity_types, mask, hitbox, layer);
-        });
+    lua["get_entities_overlapping_hitbox"] = get_entities_overlapping_hitbox;
     /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
     /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
     lua["attach_entity"] = attach_entity_by_uid;
@@ -646,25 +647,19 @@ end
     lua["spawn_over"] = spawn_entity_over;
     /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
+
+    auto entity_has_item_type = sol::overload(
+        static_cast<bool (*)(uint32_t, ENT_TYPE)>(::entity_has_item_type),
+        static_cast<bool (*)(uint32_t, std::vector<ENT_TYPE>)>(::entity_has_item_type));
     /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
-    lua["entity_has_item_type"] = sol::overload(
-        [](uint32_t uid, ENT_TYPE entity_type) -> bool
-        {
-            return entity_has_item_type(uid, {entity_type});
-        },
-        [](uint32_t uid, std::vector<ENT_TYPE> entity_types) -> bool
-        {
-            return entity_has_item_type(uid, entity_types);
-        });
+    lua["entity_has_item_type"] = entity_has_item_type;
+
+    auto entity_get_items_by = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(uint32_t, ENT_TYPE, uint32_t)>(::entity_get_items_by),
+        static_cast<std::vector<uint32_t> (*)(uint32_t, std::vector<ENT_TYPE>, uint32_t)>(::entity_get_items_by));
     /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
-    lua["entity_get_items_by"] = sol::overload(
-        [](uint32_t uid, ENT_TYPE entity_type, uint32_t mask) -> std::vector<uint32_t> {
-            return entity_get_items_by(uid, {entity_type}, mask);
-        },
-        [](uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask) -> std::vector<uint32_t> {
-            return entity_get_items_by(uid, entity_types, mask);
-        });
-    /// Kills an entity by uid.
+    lua["entity_get_items_by"] = entity_get_items_by;
+    /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
     /// ```lua
@@ -851,6 +846,63 @@ end
         return (uint16_t)0;
     };
 
+    /// Clears a callback that is specific to a screen.
+    lua["clear_screen_callback"] = [](int screen_id, CallbackId cb_id)
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->clear_screen_hooks.push_back({screen_id, cb_id});
+    };
+
+    /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+    /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
+    lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Screen* screen = get_screen_ptr(screen_id))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = screen->reserve_callback_id();
+            screen->set_pre_render(
+                id,
+                [=, fun = std::move(fun)](Screen* self)
+                {
+                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
+                    {
+                        return false;
+                    }
+
+                    VanillaRenderContext render_ctx;
+                    return backend->handle_function_with_return<bool>(fun, self, render_ctx).value_or(false);
+                });
+            backend->screen_hooks.push_back({screen_id, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+    /// Sets a callback that is called right after the screen is drawn.
+    lua["set_post_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Screen* screen = get_screen_ptr(screen_id))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = screen->reserve_callback_id();
+            screen->set_post_render(
+                id,
+                [=, fun = std::move(fun)](Screen* self)
+                {
+                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
+                    {
+                        return;
+                    }
+                    VanillaRenderContext render_ctx;
+                    backend->handle_function(fun, self, render_ctx);
+                });
+            backend->screen_hooks.push_back({screen_id, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+
     /// Clears a callback that is specific to an entity.
     lua["clear_entity_callback"] = [](int uid, CallbackId cb_id)
     {
@@ -871,7 +923,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
 
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
@@ -895,12 +947,37 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(movable);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+    /// The callback signature is `nil on_destroy(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_destroy"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_destroy(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
+                    backend->handle_function(fun, lua["cast_entity"](self));
+                });
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -920,7 +997,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
@@ -946,7 +1023,7 @@ end
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
                 {
-                    if (backend->is_entity_callback_cleared({uid, id}))
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
 
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
@@ -1043,6 +1120,10 @@ end
         ON::POST_ROOM_GENERATION,
         "POST_LEVEL_GENERATION",
         ON::POST_LEVEL_GENERATION,
+        "PRE_GET_RANDOM_ROOM",
+        ON::PRE_GET_RANDOM_ROOM,
+        "PRE_HANDLE_ROOM_TILES",
+        ON::PRE_HANDLE_ROOM_TILES,
         "SCRIPT_ENABLE",
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
@@ -1081,6 +1162,17 @@ end
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
     // Runs right level generation is done, before any entities are updated
+    // PRE_GET_RANDOM_ROOM
+    // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
+    // Return: `string room_data`
+    // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
+    // If the size of the string returned does not match with the room templates expected size the room is discarded.
+    // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
+    // PRE_HANDLE_ROOM_TILES
+    // Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`
+    // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
+    // Runs after a random room was selected and right before it would spawn entities for each tile code
+    // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -1112,6 +1204,8 @@ end
         SPAWN_TYPE_LEVEL_GEN_TILE_CODE,
         "LEVEL_GEN_PROCEDURAL",
         SPAWN_TYPE_LEVEL_GEN_PROCEDURAL,
+        "LEVEL_GEN_FLOOR_SPREADING",
+        SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING,
         "LEVEL_GEN_GENERAL",
         SPAWN_TYPE_LEVEL_GEN_GENERAL,
         "SCRIPT",
@@ -1127,6 +1221,8 @@ end
     // Similar to LEVEL_GEN but only triggers on tile code spawns.
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+    // LEVEL_GEN_FLOOR_SPREADING
+    // Only procs during floor spreading, both horizontal and vertical
     // LEVEL_GEN_GENERAL
     // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT

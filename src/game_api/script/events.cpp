@@ -37,6 +37,39 @@ void post_level_generation()
         });
 }
 
+std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
+{
+    std::string manual_room_data{};
+    LuaBackend::for_each_backend(
+        [=, &manual_room_data](LuaBackend& backend)
+        {
+            auto this_data = backend.pre_get_random_room(x, y, layer, room_template);
+            if (!this_data.empty())
+            {
+                manual_room_data = std::move(this_data);
+                return false;
+            }
+            return true;
+        });
+    return manual_room_data;
+}
+std::optional<LevelGenRoomData> pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template)
+{
+    std::optional<LevelGenRoomData> modded_room_data{std::nullopt};
+    LuaBackend::for_each_backend(
+        [=, &room_data, &modded_room_data](LuaBackend& backend)
+        {
+            auto [stop_callback, this_modded_room_data] = backend.pre_handle_room_tiles(room_data, x, y, room_template);
+            if (this_modded_room_data)
+            {
+                room_data = this_modded_room_data.value();
+                modded_room_data = this_modded_room_data;
+            }
+            return !stop_callback;
+        });
+    return modded_room_data;
+}
+
 bool pre_tile_code_spawn(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
 {
     bool block_spawn{false};

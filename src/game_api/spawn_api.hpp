@@ -1,19 +1,22 @@
 #pragma once
 
+#include "aliases.hpp"
 #include "state.hpp"
+
 #include <cstdint>
 
 class Entity;
 
-enum SpawnType : SpawnTypeFlags
+enum SpawnType : SPAWN_TYPE
 {
     SPAWN_TYPE_LEVEL_GEN_TILE_CODE = 1 << 0,
     SPAWN_TYPE_LEVEL_GEN_PROCEDURAL = 1 << 1,
-    SPAWN_TYPE_LEVEL_GEN_GENERAL = 1 << 2,
-    SPAWN_TYPE_LEVEL_GEN = SPAWN_TYPE_LEVEL_GEN_PROCEDURAL | SPAWN_TYPE_LEVEL_GEN_TILE_CODE | SPAWN_TYPE_LEVEL_GEN_GENERAL,
-    SPAWN_TYPE_SCRIPT = 1 << 3,
-    SPAWN_TYPE_SYSTEMIC = 1 << 4,
-    SPAWN_TYPE_NUM_FLAGS = 5,
+    SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING = 1 << 2,
+    SPAWN_TYPE_LEVEL_GEN_GENERAL = 1 << 3,
+    SPAWN_TYPE_LEVEL_GEN = SPAWN_TYPE_LEVEL_GEN_PROCEDURAL | SPAWN_TYPE_LEVEL_GEN_TILE_CODE | SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING | SPAWN_TYPE_LEVEL_GEN_GENERAL,
+    SPAWN_TYPE_SCRIPT = 1 << 4,
+    SPAWN_TYPE_SYSTEMIC = 1 << 5,
+    SPAWN_TYPE_NUM_FLAGS = 6,
     SPAWN_TYPE_ANY = SPAWN_TYPE_LEVEL_GEN | SPAWN_TYPE_SCRIPT | SPAWN_TYPE_SYSTEMIC
 };
 
@@ -33,7 +36,10 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right);
 
 void spawn_tree(float x, float y, LAYER layer);
 
-void push_spawn_type_flags(SpawnTypeFlags flags);
-void pop_spawn_type_flags(SpawnTypeFlags flags);
+Entity* spawn_impostor_lake(AABB aabb, LAYER layer, float top_threshold);
+void setup_impostor_lake(Entity* lake_imposter, AABB aabb, float top_threshold);
+
+void push_spawn_type_flags(SPAWN_TYPE flags);
+void pop_spawn_type_flags(SPAWN_TYPE flags);
 
 void init_spawn_hooks();

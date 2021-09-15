@@ -77,6 +77,13 @@ void register_usertypes(sol::state& lua)
         "set_texture",
         &ParticleDB::set_texture);
 
+    lua.new_usertype<ParticleEmitterInfo>(
+        "ParticleEmitterInfo",
+        "particle_type",
+        &ParticleEmitterInfo::particle_type,
+        "particle_count",
+        &ParticleEmitterInfo::particle_count);
+
     lua.create_named_table("PARTICLEEMITTER"
                            //, "TITLE_TORCHFLAME_SMOKE", 1
                            //, "", ...check__[particle_emitters.txt]\[game_data/particle_emitters.txt\]...

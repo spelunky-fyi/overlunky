@@ -45,7 +45,20 @@ void register_usertypes(sol::state& lua)
         "held_item_metadata",
         &Inventory::held_item_metadata,
         "player_slot",
-        &Inventory::player_slot,
+        sol::property([](Inventory& i) -> int8_t
+                      {
+                          if (i.player_slot >= 0)
+                              return i.player_slot + 1;
+                          else
+                              return i.player_slot;
+                      },
+                      [](Inventory& i, int8_t s)
+                      {
+                          if (s > 0)
+                              i.player_slot = s - 1;
+                          else
+                              i.player_slot = -1;
+                      }),
         "mount_type",
         &Inventory::mount_type,
         "mount_metadata",

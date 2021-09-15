@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entities_chars.hpp"
+#include "screen.hpp"
 #include "state.hpp"
 #include <cstdint>
 #include <vector>
@@ -25,6 +26,7 @@ void set_hud_flags(uint32_t flags);
 uint32_t get_hud_flags();
 void set_pause(uint8_t pause);
 void player_status();
+Screen* get_screen_ptr(uint32_t screen_id);
 Entity* get_entity_ptr(uint32_t uid);
 ENT_TYPE get_entity_type(uint32_t uid);
 int get_entity_ai_state(uint32_t uid);
@@ -37,27 +39,33 @@ float screen_distance(float x);
 float get_zoom_level();
 std::vector<uint32_t> get_entities();
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer);
-template <typename... Args>
-std::vector<uint32_t> get_entities_by_type(Args... args);
+std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER layer);
 std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types);
+std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type);
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask);
 std::vector<uint32_t> get_entities_by_layer(LAYER layer);
 std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius);
+std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float x, float y, LAYER layer, float radius);
 std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer);
+std::vector<uint32_t> get_entities_overlapping_hitbox(ENT_TYPE entity_type, uint32_t mask, AABB hitbox, LAYER layer);
 std::vector<uint32_t> get_entities_overlapping(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer);
+std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer);
 std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer);
+std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer);
 void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t);
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid);
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type);
 void entity_remove_item(uint32_t id, uint32_t item_uid);
 bool entity_has_item_uid(uint32_t uid, uint32_t item_uid);
 bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types);
+bool entity_has_item_type(uint32_t uid, ENT_TYPE entity_type);
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask);
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask);
 void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
 uint32_t get_frame_count();
 void carry(uint32_t mount_uid, uint32_t rider_uid);
-void kill_entity(uint32_t uid);
+void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse = std::nullopt);
 void destroy_entity(uint32_t uid);
 void apply_entity_db(uint32_t uid);
 void flip_entity(uint32_t uid);

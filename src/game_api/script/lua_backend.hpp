@@ -3,6 +3,7 @@
 #include "drops.hpp"
 #include "entities_chars.hpp"
 #include "entity.hpp"
+#include "level_api_types.hpp"
 #include "script.hpp"
 #include "window_api.hpp"
 
@@ -64,6 +65,8 @@ enum class ON
     PRE_LEVEL_GENERATION,
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
+    PRE_GET_RANDOM_ROOM,
+    PRE_HANDLE_ROOM_TILES,
     SCRIPT_ENABLE,
     SCRIPT_DISABLE,
     RENDER_PRE_HUD,
@@ -196,6 +199,8 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
+    std::vector<std::pair<int, std::uint32_t>> screen_hooks;
+    std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<std::string> required_scripts;
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
@@ -247,6 +252,7 @@ class LuaBackend
 
     bool is_callback_cleared(int32_t callback_id);
     bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
+    bool is_screen_callback_cleared(std::pair<int, uint32_t> callback_id);
 
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
@@ -255,6 +261,14 @@ class LuaBackend
     void pre_level_generation();
     void post_room_generation();
     void post_level_generation();
+
+    std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
+    struct PreHandleRoomTilesResult
+    {
+        bool stop_callback;
+        std::optional<LevelGenRoomData> modded_room_data;
+    };
+    PreHandleRoomTilesResult pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template);
 
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);
@@ -306,9 +320,12 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
         try
         {
             auto return_type = lua_result.get_type();
-            return return_type == sol::type::none || return_type == sol::type::nil
-                       ? std::optional<Ret>{}
-                       : std::optional{static_cast<Ret>(lua_result)};
+            if (return_type == sol::type::none || return_type == sol::type::nil)
+            {
+                return std::optional<Ret>{};
+            }
+            Ret return_value = lua_result;
+            return return_value;
         }
         catch (...)
         {

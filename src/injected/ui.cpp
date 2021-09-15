@@ -2527,7 +2527,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         {
             for (unsigned int y = 0; y < g_state->h; ++y)
             {
-                auto room_temp = g_state->level_gen->get_room_template(x, y, (LAYER)g_players.at(0)->layer);
+                auto room_temp = g_state->level_gen->get_room_template(x, y, g_players.at(0)->layer);
                 if (room_temp.has_value())
                 {
                     auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
@@ -2678,7 +2678,7 @@ void render_messages()
         NULL,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
 
     const float font_size = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
@@ -2746,7 +2746,7 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto entity : get_entities_by({0}, 255, LAYER::PLAYER))
+        for (auto entity : get_entities_by(0, 255, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)
@@ -2754,7 +2754,7 @@ void render_clickhandler()
             if (entity_names[type].find("FX") == std::string::npos)
                 render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
         }
-        for (auto entity : get_entities_by({0}, 0x100, LAYER::PLAYER))
+        for (auto entity : get_entities_by(0, 0x100, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)
@@ -3838,16 +3838,29 @@ void render_entity_props()
         g_entity->overlay = nullptr;
         g_entity->y -= 1000.0;
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Move the entity under the level,\nlike it just fell in to the void.");
     ImGui::SameLine();
     if (ImGui::Button("Kill##KillEntity"))
     {
         g_entity->kill(true, nullptr);
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Kill the entity,\nlike it received damage and died.");
     ImGui::SameLine();
-    if (ImGui::Button("Remove##RemoveEntity"))
+    if (ImGui::Button("Rem##RemoveEntity"))
     {
         g_entity->remove();
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Move the entity to limbo layer,\nlike it exists but doesn't do anything.");
+    ImGui::SameLine();
+    if (ImGui::Button("Dstr##DestroyEntity"))
+    {
+        g_entity->destroy();
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
     if (ImGui::CollapsingHeader("State"))
     {
         render_state("Current state", g_entity->state);

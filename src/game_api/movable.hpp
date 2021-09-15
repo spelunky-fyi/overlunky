@@ -74,9 +74,9 @@ class Movable : public Entity
     virtual void adjust_health(int8_t amount) = 0;      // called for dealing damage (neg amount) by the game, but not for gaining health (turkey, motherstatue), even though that works too (and there is even a max health check of 0x63)
     virtual void v45() = 0;
     virtual void v46() = 0;
-    virtual void on_flying_object_collision(Entity* victim) = 0;                                          // stuff like flying rocks, broken arrows hitting the player
-    virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint8_t unknown = 1) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost); unknown param = 2 when hired hand gets hit by player
-    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                               // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
+    virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
+    virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
+    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                       // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
     virtual void v50() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
@@ -124,6 +124,9 @@ class Movable : public Entity
 
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
     bool is_poisoned();
+
+    /// Damage the movable by the specified amount, stuns it for the specified amount of frames and applies the velocities
+    void damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
 
     bool is_button_pressed(BUTTON button);
     bool is_button_held(BUTTON button);

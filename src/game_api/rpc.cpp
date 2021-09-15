@@ -4,6 +4,7 @@
 #include "entities_floors.hpp"
 #include "entities_mounts.hpp"
 #include "entity.hpp"
+#include "game_manager.hpp"
 #include "logger.h"
 #include "state.hpp"
 #include "virtual_table.hpp"
@@ -274,6 +275,134 @@ void player_status()
     status->bombs = (99);
 }
 
+Screen* get_screen_ptr(uint32_t screen_id)
+{
+    auto game_manager = get_game_manager();
+    auto state = get_state_ptr();
+    switch (screen_id)
+    {
+    case 0:
+    {
+        return game_manager->screen_logo;
+    }
+    case 1:
+    {
+        return game_manager->screen_intro;
+    }
+    case 2:
+    {
+        return game_manager->screen_prologue;
+    }
+    case 3:
+    {
+        return game_manager->screen_title;
+    }
+    case 4:
+    {
+        return game_manager->screen_menu;
+    }
+    case 5:
+    {
+        return game_manager->screen_options;
+    }
+    case 6:
+    {
+        return game_manager->screen_player_profile;
+    }
+    case 7:
+    {
+        return game_manager->screen_leaderboards;
+    }
+    case 8:
+    {
+        return game_manager->screen_seed_input;
+    }
+    case 9:
+    {
+        return game_manager->screen_character_select;
+    }
+    case 10:
+    {
+        return state->screen_team_select;
+    }
+    case 11:
+    {
+        // a screen_camp also exists in State, but its buttons flags do not work, so we use GameManager's one
+        return game_manager->screen_camp;
+    }
+    case 12:
+    {
+        // a screen_level also exists in State
+        return game_manager->screen_level;
+    }
+    case 13:
+    {
+        return state->screen_transition;
+    }
+    case 14:
+    {
+        return state->screen_death;
+    }
+    // 15 = spaceship -> the spots in State and GameManager where this should be are both nullptr -> has no UI
+    case 16:
+    {
+        return state->screen_win;
+    }
+    case 17:
+    {
+        return state->screen_credits;
+    }
+    case 18:
+    {
+        return state->screen_scores;
+    }
+    case 19:
+    {
+        return state->screen_constellation;
+    }
+    case 20:
+    {
+        return state->screen_recap;
+    }
+    case 21:
+    {
+        return game_manager->screen_arena_menu;
+    }
+    case 22:
+    case 24:
+    {
+        return state->screen_arena_stages_select1;
+    }
+    case 23:
+    {
+        return game_manager->screen_arena_items;
+    }
+    case 25:
+    {
+        return state->screen_arena_intro;
+    }
+    case 26:
+    {
+        // the one in GameManager has no UI entries
+        return state->screen_arena_level;
+    }
+    case 27:
+    {
+        return state->screen_arena_score;
+    }
+    case 28:
+    {
+        return game_manager->screen_online_loading;
+    }
+    case 29:
+    {
+        return game_manager->screen_online_lobby;
+    }
+    }
+    DEBUG("Screen pointer requested for unknown screen ID: {}", screen_id);
+    return nullptr;
+}
+
 Entity* get_entity_ptr(uint32_t uid)
 {
     auto state = State::get();
@@ -336,12 +465,12 @@ float screen_distance(float x)
 
 std::vector<uint32_t> get_entities()
 {
-    return get_entities_by({0}, 0, LAYER::BOTH);
+    return get_entities_by({}, 0, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 {
-    return get_entities_by({0}, 0, layer);
+    return get_entities_by({}, 0, layer);
 }
 
 std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
@@ -362,17 +491,14 @@ std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
     }
     return found;
 }
-
-template <typename... Args>
-std::vector<uint32_t> get_entities_by_type(Args... args)
+std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type)
 {
-    std::vector<ENT_TYPE> types = {args...};
-    return get_entities_by_type(types);
+    return get_entities_by_type(std::vector<ENT_TYPE>{entity_type});
 }
 
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
 {
-    return get_entities_by({0}, mask, LAYER::BOTH);
+    return get_entities_by({}, mask, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
@@ -407,6 +533,10 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
         }
     }
     return found;
+}
+std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER layer)
+{
+    return get_entities_by(std::vector<ENT_TYPE>{entity_type}, mask, layer);
 }
 
 std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
@@ -446,6 +576,10 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     }
     return found;
 }
+std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
+{
+    return get_entities_at(std::vector<ENT_TYPE>{entity_type}, mask, x, y, layer, radius);
+}
 
 std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
 {
@@ -465,10 +599,18 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> enti
     }
     return result;
 }
+std::vector<uint32_t> get_entities_overlapping_hitbox(ENT_TYPE entity_type, uint32_t mask, AABB hitbox, LAYER layer)
+{
+    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, hitbox, layer);
+}
 
 std::vector<uint32_t> get_entities_overlapping(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
     return get_entities_overlapping_hitbox(entity_types, mask, {sx, sy2, sx2, sy}, layer);
+}
+std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+{
+    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, {sx, sy2, sx2, sy}, layer);
 }
 
 std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
@@ -482,6 +624,10 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
         }
     }
     return found;
+}
+std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
+{
+    return get_entities_overlapping_by_pointer(std::vector<ENT_TYPE>{entity_type}, mask, sx, sy, sx2, sy2, layer);
 }
 
 void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
@@ -555,7 +701,11 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
         }
     }
     return false;
-};
+}
+bool entity_has_item_type(uint32_t uid, ENT_TYPE entity_type)
+{
+    return entity_has_item_type(uid, std::vector<ENT_TYPE>{entity_type});
+}
 
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask)
 {
@@ -581,10 +731,14 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
     }
     return found;
 }
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask)
+{
+    return entity_get_items_by(uid, std::vector<ENT_TYPE>{entity_type}, mask);
+}
 
 void lock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at({0}, 0, x, y, LAYER::FRONT, 1);
+    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);
@@ -604,7 +758,7 @@ void lock_door_at(float x, float y)
 
 void unlock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at({0}, 0, x, y, LAYER::FRONT, 1);
+    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);
@@ -637,11 +791,11 @@ void carry(uint32_t mount_uid, uint32_t rider_uid)
     mount->carry(rider);
 }
 
-void kill_entity(uint32_t uid)
+void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
-        ent->kill(true, nullptr);
+        ent->kill(destroy_corpse.value_or(true), nullptr);
 }
 
 void destroy_entity(uint32_t uid)
@@ -1108,25 +1262,26 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
 void set_journal_enabled(bool b)
 {
     static size_t offset = 0;
-    static char original_call_instruction[5] = {0};
+    static char original_instruction[2] = {0};
     if (offset == 0)
     {
         auto memory = Memory::get();
         auto exe = memory.exe();
-        std::string pattern = "\x75\x1F\xF6\xC1\x08"s;
-        offset = memory.at_exe(find_inst(exe, pattern, memory.after_bundle) + 14);
-        for (uint8_t x = 0; x < 5; ++x)
+
+        std::string pattern = "\x45\x33\xC9\x48\x8B\xCB\x45\x33\xC0"s;
+        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        for (uint8_t x = 0; x < 2; ++x)
         {
-            original_call_instruction[x] = read_u8(offset + x);
+            original_instruction[x] = read_u8(offset + x);
         }
     }
     if (b)
     {
-        write_mem_prot(offset, std::string(original_call_instruction, 5), true);
+        write_mem_prot(offset, std::string(original_instruction, 2), true);
     }
     else
     {
-        write_mem_prot(offset, "\x90\x90\x90\x90\x90"s, true);
+        write_mem_prot(offset, "\xC3\x90"s, true);
     }
 }
 

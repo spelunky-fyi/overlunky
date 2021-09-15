@@ -13,6 +13,7 @@ header_files = [
     "../src/game_api/color.hpp",
     "../src/game_api/entity.hpp",
     "../src/game_api/movable.hpp",
+    "../src/game_api/game_manager.hpp",
     "../src/game_api/state.hpp",
     "../src/game_api/state_structs.hpp",
     "../src/game_api/prng.hpp",
@@ -29,7 +30,10 @@ header_files = [
     "../src/game_api/particles.hpp",
     "../src/game_api/savedata.hpp",
     "../src/game_api/level_api.hpp",
+    "../src/game_api/level_api_types.hpp",
     "../src/game_api/items.hpp",
+    "../src/game_api/screen.hpp",
+    "../src/game_api/screen_arena.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
@@ -68,6 +72,7 @@ api_files = [
     "../src/game_api/script/usertypes/flags_lua.cpp",
     "../src/game_api/script/usertypes/char_state_lua.cpp",
     "../src/game_api/script/usertypes/hitbox_lua.cpp",
+    "../src/game_api/script/usertypes/screen_lua.cpp",
 ]
 rpc = []
 classes = []
