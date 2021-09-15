@@ -334,7 +334,7 @@ struct Inventory
     ENT_TYPE held_item;
     /// Metadata of the held item (health, is cursed etc.) Used in level transition to transfer to new entity, is wrong during the level
     int16_t held_item_metadata;
-    uint8_t unknown5c;          //padding?
+    uint8_t unknown5c; //padding?
 
     int8_t player_slot;
     /// Used in level transition to transfer to new player entity, is wrong during the level
