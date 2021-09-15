@@ -35,7 +35,17 @@ class Movable : public Entity
     uint8_t health;
     uint16_t stun_timer;
     uint16_t stun_state;
-    uint32_t some_state;
+    union
+    { // weird fix to not break compatibility with already exposed some_state
+        /// Deprecated, it's the same as lock_input_timer, but this name makes no sense
+        uint32_t some_state;
+        struct
+        {
+            /// Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
+            uint16_t lock_input_timer;
+            uint16_t unknown; // fading the entity to black, similar to dark_shadow_timer
+        };
+    };
     int16_t poison_tick_timer;
     uint8_t dark_shadow_timer;
     uint8_t exit_invincibility_timer;
@@ -43,14 +53,14 @@ class Movable : public Entity
     uint8_t frozen_timer;
     uint8_t unknown_damage_counter_a;
     uint8_t unknown_damage_counter_b;
-    uint8_t i120a;
-    uint8_t i120b;
-    uint8_t i120c;
+    uint8_t i120a; // timer, damage related
+    uint8_t i120b; // timer
+    uint8_t i120c; // timer
     uint8_t i120d;
     uint8_t b124;
     /// airtime = falling_timer
     uint8_t falling_timer;
-    uint8_t b126;
+    uint8_t b126; // timer, after layer change?
     uint8_t b127;
 
     virtual bool can_jump() = 0;

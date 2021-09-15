@@ -1122,7 +1122,12 @@ Derived from [`Entity`](#entity)
 - [`int health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) &Movable::health
 - [`int stun_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_timer) &Movable::stun_timer
 - [`int stun_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_state) &Movable::stun_state
+- [`int lock_input_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_input_timer) &Movable::lock_input_timer
+\
+Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
 - [`int some_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_state) &Movable::some_state
+\
+Deprecated, it's the same as lock_input_timer, but this name makes no sense
 - [`int airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::falling_timer
 \
 airtime = falling_timer

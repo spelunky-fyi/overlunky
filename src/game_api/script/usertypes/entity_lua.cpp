@@ -245,6 +245,8 @@ void register_usertypes(sol::state& lua)
         &Movable::stun_timer,
         "stun_state",
         &Movable::stun_state,
+        "lock_input_timer",
+        &Movable::lock_input_timer,
         "some_state",
         &Movable::some_state,
         "airtime",
