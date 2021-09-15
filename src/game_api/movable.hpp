@@ -43,7 +43,7 @@ class Movable : public Entity
         {
             /// Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
             uint16_t lock_input_timer;
-            uint16_t unknown; // fading the entity to black, similar to dark_shadow_timer
+            uint16_t unknown_16; // fading the entity to black, similar to dark_shadow_timer
         };
     };
     int16_t poison_tick_timer;
