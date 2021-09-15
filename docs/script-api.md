@@ -1185,7 +1185,19 @@ Used in level transition to transfer to new player entity, is wrong during the l
 - [`int kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Inventory::kapala_blood_amount
 \
 Used in level transition to transfer to new player entity, is wrong during the level
+- [`ENT_TYPE held_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item) &Inventory::held_item
+\
+Used in level transition to transfer to new player entity, is wrong during the level
+- [`int held_item_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item_metadata) &Inventory::held_item_metadata
+\
+Metadata of the held item (health, is cursed etc.) Used in level transition to transfer to new entity, is wrong during the level
 - [`int player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) &Inventory::player_slot
+- [`ENT_TYPE mount_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_type) &Inventory::mount_type
+\
+Used in level transition to transfer to new player entity, is wrong during the level
+- [`int mount_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_metadata) &Inventory::mount_metadata
+\
+Metadata of the mount (health, is cursed etc.) Used in level transition to transfer to new player entity, is wrong during the level
 - [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
 - [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
 - [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total
@@ -1195,13 +1207,22 @@ Used in level transition to transfer to new player entity, is wrong during the l
 - [`int companion_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_count) &Inventory::companion_count
 \
 Number of companions, this is always up to date, can be edited
+- [`array<int, 8> companion_poison_tick_timers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_poison_tick_timers) &Inventory::companion_poison_tick_timers
+\
+Companions poison tick timers, used in level transition to transfer to new player entity, is wrong during the level
 - [`array<ENT_TYPE, 8> companions`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companions) &Inventory::companions
 \
 Companion ENT_TYPEs, used in level transition to transfer to new player entity, is wrong during the level
+- [`array<ENT_TYPE, 8> companion_held_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_items) &Inventory::companion_held_items
+\
+Items ENT_TYPE held by companions, used in level transition to transfer to new player entity, is wrong during the level
 - [`array<int, 8> companion_trust`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_trust) &Inventory::companion_trust
 \
 0..3, used in level transition to transfer to new player entity, is wrong during the level
 - [`array<int, 8> companion_health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_health) &Inventory::companion_health
+\
+Used in level transition to transfer to new player entity, is wrong during the level
+- [`array<bool, 8> is_companion_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_companion_cursed) &Inventory::is_companion_cursed
 \
 Used in level transition to transfer to new player entity, is wrong during the level
 ### `Ai`
