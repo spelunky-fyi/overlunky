@@ -384,7 +384,7 @@ void register_usertypes(sol::state& lua)
         }
     };
     /// Create image from file. Returns a tuple containing id, width and height.
-    lua["create_image"] = [](std::string path) -> std::tuple<size_t, int, int>
+    lua["create_image"] = [](std::string path) -> std::tuple<int64_t, int, int>
     {
         ScriptImage* image = new ScriptImage;
         image->width = 0;
@@ -394,7 +394,7 @@ void register_usertypes(sol::state& lua)
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (create_d3d11_texture_from_file((std::filesystem::path{backend->get_root_path()} / path).string().data(), &image->texture, &image->width, &image->height))
         {
-            size_t id = backend->images.size();
+            int64_t id = static_cast<int64_t>(backend->images.size());
             backend->images[id] = image;
             return std::make_tuple(id, image->width, image->height);
         }

@@ -53,7 +53,7 @@ void register_usertypes(sol::state& lua)
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
         "AABB",
-        sol::constructors<AABB(), AABB(float, float, float, float)>{},
+        sol::constructors<AABB(), AABB(const AABB&), AABB(float, float, float, float)>{},
         "overlaps_with",
         &AABB::overlaps_with,
         "left",

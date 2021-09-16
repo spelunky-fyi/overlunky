@@ -65,18 +65,24 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         }
     };
 
-    auto play = sol::overload(
-        static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
-        static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
-        static_cast<PlayingSound (CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
-    /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
-    /// It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
-    lua.new_usertype<CustomSound>(
-        "CustomSound",
-        "play",
-        play,
-        "get_parameters",
-        &CustomSound::get_parameters);
+    {
+        auto play = sol::overload(
+            static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
+            static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
+            static_cast<PlayingSound(CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
+        auto get_parameters = [](CustomSound& self) {
+            return sol::as_table(self.get_parameters());
+        };
+        /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
+        /// It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
+        lua.new_usertype<CustomSound>(
+            "CustomSound",
+            "play",
+            play,
+            "get_parameters",
+            get_parameters);
+    }
+
     auto set_callback = [](PlayingSound* sound, sol::function callback)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
@@ -87,6 +93,9 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
                 backend->handle_function(callback);
         };
         sound->set_callback(std::move(safe_cb));
+    };
+    auto get_parameters = [](PlayingSound& self) {
+        return sol::as_table(self.get_parameters());
     };
     /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
     /// You can just discard this handle if you do not need extended control anymore
@@ -111,7 +120,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "set_callback",
         std::move(set_callback),
         "get_parameters",
-        &PlayingSound::get_parameters,
+        get_parameters,
         "get_parameter",
         &PlayingSound::get_parameter,
         "set_parameter",

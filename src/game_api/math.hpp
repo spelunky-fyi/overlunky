@@ -5,6 +5,9 @@ struct AABB
     /// Create a new axis aligned bounding box - defaults to all zeroes
     AABB() = default;
 
+    /// Copy an axis aligned bounding box
+    AABB(const AABB&) = default;
+
     /// Create a new axis aligned bounding box by specifying its values
     AABB(float left_, float top_, float right_, float bottom_)
         : left(left_), top(top_), right(right_), bottom(bottom_)
