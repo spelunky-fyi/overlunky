@@ -67,10 +67,11 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
     {
         auto play = sol::overload(
-            static_cast<PlayingSound(CustomSound::*)()>(&CustomSound::play),
-            static_cast<PlayingSound(CustomSound::*)(bool)>(&CustomSound::play),
-            static_cast<PlayingSound(CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
-        auto get_parameters = [](CustomSound& self) {
+            static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
+            static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
+            static_cast<PlayingSound (CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
+        auto get_parameters = [](CustomSound& self)
+        {
             return sol::as_table(self.get_parameters());
         };
         /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
@@ -94,7 +95,8 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         };
         sound->set_callback(std::move(safe_cb));
     };
-    auto get_parameters = [](PlayingSound& self) {
+    auto get_parameters = [](PlayingSound& self)
+    {
         return sol::as_table(self.get_parameters());
     };
     /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
