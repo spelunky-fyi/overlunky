@@ -50,7 +50,9 @@ void register_usertypes(sol::state& lua)
         "fuchsia",
         &Color::fuchsia,
         "purple",
-        &Color::purple);
+        &Color::purple,
+        "get_ucolor",
+        &Color::get_ucolor);
     lua.new_usertype<Animation>(
         "Animation",
         "first_tile",

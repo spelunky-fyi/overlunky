@@ -98,4 +98,11 @@ struct Color
     float g;
     float b;
     float a;
+    /// Returns the `uColor` used in `GuiDrawContext` drawing functions
+    uColor get_ucolor()
+    {
+        auto toRGB = [](float c)
+        { return static_cast<uint8_t>(round(255 * fmin(fmax(c, 0.0f), 1.0f))); };
+        return (toRGB(a) << 24) + (toRGB(b) << 16) + (toRGB(g) << 8) + (toRGB(r));
+    }
 };
