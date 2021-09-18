@@ -478,6 +478,9 @@ Determines when the ghost appears, either when the player is cursed or not
 ### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
 `nil set_journal_enabled(bool b)`<br/>
 Enables or disables the journal
+### [`set_camp_camera_bounds_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camp_camera_bounds_enabled)
+`nil set_camp_camera_bounds_enabled(bool b)`<br/>
+Enables or disables the default position based camp camera bounds, to set them manually yourself
 ### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
 `int waddler_count_entity(ENT_TYPE entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
@@ -745,7 +748,7 @@ function on_guiframe(draw_ctx)
 end
 ```
 ### [`create_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
-`tuple<size_t, int, int> create_image(string path)`<br/>
+`tuple<int, int, int> create_image(string path)`<br/>
 Create image from file. Returns a tuple containing id, width and height.
 ### [`mouse_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouse_position)
 `tuple<float, float> mouse_position()`<br/>
@@ -2863,7 +2866,7 @@ It is up to you to not release this as long as any sounds returned by `CustomSou
 - [`PlayingSound play()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) play
 - [`PlayingSound play(bool paused)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) play
 - [`PlayingSound play(bool paused, SOUND_TYPE sound_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) play
-- [`map<VANILLA_SOUND_PARAM, string> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) &CustomSound::get_parameters
+- [`map<VANILLA_SOUND_PARAM, string> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) get_parameters
 ### `PlayingSound`
 Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
 You can just discard this handle if you do not need extended control anymore
@@ -2876,7 +2879,7 @@ You can just discard this handle if you do not need extended control anymore
 - [`bool set_volume(float volume)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume) &PlayingSound::set_volume
 - [`bool set_looping(SOUND_LOOP_MODE loop_mode)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_looping) &PlayingSound::set_looping
 - [`bool set_callback(SoundCallbackFunction callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback) set_callback
-- [`map<VANILLA_SOUND_PARAM, string> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) &PlayingSound::get_parameters
+- [`map<VANILLA_SOUND_PARAM, string> get_parameters()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) get_parameters
 - [`optional<float> get_parameter(VANILLA_SOUND_PARAM parameter_index)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) &PlayingSound::get_parameter
 - [`bool set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) &PlayingSound::set_parameter
 ### `PlayerSlotSettings`
@@ -3070,6 +3073,9 @@ Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the s
 - [`AABB()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
 \
 Create a new axis aligned bounding box - defaults to all zeroes
+- [`AABB(const AABB&)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
+\
+Copy an axis aligned bounding box
 - [`AABB(float left_, float top_, float right_, float bottom_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
 \
 Create a new axis aligned bounding box by specifying its values
@@ -4101,6 +4107,7 @@ Any integer in the range [0, 9] is a valid class, some are however not documente
 - [`LOGICAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) 0x1000
 - [`WATER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) 0x2000
 - [`LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) 0x4000
+- [`LIQUID`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) 0x6000
 - [`ANY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) 0x0
 ### FLOOR_SIDE
 - [`TOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.TOP) FLOOR_SIDE::TOP
