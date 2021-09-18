@@ -209,7 +209,7 @@ class Entity
         auto topmost = this;
         while (auto cur = topmost->overlay)
         {
-            if (cur->type->search_flags < 0x40)
+            if (cur->type->search_flags <= 2)
             {
                 topmost = cur;
             }
