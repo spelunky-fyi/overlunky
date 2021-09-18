@@ -193,7 +193,7 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, dark_mode = false,
-     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false;
+     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
 Inventory* g_inventory = 0;
@@ -2426,6 +2426,17 @@ void render_camera()
         ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
         ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
         ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
+        if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
+        {
+            set_camp_camera_bounds_enabled(enable_camp_camera);
+            if (!enable_camp_camera)
+            {
+                g_state->camera->bounds_left = 2.5;
+                g_state->camera->bounds_right = 74.5;
+                g_state->camera->bounds_top = 126;
+                g_state->camera->bounds_bottom = 56.5;
+            }
+        }
     }
 }
 
