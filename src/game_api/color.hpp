@@ -98,11 +98,38 @@ struct Color
     float g;
     float b;
     float a;
+
+    /// Returns RGBA colors in 0..255 range
+    std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> get_rgba()
+    {
+        return {toRGB(r), toRGB(g), toRGB(b), toRGB(a)};
+    }
+    /// Changes color based on given RGBA colors in 0..255 range
+    void set_rgba(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
+    {
+        r = red / 255.0f;
+        g = green / 255.0f;
+        b = blue / 255.0f;
+        a = alpha / 255.0f;
+    }
     /// Returns the `uColor` used in `GuiDrawContext` drawing functions
     uColor get_ucolor()
     {
-        auto toRGB = [](float c)
-        { return static_cast<uint8_t>(round(255 * fmin(fmax(c, 0.0f), 1.0f))); };
         return (toRGB(a) << 24) + (toRGB(b) << 16) + (toRGB(g) << 8) + (toRGB(r));
+    }
+    /// Changes color based on given uColor
+    void set_ucolor(uColor color)
+    {
+        uint8_t red = color & 0xFF;
+        uint8_t green = (color >> 8) & 0xFF;
+        uint8_t blue = (color >> 16) & 0xFF;
+        uint8_t alpha = (color >> 24) & 0xFF;
+        set_rgba(red, green, blue, alpha);
+    }
+
+  private:
+    uint8_t toRGB(float c)
+    {
+        return static_cast<uint8_t>(round(255 * fmin(fmax(c, 0.0f), 1.0f)));
     }
 };
