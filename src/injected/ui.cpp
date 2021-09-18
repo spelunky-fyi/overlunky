@@ -981,6 +981,11 @@ void force_zoom()
         g_state->camera->bounds_top = 124.5;
         g_state->camera->bounds_bottom = 56.5;
     }
+    else if (g_zoom == 13.5f && g_state != 0 && g_state->screen == 11 && g_state->time_level == 1)
+    {
+        enable_camp_camera = true;
+        set_camp_camera_bounds_enabled(true);
+    }
 }
 
 void force_hud_flags()
@@ -2438,7 +2443,7 @@ void render_camera()
         if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
         {
             set_camp_camera_bounds_enabled(enable_camp_camera);
-            if (!enable_camp_camera)
+            if (!enable_camp_camera && g_state->screen == 11)
             {
                 g_state->camera->bounds_left = 0.5;
                 g_state->camera->bounds_right = 74.5;
