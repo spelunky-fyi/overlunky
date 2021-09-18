@@ -1285,6 +1285,32 @@ void set_journal_enabled(bool b)
     }
 }
 
+void set_camp_camera_bounds_enabled(bool b)
+{
+    static size_t offset = 0;
+    static char original_instruction[3] = {0};
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+
+        std::string pattern = "\x65\x4c\x8b\x3c\x25\x58\x00\x00\x00\x41\xbd\x30\x01\x00\x00"s;
+        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        for (uint8_t x = 0; x < 3; ++x)
+        {
+            original_instruction[x] = read_u8(offset + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset, std::string(original_instruction, 3), true);
+    }
+    else
+    {
+        write_mem_prot(offset, "\xC3\x90\x90"s, true);
+    }
+}
+
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();

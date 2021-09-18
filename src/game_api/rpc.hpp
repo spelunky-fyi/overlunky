@@ -88,6 +88,7 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance);
 void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type);
 void generate_particles(uint32_t particle_emitter_id, uint32_t uid);
 void set_journal_enabled(bool b);
+void set_camp_camera_bounds_enabled(bool b);
 uint8_t waddler_count_entity(ENT_TYPE entity_type);
 int8_t waddler_store_entity(ENT_TYPE entity_type);
 void waddler_remove_entity(ENT_TYPE entity_type, uint8_t amount_to_remove = 99);
