@@ -967,10 +967,24 @@ void set_zoom()
 
 void force_zoom()
 {
-    if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width))
+    if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
         g_level_width = g_state->w;
+    }
+    if ((g_zoom > 13.5f || g_zoom == 0.0f) && get_zoom_level() > 13.5f && g_state != 0 && (g_state->screen == 11 || g_state->screen_next == 11) && (enable_camp_camera || g_state->time_level == 1))
+    {
+        enable_camp_camera = false;
+        set_camp_camera_bounds_enabled(false);
+        g_state->camera->bounds_left = 0.5;
+        g_state->camera->bounds_right = 74.5;
+        g_state->camera->bounds_top = 124.5;
+        g_state->camera->bounds_bottom = 56.5;
+    }
+    else if (g_zoom == 13.5f && get_zoom_level() == 13.5f && g_state != 0 && (g_state->screen == 11 || g_state->screen_next == 11) && !enable_camp_camera)
+    {
+        enable_camp_camera = true;
+        set_camp_camera_bounds_enabled(true);
     }
 }
 
@@ -2431,9 +2445,9 @@ void render_camera()
             set_camp_camera_bounds_enabled(enable_camp_camera);
             if (!enable_camp_camera)
             {
-                g_state->camera->bounds_left = 2.5;
+                g_state->camera->bounds_left = 0.5;
                 g_state->camera->bounds_right = 74.5;
-                g_state->camera->bounds_top = 126;
+                g_state->camera->bounds_top = 124.5;
                 g_state->camera->bounds_bottom = 56.5;
             }
         }
