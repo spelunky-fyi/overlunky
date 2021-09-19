@@ -658,9 +658,128 @@ class ScreenOnlineLoading : public Screen // ID: 28
     float ouroboros_angle;
 };
 
+struct OnlineLobbyScreenPlayer
+{
+    uint8_t unknown1;
+    uint8_t character;
+    bool ready;
+    uint8_t unknown2;
+};
+
 class ScreenOnlineLobby : public Screen // ID: 29
 {
-  public: // not reverse engineered
+  public:
+    uint8_t unknown2;
+    uint8_t unknown3;
+    uint8_t unknown4;
+    uint8_t unknown5;
+    float woodpanels_slidein_timer;
+    float scroll_unfurl_timer;
+    uint32_t unknown8;
+    uint32_t unknown9;
+    TextureRenderingInfo woodpanel_bottom;
+    TextureRenderingInfo woodpanel_top;
+    TextureRenderingInfo unknown13;
+    TextureRenderingInfo left_scroll_handle;
+    TextureRenderingInfo right_scroll_handle;
+    uint32_t scroll_text_id;
+    uint32_t btn_left_text_id;
+    uint32_t btn_right_text_id;
+    uint32_t btn_center_text_id;
+    bool woodpanel_top_visible;
+    bool woodpanel_bottom_visible;
+    bool toggle_panels_slidein;
+    bool unknown21;
+    std::array<OnlineLobbyScreenPlayer, 4> players;
+    TextureRenderingInfo background_image;
+    size_t unknown22;
+    size_t unknown23;
+    size_t unknown24;
+    size_t unknown25;
+    size_t unknown26;
+    size_t unknown27;
+    size_t unknown28;
+    size_t unknown29;
+    size_t unknown30;
+    TextureRenderingInfo unknown36;
+    TextureRenderingInfo unknown37;
+    float unknown38;
+    TextureRenderingInfo topleft_woodpanel_esc;
+    float topleft_woodpanel_esc_slidein_timer;
+    float character_walk_offset;
+    bool character_facing_left;
+    int8_t move_direction;
+    uint8_t unknown41;
+    uint8_t unknown42;
+    TextureRenderingInfo character;
+    TextureRenderingInfo player_ready_icon;
+    float render_timer_dupe;
+    TextureRenderingInfo arrow_left;
+    TextureRenderingInfo arrow_right;
+    float another_timer;
+    float arrow_left_hor_offset;
+    float arrow_right_hor_offset;
+    TextureRenderingInfo platform_icon;
+    uint8_t player_count;
+    bool searching_for_players;
+    uint8_t unknown47;
+    uint8_t unknown48;
+    float another_timer_2;
+    bool show_code_panel;
+    uint8_t unknown49;
+    uint8_t unknown50;
+    uint8_t unknown51;
+    uint32_t unknown53;
+
+    // The following is actually class ScreenEnterOnlineCode but it has no direct pointer in GameManager
+    // or State. In assembly this pointer is accessed by &ScreenOnlineLobby + sizeof(ScreenOnlineLobby)
+    size_t enter_code_screen_vftable;
+    float enter_code_render_timer;
+    uint32_t unknown54;
+    float unknown56;
+    float enter_code_woodpanel_bottom_slidein_pos;
+    float unknown58;
+    float unknown59;
+    float unknown60;
+    TextureRenderingInfo enter_code_woodpanel_bottom;
+    TextureRenderingInfo unknown61;
+    TextureRenderingInfo unknown62;
+    TextureRenderingInfo unknown63;
+    TextureRenderingInfo unknown64;
+    uint32_t text_id_1;
+    uint32_t text_id_2;
+    uint32_t enter_code_btn_right_text_id;
+    uint32_t text_id_4;
+    bool enter_code_woodpanel_top_visible;
+    bool enter_code_woodpanel_bottom_visible;
+    bool enter_code_toggle_panels_slidein;
+    bool unknown68;
+    uint32_t unknown69;
+    uint32_t selected_character;
+    bool unknown71a;
+    uint8_t unknown71b;
+    uint16_t code_chars[8];
+    uint16_t code_char_terminator;
+    uint32_t characters_entered_count;
+    float enter_code_topleft_woodpanel_esc_slidein_timer;
+    uint32_t enter_code_banner_text_id;
+    uint32_t enter_code_OK_text_id;
+    TextureRenderingInfo enter_code_main_woodpanel_left;
+    TextureRenderingInfo enter_code_main_woodpanel_center;
+    TextureRenderingInfo enter_code_main_woodpanel_right;
+    TextureRenderingInfo enter_code_banner;
+    TextureRenderingInfo enter_code_char_cutouts;
+    TextureRenderingInfo enter_code_pointing_hand;
+    TextureRenderingInfo enter_code_buttons;
+    TextureRenderingInfo unknown85;
+    TextureRenderingInfo enter_code_OK_panel;
+    float enter_code_OK_panel_slidein_timer;
+    int32_t unknown87;
+    TextureRenderingInfo enter_code_your_code_scroll;
+    TextureRenderingInfo enter_code_your_code_scroll_left_handle;
+    TextureRenderingInfo enter_code_your_code_scroll_right_handle;
+
+    void set_code(const std::string& code);
 };
 
 struct PauseUI

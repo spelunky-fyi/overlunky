@@ -5,6 +5,7 @@
 #include "entities_items.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "online.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -34,6 +35,7 @@
 #include "usertypes/player_lua.hpp"
 #include "usertypes/prng_lua.hpp"
 #include "usertypes/save_context.hpp"
+#include "usertypes/screen_arena_lua.hpp"
 #include "usertypes/screen_lua.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
@@ -112,6 +114,7 @@ end
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
     NScreen::register_usertypes(lua);
+    NScreenArena::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
@@ -128,6 +131,8 @@ end
     lua["state"] = get_state_ptr();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
+    /// The Online object has information about the online lobby and its players
+    lua["online"] = get_online();
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Player*>(get_players());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
