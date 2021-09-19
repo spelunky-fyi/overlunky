@@ -545,7 +545,7 @@ end
     lua["get_entities"] = get_entities;
     /// Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
     lua["filter_entities"] = [&lua](std::vector<uint32_t> entities, sol::function predicate) -> std::vector<uint32_t> {
-        return filter_entities(std::move(entities), [&lua, pred = std::move(predicate)](Entity* entity)
+        return filter_entities(std::move(entities), [&lua, pred = std::move(predicate)](Entity* entity) -> bool
                                { return pred(lua["cast_entity"](entity)); });
     };
 
