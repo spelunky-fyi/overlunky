@@ -4049,7 +4049,8 @@ void render_entity_props()
         }
         else if (g_entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
         {
-            ImGui::SliderInt("Uses left##MattockUses", (int*)&g_entity[1], 1, 255);
+            auto mattock = (Mattock*)g_entity;
+            ImGui::SliderScalar("Uses left##MattockUses", ImGuiDataType_U8, &mattock->remaining, &u8_min, &u8_max);
         }
         else if (
             g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
