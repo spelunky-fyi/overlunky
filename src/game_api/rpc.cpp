@@ -463,6 +463,21 @@ float screen_distance(float x)
     return b.first - a.first;
 }
 
+std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate)
+{
+    std::vector<uint32_t> filtered_entities{std::move(entities)};
+    auto filter_fun = [&](uint32_t uid)
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            return !predicate(entity);
+        }
+        return false;
+    };
+    std::erase_if(filtered_entities, filter_fun);
+    return filtered_entities;
+}
+
 std::vector<uint32_t> get_entities()
 {
     return get_entities_by({}, 0, LAYER::BOTH);

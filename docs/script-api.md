@@ -312,6 +312,9 @@ Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 ### [`get_grid_entity_at`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_grid_entity_at)
 `int get_grid_entity_at(float x, float y, LAYER layer)`<br/>
 Gets a grid entity, such as floor or spikes, at the given position and layer.
+### [`filter_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=filter_entities)
+`array<int> filter_entities(array<int> entities, function predicate)`<br/>
+Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
 ### [`get_entities_by`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 `array<int> get_entities_by(array<ENT_TYPE> entity_types, int mask, LAYER layer)`<br/>
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
@@ -3079,11 +3082,14 @@ Copy an axis aligned bounding box
 - [`AABB(float left_, float top_, float right_, float bottom_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) 
 \
 Create a new axis aligned bounding box by specifying its values
-- [`bool overlaps_with(const AABB& other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) &AABB::overlaps_with
 - [`float left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) &AABB::left
 - [`float bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) &AABB::bottom
 - [`float right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) &AABB::right
 - [`float top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top) &AABB::top
+- [`bool overlaps_with(const AABB& other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) &AABB::overlaps_with
+- [`AABB& abs()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs) &AABB::abs
+\
+Fixes the AABB if any of the sides have negative length
 - [`AABB& extrude(float amount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extrude) &AABB::extrude
 \
 Grows or shrinks the AABB by the given amount in all directions.
