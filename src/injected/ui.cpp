@@ -3883,7 +3883,7 @@ void render_entity_props()
     }
     if (ImGui::IsItemHovered())
         ImGui::SetTooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
-    if (ImGui::CollapsingHeader("State"))
+    if (ImGui::CollapsingHeader("State") && g_entity->is_movable())
     {
         render_state("Current state", g_entity->state);
         render_state("Last state", g_entity->last_state);
