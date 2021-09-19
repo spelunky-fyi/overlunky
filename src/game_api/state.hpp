@@ -106,7 +106,7 @@ struct StateMemory
     uint32_t time_level;
     uint32_t time_speedrun;
     uint32_t money_last_levels;
-    int32_t hud_flags;
+    int32_t level_flags;
     uint32_t presence_flags;
     ENT_TYPE coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
     uint8_t cause_of_death;
@@ -294,12 +294,12 @@ struct State
 
     uint32_t flags()
     {
-        return ptr()->hud_flags;
+        return ptr()->level_flags;
     }
 
     void set_flags(uint32_t f)
     {
-        ptr()->hud_flags = f;
+        ptr()->level_flags = f;
     }
 
     void set_pause(uint8_t p)

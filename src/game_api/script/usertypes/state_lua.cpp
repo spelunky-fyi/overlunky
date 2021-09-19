@@ -88,7 +88,7 @@ void register_usertypes(sol::state& lua)
         "time_level",
         &StateMemory::time_level,
         "level_flags",
-        &StateMemory::hud_flags,
+        &StateMemory::level_flags,
         "loading",
         &StateMemory::loading,
         "quest_flags",

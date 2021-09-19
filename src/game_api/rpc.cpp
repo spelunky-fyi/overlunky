@@ -245,13 +245,13 @@ int get_entity_ai_state(uint32_t uid)
     return 0;
 }
 
-uint32_t get_hud_flags()
+uint32_t get_level_flags()
 {
     auto state = State::get();
     return state.flags();
 }
 
-void set_hud_flags(uint32_t flags)
+void set_level_flags(uint32_t flags)
 {
     auto state = State::get();
     state.set_flags(flags);
