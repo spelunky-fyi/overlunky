@@ -193,7 +193,7 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, dark_mode = false,
-     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false;
+     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
 Inventory* g_inventory = 0;
@@ -216,7 +216,7 @@ std::string fontfile = "segoeuib.ttf";
 std::vector<float> fontsize = {18.0f, 32.0f, 72.0f};
 
 [[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
-[[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
+[[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17, u8_draw_depth_max = 53;
 [[maybe_unused]] const short s16_zero = 0, s16_one = 1, s16_min = -32768, s16_max = 32767;
 [[maybe_unused]] const ImU16 u16_zero = 0, u16_one = 1, u16_min = 0, u16_max = 65535;
 [[maybe_unused]] const ImS32 s32_zero = 0, s32_one = 1, s32_min = INT_MIN / 2, s32_max = INT_MAX / 2, s32_hi_a = INT_MAX / 2 - 100, s32_hi_b = INT_MAX / 2;
@@ -967,10 +967,24 @@ void set_zoom()
 
 void force_zoom()
 {
-    if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width))
+    if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
         g_level_width = g_state->w;
+    }
+    if ((g_zoom > 13.5f || g_zoom == 0.0f) && g_state != 0 && g_state->screen == 11 && (enable_camp_camera || g_state->time_level == 1))
+    {
+        enable_camp_camera = false;
+        set_camp_camera_bounds_enabled(false);
+        g_state->camera->bounds_left = 0.5;
+        g_state->camera->bounds_right = 74.5;
+        g_state->camera->bounds_top = 124.5;
+        g_state->camera->bounds_bottom = 56.5;
+    }
+    else if (g_zoom == 13.5f && g_state != 0 && g_state->screen == 11 && g_state->time_level == 1)
+    {
+        enable_camp_camera = true;
+        set_camp_camera_bounds_enabled(true);
     }
 }
 
@@ -2426,6 +2440,17 @@ void render_camera()
         ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
         ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
         ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
+        if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
+        {
+            set_camp_camera_bounds_enabled(enable_camp_camera);
+            if (!enable_camp_camera && g_state->screen == 11)
+            {
+                g_state->camera->bounds_left = 0.5;
+                g_state->camera->bounds_right = 74.5;
+                g_state->camera->bounds_top = 124.5;
+                g_state->camera->bounds_bottom = 56.5;
+            }
+        }
     }
 }
 
@@ -2521,22 +2546,19 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
     }
-    if (!g_players.empty())
+    for (unsigned int x = 0; x < g_state->w; ++x)
     {
-        for (unsigned int x = 0; x < g_state->w; ++x)
+        for (unsigned int y = 0; y < g_state->h; ++y)
         {
-            for (unsigned int y = 0; y < g_state->h; ++y)
+            auto room_temp = g_state->level_gen->get_room_template(x, y, g_state->camera_layer);
+            if (room_temp.has_value())
             {
-                auto room_temp = g_state->level_gen->get_room_template(x, y, g_players.at(0)->layer);
-                if (room_temp.has_value())
-                {
-                    auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
-                    auto room_pos = g_state->level_gen->get_room_pos(x, y);
-                    auto pos = screen_position(room_pos.first, room_pos.second);
-                    ImVec2 spos = screenify({pos.first, pos.second});
-                    std::string room_text = fmt::format("{:d},{:d} {:s}", x, y, room_name);
-                    draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
-                }
+                auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
+                auto room_pos = g_state->level_gen->get_room_pos(x, y);
+                auto pos = screen_position(room_pos.first, room_pos.second);
+                ImVec2 spos = screenify({pos.first, pos.second});
+                std::string room_text = fmt::format("{:d},{:d} {:s} ({:d})", x, y, room_name, room_temp.value());
+                draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
             }
         }
     }
@@ -4132,7 +4154,10 @@ void render_entity_props()
         ImGui::DragFloat("Box height##EntityBoxHeight", &g_entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset X##EntityOffsetX", &g_entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset Y##EntityOffsetY", &g_entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
-        ImGui::DragScalar("Animation Frame##EntityAnimationFrame", ImGuiDataType_U16, &g_entity->animation_frame, 0.2f, &u16_zero, &u16_max);
+        ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &g_entity->animation_frame, 0.2f, &u16_zero, &u16_max);
+        uint8_t draw_depth = g_entity->draw_depth;
+        if (ImGui::DragScalar("Draw depth##EntityDrawDepth", ImGuiDataType_U8, &draw_depth, 0.2f, &u8_zero, &u8_draw_depth_max))
+            g_entity->set_draw_depth(draw_depth);
     }
     if (ImGui::CollapsingHeader("Flags"))
     {

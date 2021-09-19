@@ -355,6 +355,8 @@ void register_usertypes(sol::state& lua)
         0x2000,
         "LAVA",
         0x4000,
+        "LIQUID",
+        0x6000,
         "ANY",
         0x0);
 }

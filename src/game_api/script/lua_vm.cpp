@@ -543,6 +543,11 @@ end
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
+    /// Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
+    lua["filter_entities"] = [&lua](std::vector<uint32_t> entities, sol::function predicate) -> std::vector<uint32_t> {
+        return filter_entities(std::move(entities), [&lua, pred = std::move(predicate)](Entity* entity) -> bool
+                               { return pred(lua["cast_entity"](entity)); });
+    };
 
     auto get_entities_by = sol::overload(
         static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, LAYER)>(::get_entities_by),
@@ -703,6 +708,8 @@ end
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
+    /// Enables or disables the default position based camp camera bounds, to set them manually yourself
+    lua["set_camp_camera_bounds_enabled"] = set_camp_camera_bounds_enabled;
     /// Returns how many of a specific entity type Waddler has stored
     lua["waddler_count_entity"] = waddler_count_entity;
     /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.

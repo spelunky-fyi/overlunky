@@ -463,6 +463,21 @@ float screen_distance(float x)
     return b.first - a.first;
 }
 
+std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate)
+{
+    std::vector<uint32_t> filtered_entities{std::move(entities)};
+    auto filter_fun = [&](uint32_t uid)
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            return !predicate(entity);
+        }
+        return false;
+    };
+    std::erase_if(filtered_entities, filter_fun);
+    return filtered_entities;
+}
+
 std::vector<uint32_t> get_entities()
 {
     return get_entities_by({}, 0, LAYER::BOTH);
@@ -1282,6 +1297,32 @@ void set_journal_enabled(bool b)
     else
     {
         write_mem_prot(offset, "\xC3\x90"s, true);
+    }
+}
+
+void set_camp_camera_bounds_enabled(bool b)
+{
+    static size_t offset = 0;
+    static char original_instruction[3] = {0};
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+
+        std::string pattern = "\x65\x4c\x8b\x3c\x25\x58\x00\x00\x00\x41\xbd\x30\x01\x00\x00"s;
+        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        for (uint8_t x = 0; x < 3; ++x)
+        {
+            original_instruction[x] = read_u8(offset + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset, std::string(original_instruction, 3), true);
+    }
+    else
+    {
+        write_mem_prot(offset, "\xC3\x90\x90"s, true);
     }
 }
 

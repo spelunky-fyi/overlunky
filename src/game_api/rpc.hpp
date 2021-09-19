@@ -3,7 +3,9 @@
 #include "entities_chars.hpp"
 #include "screen.hpp"
 #include "state.hpp"
+
 #include <cstdint>
+#include <functional>
 #include <vector>
 
 void teleport(float x, float y, bool s, float vx, float vy, bool snap);
@@ -37,6 +39,7 @@ std::pair<float, float> screen_position(float x, float y);
 std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2);
 float screen_distance(float x);
 float get_zoom_level();
+std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate);
 std::vector<uint32_t> get_entities();
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer);
 std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER layer);
@@ -88,6 +91,7 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance);
 void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type);
 void generate_particles(uint32_t particle_emitter_id, uint32_t uid);
 void set_journal_enabled(bool b);
+void set_camp_camera_bounds_enabled(bool b);
 uint8_t waddler_count_entity(ENT_TYPE entity_type);
 int8_t waddler_store_entity(ENT_TYPE entity_type);
 void waddler_remove_entity(ENT_TYPE entity_type, uint8_t amount_to_remove = 99);
