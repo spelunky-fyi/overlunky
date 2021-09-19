@@ -4828,6 +4828,7 @@ entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end
 entity_remove_item = function(...) end
 f = {}
+filter_entities = function(...) end
 flip_entity = function(...) end
 force_co_subtheme = function(...) end
 force_dark_level = function(...) end

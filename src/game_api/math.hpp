@@ -24,6 +24,16 @@ struct AABB
         return !(left == 0.0f && right == 0.0f && top == 0.0f && bottom == 0.0f);
     }
 
+    /// Fixes the AABB if any of the sides have negative length
+    AABB& abs()
+    {
+        if (left > right)
+            std::swap(left, right);
+        if (bottom > top)
+            std::swap(bottom, top);
+        return *this;
+    }
+
     /// Grows or shrinks the AABB by the given amount in all directions.
     /// If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
     AABB& extrude(float amount)

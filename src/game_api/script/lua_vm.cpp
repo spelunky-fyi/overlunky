@@ -543,6 +543,11 @@ end
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
+    /// Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
+    lua["filter_entities"] = [&lua](std::vector<uint32_t> entities, sol::function predicate) -> std::vector<uint32_t> {
+        return filter_entities(std::move(entities), [&lua, pred = std::move(predicate)](Entity* entity)
+                               { return pred(lua["cast_entity"](entity)); });
+    };
 
     auto get_entities_by = sol::overload(
         static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, LAYER)>(::get_entities_by),
