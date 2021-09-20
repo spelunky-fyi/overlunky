@@ -57,7 +57,7 @@ size_t heap_base()
             NtQueryInformationThread_ptr(main, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
 
             auto result = ((uint64_t*)tib.TebBaseAddress)[11];
-            return read_u64(read_u64(result) + 0x130);
+            return read_u64(read_u64(result) + 0x120);
         }
     }();
     return this_thread_heap_base;
@@ -89,7 +89,7 @@ size_t local_heap_base()
                 NtQueryInformationThread_ptr(thread, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
 
                 auto result = ((uint64_t*)tib.TebBaseAddress)[11];
-                return read_u64(read_u64(result) + 0x130);
+                return read_u64(read_u64(result) + 0x120);
             }
         }
     }();

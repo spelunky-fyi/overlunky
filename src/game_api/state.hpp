@@ -218,6 +218,9 @@ struct State
 
     void godmode(bool g)
     {
+        DEBUG("TODO godmode: fix get_damage() and get_insta()");
+        return;
+
         // log::debug!("God {:?}" mode; g);
         if (g)
         {

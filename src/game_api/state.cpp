@@ -69,6 +69,9 @@ size_t get_location()
 
 size_t get_damage()
 {
+    // TODO: this is the 49th virtual (on_regular_damage) of Player
+    return 0ul;
+
     ONCE(size_t)
     {
         // TODO: get vtable of character and calculate the offset
@@ -90,6 +93,9 @@ size_t get_damage()
 
 size_t get_insta()
 {
+    // TODO
+    return 0ul;
+
     ONCE(size_t)
     {
         auto memory = Memory::get();
