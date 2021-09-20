@@ -160,15 +160,19 @@ struct StateMemory
     PointerList* particle_emitters; // list of ParticleEmitterInfo*
     PointerList* lightsources;      // list of Illumination*
     size_t unknown27;
-    std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
-    size_t unknown28;
-    size_t unknown29;
+
+    size_t unknown28; // formerly std::unordered_map<uint32_t, Entity*> instance_id_to_pointer
+    size_t unknown29; // formerly std::unordered_map<uint32_t, Entity*> instance_id_to_pointer
+
+    size_t backlayer_player_related1;
+    size_t backlayer_player_related2;
+
     size_t unknown30;
     uint32_t layer_transition_effect_timer;
     uint8_t camera_layer;
-    uint8_t unknowk31a;
-    uint8_t unknowk31b;
-    uint8_t unknowk31c;
+    uint8_t unknown31a;
+    uint8_t unknown31b;
+    uint8_t unknown31c;
     size_t unknown32;
     size_t unknown33;
     size_t unknown34;
@@ -360,13 +364,16 @@ struct State
         return prng;
     }
 
-    Entity* find(uint32_t unique_id)
+    Entity* find(uint32_t /*unique_id*/)
     {
-        auto& map = ptr()->instance_id_to_pointer;
-        auto it = map.find(unique_id);
-        if (it == map.end())
-            return nullptr;
-        return it->second;
+        // TODO : figure out what type of object state.unknown28/29 is (formerly instance_id_to_pointer)
+        return nullptr;
+
+        // auto& map = ptr()->instance_id_to_pointer;
+        // auto it = map.find(unique_id);
+        // if (it == map.end())
+        //     return nullptr;
+        // return it->second;
     }
 
     std::pair<float, float> get_camera_position();
