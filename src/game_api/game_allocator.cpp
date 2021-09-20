@@ -13,7 +13,7 @@ MallocFun* get_malloc()
         auto exe = memory.exe();
         auto after_bundle = memory.after_bundle;
 
-        auto off = find_inst(exe, "\x48\x8b\x7c\x24\x30"s, after_bundle) - 0x10;
+        auto off = find_inst(exe, "\x45\x84\xe4\x0f\x84"s, after_bundle) - 0x10;
         auto fun_start = decode_pc(exe, find_inst(exe, "\xff\x15"s, off), 2);
 
         return *(MallocFun**)memory.at_exe(fun_start);
@@ -28,7 +28,7 @@ FreeFun* get_free()
         auto exe = memory.exe();
         auto after_bundle = memory.after_bundle;
 
-        auto off = find_inst(exe, "\x48\x89\xb3\x10\x01\x00\x00"s, after_bundle) - 0x10;
+        auto off = find_inst(exe, "\x48\x83\x7e\x18\x00"s, after_bundle) - 0x10;
         auto fun_start = decode_pc(exe, find_inst(exe, "\xff\x15"s, off), 2);
 
         return *(FreeFun**)memory.at_exe(fun_start);
