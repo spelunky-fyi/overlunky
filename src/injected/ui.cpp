@@ -4414,9 +4414,9 @@ void render_game_props()
                 ImGui::CheckboxFlags("Saved Parmesan##QuestSistersParmesan", &sisters_state, 4);
                 ImGui::CheckboxFlags("Met at Tide Pool door##QuestSistersTidePool", &sisters_state, 8);
                 ImGui::CheckboxFlags("Met in wet fur##QuestSistersIceCaves", &sisters_state, 32);
-                ImGui::CheckboxFlags("Met it palace##QuestSistersNeoBabylon", &sisters_state, 16);
-                g_state->quests->jungle_sisters_flags = static_cast<int8_t>(sisters_state);
+                ImGui::CheckboxFlags("Met in palace##QuestSistersNeoBabylon", &sisters_state, 16);
             }
+            g_state->quests->jungle_sisters_flags = static_cast<int8_t>(sisters_state);
         }
 
         if (ImGui::CollapsingHeader("Van Horsing"))
