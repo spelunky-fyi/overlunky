@@ -2,7 +2,10 @@
 
 #include <unordered_map>
 
+#include <Windows.h>
+
 #include "search.hpp"
+
 using namespace std::string_literals;
 
 namespace
