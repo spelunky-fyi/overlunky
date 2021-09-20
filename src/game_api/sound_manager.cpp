@@ -293,7 +293,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
         auto exe = memory.exe();
         auto start = memory.after_bundle;
 
-        auto fmod_studio_system_instruction = find_inst(exe, "\x48\x8d", find_inst(exe, "\x85\xc0\x74\x2b\x44\x8b\xc0"s, start) - 0x10);
+        auto fmod_studio_system_instruction = find_inst(exe, "\xBA\x05\x01\x02\x00"s, start) - 7;
         auto fmod_studio_system = *(FMODStudio::System**)memory.at_exe(decode_pc(exe, fmod_studio_system_instruction));
 
         auto event_properties_instruction = find_inst(exe, "\x48\x8d\xbd\x90\x00\x00\x00\x48\x8d\x74\x24\x60", start) + 0xc;
