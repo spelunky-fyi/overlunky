@@ -184,7 +184,7 @@ struct ThemeProgression
     uint8_t visited_themes[9];
 };
 
-struct ArenaConfigArenas
+struct ArenaConfigArenas // size: 40 bytes
 {
     bool dwelling_1;
     bool dwelling_2;
@@ -228,15 +228,19 @@ struct ArenaConfigArenas
     bool sunkencity_5;
 };
 
-struct ArenaConfigItems
+struct ArenaConfigItems // size: 40 bytes
 {
     bool rock;
     bool pot;
     bool bombbag;
     bool bombbox;
     bool ropepile;
+    bool pickup_12bag;
+    bool pickup_24bag;
     bool cooked_turkey;
     bool royal_jelly;
+    bool torch;
+    bool boomerang;
     bool machete;
     bool mattock;
     bool crossbow;
@@ -245,7 +249,11 @@ struct ArenaConfigItems
     bool shotgun;
     bool camera;
     bool plasma_cannon;
+    bool wooden_shield;
+    bool metal_shield;
     bool teleporter;
+    bool mine;
+    bool snaptrap;
     bool paste;
     bool climbing_gloves;
     bool pitchers_mitt;
@@ -259,25 +267,53 @@ struct ArenaConfigItems
     bool telepack;
     bool powerpack;
     bool excalibur;
+    bool scepter;
     bool kapala;
+    bool true_crown;
 };
 
-struct ArenaConfigEquippedItems
+struct ArenaConfigEquippedItems // size: 40 bytes
 {
-    bool paste;
-    bool climbing_gloves;
-    bool pitchers_mitt;
-    bool spike_shoes;
-    bool spring_shoes;
-    bool parachute;
-    bool dummy1; // the backitems and excalibur have spaces here but are unused
+    bool dummy1; // the other items have spaces here but are unused
     bool dummy2;
     bool dummy3;
     bool dummy4;
     bool dummy5;
     bool dummy6;
     bool dummy7;
+    bool dummy8;
+    bool dummy9;
+    bool dummy10;
+    bool dummy11;
+    bool dummy12;
+    bool dummy13;
+    bool dummy14;
+    bool dummy15;
+    bool dummy16;
+    bool dummy17;
+    bool dummy18;
+    bool dummy19;
+    bool dummy20;
+    bool dummy21;
+    bool dummy22;
+    bool dummy23;
+    bool dummy24;
+    bool paste;
+    bool climbing_gloves;
+    bool pitchers_mitt;
+    bool spike_shoes;
+    bool spring_shoes;
+    bool parachute;
+    bool dummy25;
+    bool dummy26;
+    bool dummy27;
+    bool dummy28;
+    bool dummy29;
+    bool dummy30;
+    bool dummy31;
+    bool dummy32;
     bool kapala;
+    bool scepter;
 };
 
 struct ArenaState
@@ -290,7 +326,11 @@ struct ArenaState
     uint8_t player_totalwins[4];
     int8_t unknown9;
     bool player_won[4];
-    uint8_t unknown14;
+    uint8_t unknown14a;
+    uint8_t unknown14b;
+    uint8_t unknown14c;
+    uint8_t unknown14d;
+    uint8_t unknown14e;
     uint8_t timer;
     uint8_t timer_ending;
     uint8_t wins;
@@ -307,30 +347,15 @@ struct ArenaState
     ArenaConfigArenas arenas;
     uint8_t dark_level_chance;
     uint8_t crate_frequency;
-    ArenaConfigItems items;
+    ArenaConfigItems items_enabled;
+    ArenaConfigItems items_in_crate;
     int8_t held_item;
     int8_t equipped_backitem;
-    uint8_t unknown25;
-    uint8_t unknown26;
-    uint8_t unknown27;
-    uint8_t unknown28;
-    uint8_t unknown29;
-    uint8_t unknown30;
-    uint8_t unknown31;
-    uint8_t unknown32;
-    uint8_t unknown33;
-    uint8_t unknown34;
-    uint8_t unknown35;
-    uint8_t unknown36;
-    uint8_t unknown37;
-    uint8_t unknown38;
-    uint8_t unknown39;
-    uint8_t unknown40;
     ArenaConfigEquippedItems equipped_items;
     uint8_t whip_damage;
-    uint8_t unknown41;
-    uint8_t unknown42;
-    uint8_t unknown43;
+    uint8_t final_ghost;
+    uint8_t breath_cooldown;
+    bool punish_ball;
 };
 
 struct LogicOuroboros
