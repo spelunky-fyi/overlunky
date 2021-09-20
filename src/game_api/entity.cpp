@@ -42,7 +42,7 @@ size_t entities_offset()
     ONCE(size_t)
     {
         auto mem = Memory::get();
-        return res = decode_imm(mem.exe(), find_inst(mem.exe(), "\x48\x8D\x8B"s, find_inst(mem.exe(), "\x29\x5C\x8F\x3D"s, mem.after_bundle)));
+        return res = decode_imm(mem.exe(), find_inst(mem.exe(), "\x48\x8D\x8E"s, find_inst(mem.exe(), "\x29\x5C\x8F\x3D"s, mem.after_bundle)));
     }
 }
 
