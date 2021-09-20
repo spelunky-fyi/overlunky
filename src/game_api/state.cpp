@@ -62,7 +62,7 @@ size_t get_location()
         auto start = memory.after_bundle;
         auto location = find_inst(exe, "\x49\x0F\x44\xC0"s, start);
         location = find_inst(exe, "\x49\x0F\x44\xC0"s, location + 1);
-        location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 0x10)));
+        location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 25)));
         return res = location;
     }
 }
@@ -122,8 +122,8 @@ void do_write_load_opt()
     auto memory = Memory::get();
     auto exe = memory.exe();
     auto start = memory.after_bundle;
-    auto off_send = find_inst(exe, "\x45\x8D\x41\x50"s, start) + 7;
-    write_mem_prot(memory.at_exe(off_send), "\x31\xC0\x31\xD2\x90\x90"s, true);
+    auto off_send = find_inst(exe, "\xFF\xD3\xB9\xFA\x00\x00\x00"s, start);
+    write_mem_prot(memory.at_exe(off_send), "\x90\x90"s, true);
 }
 bool& get_write_load_opt()
 {
@@ -161,9 +161,9 @@ State& State::get()
         auto addr_location = get_location();
         auto addr_damage = get_damage();
         auto addr_insta = get_insta();
-        auto addr_zoom = get_zoom();
-        auto addr_zoom_shop = get_zoom_shop();
-        auto addr_dark = get_dark();
+        auto addr_zoom = 0ul;      // get_zoom();
+        auto addr_zoom_shop = 0ul; //get_zoom_shop();
+        auto addr_dark = 0ul;      //get_dark();
         STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
