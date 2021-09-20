@@ -77,7 +77,7 @@ size_t entities_ptr()
     {
         auto mem = Memory::get();
         cache_entities_ptr =
-            mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\x48\xB8\x02\x55\xA7\x74\x52\x9D\x51\x43"s, mem.after_bundle) - 7));
+            mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\xA4\x84\xE4\xCA\xDA\xBF\x4E\x83"s, mem.after_bundle) - 33));
     }
     return cache_entities_ptr;
 }

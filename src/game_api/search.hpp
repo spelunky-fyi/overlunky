@@ -57,7 +57,7 @@ size_t find_after_bundle(size_t exe)
         offset += (8 + l0 + l1);
     }
 
-    uint8_t delim[] = {0x48, 0x81, 0xEC, 0xE8, 0x00, 0x00, 0x00};
+    uint8_t delim[] = {0x55, 0x41, 0x57, 0x41, 0x56, 0x41, 0x55, 0x41, 0x54};
     std::string delim_s = std::string((char*)delim, sizeof(delim));
     return find_inst((char*)exe, delim_s, offset);
 }
