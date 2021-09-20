@@ -9,13 +9,31 @@ struct TmpStruct
     OnHeapPointer<SaveData> savedata;
 };
 
+struct GameProps
+{
+    uint32_t buttons;
+    uint32_t unknown1;
+    uint32_t unknown2;
+    uint32_t unknown3;
+    uint32_t buttons_dupe;
+    uint32_t unknown4;
+    uint32_t unknown5;
+    uint32_t unknown6;
+    uint32_t buttons_dupe_but_different;
+    int8_t unknown8;
+    bool game_has_focus;
+    bool unknown9;
+    bool unknown10;
+    // there's more stuff here
+};
+
 struct GameManager
 {
     void* backgroundmusic;
     TmpStruct* tmp;
     uint8_t buttons_controls[MAX_PLAYERS];
     uint8_t buttons_movement[MAX_PLAYERS];
-    size_t more_button_states;
+    GameProps* game_props;
 
     // screen pointers below are most likely in an array and indexed through the screen ID, hence the nullptrs for
     // screens that are available in State

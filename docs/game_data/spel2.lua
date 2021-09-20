@@ -1533,6 +1533,9 @@ GHOST_BEHAVIOR = {
 GameManager = {
   __name = "sol.GameManager.user"
 }
+GameProps = {
+  __name = "sol.GameProps.user"
+}
 Generator = {
   __index = "function",
   __name = "sol.Generator.user",
@@ -2061,6 +2064,15 @@ Olmite = {
   __index = "function",
   __name = "sol.Olmite.user",
   __newindex = "function"
+}
+Online = {
+  __name = "sol.Online.user"
+}
+OnlineLobby = {
+  __name = "sol.OnlineLobby.user"
+}
+OnlinePlayer = {
+  __name = "sol.OnlinePlayer.user"
 }
 Orb = {
   __index = "function",
@@ -4923,6 +4935,7 @@ messpect = function(...) end
 modify_sparktraps = function(...) end
 mouse_position = function(...) end
 move_entity = function(...) end
+online = {}
 options = {}
 os = {
   clock = "function",
