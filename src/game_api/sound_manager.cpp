@@ -293,12 +293,18 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
         auto exe = memory.exe();
         auto start = memory.after_bundle;
 
+        // Rev.Eng.: Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
         auto fmod_studio_system_instruction = find_inst(exe, "\xBA\x05\x01\x02\x00"s, start) - 0x7;
         auto fmod_studio_system = *(FMODStudio::System**)memory.at_exe(decode_pc(exe, fmod_studio_system_instruction));
 
+        // Rev.Eng.: Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+        // Said name comes from an array that is being looped, said array is a global of type EventParameters
         auto event_properties_instruction = find_inst(exe, "\x48\x8d\x9d\x30\x01\x00\x00", start) - 0x7;
         m_SoundData.Parameters = (const EventParameters*)memory.at_exe(decode_pc(exe, event_properties_instruction) + 0x30);
 
+        // Rev.Eng.: Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+        // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
+        // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
         auto event_map_instruction = find_inst(exe, "\x89\x58\x10\x48\x8d\x48\x18\x41\xb8\x88\x01\x00\x00", start) + 0x40;
         event_map_instruction = find_inst(exe, "\xf3", event_map_instruction);
         m_SoundData.Events = (const EventMap*)memory.at_exe(decode_pc(exe, event_map_instruction, 4));
