@@ -82,6 +82,5 @@ const std::vector<ParticleEmitter>& list_particles()
         std::sort(particles.begin(), particles.end(), [](ParticleEmitter& a, ParticleEmitter& b) -> bool
                   { return a.id < b.id; });
     }
-    particle_db_ptr();
     return particles;
 }
