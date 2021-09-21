@@ -58,13 +58,13 @@ struct GameManager
     size_t unknown_screen_scores;        // available in State
     size_t unknown_screen_constellation; // available in State
     size_t unknown_screen_recap;         // available in State
-    ScreenArenaMenu* screen_arena_menu;
-    size_t unknown_screen_arena_stages; // available in State
-    ScreenArenaItems* screen_arena_items;
-    size_t unknown_screen_arena_select; // available in State
-    size_t unknown_screen_arena_intro;  // available in State
-    size_t screen_arena_level;          // also available in State, but it's a different object! this one only has a render_timer, no UI parts
-    size_t unknown_screen_arena_score;  // available in State
+    size_t unknown_screen_arena_menu;    // available in State
+    size_t unknown_screen_arena_stages;  // available in State
+    size_t unknown_screen_arena_items;   // available in State
+    size_t unknown_screen_arena_select;  // available in State
+    size_t unknown_screen_arena_intro;   // available in State
+    size_t screen_arena_level;           // also available in State, but it's a different object! this one only has a render_timer, no UI parts
+    size_t unknown_screen_arena_score;   // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;
     PauseUI* pause_ui;

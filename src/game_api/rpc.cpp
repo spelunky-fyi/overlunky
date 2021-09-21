@@ -366,7 +366,7 @@ Screen* get_screen_ptr(uint32_t screen_id)
     }
     case 21:
     {
-        return game_manager->screen_arena_menu;
+        return state->screen_arena_menu;
     }
     case 22:
     case 24:
@@ -375,7 +375,7 @@ Screen* get_screen_ptr(uint32_t screen_id)
     }
     case 23:
     {
-        return game_manager->screen_arena_items;
+        return state->screen_arena_items;
     }
     case 25:
     {

@@ -135,9 +135,9 @@ struct StateMemory
     ScreenScores* screen_scores;
     ScreenConstellation* screen_constellation;
     ScreenRecap* screen_recap;
-    size_t unknown_screen_arena_menu; // potentially ScreenArenaMenu, available in GameManager
+    ScreenArenaMenu* screen_arena_menu;
     ScreenArenaStagesSelect* screen_arena_stages_select1;
-    size_t unknown_screen_arena_intro; // potentially ScreenArenaIntro, available in GameManager
+    ScreenArenaItems* screen_arena_items;
     ScreenArenaStagesSelect* screen_arena_stages_select2;
     ScreenArenaIntro* screen_arena_intro;
     ScreenArenaLevel* screen_arena_level;
