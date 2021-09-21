@@ -12,14 +12,14 @@
 
 size_t* find_api(Memory memory)
 {
+    // Rev.Eng.: Break at startup on SteamAPI_RegisterCallback, it gets called twice, second time
+    // to hook the Steam overlay, at the beginning of that function is the pointer we need
     ONCE(size_t*)
     {
         auto exe = memory.exe();
         auto after_bundle = memory.after_bundle;
-        auto off = find_inst(exe, "\x48\x8B\x50\x10\x48\x89"s, after_bundle) - 5;
-        off = off + (*(int32_t*)(&exe[off + 1])) + 5;
-
-        return res = (size_t*)memory.at_exe(decode_pc(exe, off + 6));
+        auto off = find_inst(exe, "\x70\x08\x00\x00\xFE\xFF\xFF\xFF\x48\x8B\x05"s, after_bundle) + 8;
+        return res = (size_t*)memory.at_exe(decode_pc(exe, off));
     }
 }
 
