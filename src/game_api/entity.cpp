@@ -35,17 +35,6 @@ struct EntityHooksInfo
 };
 std::vector<EntityHooksInfo> g_entity_hooks;
 
-size_t cache_entities_ptr = 0;
-
-size_t entities_offset()
-{
-    ONCE(size_t)
-    {
-        auto mem = Memory::get();
-        return res = decode_imm(mem.exe(), find_inst(mem.exe(), "\x48\x8D\x8E"s, find_inst(mem.exe(), "\x29\x5C\x8F\x3D"s, mem.after_bundle)));
-    }
-}
-
 struct EntityBucket
 {
     void** begin;
@@ -62,10 +51,10 @@ struct EntityPool
     EntityBucket* _some_bucket;
     EntityBucket* bucket;
 };
-struct EntityStore
+struct EntityFactory
 {
-    EntityDB types[0x391];
-    bool type_set[0x391];
+    EntityDB types[0x395];
+    bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map;
     EntityMap entity_map;
     void* _ptr_7;
@@ -73,12 +62,12 @@ struct EntityStore
 
 size_t entities_ptr()
 {
-    if (cache_entities_ptr == 0)
+    static size_t cache_entities_ptr = []()
     {
         auto mem = Memory::get();
-        cache_entities_ptr =
-            mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\xA4\x84\xE4\xCA\xDA\xBF\x4E\x83"s, mem.after_bundle) - 33));
-    }
+        size_t addr = find_inst(mem.exe(), "\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"s, mem.after_bundle);
+        return mem.at_exe(decode_pc(mem.exe(), addr - 0xc));
+    }();
     return cache_entities_ptr;
 }
 
@@ -106,25 +95,17 @@ RemoveLayer get_remove_layer()
 
 std::vector<EntityItem> list_entities()
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
-    size_t off = entities_offset();
-    // Special case: map_ptr might be 0 if it's not initialized.
-    // This only occurs in list_entities; for others, do not check the pointer
-    // to see if this assumption works.
-    if (!map_ptr)
+    const EntityFactory* entity_factory = *(const EntityFactory**)entities_ptr();
+    if (!entity_factory)
         return {};
 
-    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
+    const EntityMap& map = entity_factory->entity_map;
 
     std::vector<EntityItem> result;
-    for (const auto& kv : *map)
+    for (const auto& [name, id] : map)
     {
-        result.emplace_back(kv.first, kv.second);
-        // auto entities = reinterpret_cast<EntityDB *>(map_ptr);
-        // EntityDB *entity = &entities[kv.second];
-        // printf("%d\n", entity->id);
+        result.emplace_back(name, id);
     }
-
     return result;
 }
 
@@ -146,13 +127,12 @@ EntityDB* get_type(uint32_t id)
 
 uint32_t to_id(std::string_view name)
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
-    size_t off = entities_offset();
-    if (!map_ptr)
-        return 0;
-    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
-    auto it = map->find(std::string(name));
-    return it != map->end() ? it->second : -1;
+    const EntityFactory* entity_factory = *(const EntityFactory**)entities_ptr();
+    if (!entity_factory)
+        return {};
+    const EntityMap& map = entity_factory->entity_map;
+    auto it = map.find(std::string(name));
+    return it != map.end() ? it->second : -1;
 }
 
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
