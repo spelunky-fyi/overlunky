@@ -86,48 +86,21 @@ struct LevelGenData
     RoomTemplateType get_room_template_type(std::uint16_t room_template);
 
     // TODO: Get offsets from binary instead of hardcoding them
-    const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const
-    {
-        return *(const std::unordered_map<std::uint8_t, ShortTileCodeDef>*)((size_t)this + 0x48);
-    }
-    const std::unordered_map<std::string, TileCodeDef>& tile_codes() const
-    {
-        return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
-    }
+    const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const;
+    const std::unordered_map<std::string, TileCodeDef>& tile_codes() const;
 
-    const std::unordered_map<std::string, RoomTemplateDef>& room_templates() const
-    {
-        return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
-    }
+    const std::unordered_map<std::string, RoomTemplateDef>& room_templates() const;
 
     using SetRoomDatas = std::array<RoomTemplateData, 8 * 15>;
 
-    const SetRoomDatas& setroom_datas() const
-    {
-        return *(const SetRoomDatas*)((size_t)this + 0x7f0);
-    }
-    const std::unordered_map<std::uint16_t, RoomTemplateData>& room_template_datas() const
-    {
-        return *(const std::unordered_map<std::uint16_t, RoomTemplateData>*)((size_t)this + 0x108);
-    }
+    const SetRoomDatas& setroom_datas() const;
+    const std::unordered_map<std::uint16_t, RoomTemplateData>& room_template_datas() const;
 
-    const std::unordered_map<std::string, ChanceDef>& monster_chances() const
-    {
-        return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1330);
-    }
-    const std::unordered_map<std::string, ChanceDef>& trap_chances() const
-    {
-        return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x13b0);
-    }
+    const std::unordered_map<std::string, ChanceDef>& monster_chances() const;
+    const std::unordered_map<std::string, ChanceDef>& trap_chances() const;
 
-    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_monster_chances() const
-    {
-        return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1370);
-    }
-    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_trap_chances() const
-    {
-        return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x13f0);
-    }
+    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_monster_chances() const;
+    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_trap_chances() const;
 
     union
     {

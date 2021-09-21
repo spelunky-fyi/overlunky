@@ -1521,6 +1521,67 @@ RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_templat
     return RoomTemplateType::None;
 }
 
+// Rev.Eng.: Search for string totemtrap_chance, the single XREF is used in a function that inits
+// LevelGenData, totemtrap_chance is passed to a function that emplaces into an unordered_map
+// That should help to find the offset, the same function also defines some other stuff, use
+// the strings to find info about the corresponding members
+//
+// mothership_floor -> tile_codes
+// setroom%d-%d -> room_templates
+// snake -> monster_chances
+// totemtrap_chance -> trap_chances
+
+// Rev.Eng.: Search for the string generic.lvl, it's used as a param to the function that loads
+// a .lvl file (as seen by that files usage of Data/Levels as well), that file also contains all
+// offsets to all these maps in the beginning where many locals are assigned. In this function
+// you will find short_tile_codes, level_monster_chances and trap_monster_chances
+
+const std::unordered_map<std::uint8_t, ShortTileCodeDef>& LevelGenData::short_tile_codes() const
+{
+    return *(const std::unordered_map<std::uint8_t, ShortTileCodeDef>*)((size_t)this + 0x48);
+}
+const std::unordered_map<std::string, TileCodeDef>& LevelGenData::tile_codes() const
+{
+    return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
+}
+
+const std::unordered_map<std::string, RoomTemplateDef>& LevelGenData::room_templates() const
+{
+    return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
+}
+
+// Rev.Eng.: Search for the string setroom%d-%d, you should find among the very few XREFs some code
+// that uses some form of scanf to get the coords and check whether a string matches the pattern
+// Further down some param will be either directly put into an array (setroom_datas) or put into
+// an unordered_map (room_template_datas)
+
+const LevelGenData::SetRoomDatas& LevelGenData::setroom_datas() const
+{
+    return *(const SetRoomDatas*)((size_t)this + 0x800);
+}
+const std::unordered_map<std::uint16_t, RoomTemplateData>& LevelGenData::room_template_datas() const
+{
+    return *(const std::unordered_map<std::uint16_t, RoomTemplateData>*)((size_t)this + 0x108);
+}
+
+const std::unordered_map<std::string, ChanceDef>& LevelGenData::monster_chances() const
+{
+    return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1340);
+}
+const std::unordered_map<std::string, ChanceDef>& LevelGenData::trap_chances() const
+{
+    return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x13c0);
+}
+
+const std::unordered_map<std::uint32_t, LevelChanceDef>& LevelGenData::level_monster_chances() const
+{
+    return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1380);
+}
+const std::unordered_map<std::uint32_t, LevelChanceDef>& LevelGenData::level_trap_chances() const
+{
+    return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1400);
+}
+
 using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
 void LevelGenSystem::init()
 {
