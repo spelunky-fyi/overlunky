@@ -9,11 +9,19 @@
 
 #include "logger.h"
 
-size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset)
+// Decodes the program counter inside an instruction
+// The default simple variant is 3 bytes instruction, 4 bytes rel. address, 0 bytes suffix:
+//      e.g.  movups xmm0, ptr[XXXXXXXX] = 0F1005 XXXXXXXX
+// Some instructions have 2 bytes instruction, so specify 2 for opcode_offset
+//      e.g.  call ptr[XXXXXXXX] = FF15 XXXXXXXX
+// Some (write) instructions have a value after the program counter to be extracted, so specify the opcode_suffix_offset
+//      e.g.  mov word ptr[XXXXXXXX], 1 = 66:C705 XXXXXXXX 0100 (opcode_suffix_offset = 2)
+size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset, uint8_t opcode_suffix_offset)
 {
     off_t rel = *(int32_t*)(&exe[offset + opcode_offset]);
-    return offset + rel + opcode_offset + 4;
+    return offset + rel + opcode_offset + 4 + opcode_suffix_offset;
 }
+
 size_t decode_imm(char* exe, size_t offset, uint8_t opcode_offset)
 {
     return *(uint32_t*)(&exe[offset + opcode_offset]);
@@ -28,7 +36,8 @@ PIMAGE_NT_HEADERS RtlImageNtHeader(_In_ PVOID Base)
 
 size_t find_inst(char* exe, std::string_view needle, size_t start)
 {
-    static const std::size_t exe_size = [exe]() {
+    static const std::size_t exe_size = [exe]()
+    {
         if (PIMAGE_NT_HEADERS pinth = RtlImageNtHeader(exe))
         {
             return (std::size_t)(pinth->OptionalHeader.BaseOfCode + pinth->OptionalHeader.SizeOfCode);
@@ -52,7 +61,7 @@ size_t find_inst(char* exe, std::string_view needle, size_t start)
         }
     }
 
-    if (MessageBox(NULL, fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{ needle }).c_str(), NULL, MB_OKCANCEL) == IDCANCEL)
+    if (MessageBox(NULL, fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{needle}).c_str(), NULL, MB_OKCANCEL) == IDCANCEL)
     {
         std::terminate();
     }

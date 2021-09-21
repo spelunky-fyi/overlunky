@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string_view>
 
-size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset = 3);
+size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset = 3, uint8_t opcode_suffix_offset = 0);
 size_t decode_imm(char* exe, size_t offset, uint8_t opcode_offset = 3);
 
 // Find the location of the instruction (needle) with wildcard support
