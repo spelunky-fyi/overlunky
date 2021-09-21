@@ -5148,8 +5148,7 @@ std::string make_save_path(std::string_view script_path, std::string_view script
 
 void init_ui()
 {
-    // TODO: reenable soundmanager (2nd and 3rd pattern in SoundManager ctor are not correct)
-    //g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
+    g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
     g_state = get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
