@@ -319,9 +319,13 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
 
     if (func_offset == 0)
     {
-        std::string pattern = "\xC7\x44\x24\x28\x06\x00\x00\x00\x48\x8B\xD9"s;
+        // Rev.Eng.: look for cvttss2si instruction at the end of the exe (F3:0F2CC0)
+        // Function has distinct look, one call at the top, for the rest a couple cvttss2si and
+        // moving memory around at high offsets compared to register: [register+80XXX]
+        std::string pattern = "\xC7\x44\x24\x28\x06\x00\x00\x00\xC7\x44\x24\x20\x04\x00\x00\x00"s;
         func_offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
 
+        // TODO: update this and check if stack fillers are still needed below
         auto offset = find_inst(exe, "\x4C\x8D\x0D\x59\xAF\x0F\x00"s, memory.after_bundle);
         param_9 = memory.at_exe(decode_pc(exe, offset));
     }
@@ -429,7 +433,9 @@ void init_render_api_hooks()
     }
 
     {
-        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x44\x8B\xAC\xC1\x14\x3F\x06\x00"s, after_bundle)));
+        // Rev.Eng.: break on draw_world_texture and go a couple functions higher in the call stack (4-5) until
+        // you reach one that has rdx counting down from 0x35 to 0x01
+        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x48\x81\xC6\x18\x3F\x06\x00"s, after_bundle)));
         g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)fun_start;
     }
 
