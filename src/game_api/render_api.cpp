@@ -416,12 +416,15 @@ void init_render_api_hooks()
     }
 
     {
-        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x48\x8D\x0D\x56\x05\x16\x00"s, after_bundle)));
+        // Rev.Eng.: Locate in memory 2B 00 24 00 25 00 64 00 "+$%d" (UTF16 str of the money gained text)
+        // Find reference to this memory, it's only used in the HUD
+        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x4C\x8D\x05\x63\x78\x12\x00"s, after_bundle)));
         g_render_hud_trampoline = (VanillaRenderHudFun*)fun_start;
     }
 
     {
-        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x48\x8B\x58\x10\x48\x8B\x83\xA8\x00\x00\x00"s, after_bundle)));
+        // Rev.Eng.: Put bp on GameManager.pause_ui.scroll.y
+        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x48\x8B\x05\x22\x4D\x1B\x00"s, after_bundle)));
         g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)fun_start;
     }
 
