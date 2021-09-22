@@ -60,15 +60,10 @@ struct EntityFactory
     void* _ptr_7;
 };
 
-size_t entities_ptr()
+EntityFactory* entity_factory()
 {
-    static size_t cache_entities_ptr = []()
-    {
-        auto mem = Memory::get();
-        size_t addr = find_inst(mem.exe(), "\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"s, mem.after_bundle);
-        return mem.at_exe(decode_pc(mem.exe(), addr - 0xc));
-    }();
-    return cache_entities_ptr;
+    static EntityFactory* cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
+    return cache_entity_factory;
 }
 
 AddLayer get_add_layer()
@@ -95,11 +90,11 @@ RemoveLayer get_remove_layer()
 
 std::vector<EntityItem> list_entities()
 {
-    const EntityFactory* entity_factory = *(const EntityFactory**)entities_ptr();
-    if (!entity_factory)
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (!entity_factory_ptr)
         return {};
 
-    const EntityMap& map = entity_factory->entity_map;
+    const EntityMap& map = entity_factory_ptr->entity_map;
 
     std::vector<EntityItem> result;
     for (const auto& [name, id] : map)
@@ -111,26 +106,23 @@ std::vector<EntityItem> list_entities()
 
 EntityDB* get_type(uint32_t id)
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
+    EntityFactory* entity_factory_ptr = entity_factory();
+
     // Special case: map_ptr might be 0 if it's not initialized.
     // This only occurs in list_entities; for others, do not check the pointer
     // to see if this assumption works.
-    if (!map_ptr)
+    if (!entity_factory_ptr)
         return nullptr;
 
-    //auto map = reinterpret_cast<EntityMap*>(map_ptr + entities_offset());
-
-    std::vector<EntityItem> result;
-    auto entities = reinterpret_cast<EntityDB*>(map_ptr);
-    return &entities[id];
+    return entity_factory_ptr->types + id;
 }
 
 uint32_t to_id(std::string_view name)
 {
-    const EntityFactory* entity_factory = *(const EntityFactory**)entities_ptr();
-    if (!entity_factory)
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (!entity_factory_ptr)
         return {};
-    const EntityMap& map = entity_factory->entity_map;
+    const EntityMap& map = entity_factory_ptr->entity_map;
     auto it = map.find(std::string(name));
     return it != map.end() ? it->second : -1;
 }

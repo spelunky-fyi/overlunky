@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "logger.h"
+#include "memory.hpp"
 
 // Decodes the program counter inside an instruction
 // The default simple variant is 3 bytes instruction, 4 bytes rel. address, 0 bytes suffix:
@@ -16,13 +17,13 @@
 //      e.g.  call ptr[XXXXXXXX] = FF15 XXXXXXXX
 // Some (write) instructions have a value after the program counter to be extracted, so specify the opcode_suffix_offset
 //      e.g.  mov word ptr[XXXXXXXX], 1 = 66:C705 XXXXXXXX 0100 (opcode_suffix_offset = 2)
-size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset, uint8_t opcode_suffix_offset)
+size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t opcode_suffix_offset)
 {
     off_t rel = *(int32_t*)(&exe[offset + opcode_offset]);
     return offset + rel + opcode_offset + 4 + opcode_suffix_offset;
 }
 
-size_t decode_imm(char* exe, size_t offset, uint8_t opcode_offset)
+size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset)
 {
     return *(uint32_t*)(&exe[offset + opcode_offset]);
 }
@@ -34,7 +35,7 @@ PIMAGE_NT_HEADERS RtlImageNtHeader(_In_ PVOID Base)
     return proc(Base);
 }
 
-size_t find_inst(char* exe, std::string_view needle, size_t start)
+size_t find_inst(const char* exe, std::string_view needle, size_t start)
 {
     static const std::size_t exe_size = [exe]()
     {
@@ -85,4 +86,54 @@ size_t find_after_bundle(size_t exe)
 
     using namespace std::string_view_literals;
     return find_inst((char*)exe, "\x55\x41\x57\x41\x56\x41\x55\x41\x54"sv, offset);
+}
+
+std::unordered_map<std::string_view, size_t (*)(Memory mem, const char* exe)> g_address_rules{
+    {
+        "entity_factory"sv,
+        [](Memory mem, const char* exe)
+        {
+            size_t addr = find_inst(exe, "\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"sv, mem.after_bundle, "entity_factory"sv);
+            return mem.at_exe(decode_pc(exe, addr - 0xc));
+        },
+    },
+};
+std::unordered_map<std::string_view, size_t> g_cached_addresses;
+
+void preload_addresses()
+{
+    Memory mem = Memory::get();
+    const char* exe = mem.exe();
+    for (auto [address_name, rule] : g_address_rules)
+    {
+        size_t address = rule(mem, exe);
+        if (address > 0ull)
+        {
+            g_cached_addresses[address_name] = address;
+        }
+    }
+}
+size_t load_address(std::string_view address_name)
+{
+    auto it = g_address_rules.find(address_name);
+    if (it != g_address_rules.end())
+    {
+        Memory mem = Memory::get();
+        size_t address = it->second(mem, mem.exe());
+        if (address > 0ull)
+        {
+            g_cached_addresses[address_name] = address;
+            return address;
+        }
+    }
+    return 0ull;
+}
+size_t get_address(std::string_view address_name)
+{
+    auto it = g_cached_addresses.find(address_name);
+    if (it != g_cached_addresses.end())
+    {
+        return it->second;
+    }
+    return load_address(address_name);
 }
