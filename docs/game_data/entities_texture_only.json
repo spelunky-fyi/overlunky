@@ -1,543 +1,543 @@
 {
   "ENT_TYPE_ACTIVEFLOOR_BONEBLOCK": {
     "animations": {},
-    "id": 599,
-    "texture": 115
+    "id": 601,
+    "texture": 129
   },
   "ENT_TYPE_ACTIVEFLOOR_BOULDER": {
     "animations": {},
-    "id": 597,
-    "texture": 167
+    "id": 599,
+    "texture": 182
   },
   "ENT_TYPE_ACTIVEFLOOR_BUBBLE_PLATFORM": {
     "animations": {},
-    "id": 620,
-    "texture": 363
+    "id": 622,
+    "texture": 378
   },
   "ENT_TYPE_ACTIVEFLOOR_BUSHBLOCK": {
     "animations": {},
-    "id": 600,
-    "texture": 124
+    "id": 602,
+    "texture": 138
   },
   "ENT_TYPE_ACTIVEFLOOR_CHAINEDPUSHBLOCK": {
     "animations": {},
-    "id": 602,
-    "texture": 131
+    "id": 604,
+    "texture": 145
   },
   "ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL": {
     "animations": {},
-    "id": 606,
-    "texture": 358
+    "id": 608,
+    "texture": 373
   },
   "ENT_TYPE_ACTIVEFLOOR_CRUSHING_ELEVATOR": {
-    "animations": {},
-    "id": 621,
-    "texture": -2
-  },
-  "ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP": {
-    "animations": {},
-    "id": 609,
-    "texture": 266
-  },
-  "ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP_LARGE": {
-    "animations": {},
-    "id": 610,
-    "texture": 267
-  },
-  "ENT_TYPE_ACTIVEFLOOR_DRILL": {
-    "animations": {},
-    "id": 608,
-    "texture": 137
-  },
-  "ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER": {
-    "animations": {},
-    "id": 595,
-    "texture": -2
-  },
-  "ENT_TYPE_ACTIVEFLOOR_EGGSHIPPLATFORM": {
-    "animations": {},
-    "id": 594,
-    "texture": -2
-  },
-  "ENT_TYPE_ACTIVEFLOOR_ELEVATOR": {
-    "animations": {},
-    "id": 615,
-    "texture": 266
-  },
-  "ENT_TYPE_ACTIVEFLOOR_FALLING_PLATFORM": {
-    "animations": {},
-    "id": 605,
-    "texture": 131
-  },
-  "ENT_TYPE_ACTIVEFLOOR_GIANTCLAM_BASE": {
-    "animations": {},
-    "id": 616,
-    "texture": 307
-  },
-  "ENT_TYPE_ACTIVEFLOOR_KINGU_PLATFORM": {
-    "animations": {},
-    "id": 617,
-    "texture": 315
-  },
-  "ENT_TYPE_ACTIVEFLOOR_LIGHTARROWPLATFORM": {
-    "animations": {},
-    "id": 604,
-    "texture": 358
-  },
-  "ENT_TYPE_ACTIVEFLOOR_METALARROWPLATFORM": {
-    "animations": {},
-    "id": 603,
-    "texture": 358
-  },
-  "ENT_TYPE_ACTIVEFLOOR_OLMEC": {
-    "animations": {},
-    "id": 611,
-    "texture": -2
-  },
-  "ENT_TYPE_ACTIVEFLOOR_POWDERKEG": {
-    "animations": {},
-    "id": 601,
-    "texture": 266
-  },
-  "ENT_TYPE_ACTIVEFLOOR_PUSHBLOCK": {
-    "animations": {},
-    "id": 598,
-    "texture": -5
-  },
-  "ENT_TYPE_ACTIVEFLOOR_REGENERATINGBLOCK": {
     "animations": {},
     "id": 623,
     "texture": -2
   },
+  "ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP": {
+    "animations": {},
+    "id": 611,
+    "texture": 281
+  },
+  "ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP_LARGE": {
+    "animations": {},
+    "id": 612,
+    "texture": 282
+  },
+  "ENT_TYPE_ACTIVEFLOOR_DRILL": {
+    "animations": {},
+    "id": 610,
+    "texture": 151
+  },
+  "ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER": {
+    "animations": {},
+    "id": 597,
+    "texture": -2
+  },
+  "ENT_TYPE_ACTIVEFLOOR_EGGSHIPPLATFORM": {
+    "animations": {},
+    "id": 596,
+    "texture": -2
+  },
+  "ENT_TYPE_ACTIVEFLOOR_ELEVATOR": {
+    "animations": {},
+    "id": 617,
+    "texture": 281
+  },
+  "ENT_TYPE_ACTIVEFLOOR_FALLING_PLATFORM": {
+    "animations": {},
+    "id": 607,
+    "texture": 145
+  },
+  "ENT_TYPE_ACTIVEFLOOR_GIANTCLAM_BASE": {
+    "animations": {},
+    "id": 618,
+    "texture": 322
+  },
+  "ENT_TYPE_ACTIVEFLOOR_KINGU_PLATFORM": {
+    "animations": {},
+    "id": 619,
+    "texture": 330
+  },
+  "ENT_TYPE_ACTIVEFLOOR_LIGHTARROWPLATFORM": {
+    "animations": {},
+    "id": 606,
+    "texture": 373
+  },
+  "ENT_TYPE_ACTIVEFLOOR_METALARROWPLATFORM": {
+    "animations": {},
+    "id": 605,
+    "texture": 373
+  },
+  "ENT_TYPE_ACTIVEFLOOR_OLMEC": {
+    "animations": {},
+    "id": 613,
+    "texture": -2
+  },
+  "ENT_TYPE_ACTIVEFLOOR_POWDERKEG": {
+    "animations": {},
+    "id": 603,
+    "texture": 281
+  },
+  "ENT_TYPE_ACTIVEFLOOR_PUSHBLOCK": {
+    "animations": {},
+    "id": 600,
+    "texture": -5
+  },
+  "ENT_TYPE_ACTIVEFLOOR_REGENERATINGBLOCK": {
+    "animations": {},
+    "id": 625,
+    "texture": -2
+  },
   "ENT_TYPE_ACTIVEFLOOR_SHIELD": {
     "animations": {},
-    "id": 622,
+    "id": 624,
     "texture": -2
   },
   "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL": {
     "animations": {},
-    "id": 613,
-    "texture": 229
+    "id": 615,
+    "texture": 244
   },
   "ENT_TYPE_ACTIVEFLOOR_THINICE": {
     "animations": {},
-    "id": 614,
-    "texture": 162
+    "id": 616,
+    "texture": 177
   },
   "ENT_TYPE_ACTIVEFLOOR_TIAMAT_PLATFORM": {
     "animations": {},
-    "id": 618,
+    "id": 620,
     "texture": -2
   },
   "ENT_TYPE_ACTIVEFLOOR_TIAMAT_SHOULDERPLATFORM": {
     "animations": {},
-    "id": 619,
+    "id": 621,
     "texture": -2
   },
   "ENT_TYPE_ACTIVEFLOOR_TIMEDPOWDERKEG": {
     "animations": {},
-    "id": 612,
-    "texture": 266
+    "id": 614,
+    "texture": 281
   },
   "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL": {
     "animations": {},
-    "id": 607,
-    "texture": 358
+    "id": 609,
+    "texture": 373
   },
   "ENT_TYPE_ACTIVEFLOOR_WOODENLOG_TRAP": {
     "animations": {},
-    "id": 596,
-    "texture": 121
+    "id": 598,
+    "texture": 135
   },
   "ENT_TYPE_BG_ANUBIS_THRONE": {
     "animations": {},
-    "id": 817,
-    "texture": 226
+    "id": 819,
+    "texture": 241
   },
   "ENT_TYPE_BG_BASECAMP_BUNKBED": {
     "animations": {},
-    "id": 797,
-    "texture": 110
+    "id": 799,
+    "texture": 124
   },
   "ENT_TYPE_BG_BASECAMP_DININGTABLE_DISHES": {
     "animations": {},
-    "id": 799,
-    "texture": 106
+    "id": 801,
+    "texture": 120
   },
   "ENT_TYPE_BG_BASECAMP_DRESSER": {
     "animations": {},
-    "id": 796,
-    "texture": 106
+    "id": 798,
+    "texture": 120
   },
   "ENT_TYPE_BG_BASECAMP_SHORTCUTSTATIONBANNER": {
     "animations": {},
-    "id": 800,
-    "texture": 108
+    "id": 802,
+    "texture": 122
   },
   "ENT_TYPE_BG_BASECAMP_SIDETABLE": {
     "animations": {},
-    "id": 798,
-    "texture": 106
+    "id": 800,
+    "texture": 120
   },
   "ENT_TYPE_BG_BOULDER_STATUE": {
     "animations": {},
-    "id": 826,
-    "texture": 264
+    "id": 828,
+    "texture": 279
   },
   "ENT_TYPE_BG_CONSTELLATION_CONNECTION": {
     "animations": {},
-    "id": 774,
-    "texture": 93
+    "id": 776,
+    "texture": 107
   },
   "ENT_TYPE_BG_CONSTELLATION_FLASH": {
     "animations": {},
-    "id": 770,
+    "id": 772,
     "texture": -2
   },
   "ENT_TYPE_BG_CONSTELLATION_GLOW": {
     "animations": {},
-    "id": 773,
-    "texture": 90
+    "id": 775,
+    "texture": 104
   },
   "ENT_TYPE_BG_CONSTELLATION_HALO": {
     "animations": {},
-    "id": 772,
-    "texture": 90
+    "id": 774,
+    "texture": 104
   },
   "ENT_TYPE_BG_CONSTELLATION_STAR": {
     "animations": {},
-    "id": 771,
-    "texture": 90
+    "id": 773,
+    "texture": 104
   },
   "ENT_TYPE_BG_COSMIC_FARFLOATINGDEBRIS": {
     "animations": {},
-    "id": 838,
-    "texture": 215
+    "id": 840,
+    "texture": 230
   },
   "ENT_TYPE_BG_COSMIC_FLOATINGDEBRIS": {
     "animations": {},
-    "id": 837,
-    "texture": 214
+    "id": 839,
+    "texture": 229
   },
   "ENT_TYPE_BG_CROWN_STATUE": {
     "animations": {},
-    "id": 816,
-    "texture": 242
+    "id": 818,
+    "texture": 257
   },
   "ENT_TYPE_BG_DOOR": {
     "animations": {},
-    "id": 784,
+    "id": 786,
     "texture": -6
   },
   "ENT_TYPE_BG_DOORGEM": {
     "animations": {},
-    "id": 795,
-    "texture": 106
+    "id": 797,
+    "texture": 120
   },
   "ENT_TYPE_BG_DOOR_BACK_LAYER": {
     "animations": {},
-    "id": 786,
-    "texture": 266
+    "id": 788,
+    "texture": 281
   },
   "ENT_TYPE_BG_DOOR_BLACK_MARKET": {
     "animations": {},
-    "id": 788,
-    "texture": 126
+    "id": 790,
+    "texture": 140
   },
   "ENT_TYPE_BG_DOOR_COG": {
     "animations": {},
-    "id": 789,
-    "texture": 152
+    "id": 791,
+    "texture": 167
   },
   "ENT_TYPE_BG_DOOR_EGGPLANT_WORLD": {
     "animations": {},
-    "id": 791,
-    "texture": 194
+    "id": 793,
+    "texture": 209
   },
   "ENT_TYPE_BG_DOOR_FRONT_LAYER": {
     "animations": {},
-    "id": 785,
+    "id": 787,
     "texture": -7
   },
   "ENT_TYPE_BG_DOOR_GHIST_SHOP": {
     "animations": {},
-    "id": 787,
-    "texture": 119
+    "id": 789,
+    "texture": 133
   },
   "ENT_TYPE_BG_DOOR_LARGE": {
     "animations": {},
-    "id": 783,
-    "texture": 105
+    "id": 785,
+    "texture": 119
   },
   "ENT_TYPE_BG_DOOR_OLMEC_SHIP": {
     "animations": {},
-    "id": 790,
-    "texture": 94
+    "id": 792,
+    "texture": 108
   },
   "ENT_TYPE_BG_DRILL_INDICATOR": {
     "animations": {},
-    "id": 814,
-    "texture": 132
+    "id": 816,
+    "texture": 146
   },
   "ENT_TYPE_BG_DUAT_BLOODMOON": {
     "animations": {},
-    "id": 823,
-    "texture": 200
+    "id": 825,
+    "texture": 215
   },
   "ENT_TYPE_BG_DUAT_FARFLOATINGDEBRIS": {
     "animations": {},
-    "id": 825,
-    "texture": 199
+    "id": 827,
+    "texture": 214
   },
   "ENT_TYPE_BG_DUAT_FLOATINGDEBRIS": {
     "animations": {},
-    "id": 824,
-    "texture": 199
+    "id": 826,
+    "texture": 214
   },
   "ENT_TYPE_BG_DUAT_LAYER": {
     "animations": {},
-    "id": 820,
-    "texture": 196
+    "id": 822,
+    "texture": 211
   },
   "ENT_TYPE_BG_DUAT_PYRAMID_LAYER": {
     "animations": {},
-    "id": 822,
-    "texture": 200
+    "id": 824,
+    "texture": 215
   },
   "ENT_TYPE_BG_DUAT_SIDE_DECORATION": {
     "animations": {},
-    "id": 821,
-    "texture": 198
+    "id": 823,
+    "texture": 213
   },
   "ENT_TYPE_BG_EGGSAC_STAINS": {
     "animations": {},
-    "id": 839,
-    "texture": 363
+    "id": 841,
+    "texture": 378
   },
   "ENT_TYPE_BG_EGGSHIP_ROOM": {
     "animations": {},
-    "id": 775,
-    "texture": 88
+    "id": 777,
+    "texture": 102
   },
   "ENT_TYPE_BG_ENDINGTREASURE_HUNDUN_GOLD": {
     "animations": {},
-    "id": 777,
-    "texture": 207
+    "id": 779,
+    "texture": 222
   },
   "ENT_TYPE_BG_ICE_CRYSTAL": {
     "animations": {},
-    "id": 819,
-    "texture": 171
+    "id": 821,
+    "texture": 186
   },
   "ENT_TYPE_BG_KALI_STATUE": {
     "animations": {},
-    "id": 807,
+    "id": 809,
     "texture": -9
   },
   "ENT_TYPE_BG_LEVEL_BACKWALL": {
     "animations": {},
-    "id": 778,
+    "id": 780,
     "texture": -4
   },
   "ENT_TYPE_BG_LEVEL_BOMB_SOOT": {
     "animations": {},
-    "id": 781,
-    "texture": 368
+    "id": 783,
+    "texture": 384
   },
   "ENT_TYPE_BG_LEVEL_COSMIC": {
     "animations": {},
-    "id": 836,
-    "texture": 213
+    "id": 838,
+    "texture": 228
   },
   "ENT_TYPE_BG_LEVEL_DECO": {
     "animations": {},
-    "id": 779,
+    "id": 781,
     "texture": -8
   },
   "ENT_TYPE_BG_LEVEL_POWEREDBOMB_SOOT": {
     "animations": {},
-    "id": 782,
-    "texture": 368
+    "id": 784,
+    "texture": 384
   },
   "ENT_TYPE_BG_LEVEL_SHADOW": {
     "animations": {},
-    "id": 780,
-    "texture": 368
+    "id": 782,
+    "texture": 384
   },
   "ENT_TYPE_BG_MOAI_STATUE": {
     "animations": {},
-    "id": 827,
-    "texture": 168
+    "id": 829,
+    "texture": 183
   },
   "ENT_TYPE_BG_MOTHER_STATUE": {
     "animations": {},
-    "id": 833,
-    "texture": 190
+    "id": 835,
+    "texture": 205
   },
   "ENT_TYPE_BG_OLMEC_PILLAR": {
     "animations": {},
-    "id": 818,
-    "texture": 222
+    "id": 820,
+    "texture": 237
   },
   "ENT_TYPE_BG_OUROBORO": {
     "animations": {},
-    "id": 794,
-    "texture": 111
+    "id": 796,
+    "texture": 125
   },
   "ENT_TYPE_BG_PALACE_CANDLE": {
     "animations": {},
-    "id": 831,
-    "texture": 259
+    "id": 833,
+    "texture": 274
   },
   "ENT_TYPE_BG_PALACE_DISHES": {
     "animations": {},
-    "id": 832,
-    "texture": 259
+    "id": 834,
+    "texture": 274
   },
   "ENT_TYPE_BG_PARENTSHIP_LANDINGLEG": {
     "animations": {},
-    "id": 776,
-    "texture": 99
+    "id": 778,
+    "texture": 113
   },
   "ENT_TYPE_BG_SHOP": {
     "animations": {},
-    "id": 801,
-    "texture": 216
+    "id": 803,
+    "texture": 231
   },
   "ENT_TYPE_BG_SHOPWANTEDPORTRAIT": {
     "animations": {},
-    "id": 805,
-    "texture": 270
+    "id": 807,
+    "texture": 285
   },
   "ENT_TYPE_BG_SHOPWANTEDPOSTER": {
     "animations": {},
-    "id": 804,
-    "texture": 218
+    "id": 806,
+    "texture": 233
   },
   "ENT_TYPE_BG_SHOP_BACKDOOR": {
     "animations": {},
-    "id": 803,
-    "texture": 220
+    "id": 805,
+    "texture": 235
   },
   "ENT_TYPE_BG_SHOP_DICEPOSTER": {
     "animations": {},
-    "id": 806,
-    "texture": 267
+    "id": 808,
+    "texture": 282
   },
   "ENT_TYPE_BG_SHOP_ENTRANCEDOOR": {
     "animations": {},
-    "id": 802,
-    "texture": 216
+    "id": 804,
+    "texture": 231
   },
   "ENT_TYPE_BG_SPACE": {
     "animations": {},
-    "id": 757,
-    "texture": 101
+    "id": 759,
+    "texture": 115
   },
   "ENT_TYPE_BG_SURFACE_BACKGROUNDSEAM": {
     "animations": {},
-    "id": 769,
-    "texture": 87
+    "id": 771,
+    "texture": 101
   },
   "ENT_TYPE_BG_SURFACE_ENTITY": {
     "animations": {},
-    "id": 767,
-    "texture": 103
+    "id": 769,
+    "texture": 117
   },
   "ENT_TYPE_BG_SURFACE_LAYER": {
     "animations": {},
-    "id": 764,
-    "texture": 102
+    "id": 766,
+    "texture": 116
   },
   "ENT_TYPE_BG_SURFACE_LAYER_HOLE": {
     "animations": {},
-    "id": 766,
-    "texture": 96
+    "id": 768,
+    "texture": 110
   },
   "ENT_TYPE_BG_SURFACE_LAYER_OCCLUDER": {
     "animations": {},
-    "id": 765,
-    "texture": 96
+    "id": 767,
+    "texture": 110
   },
   "ENT_TYPE_BG_SURFACE_MOVING_STAR": {
     "animations": {},
-    "id": 762,
-    "texture": 87
+    "id": 764,
+    "texture": 101
   },
   "ENT_TYPE_BG_SURFACE_NEBULA": {
+    "animations": {},
+    "id": 765,
+    "texture": 118
+  },
+  "ENT_TYPE_BG_SURFACE_OLMEC_LAYER": {
+    "animations": {},
+    "id": 770,
+    "texture": 118
+  },
+  "ENT_TYPE_BG_SURFACE_SHOOTING_STAR": {
+    "animations": {},
+    "id": 761,
+    "texture": 104
+  },
+  "ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL": {
+    "animations": {},
+    "id": 762,
+    "texture": 101
+  },
+  "ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL_PARTICLE": {
     "animations": {},
     "id": 763,
     "texture": 104
   },
-  "ENT_TYPE_BG_SURFACE_OLMEC_LAYER": {
-    "animations": {},
-    "id": 768,
-    "texture": 104
-  },
-  "ENT_TYPE_BG_SURFACE_SHOOTING_STAR": {
-    "animations": {},
-    "id": 759,
-    "texture": 90
-  },
-  "ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL": {
-    "animations": {},
-    "id": 760,
-    "texture": 87
-  },
-  "ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL_PARTICLE": {
-    "animations": {},
-    "id": 761,
-    "texture": 90
-  },
   "ENT_TYPE_BG_SURFACE_STAR": {
     "animations": {},
-    "id": 758,
-    "texture": 87
+    "id": 760,
+    "texture": 101
   },
   "ENT_TYPE_BG_TUTORIAL_SIGN_BACK": {
     "animations": {},
-    "id": 792,
+    "id": 794,
     "texture": -2
   },
   "ENT_TYPE_BG_TUTORIAL_SIGN_FRONT": {
     "animations": {},
-    "id": 793,
+    "id": 795,
     "texture": -2
   },
   "ENT_TYPE_BG_UDJATSOCKET_DECORATION": {
     "animations": {},
-    "id": 813,
-    "texture": 266
+    "id": 815,
+    "texture": 281
   },
   "ENT_TYPE_BG_VAT_BACK": {
     "animations": {},
-    "id": 828,
-    "texture": 265
+    "id": 830,
+    "texture": 280
   },
   "ENT_TYPE_BG_VAT_FRONT": {
     "animations": {},
-    "id": 830,
-    "texture": 265
+    "id": 832,
+    "texture": 280
   },
   "ENT_TYPE_BG_VAT_SHOPKEEPER_PRIME": {
     "animations": {},
-    "id": 829,
-    "texture": 265
+    "id": 831,
+    "texture": 280
   },
   "ENT_TYPE_BG_VLAD_WINDOW": {
     "animations": {},
-    "id": 815,
-    "texture": 244
+    "id": 817,
+    "texture": 259
   },
   "ENT_TYPE_BG_WATER_FOUNTAIN": {
     "animations": {},
-    "id": 834,
-    "texture": 155
+    "id": 836,
+    "texture": 170
   },
   "ENT_TYPE_BG_YAMA_BODY": {
     "animations": {},
-    "id": 835,
-    "texture": 347
+    "id": 837,
+    "texture": 362
   },
   "ENT_TYPE_CHAR_AMAZON": {
     "animations": {
@@ -858,7 +858,7 @@
       }
     },
     "id": 200,
-    "texture": 276
+    "texture": 291
   },
   "ENT_TYPE_CHAR_ANA_SPELUNKY": {
     "animations": {
@@ -1179,7 +1179,7 @@
       }
     },
     "id": 194,
-    "texture": 270
+    "texture": 285
   },
   "ENT_TYPE_CHAR_AU": {
     "animations": {
@@ -1500,7 +1500,7 @@
       }
     },
     "id": 207,
-    "texture": 283
+    "texture": 298
   },
   "ENT_TYPE_CHAR_BANDA": {
     "animations": {
@@ -1821,7 +1821,7 @@
       }
     },
     "id": 198,
-    "texture": 274
+    "texture": 289
   },
   "ENT_TYPE_CHAR_CLASSIC_GUY": {
     "animations": {
@@ -2142,7 +2142,7 @@
       }
     },
     "id": 213,
-    "texture": 289
+    "texture": 304
   },
   "ENT_TYPE_CHAR_COCO_VON_DIAMONDS": {
     "animations": {
@@ -2463,7 +2463,7 @@
       }
     },
     "id": 202,
-    "texture": 278
+    "texture": 293
   },
   "ENT_TYPE_CHAR_COLIN_NORTHWARD": {
     "animations": {
@@ -2784,7 +2784,7 @@
       }
     },
     "id": 196,
-    "texture": 272
+    "texture": 287
   },
   "ENT_TYPE_CHAR_DEMI_VON_DIAMONDS": {
     "animations": {
@@ -3105,7 +3105,7 @@
       }
     },
     "id": 208,
-    "texture": 284
+    "texture": 299
   },
   "ENT_TYPE_CHAR_DIRK_YAMAOKA": {
     "animations": {
@@ -3426,7 +3426,7 @@
       }
     },
     "id": 211,
-    "texture": 287
+    "texture": 302
   },
   "ENT_TYPE_CHAR_EGGPLANT_CHILD": {
     "animations": {
@@ -3747,7 +3747,7 @@
       }
     },
     "id": 216,
-    "texture": 291
+    "texture": 306
   },
   "ENT_TYPE_CHAR_GREEN_GIRL": {
     "animations": {
@@ -4068,7 +4068,7 @@
       }
     },
     "id": 199,
-    "texture": 275
+    "texture": 290
   },
   "ENT_TYPE_CHAR_GUY_SPELUNKY": {
     "animations": {
@@ -4389,7 +4389,7 @@
       }
     },
     "id": 212,
-    "texture": 288
+    "texture": 303
   },
   "ENT_TYPE_CHAR_HIREDHAND": {
     "animations": {
@@ -4710,7 +4710,7 @@
       }
     },
     "id": 215,
-    "texture": 290
+    "texture": 305
   },
   "ENT_TYPE_CHAR_LISE_SYSTEM": {
     "animations": {
@@ -5031,7 +5031,7 @@
       }
     },
     "id": 201,
-    "texture": 277
+    "texture": 292
   },
   "ENT_TYPE_CHAR_MANFRED_TUNNEL": {
     "animations": {
@@ -5352,7 +5352,7 @@
       }
     },
     "id": 203,
-    "texture": 279
+    "texture": 294
   },
   "ENT_TYPE_CHAR_MARGARET_TUNNEL": {
     "animations": {
@@ -5673,7 +5673,7 @@
       }
     },
     "id": 195,
-    "texture": 271
+    "texture": 286
   },
   "ENT_TYPE_CHAR_OTAKU": {
     "animations": {
@@ -5994,7 +5994,7 @@
       }
     },
     "id": 204,
-    "texture": 280
+    "texture": 295
   },
   "ENT_TYPE_CHAR_PILOT": {
     "animations": {
@@ -6315,7 +6315,7 @@
       }
     },
     "id": 209,
-    "texture": 285
+    "texture": 300
   },
   "ENT_TYPE_CHAR_PRINCESS_AIRYN": {
     "animations": {
@@ -6636,7 +6636,7 @@
       }
     },
     "id": 210,
-    "texture": 286
+    "texture": 301
   },
   "ENT_TYPE_CHAR_ROFFY_D_SLOTH": {
     "animations": {
@@ -6957,7 +6957,7 @@
       }
     },
     "id": 197,
-    "texture": 273
+    "texture": 288
   },
   "ENT_TYPE_CHAR_TINA_FLAN": {
     "animations": {
@@ -7278,7 +7278,7 @@
       }
     },
     "id": 205,
-    "texture": 281
+    "texture": 296
   },
   "ENT_TYPE_CHAR_VALERIE_CRUMP": {
     "animations": {
@@ -7599,12 +7599,12 @@
       }
     },
     "id": 206,
-    "texture": 282
+    "texture": 297
   },
   "ENT_TYPE_DECORATION_BABYLON": {
     "animations": {},
     "id": 127,
-    "texture": 231
+    "texture": 246
   },
   "ENT_TYPE_DECORATION_BABYLONBUSH": {
     "animations": {},
@@ -7614,32 +7614,32 @@
   "ENT_TYPE_DECORATION_BABYLON_FLOWER": {
     "animations": {},
     "id": 141,
-    "texture": 172
+    "texture": 187
   },
   "ENT_TYPE_DECORATION_BABYLON_HANGING_FLOWER": {
     "animations": {},
     "id": 144,
-    "texture": 172
+    "texture": 187
   },
   "ENT_TYPE_DECORATION_BABYLON_NEON_SIGN": {
     "animations": {},
     "id": 145,
-    "texture": 232
+    "texture": 247
   },
   "ENT_TYPE_DECORATION_BASECAMPDOGSIGN": {
     "animations": {},
     "id": 152,
-    "texture": 109
+    "texture": 123
   },
   "ENT_TYPE_DECORATION_BASECAMPSIGN": {
     "animations": {},
     "id": 151,
-    "texture": 110
+    "texture": 124
   },
   "ENT_TYPE_DECORATION_BEEHIVE": {
     "animations": {},
     "id": 162,
-    "texture": 210
+    "texture": 225
   },
   "ENT_TYPE_DECORATION_BG_TRANSITIONCOVER": {
     "animations": {},
@@ -7649,62 +7649,62 @@
   "ENT_TYPE_DECORATION_BONEBLOCK": {
     "animations": {},
     "id": 121,
-    "texture": 115
+    "texture": 129
   },
   "ENT_TYPE_DECORATION_BORDER": {
     "animations": {},
     "id": 115,
-    "texture": 268
+    "texture": 283
   },
   "ENT_TYPE_DECORATION_BRANCH": {
     "animations": {},
     "id": 146,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_DECORATION_BUSHBLOCK": {
     "animations": {},
     "id": 122,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_CHAINANDBLOCKS_CHAINDECORATION": {
     "animations": {},
     "id": 163,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_DECORATION_COG": {
     "animations": {},
     "id": 169,
-    "texture": 246
+    "texture": 261
   },
   "ENT_TYPE_DECORATION_CONVEYORBELT_RAILING": {
     "animations": {},
     "id": 164,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_DECORATION_CROSS_BEAM": {
     "animations": {},
     "id": 131,
-    "texture": 216
+    "texture": 231
   },
   "ENT_TYPE_DECORATION_DUAT": {
     "animations": {},
     "id": 171,
-    "texture": 258
+    "texture": 273
   },
   "ENT_TYPE_DECORATION_DUAT_DARKSAND": {
     "animations": {},
     "id": 173,
-    "texture": 258
+    "texture": 273
   },
   "ENT_TYPE_DECORATION_DUAT_DESTRUCTIBLE_BG": {
     "animations": {},
     "id": 174,
-    "texture": 258
+    "texture": 273
   },
   "ENT_TYPE_DECORATION_DUAT_SAND": {
     "animations": {},
     "id": 172,
-    "texture": 258
+    "texture": 273
   },
   "ENT_TYPE_DECORATION_DWELLINGBUSH": {
     "animations": {},
@@ -7714,7 +7714,7 @@
   "ENT_TYPE_DECORATION_EGGPLANT_ALTAR": {
     "animations": {},
     "id": 180,
-    "texture": 162
+    "texture": 177
   },
   "ENT_TYPE_DECORATION_GENERIC": {
     "animations": {},
@@ -7724,32 +7724,32 @@
   "ENT_TYPE_DECORATION_GUTS": {
     "animations": {},
     "id": 179,
-    "texture": 263
+    "texture": 278
   },
   "ENT_TYPE_DECORATION_HANGING_BANNER": {
     "animations": {},
     "id": 134,
-    "texture": 241
+    "texture": 256
   },
   "ENT_TYPE_DECORATION_HANGING_HIDE": {
     "animations": {},
     "id": 132,
-    "texture": 116
+    "texture": 130
   },
   "ENT_TYPE_DECORATION_HANGING_SEAWEED": {
     "animations": {},
     "id": 133,
-    "texture": 154
+    "texture": 169
   },
   "ENT_TYPE_DECORATION_HANGING_WIRES": {
     "animations": {},
     "id": 135,
-    "texture": 231
+    "texture": 246
   },
   "ENT_TYPE_DECORATION_JUNGLE": {
     "animations": {},
     "id": 119,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_JUNGLEBUSH": {
     "animations": {},
@@ -7759,122 +7759,122 @@
   "ENT_TYPE_DECORATION_JUNGLE_FLOWER": {
     "animations": {},
     "id": 140,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_JUNGLE_HANGING_FLOWER": {
     "animations": {},
     "id": 143,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_KELP": {
     "animations": {},
     "id": 166,
-    "texture": 153
+    "texture": 168
   },
   "ENT_TYPE_DECORATION_LARGETOMB": {
     "animations": {},
     "id": 185,
-    "texture": 223
+    "texture": 238
   },
   "ENT_TYPE_DECORATION_MINEWOOD": {
     "animations": {},
     "id": 120,
-    "texture": 216
+    "texture": 231
   },
   "ENT_TYPE_DECORATION_MINEWOOD_POLE": {
     "animations": {},
     "id": 129,
-    "texture": 217
+    "texture": 232
   },
   "ENT_TYPE_DECORATION_MOTHERSHIP": {
     "animations": {},
     "id": 170,
-    "texture": 256
+    "texture": 271
   },
   "ENT_TYPE_DECORATION_MOTHER_STATUE_HAND": {
     "animations": {},
     "id": 181,
-    "texture": 191
+    "texture": 206
   },
   "ENT_TYPE_DECORATION_MUSHROOM_HAT": {
     "animations": {},
     "id": 160,
-    "texture": 172
+    "texture": 187
   },
   "ENT_TYPE_DECORATION_PAGODA": {
     "animations": {},
     "id": 125,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_DECORATION_PAGODA_POLE": {
     "animations": {},
     "id": 130,
-    "texture": 229
+    "texture": 244
   },
   "ENT_TYPE_DECORATION_PALACE": {
     "animations": {},
     "id": 175,
-    "texture": 259
+    "texture": 274
   },
   "ENT_TYPE_DECORATION_PALACE_CHANDELIER": {
     "animations": {},
     "id": 177,
-    "texture": 261
+    "texture": 276
   },
   "ENT_TYPE_DECORATION_PALACE_PORTRAIT": {
     "animations": {},
     "id": 178,
-    "texture": 262
+    "texture": 277
   },
   "ENT_TYPE_DECORATION_PALACE_SIGN": {
     "animations": {},
     "id": 176,
-    "texture": 175
+    "texture": 190
   },
   "ENT_TYPE_DECORATION_PIPE": {
     "animations": {},
     "id": 182,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_DECORATION_POTOFGOLD_RAINBOW": {
     "animations": {},
     "id": 189,
-    "texture": 364
+    "texture": 380
   },
   "ENT_TYPE_DECORATION_REGENERATING_BORDER": {
     "animations": {},
     "id": 187,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_DECORATION_REGENERATING_SMALL_BLOCK": {
     "animations": {},
     "id": 186,
-    "texture": 195
+    "texture": 210
   },
   "ENT_TYPE_DECORATION_SHOPFORE": {
     "animations": {},
     "id": 148,
-    "texture": 216
+    "texture": 231
   },
   "ENT_TYPE_DECORATION_SHOPSIGN": {
     "animations": {},
     "id": 149,
-    "texture": 218
+    "texture": 233
   },
   "ENT_TYPE_DECORATION_SHOPSIGNICON": {
     "animations": {},
     "id": 150,
-    "texture": 216
+    "texture": 231
   },
   "ENT_TYPE_DECORATION_SKULLDROP_TRAP": {
     "animations": {},
     "id": 188,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_DECORATION_SLIDINGWALL_CHAINDECORATION": {
     "animations": {},
     "id": 167,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_DECORATION_SPIKES_BLOOD": {
     "animations": {},
@@ -7884,42 +7884,42 @@
   "ENT_TYPE_DECORATION_STONE": {
     "animations": {},
     "id": 123,
-    "texture": 221
+    "texture": 236
   },
   "ENT_TYPE_DECORATION_SUNKEN": {
     "animations": {},
     "id": 126,
-    "texture": 236
+    "texture": 251
   },
   "ENT_TYPE_DECORATION_SUNKEN_BRIDGE": {
     "animations": {},
     "id": 183,
-    "texture": 184
+    "texture": 199
   },
   "ENT_TYPE_DECORATION_SURFACE": {
     "animations": {},
     "id": 117,
-    "texture": 87
+    "texture": 101
   },
   "ENT_TYPE_DECORATION_SURFACE_COVER": {
     "animations": {},
     "id": 118,
-    "texture": 87
+    "texture": 101
   },
   "ENT_TYPE_DECORATION_TEMPLE": {
     "animations": {},
     "id": 124,
-    "texture": 225
+    "texture": 240
   },
   "ENT_TYPE_DECORATION_TEMPLE_SAND": {
     "animations": {},
     "id": 168,
-    "texture": 145
+    "texture": 160
   },
   "ENT_TYPE_DECORATION_THORN_VINE": {
     "animations": {},
     "id": 161,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_TIDEPOOLBUSH": {
     "animations": {},
@@ -7929,217 +7929,217 @@
   "ENT_TYPE_DECORATION_TIDEPOOL_CORAL": {
     "animations": {},
     "id": 142,
-    "texture": 153
+    "texture": 168
   },
   "ENT_TYPE_DECORATION_TOMB": {
     "animations": {},
     "id": 184,
-    "texture": 221
+    "texture": 236
   },
   "ENT_TYPE_DECORATION_TREE": {
     "animations": {},
     "id": 153,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_TREETRUNK_BROKEN": {
     "animations": {},
     "id": 157,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_TREETRUNK_CLIMBINGHINT": {
     "animations": {},
     "id": 154,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_TREETRUNK_TOPBACK": {
     "animations": {},
     "id": 156,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_TREETRUNK_TOPFRONT": {
     "animations": {},
     "id": 155,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_TREE_VINE": {
     "animations": {},
     "id": 159,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_TREE_VINE_TOP": {
     "animations": {},
     "id": 158,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_DECORATION_VLAD": {
     "animations": {},
     "id": 165,
-    "texture": 240
+    "texture": 255
   },
   "ENT_TYPE_EMBED_GOLD": {
     "animations": {},
     "id": 190,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_EMBED_GOLD_BIG": {
     "animations": {},
     "id": 191,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_FLOORSTYLED_BABYLON": {
     "animations": {},
     "id": 106,
-    "texture": 231
+    "texture": 246
   },
   "ENT_TYPE_FLOORSTYLED_BEEHIVE": {
     "animations": {},
     "id": 108,
-    "texture": 210
+    "texture": 225
   },
   "ENT_TYPE_FLOORSTYLED_COG": {
     "animations": {},
     "id": 110,
-    "texture": 246
+    "texture": 261
   },
   "ENT_TYPE_FLOORSTYLED_DUAT": {
     "animations": {},
     "id": 112,
-    "texture": 258
+    "texture": 273
   },
   "ENT_TYPE_FLOORSTYLED_GUTS": {
     "animations": {},
     "id": 114,
-    "texture": 263
+    "texture": 278
   },
   "ENT_TYPE_FLOORSTYLED_MINEWOOD": {
     "animations": {},
     "id": 102,
-    "texture": 216
+    "texture": 231
   },
   "ENT_TYPE_FLOORSTYLED_MOTHERSHIP": {
     "animations": {},
     "id": 111,
-    "texture": 256
+    "texture": 271
   },
   "ENT_TYPE_FLOORSTYLED_PAGODA": {
     "animations": {},
     "id": 105,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_FLOORSTYLED_PALACE": {
     "animations": {},
     "id": 113,
-    "texture": 259
+    "texture": 274
   },
   "ENT_TYPE_FLOORSTYLED_STONE": {
     "animations": {},
     "id": 103,
-    "texture": 221
+    "texture": 236
   },
   "ENT_TYPE_FLOORSTYLED_SUNKEN": {
     "animations": {},
     "id": 107,
-    "texture": 236
+    "texture": 251
   },
   "ENT_TYPE_FLOORSTYLED_TEMPLE": {
     "animations": {},
     "id": 104,
-    "texture": 225
+    "texture": 240
   },
   "ENT_TYPE_FLOORSTYLED_VLAD": {
     "animations": {},
     "id": 109,
-    "texture": 240
+    "texture": 255
   },
   "ENT_TYPE_FLOOR_ALTAR": {
     "animations": {},
     "id": 47,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_ARROW_TRAP": {
     "animations": {},
     "id": 40,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_BASECAMP_DININGTABLE": {
     "animations": {},
     "id": 8,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_FLOOR_BASECAMP_LONGTABLE": {
     "animations": {},
     "id": 9,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_FLOOR_BASECAMP_SINGLEBED": {
     "animations": {},
     "id": 7,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_FLOOR_BIGSPEAR_TRAP": {
     "animations": {},
     "id": 79,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_FLOOR_BORDERTILE": {
     "animations": {},
     "id": 1,
-    "texture": 268
+    "texture": 283
   },
   "ENT_TYPE_FLOOR_BORDERTILE_METAL": {
     "animations": {},
     "id": 2,
-    "texture": 268
+    "texture": 283
   },
   "ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS": {
     "animations": {},
     "id": 3,
-    "texture": 268
+    "texture": 283
   },
   "ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING": {
     "animations": {},
     "id": 61,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_FLOOR_CHAINANDBLOCKS_CHAIN": {
     "animations": {},
     "id": 62,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_FLOOR_CHAIN_CEILING": {
     "animations": {},
     "id": 63,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_FLOOR_CHALLENGE_ENTRANCE": {
     "animations": {},
     "id": 87,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_CHALLENGE_WAITROOM": {
     "animations": {},
     "id": 88,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_CLIMBING_POLE": {
     "animations": {},
     "id": 20,
-    "texture": 153
+    "texture": 168
   },
   "ENT_TYPE_FLOOR_CONVEYORBELT_LEFT": {
     "animations": {},
     "id": 64,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_FLOOR_CONVEYORBELT_RIGHT": {
     "animations": {},
     "id": 65,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_FLOOR_DICE_FORCEFIELD": {
     "animations": {},
     "id": 86,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_DOOR_COG": {
     "animations": {},
@@ -8194,12 +8194,12 @@
   "ENT_TYPE_FLOOR_DOOR_LOCKED": {
     "animations": {},
     "id": 29,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_FLOOR_DOOR_LOCKED_PEN": {
     "animations": {},
     "id": 30,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_FLOOR_DOOR_MAIN_EXIT": {
     "animations": {},
@@ -8209,12 +8209,12 @@
   "ENT_TYPE_FLOOR_DOOR_MOAI_STATUE": {
     "animations": {},
     "id": 32,
-    "texture": 167
+    "texture": 182
   },
   "ENT_TYPE_FLOOR_DOOR_PLATFORM": {
     "animations": {},
     "id": 37,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_DOOR_STARTING_EXIT": {
     "animations": {},
@@ -8224,7 +8224,7 @@
   "ENT_TYPE_FLOOR_DUAT_ALTAR": {
     "animations": {},
     "id": 71,
-    "texture": 258
+    "texture": 273
   },
   "ENT_TYPE_FLOOR_DUSTWALL": {
     "animations": {},
@@ -8234,32 +8234,32 @@
   "ENT_TYPE_FLOOR_EGGPLANT_ALTAR": {
     "animations": {},
     "id": 74,
-    "texture": 162
+    "texture": 177
   },
   "ENT_TYPE_FLOOR_EMPRESS_GRAVE": {
     "animations": {},
     "id": 96,
-    "texture": 202
+    "texture": 217
   },
   "ENT_TYPE_FLOOR_EXCALIBUR_STONE": {
     "animations": {},
     "id": 69,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_FLOOR_FACTORY_GENERATOR": {
     "animations": {},
     "id": 66,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_FORCEFIELD": {
     "animations": {},
     "id": 85,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_FORCEFIELD_TOP": {
     "animations": {},
     "id": 90,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_GENERIC": {
     "animations": {},
@@ -8269,32 +8269,32 @@
   "ENT_TYPE_FLOOR_GIANTFROG_PLATFORM": {
     "animations": {},
     "id": 83,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_GROWABLE_CLIMBING_POLE": {
     "animations": {},
     "id": 21,
-    "texture": 153
+    "texture": 168
   },
   "ENT_TYPE_FLOOR_GROWABLE_VINE": {
     "animations": {},
     "id": 19,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_HORIZONTAL_FORCEFIELD": {
     "animations": {},
     "id": 91,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_HORIZONTAL_FORCEFIELD_TOP": {
     "animations": {},
     "id": 92,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_ICE": {
     "animations": {},
     "id": 72,
-    "texture": 162
+    "texture": 177
   },
   "ENT_TYPE_FLOOR_IDOL_BLOCK": {
     "animations": {},
@@ -8304,42 +8304,42 @@
   "ENT_TYPE_FLOOR_IDOL_TRAP_CEILING": {
     "animations": {},
     "id": 49,
-    "texture": 216
+    "texture": 231
   },
   "ENT_TYPE_FLOOR_JUNGLE": {
     "animations": {},
     "id": 10,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_JUNGLE_SPEAR_TRAP": {
     "animations": {},
     "id": 43,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_LADDER": {
     "animations": {},
     "id": 15,
-    "texture": 115
+    "texture": 129
   },
   "ENT_TYPE_FLOOR_LADDER_PLATFORM": {
     "animations": {},
     "id": 16,
-    "texture": 115
+    "texture": 129
   },
   "ENT_TYPE_FLOOR_LASER_TRAP": {
     "animations": {},
     "id": 45,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_LION_TRAP": {
     "animations": {},
     "id": 44,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_MOAI_PLATFORM": {
     "animations": {},
     "id": 75,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_MOTHER_STATUE": {
     "animations": {},
@@ -8354,32 +8354,32 @@
   "ENT_TYPE_FLOOR_MUSHROOM_BASE": {
     "animations": {},
     "id": 55,
-    "texture": 172
+    "texture": 187
   },
   "ENT_TYPE_FLOOR_MUSHROOM_HAT_PLATFORM": {
     "animations": {},
     "id": 58,
-    "texture": 172
+    "texture": 187
   },
   "ENT_TYPE_FLOOR_MUSHROOM_TOP": {
     "animations": {},
     "id": 57,
-    "texture": 172
+    "texture": 187
   },
   "ENT_TYPE_FLOOR_MUSHROOM_TRUNK": {
     "animations": {},
     "id": 56,
-    "texture": 172
+    "texture": 187
   },
   "ENT_TYPE_FLOOR_PAGODA_PLATFORM": {
     "animations": {},
     "id": 14,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_PALACE_BOOKCASE_PLATFORM": {
     "animations": {},
     "id": 100,
-    "texture": 259
+    "texture": 274
   },
   "ENT_TYPE_FLOOR_PALACE_CHANDELIER_PLATFORM": {
     "animations": {},
@@ -8389,57 +8389,57 @@
   "ENT_TYPE_FLOOR_PALACE_TABLE_PLATFORM": {
     "animations": {},
     "id": 97,
-    "texture": 259
+    "texture": 274
   },
   "ENT_TYPE_FLOOR_PALACE_TRAY_PLATFORM": {
     "animations": {},
     "id": 98,
-    "texture": 259
+    "texture": 274
   },
   "ENT_TYPE_FLOOR_PEN": {
     "animations": {},
     "id": 93,
-    "texture": 216
+    "texture": 231
   },
   "ENT_TYPE_FLOOR_PIPE": {
     "animations": {},
     "id": 78,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_FLOOR_PLATFORM": {
     "animations": {},
     "id": 13,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_POISONED_ARROW_TRAP": {
     "animations": {},
     "id": 41,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_QUICKSAND": {
     "animations": {},
     "id": 68,
-    "texture": 145
+    "texture": 160
   },
   "ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR": {
     "animations": {},
     "id": 76,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_SLIDINGWALL_CEILING": {
     "animations": {},
     "id": 67,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_FLOOR_SPARK_TRAP": {
     "animations": {},
     "id": 46,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_SPIKEBALL_CEILING": {
     "animations": {},
     "id": 60,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_FLOOR_SPIKES": {
     "animations": {},
@@ -8449,32 +8449,32 @@
   "ENT_TYPE_FLOOR_SPIKES_UPSIDEDOWN": {
     "animations": {},
     "id": 39,
-    "texture": 162
+    "texture": 177
   },
   "ENT_TYPE_FLOOR_SPRING_TRAP": {
     "animations": {},
     "id": 73,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_FLOOR_STICKYTRAP_CEILING": {
     "animations": {},
     "id": 80,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_FLOOR_STORAGE": {
     "animations": {},
     "id": 50,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR": {
     "animations": {},
     "id": 77,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_SURFACE": {
     "animations": {},
     "id": 5,
-    "texture": 87
+    "texture": 101
   },
   "ENT_TYPE_FLOOR_SURFACE_HIDDEN": {
     "animations": {},
@@ -8494,12 +8494,12 @@
   "ENT_TYPE_FLOOR_THORN_VINE": {
     "animations": {},
     "id": 59,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_TIMED_FORCEFIELD": {
     "animations": {},
     "id": 89,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_TOMB": {
     "animations": {},
@@ -8509,27 +8509,27 @@
   "ENT_TYPE_FLOOR_TOTEM_TRAP": {
     "animations": {},
     "id": 42,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_FLOOR_TREE_BASE": {
     "animations": {},
     "id": 51,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_TREE_BRANCH": {
     "animations": {},
     "id": 54,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_TREE_TOP": {
     "animations": {},
     "id": 53,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_TREE_TRUNK": {
     "animations": {},
     "id": 52,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_TUNNEL_CURRENT": {
     "animations": {},
@@ -8544,12 +8544,12 @@
   "ENT_TYPE_FLOOR_VINE": {
     "animations": {},
     "id": 17,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_VINE_TREE_TOP": {
     "animations": {},
     "id": 18,
-    "texture": 124
+    "texture": 138
   },
   "ENT_TYPE_FLOOR_YAMA_PLATFORM": {
     "animations": {},
@@ -8558,83 +8558,83 @@
   },
   "ENT_TYPE_FX_ALIENBLAST": {
     "animations": {},
-    "id": 692,
-    "texture": 364
+    "id": 694,
+    "texture": 380
   },
   "ENT_TYPE_FX_ALIENBLAST_RETICULE_EXTERNAL": {
     "animations": {},
-    "id": 691,
-    "texture": 364
+    "id": 693,
+    "texture": 380
   },
   "ENT_TYPE_FX_ALIENBLAST_RETICULE_INTERNAL": {
     "animations": {},
-    "id": 690,
-    "texture": 364
+    "id": 692,
+    "texture": 380
   },
   "ENT_TYPE_FX_ALIENQUEEN_EYE": {
     "animations": {},
-    "id": 689,
-    "texture": 335
+    "id": 691,
+    "texture": 350
   },
   "ENT_TYPE_FX_ALIENQUEEN_EYEBALL": {
     "animations": {},
-    "id": 688,
-    "texture": 335
+    "id": 690,
+    "texture": 350
   },
   "ENT_TYPE_FX_ANKH_BACKGLOW": {
     "animations": {},
-    "id": 750,
-    "texture": 366
+    "id": 752,
+    "texture": 382
   },
   "ENT_TYPE_FX_ANKH_BROKENPIECE": {
     "animations": {},
-    "id": 753,
-    "texture": 367
+    "id": 755,
+    "texture": 383
   },
   "ENT_TYPE_FX_ANKH_FALLINGSPARK": {
     "animations": {},
-    "id": 749,
-    "texture": 367
+    "id": 751,
+    "texture": 383
   },
   "ENT_TYPE_FX_ANKH_FRONTGLOW": {
     "animations": {},
-    "id": 751,
-    "texture": 366
+    "id": 753,
+    "texture": 382
   },
   "ENT_TYPE_FX_ANKH_LIGHTBEAM": {
     "animations": {},
-    "id": 752,
-    "texture": 367
+    "id": 754,
+    "texture": 383
   },
   "ENT_TYPE_FX_ANKH_ROTATINGSPARK": {
     "animations": {},
-    "id": 748,
-    "texture": 367
+    "id": 750,
+    "texture": 383
   },
   "ENT_TYPE_FX_ANUBIS_SPECIAL_SHOT_RETICULE": {
     "animations": {},
-    "id": 733,
-    "texture": 361
+    "id": 735,
+    "texture": 376
   },
   "ENT_TYPE_FX_APEP_FIRE": {
     "animations": {},
-    "id": 679,
-    "texture": 361
+    "id": 681,
+    "texture": 376
   },
   "ENT_TYPE_FX_APEP_MOUTHPIECE": {
     "animations": {},
-    "id": 680,
-    "texture": 308
+    "id": 682,
+    "texture": 323
   },
   "ENT_TYPE_FX_AXOLOTL_HEAD_ENTERING_DOOR": {
     "animations": {},
-    "id": 740,
-    "texture": 359
+    "id": 742,
+    "texture": 374
   },
   "ENT_TYPE_FX_BASECAMP_COUCH_ARM": {
     "animations": {},
-    "id": 741,
-    "texture": 106
+    "id": 743,
+    "texture": 120
   },
   "ENT_TYPE_FX_BIRDIES": {
     "animations": {
@@ -8646,48 +8646,48 @@
         "texture": 48
       }
     },
-    "id": 634,
-    "texture": 295
+    "id": 636,
+    "texture": 310
   },
   "ENT_TYPE_FX_BUTTON": {
     "animations": {},
-    "id": 668,
-    "texture": 58
+    "id": 670,
+    "texture": 70
   },
   "ENT_TYPE_FX_BUTTON_DIALOG": {
     "animations": {},
-    "id": 669,
-    "texture": 106
+    "id": 671,
+    "texture": 120
   },
   "ENT_TYPE_FX_CINEMATIC_BLACKBAR": {
     "animations": {},
-    "id": 661,
+    "id": 663,
     "texture": -2
   },
   "ENT_TYPE_FX_COMPASS": {
     "animations": {},
-    "id": 644,
-    "texture": 55
+    "id": 646,
+    "texture": 67
   },
   "ENT_TYPE_FX_CRITTERFIREFLY_LIGHT": {
     "animations": {},
-    "id": 739,
-    "texture": 298
+    "id": 741,
+    "texture": 313
   },
   "ENT_TYPE_FX_CRUSHINGELEVATOR_DECO": {
     "animations": {},
-    "id": 715,
-    "texture": 268
+    "id": 717,
+    "texture": 283
   },
   "ENT_TYPE_FX_CRUSHINGELEVATOR_FILL": {
     "animations": {},
-    "id": 714,
-    "texture": 269
+    "id": 716,
+    "texture": 284
   },
   "ENT_TYPE_FX_DIEINDICATOR": {
     "animations": {},
-    "id": 709,
-    "texture": 53
+    "id": 711,
+    "texture": 65
   },
   "ENT_TYPE_FX_DRILL_TURNING": {
     "animations": {
@@ -8699,43 +8699,43 @@
         "texture": 5
       }
     },
-    "id": 681,
-    "texture": 364
+    "id": 683,
+    "texture": 380
   },
   "ENT_TYPE_FX_EGGSHIP_CENTERJETFLAME": {
     "animations": {},
-    "id": 628,
-    "texture": 91
+    "id": 630,
+    "texture": 105
   },
   "ENT_TYPE_FX_EGGSHIP_DOOR": {
     "animations": {},
-    "id": 627,
-    "texture": 92
+    "id": 629,
+    "texture": 106
   },
   "ENT_TYPE_FX_EGGSHIP_HOOK_CHAIN": {
     "animations": {},
-    "id": 743,
-    "texture": 99
+    "id": 745,
+    "texture": 113
   },
   "ENT_TYPE_FX_EGGSHIP_JETFLAME": {
     "animations": {},
-    "id": 629,
-    "texture": 91
+    "id": 631,
+    "texture": 105
   },
   "ENT_TYPE_FX_EGGSHIP_SHADOW": {
     "animations": {},
-    "id": 630,
-    "texture": 89
+    "id": 632,
+    "texture": 103
   },
   "ENT_TYPE_FX_EGGSHIP_SHELL": {
     "animations": {},
-    "id": 626,
-    "texture": 88
+    "id": 628,
+    "texture": 102
   },
   "ENT_TYPE_FX_EMPRESS": {
     "animations": {},
-    "id": 742,
-    "texture": 325
+    "id": 744,
+    "texture": 340
   },
   "ENT_TYPE_FX_EXPLOSION": {
     "animations": {
@@ -8747,28 +8747,28 @@
         "texture": 0
       }
     },
-    "id": 635,
-    "texture": 360
+    "id": 637,
+    "texture": 375
   },
   "ENT_TYPE_FX_HORIZONTALLASERBEAM": {
     "animations": {},
-    "id": 712,
-    "texture": 362
+    "id": 714,
+    "texture": 377
   },
   "ENT_TYPE_FX_HUNDUN_EGG_CRACK": {
     "animations": {},
-    "id": 719,
-    "texture": 353
+    "id": 721,
+    "texture": 368
   },
   "ENT_TYPE_FX_HUNDUN_EYE": {
     "animations": {},
-    "id": 724,
-    "texture": 353
+    "id": 726,
+    "texture": 368
   },
   "ENT_TYPE_FX_HUNDUN_EYEBALL": {
     "animations": {},
-    "id": 723,
-    "texture": 353
+    "id": 725,
+    "texture": 368
   },
   "ENT_TYPE_FX_HUNDUN_EYELID": {
     "animations": {
@@ -8780,28 +8780,28 @@
         "texture": 10
       }
     },
-    "id": 722,
-    "texture": 353
+    "id": 724,
+    "texture": 368
   },
   "ENT_TYPE_FX_HUNDUN_LIMB_CALF": {
     "animations": {},
-    "id": 717,
-    "texture": 351
+    "id": 719,
+    "texture": 366
   },
   "ENT_TYPE_FX_HUNDUN_LIMB_FOOT": {
     "animations": {},
-    "id": 718,
-    "texture": 351
+    "id": 720,
+    "texture": 366
   },
   "ENT_TYPE_FX_HUNDUN_LIMB_THIGH": {
     "animations": {},
-    "id": 716,
-    "texture": 351
+    "id": 718,
+    "texture": 366
   },
   "ENT_TYPE_FX_HUNDUN_NECK_PIECE": {
     "animations": {},
-    "id": 720,
-    "texture": 353
+    "id": 722,
+    "texture": 368
   },
   "ENT_TYPE_FX_HUNDUN_WING": {
     "animations": {
@@ -8827,18 +8827,18 @@
         "texture": 0
       }
     },
-    "id": 721,
-    "texture": 354
+    "id": 723,
+    "texture": 369
   },
   "ENT_TYPE_FX_INK_BLINDNESS": {
     "animations": {},
-    "id": 671,
+    "id": 673,
     "texture": -2
   },
   "ENT_TYPE_FX_INK_SPLAT": {
     "animations": {},
-    "id": 672,
-    "texture": 363
+    "id": 674,
+    "texture": 378
   },
   "ENT_TYPE_FX_JETPACKFLAME": {
     "animations": {
@@ -8850,8 +8850,8 @@
         "texture": 24
       }
     },
-    "id": 655,
-    "texture": 361
+    "id": 657,
+    "texture": 376
   },
   "ENT_TYPE_FX_KINGU_HEAD": {
     "animations": {
@@ -8884,38 +8884,38 @@
         "texture": 1
       }
     },
-    "id": 683,
-    "texture": 314
+    "id": 685,
+    "texture": 329
   },
   "ENT_TYPE_FX_KINGU_LIMB": {
     "animations": {},
-    "id": 686,
-    "texture": 322
+    "id": 688,
+    "texture": 337
   },
   "ENT_TYPE_FX_KINGU_PLATFORM": {
     "animations": {},
-    "id": 685,
-    "texture": 315
+    "id": 687,
+    "texture": 330
   },
   "ENT_TYPE_FX_KINGU_SHADOW": {
     "animations": {},
-    "id": 684,
-    "texture": 316
+    "id": 686,
+    "texture": 331
   },
   "ENT_TYPE_FX_KINGU_SLIDING": {
     "animations": {},
-    "id": 687,
+    "id": 689,
     "texture": -2
   },
   "ENT_TYPE_FX_LAMASSU_ATTACK": {
     "animations": {},
-    "id": 738,
-    "texture": 363
+    "id": 740,
+    "texture": 378
   },
   "ENT_TYPE_FX_LASERBEAM": {
     "animations": {},
-    "id": 711,
-    "texture": 362
+    "id": 713,
+    "texture": 377
   },
   "ENT_TYPE_FX_LAVA_BUBBLE": {
     "animations": {
@@ -8927,13 +8927,13 @@
         "texture": 0
       }
     },
-    "id": 673,
-    "texture": 362
+    "id": 675,
+    "texture": 377
   },
   "ENT_TYPE_FX_LAVA_GLOW": {
     "animations": {},
-    "id": 674,
-    "texture": 363
+    "id": 676,
+    "texture": 378
   },
   "ENT_TYPE_FX_LEADER_FLAG": {
     "animations": {
@@ -8952,68 +8952,68 @@
         "texture": 134
       }
     },
-    "id": 682,
-    "texture": 358
+    "id": 684,
+    "texture": 373
   },
   "ENT_TYPE_FX_MAIN_EXIT_DOOR": {
     "animations": {},
-    "id": 633,
+    "id": 635,
     "texture": -2
   },
   "ENT_TYPE_FX_MECH_COLLAR": {
     "animations": {},
-    "id": 734,
-    "texture": 330
+    "id": 736,
+    "texture": 345
   },
   "ENT_TYPE_FX_MEGAJELLYFISH_BOTTOM": {
     "animations": {},
-    "id": 730,
-    "texture": 325
+    "id": 732,
+    "texture": 340
   },
   "ENT_TYPE_FX_MEGAJELLYFISH_CROWN": {
     "animations": {},
-    "id": 726,
-    "texture": 325
+    "id": 728,
+    "texture": 340
   },
   "ENT_TYPE_FX_MEGAJELLYFISH_EYE": {
     "animations": {},
-    "id": 727,
-    "texture": 326
+    "id": 729,
+    "texture": 341
   },
   "ENT_TYPE_FX_MEGAJELLYFISH_FLIPPER": {
     "animations": {},
-    "id": 729,
-    "texture": 325
+    "id": 731,
+    "texture": 340
   },
   "ENT_TYPE_FX_MEGAJELLYFISH_STAR": {
     "animations": {},
-    "id": 728,
-    "texture": 326
+    "id": 730,
+    "texture": 341
   },
   "ENT_TYPE_FX_MEGAJELLYFISH_TAIL": {
     "animations": {},
-    "id": 731,
-    "texture": 326
+    "id": 733,
+    "texture": 341
   },
   "ENT_TYPE_FX_MEGAJELLYFISH_TAIL_BG": {
     "animations": {},
-    "id": 732,
-    "texture": 326
+    "id": 734,
+    "texture": 341
   },
   "ENT_TYPE_FX_MINIGAME_SHIP_CENTERJETFLAME": {
     "animations": {},
-    "id": 745,
-    "texture": 91
+    "id": 747,
+    "texture": 105
   },
   "ENT_TYPE_FX_MINIGAME_SHIP_DOOR": {
     "animations": {},
-    "id": 744,
+    "id": 746,
     "texture": -2
   },
   "ENT_TYPE_FX_MINIGAME_SHIP_JETFLAME": {
     "animations": {},
-    "id": 746,
-    "texture": 91
+    "id": 748,
+    "texture": 105
   },
   "ENT_TYPE_FX_MODERNEXPLOSION": {
     "animations": {
@@ -9025,8 +9025,8 @@
         "texture": 0
       }
     },
-    "id": 637,
-    "texture": 360
+    "id": 639,
+    "texture": 375
   },
   "ENT_TYPE_FX_NECROMANCER_ANKH": {
     "animations": {
@@ -9038,8 +9038,8 @@
         "texture": 32
       }
     },
-    "id": 659,
-    "texture": 363
+    "id": 661,
+    "texture": 378
   },
   "ENT_TYPE_FX_OLMECPART_FLOATER": {
     "animations": {
@@ -9058,73 +9058,73 @@
         "texture": 39
       }
     },
-    "id": 662,
-    "texture": 331
+    "id": 664,
+    "texture": 346
   },
   "ENT_TYPE_FX_OLMECPART_LARGE": {
     "animations": {},
-    "id": 663,
-    "texture": 327
+    "id": 665,
+    "texture": 342
   },
   "ENT_TYPE_FX_OLMECPART_MEDIUM": {
     "animations": {},
-    "id": 664,
-    "texture": 328
+    "id": 666,
+    "texture": 343
   },
   "ENT_TYPE_FX_OLMECPART_SMALL": {
     "animations": {},
-    "id": 665,
-    "texture": 329
+    "id": 667,
+    "texture": 344
   },
   "ENT_TYPE_FX_OLMECPART_SMALLEST": {
     "animations": {},
-    "id": 666,
-    "texture": 331
+    "id": 668,
+    "texture": 346
   },
   "ENT_TYPE_FX_OUROBORO_HEAD": {
     "animations": {},
-    "id": 639,
-    "texture": 112
+    "id": 641,
+    "texture": 126
   },
   "ENT_TYPE_FX_OUROBORO_OCCLUDER": {
     "animations": {},
-    "id": 638,
+    "id": 640,
     "texture": -2
   },
   "ENT_TYPE_FX_OUROBORO_TAIL": {
     "animations": {},
-    "id": 640,
-    "texture": 112
+    "id": 642,
+    "texture": 126
   },
   "ENT_TYPE_FX_OUROBORO_TEXT": {
     "animations": {},
-    "id": 641,
+    "id": 643,
     "texture": -2
   },
   "ENT_TYPE_FX_OUROBORO_TRAIL": {
     "animations": {},
-    "id": 642,
-    "texture": 112
+    "id": 644,
+    "texture": 126
   },
   "ENT_TYPE_FX_PICKUPEFFECT": {
     "animations": {},
-    "id": 653,
-    "texture": 358
+    "id": 655,
+    "texture": 373
   },
   "ENT_TYPE_FX_PLAYERINDICATOR": {
     "animations": {},
-    "id": 646,
-    "texture": 55
+    "id": 648,
+    "texture": 67
   },
   "ENT_TYPE_FX_PLAYERINDICATORPORTRAIT": {
     "animations": {},
-    "id": 647,
-    "texture": 270
+    "id": 649,
+    "texture": 285
   },
   "ENT_TYPE_FX_PORTAL": {
     "animations": {},
-    "id": 725,
-    "texture": 333
+    "id": 727,
+    "texture": 348
   },
   "ENT_TYPE_FX_POWEREDEXPLOSION": {
     "animations": {
@@ -9136,48 +9136,48 @@
         "texture": 0
       }
     },
-    "id": 636,
-    "texture": 360
+    "id": 638,
+    "texture": 375
   },
   "ENT_TYPE_FX_QUICKSAND_DUST": {
     "animations": {},
-    "id": 735,
-    "texture": 363
+    "id": 737,
+    "texture": 378
   },
   "ENT_TYPE_FX_QUICKSAND_RUBBLE": {
     "animations": {},
-    "id": 736,
-    "texture": 365
+    "id": 738,
+    "texture": 381
   },
   "ENT_TYPE_FX_SALEDIALOG_CONTAINER": {
     "animations": {},
-    "id": 649,
-    "texture": 33
+    "id": 651,
+    "texture": 44
   },
   "ENT_TYPE_FX_SALEDIALOG_ICON": {
     "animations": {},
-    "id": 652,
-    "texture": 53
+    "id": 654,
+    "texture": 65
   },
   "ENT_TYPE_FX_SALEDIALOG_TITLE": {
     "animations": {},
-    "id": 650,
+    "id": 652,
     "texture": -2
   },
   "ENT_TYPE_FX_SALEDIALOG_VALUE": {
     "animations": {},
-    "id": 651,
+    "id": 653,
     "texture": -2
   },
   "ENT_TYPE_FX_SALEICON": {
     "animations": {},
-    "id": 648,
-    "texture": 53
+    "id": 650,
+    "texture": 65
   },
   "ENT_TYPE_FX_SHADOW": {
     "animations": {},
-    "id": 631,
-    "texture": 361
+    "id": 633,
+    "texture": 376
   },
   "ENT_TYPE_FX_SHOTGUNBLAST": {
     "animations": {
@@ -9189,8 +9189,8 @@
         "texture": 0
       }
     },
-    "id": 654,
-    "texture": 364
+    "id": 656,
+    "texture": 380
   },
   "ENT_TYPE_FX_SLEEP_BUBBLE": {
     "animations": {
@@ -9202,18 +9202,18 @@
         "texture": 185
       }
     },
-    "id": 670,
-    "texture": 358
+    "id": 672,
+    "texture": 373
   },
   "ENT_TYPE_FX_SMALLFLAME": {
     "animations": {},
-    "id": 656,
-    "texture": 361
+    "id": 658,
+    "texture": 376
   },
   "ENT_TYPE_FX_SORCERESS_ATTACK": {
     "animations": {},
-    "id": 737,
-    "texture": 363
+    "id": 739,
+    "texture": 378
   },
   "ENT_TYPE_FX_SPARK": {
     "animations": {
@@ -9225,8 +9225,8 @@
         "texture": 9
       }
     },
-    "id": 693,
-    "texture": 363
+    "id": 695,
+    "texture": 378
   },
   "ENT_TYPE_FX_SPARK_SMALL": {
     "animations": {
@@ -9238,53 +9238,53 @@
         "texture": 9
       }
     },
-    "id": 694,
-    "texture": 363
+    "id": 696,
+    "texture": 378
   },
   "ENT_TYPE_FX_SPECIALCOMPASS": {
     "animations": {},
-    "id": 645,
-    "texture": 55
+    "id": 647,
+    "texture": 67
   },
   "ENT_TYPE_FX_SPRINGTRAP_RING": {
     "animations": {},
-    "id": 657,
-    "texture": 361
+    "id": 659,
+    "texture": 376
   },
   "ENT_TYPE_FX_STORAGE_INDICATOR": {
     "animations": {},
-    "id": 710,
-    "texture": 53
+    "id": 712,
+    "texture": 65
   },
   "ENT_TYPE_FX_TELEPORTSHADOW": {
     "animations": {},
-    "id": 660,
-    "texture": 361
+    "id": 662,
+    "texture": 376
   },
   "ENT_TYPE_FX_TIAMAT_ARM_LEFT1": {
     "animations": {},
-    "id": 702,
-    "texture": 339
+    "id": 704,
+    "texture": 354
   },
   "ENT_TYPE_FX_TIAMAT_ARM_LEFT2": {
     "animations": {},
-    "id": 703,
-    "texture": 339
+    "id": 705,
+    "texture": 354
   },
   "ENT_TYPE_FX_TIAMAT_ARM_LEFT3": {
     "animations": {},
-    "id": 704,
-    "texture": 340
+    "id": 706,
+    "texture": 355
   },
   "ENT_TYPE_FX_TIAMAT_ARM_RIGHT1": {
     "animations": {},
-    "id": 705,
-    "texture": 340
+    "id": 707,
+    "texture": 355
   },
   "ENT_TYPE_FX_TIAMAT_ARM_RIGHT2": {
     "animations": {},
-    "id": 706,
-    "texture": 342
+    "id": 708,
+    "texture": 357
   },
   "ENT_TYPE_FX_TIAMAT_HEAD": {
     "animations": {
@@ -9331,68 +9331,68 @@
         "texture": 15
       }
     },
-    "id": 708,
-    "texture": 337
+    "id": 710,
+    "texture": 352
   },
   "ENT_TYPE_FX_TIAMAT_NECK": {
     "animations": {},
-    "id": 707,
-    "texture": 341
+    "id": 709,
+    "texture": 356
   },
   "ENT_TYPE_FX_TIAMAT_TAIL": {
     "animations": {},
-    "id": 697,
-    "texture": 343
+    "id": 699,
+    "texture": 358
   },
   "ENT_TYPE_FX_TIAMAT_TAIL_DECO1": {
     "animations": {},
-    "id": 698,
-    "texture": 338
+    "id": 700,
+    "texture": 353
   },
   "ENT_TYPE_FX_TIAMAT_TAIL_DECO2": {
     "animations": {},
-    "id": 699,
-    "texture": 338
+    "id": 701,
+    "texture": 353
   },
   "ENT_TYPE_FX_TIAMAT_TAIL_DECO3": {
     "animations": {},
-    "id": 700,
-    "texture": 337
+    "id": 702,
+    "texture": 352
   },
   "ENT_TYPE_FX_TIAMAT_THRONE": {
     "animations": {},
-    "id": 695,
-    "texture": 345
+    "id": 697,
+    "texture": 360
   },
   "ENT_TYPE_FX_TIAMAT_TORSO": {
     "animations": {},
-    "id": 701,
-    "texture": 338
+    "id": 703,
+    "texture": 353
   },
   "ENT_TYPE_FX_TIAMAT_WAIST": {
     "animations": {},
-    "id": 696,
-    "texture": 344
+    "id": 698,
+    "texture": 359
   },
   "ENT_TYPE_FX_TORNJOURNALPAGE": {
     "animations": {},
-    "id": 632,
-    "texture": 63
+    "id": 634,
+    "texture": 75
   },
   "ENT_TYPE_FX_UNDERWATER_BUBBLE": {
     "animations": {},
-    "id": 675,
-    "texture": 362
+    "id": 677,
+    "texture": 377
   },
   "ENT_TYPE_FX_VAT_BUBBLE": {
     "animations": {},
-    "id": 713,
-    "texture": 362
+    "id": 715,
+    "texture": 377
   },
   "ENT_TYPE_FX_WATER_DROP": {
     "animations": {},
-    "id": 676,
-    "texture": 363
+    "id": 678,
+    "texture": 378
   },
   "ENT_TYPE_FX_WATER_SPLASH": {
     "animations": {
@@ -9404,18 +9404,18 @@
         "texture": 59
       }
     },
-    "id": 677,
-    "texture": 362
+    "id": 679,
+    "texture": 377
   },
   "ENT_TYPE_FX_WATER_SURFACE": {
     "animations": {},
-    "id": 678,
-    "texture": 363
+    "id": 680,
+    "texture": 378
   },
   "ENT_TYPE_FX_WEBBEDEFFECT": {
     "animations": {},
-    "id": 667,
-    "texture": 361
+    "id": 669,
+    "texture": 376
   },
   "ENT_TYPE_FX_WITCHDOCTOR_HINT": {
     "animations": {
@@ -9427,23 +9427,23 @@
         "texture": 24
       }
     },
-    "id": 658,
-    "texture": 363
+    "id": 660,
+    "texture": 378
   },
   "ENT_TYPE_ITEM_ACIDBUBBLE": {
     "animations": {},
     "id": 391,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_ACIDSPIT": {
     "animations": {},
     "id": 389,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE": {
     "animations": {},
     "id": 463,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_ANUBIS_COFFIN": {
     "animations": {},
@@ -9453,72 +9453,72 @@
   "ENT_TYPE_ITEM_AUTOWALLTORCH": {
     "animations": {},
     "id": 415,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_AXOLOTL_BUBBLESHOT": {
     "animations": {},
     "id": 456,
-    "texture": 363
+    "texture": 378
   },
   "ENT_TYPE_ITEM_BASECAMP_TUTORIAL_SIGN": {
     "animations": {},
     "id": 408,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_ITEM_BIG_SPEAR": {
     "animations": {},
     "id": 364,
-    "texture": 183
+    "texture": 198
   },
   "ENT_TYPE_ITEM_BLOOD": {
     "animations": {},
     "id": 352,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_BOMB": {
     "animations": {},
     "id": 347,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_BONES": {
     "animations": {},
     "id": 483,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_BOOMBOX": {
     "animations": {},
     "id": 409,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_ITEM_BOOMERANG": {
     "animations": {},
-    "id": 581,
-    "texture": 358
+    "id": 583,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_BROKENEXCALIBUR": {
     "animations": {},
-    "id": 584,
-    "texture": 358
+    "id": 586,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_BROKEN_ARROW": {
     "animations": {},
     "id": 372,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_BROKEN_MATTOCK": {
     "animations": {},
     "id": 428,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_BULLET": {
     "animations": {},
     "id": 424,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CAMERA": {
     "animations": {},
-    "id": 578,
-    "texture": 358
+    "id": 580,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CAPE": {
     "animations": {
@@ -9579,38 +9579,38 @@
         "texture": 125
       }
     },
-    "id": 562,
-    "texture": 358
+    "id": 564,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CHAIN": {
     "animations": {},
     "id": 431,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_ITEM_CHAIN_LASTPIECE": {
     "animations": {},
     "id": 432,
-    "texture": 131
+    "texture": 145
   },
   "ENT_TYPE_ITEM_CHEST": {
     "animations": {},
     "id": 395,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CLIMBABLE_ROPE": {
     "animations": {},
     "id": 350,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CLONEGUN": {
     "animations": {},
-    "id": 587,
-    "texture": 358
+    "id": 589,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CLONEGUNSHOT": {
     "animations": {},
     "id": 426,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_COFFIN": {
     "animations": {},
@@ -9620,42 +9620,42 @@
   "ENT_TYPE_ITEM_CONSTRUCTION_SIGN": {
     "animations": {},
     "id": 405,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_ITEM_COOKFIRE": {
     "animations": {},
     "id": 484,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_ITEM_CRABMAN_ACIDBUBBLE": {
     "animations": {},
     "id": 392,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CRABMAN_CLAW": {
     "animations": {},
     "id": 393,
-    "texture": 355
+    "texture": 370
   },
   "ENT_TYPE_ITEM_CRABMAN_CLAWCHAIN": {
     "animations": {},
     "id": 394,
-    "texture": 355
+    "texture": 370
   },
   "ENT_TYPE_ITEM_CRATE": {
     "animations": {},
     "id": 402,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CROSSBOW": {
     "animations": {},
-    "id": 577,
-    "texture": 358
+    "id": 579,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CURSEDPOT": {
     "animations": {},
     "id": 481,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_CURSING_CLOUD": {
     "animations": {
@@ -9668,27 +9668,27 @@
       }
     },
     "id": 440,
-    "texture": 362
+    "texture": 377
   },
   "ENT_TYPE_ITEM_DEPLOYED_PARACHUTE": {
     "animations": {},
     "id": 464,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_DIAMOND": {
     "animations": {},
     "id": 497,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_DICE_BET": {
     "animations": {},
     "id": 449,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_ITEM_DICE_PRIZE_DISPENSER": {
     "animations": {},
     "id": 450,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_ITEM_DIE": {
     "animations": {
@@ -9701,17 +9701,17 @@
       }
     },
     "id": 448,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_DMCRATE": {
     "animations": {},
     "id": 403,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_EGGPLANT": {
     "animations": {},
     "id": 487,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_EGGSAC": {
     "animations": {
@@ -9738,62 +9738,62 @@
       }
     },
     "id": 492,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_ITEM_EGGSHIP": {
     "animations": {},
     "id": 353,
-    "texture": 88
+    "texture": 102
   },
   "ENT_TYPE_ITEM_EGGSHIP_HOOK": {
     "animations": {},
     "id": 455,
-    "texture": 99
+    "texture": 113
   },
   "ENT_TYPE_ITEM_EMERALD": {
     "animations": {},
     "id": 498,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_EMERALD_SMALL": {
     "animations": {},
     "id": 503,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_EMPRESS_GRAVE": {
     "animations": {},
     "id": 470,
-    "texture": 348
+    "texture": 363
   },
   "ENT_TYPE_ITEM_ENDINGTREASURE_HUNDUN": {
     "animations": {},
     "id": 398,
-    "texture": 207
+    "texture": 222
   },
   "ENT_TYPE_ITEM_ENDINGTREASURE_TIAMAT": {
     "animations": {},
     "id": 397,
-    "texture": 176
+    "texture": 191
   },
   "ENT_TYPE_ITEM_EXCALIBUR": {
     "animations": {},
-    "id": 583,
-    "texture": 358
+    "id": 585,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_FIREBALL": {
     "animations": {},
     "id": 385,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_FLAMETHROWER_FIREBALL": {
     "animations": {},
     "id": 387,
-    "texture": 362
+    "texture": 377
   },
   "ENT_TYPE_ITEM_FLOATING_ORB": {
     "animations": {},
     "id": 491,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_FLY": {
     "animations": {
@@ -9806,27 +9806,27 @@
       }
     },
     "id": 436,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_ITEM_FREEZERAY": {
     "animations": {},
-    "id": 576,
-    "texture": 358
+    "id": 578,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_FREEZERAYSHOT": {
     "animations": {},
     "id": 425,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_FROZEN_LIQUID": {
     "animations": {},
     "id": 462,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_GHIST_PRESENT": {
     "animations": {},
     "id": 423,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_GIANTCLAM_TOP": {
     "animations": {
@@ -9860,7 +9860,7 @@
       }
     },
     "id": 445,
-    "texture": 307
+    "texture": 322
   },
   "ENT_TYPE_ITEM_GIANTFLY_HEAD": {
     "animations": {
@@ -9894,12 +9894,12 @@
       }
     },
     "id": 467,
-    "texture": 306
+    "texture": 321
   },
   "ENT_TYPE_ITEM_GIANTSPIDER_WEBSHOT": {
     "animations": {},
     "id": 368,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_GOLDBAR": {
     "animations": {
@@ -9919,7 +9919,7 @@
       }
     },
     "id": 495,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_GOLDBARS": {
     "animations": {
@@ -9939,7 +9939,7 @@
       }
     },
     "id": 496,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_GOLDCOIN": {
     "animations": {
@@ -9959,37 +9959,37 @@
       }
     },
     "id": 502,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_HANGANCHOR": {
     "animations": {},
     "id": 370,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_HANGSTRAND": {
     "animations": {},
     "id": 369,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_HOLDTHEIDOL": {
     "animations": {},
     "id": 359,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_HONEY": {
     "animations": {},
     "id": 444,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_HORIZONTALLASERBEAM": {
     "animations": {},
     "id": 452,
-    "texture": 362
+    "texture": 377
   },
   "ENT_TYPE_ITEM_HOUYIBOW": {
     "animations": {},
-    "id": 588,
-    "texture": 358
+    "id": 590,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_HOVERPACK": {
     "animations": {
@@ -10015,138 +10015,138 @@
         "texture": 150
       }
     },
-    "id": 570,
-    "texture": 358
+    "id": 572,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_HUNDUN_FIREBALL": {
     "animations": {},
     "id": 386,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_ICECAGE": {
     "animations": {},
     "id": 427,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_ICESPIRE": {
     "animations": {},
     "id": 488,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_IDOL": {
     "animations": {},
     "id": 356,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_INKSPIT": {
     "animations": {},
     "id": 390,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_JETPACK": {
     "animations": {},
-    "id": 565,
-    "texture": 358
+    "id": 567,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_JETPACK_MECH": {
     "animations": {},
-    "id": 566,
-    "texture": 358
+    "id": 568,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_JUNGLE_SPEAR_COSMETIC": {
     "animations": {},
     "id": 361,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_JUNGLE_SPEAR_DAMAGING": {
     "animations": {},
     "id": 362,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_KEY": {
     "animations": {},
     "id": 399,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LAMASSU_LASER_SHOT": {
     "animations": {},
     "id": 380,
-    "texture": 363
+    "texture": 378
   },
   "ENT_TYPE_ITEM_LAMP": {
     "animations": {},
     "id": 418,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LAMPFLAME": {
     "animations": {},
     "id": 419,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_LANDMINE": {
     "animations": {},
     "id": 439,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LASERBEAM": {
     "animations": {},
     "id": 451,
-    "texture": 362
+    "texture": 377
   },
   "ENT_TYPE_ITEM_LASERTRAP_SHOT": {
     "animations": {},
     "id": 382,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_LAVAPOT": {
     "animations": {},
     "id": 485,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LEAF": {
     "animations": {},
     "id": 388,
-    "texture": 365
+    "texture": 381
   },
   "ENT_TYPE_ITEM_LIGHT_ARROW": {
     "animations": {},
     "id": 374,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LION_SPEAR": {
     "animations": {},
     "id": 363,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LITWALLTORCH": {
     "animations": {},
     "id": 414,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LOCKEDCHEST": {
     "animations": {},
     "id": 400,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_LOCKEDCHEST_KEY": {
     "animations": {},
     "id": 401,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_MACHETE": {
     "animations": {},
-    "id": 582,
-    "texture": 358
+    "id": 584,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_MADAMETUSK_IDOL": {
     "animations": {},
     "id": 357,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_MADAMETUSK_IDOLNOTE": {
     "animations": {},
     "id": 358,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_MATTOCK": {
     "animations": {
@@ -10165,38 +10165,38 @@
         "texture": 128
       }
     },
-    "id": 580,
-    "texture": 358
+    "id": 582,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_METAL_ARROW": {
     "animations": {},
     "id": 373,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_METAL_SHIELD": {
     "animations": {},
-    "id": 590,
-    "texture": 358
+    "id": 592,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_MINIGAME_ASTEROID": {
     "animations": {},
     "id": 477,
-    "texture": 301
+    "texture": 316
   },
   "ENT_TYPE_ITEM_MINIGAME_ASTEROID_BG": {
     "animations": {},
     "id": 476,
-    "texture": 301
+    "texture": 316
   },
   "ENT_TYPE_ITEM_MINIGAME_BROKEN_ASTEROID": {
     "animations": {},
     "id": 478,
-    "texture": 301
+    "texture": 316
   },
   "ENT_TYPE_ITEM_MINIGAME_SHIP": {
     "animations": {},
     "id": 474,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_MINIGAME_UFO": {
     "animations": {
@@ -10209,217 +10209,227 @@
       }
     },
     "id": 475,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_ITEM_NUGGET": {
     "animations": {},
     "id": 501,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_NUGGET_SMALL": {
     "animations": {},
     "id": 506,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_OLMECCANNON_BOMBS": {
     "animations": {},
     "id": 437,
-    "texture": 329
+    "texture": 344
   },
   "ENT_TYPE_ITEM_OLMECCANNON_UFO": {
     "animations": {},
     "id": 438,
-    "texture": 329
+    "texture": 344
   },
   "ENT_TYPE_ITEM_OLMECSHIP": {
     "animations": {},
     "id": 355,
-    "texture": 94
+    "texture": 108
   },
   "ENT_TYPE_ITEM_PALACE_CANDLE": {
     "animations": {},
     "id": 489,
-    "texture": 259
+    "texture": 274
   },
   "ENT_TYPE_ITEM_PALACE_CANDLE_FLAME": {
     "animations": {},
     "id": 468,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_PARENTSSHIP": {
     "animations": {},
     "id": 354,
-    "texture": 97
+    "texture": 111
   },
   "ENT_TYPE_ITEM_PASTEBOMB": {
     "animations": {},
     "id": 348,
-    "texture": 358
+    "texture": 373
+  },
+  "ENT_TYPE_ITEM_PICKUP_12BAG": {
+    "animations": {},
+    "id": 515,
+    "texture": 373
+  },
+  "ENT_TYPE_ITEM_PICKUP_24BAG": {
+    "animations": {},
+    "id": 516,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_ANKH": {
     "animations": {},
-    "id": 537,
-    "texture": 358
+    "id": 539,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_BOMBBAG": {
     "animations": {},
     "id": 513,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_BOMBBOX": {
     "animations": {},
     "id": 514,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_CLIMBINGGLOVES": {
     "animations": {},
-    "id": 523,
-    "texture": 358
+    "id": 525,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_CLOVER": {
     "animations": {},
-    "id": 519,
-    "texture": 358
+    "id": 521,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_COMPASS": {
     "animations": {},
-    "id": 528,
-    "texture": 358
+    "id": 530,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_COOKEDTURKEY": {
     "animations": {},
-    "id": 516,
-    "texture": 358
+    "id": 518,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_CROWN": {
     "animations": {},
-    "id": 534,
-    "texture": 358
+    "id": 536,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_EGGPLANTCROWN": {
     "animations": {},
-    "id": 535,
-    "texture": 358
+    "id": 537,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_ELIXIR": {
     "animations": {},
-    "id": 518,
-    "texture": 358
+    "id": 520,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_GIANTFOOD": {
     "animations": {},
-    "id": 517,
-    "texture": 358
+    "id": 519,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_HEDJET": {
     "animations": {},
-    "id": 533,
-    "texture": 358
+    "id": 535,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_JOURNAL": {
     "animations": {},
     "id": 510,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_KAPALA": {
     "animations": {},
-    "id": 532,
-    "texture": 358
+    "id": 534,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_PARACHUTE": {
     "animations": {},
-    "id": 530,
-    "texture": 358
+    "id": 532,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_PASTE": {
     "animations": {},
-    "id": 527,
-    "texture": 358
+    "id": 529,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_PITCHERSMITT": {
     "animations": {},
-    "id": 524,
-    "texture": 358
+    "id": 526,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_PLAYERBAG": {
     "animations": {},
-    "id": 541,
-    "texture": 270
+    "id": 543,
+    "texture": 285
   },
   "ENT_TYPE_ITEM_PICKUP_ROPE": {
     "animations": {},
     "id": 511,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_ROPEPILE": {
     "animations": {},
     "id": 512,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_ROYALJELLY": {
     "animations": {},
-    "id": 515,
-    "texture": 358
+    "id": 517,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_SEEDEDRUNSUNLOCKER": {
     "animations": {},
-    "id": 520,
-    "texture": 358
+    "id": 522,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_SKELETON_KEY": {
     "animations": {},
-    "id": 539,
-    "texture": 358
+    "id": 541,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_SPECIALCOMPASS": {
     "animations": {},
-    "id": 529,
-    "texture": 358
+    "id": 531,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_SPECTACLES": {
     "animations": {},
-    "id": 522,
-    "texture": 358
+    "id": 524,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_SPIKESHOES": {
     "animations": {},
-    "id": 526,
-    "texture": 358
+    "id": 528,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_SPRINGSHOES": {
     "animations": {},
-    "id": 525,
-    "texture": 358
+    "id": 527,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_TABLETOFDESTINY": {
     "animations": {},
-    "id": 538,
-    "texture": 358
+    "id": 540,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_TORNJOURNALPAGE": {
     "animations": {},
     "id": 509,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_TRUECROWN": {
     "animations": {},
-    "id": 536,
-    "texture": 358
+    "id": 538,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PICKUP_UDJATEYE": {
     "animations": {},
-    "id": 531,
-    "texture": 358
+    "id": 533,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PLASMACANNON": {
     "animations": {},
-    "id": 585,
-    "texture": 358
+    "id": 587,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PLASMACANNON_SHOT": {
     "animations": {},
     "id": 375,
-    "texture": 363
+    "texture": 378
   },
   "ENT_TYPE_ITEM_PLAYERGHOST": {
     "animations": {
@@ -10460,27 +10470,27 @@
       }
     },
     "id": 446,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PLAYERGHOST_BREATH": {
     "animations": {},
     "id": 447,
-    "texture": 362
+    "texture": 377
   },
   "ENT_TYPE_ITEM_POT": {
     "animations": {},
     "id": 480,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_POTOFGOLD": {
     "animations": {},
     "id": 457,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_POWERPACK": {
     "animations": {},
-    "id": 572,
-    "texture": 358
+    "id": 574,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_POWERUP_ANKH": {
     "animations": {
@@ -10499,248 +10509,248 @@
         "texture": 7
       }
     },
-    "id": 558,
-    "texture": 366
+    "id": 560,
+    "texture": 382
   },
   "ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES": {
-    "animations": {},
-    "id": 544,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_COMPASS": {
-    "animations": {},
-    "id": 552,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_CROWN": {
-    "animations": {},
-    "id": 555,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_EGGPLANTCROWN": {
-    "animations": {},
-    "id": 556,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_HEDJET": {
-    "animations": {},
-    "id": 554,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_KAPALA": {
-    "animations": {},
-    "id": 547,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_PARACHUTE": {
-    "animations": {},
-    "id": 551,
-    "texture": 358
-  },
-  "ENT_TYPE_ITEM_POWERUP_PASTE": {
-    "animations": {},
-    "id": 543,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_PITCHERSMITT": {
-    "animations": {},
-    "id": 549,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_SKELETON_KEY": {
-    "animations": {},
-    "id": 560,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS": {
-    "animations": {},
-    "id": 553,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_SPECTACLES": {
-    "animations": {},
-    "id": 548,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_SPIKE_SHOES": {
-    "animations": {},
-    "id": 545,
-    "texture": -2
-  },
-  "ENT_TYPE_ITEM_POWERUP_SPRING_SHOES": {
     "animations": {},
     "id": 546,
     "texture": -2
   },
-  "ENT_TYPE_ITEM_POWERUP_TABLETOFDESTINY": {
+  "ENT_TYPE_ITEM_POWERUP_COMPASS": {
     "animations": {},
-    "id": 559,
+    "id": 554,
     "texture": -2
   },
-  "ENT_TYPE_ITEM_POWERUP_TRUECROWN": {
+  "ENT_TYPE_ITEM_POWERUP_CROWN": {
     "animations": {},
     "id": 557,
     "texture": -2
   },
-  "ENT_TYPE_ITEM_POWERUP_UDJATEYE": {
+  "ENT_TYPE_ITEM_POWERUP_EGGPLANTCROWN": {
+    "animations": {},
+    "id": 558,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_HEDJET": {
+    "animations": {},
+    "id": 556,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_KAPALA": {
+    "animations": {},
+    "id": 549,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_PARACHUTE": {
+    "animations": {},
+    "id": 553,
+    "texture": 373
+  },
+  "ENT_TYPE_ITEM_POWERUP_PASTE": {
+    "animations": {},
+    "id": 545,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_PITCHERSMITT": {
+    "animations": {},
+    "id": 551,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_SKELETON_KEY": {
+    "animations": {},
+    "id": 562,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS": {
+    "animations": {},
+    "id": 555,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_SPECTACLES": {
     "animations": {},
     "id": 550,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_SPIKE_SHOES": {
+    "animations": {},
+    "id": 547,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_SPRING_SHOES": {
+    "animations": {},
+    "id": 548,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_TABLETOFDESTINY": {
+    "animations": {},
+    "id": 561,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_TRUECROWN": {
+    "animations": {},
+    "id": 559,
+    "texture": -2
+  },
+  "ENT_TYPE_ITEM_POWERUP_UDJATEYE": {
+    "animations": {},
+    "id": 552,
     "texture": -2
   },
   "ENT_TYPE_ITEM_PRESENT": {
     "animations": {},
     "id": 422,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PUNISHBALL": {
     "animations": {},
     "id": 429,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PUNISHCHAIN": {
     "animations": {},
     "id": 430,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PURCHASABLE_CAPE": {
     "animations": {},
-    "id": 564,
-    "texture": 358
+    "id": 566,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PURCHASABLE_HOVERPACK": {
     "animations": {},
-    "id": 571,
-    "texture": 358
+    "id": 573,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PURCHASABLE_JETPACK": {
     "animations": {},
-    "id": 567,
-    "texture": 358
+    "id": 569,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PURCHASABLE_POWERPACK": {
     "animations": {},
-    "id": 573,
-    "texture": 358
+    "id": 575,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_PURCHASABLE_TELEPORTER_BACKPACK": {
     "animations": {},
-    "id": 569,
-    "texture": 358
+    "id": 571,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_REDLANTERN": {
     "animations": {},
     "id": 420,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_REDLANTERNFLAME": {
     "animations": {},
     "id": 421,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_ROCK": {
     "animations": {},
     "id": 365,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_ROPE": {
     "animations": {},
     "id": 349,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_RUBBLE": {
     "animations": {},
-    "id": 643,
-    "texture": 365
+    "id": 645,
+    "texture": 381
   },
   "ENT_TYPE_ITEM_RUBY": {
     "animations": {},
     "id": 500,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_RUBY_SMALL": {
     "animations": {},
     "id": 505,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SAPPHIRE": {
     "animations": {},
     "id": 499,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SAPPHIRE_SMALL": {
     "animations": {},
     "id": 504,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SCEPTER": {
     "animations": {},
-    "id": 586,
-    "texture": 358
+    "id": 588,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SCEPTER_ANUBISSHOT": {
     "animations": {},
     "id": 376,
-    "texture": 362
+    "texture": 377
   },
   "ENT_TYPE_ITEM_SCEPTER_ANUBISSPECIALSHOT": {
     "animations": {},
     "id": 377,
-    "texture": 364
+    "texture": 380
   },
   "ENT_TYPE_ITEM_SCEPTER_PLAYERSHOT": {
     "animations": {},
     "id": 378,
-    "texture": 362
+    "texture": 377
   },
   "ENT_TYPE_ITEM_SCRAP": {
     "animations": {},
     "id": 486,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SHORTCUT_SIGN": {
     "animations": {},
     "id": 406,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_ITEM_SHOTGUN": {
     "animations": {},
-    "id": 575,
-    "texture": 358
+    "id": 577,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SKULL": {
     "animations": {},
     "id": 482,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SKULLDROPTRAP": {
     "animations": {},
     "id": 461,
-    "texture": 299
+    "texture": 314
   },
   "ENT_TYPE_ITEM_SKULLDROPTRAP_SKULL": {
     "animations": {},
     "id": 490,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SLIDINGWALL_CHAIN": {
     "animations": {},
     "id": 433,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_ITEM_SLIDINGWALL_CHAIN_LASTPIECE": {
     "animations": {},
     "id": 434,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_ITEM_SLIDINGWALL_SWITCH": {
     "animations": {},
     "id": 465,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_ITEM_SLIDINGWALL_SWITCH_REWARD": {
     "animations": {},
     "id": 466,
-    "texture": 228
+    "texture": 243
   },
   "ENT_TYPE_ITEM_SNAP_TRAP": {
     "animations": {
@@ -10760,102 +10770,102 @@
       }
     },
     "id": 469,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_SORCERESS_DAGGER_SHOT": {
     "animations": {},
     "id": 381,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_SPARK": {
     "animations": {},
     "id": 383,
-    "texture": 363
+    "texture": 378
   },
   "ENT_TYPE_ITEM_SPEEDRUN_SIGN": {
     "animations": {},
     "id": 407,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_ITEM_SPIKES": {
     "animations": {},
     "id": 454,
-    "texture": 115
+    "texture": 129
   },
   "ENT_TYPE_ITEM_STICKYTRAP_BALL": {
     "animations": {},
     "id": 460,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_ITEM_STICKYTRAP_LASTPIECE": {
     "animations": {},
     "id": 459,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_ITEM_STICKYTRAP_PIECE": {
     "animations": {},
     "id": 458,
-    "texture": 182
+    "texture": 197
   },
   "ENT_TYPE_ITEM_TELEPORTER": {
     "animations": {},
-    "id": 579,
-    "texture": 358
+    "id": 581,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_TELEPORTER_BACKPACK": {
     "animations": {},
-    "id": 568,
-    "texture": 358
+    "id": 570,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_TELESCOPE": {
     "animations": {},
     "id": 411,
-    "texture": 109
+    "texture": 123
   },
   "ENT_TYPE_ITEM_TENTACLE": {
     "animations": {},
     "id": 471,
-    "texture": 153
+    "texture": 168
   },
   "ENT_TYPE_ITEM_TENTACLE_LAST_PIECE": {
     "animations": {},
     "id": 473,
-    "texture": 153
+    "texture": 168
   },
   "ENT_TYPE_ITEM_TENTACLE_PIECE": {
     "animations": {},
     "id": 472,
-    "texture": 153
+    "texture": 168
   },
   "ENT_TYPE_ITEM_TIAMAT_SHOT": {
     "animations": {},
     "id": 384,
-    "texture": 363
+    "texture": 378
   },
   "ENT_TYPE_ITEM_TORCH": {
     "animations": {},
     "id": 416,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_TORCHFLAME": {
     "animations": {},
     "id": 417,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_TOTEM_SPEAR": {
     "animations": {},
     "id": 360,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_TURKEY_NECK": {
     "animations": {},
     "id": 443,
-    "texture": 359
+    "texture": 374
   },
   "ENT_TYPE_ITEM_TUTORIAL_MONSTER_SIGN": {
     "animations": {},
     "id": 404,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_ITEM_TV": {
     "animations": {
@@ -10903,32 +10913,32 @@
       }
     },
     "id": 410,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_ITEM_UDJAT_SOCKET": {
     "animations": {},
     "id": 441,
-    "texture": 266
+    "texture": 281
   },
   "ENT_TYPE_ITEM_UFO_LASER_SHOT": {
     "animations": {},
     "id": 379,
-    "texture": 363
+    "texture": 378
   },
   "ENT_TYPE_ITEM_UNROLLED_ROPE": {
     "animations": {},
     "id": 351,
-    "texture": 270
+    "texture": 285
   },
   "ENT_TYPE_ITEM_USHABTI": {
     "animations": {},
     "id": 442,
-    "texture": 179
+    "texture": 194
   },
   "ENT_TYPE_ITEM_VAULTCHEST": {
     "animations": {},
     "id": 396,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_VLADS_CAPE": {
     "animations": {
@@ -10975,362 +10985,372 @@
         "texture": 102
       }
     },
-    "id": 563,
-    "texture": 358
+    "id": 565,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_WALLTORCH": {
     "animations": {},
     "id": 412,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_WALLTORCHFLAME": {
     "animations": {},
     "id": 413,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_WEB": {
     "animations": {},
     "id": 366,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_WEBGUN": {
     "animations": {},
-    "id": 574,
-    "texture": 358
+    "id": 576,
+    "texture": 373
   },
   "ENT_TYPE_ITEM_WEBSHOT": {
     "animations": {},
     "id": 367,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_WHIP": {
     "animations": {},
     "id": 345,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_WHIP_FLAME": {
     "animations": {},
     "id": 346,
-    "texture": 361
+    "texture": 376
   },
   "ENT_TYPE_ITEM_WOODEN_ARROW": {
     "animations": {},
     "id": 371,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_ITEM_WOODEN_SHIELD": {
     "animations": {},
-    "id": 589,
-    "texture": 358
+    "id": 591,
+    "texture": 373
+  },
+  "ENT_TYPE_LIQUID_COARSE_LAVA": {
+    "animations": {},
+    "id": 915,
+    "texture": -2
   },
   "ENT_TYPE_LIQUID_COARSE_WATER": {
-    "animations": {},
-    "id": 908,
-    "texture": -2
-  },
-  "ENT_TYPE_LIQUID_IMPOSTOR_LAKE": {
-    "animations": {},
-    "id": 909,
-    "texture": -2
-  },
-  "ENT_TYPE_LIQUID_LAVA": {
     "animations": {},
     "id": 910,
     "texture": -2
   },
-  "ENT_TYPE_LIQUID_STAGNANT_LAVA": {
+  "ENT_TYPE_LIQUID_IMPOSTOR_LAKE": {
     "animations": {},
     "id": 911,
     "texture": -2
   },
+  "ENT_TYPE_LIQUID_IMPOSTOR_LAVA": {
+    "animations": {},
+    "id": 914,
+    "texture": -2
+  },
+  "ENT_TYPE_LIQUID_LAVA": {
+    "animations": {},
+    "id": 912,
+    "texture": -2
+  },
+  "ENT_TYPE_LIQUID_STAGNANT_LAVA": {
+    "animations": {},
+    "id": 913,
+    "texture": -2
+  },
   "ENT_TYPE_LIQUID_WATER": {
     "animations": {},
-    "id": 907,
+    "id": 909,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_ANCHOVY_FLOCK": {
     "animations": {},
-    "id": 871,
+    "id": 873,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER": {
     "animations": {},
-    "id": 847,
+    "id": 849,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_BIGSPEAR_TRAP_TRIGGER": {
     "animations": {},
-    "id": 882,
+    "id": 884,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_BLACKMARKET_DOOR": {
     "animations": {},
-    "id": 846,
+    "id": 848,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_BOULDERSPAWNER": {
     "animations": {},
-    "id": 878,
+    "id": 880,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_BURNING_ROPE_EFFECT": {
     "animations": {},
-    "id": 861,
+    "id": 863,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_CAMERA_ANCHOR": {
     "animations": {},
-    "id": 857,
+    "id": 859,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_CAMERA_FLASH": {
     "animations": {},
-    "id": 863,
+    "id": 865,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_CINEMATIC_ANCHOR": {
     "animations": {},
-    "id": 860,
+    "id": 862,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_CONSTELLATION": {
     "animations": {},
-    "id": 842,
+    "id": 844,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_CONVEYORBELT_SOUND_SOURCE": {
     "animations": {},
-    "id": 870,
+    "id": 872,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_CRUSH_TRAP_TRIGGER": {
     "animations": {},
-    "id": 851,
+    "id": 853,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_CURSED_EFFECT": {
     "animations": {},
-    "id": 856,
+    "id": 858,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DM_ALIEN_BLAST": {
     "animations": {},
-    "id": 887,
+    "id": 889,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DM_CAMERA_ANCHOR": {
     "animations": {},
-    "id": 885,
+    "id": 887,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DM_CRATE_SPAWNING": {
     "animations": {},
-    "id": 888,
-    "texture": 363
+    "id": 890,
+    "texture": 378
   },
   "ENT_TYPE_LOGICAL_DM_DEATH_MIST": {
     "animations": {},
-    "id": 886,
+    "id": 888,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DM_IDOL_SPAWNING": {
     "animations": {},
-    "id": 889,
-    "texture": 363
+    "id": 891,
+    "texture": 378
   },
   "ENT_TYPE_LOGICAL_DM_SPAWN_POINT": {
     "animations": {},
-    "id": 884,
+    "id": 886,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DOOR": {
     "animations": {},
-    "id": 844,
+    "id": 846,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DOOR_AMBIENT_SOUND": {
     "animations": {},
-    "id": 845,
+    "id": 847,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DUSTWALL_APEP": {
     "animations": {},
-    "id": 862,
+    "id": 864,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_DUSTWALL_SOUND_SOURCE": {
     "animations": {},
-    "id": 875,
+    "id": 877,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_EGGPLANT_THROWER": {
     "animations": {},
-    "id": 892,
+    "id": 894,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_FROST_BREATH": {
     "animations": {},
-    "id": 891,
+    "id": 893,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_ICESLIDING_SOUND_SOURCE": {
     "animations": {},
-    "id": 876,
+    "id": 878,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_JUNGLESPEAR_TRAP_TRIGGER": {
     "animations": {},
-    "id": 849,
+    "id": 851,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_LAVA_DRAIN": {
     "animations": {},
-    "id": 880,
-    "texture": 153
+    "id": 882,
+    "texture": 168
   },
   "ENT_TYPE_LOGICAL_LIMB_ANCHOR": {
-    "animations": {},
-    "id": 865,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_MINIGAME": {
-    "animations": {},
-    "id": 893,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_MUMMYFLIES_SOUND_SOURCE": {
-    "animations": {},
-    "id": 872,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_ONFIRE_EFFECT": {
-    "animations": {},
-    "id": 854,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR": {
-    "animations": {},
-    "id": 858,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR_ZOOMIN": {
-    "animations": {},
-    "id": 859,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_PIPE_TRAVELER_SOUND_SOURCE": {
-    "animations": {},
-    "id": 877,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_PLATFORM_SPAWNER": {
-    "animations": {},
-    "id": 883,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_POISONED_EFFECT": {
-    "animations": {},
-    "id": 855,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_PORTAL": {
-    "animations": {},
-    "id": 866,
-    "texture": 333
-  },
-  "ENT_TYPE_LOGICAL_QUICKSAND_AMBIENT_SOUND_SOURCE": {
-    "animations": {},
-    "id": 873,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_QUICKSAND_SOUND_SOURCE": {
-    "animations": {},
-    "id": 874,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_REGENERATING_BLOCK": {
-    "animations": {},
-    "id": 881,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_ROOM_LIGHT": {
-    "animations": {},
-    "id": 864,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_SHOOTING_STARS_SPAWNER": {
-    "animations": {},
-    "id": 843,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_SPIKEBALL_TRIGGER": {
-    "animations": {},
-    "id": 850,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_SPLASH_BUBBLE_GENERATOR": {
-    "animations": {},
-    "id": 890,
-    "texture": -2
-  },
-  "ENT_TYPE_LOGICAL_STATICLAVA_SOUND_SOURCE": {
     "animations": {},
     "id": 867,
     "texture": -2
   },
-  "ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE": {
+  "ENT_TYPE_LOGICAL_MINIGAME": {
+    "animations": {},
+    "id": 895,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_MUMMYFLIES_SOUND_SOURCE": {
+    "animations": {},
+    "id": 874,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_ONFIRE_EFFECT": {
+    "animations": {},
+    "id": 856,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR": {
+    "animations": {},
+    "id": 860,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR_ZOOMIN": {
+    "animations": {},
+    "id": 861,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_PIPE_TRAVELER_SOUND_SOURCE": {
+    "animations": {},
+    "id": 879,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_PLATFORM_SPAWNER": {
+    "animations": {},
+    "id": 885,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_POISONED_EFFECT": {
+    "animations": {},
+    "id": 857,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_PORTAL": {
     "animations": {},
     "id": 868,
-    "texture": -2
+    "texture": 348
   },
-  "ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE": {
+  "ENT_TYPE_LOGICAL_QUICKSAND_AMBIENT_SOUND_SOURCE": {
     "animations": {},
-    "id": 869,
+    "id": 875,
     "texture": -2
   },
-  "ENT_TYPE_LOGICAL_TENTACLE_TRIGGER": {
+  "ENT_TYPE_LOGICAL_QUICKSAND_SOUND_SOURCE": {
+    "animations": {},
+    "id": 876,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_REGENERATING_BLOCK": {
+    "animations": {},
+    "id": 883,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_ROOM_LIGHT": {
+    "animations": {},
+    "id": 866,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_SHOOTING_STARS_SPAWNER": {
+    "animations": {},
+    "id": 845,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_SPIKEBALL_TRIGGER": {
     "animations": {},
     "id": 852,
     "texture": -2
   },
+  "ENT_TYPE_LOGICAL_SPLASH_BUBBLE_GENERATOR": {
+    "animations": {},
+    "id": 892,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_STATICLAVA_SOUND_SOURCE": {
+    "animations": {},
+    "id": 869,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE": {
+    "animations": {},
+    "id": 870,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE": {
+    "animations": {},
+    "id": 871,
+    "texture": -2
+  },
+  "ENT_TYPE_LOGICAL_TENTACLE_TRIGGER": {
+    "animations": {},
+    "id": 854,
+    "texture": -2
+  },
   "ENT_TYPE_LOGICAL_TOTEM_TRAP_TRIGGER": {
     "animations": {},
-    "id": 848,
+    "id": 850,
     "texture": -2
   },
   "ENT_TYPE_LOGICAL_WATER_DRAIN": {
     "animations": {},
-    "id": 879,
-    "texture": 153
+    "id": 881,
+    "texture": 168
   },
   "ENT_TYPE_LOGICAL_WET_EFFECT": {
     "animations": {},
-    "id": 853,
+    "id": 855,
     "texture": -2
   },
   "ENT_TYPE_MIDBG": {
     "animations": {},
-    "id": 808,
+    "id": 810,
     "texture": -5
   },
   "ENT_TYPE_MIDBG_BEEHIVE": {
     "animations": {},
-    "id": 811,
-    "texture": 210
+    "id": 813,
+    "texture": 225
   },
   "ENT_TYPE_MIDBG_PALACE_STYLEDDECORATION": {
     "animations": {},
-    "id": 810,
-    "texture": 259
+    "id": 812,
+    "texture": 274
   },
   "ENT_TYPE_MIDBG_PLATFORM_STRUCTURE": {
     "animations": {},
-    "id": 812,
-    "texture": 266
+    "id": 814,
+    "texture": 281
   },
   "ENT_TYPE_MIDBG_STYLEDDECORATION": {
     "animations": {},
-    "id": 809,
+    "id": 811,
     "texture": -8
   },
   "ENT_TYPE_MONS_ALIEN": {
@@ -11386,7 +11406,7 @@
       }
     },
     "id": 267,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_ALIENQUEEN": {
     "animations": {
@@ -11413,7 +11433,7 @@
       }
     },
     "id": 271,
-    "texture": 334
+    "texture": 349
   },
   "ENT_TYPE_MONS_AMMIT": {
     "animations": {
@@ -11447,7 +11467,7 @@
       }
     },
     "id": 280,
-    "texture": 309
+    "texture": 324
   },
   "ENT_TYPE_MONS_ANUBIS": {
     "animations": {
@@ -11495,7 +11515,7 @@
       }
     },
     "id": 253,
-    "texture": 302
+    "texture": 317
   },
   "ENT_TYPE_MONS_ANUBIS2": {
     "animations": {
@@ -11515,12 +11535,12 @@
       }
     },
     "id": 259,
-    "texture": 301
+    "texture": 316
   },
   "ENT_TYPE_MONS_APEP_BODY": {
     "animations": {},
     "id": 255,
-    "texture": 308
+    "texture": 323
   },
   "ENT_TYPE_MONS_APEP_HEAD": {
     "animations": {},
@@ -11530,7 +11550,7 @@
   "ENT_TYPE_MONS_APEP_TAIL": {
     "animations": {},
     "id": 256,
-    "texture": 308
+    "texture": 323
   },
   "ENT_TYPE_MONS_BAT": {
     "animations": {
@@ -11557,7 +11577,7 @@
       }
     },
     "id": 224,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_BEE": {
     "animations": {
@@ -11591,7 +11611,7 @@
       }
     },
     "id": 278,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_BODYGUARD": {
     "animations": {
@@ -11709,7 +11729,7 @@
       }
     },
     "id": 306,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_CATMUMMY": {
     "animations": {
@@ -11729,7 +11749,7 @@
       }
     },
     "id": 251,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_CAVEMAN": {
     "animations": {
@@ -11868,7 +11888,7 @@
       }
     },
     "id": 225,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_CAVEMAN_BOSS": {
     "animations": {
@@ -11944,7 +11964,7 @@
       }
     },
     "id": 232,
-    "texture": 300
+    "texture": 315
   },
   "ENT_TYPE_MONS_CAVEMAN_SHOPKEEPER": {
     "animations": {
@@ -12083,7 +12103,7 @@
       }
     },
     "id": 226,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_COBRA": {
     "animations": {
@@ -12117,7 +12137,7 @@
       }
     },
     "id": 248,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_CRABMAN": {
     "animations": {
@@ -12179,7 +12199,7 @@
       }
     },
     "id": 311,
-    "texture": 305
+    "texture": 320
   },
   "ENT_TYPE_MONS_CRITTERANCHOVY": {
     "animations": {
@@ -12192,7 +12212,7 @@
       }
     },
     "id": 335,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_CRITTERBUTTERFLY": {
     "animations": {
@@ -12212,7 +12232,7 @@
       }
     },
     "id": 332,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_CRITTERCRAB": {
     "animations": {
@@ -12232,7 +12252,7 @@
       }
     },
     "id": 336,
-    "texture": 356
+    "texture": 371
   },
   "ENT_TYPE_MONS_CRITTERDRONE": {
     "animations": {
@@ -12245,7 +12265,7 @@
       }
     },
     "id": 340,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_CRITTERDUNGBEETLE": {
     "animations": {
@@ -12272,7 +12292,7 @@
       }
     },
     "id": 331,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_CRITTERFIREFLY": {
     "animations": {
@@ -12292,7 +12312,7 @@
       }
     },
     "id": 339,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_CRITTERFISH": {
     "animations": {
@@ -12326,7 +12346,7 @@
       }
     },
     "id": 334,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_CRITTERLOCUST": {
     "animations": {
@@ -12346,7 +12366,7 @@
       }
     },
     "id": 337,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_CRITTERPENGUIN": {
     "animations": {
@@ -12387,7 +12407,7 @@
       }
     },
     "id": 338,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_CRITTERSLIME": {
     "animations": {
@@ -12421,7 +12441,7 @@
       }
     },
     "id": 341,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_CRITTERSNAIL": {
     "animations": {
@@ -12441,7 +12461,7 @@
       }
     },
     "id": 333,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_CROCMAN": {
     "animations": {
@@ -12517,7 +12537,7 @@
       }
     },
     "id": 247,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_EGGPLANT_MINISTER": {
     "animations": {
@@ -12572,7 +12592,7 @@
       }
     },
     "id": 290,
-    "texture": 312
+    "texture": 327
   },
   "ENT_TYPE_MONS_FEMALE_JIANGSHI": {
     "animations": {
@@ -12620,7 +12640,7 @@
       }
     },
     "id": 261,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_FIREBUG": {
     "animations": {
@@ -12654,7 +12674,7 @@
       }
     },
     "id": 241,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_FIREBUG_UNCHAINED": {
     "animations": {
@@ -12695,7 +12715,7 @@
       }
     },
     "id": 242,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_FIREFROG": {
     "animations": {
@@ -12757,7 +12777,7 @@
       }
     },
     "id": 284,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_FISH": {
     "animations": {
@@ -12798,7 +12818,7 @@
       }
     },
     "id": 262,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_FROG": {
     "animations": {
@@ -12860,7 +12880,7 @@
       }
     },
     "id": 283,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_GHIST": {
     "animations": {
@@ -12880,7 +12900,7 @@
       }
     },
     "id": 314,
-    "texture": 326
+    "texture": 341
   },
   "ENT_TYPE_MONS_GHIST_SHOPKEEPER": {
     "animations": {
@@ -12900,7 +12920,7 @@
       }
     },
     "id": 315,
-    "texture": 326
+    "texture": 341
   },
   "ENT_TYPE_MONS_GHOST": {
     "animations": {
@@ -12927,7 +12947,7 @@
       }
     },
     "id": 317,
-    "texture": 325
+    "texture": 340
   },
   "ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY": {
     "animations": {
@@ -12954,7 +12974,7 @@
       }
     },
     "id": 319,
-    "texture": 325
+    "texture": 340
   },
   "ENT_TYPE_MONS_GHOST_MEDIUM_SAD": {
     "animations": {
@@ -12981,7 +13001,7 @@
       }
     },
     "id": 318,
-    "texture": 325
+    "texture": 340
   },
   "ENT_TYPE_MONS_GHOST_SMALL_ANGRY": {
     "animations": {
@@ -13008,7 +13028,7 @@
       }
     },
     "id": 320,
-    "texture": 326
+    "texture": 341
   },
   "ENT_TYPE_MONS_GHOST_SMALL_HAPPY": {
     "animations": {
@@ -13035,7 +13055,7 @@
       }
     },
     "id": 323,
-    "texture": 326
+    "texture": 341
   },
   "ENT_TYPE_MONS_GHOST_SMALL_SAD": {
     "animations": {
@@ -13062,7 +13082,7 @@
       }
     },
     "id": 321,
-    "texture": 326
+    "texture": 341
   },
   "ENT_TYPE_MONS_GHOST_SMALL_SURPRISED": {
     "animations": {
@@ -13089,7 +13109,7 @@
       }
     },
     "id": 322,
-    "texture": 326
+    "texture": 341
   },
   "ENT_TYPE_MONS_GIANTFISH": {
     "animations": {
@@ -13116,7 +13136,7 @@
       }
     },
     "id": 265,
-    "texture": 324
+    "texture": 339
   },
   "ENT_TYPE_MONS_GIANTFLY": {
     "animations": {
@@ -13143,7 +13163,7 @@
       }
     },
     "id": 288,
-    "texture": 305
+    "texture": 320
   },
   "ENT_TYPE_MONS_GIANTFROG": {
     "animations": {
@@ -13177,7 +13197,7 @@
       }
     },
     "id": 285,
-    "texture": 311
+    "texture": 326
   },
   "ENT_TYPE_MONS_GIANTSPIDER": {
     "animations": {
@@ -13225,7 +13245,7 @@
       }
     },
     "id": 223,
-    "texture": 300
+    "texture": 315
   },
   "ENT_TYPE_MONS_GOLDMONKEY": {
     "animations": {
@@ -13259,7 +13279,7 @@
       }
     },
     "id": 309,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_GRUB": {
     "animations": {
@@ -13307,7 +13327,7 @@
       }
     },
     "id": 286,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_HANGSPIDER": {
     "animations": {
@@ -13362,7 +13382,7 @@
       }
     },
     "id": 222,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_HERMITCRAB": {
     "animations": {
@@ -13494,7 +13514,7 @@
       }
     },
     "id": 264,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_HORNEDLIZARD": {
     "animations": {
@@ -13598,12 +13618,12 @@
       }
     },
     "id": 230,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_HUNDUN": {
     "animations": {},
     "id": 292,
-    "texture": 349
+    "texture": 364
   },
   "ENT_TYPE_MONS_HUNDUNS_SERVANT": {
     "animations": {
@@ -13721,17 +13741,17 @@
       }
     },
     "id": 307,
-    "texture": 295
+    "texture": 310
   },
   "ENT_TYPE_MONS_HUNDUN_BIRDHEAD": {
     "animations": {},
     "id": 293,
-    "texture": 352
+    "texture": 367
   },
   "ENT_TYPE_MONS_HUNDUN_SNAKEHEAD": {
     "animations": {},
     "id": 294,
-    "texture": 352
+    "texture": 367
   },
   "ENT_TYPE_MONS_IMP": {
     "animations": {
@@ -13751,7 +13771,7 @@
       }
     },
     "id": 243,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_JIANGSHI": {
     "animations": {
@@ -13792,7 +13812,7 @@
       }
     },
     "id": 260,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_JUMPDOG": {
     "animations": {
@@ -13812,12 +13832,12 @@
       }
     },
     "id": 289,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_KINGU": {
     "animations": {},
     "id": 281,
-    "texture": 317
+    "texture": 332
   },
   "ENT_TYPE_MONS_LAMASSU": {
     "animations": {
@@ -13851,7 +13871,7 @@
       }
     },
     "id": 274,
-    "texture": 304
+    "texture": 319
   },
   "ENT_TYPE_MONS_LAVAMANDER": {
     "animations": {
@@ -13934,7 +13954,7 @@
       }
     },
     "id": 244,
-    "texture": 305
+    "texture": 320
   },
   "ENT_TYPE_MONS_LEPRECHAUN": {
     "animations": {
@@ -14010,7 +14030,7 @@
       }
     },
     "id": 310,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_MADAMETUSK": {
     "animations": {
@@ -14037,7 +14057,7 @@
       }
     },
     "id": 305,
-    "texture": 308
+    "texture": 323
   },
   "ENT_TYPE_MONS_MAGMAMAN": {
     "animations": {
@@ -14092,7 +14112,7 @@
       }
     },
     "id": 239,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_MANTRAP": {
     "animations": {
@@ -14154,7 +14174,7 @@
       }
     },
     "id": 233,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_MARLA_TUNNEL": {
     "animations": {
@@ -14216,17 +14236,17 @@
       }
     },
     "id": 299,
-    "texture": 106
+    "texture": 120
   },
   "ENT_TYPE_MONS_MEGAJELLYFISH": {
     "animations": {},
     "id": 312,
-    "texture": 325
+    "texture": 340
   },
   "ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND": {
     "animations": {},
     "id": 313,
-    "texture": 325
+    "texture": 340
   },
   "ENT_TYPE_MONS_MERCHANT": {
     "animations": {
@@ -14344,7 +14364,7 @@
       }
     },
     "id": 297,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_MOLE": {
     "animations": {
@@ -14448,7 +14468,7 @@
       }
     },
     "id": 231,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_MONKEY": {
     "animations": {
@@ -14482,7 +14502,7 @@
       }
     },
     "id": 238,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_MOSQUITO": {
     "animations": {
@@ -14502,7 +14522,7 @@
       }
     },
     "id": 237,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_MUMMY": {
     "animations": {
@@ -14536,7 +14556,7 @@
       }
     },
     "id": 249,
-    "texture": 301
+    "texture": 316
   },
   "ENT_TYPE_MONS_NECROMANCER": {
     "animations": {
@@ -14619,7 +14639,7 @@
       }
     },
     "id": 252,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_OCTOPUS": {
     "animations": {
@@ -14702,7 +14722,7 @@
       }
     },
     "id": 263,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_OLD_HUNTER": {
     "animations": {
@@ -14820,7 +14840,7 @@
       }
     },
     "id": 303,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_OLMITE_BODYARMORED": {
     "animations": {
@@ -14910,7 +14930,7 @@
       }
     },
     "id": 276,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_OLMITE_HELMET": {
     "animations": {
@@ -15000,7 +15020,7 @@
       }
     },
     "id": 275,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_OLMITE_NAKED": {
     "animations": {
@@ -15090,7 +15110,7 @@
       }
     },
     "id": 277,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_OSIRIS_HAND": {
     "animations": {
@@ -15110,7 +15130,7 @@
       }
     },
     "id": 258,
-    "texture": 333
+    "texture": 348
   },
   "ENT_TYPE_MONS_OSIRIS_HEAD": {
     "animations": {
@@ -15137,7 +15157,7 @@
       }
     },
     "id": 257,
-    "texture": 332
+    "texture": 347
   },
   "ENT_TYPE_MONS_PET_CAT": {
     "animations": {
@@ -15248,7 +15268,7 @@
       }
     },
     "id": 327,
-    "texture": 292
+    "texture": 307
   },
   "ENT_TYPE_MONS_PET_DOG": {
     "animations": {
@@ -15359,7 +15379,7 @@
       }
     },
     "id": 326,
-    "texture": 292
+    "texture": 307
   },
   "ENT_TYPE_MONS_PET_HAMSTER": {
     "animations": {
@@ -15470,7 +15490,7 @@
       }
     },
     "id": 328,
-    "texture": 292
+    "texture": 307
   },
   "ENT_TYPE_MONS_PET_TUTORIAL": {
     "animations": {
@@ -15560,7 +15580,7 @@
       }
     },
     "id": 219,
-    "texture": 292
+    "texture": 307
   },
   "ENT_TYPE_MONS_PROTOSHOPKEEPER": {
     "animations": {
@@ -15629,7 +15649,7 @@
       }
     },
     "id": 272,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_QUEENBEE": {
     "animations": {
@@ -15642,7 +15662,7 @@
       }
     },
     "id": 279,
-    "texture": 300
+    "texture": 315
   },
   "ENT_TYPE_MONS_REDSKELETON": {
     "animations": {
@@ -15676,7 +15696,7 @@
       }
     },
     "id": 228,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_ROBOT": {
     "animations": {
@@ -15717,7 +15737,7 @@
       }
     },
     "id": 240,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_SCARAB": {
     "animations": {
@@ -15730,7 +15750,7 @@
       }
     },
     "id": 295,
-    "texture": 358
+    "texture": 373
   },
   "ENT_TYPE_MONS_SCORPION": {
     "animations": {
@@ -15771,7 +15791,7 @@
       }
     },
     "id": 229,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_SHOPKEEPER": {
     "animations": {
@@ -15889,7 +15909,7 @@
       }
     },
     "id": 296,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_SHOPKEEPERCLONE": {
     "animations": {
@@ -16000,7 +16020,7 @@
       }
     },
     "id": 273,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_SISTER_PARMESAN": {
     "animations": {
@@ -16118,7 +16138,7 @@
       }
     },
     "id": 302,
-    "texture": 295
+    "texture": 310
   },
   "ENT_TYPE_MONS_SISTER_PARSLEY": {
     "animations": {
@@ -16236,7 +16256,7 @@
       }
     },
     "id": 300,
-    "texture": 295
+    "texture": 310
   },
   "ENT_TYPE_MONS_SISTER_PARSNIP": {
     "animations": {
@@ -16354,7 +16374,7 @@
       }
     },
     "id": 301,
-    "texture": 295
+    "texture": 310
   },
   "ENT_TYPE_MONS_SKELETON": {
     "animations": {
@@ -16388,7 +16408,7 @@
       }
     },
     "id": 227,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_SNAKE": {
     "animations": {
@@ -16415,7 +16435,7 @@
       }
     },
     "id": 220,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_SORCERESS": {
     "animations": {
@@ -16498,7 +16518,7 @@
       }
     },
     "id": 250,
-    "texture": 297
+    "texture": 312
   },
   "ENT_TYPE_MONS_SPIDER": {
     "animations": {
@@ -16539,7 +16559,7 @@
       }
     },
     "id": 221,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_STORAGEGUY": {
     "animations": {
@@ -16580,7 +16600,7 @@
       }
     },
     "id": 308,
-    "texture": 323
+    "texture": 338
   },
   "ENT_TYPE_MONS_TADPOLE": {
     "animations": {
@@ -16614,7 +16634,7 @@
       }
     },
     "id": 287,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_THIEF": {
     "animations": {
@@ -16732,12 +16752,12 @@
       }
     },
     "id": 304,
-    "texture": 295
+    "texture": 310
   },
   "ENT_TYPE_MONS_TIAMAT": {
     "animations": {},
     "id": 282,
-    "texture": 338
+    "texture": 353
   },
   "ENT_TYPE_MONS_TIKIMAN": {
     "animations": {
@@ -16820,7 +16840,7 @@
       }
     },
     "id": 234,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_UFO": {
     "animations": {
@@ -16854,7 +16874,7 @@
       }
     },
     "id": 266,
-    "texture": 293
+    "texture": 308
   },
   "ENT_TYPE_MONS_VAMPIRE": {
     "animations": {
@@ -16958,7 +16978,7 @@
       }
     },
     "id": 245,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_VLAD": {
     "animations": {
@@ -17062,7 +17082,7 @@
       }
     },
     "id": 246,
-    "texture": 294
+    "texture": 309
   },
   "ENT_TYPE_MONS_WITCHDOCTOR": {
     "animations": {
@@ -17152,7 +17172,7 @@
       }
     },
     "id": 235,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_WITCHDOCTORSKULL": {
     "animations": {
@@ -17172,12 +17192,12 @@
       }
     },
     "id": 236,
-    "texture": 296
+    "texture": 311
   },
   "ENT_TYPE_MONS_YAMA": {
     "animations": {},
     "id": 291,
-    "texture": 346
+    "texture": 361
   },
   "ENT_TYPE_MONS_YANG": {
     "animations": {
@@ -17295,7 +17315,7 @@
       }
     },
     "id": 298,
-    "texture": 295
+    "texture": 310
   },
   "ENT_TYPE_MONS_YETI": {
     "animations": {
@@ -17378,7 +17398,7 @@
       }
     },
     "id": 268,
-    "texture": 298
+    "texture": 313
   },
   "ENT_TYPE_MONS_YETIKING": {
     "animations": {
@@ -17447,7 +17467,7 @@
       }
     },
     "id": 269,
-    "texture": 304
+    "texture": 319
   },
   "ENT_TYPE_MONS_YETIQUEEN": {
     "animations": {
@@ -17516,7 +17536,7 @@
       }
     },
     "id": 270,
-    "texture": 304
+    "texture": 319
   },
   "ENT_TYPE_MOUNT_AXOLOTL": {
     "animations": {
@@ -17661,18 +17681,18 @@
         "texture": 146
       }
     },
-    "id": 899,
-    "texture": 359
+    "id": 901,
+    "texture": 374
   },
   "ENT_TYPE_MOUNT_BASECAMP_CHAIR": {
     "animations": {},
-    "id": 903,
-    "texture": 106
+    "id": 905,
+    "texture": 120
   },
   "ENT_TYPE_MOUNT_BASECAMP_COUCH": {
     "animations": {},
-    "id": 904,
-    "texture": 106
+    "id": 906,
+    "texture": 120
   },
   "ENT_TYPE_MOUNT_MECH": {
     "animations": {
@@ -17775,8 +17795,8 @@
         "texture": 52
       }
     },
-    "id": 900,
-    "texture": 329
+    "id": 902,
+    "texture": 344
   },
   "ENT_TYPE_MOUNT_QILIN": {
     "animations": {
@@ -17921,8 +17941,8 @@
         "texture": 210
       }
     },
-    "id": 901,
-    "texture": 359
+    "id": 903,
+    "texture": 374
   },
   "ENT_TYPE_MOUNT_ROCKDOG": {
     "animations": {
@@ -18067,8 +18087,8 @@
         "texture": 82
       }
     },
-    "id": 898,
-    "texture": 359
+    "id": 900,
+    "texture": 374
   },
   "ENT_TYPE_MOUNT_TURKEY": {
     "animations": {
@@ -18213,7 +18233,7 @@
         "texture": 18
       }
     },
-    "id": 897,
-    "texture": 359
+    "id": 899,
+    "texture": 374
   }
 }
