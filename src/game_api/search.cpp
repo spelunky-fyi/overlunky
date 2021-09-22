@@ -111,7 +111,7 @@ std::unordered_map<std::string_view, size_t (*)(Memory mem, const char* exe)> g_
         "load_item"sv,
         [](Memory mem, const char* exe)
         {
-            size_t addr = find_inst(exe, "\x83\x80\x44\x01\x00\x00\xFF"s, mem.after_bundle, "load_item"sv);
+            size_t addr = find_inst(exe, "\x83\x80\x44\x01\x00\x00\xFF"sv, mem.after_bundle, "load_item"sv);
             return function_start(mem.at_exe(addr));
         },
     },
@@ -121,8 +121,39 @@ std::unordered_map<std::string_view, size_t (*)(Memory mem, const char* exe)> g_
         {
             // Rev.Eng.: Look at any entity in memory, dereference the __vftable to see the big table of pointers
             // scroll up to the first one, and find a reference to that
-            size_t addr = find_inst(exe, "\x48\x8D\x0D\x03\x79\x51\x00"s, mem.after_bundle, "get_virtual_function_address"sv);
+            size_t addr = find_inst(exe, "\x48\x8D\x0D\x03\x79\x51\x00"sv, mem.after_bundle, "get_virtual_function_address"sv);
             return mem.at_exe(decode_pc(exe, addr));
+        },
+    },
+    {
+        "fmod_studio"sv,
+        [](Memory mem, const char* exe)
+        {
+            // Rev.Eng.: Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+            auto fmod_studio_system_instruction = find_inst(exe, "\xBA\x05\x01\x02\x00"sv, mem.after_bundle) - 0x7;
+            return mem.at_exe(decode_pc(exe, fmod_studio_system_instruction));
+        },
+    },
+    {
+        "fmod_event_properties"sv,
+        [](Memory mem, const char* exe)
+        {
+            // Rev.Eng.: Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+            // Said name comes from an array that is being looped, said array is a global of type EventParameters
+            auto event_properties_instruction = find_inst(exe, "\x48\x8d\x9d\x30\x01\x00\x00"sv, mem.after_bundle) - 0x7;
+            return mem.at_exe(decode_pc(exe, event_properties_instruction) + 0x30);
+        },
+    },
+    {
+        "fmod_event_map"sv,
+        [](Memory mem, const char* exe)
+        {
+            // Rev.Eng.: Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+            // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
+            // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
+            auto event_map_instruction = find_inst(exe, "\x89\x58\x10\x48\x8d\x48\x18\x41\xb8\x88\x01\x00\x00"sv, mem.after_bundle) + 0x40;
+            event_map_instruction = find_inst(exe, "\xf3"sv, event_map_instruction);
+            return mem.at_exe(decode_pc(exe, event_map_instruction, 4));
         },
     },
 };
