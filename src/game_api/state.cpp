@@ -213,18 +213,40 @@ std::pair<float, float> State::screen_position(float x, float y)
 
 float State::get_zoom_level()
 {
-    auto memory = Memory::get();
-    auto offset = memory.at_exe(0x22334A00); //TODO: patterns or something. Also this pointer is kinda slow, it doesn't work before intro cutscene.
-    offset = read_u64(offset);
-    if (offset != 0)
+    float default_zoom = 13.5;
+    static size_t offset = 0;
+    if (offset == 0)
     {
-        offset += 0x804ec;
-        return read_f32(offset);
+        auto memory = Memory::get();
+        auto exe = memory.exe();
+
+        // Rev.Eng.: Go stand in a level next to a shop. In Cheat Engine, search for float 13.5
+        // Go into the shop, search for 12.5, put a write bp on that address.
+        // In 1.23.2 the default shop and level zoom levels aren't hardcoded in the exe, they are
+        // in variables (loaded into xmm6)
+        // Note that xmm6 (the new zoom level) gets written at a huge offset of rax. Rax is the
+        // return value of the call just above, so look in that function at the bottom. There will
+        // be a hardcoded value loaded in rax. At offset 0x10 in rax is another pointer that is the
+        // base for the big offset. Careful, the big offset is hardcoded below (0x804D8), so update
+        // that too.
+        size_t addr = find_inst(exe, "\x48\x8B\x05\x9F\x4F\x15\x00"s, memory.after_bundle);
+        size_t obj1 = memory.at_exe(decode_pc(exe, addr));
+
+        size_t obj2 = read_u64(obj1);
+        if (obj2 == 0)
+        {
+            return default_zoom;
+        }
+
+        size_t obj3 = read_u64(obj2 + 0x10);
+        if (obj3 == 0)
+        {
+            return default_zoom;
+        }
+
+        offset = obj3 + 0x804D8;
     }
-    else
-    {
-        return 13.5;
-    }
+    return read_f32(offset);
 }
 
 std::pair<float, float> State::get_camera_position()
