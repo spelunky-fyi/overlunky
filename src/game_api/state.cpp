@@ -170,8 +170,8 @@ StateMemory* State::ptr_local() const
 std::pair<float, float> State::click_position(float x, float y)
 {
     float cz = get_zoom_level();
-    float cx = read_f32(get_camera());
-    float cy = read_f32(get_camera() + 4);
+    float cx = ptr()->camera->calculated_focus_x;
+    float cy = ptr()->camera->calculated_focus_y;
     float rx = cx + ZF * cz * x;
     float ry = cy + (ZF / 16.0f * 9.0f) * cz * y;
     return {rx, ry};
@@ -180,8 +180,8 @@ std::pair<float, float> State::click_position(float x, float y)
 std::pair<float, float> State::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
-    float cx = read_f32(get_camera());
-    float cy = read_f32(get_camera() + 4);
+    float cx = ptr()->camera->calculated_focus_x;
+    float cy = ptr()->camera->calculated_focus_y;
     float rx = (x - cx) / cz / ZF;
     float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
@@ -246,8 +246,8 @@ void State::godmode(bool g)
 
 std::pair<float, float> State::get_camera_position()
 {
-    float cx = read_f32(get_camera());
-    float cy = read_f32(get_camera() + 4);
+    float cx = ptr()->camera->calculated_focus_x;
+    float cy = ptr()->camera->calculated_focus_y;
     return {cx, cy};
 }
 

@@ -156,6 +156,8 @@ class Entity
     uint8_t b3f;
     float x;
     float y;
+    float abs_x;
+    float abs_y;
     float w;
     float h;
     float special_offsetx;

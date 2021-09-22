@@ -7,22 +7,6 @@
 #include "state.hpp"
 
 using LoadItem = size_t (*)(Layer*, size_t, float, float, bool);
-LoadItem get_load_item()
-{
-    ONCE(LoadItem)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto needle = "\xBA\xB9\x01\x00\x00"s;
-        auto off = find_inst(exe, needle, memory.after_bundle);
-        off = find_inst(exe, needle, off + 5);
-        off = find_inst(exe, needle, off + 5);
-        off = find_inst(exe, "\xE8"s, off + 5);
-
-        return res = (LoadItem)memory.at_exe(Memory::decode_call(off));
-    }
-}
-
 using LoadItemOver = Entity* (*)(Layer*, size_t, Entity*, float, float, bool);
 LoadItemOver get_load_item_over()
 {
@@ -52,7 +36,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
 {
     if (id == 0)
         return nullptr;
-    auto load_item = get_load_item();
+    auto load_item = (LoadItem)get_address("load_item");
     size_t addr;
     Entity* spawned;
     float min_speed_check = 0.01f;
@@ -81,8 +65,9 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
     }
     if (abs(vx) + abs(vy) > min_speed_check && spawned->is_movable())
     {
-        write_mem(addr + 0x100, to_le_bytes(vx));
-        write_mem(addr + 0x104, to_le_bytes(vy));
+        auto movable = (Movable*)spawned;
+        movable->velocityx = vx;
+        movable->velocityy = vy;
     }
     DEBUG("Spawned {:x}", addr);
     return spawned;

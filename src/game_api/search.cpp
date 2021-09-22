@@ -108,6 +108,14 @@ std::unordered_map<std::string_view, size_t (*)(Memory mem, const char* exe)> g_
         },
     },
     {
+        "load_item"sv,
+        [](Memory mem, const char* exe)
+        {
+            size_t addr = find_inst(exe, "\x83\x80\x44\x01\x00\x00\xFF"s, mem.after_bundle, "load_item"sv);
+            return function_start(mem.at_exe(addr));
+        },
+    },
+    {
         "get_virtual_function_address"sv,
         [](Memory mem, const char* exe)
         {
