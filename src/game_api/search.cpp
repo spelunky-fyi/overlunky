@@ -107,6 +107,16 @@ std::unordered_map<std::string_view, size_t (*)(Memory mem, const char* exe)> g_
             return mem.at_exe(decode_pc(exe, addr - 0xc));
         },
     },
+    {
+        "get_virtual_function_address"sv,
+        [](Memory mem, const char* exe)
+        {
+            // Rev.Eng.: Look at any entity in memory, dereference the __vftable to see the big table of pointers
+            // scroll up to the first one, and find a reference to that
+            size_t addr = find_inst(exe, "\x48\x8D\x0D\x03\x79\x51\x00"s, mem.after_bundle, "get_virtual_function_address"sv);
+            return mem.at_exe(decode_pc(exe, addr));
+        },
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

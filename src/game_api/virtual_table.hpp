@@ -4,7 +4,7 @@
 
 // The numbers below represent the index in the memory block containing the virtual tables of all the objects
 // This table can be found by following the pattern in the get_virtual_function_address function, which looks
-// up the pointer to the D3Dcompile function, the first in the table.
+// up the pointer to the first in the table.
 
 // These numbers will change with every release of Spelunky. To look them up, you can use the x64dbg plugin:
 // make sure you are in a level containing the entity you want to detect, click on Virtual Table -> Detect entities
@@ -60,6 +60,7 @@ enum class VTABLE_OFFSET
     MONS_YETIKING = 49600,
     MONS_YETIQUEEN = 2141,
     MOUNT_TURKEY = 4966,
+    CHAR_ANA_SPELUNKY = 46816,
 };
 
 size_t get_virtual_function_address(VTABLE_OFFSET tableEntry, uint32_t relativeOffset);

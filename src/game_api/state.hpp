@@ -190,7 +190,6 @@ struct StateMemory
 struct State
 {
     size_t location;
-    size_t addr_damage;
     size_t addr_insta;
     size_t addr_zoom;
     size_t addr_zoom_shop;
@@ -220,23 +219,7 @@ struct State
         return (Items*)(pointer);
     }
 
-    void godmode(bool g)
-    {
-        DEBUG("TODO godmode: fix get_damage() and get_insta()");
-        return;
-
-        // log::debug!("God {:?}" mode; g);
-        if (g)
-        {
-            write_mem_prot(addr_damage, ("\xC3"s), true);
-            write_mem_prot(addr_insta, ("\xC3"s), true);
-        }
-        else
-        {
-            write_mem_prot(addr_damage, ("\x48"s), true);
-            write_mem_prot(addr_insta, ("\x40"s), true);
-        }
-    }
+    void godmode(bool g);
 
     void darkmode(bool g)
     {

@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "render_api.hpp"
 #include "spawn_api.hpp"
+#include "virtual_table.hpp"
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -64,30 +65,6 @@ size_t get_location()
         location = find_inst(exe, "\x49\x0F\x44\xC0"s, location + 1);
         location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 25)));
         return res = location;
-    }
-}
-
-size_t get_damage()
-{
-    // TODO: this is the 49th virtual (on_regular_damage) of Player
-    return 0ul;
-
-    ONCE(size_t)
-    {
-        // TODO: get vtable of character and calculate the offset
-        auto memory = Memory::get();
-        auto off = memory.after_bundle;
-        while (true)
-        {
-            // sub rsp, 0x90; xor reg, reg
-            off = find_inst(memory.exe(), "\x48\x81\xEC\x90\x00\x00\x00"s, off + 1);
-            if (read_u8(memory.at_exe(off + 7)) == 0x33 || read_u8(memory.at_exe(off + 8)) == 0x33)
-            {
-                break;
-            }
-        }
-
-        return res = function_start(memory.at_exe(off));
     }
 }
 
@@ -165,12 +142,11 @@ State& State::get()
             do_write_load_opt();
         }
         auto addr_location = get_location();
-        auto addr_damage = get_damage();
         auto addr_insta = get_insta();
         auto addr_zoom = 0ul;      // get_zoom();
         auto addr_zoom_shop = 0ul; //get_zoom_shop();
         auto addr_dark = 0ul;      //get_dark();
-        STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
+        STATE = State{addr_location, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
         init_render_api_hooks();
@@ -247,6 +223,25 @@ float State::get_zoom_level()
         offset = obj3 + 0x804D8;
     }
     return read_f32(offset);
+}
+
+void State::godmode(bool g)
+{
+    DEBUG("TODO godmode: fix get_insta()");
+    auto memory = Memory::get();
+    auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
+
+    // log::debug!("God {:?}" mode; g);
+    if (g)
+    {
+        write_mem_prot(addr_damage, ("\xC3"s), true);
+        //write_mem_prot(addr_insta, ("\xC3"s), true);
+    }
+    else
+    {
+        write_mem_prot(addr_damage, ("\x41"s), true);
+        //write_mem_prot(addr_insta, ("\x40"s), true);
+    }
 }
 
 std::pair<float, float> State::get_camera_position()
