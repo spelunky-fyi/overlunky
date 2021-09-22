@@ -1309,7 +1309,8 @@ void set_camp_camera_bounds_enabled(bool b)
         auto memory = Memory::get();
         auto exe = memory.exe();
 
-        std::string pattern = "\x65\x4c\x8b\x3c\x25\x58\x00\x00\x00\x41\xbd\x30\x01\x00\x00"s;
+        // Rev.Eng.: Go into basecamp, put a write bp on state.camera.bounds.top
+        std::string pattern = "\xF3\x48\x0F\x2A\xF0\x45\x8B\x78\x4C"s;
         offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
         for (uint8_t x = 0; x < 3; ++x)
         {
