@@ -35,13 +35,13 @@ PIMAGE_NT_HEADERS RtlImageNtHeader(_In_ PVOID Base)
     return proc(Base);
 }
 
-size_t find_inst(const char* exe, std::string_view needle, size_t start)
+size_t find_inst(const char* exe, std::string_view needle, size_t start, std::string_view pattern_name)
 {
     static const std::size_t exe_size = [exe]()
     {
-        if (PIMAGE_NT_HEADERS pinth = RtlImageNtHeader(exe))
+        if (PIMAGE_NT_HEADERS pinth = RtlImageNtHeader((PVOID)exe))
         {
-            return (std::size_t)(pinth->OptionalHeader.BaseOfCode + pinth->OptionalHeader.SizeOfCode);
+            return (std::size_t)(pinth->OptionalHeader.BaseOfCode) + pinth->OptionalHeader.SizeOfCode;
         }
         return 0ull;
     }();
@@ -62,7 +62,17 @@ size_t find_inst(const char* exe, std::string_view needle, size_t start)
         }
     }
 
-    if (MessageBox(NULL, fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{needle}).c_str(), NULL, MB_OKCANCEL) == IDCANCEL)
+    std::string message;
+    if (pattern_name.empty())
+    {
+        message = fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{needle});
+    }
+    else
+    {
+        message = fmt::format("Failed finding pattern '' ('{}') in Spel2.exe", pattern_name, ByteStr{needle});
+    }
+
+    if (MessageBox(NULL, message.c_str(), NULL, MB_OKCANCEL) == IDCANCEL)
     {
         std::terminate();
     }
