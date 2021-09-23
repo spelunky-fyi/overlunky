@@ -136,6 +136,11 @@ class PatternCommandBuffer
         commands.push_back({CommandType::AtExe});
         return *this;
     }
+    PatternCommandBuffer& function_start()
+    {
+        commands.push_back({CommandType::FunctionStart});
+        return *this;
+    }
 
     size_t operator()(Memory mem, const char* exe) const
     {
@@ -159,7 +164,11 @@ class PatternCommandBuffer
                 break;
             case CommandType::AtExe:
                 offset = mem.at_exe(offset);
+            case CommandType::FunctionStart:
+                offset = ::function_start(offset);
+                break;
             default:
+                DEBUG("Unkown command...");
                 break;
             }
         }
@@ -177,6 +186,7 @@ class PatternCommandBuffer
         DecodePC,
         DecodeIMM,
         AtExe,
+        FunctionStart,
     };
     union CommandData
     {
@@ -204,52 +214,51 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     },
     {
         "load_item"sv,
-        [](Memory mem, const char* exe)
-        {
-            size_t addr = find_inst(exe, "\x83\x80\x44\x01\x00\x00\xFF"sv, mem.after_bundle, "load_item"sv);
-            return function_start(mem.at_exe(addr));
-        },
+        PatternCommandBuffer{"load_item"sv}
+            .find_inst("\x83\x80\x44\x01\x00\x00\xFF"sv)
+            .at_exe()
+            .function_start(),
     },
     {
         "get_virtual_function_address"sv,
-        [](Memory mem, const char* exe)
-        {
-            // Rev.Eng.: Look at any entity in memory, dereference the __vftable to see the big table of pointers
-            // scroll up to the first one, and find a reference to that
-            size_t addr = find_inst(exe, "\x48\x8D\x0D\x03\x79\x51\x00"sv, mem.after_bundle, "get_virtual_function_address"sv);
-            return mem.at_exe(decode_pc(exe, addr));
-        },
+        // Rev.Eng.: Look at any entity in memory, dereference the __vftable to see the big table of pointers
+        // scroll up to the first one, and find a reference to that
+        PatternCommandBuffer{"get_virtual_function_address"sv}
+            .find_inst("\x48\x8D\x0D\x03\x79\x51\x00"sv)
+            .decode_pc()
+            .at_exe(),
     },
     {
         "fmod_studio"sv,
-        [](Memory mem, const char* exe)
-        {
-            // Rev.Eng.: Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
-            auto fmod_studio_system_instruction = find_inst(exe, "\xBA\x05\x01\x02\x00"sv, mem.after_bundle) - 0x7;
-            return mem.at_exe(decode_pc(exe, fmod_studio_system_instruction));
-        },
+        // Rev.Eng.: Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+        PatternCommandBuffer{"fmod_studio"sv}
+            .find_inst("\xBA\x05\x01\x02\x00"sv)
+            .offset(-0x7)
+            .decode_pc()
+            .at_exe(),
     },
     {
         "fmod_event_properties"sv,
-        [](Memory mem, const char* exe)
-        {
-            // Rev.Eng.: Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
-            // Said name comes from an array that is being looped, said array is a global of type EventParameters
-            auto event_properties_instruction = find_inst(exe, "\x48\x8d\x9d\x30\x01\x00\x00"sv, mem.after_bundle) - 0x7;
-            return mem.at_exe(decode_pc(exe, event_properties_instruction) + 0x30);
-        },
+        // Rev.Eng.: Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+        // Said name comes from an array that is being looped, said array is a global of type EventParameters
+        PatternCommandBuffer{"fmod_event_properties"sv}
+            .find_inst("\x48\x8d\x9d\x30\x01\x00\x00"sv)
+            .offset(-0x7)
+            .decode_pc()
+            .offset(0x30)
+            .at_exe(),
     },
     {
         "fmod_event_map"sv,
-        [](Memory mem, const char* exe)
-        {
-            // Rev.Eng.: Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
-            // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
-            // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
-            auto event_map_instruction = find_inst(exe, "\x89\x58\x10\x48\x8d\x48\x18\x41\xb8\x88\x01\x00\x00"sv, mem.after_bundle) + 0x40;
-            event_map_instruction = find_inst(exe, "\xf3"sv, event_map_instruction);
-            return mem.at_exe(decode_pc(exe, event_map_instruction, 4));
-        },
+        // Rev.Eng.: Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+        // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
+        // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
+        PatternCommandBuffer{"fmod_event_map"sv}
+            .find_inst("\x89\x58\x10\x48\x8d\x48\x18\x41\xb8\x88\x01\x00\x00"sv)
+            .offset(0x40)
+            .find_inst("\xf3"sv)
+            .decode_pc(4)
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
