@@ -14,6 +14,7 @@
 #include "texture.hpp"
 #include "vtable_hook.hpp"
 
+using namespace std::chrono_literals;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
 template <class FunT>
@@ -63,6 +64,11 @@ struct EntityFactory
 EntityFactory* entity_factory()
 {
     static EntityFactory* cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
+    while (cache_entity_factory == 0)
+    {
+        std::this_thread::sleep_for(500ms);
+        cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
+    }
     return cache_entity_factory;
 }
 
