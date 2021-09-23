@@ -10,19 +10,6 @@
 #include "script/lua_backend.hpp"
 #include "texture.hpp"
 
-size_t* find_api(Memory memory)
-{
-    // Rev.Eng.: Break at startup on SteamAPI_RegisterCallback, it gets called twice, second time
-    // to hook the Steam overlay, at the beginning of that function is the pointer we need
-    ONCE(size_t*)
-    {
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-        auto off = find_inst(exe, "\x70\x08\x00\x00\xFE\xFF\xFF\xFF\x48\x8B\x05"s, after_bundle) + 8;
-        return res = (size_t*)memory.at_exe(decode_pc(exe, off));
-    }
-}
-
 size_t get_load_texture()
 {
     ONCE(size_t)
@@ -41,11 +28,7 @@ RenderAPI& RenderAPI::get()
 {
     static RenderAPI render_api = []()
     {
-        auto memory = Memory::get();
-        auto _api = (find_api(memory));
-        auto off = decode_imm(memory.exe(), find_inst(memory.exe(), "\xBA\xF0\xFF\xFF\xFF\x41\xB8\x00\x00\x00\x90"s, memory.after_bundle) + 17);
-
-        return RenderAPI{_api, off};
+        return RenderAPI{(size_t*)get_address("render_api_callback"), get_address("render_api_offset")};
     }();
     return render_api;
 }
@@ -319,11 +302,7 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
 
     if (func_offset == 0)
     {
-        // Rev.Eng.: look for cvttss2si instruction at the end of the exe (F3:0F2CC0)
-        // Function has distinct look, one call at the top, for the rest a couple cvttss2si and
-        // moving memory around at high offsets compared to register: [register+80XXX]
-        std::string pattern = "\xC7\x44\x24\x28\x06\x00\x00\x00\xC7\x44\x24\x20\x04\x00\x00\x00"s;
-        func_offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        func_offset = get_address("draw_world_texture");
 
         // TODO: update this and check if stack fillers are still needed below
         auto offset = find_inst(exe, "\x4C\x8D\x0D\x59\xAF\x0F\x00"s, memory.after_bundle);
@@ -408,43 +387,28 @@ const Texture* fetch_texture(class Entity* source_entity, TEXTURE texture_id)
 
 void init_render_api_hooks()
 {
-    auto& memory = Memory::get();
-    auto exe = memory.exe();
-    auto after_bundle = memory.after_bundle;
+    DEBUG("TODO: pattern for FetchTexture");
+    // auto& memory = Memory::get();
+    // auto exe = memory.exe();
+    // auto after_bundle = memory.after_bundle;
 
-    {
-        auto fun_start = find_inst(exe, "\x48\x83\xec\x20\x48\x8b\x01\x48\x8b\xf9\x48\x8b\x58\x28"s, after_bundle);
-        fun_start = find_inst(exe, "\xe8"s, fun_start);
-        fun_start = Memory::decode_call(fun_start);
-        g_fetch_texture_trampoline = (FetchTexture*)memory.at_exe(fun_start);
-    }
+    // {
+    //     auto fun_start = find_inst(exe, "\x48\x83\xec\x20\x48\x8b\x01\x48\x8b\xf9\x48\x8b\x58\x28"s, after_bundle);
+    //     fun_start = find_inst(exe, "\xe8"s, fun_start);
+    //     fun_start = Memory::decode_call(fun_start);
+    //     g_fetch_texture_trampoline = (FetchTexture*)memory.at_exe(fun_start);
+    // }
 
-    {
-        // Rev.Eng.: Locate in memory 2B 00 24 00 25 00 64 00 "+$%d" (UTF16 str of the money gained text)
-        // Find reference to this memory, it's only used in the HUD
-        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\xB8\x88\x14\x00\x00\xE8"s, after_bundle)));
-        g_render_hud_trampoline = (VanillaRenderHudFun*)fun_start;
-    }
-
-    {
-        // Rev.Eng.: Put bp on GameManager.pause_ui.scroll.y
-        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\xFE\xFF\xFF\xFF\x83\xB9"s, after_bundle)));
-        g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)fun_start;
-    }
-
-    {
-        // Rev.Eng.: break on draw_world_texture and go a couple functions higher in the call stack (4-5) until
-        // you reach one that has rdx counting down from 0x35 to 0x01
-        auto fun_start = function_start(memory.at_exe(find_inst(exe, "\x48\x81\xC6\x18\x3F\x06\x00"s, after_bundle)));
-        g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)fun_start;
-    }
+    g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud");
+    g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu");
+    g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth");
 
     DetourRestoreAfterWith();
 
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-    DetourAttach((void**)&g_fetch_texture_trampoline, &fetch_texture);
+    //DetourAttach((void**)&g_fetch_texture_trampoline, &fetch_texture);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);

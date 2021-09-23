@@ -54,20 +54,6 @@ size_t get_zoom_shop()
     }
 }
 
-size_t get_location()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
-        auto location = find_inst(exe, "\x49\x0F\x44\xC0"s, start);
-        location = find_inst(exe, "\x49\x0F\x44\xC0"s, location + 1);
-        location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 25)));
-        return res = location;
-    }
-}
-
 size_t get_insta()
 {
     // TODO
@@ -102,11 +88,7 @@ inline bool& get_is_init()
 
 void do_write_load_opt()
 {
-    auto memory = Memory::get();
-    auto exe = memory.exe();
-    auto start = memory.after_bundle;
-    auto off_send = find_inst(exe, "\xFF\xD3\xB9\xFA\x00\x00\x00"s, start);
-    write_mem_prot(memory.at_exe(off_send), "\x90\x90"s, true);
+    write_mem_prot(get_address("write_load_opt"), "\x90\x90"s, true);
 }
 bool& get_write_load_opt()
 {
@@ -141,14 +123,15 @@ State& State::get()
         {
             do_write_load_opt();
         }
-        auto addr_location = get_location();
+        auto addr_location = get_address("state_location");
         auto addr_insta = get_insta();
         auto addr_zoom = 0ul;      // get_zoom();
         auto addr_zoom_shop = 0ul; //get_zoom_shop();
         auto addr_dark = 0ul;      //get_dark();
         STATE = State{addr_location, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
-        STATE.ptr()->level_gen->init();
-        init_spawn_hooks();
+        DEBUG("TODO: patterns for level_gen and spawn_hooks");
+        //STATE.ptr()->level_gen->init();
+        //init_spawn_hooks();
         init_render_api_hooks();
         get_is_init() = true;
     }
@@ -193,20 +176,7 @@ float State::get_zoom_level()
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        // Rev.Eng.: Go stand in a level next to a shop. In Cheat Engine, search for float 13.5
-        // Go into the shop, search for 12.5, put a write bp on that address.
-        // In 1.23.3 the default shop and level zoom levels aren't hardcoded in the exe, they are
-        // in variables (loaded into xmm6)
-        // Note that xmm6 (the new zoom level) gets written at a huge offset of rax. Rax is the
-        // return value of the call just above, so look in that function at the bottom. There will
-        // be a hardcoded value loaded in rax. At offset 0x10 in rax is another pointer that is the
-        // base for the big offset. Careful, the big offset is hardcoded below (0x804D8), so update
-        // that too.
-        size_t addr = find_inst(exe, "\x48\x8B\x05\xCF\x4F\x15\x00"s, memory.after_bundle);
-        size_t obj1 = memory.at_exe(decode_pc(exe, addr));
+        size_t obj1 = get_address("zoom_level");
 
         size_t obj2 = read_u64(obj1);
         if (obj2 == 0)
@@ -219,8 +189,7 @@ float State::get_zoom_level()
         {
             return default_zoom;
         }
-
-        offset = obj3 + 0x804D8;
+        offset = obj3 + get_address("zoom_level_offset");
     }
     return read_f32(offset);
 }

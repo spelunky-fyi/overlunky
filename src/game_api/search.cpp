@@ -208,6 +208,40 @@ class PatternCommandBuffer
 
 std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char* exe, std::string_view address_name)>> g_address_rules{
     {
+        "state_location"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x49\x0F\x44\xC0"sv)
+            .offset(0x1)
+            .find_inst("\x49\x0F\x44\xC0"sv)
+            .offset(-0x19)
+            .find_inst("\x48\x8B"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "write_load_opt"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xFF\xD3\xB9\xFA\x00\x00\x00"sv)
+            .at_exe(),
+    },
+    {
+        "render_api_callback"sv,
+        // Break at startup on SteamAPI_RegisterCallback, it gets called twice, second time
+        // to hook the Steam overlay, at the beginning of that function is the pointer we need
+        PatternCommandBuffer{}
+            .find_inst("\x70\x08\x00\x00\xFE\xFF\xFF\xFF\x48\x8B\x05"sv)
+            .offset(0x8)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "render_api_offset"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xBA\xF0\xFF\xFF\xFF\x41\xB8\x00\x00\x00\x90"sv)
+            .offset(0x11)
+            .decode_imm(),
+    },
+    {
         "entity_factory"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"sv)
@@ -223,8 +257,8 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
-        "get_virtual_function_address"sv,
-        // Rev.Eng.: Look at any entity in memory, dereference the __vftable to see the big table of pointers
+        "virtual_functions_table"sv,
+        // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
         PatternCommandBuffer{}
             .find_inst("\x48\x8D\x0D\x03\x79\x51\x00"sv)
@@ -233,7 +267,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     },
     {
         "fmod_studio"sv,
-        // Rev.Eng.: Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+        // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
         PatternCommandBuffer{}
             .find_inst("\xBA\x05\x01\x02\x00"sv)
             .offset(-0x7)
@@ -242,7 +276,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     },
     {
         "fmod_event_properties"sv,
-        // Rev.Eng.: Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+        // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
         // Said name comes from an array that is being looped, said array is a global of type EventParameters
         PatternCommandBuffer{}
             .find_inst("\x48\x8d\x9d\x30\x01\x00\x00"sv)
@@ -253,7 +287,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     },
     {
         "fmod_event_map"sv,
-        // Rev.Eng.: Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+        // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
         // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
         // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
         PatternCommandBuffer{}
@@ -265,7 +299,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     },
     {
         "level_gen_load_level_file"sv,
-        // Rev.Eng.: Search for string "generic.lvl", it is used in a call to this function
+        // Search for string "generic.lvl", it is used in a call to this function
         PatternCommandBuffer{}
             .find_inst("\x45\x84\xed\x74\x0f"sv)
             .offset(0x1)
@@ -273,6 +307,116 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\xe8"sv)
             .decode_call()
             .at_exe(),
+    },
+    {
+        "online"sv,
+        // Find online code in memory (reverse for endianness), look higher up and find __vftable, set read bp on __vftable
+        PatternCommandBuffer{}
+            .find_inst("\x66\x0F\x29\x85\xE0\x03\x00\x00"sv)
+            .offset(0x8)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "particle_emitter_db"sv,
+        // Locate the particles init function (see pattern `particle_emitter_list`). At the start you will see the value 1
+        // being written to a memory address. This is the start of the particle DB. Note that this function builds up the entire
+        // DB so you have to step into it quite a bit to see the particle DB start forming in memory.
+        // The size of a particle emitter is 0xA0
+        PatternCommandBuffer{}
+            .find_inst("\xFE\xFF\xFF\xFF\x66\xC7\x05"sv)
+            .offset(0x4)
+            .decode_pc(3, 2)
+            .at_exe(),
+    },
+    {
+        "particle_emitter_list"sv,
+        // Find string reference PARTICLEEMITTER_TITLE_TORCHFLAME_SMOKE, used in particles init function, it processes all particle emitters
+        // and inserts all into the unordered_map. Look at function call(s) shortly after string reference (insertion in map), it will contain a
+        // reference to the start of the map, or the `size` which it increments. The unordered map insertion function can be recognized by a little
+        // stub with some jumps to `Xlength_error` at the end.
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x48\x0F\x2A\xC0\xF3\x0F\x58\xC0\xF3\x0F\x10\x0D"sv)
+            .offset(0x9)
+            .decode_pc(4)
+            .at_exe(),
+    },
+    {
+        "render_hud"sv,
+        // Locate in memory 2B 00 24 00 25 00 64 00 "+$%d" (UTF16 str of the money gained text)
+        // Find reference to this memory, it's only used in the HUD
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x88\x14\x00\x00\xE8"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "render_pause_menu"sv,
+        // Put write bp on GameManager.pause_ui.scroll.y
+        PatternCommandBuffer{}
+            .find_inst("\xFE\xFF\xFF\xFF\x83\xB9"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "render_draw_depth"sv,
+        // Break on draw_world_texture and go a couple functions higher in the call stack (4-5) until
+        // you reach one that has rdx counting down from 0x35 to 0x01
+        PatternCommandBuffer{}
+            .find_inst("\x48\x81\xC6\x18\x3F\x06\x00"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "draw_world_texture"sv,
+        // Look for cvttss2si instruction at the end of the exe (F3:0F2CC0)
+        // Function has distinct look, one call at the top, for the rest a couple cvttss2si and
+        // moving memory around at high offsets compared to register: [register+80XXX]
+        PatternCommandBuffer{}
+            .find_inst("\xC7\x44\x24\x28\x06\x00\x00\x00\xC7\x44\x24\x20\x04\x00\x00\x00"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "texture_db"sv,
+        // Look up string reference to "Data/Textures/", at the beginning of this function
+        // there will be a pointer to the start of TextureDB
+        PatternCommandBuffer{}
+            .find_inst("\x4C\x89\xC6\x41\x89\xCF\x8B\x1D"sv)
+            .offset(0x6)
+            .decode_pc(2)
+            .at_exe(),
+    },
+    {
+        "zoom_level"sv,
+        // Go stand in a level next to a shop. In Cheat Engine, search for float 13.5
+        // Go into the shop, search for 12.5, put a write bp on that address.
+        // In 1.23.3 the default shop and level zoom levels aren't hardcoded in the exe, they are
+        // in variables (loaded into xmm6)
+        // Note that xmm6 (the new zoom level) gets written at a huge offset of rax. Rax is the
+        // return value of the call just above, so look in that function at the bottom. There will
+        // be a hardcoded value loaded in rax. At offset 0x10 in rax is another pointer that is the
+        // base for the big offset.
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8B\x05\xCF\x4F\x15\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "zoom_level_offset"sv,
+        // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
+        // That instruction contains the offset
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
+            .decode_imm(4),
+    },
+    {
+        "enforce_camp_camera_bounds"sv,
+        // Go into basecamp, put a write bp on state.camera.bounds.top
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x48\x0F\x2A\xF0\x45\x8B\x78\x4C"sv)
+            .at_exe()
+            .function_start(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

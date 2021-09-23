@@ -1306,12 +1306,7 @@ void set_camp_camera_bounds_enabled(bool b)
     static char original_instruction[3] = {0};
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        // Rev.Eng.: Go into basecamp, put a write bp on state.camera.bounds.top
-        std::string pattern = "\xF3\x48\x0F\x2A\xF0\x45\x8B\x78\x4C"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("enforce_camp_camera_bounds");
         for (uint8_t x = 0; x < 3; ++x)
         {
             original_instruction[x] = read_u8(offset + x);

@@ -4,15 +4,6 @@
 
 Textures* get_textures()
 {
-    static Textures* textures_ptr = (Textures*)[]()
-    {
-        // Rev.Eng.: Look up string reference to "Data/Textures/", at the beginning of this function
-        // there will be a pointer to the TextureDB start
-        auto mem = Memory::get();
-        size_t off = find_inst(mem.exe(), "\x4C\x89\xC6\x41\x89\xCF\x8B\x1D"s, mem.after_bundle);
-        off = mem.at_exe(decode_pc(mem.exe(), off + 6, 2));
-        return off;
-    }
-    ();
+    static Textures* textures_ptr = (Textures*)get_address("texture_db");
     return textures_ptr;
 }

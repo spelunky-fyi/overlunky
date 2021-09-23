@@ -96,7 +96,8 @@ end
 
     NHitbox::register_usertypes(lua);
     NSound::register_usertypes(lua, sound_manager);
-    NLevel::register_usertypes(lua);
+    DEBUG("TODO: re-enable NLevel::register_usertypes()");
+    // NLevel::register_usertypes(lua);
     NGui::register_usertypes(lua);
     NVanillaRender::register_usertypes(lua);
     NTexture::register_usertypes(lua);
