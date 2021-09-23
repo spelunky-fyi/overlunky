@@ -94,7 +94,6 @@ size_t find_after_bundle(size_t exe)
         offset += (8 + l0 + l1);
     }
 
-    using namespace std::string_view_literals;
     return find_inst((char*)exe, "\x55\x41\x57\x41\x56\x41\x55\x41\x54"sv, offset);
 }
 
@@ -168,6 +167,7 @@ class PatternCommandBuffer
                 break;
             case CommandType::AtExe:
                 offset = mem.at_exe(offset);
+                break;
             case CommandType::FunctionStart:
                 offset = ::function_start(offset);
                 break;
