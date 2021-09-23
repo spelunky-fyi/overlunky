@@ -6,6 +6,13 @@
 
 class Entity;
 
+struct RobinHoodTableEntry
+{
+    uint32_t uid_plus_one;
+    uint32_t padding;
+    Entity* entity;
+};
+
 struct LightParams
 {
     float red; // default = 1.0 (can go over 1.0 for oversaturation)

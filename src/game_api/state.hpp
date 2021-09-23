@@ -161,8 +161,9 @@ struct StateMemory
     PointerList* lightsources;      // list of Illumination*
     size_t unknown27;
 
-    size_t unknown28; // formerly std::unordered_map<uint32_t, Entity*> instance_id_to_pointer
-    size_t unknown29; // formerly std::unordered_map<uint32_t, Entity*> instance_id_to_pointer
+    // This is a Robin Hood Table
+    size_t uid_to_entity_mask;
+    RobinHoodTableEntry* uid_to_entity_data;
 
     size_t backlayer_player_related1;
     size_t backlayer_player_related2;
@@ -347,17 +348,7 @@ struct State
         return prng;
     }
 
-    Entity* find(uint32_t /*unique_id*/)
-    {
-        // TODO : figure out what type of object state.unknown28/29 is (formerly instance_id_to_pointer)
-        return nullptr;
-
-        // auto& map = ptr()->instance_id_to_pointer;
-        // auto it = map.find(unique_id);
-        // if (it == map.end())
-        //     return nullptr;
-        // return it->second;
-    }
+    Entity* find(uint32_t uid);
 
     std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);
