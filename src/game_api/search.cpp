@@ -411,6 +411,40 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .decode_imm(4),
     },
     {
+        "default_zoom_level"sv,
+        // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
+        // Above this instruction there are two memory locations being written into xmm6
+        // The second is the default zoom level
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x11\xB0****\x49"sv) // same pattern as zoom_level_offset
+            .offset(-0x11)
+            .decode_pc(4)
+            .at_exe(),
+    },
+    {
+        "default_zoom_level_shop"sv,
+        // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
+        // Above this instruction there are two memory locations being written into xmm6
+        // The first is the default shop zoom level
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x11\xB0****\x49"sv) // same pattern as zoom_level_offset
+            .offset(-0x1B)
+            .decode_pc(4)
+            .at_exe(),
+    },
+    {
+        "default_zoom_level_camp"sv,
+        // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
+        // Put a write bp on this float with the condition not to break at the RIP where shop/in-game level is written.
+        // Then warp to camp
+        PatternCommandBuffer{}
+            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
+            .offset(0x1)
+            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
+            .offset(0x6)
+            .at_exe(),
+    },
+    {
         "enforce_camp_camera_bounds"sv,
         // Go into basecamp, put a write bp on state.camera.bounds.top
         PatternCommandBuffer{}

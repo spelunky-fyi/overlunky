@@ -192,8 +192,6 @@ struct State
 {
     size_t location;
     size_t addr_insta;
-    size_t addr_zoom;
-    size_t addr_zoom_shop;
     size_t addr_dark;
 
     static void set_write_load_opt(bool allow);
@@ -235,88 +233,12 @@ struct State
         }
     }
 
-    void zoom(float level)
-    {
-        // This technically sets camp zoom but not interactively :(
-        // auto addr_zoom = find_inst(memory.exe(), &hex!("C7 80 E8 04 08 00"),
-        // memory.after_bundle); write_mem_prot(memory.at_exe(addr_zoom + 6),
-        // to_le_bytes(level), true); addr_zoom = memory.after_bundle;
-
-        auto roomx = ptr()->w;
-        if (level == 0.0)
-        {
-            switch (roomx)
-            {
-            case 1:
-                level = 9.50f;
-                break;
-            case 2:
-                level = 16.29f;
-                break;
-            case 3:
-                level = 23.08f;
-                break;
-            case 4:
-                level = 29.87f;
-                break;
-            case 5:
-                level = 36.66f;
-                break;
-            case 6:
-                level = 43.45f;
-                break;
-            case 7:
-                level = 50.24f;
-                break;
-            case 8:
-                level = 57.03f;
-                break;
-            default:
-                level = 13.5f;
-            }
-        }
-
-        static size_t offset[4] = {0}; // where the different hardcoded zoom levels are written
-        if (offset[0] == 0)
-        {
-            auto memory = Memory::get();
-            auto _addr_zoom = memory.after_bundle;
-            for (int i = 0; i < 4; i++)
-            {
-                _addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, _addr_zoom + 1);
-                offset[i] = memory.at_exe(_addr_zoom) + 10;
-            }
-        }
-        if (offset[0] != 0)
-            write_mem_prot(offset[0], to_le_bytes(level), true); // I dunno :D
-        if (offset[1] != 0)
-            write_mem_prot(offset[1], to_le_bytes(level), true); // shop
-        if (offset[2] != 0)
-            write_mem_prot(offset[2], to_le_bytes(level), true); // level
-        if (offset[3] != 0)
-            write_mem_prot(offset[3], to_le_bytes(level), true); // default (camp, transition)
-
-        static size_t real_offset = 0; // actual target zoom level
-        if (real_offset == 0)
-        {
-            auto memory = Memory::get();
-            auto _offset = memory.at_exe(0x22334A00); //TODO: patterns or something. Also this pointer is kinda slow, it doesn't work before intro cutscene.
-            _offset = read_u64(_offset);
-            if (_offset != 0)
-            {
-                _offset += 0x804f0;
-                real_offset = _offset;
-            }
-        }
-        if (real_offset != 0)
-        {
-            write_mem_prot(real_offset, to_le_bytes(level), true);
-        }
-    }
+    size_t get_zoom_level_address();
+    float get_zoom_level();
+    void zoom(float level);
 
     std::pair<float, float> click_position(float x, float y);
     std::pair<float, float> screen_position(float x, float y);
-    float get_zoom_level();
 
     uint32_t flags()
     {

@@ -26,34 +26,6 @@ size_t get_dark()
     }
 }
 
-size_t get_zoom()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto addr_zoom = memory.after_bundle;
-        for (int _ = 0; _ < 3; _++)
-        {
-            addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-        }
-        return res = memory.at_exe(addr_zoom) + 10;
-    }
-}
-
-size_t get_zoom_shop()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto addr_zoom = memory.after_bundle;
-        for (int _ = 0; _ < 2; _++)
-        {
-            addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-        }
-        return res = memory.at_exe(addr_zoom) + 10;
-    }
-}
-
 size_t get_insta()
 {
     // TODO
@@ -125,10 +97,8 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         auto addr_insta = get_insta();
-        auto addr_zoom = 0ul;      // get_zoom();
-        auto addr_zoom_shop = 0ul; //get_zoom_shop();
-        auto addr_dark = 0ul;      //get_dark();
-        STATE = State{addr_location, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
+        auto addr_dark = 0ul; //get_dark();
+        STATE = State{addr_location, addr_insta, addr_dark};
         DEBUG("TODO: patterns for level_gen and spawn_hooks");
         //STATE.ptr()->level_gen->init();
         //init_spawn_hooks();
@@ -170,28 +140,89 @@ std::pair<float, float> State::screen_position(float x, float y)
     return {rx, ry};
 }
 
+size_t State::get_zoom_level_address()
+{
+    size_t obj1 = get_address("zoom_level");
+
+    size_t obj2 = read_u64(obj1);
+    if (obj2 == 0)
+    {
+        return 0;
+    }
+
+    size_t obj3 = read_u64(obj2 + 0x10);
+    if (obj3 == 0)
+    {
+        return 0;
+    }
+    return obj3 + get_address("zoom_level_offset");
+}
+
 float State::get_zoom_level()
 {
-    float default_zoom = 13.5;
     static size_t offset = 0;
     if (offset == 0)
     {
-        size_t obj1 = get_address("zoom_level");
-
-        size_t obj2 = read_u64(obj1);
-        if (obj2 == 0)
+        auto addr = get_zoom_level_address();
+        if (addr == 0)
         {
-            return default_zoom;
+            return 13.5;
         }
-
-        size_t obj3 = read_u64(obj2 + 0x10);
-        if (obj3 == 0)
-        {
-            return default_zoom;
-        }
-        offset = obj3 + get_address("zoom_level_offset");
+        offset = addr;
     }
     return read_f32(offset);
+}
+
+void State::zoom(float level)
+{
+    auto roomx = ptr()->w;
+    if (level == 0.0)
+    {
+        switch (roomx)
+        {
+        case 1:
+            level = 9.50f;
+            break;
+        case 2:
+            level = 16.29f;
+            break;
+        case 3:
+            level = 23.08f;
+            break;
+        case 4:
+            level = 29.87f;
+            break;
+        case 5:
+            level = 36.66f;
+            break;
+        case 6:
+            level = 43.45f;
+            break;
+        case 7:
+            level = 50.24f;
+            break;
+        case 8:
+            level = 57.03f;
+            break;
+        default:
+            level = 13.5f;
+        }
+    }
+
+    const auto level_str = to_le_bytes(level);
+
+    // overwrite the defaults
+    write_mem_prot(get_address("default_zoom_level"), level_str, true);
+    write_mem_prot(get_address("default_zoom_level_shop"), level_str, true);
+    write_mem_prot(get_address("default_zoom_level_camp"), level_str, true);
+    // no idea what triggers the fourth instance of writing 13.5 to current zoom level (see pattern for camp, it's the first match that is skipped)
+
+    // overwrite the current value
+    auto zla = get_zoom_level_address();
+    if (zla != 0)
+    {
+        write_mem_prot(zla, level_str, true);
+    }
 }
 
 void State::godmode(bool g)
