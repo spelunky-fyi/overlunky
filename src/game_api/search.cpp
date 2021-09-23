@@ -98,14 +98,109 @@ size_t find_after_bundle(size_t exe)
     return find_inst((char*)exe, "\x55\x41\x57\x41\x56\x41\x55\x41\x54"sv, offset);
 }
 
-std::unordered_map<std::string_view, size_t (*)(Memory mem, const char* exe)> g_address_rules{
+class PatternCommandBuffer
+{
+  public:
+    PatternCommandBuffer(std::string_view _pattern_name)
+        : pattern_name{_pattern_name}
+    {
+    }
+    PatternCommandBuffer() = delete;
+    PatternCommandBuffer(const PatternCommandBuffer&) = default;
+    PatternCommandBuffer(PatternCommandBuffer&&) noexcept = default;
+    PatternCommandBuffer& operator=(const PatternCommandBuffer&) = default;
+    PatternCommandBuffer& operator=(PatternCommandBuffer&&) noexcept = default;
+
+    PatternCommandBuffer& find_inst(std::string_view pattern)
+    {
+        commands.push_back({CommandType::FindInst, {.pattern = pattern}});
+        return *this;
+    }
+    PatternCommandBuffer& offset(int64_t offset)
+    {
+        commands.push_back({CommandType::Offset, {.offset = offset}});
+        return *this;
+    }
+    PatternCommandBuffer& decode_pc(uint8_t opcode_prefix = 3, uint8_t opcode_suffix = 0)
+    {
+        commands.push_back({CommandType::DecodePC, {.decode_pc_prefix_suffix = {opcode_prefix, opcode_suffix}}});
+        return *this;
+    }
+    PatternCommandBuffer& decode_imm(uint8_t opcode_prefix = 3)
+    {
+        commands.push_back({CommandType::DecodeIMM, {.decode_imm_prefix = opcode_prefix}});
+        return *this;
+    }
+    PatternCommandBuffer& at_exe()
+    {
+        commands.push_back({CommandType::AtExe});
+        return *this;
+    }
+
+    size_t operator()(Memory mem, const char* exe) const
+    {
+        size_t offset = mem.after_bundle;
+
+        for (auto& [command, data] : commands)
+        {
+            switch (command)
+            {
+            case CommandType::FindInst:
+                offset = ::find_inst(exe, data.pattern, offset, pattern_name);
+                break;
+            case CommandType::Offset:
+                offset = offset + data.offset;
+                break;
+            case CommandType::DecodePC:
+                offset = ::decode_pc(exe, offset, data.decode_pc_prefix_suffix.first, data.decode_pc_prefix_suffix.second);
+                break;
+            case CommandType::DecodeIMM:
+                offset = ::decode_imm(exe, offset, data.decode_imm_prefix);
+                break;
+            case CommandType::AtExe:
+                offset = mem.at_exe(offset);
+            default:
+                break;
+            }
+        }
+
+        return offset;
+    }
+
+  private:
+    std::string_view pattern_name;
+
+    enum class CommandType
+    {
+        FindInst,
+        Offset,
+        DecodePC,
+        DecodeIMM,
+        AtExe,
+    };
+    union CommandData
+    {
+        std::string_view pattern;
+        int64_t offset;
+        std::pair<uint8_t, uint8_t> decode_pc_prefix_suffix;
+        uint8_t decode_imm_prefix;
+    };
+    struct Command
+    {
+        CommandType command;
+        CommandData data;
+    };
+    std::vector<Command> commands;
+};
+
+std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char* exe)>> g_address_rules{
     {
         "entity_factory"sv,
-        [](Memory mem, const char* exe)
-        {
-            size_t addr = find_inst(exe, "\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"sv, mem.after_bundle, "entity_factory"sv);
-            return mem.at_exe(decode_pc(exe, addr - 0xc));
-        },
+        PatternCommandBuffer{"entity_factory"sv}
+            .find_inst("\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"sv)
+            .offset(-0xc)
+            .decode_pc()
+            .at_exe(),
     },
     {
         "load_item"sv,
