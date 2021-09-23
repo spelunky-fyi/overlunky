@@ -234,7 +234,7 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     {
         ptr()->items->player_select_slots[0].activated = true;
         ptr()->items->player_select_slots[0].character = savedata()->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 270; //TODO: magic numbers
+        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 285; //TODO: magic numbers
         ptr()->items->player_count = 1;
     }
     ptr()->world_next = w;

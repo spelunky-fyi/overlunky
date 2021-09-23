@@ -1041,7 +1041,7 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
     g_state->items->player_select_slots[0].activated = true;
     g_state->items->player_select_slots[0].character = g_save->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + 270; //TODO: magic numbers
+    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + 285; //TODO: magic numbers
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
     g_state->screen_next = screen;
@@ -1066,9 +1066,10 @@ void warp_inc(uint8_t w, uint8_t l, uint8_t t)
 
 void warp_next_level(size_t num)
 {
-    std::vector<Target*> targets;
-    Target* target = new Target;
-    target->world = 0;
+    std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> targets; // tuple = world, level, theme
+    uint8_t target_world = 0;
+    uint8_t target_level = 0;
+    uint8_t target_theme = 0;
     int tnum = g_state->world * 100 + g_state->level;
     switch (tnum)
     {
@@ -1076,74 +1077,74 @@ void warp_next_level(size_t num)
     case 301:
         break;
     case 501:
-        target->world = 6;
-        target->level = 1;
-        target->theme = 8;
+        target_world = 6;
+        target_level = 1;
+        target_theme = 8;
         break;
     case 204:
-        target->world = 3;
-        target->level = 1;
-        target->theme = 4;
+        target_world = 3;
+        target_level = 1;
+        target_theme = 4;
         break;
     case 403:
         if (g_state->theme == 11)
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 6;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 6;
         }
         else
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 5;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 5;
         }
         break;
     case 404:
-        target->world = 5;
-        target->level = 1;
-        target->theme = 7;
+        target_world = 5;
+        target_level = 1;
+        target_theme = 7;
         break;
     case 603:
-        target->world = 6;
-        target->level = 4;
-        target->theme = 14;
+        target_world = 6;
+        target_level = 4;
+        target_theme = 14;
         break;
     case 604:
-        target->world = 7;
-        target->level = 1;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 1;
+        target_theme = 9;
         break;
     case 702:
-        target->world = 7;
-        target->level = 3;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 3;
+        target_theme = 9;
         break;
     case 703:
-        target->world = 7;
-        target->level = 4;
-        target->theme = 16;
+        target_world = 7;
+        target_level = 4;
+        target_theme = 16;
         break;
     case 704:
-        target->world = 8;
-        target->level = 5;
-        target->theme = 10;
+        target_world = 8;
+        target_level = 5;
+        target_theme = 10;
         break;
     default:
-        target->world = g_state->world;
-        target->level = g_state->level + 1;
-        target->theme = g_state->theme;
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
         break;
     }
     if (g_state->theme == 17)
     {
-        target->world = 1;
-        target->level = 1;
-        target->theme = 1;
+        target_world = 1;
+        target_level = 1;
+        target_theme = 1;
     }
-    if (target->world > 0)
+    if (target_world > 0)
     {
-        targets.push_back(target);
+        targets.emplace_back(target_world, target_level, target_theme);
     }
 
     std::vector<uint32_t> doortypes;
@@ -1158,25 +1159,26 @@ void warp_next_level(size_t num)
         std::tie(world, level, theme) = doorent->get_target();
         if (!doorent->special_door)
             continue;
-        target = new Target;
-        target->world = world;
-        target->level = level;
-        target->theme = theme;
-        targets.push_back(target);
+        targets.emplace_back(world, level, theme);
     }
 
     if (g_state->theme == 11)
     {
-        target = new Target;
-        target->world = 4;
-        target->level = 4;
-        target->theme = 12;
-        targets.push_back(target);
+        uint8_t world = 4;
+        uint8_t level = 4;
+        uint8_t theme = 12;
+        targets.emplace_back(world, level, theme);
     }
     if (num > targets.size() - 1 && targets.size() > 0)
+    {
         num = targets.size() - 1;
+    }
     if (targets.size() > num)
-        warp_inc(targets.at(num)->world, targets.at(num)->level, targets.at(num)->theme);
+    {
+        uint8_t world, level, theme;
+        std::tie(world, level, theme) = targets.at(num);
+        warp_inc(world, level, theme);
+    }
 }
 
 bool pressed(std::string keyname, WPARAM wParam)
@@ -2089,8 +2091,9 @@ void render_narnia()
     ImGui::SameLine(100.0f);
     int n = 0;
 
-    Target* target = new Target;
-    target->world = 0;
+    uint8_t target_world = 0;
+    uint8_t target_level = 0;
+    uint8_t target_theme = 0;
     int tnum = g_state->world * 100 + g_state->level;
     switch (tnum)
     {
@@ -2098,77 +2101,77 @@ void render_narnia()
     case 301:
         break;
     case 501:
-        target->world = 6;
-        target->level = 1;
-        target->theme = 8;
+        target_world = 6;
+        target_level = 1;
+        target_theme = 8;
         break;
     case 204:
-        target->world = 3;
-        target->level = 1;
-        target->theme = 4;
+        target_world = 3;
+        target_level = 1;
+        target_theme = 4;
         break;
     case 403:
         if (g_state->theme == 11)
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 6;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 6;
         }
         else
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 5;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 5;
         }
         break;
     case 404:
-        target->world = 5;
-        target->level = 1;
-        target->theme = 7;
+        target_world = 5;
+        target_level = 1;
+        target_theme = 7;
         break;
     case 603:
-        target->world = 6;
-        target->level = 4;
-        target->theme = 14;
+        target_world = 6;
+        target_level = 4;
+        target_theme = 14;
         break;
     case 604:
-        target->world = 7;
-        target->level = 1;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 1;
+        target_theme = 9;
         break;
     case 702:
-        target->world = 7;
-        target->level = 3;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 3;
+        target_theme = 9;
         break;
     case 703:
-        target->world = 7;
-        target->level = 4;
-        target->theme = 16;
+        target_world = 7;
+        target_level = 4;
+        target_theme = 16;
         break;
     case 704:
-        target->world = 8;
-        target->level = 5;
-        target->theme = 10;
+        target_world = 8;
+        target_level = 5;
+        target_theme = 10;
         break;
     default:
-        target->world = g_state->world;
-        target->level = g_state->level + 1;
-        target->theme = g_state->theme;
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
         break;
     }
     if (g_state->theme == 17)
     {
-        target->world = 1;
-        target->level = 1;
-        target->theme = 1;
+        target_world = 1;
+        target_level = 1;
+        target_theme = 1;
     }
-    if (target->world > 0)
+    if (target_world > 0)
     {
-        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target->world, target->level, target->theme);
+            warp_inc(target_world, target_level, target_theme);
         }
         n++;
     }
@@ -2181,7 +2184,7 @@ void render_narnia()
     for (auto doorid : doors)
     {
         Movable* doorent = (Movable*)get_entity_ptr(doorid);
-        target = reinterpret_cast<Target*>(&doorent->anim_func);
+        auto target = reinterpret_cast<Target*>(&doorent->anim_func);
         if (!target->enabled)
             continue;
 
@@ -2197,16 +2200,15 @@ void render_narnia()
 
     if (g_state->theme == 11)
     {
-        target = new Target;
-        target->world = 4;
-        target->level = 4;
-        target->theme = 12;
+        target_world = 4;
+        target_level = 4;
+        target_theme = 12;
 
-        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
         ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target->world, target->level, target->theme);
+            warp_inc(target_world, target_level, target_theme);
         }
         n++;
     }
