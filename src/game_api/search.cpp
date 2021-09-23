@@ -101,11 +101,7 @@ size_t find_after_bundle(size_t exe)
 class PatternCommandBuffer
 {
   public:
-    PatternCommandBuffer(std::string_view _pattern_name)
-        : pattern_name{_pattern_name}
-    {
-    }
-    PatternCommandBuffer() = delete;
+    PatternCommandBuffer() = default;
     PatternCommandBuffer(const PatternCommandBuffer&) = default;
     PatternCommandBuffer(PatternCommandBuffer&&) noexcept = default;
     PatternCommandBuffer& operator=(const PatternCommandBuffer&) = default;
@@ -142,7 +138,7 @@ class PatternCommandBuffer
         return *this;
     }
 
-    size_t operator()(Memory mem, const char* exe) const
+    size_t operator()(Memory mem, const char* exe, std::string_view address_name) const
     {
         size_t offset = mem.after_bundle;
 
@@ -151,7 +147,7 @@ class PatternCommandBuffer
             switch (command)
             {
             case CommandType::FindInst:
-                offset = ::find_inst(exe, data.pattern, offset, pattern_name);
+                offset = ::find_inst(exe, data.pattern, offset, address_name);
                 break;
             case CommandType::Offset:
                 offset = offset + data.offset;
@@ -177,8 +173,6 @@ class PatternCommandBuffer
     }
 
   private:
-    std::string_view pattern_name;
-
     enum class CommandType
     {
         FindInst,
@@ -203,10 +197,10 @@ class PatternCommandBuffer
     std::vector<Command> commands;
 };
 
-std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char* exe)>> g_address_rules{
+std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char* exe, std::string_view address_name)>> g_address_rules{
     {
         "entity_factory"sv,
-        PatternCommandBuffer{"entity_factory"sv}
+        PatternCommandBuffer{}
             .find_inst("\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"sv)
             .offset(-0xc)
             .decode_pc()
@@ -214,7 +208,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     },
     {
         "load_item"sv,
-        PatternCommandBuffer{"load_item"sv}
+        PatternCommandBuffer{}
             .find_inst("\x83\x80\x44\x01\x00\x00\xFF"sv)
             .at_exe()
             .function_start(),
@@ -223,7 +217,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         "get_virtual_function_address"sv,
         // Rev.Eng.: Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
-        PatternCommandBuffer{"get_virtual_function_address"sv}
+        PatternCommandBuffer{}
             .find_inst("\x48\x8D\x0D\x03\x79\x51\x00"sv)
             .decode_pc()
             .at_exe(),
@@ -231,7 +225,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     {
         "fmod_studio"sv,
         // Rev.Eng.: Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
-        PatternCommandBuffer{"fmod_studio"sv}
+        PatternCommandBuffer{}
             .find_inst("\xBA\x05\x01\x02\x00"sv)
             .offset(-0x7)
             .decode_pc()
@@ -241,7 +235,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         "fmod_event_properties"sv,
         // Rev.Eng.: Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
         // Said name comes from an array that is being looped, said array is a global of type EventParameters
-        PatternCommandBuffer{"fmod_event_properties"sv}
+        PatternCommandBuffer{}
             .find_inst("\x48\x8d\x9d\x30\x01\x00\x00"sv)
             .offset(-0x7)
             .decode_pc()
@@ -253,7 +247,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         // Rev.Eng.: Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
         // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
         // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
-        PatternCommandBuffer{"fmod_event_map"sv}
+        PatternCommandBuffer{}
             .find_inst("\x89\x58\x10\x48\x8d\x48\x18\x41\xb8\x88\x01\x00\x00"sv)
             .offset(0x40)
             .find_inst("\xf3"sv)
@@ -269,7 +263,7 @@ void preload_addresses()
     const char* exe = mem.exe();
     for (auto [address_name, rule] : g_address_rules)
     {
-        size_t address = rule(mem, exe);
+        size_t address = rule(mem, exe, address_name);
         if (address > 0ull)
         {
             g_cached_addresses[address_name] = address;
@@ -282,7 +276,7 @@ size_t load_address(std::string_view address_name)
     if (it != g_address_rules.end())
     {
         Memory mem = Memory::get();
-        size_t address = it->second(mem, mem.exe());
+        size_t address = it->second(mem, mem.exe(), address_name);
         if (address > 0ull)
         {
             g_cached_addresses[address_name] = address;
