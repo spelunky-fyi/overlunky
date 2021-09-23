@@ -127,6 +127,11 @@ class PatternCommandBuffer
         commands.push_back({CommandType::DecodeIMM, {.decode_imm_prefix = opcode_prefix}});
         return *this;
     }
+    PatternCommandBuffer& decode_call()
+    {
+        commands.push_back({CommandType::DecodeCall});
+        return *this;
+    }
     PatternCommandBuffer& at_exe()
     {
         commands.push_back({CommandType::AtExe});
@@ -158,6 +163,9 @@ class PatternCommandBuffer
             case CommandType::DecodeIMM:
                 offset = ::decode_imm(exe, offset, data.decode_imm_prefix);
                 break;
+            case CommandType::DecodeCall:
+                offset = mem.decode_call(offset);
+                break;
             case CommandType::AtExe:
                 offset = mem.at_exe(offset);
             case CommandType::FunctionStart:
@@ -179,6 +187,7 @@ class PatternCommandBuffer
         Offset,
         DecodePC,
         DecodeIMM,
+        DecodeCall,
         AtExe,
         FunctionStart,
     };
@@ -252,6 +261,17 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(0x40)
             .find_inst("\xf3"sv)
             .decode_pc(4)
+            .at_exe(),
+    },
+    {
+        "level_gen_load_level_file"sv,
+        // Rev.Eng.: Search for string "generic.lvl", it is used in a call to this function
+        PatternCommandBuffer{}
+            .find_inst("\x45\x84\xed\x74\x0f"sv)
+            .offset(0x1)
+            .find_inst("\x45\x84\xed\x74\x0f"sv)
+            .find_inst("\xe8"sv)
+            .decode_call()
             .at_exe(),
     },
 };

@@ -586,16 +586,6 @@ std::vector<std::unique_ptr<ManualRoomData>> g_manual_room_datas;
 bool g_replace_level_loads{false};
 std::vector<std::string> g_levels_to_load;
 
-//#define HOOK_LOAD_ITEM
-#ifdef HOOK_LOAD_ITEM
-using LoadItemFun = void*(Layer*, std::uint32_t, float, float, bool);
-LoadItemFun* g_load_item_trampoline{nullptr};
-void* load_item(Layer* _this, std::uint32_t entity_id, float x, float y, bool some_bool)
-{
-    return g_load_item_trampoline(_this, entity_id, x, y, some_bool);
-}
-#endif
-
 using LevelGenFun = void(LevelGenSystem*, float);
 LevelGenFun* g_level_gen_trampoline{nullptr};
 void level_gen(LevelGenSystem* level_gen_sys, float param_2)
@@ -1117,69 +1107,67 @@ void LevelGenData::init()
         }
 
         {
-            auto fun_start = find_inst(exe, "\x49\x8d\x40\x01\x48\x89\x03"s, after_bundle);
-            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-            g_load_level_file_trampoline = (LoadLevelFile*)memory.at_exe(fun_start);
+            g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
 
-            {
-                const void* get_room_size_addr = &get_room_size;
-
-                // Manually assembled code, let's hope it won't have to change ever
-                std::string code = fmt::format(
-                    //""                             /// Breakpoint for debugging
-                    //"\xcc"                         // int 3
-                    ""                             /// Push all volatile registers
-                    "\x50"                         // push   rax
-                    "\x51"                         // push   rcx
-                    "\x52"                         // push   rdx
-                    "\x41\x50"                     // push   r8
-                    "\x41\x51"                     // push   r9
-                    "\x41\x52"                     // push   r10
-                    "\x41\x53"                     // push   r11
-                    ""                             /// Setup call
-                    "\x89\xd9"                     // mov    ecx, ebx
-                    "\x48\x8d\x95\x38\xff\xff\xff" // lea    rdx, [rbp-0x100+0x38]
-                    "\x4c\x8d\x85\x3c\xff\xff\xff" // lea    r8, [rbp-0x100+0x3c]
-                    ""                             /// Do the call with an absolute address
-                    "\x48\xb8{}"                   // mov    rax, &get_room_size
-                    "\xff\xd0"                     // call   rax
-                    ""                             /// Recover volatile registers
-                    "\x41\x5b"                     // pop    r11
-                    "\x41\x5a"                     // pop    r10
-                    "\x41\x59"                     // pop    r9
-                    "\x41\x58"                     // pop    r8
-                    "\x5a"                         // pop    rdx
-                    "\x59"                         // pop    rcx
-                    "\x58"                         // pop    rax
-                    ""                             /// Move room width into its expected register
-                    "\x48\x8B\x74\x24\x38"         // mov    rsi, QWORD PTR[rsp + 0x38]
-                    "\x4c\x8b\x64\x24\x3c"         // mov    r12, QWORD PTR[rsp + 0x3c]
-                    ""                             /// Move room width into a redundant stack variable
-                    "\x48\x89\x74\x24\x48"         // mov    QWORD PTR[rsp + 0x48], rsi
-                    ""                             /// Setup some registers for the next loop iteration
-                    "\x44\x8b\x74\x24\x48"         // mov    r14d, DWORD PTR[rsp + 0x48]
-                    "\x44\x8b\x7c\x24\x4c"         // mov    r15d, DWORD PTR[rsp + 0x4c]
-                    "\x48\x8b\x5c\x24\x40"         // mov    rbx, QWORD PTR[rsp + 0x40]
-                    "\x4c\x8b\x54\x24\x30"         // mov    r10, QWORD PTR[rsp + 0x30]
-                    "\x4c\x8b\x5c\x24\x28"         // mov    r11, QWORD PTR[rsp + 0x28]
-                    "\x8b\x7c\x24\x20"             // mov    edi, DWORD PTR[rsp + 0x20]
-                    ,
-                    to_le_bytes(get_room_size_addr));
-
-                // function start, expected at 0x220addd0
-                const size_t get_room_size_off = (size_t)g_load_level_file_trampoline + (0x220af23e - 0x220addd0); // at 0x220af23e
-                const size_t get_room_size_size = 0x220af32c - 0x220af23e;                                         // until 0x220af32c
-
-                // Fill with nop, code is not performance-critical either way
-                code.resize(get_room_size_size, '\x90');
-
-                write_mem_prot(get_room_size_off, std::move(code), true);
-
-                // Replace MessageBox call with a breakpoint for debugging
-                std::string breakpoint = "\x90\x90\xcc"s;
-                breakpoint.resize(0x33, '\x90');
-                write_mem_prot(memory.at_exe(0x220af42b), std::move(breakpoint), true);
-            }
+            //    {
+            //        const void* get_room_size_addr = &get_room_size;
+            //
+            //        // Manually assembled code, let's hope it won't have to change ever
+            //        std::string code = fmt::format(
+            //            //""                             /// Breakpoint for debugging
+            //            //"\xcc"                         // int 3
+            //            ""                             /// Push all volatile registers
+            //            "\x50"                         // push   rax
+            //            "\x51"                         // push   rcx
+            //            "\x52"                         // push   rdx
+            //            "\x41\x50"                     // push   r8
+            //            "\x41\x51"                     // push   r9
+            //            "\x41\x52"                     // push   r10
+            //            "\x41\x53"                     // push   r11
+            //            ""                             /// Setup call
+            //            "\x89\xd9"                     // mov    ecx, ebx
+            //            "\x48\x8d\x95\x38\xff\xff\xff" // lea    rdx, [rbp-0x100+0x38]
+            //            "\x4c\x8d\x85\x3c\xff\xff\xff" // lea    r8, [rbp-0x100+0x3c]
+            //            ""                             /// Do the call with an absolute address
+            //            "\x48\xb8{}"                   // mov    rax, &get_room_size
+            //            "\xff\xd0"                     // call   rax
+            //            ""                             /// Recover volatile registers
+            //            "\x41\x5b"                     // pop    r11
+            //            "\x41\x5a"                     // pop    r10
+            //            "\x41\x59"                     // pop    r9
+            //            "\x41\x58"                     // pop    r8
+            //            "\x5a"                         // pop    rdx
+            //            "\x59"                         // pop    rcx
+            //            "\x58"                         // pop    rax
+            //            ""                             /// Move room width into its expected register
+            //            "\x48\x8B\x74\x24\x38"         // mov    rsi, QWORD PTR[rsp + 0x38]
+            //            "\x4c\x8b\x64\x24\x3c"         // mov    r12, QWORD PTR[rsp + 0x3c]
+            //            ""                             /// Move room width into a redundant stack variable
+            //            "\x48\x89\x74\x24\x48"         // mov    QWORD PTR[rsp + 0x48], rsi
+            //            ""                             /// Setup some registers for the next loop iteration
+            //            "\x44\x8b\x74\x24\x48"         // mov    r14d, DWORD PTR[rsp + 0x48]
+            //            "\x44\x8b\x7c\x24\x4c"         // mov    r15d, DWORD PTR[rsp + 0x4c]
+            //            "\x48\x8b\x5c\x24\x40"         // mov    rbx, QWORD PTR[rsp + 0x40]
+            //            "\x4c\x8b\x54\x24\x30"         // mov    r10, QWORD PTR[rsp + 0x30]
+            //            "\x4c\x8b\x5c\x24\x28"         // mov    r11, QWORD PTR[rsp + 0x28]
+            //            "\x8b\x7c\x24\x20"             // mov    edi, DWORD PTR[rsp + 0x20]
+            //            ,
+            //            to_le_bytes(get_room_size_addr));
+            //
+            //        // function start, expected at 0x220addd0
+            //        const size_t get_room_size_off = (size_t)g_load_level_file_trampoline + (0x220af23e - 0x220addd0); // at 0x220af23e
+            //        const size_t get_room_size_size = 0x220af32c - 0x220af23e;                                         // until 0x220af32c
+            //
+            //        // Fill with nop, code is not performance-critical either way
+            //        code.resize(get_room_size_size, '\x90');
+            //
+            //        write_mem_prot(get_room_size_off, std::move(code), true);
+            //
+            //        // Replace MessageBox call with a breakpoint for debugging
+            //        std::string breakpoint = "\x90\x90\xcc"s;
+            //        breakpoint.resize(0x33, '\x90');
+            //        write_mem_prot(memory.at_exe(0x220af42b), std::move(breakpoint), true);
+            //    }
         }
 
         {
@@ -1217,12 +1205,6 @@ void LevelGenData::init()
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
-
-#ifdef HOOK_LOAD_ITEM
-        auto load_item_off = find_inst(exe, "\x48\x89\x5c\x24\x10\x48\x89\x6c\x24\x18\x56\x57\x41\x56\x48\x83\xec\x60\x48\x8b\xf1\x0f\xb6\x01\xc6\x44\x24\x30\x00\x48\xc7\x44\x24\x28\x00\x00\x00\x00\x88\x44\x24\x20"s, after_bundle);
-        g_load_item_trampoline = (LoadItemFun*)memory.at_exe(load_item_off);
-        DetourAttach((void**)&g_load_item_trampoline, load_item);
-#endif
 
         DetourAttach((void**)&g_level_gen_trampoline, level_gen);
         DetourAttach((void**)&g_gen_rooms_trampoline, gen_rooms);
