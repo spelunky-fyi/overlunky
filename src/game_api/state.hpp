@@ -191,7 +191,6 @@ struct StateMemory
 struct State
 {
     size_t location;
-    size_t addr_insta;
     size_t addr_dark;
 
     static void set_write_load_opt(bool allow);

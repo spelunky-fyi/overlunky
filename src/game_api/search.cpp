@@ -452,6 +452,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe()
             .function_start(),
     },
+    {
+        "insta_gib"sv,
+        // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
+        // then place yourself in Quillback's path
+        PatternCommandBuffer{}
+            .find_inst("\x48\x81\xCA\x00\x00\x00\x10\x49\x89\x54\x24\x30"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
