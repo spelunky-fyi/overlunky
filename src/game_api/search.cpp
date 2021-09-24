@@ -461,6 +461,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe()
             .function_start(),
     },
+    {
+        "spawn_companion"sv,
+        // Break on `load_item` with a condition of `rdx == 0xD7` (or whatever the id of a hired hand is).
+        // Slap the coffin underneath Quillback
+        PatternCommandBuffer{}
+            .find_inst("\xBA\xD7\x00\x00\x00\x0F\x45\xD0"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

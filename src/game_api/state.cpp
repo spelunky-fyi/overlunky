@@ -220,7 +220,7 @@ void State::godmode(bool g)
     if (original_damage_instruction == 0)
     {
         original_damage_instruction = read_u8(addr_damage);
-        original_instagib_instruction = read_u8(addr_damage);
+        original_instagib_instruction = read_u8(addr_insta);
     }
 
     // log::debug!("God {:?}" mode; g);

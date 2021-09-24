@@ -1417,14 +1417,7 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
 
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\xBA\xD7\x00\x00\x00\x8B\x44\x24\x60"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
-    }
+    auto offset = get_address("spawn_companion");
     if (offset != 0)
     {
         auto state = get_state_ptr();
