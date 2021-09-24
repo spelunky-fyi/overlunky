@@ -310,16 +310,6 @@ void pop_spawn_type_flags(SPAWN_TYPE flags)
     update_spawn_type_flags();
 }
 
-//#define HOOK_LOAD_ITEM
-#ifdef HOOK_LOAD_ITEM
-using LoadItemFun = void*(Layer*, std::uint32_t, float, float);
-LoadItemFun* g_load_item_trampoline{nullptr};
-void* load_item(Layer* _this, std::uint32_t entity_id, float x, float y)
-{
-    return g_load_item_trampoline(_this, entity_id, x, y);
-}
-#endif
-
 struct EntityStore;
 using SpawnEntityFun = Entity*(EntityStore*, std::uint32_t, float, float, bool, Entity*, bool);
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
@@ -353,36 +343,22 @@ Entity* floor_spreading()
 void init_spawn_hooks()
 {
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-
         DetourRestoreAfterWith();
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
-#ifdef HOOK_LOAD_ITEM
-        auto load_item_off = find_inst(exe, "\x48\x89\x5c\x24\x10\x48\x89\x6c\x24\x18\x56\x57\x41\x56\x48\x83\xec\x60\x48\x8b\xf1\x0f\xb6\x01\xc6\x44\x24\x30\x00\x48\xc7\x44\x24\x28\x00\x00\x00\x00\x88\x44\x24\x20"s, after_bundle);
-        g_load_item_trampoline = (LoadItemFun*)memory.at_exe(load_item_off);
-        DetourAttach((void**)&g_load_item_trampoline, load_item);
-#endif
+        g_spawn_entity_trampoline = (SpawnEntityFun*)get_address("spawn_entity");
 
-        {
-            auto spawn_entity_off = find_inst(exe, "\xba\x79\x00\x00\x00\x41\x0f\xb6\x06\x88\x44\x24\x20"s, after_bundle);
-            auto spawn_entity_call = find_inst(exe, "\xE8"s, spawn_entity_off);
-            auto spawn_entity_start = Memory::decode_call(spawn_entity_call);
-            g_spawn_entity_trampoline = (SpawnEntityFun*)memory.at_exe(spawn_entity_start);
-        }
-
-        {
-            auto floor_spreading_off = find_inst(exe, "\x45\x0f\x57\xe4\x44\x88\x94\x24\x20\x01\x00\x00\x44\x89\x4c\x24\x44"s, after_bundle);
-            auto floor_spreading_start = function_start(memory.at_exe(floor_spreading_off));
-            g_floor_spreading_trampoline = (FloorSpreadingFun*)floor_spreading_start;
-        }
+        // TODO: 1.23.3
+        //{
+        //    auto floor_spreading_off = find_inst(exe, " 45 0f 57 e4 44 88 94 24 20 01 00 00 44 89 4c 24 44"s, after_bundle);
+        //    auto floor_spreading_start = function_start(memory.at_exe(floor_spreading_off));
+        //    g_floor_spreading_trampoline = (FloorSpreadingFun*)floor_spreading_start;
+        //}
 
         DetourAttach((void**)&g_spawn_entity_trampoline, (SpawnEntityFun*)spawn_entity);
-        DetourAttach((void**)&g_floor_spreading_trampoline, floor_spreading);
+        //DetourAttach((void**)&g_floor_spreading_trampoline, floor_spreading);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)

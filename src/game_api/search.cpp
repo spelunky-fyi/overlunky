@@ -257,6 +257,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "spawn_entity"sv,
+        // First call in LoadItem is to this function
+        PatternCommandBuffer{}
+            .find_inst("\x44\x88\xb8\xa0\x00\x00\x00\xf3\x0f\x11\x78\x40"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
@@ -305,6 +313,45 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(0x1)
             .find_inst("\x45\x84\xed\x74\x0f"sv)
             .find_inst("\xe8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gen_handle_tile_code"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x83\xC5\x01"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_generate_room"sv,
+        // One call up from generate_room_from_tile_codes
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x83\xC6\x01\x39\xF3"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gather_room_data"sv,
+        // First call in generate_room, it gets something from the unordered_map in `param_1 + 0x108`
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x44\x8A\x44\x24*\x45\x84\xC0"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_get_random_room_data"sv,
+        // Call to this is the only thing happening in a loop along with checking a flag on the returned value
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x48\x8B\x58\x08"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gen_generate_room_from_tile_codes"sv,
+        // One of the few calls to handle_tile_code, does a `if (param != 0xec)` before the call
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x45\x89\xF8"sv)
             .decode_call()
             .at_exe(),
     },
