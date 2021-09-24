@@ -17,6 +17,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_cityofgolddoor"] = &Entity::as<CityOfGoldDoor>;
     lua["Entity"]["as_mainexit"] = &Entity::as<MainExit>;
     lua["Entity"]["as_eggshipdoor"] = &Entity::as<EggShipDoor>;
+    lua["Entity"]["as_eggshipdoors"] = &Entity::as<EggShipDoorS>;
     lua["Entity"]["as_arrowtrap"] = &Entity::as<Arrowtrap>;
     lua["Entity"]["as_totemtrap"] = &Entity::as<TotemTrap>;
     lua["Entity"]["as_lasertrap"] = &Entity::as<LaserTrap>;
@@ -138,10 +139,15 @@ void register_usertypes(sol::state& lua)
         "EggShipDoor",
         "timer",
         &EggShipDoor::timer,
-        "entered",
-        &EggShipDoor::entered,
         sol::base_classes,
         sol::bases<Entity, Floor, Door>());
+
+    lua.new_usertype<EggShipDoorS>(
+        "EggShipDoorS",
+        "entered",
+        &EggShipDoorS::entered,
+        sol::base_classes,
+        sol::bases<Entity, Floor, Door, EggShipDoor>());
 
     lua.new_usertype<Arrowtrap>(
         "Arrowtrap",

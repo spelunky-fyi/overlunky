@@ -156,7 +156,7 @@ class Entity
     uint8_t b3f;
     float x;
     float y;
-    float abs_x;
+    float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
     float abs_y;
     float w;
     float h;

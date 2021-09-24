@@ -113,7 +113,7 @@ class MainExit : public ExitDoor
     float value;     // unsure
 };
 
-class EggShipDoor : public Door
+class EggShipDoor : public Door // probably the same as ExitDoor, but only timer is in use
 {
   public:
     uint16_t unused11;
@@ -121,7 +121,11 @@ class EggShipDoor : public Door
     uint8_t timer; // counts from 30 to 0, dunno why
     uint16_t unknown3;
     uint16_t unknown4;
-    /// only for DOOR_EGGSHIP
+};
+
+class EggShipDoorS : public EggShipDoor
+{
+  public:
     bool entered;
 };
 
@@ -196,7 +200,8 @@ class ConveyorBelt : public TransferFloor
 {
   public:
     UnknownPointerGroup unknown1;
-    uint8_t timer; // 0 to 15
+    uint8_t timer;  // 0 to 15
+    uint8_t timer2; // not exposed to lua
 };
 
 class Pipe : public TransferFloor
