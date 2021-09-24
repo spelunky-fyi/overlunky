@@ -1255,10 +1255,7 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x48\x8B\xD9\xB9\xB0\x01\x00\x00"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("generate_particles");
     }
 
     if (offset != 0)

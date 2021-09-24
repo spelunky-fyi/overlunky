@@ -478,6 +478,16 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe()
             .function_start(),
     },
+    {
+        "generate_particles"sv,
+        // Put read bp on State.particle_emitters, conditionally exclude the couple bp's it hits for just being in the level,
+        // jump and when landing the floorpoof particle emitter id will be loaded into rdx. The subsequent call is the
+        // generate_particles function.
+        PatternCommandBuffer{}
+            .find_inst("\x4D\x8D\x66\x08\x49\x8B\x5E\x08"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
