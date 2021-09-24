@@ -1154,20 +1154,11 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
-    static size_t normal_offset = 0;
-    static size_t cursed_offset = 0;
-    if (normal_offset == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\xBA\x28\x23\x00\x00\x41\xB8\x30\x2A\x00\x00"s;
-        auto offset = find_inst(exe, pattern, memory.after_bundle);
-        normal_offset = memory.at_exe(offset + 7);
-        cursed_offset = memory.at_exe(offset + 1);
-    }
-    write_mem_prot(normal_offset, to_le_bytes(normal), true);
-    write_mem_prot(cursed_offset, to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time"), to_le_bytes(normal), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), to_le_bytes(cursed), true);
 }
 
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)

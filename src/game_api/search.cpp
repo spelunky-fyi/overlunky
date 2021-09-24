@@ -488,6 +488,46 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe()
             .function_start(),
     },
+    {
+        "ghost_spawn_time"sv,
+        // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
+        // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )
+        // Search for 0x2328 and 0x2A30 in very close proximity
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(0xB)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player1"sv,
+        // See `ghost_spawn_time` on how to search. New in 1.23.x is the fact that now all four players get checked
+        // for curse, and they all have individual ghost trigger timings (all 0x2328 of course)
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(-0x59)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player2"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(-0x3B)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player3"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(-0x1D)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player4"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
