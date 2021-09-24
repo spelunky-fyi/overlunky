@@ -604,23 +604,6 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2)
     g_levels_to_load.clear();
 }
 
-using GenRoomsFun = void(ThemeInfo*);
-GenRoomsFun* g_gen_rooms_trampoline{nullptr};
-void gen_rooms(ThemeInfo* theme)
-{
-    g_gen_rooms_trampoline(theme);
-    post_room_generation();
-
-    {
-        std::lock_guard lock{g_extra_spawn_logic_providers_lock};
-        for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
-        {
-            provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
-            provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
-        }
-    }
-}
-
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16_t room_template, float x, float y, std::uint8_t layer)
@@ -858,9 +841,9 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_width, std::uint32_t
     }
 }
 
-using GenerateRoom = void(LevelGenSystem*, int, int);
+using GenerateRoom = void(LevelGenSystem*, int32_t, int32_t);
 GenerateRoom* g_generate_room_trampoline{nullptr};
-void generate_room(LevelGenSystem* level_gen, int room_idx_x, int room_idx_y)
+void generate_room(LevelGenSystem* level_gen, int32_t room_idx_x, int32_t room_idx_y)
 {
     if (g_overridden_room_template == std::nullopt)
     {
@@ -880,6 +863,21 @@ void generate_room(LevelGenSystem* level_gen, int room_idx_x, int room_idx_y)
         const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
         State::get().ptr()->level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_template.value();
         g_overridden_room_template.reset();
+    }
+
+    const auto* state = State::get().ptr();
+    if (room_idx_x == static_cast<int32_t>(state->w - 1) && room_idx_y == static_cast<int32_t>(state->h - 1))
+    {
+        post_room_generation();
+
+        {
+            std::lock_guard lock{ g_extra_spawn_logic_providers_lock };
+            for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+            {
+                provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
+                provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
+            }
+        }
     }
 }
 
@@ -1082,33 +1080,25 @@ void LevelGenData::init()
         auto exe = memory.exe();
         auto after_bundle = memory.after_bundle;
 
+        // TODO: 1.23.3
         {
             auto fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, after_bundle);
             fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
             fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
             g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
-
-            fun_start = find_inst(exe, "\x48\x0f\x44\xcf\x48\x8b\x49\x6c"s, fun_start);
-            fun_start = find_inst(exe, "\x48\x0f\x44\xcf\x48\x8b\x49\x6c"s, fun_start + 1);
-            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-            g_gen_rooms_trampoline = (GenRoomsFun*)memory.at_exe(fun_start);
         }
 
-        {
-            auto fun_start = find_inst(exe, "\x44\x0f\xb7\xc5\xf3\x0f\x11\x7c\x24\x20"s, after_bundle);
-            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-            g_handle_tile_code_trampoline = (HandleTileCodeFun*)memory.at_exe(fun_start);
-        }
+        g_handle_tile_code_trampoline = (HandleTileCodeFun*)get_address("level_gen_handle_tile_code"sv);
+        g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
+        // TODO: 1.23.3
+        // Need to redo the room size garbo
+        g_generate_room_trampoline = (GenerateRoom*)get_address("level_gen_generate_room");
+        g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data");
+        g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data");
+        g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes");
 
         {
-            auto fun_start = find_inst(exe, "\x4c\x8b\xf1\xc6\x81\x40\x01\x00\x00\x01"s, after_bundle);
-            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-            g_setup_level_files_trampoline = (SetupLevelFiles*)memory.at_exe(fun_start);
-        }
-
-        {
-            g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
-
+            // TODO: 1.23.3
             //    {
             //        const void* get_room_size_addr = &get_room_size;
             //
@@ -1170,35 +1160,12 @@ void LevelGenData::init()
             //    }
         }
 
+        // TODO: 1.23.3
         {
             auto fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, after_bundle);
             fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, fun_start + 1);
             fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
             g_do_extra_spawns_trampoline = (DoExtraSpawns*)memory.at_exe(fun_start);
-        }
-
-        {
-            auto fun_start = find_inst(exe, "\x48\x89\x85\xd0\x02\x00\x00\x48\x8b\x81\xb8\x00\x00\x00"s, after_bundle);
-            fun_start = function_start(memory.at_exe(fun_start));
-            g_generate_room_trampoline = (GenerateRoom*)fun_start;
-        }
-
-        {
-            auto fun_start = find_inst(exe, "\x42\x0f\xbf\x0c\x40\x66\x89\x8c\x24\x98\x00\x00\x00"s, after_bundle);
-            fun_start = function_start(memory.at_exe(fun_start));
-            g_gather_room_data_trampoline = (GatherRoomData*)fun_start;
-        }
-
-        {
-            auto fun_start = find_inst(exe, "\x4d\x8d\x48\x7f\x40\xb5\x01"s, after_bundle);
-            fun_start = function_start(memory.at_exe(fun_start));
-            g_get_random_room_data_trampoline = (GetRandomRoomData*)fun_start;
-        }
-
-        {
-            auto fun_start = find_inst(exe, "\x8b\xc7\xf3\x48\x0f\x2a\xf0\xf3\x41\x0f\x58\xf0"s, after_bundle);
-            fun_start = function_start(memory.at_exe(fun_start));
-            g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)fun_start;
         }
 
         DetourRestoreAfterWith();
@@ -1207,7 +1174,6 @@ void LevelGenData::init()
         DetourUpdateThread(GetCurrentThread());
 
         DetourAttach((void**)&g_level_gen_trampoline, level_gen);
-        DetourAttach((void**)&g_gen_rooms_trampoline, gen_rooms);
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
         DetourAttach((void**)&g_setup_level_files_trampoline, setup_level_files);
         DetourAttach((void**)&g_load_level_file_trampoline, load_level_file);
