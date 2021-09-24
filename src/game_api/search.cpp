@@ -528,6 +528,40 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(0x1)
             .at_exe(),
     },
+    {
+        "olmec_transition_phase_1_y_level"sv,
+        // Put a write bp on Olmec.attack_phase and trigger phase 1.
+        // There will be a reference to the same float loaded in an xmm register twice,
+        // once compared and once as an arg for a call. Both need to point to our custom float.
+        // This address needs to point 1 after the first movss instruction because the relative
+        // distance to our custom float needs to be calculated from this point.
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
+            .offset(0xD)
+            .at_exe(),
+    },
+    {
+        "olmec_transition_phase_2_y_level"sv,
+        // Look in the function determined by `olmec_transition_phase_1_y_level`
+        // Search below the phase assignment to a similar pattern (two movss instructions, one
+        // compared, one as arg for a call). The value should point at 83.0
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x40\x44\xF3\x0F\x10\x0D****\x0F\x2E\xC8\x48\x8B\x45"sv)
+            .offset(0xD)
+            .at_exe(),
+    },
+    {
+        "olmec_transition_phase_1_custom_floats"sv,
+        // Take the start of the function determined by `olmec_transition_phase_1_y_level`
+        // and use the room above that. Make sure to leave room for the second float.
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
+            .at_exe()
+            .function_start()
+            .offset(-0x0A)
+            .function_start() // have to go up a couple functions to find some room in-between
+            .offset(-0x0c),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

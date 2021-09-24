@@ -1087,7 +1087,7 @@ void drop(uint32_t who_uid, uint32_t what_uid)
 void set_olmec_phase_y_level(uint8_t phase, float y)
 {
     // Sets the Y-level Olmec changes phases. The defaults are :
-    // - phase 1 (bombs) = 99 (+1)  (the game adds 1 to the fixed value for some reason)
+    // - phase 1 (bombs) = 100
     // - phase 2 (ufos) = 83
     // Olmecs checks phases in order! The means if you want ufo's from the start
     // you have to put both phase 1 and 2 at e.g. level 199
@@ -1097,49 +1097,30 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     static size_t phase2_offset = 0;
     if (phase1_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
+        // from 1.23.x onwards, there are now two instructions per phase that reference the y-level float
+        size_t phase_1_instruction_a = get_address("olmec_transition_phase_1_y_level");
+        size_t phase_1_instruction_b = phase_1_instruction_a + 0xd;
+        phase1_offset = get_address("olmec_transition_phase_1_custom_floats");
 
-        std::string pattern_phase1 = "\xF3\x0F\x10\x15\x1B\x8C\x36\x00"s;
-        std::string pattern_phase2 = "\xF3\x0F\x10\x0D\xE1\x87\x36\x00"s;
-
-        // first look up these patterns so we are in the correct function
-        auto offset1 = find_inst(exe, pattern_phase1, memory.after_bundle);
-        auto offset2 = find_inst(exe, pattern_phase2, memory.after_bundle);
-
-        // find the space inbetween this function and the next
-        uint8_t cc_counter = 0;
-        size_t op_counter = offset1;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-
-        // here's the memory location where we save our floats
-        phase1_offset = op_counter;
-        phase2_offset = phase1_offset + 4;
+        size_t phase_2_instruction_a = get_address("olmec_transition_phase_2_y_level");
+        size_t phase_2_instruction_b = phase_2_instruction_a + 0x11;
+        phase2_offset = phase1_offset + 0x4;
 
         // write the default values to our new floats
-        write_mem_prot(memory.at_exe(phase1_offset), to_le_bytes(99.0f), true);
-        write_mem_prot(memory.at_exe(phase2_offset), to_le_bytes(83.0f), true);
+        write_mem_prot(phase1_offset, to_le_bytes(100.0f), true);
+        write_mem_prot(phase2_offset, to_le_bytes(83.0f), true);
 
         // calculate the distances between our floats and the movss instructions
-        uint32_t distance_1 = static_cast<uint32_t>(phase1_offset - (offset1 + 8));
-        uint32_t distance_2 = static_cast<uint32_t>(phase2_offset - (offset2 + 8));
+        auto distance_1_a = static_cast<int32_t>(phase1_offset - phase_1_instruction_a);
+        auto distance_1_b = static_cast<int32_t>(phase1_offset - phase_1_instruction_b);
+        auto distance_2_a = static_cast<int32_t>(phase2_offset - phase_2_instruction_a);
+        auto distance_2_b = static_cast<int32_t>(phase2_offset - phase_2_instruction_b);
 
         // overwrite the movss instructions to load our floats
-        write_mem_prot(memory.at_exe(offset1 + 4), to_le_bytes(distance_1), true);
-        write_mem_prot(memory.at_exe(offset2 + 4), to_le_bytes(distance_2), true);
-
-        phase1_offset = memory.at_exe(phase1_offset);
-        phase2_offset = memory.at_exe(phase2_offset);
+        write_mem_prot(phase_1_instruction_a - 4, to_le_bytes(distance_1_a), true);
+        write_mem_prot(phase_1_instruction_b - 4, to_le_bytes(distance_1_b), true);
+        write_mem_prot(phase_2_instruction_a - 4, to_le_bytes(distance_2_a), true);
+        write_mem_prot(phase_2_instruction_b - 4, to_le_bytes(distance_2_b), true);
     }
 
     if (phase == 1)
