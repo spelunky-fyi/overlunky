@@ -1280,11 +1280,7 @@ void set_journal_enabled(bool b)
     static char original_instruction[2] = {0};
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\x45\x33\xC9\x48\x8B\xCB\x45\x33\xC0"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("show_journal");
         for (uint8_t x = 0; x < 2; ++x)
         {
             original_instruction[x] = read_u8(offset + x);

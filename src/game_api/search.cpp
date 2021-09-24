@@ -470,6 +470,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe()
             .function_start(),
     },
+    {
+        "show_journal"sv,
+        // Break on GameManager.journal_ui.state, open the journal
+        PatternCommandBuffer{}
+            .find_inst("\xC6\x87\x00\x02\x00\x00\x0F"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
