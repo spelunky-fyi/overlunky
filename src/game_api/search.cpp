@@ -452,6 +452,82 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe()
             .function_start(),
     },
+    {
+        "insta_gib"sv,
+        // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
+        // then place yourself in Quillback's path
+        PatternCommandBuffer{}
+            .find_inst("\x48\x81\xCA\x00\x00\x00\x10\x49\x89\x54\x24\x30"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "spawn_companion"sv,
+        // Break on `load_item` with a condition of `rdx == 0xD7` (or whatever the id of a hired hand is).
+        // Slap the coffin underneath Quillback
+        PatternCommandBuffer{}
+            .find_inst("\xBA\xD7\x00\x00\x00\x0F\x45\xD0"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "show_journal"sv,
+        // Break on GameManager.journal_ui.state, open the journal
+        PatternCommandBuffer{}
+            .find_inst("\xC6\x87\x00\x02\x00\x00\x0F"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "generate_particles"sv,
+        // Put read bp on State.particle_emitters, conditionally exclude the couple bp's it hits for just being in the level,
+        // jump and when landing the floorpoof particle emitter id will be loaded into rdx. The subsequent call is the
+        // generate_particles function.
+        PatternCommandBuffer{}
+            .find_inst("\x4D\x8D\x66\x08\x49\x8B\x5E\x08"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "ghost_spawn_time"sv,
+        // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
+        // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )
+        // Search for 0x2328 and 0x2A30 in very close proximity
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(0xB)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player1"sv,
+        // See `ghost_spawn_time` on how to search. New in 1.23.x is the fact that now all four players get checked
+        // for curse, and they all have individual ghost trigger timings (all 0x2328 of course)
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(-0x59)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player2"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(-0x3B)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player3"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(-0x1D)
+            .at_exe(),
+    },
+    {
+        "ghost_spawn_time_cursed_player4"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

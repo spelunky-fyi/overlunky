@@ -59,7 +59,6 @@ const std::vector<ParticleEmitter>& list_particles()
     static std::vector<ParticleEmitter> particles = {};
     if (particles.size() == 0)
     {
-        auto mem = Memory::get();
         auto mapOffset = get_address("particle_emitter_list");
         std::unordered_map<std::string, uint16_t>* map = reinterpret_cast<std::unordered_map<std::string, uint16_t>*>(mapOffset);
         for (const auto& [particle_name, particle_id] : *map)

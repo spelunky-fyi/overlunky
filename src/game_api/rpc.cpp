@@ -1154,20 +1154,11 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
-    static size_t normal_offset = 0;
-    static size_t cursed_offset = 0;
-    if (normal_offset == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\xBA\x28\x23\x00\x00\x41\xB8\x30\x2A\x00\x00"s;
-        auto offset = find_inst(exe, pattern, memory.after_bundle);
-        normal_offset = memory.at_exe(offset + 7);
-        cursed_offset = memory.at_exe(offset + 1);
-    }
-    write_mem_prot(normal_offset, to_le_bytes(normal), true);
-    write_mem_prot(cursed_offset, to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time"), to_le_bytes(normal), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), to_le_bytes(cursed), true);
 }
 
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
@@ -1255,10 +1246,7 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x48\x8B\xD9\xB9\xB0\x01\x00\x00"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("generate_particles");
     }
 
     if (offset != 0)
@@ -1280,11 +1268,7 @@ void set_journal_enabled(bool b)
     static char original_instruction[2] = {0};
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\x45\x33\xC9\x48\x8B\xCB\x45\x33\xC0"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("show_journal");
         for (uint8_t x = 0; x < 2; ++x)
         {
             original_instruction[x] = read_u8(offset + x);
@@ -1417,14 +1401,7 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
 
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\xBA\xD7\x00\x00\x00\x8B\x44\x24\x60"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
-    }
+    auto offset = get_address("spawn_companion");
     if (offset != 0)
     {
         auto state = get_state_ptr();

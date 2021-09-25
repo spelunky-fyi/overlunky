@@ -26,21 +26,6 @@ size_t get_dark()
     }
 }
 
-size_t get_insta()
-{
-    // TODO
-    return 0ul;
-
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto off = memory.after_bundle;
-        off = find_inst(memory.exe(), "\x40\x53\x56\x41\x54\x41\x55\x48\x83\xEC\x68"s,
-                        off + 1); // Spel2.exe+21E37920
-        return res = function_start(memory.at_exe(off));
-    }
-}
-
 size_t get_camera()
 {
     ONCE(size_t)
@@ -96,9 +81,8 @@ State& State::get()
             do_write_load_opt();
         }
         auto addr_location = get_address("state_location");
-        auto addr_insta = get_insta();
         auto addr_dark = 0ul; //get_dark();
-        STATE = State{addr_location, addr_insta, addr_dark};
+        STATE = State{addr_location, addr_dark};
         DEBUG("TODO: patterns for level_gen and spawn_hooks");
         //STATE.ptr()->level_gen->init();
         //init_spawn_hooks();
@@ -227,20 +211,28 @@ void State::zoom(float level)
 
 void State::godmode(bool g)
 {
-    DEBUG("TODO godmode: fix get_insta()");
     auto memory = Memory::get();
     auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
+    auto addr_insta = get_address("insta_gib");
+
+    static char original_damage_instruction = 0;
+    static char original_instagib_instruction = 0;
+    if (original_damage_instruction == 0)
+    {
+        original_damage_instruction = read_u8(addr_damage);
+        original_instagib_instruction = read_u8(addr_insta);
+    }
 
     // log::debug!("God {:?}" mode; g);
     if (g)
     {
         write_mem_prot(addr_damage, ("\xC3"s), true);
-        //write_mem_prot(addr_insta, ("\xC3"s), true);
+        write_mem_prot(addr_insta, ("\xC3"s), true);
     }
     else
     {
-        write_mem_prot(addr_damage, ("\x41"s), true);
-        //write_mem_prot(addr_insta, ("\x40"s), true);
+        write_mem_prot(addr_damage, std::string(&original_damage_instruction, 1), true);
+        write_mem_prot(addr_insta, std::string(&original_instagib_instruction, 1), true);
     }
 }
 
