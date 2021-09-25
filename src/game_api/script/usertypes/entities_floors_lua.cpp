@@ -209,6 +209,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TransferFloor>(
         "TransferFloor",
+        "transferred_entities",
+        &TransferFloor::transferred_entities,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 

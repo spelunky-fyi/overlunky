@@ -1444,6 +1444,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 for the start and retract
 ### `TransferFloor`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`map<int, int> transferred_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transferred_entities) &TransferFloor::transferred_entities
+\
+Index is the uid, value is frame the entity entered the floor, use `pairs` to loop thru
 ### `ConveyorBelt`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ConveyorBelt::timer

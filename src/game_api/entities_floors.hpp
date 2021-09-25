@@ -193,7 +193,8 @@ class SpikeballTrap : public Floor
 class TransferFloor : public Floor
 {
   public:
-    std::unordered_map<size_t, size_t> unknown_map; // types are wrong, no idea what's inside
+    /// Index is the uid, value is frame the entity entered the floor (time_level), use `pairs` to loop thru
+    std::unordered_map<int32_t, uint32_t> transferred_entities;
 };
 
 class ConveyorBelt : public TransferFloor
