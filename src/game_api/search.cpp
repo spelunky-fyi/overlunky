@@ -706,6 +706,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(0x8)
             .at_exe(),
     },
+    {
+        "cosmic_ocean_subtheme"sv,
+        // Put a write bp on LevelGen.theme_cosmicocean.sub_theme and go to CO
+        PatternCommandBuffer{}
+            .find_inst("\x80\x42\x6B\x01\xC6\x42\x69\x04\xC6\x42\x75\x06\xC3"sv)
+            .offset(0x40)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
