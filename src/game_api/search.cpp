@@ -685,6 +685,27 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(-0xD)
             .at_exe(),
     },
+    {
+        "first_poison_tick_timer_default"sv,
+        // Put a write bp on a non-poisoned Player(Movable):poison_tick_timer and poison the player
+        // New in 1.21.x: This is only the first delay to a poison tick, from then on, see `subsequent_poison_timer_tick_default`
+        // Note that there is a similar value of 1800 frames being written just above this location, no idea what triggers that
+        PatternCommandBuffer{}
+            .find_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
+            .offset(0x1)
+            .find_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
+            .offset(0x7)
+            .at_exe(),
+    },
+    {
+        "subsequent_poison_tick_timer_default"sv,
+        // Put a write bp on a poisoned Player(Movable):poison_tick_timer after the first poison tick has occurred
+        // and filter out the timer countdown
+        PatternCommandBuffer{}
+            .find_inst("\x66\x41\xC7\x87\x20\x01\x00\x00\x08\x07"sv)
+            .offset(0x8)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
