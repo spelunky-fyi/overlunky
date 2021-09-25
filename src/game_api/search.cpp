@@ -645,6 +645,25 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\xF3\x0F\x58\x05****\xF3\x0F\x11\x81\x58\x01\x00\x00"sv)
             .at_exe(),
     },
+    {
+        "arrowtrap_projectile"sv,
+        // Put a conditional bp on load_item (rdx = 0x173 (id of wooden arrow))
+        // Trigger a trap
+        PatternCommandBuffer{}
+            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
+    {
+        "poison_arrowtrap_projectile"sv,
+        // See `arrowtrap_projectile`, second occurrence of pattern
+        PatternCommandBuffer{}
+            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .offset(0x1)
+            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

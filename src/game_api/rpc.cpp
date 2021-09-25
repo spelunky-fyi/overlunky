@@ -870,21 +870,8 @@ void set_seed(uint32_t seed)
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
 {
-    static size_t offset_poison = 0;
-    static size_t offset_regular = 0;
-    if (offset_poison == 0)
-    {
-        std::string pattern = "\xBA\x73\x01\x00\x00\x48\x8B\x8C\xC1\xC0\x12\x00\x00"s;
-        auto memory = Memory::get();
-        // the pattern occurs twice in the executable
-        // the first instance is for poison arrowtraps
-        // the second is for regular arrowtraps
-        offset_poison = find_inst(memory.exe(), pattern, memory.after_bundle);
-        offset_regular = memory.at_exe(find_inst(memory.exe(), pattern, offset_poison + 1));
-        offset_poison = memory.at_exe(offset_poison);
-    }
-    write_mem_prot(offset_regular + 1, to_le_bytes(regular_entity_type), true);
-    write_mem_prot(offset_poison + 1, to_le_bytes(poison_entity_type), true);
+    write_mem_prot(get_address("arrowtrap_projectile"), to_le_bytes(regular_entity_type), true);
+    write_mem_prot(get_address("poison_arrowtrap_projectile"), to_le_bytes(poison_entity_type), true);
 }
 
 void modify_sparktraps(float angle_increment, float distance)
