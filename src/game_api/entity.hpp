@@ -404,16 +404,6 @@ class SoundPosition
     float unknown9;
 };
 
-struct Target
-{
-    uint8_t b00;
-    uint8_t enabled;
-    uint8_t level;
-    uint8_t from;
-    uint8_t world;
-    uint8_t theme;
-};
-
 std::vector<EntityItem> list_entities();
 
 std::tuple<float, float, uint8_t> get_position(uint32_t uid);

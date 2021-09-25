@@ -2183,17 +2183,16 @@ void render_narnia()
     auto doors = get_entities_by_type(doortypes);
     for (auto doorid : doors)
     {
-        Movable* doorent = (Movable*)get_entity_ptr(doorid);
-        auto target = reinterpret_cast<Target*>(&doorent->anim_func);
-        if (!target->enabled)
+        auto doorent = (ExitDoor*)get_entity_ptr(doorid);
+        if (!doorent->special_door)
             continue;
 
-        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", doorent->world, doorent->level, theme_name(doorent->theme));
         if (n > 0)
             ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target->world, target->level, target->theme);
+            warp_inc(doorent->world, doorent->level, doorent->theme);
         }
         n++;
     }
@@ -4035,11 +4034,12 @@ void render_entity_props()
                 coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
             ImGui::Text("%s", entity_names[coffin->inside].c_str());
-            ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int*)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
+            ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U8, &coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
         else if (
             g_entity_type == to_id("ENT_TYPE_ITEM_CRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_PRESENT") ||
-            g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT"))
+            g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT") ||
+            g_entity_type == to_id("ENT_TYPE_ITEM_DMCRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"))
         {
             auto container = (Container*)g_entity;
             ImGui::Text("Item in container:");
@@ -4059,9 +4059,9 @@ void render_entity_props()
             g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
             g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
-            Target* target = reinterpret_cast<Target*>(&g_entity->anim_func);
+            auto target = (ExitDoor*)g_entity;
             ImGui::Text("Door target:");
-            ImGui::Checkbox("Enabled##DoorEnabled", (bool*)&target->enabled);
+            ImGui::Checkbox("Enabled##DoorEnabled", &target->special_door);
             ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Theme##DoorThemenumber", ImGuiDataType_U8, &target->theme, 0.2f, &u8_one, &u8_seventeen);

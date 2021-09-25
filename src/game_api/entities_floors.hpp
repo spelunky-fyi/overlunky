@@ -67,9 +67,6 @@ class Door : public Floor
     int16_t unused2;
     int32_t unused3;
     Entity* fx_button;
-
-    void set_target(uint8_t w, uint8_t l, uint8_t t);
-    std::tuple<uint8_t, uint8_t, uint8_t> get_target();
 };
 
 class ExitDoor : public Door
@@ -84,6 +81,9 @@ class ExitDoor : public Door
     uint8_t world;
     uint8_t theme;
     uint16_t padding;
+
+    void set_target(uint8_t set_world, uint8_t l, uint8_t t);
+    std::tuple<uint8_t, uint8_t, uint8_t> get_target();
 };
 
 class DecoratedDoor : public ExitDoor

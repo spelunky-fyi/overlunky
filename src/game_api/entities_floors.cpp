@@ -636,19 +636,17 @@ bool Floor::get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2])
     return true;
 }
 
-void Door::set_target(uint8_t world, uint8_t l, uint8_t t)
+void ExitDoor::set_target(uint8_t set_world, uint8_t l, uint8_t t)
 {
-    uint8_t array[5] = {1, l, 1, world, t};
-    DEBUG("Making door go to {}-{}, {}", world, l, t);
-    write_mem(pointer() + 0xc1, std::string((char*)array, sizeof(array)));
+    special_door = true;
+    world = set_world;
+    level = l;
+    theme = t;
 }
 
-std::tuple<uint8_t, uint8_t, uint8_t> Door::get_target()
+std::tuple<uint8_t, uint8_t, uint8_t> ExitDoor::get_target()
 {
-    uint8_t l = read_u8(pointer() + 0xc2);
-    uint8_t world = read_u8(pointer() + 0xc4);
-    uint8_t t = read_u8(pointer() + 0xc5);
-    return std::make_tuple(world, l, t);
+    return std::make_tuple(world, level, theme);
 }
 
 void Arrowtrap::rearm()
