@@ -664,6 +664,27 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(0x1)
             .at_exe(),
     },
+    {
+        "give_powerup"sv,
+        // Put a write bp on Player(PowerupCapable).powerups.size and give that player a powerup
+        // Go up in the callstack until you find a function that takes the powerup ID in rdx
+        PatternCommandBuffer{}
+            .find_inst("\x8D\x86\xD4\xFD\xFF\xFF\x83\xF8\x03"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "remove_powerup"sv,
+        // Give the player an ankh, put a write bp on Player(PowerupCapable).powerups.size, kill the player
+        // Go up in the callstack until you find a function that takes the powerup ID in rdx
+        // Careful: in 1.23.x the beginning of the function isn't clear! There aren't a bunch of 0xCC's to indicate where
+        // it begins. That means we can't use function_start, because it looks for that 0xCC. Just use a manual offset.
+        // Look for the typical pushing onto the stack to find the start of the function.
+        PatternCommandBuffer{}
+            .find_inst("\x48\xC7\x45\x00\xFE\xFF\xFF\xFF\x89\xD0"sv)
+            .offset(-0xD)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
