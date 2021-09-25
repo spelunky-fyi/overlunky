@@ -630,6 +630,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\x0F\xB6\x89\x30\x01\x00\x00"sv)
             .at_exe(),
     },
+    {
+        "kapala_blood_threshold"sv,
+        // Put a write bp on KapalaPowerup:amount_of_blood
+        PatternCommandBuffer{}
+            .find_inst("\x88\x88\x30\x01\x00\x00\x80\xF9\x07"sv)
+            .offset(0x8)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

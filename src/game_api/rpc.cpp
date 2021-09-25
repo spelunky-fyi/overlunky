@@ -968,14 +968,7 @@ void modify_sparktraps(float angle_increment, float distance)
 
 void set_kapala_blood_threshold(uint8_t threshold)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        std::string pattern = "\xFE\x80\x28\x01\x00\x00\x80\xB8\x28\x01\x00\x00\x07"s;
-        offset = memory.at_exe(find_inst(memory.exe(), pattern, memory.after_bundle) + 12);
-    }
-    write_mem_prot(offset, to_le_bytes(threshold), true);
+    write_mem_prot(get_address("kapala_blood_threshold"), to_le_bytes(threshold), true);
 }
 
 void set_kapala_hud_icon(int8_t icon_index)
