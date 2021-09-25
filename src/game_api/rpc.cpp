@@ -1027,29 +1027,10 @@ void set_kapala_hud_icon(int8_t icon_index)
     }
 }
 
-void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier)
+void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscape_multiplier)
 {
-    size_t offset_default1 = 0;
-    size_t offset_vladscape1 = 0;
-    size_t offset_default2 = 0;
-    size_t offset_vladscape2 = 0;
-    if (offset_default1 == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x41\xB8\x02\x00\x00\x00\x84\xC0\x75\x06\x41\xB8\x01\x00\x00\x00"s;
-        auto offset = find_inst(exe, pattern, memory.after_bundle);
-        offset_default1 = memory.at_exe(offset + 12);
-        offset_vladscape1 = memory.at_exe(offset + 2);
-        offset = find_inst(exe, pattern, offset + 1);
-        offset_default2 = memory.at_exe(offset + 12);
-        offset_vladscape2 = memory.at_exe(offset + 2);
-    }
-
-    write_mem_prot(offset_default1, to_le_bytes(default_multiplier), true);
-    write_mem_prot(offset_default2, to_le_bytes(default_multiplier), true);
-    write_mem_prot(offset_vladscape1, to_le_bytes(vladscape_multiplier), true);
-    write_mem_prot(offset_vladscape2, to_le_bytes(vladscape_multiplier), true);
+    // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
+    write_mem_prot(get_address("blood_multiplication"), to_le_bytes(vladscape_multiplier), true);
 }
 
 SaveData* savedata()

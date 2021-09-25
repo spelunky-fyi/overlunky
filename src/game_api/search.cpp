@@ -609,6 +609,20 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start() // have to go up a couple functions to find some room in-between
             .offset(-0x0c),
     },
+    {
+        "blood_multiplication"sv,
+        // Put a read bp on Caveman(EntityDB):blood_content and kill one. If you look up a bit you will see
+        // the value 2 get loaded into a register, this is the multiplication factor. From 1.23.x
+        // onwards, the difference between wearing Vlad's cape and not is made by setting the default
+        // at two, and subtracting 1 if you're not wearing the cape. This makes it hard to let the
+        // modder set two distinct multiplication factors. When adjusting the hardcoded 2, you will
+        // be setting Vlad's cape multiplier, and default will be n-1.
+        // The pattern occurs twice with seemingly the same code logic, but don't know how to trigger.
+        PatternCommandBuffer{}
+            .find_inst("\xBD\x02\x00\x00\x00\x29\xFD"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
