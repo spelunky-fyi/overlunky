@@ -986,38 +986,21 @@ void set_kapala_hud_icon(int8_t icon_index)
 
     if (instruction_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\x0F\xB6\x81\x28\x01\x00\x00\x89\x02\x48\x8B\xC2"s;
-
-        instruction_offset = find_inst(exe, pattern, memory.after_bundle);
-
-        uint8_t cc_counter = 0;
-        size_t op_counter = instruction_offset;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-        icon_index_offset = memory.at_exe(op_counter);
-        distance = static_cast<uint32_t>(op_counter - (instruction_offset + 7));
-        instruction_offset = memory.at_exe(instruction_offset);
+        instruction_offset = get_address("kapala_hud_icon");
+        icon_index_offset = instruction_offset + 0x12;
+        distance = static_cast<uint32_t>(icon_index_offset - (instruction_offset + 7));
     }
 
     if (icon_index < 0) // reset to original
     {
-        write_mem_prot(instruction_offset + 2, to_le_bytes(0x00012881), true);
+        write_mem_prot(instruction_offset + 2, to_le_bytes(0x00013089), true);
     }
     else
     {
-        write_mem_prot(instruction_offset + 2, {0x05}, true);
+        // Instead of loading the value from KapalaPowerup:amount_of_blood (the instruction pointed at by instruction_offset)
+        // we overwrite this with an instruction that loads a byte located a bit after the current function.
+        // So you need to assemble `movzx  <relevant register>,BYTE PTR [rip+<distance>]`
+        write_mem_prot(instruction_offset + 2, {0x0d}, true);
         write_mem_prot(instruction_offset + 3, to_le_bytes(distance), true);
         if (icon_index > 6)
         {
