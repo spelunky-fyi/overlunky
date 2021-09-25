@@ -638,6 +638,13 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(0x8)
             .at_exe(),
     },
+    {
+        "sparktrap_angle_increment"sv,
+        // Put a read bp on Spark:angle, the next instruction adds a hardcoded float
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x05****\xF3\x0F\x11\x81\x58\x01\x00\x00"sv)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
