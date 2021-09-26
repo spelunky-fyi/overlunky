@@ -155,28 +155,15 @@ void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float 
     g_render_draw_depth_trampoline(layer, draw_depth, bbox_left, bbox_bottom, bbox_right, bbox_top);
 }
 
-static size_t text_rendering_context_offset = 0;
-static size_t text_rendering_func1_offset = 0;
-static size_t text_rendering_func2_offset = 0;
 bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
 {
-    auto& memory = Memory::get();
-    auto exe = memory.exe();
-
-    if (text_rendering_context_offset == 0)
+    static size_t text_rendering_func1_offset = 0;
+    if (text_rendering_func1_offset == 0)
     {
-        std::string pattern = "\x48\x8D\x0D\x56\x05\x16\x00"s;
-        size_t pattern_pos = find_inst(exe, pattern, memory.after_bundle);
-        text_rendering_context_offset = memory.at_exe(decode_pc(exe, pattern_pos));
-
-        pattern_pos += 7;
-        text_rendering_func1_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
-
-        pattern_pos += 13;
-        text_rendering_func2_offset = memory.at_exe(decode_pc(exe, pattern_pos, 1));
+        text_rendering_func1_offset = get_address("prepare_text_for_rendering");
     }
 
-    if (text_rendering_context_offset != 0)
+    if (text_rendering_func1_offset != 0)
     {
         auto convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), nullptr, 0);
         if (convert_result <= 0)
@@ -187,10 +174,9 @@ bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text
         wide_text.resize(convert_result + 10);
         convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), &wide_text[0], static_cast<int>(wide_text.size()));
 
-        typedef void func1(size_t context, uint32_t fontstyle, void* text_to_draw, uint32_t, float x, float y, TextRenderingInfo*, uint32_t, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
+        typedef void func1(uint32_t fontstyle, void* text_to_draw, uint32_t, float x, float y, TextRenderingInfo*, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
         static func1* f1 = (func1*)(text_rendering_func1_offset);
-        f1(text_rendering_context_offset, fontstyle, wide_text.data(), 2, x, y, info, 1, scale_x, scale_y, alignment, 2, 0);
-
+        f1(fontstyle, wide_text.data(), 2, x, y, info, scale_x, scale_y, alignment, 2, 0);
         return true;
     }
     return false;
@@ -204,9 +190,18 @@ void RenderAPI::draw_text(const std::string& text, float x, float y, float scale
         return;
     }
 
-    typedef void func2(TextRenderingInfo*, Color * color);
-    static func2* f2 = (func2*)(text_rendering_func2_offset);
-    f2(&tri, &color);
+    static size_t text_rendering_func2_offset = 0;
+    if (text_rendering_func2_offset == 0)
+    {
+        text_rendering_func2_offset = get_address("draw_text");
+    }
+
+    if (text_rendering_func2_offset != 0)
+    {
+        typedef void func2(TextRenderingInfo*, Color * color);
+        static func2* f2 = (func2*)(text_rendering_func2_offset);
+        f2(&tri, &color);
+    }
 }
 
 std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
@@ -223,13 +218,9 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
 {
     static size_t offset = 0;
 
-    auto& memory = Memory::get();
-    auto exe = memory.exe();
-
     if (offset == 0)
     {
-        std::string pattern = "\xB2\x29\xE8\xAE\x87\x04\x00"s;
-        offset = memory.at_exe(decode_pc(exe, find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("draw_screen_texture");
     }
 
     if (offset != 0)
@@ -294,19 +285,13 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
 void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
     static size_t func_offset = 0;
-    static size_t param_9 = 0;
+    static size_t param_7 = 0;
     uint8_t shader = 0x7; // this comes from RenderInfo->shader
-
-    auto& memory = Memory::get();
-    auto exe = memory.exe();
 
     if (func_offset == 0)
     {
         func_offset = get_address("draw_world_texture");
-
-        // TODO: update this and check if stack fillers are still needed below
-        auto offset = find_inst(exe, "\x4C\x8D\x0D\x59\xAF\x0F\x00"s, memory.after_bundle);
-        param_9 = memory.at_exe(decode_pc(exe, offset));
+        param_7 = get_address("draw_world_texture_param_7");
     }
 
     if (func_offset != 0)
@@ -357,11 +342,10 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
             uv_top,
         };
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, float* source, void*, void*, void*, void*, Color*, float*);
+        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, float* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
-        size_t stack_filler = 0;
         auto texture_name = texture->name;
-        rf(renderer(), shader, &texture_name, 1, destination, source, (void*)stack_filler, (void*)stack_filler, (void*)param_9, (void*)stack_filler, &color, nullptr);
+        rf(renderer(), shader, &texture_name, 1, destination, source, (void*)param_7, &color, nullptr);
     }
 }
 

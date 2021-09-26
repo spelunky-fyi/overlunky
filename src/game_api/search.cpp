@@ -398,6 +398,26 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "prepare_text_for_rendering"sv,
+        // Use `render_hud` to find the big function that renders the HUD. After every string preparation you will see two calls very
+        // close to each other. The first is to prepare the text for rendering/calculate text dimensions/...
+        // The second is to actually draw on screen
+        PatternCommandBuffer{}
+            .find_inst("\xB9\x02\x00\x00\x00\x41\xB8\x02\x00\x00\x00\x41\x0F\x28\xD8"sv)
+            .offset(0xF)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "draw_text"sv,
+        // See `prepare_text_for_rendering`
+        PatternCommandBuffer{}
+            .find_inst("\xB9\x02\x00\x00\x00\x41\xB8\x02\x00\x00\x00\x41\x0F\x28\xD8"sv)
+            .offset(0x25)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "render_pause_menu"sv,
         // Put write bp on GameManager.pause_ui.scroll.y
         PatternCommandBuffer{}
@@ -415,6 +435,16 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "draw_screen_texture"sv,
+        // Locate the function in `render_hud`. Towards the bottom you will find calls following a big stack buildup
+        // and r8 will have the char* of the texture
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8B\x8D\xC8\x12\x00\x00\xB2\x29"sv)
+            .offset(0x9)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "draw_world_texture"sv,
         // Look for cvttss2si instruction at the end of the exe (F3:0F2CC0)
         // Function has distinct look, one call at the top, for the rest a couple cvttss2si and
@@ -423,6 +453,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\xC7\x44\x24\x28\x06\x00\x00\x00\xC7\x44\x24\x20\x04\x00\x00\x00"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "draw_world_texture_param_7"sv,
+        // Look at the call site of `draw_world_texture`, there will be two hardcoded values loaded
+        // One is the renderer, the other is the seventh param we need to pass to draw_world_texture
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x1D****\x48\x89\x5C\x24\x30"sv)
+            .decode_pc()
+            .at_exe(),
     },
     {
         "texture_db"sv,

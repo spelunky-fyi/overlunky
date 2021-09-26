@@ -1283,9 +1283,9 @@ end
     lua.create_named_table(
         "VANILLA_FONT_STYLE",
         "ITALIC",
-        0,
+        1,
         "BOLD",
-        1);
+        2);
 }
 
 std::vector<std::string> safe_fields{};
