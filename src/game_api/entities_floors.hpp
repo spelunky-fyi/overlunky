@@ -205,9 +205,10 @@ class ConveyorBelt : public TransferFloor
     uint8_t timer2; // not exposed to lua
 };
 
-class Pipe : public TransferFloor
+class Pipe : public Floor
 {
   public:
+    UnknownPointerGroup unknown1;
     /// 3 - straight_horizontal, 4 - blocked, 5 - down_left_turn, 6 - down_right_turn, 8 - blocked, 9 - up_left_turn, 10 - up_right_turn, 12 - straight_vertical
     int8_t direction_type;
     bool end_pipe;

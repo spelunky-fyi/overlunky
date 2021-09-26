@@ -228,7 +228,7 @@ void register_usertypes(sol::state& lua)
         "end_pipe",
         &Pipe::end_pipe,
         sol::base_classes,
-        sol::bases<Entity, Floor, TransferFloor>());
+        sol::bases<Entity, Floor>());
 
     lua.new_usertype<Generator>(
         "Generator",

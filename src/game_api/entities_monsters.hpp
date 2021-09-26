@@ -217,14 +217,15 @@ class Shopkeeper : public RoomOwner
 class Yang : public RoomOwner
 {
   public:
-    std::map<int64_t, int64_t> unknown2;
+    /// Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    std::set<int32_t> turkeys_in_den; // probably a Map, but the second value is just 1 or 0, not really useful
     uint8_t unknown4;
     uint8_t unknown5;
     /// I'm looking for turkeys, wanna help?
     bool first_message_shown;
-    /// set to false when the quest is over (Yang dead or second turkey delivered)
+    /// Is set to false when the quest is over (Yang dead or second turkey delivered)
     bool quest_incomplete;
-    /// tusk palace/black market/one way door - message shown
+    /// Tusk palace/black market/one way door - message shown
     bool special_message_shown;
     uint8_t padding4;
     uint8_t padding5;

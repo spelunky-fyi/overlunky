@@ -276,6 +276,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Yang>(
         "Yang",
+        "turkeys_in_den",
+        &Yang::turkeys_in_den,
         "first_message_shown",
         &Yang::first_message_shown,
         "quest_incomplete",
