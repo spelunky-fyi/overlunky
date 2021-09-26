@@ -231,7 +231,7 @@ class SlidingWallCeiling : public Floor
   public:
     Entity* attached_piece;
     int32_t active_floor_part_uid;
-    /// 1 - top, 2 - pause
+    /// 1 - going up / is at the top, 2 - pause
     uint8_t state; // i labeled some as wrong_pause cause they are probably not used, they pause the movement but not the sound
     uint8_t unused1;
     uint16_t unused2;
@@ -264,6 +264,7 @@ class StickyTrap : public Floor
     UnknownPointerGroup unknown1;
     int32_t attached_piece_uid;
     int32_t ball_uid;
+    /// 0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
     int8_t state;
     uint8_t timer; // for the start and for the retract
 };
@@ -358,6 +359,8 @@ class TentacleBottom : public Floor
     UnknownPointerGroup unknown1;
     int32_t attached_piece_uid;
     int32_t tentacle_uid;
+    /// 0 - none, 1 - start, 2 - moving up, 3 - at the top, 4 - moving down 5 - pause
+    int8_t state;
 };
 
 class PoleDeco : public Floor

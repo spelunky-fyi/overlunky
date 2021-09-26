@@ -1473,7 +1473,7 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int active_floor_part_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_floor_part_uid) &SlidingWallCeiling::active_floor_part_uid
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &SlidingWallCeiling::state
 \
-1 - top, 2 - pause
+1 - going up / is at the top, 2 - pause
 ### `QuickSand`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 ### `BigSpearTrap`
@@ -1487,6 +1487,8 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid
 - [`int ball_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ball_uid) &StickyTrap::ball_uid
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &StickyTrap::state
+\
+0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &StickyTrap::timer
 ### `MotherStatue`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
@@ -1539,6 +1541,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &TentacleBottom::attached_piece_uid
 - [`int tentacle_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tentacle_uid) &TentacleBottom::tentacle_uid
+- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &TentacleBottom::state
+\
+0 - none, 1 - start, 2 - moving up, 3 - at the top, 4 - moving down 5 - pause
 ### `PoleDeco`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int deco_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_up) &PoleDeco::deco_up

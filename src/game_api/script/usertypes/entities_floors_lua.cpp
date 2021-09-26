@@ -372,6 +372,8 @@ void register_usertypes(sol::state& lua)
         &TentacleBottom::attached_piece_uid,
         "tentacle_uid",
         &TentacleBottom::tentacle_uid,
+        "state",
+        &TentacleBottom::state,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 

@@ -459,7 +459,7 @@ class Container : public Movable
 class Coffin : public Container
 {
   public:
-    int8_t timer;
+    uint8_t timer;
     int8_t shake_state; /* unsure */
 };
 
