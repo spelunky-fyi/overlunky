@@ -242,7 +242,10 @@ class SlidingWallCeiling : public Floor
 class QuickSand : public Floor
 {
   public:
-    uint8_t unknown_timer;
+    uint8_t unknown_timer1;
+    uint8_t unknown_timer2;
+    uint8_t unknown_timer3;
+    uint8_t unknown_timer4;
 };
 
 class BigSpearTrap : public Floor
