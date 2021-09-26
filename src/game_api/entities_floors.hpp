@@ -235,8 +235,8 @@ class SlidingWallCeiling : public Floor
     uint8_t state; // i labeled some as wrong_pause cause they are probably not used, they pause the movement but not the sound
     uint8_t unused1;
     uint16_t unused2;
-    size_t unknown1;
-    size_t unknown2;
+    SoundPosition* ball_rise;
+    SoundPosition* ball_drop;
 };
 
 class QuickSand : public Floor
