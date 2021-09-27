@@ -20,18 +20,6 @@ LoadItemOver get_load_item_over()
     }
 }
 
-using GetGridEntityAt = Entity* (*)(Layer*, float, float);
-GetGridEntityAt get_get_grid_entity_at()
-{
-    ONCE(GetGridEntityAt)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x48\x8b\x00\xff\x90\x38\x01\x00\x00"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xE8"s, off - 0x10);
-        return res = (GetGridEntityAt)memory.at_exe(Memory::decode_call(off));
-    }
-}
-
 Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap)
 {
     if (id == 0)
@@ -103,8 +91,9 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 
 Entity* Layer::get_grid_entity_at(float x, float y)
 {
-    auto get_grid_entity_at = (get_get_grid_entity_at());
-    return get_grid_entity_at(this, x, y);
+    const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
+    const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
+    return get_entity_ptr(grid_entities[ix][iy]);
 }
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
