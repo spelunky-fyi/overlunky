@@ -469,7 +469,8 @@ Speed: expressed as the amount that should be added to the angle every frame (us
 Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
 ### [`set_blood_multiplication`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
 `nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)`<br/>
-Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
+Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 `nil flip_entity(int uid)`<br/>
 Flip entity around by uid. All new entities face right by default.
@@ -1000,6 +1001,8 @@ end
 - [`ScreenArenaIntro screen_arena_intro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_intro) &StateMemory::screen_arena_intro
 - [`ScreenArenaLevel screen_arena_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_level) &StateMemory::screen_arena_level
 - [`ScreenArenaScore screen_arena_score`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_score) &StateMemory::screen_arena_score
+- [`ScreenArenaMenu screen_arena_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_menu) &StateMemory::screen_arena_menu
+- [`ScreenArenaItems screen_arena_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_items) &StateMemory::screen_arena_items
 - [`int get_correct_ushabti()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti) &StateMemory::get_correct_ushabti
 \
 Returns animation_frame of the correct ushabti
@@ -1018,8 +1021,6 @@ Returns animation_frame of the correct ushabti
 - [`ScreenCharacterSelect screen_character_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) &GameManager::screen_character_select
 - [`ScreenCamp screen_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) &GameManager::screen_camp
 - [`ScreenLevel screen_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) &GameManager::screen_level
-- [`ScreenArenaMenu screen_arena_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_menu) &GameManager::screen_arena_menu
-- [`ScreenArenaItems screen_arena_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_items) &GameManager::screen_arena_items
 - [`ScreenOnlineLoading screen_online_loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_loading) &GameManager::screen_online_loading
 - [`ScreenOnlineLobby screen_online_lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_lobby) &GameManager::screen_online_lobby
 - [`PauseUI pause_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) &GameManager::pause_ui
@@ -1075,7 +1076,7 @@ see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
 - [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
 ### `Online`
 - [`array<OnlinePlayer, 4> online_players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) &Online::online_players
-- [`OnlinePlayer local_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=local_player) &Online::local_player
+- [`OnlinePlayerShort local_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=local_player) &Online::local_player
 - [`OnlineLobby lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lobby) &Online::lobby
 ### `OnlinePlayer`
 - [`int ready_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) &OnlinePlayer::ready_state

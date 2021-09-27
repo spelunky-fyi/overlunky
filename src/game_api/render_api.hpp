@@ -54,9 +54,9 @@ struct RenderAPI
 struct RenderInfo
 {
     size_t __vftable;
-    uint32_t unknown1;
     float x;
     float y;
+    uint32_t unknown3;
     uint32_t unknown4;
     uint32_t unknown5;
     uint32_t unknown6;
