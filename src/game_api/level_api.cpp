@@ -871,7 +871,7 @@ void generate_room(LevelGenSystem* level_gen, int32_t room_idx_x, int32_t room_i
         post_room_generation();
 
         {
-            std::lock_guard lock{ g_extra_spawn_logic_providers_lock };
+            std::lock_guard lock{g_extra_spawn_logic_providers_lock};
             for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
             {
                 provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
