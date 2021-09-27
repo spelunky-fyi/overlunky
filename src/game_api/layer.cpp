@@ -75,18 +75,21 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
 
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 {
-    using SpawnEntityHopefullySynced = Entity* (*)(Layer*, size_t, float, float);
-    static SpawnEntityHopefullySynced spawn_entity_snap_to_floor = []
+    const EntityDB* type = get_type(id);
+    const float y_center = (float)roundf(y) - 0.5;
+    Entity* ent = spawn_entity(id, x, type->rect_collision.up_plus_down - type->rect_collision.up_minus_down + y_center, false, 0.0f, 0.0f, false);
+    if ((type->search_flags & 0x700) == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto off = find_inst(exe, "\x41\x0f\x28\xd8\x49\x8b\xce"s, memory.after_bundle);
-        off = find_inst(exe, "\xE8"s, off + 5);
-
-        return (SpawnEntityHopefullySynced)memory.at_exe(Memory::decode_call(off));
-    }();
-
-    return spawn_entity_snap_to_floor(this, id, x, y);
+        ent->y = y_center - ent->hitboxy + ent->offsety;
+        // Idk how anything could have an overlay here but this is what the vanilla function does
+        Entity* overlay = ent->overlay;
+        while (overlay != nullptr)
+        {
+            ent->y -= overlay->y;
+            overlay = overlay->overlay;
+        }
+    }
+    return ent;
 }
 
 Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
