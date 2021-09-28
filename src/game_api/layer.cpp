@@ -61,21 +61,26 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
     return spawned;
 }
 
+void snap_to_floor(Entity* ent, float y)
+{
+    ent->y = y - ent->hitboxy + ent->offsety;
+    Entity* overlay = ent->overlay;
+    while (overlay != nullptr)
+    {
+        ent->y -= overlay->y;
+        overlay = overlay->overlay;
+    }
+}
+
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 {
     const EntityDB* type = get_type(id);
-    const float y_center = (float)roundf(y) - 0.5;
-    Entity* ent = spawn_entity(id, x, type->rect_collision.up_plus_down - type->rect_collision.up_minus_down + y_center, false, 0.0f, 0.0f, false);
+    const float y_center = (float)roundf(y) - 0.5f;
+    const float snapped_y = type->rect_collision.up_plus_down - type->rect_collision.up_minus_down + y_center;
+    Entity* ent = spawn_entity(id, x, snapped_y, false, 0.0f, 0.0f, false);
     if ((type->search_flags & 0x700) == 0)
     {
-        ent->y = y_center - ent->hitboxy + ent->offsety;
-        // Idk how anything could have an overlay here but this is what the vanilla function does
-        Entity* overlay = ent->overlay;
-        while (overlay != nullptr)
-        {
-            ent->y -= overlay->y;
-            overlay = overlay->overlay;
-        }
+        snap_to_floor(ent, y_center);
     }
     return ent;
 }
@@ -93,7 +98,7 @@ Entity* Layer::get_grid_entity_at(float x, float y)
 {
     const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
     const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
-    return get_entity_ptr(grid_entities[ix][iy]);
+    return grid_entities[ix][iy];
 }
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)

@@ -12,7 +12,7 @@ struct Layer
         int size;
     } items_;
     char stuff0[0xF460]; // Just wanna get to grid_entities
-    size_t grid_entities[0x56][0x7e];
+    Entity* grid_entities[0x56][0x7e];
     char stuff1[0x3FD10]; // Just wanna get to expired_items_
     // List of items that were destroyed and are waiting to have the dtor called
     // and then be returned to the entity pool
