@@ -325,11 +325,12 @@ uint8_t Player::kapala_blood_amount()
 
 void Movable::poison(int16_t frames)
 {
-    static size_t offset = 0;
-    if (offset == 0)
+    static size_t offset_first = 0;
+    static size_t offset_subsequent = 0;
+    if (offset_first == 0)
     {
-        auto memory = Memory::get();
-        offset = memory.at_exe(find_inst(memory.exe(), "\xB8\x08\x07\x00\x00\x66\x89\x87\x18\x01\x00\x00"s, memory.after_bundle));
+        offset_first = get_address("first_poison_tick_timer_default");
+        offset_subsequent = get_address("subsequent_poison_tick_timer_default");
     }
     poison_tick_timer = frames;
 
@@ -337,7 +338,8 @@ void Movable::poison(int16_t frames)
     {
         frames = 1800;
     }
-    write_mem_prot(offset + 1, to_le_bytes(frames), true);
+    write_mem_prot(offset_first, to_le_bytes(frames), true);
+    write_mem_prot(offset_subsequent, to_le_bytes(frames), true);
 }
 
 bool Movable::is_poisoned()

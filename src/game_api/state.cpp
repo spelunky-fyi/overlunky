@@ -26,17 +26,6 @@ size_t get_dark()
     }
 }
 
-size_t get_camera()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xC7\x87\xCC\x00\x00\x00\x00\x00"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xF3\x0F\x11\x05"s, off) + 1;
-        return res = memory.at_exe(decode_pc(memory.exe(), off));
-    }
-}
-
 inline bool& get_is_init()
 {
     static bool is_init{false};
@@ -245,8 +234,10 @@ std::pair<float, float> State::get_camera_position()
 
 void State::set_camera_position(float cx, float cy)
 {
-    write_mem_prot(get_camera(), to_le_bytes(cx), true);
-    write_mem_prot(get_camera() + 4, to_le_bytes(cy), true);
+    auto camera = ptr()->camera;
+    camera->focused_entity_uid = -1;
+    camera->focus_x = cx;
+    camera->focus_y = cy;
 }
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)

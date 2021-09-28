@@ -6,10 +6,7 @@ void PowerupCapable::remove_powerup(ENT_TYPE powerup_type)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x48\x8B\xCB\xFF\x90\xF0\x02\x00\x00\x48\x8B\x5C\x24\x30"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("remove_powerup");
     }
 
     if (offset != 0)
@@ -25,10 +22,7 @@ void PowerupCapable::give_powerup(ENT_TYPE powerup_type)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x83\x8A\xF4\x09\x00\x00\x40"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("give_powerup");
     }
 
     if (offset != 0)

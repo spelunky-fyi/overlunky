@@ -257,6 +257,30 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "fun_22872fe0"sv,
+        // Used in load_item as `fun_22872fe0(layer, spawned_entity)`
+        PatternCommandBuffer{}
+            .find_inst("\xE9****\x49\x81\xC6****"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "fun_2286f240"sv,
+        // Used in load_item as `fun_2286f240(layer + something, spawned_entity, false)`
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x8B\x43\x0C"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "spawn_entity"sv,
+        // First call in LoadItem is to this function
+        PatternCommandBuffer{}
+            .find_inst("\x44\x88\xb8\xa0\x00\x00\x00\xf3\x0f\x11\x78\x40"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
@@ -309,6 +333,45 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
+        "level_gen_handle_tile_code"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x83\xC5\x01"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_generate_room"sv,
+        // One call up from generate_room_from_tile_codes
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x83\xC6\x01\x39\xF3"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gather_room_data"sv,
+        // First call in generate_room, it gets something from the unordered_map in `param_1 + 0x108`
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x44\x8A\x44\x24*\x45\x84\xC0"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_get_random_room_data"sv,
+        // Call to this is the only thing happening in a loop along with checking a flag on the returned value
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x48\x8B\x58\x08"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gen_generate_room_from_tile_codes"sv,
+        // One of the few calls to handle_tile_code, does a `if (param != 0xec)` before the call
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x45\x89\xF8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "online"sv,
         // Find online code in memory (reverse for endianness), look higher up and find __vftable, set read bp on __vftable
         PatternCommandBuffer{}
@@ -351,6 +414,26 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "prepare_text_for_rendering"sv,
+        // Use `render_hud` to find the big function that renders the HUD. After every string preparation you will see two calls very
+        // close to each other. The first is to prepare the text for rendering/calculate text dimensions/...
+        // The second is to actually draw on screen
+        PatternCommandBuffer{}
+            .find_inst("\xB9\x02\x00\x00\x00\x41\xB8\x02\x00\x00\x00\x41\x0F\x28\xD8"sv)
+            .offset(0xF)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "draw_text"sv,
+        // See `prepare_text_for_rendering`
+        PatternCommandBuffer{}
+            .find_inst("\xB9\x02\x00\x00\x00\x41\xB8\x02\x00\x00\x00\x41\x0F\x28\xD8"sv)
+            .offset(0x25)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "render_pause_menu"sv,
         // Put write bp on GameManager.pause_ui.scroll.y
         PatternCommandBuffer{}
@@ -368,6 +451,16 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "draw_screen_texture"sv,
+        // Locate the function in `render_hud`. Towards the bottom you will find calls following a big stack buildup
+        // and r8 will have the char* of the texture
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8B\x8D\xC8\x12\x00\x00\xB2\x29"sv)
+            .offset(0x9)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "draw_world_texture"sv,
         // Look for cvttss2si instruction at the end of the exe (F3:0F2CC0)
         // Function has distinct look, one call at the top, for the rest a couple cvttss2si and
@@ -376,6 +469,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\xC7\x44\x24\x28\x06\x00\x00\x00\xC7\x44\x24\x20\x04\x00\x00\x00"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "draw_world_texture_param_7"sv,
+        // Look at the call site of `draw_world_texture`, there will be two hardcoded values loaded
+        // One is the renderer, the other is the seventh param we need to pass to draw_world_texture
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x1D****\x48\x89\x5C\x24\x30"sv)
+            .decode_pc()
+            .at_exe(),
     },
     {
         "texture_db"sv,
@@ -526,6 +628,145 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         PatternCommandBuffer{}
             .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
             .offset(0x1)
+            .at_exe(),
+    },
+    {
+        "olmec_transition_phase_1_y_level"sv,
+        // Put a write bp on Olmec.attack_phase and trigger phase 1.
+        // There will be a reference to the same float loaded in an xmm register twice,
+        // once compared and once as an arg for a call. Both need to point to our custom float.
+        // This address needs to point 1 after the first movss instruction because the relative
+        // distance to our custom float needs to be calculated from this point.
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
+            .offset(0xD)
+            .at_exe(),
+    },
+    {
+        "olmec_transition_phase_2_y_level"sv,
+        // Look in the function determined by `olmec_transition_phase_1_y_level`
+        // Search below the phase assignment to a similar pattern (two movss instructions, one
+        // compared, one as arg for a call). The value should point at 83.0
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x40\x44\xF3\x0F\x10\x0D****\x0F\x2E\xC8\x48\x8B\x45"sv)
+            .offset(0xD)
+            .at_exe(),
+    },
+    {
+        "olmec_transition_phase_1_custom_floats"sv,
+        // Take the start of the function determined by `olmec_transition_phase_1_y_level`
+        // and use the room above that. Make sure to leave room for the second float.
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
+            .at_exe()
+            .function_start()
+            .offset(-0x0A)
+            .function_start() // have to go up a couple functions to find some room in-between
+            .offset(-0x0c),
+    },
+    {
+        "blood_multiplication"sv,
+        // Put a read bp on Caveman(EntityDB):blood_content and kill one. If you look up a bit you will see
+        // the value 2 get loaded into a register, this is the multiplication factor. From 1.23.x
+        // onwards, the difference between wearing Vlad's cape and not is made by setting the default
+        // at two, and subtracting 1 if you're not wearing the cape. This makes it hard to let the
+        // modder set two distinct multiplication factors. When adjusting the hardcoded 2, you will
+        // be setting Vlad's cape multiplier, and default will be n-1.
+        // The pattern occurs twice with seemingly the same code logic, but don't know how to trigger.
+        PatternCommandBuffer{}
+            .find_inst("\xBD\x02\x00\x00\x00\x29\xFD"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
+    {
+        "kapala_hud_icon"sv,
+        // Put a read bp on KapalaPowerup:amount_of_blood
+        PatternCommandBuffer{}
+            .find_inst("\x0F\xB6\x89\x30\x01\x00\x00"sv)
+            .at_exe(),
+    },
+    {
+        "kapala_blood_threshold"sv,
+        // Put a write bp on KapalaPowerup:amount_of_blood
+        PatternCommandBuffer{}
+            .find_inst("\x88\x88\x30\x01\x00\x00\x80\xF9\x07"sv)
+            .offset(0x8)
+            .at_exe(),
+    },
+    {
+        "sparktrap_angle_increment"sv,
+        // Put a read bp on Spark:angle, the next instruction adds a hardcoded float
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x58\x05****\xF3\x0F\x11\x81\x58\x01\x00\x00"sv)
+            .at_exe(),
+    },
+    {
+        "arrowtrap_projectile"sv,
+        // Put a conditional bp on load_item (rdx = 0x173 (id of wooden arrow))
+        // Trigger a trap
+        PatternCommandBuffer{}
+            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
+    {
+        "poison_arrowtrap_projectile"sv,
+        // See `arrowtrap_projectile`, second occurrence of pattern
+        PatternCommandBuffer{}
+            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .offset(0x1)
+            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .offset(0x1)
+            .at_exe(),
+    },
+    {
+        "give_powerup"sv,
+        // Put a write bp on Player(PowerupCapable).powerups.size and give that player a powerup
+        // Go up in the callstack until you find a function that takes the powerup ID in rdx
+        PatternCommandBuffer{}
+            .find_inst("\x8D\x86\xD4\xFD\xFF\xFF\x83\xF8\x03"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "remove_powerup"sv,
+        // Give the player an ankh, put a write bp on Player(PowerupCapable).powerups.size, kill the player
+        // Go up in the callstack until you find a function that takes the powerup ID in rdx
+        // Careful: in 1.23.x the beginning of the function isn't clear! There aren't a bunch of 0xCC's to indicate where
+        // it begins. That means we can't use function_start, because it looks for that 0xCC. Just use a manual offset.
+        // Look for the typical pushing onto the stack to find the start of the function.
+        PatternCommandBuffer{}
+            .find_inst("\x48\xC7\x45\x00\xFE\xFF\xFF\xFF\x89\xD0"sv)
+            .offset(-0xD)
+            .at_exe(),
+    },
+    {
+        "first_poison_tick_timer_default"sv,
+        // Put a write bp on a non-poisoned Player(Movable):poison_tick_timer and poison the player
+        // New in 1.21.x: This is only the first delay to a poison tick, from then on, see `subsequent_poison_timer_tick_default`
+        // Note that there is a similar value of 1800 frames being written just above this location, no idea what triggers that
+        PatternCommandBuffer{}
+            .find_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
+            .offset(0x1)
+            .find_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
+            .offset(0x7)
+            .at_exe(),
+    },
+    {
+        "subsequent_poison_tick_timer_default"sv,
+        // Put a write bp on a poisoned Player(Movable):poison_tick_timer after the first poison tick has occurred
+        // and filter out the timer countdown
+        PatternCommandBuffer{}
+            .find_inst("\x66\x41\xC7\x87\x20\x01\x00\x00\x08\x07"sv)
+            .offset(0x8)
+            .at_exe(),
+    },
+    {
+        "cosmic_ocean_subtheme"sv,
+        // Put a write bp on LevelGen.theme_cosmicocean.sub_theme and go to CO
+        PatternCommandBuffer{}
+            .find_inst("\x80\x42\x6B\x01\xC6\x42\x69\x04\xC6\x42\x75\x06\xC3"sv)
+            .offset(0x40)
             .at_exe(),
     },
 };

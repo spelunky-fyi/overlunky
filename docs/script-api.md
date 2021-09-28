@@ -469,7 +469,8 @@ Speed: expressed as the amount that should be added to the angle every frame (us
 Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
 ### [`set_blood_multiplication`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
 `nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)`<br/>
-Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
+Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 `nil flip_entity(int uid)`<br/>
 Flip entity around by uid. All new entities face right by default.
