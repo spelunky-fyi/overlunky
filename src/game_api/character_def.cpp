@@ -1,5 +1,6 @@
 #include "character_def.hpp"
 
+#include "game_allocator.hpp"
 #include "logger.h"
 #include "memory.hpp"
 
@@ -29,6 +30,9 @@ struct CharacterDB
     float bed_position_y;
     SomeCharEnum some_enum;
 };
+static constexpr auto sizeof_CharacterDB = sizeof(CharacterDB);
+static constexpr auto expect_CharacterDB = 0x2c;
+static_assert(sizeof_CharacterDB == expect_CharacterDB);
 
 std::span<CharacterDB> GetCharacterDefinitions()
 {
@@ -79,6 +83,8 @@ std::span<CharacterDB> GetCharacterDefinitions()
     return static_character_table;
 }
 
+namespace NCharacterDB
+{
 CharacterDB& get_character_definition(std::uint32_t character_index)
 {
     return GetCharacterDefinitions()[std::clamp(character_index, 0u, 19u)];
@@ -94,12 +100,12 @@ const char16_t* get_character_full_name(std::uint32_t character_index)
     static const auto string_table = (const char16_t**)get_address("string_table");
     return string_table[get_character_definition(character_index).full_name_string_id];
 }
-const char16_t* get_character_shortname(std::uint32_t character_index)
+const char16_t* get_character_short_name(std::uint32_t character_index)
 {
     static const auto string_table = (const char16_t**)get_address("string_table");
     return string_table[get_character_definition(character_index).short_name_string_id];
 }
-Color get_character_heartcolor(std::uint32_t character_index)
+Color get_character_heart_color(std::uint32_t character_index)
 {
     return get_character_definition(character_index).heart_color;
 }
@@ -108,29 +114,37 @@ bool get_character_gender(std::uint32_t character_index)
     return get_character_definition(character_index).gender == CharGender::Female;
 }
 
-void set_character_full_name(std::uint32_t /*character_index*/, std::u16string_view /*name*/)
+void set_character_full_name(std::uint32_t character_index, std::u16string_view name)
 {
-    //const auto max_size = sizeof(CharacterDB::full_name) / sizeof(char16_t);
-    //if (name.size() > max_size)
-    //{
-    //    DEBUG("Character name is too long, max supported size is {}", max_size);
-    //}
-    //auto& char_def = get_character_definition(character_index);
-    //memset(char_def.full_name, 0, max_size * sizeof(char16_t));
-    //memcpy(char_def.full_name, name.data(), std::min(name.size(), max_size) * sizeof(char16_t));
+    static const auto string_table = (const char16_t**)get_address("string_table");
+
+    auto& char_def = get_character_definition(character_index);
+    const char16_t** full_name = string_table + char_def.full_name_string_id;
+
+    const auto data_size = name.size() * sizeof(char16_t);
+    char16_t* new_full_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+    new_full_name[data_size] = u'\0';
+    memcpy(new_full_name, name.data(), data_size);
+
+    game_free((void*)*full_name);
+    *full_name = new_full_name;
 }
-void set_character_short_name(std::uint32_t /*character_index*/, std::u16string_view /*name*/)
+void set_character_short_name(std::uint32_t character_index, std::u16string_view name)
 {
-    //const auto max_size = sizeof(CharacterDB::short_name) / sizeof(char16_t);
-    //if (name.size() > max_size)
-    //{
-    //    DEBUG("Character name is too long, max supported size is {}", max_size);
-    //}
-    //auto& char_def = get_character_definition(character_index);
-    //memset(char_def.short_name, 0, max_size * sizeof(char16_t));
-    //memcpy(char_def.short_name, name.data(), std::min(name.size(), max_size) * sizeof(char16_t));
+    static const auto string_table = (const char16_t**)get_address("string_table");
+
+    auto& char_def = get_character_definition(character_index);
+    const char16_t** short_name = string_table + char_def.short_name_string_id;
+
+    const auto data_size = name.size() * sizeof(char16_t);
+    char16_t* new_short_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+    new_short_name[data_size] = u'\0';
+    memcpy(new_short_name, name.data(), data_size);
+
+    game_free((void*)*short_name);
+    *short_name = new_short_name;
 }
-void set_character_heartcolor(std::uint32_t character_index, Color color)
+void set_character_heart_color(std::uint32_t character_index, Color color)
 {
     get_character_definition(character_index).heart_color = color;
 }
@@ -138,3 +152,4 @@ void set_character_gender(std::uint32_t character_index, bool female)
 {
     get_character_definition(character_index).gender = female ? CharGender::Female : CharGender::Male;
 }
+} // namespace NCharacterDB

@@ -83,6 +83,9 @@ class Player : public PowerupCapable
     void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();
 
+    void set_name(std::u16string name);
+    void set_short_name(std::u16string name);
+
     /// Get the full name of the character, this will be the modded name not only the vanilla name.
     std::u16string get_name();
     /// Get the short name of the character, this will be the modded name not only the vanilla name.
