@@ -633,9 +633,9 @@ void register_usertypes(sol::state& lua)
                            //, "EMPTY", 0
                            //, "", ...check__[tile_codes.txt]\[game_data/tile_codes.txt\]...
     );
-    for (const auto& [tile_code_name, tile_code] : State::get().ptr()->level_gen->data->tile_codes())
+    for (const auto& [tile_code_name, tile_code] : State::get().ptr()->level_gen->data->tile_codes)
     {
-        std::string clean_tile_code_name = tile_code_name;
+        std::string clean_tile_code_name = tile_code_name.c_str();
         std::transform(
             clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
             { return (unsigned char)std::toupper(c); });
@@ -648,7 +648,7 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
 
-    auto room_templates = State::get().ptr()->level_gen->data->room_templates();
+    auto room_templates = State::get().ptr()->level_gen->data->room_templates;
     room_templates["empty_backlayer"] = {9};
     room_templates["boss_arena"] = {22};
     room_templates["shop_jail_backlayer"] = {44};
@@ -659,7 +659,7 @@ void register_usertypes(sol::state& lua)
     room_templates["mothership_room"] = {125};
     for (const auto& [room_name, room_template] : room_templates)
     {
-        std::string clean_room_name = room_name;
+        std::string clean_room_name = room_name.c_str();
         std::transform(
             clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
             { return (unsigned char)std::toupper(c); });
@@ -672,11 +672,11 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[spawn_chances.txt]\[game_data/spawn_chances.txt\]...
     );
     auto* state = State::get().ptr();
-    for (auto* chances : {&state->level_gen->data->monster_chances(), &state->level_gen->data->trap_chances()})
+    for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
     {
         for (const auto& [chance_name, chance] : *chances)
         {
-            std::string clean_chance_name = chance_name;
+            std::string clean_chance_name = chance_name.c_str();
             std::transform(
                 clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
                 { return (unsigned char)std::toupper(c); });

@@ -993,11 +993,9 @@ void LevelGenData::init()
 {
     // Scan tile codes to know what id to start at
     {
-        auto& tile_codes_map = tile_codes();
-
         // Getting the last id like this in case the game decides to skip some ids so that last_id != tile_codes.size()
         auto max_id = 0u;
-        for (auto& [name, def] : tile_codes_map)
+        for (auto& [name, def] : tile_codes)
         {
             max_id = std::max(def.id, max_id);
             g_tile_code_id_to_name[def.id] = name;
@@ -1013,26 +1011,18 @@ void LevelGenData::init()
     {
         auto max_id = 0u;
 
+        // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
+        for (auto& [name, def] : monster_chances)
         {
-            auto& chances_map = monster_chances();
-
-            // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
-            for (auto& [name, def] : chances_map)
-            {
-                max_id = std::max(def.id, max_id);
-                g_monster_chance_id_to_name[def.id] = name;
-            }
+            max_id = std::max(def.id, max_id);
+            g_monster_chance_id_to_name[def.id] = name;
         }
 
+        // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
+        for (auto& [name, def] : trap_chances)
         {
-            auto& chances_map = trap_chances();
-
-            // Getting the last id like this in case the game decides to skip some ids so that last_id != chances.size()
-            for (auto& [name, def] : chances_map)
-            {
-                max_id = std::max(def.id, max_id);
-                g_trap_chance_id_to_name[def.id] = name;
-            }
+            max_id = std::max(def.id, max_id);
+            g_trap_chance_id_to_name[def.id] = name;
         }
 
         // The game doesn't centrally handle chances so we can use whatever id
@@ -1203,9 +1193,8 @@ void LevelGenData::init()
 
 std::optional<std::uint32_t> LevelGenData::get_tile_code(const std::string& tile_code)
 {
-    auto& tile_codes_map = tile_codes();
-    auto it = tile_codes_map.find(tile_code);
-    if (it != tile_codes_map.end())
+    auto it = tile_codes.find((game_string&)tile_code);
+    if (it != tile_codes.end())
     {
         return it->second.id;
     }
@@ -1218,13 +1207,7 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
         return existing.value();
     }
 
-    using string_t = std::basic_string<char, std::char_traits<char>, game_allocator<char>>;
-    using map_value_t = std::pair<const string_t, TileCodeDef>;
-    using map_allocator_t = game_allocator<map_value_t>;
-    using mutable_tile_code_map_t = std::unordered_map<string_t, TileCodeDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
-    auto& tile_code_map = (mutable_tile_code_map_t&)tile_codes();
-
-    auto [it, success] = tile_code_map.emplace(std::move(tile_code), TileCodeDef{g_current_tile_code_id});
+    auto [it, success] = tile_codes.emplace(tile_code.c_str(), TileCodeDef{g_current_tile_code_id});
     g_current_tile_code_id++;
 
     g_tile_code_id_to_name[it->second.id] = it->first;
@@ -1233,7 +1216,7 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
 
 std::optional<uint8_t> LevelGenData::get_short_tile_code(ShortTileCodeDef short_tile_code_def)
 {
-    for (auto [i, def] : short_tile_codes())
+    for (auto [i, def] : short_tile_codes)
     {
         if (def == short_tile_code_def)
         {
@@ -1244,9 +1227,8 @@ std::optional<uint8_t> LevelGenData::get_short_tile_code(ShortTileCodeDef short_
 }
 std::optional<ShortTileCodeDef> LevelGenData::get_short_tile_code_def(uint8_t short_tile_code)
 {
-    auto& short_tile_codes_map = short_tile_codes();
-    auto it = short_tile_codes_map.find(short_tile_code);
-    if (it != short_tile_codes_map.end())
+    auto it = short_tile_codes.find(short_tile_code);
+    if (it != short_tile_codes.end())
     {
         return it->second;
     }
@@ -1254,33 +1236,24 @@ std::optional<ShortTileCodeDef> LevelGenData::get_short_tile_code_def(uint8_t sh
 }
 void LevelGenData::change_short_tile_code(uint8_t short_tile_code, ShortTileCodeDef short_tile_code_def)
 {
-    using map_value_t = std::pair<const uint8_t, ShortTileCodeDef>;
-    using map_allocator_t = game_allocator<map_value_t>;
-    using mutable_short_tile_code_map_t = std::unordered_map<uint8_t, ShortTileCodeDef, std::hash<uint8_t>, std::equal_to<uint8_t>, map_allocator_t>;
-    auto& short_tile_code_map = (mutable_short_tile_code_map_t&)short_tile_codes();
-    short_tile_code_map[short_tile_code] = short_tile_code_def;
+    short_tile_codes[short_tile_code] = short_tile_code_def;
 }
 std::optional<uint8_t> LevelGenData::define_short_tile_code(ShortTileCodeDef short_tile_code_def)
 {
-    using map_value_t = std::pair<const uint8_t, ShortTileCodeDef>;
-    using map_allocator_t = game_allocator<map_value_t>;
-    using mutable_short_tile_code_map_t = std::unordered_map<uint8_t, ShortTileCodeDef, std::hash<uint8_t>, std::equal_to<uint8_t>, map_allocator_t>;
-    auto& short_tile_code_map = (mutable_short_tile_code_map_t&)short_tile_codes();
-
     // Try all printable chars, note that all chars are allowed since we won't need to parse this anymore
     // Might even be allowed to use non-printable chars, TBD
     // Also check existing short tile codes for an exact match
     std::optional<uint8_t> smallest_match;
     for (uint8_t i = 0x20; i < 0x7f; i++)
     {
-        if (!short_tile_code_map.contains(i))
+        if (!short_tile_codes.contains(i))
         {
             if (!smallest_match.has_value())
             {
                 smallest_match = i;
             }
         }
-        else if (short_tile_code_map[i] == short_tile_code_def)
+        else if (short_tile_codes[i] == short_tile_code_def)
         {
             return i;
         }
@@ -1288,7 +1261,7 @@ std::optional<uint8_t> LevelGenData::define_short_tile_code(ShortTileCodeDef sho
 
     if (smallest_match.has_value())
     {
-        short_tile_code_map[smallest_match.value()] = short_tile_code_def;
+        short_tile_codes[smallest_match.value()] = short_tile_code_def;
         return smallest_match;
     }
 
@@ -1298,17 +1271,15 @@ std::optional<uint8_t> LevelGenData::define_short_tile_code(ShortTileCodeDef sho
 std::optional<std::uint32_t> LevelGenData::get_chance(const std::string& chance)
 {
     {
-        auto& chances_map = monster_chances();
-        auto it = chances_map.find(chance);
-        if (it != chances_map.end())
+        auto it = monster_chances.find((game_string&)chance);
+        if (it != monster_chances.end())
         {
             return it->second.id;
         }
     }
     {
-        auto& chances_map = trap_chances();
-        auto it = chances_map.find(chance);
-        if (it != chances_map.end())
+        auto it = trap_chances.find((game_string&)chance);
+        if (it != trap_chances.end())
         {
             return it->second.id;
         }
@@ -1322,15 +1293,8 @@ std::uint32_t LevelGenData::define_chance(std::string chance)
         return existing.value();
     }
 
-    using string_t = std::basic_string<char, std::char_traits<char>, game_allocator<char>>;
-    using map_value_t = std::pair<const string_t, ChanceDef>;
-    using map_allocator_t = game_allocator<map_value_t>;
-    using mutable_chance_map_t = std::unordered_map<string_t, ChanceDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
-
     // We use only monster chances to define new stuff, keep an eye out for whether this is dangerous
-    auto& chance_map = (mutable_chance_map_t&)monster_chances();
-
-    auto [it, success] = chance_map.emplace(std::move(chance), ChanceDef{g_current_chance_id});
+    auto [it, success] = monster_chances.emplace(chance.c_str(), ChanceDef{g_current_chance_id});
     g_current_chance_id++;
 
     g_monster_chance_id_to_name[it->second.id] = it->first;
@@ -1412,13 +1376,10 @@ void LevelGenData::undefine_extra_spawn(std::uint32_t extra_spawn_id)
 
 std::optional<std::uint16_t> LevelGenData::get_room_template(const std::string& room_template)
 {
+    auto it = room_templates.find((game_string&)room_template);
+    if (it != room_templates.end())
     {
-        auto& room_templates_map = room_templates();
-        auto it = room_templates_map.find(room_template);
-        if (it != room_templates_map.end())
-        {
-            return it->second.id;
-        }
+        return it->second.id;
     }
     return {};
 }
@@ -1429,13 +1390,7 @@ std::uint16_t LevelGenData::define_room_template(std::string room_template, Room
         return existing.value();
     }
 
-    using string_t = std::basic_string<char, std::char_traits<char>, game_allocator<char>>;
-    using map_value_t = std::pair<const string_t, RoomTemplateDef>;
-    using map_allocator_t = game_allocator<map_value_t>;
-    using mutable_room_template_map_t = std::unordered_map<string_t, RoomTemplateDef, std::hash<string_t>, std::equal_to<string_t>, map_allocator_t>;
-    auto& room_template_map = (mutable_room_template_map_t&)room_templates();
-
-    auto [it, success] = room_template_map.emplace(std::move(room_template), RoomTemplateDef{(uint16_t)room_template_map.size()});
+    auto [it, success] = room_templates.emplace(std::move(room_template), RoomTemplateDef{(uint16_t)room_templates.size()});
 
     if (type != RoomTemplateType::None)
     {
@@ -1467,67 +1422,6 @@ RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_templat
         return it->second;
     }
     return RoomTemplateType::None;
-}
-
-// Rev.Eng.: Search for string totemtrap_chance, the single XREF is used in a function that inits
-// LevelGenData, totemtrap_chance is passed to a function that emplaces into an unordered_map
-// That should help to find the offset, the same function also defines some other stuff, use
-// the strings to find info about the corresponding members
-//
-// mothership_floor -> tile_codes
-// setroom%d-%d -> room_templates
-// snake -> monster_chances
-// totemtrap_chance -> trap_chances
-
-// Rev.Eng.: Search for the string generic.lvl, it's used as a param to the function that loads
-// a .lvl file (as seen by that files usage of Data/Levels as well), that file also contains all
-// offsets to all these maps in the beginning where many locals are assigned. In this function
-// you will find short_tile_codes, level_monster_chances and trap_monster_chances
-
-const std::unordered_map<std::uint8_t, ShortTileCodeDef>& LevelGenData::short_tile_codes() const
-{
-    return *(const std::unordered_map<std::uint8_t, ShortTileCodeDef>*)((size_t)this + 0x48);
-}
-const std::unordered_map<std::string, TileCodeDef>& LevelGenData::tile_codes() const
-{
-    return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
-}
-
-const std::unordered_map<std::string, RoomTemplateDef>& LevelGenData::room_templates() const
-{
-    return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
-}
-
-// Rev.Eng.: Search for the string setroom%d-%d, you should find among the very few XREFs some code
-// that uses some form of scanf to get the coords and check whether a string matches the pattern
-// Further down some param will be either directly put into an array (setroom_datas) or put into
-// an unordered_map (room_template_datas)
-
-const LevelGenData::SetRoomDatas& LevelGenData::setroom_datas() const
-{
-    return *(const SetRoomDatas*)((size_t)this + 0x800);
-}
-const std::unordered_map<std::uint16_t, RoomTemplateData>& LevelGenData::room_template_datas() const
-{
-    return *(const std::unordered_map<std::uint16_t, RoomTemplateData>*)((size_t)this + 0x108);
-}
-
-const std::unordered_map<std::string, ChanceDef>& LevelGenData::monster_chances() const
-{
-    return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1340);
-}
-const std::unordered_map<std::string, ChanceDef>& LevelGenData::trap_chances() const
-{
-    return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x13c0);
-}
-
-const std::unordered_map<std::uint32_t, LevelChanceDef>& LevelGenData::level_monster_chances() const
-{
-    return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1380);
-}
-const std::unordered_map<std::uint32_t, LevelChanceDef>& LevelGenData::level_trap_chances() const
-{
-    return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1400);
 }
 
 using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
@@ -1638,7 +1532,7 @@ bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is
 
 std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
 {
-    for (const auto& [name, room_tpl] : data->room_templates())
+    for (const auto& [name, room_tpl] : data->room_templates)
     {
         if (room_tpl.id == room_template)
         {
@@ -1648,38 +1542,11 @@ std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
     return "invalid";
 }
 
-struct MutableLevelChanceDef
-{
-    std::vector<uint32_t, game_allocator<uint32_t>> chances;
-};
-MutableLevelChanceDef& get_or_emplace_level_chance(std::unordered_map<std::uint32_t, LevelChanceDef>& level_chances, uint32_t chance_id)
-{
-    struct LevelChanceNode
-    {
-        void* ptr0;
-        void* ptr1;
-        std::pair<uint32_t, MutableLevelChanceDef> value;
-    };
-    using EmplaceLevelChance = LevelChanceNode** (*)(void*, std::pair<LevelChanceNode*, bool>*, uint32_t*);
-    static EmplaceLevelChance emplace_level_chance = []()
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x49\x8d\x8d\x70\x13\x00\x00"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xe8"s, off);
-        return (EmplaceLevelChance)memory.at_exe(Memory::decode_call(off));
-    }();
-
-    std::pair<LevelChanceNode*, bool> node;
-    emplace_level_chance((void*)&level_chances, &node, &chance_id);
-
-    return node.first->value.second;
-}
-
 uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
-        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_monster_chances(), chance_id);
+        LevelChanceDef this_chances = data->level_monster_chances[chance_id];
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
@@ -1696,7 +1563,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 
     if (g_trap_chance_id_to_name.contains(chance_id))
     {
-        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_trap_chances(), chance_id);
+        LevelChanceDef& this_chances = data->level_trap_chances[chance_id];
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
@@ -1717,7 +1584,7 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
-        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_monster_chances(), chance_id);
+        LevelChanceDef& this_chances = data->level_monster_chances[chance_id];
         if (inverse_chance == 0)
         {
             this_chances.chances.clear();
@@ -1731,7 +1598,7 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 
     if (g_trap_chance_id_to_name.contains(chance_id))
     {
-        MutableLevelChanceDef& this_chances = get_or_emplace_level_chance((std::unordered_map<std::uint32_t, LevelChanceDef>&)data->level_trap_chances(), chance_id);
+        LevelChanceDef& this_chances = data->level_trap_chances[chance_id];
         if (inverse_chance == 0)
         {
             this_chances.chances.clear();
