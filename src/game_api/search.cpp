@@ -777,6 +777,20 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .offset(0x40)
             .at_exe(),
     },
+    {
+        "character_db"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x6B\xC3\x2C\x48\x8D\x15****\x48"sv)
+            .decode_pc(7)
+            .at_exe(),
+    },
+    {
+        "string_table"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x15\x58\x1E\x5F\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
