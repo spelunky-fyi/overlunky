@@ -40,7 +40,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
         movable->velocityy = vy;
     }
 
-    DEBUG("Spawned {:x}", spawned);
+    DEBUG("Spawned {}", fmt::ptr(spawned));
     return spawned;
 }
 
