@@ -74,7 +74,7 @@ void snap_to_floor(Entity* ent, float y)
 
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 {
-    const EntityDB* type = get_type(id);
+    const EntityDB* type = get_type(static_cast<uint32_t>(id));
     const float y_center = (float)roundf(y) - 0.5f;
     const float snapped_y = type->rect_collision.up_plus_down - type->rect_collision.up_minus_down + y_center;
     Entity* ent = spawn_entity(id, x, snapped_y, false, 0.0f, 0.0f, false);
@@ -87,11 +87,21 @@ Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 
 Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 {
-    if (id == 0)
-        return nullptr;
-    auto load_item_over = (get_load_item_over());
+    using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool, Entity*, bool);
+    static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
+    static auto fun_22872fe0 = (void (*)(void*, Entity*))get_address("fun_22872fe0");
+    static auto fun_2286f240 = (void (*)(void*, Entity*, bool))get_address("fun_2286f240");
 
-    return load_item_over(this, id, overlay, x, y, true);
+    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, false);
+    if (*((bool*)this + 0x64490))
+    {
+        fun_22872fe0(this, ent);
+    }
+    else
+    {
+        fun_2286f240((void*)((size_t)this + 0x64440), ent, false);
+    }
+    return ent;
 }
 
 Entity* Layer::get_grid_entity_at(float x, float y)

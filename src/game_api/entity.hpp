@@ -429,3 +429,5 @@ std::tuple<float, float, uint8_t> get_render_position(uint32_t uid);
 std::tuple<float, float> get_velocity(uint32_t uid);
 
 AABB get_hitbox(uint32_t uid, bool use_render_pos);
+
+struct EntityFactory* entity_factory();

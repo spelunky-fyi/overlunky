@@ -257,6 +257,22 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "fun_22872fe0"sv,
+        // Used in load_item as `fun_22872fe0(layer, spawned_entity)`
+        PatternCommandBuffer{}
+            .find_inst("\xE9****\x49\x81\xC6****"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "fun_2286f240"sv,
+        // Used in load_item as `fun_2286f240(layer + something, spawned_entity, false)`
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x8B\x43\x0C"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "spawn_entity"sv,
         // First call in LoadItem is to this function
         PatternCommandBuffer{}

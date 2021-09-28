@@ -310,10 +310,10 @@ void pop_spawn_type_flags(SPAWN_TYPE flags)
     update_spawn_type_flags();
 }
 
-struct EntityStore;
-using SpawnEntityFun = Entity*(EntityStore*, std::uint32_t, float, float, bool, Entity*, bool);
+struct EntityFactory;
+using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool, Entity*, bool);
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
-Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
+Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
     Entity* spawned_ent{nullptr};
     if (g_SpawnNonReplacable == 0)
@@ -323,7 +323,7 @@ Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float
 
     if (spawned_ent == nullptr)
     {
-        spawned_ent = g_spawn_entity_trampoline(entity_store, entity_type, x, y, layer, overlay, some_bool);
+        spawned_ent = g_spawn_entity_trampoline(entity_factory, entity_type, x, y, layer, overlay, some_bool);
     }
 
     post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
