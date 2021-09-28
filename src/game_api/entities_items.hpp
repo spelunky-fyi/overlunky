@@ -176,9 +176,9 @@ class JungleSpearCosmetic : public Movable
 
 struct UnknownPointerGroup
 {
-    uint32_t unknown_uid1;
-    uint32_t unknown_uid2;
-    uint32_t unknown_uid3;
+    size_t unknown_uid1; // it's pointer to the uid
+    size_t unknown_uid2;
+    size_t unknown_uid3;
 };
 
 class WebShot : public Movable
