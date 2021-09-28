@@ -75,7 +75,7 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
     static auto fun_22872fe0 = (void (*)(void*, Entity*))get_address("fun_22872fe0");
     static auto fun_2286f240 = (void (*)(void*, Entity*, bool))get_address("fun_2286f240");
 
-    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, false);
+    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, true);
     if (*((bool*)this + 0x64490))
     {
         fun_22872fe0(this, ent);
