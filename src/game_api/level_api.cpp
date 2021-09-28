@@ -1550,7 +1550,7 @@ void LevelGenSystem::init()
                 }
                 original(self, spawn_info);
             },
-            0x32);
+            0x33);
     }
 }
 
