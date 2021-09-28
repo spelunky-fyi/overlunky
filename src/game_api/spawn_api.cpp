@@ -19,17 +19,7 @@ std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
 void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 {
     using spawn_liquid_fun_t = void(void*, float, float, std::uint32_t, bool);
-    static auto spawn_liquid_call = (spawn_liquid_fun_t*)[]()
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
-        auto location = find_inst(exe, "\x41\xb9\x8b\x03\x00\x00\x0f\x28\xd7"s, start) - 0x1;
-        location = find_inst(exe, "\xe8"s, location);
-        location = decode_pc(exe, location, 1);
-        return memory.at_exe(location);
-    }
-    ();
+    static auto spawn_liquid_call = (spawn_liquid_fun_t*)get_address("spawn_liquid");
 
     auto state = State::get().ptr();
     spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
@@ -224,6 +214,9 @@ void spawn_tree(float x, float y, LAYER layer)
     }
     ();
     spawn_tree_call(nullptr, actual_layer, x + offset_position.first, y + offset_position.second);
+
+    // TODO: 1.23.3
+    // Needs manual implementation
 }
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, float top_threshold)

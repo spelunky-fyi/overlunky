@@ -281,6 +281,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "spawn_liquid"sv,
+        // See tile code for water (0xea for 1.23.3) in handle_tile_code, last call before returning
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\xE9****\x48\x81\xC6"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
