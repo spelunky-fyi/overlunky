@@ -324,31 +324,31 @@ std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, f
 
 const char16_t* Spelunky_GetCharacterFullName(std::uint32_t character_index)
 {
-    return get_character_full_name(character_index);
+    return NCharacterDB::get_character_full_name(character_index);
 }
 const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index)
 {
-    return get_character_shortname(character_index);
+    return NCharacterDB::get_character_short_name(character_index);
 }
 void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
     static_assert(sizeof(Color) == sizeof(color));
 
-    Color col = get_character_heartcolor(character_index);
+    Color col = NCharacterDB::get_character_heart_color(character_index);
     memcpy(color, &col, sizeof(Color));
 }
 bool Spelunky_GetCharacterGender(std::uint32_t character_index)
 {
-    return get_character_gender(character_index);
+    return NCharacterDB::get_character_gender(character_index);
 }
 
 void Spelunky_SetCharacterFullName(std::uint32_t character_index, const char16_t* name)
 {
-    set_character_full_name(character_index, name);
+    NCharacterDB::set_character_full_name(character_index, name);
 }
 void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_t* name)
 {
-    set_character_short_name(character_index, name);
+    NCharacterDB::set_character_short_name(character_index, name);
 }
 void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
@@ -356,9 +356,9 @@ void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&colo
 
     Color col;
     memcpy(&col, color, sizeof(Color));
-    set_character_heart_color(character_index, col);
+    NCharacterDB::set_character_heart_color(character_index, col);
 }
 void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female)
 {
-    set_character_gender(character_index, female);
+    NCharacterDB::set_character_gender(character_index, female);
 }

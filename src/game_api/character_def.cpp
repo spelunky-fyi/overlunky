@@ -98,20 +98,24 @@ std::uint32_t get_character_index(std::uint32_t entity_type)
 const char16_t* get_character_full_name(std::uint32_t character_index)
 {
     static const auto string_table = (const char16_t**)get_address("string_table");
-    return string_table[get_character_definition(character_index).full_name_string_id];
+    auto& char_def = get_character_definition(character_index);
+    return string_table[char_def.full_name_string_id];
 }
 const char16_t* get_character_short_name(std::uint32_t character_index)
 {
     static const auto string_table = (const char16_t**)get_address("string_table");
-    return string_table[get_character_definition(character_index).short_name_string_id];
+    auto& char_def = get_character_definition(character_index);
+    return string_table[char_def.short_name_string_id];
 }
 Color get_character_heart_color(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).heart_color;
+    auto& char_def = get_character_definition(character_index);
+    return char_def.heart_color;
 }
 bool get_character_gender(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).gender == CharGender::Female;
+    auto& char_def = get_character_definition(character_index);
+    return char_def.gender == CharGender::Female;
 }
 
 void set_character_full_name(std::uint32_t character_index, std::u16string_view name)
@@ -146,10 +150,12 @@ void set_character_short_name(std::uint32_t character_index, std::u16string_view
 }
 void set_character_heart_color(std::uint32_t character_index, Color color)
 {
-    get_character_definition(character_index).heart_color = color;
+    auto& char_def = get_character_definition(character_index);
+    char_def.heart_color = color;
 }
 void set_character_gender(std::uint32_t character_index, bool female)
 {
-    get_character_definition(character_index).gender = female ? CharGender::Female : CharGender::Male;
+    auto& char_def = get_character_definition(character_index);
+    char_def.gender = female ? CharGender::Female : CharGender::Male;
 }
 } // namespace NCharacterDB
