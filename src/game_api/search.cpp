@@ -366,6 +366,13 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
+        "level_gen_handle_tile_code"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x83\xC5\x01"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "level_gen_setup_level_files"sv,
         // Search for string "ending.lvl", it is used in a call to this function
         PatternCommandBuffer{}
@@ -391,13 +398,6 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\xf3\x0f\x11\x84\x24\xdc\x00\x00\x00"sv)
             .at_exe()
             .function_start(),
-    },
-    {
-        "level_gen_handle_tile_code"sv,
-        PatternCommandBuffer{}
-            .find_inst("\xE8****\x83\xC5\x01"sv)
-            .decode_call()
-            .at_exe(),
     },
     {
         "level_generate_room"sv,

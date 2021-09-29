@@ -1075,8 +1075,8 @@ void LevelGenData::init()
         //}
 
         g_handle_tile_code_trampoline = (HandleTileCodeFun*)get_address("level_gen_handle_tile_code"sv);
-        g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
         g_setup_level_files_trampoline = (SetupLevelFiles*)get_address("level_gen_setup_level_files"sv);
+        g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
         // TODO: 1.23.3
         // Need to redo the room size garbo
         g_do_extra_spawns_trampoline = (DoExtraSpawns*)get_address("level_gen_do_extra_spawns");
