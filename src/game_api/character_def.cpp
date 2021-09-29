@@ -128,7 +128,7 @@ void set_character_full_name(std::uint32_t character_index, std::u16string_view 
 
     const auto data_size = name.size() * sizeof(char16_t);
     char16_t* new_full_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-    new_full_name[data_size] = u'\0';
+    new_full_name[name.size()] = u'\0';
     memcpy(new_full_name, name.data(), data_size);
 
     game_free((void*)*full_name);
@@ -143,7 +143,7 @@ void set_character_short_name(std::uint32_t character_index, std::u16string_view
 
     const auto data_size = name.size() * sizeof(char16_t);
     char16_t* new_short_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-    new_short_name[data_size] = u'\0';
+    new_short_name[name.size()] = u'\0';
     memcpy(new_short_name, name.data(), data_size);
 
     game_free((void*)*short_name);
