@@ -332,10 +332,7 @@ const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index)
 }
 void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
-    static_assert(sizeof(Color) == sizeof(color));
-
-    Color col = NCharacterDB::get_character_heart_color(character_index);
-    memcpy(color, &col, sizeof(Color));
+    NCharacterDB::get_character_heart_color(character_index).to_float(color);
 }
 bool Spelunky_GetCharacterGender(std::uint32_t character_index)
 {
@@ -352,11 +349,7 @@ void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_
 }
 void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
-    static_assert(sizeof(Color) == sizeof(color));
-
-    Color col;
-    memcpy(&col, color, sizeof(Color));
-    NCharacterDB::set_character_heart_color(character_index, col);
+    NCharacterDB::set_character_heart_color(character_index, Color{color});
 }
 void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female)
 {
