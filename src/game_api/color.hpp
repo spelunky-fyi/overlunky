@@ -21,7 +21,7 @@ struct Color
     {
     }
 
-    constexpr void to_float(float(&c)[4]) const
+    constexpr void to_float(float (&c)[4]) const
     {
         c[0] = r;
         c[1] = g;

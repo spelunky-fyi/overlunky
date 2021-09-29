@@ -75,8 +75,8 @@ struct game_allocator
     }
 };
 
-template<class K, class V>
+template <class K, class V>
 using game_unordered_map = std::unordered_map<K, V, std::hash<K>, std::equal_to<K>, game_allocator<std::pair<const K, V>>>;
-template<class T>
+template <class T>
 using game_vector = std::vector<T, game_allocator<T>>;
 using game_string = std::basic_string<char, std::char_traits<char>, game_allocator<char>>;
