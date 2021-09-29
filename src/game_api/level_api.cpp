@@ -1076,8 +1076,10 @@ void LevelGenData::init()
 
         g_handle_tile_code_trampoline = (HandleTileCodeFun*)get_address("level_gen_handle_tile_code"sv);
         g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
+        g_setup_level_files_trampoline = (SetupLevelFiles*)get_address("level_gen_setup_level_files"sv);
         // TODO: 1.23.3
         // Need to redo the room size garbo
+        g_do_extra_spawns_trampoline = (DoExtraSpawns*)get_address("level_gen_do_extra_spawns");
         g_generate_room_trampoline = (GenerateRoom*)get_address("level_gen_generate_room");
         g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data");
         g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data");
@@ -1146,14 +1148,6 @@ void LevelGenData::init()
             //    }
         }
 
-        // TODO: 1.23.3
-        //{
-        //    auto fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, after_bundle);
-        //    fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, fun_start + 1);
-        //    fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-        //    g_do_extra_spawns_trampoline = (DoExtraSpawns*)memory.at_exe(fun_start);
-        //}
-
         DetourRestoreAfterWith();
 
         DetourTransactionBegin();
@@ -1163,7 +1157,7 @@ void LevelGenData::init()
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
         DetourAttach((void**)&g_setup_level_files_trampoline, setup_level_files);
         DetourAttach((void**)&g_load_level_file_trampoline, load_level_file);
-        //DetourAttach((void**)&g_do_extra_spawns_trampoline, do_extra_spawns);
+        DetourAttach((void**)&g_do_extra_spawns_trampoline, do_extra_spawns);
         DetourAttach((void**)&g_generate_room_trampoline, generate_room);
         DetourAttach((void**)&g_gather_room_data_trampoline, gather_room_data);
         DetourAttach((void**)&g_get_random_room_data_trampoline, get_random_room_data);

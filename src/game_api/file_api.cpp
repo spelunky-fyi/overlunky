@@ -171,16 +171,7 @@ void register_on_load_file(LoadFileCallback on_load_file)
 {
     if (g_read_encrypted_file_trampoline == nullptr && on_load_file != nullptr)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-
-        auto off = find_inst(exe, "\x41\xb8\x50\x46\x00\x00"s, after_bundle);
-        off = find_inst(exe, "\xe8"s, off) + 0x1;
-        off = find_inst(exe, "\xe8"s, off);
-        auto fun_start = decode_pc(exe, off, 1);
-
-        g_read_encrypted_file_trampoline = (ReadEncryptedFileFun*)memory.at_exe(fun_start);
+        g_read_encrypted_file_trampoline = (ReadEncryptedFileFun*)get_address("read_encrypted_file"sv);
 
         DetourRestoreAfterWith();
 

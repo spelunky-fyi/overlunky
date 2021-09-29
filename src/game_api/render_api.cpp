@@ -10,25 +10,11 @@
 #include "script/lua_backend.hpp"
 #include "texture.hpp"
 
-size_t get_load_texture()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-        auto off = find_inst(exe, "\x75\xf7\x48\x8d\x54\x24\x40\x48"s, after_bundle);
-        off = find_inst(exe, "\xe8"s, off);
-        off = find_inst(exe, "\xe8"s, off + 1);
-        return res = memory.at_exe(decode_pc(exe, off, 1));
-    }
-}
-
 RenderAPI& RenderAPI::get()
 {
     static RenderAPI render_api = []()
     {
-        return RenderAPI{(size_t*)get_address("render_api_callback"), get_address("render_api_offset")};
+        return RenderAPI{(size_t*)get_address("render_api_callback"sv), get_address("render_api_offset"sv)};
     }();
     return render_api;
 }
@@ -123,8 +109,9 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
 using LoadTextureFunT = const char**(void*, std::string*, std::uint8_t);
 const char** RenderAPI::load_texture(std::string file_name)
 {
+    static auto load_texture = (LoadTextureFunT*)get_address("load_texture"sv);
+
     void* render_api = (void*)renderer();
-    auto load_texture = (LoadTextureFunT*)get_load_texture();
     return load_texture(render_api, &file_name, 1);
 }
 
@@ -160,7 +147,7 @@ bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text
     static size_t text_rendering_func1_offset = 0;
     if (text_rendering_func1_offset == 0)
     {
-        text_rendering_func1_offset = get_address("prepare_text_for_rendering");
+        text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
     }
 
     if (text_rendering_func1_offset != 0)
@@ -193,7 +180,7 @@ void RenderAPI::draw_text(const std::string& text, float x, float y, float scale
     static size_t text_rendering_func2_offset = 0;
     if (text_rendering_func2_offset == 0)
     {
-        text_rendering_func2_offset = get_address("draw_text");
+        text_rendering_func2_offset = get_address("draw_text"sv);
     }
 
     if (text_rendering_func2_offset != 0)
@@ -290,8 +277,8 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
 
     if (func_offset == 0)
     {
-        func_offset = get_address("draw_world_texture");
-        param_7 = get_address("draw_world_texture_param_7");
+        func_offset = get_address("draw_world_texture"sv);
+        param_7 = get_address("draw_world_texture_param_7"sv);
     }
 
     if (func_offset != 0)
@@ -349,50 +336,22 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
     }
 }
 
-using FetchTexture = const Texture*(class Entity*, TEXTURE);
-FetchTexture* g_fetch_texture_trampoline{nullptr};
-const Texture* fetch_texture(class Entity* source_entity, TEXTURE texture_id)
-{
-    auto* textures = get_textures();
-    if (texture_id >= static_cast<int64_t>(textures->texture_map.size()))
-    {
-        const auto& render_api = RenderAPI::get();
-        std::lock_guard lock{render_api.custom_textures_lock};
-        const auto& custom_textures = render_api.custom_textures;
-        auto it = custom_textures.find(texture_id);
-        if (it != custom_textures.end())
-        {
-            return &it->second;
-        }
-    }
-
-    return g_fetch_texture_trampoline(source_entity, texture_id);
-}
+// TODO: Replacement for fetch_texture T.T
+// This function made it possible to change the texture id of an entity before it was spawned to the id of a custom texture
+// E.g. when changing the texture of the player character it allowed to throw ropes without crashing
+// To replace it we need to override the code in spawn_entity
 
 void init_render_api_hooks()
 {
-    DEBUG("TODO: pattern for FetchTexture");
-    // auto& memory = Memory::get();
-    // auto exe = memory.exe();
-    // auto after_bundle = memory.after_bundle;
-
-    // {
-    //     auto fun_start = find_inst(exe, "\x48\x83\xec\x20\x48\x8b\x01\x48\x8b\xf9\x48\x8b\x58\x28"s, after_bundle);
-    //     fun_start = find_inst(exe, "\xe8"s, fun_start);
-    //     fun_start = Memory::decode_call(fun_start);
-    //     g_fetch_texture_trampoline = (FetchTexture*)memory.at_exe(fun_start);
-    // }
-
-    g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud");
-    g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu");
-    g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth");
+    g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
+    g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
+    g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
 
     DetourRestoreAfterWith();
 
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-    //DetourAttach((void**)&g_fetch_texture_trampoline, &fetch_texture);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);
