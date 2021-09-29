@@ -1674,11 +1674,10 @@ void force_co_subtheme(int8_t subtheme)
     if (subtheme >= 0 && subtheme <= 7)
     {
         uint8_t replacement[] = {0x41, 0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0xEB, 0x1F, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90};
-        std::string replacement_s = std::string((char*)replacement, sizeof(replacement));
-        write_mem_prot(offset, replacement_s, true);
+        write_mem_prot(offset, replacement, true);
     }
     else if (subtheme == -1)
     {
-        write_mem_prot(offset, "\x4C\x8B\x00\x4C\x8B\x48\x08\x48\xBA\x4B\x57\x4C\x4F\x80"s, true);
+        write_mem_prot(offset, "\x4C\x8B\x00\x4C\x8B\x48\x08\x48\xBA\x4B\x57\x4C\x4F\x80"sv, true);
     }
 }

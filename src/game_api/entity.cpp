@@ -338,8 +338,8 @@ void Movable::poison(int16_t frames)
     {
         frames = 1800;
     }
-    write_mem_prot(offset_first, to_le_bytes(frames), true);
-    write_mem_prot(offset_subsequent, to_le_bytes(frames), true);
+    write_mem_prot(offset_first, frames, true);
+    write_mem_prot(offset_subsequent, frames, true);
 }
 
 bool Movable::is_poisoned()

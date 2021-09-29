@@ -870,8 +870,8 @@ void set_seed(uint32_t seed)
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
 {
-    write_mem_prot(get_address("arrowtrap_projectile"), to_le_bytes(regular_entity_type), true);
-    write_mem_prot(get_address("poison_arrowtrap_projectile"), to_le_bytes(poison_entity_type), true);
+    write_mem_prot(get_address("arrowtrap_projectile"), regular_entity_type, true);
+    write_mem_prot(get_address("poison_arrowtrap_projectile"), poison_entity_type, true);
 }
 
 void modify_sparktraps(float angle_increment, float distance)
@@ -883,9 +883,9 @@ void modify_sparktraps(float angle_increment, float distance)
         angle_increment_instruction = get_address("sparktrap_angle_increment");
         angle_increment_offset = angle_increment_instruction - 0x32;
         auto distance_offset_relative = static_cast<int32_t>(angle_increment_offset - (angle_increment_instruction + 8));
-        write_mem_prot(angle_increment_instruction + 4, to_le_bytes(distance_offset_relative), true);
+        write_mem_prot(angle_increment_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
+    write_mem_prot(angle_increment_offset, angle_increment, true);
 
     static size_t distance_offset = 0;
     if (distance_offset == 0)
@@ -893,14 +893,14 @@ void modify_sparktraps(float angle_increment, float distance)
         auto distance_instruction = angle_increment_instruction + 0x1F;
         distance_offset = angle_increment_instruction - 0x2E;
         auto distance_offset_relative = static_cast<int32_t>(distance_offset - (distance_instruction + 8));
-        write_mem_prot(distance_instruction + 4, to_le_bytes(distance_offset_relative), true);
+        write_mem_prot(distance_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(distance_offset, to_le_bytes(distance), true);
+    write_mem_prot(distance_offset, distance, true);
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
 {
-    write_mem_prot(get_address("kapala_blood_threshold"), to_le_bytes(threshold), true);
+    write_mem_prot(get_address("kapala_blood_threshold"), threshold, true);
 }
 
 void set_kapala_hud_icon(int8_t icon_index)
@@ -918,7 +918,7 @@ void set_kapala_hud_icon(int8_t icon_index)
 
     if (icon_index < 0) // reset to original
     {
-        write_mem_prot(instruction_offset + 2, to_le_bytes(0x00013089), true);
+        write_mem_prot(instruction_offset + 2, 0x00013089, true);
     }
     else
     {
@@ -926,19 +926,19 @@ void set_kapala_hud_icon(int8_t icon_index)
         // we overwrite this with an instruction that loads a byte located a bit after the current function.
         // So you need to assemble `movzx  <relevant register>,BYTE PTR [rip+<distance>]`
         write_mem_prot(instruction_offset + 2, {0x0d}, true);
-        write_mem_prot(instruction_offset + 3, to_le_bytes(distance), true);
+        write_mem_prot(instruction_offset + 3, distance, true);
         if (icon_index > 6)
         {
             icon_index = 6;
         }
-        write_mem_prot(icon_index_offset, to_le_bytes(icon_index), true);
+        write_mem_prot(icon_index_offset, icon_index, true);
     }
 }
 
 void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscape_multiplier)
 {
     // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
-    write_mem_prot(get_address("blood_multiplication"), to_le_bytes(vladscape_multiplier), true);
+    write_mem_prot(get_address("blood_multiplication"), vladscape_multiplier, true);
 }
 
 SaveData* savedata()
@@ -996,8 +996,8 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
         phase2_offset = phase1_offset + 0x4;
 
         // write the default values to our new floats
-        write_mem_prot(phase1_offset, to_le_bytes(100.0f), true);
-        write_mem_prot(phase2_offset, to_le_bytes(83.0f), true);
+        write_mem_prot(phase1_offset, 100.0f, true);
+        write_mem_prot(phase2_offset, 83.0f, true);
 
         // calculate the distances between our floats and the movss instructions
         auto distance_1_a = static_cast<int32_t>(phase1_offset - phase_1_instruction_a);
@@ -1006,29 +1006,29 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
         auto distance_2_b = static_cast<int32_t>(phase2_offset - phase_2_instruction_b);
 
         // overwrite the movss instructions to load our floats
-        write_mem_prot(phase_1_instruction_a - 4, to_le_bytes(distance_1_a), true);
-        write_mem_prot(phase_1_instruction_b - 4, to_le_bytes(distance_1_b), true);
-        write_mem_prot(phase_2_instruction_a - 4, to_le_bytes(distance_2_a), true);
-        write_mem_prot(phase_2_instruction_b - 4, to_le_bytes(distance_2_b), true);
+        write_mem_prot(phase_1_instruction_a - 4, distance_1_a, true);
+        write_mem_prot(phase_1_instruction_b - 4, distance_1_b, true);
+        write_mem_prot(phase_2_instruction_a - 4, distance_2_a, true);
+        write_mem_prot(phase_2_instruction_b - 4, distance_2_b, true);
     }
 
     if (phase == 1)
     {
-        write_mem_prot(phase1_offset, to_le_bytes(y), true);
+        write_mem_prot(phase1_offset, y, true);
     }
     else if (phase == 2)
     {
-        write_mem_prot(phase2_offset, to_le_bytes(y), true);
+        write_mem_prot(phase2_offset, y, true);
     }
 }
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
-    write_mem_prot(get_address("ghost_spawn_time"), to_le_bytes(normal), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), to_le_bytes(cursed), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), to_le_bytes(cursed), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), to_le_bytes(cursed), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time"), normal, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), cursed, true);
 }
 
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
@@ -1050,12 +1050,12 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
         {
             if (entry.chance_sizeof == 4)
             {
-                write_mem_prot(entry.offset, to_le_bytes(new_drop_chance), true);
+                write_mem_prot(entry.offset, new_drop_chance, true);
             }
             else if (entry.chance_sizeof == 1)
             {
                 uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_prot(entry.offset, to_le_bytes(value), true);
+                write_mem_prot(entry.offset, value, true);
             }
         }
     }
@@ -1105,7 +1105,7 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
         {
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
             {
-                write_mem_prot(entry.offsets[x], to_le_bytes(new_drop_entity_type), true);
+                write_mem_prot(entry.offsets[x], new_drop_entity_type, true);
             }
         }
     }
