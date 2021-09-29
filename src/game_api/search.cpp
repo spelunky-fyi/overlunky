@@ -356,7 +356,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "level_gather_room_data"sv,
+        "level_gen_gather_room_data"sv,
         // First call in generate_room, it gets something from the unordered_map in `param_1 + 0x108`
         PatternCommandBuffer{}
             .find_inst("\xE8****\x44\x8A\x44\x24*\x45\x84\xC0"sv)
@@ -364,7 +364,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "level_get_random_room_data"sv,
+        "level_gen_get_random_room_data"sv,
         // Call to this is the only thing happening in a loop along with checking a flag on the returned value
         PatternCommandBuffer{}
             .find_inst("\xE8****\x48\x8B\x58\x08"sv)
@@ -376,6 +376,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         // One of the few calls to handle_tile_code, does a `if (param != 0xec)` before the call
         PatternCommandBuffer{}
             .find_inst("\xE8****\x45\x89\xF8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gen_test_spawn_chance"sv,
+        // Called in the last virtual on ThemeInfo to determine whether a load_item should be done
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x84\xC0\x48\x8B\x6C\x24"sv)
             .decode_call()
             .at_exe(),
     },

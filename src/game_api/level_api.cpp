@@ -1066,17 +1066,13 @@ void LevelGenData::init()
     g_last_community_chance_id = g_current_chance_id;
 
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-
         // TODO: 1.23.3
-        {
-            auto fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, after_bundle);
-            fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
-            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-            g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
-        }
+        //{
+        //    auto fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, after_bundle);
+        //    fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
+        //    fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
+        //    g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
+        //}
 
         g_handle_tile_code_trampoline = (HandleTileCodeFun*)get_address("level_gen_handle_tile_code"sv);
         g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
@@ -1151,23 +1147,23 @@ void LevelGenData::init()
         }
 
         // TODO: 1.23.3
-        {
-            auto fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, after_bundle);
-            fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, fun_start + 1);
-            fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-            g_do_extra_spawns_trampoline = (DoExtraSpawns*)memory.at_exe(fun_start);
-        }
+        //{
+        //    auto fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, after_bundle);
+        //    fun_start = find_inst(exe, "\x44\x88\x64\x24\x28\x44\x89\x7c\x24\x20"s, fun_start + 1);
+        //    fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
+        //    g_do_extra_spawns_trampoline = (DoExtraSpawns*)memory.at_exe(fun_start);
+        //}
 
         DetourRestoreAfterWith();
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
-        DetourAttach((void**)&g_level_gen_trampoline, level_gen);
+        //DetourAttach((void**)&g_level_gen_trampoline, level_gen);
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
         DetourAttach((void**)&g_setup_level_files_trampoline, setup_level_files);
         DetourAttach((void**)&g_load_level_file_trampoline, load_level_file);
-        DetourAttach((void**)&g_do_extra_spawns_trampoline, do_extra_spawns);
+        //DetourAttach((void**)&g_do_extra_spawns_trampoline, do_extra_spawns);
         DetourAttach((void**)&g_generate_room_trampoline, generate_room);
         DetourAttach((void**)&g_gather_room_data_trampoline, gather_room_data);
         DetourAttach((void**)&g_get_random_room_data_trampoline, get_random_room_data);
@@ -1180,15 +1176,7 @@ void LevelGenData::init()
         }
     }
 
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-
-        auto off = find_inst(exe, "\xba\xee\x00\x00\x00\x48\x8d\x0c\x18"s, after_bundle);
-        auto fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, off));
-        g_test_chance = (TestChance*)memory.at_exe(fun_start);
-    }
+    g_test_chance = (TestChance*)get_address("level_gen_test_spawn_chance");
 }
 
 std::optional<std::uint32_t> LevelGenData::get_tile_code(const std::string& tile_code)
