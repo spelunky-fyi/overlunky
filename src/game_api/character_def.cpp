@@ -1,5 +1,6 @@
 #include "character_def.hpp"
 
+#include "color.hpp"
 #include "game_allocator.hpp"
 #include "logger.h"
 #include "memory.hpp"
@@ -151,11 +152,11 @@ void set_character_short_name(std::uint32_t character_index, std::u16string_view
 void set_character_heart_color(std::uint32_t character_index, Color color)
 {
     auto& char_def = get_character_definition(character_index);
-    char_def.heart_color = color;
+    write_mem_prot(&char_def.heart_color, color, true);
 }
 void set_character_gender(std::uint32_t character_index, bool female)
 {
     auto& char_def = get_character_definition(character_index);
-    char_def.gender = female ? CharGender::Female : CharGender::Male;
+    write_mem_prot(&char_def.gender, female ? CharGender::Female : CharGender::Male, true);
 }
 } // namespace NCharacterDB
