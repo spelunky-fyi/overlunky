@@ -6,58 +6,41 @@
 #include "rpc.hpp"
 #include "state.hpp"
 
-using LoadItem = size_t (*)(Layer*, size_t, float, float, bool);
-using LoadItemOver = Entity* (*)(Layer*, size_t, Entity*, float, float, bool);
-LoadItemOver get_load_item_over()
-{
-    ONCE(LoadItemOver)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xBA\x51\x00\x00\x00\x48\x8B"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xE8"s, off + 5);
-        off = find_inst(memory.exe(), "\xE8"s, off + 5);
-        return res = (LoadItemOver)memory.at_exe(Memory::decode_call(off));
-    }
-}
-
 Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap)
 {
     if (id == 0)
         return nullptr;
-    auto load_item = (LoadItem)get_address("load_item");
-    size_t addr;
-    Entity* spawned;
+
+    using LoadItem = Entity*(Layer*, size_t, float, float, bool);
+    static auto load_item = (LoadItem*)get_address("load_item");
+
     float min_speed_check = 0.01f;
-    if (!screen)
+    if (!screen && snap)
     {
-        if (snap)
+        x = round(x);
+        y = round(y);
+    }
+    else if (screen)
+    {
+        auto state = State::get();
+        std::tie(x, y) = state.click_position(x, y);
+        min_speed_check = 0.04f;
+        if (snap && abs(vx) + abs(vy) <= min_speed_check)
         {
             x = round(x);
             y = round(y);
         }
-        addr = load_item(this, id, x, y, false);
-        spawned = (Entity*)(addr);
     }
-    else
-    {
-        auto state = State::get();
-        auto [rx, ry] = state.click_position(x, y);
-        min_speed_check = 0.04f;
-        if (snap && abs(vx) + abs(vy) <= min_speed_check)
-        {
-            rx = round(rx);
-            ry = round(ry);
-        }
-        addr = load_item(this, id, rx, ry, false);
-        spawned = (Entity*)(addr);
-    }
+
+    Entity* spawned = load_item(this, id, x, y, false);
     if (abs(vx) + abs(vy) > min_speed_check && spawned->is_movable())
     {
         auto movable = (Movable*)spawned;
         movable->velocityx = vx;
         movable->velocityy = vy;
     }
-    DEBUG("Spawned {:x}", addr);
+
+    DEBUG("Spawned {}", fmt::ptr(spawned));
     return spawned;
 }
 
@@ -87,12 +70,12 @@ Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 
 Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 {
-    using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool, Entity*, bool);
+    using SpawnEntityFun = Entity*(EntityFactory*, size_t, float, float, bool, Entity*, bool);
     static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
     static auto fun_22872fe0 = (void (*)(void*, Entity*))get_address("fun_22872fe0");
     static auto fun_2286f240 = (void (*)(void*, Entity*, bool))get_address("fun_2286f240");
 
-    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, false);
+    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, true);
     if (*((bool*)this + 0x64490))
     {
         fun_22872fe0(this, ent);

@@ -281,6 +281,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "spawn_liquid"sv,
+        // See tile code for water (0xea for 1.23.3) in handle_tile_code, last call before returning
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\xE9****\x48\x81\xC6"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
@@ -767,6 +775,20 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         PatternCommandBuffer{}
             .find_inst("\x80\x42\x6B\x01\xC6\x42\x69\x04\xC6\x42\x75\x06\xC3"sv)
             .offset(0x40)
+            .at_exe(),
+    },
+    {
+        "character_db"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x6B\xC3\x2C\x48\x8D\x15****\x48"sv)
+            .decode_pc(7)
+            .at_exe(),
+    },
+    {
+        "string_table"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x15\x58\x1E\x5F\x00"sv)
+            .decode_pc()
             .at_exe(),
     },
 };

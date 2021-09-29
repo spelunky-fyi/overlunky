@@ -462,7 +462,6 @@ class Vampire : public Monster
 class Vlad : public Vampire
 {
   public:
-    uint32_t unknown1;
     /// triggers when Vlad teleports, when timer running he can't teleport and will stun when hit
     uint8_t teleport_timer;
     /// or is awake
