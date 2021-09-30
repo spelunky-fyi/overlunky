@@ -317,6 +317,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "add_item_ptr"sv,
+        // Used in spawn_entity as `add_item_ptr(overlay + 0x18, spawned_entity, false)`
+        PatternCommandBuffer{}
+            .find_inst("\xe8****\x44\x88\x76"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "spawn_liquid"sv,
         // See tile code for water (0xea for 1.23.3) in handle_tile_code, last call before returning
         PatternCommandBuffer{}
