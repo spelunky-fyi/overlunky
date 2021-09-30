@@ -881,6 +881,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
+        "force_dark_level"sv,
+        // Put a write bp on State.level_flags (3rd byte, containing dark level flag)
+        // Filter out all breaks, then load levels until you get a dark one
+        PatternCommandBuffer{}
+            .find_inst("\x80\x79\x52\x02\x7E\x2F"sv)
+            .offset(0x4)
+            .at_exe(),
+    },
+    {
         "character_db"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x6B\xC3\x2C\x48\x8D\x15****\x48"sv)
