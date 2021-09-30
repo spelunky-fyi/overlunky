@@ -7,10 +7,7 @@ Toast get_toast()
 {
     ONCE(Toast)
     {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x49\x8B\x0C\x3F\xB8\x60\x01\x00\x00"s, memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (Toast)off;
+        return res = (Toast)get_address("toast");
     }
 }
 

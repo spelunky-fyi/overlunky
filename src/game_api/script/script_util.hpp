@@ -5,7 +5,7 @@
 
 #include <string>
 
-using Toast = void (*)(void*, wchar_t*);
+using Toast = void (*)(wchar_t*);
 Toast get_toast();
 
 using Say = void (*)(void*, Entity*, wchar_t*, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);

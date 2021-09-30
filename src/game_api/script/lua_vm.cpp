@@ -281,7 +281,7 @@ end
     lua["toast"] = [](std::wstring message)
     {
         auto toast = get_toast();
-        toast(NULL, message.data());
+        toast(message.data());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::wstring message, int unk_type, bool top)
