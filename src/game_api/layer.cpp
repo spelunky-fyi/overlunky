@@ -115,7 +115,10 @@ Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     default:
         return nullptr;
     };
-    static_cast<Door*>(door)->set_target(w, l, t);
+    door->as<ExitDoor>()->world = w;
+    door->as<ExitDoor>()->level = l;
+    door->as<ExitDoor>()->theme = t;
+    door->as<ExitDoor>()->special_door = true;
     spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), round(x), round(y - 1.0f), false, 0.0, 0.0, true);
     return door;
 }

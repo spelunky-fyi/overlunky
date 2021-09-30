@@ -657,15 +657,18 @@ void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return;
-    static_cast<Door*>(door)->set_target(w, l, t);
+    door->as<ExitDoor>()->world = w;
+    door->as<ExitDoor>()->level = l;
+    door->as<ExitDoor>()->theme = t;
+    door->as<ExitDoor>()->special_door = true;
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
     Entity* door = get_entity_ptr(uid);
-    if (door == nullptr)
+    if (door == nullptr || !door->as<ExitDoor>()->special_door)
         return std::make_tuple((uint8_t)0, (uint8_t)0, (uint8_t)0);
-    return static_cast<Door*>(door)->get_target();
+    return std::make_tuple(door->as<ExitDoor>()->world, door->as<ExitDoor>()->level, door->as<ExitDoor>()->theme);
 }
 
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
