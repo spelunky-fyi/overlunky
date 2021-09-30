@@ -640,6 +640,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "mount_carry"sv,
+        // Set a bp on player's Entity::overlay, then jump on a turkey
+        PatternCommandBuffer{}
+            .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00")
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "insta_gib"sv,
         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
         // then place yourself in Quillback's path

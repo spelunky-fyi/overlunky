@@ -5,26 +5,20 @@
 
 Toast get_toast()
 {
-    ONCE(Toast)
-    {
-        return res = (Toast)get_address("toast");
-    }
+    static Toast toast = (Toast)get_address("toast");
+    return toast;
 }
 
 Say get_say()
 {
-    ONCE(Say)
-    {
-        return res = (Say)get_address("say");
-    }
+    static Say say = (Say)get_address("say");
+    return say;
 }
 
 size_t get_say_context()
 {
-    ONCE(size_t)
-    {
-        return res = get_address("say_context");
-    }
+    static size_t say_context = get_address("say_context");
+    return say_context;
 }
 
 Prng get_seed_prng()

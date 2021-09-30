@@ -131,7 +131,7 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
             attach_entity(bottom, top);
             top->x = offset[0];
             top->y = offset[0];
-            if ((bottom->flags >> 0x10) & 0x1)  // facing left
+            if ((bottom->flags >> 0x10) & 0x1) // facing left
             {
                 top->x *= -1.0f;
             }

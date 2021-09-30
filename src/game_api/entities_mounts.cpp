@@ -1,9 +1,9 @@
 #include "entities_mounts.hpp"
 
-using Carry = void (*)(Entity*, Entity*);
 void Mount::carry(Movable* rider)
 {
-    auto carry = (Carry)get_address("mount_carry_rider");
+    using Carry = void(Entity*, Entity*);
+    static Carry* carry = (Carry*)get_address("mount_carry");
     rider->move_state = 0x11;
     return carry(this, rider);
 }
