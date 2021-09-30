@@ -847,6 +847,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
+        "mount_carry_rider"sv,
+        // Put a write bp on Player.overlay and hop on a mount
+        PatternCommandBuffer{}
+            .find_inst("\x48\xC7\x87\x08\x01\x00\x00\x00\x00\x00\x00\xC6\x87\x2D\x01"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "character_db"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x6B\xC3\x2C\x48\x8D\x15****\x48"sv)
