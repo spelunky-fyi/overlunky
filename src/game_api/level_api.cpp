@@ -1079,11 +1079,11 @@ void LevelGenData::init()
         g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
         // TODO: 1.23.3
         // Need to redo the room size garbo
-        g_do_extra_spawns_trampoline = (DoExtraSpawns*)get_address("level_gen_do_extra_spawns");
-        g_generate_room_trampoline = (GenerateRoom*)get_address("level_gen_generate_room");
-        g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data");
-        g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data");
-        g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes");
+        g_do_extra_spawns_trampoline = (DoExtraSpawns*)get_address("level_gen_do_extra_spawns"sv);
+        g_generate_room_trampoline = (GenerateRoom*)get_address("level_gen_generate_room"sv);
+        g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data"sv);
+        g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data"sv);
+        g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
 
         {
             // TODO: 1.23.3

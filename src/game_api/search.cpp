@@ -400,7 +400,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
-        "level_generate_room"sv,
+        "level_gen_generate_room"sv,
         // One call up from generate_room_from_tile_codes
         PatternCommandBuffer{}
             .find_inst("\xE8****\x83\xC6\x01\x39\xF3"sv)
@@ -424,7 +424,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "level_gen_generate_room_from_tile_codes"sv,
+        "level_gen_spawn_room_from_tile_codes"sv,
         // One of the few calls to handle_tile_code, does a `if (param != 0xec)` before the call
         PatternCommandBuffer{}
             .find_inst("\xE8****\x45\x89\xF8"sv)
@@ -863,12 +863,24 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
+[[maybe_unused]] static constexpr auto g_debug_pattern = ""sv;
+
 void preload_addresses()
 {
     Memory mem = Memory::get();
     const char* exe = mem.exe();
     for (auto [address_name, rule] : g_address_rules)
     {
+#ifdef DEBUG
+        if constexpr (!g_debug_pattern.empty())
+        {
+            if (address_name == g_debug_pattern)
+            {
+                __debugbreak();
+            }
+        }
+#endif // DEBUG
+
         size_t address = rule(mem, exe, address_name);
         if (address > 0ull)
         {
