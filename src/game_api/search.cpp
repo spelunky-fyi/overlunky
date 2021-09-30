@@ -863,6 +863,24 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "say"sv,
+        // Put a write bp on State.speechbubble
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
+            .offset(0x1)
+            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "say_context"sv,
+        // Find the pattern for `say`, go one up higher in the callstack and look what writes to rcx
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x0D****\x4C\x8D\x44\x24\x40\x4C\x89\xFA\x41"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
         "character_db"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x6B\xC3\x2C\x48\x8D\x15****\x48"sv)

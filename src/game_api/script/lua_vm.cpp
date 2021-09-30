@@ -290,7 +290,7 @@ end
         auto entity = get_entity_ptr(entity_uid);
         if (entity == nullptr)
             return;
-        say(NULL, entity, message.data(), unk_type, top);
+        say((void*)get_say_context(), entity, message.data(), unk_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
