@@ -123,12 +123,6 @@ EntityDB* get_type(uint32_t id);
 
 uint32_t to_id(std::string_view id);
 
-template <typename T>
-std::string to_le_bytes(T fmt)
-{
-    return std::string((char*)&fmt, sizeof(T));
-}
-
 class Vector
 {
   public:

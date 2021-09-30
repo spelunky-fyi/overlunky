@@ -247,21 +247,18 @@ void Entity::respawn(LAYER layer_to)
 
 std::pair<float, float> Entity::position()
 {
-    // Return the resolved position
-    // overlay exists if player is riding something / etc
     auto [x_pos, y_pos] = position_self();
-    // log::debug!("Item #{}: Position is {}, {}", unique_id(), x, y);
-    switch ((size_t)overlay)
+
+    // overlay exists if player is riding something / etc
+    Entity* overlay_nested = overlay;
+    while (overlay_nested != nullptr)
     {
-    case NULL:
-        return {x_pos, y_pos};
-    default:
-    {
-        float _x, _y;
-        std::tie(_x, _y) = overlay->position();
-        return {x_pos + _x, y_pos + _y};
+        const auto [overlay_x_pos, overlay_y_pos] = overlay->position();
+        x_pos += overlay_x_pos;
+        y_pos += overlay_y_pos;
+        overlay_nested = overlay_nested->overlay;
     }
-    }
+    return {x_pos, y_pos};
 }
 
 std::pair<float, float> Entity::position_self() const
@@ -338,8 +335,8 @@ void Movable::poison(int16_t frames)
     {
         frames = 1800;
     }
-    write_mem_prot(offset_first, to_le_bytes(frames), true);
-    write_mem_prot(offset_subsequent, to_le_bytes(frames), true);
+    write_mem_prot(offset_first, frames, true);
+    write_mem_prot(offset_subsequent, frames, true);
 }
 
 bool Movable::is_poisoned()

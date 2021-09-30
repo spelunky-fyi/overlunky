@@ -1,5 +1,6 @@
 #include "character_def.hpp"
 
+#include "color.hpp"
 #include "game_allocator.hpp"
 #include "logger.h"
 #include "memory.hpp"
@@ -98,20 +99,24 @@ std::uint32_t get_character_index(std::uint32_t entity_type)
 const char16_t* get_character_full_name(std::uint32_t character_index)
 {
     static const auto string_table = (const char16_t**)get_address("string_table");
-    return string_table[get_character_definition(character_index).full_name_string_id];
+    auto& char_def = get_character_definition(character_index);
+    return string_table[char_def.full_name_string_id];
 }
 const char16_t* get_character_short_name(std::uint32_t character_index)
 {
     static const auto string_table = (const char16_t**)get_address("string_table");
-    return string_table[get_character_definition(character_index).short_name_string_id];
+    auto& char_def = get_character_definition(character_index);
+    return string_table[char_def.short_name_string_id];
 }
 Color get_character_heart_color(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).heart_color;
+    auto& char_def = get_character_definition(character_index);
+    return char_def.heart_color;
 }
 bool get_character_gender(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).gender == CharGender::Female;
+    auto& char_def = get_character_definition(character_index);
+    return char_def.gender == CharGender::Female;
 }
 
 void set_character_full_name(std::uint32_t character_index, std::u16string_view name)
@@ -123,7 +128,7 @@ void set_character_full_name(std::uint32_t character_index, std::u16string_view 
 
     const auto data_size = name.size() * sizeof(char16_t);
     char16_t* new_full_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-    new_full_name[data_size] = u'\0';
+    new_full_name[name.size()] = u'\0';
     memcpy(new_full_name, name.data(), data_size);
 
     game_free((void*)*full_name);
@@ -138,7 +143,7 @@ void set_character_short_name(std::uint32_t character_index, std::u16string_view
 
     const auto data_size = name.size() * sizeof(char16_t);
     char16_t* new_short_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-    new_short_name[data_size] = u'\0';
+    new_short_name[name.size()] = u'\0';
     memcpy(new_short_name, name.data(), data_size);
 
     game_free((void*)*short_name);
@@ -146,10 +151,12 @@ void set_character_short_name(std::uint32_t character_index, std::u16string_view
 }
 void set_character_heart_color(std::uint32_t character_index, Color color)
 {
-    get_character_definition(character_index).heart_color = color;
+    auto& char_def = get_character_definition(character_index);
+    write_mem_prot(&char_def.heart_color, color, true);
 }
 void set_character_gender(std::uint32_t character_index, bool female)
 {
-    get_character_definition(character_index).gender = female ? CharGender::Female : CharGender::Male;
+    auto& char_def = get_character_definition(character_index);
+    write_mem_prot(&char_def.gender, female ? CharGender::Female : CharGender::Male, true);
 }
 } // namespace NCharacterDB

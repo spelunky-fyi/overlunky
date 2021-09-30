@@ -636,19 +636,6 @@ bool Floor::get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2])
     return true;
 }
 
-void ExitDoor::set_target(uint8_t set_world, uint8_t l, uint8_t t)
-{
-    special_door = true;
-    world = set_world;
-    level = l;
-    theme = t;
-}
-
-std::tuple<uint8_t, uint8_t, uint8_t> ExitDoor::get_target()
-{
-    return std::make_tuple(world, level, theme);
-}
-
 void Arrowtrap::rearm()
 {
     if (arrow_shot)

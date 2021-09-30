@@ -60,15 +60,19 @@ float get_zoom_level()
 
 void attach_entity(Entity* overlay, Entity* attachee)
 {
-    using AttachEntity = void (*)(Entity*, Entity*);
-    static AttachEntity attach_entity = []()
+    if (attachee->overlay)
     {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x48\x8b\xd0\x48\x8b\xcd\x48\x8b\xd8"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xe8"s, off);
-        return (AttachEntity)memory.at_exe(Memory::decode_call(off));
-    }();
-    attach_entity(overlay, attachee);
+        overlay->remove_item_ptr(attachee);
+    }
+
+    auto [x, y] = overlay->position();
+    attachee->x -= x;
+    attachee->y -= y;
+    attachee->overlay = overlay;
+
+    using AddItemPtr = void(Vector*, Entity*, bool);
+    static AddItemPtr* add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
+    add_item_ptr(&overlay->items, attachee, false);
 }
 
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
@@ -114,20 +118,23 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
 
 void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
 {
-    using StackEntities = void (*)(Entity*, Entity*, float(&)[2]);
-    static StackEntities stack_entities = []()
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x49\x8b\xc9\xf3\x0f\x11\x5c\x24\x34"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xe8"s, off);
-        return (StackEntities)memory.at_exe(Memory::decode_call(off));
-    }();
-
     if (Entity* bottom = get_entity_ptr(bottom_uid))
     {
         if (Entity* top = get_entity_ptr(top_uid))
         {
-            stack_entities(bottom, top, offset);
+            if (top->overlay)
+            {
+                top->overlay->remove_item_ptr(top);
+            }
+            top->w = offset[0];
+            top->h = offset[1];
+            attach_entity(bottom, top);
+            top->x = offset[0];
+            top->y = offset[0];
+            if ((bottom->flags >> 0x10) & 0x1) // facing left
+            {
+                top->x *= -1.0f;
+            }
         }
     }
 }
@@ -650,15 +657,18 @@ void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return;
-    static_cast<ExitDoor*>(door)->set_target(w, l, t);
+    door->as<ExitDoor>()->world = w;
+    door->as<ExitDoor>()->level = l;
+    door->as<ExitDoor>()->theme = t;
+    door->as<ExitDoor>()->special_door = true;
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
     Entity* door = get_entity_ptr(uid);
-    if (door == nullptr)
+    if (door == nullptr || !door->as<ExitDoor>()->special_door)
         return std::make_tuple((uint8_t)0, (uint8_t)0, (uint8_t)0);
-    return static_cast<ExitDoor*>(door)->get_target();
+    return std::make_tuple(door->as<ExitDoor>()->world, door->as<ExitDoor>()->level, door->as<ExitDoor>()->theme);
 }
 
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
@@ -870,8 +880,8 @@ void set_seed(uint32_t seed)
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
 {
-    write_mem_prot(get_address("arrowtrap_projectile"), to_le_bytes(regular_entity_type), true);
-    write_mem_prot(get_address("poison_arrowtrap_projectile"), to_le_bytes(poison_entity_type), true);
+    write_mem_prot(get_address("arrowtrap_projectile"), regular_entity_type, true);
+    write_mem_prot(get_address("poison_arrowtrap_projectile"), poison_entity_type, true);
 }
 
 void modify_sparktraps(float angle_increment, float distance)
@@ -883,9 +893,9 @@ void modify_sparktraps(float angle_increment, float distance)
         angle_increment_instruction = get_address("sparktrap_angle_increment");
         angle_increment_offset = angle_increment_instruction - 0x32;
         auto distance_offset_relative = static_cast<int32_t>(angle_increment_offset - (angle_increment_instruction + 8));
-        write_mem_prot(angle_increment_instruction + 4, to_le_bytes(distance_offset_relative), true);
+        write_mem_prot(angle_increment_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
+    write_mem_prot(angle_increment_offset, angle_increment, true);
 
     static size_t distance_offset = 0;
     if (distance_offset == 0)
@@ -893,14 +903,14 @@ void modify_sparktraps(float angle_increment, float distance)
         auto distance_instruction = angle_increment_instruction + 0x1F;
         distance_offset = angle_increment_instruction - 0x2E;
         auto distance_offset_relative = static_cast<int32_t>(distance_offset - (distance_instruction + 8));
-        write_mem_prot(distance_instruction + 4, to_le_bytes(distance_offset_relative), true);
+        write_mem_prot(distance_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(distance_offset, to_le_bytes(distance), true);
+    write_mem_prot(distance_offset, distance, true);
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
 {
-    write_mem_prot(get_address("kapala_blood_threshold"), to_le_bytes(threshold), true);
+    write_mem_prot(get_address("kapala_blood_threshold"), threshold, true);
 }
 
 void set_kapala_hud_icon(int8_t icon_index)
@@ -918,7 +928,7 @@ void set_kapala_hud_icon(int8_t icon_index)
 
     if (icon_index < 0) // reset to original
     {
-        write_mem_prot(instruction_offset + 2, to_le_bytes(0x00013089), true);
+        write_mem_prot(instruction_offset + 2, 0x00013089, true);
     }
     else
     {
@@ -926,19 +936,19 @@ void set_kapala_hud_icon(int8_t icon_index)
         // we overwrite this with an instruction that loads a byte located a bit after the current function.
         // So you need to assemble `movzx  <relevant register>,BYTE PTR [rip+<distance>]`
         write_mem_prot(instruction_offset + 2, {0x0d}, true);
-        write_mem_prot(instruction_offset + 3, to_le_bytes(distance), true);
+        write_mem_prot(instruction_offset + 3, distance, true);
         if (icon_index > 6)
         {
             icon_index = 6;
         }
-        write_mem_prot(icon_index_offset, to_le_bytes(icon_index), true);
+        write_mem_prot(icon_index_offset, icon_index, true);
     }
 }
 
 void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscape_multiplier)
 {
     // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
-    write_mem_prot(get_address("blood_multiplication"), to_le_bytes(vladscape_multiplier), true);
+    write_mem_prot(get_address("blood_multiplication"), vladscape_multiplier, true);
 }
 
 SaveData* savedata()
@@ -996,8 +1006,8 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
         phase2_offset = phase1_offset + 0x4;
 
         // write the default values to our new floats
-        write_mem_prot(phase1_offset, to_le_bytes(100.0f), true);
-        write_mem_prot(phase2_offset, to_le_bytes(83.0f), true);
+        write_mem_prot(phase1_offset, 100.0f, true);
+        write_mem_prot(phase2_offset, 83.0f, true);
 
         // calculate the distances between our floats and the movss instructions
         auto distance_1_a = static_cast<int32_t>(phase1_offset - phase_1_instruction_a);
@@ -1006,29 +1016,29 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
         auto distance_2_b = static_cast<int32_t>(phase2_offset - phase_2_instruction_b);
 
         // overwrite the movss instructions to load our floats
-        write_mem_prot(phase_1_instruction_a - 4, to_le_bytes(distance_1_a), true);
-        write_mem_prot(phase_1_instruction_b - 4, to_le_bytes(distance_1_b), true);
-        write_mem_prot(phase_2_instruction_a - 4, to_le_bytes(distance_2_a), true);
-        write_mem_prot(phase_2_instruction_b - 4, to_le_bytes(distance_2_b), true);
+        write_mem_prot(phase_1_instruction_a - 4, distance_1_a, true);
+        write_mem_prot(phase_1_instruction_b - 4, distance_1_b, true);
+        write_mem_prot(phase_2_instruction_a - 4, distance_2_a, true);
+        write_mem_prot(phase_2_instruction_b - 4, distance_2_b, true);
     }
 
     if (phase == 1)
     {
-        write_mem_prot(phase1_offset, to_le_bytes(y), true);
+        write_mem_prot(phase1_offset, y, true);
     }
     else if (phase == 2)
     {
-        write_mem_prot(phase2_offset, to_le_bytes(y), true);
+        write_mem_prot(phase2_offset, y, true);
     }
 }
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
-    write_mem_prot(get_address("ghost_spawn_time"), to_le_bytes(normal), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), to_le_bytes(cursed), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), to_le_bytes(cursed), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), to_le_bytes(cursed), true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time"), normal, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), cursed, true);
 }
 
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
@@ -1050,12 +1060,12 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
         {
             if (entry.chance_sizeof == 4)
             {
-                write_mem_prot(entry.offset, to_le_bytes(new_drop_chance), true);
+                write_mem_prot(entry.offset, new_drop_chance, true);
             }
             else if (entry.chance_sizeof == 1)
             {
                 uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_prot(entry.offset, to_le_bytes(value), true);
+                write_mem_prot(entry.offset, value, true);
             }
         }
     }
@@ -1105,7 +1115,7 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
         {
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
             {
-                write_mem_prot(entry.offsets[x], to_le_bytes(new_drop_entity_type), true);
+                write_mem_prot(entry.offsets[x], new_drop_entity_type, true);
             }
         }
     }

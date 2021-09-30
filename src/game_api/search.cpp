@@ -69,7 +69,7 @@ size_t find_inst(const char* exe, std::string_view needle, size_t start, std::st
     }
     else
     {
-        message = fmt::format("Failed finding pattern '' ('{}') in Spel2.exe", pattern_name, ByteStr{needle});
+        message = fmt::format("Failed finding pattern '{}' ('{}') in Spel2.exe", pattern_name, ByteStr{needle});
     }
 
     if (MessageBox(NULL, message.c_str(), NULL, MB_OKCANCEL) == IDCANCEL)
@@ -208,6 +208,34 @@ class PatternCommandBuffer
 
 std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char* exe, std::string_view address_name)>> g_address_rules{
     {
+        "game_malloc"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x45\x84\xe4\x0f\x84"sv)
+            .offset(-0x10)
+            .find_inst("\xff\x15"sv)
+            .decode_pc(2)
+            .at_exe(),
+    },
+    {
+        "game_free"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x83\x7e\x18\x00"sv)
+            .offset(-0x10)
+            .find_inst("\xff\x15"sv)
+            .decode_pc(2)
+            .at_exe(),
+    },
+    {
+        "read_encrypted_file"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x41\xb8\x50\x46\x00\x00"sv)
+            .find_inst("\xe8"sv)
+            .offset(0x1)
+            .find_inst("\xe8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "state_location"sv,
         PatternCommandBuffer{}
             .find_inst("\x49\x0F\x44\xC0"sv)
@@ -215,6 +243,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\x49\x0F\x44\xC0"sv)
             .offset(-0x19)
             .find_inst("\x48\x8B"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "game_manager"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xC6\x80\x39\x01\x00\x00\x00\x48"sv)
+            .offset(0x7)
             .decode_pc()
             .at_exe(),
     },
@@ -281,6 +317,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .function_start(),
     },
     {
+        "add_item_ptr"sv,
+        // Used in spawn_entity as `add_item_ptr(overlay + 0x18, spawned_entity, false)`
+        PatternCommandBuffer{}
+            .find_inst("\xe8****\x44\x88\x76"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "spawn_liquid"sv,
         // See tile code for water (0xea for 1.23.3) in handle_tile_code, last call before returning
         PatternCommandBuffer{}
@@ -330,6 +374,21 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
+        "level_gen_handle_tile_code"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x83\xC5\x01"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gen_setup_level_files"sv,
+        // Search for string "ending.lvl", it is used in a call to this function
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x49\x8B\xB7****\x48\x8D\x4E\x48"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "level_gen_load_level_file"sv,
         // Search for string "generic.lvl", it is used in a call to this function
         PatternCommandBuffer{}
@@ -341,14 +400,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "level_gen_handle_tile_code"sv,
+        "level_gen_do_extra_spawns"sv,
+        // The only function that calls Mount::carry twice, on one call site it spawns entity 0xe1
         PatternCommandBuffer{}
-            .find_inst("\xE8****\x83\xC5\x01"sv)
-            .decode_call()
-            .at_exe(),
+            .find_inst("\xf3\x0f\x11\x84\x24\xdc\x00\x00\x00"sv)
+            .at_exe()
+            .function_start(),
     },
     {
-        "level_generate_room"sv,
+        "level_gen_generate_room"sv,
         // One call up from generate_room_from_tile_codes
         PatternCommandBuffer{}
             .find_inst("\xE8****\x83\xC6\x01\x39\xF3"sv)
@@ -356,7 +416,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "level_gather_room_data"sv,
+        "level_gen_gather_room_data"sv,
         // First call in generate_room, it gets something from the unordered_map in `param_1 + 0x108`
         PatternCommandBuffer{}
             .find_inst("\xE8****\x44\x8A\x44\x24*\x45\x84\xC0"sv)
@@ -364,7 +424,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "level_get_random_room_data"sv,
+        "level_gen_get_random_room_data"sv,
         // Call to this is the only thing happening in a loop along with checking a flag on the returned value
         PatternCommandBuffer{}
             .find_inst("\xE8****\x48\x8B\x58\x08"sv)
@@ -372,10 +432,18 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "level_gen_generate_room_from_tile_codes"sv,
+        "level_gen_spawn_room_from_tile_codes"sv,
         // One of the few calls to handle_tile_code, does a `if (param != 0xec)` before the call
         PatternCommandBuffer{}
             .find_inst("\xE8****\x45\x89\xF8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "level_gen_test_spawn_chance"sv,
+        // Called in the last virtual on ThemeInfo to determine whether a load_item should be done
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x84\xC0\x48\x8B\x6C\x24"sv)
             .decode_call()
             .at_exe(),
     },
@@ -410,6 +478,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\xF3\x48\x0F\x2A\xC0\xF3\x0F\x58\xC0\xF3\x0F\x10\x0D"sv)
             .offset(0x9)
             .decode_pc(4)
+            .at_exe(),
+    },
+    {
+        "load_texture"sv,
+        // Search for a string of any of the textures, e.g. just `.DDS`, take one with just one XREF and see the call that it is used in,
+        // that call is load_texture
+        PatternCommandBuffer{}
+            .find_inst("\xe8****\xc7\x44\x24\x50"sv)
+            .decode_call()
             .at_exe(),
     },
     {
@@ -561,6 +638,14 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .find_inst("\xF3\x48\x0F\x2A\xF0\x45\x8B\x78\x4C"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "mount_carry"sv,
+        // Set a bp on player's Entity::overlay, then jump on a turkey
+        PatternCommandBuffer{}
+            .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00")
+            .decode_call()
+            .at_exe(),
     },
     {
         "insta_gib"sv,
@@ -778,6 +863,49 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
+        "mount_carry_rider"sv,
+        // Put a write bp on Player.overlay and hop on a mount
+        PatternCommandBuffer{}
+            .find_inst("\x48\xC7\x87\x08\x01\x00\x00\x00\x00\x00\x00\xC6\x87\x2D\x01"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "toast"sv,
+        // Put a write bp on State.toast
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "say"sv,
+        // Put a write bp on State.speechbubble
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
+            .offset(0x1)
+            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "say_context"sv,
+        // Find the pattern for `say`, go one up higher in the callstack and look what writes to rcx
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x0D****\x4C\x8D\x44\x24\x40\x4C\x89\xFA\x41"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "force_dark_level"sv,
+        // Put a write bp on State.level_flags (3rd byte, containing dark level flag)
+        // Filter out all breaks, then load levels until you get a dark one
+        PatternCommandBuffer{}
+            .find_inst("\x80\x79\x52\x02\x7E\x2F"sv)
+            .offset(0x4)
+            .at_exe(),
+    },
+    {
         "character_db"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x6B\xC3\x2C\x48\x8D\x15****\x48"sv)
@@ -794,12 +922,24 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
+[[maybe_unused]] static constexpr auto g_debug_pattern = ""sv;
+
 void preload_addresses()
 {
     Memory mem = Memory::get();
     const char* exe = mem.exe();
     for (auto [address_name, rule] : g_address_rules)
     {
+#ifdef DEBUG
+        if constexpr (!g_debug_pattern.empty())
+        {
+            if (address_name == g_debug_pattern)
+            {
+                __debugbreak();
+            }
+        }
+#endif // DEBUG
+
         size_t address = rule(mem, exe, address_name);
         if (address > 0ull)
         {
@@ -820,6 +960,8 @@ size_t load_address(std::string_view address_name)
             return address;
         }
     }
+    const std::string message = fmt::format("Tried to get unknown address '{}'", address_name);
+    MessageBox(NULL, message.c_str(), NULL, MB_OK);
     return 0ull;
 }
 size_t get_address(std::string_view address_name)

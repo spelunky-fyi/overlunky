@@ -299,8 +299,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {
-        auto tile_codes = state->level_gen->data->tile_codes();
-        for (const auto& tile_code : tile_codes)
+        for (const auto& tile_code : state->level_gen->data->tile_codes)
         {
             file << tile_code.second.id << ": " << tile_code.first << "\n";
         }
@@ -309,11 +308,11 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
     if (auto file = std::ofstream("game_data/spawn_chances.txt"))
     {
         std::multimap<std::uint32_t, std::string> ordered_chances;
-        for (auto* chances : {&state->level_gen->data->monster_chances(), &state->level_gen->data->trap_chances()})
+        for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
         {
             for (const auto& spawn_chanc : *chances)
             {
-                std::string clean_chance_name = spawn_chanc.first;
+                std::string clean_chance_name = spawn_chanc.first.c_str();
                 std::transform(
                     clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
                     { return (unsigned char)std::toupper(c); });
@@ -327,7 +326,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
 
     if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
-        auto templates = state->level_gen->data->room_templates();
+        auto templates = state->level_gen->data->room_templates;
         templates["empty_backlayer"] = {9};
         templates["boss_arena"] = {22};
         templates["shop_jail_backlayer"] = {44};
@@ -340,7 +339,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {
-            std::string clean_room_name = room_template.first;
+            std::string clean_room_name = room_template.first.c_str();
             std::transform(
                 clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
                 { return (unsigned char)std::toupper(c); });

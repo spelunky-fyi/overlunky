@@ -191,7 +191,6 @@ struct StateMemory
 struct State
 {
     size_t location;
-    size_t addr_dark;
 
     static void set_write_load_opt(bool allow);
 
@@ -218,19 +217,7 @@ struct State
     }
 
     void godmode(bool g);
-
-    void darkmode(bool g)
-    {
-        // log::debug!("God {:?}" mode; g);
-        if (g)
-        {
-            write_mem_prot(addr_dark, ("\x90\x90"s), true);
-        }
-        else
-        {
-            write_mem_prot(addr_dark, ("\xEB\x2E"s), true);
-        }
-    }
+    void darkmode(bool g);
 
     size_t get_zoom_level_address();
     float get_zoom_level();

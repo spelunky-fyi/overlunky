@@ -1154,12 +1154,10 @@ void warp_next_level(size_t num)
     auto doors = get_entities_by_type(doortypes);
     for (auto doorid : doors)
     {
-        uint8_t world, level, theme;
         ExitDoor* doorent = (ExitDoor*)get_entity_ptr(doorid);
-        std::tie(world, level, theme) = doorent->get_target();
         if (!doorent->special_door)
             continue;
-        targets.emplace_back(world, level, theme);
+        targets.emplace_back(doorent->world, doorent->level, doorent->theme);
     }
 
     if (g_state->theme == 11)
@@ -2183,16 +2181,15 @@ void render_narnia()
     auto doors = get_entities_by_type(doortypes);
     for (auto doorid : doors)
     {
-        auto doorent = (ExitDoor*)get_entity_ptr(doorid);
-        if (!doorent->special_door)
+        ExitDoor* target = (ExitDoor*)get_entity_ptr(doorid);
+        if (!target->special_door)
             continue;
-
-        std::string buf = fmt::format("{}-{} {}", doorent->world, doorent->level, theme_name(doorent->theme));
+        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (n > 0)
             ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(doorent->world, doorent->level, doorent->theme);
+            warp_inc(target->world, target->level, target->theme);
         }
         n++;
     }
