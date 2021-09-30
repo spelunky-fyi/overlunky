@@ -376,7 +376,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         "level_gen_setup_level_files"sv,
         // Search for string "ending.lvl", it is used in a call to this function
         PatternCommandBuffer{}
-            .find_inst(" \xE8****\x49\x8B\xB7****\x48\x8D\x4E\x48"sv)
+            .find_inst("\xE8****\x49\x8B\xB7****\x48\x8D\x4E\x48"sv)
             .decode_call()
             .at_exe(),
     },
