@@ -1,5 +1,7 @@
 #include "character_def.hpp"
 
+#include "color.hpp"
+#include "game_allocator.hpp"
 #include "logger.h"
 #include "memory.hpp"
 
@@ -18,67 +20,63 @@ enum class SomeCharEnum
     Variant_2,
     Variant_3,
 };
-struct CharacterDefinition
+struct CharacterDB
 {
     CharGender gender;
     Color heart_color;
-    char16_t full_name[0x18];
-    char16_t short_name[0xc];
+    uint32_t full_name_string_id;
+    uint32_t short_name_string_id;
     std::uint32_t _uint0;
     float bed_position_x;
     float bed_position_y;
     SomeCharEnum some_enum;
 };
-static constexpr auto sizeof_CharacterDefinition = sizeof(CharacterDefinition);
-static constexpr auto expect_CharacterDefinition = 0x36 * sizeof(char16_t);
-static_assert(sizeof_CharacterDefinition == expect_CharacterDefinition);
+static constexpr auto sizeof_CharacterDB = sizeof(CharacterDB);
+static constexpr auto expect_CharacterDB = 0x2c;
+static_assert(sizeof_CharacterDB == expect_CharacterDB);
 
-std::span<CharacterDefinition> GetCharacterDefinitions()
+std::span<CharacterDB> GetCharacterDefinitions()
 {
-    static std::span<CharacterDefinition> static_character_table = []()
+    static std::span<CharacterDB> static_character_table = []()
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
+        const auto character_db = get_address("character_db");
+        std::span<CharacterDB> character_table{(CharacterDB*)character_db, 20};
 
-        const auto static_init_strings = find_inst(exe, "\x48\x8b\xc4\x48\x81\xec\xe8\x00\x00\x00\x0f\x29\x70\xe8\x0f\x29\x78\xd8\x44\x0f\x29\x40\xc8\x44\x0f\x29\x48\xb8\x44\x0f\x29\x50\xa8"s, after_bundle);
-        const auto load_ana_strings = find_inst(exe, "\xf3\x44\x0f\x10\xc8"s, static_init_strings);
-        // load_ana_strings = (char*)load_ana_strings + 12;
-        const auto write_ana_strings = find_inst(exe, "\x0f\x11"s, load_ana_strings);
-
-        auto ana_strings = memory.at_exe(decode_pc(exe, write_ana_strings));
-        static constexpr auto start_offset = sizeof(CharacterDefinition::short_name) + 0x10;
-        auto string_table_first_element = ana_strings + sizeof(CharacterDefinition::full_name) + start_offset;
-        auto string_table_start = string_table_first_element - sizeof(CharacterDefinition);
-        std::span<CharacterDefinition> character_table{(CharacterDefinition*)(string_table_start), 20};
-        [[maybe_unused]] constexpr std::array known_tables{
-            CharacterDefinition{.full_name{u"Ana Spelunky"}, .short_name{u"Ana"}},
-            CharacterDefinition{.full_name{u"Margaret Tunnel"}, .short_name{u"Margaret"}},
-            CharacterDefinition{.full_name{u"Colin Northward"}, .short_name{u"Colin"}},
-            CharacterDefinition{.full_name{u"Roffy D. Sloth"}, .short_name{u"Roffy"}},
-            CharacterDefinition{.full_name{u"Alto Singh"}, .short_name{u"Alto"}},
-            CharacterDefinition{.full_name{u"Liz Mutton"}, .short_name{u"Liz"}},
-            CharacterDefinition{.full_name{u"Nekka The Eagle"}, .short_name{u"Nekka"}},
-            CharacterDefinition{.full_name{u"LISE Project"}, .short_name{u"LISE"}},
-            CharacterDefinition{.full_name{u"Coco Von Diamonds"}, .short_name{u"Coco"}},
-            CharacterDefinition{.full_name{u"Manfred Tunnel"}, .short_name{u"Manfred"}},
-            CharacterDefinition{.full_name{u"Little Jay"}, .short_name{u"Jay"}},
-            CharacterDefinition{.full_name{u"Tina Flan"}, .short_name{u"Tina"}},
-            CharacterDefinition{.full_name{u"Valerie Crump"}, .short_name{u"Valerie"}},
-            CharacterDefinition{.full_name{u"Au"}, .short_name{u"Au"}},
-            CharacterDefinition{.full_name{u"Demi Von Diamonds"}, .short_name{u"Demi"}},
-            CharacterDefinition{.full_name{u"Pilot"}, .short_name{u"Pilot"}},
-            CharacterDefinition{.full_name{u"Princess Airyn"}, .short_name{u"Airyn"}},
-            CharacterDefinition{.full_name{u"Dirk Yamaoka"}, .short_name{u"Dirk"}},
-            CharacterDefinition{.full_name{u"Guy Spelunky"}, .short_name{u"Guy"}},
-            CharacterDefinition{.full_name{u"Classic Guy"}, .short_name{u"Classic Guy"}},
+        struct KnownCharacter
+        {
+            std::u16string_view full_name;
+            std::u16string_view short_name;
         };
+        [[maybe_unused]] constexpr std::array known_tables{
+            KnownCharacter{.full_name{u"Ana Spelunky"}, .short_name{u"Ana"}},
+            KnownCharacter{.full_name{u"Margaret Tunnel"}, .short_name{u"Margaret"}},
+            KnownCharacter{.full_name{u"Colin Northward"}, .short_name{u"Colin"}},
+            KnownCharacter{.full_name{u"Roffy D. Sloth"}, .short_name{u"Roffy"}},
+            KnownCharacter{.full_name{u"Alto Singh"}, .short_name{u"Alto"}},
+            KnownCharacter{.full_name{u"Liz Mutton"}, .short_name{u"Liz"}},
+            KnownCharacter{.full_name{u"Nekka The Eagle"}, .short_name{u"Nekka"}},
+            KnownCharacter{.full_name{u"LISE Project"}, .short_name{u"LISE"}},
+            KnownCharacter{.full_name{u"Coco Von Diamonds"}, .short_name{u"Coco"}},
+            KnownCharacter{.full_name{u"Manfred Tunnel"}, .short_name{u"Manfred"}},
+            KnownCharacter{.full_name{u"Little Jay"}, .short_name{u"Jay"}},
+            KnownCharacter{.full_name{u"Tina Flan"}, .short_name{u"Tina"}},
+            KnownCharacter{.full_name{u"Valerie Crump"}, .short_name{u"Valerie"}},
+            KnownCharacter{.full_name{u"Au"}, .short_name{u"Au"}},
+            KnownCharacter{.full_name{u"Demi Von Diamonds"}, .short_name{u"Demi"}},
+            KnownCharacter{.full_name{u"Pilot"}, .short_name{u"Pilot"}},
+            KnownCharacter{.full_name{u"Princess Airyn"}, .short_name{u"Airyn"}},
+            KnownCharacter{.full_name{u"Dirk Yamaoka"}, .short_name{u"Dirk"}},
+            KnownCharacter{.full_name{u"Guy Spelunky"}, .short_name{u"Guy"}},
+            KnownCharacter{.full_name{u"Classic Guy"}, .short_name{u"Classic Guy"}},
+        };
+
+        [[maybe_unused]] const auto string_table = (const char16_t**)get_address("string_table");
         for (size_t i = 0; i < 20; i++)
         {
-            [[maybe_unused]] CharacterDefinition& string_table = character_table[i];
-            [[maybe_unused]] const CharacterDefinition& known_table = known_tables[i];
-            assert(memcmp(string_table.full_name, known_table.full_name, sizeof(CharacterDefinition::full_name)) == 0);
-            assert(memcmp(string_table.short_name, known_table.short_name, sizeof(CharacterDefinition::short_name)) == 0);
+            [[maybe_unused]] const CharacterDB& character = character_table[i];
+            [[maybe_unused]] const KnownCharacter& known_name = known_tables[i];
+            assert(memcmp(string_table[character.full_name_string_id], known_name.full_name.data(), known_name.full_name.size()) == 0);
+            assert(memcmp(string_table[character.short_name_string_id], known_name.short_name.data(), known_name.short_name.size()) == 0);
         }
 
         return character_table;
@@ -86,7 +84,9 @@ std::span<CharacterDefinition> GetCharacterDefinitions()
     return static_character_table;
 }
 
-CharacterDefinition& get_character_definition(std::uint32_t character_index)
+namespace NCharacterDB
+{
+CharacterDB& get_character_definition(std::uint32_t character_index)
 {
     return GetCharacterDefinitions()[std::clamp(character_index, 0u, 19u)];
 }
@@ -98,48 +98,65 @@ std::uint32_t get_character_index(std::uint32_t entity_type)
 
 const char16_t* get_character_full_name(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).full_name;
+    static const auto string_table = (const char16_t**)get_address("string_table");
+    auto& char_def = get_character_definition(character_index);
+    return string_table[char_def.full_name_string_id];
 }
-const char16_t* get_character_shortname(std::uint32_t character_index)
+const char16_t* get_character_short_name(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).short_name;
+    static const auto string_table = (const char16_t**)get_address("string_table");
+    auto& char_def = get_character_definition(character_index);
+    return string_table[char_def.short_name_string_id];
 }
-Color get_character_heartcolor(std::uint32_t character_index)
+Color get_character_heart_color(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).heart_color;
+    auto& char_def = get_character_definition(character_index);
+    return char_def.heart_color;
 }
 bool get_character_gender(std::uint32_t character_index)
 {
-    return get_character_definition(character_index).gender == CharGender::Female;
+    auto& char_def = get_character_definition(character_index);
+    return char_def.gender == CharGender::Female;
 }
 
 void set_character_full_name(std::uint32_t character_index, std::u16string_view name)
 {
-    const auto max_size = sizeof(CharacterDefinition::full_name) / sizeof(char16_t);
-    if (name.size() > max_size)
-    {
-        DEBUG("Character name is too long, max supported size is {}", max_size);
-    }
+    static const auto string_table = (const char16_t**)get_address("string_table");
+
     auto& char_def = get_character_definition(character_index);
-    memset(char_def.full_name, 0, max_size * sizeof(char16_t));
-    memcpy(char_def.full_name, name.data(), std::min(name.size(), max_size) * sizeof(char16_t));
+    const char16_t** full_name = string_table + char_def.full_name_string_id;
+
+    const auto data_size = name.size() * sizeof(char16_t);
+    char16_t* new_full_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+    new_full_name[name.size()] = u'\0';
+    memcpy(new_full_name, name.data(), data_size);
+
+    game_free((void*)*full_name);
+    *full_name = new_full_name;
 }
 void set_character_short_name(std::uint32_t character_index, std::u16string_view name)
 {
-    const auto max_size = sizeof(CharacterDefinition::short_name) / sizeof(char16_t);
-    if (name.size() > max_size)
-    {
-        DEBUG("Character name is too long, max supported size is {}", max_size);
-    }
+    static const auto string_table = (const char16_t**)get_address("string_table");
+
     auto& char_def = get_character_definition(character_index);
-    memset(char_def.short_name, 0, max_size * sizeof(char16_t));
-    memcpy(char_def.short_name, name.data(), std::min(name.size(), max_size) * sizeof(char16_t));
+    const char16_t** short_name = string_table + char_def.short_name_string_id;
+
+    const auto data_size = name.size() * sizeof(char16_t);
+    char16_t* new_short_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+    new_short_name[name.size()] = u'\0';
+    memcpy(new_short_name, name.data(), data_size);
+
+    game_free((void*)*short_name);
+    *short_name = new_short_name;
 }
-void set_character_heartcolor(std::uint32_t character_index, Color color)
+void set_character_heart_color(std::uint32_t character_index, Color color)
 {
-    get_character_definition(character_index).heart_color = color;
+    auto& char_def = get_character_definition(character_index);
+    write_mem_prot(&char_def.heart_color, color, true);
 }
 void set_character_gender(std::uint32_t character_index, bool female)
 {
-    get_character_definition(character_index).gender = female ? CharGender::Female : CharGender::Male;
+    auto& char_def = get_character_definition(character_index);
+    write_mem_prot(&char_def.gender, female ? CharGender::Female : CharGender::Male, true);
 }
+} // namespace NCharacterDB

@@ -3,6 +3,56 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 
+#include <span>
+
+struct ByteStr
+{
+    std::string_view str;
+};
+template <>
+struct fmt::formatter<ByteStr>
+{
+    constexpr auto parse(format_parse_context& ctx)
+    {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(ByteStr byte_str, FormatContext& ctx)
+    {
+        auto out = ctx.out();
+
+        const std::size_t num_bytes = byte_str.str.size();
+        if (num_bytes > 0)
+        {
+            const uint8_t first_byte = byte_str.str[0];
+            if (first_byte == '*')
+            {
+                out = format_to(out, "??");
+            }
+            else
+            {
+                out = format_to(out, "{:02x}", first_byte);
+            }
+
+            std::span<uint8_t> remainder_byte_span{(uint8_t*)byte_str.str.data() + 1, num_bytes - 1};
+            for (uint8_t c : remainder_byte_span)
+            {
+                if (c == '*')
+                {
+                    out = format_to(out, " ??");
+                }
+                else
+                {
+                    out = format_to(out, " {:02x}", c);
+                }
+            }
+        }
+
+        return out;
+    }
+};
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 

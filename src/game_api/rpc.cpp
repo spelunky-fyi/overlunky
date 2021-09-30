@@ -366,7 +366,7 @@ Screen* get_screen_ptr(uint32_t screen_id)
     }
     case 21:
     {
-        return game_manager->screen_arena_menu;
+        return state->screen_arena_menu;
     }
     case 22:
     case 24:
@@ -375,7 +375,7 @@ Screen* get_screen_ptr(uint32_t screen_id)
     }
     case 23:
     {
-        return game_manager->screen_arena_items;
+        return state->screen_arena_items;
     }
     case 25:
     {
@@ -870,112 +870,37 @@ void set_seed(uint32_t seed)
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
 {
-    static size_t offset_poison = 0;
-    static size_t offset_regular = 0;
-    if (offset_poison == 0)
-    {
-        std::string pattern = "\xBA\x73\x01\x00\x00\x48\x8B\x8C\xC1\xC0\x12\x00\x00"s;
-        auto memory = Memory::get();
-        // the pattern occurs twice in the executable
-        // the first instance is for poison arrowtraps
-        // the second is for regular arrowtraps
-        offset_poison = find_inst(memory.exe(), pattern, memory.after_bundle);
-        offset_regular = memory.at_exe(find_inst(memory.exe(), pattern, offset_poison + 1));
-        offset_poison = memory.at_exe(offset_poison);
-    }
-    write_mem_prot(offset_regular + 1, to_le_bytes(regular_entity_type), true);
-    write_mem_prot(offset_poison + 1, to_le_bytes(poison_entity_type), true);
+    write_mem_prot(get_address("arrowtrap_projectile"), regular_entity_type, true);
+    write_mem_prot(get_address("poison_arrowtrap_projectile"), poison_entity_type, true);
 }
 
 void modify_sparktraps(float angle_increment, float distance)
 {
     static size_t angle_increment_offset = 0;
+    static size_t angle_increment_instruction = 0;
     if (angle_increment_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\xF3\x0F\x10\x81\x50\x01\x00\x00\x48\xBE\x4B\x57\x4C\x4F\x80\x3E\x83\xD3"s;
-        size_t angle_instruction_offset = find_inst(memory.exe(), pattern, memory.after_bundle) + 18;
-
-        uint8_t cc_counter = 0;
-        size_t op_counter = angle_instruction_offset;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 8)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-        angle_increment_offset = memory.at_exe(op_counter);
-
-        uint32_t distance_offset_relative = static_cast<uint32_t>(op_counter - (angle_instruction_offset + 8));
-        write_mem_prot(memory.at_exe(angle_instruction_offset + 4), to_le_bytes(distance_offset_relative), true);
+        angle_increment_instruction = get_address("sparktrap_angle_increment");
+        angle_increment_offset = angle_increment_instruction - 0x32;
+        auto distance_offset_relative = static_cast<int32_t>(angle_increment_offset - (angle_increment_instruction + 8));
+        write_mem_prot(angle_increment_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
+    write_mem_prot(angle_increment_offset, angle_increment, true);
 
     static size_t distance_offset = 0;
     if (distance_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\xF3\x0F\x10\x83\x50\x01\x00\x00\xF3\x0F\x59\x3D"s;
-
-        // first look up this pattern so we are in the correct function
-        auto offset = find_inst(exe, pattern, memory.after_bundle) + 8;
-
-        // dirty trick: inject the distance float between this function and the next
-        // reason is that the default float being referenced is a const with value 3.0
-        // and this value is used elsewhere (as a compiler optimization)
-        // so if we overwrite this value we crash elsewhere
-        // -> save our own float and adjust the mulss calls to reference this
-        uint8_t cc_counter = 0;
-        size_t op_counter = offset;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-        distance_offset = memory.at_exe(op_counter);
-
-        // now overwrite the mulss instructions 4 times:
-        // mulss xmm7 -> mulss xmm0 -> mulss xmm7 -> mulss xmm0
-        std::string pattern1 = "\xF3\x0F\x59\x3D"s;
-        std::string pattern2 = "\xF3\x0F\x59\x05"s;
-        bool use_pattern1 = true;
-        auto start = offset - 20;
-        for (auto x = 0; x < 4; ++x)
-        {
-            auto mulss_offset = find_inst(exe, use_pattern1 ? pattern1 : pattern2, start);
-            uint32_t distance_offset_relative = static_cast<uint32_t>(op_counter - (mulss_offset + 8));
-            write_mem_prot(memory.at_exe(mulss_offset + 4), to_le_bytes(distance_offset_relative), true);
-            start = mulss_offset + 1;
-            use_pattern1 = !use_pattern1;
-        }
+        auto distance_instruction = angle_increment_instruction + 0x1F;
+        distance_offset = angle_increment_instruction - 0x2E;
+        auto distance_offset_relative = static_cast<int32_t>(distance_offset - (distance_instruction + 8));
+        write_mem_prot(distance_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(distance_offset, to_le_bytes(distance), true);
+    write_mem_prot(distance_offset, distance, true);
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        std::string pattern = "\xFE\x80\x28\x01\x00\x00\x80\xB8\x28\x01\x00\x00\x07"s;
-        offset = memory.at_exe(find_inst(memory.exe(), pattern, memory.after_bundle) + 12);
-    }
-    write_mem_prot(offset, to_le_bytes(threshold), true);
+    write_mem_prot(get_address("kapala_blood_threshold"), threshold, true);
 }
 
 void set_kapala_hud_icon(int8_t icon_index)
@@ -986,70 +911,34 @@ void set_kapala_hud_icon(int8_t icon_index)
 
     if (instruction_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\x0F\xB6\x81\x28\x01\x00\x00\x89\x02\x48\x8B\xC2"s;
-
-        instruction_offset = find_inst(exe, pattern, memory.after_bundle);
-
-        uint8_t cc_counter = 0;
-        size_t op_counter = instruction_offset;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-        icon_index_offset = memory.at_exe(op_counter);
-        distance = static_cast<uint32_t>(op_counter - (instruction_offset + 7));
-        instruction_offset = memory.at_exe(instruction_offset);
+        instruction_offset = get_address("kapala_hud_icon");
+        icon_index_offset = instruction_offset + 0x12;
+        distance = static_cast<uint32_t>(icon_index_offset - (instruction_offset + 7));
     }
 
     if (icon_index < 0) // reset to original
     {
-        write_mem_prot(instruction_offset + 2, to_le_bytes(0x00012881), true);
+        write_mem_prot(instruction_offset + 2, 0x00013089, true);
     }
     else
     {
-        write_mem_prot(instruction_offset + 2, {0x05}, true);
-        write_mem_prot(instruction_offset + 3, to_le_bytes(distance), true);
+        // Instead of loading the value from KapalaPowerup:amount_of_blood (the instruction pointed at by instruction_offset)
+        // we overwrite this with an instruction that loads a byte located a bit after the current function.
+        // So you need to assemble `movzx  <relevant register>,BYTE PTR [rip+<distance>]`
+        write_mem_prot(instruction_offset + 2, {0x0d}, true);
+        write_mem_prot(instruction_offset + 3, distance, true);
         if (icon_index > 6)
         {
             icon_index = 6;
         }
-        write_mem_prot(icon_index_offset, to_le_bytes(icon_index), true);
+        write_mem_prot(icon_index_offset, icon_index, true);
     }
 }
 
-void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier)
+void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscape_multiplier)
 {
-    size_t offset_default1 = 0;
-    size_t offset_vladscape1 = 0;
-    size_t offset_default2 = 0;
-    size_t offset_vladscape2 = 0;
-    if (offset_default1 == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x41\xB8\x02\x00\x00\x00\x84\xC0\x75\x06\x41\xB8\x01\x00\x00\x00"s;
-        auto offset = find_inst(exe, pattern, memory.after_bundle);
-        offset_default1 = memory.at_exe(offset + 12);
-        offset_vladscape1 = memory.at_exe(offset + 2);
-        offset = find_inst(exe, pattern, offset + 1);
-        offset_default2 = memory.at_exe(offset + 12);
-        offset_vladscape2 = memory.at_exe(offset + 2);
-    }
-
-    write_mem_prot(offset_default1, to_le_bytes(default_multiplier), true);
-    write_mem_prot(offset_default2, to_le_bytes(default_multiplier), true);
-    write_mem_prot(offset_vladscape1, to_le_bytes(vladscape_multiplier), true);
-    write_mem_prot(offset_vladscape2, to_le_bytes(vladscape_multiplier), true);
+    // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
+    write_mem_prot(get_address("blood_multiplication"), vladscape_multiplier, true);
 }
 
 SaveData* savedata()
@@ -1087,7 +976,7 @@ void drop(uint32_t who_uid, uint32_t what_uid)
 void set_olmec_phase_y_level(uint8_t phase, float y)
 {
     // Sets the Y-level Olmec changes phases. The defaults are :
-    // - phase 1 (bombs) = 99 (+1)  (the game adds 1 to the fixed value for some reason)
+    // - phase 1 (bombs) = 100
     // - phase 2 (ufos) = 83
     // Olmecs checks phases in order! The means if you want ufo's from the start
     // you have to put both phase 1 and 2 at e.g. level 199
@@ -1097,77 +986,49 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     static size_t phase2_offset = 0;
     if (phase1_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
+        // from 1.23.x onwards, there are now two instructions per phase that reference the y-level float
+        size_t phase_1_instruction_a = get_address("olmec_transition_phase_1_y_level");
+        size_t phase_1_instruction_b = phase_1_instruction_a + 0xd;
+        phase1_offset = get_address("olmec_transition_phase_1_custom_floats");
 
-        std::string pattern_phase1 = "\xF3\x0F\x10\x15\x1B\x8C\x36\x00"s;
-        std::string pattern_phase2 = "\xF3\x0F\x10\x0D\xE1\x87\x36\x00"s;
-
-        // first look up these patterns so we are in the correct function
-        auto offset1 = find_inst(exe, pattern_phase1, memory.after_bundle);
-        auto offset2 = find_inst(exe, pattern_phase2, memory.after_bundle);
-
-        // find the space inbetween this function and the next
-        uint8_t cc_counter = 0;
-        size_t op_counter = offset1;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-
-        // here's the memory location where we save our floats
-        phase1_offset = op_counter;
-        phase2_offset = phase1_offset + 4;
+        size_t phase_2_instruction_a = get_address("olmec_transition_phase_2_y_level");
+        size_t phase_2_instruction_b = phase_2_instruction_a + 0x11;
+        phase2_offset = phase1_offset + 0x4;
 
         // write the default values to our new floats
-        write_mem_prot(memory.at_exe(phase1_offset), to_le_bytes(99.0f), true);
-        write_mem_prot(memory.at_exe(phase2_offset), to_le_bytes(83.0f), true);
+        write_mem_prot(phase1_offset, 100.0f, true);
+        write_mem_prot(phase2_offset, 83.0f, true);
 
         // calculate the distances between our floats and the movss instructions
-        uint32_t distance_1 = static_cast<uint32_t>(phase1_offset - (offset1 + 8));
-        uint32_t distance_2 = static_cast<uint32_t>(phase2_offset - (offset2 + 8));
+        auto distance_1_a = static_cast<int32_t>(phase1_offset - phase_1_instruction_a);
+        auto distance_1_b = static_cast<int32_t>(phase1_offset - phase_1_instruction_b);
+        auto distance_2_a = static_cast<int32_t>(phase2_offset - phase_2_instruction_a);
+        auto distance_2_b = static_cast<int32_t>(phase2_offset - phase_2_instruction_b);
 
         // overwrite the movss instructions to load our floats
-        write_mem_prot(memory.at_exe(offset1 + 4), to_le_bytes(distance_1), true);
-        write_mem_prot(memory.at_exe(offset2 + 4), to_le_bytes(distance_2), true);
-
-        phase1_offset = memory.at_exe(phase1_offset);
-        phase2_offset = memory.at_exe(phase2_offset);
+        write_mem_prot(phase_1_instruction_a - 4, distance_1_a, true);
+        write_mem_prot(phase_1_instruction_b - 4, distance_1_b, true);
+        write_mem_prot(phase_2_instruction_a - 4, distance_2_a, true);
+        write_mem_prot(phase_2_instruction_b - 4, distance_2_b, true);
     }
 
     if (phase == 1)
     {
-        write_mem_prot(phase1_offset, to_le_bytes(y), true);
+        write_mem_prot(phase1_offset, y, true);
     }
     else if (phase == 2)
     {
-        write_mem_prot(phase2_offset, to_le_bytes(y), true);
+        write_mem_prot(phase2_offset, y, true);
     }
 }
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
-    static size_t normal_offset = 0;
-    static size_t cursed_offset = 0;
-    if (normal_offset == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\xBA\x28\x23\x00\x00\x41\xB8\x30\x2A\x00\x00"s;
-        auto offset = find_inst(exe, pattern, memory.after_bundle);
-        normal_offset = memory.at_exe(offset + 7);
-        cursed_offset = memory.at_exe(offset + 1);
-    }
-    write_mem_prot(normal_offset, to_le_bytes(normal), true);
-    write_mem_prot(cursed_offset, to_le_bytes(cursed), true);
+    write_mem_prot(get_address("ghost_spawn_time"), normal, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), cursed, true);
 }
 
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
@@ -1189,12 +1050,12 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
         {
             if (entry.chance_sizeof == 4)
             {
-                write_mem_prot(entry.offset, to_le_bytes(new_drop_chance), true);
+                write_mem_prot(entry.offset, new_drop_chance, true);
             }
             else if (entry.chance_sizeof == 1)
             {
                 uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_prot(entry.offset, to_le_bytes(value), true);
+                write_mem_prot(entry.offset, value, true);
             }
         }
     }
@@ -1244,7 +1105,7 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
         {
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
             {
-                write_mem_prot(entry.offsets[x], to_le_bytes(new_drop_entity_type), true);
+                write_mem_prot(entry.offsets[x], new_drop_entity_type, true);
             }
         }
     }
@@ -1255,10 +1116,7 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x48\x8B\xD9\xB9\xB0\x01\x00\x00"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("generate_particles");
     }
 
     if (offset != 0)
@@ -1280,11 +1138,7 @@ void set_journal_enabled(bool b)
     static char original_instruction[2] = {0};
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\x45\x33\xC9\x48\x8B\xCB\x45\x33\xC0"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("show_journal");
         for (uint8_t x = 0; x < 2; ++x)
         {
             original_instruction[x] = read_u8(offset + x);
@@ -1306,11 +1160,7 @@ void set_camp_camera_bounds_enabled(bool b)
     static char original_instruction[3] = {0};
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\x65\x4c\x8b\x3c\x25\x58\x00\x00\x00\x41\xbd\x30\x01\x00\x00"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("enforce_camp_camera_bounds");
         for (uint8_t x = 0; x < 3; ++x)
         {
             original_instruction[x] = read_u8(offset + x);
@@ -1421,14 +1271,7 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
 
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\xBA\xD7\x00\x00\x00\x8B\x44\x24\x60"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
-    }
+    auto offset = get_address("spawn_companion");
     if (offset != 0)
     {
         auto state = get_state_ptr();

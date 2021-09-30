@@ -6,6 +6,7 @@
 #include <d3d11.h>
 #include <detours.h>
 
+#include "game_allocator.hpp"
 #include "logger.h"
 #include "memory.hpp"
 #include "util.hpp"
@@ -155,29 +156,22 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
     return nullptr;
 }
 
-using ReadEncryptedFileFun = FileInfo*(const char* file_path, AllocFun alloc_fun);
+using ReadEncryptedFileFun = FileInfo*(const char* file_path);
 ReadEncryptedFileFun* g_read_encrypted_file_trampoline{nullptr};
-FileInfo* read_encrypted_file(const char* file_path, AllocFun alloc_fun)
+FileInfo* read_encrypted_file(const char* file_path)
 {
-    if (auto file = g_OnLoadFile(file_path, alloc_fun))
+    if (auto file = g_OnLoadFile(file_path, &game_malloc))
     {
         return file;
     }
-    return g_read_encrypted_file_trampoline(file_path, alloc_fun);
+    return g_read_encrypted_file_trampoline(file_path);
 }
 
 void register_on_load_file(LoadFileCallback on_load_file)
 {
     if (g_read_encrypted_file_trampoline == nullptr && on_load_file != nullptr)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-
-        auto off = find_inst(exe, "\x4c\x63\x78\x0c\x49\x8b\xcf\x44\x89\x68\x08"s, after_bundle) - 0x30;
-        auto fun_start = decode_pc(exe, find_inst(exe, "\xe8"s, off), 1);
-
-        g_read_encrypted_file_trampoline = (ReadEncryptedFileFun*)memory.at_exe(fun_start);
+        g_read_encrypted_file_trampoline = (ReadEncryptedFileFun*)get_address("read_encrypted_file"sv);
 
         DetourRestoreAfterWith();
 

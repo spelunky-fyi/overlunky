@@ -5,6 +5,7 @@
 #include "entities_items.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "online.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -34,6 +35,7 @@
 #include "usertypes/player_lua.hpp"
 #include "usertypes/prng_lua.hpp"
 #include "usertypes/save_context.hpp"
+#include "usertypes/screen_arena_lua.hpp"
 #include "usertypes/screen_lua.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
@@ -112,6 +114,7 @@ end
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
     NScreen::register_usertypes(lua);
+    NScreenArena::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
@@ -128,6 +131,8 @@ end
     lua["state"] = get_state_ptr();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
+    /// The Online object has information about the online lobby and its players
+    lua["online"] = get_online();
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Player*>(get_players());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
@@ -698,7 +703,8 @@ end
     /// Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
     /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
     lua["modify_sparktraps"] = modify_sparktraps;
-    /// Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+    /// Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
+    /// Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
     lua["set_blood_multiplication"] = set_blood_multiplication;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
@@ -1276,9 +1282,9 @@ end
     lua.create_named_table(
         "VANILLA_FONT_STYLE",
         "ITALIC",
-        0,
+        1,
         "BOLD",
-        1);
+        2);
 }
 
 std::vector<std::string> safe_fields{};

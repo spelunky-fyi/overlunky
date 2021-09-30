@@ -6,10 +6,7 @@ void PowerupCapable::remove_powerup(ENT_TYPE powerup_type)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x48\x8B\xCB\xFF\x90\xF0\x02\x00\x00\x48\x8B\x5C\x24\x30"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("remove_powerup");
     }
 
     if (offset != 0)
@@ -25,10 +22,7 @@ void PowerupCapable::give_powerup(ENT_TYPE powerup_type)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x83\x8A\xF4\x09\x00\x00\x40"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("give_powerup");
     }
 
     if (offset != 0)
@@ -44,6 +38,15 @@ bool PowerupCapable::has_powerup(ENT_TYPE powerup_type)
     return powerups.find(powerup_type) != powerups.end();
 }
 
+void Player::set_name(std::u16string name)
+{
+    return NCharacterDB::set_character_full_name(NCharacterDB::get_character_index(type->id), name);
+}
+void Player::set_short_name(std::u16string name)
+{
+    return NCharacterDB::set_character_short_name(NCharacterDB::get_character_index(type->id), name);
+}
+
 std::vector<ENT_TYPE> PowerupCapable::get_powerups()
 {
     std::vector<ENT_TYPE> return_powerups;
@@ -56,44 +59,44 @@ std::vector<ENT_TYPE> PowerupCapable::get_powerups()
 
 std::u16string Player::get_name()
 {
-    return ::get_character_full_name(get_character_index(type->id));
+    return NCharacterDB::get_character_full_name(NCharacterDB::get_character_index(type->id));
 }
 std::u16string Player::get_short_name()
 {
-    return ::get_character_short_name(get_character_index(type->id));
+    return NCharacterDB::get_character_short_name(NCharacterDB::get_character_index(type->id));
 }
 Color Player::get_heart_color()
 {
-    return ::get_character_heart_color(get_character_index(type->id));
+    return NCharacterDB::get_character_heart_color(NCharacterDB::get_character_index(type->id));
 }
 bool Player::is_female()
 {
-    return ::get_character_gender(get_character_index(type->id));
+    return NCharacterDB::get_character_gender(NCharacterDB::get_character_index(type->id));
 }
 
 void Player::set_heart_color(Color hcolor)
 {
-    ::set_character_heart_color(get_character_index(type->id), hcolor);
+    ::set_character_heart_color(NCharacterDB::get_character_index(type->id), hcolor);
 }
 
 std::u16string get_character_name(ENT_TYPE type_id)
 {
-    return get_character_full_name(get_character_index(type_id));
+    return NCharacterDB::get_character_full_name(NCharacterDB::get_character_index(type_id));
 }
 std::u16string get_character_short_name(ENT_TYPE type_id)
 {
-    return get_character_shortname(get_character_index(type_id));
+    return NCharacterDB::get_character_short_name(NCharacterDB::get_character_index(type_id));
 }
 Color get_character_heart_color(ENT_TYPE type_id)
 {
-    return get_character_heartcolor(get_character_index(type_id));
+    return NCharacterDB::get_character_heart_color(NCharacterDB::get_character_index(type_id));
 }
 bool is_character_female(ENT_TYPE type_id)
 {
-    return get_character_gender(get_character_index(type_id));
+    return NCharacterDB::get_character_gender(NCharacterDB::get_character_index(type_id));
 }
 
 void set_character_heart_color(ENT_TYPE type_id, Color color)
 {
-    set_character_heartcolor(get_character_index(type_id), color);
+    NCharacterDB::set_character_heart_color(NCharacterDB::get_character_index(type_id), color);
 }

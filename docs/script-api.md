@@ -91,6 +91,10 @@ if state.time_level > 300 and state.theme == THEME.DWELLING then
     toast("Congratulations for lasting 5 seconds in Dwelling")
 end
 ```
+### [`game_manager`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_manager)
+The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
+### [`online`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online)
+The Online object has information about the online lobby and its players
 ### [`players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players)
 An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
 ### [`savegame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=savegame)
@@ -105,9 +109,6 @@ If you don't care what part of the game you affect just use `prng.random`.
 The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
-### [`game_manager`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_manager)
-`nil game_manager()`<br/>
-The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
 `nil lua_print()`<br/>
 Standard lua print function, prints directly to the console but not to the game
@@ -468,7 +469,8 @@ Speed: expressed as the amount that should be added to the angle every frame (us
 Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
 ### [`set_blood_multiplication`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
 `nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)`<br/>
-Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
+Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ### [`flip_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 `nil flip_entity(int uid)`<br/>
 Flip entity around by uid. All new entities face right by default.
@@ -999,11 +1001,14 @@ end
 - [`ScreenArenaIntro screen_arena_intro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_intro) &StateMemory::screen_arena_intro
 - [`ScreenArenaLevel screen_arena_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_level) &StateMemory::screen_arena_level
 - [`ScreenArenaScore screen_arena_score`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_score) &StateMemory::screen_arena_score
+- [`ScreenArenaMenu screen_arena_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_menu) &StateMemory::screen_arena_menu
+- [`ScreenArenaItems screen_arena_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_items) &StateMemory::screen_arena_items
 - [`int get_correct_ushabti()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti) &StateMemory::get_correct_ushabti
 \
 Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 ### `GameManager`
+- [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
 - [`ScreenIntro screen_intro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_intro) &GameManager::screen_intro
 - [`ScreenPrologue screen_prologue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_prologue) &GameManager::screen_prologue
@@ -1016,12 +1021,13 @@ Returns animation_frame of the correct ushabti
 - [`ScreenCharacterSelect screen_character_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) &GameManager::screen_character_select
 - [`ScreenCamp screen_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) &GameManager::screen_camp
 - [`ScreenLevel screen_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) &GameManager::screen_level
-- [`ScreenArenaMenu screen_arena_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_menu) &GameManager::screen_arena_menu
-- [`ScreenArenaItems screen_arena_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_items) &GameManager::screen_arena_items
 - [`ScreenOnlineLoading screen_online_loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_loading) &GameManager::screen_online_loading
 - [`ScreenOnlineLobby screen_online_lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_lobby) &GameManager::screen_online_lobby
 - [`PauseUI pause_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) &GameManager::pause_ui
 - [`JournalUI journal_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) &GameManager::journal_ui
+### `GameProps`
+- [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &GameProps::buttons
+- [`bool game_has_focus`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) &GameProps::game_has_focus
 ### `LightParams`
 - [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &LightParams::red
 - [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &LightParams::green
@@ -1068,6 +1074,19 @@ see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
 - [`bool uniform_shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uniform_shake) &Camera::uniform_shake
 - [`int focused_entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) &Camera::focused_entity_uid
 - [`float inertia`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) &Camera::inertia
+### `Online`
+- [`array<OnlinePlayer, 4> online_players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) &Online::online_players
+- [`OnlinePlayerShort local_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=local_player) &Online::local_player
+- [`OnlineLobby lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lobby) &Online::lobby
+### `OnlinePlayer`
+- [`int ready_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) &OnlinePlayer::ready_state
+- [`int character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &OnlinePlayer::character
+- [`player_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) &OnlinePlayer::player_name
+### `OnlineLobby`
+- [`int code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=code) &OnlineLobby::code
+- [`string get_code()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_code) &OnlineLobby::get_code
+\
+Gets the string equivalent of the code
 ### `PRNG`
 PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
@@ -3437,6 +3456,89 @@ Derived from [`Screen`](#screen)
 - [`float constellation_text_opacity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text_opacity) &ScreenConstellation::constellation_text_opacity
 ### `ScreenRecap`
 Derived from [`Screen`](#screen)
+### `ScreenOnlineLoading`
+Derived from [`Screen`](#screen)
+- [`TextureRenderingInfo ouroboros`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ouroboros) &ScreenOnlineLoading::ouroboros
+- [`float ouroboros_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ouroboros_angle) &ScreenOnlineLoading::ouroboros_angle
+### `ScreenOnlineLobby`
+Derived from [`Screen`](#screen)
+- [`float woodpanels_slidein_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanels_slidein_timer) &ScreenOnlineLobby::woodpanels_slidein_timer
+- [`float scroll_unfurl_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_unfurl_timer) &ScreenOnlineLobby::scroll_unfurl_timer
+- [`TextureRenderingInfo woodpanel_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_bottom) &ScreenOnlineLobby::woodpanel_bottom
+- [`TextureRenderingInfo woodpanel_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top) &ScreenOnlineLobby::woodpanel_top
+- [`TextureRenderingInfo left_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_scroll_handle) &ScreenOnlineLobby::left_scroll_handle
+- [`TextureRenderingInfo right_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_scroll_handle) &ScreenOnlineLobby::right_scroll_handle
+- [`int scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenOnlineLobby::scroll_text_id
+- [`int btn_left_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_left_text_id) &ScreenOnlineLobby::btn_left_text_id
+- [`int btn_right_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_right_text_id) &ScreenOnlineLobby::btn_right_text_id
+- [`int btn_center_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_center_text_id) &ScreenOnlineLobby::btn_center_text_id
+- [`bool woodpanel_top_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top_visible) &ScreenOnlineLobby::woodpanel_top_visible
+- [`bool woodpanel_bottom_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_bottom_visible) &ScreenOnlineLobby::woodpanel_bottom_visible
+- [`bool toggle_panels_slidein`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_panels_slidein) &ScreenOnlineLobby::toggle_panels_slidein
+- [`array<OnlineLobbyScreenPlayer, 4> players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) &ScreenOnlineLobby::players
+- [`TextureRenderingInfo background_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background_image) &ScreenOnlineLobby::background_image
+- [`TextureRenderingInfo topleft_woodpanel_esc`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc) &ScreenOnlineLobby::topleft_woodpanel_esc
+- [`float topleft_woodpanel_esc_slidein_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc_slidein_timer) &ScreenOnlineLobby::topleft_woodpanel_esc_slidein_timer
+- [`float character_walk_offset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_walk_offset) &ScreenOnlineLobby::character_walk_offset
+- [`bool character_facing_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_facing_left) &ScreenOnlineLobby::character_facing_left
+- [`int move_direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) &ScreenOnlineLobby::move_direction
+- [`TextureRenderingInfo character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &ScreenOnlineLobby::character
+- [`TextureRenderingInfo player_ready_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_ready_icon) &ScreenOnlineLobby::player_ready_icon
+- [`TextureRenderingInfo arrow_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_left) &ScreenOnlineLobby::arrow_left
+- [`TextureRenderingInfo arrow_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_right) &ScreenOnlineLobby::arrow_right
+- [`float arrow_left_hor_offset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_left_hor_offset) &ScreenOnlineLobby::arrow_left_hor_offset
+- [`float arrow_right_hor_offset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_right_hor_offset) &ScreenOnlineLobby::arrow_right_hor_offset
+- [`TextureRenderingInfo platform_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_icon) &ScreenOnlineLobby::platform_icon
+- [`int player_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) &ScreenOnlineLobby::player_count
+- [`bool searching_for_players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=searching_for_players) &ScreenOnlineLobby::searching_for_players
+- [`bool show_code_panel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_code_panel) &ScreenOnlineLobby::show_code_panel
+- [`float enter_code_woodpanel_bottom_slidein_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom_slidein_pos) &ScreenOnlineLobby::enter_code_woodpanel_bottom_slidein_pos
+- [`TextureRenderingInfo enter_code_woodpanel_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom) &ScreenOnlineLobby::enter_code_woodpanel_bottom
+- [`int enter_code_btn_right_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_btn_right_text_id) &ScreenOnlineLobby::enter_code_btn_right_text_id
+- [`bool enter_code_woodpanel_top_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_top_visible) &ScreenOnlineLobby::enter_code_woodpanel_top_visible
+- [`bool enter_code_woodpanel_bottom_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom_visible) &ScreenOnlineLobby::enter_code_woodpanel_bottom_visible
+- [`bool enter_code_toggle_panels_slidein`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_toggle_panels_slidein) &ScreenOnlineLobby::enter_code_toggle_panels_slidein
+- [`int selected_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_character) &ScreenOnlineLobby::selected_character
+- [`int characters_entered_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters_entered_count) &ScreenOnlineLobby::characters_entered_count
+- [`float enter_code_topleft_woodpanel_esc_slidein_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_topleft_woodpanel_esc_slidein_timer) &ScreenOnlineLobby::enter_code_topleft_woodpanel_esc_slidein_timer
+- [`int enter_code_banner_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_banner_text_id) &ScreenOnlineLobby::enter_code_banner_text_id
+- [`int enter_code_OK_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_OK_text_id) &ScreenOnlineLobby::enter_code_OK_text_id
+- [`TextureRenderingInfo enter_code_main_woodpanel_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_left) &ScreenOnlineLobby::enter_code_main_woodpanel_left
+- [`TextureRenderingInfo enter_code_main_woodpanel_center`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_center) &ScreenOnlineLobby::enter_code_main_woodpanel_center
+- [`TextureRenderingInfo enter_code_main_woodpanel_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_right) &ScreenOnlineLobby::enter_code_main_woodpanel_right
+- [`TextureRenderingInfo enter_code_banner`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_banner) &ScreenOnlineLobby::enter_code_banner
+- [`TextureRenderingInfo enter_code_char_cutouts`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_char_cutouts) &ScreenOnlineLobby::enter_code_char_cutouts
+- [`TextureRenderingInfo enter_code_pointing_hand`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_pointing_hand) &ScreenOnlineLobby::enter_code_pointing_hand
+- [`TextureRenderingInfo enter_code_buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_buttons) &ScreenOnlineLobby::enter_code_buttons
+- [`TextureRenderingInfo enter_code_OK_panel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_OK_panel) &ScreenOnlineLobby::enter_code_OK_panel
+- [`float enter_code_OK_panel_slidein_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_OK_panel_slidein_timer) &ScreenOnlineLobby::enter_code_OK_panel_slidein_timer
+- [`TextureRenderingInfo enter_code_your_code_scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_your_code_scroll) &ScreenOnlineLobby::enter_code_your_code_scroll
+- [`TextureRenderingInfo enter_code_your_code_scroll_left_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_your_code_scroll_left_handle) &ScreenOnlineLobby::enter_code_your_code_scroll_left_handle
+- [`TextureRenderingInfo enter_code_your_code_scroll_right_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_your_code_scroll_right_handle) &ScreenOnlineLobby::enter_code_your_code_scroll_right_handle
+- [`nil set_code(const string& code)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_code) &ScreenOnlineLobby::set_code
+### `PauseUI`
+- [`float menu_slidein_progress`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_slidein_progress) &PauseUI::menu_slidein_progress
+- [`TextureRenderingInfo blurred_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blurred_background) &PauseUI::blurred_background
+- [`TextureRenderingInfo woodpanel_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_left) &PauseUI::woodpanel_left
+- [`TextureRenderingInfo woodpanel_middle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_middle) &PauseUI::woodpanel_middle
+- [`TextureRenderingInfo woodpanel_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_right) &PauseUI::woodpanel_right
+- [`TextureRenderingInfo woodpanel_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top) &PauseUI::woodpanel_top
+- [`TextureRenderingInfo scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll) &PauseUI::scroll
+- [`TextureRenderingInfo confirmation_panel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=confirmation_panel) &PauseUI::confirmation_panel
+- [`int previously_selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=previously_selected_menu_index) &PauseUI::previously_selected_menu_index
+- [`int visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &PauseUI::visibility
+### `JournalUI`
+- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &JournalUI::state
+- [`int page_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_shown) &JournalUI::page_shown
+- [`int current_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_page) &JournalUI::current_page
+- [`int flipping_to_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipping_to_page) &JournalUI::flipping_to_page
+- [`int max_page_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_page_count) &JournalUI::max_page_count
+- [`TextureRenderingInfo book_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=book_background) &JournalUI::book_background
+- [`TextureRenderingInfo arrow_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_left) &JournalUI::arrow_left
+- [`TextureRenderingInfo arrow_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_right) &JournalUI::arrow_right
+- [`TextureRenderingInfo unknown23`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) &JournalUI::unknown23
+- [`TextureRenderingInfo entire_book`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) &JournalUI::entire_book
+- [`int page_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) &JournalUI::page_timer
 ### `ScreenArenaMenu`
 Derived from [`Screen`](#screen)
 - [`ScreenZoomAnimation brick_background_animation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_background_animation) &ScreenArenaMenu::brick_background_animation
@@ -3618,35 +3720,6 @@ Derived from [`Screen`](#screen)
 - [`array<float, MAX_PLAYERS> player_crushing_pillar_height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_crushing_pillar_height) &ScreenArenaScore::player_crushing_pillar_height
 - [`array<bool, MAX_PLAYERS> player_create_giblets`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_create_giblets) &ScreenArenaScore::player_create_giblets
 - [`float next_sidepanel_slidein_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_sidepanel_slidein_timer) &ScreenArenaScore::next_sidepanel_slidein_timer
-### `ScreenOnlineLoading`
-Derived from [`Screen`](#screen)
-- [`TextureRenderingInfo ouroboros`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ouroboros) &ScreenOnlineLoading::ouroboros
-- [`float ouroboros_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ouroboros_angle) &ScreenOnlineLoading::ouroboros_angle
-### `ScreenOnlineLobby`
-Derived from [`Screen`](#screen)
-### `PauseUI`
-- [`float menu_slidein_progress`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_slidein_progress) &PauseUI::menu_slidein_progress
-- [`TextureRenderingInfo blurred_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blurred_background) &PauseUI::blurred_background
-- [`TextureRenderingInfo woodpanel_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_left) &PauseUI::woodpanel_left
-- [`TextureRenderingInfo woodpanel_middle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_middle) &PauseUI::woodpanel_middle
-- [`TextureRenderingInfo woodpanel_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_right) &PauseUI::woodpanel_right
-- [`TextureRenderingInfo woodpanel_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top) &PauseUI::woodpanel_top
-- [`TextureRenderingInfo scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll) &PauseUI::scroll
-- [`TextureRenderingInfo confirmation_panel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=confirmation_panel) &PauseUI::confirmation_panel
-- [`int previously_selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=previously_selected_menu_index) &PauseUI::previously_selected_menu_index
-- [`int visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &PauseUI::visibility
-### `JournalUI`
-- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &JournalUI::state
-- [`int page_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_shown) &JournalUI::page_shown
-- [`int current_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_page) &JournalUI::current_page
-- [`int flipping_to_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipping_to_page) &JournalUI::flipping_to_page
-- [`int max_page_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_page_count) &JournalUI::max_page_count
-- [`TextureRenderingInfo book_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=book_background) &JournalUI::book_background
-- [`TextureRenderingInfo arrow_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_left) &JournalUI::arrow_left
-- [`TextureRenderingInfo arrow_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_right) &JournalUI::arrow_right
-- [`TextureRenderingInfo unknown23`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) &JournalUI::unknown23
-- [`TextureRenderingInfo entire_book`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) &JournalUI::entire_book
-- [`int page_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) &JournalUI::page_timer
 ## Automatic casting of entities
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
 

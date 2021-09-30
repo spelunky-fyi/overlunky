@@ -135,9 +135,9 @@ struct StateMemory
     ScreenScores* screen_scores;
     ScreenConstellation* screen_constellation;
     ScreenRecap* screen_recap;
-    size_t unknown_screen_arena_menu; // potentially ScreenArenaMenu, available in GameManager
+    ScreenArenaMenu* screen_arena_menu;
     ScreenArenaStagesSelect* screen_arena_stages_select1;
-    size_t unknown_screen_arena_intro; // potentially ScreenArenaIntro, available in GameManager
+    ScreenArenaItems* screen_arena_items;
     ScreenArenaStagesSelect* screen_arena_stages_select2;
     ScreenArenaIntro* screen_arena_intro;
     ScreenArenaLevel* screen_arena_level;
@@ -160,15 +160,20 @@ struct StateMemory
     PointerList* particle_emitters; // list of ParticleEmitterInfo*
     PointerList* lightsources;      // list of Illumination*
     size_t unknown27;
-    std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
-    size_t unknown28;
-    size_t unknown29;
+
+    // This is a Robin Hood Table
+    size_t uid_to_entity_mask;
+    RobinHoodTableEntry* uid_to_entity_data;
+
+    size_t backlayer_player_related1;
+    size_t backlayer_player_related2;
+
     size_t unknown30;
     uint32_t layer_transition_effect_timer;
     uint8_t camera_layer;
-    uint8_t unknowk31a;
-    uint8_t unknowk31b;
-    uint8_t unknowk31c;
+    uint8_t unknown31a;
+    uint8_t unknown31b;
+    uint8_t unknown31c;
     size_t unknown32;
     size_t unknown33;
     size_t unknown34;
@@ -186,10 +191,6 @@ struct StateMemory
 struct State
 {
     size_t location;
-    size_t addr_damage;
-    size_t addr_insta;
-    size_t addr_zoom;
-    size_t addr_zoom_shop;
     size_t addr_dark;
 
     static void set_write_load_opt(bool allow);
@@ -216,20 +217,7 @@ struct State
         return (Items*)(pointer);
     }
 
-    void godmode(bool g)
-    {
-        // log::debug!("God {:?}" mode; g);
-        if (g)
-        {
-            write_mem_prot(addr_damage, ("\xC3"s), true);
-            write_mem_prot(addr_insta, ("\xC3"s), true);
-        }
-        else
-        {
-            write_mem_prot(addr_damage, ("\x48"s), true);
-            write_mem_prot(addr_insta, ("\x40"s), true);
-        }
-    }
+    void godmode(bool g);
 
     void darkmode(bool g)
     {
@@ -244,88 +232,12 @@ struct State
         }
     }
 
-    void zoom(float level)
-    {
-        // This technically sets camp zoom but not interactively :(
-        // auto addr_zoom = find_inst(memory.exe(), &hex!("C7 80 E8 04 08 00"),
-        // memory.after_bundle); write_mem_prot(memory.at_exe(addr_zoom + 6),
-        // to_le_bytes(level), true); addr_zoom = memory.after_bundle;
-
-        auto roomx = ptr()->w;
-        if (level == 0.0)
-        {
-            switch (roomx)
-            {
-            case 1:
-                level = 9.50f;
-                break;
-            case 2:
-                level = 16.29f;
-                break;
-            case 3:
-                level = 23.08f;
-                break;
-            case 4:
-                level = 29.87f;
-                break;
-            case 5:
-                level = 36.66f;
-                break;
-            case 6:
-                level = 43.45f;
-                break;
-            case 7:
-                level = 50.24f;
-                break;
-            case 8:
-                level = 57.03f;
-                break;
-            default:
-                level = 13.5f;
-            }
-        }
-
-        static size_t offset[4] = {0}; // where the different hardcoded zoom levels are written
-        if (offset[0] == 0)
-        {
-            auto memory = Memory::get();
-            auto _addr_zoom = memory.after_bundle;
-            for (int i = 0; i < 4; i++)
-            {
-                _addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, _addr_zoom + 1);
-                offset[i] = memory.at_exe(_addr_zoom) + 10;
-            }
-        }
-        if (offset[0] != 0)
-            write_mem_prot(offset[0], to_le_bytes(level), true); // I dunno :D
-        if (offset[1] != 0)
-            write_mem_prot(offset[1], to_le_bytes(level), true); // shop
-        if (offset[2] != 0)
-            write_mem_prot(offset[2], to_le_bytes(level), true); // level
-        if (offset[3] != 0)
-            write_mem_prot(offset[3], to_le_bytes(level), true); // default (camp, transition)
-
-        static size_t real_offset = 0; // actual target zoom level
-        if (real_offset == 0)
-        {
-            auto memory = Memory::get();
-            auto _offset = memory.at_exe(0x22334A00); //TODO: patterns or something. Also this pointer is kinda slow, it doesn't work before intro cutscene.
-            _offset = read_u64(_offset);
-            if (_offset != 0)
-            {
-                _offset += 0x804f0;
-                real_offset = _offset;
-            }
-        }
-        if (real_offset != 0)
-        {
-            write_mem_prot(real_offset, to_le_bytes(level), true);
-        }
-    }
+    size_t get_zoom_level_address();
+    float get_zoom_level();
+    void zoom(float level);
 
     std::pair<float, float> click_position(float x, float y);
     std::pair<float, float> screen_position(float x, float y);
-    float get_zoom_level();
 
     uint32_t flags()
     {
@@ -357,14 +269,7 @@ struct State
         return prng;
     }
 
-    Entity* find(uint32_t unique_id)
-    {
-        auto& map = ptr()->instance_id_to_pointer;
-        auto it = map.find(unique_id);
-        if (it == map.end())
-            return nullptr;
-        return it->second;
-    }
+    Entity* find(uint32_t uid);
 
     std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);

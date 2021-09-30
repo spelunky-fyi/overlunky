@@ -6,117 +6,92 @@
 #include "rpc.hpp"
 #include "state.hpp"
 
-using LoadItem = size_t (*)(Layer*, size_t, float, float, bool);
-LoadItem get_load_item()
-{
-    ONCE(LoadItem)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto needle = "\xBA\xB9\x01\x00\x00"s;
-        auto off = find_inst(exe, needle, memory.after_bundle);
-        off = find_inst(exe, needle, off + 5);
-        off = find_inst(exe, needle, off + 5);
-        off = find_inst(exe, "\xE8"s, off + 5);
-
-        return res = (LoadItem)memory.at_exe(Memory::decode_call(off));
-    }
-}
-
-using LoadItemOver = Entity* (*)(Layer*, size_t, Entity*, float, float, bool);
-LoadItemOver get_load_item_over()
-{
-    ONCE(LoadItemOver)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xBA\x51\x00\x00\x00\x48\x8B"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xE8"s, off + 5);
-        off = find_inst(memory.exe(), "\xE8"s, off + 5);
-        return res = (LoadItemOver)memory.at_exe(Memory::decode_call(off));
-    }
-}
-
-using GetGridEntityAt = Entity* (*)(Layer*, float, float);
-GetGridEntityAt get_get_grid_entity_at()
-{
-    ONCE(GetGridEntityAt)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x48\x8b\x00\xff\x90\x38\x01\x00\x00"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xE8"s, off - 0x10);
-        return res = (GetGridEntityAt)memory.at_exe(Memory::decode_call(off));
-    }
-}
-
 Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap)
 {
     if (id == 0)
         return nullptr;
-    auto load_item = get_load_item();
-    size_t addr;
-    Entity* spawned;
+
+    using LoadItem = Entity*(Layer*, size_t, float, float, bool);
+    static auto load_item = (LoadItem*)get_address("load_item");
+
     float min_speed_check = 0.01f;
-    if (!screen)
+    if (!screen && snap)
     {
-        if (snap)
+        x = round(x);
+        y = round(y);
+    }
+    else if (screen)
+    {
+        auto state = State::get();
+        std::tie(x, y) = state.click_position(x, y);
+        min_speed_check = 0.04f;
+        if (snap && abs(vx) + abs(vy) <= min_speed_check)
         {
             x = round(x);
             y = round(y);
         }
-        addr = load_item(this, id, x, y, false);
-        spawned = (Entity*)(addr);
     }
-    else
-    {
-        auto state = State::get();
-        auto [rx, ry] = state.click_position(x, y);
-        min_speed_check = 0.04f;
-        if (snap && abs(vx) + abs(vy) <= min_speed_check)
-        {
-            rx = round(rx);
-            ry = round(ry);
-        }
-        addr = load_item(this, id, rx, ry, false);
-        spawned = (Entity*)(addr);
-    }
+
+    Entity* spawned = load_item(this, id, x, y, false);
     if (abs(vx) + abs(vy) > min_speed_check && spawned->is_movable())
     {
-        write_mem(addr + 0x100, to_le_bytes(vx));
-        write_mem(addr + 0x104, to_le_bytes(vy));
+        auto movable = (Movable*)spawned;
+        movable->velocityx = vx;
+        movable->velocityy = vy;
     }
-    DEBUG("Spawned {:x}", addr);
+
+    DEBUG("Spawned {}", fmt::ptr(spawned));
     return spawned;
+}
+
+void snap_to_floor(Entity* ent, float y)
+{
+    ent->y = y - ent->hitboxy + ent->offsety;
+    Entity* overlay = ent->overlay;
+    while (overlay != nullptr)
+    {
+        ent->y -= overlay->y;
+        overlay = overlay->overlay;
+    }
 }
 
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 {
-    using SpawnEntityHopefullySynced = Entity* (*)(Layer*, size_t, float, float);
-    static SpawnEntityHopefullySynced spawn_entity_snap_to_floor = []
+    const EntityDB* type = get_type(static_cast<uint32_t>(id));
+    const float y_center = (float)roundf(y) - 0.5f;
+    const float snapped_y = type->rect_collision.up_plus_down - type->rect_collision.up_minus_down + y_center;
+    Entity* ent = spawn_entity(id, x, snapped_y, false, 0.0f, 0.0f, false);
+    if ((type->search_flags & 0x700) == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto off = find_inst(exe, "\x41\x0f\x28\xd8\x49\x8b\xce"s, memory.after_bundle);
-        off = find_inst(exe, "\xE8"s, off + 5);
-
-        return (SpawnEntityHopefullySynced)memory.at_exe(Memory::decode_call(off));
-    }();
-
-    return spawn_entity_snap_to_floor(this, id, x, y);
+        snap_to_floor(ent, y_center);
+    }
+    return ent;
 }
 
 Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 {
-    if (id == 0)
-        return nullptr;
-    auto load_item_over = (get_load_item_over());
+    using SpawnEntityFun = Entity*(EntityFactory*, size_t, float, float, bool, Entity*, bool);
+    static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
+    static auto fun_22872fe0 = (void (*)(void*, Entity*))get_address("fun_22872fe0");
+    static auto fun_2286f240 = (void (*)(void*, Entity*, bool))get_address("fun_2286f240");
 
-    return load_item_over(this, id, overlay, x, y, true);
+    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, true);
+    if (*((bool*)this + 0x64490))
+    {
+        fun_22872fe0(this, ent);
+    }
+    else
+    {
+        fun_2286f240((void*)((size_t)this + 0x64440), ent, false);
+    }
+    return ent;
 }
 
 Entity* Layer::get_grid_entity_at(float x, float y)
 {
-    auto get_grid_entity_at = (get_get_grid_entity_at());
-    return get_grid_entity_at(this, x, y);
+    const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
+    const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
+    return grid_entities[ix][iy];
 }
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)

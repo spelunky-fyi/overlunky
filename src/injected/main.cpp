@@ -7,6 +7,7 @@
 #include "logger.h"
 #include "memory.h"
 #include "render_api.hpp"
+#include "search.hpp"
 #include "state.hpp"
 #include "ui.hpp"
 #include "window_api.hpp"
@@ -64,6 +65,8 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         fclose(fp);
     }
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
+
+    preload_addresses();
 
     while (true)
     {

@@ -3,15 +3,10 @@
 #include "memory.hpp"
 #include "render_api.hpp"
 
-size_t particle_db_ptr()
+ParticleDB* particle_db_ptr()
 {
-    ONCE(size_t)
-    {
-        auto mem = Memory::get();
-        std::string pattern = "\xB8\x01\x00\x00\x00\x66\x89\x05"s;
-        res = mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), pattern, find_inst(mem.exe(), pattern, mem.after_bundle) + 1) + 5));
-        return res;
-    }
+    static ParticleDB* addr = (ParticleDB*)get_address("particle_emitter_db");
+    return addr;
 }
 
 std::uint64_t ParticleDB::get_texture()
@@ -36,7 +31,7 @@ ParticleDB* get_particle_type(uint32_t id)
         uint32_t current_id = 0;
         uint32_t max_entries = 250;
         uint32_t counter = 0;
-        ParticleDB* db = reinterpret_cast<ParticleDB*>(particle_db_ptr());
+        ParticleDB* db = particle_db_ptr();
         while (counter < max_entries)
         {
             if (db->id > current_id && db->id < (current_id + 10)) // allow for gaps in the id's
@@ -64,8 +59,7 @@ const std::vector<ParticleEmitter>& list_particles()
     static std::vector<ParticleEmitter> particles = {};
     if (particles.size() == 0)
     {
-        auto mem = Memory::get();
-        auto mapOffset = mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\xA8\x16\x00\x00\x48\x8D\x0D"s, mem.after_bundle) + 4));
+        auto mapOffset = get_address("particle_emitter_list");
         std::unordered_map<std::string, uint16_t>* map = reinterpret_cast<std::unordered_map<std::string, uint16_t>*>(mapOffset);
         for (const auto& [particle_name, particle_id] : *map)
         {

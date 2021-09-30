@@ -14,6 +14,7 @@
 #include "texture.hpp"
 #include "vtable_hook.hpp"
 
+using namespace std::chrono_literals;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
 template <class FunT>
@@ -35,17 +36,6 @@ struct EntityHooksInfo
 };
 std::vector<EntityHooksInfo> g_entity_hooks;
 
-size_t cache_entities_ptr = 0;
-
-size_t entities_offset()
-{
-    ONCE(size_t)
-    {
-        auto mem = Memory::get();
-        return res = decode_imm(mem.exe(), find_inst(mem.exe(), "\x48\x8D\x8B"s, find_inst(mem.exe(), "\x29\x5C\x8F\x3D"s, mem.after_bundle)));
-    }
-}
-
 struct EntityBucket
 {
     void** begin;
@@ -62,24 +52,24 @@ struct EntityPool
     EntityBucket* _some_bucket;
     EntityBucket* bucket;
 };
-struct EntityStore
+struct EntityFactory
 {
-    EntityDB types[0x391];
-    bool type_set[0x391];
+    EntityDB types[0x395];
+    bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map;
     EntityMap entity_map;
     void* _ptr_7;
 };
 
-size_t entities_ptr()
+EntityFactory* entity_factory()
 {
-    if (cache_entities_ptr == 0)
+    static EntityFactory* cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
+    while (cache_entity_factory == 0)
     {
-        auto mem = Memory::get();
-        cache_entities_ptr =
-            mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\x48\xB8\x02\x55\xA7\x74\x52\x9D\x51\x43"s, mem.after_bundle) - 7));
+        std::this_thread::sleep_for(500ms);
+        cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
     }
-    return cache_entities_ptr;
+    return cache_entity_factory;
 }
 
 AddLayer get_add_layer()
@@ -106,53 +96,41 @@ RemoveLayer get_remove_layer()
 
 std::vector<EntityItem> list_entities()
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
-    size_t off = entities_offset();
-    // Special case: map_ptr might be 0 if it's not initialized.
-    // This only occurs in list_entities; for others, do not check the pointer
-    // to see if this assumption works.
-    if (!map_ptr)
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (!entity_factory_ptr)
         return {};
 
-    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
+    const EntityMap& map = entity_factory_ptr->entity_map;
 
     std::vector<EntityItem> result;
-    for (const auto& kv : *map)
+    for (const auto& [name, id] : map)
     {
-        result.emplace_back(kv.first, kv.second);
-        // auto entities = reinterpret_cast<EntityDB *>(map_ptr);
-        // EntityDB *entity = &entities[kv.second];
-        // printf("%d\n", entity->id);
+        result.emplace_back(name, id);
     }
-
     return result;
 }
 
 EntityDB* get_type(uint32_t id)
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
+    EntityFactory* entity_factory_ptr = entity_factory();
+
     // Special case: map_ptr might be 0 if it's not initialized.
     // This only occurs in list_entities; for others, do not check the pointer
     // to see if this assumption works.
-    if (!map_ptr)
+    if (!entity_factory_ptr)
         return nullptr;
 
-    //auto map = reinterpret_cast<EntityMap*>(map_ptr + entities_offset());
-
-    std::vector<EntityItem> result;
-    auto entities = reinterpret_cast<EntityDB*>(map_ptr);
-    return &entities[id];
+    return entity_factory_ptr->types + id;
 }
 
 uint32_t to_id(std::string_view name)
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
-    size_t off = entities_offset();
-    if (!map_ptr)
-        return 0;
-    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
-    auto it = map->find(std::string(name));
-    return it != map->end() ? it->second : -1;
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (!entity_factory_ptr)
+        return {};
+    const EntityMap& map = entity_factory_ptr->entity_map;
+    auto it = map.find(std::string(name));
+    return it != map.end() ? it->second : -1;
 }
 
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
@@ -347,11 +325,12 @@ uint8_t Player::kapala_blood_amount()
 
 void Movable::poison(int16_t frames)
 {
-    static size_t offset = 0;
-    if (offset == 0)
+    static size_t offset_first = 0;
+    static size_t offset_subsequent = 0;
+    if (offset_first == 0)
     {
-        auto memory = Memory::get();
-        offset = memory.at_exe(find_inst(memory.exe(), "\xB8\x08\x07\x00\x00\x66\x89\x87\x18\x01\x00\x00"s, memory.after_bundle));
+        offset_first = get_address("first_poison_tick_timer_default");
+        offset_subsequent = get_address("subsequent_poison_tick_timer_default");
     }
     poison_tick_timer = frames;
 
@@ -359,7 +338,8 @@ void Movable::poison(int16_t frames)
     {
         frames = 1800;
     }
-    write_mem_prot(offset + 1, to_le_bytes(frames), true);
+    write_mem_prot(offset_first, frames, true);
+    write_mem_prot(offset_subsequent, frames, true);
 }
 
 bool Movable::is_poisoned()

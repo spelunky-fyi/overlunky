@@ -2,6 +2,7 @@
 
 #include "game_manager.hpp"
 #include "level_api.hpp"
+#include "online.hpp"
 #include "state.hpp"
 
 #include <sol/sol.hpp>
@@ -167,12 +168,18 @@ void register_usertypes(sol::state& lua)
         &StateMemory::screen_arena_level,
         "screen_arena_score",
         &StateMemory::screen_arena_score,
+        "screen_arena_menu",
+        &StateMemory::screen_arena_menu,
+        "screen_arena_items",
+        &StateMemory::screen_arena_items,
         "get_correct_ushabti",
         &StateMemory::get_correct_ushabti,
         "set_correct_ushabti",
         &StateMemory::set_correct_ushabti);
     lua.new_usertype<GameManager>(
         "GameManager",
+        "game_props",
+        &GameManager::game_props,
         "screen_logo",
         &GameManager::screen_logo,
         "screen_intro",
@@ -197,10 +204,6 @@ void register_usertypes(sol::state& lua)
         &GameManager::screen_camp,
         "screen_level",
         &GameManager::screen_level,
-        "screen_arena_menu",
-        &GameManager::screen_arena_menu,
-        "screen_arena_items",
-        &GameManager::screen_arena_items,
         "screen_online_loading",
         &GameManager::screen_online_loading,
         "screen_online_lobby",
@@ -209,6 +212,12 @@ void register_usertypes(sol::state& lua)
         &GameManager::pause_ui,
         "journal_ui",
         &GameManager::journal_ui);
+    lua.new_usertype<GameProps>(
+        "GameProps",
+        "buttons",
+        &GameProps::buttons,
+        "game_has_focus",
+        &GameProps::game_has_focus);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
@@ -289,6 +298,28 @@ void register_usertypes(sol::state& lua)
         &Camera::focused_entity_uid,
         "inertia",
         &Camera::inertia);
+    lua.new_usertype<Online>(
+        "Online",
+        "online_players",
+        &Online::online_players,
+        "local_player",
+        &Online::local_player,
+        "lobby",
+        &Online::lobby);
+    lua.new_usertype<OnlinePlayer>(
+        "OnlinePlayer",
+        "ready_state",
+        sol::readonly(&OnlinePlayer::ready_state),
+        "character",
+        &OnlinePlayer::character,
+        "player_name",
+        sol::readonly(&OnlinePlayer::player_name));
+    lua.new_usertype<OnlineLobby>(
+        "OnlineLobby",
+        "code",
+        &OnlineLobby::code,
+        "get_code",
+        &OnlineLobby::get_code);
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 

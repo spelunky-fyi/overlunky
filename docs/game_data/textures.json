@@ -30,21 +30,246 @@
     "width": 256
   },
   "10": {
-    "height": 1080,
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansboldru_0.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "100": {
+    "height": 1600,
+    "num_tiles": {
+      "height": 4,
+      "width": 16
+    },
+    "offset": {
+      "height": 320,
+      "width": 0
+    },
+    "path": "Data/Textures/journal_entry_traps.DDS",
+    "tile_height": 80,
+    "tile_width": 80,
+    "width": 1600
+  },
+  "101": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_surface.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "102": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "103": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 752,
+      "width": 640
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 16,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "104": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "105": {
+    "height": 1024,
     "num_tiles": {
       "height": 1,
       "width": 1
     },
     "offset": {
       "height": 0,
+      "width": 384
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "106": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_title.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
   },
-  "100": {
+  "107": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 2
+    },
+    "offset": {
+      "height": 384,
+      "width": 512
+    },
+    "path": "Data/Textures/base_eggship.DDS",
+    "tile_height": 128,
+    "tile_width": 348,
+    "width": 1024
+  },
+  "108": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship2.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "109": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship2.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1024
+  },
+  "11": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansitalicru_0.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "110": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 384,
+      "width": 512
+    },
+    "path": "Data/Textures/base_eggship2.DDS",
+    "tile_height": 128,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "111": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 384,
+      "width": 384
+    },
+    "path": "Data/Textures/base_eggship3.DDS",
+    "tile_height": 384,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "112": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship3.DDS",
+    "tile_height": 640,
+    "tile_width": 384,
+    "width": 1024
+  },
+  "113": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/base_eggship3.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "114": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -59,7 +284,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "101": {
+  "115": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -74,7 +299,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "102": {
+  "116": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -89,7 +314,7 @@
     "tile_width": 1024,
     "width": 1024
   },
-  "103": {
+  "117": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -104,7 +329,7 @@
     "tile_width": 512,
     "width": 1024
   },
-  "104": {
+  "118": {
     "height": 1024,
     "num_tiles": {
       "height": 2,
@@ -119,7 +344,7 @@
     "tile_width": 1024,
     "width": 1024
   },
-  "105": {
+  "119": {
     "height": 2048,
     "num_tiles": {
       "height": 4,
@@ -134,7 +359,22 @@
     "tile_width": 512,
     "width": 2048
   },
-  "106": {
+  "12": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansboldcs_0.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 4096
+  },
+  "120": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -149,7 +389,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "107": {
+  "121": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -164,7 +404,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "108": {
+  "122": {
     "height": 2048,
     "num_tiles": {
       "height": 4,
@@ -179,7 +419,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "109": {
+  "123": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -194,22 +434,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "11": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_titlegal.DDS",
-    "tile_height": 1024,
-    "tile_width": 1024,
-    "width": 1024
-  },
-  "110": {
+  "124": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -224,7 +449,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "111": {
+  "125": {
     "height": 2048,
     "num_tiles": {
       "height": 4,
@@ -239,7 +464,7 @@
     "tile_width": 896,
     "width": 2048
   },
-  "112": {
+  "126": {
     "height": 2048,
     "num_tiles": {
       "height": 2,
@@ -254,7 +479,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "113": {
+  "127": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -269,7 +494,7 @@
     "tile_width": 512,
     "width": 1024
   },
-  "114": {
+  "128": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -284,7 +509,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "115": {
+  "129": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -299,7 +524,22 @@
     "tile_width": 128,
     "width": 1536
   },
-  "116": {
+  "13": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansitaliccs_0.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 4096
+  },
+  "130": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -314,7 +554,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "117": {
+  "131": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -329,7 +569,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "118": {
+  "132": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -344,7 +584,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "119": {
+  "133": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -359,22 +599,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "12": {
-    "height": 512,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_body.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 512
-  },
-  "120": {
+  "134": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -389,7 +614,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "121": {
+  "135": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -404,7 +629,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "122": {
+  "136": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -419,7 +644,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "123": {
+  "137": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -434,7 +659,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "124": {
+  "138": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -449,7 +674,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "125": {
+  "139": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -464,7 +689,22 @@
     "tile_width": 384,
     "width": 1536
   },
-  "126": {
+  "14": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansboldct_0.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 4096
+  },
+  "140": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -479,7 +719,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "127": {
+  "141": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -494,7 +734,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "128": {
+  "142": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -509,7 +749,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "129": {
+  "143": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -524,22 +764,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "13": {
-    "height": 256,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_dirt.DDS",
-    "tile_height": 256,
-    "tile_width": 1024,
-    "width": 1024
-  },
-  "130": {
+  "144": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -554,7 +779,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "131": {
+  "145": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -569,7 +794,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "132": {
+  "146": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -584,7 +809,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "133": {
+  "147": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -599,7 +824,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "134": {
+  "148": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -614,7 +839,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "135": {
+  "149": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -629,7 +854,22 @@
     "tile_width": 512,
     "width": 1536
   },
-  "136": {
+  "15": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansitalicct_0.DDS",
+    "tile_height": 1024,
+    "tile_width": 2048,
+    "width": 4096
+  },
+  "150": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -644,7 +884,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "137": {
+  "151": {
     "height": 1536,
     "num_tiles": {
       "height": 4,
@@ -659,7 +899,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "138": {
+  "152": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -674,7 +914,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "139": {
+  "153": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -689,22 +929,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "14": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_door.DDS",
-    "tile_height": 1024,
-    "tile_width": 512,
-    "width": 512
-  },
-  "140": {
+  "154": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -719,7 +944,22 @@
     "tile_width": 128,
     "width": 1536
   },
-  "141": {
+  "155": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_volcano.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "156": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -734,7 +974,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "142": {
+  "157": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -749,7 +989,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "143": {
+  "158": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -764,7 +1004,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "144": {
+  "159": {
     "height": 1280,
     "num_tiles": {
       "height": 1,
@@ -779,7 +1019,22 @@
     "tile_width": 128,
     "width": 1280
   },
-  "145": {
+  "16": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansboldko_0.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 2048
+  },
+  "160": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -794,7 +1049,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "146": {
+  "161": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -809,7 +1064,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "147": {
+  "162": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -824,7 +1079,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "148": {
+  "163": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -839,7 +1094,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "149": {
+  "164": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -854,22 +1109,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "15": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_doorback.DDS",
-    "tile_height": 1024,
-    "tile_width": 1024,
-    "width": 1024
-  },
-  "150": {
+  "165": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -884,7 +1124,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "151": {
+  "166": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -899,7 +1139,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "152": {
+  "167": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -914,7 +1154,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "153": {
+  "168": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -929,7 +1169,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "154": {
+  "169": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -944,7 +1184,22 @@
     "tile_width": 128,
     "width": 1536
   },
-  "155": {
+  "17": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansitalicko_0.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "170": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -959,7 +1214,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "156": {
+  "171": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -974,7 +1229,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "157": {
+  "172": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -989,7 +1244,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "158": {
+  "173": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -1004,7 +1259,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "159": {
+  "174": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1019,22 +1274,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "16": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_doorframe.DDS",
-    "tile_height": 1080,
-    "tile_width": 1280,
-    "width": 1280
-  },
-  "160": {
+  "175": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -1049,7 +1289,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "161": {
+  "176": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -1064,7 +1304,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "162": {
+  "177": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1079,7 +1319,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "163": {
+  "178": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1094,7 +1334,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "164": {
+  "179": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1109,7 +1349,22 @@
     "tile_width": 256,
     "width": 1536
   },
-  "165": {
+  "18": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnotosansboldnicknames_0.DDS",
+    "tile_height": 512,
+    "tile_width": 1024,
+    "width": 2048
+  },
+  "180": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -1124,7 +1379,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "166": {
+  "181": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1139,7 +1394,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "167": {
+  "182": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1154,7 +1409,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "168": {
+  "183": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1169,7 +1424,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "169": {
+  "184": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -1184,22 +1439,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "17": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_fore1.DDS",
-    "tile_height": 1080,
-    "tile_width": 512,
-    "width": 512
-  },
-  "170": {
+  "185": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -1214,7 +1454,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "171": {
+  "186": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -1229,7 +1469,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "172": {
+  "187": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1244,7 +1484,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "173": {
+  "188": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1259,7 +1499,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "174": {
+  "189": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1274,7 +1514,22 @@
     "tile_width": 256,
     "width": 1536
   },
-  "175": {
+  "19": {
+    "height": 256,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontmono.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 256
+  },
+  "190": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1289,7 +1544,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "176": {
+  "191": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -1304,7 +1559,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "177": {
+  "192": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1319,7 +1574,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "178": {
+  "193": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1334,7 +1589,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "179": {
+  "194": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1349,22 +1604,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "18": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_fore2.DDS",
-    "tile_height": 1080,
-    "tile_width": 768,
-    "width": 768
-  },
-  "180": {
+  "195": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -1379,7 +1619,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "181": {
+  "196": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -1394,7 +1634,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "182": {
+  "197": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1409,7 +1649,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "183": {
+  "198": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1424,7 +1664,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "184": {
+  "199": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1438,246 +1678,6 @@
     "tile_height": 128,
     "tile_width": 256,
     "width": 1536
-  },
-  "185": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 2,
-      "width": 1
-    },
-    "offset": {
-      "height": 896,
-      "width": 0
-    },
-    "path": "Data/Textures/floor_sunken.DDS",
-    "tile_height": 320,
-    "tile_width": 384,
-    "width": 1536
-  },
-  "186": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 6,
-      "width": 6
-    },
-    "offset": {
-      "height": 768,
-      "width": 1024
-    },
-    "path": "Data/Textures/floor_sunken.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1536
-  },
-  "187": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/deco_eggplant.DDS",
-    "tile_height": 320,
-    "tile_width": 384,
-    "width": 1536
-  },
-  "188": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 3,
-      "width": 3
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/deco_sunken.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 1536
-  },
-  "189": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 2,
-      "width": 3
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/deco_sunken.DDS",
-    "tile_height": 640,
-    "tile_width": 512,
-    "width": 1536
-  },
-  "19": {
-    "height": 512,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/main_head.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 512
-  },
-  "190": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 2,
-      "width": 6
-    },
-    "offset": {
-      "height": 640,
-      "width": 0
-    },
-    "path": "Data/Textures/deco_sunken.DDS",
-    "tile_height": 768,
-    "tile_width": 256,
-    "width": 1536
-  },
-  "191": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 12,
-      "width": 12
-    },
-    "offset": {
-      "height": 640,
-      "width": 256
-    },
-    "path": "Data/Textures/deco_sunken.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1536
-  },
-  "192": {
-    "height": 512,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/bg_sunken.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 512
-  },
-  "193": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 640,
-      "width": 1280
-    },
-    "path": "Data/Textures/floor_sunken.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1536
-  },
-  "194": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 2,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 512
-    },
-    "path": "Data/Textures/floor_sunken.DDS",
-    "tile_height": 320,
-    "tile_width": 384,
-    "width": 1536
-  },
-  "195": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 24,
-      "width": 24
-    },
-    "offset": {
-      "height": 1408,
-      "width": 768
-    },
-    "path": "Data/Textures/floor_sunken.DDS",
-    "tile_height": 64,
-    "tile_width": 64,
-    "width": 1536
-  },
-  "196": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 4,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/bg_duat.DDS",
-    "tile_height": 256,
-    "tile_width": 1024,
-    "width": 1024
-  },
-  "197": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 768,
-      "width": 512
-    },
-    "path": "Data/Textures/floorstyled_duat.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "198": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 4,
-      "width": 2
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/bg_duat.DDS",
-    "tile_height": 256,
-    "tile_width": 512,
-    "width": 1024
-  },
-  "199": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 4,
-      "width": 8
-    },
-    "offset": {
-      "height": 0,
-      "width": 512
-    },
-    "path": "Data/Textures/bg_duat.DDS",
-    "tile_height": 256,
-    "tile_width": 128,
-    "width": 1024
   },
   "2": {
     "height": 128,
@@ -1695,21 +1695,261 @@
     "width": 128
   },
   "20": {
-    "height": 768,
+    "height": 512,
     "num_tiles": {
-      "height": 3,
+      "height": 1,
       "width": 1
     },
     "offset": {
       "height": 0,
-      "width": 192
+      "width": 0
     },
-    "path": "Data/Textures/menu_disp.DDS",
-    "tile_height": 256,
-    "tile_width": 1024,
-    "width": 1408
+    "path": "Data/Textures/fontdebug.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
   },
   "200": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 896,
+      "width": 0
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "201": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 6,
+      "width": 6
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "202": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_eggplant.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "203": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 3,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "204": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 3
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 640,
+    "tile_width": 512,
+    "width": 1536
+  },
+  "205": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 6
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 768,
+    "tile_width": 256,
+    "width": 1536
+  },
+  "206": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 640,
+      "width": 256
+    },
+    "path": "Data/Textures/deco_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "207": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_sunken.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "208": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 640,
+      "width": 1280
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "209": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 320,
+    "tile_width": 384,
+    "width": 1536
+  },
+  "21": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_title.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "210": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 24,
+      "width": 24
+    },
+    "offset": {
+      "height": 1408,
+      "width": 768
+    },
+    "path": "Data/Textures/floor_sunken.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 1536
+  },
+  "211": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_duat.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "212": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 768,
+      "width": 512
+    },
+    "path": "Data/Textures/floorstyled_duat.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "213": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 2
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_duat.DDS",
+    "tile_height": 256,
+    "tile_width": 512,
+    "width": 1024
+  },
+  "214": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 4,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 512
+    },
+    "path": "Data/Textures/bg_duat.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1024
+  },
+  "215": {
     "height": 1024,
     "num_tiles": {
       "height": 2,
@@ -1724,7 +1964,7 @@
     "tile_width": 1024,
     "width": 1024
   },
-  "201": {
+  "216": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1739,7 +1979,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "202": {
+  "217": {
     "height": 1536,
     "num_tiles": {
       "height": 12,
@@ -1754,7 +1994,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "203": {
+  "218": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1769,7 +2009,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "204": {
+  "219": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -1784,7 +2024,22 @@
     "tile_width": 384,
     "width": 1536
   },
-  "205": {
+  "22": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_titlegal.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "220": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1799,7 +2054,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "206": {
+  "221": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1814,7 +2069,7 @@
     "tile_width": 256,
     "width": 1536
   },
-  "207": {
+  "222": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -1829,7 +2084,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "208": {
+  "223": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -1844,7 +2099,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "209": {
+  "224": {
     "height": 1536,
     "num_tiles": {
       "height": 1,
@@ -1859,22 +2114,7 @@
     "tile_width": 128,
     "width": 1536
   },
-  "21": {
-    "height": 768,
-    "num_tiles": {
-      "height": 3,
-      "width": 11
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_disp.DDS",
-    "tile_height": 256,
-    "tile_width": 128,
-    "width": 1408
-  },
-  "210": {
+  "225": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -1889,7 +2129,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "211": {
+  "226": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -1904,7 +2144,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "212": {
+  "227": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -1919,7 +2159,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "213": {
+  "228": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -1934,7 +2174,7 @@
     "tile_width": 512,
     "width": 2048
   },
-  "214": {
+  "229": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1949,7 +2189,22 @@
     "tile_width": 128,
     "width": 2048
   },
-  "215": {
+  "23": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_body.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "230": {
     "height": 1536,
     "num_tiles": {
       "height": 6,
@@ -1964,261 +2219,6 @@
     "tile_width": 128,
     "width": 2048
   },
-  "216": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_wood.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "217": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_wood.DDS",
-    "tile_height": 256,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "218": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 5
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_wood.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "219": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 5
-    },
-    "offset": {
-      "height": 768,
-      "width": 1024
-    },
-    "path": "Data/Textures/floorstyled_wood.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "22": {
-    "height": 768,
-    "num_tiles": {
-      "height": 3,
-      "width": 1
-    },
-    "offset": {
-      "height": 256,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_disp.DDS",
-    "tile_height": 256,
-    "tile_width": 1408,
-    "width": 1408
-  },
-  "220": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 5
-    },
-    "offset": {
-      "height": 512,
-      "width": 1024
-    },
-    "path": "Data/Textures/floorstyled_wood.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "221": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_stone.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "222": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 5
-    },
-    "offset": {
-      "height": 128,
-      "width": 1024
-    },
-    "path": "Data/Textures/floorstyled_stone.DDS",
-    "tile_height": 128,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "223": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 5
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_stone.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "224": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 5
-    },
-    "offset": {
-      "height": 768,
-      "width": 1024
-    },
-    "path": "Data/Textures/floorstyled_stone.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "225": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_temple.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "226": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 3,
-      "width": 5
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_temple.DDS",
-    "tile_height": 384,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "227": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 5
-    },
-    "offset": {
-      "height": 768,
-      "width": 1024
-    },
-    "path": "Data/Textures/floorstyled_temple.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "228": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_pagoda.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "229": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_pagoda.DDS",
-    "tile_height": 256,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "23": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_charsel.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
-  },
-  "230": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 5
-    },
-    "offset": {
-      "height": 768,
-      "width": 1024
-    },
-    "path": "Data/Textures/floorstyled_pagoda.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1280
-  },
   "231": {
     "height": 1280,
     "num_tiles": {
@@ -2229,7 +2229,7 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "path": "Data/Textures/floorstyled_wood.DDS",
     "tile_height": 128,
     "tile_width": 128,
     "width": 1280
@@ -2244,7 +2244,7 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "path": "Data/Textures/floorstyled_wood.DDS",
     "tile_height": 256,
     "tile_width": 128,
     "width": 1280
@@ -2252,34 +2252,19 @@
   "233": {
     "height": 1280,
     "num_tiles": {
-      "height": 10,
+      "height": 5,
       "width": 5
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_babylon.DDS",
-    "tile_height": 128,
+    "path": "Data/Textures/floorstyled_wood.DDS",
+    "tile_height": 256,
     "tile_width": 256,
     "width": 1280
   },
   "234": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 1
-    },
-    "offset": {
-      "height": 1024,
-      "width": 384
-    },
-    "path": "Data/Textures/floorstyled_babylon.DDS",
-    "tile_height": 128,
-    "tile_width": 896,
-    "width": 1280
-  },
-  "235": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -2289,7 +2274,22 @@
       "height": 768,
       "width": 1024
     },
-    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "path": "Data/Textures/floorstyled_wood.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "235": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 512,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_wood.DDS",
     "tile_height": 256,
     "tile_width": 256,
     "width": 1280
@@ -2304,7 +2304,7 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "path": "Data/Textures/floorstyled_stone.DDS",
     "tile_height": 128,
     "tile_width": 128,
     "width": 1280
@@ -2316,10 +2316,10 @@
       "width": 5
     },
     "offset": {
-      "height": 0,
-      "width": 0
+      "height": 128,
+      "width": 1024
     },
-    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "path": "Data/Textures/floorstyled_stone.DDS",
     "tile_height": 128,
     "tile_width": 256,
     "width": 1280
@@ -2327,16 +2327,16 @@
   "238": {
     "height": 1280,
     "num_tiles": {
-      "height": 10,
-      "width": 1
+      "height": 5,
+      "width": 5
     },
     "offset": {
-      "height": 1024,
-      "width": 384
+      "height": 0,
+      "width": 0
     },
-    "path": "Data/Textures/floorstyled_sunken.DDS",
-    "tile_height": 128,
-    "tile_width": 896,
+    "path": "Data/Textures/floorstyled_stone.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
     "width": 1280
   },
   "239": {
@@ -2349,13 +2349,13 @@
       "height": 768,
       "width": 1024
     },
-    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "path": "Data/Textures/floorstyled_stone.DDS",
     "tile_height": 256,
     "tile_width": 256,
     "width": 1280
   },
   "24": {
-    "height": 512,
+    "height": 256,
     "num_tiles": {
       "height": 1,
       "width": 1
@@ -2364,10 +2364,10 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_chardoor.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 512
+    "path": "Data/Textures/main_dirt.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1024
   },
   "240": {
     "height": 1280,
@@ -2379,27 +2379,12 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "path": "Data/Textures/floorstyled_temple.DDS",
     "tile_height": 128,
     "tile_width": 128,
     "width": 1280
   },
   "241": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 5,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floorstyled_vlad.DDS",
-    "tile_height": 256,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "242": {
     "height": 1280,
     "num_tiles": {
       "height": 3,
@@ -2409,12 +2394,12 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "path": "Data/Textures/floorstyled_temple.DDS",
     "tile_height": 384,
     "tile_width": 256,
     "width": 1280
   },
-  "243": {
+  "242": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -2424,40 +2409,55 @@
       "height": 768,
       "width": 1024
     },
-    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "path": "Data/Textures/floorstyled_temple.DDS",
     "tile_height": 256,
     "tile_width": 256,
     "width": 1280
   },
-  "244": {
+  "243": {
     "height": 1280,
     "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 384,
-      "width": 1024
-    },
-    "path": "Data/Textures/floorstyled_vlad.DDS",
-    "tile_height": 256,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "245": {
-    "height": 512,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
+      "height": 10,
+      "width": 10
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/bg_vlad.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 512
+    "path": "Data/Textures/floorstyled_pagoda.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "244": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_pagoda.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "245": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_pagoda.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
   },
   "246": {
     "height": 1280,
@@ -2469,7 +2469,7 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_gold.DDS",
+    "path": "Data/Textures/floorstyled_babylon.DDS",
     "tile_height": 128,
     "tile_width": 128,
     "width": 1280
@@ -2484,12 +2484,267 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/floorstyled_gold.DDS",
+    "path": "Data/Textures/floorstyled_babylon.DDS",
     "tile_height": 256,
     "tile_width": 128,
     "width": 1280
   },
   "248": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "249": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 1
+    },
+    "offset": {
+      "height": 1024,
+      "width": 384
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 128,
+    "tile_width": 896,
+    "width": 1280
+  },
+  "25": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_door.DDS",
+    "tile_height": 1024,
+    "tile_width": 512,
+    "width": 512
+  },
+  "250": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_babylon.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "251": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "252": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "253": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 1
+    },
+    "offset": {
+      "height": 1024,
+      "width": 384
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 128,
+    "tile_width": 896,
+    "width": 1280
+  },
+  "254": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_sunken.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "255": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "256": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "257": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 5
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 384,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "258": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 5
+    },
+    "offset": {
+      "height": 768,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 256,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "259": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 384,
+      "width": 1024
+    },
+    "path": "Data/Textures/floorstyled_vlad.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "26": {
+    "height": 1024,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_doorback.DDS",
+    "tile_height": 1024,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "260": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/bg_vlad.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "261": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_gold.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "262": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 5,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/floorstyled_gold.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "263": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -2504,7 +2759,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "249": {
+  "264": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -2519,22 +2774,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "25": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_generic.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
-  },
-  "250": {
+  "265": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -2549,7 +2789,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "251": {
+  "266": {
     "height": 1536,
     "num_tiles": {
       "height": 3,
@@ -2564,7 +2804,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "252": {
+  "267": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -2579,7 +2819,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "253": {
+  "268": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -2594,7 +2834,7 @@
     "tile_width": 384,
     "width": 1536
   },
-  "254": {
+  "269": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -2609,7 +2849,22 @@
     "tile_width": 512,
     "width": 512
   },
-  "255": {
+  "27": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_doorframe.DDS",
+    "tile_height": 1080,
+    "tile_width": 1280,
+    "width": 1280
+  },
+  "270": {
     "height": 1280,
     "num_tiles": {
       "height": 1,
@@ -2624,7 +2879,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "256": {
+  "271": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -2639,7 +2894,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "257": {
+  "272": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -2654,7 +2909,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "258": {
+  "273": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -2669,7 +2924,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "259": {
+  "274": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -2684,22 +2939,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "26": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_cave1.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
-  },
-  "260": {
+  "275": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -2714,7 +2954,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "261": {
+  "276": {
     "height": 1280,
     "num_tiles": {
       "height": 5,
@@ -2729,7 +2969,7 @@
     "tile_width": 384,
     "width": 1280
   },
-  "262": {
+  "277": {
     "height": 1280,
     "num_tiles": {
       "height": 3,
@@ -2744,7 +2984,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "263": {
+  "278": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -2759,7 +2999,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "264": {
+  "279": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -2774,7 +3014,22 @@
     "tile_width": 512,
     "width": 1536
   },
-  "265": {
+  "28": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_fore1.DDS",
+    "tile_height": 1080,
+    "tile_width": 512,
+    "width": 512
+  },
+  "280": {
     "height": 1536,
     "num_tiles": {
       "height": 2,
@@ -2789,7 +3044,7 @@
     "tile_width": 512,
     "width": 1536
   },
-  "266": {
+  "281": {
     "height": 1024,
     "num_tiles": {
       "height": 8,
@@ -2804,7 +3059,7 @@
     "tile_width": 128,
     "width": 1024
   },
-  "267": {
+  "282": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -2819,7 +3074,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "268": {
+  "283": {
     "height": 1024,
     "num_tiles": {
       "height": 8,
@@ -2834,7 +3089,7 @@
     "tile_width": 128,
     "width": 1024
   },
-  "269": {
+  "284": {
     "height": 1024,
     "num_tiles": {
       "height": 3,
@@ -2849,22 +3104,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "27": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_cave2.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
-  },
-  "270": {
+  "285": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2879,7 +3119,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "271": {
+  "286": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2894,7 +3134,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "272": {
+  "287": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2909,7 +3149,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "273": {
+  "288": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2924,7 +3164,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "274": {
+  "289": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2939,7 +3179,22 @@
     "tile_width": 128,
     "width": 2048
   },
-  "275": {
+  "29": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/main_fore2.DDS",
+    "tile_height": 1080,
+    "tile_width": 768,
+    "width": 768
+  },
+  "290": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2954,7 +3209,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "276": {
+  "291": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2969,7 +3224,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "277": {
+  "292": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2984,7 +3239,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "278": {
+  "293": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -2999,7 +3254,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "279": {
+  "294": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3014,22 +3269,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "28": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_brick1.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
-  },
-  "280": {
+  "295": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3044,7 +3284,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "281": {
+  "296": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3059,7 +3299,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "282": {
+  "297": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3074,7 +3314,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "283": {
+  "298": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3089,7 +3329,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "284": {
+  "299": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3102,246 +3342,6 @@
     "path": "Data/Textures/char_red.DDS",
     "tile_height": 128,
     "tile_width": 128,
-    "width": 2048
-  },
-  "285": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/char_pink.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "286": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/char_violet.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "287": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/char_gray.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "288": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/char_khaki.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "289": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/char_orange.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "29": {
-    "height": 1080,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_brick2.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
-  },
-  "290": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/char_hired.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "291": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/char_eggchild.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "292": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 12,
-      "width": 12
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monsters_pets.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1536
-  },
-  "293": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monstersbasic01.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "294": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monstersbasic02.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "295": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monstersbasic03.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "296": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monsters01.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "297": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monsters02.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "298": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 16
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monsters03.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 2048
-  },
-  "299": {
-    "height": 2048,
-    "num_tiles": {
-      "height": 16,
-      "width": 8
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/monsters03.DDS",
-    "tile_height": 128,
-    "tile_width": 256,
     "width": 2048
   },
   "3": {
@@ -3360,7 +3360,7 @@
     "width": 1920
   },
   "30": {
-    "height": 1280,
+    "height": 512,
     "num_tiles": {
       "height": 1,
       "width": 1
@@ -3369,12 +3369,252 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_basic.DDS",
-    "tile_height": 1280,
-    "tile_width": 1280,
-    "width": 1280
+    "path": "Data/Textures/main_head.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
   },
   "300": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_pink.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "301": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_violet.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "302": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_gray.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "303": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_khaki.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "304": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_orange.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "305": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_hired.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "306": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/char_eggchild.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "307": {
+    "height": 1536,
+    "num_tiles": {
+      "height": 12,
+      "width": 12
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters_pets.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1536
+  },
+  "308": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbasic01.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "309": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbasic02.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "31": {
+    "height": 768,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 192
+    },
+    "path": "Data/Textures/menu_disp.DDS",
+    "tile_height": 256,
+    "tile_width": 1024,
+    "width": 1408
+  },
+  "310": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monstersbasic03.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "311": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters01.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "312": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters02.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "313": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters03.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 2048
+  },
+  "314": {
+    "height": 2048,
+    "num_tiles": {
+      "height": 16,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/monsters03.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 2048
+  },
+  "315": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3389,7 +3629,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "301": {
+  "316": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3404,7 +3644,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "302": {
+  "317": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3419,7 +3659,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "303": {
+  "318": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3434,7 +3674,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "304": {
+  "319": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3449,7 +3689,22 @@
     "tile_width": 256,
     "width": 2048
   },
-  "305": {
+  "32": {
+    "height": 768,
+    "num_tiles": {
+      "height": 3,
+      "width": 11
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_disp.DDS",
+    "tile_height": 256,
+    "tile_width": 128,
+    "width": 1408
+  },
+  "320": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3464,7 +3719,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "306": {
+  "321": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3479,7 +3734,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "307": {
+  "322": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3494,7 +3749,7 @@
     "tile_width": 384,
     "width": 2048
   },
-  "308": {
+  "323": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3509,7 +3764,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "309": {
+  "324": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3524,22 +3779,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "31": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 20,
-      "width": 20
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_basic.DDS",
-    "tile_height": 64,
-    "tile_width": 64,
-    "width": 1280
-  },
-  "311": {
+  "326": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3554,7 +3794,7 @@
     "tile_width": 384,
     "width": 2048
   },
-  "312": {
+  "327": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3569,7 +3809,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "313": {
+  "328": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3584,7 +3824,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "314": {
+  "329": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3599,7 +3839,22 @@
     "tile_width": 256,
     "width": 2048
   },
-  "315": {
+  "33": {
+    "height": 768,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 256,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_disp.DDS",
+    "tile_height": 256,
+    "tile_width": 1408,
+    "width": 1408
+  },
+  "330": {
     "height": 2048,
     "num_tiles": {
       "height": 2,
@@ -3614,7 +3869,7 @@
     "tile_width": 640,
     "width": 2048
   },
-  "316": {
+  "331": {
     "height": 2048,
     "num_tiles": {
       "height": 1,
@@ -3629,7 +3884,7 @@
     "tile_width": 512,
     "width": 2048
   },
-  "317": {
+  "332": {
     "height": 2048,
     "num_tiles": {
       "height": 1,
@@ -3644,7 +3899,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "318": {
+  "333": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3659,7 +3914,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "319": {
+  "334": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3674,22 +3929,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "32": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_basic.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "320": {
+  "335": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3704,7 +3944,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "321": {
+  "336": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3719,7 +3959,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "322": {
+  "337": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3734,7 +3974,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "323": {
+  "338": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3749,7 +3989,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "324": {
+  "339": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3764,7 +4004,22 @@
     "tile_width": 512,
     "width": 2048
   },
-  "325": {
+  "34": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_charsel.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "340": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3779,7 +4034,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "326": {
+  "341": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3794,7 +4049,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "327": {
+  "342": {
     "height": 2048,
     "num_tiles": {
       "height": 4,
@@ -3809,7 +4064,7 @@
     "tile_width": 512,
     "width": 2048
   },
-  "328": {
+  "343": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3824,7 +4079,7 @@
     "tile_width": 512,
     "width": 2048
   },
-  "329": {
+  "344": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3839,22 +4094,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "33": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 5
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_basic.DDS",
-    "tile_height": 128,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "330": {
+  "345": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -3869,7 +4109,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "331": {
+  "346": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3884,7 +4124,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "332": {
+  "347": {
     "height": 2048,
     "num_tiles": {
       "height": 2,
@@ -3899,7 +4139,7 @@
     "tile_width": 640,
     "width": 2048
   },
-  "333": {
+  "348": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3914,7 +4154,7 @@
     "tile_width": 384,
     "width": 2048
   },
-  "334": {
+  "349": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3929,7 +4169,22 @@
     "tile_width": 384,
     "width": 2048
   },
-  "335": {
+  "35": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_chardoor.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "350": {
     "height": 2048,
     "num_tiles": {
       "height": 3,
@@ -3944,7 +4199,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "336": {
+  "351": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -3959,7 +4214,7 @@
     "tile_width": 384,
     "width": 2048
   },
-  "337": {
+  "352": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3974,7 +4229,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "338": {
+  "353": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -3989,7 +4244,7 @@
     "tile_width": 384,
     "width": 2048
   },
-  "339": {
+  "354": {
     "height": 2048,
     "num_tiles": {
       "height": 5,
@@ -4004,22 +4259,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "34": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 2
-    },
-    "offset": {
-      "height": 640,
-      "width": 384
-    },
-    "path": "Data/Textures/menu_basic.DDS",
-    "tile_height": 128,
-    "tile_width": 512,
-    "width": 1280
-  },
-  "340": {
+  "355": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -4034,7 +4274,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "341": {
+  "356": {
     "height": 2048,
     "num_tiles": {
       "height": 8,
@@ -4049,7 +4289,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "342": {
+  "357": {
     "height": 2048,
     "num_tiles": {
       "height": 3,
@@ -4064,7 +4304,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "343": {
+  "358": {
     "height": 2048,
     "num_tiles": {
       "height": 3,
@@ -4079,7 +4319,7 @@
     "tile_width": 1152,
     "width": 2048
   },
-  "344": {
+  "359": {
     "height": 2048,
     "num_tiles": {
       "height": 4,
@@ -4094,7 +4334,22 @@
     "tile_width": 512,
     "width": 2048
   },
-  "345": {
+  "36": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_generic.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "360": {
     "height": 2048,
     "num_tiles": {
       "height": 1,
@@ -4109,7 +4364,7 @@
     "tile_width": 768,
     "width": 2048
   },
-  "346": {
+  "361": {
     "height": 1280,
     "num_tiles": {
       "height": 3,
@@ -4124,7 +4379,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "347": {
+  "362": {
     "height": 1280,
     "num_tiles": {
       "height": 1,
@@ -4139,7 +4394,7 @@
     "tile_width": 1024,
     "width": 1280
   },
-  "348": {
+  "363": {
     "height": 1280,
     "num_tiles": {
       "height": 2,
@@ -4154,7 +4409,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "349": {
+  "364": {
     "height": 1280,
     "num_tiles": {
       "height": 2,
@@ -4169,22 +4424,7 @@
     "tile_width": 384,
     "width": 1280
   },
-  "35": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 3
-    },
-    "offset": {
-      "height": 640,
-      "width": 896
-    },
-    "path": "Data/Textures/menu_basic.DDS",
-    "tile_height": 128,
-    "tile_width": 384,
-    "width": 1280
-  },
-  "350": {
+  "365": {
     "height": 1280,
     "num_tiles": {
       "height": 1,
@@ -4199,7 +4439,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "351": {
+  "366": {
     "height": 1280,
     "num_tiles": {
       "height": 1,
@@ -4214,7 +4454,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "352": {
+  "367": {
     "height": 1280,
     "num_tiles": {
       "height": 2,
@@ -4229,7 +4469,7 @@
     "tile_width": 256,
     "width": 1280
   },
-  "353": {
+  "368": {
     "height": 1280,
     "num_tiles": {
       "height": 2,
@@ -4244,7 +4484,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "354": {
+  "369": {
     "height": 1280,
     "num_tiles": {
       "height": 3,
@@ -4259,7 +4499,22 @@
     "tile_width": 384,
     "width": 1280
   },
-  "355": {
+  "37": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_cave1.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "370": {
     "height": 2048,
     "num_tiles": {
       "height": 2,
@@ -4274,7 +4529,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "356": {
+  "371": {
     "height": 2048,
     "num_tiles": {
       "height": 1,
@@ -4289,7 +4544,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "357": {
+  "372": {
     "height": 2048,
     "num_tiles": {
       "height": 1,
@@ -4304,7 +4559,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "358": {
+  "373": {
     "height": 2048,
     "num_tiles": {
       "height": 16,
@@ -4319,10 +4574,10 @@
     "tile_width": 128,
     "width": 2048
   },
-  "359": {
+  "374": {
     "height": 2048,
     "num_tiles": {
-      "height": 2,
+      "height": 16,
       "width": 16
     },
     "offset": {
@@ -4334,22 +4589,7 @@
     "tile_width": 128,
     "width": 2048
   },
-  "36": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 10
-    },
-    "offset": {
-      "height": 768,
-      "width": 768
-    },
-    "path": "Data/Textures/menu_basic.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "360": {
+  "375": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -4364,7 +4604,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "361": {
+  "376": {
     "height": 1024,
     "num_tiles": {
       "height": 8,
@@ -4379,7 +4619,7 @@
     "tile_width": 128,
     "width": 1024
   },
-  "362": {
+  "377": {
     "height": 1024,
     "num_tiles": {
       "height": 8,
@@ -4394,7 +4634,7 @@
     "tile_width": 128,
     "width": 1024
   },
-  "363": {
+  "378": {
     "height": 1024,
     "num_tiles": {
       "height": 8,
@@ -4409,7 +4649,37 @@
     "tile_width": 128,
     "width": 1024
   },
-  "364": {
+  "379": {
+    "height": 1028,
+    "num_tiles": {
+      "height": 16,
+      "width": 16
+    },
+    "offset": {
+      "height": 672,
+      "width": 32
+    },
+    "path": "Data/Textures/fx_small3.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 1024
+  },
+  "38": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_cave2.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "380": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -4424,7 +4694,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "365": {
+  "381": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -4439,7 +4709,7 @@
     "tile_width": 128,
     "width": 1024
   },
-  "366": {
+  "382": {
     "height": 2048,
     "num_tiles": {
       "height": 2,
@@ -4454,7 +4724,7 @@
     "tile_width": 512,
     "width": 2048
   },
-  "367": {
+  "383": {
     "height": 2048,
     "num_tiles": {
       "height": 2,
@@ -4469,7 +4739,7 @@
     "tile_width": 256,
     "width": 2048
   },
-  "368": {
+  "384": {
     "height": 256,
     "num_tiles": {
       "height": 1,
@@ -4484,7 +4754,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "369": {
+  "385": {
     "height": 768,
     "num_tiles": {
       "height": 1,
@@ -4499,22 +4769,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "37": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_header.DDS",
-    "tile_height": 1280,
-    "tile_width": 1280,
-    "width": 1280
-  },
-  "370": {
+  "386": {
     "height": 768,
     "num_tiles": {
       "height": 1,
@@ -4529,7 +4784,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "371": {
+  "387": {
     "height": 768,
     "num_tiles": {
       "height": 1,
@@ -4544,7 +4799,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "372": {
+  "388": {
     "height": 768,
     "num_tiles": {
       "height": 1,
@@ -4559,7 +4814,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "373": {
+  "389": {
     "height": 768,
     "num_tiles": {
       "height": 1,
@@ -4574,7 +4829,22 @@
     "tile_width": 256,
     "width": 1024
   },
-  "374": {
+  "39": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_brick1.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "390": {
     "height": 768,
     "num_tiles": {
       "height": 1,
@@ -4589,7 +4859,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "375": {
+  "391": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -4604,7 +4874,7 @@
     "tile_width": 256,
     "width": 1024
   },
-  "376": {
+  "392": {
     "height": 1024,
     "num_tiles": {
       "height": 8,
@@ -4619,67 +4889,7 @@
     "tile_width": 128,
     "width": 1024
   },
-  "377": {
-    "height": 1,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/liquidgradient_water",
-    "tile_height": 1,
-    "tile_width": 1,
-    "width": 1
-  },
-  "378": {
-    "height": 1,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/liquidgradient_eggplant_water",
-    "tile_height": 1,
-    "tile_width": 1,
-    "width": 1
-  },
-  "379": {
-    "height": 1,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/liquidgradient_lava",
-    "tile_height": 1,
-    "tile_width": 1,
-    "width": 1
-  },
-  "38": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 10
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_leader.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1280
-  },
-  "380": {
+  "393": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -4694,7 +4904,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "381": {
+  "394": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -4709,22 +4919,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "382": {
-    "height": 8,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/bayer8.DDS",
-    "tile_height": 8,
-    "tile_width": 8,
-    "width": 8
-  },
-  "383": {
+  "395": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -4739,7 +4934,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "384": {
+  "396": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -4754,7 +4949,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "385": {
+  "397": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -4769,7 +4964,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "386": {
+  "398": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -4784,7 +4979,7 @@
     "tile_width": 512,
     "width": 512
   },
-  "387": {
+  "399": {
     "height": 512,
     "num_tiles": {
       "height": 1,
@@ -4798,36 +4993,6 @@
     "tile_height": 512,
     "tile_width": 512,
     "width": 512
-  },
-  "388": {
-    "height": 512,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/shine.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 512
-  },
-  "39": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_leader.DDS",
-    "tile_height": 128,
-    "tile_width": 1152,
-    "width": 1280
   },
   "4": {
     "height": 1080,
@@ -4845,36 +5010,6 @@
     "width": 1920
   },
   "40": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 10,
-      "width": 5
-    },
-    "offset": {
-      "height": 640,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_leader.DDS",
-    "tile_height": 128,
-    "tile_width": 256,
-    "width": 1280
-  },
-  "41": {
-    "height": 1280,
-    "num_tiles": {
-      "height": 3,
-      "width": 2
-    },
-    "offset": {
-      "height": 640,
-      "width": 256
-    },
-    "path": "Data/Textures/menu_leader.DDS",
-    "tile_height": 384,
-    "tile_width": 640,
-    "width": 1280
-  },
-  "42": {
     "height": 1080,
     "num_tiles": {
       "height": 1,
@@ -4884,10 +5019,55 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_deathmatch.DDS",
+    "path": "Data/Textures/menu_brick2.DDS",
     "tile_height": 1080,
     "tile_width": 1920,
     "width": 1920
+  },
+  "400": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/shine.DDS",
+    "tile_height": 512,
+    "tile_width": 512,
+    "width": 512
+  },
+  "41": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
+    "width": 1280
+  },
+  "42": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 20,
+      "width": 20
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 1280
   },
   "43": {
     "height": 1280,
@@ -4899,54 +5079,54 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_deathmatch2.DDS",
+    "path": "Data/Textures/menu_basic.DDS",
     "tile_height": 128,
     "tile_width": 128,
     "width": 1280
   },
   "44": {
-    "height": 1024,
+    "height": 1280,
     "num_tiles": {
-      "height": 1,
-      "width": 1
+      "height": 10,
+      "width": 5
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_deathmatch3.DDS",
-    "tile_height": 1024,
-    "tile_width": 1024,
-    "width": 1024
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
   },
   "45": {
     "height": 1280,
     "num_tiles": {
-      "height": 1,
-      "width": 1
+      "height": 10,
+      "width": 2
     },
     "offset": {
-      "height": 0,
-      "width": 0
+      "height": 640,
+      "width": 384
     },
-    "path": "Data/Textures/menu_deathmatch4.DDS",
-    "tile_height": 1280,
-    "tile_width": 1280,
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 512,
     "width": 1280
   },
   "46": {
     "height": 1280,
     "num_tiles": {
-      "height": 1,
-      "width": 1
+      "height": 10,
+      "width": 3
     },
     "offset": {
-      "height": 0,
-      "width": 0
+      "height": 640,
+      "width": 896
     },
-    "path": "Data/Textures/menu_deathmatch5.DDS",
-    "tile_height": 1280,
-    "tile_width": 1280,
+    "path": "Data/Textures/menu_basic.DDS",
+    "tile_height": 128,
+    "tile_width": 384,
     "width": 1280
   },
   "47": {
@@ -4956,10 +5136,10 @@
       "width": 10
     },
     "offset": {
-      "height": 0,
-      "width": 0
+      "height": 768,
+      "width": 768
     },
-    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "path": "Data/Textures/menu_basic.DDS",
     "tile_height": 128,
     "tile_width": 128,
     "width": 1280
@@ -4967,31 +5147,31 @@
   "48": {
     "height": 1280,
     "num_tiles": {
-      "height": 10,
-      "width": 6
+      "height": 1,
+      "width": 1
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_deathmatch5.DDS",
-    "tile_height": 128,
-    "tile_width": 192,
+    "path": "Data/Textures/menu_header.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
     "width": 1280
   },
   "49": {
     "height": 1280,
     "num_tiles": {
-      "height": 1,
-      "width": 27
+      "height": 10,
+      "width": 10
     },
     "offset": {
-      "height": 768,
+      "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_deathmatch5.DDS",
-    "tile_height": 32,
-    "tile_width": 32,
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
     "width": 1280
   },
   "5": {
@@ -5010,21 +5190,51 @@
     "width": 1024
   },
   "50": {
-    "height": 1080,
+    "height": 1280,
     "num_tiles": {
-      "height": 1,
+      "height": 10,
       "width": 1
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_deathmatch6.DDS",
-    "tile_height": 1080,
-    "tile_width": 1920,
-    "width": 1920
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 128,
+    "tile_width": 1152,
+    "width": 1280
   },
   "51": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 5
+    },
+    "offset": {
+      "height": 640,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 128,
+    "tile_width": 256,
+    "width": 1280
+  },
+  "52": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 3,
+      "width": 2
+    },
+    "offset": {
+      "height": 640,
+      "width": 256
+    },
+    "path": "Data/Textures/menu_leader.DDS",
+    "tile_height": 384,
+    "tile_width": 640,
+    "width": 1280
+  },
+  "53": {
     "height": 1080,
     "num_tiles": {
       "height": 1,
@@ -5034,114 +5244,84 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/menu_online.DDS",
+    "path": "Data/Textures/menu_deathmatch.DDS",
     "tile_height": 1080,
     "tile_width": 1920,
     "width": 1920
   },
-  "52": {
-    "height": 1152,
-    "num_tiles": {
-      "height": 3,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/menu_tunnel.DDS",
-    "tile_height": 384,
-    "tile_width": 512,
-    "width": 512
-  },
-  "53": {
-    "height": 512,
-    "num_tiles": {
-      "height": 8,
-      "width": 8
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/hud.DDS",
-    "tile_height": 64,
-    "tile_width": 64,
-    "width": 512
-  },
   "54": {
-    "height": 512,
+    "height": 1280,
     "num_tiles": {
-      "height": 2,
-      "width": 8
-    },
-    "offset": {
-      "height": 128,
-      "width": 0
-    },
-    "path": "Data/Textures/hud.DDS",
-    "tile_height": 32,
-    "tile_width": 32,
-    "width": 512
-  },
-  "55": {
-    "height": 512,
-    "num_tiles": {
-      "height": 4,
-      "width": 4
+      "height": 10,
+      "width": 10
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/hud.DDS",
+    "path": "Data/Textures/menu_deathmatch2.DDS",
     "tile_height": 128,
     "tile_width": 128,
-    "width": 512
+    "width": 1280
+  },
+  "55": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 2,
+      "width": 2
+    },
+    "offset": {
+      "height": 320,
+      "width": 1024
+    },
+    "path": "Data/Textures/menu_deathmatch2.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
   },
   "56": {
-    "height": 512,
+    "height": 1024,
     "num_tiles": {
-      "height": 4,
+      "height": 1,
       "width": 1
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/hud_text.DDS",
-    "tile_height": 128,
+    "path": "Data/Textures/menu_deathmatch3.DDS",
+    "tile_height": 1024,
     "tile_width": 1024,
     "width": 1024
   },
   "57": {
     "height": 1280,
     "num_tiles": {
-      "height": 10,
-      "width": 10
+      "height": 1,
+      "width": 1
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/hud_controller_buttons.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
+    "path": "Data/Textures/menu_deathmatch4.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
     "width": 1280
   },
   "58": {
     "height": 1280,
     "num_tiles": {
-      "height": 10,
-      "width": 10
+      "height": 1,
+      "width": 1
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/hud_controller_buttons.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
+    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "tile_height": 1280,
+    "tile_width": 1280,
     "width": 1280
   },
   "59": {
@@ -5151,10 +5331,10 @@
       "width": 10
     },
     "offset": {
-      "height": 384,
+      "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "path": "Data/Textures/menu_deathmatch5.DDS",
     "tile_height": 128,
     "tile_width": 128,
     "width": 1280
@@ -5169,12 +5349,207 @@
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/fontfirasans.DDS",
+    "path": "Data/Textures/fontyorkten.DDS",
     "tile_height": 512,
     "tile_width": 1024,
     "width": 1024
   },
   "60": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 6
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "tile_height": 128,
+    "tile_width": 192,
+    "width": 1280
+  },
+  "61": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 1,
+      "width": 27
+    },
+    "offset": {
+      "height": 768,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch5.DDS",
+    "tile_height": 32,
+    "tile_width": 32,
+    "width": 1280
+  },
+  "62": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_deathmatch6.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "63": {
+    "height": 1080,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_online.DDS",
+    "tile_height": 1080,
+    "tile_width": 1920,
+    "width": 1920
+  },
+  "64": {
+    "height": 1152,
+    "num_tiles": {
+      "height": 3,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/menu_tunnel.DDS",
+    "tile_height": 384,
+    "tile_width": 512,
+    "width": 512
+  },
+  "65": {
+    "height": 512,
+    "num_tiles": {
+      "height": 8,
+      "width": 8
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud.DDS",
+    "tile_height": 64,
+    "tile_width": 64,
+    "width": 512
+  },
+  "66": {
+    "height": 512,
+    "num_tiles": {
+      "height": 2,
+      "width": 8
+    },
+    "offset": {
+      "height": 128,
+      "width": 0
+    },
+    "path": "Data/Textures/hud.DDS",
+    "tile_height": 32,
+    "tile_width": 32,
+    "width": 512
+  },
+  "67": {
+    "height": 512,
+    "num_tiles": {
+      "height": 4,
+      "width": 4
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 512
+  },
+  "68": {
+    "height": 512,
+    "num_tiles": {
+      "height": 4,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_text.DDS",
+    "tile_height": 128,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "69": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "7": {
+    "height": 512,
+    "num_tiles": {
+      "height": 1,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontfirasans.DDS",
+    "tile_height": 512,
+    "tile_width": 1024,
+    "width": 1024
+  },
+  "70": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "71": {
+    "height": 1280,
+    "num_tiles": {
+      "height": 10,
+      "width": 10
+    },
+    "offset": {
+      "height": 384,
+      "width": 0
+    },
+    "path": "Data/Textures/hud_controller_buttons.DDS",
+    "tile_height": 128,
+    "tile_width": 128,
+    "width": 1280
+  },
+  "72": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -5189,7 +5564,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "61": {
+  "73": {
     "height": 1280,
     "num_tiles": {
       "height": 10,
@@ -5204,7 +5579,7 @@
     "tile_width": 128,
     "width": 1280
   },
-  "62": {
+  "74": {
     "height": 1024,
     "num_tiles": {
       "height": 4,
@@ -5219,7 +5594,7 @@
     "tile_width": 256,
     "width": 3072
   },
-  "63": {
+  "75": {
     "height": 1024,
     "num_tiles": {
       "height": 1,
@@ -5234,7 +5609,7 @@
     "tile_width": 1024,
     "width": 1024
   },
-  "64": {
+  "76": {
     "height": 1024,
     "num_tiles": {
       "height": 1,
@@ -5249,7 +5624,7 @@
     "tile_width": 2048,
     "width": 2048
   },
-  "65": {
+  "77": {
     "height": 1024,
     "num_tiles": {
       "height": 1,
@@ -5264,7 +5639,7 @@
     "tile_width": 2048,
     "width": 2048
   },
-  "66": {
+  "78": {
     "height": 96,
     "num_tiles": {
       "height": 1,
@@ -5279,7 +5654,7 @@
     "tile_width": 640,
     "width": 640
   },
-  "67": {
+  "79": {
     "height": 800,
     "num_tiles": {
       "height": 10,
@@ -5294,7 +5669,22 @@
     "tile_width": 80,
     "width": 800
   },
-  "68": {
+  "8": {
+    "height": 4096,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontnewrodin.DDS",
+    "tile_height": 2048,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "80": {
     "height": 800,
     "num_tiles": {
       "height": 10,
@@ -5309,7 +5699,7 @@
     "tile_width": 80,
     "width": 800
   },
-  "69": {
+  "81": {
     "height": 800,
     "num_tiles": {
       "height": 5,
@@ -5324,22 +5714,7 @@
     "tile_width": 160,
     "width": 800
   },
-  "7": {
-    "height": 512,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/fontyorkten.DDS",
-    "tile_height": 512,
-    "tile_width": 1024,
-    "width": 1024
-  },
-  "70": {
+  "82": {
     "height": 1024,
     "num_tiles": {
       "height": 1,
@@ -5354,7 +5729,7 @@
     "tile_width": 2048,
     "width": 2048
   },
-  "71": {
+  "83": {
     "height": 1024,
     "num_tiles": {
       "height": 1,
@@ -5369,7 +5744,7 @@
     "tile_width": 2048,
     "width": 2048
   },
-  "72": {
+  "84": {
     "height": 1024,
     "num_tiles": {
       "height": 1,
@@ -5384,7 +5759,7 @@
     "tile_width": 2048,
     "width": 2048
   },
-  "73": {
+  "85": {
     "height": 1024,
     "num_tiles": {
       "height": 1,
@@ -5399,7 +5774,7 @@
     "tile_width": 2048,
     "width": 2048
   },
-  "74": {
+  "86": {
     "height": 1280,
     "num_tiles": {
       "height": 4,
@@ -5414,7 +5789,7 @@
     "tile_width": 320,
     "width": 1280
   },
-  "75": {
+  "87": {
     "height": 1280,
     "num_tiles": {
       "height": 4,
@@ -5429,7 +5804,7 @@
     "tile_width": 640,
     "width": 2560
   },
-  "76": {
+  "88": {
     "height": 960,
     "num_tiles": {
       "height": 6,
@@ -5444,7 +5819,7 @@
     "tile_width": 160,
     "width": 1600
   },
-  "77": {
+  "89": {
     "height": 1920,
     "num_tiles": {
       "height": 6,
@@ -5459,7 +5834,22 @@
     "tile_width": 320,
     "width": 1600
   },
-  "78": {
+  "9": {
+    "height": 4096,
+    "num_tiles": {
+      "height": 2,
+      "width": 1
+    },
+    "offset": {
+      "height": 0,
+      "width": 0
+    },
+    "path": "Data/Textures/fontrodincattleya.DDS",
+    "tile_height": 2048,
+    "tile_width": 2048,
+    "width": 2048
+  },
+  "90": {
     "height": 800,
     "num_tiles": {
       "height": 5,
@@ -5474,7 +5864,7 @@
     "tile_width": 160,
     "width": 1600
   },
-  "79": {
+  "91": {
     "height": 800,
     "num_tiles": {
       "height": 2,
@@ -5489,22 +5879,7 @@
     "tile_width": 320,
     "width": 1600
   },
-  "8": {
-    "height": 256,
-    "num_tiles": {
-      "height": 4,
-      "width": 4
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/fontmono.DDS",
-    "tile_height": 64,
-    "tile_width": 64,
-    "width": 256
-  },
-  "80": {
+  "92": {
     "height": 1600,
     "num_tiles": {
       "height": 10,
@@ -5519,7 +5894,7 @@
     "tile_width": 160,
     "width": 1600
   },
-  "81": {
+  "93": {
     "height": 512,
     "num_tiles": {
       "height": 5,
@@ -5534,7 +5909,7 @@
     "tile_width": 192,
     "width": 512
   },
-  "82": {
+  "94": {
     "height": 512,
     "num_tiles": {
       "height": 8,
@@ -5549,7 +5924,7 @@
     "tile_width": 64,
     "width": 512
   },
-  "83": {
+  "95": {
     "height": 1600,
     "num_tiles": {
       "height": 10,
@@ -5564,7 +5939,7 @@
     "tile_width": 160,
     "width": 1600
   },
-  "84": {
+  "96": {
     "height": 1600,
     "num_tiles": {
       "height": 5,
@@ -5579,7 +5954,7 @@
     "tile_width": 160,
     "width": 1600
   },
-  "85": {
+  "97": {
     "height": 1600,
     "num_tiles": {
       "height": 5,
@@ -5594,7 +5969,7 @@
     "tile_width": 320,
     "width": 1600
   },
-  "86": {
+  "98": {
     "height": 2048,
     "num_tiles": {
       "height": 1,
@@ -5609,214 +5984,19 @@
     "tile_width": 1024,
     "width": 1024
   },
-  "87": {
-    "height": 1536,
-    "num_tiles": {
-      "height": 12,
-      "width": 12
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/floor_surface.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1536
-  },
-  "88": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 2,
-      "width": 2
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/base_eggship.DDS",
-    "tile_height": 384,
-    "tile_width": 384,
-    "width": 1024
-  },
-  "89": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 752,
-      "width": 640
-    },
-    "path": "Data/Textures/base_eggship.DDS",
-    "tile_height": 16,
-    "tile_width": 384,
-    "width": 1024
-  },
-  "9": {
-    "height": 512,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/fontdebug.DDS",
-    "tile_height": 512,
-    "tile_width": 512,
-    "width": 512
-  },
-  "90": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 8,
-      "width": 8
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/base_eggship.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
-    "width": 1024
-  },
-  "91": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 1,
-      "width": 1
-    },
-    "offset": {
-      "height": 0,
-      "width": 384
-    },
-    "path": "Data/Textures/base_eggship.DDS",
-    "tile_height": 256,
-    "tile_width": 128,
-    "width": 1024
-  },
-  "92": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 4,
-      "width": 4
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/base_eggship.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1024
-  },
-  "93": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 8,
-      "width": 2
-    },
-    "offset": {
-      "height": 384,
-      "width": 512
-    },
-    "path": "Data/Textures/base_eggship.DDS",
-    "tile_height": 128,
-    "tile_width": 348,
-    "width": 1024
-  },
-  "94": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 2,
-      "width": 2
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/base_eggship2.DDS",
-    "tile_height": 384,
-    "tile_width": 384,
-    "width": 1024
-  },
-  "95": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 4,
-      "width": 4
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/base_eggship2.DDS",
-    "tile_height": 256,
-    "tile_width": 256,
-    "width": 1024
-  },
-  "96": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 2,
-      "width": 1
-    },
-    "offset": {
-      "height": 384,
-      "width": 512
-    },
-    "path": "Data/Textures/base_eggship2.DDS",
-    "tile_height": 128,
-    "tile_width": 512,
-    "width": 1024
-  },
-  "97": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 2,
-      "width": 2
-    },
-    "offset": {
-      "height": 384,
-      "width": 384
-    },
-    "path": "Data/Textures/base_eggship3.DDS",
-    "tile_height": 384,
-    "tile_width": 384,
-    "width": 1024
-  },
-  "98": {
-    "height": 1024,
-    "num_tiles": {
-      "height": 1,
-      "width": 2
-    },
-    "offset": {
-      "height": 0,
-      "width": 0
-    },
-    "path": "Data/Textures/base_eggship3.DDS",
-    "tile_height": 640,
-    "tile_width": 384,
-    "width": 1024
-  },
   "99": {
-    "height": 1024,
+    "height": 2048,
     "num_tiles": {
-      "height": 8,
-      "width": 8
+      "height": 1,
+      "width": 1
     },
     "offset": {
       "height": 0,
       "width": 0
     },
-    "path": "Data/Textures/base_eggship3.DDS",
-    "tile_height": 128,
-    "tile_width": 128,
+    "path": "Data/Textures/journal_trophies.DDS",
+    "tile_height": 2048,
+    "tile_width": 1024,
     "width": 1024
   }
 }

@@ -2,7 +2,10 @@
 
 #include <unordered_map>
 
+#include <Windows.h>
+
 #include "search.hpp"
+
 using namespace std::string_literals;
 
 namespace
@@ -12,7 +15,14 @@ size_t round_up(size_t i, size_t div)
     return ((i + div - 1) / div) * div;
 }
 
-void write_mem_prot(size_t addr, std::string payload, bool prot)
+template <typename T>
+requires std::is_trivially_copyable_v<T>
+    std::string_view to_le_bytes(const T& payload)
+{
+    return std::string_view{reinterpret_cast<const char*>(&payload), sizeof(payload)};
+}
+
+void write_mem_prot(size_t addr, std::string_view payload, bool prot)
 {
     DWORD old_protect = 0;
     auto page = addr & ~0xFFF;
@@ -26,6 +36,23 @@ void write_mem_prot(size_t addr, std::string payload, bool prot)
     {
         VirtualProtect((LPVOID)page, size, old_protect, &old_protect);
     }
+}
+
+template <class T>
+requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_prot(size_t addr, const T& payload, bool prot)
+{
+    write_mem_prot(addr, to_le_bytes(payload), prot);
+}
+
+template <class T>
+requires std::is_trivially_copyable_v<T> void write_mem_prot(void* addr, const T& payload, bool prot)
+{
+    write_mem_prot((size_t)addr, to_le_bytes(payload), prot);
+}
+
+void write_mem_prot(size_t addr, std::string payload, bool prot)
+{
+    write_mem_prot(addr, std::string_view{payload}, prot);
 }
 
 [[maybe_unused]] void write_mem(size_t addr, std::string payload)

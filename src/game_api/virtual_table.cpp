@@ -4,15 +4,9 @@
 
 size_t get_virtual_function_address(VTABLE_OFFSET tableEntry, uint32_t relativeOffset)
 {
+    static auto firstTableEntry = get_address("virtual_functions_table");
+
     auto mem = Memory::get();
-
-    static size_t firstTableEntry = 0;
-    if (firstTableEntry == 0)
-    {
-        auto offset = find_inst(mem.exe(), "\x4C\x89\x6C\x24\x20\xFF\x15"s, mem.after_bundle);
-        firstTableEntry = mem.at_exe(decode_pc(mem.exe(), offset + 5, 2));
-    }
-
     if (firstTableEntry == 0)
     {
         return 0;

@@ -193,7 +193,8 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, dark_mode = false,
-     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true;
+     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
+std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
 Inventory* g_inventory = 0;
@@ -1040,7 +1041,7 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
     g_state->items->player_select_slots[0].activated = true;
     g_state->items->player_select_slots[0].character = g_save->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + 270; //TODO: magic numbers
+    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + 285; //TODO: magic numbers
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
     g_state->screen_next = screen;
@@ -1065,9 +1066,10 @@ void warp_inc(uint8_t w, uint8_t l, uint8_t t)
 
 void warp_next_level(size_t num)
 {
-    std::vector<Target*> targets;
-    Target* target = new Target;
-    target->world = 0;
+    std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> targets; // tuple = world, level, theme
+    uint8_t target_world = 0;
+    uint8_t target_level = 0;
+    uint8_t target_theme = 0;
     int tnum = g_state->world * 100 + g_state->level;
     switch (tnum)
     {
@@ -1075,74 +1077,74 @@ void warp_next_level(size_t num)
     case 301:
         break;
     case 501:
-        target->world = 6;
-        target->level = 1;
-        target->theme = 8;
+        target_world = 6;
+        target_level = 1;
+        target_theme = 8;
         break;
     case 204:
-        target->world = 3;
-        target->level = 1;
-        target->theme = 4;
+        target_world = 3;
+        target_level = 1;
+        target_theme = 4;
         break;
     case 403:
         if (g_state->theme == 11)
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 6;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 6;
         }
         else
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 5;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 5;
         }
         break;
     case 404:
-        target->world = 5;
-        target->level = 1;
-        target->theme = 7;
+        target_world = 5;
+        target_level = 1;
+        target_theme = 7;
         break;
     case 603:
-        target->world = 6;
-        target->level = 4;
-        target->theme = 14;
+        target_world = 6;
+        target_level = 4;
+        target_theme = 14;
         break;
     case 604:
-        target->world = 7;
-        target->level = 1;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 1;
+        target_theme = 9;
         break;
     case 702:
-        target->world = 7;
-        target->level = 3;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 3;
+        target_theme = 9;
         break;
     case 703:
-        target->world = 7;
-        target->level = 4;
-        target->theme = 16;
+        target_world = 7;
+        target_level = 4;
+        target_theme = 16;
         break;
     case 704:
-        target->world = 8;
-        target->level = 5;
-        target->theme = 10;
+        target_world = 8;
+        target_level = 5;
+        target_theme = 10;
         break;
     default:
-        target->world = g_state->world;
-        target->level = g_state->level + 1;
-        target->theme = g_state->theme;
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
         break;
     }
     if (g_state->theme == 17)
     {
-        target->world = 1;
-        target->level = 1;
-        target->theme = 1;
+        target_world = 1;
+        target_level = 1;
+        target_theme = 1;
     }
-    if (target->world > 0)
+    if (target_world > 0)
     {
-        targets.push_back(target);
+        targets.emplace_back(target_world, target_level, target_theme);
     }
 
     std::vector<uint32_t> doortypes;
@@ -1157,25 +1159,26 @@ void warp_next_level(size_t num)
         std::tie(world, level, theme) = doorent->get_target();
         if (!doorent->special_door)
             continue;
-        target = new Target;
-        target->world = world;
-        target->level = level;
-        target->theme = theme;
-        targets.push_back(target);
+        targets.emplace_back(world, level, theme);
     }
 
     if (g_state->theme == 11)
     {
-        target = new Target;
-        target->world = 4;
-        target->level = 4;
-        target->theme = 12;
-        targets.push_back(target);
+        uint8_t world = 4;
+        uint8_t level = 4;
+        uint8_t theme = 12;
+        targets.emplace_back(world, level, theme);
     }
     if (num > targets.size() - 1 && targets.size() > 0)
+    {
         num = targets.size() - 1;
+    }
     if (targets.size() > num)
-        warp_inc(targets.at(num)->world, targets.at(num)->level, targets.at(num)->theme);
+    {
+        uint8_t world, level, theme;
+        std::tie(world, level, theme) = targets.at(num);
+        warp_inc(world, level, theme);
+    }
 }
 
 bool pressed(std::string keyname, WPARAM wParam)
@@ -2088,8 +2091,9 @@ void render_narnia()
     ImGui::SameLine(100.0f);
     int n = 0;
 
-    Target* target = new Target;
-    target->world = 0;
+    uint8_t target_world = 0;
+    uint8_t target_level = 0;
+    uint8_t target_theme = 0;
     int tnum = g_state->world * 100 + g_state->level;
     switch (tnum)
     {
@@ -2097,77 +2101,77 @@ void render_narnia()
     case 301:
         break;
     case 501:
-        target->world = 6;
-        target->level = 1;
-        target->theme = 8;
+        target_world = 6;
+        target_level = 1;
+        target_theme = 8;
         break;
     case 204:
-        target->world = 3;
-        target->level = 1;
-        target->theme = 4;
+        target_world = 3;
+        target_level = 1;
+        target_theme = 4;
         break;
     case 403:
         if (g_state->theme == 11)
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 6;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 6;
         }
         else
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 5;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 5;
         }
         break;
     case 404:
-        target->world = 5;
-        target->level = 1;
-        target->theme = 7;
+        target_world = 5;
+        target_level = 1;
+        target_theme = 7;
         break;
     case 603:
-        target->world = 6;
-        target->level = 4;
-        target->theme = 14;
+        target_world = 6;
+        target_level = 4;
+        target_theme = 14;
         break;
     case 604:
-        target->world = 7;
-        target->level = 1;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 1;
+        target_theme = 9;
         break;
     case 702:
-        target->world = 7;
-        target->level = 3;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 3;
+        target_theme = 9;
         break;
     case 703:
-        target->world = 7;
-        target->level = 4;
-        target->theme = 16;
+        target_world = 7;
+        target_level = 4;
+        target_theme = 16;
         break;
     case 704:
-        target->world = 8;
-        target->level = 5;
-        target->theme = 10;
+        target_world = 8;
+        target_level = 5;
+        target_theme = 10;
         break;
     default:
-        target->world = g_state->world;
-        target->level = g_state->level + 1;
-        target->theme = g_state->theme;
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
         break;
     }
     if (g_state->theme == 17)
     {
-        target->world = 1;
-        target->level = 1;
-        target->theme = 1;
+        target_world = 1;
+        target_level = 1;
+        target_theme = 1;
     }
-    if (target->world > 0)
+    if (target_world > 0)
     {
-        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target->world, target->level, target->theme);
+            warp_inc(target_world, target_level, target_theme);
         }
         n++;
     }
@@ -2180,7 +2184,7 @@ void render_narnia()
     for (auto doorid : doors)
     {
         Movable* doorent = (Movable*)get_entity_ptr(doorid);
-        target = reinterpret_cast<Target*>(&doorent->anim_func);
+        auto target = reinterpret_cast<Target*>(&doorent->anim_func);
         if (!target->enabled)
             continue;
 
@@ -2196,16 +2200,15 @@ void render_narnia()
 
     if (g_state->theme == 11)
     {
-        target = new Target;
-        target->world = 4;
-        target->level = 4;
-        target->theme = 12;
+        target_world = 4;
+        target_level = 4;
+        target_theme = 12;
 
-        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
         ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target->world, target->level, target->theme);
+            warp_inc(target_world, target_level, target_theme);
         }
         n++;
     }
@@ -4049,7 +4052,8 @@ void render_entity_props()
         }
         else if (g_entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
         {
-            ImGui::SliderInt("Uses left##MattockUses", (int*)&g_entity[1], 1, 255);
+            auto mattock = (Mattock*)g_entity;
+            ImGui::SliderScalar("Uses left##MattockUses", ImGuiDataType_U8, &mattock->remaining, &u8_min, &u8_max);
         }
         else if (
             g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
@@ -4242,6 +4246,19 @@ void force_time()
     {
         g_state->time_total = g_total_time;
     }
+
+    if (quest_yang_state.has_value())
+        g_state->quests->yang_state = quest_yang_state.value();
+    if (quest_sisters_state.has_value())
+        g_state->quests->jungle_sisters_flags = quest_sisters_state.value();
+    if (quest_horsing_state.has_value())
+        g_state->quests->van_horsing_state = quest_horsing_state.value();
+    if (quest_sparrow_state.has_value())
+        g_state->quests->sparrow_state = quest_sparrow_state.value();
+    if (quest_tusk_state.has_value())
+        g_state->quests->madame_tusk_state = quest_tusk_state.value();
+    if (quest_beg_state.has_value())
+        g_state->quests->beg_state = quest_beg_state.value();
 }
 
 void render_timer()
@@ -4348,6 +4365,147 @@ void render_game_props()
         {
             darkmode(dark_mode);
         }
+    }
+    if (ImGui::CollapsingHeader("Quests"))
+    {
+        ImGui::Indent(16.0f);
+
+        if (ImGui::CollapsingHeader("Yang"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestYang", &freeze_quest_yang))
+            {
+                if (freeze_quest_yang)
+                    quest_yang_state = g_state->quests->yang_state;
+                else
+                    quest_yang_state.reset();
+            }
+            int yang_state = static_cast<int>(g_state->quests->yang_state);
+            ImGui::RadioButton("Angry##QuestYangAngry", &yang_state, -1);
+            ImGui::RadioButton("Not started##QuestYangDefault", &yang_state, 0);
+            ImGui::RadioButton("Pen spawned##QuestYangPen", &yang_state, 2);
+            ImGui::RadioButton("Delivered##QuestYangDelivered", &yang_state, 3);
+            ImGui::RadioButton("Shop spawned##QuestYangShop", &yang_state, 4);
+            ImGui::RadioButton("1 turkey bought##QuestYang1", &yang_state, 5);
+            ImGui::RadioButton("2 turkeys bought##QuestYang2", &yang_state, 6);
+            ImGui::RadioButton("3 turkeys bought##QuestYang3", &yang_state, 7);
+            g_state->quests->yang_state = static_cast<int8_t>(yang_state);
+        }
+
+        if (ImGui::CollapsingHeader("Jungle Sisters"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestSisters", &freeze_quest_sisters))
+            {
+                if (freeze_quest_sisters)
+                    quest_sisters_state = g_state->quests->jungle_sisters_flags;
+                else
+                    quest_sisters_state.reset();
+            }
+            int sisters_state = static_cast<int>(g_state->quests->jungle_sisters_flags);
+            bool angry = sisters_state == -1;
+            if (ImGui::Checkbox("Angry##QuestSistersAngry", &angry))
+            {
+                if (angry)
+                    sisters_state = -1;
+                else
+                    sisters_state = 0;
+            }
+            if (!angry)
+            {
+                ImGui::CheckboxFlags("Saved Parsley##QuestSistersParsley", &sisters_state, 1);
+                ImGui::CheckboxFlags("Saved Parsnip##QuestSistersParsnip", &sisters_state, 2);
+                ImGui::CheckboxFlags("Saved Parmesan##QuestSistersParmesan", &sisters_state, 4);
+                ImGui::CheckboxFlags("Met at Tide Pool door##QuestSistersTidePool", &sisters_state, 8);
+                ImGui::CheckboxFlags("Met in wet fur##QuestSistersIceCaves", &sisters_state, 32);
+                ImGui::CheckboxFlags("Met in palace##QuestSistersNeoBabylon", &sisters_state, 16);
+            }
+            g_state->quests->jungle_sisters_flags = static_cast<int8_t>(sisters_state);
+        }
+
+        if (ImGui::CollapsingHeader("Van Horsing"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestHorsing", &freeze_quest_horsing))
+            {
+                if (freeze_quest_horsing)
+                    quest_horsing_state = g_state->quests->van_horsing_state;
+                else
+                    quest_horsing_state.reset();
+            }
+            int horsing_state = static_cast<int>(g_state->quests->van_horsing_state);
+            ImGui::RadioButton("Angry##QuestHorsingAngry", &horsing_state, -1);
+            ImGui::RadioButton("Not started##QuestHorsingDefault", &horsing_state, 0);
+            ImGui::RadioButton("Cell spawned##QuestHorsingCell", &horsing_state, 1);
+            ImGui::RadioButton("Got diamond##QuestHorsingDiamond", &horsing_state, 2);
+            ImGui::RadioButton("Spawned in Castle##QuestHorsingVlad", &horsing_state, 3);
+            ImGui::RadioButton("Shot Vlad##QuestHorsingVladShot", &horsing_state, 4);
+            ImGui::RadioButton("Spawned in Temple##QuestHorsingTemple", &horsing_state, 5);
+            ImGui::RadioButton("Got alien compass##QuestHorsingComplass", &horsing_state, 6);
+            ImGui::RadioButton("Palace basement ending##QuestHorsingTusk", &horsing_state, 7);
+            g_state->quests->van_horsing_state = static_cast<int8_t>(horsing_state);
+        }
+
+        if (ImGui::CollapsingHeader("Sparrow"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestSparrow", &freeze_quest_sparrow))
+            {
+                if (freeze_quest_sparrow)
+                    quest_sparrow_state = g_state->quests->sparrow_state;
+                else
+                    quest_sparrow_state.reset();
+            }
+            int sparrow_state = static_cast<int>(g_state->quests->sparrow_state);
+            ImGui::RadioButton("Angry##QuestSparrowAngry", &sparrow_state, -1);
+            ImGui::RadioButton("Not started##QuestSparrowDefault", &sparrow_state, 0);
+            ImGui::RadioButton("Thief##QuestSparrowThief", &sparrow_state, 1);
+            ImGui::RadioButton("Finished level as thief##QuestSparrowThiefLevel", &sparrow_state, 2);
+            ImGui::RadioButton("Spawned in first hideout##QuestSparrowFirst", &sparrow_state, 3);
+            ImGui::RadioButton("Got ropes##QuestSparrowRopes", &sparrow_state, 4);
+            ImGui::RadioButton("Stole Tusk idol##QuestSparrowTusk", &sparrow_state, 5);
+            ImGui::RadioButton("Spawned in Neo Babylon##QuestSparrowSecond", &sparrow_state, 6);
+            ImGui::RadioButton("Met in Neo Babylon##QuestSparrowSecondComplete", &sparrow_state, 7);
+            ImGui::RadioButton("Palace basement ending##QuestSparrowTusk", &sparrow_state, 8);
+            g_state->quests->sparrow_state = static_cast<int8_t>(sparrow_state);
+        }
+
+        if (ImGui::CollapsingHeader("Madame Tusk"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestTusk", &freeze_quest_tusk))
+            {
+                if (freeze_quest_tusk)
+                    quest_tusk_state = g_state->quests->madame_tusk_state;
+                else
+                    quest_tusk_state.reset();
+            }
+            int tusk_state = static_cast<int>(g_state->quests->madame_tusk_state);
+            ImGui::RadioButton("Angry##QuestTuskAngry", &tusk_state, -2);
+            ImGui::RadioButton("Dead##QuestTuskDead", &tusk_state, -1);
+            ImGui::RadioButton("Not started##QuestTuskDefault", &tusk_state, 0);
+            ImGui::RadioButton("Dice house spawned##QuestTuskDice", &tusk_state, 1);
+            ImGui::RadioButton("High roller##QuestTuskHighRoller", &tusk_state, 2);
+            ImGui::RadioButton("Palace ending##QuestTuskPalace", &tusk_state, 3);
+            g_state->quests->madame_tusk_state = static_cast<int8_t>(tusk_state);
+        }
+
+        if (ImGui::CollapsingHeader("Beg"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestBeg", &freeze_quest_beg))
+            {
+                if (freeze_quest_beg)
+                    quest_beg_state = g_state->quests->beg_state;
+                else
+                    quest_beg_state.reset();
+            }
+            int beg_state = static_cast<int>(g_state->quests->beg_state);
+            ImGui::RadioButton("Angry##QuestBegAngry", &beg_state, -1);
+            ImGui::RadioButton("Not started##QuestBegDefault", &beg_state, 0);
+            ImGui::RadioButton("Altar destroyed##QuestBegAltar", &beg_state, 1);
+            ImGui::RadioButton("Spawned with bombs##QuestBegBombs", &beg_state, 2);
+            ImGui::RadioButton("Got bombs##QuestBegGotBombs", &beg_state, 3);
+            ImGui::RadioButton("Spawned with true crown##QuestBegCrown", &beg_state, 4);
+            ImGui::RadioButton("Got true crown##QuestBegGotCrown", &beg_state, 5);
+            g_state->quests->beg_state = static_cast<int8_t>(beg_state);
+        }
+
+        ImGui::Unindent(16.0f);
     }
     if (ImGui::CollapsingHeader("Street cred"))
     {

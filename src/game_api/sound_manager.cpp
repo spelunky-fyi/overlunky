@@ -289,24 +289,16 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 {
     if (HMODULE fmod_studio = GetModuleHandle("fmodstudio.dll"))
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
+        m_SoundData.Parameters = (const EventParameters*)get_address("fmod_event_properties"sv);
+        m_SoundData.Events = (const EventMap*)get_address("fmod_event_map"sv);
 
-        auto fmod_studio_system_instruction = find_inst(exe, "\x48\x8d", find_inst(exe, "\x85\xc0\x74\x2b\x44\x8b\xc0"s, start) - 0x10);
-        auto fmod_studio_system = *(FMODStudio::System**)memory.at_exe(decode_pc(exe, fmod_studio_system_instruction));
-
-        auto event_properties_instruction = find_inst(exe, "\x48\x8d\xbd\x90\x00\x00\x00\x48\x8d\x74\x24\x60", start) + 0xc;
-        m_SoundData.Parameters = (const EventParameters*)memory.at_exe(decode_pc(exe, event_properties_instruction));
-
-        auto event_map_instruction = find_inst(exe, "\x48\x8b\x08\x48\x83\xc1\x18\x48\x8d\x54\x24\x30", start) - 0xc;
-        m_SoundData.Events = (const EventMap*)memory.at_exe(decode_pc(exe, event_map_instruction));
         for (const auto& [id, event] : *m_SoundData.Events)
         {
             m_SoundData.FmodEventToEvent[event.Event] = &event;
             m_SoundData.NameToEvent[event.Name] = &event;
         }
 
+        auto fmod_studio_system = *(FMODStudio::System**)get_address("fmod_studio"sv);
         auto get_core_system = reinterpret_cast<FMODStudio::GetCoreSystem*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetCoreSystem"));
         {
             auto err = get_core_system(fmod_studio_system, &m_FmodSystem);

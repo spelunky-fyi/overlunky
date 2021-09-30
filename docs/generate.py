@@ -34,6 +34,7 @@ header_files = [
     "../src/game_api/items.hpp",
     "../src/game_api/screen.hpp",
     "../src/game_api/screen_arena.hpp",
+    "../src/game_api/online.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
@@ -73,6 +74,7 @@ api_files = [
     "../src/game_api/script/usertypes/char_state_lua.cpp",
     "../src/game_api/script/usertypes/hitbox_lua.cpp",
     "../src/game_api/script/usertypes/screen_lua.cpp",
+    "../src/game_api/script/usertypes/screen_arena_lua.cpp",
 ]
 rpc = []
 classes = []
@@ -107,7 +109,7 @@ replace = {
     "variadic_args va": "int, int...",
 }
 comment = []
-not_functions = ["players", "state", "savegame", "options", "meta", "prng"]
+not_functions = ["players", "state", "game_manager", "online", "savegame", "options", "meta", "prng"]
 skip = False
 
 

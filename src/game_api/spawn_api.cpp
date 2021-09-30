@@ -4,6 +4,7 @@
 #include "layer.hpp"
 #include "logger.h"
 #include "memory.hpp"
+#include "prng.hpp"
 #include "rpc.hpp"
 #include "util.hpp"
 
@@ -19,17 +20,7 @@ std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
 void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 {
     using spawn_liquid_fun_t = void(void*, float, float, std::uint32_t, bool);
-    static auto spawn_liquid_call = (spawn_liquid_fun_t*)[]()
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
-        auto location = find_inst(exe, "\x41\xb9\x8b\x03\x00\x00\x0f\x28\xd7"s, start) - 0x1;
-        location = find_inst(exe, "\xe8"s, location);
-        location = decode_pc(exe, location, 1);
-        return memory.at_exe(location);
-    }
-    ();
+    static auto spawn_liquid_call = (spawn_liquid_fun_t*)get_address("spawn_liquid");
 
     auto state = State::get().ptr();
     spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
@@ -210,20 +201,74 @@ void spawn_tree(float x, float y, LAYER layer)
 
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
+    x += offset_position.first;
+    y += offset_position.second;
 
-    using spawn_tree_fun_t = void(void*, int, float, float);
-    static auto spawn_tree_call = (spawn_tree_fun_t*)[]()
+    x = std::roundf(x);
+    y = std::roundf(y);
+
+    Layer* layer_ptr = State::get().layer_local(actual_layer);
+
+    // Needs some space on top
+    if (layer_ptr->get_grid_entity_at(x, y + 2.0f) == nullptr)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
-        auto location = find_inst(exe, "\x0f\x28\xd7\x40\x0f\xb6\xd7"s, start);
-        location = find_inst(exe, "\xe8"s, location);
-        location = decode_pc(exe, location, 1);
-        return memory.at_exe(location);
+        static const auto tree_base = to_id("ENT_TYPE_FLOOR_TREE_BASE");
+        static const auto tree_trunk = to_id("ENT_TYPE_FLOOR_TREE_TRUNK");
+        static const auto tree_top = to_id("ENT_TYPE_FLOOR_TREE_TOP");
+        static const auto tree_branch = to_id("ENT_TYPE_FLOOR_TREE_BRANCH");
+        static const auto tree_deco = to_id("ENT_TYPE_DECORATION_TREE");
+
+        PRNG& prng = PRNG::get_local();
+
+        // spawn the base
+        Entity* base = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
+
+        // spawn segments
+        if (layer_ptr->get_grid_entity_at(x, y + 3.0f) == nullptr)
+        {
+            size_t i = 5;
+            while (i > 0)
+            {
+                i--;
+                y = y + 1;
+                base = layer_ptr->spawn_entity_over(tree_trunk, base, 0.0f, 1.0f);
+                if (layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
+                {
+                    break;
+                }
+                if (prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+                {
+                    break;
+                }
+            }
+        }
+
+        // spawn the top
+        base = layer_ptr->spawn_entity_over(tree_top, base, 0.0f, 1.0f);
+
+        // spawn branches
+        do
+        {
+            auto spawn_deco = [&](Entity* branch, float w)
+            {
+                Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
+                deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION).value_or(0)) * 12;
+                deco->w *= w;
+            };
+            if (prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            {
+                Entity* branch = layer_ptr->spawn_entity_over(tree_branch, base, 1.02f, 0.0f);
+                spawn_deco(branch, 1.0f);
+            }
+            if (prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            {
+                Entity* branch = layer_ptr->spawn_entity_over(tree_branch, base, -1.02f, 0.0f);
+                branch->w = -1.0f;
+                spawn_deco(branch, -1.0f);
+            }
+            base = base->overlay;
+        } while (base->overlay);
     }
-    ();
-    spawn_tree_call(nullptr, actual_layer, x + offset_position.first, y + offset_position.second);
 }
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, float top_threshold)
@@ -310,20 +355,10 @@ void pop_spawn_type_flags(SPAWN_TYPE flags)
     update_spawn_type_flags();
 }
 
-//#define HOOK_LOAD_ITEM
-#ifdef HOOK_LOAD_ITEM
-using LoadItemFun = void*(Layer*, std::uint32_t, float, float);
-LoadItemFun* g_load_item_trampoline{nullptr};
-void* load_item(Layer* _this, std::uint32_t entity_id, float x, float y)
-{
-    return g_load_item_trampoline(_this, entity_id, x, y);
-}
-#endif
-
-struct EntityStore;
-using SpawnEntityFun = Entity*(EntityStore*, std::uint32_t, float, float, bool, Entity*, bool);
+struct EntityFactory;
+using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool, Entity*, bool);
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
-Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
+Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
     Entity* spawned_ent{nullptr};
     if (g_SpawnNonReplacable == 0)
@@ -333,7 +368,7 @@ Entity* spawn_entity(EntityStore* entity_store, std::uint32_t entity_type, float
 
     if (spawned_ent == nullptr)
     {
-        spawned_ent = g_spawn_entity_trampoline(entity_store, entity_type, x, y, layer, overlay, some_bool);
+        spawned_ent = g_spawn_entity_trampoline(entity_factory, entity_type, x, y, layer, overlay, some_bool);
     }
 
     post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
@@ -353,36 +388,22 @@ Entity* floor_spreading()
 void init_spawn_hooks()
 {
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-
         DetourRestoreAfterWith();
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
-#ifdef HOOK_LOAD_ITEM
-        auto load_item_off = find_inst(exe, "\x48\x89\x5c\x24\x10\x48\x89\x6c\x24\x18\x56\x57\x41\x56\x48\x83\xec\x60\x48\x8b\xf1\x0f\xb6\x01\xc6\x44\x24\x30\x00\x48\xc7\x44\x24\x28\x00\x00\x00\x00\x88\x44\x24\x20"s, after_bundle);
-        g_load_item_trampoline = (LoadItemFun*)memory.at_exe(load_item_off);
-        DetourAttach((void**)&g_load_item_trampoline, load_item);
-#endif
+        g_spawn_entity_trampoline = (SpawnEntityFun*)get_address("spawn_entity");
 
-        {
-            auto spawn_entity_off = find_inst(exe, "\xba\x79\x00\x00\x00\x41\x0f\xb6\x06\x88\x44\x24\x20"s, after_bundle);
-            auto spawn_entity_call = find_inst(exe, "\xE8"s, spawn_entity_off);
-            auto spawn_entity_start = Memory::decode_call(spawn_entity_call);
-            g_spawn_entity_trampoline = (SpawnEntityFun*)memory.at_exe(spawn_entity_start);
-        }
-
-        {
-            auto floor_spreading_off = find_inst(exe, "\x45\x0f\x57\xe4\x44\x88\x94\x24\x20\x01\x00\x00\x44\x89\x4c\x24\x44"s, after_bundle);
-            auto floor_spreading_start = function_start(memory.at_exe(floor_spreading_off));
-            g_floor_spreading_trampoline = (FloorSpreadingFun*)floor_spreading_start;
-        }
+        // TODO: 1.23.3
+        //{
+        //    auto floor_spreading_off = find_inst(exe, " 45 0f 57 e4 44 88 94 24 20 01 00 00 44 89 4c 24 44"s, after_bundle);
+        //    auto floor_spreading_start = function_start(memory.at_exe(floor_spreading_off));
+        //    g_floor_spreading_trampoline = (FloorSpreadingFun*)floor_spreading_start;
+        //}
 
         DetourAttach((void**)&g_spawn_entity_trampoline, (SpawnEntityFun*)spawn_entity);
-        DetourAttach((void**)&g_floor_spreading_trampoline, floor_spreading);
+        //DetourAttach((void**)&g_floor_spreading_trampoline, floor_spreading);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)
