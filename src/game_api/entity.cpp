@@ -253,9 +253,8 @@ std::pair<float, float> Entity::position()
     Entity* overlay_nested = overlay;
     while (overlay_nested != nullptr)
     {
-        const auto [overlay_x_pos, overlay_y_pos] = overlay->position();
-        x_pos += overlay_x_pos;
-        y_pos += overlay_y_pos;
+        x_pos += overlay_nested->x;
+        y_pos += overlay_nested->y;
         overlay_nested = overlay_nested->overlay;
     }
     return {x_pos, y_pos};
