@@ -35,7 +35,7 @@ PIMAGE_NT_HEADERS RtlImageNtHeader(_In_ PVOID Base)
     return proc(Base);
 }
 
-size_t find_inst(const char* exe, std::string_view needle, size_t start, std::string_view pattern_name)
+size_t find_inst(const char* exe, std::string_view needle, size_t start, std::string_view pattern_name, bool is_required)
 {
     static const std::size_t exe_size = [exe]()
     {
@@ -62,21 +62,28 @@ size_t find_inst(const char* exe, std::string_view needle, size_t start, std::st
         }
     }
 
-    std::string message;
+    std::string error_message;
     if (pattern_name.empty())
     {
-        message = fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{needle});
+        error_message = fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{ needle });
     }
     else
     {
-        message = fmt::format("Failed finding pattern '{}' ('{}') in Spel2.exe", pattern_name, ByteStr{needle});
+        error_message = fmt::format("Failed finding pattern '{}' ('{}') in Spel2.exe", pattern_name, ByteStr{ needle });
     }
 
-    if (MessageBox(NULL, message.c_str(), NULL, MB_OKCANCEL) == IDCANCEL)
+    if (is_required)
     {
-        std::terminate();
+        if (MessageBox(NULL, error_message.c_str(), NULL, MB_OKCANCEL) == IDCANCEL)
+        {
+            std::terminate();
+        }
+        return 0ull;
     }
-    return SIZE_MAX;
+    else
+    {
+        throw std::logic_error{error_message};
+    }
 }
 
 size_t find_after_bundle(size_t exe)
@@ -106,10 +113,19 @@ class PatternCommandBuffer
     PatternCommandBuffer& operator=(const PatternCommandBuffer&) = default;
     PatternCommandBuffer& operator=(PatternCommandBuffer&&) noexcept = default;
 
+    PatternCommandBuffer& set_optional(bool optional)
+    {
+        commands.push_back({ CommandType::SetOptional, {.optional = optional} });
+        return *this;
+    }
     PatternCommandBuffer& find_inst(std::string_view pattern)
     {
         commands.push_back({CommandType::FindInst, {.pattern = pattern}});
         return *this;
+    }
+    PatternCommandBuffer& find_next_inst(std::string_view pattern)
+    {
+        return offset(0x1).find_inst(pattern);
     }
     PatternCommandBuffer& offset(int64_t offset)
     {
@@ -142,16 +158,26 @@ class PatternCommandBuffer
         return *this;
     }
 
-    size_t operator()(Memory mem, const char* exe, std::string_view address_name) const
+    std::optional<size_t> operator()(Memory mem, const char* exe, std::string_view address_name) const
     {
         size_t offset = mem.after_bundle;
+        bool optional{false};
 
         for (auto& [command, data] : commands)
         {
             switch (command)
             {
+            case CommandType::SetOptional:
+                optional = data.optional;
+                break;
             case CommandType::FindInst:
-                offset = ::find_inst(exe, data.pattern, offset, address_name);
+                try {
+                    offset = ::find_inst(exe, data.pattern, offset, address_name, !optional);
+                }
+                catch (const std::logic_error&)
+                {
+                    return 0;
+                }
                 break;
             case CommandType::Offset:
                 offset = offset + data.offset;
@@ -183,6 +209,7 @@ class PatternCommandBuffer
   private:
     enum class CommandType
     {
+        SetOptional,
         FindInst,
         Offset,
         DecodePC,
@@ -193,6 +220,7 @@ class PatternCommandBuffer
     };
     union CommandData
     {
+        bool optional;
         std::string_view pattern;
         int64_t offset;
         std::pair<uint8_t, uint8_t> decode_pc_prefix_suffix;
@@ -206,7 +234,8 @@ class PatternCommandBuffer
     std::vector<Command> commands;
 };
 
-std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char* exe, std::string_view address_name)>> g_address_rules{
+using AddressRule = std::function<std::optional<size_t>(Memory mem, const char* exe, std::string_view address_name)>;
+std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "game_malloc"sv,
         PatternCommandBuffer{}
@@ -230,8 +259,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         PatternCommandBuffer{}
             .find_inst("\x41\xb8\x50\x46\x00\x00"sv)
             .find_inst("\xe8"sv)
-            .offset(0x1)
-            .find_inst("\xe8"sv)
+            .find_next_inst("\xe8"sv)
             .decode_call()
             .at_exe(),
     },
@@ -239,8 +267,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         "state_location"sv,
         PatternCommandBuffer{}
             .find_inst("\x49\x0F\x44\xC0"sv)
-            .offset(0x1)
-            .find_inst("\x49\x0F\x44\xC0"sv)
+            .find_next_inst("\x49\x0F\x44\xC0"sv)
             .offset(-0x19)
             .find_inst("\x48\x8B"sv)
             .decode_pc()
@@ -257,7 +284,15 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
     {
         "write_load_opt"sv,
         PatternCommandBuffer{}
+            .set_optional(true)
             .find_inst("\xFF\xD3\xB9\xFA\x00\x00\x00"sv)
+            .at_exe(),
+    },
+    {
+        "write_load_opt_fixed"sv,
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .find_inst("\x90\x90\xB9\xFA\x00\x00\x00"sv)
             .at_exe(),
     },
     {
@@ -393,8 +428,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         // Search for string "generic.lvl", it is used in a call to this function
         PatternCommandBuffer{}
             .find_inst("\x45\x84\xed\x74\x0f"sv)
-            .offset(0x1)
-            .find_inst("\x45\x84\xed\x74\x0f"sv)
+            .find_next_inst("\x45\x84\xed\x74\x0f"sv)
             .find_inst("\xe8"sv)
             .decode_call()
             .at_exe(),
@@ -481,11 +515,13 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
             .at_exe(),
     },
     {
-        "load_texture"sv,
+        "declare_texture"sv,
         // Search for a string of any of the textures, e.g. just `.DDS`, take one with just one XREF and see the call that it is used in,
         // that call is load_texture
         PatternCommandBuffer{}
             .find_inst("\xe8****\xc7\x44\x24\x50"sv)
+            .find_next_inst("\xe8****\xc7\x44\x24\x50"sv)
+            .find_next_inst("\xe8****\xc7\x44\x24\x50"sv)
             .decode_call()
             .at_exe(),
     },
@@ -626,8 +662,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         // Then warp to camp
         PatternCommandBuffer{}
             .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
-            .offset(0x1)
-            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
+            .find_next_inst("\xC7\x80****\x00\x00\x58\x41"sv)
             .offset(0x6)
             .at_exe(),
     },
@@ -807,8 +842,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         // See `arrowtrap_projectile`, second occurrence of pattern
         PatternCommandBuffer{}
             .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
-            .offset(0x1)
-            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .find_next_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
             .offset(0x1)
             .at_exe(),
     },
@@ -840,8 +874,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         // Note that there is a similar value of 1800 frames being written just above this location, no idea what triggers that
         PatternCommandBuffer{}
             .find_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
-            .offset(0x1)
-            .find_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
+            .find_next_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
             .offset(0x7)
             .at_exe(),
     },
@@ -883,8 +916,7 @@ std::unordered_map<std::string_view, std::function<size_t(Memory mem, const char
         // Put a write bp on State.speechbubble
         PatternCommandBuffer{}
             .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
-            .offset(0x1)
-            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
+            .find_next_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
             .at_exe()
             .function_start(),
     },
@@ -940,10 +972,9 @@ void preload_addresses()
         }
 #endif // DEBUG
 
-        size_t address = rule(mem, exe, address_name);
-        if (address > 0ull)
+        if (auto address = rule(mem, exe, address_name))
         {
-            g_cached_addresses[address_name] = address;
+            g_cached_addresses[address_name] = address.value();
         }
     }
 }
@@ -953,11 +984,10 @@ size_t load_address(std::string_view address_name)
     if (it != g_address_rules.end())
     {
         Memory mem = Memory::get();
-        size_t address = it->second(mem, mem.exe(), address_name);
-        if (address > 0ull)
+        if (auto address = it->second(mem, mem.exe(), address_name))
         {
-            g_cached_addresses[address_name] = address;
-            return address;
+            g_cached_addresses[address_name] = address.value();
+            return address.value();
         }
     }
     const std::string message = fmt::format("Tried to get unknown address '{}'", address_name);

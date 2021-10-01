@@ -42,7 +42,6 @@ struct RenderAPI
     TextureDefinition get_texture_definition(TEXTURE texture_id);
     Texture* get_texture(TEXTURE texture_id);
     TEXTURE define_texture(TextureDefinition data);
-    const char** load_texture(std::string file_name);
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);

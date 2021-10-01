@@ -86,7 +86,9 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
 
     for (auto& [id, texture] : custom_textures)
     {
-        if (*texture.name == data.texture_path && is_same(texture, new_texture))
+        std::string_view existing_name{*texture.name};
+        existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
+        if (existing_name == data.texture_path && is_same(texture, new_texture))
         {
             return texture.id;
         }
@@ -100,19 +102,31 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         }
     }
 
-    new_texture.name = load_texture(std::move(data.texture_path));
+    auto* new_texture_target = textures->texture_map[0];
+
+    const auto backup_num_textures = textures->num_textures;
+    const auto backup_texture = *new_texture_target;
+    textures->num_textures = 0;
+    data.texture_path = "../../" + data.texture_path;
+
+    // clang-format off
+    using DeclareTextureFunT = void(
+        uint8_t, uint32_t, const char*,
+        uint32_t, uint32_t, uint32_t, uint32_t,
+        uint32_t, uint32_t, uint32_t, uint32_t);
+    static auto declare_texture_fun = (DeclareTextureFunT*)get_address("declare_texture"sv);
+    declare_texture_fun(
+        1, 0x0, data.texture_path.c_str(),
+        data.width, data.height, data.tile_width, data.tile_height,
+        data.sub_image_offset_x, data.sub_image_offset_y, data.sub_image_width, data.sub_image_height);
+    // clang-format on
+
+    new_texture.name = new_texture_target->name;
+    textures->num_textures = backup_num_textures;
+    *new_texture_target = backup_texture;
     custom_textures[new_texture.id] = new_texture;
 
     return new_texture.id;
-}
-
-using LoadTextureFunT = const char**(void*, std::string*, std::uint8_t);
-const char** RenderAPI::load_texture(std::string file_name)
-{
-    static auto load_texture = (LoadTextureFunT*)get_address("load_texture"sv);
-
-    void* render_api = (void*)renderer();
-    return load_texture(render_api, &file_name, 1);
 }
 
 using VanillaRenderHudFun = void(size_t, float, float, size_t);
