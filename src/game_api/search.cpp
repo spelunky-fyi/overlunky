@@ -65,11 +65,11 @@ size_t find_inst(const char* exe, std::string_view needle, size_t start, std::st
     std::string error_message;
     if (pattern_name.empty())
     {
-        error_message = fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{ needle });
+        error_message = fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{needle});
     }
     else
     {
-        error_message = fmt::format("Failed finding pattern '{}' ('{}') in Spel2.exe", pattern_name, ByteStr{ needle });
+        error_message = fmt::format("Failed finding pattern '{}' ('{}') in Spel2.exe", pattern_name, ByteStr{needle});
     }
 
     if (is_required)
@@ -115,7 +115,7 @@ class PatternCommandBuffer
 
     PatternCommandBuffer& set_optional(bool optional)
     {
-        commands.push_back({ CommandType::SetOptional, {.optional = optional} });
+        commands.push_back({CommandType::SetOptional, {.optional = optional}});
         return *this;
     }
     PatternCommandBuffer& find_inst(std::string_view pattern)
@@ -171,7 +171,8 @@ class PatternCommandBuffer
                 optional = data.optional;
                 break;
             case CommandType::FindInst:
-                try {
+                try
+                {
                     offset = ::find_inst(exe, data.pattern, offset, address_name, !optional);
                 }
                 catch (const std::logic_error&)

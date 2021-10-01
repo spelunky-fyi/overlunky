@@ -636,7 +636,6 @@ bool Floor::get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2])
     return true;
 }
 
-
 void Arrowtrap::rearm()
 {
     if (arrow_shot)
