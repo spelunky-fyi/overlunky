@@ -410,8 +410,6 @@ void init_render_api_hooks()
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
 
-    DetourRestoreAfterWith();
-
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 

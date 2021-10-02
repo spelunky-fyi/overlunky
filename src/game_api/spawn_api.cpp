@@ -396,8 +396,6 @@ Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, f
 void init_spawn_hooks()
 {
     {
-        DetourRestoreAfterWith();
-
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 

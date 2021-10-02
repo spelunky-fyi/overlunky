@@ -173,8 +173,6 @@ void register_on_load_file(LoadFileCallback on_load_file)
     {
         g_read_encrypted_file_trampoline = (ReadEncryptedFileFun*)get_address("read_encrypted_file"sv);
 
-        DetourRestoreAfterWith();
-
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 

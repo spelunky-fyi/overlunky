@@ -1141,8 +1141,6 @@ void LevelGenData::init()
             //    }
         }
 
-        DetourRestoreAfterWith();
-
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
