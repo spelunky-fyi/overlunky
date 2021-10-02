@@ -409,8 +409,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc(4)
             .at_exe(),
     },
+    {"level_gen_entry"sv,
+     // Put a bp on the virtual LevelInfo::pppulate_level, start a new game, the caller is this function
+     PatternCommandBuffer{}
+         .find_inst("\xE8****\x41\x80\x7F**\x7C\x22")
+         .decode_call()
+         .at_exe()},
     {
         "level_gen_handle_tile_code"sv,
+        // Put a conditional bp on spawn_entity with entity_type == to_id("ENT_TYPE_FLOOR_GENERIC")
+        // The callstack should be handle_tile_code -> load_item -> spawn_entity
         PatternCommandBuffer{}
             .find_inst("\xE8****\x83\xC5\x01"sv)
             .decode_call()
