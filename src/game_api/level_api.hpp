@@ -184,6 +184,9 @@ class ThemeInfo
     // metal clanking and air of oppression
     virtual void set_theme_specific_level_feeling() = 0;
 
+    // Note: Inserted somewhere between initialize_flags and populate_level
+    virtual bool unknown_v12() = 0;
+
     // disable this and only the player is spawned in the level
     virtual void populate_level() = 0;
 
@@ -255,13 +258,13 @@ class ThemeInfo
     virtual uint32_t random_block_floorstyle_2() = 0;
 
     // all return false, except olmec, temple, neobab, cog, duat
-    virtual bool unknown_v29() = 0;
+    virtual bool unknown_v30() = 0;
 
     // determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme
     // returns 85 by default, except for: olmec: 15, cog: 23
     virtual uint32_t transition_tunnel_block_modifier() = 0;
 
-    virtual uint32_t unknown_v31() = 0;
+    virtual uint32_t unknown_v32() = 0;
 
     // always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
     virtual uint32_t backwall_entity_id() = 0;
@@ -329,7 +332,7 @@ class ThemeInfo
     virtual uint32_t get_zero_based_level_height() = 0;
 
     // returns a value that appears to affect room generation and is based on current world,level
-    virtual uint32_t unknown_v46() = 0;
+    virtual uint32_t unknown_v47() = 0;
 
     // used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues
     // also implemented for neobab (i think in the zoos)

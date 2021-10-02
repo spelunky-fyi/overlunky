@@ -2,6 +2,7 @@
 
 #include "entity.hpp"
 #include "layer.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "memory.hpp"
 #include "prng.hpp"
@@ -14,7 +15,7 @@
 #include <detours.h>
 
 std::uint32_t g_SpawnNonReplacable;
-SPAWN_TYPE g_SpawnTypeFlags;
+SpawnType g_SpawnTypeFlags;
 std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
 
 void spawn_liquid(ENT_TYPE entity_type, float x, float y)
@@ -312,25 +313,27 @@ void setup_impostor_lake(Entity* lake_impostor, AABB aabb, float top_threshold)
 
 void update_spawn_type_flags()
 {
-    g_SpawnTypeFlags = 0;
+    SPAWN_TYPE flags = 0;
 
-    g_SpawnTypeFlags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
-    g_SpawnTypeFlags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING : 0;
+    flags |= g_SpawnTypes[0] ? SPAWN_TYPE_LEVEL_GEN_TILE_CODE : 0;
+    flags |= g_SpawnTypes[1] ? SPAWN_TYPE_LEVEL_GEN_PROCEDURAL : 0;
+    flags |= g_SpawnTypes[2] ? SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING : 0;
 
     // LEVEL_GEN_GENERAL only covers level gen spawns not covered by the others
-    if ((g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) == 0)
+    if ((flags & SPAWN_TYPE_LEVEL_GEN) == 0)
     {
-        g_SpawnTypeFlags |= g_SpawnTypes[3] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
+        flags |= g_SpawnTypes[3] ? SPAWN_TYPE_LEVEL_GEN_GENERAL : 0;
     }
 
-    g_SpawnTypeFlags |= g_SpawnTypes[4] ? SPAWN_TYPE_SCRIPT : 0;
+    flags |= g_SpawnTypes[4] ? SPAWN_TYPE_SCRIPT : 0;
 
     // SYSTEMIC covers everything that isn't covered above
-    if (g_SpawnTypeFlags == 0)
+    if (flags == 0)
     {
-        g_SpawnTypeFlags |= SPAWN_TYPE_SYSTEMIC;
+        flags |= SPAWN_TYPE_SYSTEMIC;
     }
+
+    g_SpawnTypeFlags = SpawnType(flags);
 }
 void push_spawn_type_flags(SPAWN_TYPE flags)
 {
@@ -360,6 +363,15 @@ using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
+    const auto state = State::get().ptr_local();
+    const auto theme = state->theme;
+    const auto theme_floor = state->level_gen->themes[theme]->random_block_floorstyle();
+    const bool is_floor_spreading = (entity_type == theme_floor) && (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) && !(g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
+    if (is_floor_spreading)
+    {
+        push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING);
+    }
+
     Entity* spawned_ent{nullptr};
     if (g_SpawnNonReplacable == 0)
     {
@@ -372,17 +384,13 @@ Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, f
     }
 
     post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
-    return spawned_ent;
-}
 
-using FloorSpreadingFun = Entity*();
-FloorSpreadingFun* g_floor_spreading_trampoline{nullptr};
-Entity* floor_spreading()
-{
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING); }};
-    return g_floor_spreading_trampoline();
+    if (is_floor_spreading)
+    {
+        pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING);
+    }
+
+    return spawned_ent;
 }
 
 void init_spawn_hooks()
@@ -395,15 +403,7 @@ void init_spawn_hooks()
 
         g_spawn_entity_trampoline = (SpawnEntityFun*)get_address("spawn_entity");
 
-        // TODO: 1.23.3
-        //{
-        //    auto floor_spreading_off = find_inst(exe, " 45 0f 57 e4 44 88 94 24 20 01 00 00 44 89 4c 24 44"s, after_bundle);
-        //    auto floor_spreading_start = function_start(memory.at_exe(floor_spreading_off));
-        //    g_floor_spreading_trampoline = (FloorSpreadingFun*)floor_spreading_start;
-        //}
-
         DetourAttach((void**)&g_spawn_entity_trampoline, (SpawnEntityFun*)spawn_entity);
-        //DetourAttach((void**)&g_floor_spreading_trampoline, floor_spreading);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)
