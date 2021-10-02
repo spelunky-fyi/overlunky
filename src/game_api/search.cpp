@@ -118,10 +118,19 @@ class PatternCommandBuffer
         commands.push_back({CommandType::SetOptional, {.optional = optional}});
         return *this;
     }
+    PatternCommandBuffer& get_address(std::string_view address_name)
+    {
+        commands.push_back({CommandType::GetAddress, {.address_name = address_name}});
+        return *this;
+    }
     PatternCommandBuffer& find_inst(std::string_view pattern)
     {
         commands.push_back({CommandType::FindInst, {.pattern = pattern}});
         return *this;
+    }
+    PatternCommandBuffer& find_after_inst(std::string_view pattern)
+    {
+        return find_inst(pattern).offset(pattern.size());
     }
     PatternCommandBuffer& find_next_inst(std::string_view pattern)
     {
@@ -170,6 +179,9 @@ class PatternCommandBuffer
             case CommandType::SetOptional:
                 optional = data.optional;
                 break;
+            case CommandType::GetAddress:
+                offset = ::get_address(data.address_name) - (size_t)exe;
+                break;
             case CommandType::FindInst:
                 try
                 {
@@ -211,6 +223,7 @@ class PatternCommandBuffer
     enum class CommandType
     {
         SetOptional,
+        GetAddress,
         FindInst,
         Offset,
         DecodePC,
@@ -222,6 +235,7 @@ class PatternCommandBuffer
     union CommandData
     {
         bool optional;
+        std::string_view address_name;
         std::string_view pattern;
         int64_t offset;
         std::pair<uint8_t, uint8_t> decode_pc_prefix_suffix;
@@ -409,12 +423,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc(4)
             .at_exe(),
     },
-    {"level_gen_entry"sv,
-     // Put a bp on the virtual LevelInfo::pppulate_level, start a new game, the caller is this function
-     PatternCommandBuffer{}
-         .find_inst("\xE8****\x41\x80\x7F**\x7C\x22")
-         .decode_call()
-         .at_exe()},
+    {
+        "level_gen_entry"sv,
+        // Put a bp on the virtual LevelInfo::pppulate_level, start a new game, the caller is this function
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x41\x80\x7F**\x7C\x22")
+            .decode_call()
+            .at_exe(),
+    },
     {
         "level_gen_handle_tile_code"sv,
         // Put a conditional bp on spawn_entity with entity_type == to_id("ENT_TYPE_FLOOR_GENERIC")
@@ -521,6 +537,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xF3\x48\x0F\x2A\xC0\xF3\x0F\x58\xC0\xF3\x0F\x10\x0D"sv)
             .offset(0x9)
             .decode_pc(4)
+            .at_exe(),
+    },
+    {
+        "fetch_texture_begin"sv,
+        // In spawn_entity right after the texture_id is assigned to a local (probably eax)
+        // and then checked against -4
+        PatternCommandBuffer{}
+            .get_address("spawn_entity"sv)
+            .find_inst("\x83\xf8\xfc"sv)
+            .at_exe(),
+    },
+    {
+        "fetch_texture_end"sv,
+        // In spawn_entity before assigning Entity::animation_frame (0x3c)
+        PatternCommandBuffer{}
+            .get_address("fetch_texture_begin"sv)
+            .find_next_inst("\x66\x89\x46\x3c"sv)
             .at_exe(),
     },
     {

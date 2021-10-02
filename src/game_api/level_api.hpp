@@ -319,7 +319,7 @@ class ThemeInfo
     // ...
     // the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number
     // that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
-    virtual uint32_t get_dynamic_floor_texture_id(int8_t texture_id) = 0;
+    virtual uint32_t get_dynamic_floor_texture_id(int32_t texture_id) = 0;
 
     // manipulates state.level_next, world_next and theme_next; triggers when exiting a level
     // for dwelling, it just increments level_next because the world/theme choice is made by which door you pick
