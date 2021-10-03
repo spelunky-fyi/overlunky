@@ -46,8 +46,6 @@ class Entity;
 using EntityCreate = Entity* (*)();
 using EntityDestroy = void (*)(Entity*);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
-using AddLayer = void (*)(void*, Entity*);
-using RemoveLayer = void (*)(void*, Entity*);
 
 struct EntityDB
 {

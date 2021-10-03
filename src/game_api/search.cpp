@@ -343,18 +343,20 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        "fun_22872fe0"sv,
-        // Used in load_item as `fun_22872fe0(layer, spawned_entity)`
+        "add_to_layer"sv,
+        // Used in load_item as `add_to_layer(layer, spawned_entity)`
         PatternCommandBuffer{}
             .find_inst("\xE9****\x49\x81\xC6****"sv)
             .decode_call()
             .at_exe(),
     },
     {
-        "fun_2286f240"sv,
-        // Used in load_item as `fun_2286f240(layer + something, spawned_entity, false)`
+        "remove_from_layer"sv,
+        // Set a data-bp on player.layer, then go through a layer door
+        // Should hit the bp where it runs player.layer = 2, that is this function
         PatternCommandBuffer{}
-            .find_inst("\xE8****\x8B\x43\x0C"sv)
+            .find_inst("\x48\x8b\x4d\xe0\x48\x89\xf2\xe8****\x48"sv)
+            .offset(0x7)
             .decode_call()
             .at_exe(),
     },

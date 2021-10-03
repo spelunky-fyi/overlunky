@@ -72,17 +72,19 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 {
     using SpawnEntityFun = Entity*(EntityFactory*, size_t, float, float, bool, Entity*, bool);
     static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
-    static auto fun_22872fe0 = (void (*)(void*, Entity*))get_address("fun_22872fe0");
-    static auto fun_2286f240 = (void (*)(void*, Entity*, bool))get_address("fun_2286f240");
+    using AddToLayer = void(Layer*, bool);
+    static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
+    using AddItemPtr = void(Entity*, Entity*, bool);
+    static auto add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
 
     Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, true);
     if (*((bool*)this + 0x64490))
     {
-        fun_22872fe0(this, ent);
+        add_to_layer(this, ent);
     }
     else
     {
-        fun_2286f240((void*)((size_t)this + 0x64440), ent, false);
+        add_item_ptr((Entity*)((size_t)this + 0x64440), ent, false);
     }
     return ent;
 }
