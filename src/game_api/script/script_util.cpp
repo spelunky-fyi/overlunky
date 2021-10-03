@@ -1,5 +1,6 @@
 #include "script_util.hpp"
 #include "memory.hpp"
+#include "prng.hpp"
 
 #include <regex>
 
@@ -21,17 +22,26 @@ size_t get_say_context()
     return say_context;
 }
 
-Prng get_seed_prng()
+void seed_prng(int64_t seed)
 {
-    ONCE(Prng)
+    auto next_pair = [useed = static_cast<uint64_t>(seed)]() mutable
     {
-        auto memory = Memory::get();
-        auto off = find_inst(
-            memory.exe(),
-            "\x48\x89\x5C\x24\x08\x48\x89\x74\x24\x10\x57\x48\x83\xEC\x10\x8B\xC1\x33\xFF\x48\x85\xC0\x41\xB9\x30\x01\x00\x00\x48\xBB\x99\x9A\x6A\x67\xD0\x63\x6C\x9E"s,
-            memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (Prng)off;
+        // advance state
+        useed = (uint64_t((useed & 0xffffffff) == 0) - (useed & 0xffffffff)) * -0x61939c2f98956567;
+        useed = (((useed >> 0x1c) ^ useed) >> 0x17) ^ useed;
+
+        // generate next pair
+        PRNG::prng_pair useed_pair;
+        useed_pair.first = useed * -0x61939c2f98956567;
+        useed_pair.second = (useed * -0x7cc4ab2b38000000 | useed_pair.first >> 0x25) * -0x61939c2f98956567;
+        useed_pair.first = (useed_pair.first >> 0x1c ^ useed_pair.first) >> 0x17 ^ useed_pair.first;
+        return useed_pair;
+    };
+
+    PRNG& prng = PRNG::get();
+    for (auto& pair : prng.pairs)
+    {
+        pair = next_pair();
     }
 }
 

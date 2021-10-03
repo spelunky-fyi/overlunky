@@ -369,7 +369,7 @@ const Texture* fetch_texture(int32_t texture_id)
 
     if (texture_id < -3)
     {
-        auto* current_theme = *((ThemeInfo**)&State::get().ptr_local()->i6c);
+        auto* current_theme = State::get().ptr_local()->current_theme();
         texture_id = current_theme->get_dynamic_floor_texture_id(texture_id);
     }
     return get_textures()->texture_map[texture_id];
