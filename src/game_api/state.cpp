@@ -68,7 +68,6 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
-        DEBUG("TODO: patterns for level_gen and spawn_hooks");
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
         init_render_api_hooks();

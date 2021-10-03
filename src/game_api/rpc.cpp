@@ -827,7 +827,7 @@ void destroy_entity(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
-        ent->destroy(); // TODO
+        ent->destroy();
 }
 
 void apply_entity_db(uint32_t uid)

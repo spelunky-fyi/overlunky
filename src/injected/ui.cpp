@@ -1040,9 +1040,13 @@ void frame_advance()
 
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
+    const auto ana_id = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    const auto ana_type = get_type(ana_id);
+    const auto ana_texture = ana_type->texture;
+
     g_state->items->player_select_slots[0].activated = true;
-    g_state->items->player_select_slots[0].character = g_save->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + 285; //TODO: magic numbers
+    g_state->items->player_select_slots[0].character = g_save->players[0] + ana_id;
+    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + ana_texture;
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
     g_state->screen_next = screen;
