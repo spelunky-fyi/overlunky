@@ -1,7 +1,8 @@
 add_library(shared INTERFACE)
 target_include_directories(shared INTERFACE .)
 target_link_libraries(shared INTERFACE
-        fmt)
+        fmt
+        overlunky_version)
 target_precompile_headers(shared INTERFACE
         "logger.h"
         <fmt/format.h>

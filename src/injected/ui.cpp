@@ -39,6 +39,7 @@
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "version.hpp"
 #include "window_api.hpp"
 
 #include "decode_audio_file.hpp"
@@ -4810,7 +4811,7 @@ void imgui_init(ImGuiContext*)
 void imgui_draw()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    std::string buf = fmt::format("Overlunky {}", TOSTRING(GIT_VERSION));
+    std::string buf = fmt::format("Overlunky {}", get_version());
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
