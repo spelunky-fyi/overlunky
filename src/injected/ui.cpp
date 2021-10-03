@@ -39,6 +39,7 @@
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "version.hpp"
 #include "window_api.hpp"
 
 #include "decode_audio_file.hpp"
@@ -1154,12 +1155,10 @@ void warp_next_level(size_t num)
     auto doors = get_entities_by_type(doortypes);
     for (auto doorid : doors)
     {
-        uint8_t world, level, theme;
         ExitDoor* doorent = (ExitDoor*)get_entity_ptr(doorid);
-        std::tie(world, level, theme) = doorent->get_target();
         if (!doorent->special_door)
             continue;
-        targets.emplace_back(world, level, theme);
+        targets.emplace_back(doorent->world, doorent->level, doorent->theme);
     }
 
     if (g_state->theme == 11)
@@ -2183,11 +2182,9 @@ void render_narnia()
     auto doors = get_entities_by_type(doortypes);
     for (auto doorid : doors)
     {
-        Movable* doorent = (Movable*)get_entity_ptr(doorid);
-        auto target = reinterpret_cast<Target*>(&doorent->anim_func);
-        if (!target->enabled)
+        ExitDoor* target = (ExitDoor*)get_entity_ptr(doorid);
+        if (!target->special_door)
             continue;
-
         std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (n > 0)
             ImGui::SameLine();
@@ -4814,7 +4811,7 @@ void imgui_init(ImGuiContext*)
 void imgui_draw()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    std::string buf = fmt::format("Overlunky {}", TOSTRING(GIT_VERSION));
+    std::string buf = fmt::format("Overlunky {}", get_version());
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 

@@ -60,15 +60,19 @@ float get_zoom_level()
 
 void attach_entity(Entity* overlay, Entity* attachee)
 {
-    using AttachEntity = void (*)(Entity*, Entity*);
-    static AttachEntity attach_entity = []()
+    if (attachee->overlay)
     {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x48\x8b\xd0\x48\x8b\xcd\x48\x8b\xd8"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xe8"s, off);
-        return (AttachEntity)memory.at_exe(Memory::decode_call(off));
-    }();
-    attach_entity(overlay, attachee);
+        overlay->remove_item_ptr(attachee);
+    }
+
+    auto [x, y] = overlay->position();
+    attachee->x -= x;
+    attachee->y -= y;
+    attachee->overlay = overlay;
+
+    using AddItemPtr = void(Vector*, Entity*, bool);
+    static AddItemPtr* add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
+    add_item_ptr(&overlay->items, attachee, false);
 }
 
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
@@ -114,20 +118,23 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
 
 void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
 {
-    using StackEntities = void (*)(Entity*, Entity*, float(&)[2]);
-    static StackEntities stack_entities = []()
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x49\x8b\xc9\xf3\x0f\x11\x5c\x24\x34"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xe8"s, off);
-        return (StackEntities)memory.at_exe(Memory::decode_call(off));
-    }();
-
     if (Entity* bottom = get_entity_ptr(bottom_uid))
     {
         if (Entity* top = get_entity_ptr(top_uid))
         {
-            stack_entities(bottom, top, offset);
+            if (top->overlay)
+            {
+                top->overlay->remove_item_ptr(top);
+            }
+            top->w = offset[0];
+            top->h = offset[1];
+            attach_entity(bottom, top);
+            top->x = offset[0];
+            top->y = offset[0];
+            if ((bottom->flags >> 0x10) & 0x1) // facing left
+            {
+                top->x *= -1.0f;
+            }
         }
     }
 }
@@ -650,15 +657,18 @@ void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return;
-    static_cast<Door*>(door)->set_target(w, l, t);
+    door->as<ExitDoor>()->world = w;
+    door->as<ExitDoor>()->level = l;
+    door->as<ExitDoor>()->theme = t;
+    door->as<ExitDoor>()->special_door = true;
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
     Entity* door = get_entity_ptr(uid);
-    if (door == nullptr)
+    if (door == nullptr || !door->as<ExitDoor>()->special_door)
         return std::make_tuple((uint8_t)0, (uint8_t)0, (uint8_t)0);
-    return static_cast<Door*>(door)->get_target();
+    return std::make_tuple(door->as<ExitDoor>()->world, door->as<ExitDoor>()->level, door->as<ExitDoor>()->theme);
 }
 
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type)

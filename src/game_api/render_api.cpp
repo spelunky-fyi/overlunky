@@ -5,9 +5,11 @@
 #include <string>
 
 #include "layer.hpp"
+#include "level_api.hpp"
 #include "memory.hpp"
 #include "script/events.hpp"
 #include "script/lua_backend.hpp"
+#include "state.hpp"
 #include "texture.hpp"
 
 RenderAPI& RenderAPI::get()
@@ -86,7 +88,9 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
 
     for (auto& [id, texture] : custom_textures)
     {
-        if (*texture.name == data.texture_path && is_same(texture, new_texture))
+        std::string_view existing_name{*texture.name};
+        existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
+        if (existing_name == data.texture_path && is_same(texture, new_texture))
         {
             return texture.id;
         }
@@ -100,19 +104,31 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         }
     }
 
-    new_texture.name = load_texture(std::move(data.texture_path));
+    auto* new_texture_target = textures->texture_map[0];
+
+    const auto backup_num_textures = textures->num_textures;
+    const auto backup_texture = *new_texture_target;
+    textures->num_textures = 0;
+    data.texture_path = "../../" + data.texture_path;
+
+    // clang-format off
+    using DeclareTextureFunT = void(
+        uint8_t, uint32_t, const char*,
+        uint32_t, uint32_t, uint32_t, uint32_t,
+        uint32_t, uint32_t, uint32_t, uint32_t);
+    static auto declare_texture_fun = (DeclareTextureFunT*)get_address("declare_texture"sv);
+    declare_texture_fun(
+        1, 0x0, data.texture_path.c_str(),
+        data.width, data.height, data.tile_width, data.tile_height,
+        data.sub_image_offset_x, data.sub_image_offset_y, data.sub_image_width, data.sub_image_height);
+    // clang-format on
+
+    new_texture.name = new_texture_target->name;
+    textures->num_textures = backup_num_textures;
+    *new_texture_target = backup_texture;
     custom_textures[new_texture.id] = new_texture;
 
     return new_texture.id;
-}
-
-using LoadTextureFunT = const char**(void*, std::string*, std::uint8_t);
-const char** RenderAPI::load_texture(std::string file_name)
-{
-    static auto load_texture = (LoadTextureFunT*)get_address("load_texture"sv);
-
-    void* render_api = (void*)renderer();
-    return load_texture(render_api, &file_name, 1);
 }
 
 using VanillaRenderHudFun = void(size_t, float, float, size_t);
@@ -336,18 +352,63 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
     }
 }
 
-// TODO: Replacement for fetch_texture T.T
-// This function made it possible to change the texture id of an entity before it was spawned to the id of a custom texture
-// E.g. when changing the texture of the player character it allowed to throw ropes without crashing
-// To replace it we need to override the code in spawn_entity
+const Texture* fetch_texture(int32_t texture_id)
+{
+    auto* textures = get_textures();
+    if (texture_id >= static_cast<int64_t>(textures->texture_map.size()))
+    {
+        const auto& render_api = RenderAPI::get();
+        std::lock_guard lock{render_api.custom_textures_lock};
+        const auto& custom_textures = render_api.custom_textures;
+        auto it = custom_textures.find(texture_id);
+        if (it != custom_textures.end())
+        {
+            return &it->second;
+        }
+    }
+
+    if (texture_id < -3)
+    {
+        auto* current_theme = *((ThemeInfo**)&State::get().ptr_local()->i6c);
+        texture_id = current_theme->get_dynamic_floor_texture_id(texture_id);
+    }
+    return get_textures()->texture_map[texture_id];
+}
 
 void init_render_api_hooks()
 {
+    // Fix the texture fetching in spawn_entity
+    {
+        const size_t fetch_texture_begin = get_address("fetch_texture_begin");
+        const size_t fetch_texture_end = get_address("fetch_texture_end");
+
+        const size_t fetch_texture_addr = (size_t)&fetch_texture;
+
+        // Manually assembled code, let's hope it won't have to change ever
+        std::string code = fmt::format(
+            "\x48\x89\xc1"                         //mov    rcx, rax
+            "\x48\xba{}"                           //mov    rdx, 0x0
+            "\xff\xd2"                             //call   rdx
+            "\x48\x89\x86\x90\x00\x00\x00"         //mov    QWORD PTR[rsi + 0x90], rax
+            "\x48\x85\xc0"                         //test   rax, rax
+            "\x74\x17"                             //jz     0x17
+            "\x48\x0f\xb7\x40\x18"                 //movzx  rax, WORD PTR[rax + 0x18]
+            "\x66\x0f\xaf\x84\x1f\x90\x00\x00\x00" //imul   ax, WORD PTR[rdi + rbx * 1 + 0x90]
+            "\x66\x03\x84\x1f\x8c\x00\x00\x00"     //add    ax, WORD PTR[rdi + rbx * 1 + 0x8c]
+            "\xeb\x02"                             //jmp    0x2
+            "\x31\xc0"sv,                          //xor    rax, rax
+            to_le_bytes(fetch_texture_addr));
+
+        // Fill with nop, code is not performance-critical either way
+        const size_t original_code_size = fetch_texture_end - fetch_texture_begin;
+        code.resize(original_code_size, '\x90');
+
+        write_mem_prot(fetch_texture_begin, code, true);
+    }
+
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
-
-    DetourRestoreAfterWith();
 
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());

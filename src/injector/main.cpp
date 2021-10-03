@@ -5,6 +5,7 @@
 #include "cmd_line.h"
 #include "injector.h"
 #include "logger.h"
+#include "version.hpp"
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
@@ -29,7 +30,7 @@ int main(int argc, char** argv)
         PANIC("DLL not found! {}", overlunky_path.string().data());
     }
 
-    INFO("Overlunky version: " TOSTRING(GIT_VERSION));
+    INFO("Overlunky version: {}", get_version());
 
     Process game_proc = [&cmd_line_parser]()
     {

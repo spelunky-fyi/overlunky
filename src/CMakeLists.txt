@@ -56,6 +56,10 @@ target_compile_options(lib_detours_overlunky PRIVATE /w /Zi /MT /Gy /Gm- /Zl /Od
 target_include_directories(lib_detours_overlunky PUBLIC detours/src)
 
 # --------------------------------------------------
+# wrapper for version to avoid excessive recompiles
+add_subdirectory(version)
+
+# --------------------------------------------------
 # warnings interface target
 add_library(overlunky_warnings INTERFACE)
 if(MSVC)

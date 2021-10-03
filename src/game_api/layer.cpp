@@ -72,17 +72,19 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 {
     using SpawnEntityFun = Entity*(EntityFactory*, size_t, float, float, bool, Entity*, bool);
     static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
-    static auto fun_22872fe0 = (void (*)(void*, Entity*))get_address("fun_22872fe0");
-    static auto fun_2286f240 = (void (*)(void*, Entity*, bool))get_address("fun_2286f240");
+    using AddToLayer = void(Layer*, bool);
+    static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
+    using AddItemPtr = void(Entity*, Entity*, bool);
+    static auto add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
 
     Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, true);
     if (*((bool*)this + 0x64490))
     {
-        fun_22872fe0(this, ent);
+        add_to_layer(this, ent);
     }
     else
     {
-        fun_2286f240((void*)((size_t)this + 0x64440), ent, false);
+        add_item_ptr((Entity*)((size_t)this + 0x64440), ent, false);
     }
     return ent;
 }
@@ -115,7 +117,10 @@ Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     default:
         return nullptr;
     };
-    static_cast<Door*>(door)->set_target(w, l, t);
+    door->as<ExitDoor>()->world = w;
+    door->as<ExitDoor>()->level = l;
+    door->as<ExitDoor>()->theme = t;
+    door->as<ExitDoor>()->special_door = true;
     spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), round(x), round(y - 1.0f), false, 0.0, 0.0, true);
     return door;
 }

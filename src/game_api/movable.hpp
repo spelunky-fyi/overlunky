@@ -64,20 +64,20 @@ class Movable : public Entity
     uint8_t b127;
 
     virtual bool can_jump() = 0;
-    virtual void v37() = 0;
+    virtual void v38() = 0;
     virtual float sprint_factor() = 0;
     virtual void calculate_jump_height() = 0; // when disabled, jump height is very high
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0;
     virtual void apply_velocity(float* velocities) = 0; // param is pointer to an array of two floats: velocity x and y
     virtual int8_t stomp_damage() = 0;                  // calculates the amount of stomp damage applied (checks spike shoes, movable.state and stand_counter resulting in different damage values)
     virtual int8_t stomp_damage_trampoline() = 0;       // simply jumps to the 43rd virtual function, aka stomp_damage...
-    virtual void adjust_health(int8_t amount) = 0;      // called for dealing damage (neg amount) by the game, but not for gaining health (turkey, motherstatue), even though that works too (and there is even a max health check of 0x63)
-    virtual void v45() = 0;
+    virtual bool is_on_fire() = 0;
     virtual void v46() = 0;
-    virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
+    virtual void v47() = 0;
+    //virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
     virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
     virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                       // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
-    virtual void v50() = 0;
+    virtual void v51() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
     virtual void light_on_fire() = 0;
@@ -87,6 +87,7 @@ class Movable : public Entity
     virtual uint32_t get_last_owner_uid() = 0;               // for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
     virtual void check_out_of_bounds() = 0;                  // kills with the 'still falling' death cause
     virtual Entity* standing_on() = 0;                       // looks up movable.standing_on_uid in state.instance_id_to_pointer
+    virtual void v60() = 0;
     virtual void on_stomped_on_by(Entity* stomper) = 0;
     virtual void on_thrown_by(Entity* thrower) = 0;      // implemented for special cases like hired hand (player with ai_func), horned lizard...
     virtual void on_clonegunshot_hit(Entity* clone) = 0; // implemented for player/hired hand: copies health to clone etc

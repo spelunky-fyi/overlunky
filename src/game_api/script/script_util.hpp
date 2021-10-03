@@ -5,11 +5,12 @@
 
 #include <string>
 
-using Toast = void (*)(void*, wchar_t*);
+using Toast = void (*)(wchar_t*);
 Toast get_toast();
 
 using Say = void (*)(void*, Entity*, wchar_t*, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);
 Say get_say();
+size_t get_say_context();
 
 using Prng = void (*)(int64_t seed);
 Prng get_seed_prng();

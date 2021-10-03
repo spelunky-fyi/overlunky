@@ -15,17 +15,6 @@ void StateMemory::set_correct_ushabti(uint16_t animation_frame)
     correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
 }
 
-size_t get_dark()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto addr_dark = memory.after_bundle;
-        addr_dark = find_inst(memory.exe(), "\x44\xC5\x80\xA0\x12\x0A\x00\x00\xFD"s, memory.after_bundle);
-        return res = memory.at_exe(addr_dark) + 9;
-    }
-}
-
 inline bool& get_is_init()
 {
     static bool is_init{false};
@@ -34,7 +23,15 @@ inline bool& get_is_init()
 
 void do_write_load_opt()
 {
-    write_mem_prot(get_address("write_load_opt"), "\x90\x90"s, true);
+    size_t write_load_addr = get_address("write_load_opt");
+    if (write_load_addr > 0ull)
+    {
+        write_mem_prot(write_load_addr, "\x90\x90"sv, true);
+    }
+    else
+    {
+        assert(get_address("write_load_opt_fixed") > 0ull);
+    }
 }
 bool& get_write_load_opt()
 {
@@ -70,11 +67,10 @@ State& State::get()
             do_write_load_opt();
         }
         auto addr_location = get_address("state_location");
-        auto addr_dark = 0ul; //get_dark();
-        STATE = State{addr_location, addr_dark};
+        STATE = State{addr_location};
         DEBUG("TODO: patterns for level_gen and spawn_hooks");
-        //STATE.ptr()->level_gen->init();
-        //init_spawn_hooks();
+        STATE.ptr()->level_gen->init();
+        init_spawn_hooks();
         init_render_api_hooks();
         get_is_init() = true;
     }
@@ -222,6 +218,26 @@ void State::godmode(bool g)
     {
         write_mem_prot(addr_damage, std::string(&original_damage_instruction, 1), true);
         write_mem_prot(addr_insta, std::string(&original_instagib_instruction, 1), true);
+    }
+}
+
+void State::darkmode(bool g)
+{
+    static size_t addr_dark = 0;
+    static char original_instructions[2] = {0};
+    if (addr_dark == 0)
+    {
+        addr_dark = get_address("force_dark_level");
+        original_instructions[0] = read_u8(addr_dark);
+        original_instructions[1] = read_u8(addr_dark + 1);
+    }
+    if (g)
+    {
+        write_mem_prot(addr_dark, ("\x90\x90"s), true);
+    }
+    else
+    {
+        write_mem_prot(addr_dark, std::string(original_instructions, 2), true);
     }
 }
 

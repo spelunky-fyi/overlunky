@@ -301,7 +301,12 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
     {
         for (const auto& tile_code : state->level_gen->data->tile_codes)
         {
-            file << tile_code.second.id << ": " << tile_code.first << "\n";
+            std::string clean_tile_code_name = tile_code.first.c_str();
+            std::transform(
+                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
+                { return (unsigned char)std::toupper(c); });
+            std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+            file << clean_tile_code_name << ": " << tile_code.second.id << "\n";
         }
     }
 

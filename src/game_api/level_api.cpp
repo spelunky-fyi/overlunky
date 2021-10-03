@@ -586,9 +586,9 @@ std::vector<std::unique_ptr<ManualRoomData>> g_manual_room_datas;
 bool g_replace_level_loads{false};
 std::vector<std::string> g_levels_to_load;
 
-using LevelGenFun = void(LevelGenSystem*, float);
+using LevelGenFun = void(LevelGenSystem*, float, size_t);
 LevelGenFun* g_level_gen_trampoline{nullptr};
-void level_gen(LevelGenSystem* level_gen_sys, float param_2)
+void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
     OnScopeExit pop{[]
@@ -597,7 +597,7 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2)
     g_manual_room_datas.clear();
 
     pre_level_generation();
-    g_level_gen_trampoline(level_gen_sys, param_2);
+    g_level_gen_trampoline(level_gen_sys, param_2, param_3);
     post_level_generation();
 
     g_replace_level_loads = false;
@@ -1066,14 +1066,7 @@ void LevelGenData::init()
     g_last_community_chance_id = g_current_chance_id;
 
     {
-        // TODO: 1.23.3
-        //{
-        //    auto fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, after_bundle);
-        //    fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
-        //    fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-        //    g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
-        //}
-
+        g_level_gen_trampoline = (LevelGenFun*)get_address("level_gen_entry"sv);
         g_handle_tile_code_trampoline = (HandleTileCodeFun*)get_address("level_gen_handle_tile_code"sv);
         g_setup_level_files_trampoline = (SetupLevelFiles*)get_address("level_gen_setup_level_files"sv);
         g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
@@ -1148,12 +1141,10 @@ void LevelGenData::init()
             //    }
         }
 
-        DetourRestoreAfterWith();
-
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
-        //DetourAttach((void**)&g_level_gen_trampoline, level_gen);
+        DetourAttach((void**)&g_level_gen_trampoline, level_gen);
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
         DetourAttach((void**)&g_setup_level_files_trampoline, setup_level_files);
         DetourAttach((void**)&g_load_level_file_trampoline, load_level_file);

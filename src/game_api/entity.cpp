@@ -72,28 +72,6 @@ EntityFactory* entity_factory()
     return cache_entity_factory;
 }
 
-AddLayer get_add_layer()
-{
-    ONCE(AddLayer)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x40\x56\x41\x54\x48\x83\xec\x58\x4c\x8b\xe1\x48\x8b\xf2\x48\x83\xc1\x08\xe8\xd9\xe1\xff\xff"s, memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (AddLayer)off;
-    }
-}
-
-RemoveLayer get_remove_layer()
-{
-    ONCE(RemoveLayer)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x40\x53\x56\x41\x55\x48\x83\xec\x50\x4c\x8b\xe9\x48\x8b\xf2\x48\x83\xc1\x08"s, memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (RemoveLayer)off;
-    }
-}
-
 std::vector<EntityItem> list_entities()
 {
     const EntityFactory* entity_factory_ptr = entity_factory();
@@ -206,13 +184,17 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == 0 || layer == 1)
     {
         auto ptr_from = state.ptr()->layers[layer];
-        auto remove_layer_func = get_remove_layer();
-        remove_layer_func(ptr_from, this);
+
+        using RemoveFromLayer = void(Layer*, Entity*);
+        static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
+        remove_from_layer(ptr_from, this);
     }
 
     auto ptr_to = state.ptr()->layers[dest_layer];
-    auto add_layer_func = get_add_layer();
-    add_layer_func(ptr_to, this);
+
+    using AddToLayer = void(Layer*, Entity*);
+    static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
+    add_to_layer(ptr_to, this);
 
     int* pitems = (int*)items.begin;
     for (uint8_t idx = 0; idx < items.count; ++idx)
@@ -224,20 +206,25 @@ void Entity::set_layer(LAYER layer_to)
 
 void Entity::remove()
 {
-    auto state = State::get();
-    auto ptr_from = state.ptr()->layers[layer];
-    auto remove_layer_func = get_remove_layer();
-    if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
+    if (layer != 2)
     {
-        remove_layer_func(ptr_from, this);
-        int* pitems = (int*)items.begin;
-        for (uint8_t idx = 0; idx < items.count; ++idx)
+        auto state = State::get();
+        auto ptr_from = state.ptr()->layers[layer];
+        if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
         {
-            auto item = get_entity_ptr(pitems[idx]);
-            item->remove();
+            using RemoveFromLayer = void(Layer*, Entity*);
+            static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
+            remove_from_layer(ptr_from, this);
+
+            int* pitems = (int*)items.begin;
+            for (uint8_t idx = 0; idx < items.count; ++idx)
+            {
+                auto item = get_entity_ptr(pitems[idx]);
+                item->remove();
+            }
         }
+        layer = 2;
     }
-    layer = 2;
 }
 
 void Entity::respawn(LAYER layer_to)
@@ -247,21 +234,17 @@ void Entity::respawn(LAYER layer_to)
 
 std::pair<float, float> Entity::position()
 {
-    // Return the resolved position
-    // overlay exists if player is riding something / etc
     auto [x_pos, y_pos] = position_self();
-    // log::debug!("Item #{}: Position is {}, {}", unique_id(), x, y);
-    switch ((size_t)overlay)
+
+    // overlay exists if player is riding something / etc
+    Entity* overlay_nested = overlay;
+    while (overlay_nested != nullptr)
     {
-    case NULL:
-        return {x_pos, y_pos};
-    default:
-    {
-        float _x, _y;
-        std::tie(_x, _y) = overlay->position();
-        return {x_pos + _x, y_pos + _y};
+        x_pos += overlay_nested->x;
+        y_pos += overlay_nested->y;
+        overlay_nested = overlay_nested->overlay;
     }
-    }
+    return {x_pos, y_pos};
 }
 
 std::pair<float, float> Entity::position_self() const
