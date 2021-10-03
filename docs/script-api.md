@@ -753,7 +753,7 @@ function on_guiframe(draw_ctx)
 end
 ```
 ### [`create_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
-`tuple<int, int, int> create_image(string path)`<br/>
+`tuple<IMAGE, int, int> create_image(string path)`<br/>
 Create image from file. Returns a tuple containing id, width and height.
 ### [`mouse_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouse_position)
 `tuple<float, float> mouse_position()`<br/>
@@ -847,10 +847,10 @@ Use `GuiDrawContext.draw_circle_filled` instead
 `nil draw_text(float x, float y, float size, string text, uColor color)`<br/>
 Use `GuiDrawContext.draw_text` instead
 ### [`draw_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
-`nil draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`<br/>
+`nil draw_image(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`<br/>
 Use `GuiDrawContext.draw_image` instead
 ### [`draw_image_rotated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated)
-`nil draw_image_rotated(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`<br/>
+`nil draw_image_rotated(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`<br/>
 Use `GuiDrawContext.draw_image_rotated` instead
 ### [`window`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
 `nil window(string title, float x, float y, float w, float h, bool movable, function callback)`<br/>
@@ -904,7 +904,7 @@ Use `GuiDrawContext.win_pushid` instead
 `nil win_popid()`<br/>
 Use `GuiDrawContext.win_popid` instead
 ### [`win_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
-`nil win_image(int image, int width, int height)`<br/>
+`nil win_image(IMAGE image, int width, int height)`<br/>
 Use `GuiDrawContext.win_image` instead
 ## Types
 Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:
@@ -961,7 +961,7 @@ end
 - [`int journal_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_flags) &StateMemory::journal_flags
 - [`int time_last_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) &StateMemory::time_last_level
 - [`int time_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) &StateMemory::time_level
-- [`int level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_flags) &StateMemory::hud_flags
+- [`int level_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_flags) &StateMemory::level_flags
 - [`int loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) &StateMemory::loading
 - [`int quest_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) &StateMemory::quest_flags
 - [`int presence_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=presence_flags) &StateMemory::presence_flags
@@ -1117,6 +1117,8 @@ Drop-in replacement for `math.random(min, max)`
 - [`Color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 \
 Create a new color - defaults to black
+- [`Color(const Color&)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
+- [`Color(Color&&)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 - [`Color(float r_, float g_, float b_, float a_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 \
 Create a new color by specifying its values
@@ -3008,16 +3010,16 @@ Draws a filled circle on screen
 - [`nil draw_text(float x, float y, float size, string text, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &GuiDrawContext::draw_text
 \
 Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
-- [`nil draw_image(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
+- [`nil draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
 \
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-- [`nil draw_image(int image, AABB rect, AABB uv_rect, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
+- [`nil draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) draw_image
 \
 Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-- [`nil draw_image_rotated(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+- [`nil draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
 \
 Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-- [`nil draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
+- [`nil draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) draw_image_rotated
 \
 Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 - [`bool window(string title, float x, float y, float w, float h, bool movable, function callback)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) &GuiDrawContext::window
@@ -3077,7 +3079,7 @@ Add unique identifier to the stack, to distinguish identical inputs from each ot
 - [`nil win_popid()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) &GuiDrawContext::win_popid
 \
 Pop unique identifier from the stack. Put after the input.
-- [`nil win_image(int image, int width, int height)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) &GuiDrawContext::win_image
+- [`nil win_image(IMAGE image, int width, int height)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) &GuiDrawContext::win_image
 \
 Draw image to window.
 ### `VanillaRenderContext`
@@ -4185,8 +4187,8 @@ Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of 
 - [`RIGHT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_TEXT_ALIGNMENT.RIGHT) 2
 ### VANILLA_FONT_STYLE
 Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
-- [`ITALIC`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.ITALIC) 0
-- [`BOLD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.BOLD) 1
+- [`ITALIC`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.ITALIC) 1
+- [`BOLD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.BOLD) 2
 ### CAUSE_OF_DEATH
 - [`DEATH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.DEATH) 0
 - [`ENTITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.ENTITY) 1

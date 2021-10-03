@@ -31,13 +31,13 @@ class GuiDrawContext
     /// Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
     void draw_text(float x, float y, float size, std::string text, uColor color);
     /// Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-    void draw_image(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color);
+    void draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color);
     /// Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-    void draw_image(int image, AABB rect, AABB uv_rect, uColor color);
+    void draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color);
     /// Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-    void draw_image_rotated(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py);
+    void draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py);
     /// Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-    void draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py);
+    void draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py);
 
     /// Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
     /// [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
@@ -80,7 +80,7 @@ class GuiDrawContext
     /// Pop unique identifier from the stack. Put after the input.
     void win_popid();
     /// Draw image to window.
-    void win_image(int image, int width, int height);
+    void win_image(IMAGE image, int width, int height);
 
   private:
     class LuaBackend* backend;

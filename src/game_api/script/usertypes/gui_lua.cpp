@@ -94,7 +94,7 @@ void GuiDrawContext::draw_text(float x, float y, float size, std::string text, u
     }
     backend->draw_list->AddText(font, size, a, color, text.c_str());
 };
-void GuiDrawContext::draw_image(int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
+void GuiDrawContext::draw_image(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
 {
     if (!backend->images.contains(image))
         return;
@@ -104,11 +104,11 @@ void GuiDrawContext::draw_image(int image, float x1, float y1, float x2, float y
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     backend->draw_list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
 };
-void GuiDrawContext::draw_image(int image, AABB rect, AABB uv_rect, uColor color)
+void GuiDrawContext::draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)
 {
     draw_image(image, rect.left, rect.bottom, rect.right, rect.top, uv_rect.left, uv_rect.bottom, uv_rect.right, uv_rect.top, color);
 }
-void GuiDrawContext::draw_image_rotated(int image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
+void GuiDrawContext::draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
 {
     if (!backend->images.contains(image))
         return;
@@ -119,7 +119,7 @@ void GuiDrawContext::draw_image_rotated(int image, float left, float top, float 
     ImVec2 pivot = {screenify(px), screenify(py)};
     AddImageRotated(backend->draw_list, backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
 };
-void GuiDrawContext::draw_image_rotated(int image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)
+void GuiDrawContext::draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)
 {
     draw_image_rotated(image, rect.left, rect.bottom, rect.right, rect.top, uv_rect.left, uv_rect.bottom, uv_rect.right, uv_rect.top, color, angle, px, py);
 }
@@ -252,7 +252,7 @@ void GuiDrawContext::win_popid()
 {
     ImGui::PopID();
 };
-void GuiDrawContext::win_image(int image, int width, int height)
+void GuiDrawContext::win_image(IMAGE image, int width, int height)
 {
     if (!backend->images.contains(image))
         return;
@@ -276,11 +276,11 @@ void register_usertypes(sol::state& lua)
         static_cast<void (GuiDrawContext::*)(float, float, float, float, float, uColor)>(&GuiDrawContext::draw_rect_filled),
         static_cast<void (GuiDrawContext::*)(AABB, float, uColor)>(&GuiDrawContext::draw_rect_filled));
     auto draw_image = sol::overload(
-        static_cast<void (GuiDrawContext::*)(int, float, float, float, float, float, float, float, float, uColor)>(&GuiDrawContext::draw_image),
-        static_cast<void (GuiDrawContext::*)(int, AABB, AABB, uColor)>(&GuiDrawContext::draw_image));
+        static_cast<void (GuiDrawContext::*)(IMAGE, float, float, float, float, float, float, float, float, uColor)>(&GuiDrawContext::draw_image),
+        static_cast<void (GuiDrawContext::*)(IMAGE, AABB, AABB, uColor)>(&GuiDrawContext::draw_image));
     auto draw_image_rotated = sol::overload(
-        static_cast<void (GuiDrawContext::*)(int, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
-        static_cast<void (GuiDrawContext::*)(int, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
+        static_cast<void (GuiDrawContext::*)(IMAGE, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
+        static_cast<void (GuiDrawContext::*)(IMAGE, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
     lua.new_usertype<GuiDrawContext>(
         "GuiDrawContext",
         "draw_line",
@@ -384,7 +384,7 @@ void register_usertypes(sol::state& lua)
         }
     };
     /// Create image from file. Returns a tuple containing id, width and height.
-    lua["create_image"] = [](std::string path) -> std::tuple<int64_t, int, int>
+    lua["create_image"] = [](std::string path) -> std::tuple<IMAGE, int, int>
     {
         ScriptImage* image = new ScriptImage;
         image->width = 0;
@@ -394,11 +394,11 @@ void register_usertypes(sol::state& lua)
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (create_d3d11_texture_from_file((std::filesystem::path{backend->get_root_path()} / path).string().data(), &image->texture, &image->width, &image->height))
         {
-            int64_t id = static_cast<int64_t>(backend->images.size());
+            IMAGE id = static_cast<IMAGE>(backend->images.size());
             backend->images[id] = image;
             return std::make_tuple(id, image->width, image->height);
         }
-        return std::make_tuple(-1, -1, -1);
+        return std::make_tuple((IMAGE)-1, -1, -1);
     };
     /// Current mouse cursor position in screen coordinates.
     lua["mouse_position"] = []() -> std::pair<float, float>
@@ -451,14 +451,14 @@ void register_usertypes(sol::state& lua)
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_image` instead
-    lua["draw_image"] = [](int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
+    lua["draw_image"] = [](IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend, backend->draw_list).draw_image(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_image_rotated` instead
-    lua["draw_image_rotated"] = [](int image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
+    lua["draw_image_rotated"] = [](IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend, backend->draw_list).draw_image_rotated(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color, angle, px, py);
@@ -585,7 +585,7 @@ void register_usertypes(sol::state& lua)
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_image` instead
-    lua["win_image"] = [](int image, int width, int height)
+    lua["win_image"] = [](IMAGE image, int width, int height)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend, backend->draw_list).win_image(image, width, height);
