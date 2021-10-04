@@ -500,10 +500,12 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<CloneGunShot>(
         "CloneGunShot",
+        "timer",
+        &CloneGunShot::timer,
         "spawn_y",
         &CloneGunShot::spawn_y,
         sol::base_classes,
-        sol::bases<Entity, Movable, LightShot, TimedShot>());
+        sol::bases<Entity, Movable, LightShot>());
 
     lua.new_usertype<PunishBall>(
         "PunishBall",
@@ -534,10 +536,12 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Coffin>(
         "Coffin",
+        "inside",
+        &Coffin::inside,
         "timer",
         &Coffin::timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, Container>());
+        sol::bases<Entity, Movable>());
 
     lua.new_usertype<Fly>(
         "Fly",
@@ -739,10 +743,12 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Pot>(
         "Pot",
+        "inside",
+        &Pot::inside,
         "dont_transfer_dmg",
         &Pot::dont_transfer_dmg,
         sol::base_classes,
-        sol::bases<Entity, Movable, Container>());
+        sol::bases<Entity, Movable>());
 
     lua.new_usertype<CursedPot>(
         "CursedPot",

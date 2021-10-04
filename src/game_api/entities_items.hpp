@@ -421,9 +421,10 @@ class TimedShot : public LightShot
     uint8_t timer;
 };
 
-class CloneGunShot : public TimedShot
+class CloneGunShot : public LightShot
 {
   public:
+    uint8_t timer;
     int8_t unused1;
     int16_t unused2;
     float spawn_y;
@@ -456,9 +457,10 @@ class Container : public Movable
     void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
-class Coffin : public Container
+class Coffin : public Movable
 {
   public:
+    ENT_TYPE inside;
     uint8_t timer;
     int8_t shake_state; /* unsure */
 };
@@ -614,9 +616,10 @@ class MiniGameAsteroid : public Movable
     float spin_speed;
 };
 
-class Pot : public Container
+class Pot : public Movable
 {
   public:
+    ENT_TYPE inside;
     bool dont_transfer_dmg; // if false, spawned entity will receive dmg that the pot received
 };
 
