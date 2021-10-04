@@ -770,7 +770,7 @@ class Frog : public Monster
   public:
     int32_t grub_being_eaten_uid;
     uint8_t jump_timer; // when 0 it jumps
-    bool pause;          // not actually used?
+    bool pause;         // not actually used?
     int16_t padding;
 };
 
