@@ -8,6 +8,7 @@
 class Backpack : public Movable
 {
   public:
+    /// More like on fire trigger, the explosion happens when the timer reaches > 29
     bool explosion_trigger;
     uint8_t explosion_timer; // counts from 0 to 30
     uint16_t unknown1;
@@ -40,7 +41,7 @@ class Hoverpack : public Backpack
 class Bomb : public Movable
 {
   public:
-    size_t unknown1;
+    SoundPosition* sound_pos;
     /// 1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     float scale_hor;
     float scale_ver;
@@ -48,10 +49,9 @@ class Bomb : public Movable
     bool is_big_bomb;
 };
 
-class Cape : public Movable
+class Cape : public Backpack
 {
   public:
-    size_t unknown;
     bool floating_down;
     uint8_t padding1;
     uint8_t padding2;
@@ -80,12 +80,12 @@ class Gun : public Movable
     /// used only for clonegun
     uint8_t shots2;
     uint8_t b12b;
+    /// Only for webgun, uid of the webshot entity
+    int32_t in_chamber;
 };
 
 class WebGun : public Gun
 {
-  public:
-    int32_t in_chamber;
 };
 
 class UdjatSocket : public Movable

@@ -457,6 +457,7 @@ class Vampire : public Monster
     float sleep_pos_x;
     float sleep_pos_y;
     uint32_t walk_pause_timer; // alternates between walking and pausing when timer reaches zero
+    int32_t _padding;
 };
 
 class Vlad : public Vampire

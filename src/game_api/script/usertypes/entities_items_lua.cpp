@@ -136,9 +136,9 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, Backpack>());
 
-    lua.new_usertype<Cape>("Cape", "floating_down", &VladsCape::floating_down, sol::base_classes, sol::bases<Entity, Movable>());
+    lua.new_usertype<Cape>("Cape", "floating_down", &Cape::floating_down, sol::base_classes, sol::bases<Entity, Movable, Backpack>());
 
-    lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Cape>());
+    lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Backpack, Cape>());
 
     lua.new_usertype<Mattock>(
         "Mattock",
@@ -155,13 +155,13 @@ void register_usertypes(sol::state& lua)
         &Gun::shots,
         "shots2",
         &Gun::shots2,
+        "in_chamber",
+        &Gun::in_chamber,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
-    lua.new_usertype<WebGun>(
+    lua.new_usertype<WebGun>( //left to not break compability
         "WebGun",
-        "in_chamber",
-        &WebGun::in_chamber,
         sol::base_classes,
         sol::bases<Entity, Movable, Gun>());
 
@@ -860,7 +860,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<YellowCape>(
         "YellowCape",
         sol::base_classes,
-        sol::bases<Entity, Movable, Cape>());
+        sol::bases<Entity, Movable, Backpack, Cape>());
 
     lua.new_usertype<Teleporter>(
         "Teleporter",
