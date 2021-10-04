@@ -326,6 +326,8 @@ class ForceField : public Floor
     Illumination* emitted_light;
     float bounce_force; /* unsure */ // max 1.0 ?
     bool is_on;                      // starts the sound + first_item_beam but not fx for some reason
+    uint8_t unused1;
+    uint16_t unused2;
 
     void activate_laserbeam(bool turn_on);
 };
@@ -333,8 +335,6 @@ class ForceField : public Floor
 class TimedForceField : public ForceField
 {
   public:
-    uint8_t unused1;
-    uint16_t unused2;
     uint32_t timer; // max 300? at 100 it's start the proces, changing the animation_frame
     bool pause;
 };
