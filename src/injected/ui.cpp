@@ -3657,6 +3657,14 @@ void render_savegame()
     ImGui::PushID("Miscellaneous");
     if (ImGui::CollapsingHeader("Miscellaneous"))
     {
+        bool tutorialcomplete = g_save->tutorial_state > 2;
+        if (ImGui::Checkbox("Tutorial completed", &tutorialcomplete))
+        {
+            if (tutorialcomplete)
+                g_save->tutorial_state = 4;
+            else
+                g_save->tutorial_state = 0;
+        }
         ImGui::Checkbox("Seeded runs unlocked", &g_save->seeded_unlocked);
         ImGui::Checkbox("Profile seen", &g_save->profile_seen);
         for (int s = 0; s < 4; ++s)
@@ -3679,6 +3687,23 @@ void render_savegame()
         ImGui::SliderScalar("Rescued dogs", ImGuiDataType_U8, &g_save->pets_rescued[0], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
+    }
+    ImGui::PushID("UnlockAll");
+    if (ImGui::CollapsingHeader("Big scary button to unlock everything"))
+    {
+        ImGui::PushFont(bigfont);
+        ImGui::PushItemWidth(ImGui::GetContentRegionMax().x);
+        if (ImGui::Button("Unlock Everything*", {ImGui::GetContentRegionMax().x, 0}))
+        {
+            g_save->tutorial_state = 4;
+            g_save->profile_seen = true;
+            g_save->seeded_unlocked = true;
+            g_save->characters = 0xfffff;
+            g_save->shortcuts = 0xa;
+        }
+        ImGui::PopItemWidth();
+        ImGui::PopFont();
+        ImGui::TextWrapped("*Tutorial, seeded, characters and shortcuts");
     }
     ImGui::PopID();
 }
