@@ -3448,9 +3448,10 @@ std::string format_time(int64_t frames)
 {
     struct tm newtime;
     time_t secs = frames / 60;
-    char time[10];
+    char time[32];
     gmtime_s(&newtime, &secs);
-    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    size_t endpos = std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    snprintf(time + endpos, sizeof time - endpos, ".%03d", (int)((frames % 60) * 1000 / 60));
     return time;
 }
 
@@ -3459,7 +3460,17 @@ int parse_time(std::string time)
     std::tm tm = {};
     std::stringstream ss(time);
     ss >> std::get_time(&tm, "%H:%M:%S");
-    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
+    const auto pos = time.find_last_of(".");
+    int frames = 0;
+    if (pos != std::string::npos)
+    {
+        double dec = 0;
+        std::stringstream sff(time.substr(pos));
+        sff >> dec;
+        dec += 0.001;
+        frames = static_cast<int>(dec * 60);
+    }
+    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec) + frames;
 }
 
 void render_savegame()
@@ -3611,7 +3622,7 @@ void render_savegame()
         {
             g_save->time_best = parse_time(besttime);
         }
-        std::string totaltime = format_time(g_save->time_total); //TODO: these functions are crap for this purpose
+        std::string totaltime = format_time(g_save->time_total);
         if (ImGui::InputText("Total time##BestTime", &totaltime))
         {
             g_save->time_total = parse_time(totaltime);
