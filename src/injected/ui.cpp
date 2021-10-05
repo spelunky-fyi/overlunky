@@ -3700,10 +3700,12 @@ void render_savegame()
             g_save->seeded_unlocked = true;
             g_save->characters = 0xfffff;
             g_save->shortcuts = 0xa;
+            g_save->deepest_area = 7;
+            g_save->deepest_level = 4;
         }
         ImGui::PopItemWidth();
         ImGui::PopFont();
-        ImGui::TextWrapped("*Tutorial, seeded, characters and shortcuts");
+        ImGui::TextWrapped("*Tutorial, seeded, characters, shortcuts, camp");
     }
     ImGui::PopID();
 }
