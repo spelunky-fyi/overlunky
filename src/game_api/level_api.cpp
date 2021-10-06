@@ -714,7 +714,8 @@ void setup_level_files(LevelGenData* level_gen_data, const char* level_file_name
     g_setup_level_files_trampoline(level_gen_data, level_file_name, load_generic);
 }
 
-void get_room_size(uint32_t room_template, uint32_t& room_width, uint32_t& room_height)
+ExecutableMemory g_get_room_size_redirect;
+void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_height)
 {
     // cache, ghistroom
     if (room_template >= 14 && room_template <= 15)
@@ -768,6 +769,11 @@ void get_room_size(uint32_t room_template, uint32_t& room_width, uint32_t& room_
             room_height = 8;
         }
     }
+}
+void get_room_size(const std::string& room_template_name, uint32_t& room_width, uint32_t& room_height)
+{
+    const uint16_t room_template = State::get().ptr_local()->level_gen->data->get_room_template(room_template_name).value_or(0);
+    get_room_size(room_template, room_width, room_height);
 }
 
 using LoadLevelFile = void(LevelGenData*, const char*);
@@ -1066,80 +1072,75 @@ void LevelGenData::init()
     g_last_community_chance_id = g_current_chance_id;
 
     {
+        {
+            const size_t get_room_size_first_jump = get_address("get_room_size_first_jump");
+            const size_t get_room_size_second_jump = get_address("get_room_size_second_jump");
+
+            const size_t get_room_size_addr = (size_t) static_cast<void (*)(const std::string&, uint32_t&, uint32_t&)>(&get_room_size);
+
+            const std::string redirect_code = fmt::format(
+                "\x50"                         //PUSH       RAX
+                "\x51"                         //PUSH       RCX
+                "\x52"                         //PUSH       RDX
+                "\x41\x50"                     //PUSH       R8
+                "\x41\x51"                     //PUSH       R9
+                "\x41\x52"                     //PUSH       R10
+                "\x41\x53"                     //PUSH       R11
+                "\x48\x8d\x8d\x00\x04\x00\x00" //LEA        RCX, [RBP + 0x400] == room_template_name
+                "\x48\x8d\x95\x58\x05\x00\x00" //LEA        RDX, [RBP + 0x558] == room_width
+                "\x4c\x8d\x85\xb8\x05\x00\x00" //LEA        R8, [RBP + 0x5b8] == room_height
+                "\x48\xb8{}"                   //MOV        RAX, &get_room_size
+                "\xff\xd0"                     //CALL       RAX
+                "\x58"                         //POP        RAX
+                "\x59"                         //POP        RCX
+                "\x5a"                         //POP        RDX
+                "\x41\x58"                     //POP        R8
+                "\x41\x59"                     //POP        R9
+                "\x41\x5a"                     //POP        R10
+                "\x41\x5b"                     //POP        R11
+                "\x44\x8b\xad\xd4\x05\x00\x00" //MOV        R13D,dword ptr [RBP + 0x5d4]
+                "\x41\x83\xe5\x08"             //AND        R13D,0x8
+                "\x48\x8b\x85\x50\x05\x00\x00" //MOV        RAX,qword ptr [RBP + 0x550]
+                "\x48\x85\xc0"                 //TEST       RAX,RAX
+                "\x74\x13"                     //JZ         FIRST_JUMP
+                "\x49\x89\xc4"                 //MOV        R12,RAX
+                "\x48\x8b\x9d\x60\x05\x00\x00" //MOV        RBX,qword ptr [RBP + 0x560]
+                "\x48\x8b\xb5\x48\x05\x00\x00" //MOV        RSI,qword ptr [RBP + 0x548]
+                "\xeb\x0c"                     //JMP        SECOND_JUMP
+                /*FIST_JUMP*/ "\x48\xb8{}"     //MOV        RAX, get_room_size_first_jump
+                "\xff\xe0"                     //JMP        RAX
+                /*SECOND_JUMP*/ "\x48\xb8{}"   //MOV        RAX, get_room_size_second_jump
+                "\xff\xe0"sv,                  //JMP        RAX
+                to_le_bytes(get_room_size_addr),
+                to_le_bytes(get_room_size_first_jump),
+                to_le_bytes(get_room_size_second_jump));
+
+            g_get_room_size_redirect = ExecutableMemory{redirect_code};
+
+            const size_t get_room_size_begin = get_address("get_room_size_begin");
+            const size_t get_room_size_end = get_address("get_room_size_end");
+
+            std::string code = fmt::format(
+                "\x48\xb8{}"  //MOV         RAX, g_get_room_size_redirect.get()
+                "\xff\xe0"sv, //JMP         RAX
+                to_le_bytes((size_t)g_get_room_size_redirect.get()));
+
+            // Fill with nop, code is not performance-critical either way
+            const size_t original_code_size = get_room_size_end - get_room_size_begin;
+            code.resize(original_code_size, '\x90');
+
+            write_mem_prot(get_room_size_begin, code, true);
+        }
+
         g_level_gen_trampoline = (LevelGenFun*)get_address("level_gen_entry"sv);
         g_handle_tile_code_trampoline = (HandleTileCodeFun*)get_address("level_gen_handle_tile_code"sv);
         g_setup_level_files_trampoline = (SetupLevelFiles*)get_address("level_gen_setup_level_files"sv);
         g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
-        // TODO: 1.23.3
-        // Need to redo the room size garbo
         g_do_extra_spawns_trampoline = (DoExtraSpawns*)get_address("level_gen_do_extra_spawns"sv);
         g_generate_room_trampoline = (GenerateRoom*)get_address("level_gen_generate_room"sv);
         g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data"sv);
         g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data"sv);
         g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
-
-        {
-            // TODO: 1.23.3
-            //    {
-            //        const void* get_room_size_addr = &get_room_size;
-            //
-            //        // Manually assembled code, let's hope it won't have to change ever
-            //        std::string code = fmt::format(
-            //            //""                             /// Breakpoint for debugging
-            //            //"\xcc"                         // int 3
-            //            ""                             /// Push all volatile registers
-            //            "\x50"                         // push   rax
-            //            "\x51"                         // push   rcx
-            //            "\x52"                         // push   rdx
-            //            "\x41\x50"                     // push   r8
-            //            "\x41\x51"                     // push   r9
-            //            "\x41\x52"                     // push   r10
-            //            "\x41\x53"                     // push   r11
-            //            ""                             /// Setup call
-            //            "\x89\xd9"                     // mov    ecx, ebx
-            //            "\x48\x8d\x95\x38\xff\xff\xff" // lea    rdx, [rbp-0x100+0x38]
-            //            "\x4c\x8d\x85\x3c\xff\xff\xff" // lea    r8, [rbp-0x100+0x3c]
-            //            ""                             /// Do the call with an absolute address
-            //            "\x48\xb8{}"                   // mov    rax, &get_room_size
-            //            "\xff\xd0"                     // call   rax
-            //            ""                             /// Recover volatile registers
-            //            "\x41\x5b"                     // pop    r11
-            //            "\x41\x5a"                     // pop    r10
-            //            "\x41\x59"                     // pop    r9
-            //            "\x41\x58"                     // pop    r8
-            //            "\x5a"                         // pop    rdx
-            //            "\x59"                         // pop    rcx
-            //            "\x58"                         // pop    rax
-            //            ""                             /// Move room width into its expected register
-            //            "\x48\x8B\x74\x24\x38"         // mov    rsi, QWORD PTR[rsp + 0x38]
-            //            "\x4c\x8b\x64\x24\x3c"         // mov    r12, QWORD PTR[rsp + 0x3c]
-            //            ""                             /// Move room width into a redundant stack variable
-            //            "\x48\x89\x74\x24\x48"         // mov    QWORD PTR[rsp + 0x48], rsi
-            //            ""                             /// Setup some registers for the next loop iteration
-            //            "\x44\x8b\x74\x24\x48"         // mov    r14d, DWORD PTR[rsp + 0x48]
-            //            "\x44\x8b\x7c\x24\x4c"         // mov    r15d, DWORD PTR[rsp + 0x4c]
-            //            "\x48\x8b\x5c\x24\x40"         // mov    rbx, QWORD PTR[rsp + 0x40]
-            //            "\x4c\x8b\x54\x24\x30"         // mov    r10, QWORD PTR[rsp + 0x30]
-            //            "\x4c\x8b\x5c\x24\x28"         // mov    r11, QWORD PTR[rsp + 0x28]
-            //            "\x8b\x7c\x24\x20"             // mov    edi, DWORD PTR[rsp + 0x20]
-            //            ,
-            //            to_le_bytes(get_room_size_addr));
-            //
-            //        // function start, expected at 0x220addd0
-            //        const size_t get_room_size_off = (size_t)g_load_level_file_trampoline + (0x220af23e - 0x220addd0); // at 0x220af23e
-            //        const size_t get_room_size_size = 0x220af32c - 0x220af23e;                                         // until 0x220af32c
-            //
-            //        // Fill with nop, code is not performance-critical either way
-            //        code.resize(get_room_size_size, '\x90');
-            //
-            //        write_mem_prot(get_room_size_off, std::move(code), true);
-            //
-            //        // Replace MessageBox call with a breakpoint for debugging
-            //        std::string breakpoint = "\x90\x90\xcc"s;
-            //        breakpoint.resize(0x33, '\x90');
-            //        write_mem_prot(memory.at_exe(0x220af42b), std::move(breakpoint), true);
-            //    }
-        }
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
