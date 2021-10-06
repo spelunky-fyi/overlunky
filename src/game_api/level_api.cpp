@@ -381,7 +381,7 @@ std::array g_community_tile_codes{
             Entity* slidingwall = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             // hook the function that dereferences the top part of the trap (which is nullptr right now)
             hook_vtable<void(Entity*, Entity*)>(
-                slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {}, 25);
+                slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {}, 26);
         },
     },
     CommunityTileCode{"spikeball_trap", "ENT_TYPE_FLOOR_SPIKEBALL_CEILING"},
