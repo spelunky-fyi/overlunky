@@ -128,7 +128,7 @@ class ExecutableMemory
     }
 
     template <class Ret, class... Args>
-    using func_ptr = Ret(*)(Args...);
+    using func_ptr = Ret (*)(Args...);
     template <class Ret, class... Args>
     explicit operator func_ptr<Ret, Args...>() const
     {
@@ -136,8 +136,13 @@ class ExecutableMemory
     }
 
   private:
-    using deleter_t = decltype([](std::byte* mem)
-                               { VirtualFree(mem, 0, MEM_RELEASE); });
+    struct deleter_t
+    {
+        void operator()(std::byte* mem) const
+        {
+            VirtualFree(mem, 0, MEM_RELEASE);
+        }
+    };
     using storage_t = std::unique_ptr<std::byte, deleter_t>;
     storage_t code;
 };
