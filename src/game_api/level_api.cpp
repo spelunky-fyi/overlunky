@@ -770,10 +770,17 @@ void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_
         }
     }
 }
-void get_room_size(const std::string& room_template_name, uint32_t& room_width, uint32_t& room_height)
+void get_room_size(const char* room_template_name, uint32_t& room_width, uint32_t& room_height)
 {
-    const uint16_t room_template = State::get().ptr_local()->level_gen->data->get_room_template(room_template_name).value_or(0);
-    get_room_size(room_template, room_width, room_height);
+    const auto room_template = State::get().ptr_local()->level_gen->data->get_room_template(room_template_name);
+    if (!room_template)
+    {
+        DEBUG("Unkown room_template name {}", room_template_name);
+    }
+    else
+    {
+        get_room_size(room_template.value(), room_width, room_height);
+    }
 }
 
 using LoadLevelFile = void(LevelGenData*, const char*);
@@ -1076,7 +1083,7 @@ void LevelGenData::init()
             const size_t get_room_size_first_jump = get_address("get_room_size_first_jump");
             const size_t get_room_size_second_jump = get_address("get_room_size_second_jump");
 
-            const size_t get_room_size_addr = (size_t) static_cast<void (*)(const std::string&, uint32_t&, uint32_t&)>(&get_room_size);
+            const size_t get_room_size_addr = (size_t) static_cast<void (*)(const char*, uint32_t&, uint32_t&)>(&get_room_size);
 
             const std::string redirect_code = fmt::format(
                 "\x50"                         //PUSH       RAX
@@ -1086,7 +1093,7 @@ void LevelGenData::init()
                 "\x41\x51"                     //PUSH       R9
                 "\x41\x52"                     //PUSH       R10
                 "\x41\x53"                     //PUSH       R11
-                "\x48\x8d\x8d\x00\x04\x00\x00" //LEA        RCX, [RBP + 0x400] == room_template_name
+                "\x48\x8d\x8d\xa0\x02\x00\x00" //LEA        RCX, [RBP + 0x2a0] == room_template_name
                 "\x48\x8d\x95\x58\x05\x00\x00" //LEA        RDX, [RBP + 0x558] == room_width
                 "\x4c\x8d\x85\xb8\x05\x00\x00" //LEA        R8, [RBP + 0x5b8] == room_height
                 "\x48\xb8{}"                   //MOV        RAX, &get_room_size
