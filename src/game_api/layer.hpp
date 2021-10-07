@@ -3,7 +3,7 @@
 
 struct Layer
 {
-    size_t __vftable;
+    bool is_back_layer;
     struct
     {
         Entity** begin;

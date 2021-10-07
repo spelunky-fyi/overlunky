@@ -77,9 +77,9 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
     using AddItemPtr = void(Entity*, Entity*, bool);
     static auto add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
 
-    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, false);
+    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, is_back_layer, overlay, true);
 
-    const auto param_5 = false;
+    const auto param_5 = true;
     if (((bool*)this)[0x64490] == false && param_5 == false)
     {
         add_item_ptr(((Entity**)this)[0x64440 / 0x8], ent, false);
