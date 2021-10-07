@@ -748,7 +748,7 @@ void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_
         room_height = 8;
     }
     // tallroom
-    else if (room_template >= 109 && room_template <= 110)
+    else if (room_template >= 109 && room_template <= 111)
     {
         room_width = 10;
         room_height = 16;
