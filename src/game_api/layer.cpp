@@ -93,9 +93,13 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 
 Entity* Layer::get_grid_entity_at(float x, float y)
 {
-    const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
-    const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
-    return grid_entities[ix][iy];
+    const uint32_t ix = static_cast<uint32_t>(x);
+    const uint32_t iy = static_cast<uint32_t>(y);
+    if (ix < 0x56 && iy < 0x7e)
+    {
+        return grid_entities[iy][ix];
+    }
+    return nullptr;
 }
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
