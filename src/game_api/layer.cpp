@@ -93,8 +93,8 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 
 Entity* Layer::get_grid_entity_at(float x, float y)
 {
-    const uint32_t ix = static_cast<uint32_t>(x);
-    const uint32_t iy = static_cast<uint32_t>(y);
+    const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
+    const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
     if (ix < 0x56 && iy < 0x7e)
     {
         return grid_entities[iy][ix];
