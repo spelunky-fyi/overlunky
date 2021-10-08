@@ -204,7 +204,15 @@ class PatternCommandBuffer
                 optional = data.optional;
                 break;
             case CommandType::GetAddress:
-                offset = ::get_address(data.address_name) - (size_t)exe;
+                offset = ::get_address(data.address_name);
+                if (optional && offset == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    offset -= (size_t)exe;
+                }
                 break;
             case CommandType::FindInst:
                 try
@@ -502,6 +510,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_room_size_begin"sv,
         // Right after the big switch check for the first char to be `\\`
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("level_gen_load_level_file"sv)
             .find_inst("\x44\x8b\xad\xd4\x05\x00\x00"sv)
             .at_exe(),
@@ -510,6 +519,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_room_size_first_jump"sv,
         // First jump JMP after get_room_size_begin
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("get_room_size_begin"sv)
             .find_next_inst("\x74"sv)
             .decode_pc(1, 0, 1)
@@ -519,6 +529,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_room_size_second_jump"sv,
         // Second jump JMP after get_room_size_begin
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("get_room_size_begin"sv)
             .find_next_inst("\x74"sv)
             .find_next_inst("\xeb"sv)
@@ -529,6 +540,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_room_size_end"sv,
         // Right after the second jump
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("get_room_size_begin"sv)
             .find_next_inst("\x74"sv)
             .find_after_inst("\xeb*"sv)
@@ -620,6 +632,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // In spawn_entity right after the texture_id is assigned to a local (probably eax)
         // and then checked against -4
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("spawn_entity"sv)
             .find_inst("\x83\xf8\xfc"sv)
             .at_exe(),
@@ -628,6 +641,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "fetch_texture_end"sv,
         // In spawn_entity before assigning Entity::animation_frame (0x3c)
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("fetch_texture_begin"sv)
             .find_next_inst("\x66\x89\x46\x3c"sv)
             .at_exe(),

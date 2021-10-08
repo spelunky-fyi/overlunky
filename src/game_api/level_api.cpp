@@ -1079,7 +1079,10 @@ void LevelGenData::init()
     g_last_community_chance_id = g_current_chance_id;
 
     {
+        if (const size_t get_room_size_begin = get_address("get_room_size_begin"))
         {
+            const size_t get_room_size_end = get_address("get_room_size_end");
+
             const size_t get_room_size_first_jump = get_address("get_room_size_first_jump");
             const size_t get_room_size_second_jump = get_address("get_room_size_second_jump");
 
@@ -1123,9 +1126,6 @@ void LevelGenData::init()
                 to_le_bytes(get_room_size_second_jump));
 
             g_get_room_size_redirect = ExecutableMemory{redirect_code};
-
-            const size_t get_room_size_begin = get_address("get_room_size_begin");
-            const size_t get_room_size_end = get_address("get_room_size_end");
 
             std::string code = fmt::format(
                 "\x48\xb8{}"  //MOV         RAX, g_get_room_size_redirect.get()
