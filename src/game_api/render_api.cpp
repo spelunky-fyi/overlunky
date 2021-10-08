@@ -378,7 +378,8 @@ const Texture* fetch_texture(int32_t texture_id)
 void init_render_api_hooks()
 {
     // Fix the texture fetching in spawn_entity
-    if (const size_t fetch_texture_begin = get_address("fetch_texture_begin")) {
+    if (const size_t fetch_texture_begin = get_address("fetch_texture_begin"))
+    {
         const size_t fetch_texture_end = get_address("fetch_texture_end");
 
         const size_t fetch_texture_addr = (size_t)&fetch_texture;
