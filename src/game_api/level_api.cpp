@@ -429,11 +429,11 @@ std::array g_community_tile_codes{
                 {
                     if (ent->type->id == helmet_id || ent->type->id == naked_id || ent->type->id == self.entity_id)
                     {
-                        *(bool*)((size_t)ent + 0x149) = true;
-                        *(bool*)((size_t)olmite + 0x149) = true;
-                        *(uint32_t*)((size_t)olmite + 0x14c) = ent->uid;
+                        *(bool*)((size_t)ent + 0x151) = true;
+                        *(bool*)((size_t)olmite + 0x151) = true;
+                        *(uint32_t*)((size_t)olmite + 0x154) = ent->uid;
 
-                        float offset[]{0.0f, 0.64f};
+                        static constexpr float offset[]{0.0f, 0.64f};
                         stack_entities(olmite->uid, ent->uid, offset);
                     }
                 }

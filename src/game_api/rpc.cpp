@@ -68,6 +68,8 @@ void attach_entity(Entity* overlay, Entity* attachee)
     auto [x, y] = overlay->position();
     attachee->x -= x;
     attachee->y -= y;
+    attachee->special_offsetx = attachee->x;
+    attachee->special_offsety = attachee->y;
     attachee->overlay = overlay;
 
     using AddItemPtr = void(Vector*, Entity*, bool);
@@ -116,7 +118,7 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
     return -1;
 }
 
-void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
+void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)[2])
 {
     if (Entity* bottom = get_entity_ptr(bottom_uid))
     {
@@ -126,11 +128,11 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
             {
                 top->overlay->remove_item_ptr(top);
             }
-            top->w = offset[0];
-            top->h = offset[1];
             attach_entity(bottom, top);
             top->x = offset[0];
             top->y = offset[0];
+            top->special_offsetx = offset[0];
+            top->special_offsety = offset[1];
             if ((bottom->flags >> 0x10) & 0x1) // facing left
             {
                 top->x *= -1.0f;
