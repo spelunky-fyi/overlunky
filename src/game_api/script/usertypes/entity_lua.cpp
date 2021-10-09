@@ -10,7 +10,7 @@ void register_usertypes(sol::state& lua)
 {
     lua.new_usertype<Color>(
         "Color",
-        sol::constructors<Color(), Color(float, float, float, float)>{},
+        sol::constructors<Color(), Color(const Color&), Color(float, float, float, float)>{},
         "r",
         &Color::r,
         "g",
