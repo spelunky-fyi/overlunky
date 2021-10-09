@@ -1040,9 +1040,13 @@ void frame_advance()
 
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
+    const auto ana_id = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    const auto ana_type = get_type(ana_id);
+    const auto ana_texture = ana_type->texture;
+
     g_state->items->player_select_slots[0].activated = true;
-    g_state->items->player_select_slots[0].character = g_save->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + 285; //TODO: magic numbers
+    g_state->items->player_select_slots[0].character = g_save->players[0] + ana_id;
+    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + ana_texture;
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
     g_state->screen_next = screen;
@@ -3444,9 +3448,10 @@ std::string format_time(int64_t frames)
 {
     struct tm newtime;
     time_t secs = frames / 60;
-    char time[10];
+    char time[32];
     gmtime_s(&newtime, &secs);
-    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    size_t endpos = std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    snprintf(time + endpos, sizeof time - endpos, ".%03d", (int)((frames % 60) * 1000 / 60));
     return time;
 }
 
@@ -3455,7 +3460,17 @@ int parse_time(std::string time)
     std::tm tm = {};
     std::stringstream ss(time);
     ss >> std::get_time(&tm, "%H:%M:%S");
-    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
+    const auto pos = time.find_last_of(".");
+    int frames = 0;
+    if (pos != std::string::npos)
+    {
+        double dec = 0;
+        std::stringstream sff(time.substr(pos));
+        sff >> dec;
+        dec += 0.001;
+        frames = static_cast<int>(dec * 60);
+    }
+    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec) + frames;
 }
 
 void render_savegame()
@@ -3607,7 +3622,7 @@ void render_savegame()
         {
             g_save->time_best = parse_time(besttime);
         }
-        std::string totaltime = format_time(g_save->time_total); //TODO: these functions are crap for this purpose
+        std::string totaltime = format_time(g_save->time_total);
         if (ImGui::InputText("Total time##BestTime", &totaltime))
         {
             g_save->time_total = parse_time(totaltime);
@@ -3642,6 +3657,14 @@ void render_savegame()
     ImGui::PushID("Miscellaneous");
     if (ImGui::CollapsingHeader("Miscellaneous"))
     {
+        bool tutorialcomplete = g_save->tutorial_state > 2;
+        if (ImGui::Checkbox("Tutorial completed", &tutorialcomplete))
+        {
+            if (tutorialcomplete)
+                g_save->tutorial_state = 4;
+            else
+                g_save->tutorial_state = 0;
+        }
         ImGui::Checkbox("Seeded runs unlocked", &g_save->seeded_unlocked);
         ImGui::Checkbox("Profile seen", &g_save->profile_seen);
         for (int s = 0; s < 4; ++s)
@@ -3664,6 +3687,25 @@ void render_savegame()
         ImGui::SliderScalar("Rescued dogs", ImGuiDataType_U8, &g_save->pets_rescued[0], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
+    }
+    ImGui::PushID("UnlockAll");
+    if (ImGui::CollapsingHeader("Big scary button to unlock everything"))
+    {
+        ImGui::PushFont(bigfont);
+        ImGui::PushItemWidth(ImGui::GetContentRegionMax().x);
+        if (ImGui::Button("Unlock Everything*", {ImGui::GetContentRegionMax().x, 0}))
+        {
+            g_save->tutorial_state = 4;
+            g_save->profile_seen = true;
+            g_save->seeded_unlocked = true;
+            g_save->characters = 0xfffff;
+            g_save->shortcuts = 0xa;
+            g_save->deepest_area = 7;
+            g_save->deepest_level = 4;
+        }
+        ImGui::PopItemWidth();
+        ImGui::PopFont();
+        ImGui::TextWrapped("*Tutorial, seeded, characters, shortcuts, camp");
     }
     ImGui::PopID();
 }

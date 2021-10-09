@@ -17,10 +17,23 @@
 //      e.g.  call ptr[XXXXXXXX] = FF15 XXXXXXXX
 // Some (write) instructions have a value after the program counter to be extracted, so specify the opcode_suffix_offset
 //      e.g.  mov word ptr[XXXXXXXX], 1 = 66:C705 XXXXXXXX 0100 (opcode_suffix_offset = 2)
-size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t opcode_suffix_offset)
+size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t opcode_suffix_offset, uint8_t opcode_addr_size)
 {
-    off_t rel = *(int32_t*)(&exe[offset + opcode_offset]);
-    return offset + rel + opcode_offset + 4 + opcode_suffix_offset;
+    off_t rel;
+    switch (opcode_addr_size)
+    {
+    case 1:
+        rel = *(int8_t*)(&exe[offset + opcode_offset]);
+        break;
+    case 2:
+        rel = *(int16_t*)(&exe[offset + opcode_offset]);
+        break;
+    case 4:
+    default:
+        rel = *(int32_t*)(&exe[offset + opcode_offset]);
+        break;
+    }
+    return offset + rel + opcode_offset + opcode_addr_size + opcode_suffix_offset;
 }
 
 size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset)
@@ -141,9 +154,9 @@ class PatternCommandBuffer
         commands.push_back({CommandType::Offset, {.offset = offset}});
         return *this;
     }
-    PatternCommandBuffer& decode_pc(uint8_t opcode_prefix = 3, uint8_t opcode_suffix = 0)
+    PatternCommandBuffer& decode_pc(uint8_t opcode_prefix = 3, uint8_t opcode_suffix = 0, uint8_t opcode_addr = 4)
     {
-        commands.push_back({CommandType::DecodePC, {.decode_pc_prefix_suffix = {opcode_prefix, opcode_suffix}}});
+        commands.push_back({CommandType::DecodePC, {.decode_pc_args = {opcode_prefix, opcode_suffix, opcode_addr}}});
         return *this;
     }
     PatternCommandBuffer& decode_imm(uint8_t opcode_prefix = 3)
@@ -172,6 +185,17 @@ class PatternCommandBuffer
         size_t offset = mem.after_bundle;
         bool optional{false};
 
+#ifdef DEBUG
+        static constexpr auto debug_pattern = ""sv;
+        if constexpr (!debug_pattern.empty())
+        {
+            if (address_name == debug_pattern)
+            {
+                __debugbreak();
+            }
+        }
+#endif // DEBUG
+
         for (auto& [command, data] : commands)
         {
             switch (command)
@@ -180,7 +204,15 @@ class PatternCommandBuffer
                 optional = data.optional;
                 break;
             case CommandType::GetAddress:
-                offset = ::get_address(data.address_name) - (size_t)exe;
+                offset = ::get_address(data.address_name);
+                if (optional && offset == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    offset -= (size_t)exe;
+                }
                 break;
             case CommandType::FindInst:
                 try
@@ -196,7 +228,9 @@ class PatternCommandBuffer
                 offset = offset + data.offset;
                 break;
             case CommandType::DecodePC:
-                offset = ::decode_pc(exe, offset, data.decode_pc_prefix_suffix.first, data.decode_pc_prefix_suffix.second);
+                offset = std::apply([=](auto... args)
+                                    { return ::decode_pc(exe, offset, args...); },
+                                    data.decode_pc_args.as_tuple());
                 break;
             case CommandType::DecodeIMM:
                 offset = ::decode_imm(exe, offset, data.decode_imm_prefix);
@@ -220,6 +254,18 @@ class PatternCommandBuffer
     }
 
   private:
+    struct DecodePcArgs
+    {
+        uint8_t opcode_offset;
+        uint8_t opcode_suffix_offset;
+        uint8_t opcode_addr_size;
+
+        std::tuple<uint8_t, uint8_t, uint8_t> as_tuple() const
+        {
+            return {opcode_offset, opcode_suffix_offset, opcode_addr_size};
+        }
+    };
+
     enum class CommandType
     {
         SetOptional,
@@ -238,7 +284,7 @@ class PatternCommandBuffer
         std::string_view address_name;
         std::string_view pattern;
         int64_t offset;
-        std::pair<uint8_t, uint8_t> decode_pc_prefix_suffix;
+        DecodePcArgs decode_pc_args;
         uint8_t decode_imm_prefix;
     };
     struct Command
@@ -461,6 +507,46 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "get_room_size_begin"sv,
+        // Right after the big switch check for the first char to be `\\`
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .get_address("level_gen_load_level_file"sv)
+            .find_inst("\x44\x8b\xad\xd4\x05\x00\x00"sv)
+            .at_exe(),
+    },
+    {
+        "get_room_size_first_jump"sv,
+        // First jump JMP after get_room_size_begin
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .get_address("get_room_size_begin"sv)
+            .find_next_inst("\x74"sv)
+            .decode_pc(1, 0, 1)
+            .at_exe(),
+    },
+    {
+        "get_room_size_second_jump"sv,
+        // Second jump JMP after get_room_size_begin
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .get_address("get_room_size_begin"sv)
+            .find_next_inst("\x74"sv)
+            .find_next_inst("\xeb"sv)
+            .decode_pc(1, 0, 1)
+            .at_exe(),
+    },
+    {
+        "get_room_size_end"sv,
+        // Right after the second jump
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .get_address("get_room_size_begin"sv)
+            .find_next_inst("\x74"sv)
+            .find_after_inst("\xeb*"sv)
+            .at_exe(),
+    },
+    {
         "level_gen_do_extra_spawns"sv,
         // The only function that calls Mount::carry twice, on one call site it spawns entity 0xe1
         PatternCommandBuffer{}
@@ -546,6 +632,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // In spawn_entity right after the texture_id is assigned to a local (probably eax)
         // and then checked against -4
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("spawn_entity"sv)
             .find_inst("\x83\xf8\xfc"sv)
             .at_exe(),
@@ -554,6 +641,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "fetch_texture_end"sv,
         // In spawn_entity before assigning Entity::animation_frame (0x3c)
         PatternCommandBuffer{}
+            .set_optional(true)
             .get_address("fetch_texture_begin"sv)
             .find_next_inst("\x66\x89\x46\x3c"sv)
             .at_exe(),
@@ -998,24 +1086,12 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
-[[maybe_unused]] static constexpr auto g_debug_pattern = ""sv;
-
 void preload_addresses()
 {
     Memory mem = Memory::get();
     const char* exe = mem.exe();
     for (auto [address_name, rule] : g_address_rules)
     {
-#ifdef DEBUG
-        if constexpr (!g_debug_pattern.empty())
-        {
-            if (address_name == g_debug_pattern)
-            {
-                __debugbreak();
-            }
-        }
-#endif // DEBUG
-
         if (auto address = rule(mem, exe, address_name))
         {
             g_cached_addresses[address_name] = address.value();

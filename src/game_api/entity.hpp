@@ -34,11 +34,10 @@ struct Animation
 
 struct Rect
 {
-    int masks;
-    float up_minus_down, side, up_plus_down;
-    uint8_t field_10;
-    uint8_t field_11;
-    uint16_t field_12;
+    float offsetx;
+    float offsety;
+    float hitboxx;
+    float hitboxy;
 };
 
 class Entity;
@@ -61,6 +60,7 @@ struct EntityDB
     uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
     int16_t field_26;
     Rect rect_collision;
+    uint32_t default_duckmask;
     int32_t field_3C;
     int32_t field_40;
     int32_t field_44;
@@ -75,10 +75,17 @@ struct EntityDB
     float max_speed;
     float sprint_factor;
     float jump;
-    float glow_red;
-    float glow_green;
-    float glow_blue;
-    float glow_alpha;
+    union
+    {
+        Color default_color;
+        struct
+        {
+            float glow_red;
+            float glow_green;
+            float glow_blue;
+            float glow_alpha;
+        };
+    };
     int32_t texture;
     int32_t technique;
     int32_t tile_x;
@@ -97,8 +104,8 @@ struct EntityDB
     float field_a8;
     int32_t field_AC;
     AnimationMap animations;
-    float attachOffsetX;
-    float attachOffsetY;
+    float default_special_offsetx;
+    float default_special_offsety;
     uint8_t init;
 };
 

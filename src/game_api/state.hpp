@@ -13,6 +13,7 @@ const float ZF = 0.737f;
 
 struct Layer;
 struct LevelGenSystem;
+class ThemeInfo;
 
 struct StateMemory
 {
@@ -182,6 +183,11 @@ struct StateMemory
     uint32_t time_startup;
     uint32_t special_visibility_flags;
     Camera* camera;
+
+    ThemeInfo* current_theme()
+    {
+        return *((ThemeInfo**)&i6c);
+    }
 
     /// Returns animation_frame of the correct ushabti
     uint16_t get_correct_ushabti();

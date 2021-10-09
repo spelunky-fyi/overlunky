@@ -12,6 +12,9 @@ struct PRNG
     static PRNG& get();
     static PRNG& get_local();
 
+    /// Same as `seed_prng`
+    void seed(int64_t seed);
+
     enum PRNG_CLASS
     {
         PROCEDURAL_SPAWNS = 0,

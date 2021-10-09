@@ -162,9 +162,6 @@ Clear previously added callback `id`
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 `nil load_script(string id)`<br/>
 Load another script by id "author/name"
-### [`seed_prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_prng)
-`nil seed_prng(int seed)`<br/>
-Seed the game prng.
 ### [`read_prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
 `array<int> read_prng()`<br/>
 Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
@@ -615,6 +612,9 @@ Raise a signal and probably crash the game
 `nil cancel_toast()`<br/>
 ### [`cancel_speechbubble`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cancel_speechbubble)
 `nil cancel_speechbubble()`<br/>
+### [`seed_prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_prng)
+`nil seed_prng(int seed)`<br/>
+Seed the game prng.
 ### [`get_character_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_character_name)
 `string get_character_name(ENT_TYPE type_id)`<br/>
 Same as `Player.get_name`
@@ -1092,6 +1092,9 @@ PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of 
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
 The used buffer is determined by [`PRNG_CLASS`](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
 If you don't care what part of the game you affect just use `prng.random`.
+- [`nil seed(int seed)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) &PRNG::seed
+\
+Same as `seed_prng`
 - [`float random_float(PRNG_CLASS type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_float) &PRNG::random_float
 \
 Generate a random floating point number in the range `[0, 1)`
@@ -1118,7 +1121,6 @@ Drop-in replacement for `math.random(min, max)`
 \
 Create a new color - defaults to black
 - [`Color(const Color&)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
-- [`Color(Color&&)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 - [`Color(float r_, float g_, float b_, float a_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 \
 Create a new color by specifying its values

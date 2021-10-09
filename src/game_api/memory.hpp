@@ -95,6 +95,57 @@ FunT* vtable_find(T* obj, size_t index)
         return static_cast<FunT*>(nullptr);
     return reinterpret_cast<FunT*>(&ptr[0][index]);
 }
+
+class ExecutableMemory
+{
+  public:
+    ExecutableMemory(std::string_view raw_code)
+    {
+        SYSTEM_INFO system_info;
+        GetSystemInfo(&system_info);
+
+        auto const page_size = system_info.dwPageSize;
+        auto const alloc_size = (raw_code.size() / page_size + 1) * page_size;
+
+        auto const memory = (std::byte*)VirtualAlloc(nullptr, page_size, MEM_COMMIT, PAGE_READWRITE);
+        std::memcpy(memory, raw_code.data(), raw_code.size());
+
+        DWORD dummy;
+        VirtualProtect(memory, alloc_size, PAGE_EXECUTE_READ, &dummy);
+
+        code = storage_t{memory};
+    }
+
+    ExecutableMemory() = default;
+    ExecutableMemory(const ExecutableMemory&) = delete;
+    ExecutableMemory(ExecutableMemory&&) noexcept = default;
+    ExecutableMemory& operator=(const ExecutableMemory&) = delete;
+    ExecutableMemory& operator=(ExecutableMemory&&) noexcept = default;
+
+    std::byte* get() const
+    {
+        return code.get();
+    }
+
+    template <class Ret, class... Args>
+    using func_ptr = Ret (*)(Args...);
+    template <class Ret, class... Args>
+    explicit operator func_ptr<Ret, Args...>() const
+    {
+        return (Ret(*)(Args...))(code.get());
+    }
+
+  private:
+    struct deleter_t
+    {
+        void operator()(std::byte* mem) const
+        {
+            VirtualFree(mem, 0, MEM_RELEASE);
+        }
+    };
+    using storage_t = std::unique_ptr<std::byte, deleter_t>;
+    storage_t code;
+};
 }; // namespace
 
 struct Memory

@@ -369,7 +369,7 @@ const Texture* fetch_texture(int32_t texture_id)
 
     if (texture_id < -3)
     {
-        auto* current_theme = *((ThemeInfo**)&State::get().ptr_local()->i6c);
+        auto* current_theme = State::get().ptr_local()->current_theme();
         texture_id = current_theme->get_dynamic_floor_texture_id(texture_id);
     }
     return get_textures()->texture_map[texture_id];
@@ -378,8 +378,8 @@ const Texture* fetch_texture(int32_t texture_id)
 void init_render_api_hooks()
 {
     // Fix the texture fetching in spawn_entity
+    if (const size_t fetch_texture_begin = get_address("fetch_texture_begin"))
     {
-        const size_t fetch_texture_begin = get_address("fetch_texture_begin");
         const size_t fetch_texture_end = get_address("fetch_texture_end");
 
         const size_t fetch_texture_addr = (size_t)&fetch_texture;
