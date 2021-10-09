@@ -595,6 +595,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "level_gen_emplace_level_chance"sv,
+        // Called in load_level_file on LevelGenData::level_trap_chances and LevelGenData::level_trap_chances
+        PatternCommandBuffer{}
+            .find_inst("\x41\x89\xd8\xe8****\x48\x8b\x44\x24\x20"sv)
+            .offset(0x3)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "online"sv,
         // Find online code in memory (reverse for endianness), look higher up and find __vftable, set read bp on __vftable
         PatternCommandBuffer{}

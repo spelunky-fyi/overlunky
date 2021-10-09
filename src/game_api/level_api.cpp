@@ -1523,11 +1523,28 @@ std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
     return "invalid";
 }
 
+LevelChanceDef& get_or_emplace_level_chance(game_unordered_map<std::uint32_t, LevelChanceDef>& level_chances, uint32_t chance_id)
+{
+    struct LevelChanceNode
+    {
+        void* ptr0;
+        void* ptr1;
+        std::pair<uint32_t, LevelChanceDef> value;
+    };
+    using EmplaceLevelChance = LevelChanceNode**(void*, std::pair<LevelChanceNode*, bool>*, uint32_t);
+    static EmplaceLevelChance* emplace_level_chance = (EmplaceLevelChance*)get_address("level_gen_emplace_level_chance");
+
+    std::pair<LevelChanceNode*, bool> node;
+    emplace_level_chance((void*)&level_chances, &node, chance_id);
+
+    return node.first->value.second;
+}
+
 uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef this_chances = data->level_monster_chances[chance_id];
+        LevelChanceDef this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
@@ -1544,7 +1561,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 
     if (g_trap_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef& this_chances = data->level_trap_chances[chance_id];
+        LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_trap_chances, chance_id);
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
@@ -1565,7 +1582,7 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef& this_chances = data->level_monster_chances[chance_id];
+        LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
         if (inverse_chance == 0)
         {
             this_chances.chances.clear();
@@ -1579,7 +1596,7 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 
     if (g_trap_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef& this_chances = data->level_trap_chances[chance_id];
+        LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_trap_chances, chance_id);
         if (inverse_chance == 0)
         {
             this_chances.chances.clear();
