@@ -259,8 +259,6 @@ end
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->required_scripts.push_back(sanitize(id));
     };
-    /// Seed the game prng.
-    lua["seed_prng"] = seed_prng;
     /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
     /// ```lua
     /// -- this should always print the same table D877...E555

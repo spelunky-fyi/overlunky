@@ -12,8 +12,6 @@ using Say = void (*)(void*, Entity*, wchar_t*, int unk_type /* 0, 2, 3 */, bool 
 Say get_say();
 size_t get_say_context();
 
-void seed_prng(int64_t seed);
-
 float screenify(float dis);
 
 ImVec2 screenify(ImVec2 pos);

@@ -22,29 +22,6 @@ size_t get_say_context()
     return say_context;
 }
 
-void seed_prng(int64_t seed)
-{
-    auto next_pair = [useed = static_cast<uint64_t>(seed)]() mutable
-    {
-        // advance state
-        useed = (uint64_t((useed & 0xffffffff) == 0) - (useed & 0xffffffff)) * -0x61939c2f98956567;
-        useed = (((useed >> 0x1c) ^ useed) >> 0x17) ^ useed;
-
-        // generate next pair
-        PRNG::prng_pair useed_pair;
-        useed_pair.first = useed * -0x61939c2f98956567;
-        useed_pair.second = (useed * -0x7cc4ab2b38000000 | useed_pair.first >> 0x25) * -0x61939c2f98956567;
-        useed_pair.first = (useed_pair.first >> 0x1c ^ useed_pair.first) >> 0x17 ^ useed_pair.first;
-        return useed_pair;
-    };
-
-    PRNG& prng = PRNG::get();
-    for (auto& pair : prng.pairs)
-    {
-        pair = next_pair();
-    }
-}
-
 float screenify(float dis)
 {
     ImGuiIO& io = ImGui::GetIO();
