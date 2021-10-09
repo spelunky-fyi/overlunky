@@ -46,7 +46,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
 
 void snap_to_floor(Entity* ent, float y)
 {
-    ent->y = y - ent->hitboxy + ent->offsety;
+    ent->y = y + ent->hitboxy - ent->offsety;
     Entity* overlay = ent->overlay;
     while (overlay != nullptr)
     {
