@@ -58,8 +58,8 @@ void snap_to_floor(Entity* ent, float y)
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 {
     const EntityDB* type = get_type(static_cast<uint32_t>(id));
-    const float y_center = roundf(y);
-    const float snapped_y = type->rect_collision.up_plus_down - type->rect_collision.up_minus_down + y_center;
+    const float y_center = roundf(y) - 0.5f;
+    const float snapped_y = y_center + type->rect_collision.hitboxy - type->rect_collision.offsety;
     Entity* ent = spawn_entity(id, x, snapped_y, false, 0.0f, 0.0f, false);
     if ((type->search_flags & 0x700) == 0)
     {
