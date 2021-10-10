@@ -1096,18 +1096,20 @@ void LevelGenData::init()
                 "\x41\x51"                     //PUSH       R9
                 "\x41\x52"                     //PUSH       R10
                 "\x41\x53"                     //PUSH       R11
+                "\x41\x53"                     //PUSH       R11
                 "\x48\x8d\x8d\xa0\x02\x00\x00" //LEA        RCX, [RBP + 0x2a0] == room_template_name
                 "\x48\x8d\x95\x58\x05\x00\x00" //LEA        RDX, [RBP + 0x558] == room_width
                 "\x4c\x8d\x85\xb8\x05\x00\x00" //LEA        R8, [RBP + 0x5b8] == room_height
                 "\x48\xb8{}"                   //MOV        RAX, &get_room_size
                 "\xff\xd0"                     //CALL       RAX
-                "\x58"                         //POP        RAX
-                "\x59"                         //POP        RCX
-                "\x5a"                         //POP        RDX
-                "\x41\x58"                     //POP        R8
-                "\x41\x59"                     //POP        R9
-                "\x41\x5a"                     //POP        R10
                 "\x41\x5b"                     //POP        R11
+                "\x41\x5b"                     //POP        R11
+                "\x41\x5a"                     //POP        R10
+                "\x41\x59"                     //POP        R9
+                "\x41\x58"                     //POP        R8
+                "\x5a"                         //POP        RDX
+                "\x59"                         //POP        RCX
+                "\x58"                         //POP        RAX
                 "\x44\x8b\xad\xd4\x05\x00\x00" //MOV        R13D,dword ptr [RBP + 0x5d4]
                 "\x41\x83\xe5\x08"             //AND        R13D,0x8
                 "\x48\x8b\x85\x50\x05\x00\x00" //MOV        RAX,qword ptr [RBP + 0x550]
