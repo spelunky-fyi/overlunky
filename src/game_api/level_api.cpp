@@ -877,21 +877,6 @@ void generate_room(LevelGenSystem* level_gen, int32_t room_idx_x, int32_t room_i
         State::get().ptr()->level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_template.value();
         g_overridden_room_template.reset();
     }
-
-    const auto* state = State::get().ptr();
-    if (room_idx_x == static_cast<int32_t>(state->w - 1) && room_idx_y == static_cast<int32_t>(state->h - 1))
-    {
-        post_room_generation();
-
-        {
-            std::lock_guard lock{g_extra_spawn_logic_providers_lock};
-            for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
-            {
-                provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
-                provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
-            }
-        }
-    }
 }
 
 using GatherRoomData = void(LevelGenData*, byte, int room_x, int, bool, uint8_t*, uint8_t*, size_t, uint8_t*, uint8_t*, uint8_t*, uint8_t*);
@@ -1414,6 +1399,24 @@ void LevelGenSystem::init()
 
     for (ThemeInfo* theme : themes)
     {
+        using PopulateLevelFun = void(ThemeInfo * self, uint64_t param_2, uint64_t param_3, uint64_t param_4);
+        hook_vtable<PopulateLevelFun>(
+            theme_dwelling, [](ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
+            {
+                post_room_generation();
+
+                {
+                    std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+                    for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+                    {
+                        provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
+                        provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
+                    }
+                }
+
+                original(self, param_2, param_3, param_4);
+            },
+            0xd);
         hook_vtable<DoProceduralSpawnFun>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {
