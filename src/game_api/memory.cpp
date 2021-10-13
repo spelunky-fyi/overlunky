@@ -16,7 +16,7 @@ ExecutableMemory::ExecutableMemory(std::string_view raw_code)
         DWORD dummy;
         VirtualProtect(memory, alloc_size, PAGE_EXECUTE_READ, &dummy);
 
-        code = storage_t{ memory };
+        code = storage_t{memory};
     }
     else
     {
