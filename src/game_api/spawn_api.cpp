@@ -30,7 +30,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
     static auto spawn_liquid_call = (spawn_liquid_fun_t*)get_address("spawn_liquid");
 
     // In case of lava, construct an Illumination* and assign it to each new lava entity
-    // Do this only during level-gen
+    // Do this only outside of level-gen, otherwise the game will create these objects
     static const auto lava_types = std::vector{
         to_id("ENT_TYPE_LIQUID_LAVA"),
         to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"),
