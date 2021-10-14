@@ -4598,6 +4598,8 @@ void render_game_props()
     }
     if (ImGui::CollapsingHeader("AI targets"))
     {
+        ImGui::Text("TODO: crashes");
+        /*
         for (const auto& [ai, target] : *(g_state->ai_targets))
         {
             auto ai_entity = get_entity_ptr(ai);
@@ -4625,7 +4627,7 @@ void render_game_props()
                     ImGui::Text("Invalid target uid: %s", std::to_string(target).c_str());
                 }
             }
-        }
+        }*/
     }
     ImGui::PopItemWidth();
 }
