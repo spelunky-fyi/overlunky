@@ -77,11 +77,10 @@ class Player : public PowerupCapable
     size_t p160;
     int32_t i168;
     int32_t i16c;
+    float y_pos; // not sure why, seams to be the same as abs_y
     uint32_t jump_flags;
     uint8_t some_timer;
     uint8_t can_use;
-    uint8_t b176;
-    uint8_t b177;
 
     void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();

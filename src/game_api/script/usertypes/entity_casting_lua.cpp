@@ -47,7 +47,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][30] = lua["Entity"]["as_lockeddoor"];           // FLOOR_DOOR_LOCKED_PEN
     lua["TYPE_MAP"][31] = lua["Entity"]["as_cityofgolddoor"];       // FLOOR_DOOR_COG
     lua["TYPE_MAP"][32] = lua["Entity"]["as_door"];                 // FLOOR_DOOR_MOAI_STATUE
-    lua["TYPE_MAP"][33] = lua["Entity"]["as_eggshipdoor"];          // FLOOR_DOOR_EGGSHIP
+    lua["TYPE_MAP"][33] = lua["Entity"]["as_eggshipdoors"];         // FLOOR_DOOR_EGGSHIP
     lua["TYPE_MAP"][34] = lua["Entity"]["as_eggshipdoor"];          // FLOOR_DOOR_EGGSHIP_ATREZZO
     lua["TYPE_MAP"][35] = lua["Entity"]["as_eggshipdoor"];          // FLOOR_DOOR_EGGSHIP_ROOM
     lua["TYPE_MAP"][36] = lua["Entity"]["as_decorateddoor"];        // FLOOR_DOOR_EGGPLANT_WORLD

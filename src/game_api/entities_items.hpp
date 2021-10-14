@@ -8,6 +8,7 @@
 class Backpack : public Movable
 {
   public:
+    /// More like on fire trigger, the explosion happens when the timer reaches > 29
     bool explosion_trigger;
     uint8_t explosion_timer; // counts from 0 to 30
     uint16_t unknown1;
@@ -40,7 +41,7 @@ class Hoverpack : public Backpack
 class Bomb : public Movable
 {
   public:
-    size_t unknown1;
+    SoundPosition* sound_pos;
     /// 1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     float scale_hor;
     float scale_ver;
@@ -48,10 +49,9 @@ class Bomb : public Movable
     bool is_big_bomb;
 };
 
-class Cape : public Movable
+class Cape : public Backpack
 {
   public:
-    size_t unknown;
     bool floating_down;
     uint8_t padding1;
     uint8_t padding2;
@@ -80,12 +80,12 @@ class Gun : public Movable
     /// used only for clonegun
     uint8_t shots2;
     uint8_t b12b;
+    /// Only for webgun, uid of the webshot entity
+    int32_t in_chamber;
 };
 
 class WebGun : public Gun
 {
-  public:
-    int32_t in_chamber;
 };
 
 class UdjatSocket : public Movable
@@ -176,9 +176,9 @@ class JungleSpearCosmetic : public Movable
 
 struct UnknownPointerGroup
 {
-    uint32_t unknown_uid1;
-    uint32_t unknown_uid2;
-    uint32_t unknown_uid3;
+    size_t unknown_uid1; // it's pointer to the uid
+    size_t unknown_uid2;
+    size_t unknown_uid3;
 };
 
 class WebShot : public Movable
@@ -421,9 +421,10 @@ class TimedShot : public LightShot
     uint8_t timer;
 };
 
-class CloneGunShot : public TimedShot
+class CloneGunShot : public LightShot
 {
   public:
+    uint8_t timer;
     int8_t unused1;
     int16_t unused2;
     float spawn_y;
@@ -456,10 +457,11 @@ class Container : public Movable
     void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
-class Coffin : public Container
+class Coffin : public Movable
 {
   public:
-    int8_t timer;
+    ENT_TYPE inside;
+    uint8_t timer;
     int8_t shake_state; /* unsure */
 };
 
@@ -614,9 +616,10 @@ class MiniGameAsteroid : public Movable
     float spin_speed;
 };
 
-class Pot : public Container
+class Pot : public Movable
 {
   public:
+    ENT_TYPE inside;
     bool dont_transfer_dmg; // if false, spawned entity will receive dmg that the pot received
 };
 

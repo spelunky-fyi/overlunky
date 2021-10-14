@@ -110,7 +110,7 @@ class MainExit : public ExitDoor
     float value;     // unsure
 };
 
-class EggShipDoor : public Door
+class EggShipDoor : public Door // probably the same as ExitDoor, but only timer is in use
 {
   public:
     uint16_t unused11;
@@ -118,7 +118,11 @@ class EggShipDoor : public Door
     uint8_t timer; // counts from 30 to 0, dunno why
     uint16_t unknown3;
     uint16_t unknown4;
-    /// only for DOOR_EGGSHIP
+};
+
+class EggShipDoorS : public EggShipDoor
+{
+  public:
     bool entered;
 };
 
@@ -186,19 +190,22 @@ class SpikeballTrap : public Floor
 class TransferFloor : public Floor
 {
   public:
-    std::unordered_map<size_t, size_t> unknown_map; // types are wrong, no idea what's inside
+    /// Index is the uid, value is frame the entity entered the floor (time_level), use `pairs` to loop thru
+    std::unordered_map<int32_t, uint32_t> transferred_entities;
 };
 
 class ConveyorBelt : public TransferFloor
 {
   public:
     UnknownPointerGroup unknown1;
-    uint8_t timer; // 0 to 15
+    uint8_t timer;  // 0 to 15
+    uint8_t timer2; // not exposed to lua
 };
 
-class Pipe : public TransferFloor
+class Pipe : public Floor
 {
   public:
+    UnknownPointerGroup unknown1;
     /// 3 - straight_horizontal, 4 - blocked, 5 - down_left_turn, 6 - down_right_turn, 8 - blocked, 9 - up_left_turn, 10 - up_right_turn, 12 - straight_vertical
     int8_t direction_type;
     bool end_pipe;
@@ -221,18 +228,21 @@ class SlidingWallCeiling : public Floor
   public:
     Entity* attached_piece;
     int32_t active_floor_part_uid;
-    /// 1 - top, 2 - pause
+    /// 1 - going up / is at the top, 2 - pause
     uint8_t state; // i labeled some as wrong_pause cause they are probably not used, they pause the movement but not the sound
     uint8_t unused1;
     uint16_t unused2;
-    size_t unknown1;
-    size_t unknown2;
+    SoundPosition* ball_rise;
+    SoundPosition* ball_drop;
 };
 
 class QuickSand : public Floor
 {
   public:
-    uint8_t unknown_timer;
+    uint8_t unknown_timer1;
+    uint8_t unknown_timer2;
+    uint8_t unknown_timer3;
+    uint8_t unknown_timer4;
 };
 
 class BigSpearTrap : public Floor
@@ -251,6 +261,7 @@ class StickyTrap : public Floor
     UnknownPointerGroup unknown1;
     int32_t attached_piece_uid;
     int32_t ball_uid;
+    /// 0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
     int8_t state;
     uint8_t timer; // for the start and for the retract
 };
@@ -315,6 +326,8 @@ class ForceField : public Floor
     Illumination* emitted_light;
     float bounce_force; /* unsure */ // max 1.0 ?
     bool is_on;                      // starts the sound + first_item_beam but not fx for some reason
+    uint8_t unused1;
+    uint16_t unused2;
 
     void activate_laserbeam(bool turn_on);
 };
@@ -322,8 +335,6 @@ class ForceField : public Floor
 class TimedForceField : public ForceField
 {
   public:
-    uint8_t unused1;
-    uint16_t unused2;
     uint32_t timer; // max 300? at 100 it's start the proces, changing the animation_frame
     bool pause;
 };
@@ -345,6 +356,8 @@ class TentacleBottom : public Floor
     UnknownPointerGroup unknown1;
     int32_t attached_piece_uid;
     int32_t tentacle_uid;
+    /// 0 - none, 1 - start, 2 - moving up, 3 - at the top, 4 - moving down 5 - pause
+    int8_t state;
 };
 
 class PoleDeco : public Floor

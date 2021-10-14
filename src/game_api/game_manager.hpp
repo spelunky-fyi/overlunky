@@ -1,4 +1,3 @@
-#include "items.hpp"
 #include "savedata.hpp"
 #include "screen.hpp"
 #include "screen_arena.hpp"

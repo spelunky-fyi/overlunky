@@ -1454,9 +1454,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`ExitDoor`](
 ### `EggShipDoor`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &EggShipDoor::timer
-- [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &EggShipDoor::entered
-\
-only for DOOR_EGGSHIP
+### `EggShipDoorS`
+Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`EggShipDoor`](#eggshipdoor)
+- [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &EggShipDoorS::entered
 ### `Arrowtrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
@@ -1493,11 +1493,14 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 for the start and retract
 ### `TransferFloor`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`map<int, int> transferred_entities`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transferred_entities) &TransferFloor::transferred_entities
+\
+Index is the uid, value is frame the entity entered the floor (time_level), use `pairs` to loop thru
 ### `ConveyorBelt`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ConveyorBelt::timer
 ### `Pipe`
-Derived from [`Entity`](#entity) [`Floor`](#floor) [`TransferFloor`](#transferfloor)
+Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int direction_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_type) &Pipe::direction_type
 \
 3 - straight_horizontal, 4 - blocked, 5 - down_left_turn, 6 - down_right_turn, 8 - blocked, 9 - up_left_turn, 10 - up_right_turn, 12 - straight_vertical
@@ -1519,7 +1522,7 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int active_floor_part_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_floor_part_uid) &SlidingWallCeiling::active_floor_part_uid
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &SlidingWallCeiling::state
 \
-1 - top, 2 - pause
+1 - going up / is at the top, 2 - pause
 ### `QuickSand`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 ### `BigSpearTrap`
@@ -1533,6 +1536,8 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid
 - [`int ball_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ball_uid) &StickyTrap::ball_uid
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &StickyTrap::state
+\
+0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &StickyTrap::timer
 ### `MotherStatue`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
@@ -1585,6 +1590,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &TentacleBottom::attached_piece_uid
 - [`int tentacle_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tentacle_uid) &TentacleBottom::tentacle_uid
+- [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &TentacleBottom::state
+\
+0 - none, 1 - start, 2 - moving up, 3 - at the top, 4 - moving down 5 - pause
 ### `PoleDeco`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int deco_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_up) &PoleDeco::deco_up
@@ -1816,15 +1824,18 @@ can't shot when the timer is running
 - [`bool shop_owner`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_owner) &Shopkeeper::shop_owner
 ### `Yang`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`RoomOwner`](#roomowner)
+- [`set<int> turkeys_in_den`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=turkeys_in_den) &Yang::turkeys_in_den
+\
+Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
 - [`bool first_message_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_message_shown) &Yang::first_message_shown
 \
 I'm looking for turkeys, wanna help?
 - [`bool quest_incomplete`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_incomplete) &Yang::quest_incomplete
 \
-set to false when the quest is over (Yang dead or second turkey delivered)
+Is set to false when the quest is over (Yang dead or second turkey delivered)
 - [`bool special_message_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_message_shown) &Yang::special_message_shown
 \
-tusk palace/black market/one way door - message shown
+Tusk palace/black market/one way door - message shown
 ### `Tun`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`RoomOwner`](#roomowner)
 - [`int arrows_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrows_left) &Tun::arrows_left
@@ -3793,6 +3804,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_eggplantminister
 - as_eggsac
 - as_eggshipdoor
+- as_eggshipdoors
 - as_elevator
 - as_empressgrave
 - as_entity

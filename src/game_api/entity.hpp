@@ -156,7 +156,7 @@ class Entity
     uint8_t b3f;
     float x;
     float y;
-    float abs_x;
+    float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
     float abs_y;
     float w;
     float h;
@@ -397,16 +397,6 @@ class SoundPosition
     float unknown7;
     float unknown8;
     float unknown9;
-};
-
-struct Target
-{
-    uint8_t b00;
-    uint8_t enabled;
-    uint8_t level;
-    uint8_t from;
-    uint8_t world;
-    uint8_t theme;
 };
 
 std::vector<EntityItem> list_entities();

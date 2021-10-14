@@ -17,6 +17,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_cityofgolddoor"] = &Entity::as<CityOfGoldDoor>;
     lua["Entity"]["as_mainexit"] = &Entity::as<MainExit>;
     lua["Entity"]["as_eggshipdoor"] = &Entity::as<EggShipDoor>;
+    lua["Entity"]["as_eggshipdoors"] = &Entity::as<EggShipDoorS>;
     lua["Entity"]["as_arrowtrap"] = &Entity::as<Arrowtrap>;
     lua["Entity"]["as_totemtrap"] = &Entity::as<TotemTrap>;
     lua["Entity"]["as_lasertrap"] = &Entity::as<LaserTrap>;
@@ -138,10 +139,15 @@ void register_usertypes(sol::state& lua)
         "EggShipDoor",
         "timer",
         &EggShipDoor::timer,
-        "entered",
-        &EggShipDoor::entered,
         sol::base_classes,
         sol::bases<Entity, Floor, Door>());
+
+    lua.new_usertype<EggShipDoorS>(
+        "EggShipDoorS",
+        "entered",
+        &EggShipDoorS::entered,
+        sol::base_classes,
+        sol::bases<Entity, Floor, Door, EggShipDoor>());
 
     lua.new_usertype<Arrowtrap>(
         "Arrowtrap",
@@ -203,6 +209,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TransferFloor>(
         "TransferFloor",
+        "transferred_entities",
+        &TransferFloor::transferred_entities,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
@@ -220,7 +228,7 @@ void register_usertypes(sol::state& lua)
         "end_pipe",
         &Pipe::end_pipe,
         sol::base_classes,
-        sol::bases<Entity, Floor, TransferFloor>());
+        sol::bases<Entity, Floor>());
 
     lua.new_usertype<Generator>(
         "Generator",
@@ -364,6 +372,8 @@ void register_usertypes(sol::state& lua)
         &TentacleBottom::attached_piece_uid,
         "tentacle_uid",
         &TentacleBottom::tentacle_uid,
+        "state",
+        &TentacleBottom::state,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 

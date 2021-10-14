@@ -139,6 +139,11 @@ def rpcfunc(name):
 
 def replace_all(text, dic):
     for i, j in dic.items():
+        pos = text.find(i)
+        br2 = text.find('`', pos + len(i))
+        br1 = text.rfind('`', 0, pos)
+        if pos > 0 and br1 >= 0 and br2 > 0:
+            continue
         text = text.replace(i, j)
     return text
 

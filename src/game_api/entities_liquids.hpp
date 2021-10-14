@@ -8,16 +8,19 @@ class Liquid : public Entity
 {
   public:
     Entity* fx_surface;
-    size_t unknown;
+    float x_pos;
+    float y_pos;
+    size_t unknown; // MysteryLiquidPointer1 in plugin
     uint16_t unknown_readonly1;
     uint16_t unknown_readonly2;
-    uint16_t unknown_timer1;
-    uint16_t unknown_timer2;
+    uint8_t unknown_timer1;
+    uint8_t unknown_timer2;
+    uint8_t unknown_timer3;
+    uint8_t unk21; //probably padding
 };
 
 class Lava : public Liquid
 {
   public:
-    size_t laval_unknown1; // Might be a member on Liquid, idk
     Illumination* emitted_light;
 };

@@ -60,6 +60,7 @@ class PushBlock : public Movable
     SoundPosition* sound_pos;
     ParticleEmitterInfo* dust_particle;
     float dest_pos_x;
+    uint32_t unused;
 };
 
 class BoneBlock : public Movable
@@ -71,7 +72,6 @@ class BoneBlock : public Movable
 class ChainedPushBlock : public PushBlock
 {
   public:
-    uint32_t unused;
     bool is_chained; // changing this when chained does nothing, when unchained it's forced to 0
 };
 
@@ -142,7 +142,6 @@ class RegenBlock : public Movable
 class TimedPowderkeg : public PushBlock
 {
   public:
-    uint32_t unused;
     /// timer till explosion, -1 = pause, counts down
     int32_t timer;
 };
