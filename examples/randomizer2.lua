@@ -944,6 +944,9 @@ set_callback(function()
     for i,v in ipairs(in_shop) do
         --math.randomseed(read_prng()[8]+i)
         v.price = prng:random(1000, math.min(20000, 2*get_money())+prng:random(1500, 6000))
+        if prng:random(100) == 1 then
+            v.price = 0
+        end
     end
 end, ON.POST_LEVEL_GENERATION)
 
@@ -952,7 +955,12 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
-        return spawn_entity_nonreplaceable(pick(all_shop_items), x, y, l, 0, 0)
+        local eid = pick(all_shop_items)
+        local etype = get_type(eid)
+        if etype.description > 1900 then
+            etype.description = prng:random(1900)
+        end
+        return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, shop_items)
@@ -962,7 +970,12 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
-        return spawn_entity_nonreplaceable(pick(shop_mounts), x, y, l, 0, 0)
+        local eid = pick(shop_mounts)
+        local etype = get_type(eid)
+        if etype.description > 1900 then
+            etype.description = prng:random(1900)
+        end
+        return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, MASK.MOUNT, shop_mounts)
@@ -986,7 +999,12 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
-        return spawn_entity_nonreplaceable(pick(all_shop_guns), x, y, l, 0, 0)
+        local eid = pick(all_shop_guns)
+        local etype = get_type(eid)
+        if etype.description > 1900 then
+            etype.description = prng:random(1900)
+        end
+        return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
