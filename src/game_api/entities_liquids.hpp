@@ -22,6 +22,5 @@ class Liquid : public Entity
 class Lava : public Liquid
 {
   public:
-    size_t laval_unknown1; // Might be a member on Liquid, idk
     Illumination* emitted_light;
 };
