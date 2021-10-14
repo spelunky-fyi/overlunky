@@ -1401,7 +1401,7 @@ void LevelGenSystem::init()
     {
         using PopulateLevelFun = void(ThemeInfo * self, uint64_t param_2, uint64_t param_3, uint64_t param_4);
         hook_vtable<PopulateLevelFun>(
-            theme_dwelling, [](ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
+            theme, [](ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
             {
                 post_room_generation();
 
