@@ -34,11 +34,10 @@ struct Animation
 
 struct Rect
 {
-    int masks;
-    float up_minus_down, side, up_plus_down;
-    uint8_t field_10;
-    uint8_t field_11;
-    uint16_t field_12;
+    float offsetx;
+    float offsety;
+    float hitboxx;
+    float hitboxy;
 };
 
 class Entity;
@@ -46,8 +45,6 @@ class Entity;
 using EntityCreate = Entity* (*)();
 using EntityDestroy = void (*)(Entity*);
 using AnimationMap = std::unordered_map<uint8_t, Animation>;
-using AddLayer = void (*)(void*, Entity*);
-using RemoveLayer = void (*)(void*, Entity*);
 
 struct EntityDB
 {
@@ -63,6 +60,7 @@ struct EntityDB
     uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
     int16_t field_26;
     Rect rect_collision;
+    uint32_t default_duckmask;
     int32_t field_3C;
     int32_t field_40;
     int32_t field_44;
@@ -77,10 +75,17 @@ struct EntityDB
     float max_speed;
     float sprint_factor;
     float jump;
-    float glow_red;
-    float glow_green;
-    float glow_blue;
-    float glow_alpha;
+    union
+    {
+        Color default_color;
+        struct
+        {
+            float glow_red;
+            float glow_green;
+            float glow_blue;
+            float glow_alpha;
+        };
+    };
     int32_t texture;
     int32_t technique;
     int32_t tile_x;
@@ -99,8 +104,8 @@ struct EntityDB
     float field_a8;
     int32_t field_AC;
     AnimationMap animations;
-    float attachOffsetX;
-    float attachOffsetY;
+    float default_special_offsetx;
+    float default_special_offsety;
     uint8_t init;
 };
 
@@ -268,20 +273,20 @@ class Entity
     }
 
     virtual ~Entity() = 0;
-    /*WRONG IN 1.23.3*/ virtual void create_rendering_info() = 0;
+    virtual void create_rendering_info() = 0;
     /*UNKNOWN/NEW IN 1.23.3*/ virtual void v2() = 0;
 
     /// Kills the entity in the most violent way possible, for example cavemen turn into gibs
     virtual void kill(bool, Entity* frm) = 0;
 
-    /*WRONG IN 1.23.3*/ virtual void on_collision1(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision2
+    virtual void on_collision1(Entity* other_entity) = 0; // triggers on collision between whip and hit object
 
     /// Completely removes the entity from existence
     virtual void destroy() = 0;
 
     virtual void apply_texture(Texture*) = 0;
-    /*WRONG IN 1.23.3*/ virtual void hiredhand_description(char*) = 0;
-    /*WRONG IN 1.23.3*/ virtual void generate_stomp_damage_particles(Entity* victim) = 0; // particles when jumping on top of enemy
+    virtual void hiredhand_description(char*) = 0;
+    virtual void generate_stomp_damage_particles(Entity* victim) = 0; // particles when jumping on top of enemy
     virtual float get_type_field_a8() = 0;
     virtual bool block_pushing_related() = 0; // does a bittest for the 14 entities starting at pushblock, function hits when player pushes entity
     virtual void v11() = 0;
@@ -291,24 +296,24 @@ class Entity
     virtual void set_invisible(bool) = 0;
     virtual void handle_turning_left(bool apply) = 0; // if disabled, monsters don't turn left and keep walking in the wall (and other right-left issues)
     virtual void set_draw_depth(uint8_t draw_depth) = 0;
-    /*CHANGED IN 1.23.3*/ virtual void resume_ai() = 0; // works on entities with ai_func != 0; runs when companions are let go from being held. AI resumes anyway in 1.23.3
+    virtual void resume_ai() = 0; // works on entities with ai_func != 0; runs when companions are let go from being held. AI resumes anyway in 1.23.3
     virtual float friction() = 0;
     virtual void v20() = 0;
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
     virtual void v23() = 0;
-    /*WRONG IN 1.23.3*/ virtual bool on_check_is_looking_up_while_thrown(Entity* thrower) = 0; // used for crates and presents: checks whether looking up to open rather than throw
-    /*WRONG IN 1.23.3*/ virtual void on_attempt_shop_purchase(Entity* buyer) = 0;              // checks if you have sufficient money, performs the sale if so
-    virtual void on_collision2(Entity* other_entity) = 0;                                      // needs investigating, difference between this and on_collision1
-    virtual uint64_t on_save_level_transition_data() = 0;                                      // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    virtual bool on_check_is_looking_up_while_thrown(Entity* thrower) = 0; // used for crates and presents: checks whether looking up to open rather than throw
+    virtual void on_attempt_shop_purchase(Entity* buyer) = 0;              // checks if you have sufficient money, performs the sale if so
+    virtual void on_collision2(Entity* other_entity) = 0;                  // needs investigating, difference between this and on_collision1
+    virtual uint64_t on_save_level_transition_data() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual void on_restore_level_transition_data(uint64_t data) = 0;
-    /*WRONG IN 1.23.3*/ virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
-    /*WRONG IN 1.23.3*/ virtual void on_walked_off_by(Entity* walker) = 0; // hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual 20 (remove_item_ptr)
+    virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
+    virtual void on_walked_off_by(Entity* walker) = 0; // appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr
     virtual void v31() = 0;
-    /*WRONG IN 1.23.3*/ virtual void on_stood_on_by(Entity* entity) = 0; // e.g. pots, skulls, pushblocks, ... standing on floors
-    virtual void toggle_backlayer_illumination() = 0;                    // for the player: when going to the backlayer, turns on player emitted light
+    virtual void on_stood_on_by(Entity* entity) = 0;  // e.g. pots, skulls, pushblocks, ... standing on floors
+    virtual void toggle_backlayer_illumination() = 0; // for the player: when going to the backlayer, turns on player emitted light
     virtual void v34() = 0;
-    /*WRONG IN 1.23.3*/ virtual void liberate_from_shop() = 0; // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
+    virtual void liberate_from_shop() = 0; // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
 
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0;

@@ -381,7 +381,7 @@ std::array g_community_tile_codes{
             Entity* slidingwall = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             // hook the function that dereferences the top part of the trap (which is nullptr right now)
             hook_vtable<void(Entity*, Entity*)>(
-                slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {}, 25);
+                slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {}, 26);
         },
     },
     CommunityTileCode{"spikeball_trap", "ENT_TYPE_FLOOR_SPIKEBALL_CEILING"},
@@ -429,11 +429,11 @@ std::array g_community_tile_codes{
                 {
                     if (ent->type->id == helmet_id || ent->type->id == naked_id || ent->type->id == self.entity_id)
                     {
-                        *(bool*)((size_t)ent + 0x149) = true;
-                        *(bool*)((size_t)olmite + 0x149) = true;
-                        *(uint32_t*)((size_t)olmite + 0x14c) = ent->uid;
+                        *(bool*)((size_t)ent + 0x151) = true;
+                        *(bool*)((size_t)olmite + 0x151) = true;
+                        *(uint32_t*)((size_t)olmite + 0x154) = ent->uid;
 
-                        float offset[]{0.0f, 0.64f};
+                        static constexpr float offset[]{0.0f, 0.64f};
                         stack_entities(olmite->uid, ent->uid, offset);
                     }
                 }
@@ -586,9 +586,9 @@ std::vector<std::unique_ptr<ManualRoomData>> g_manual_room_datas;
 bool g_replace_level_loads{false};
 std::vector<std::string> g_levels_to_load;
 
-using LevelGenFun = void(LevelGenSystem*, float);
+using LevelGenFun = void(LevelGenSystem*, float, size_t);
 LevelGenFun* g_level_gen_trampoline{nullptr};
-void level_gen(LevelGenSystem* level_gen_sys, float param_2)
+void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
     OnScopeExit pop{[]
@@ -597,7 +597,7 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2)
     g_manual_room_datas.clear();
 
     pre_level_generation();
-    g_level_gen_trampoline(level_gen_sys, param_2);
+    g_level_gen_trampoline(level_gen_sys, param_2, param_3);
     post_level_generation();
 
     g_replace_level_loads = false;
@@ -714,7 +714,8 @@ void setup_level_files(LevelGenData* level_gen_data, const char* level_file_name
     g_setup_level_files_trampoline(level_gen_data, level_file_name, load_generic);
 }
 
-void get_room_size(uint32_t room_template, uint32_t& room_width, uint32_t& room_height)
+ExecutableMemory g_get_room_size_redirect;
+void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_height)
 {
     // cache, ghistroom
     if (room_template >= 14 && room_template <= 15)
@@ -747,7 +748,7 @@ void get_room_size(uint32_t room_template, uint32_t& room_width, uint32_t& room_
         room_height = 8;
     }
     // tallroom
-    else if (room_template >= 109 && room_template <= 110)
+    else if (room_template >= 109 && room_template <= 111)
     {
         room_width = 10;
         room_height = 16;
@@ -767,6 +768,18 @@ void get_room_size(uint32_t room_template, uint32_t& room_width, uint32_t& room_
             room_width = 10;
             room_height = 8;
         }
+    }
+}
+void get_room_size(const char* room_template_name, uint32_t& room_width, uint32_t& room_height)
+{
+    const auto room_template = State::get().ptr_local()->level_gen->data->get_room_template(room_template_name);
+    if (!room_template)
+    {
+        DEBUG("Unkown room_template name {}", room_template_name);
+    }
+    else
+    {
+        get_room_size(room_template.value(), room_width, room_height);
     }
 }
 
@@ -863,21 +876,6 @@ void generate_room(LevelGenSystem* level_gen, int32_t room_idx_x, int32_t room_i
         const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
         State::get().ptr()->level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_template.value();
         g_overridden_room_template.reset();
-    }
-
-    const auto* state = State::get().ptr();
-    if (room_idx_x == static_cast<int32_t>(state->w - 1) && room_idx_y == static_cast<int32_t>(state->h - 1))
-    {
-        post_room_generation();
-
-        {
-            std::lock_guard lock{g_extra_spawn_logic_providers_lock};
-            for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
-            {
-                provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
-                provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
-            }
-        }
     }
 }
 
@@ -1066,94 +1064,82 @@ void LevelGenData::init()
     g_last_community_chance_id = g_current_chance_id;
 
     {
-        // TODO: 1.23.3
-        //{
-        //    auto fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, after_bundle);
-        //    fun_start = find_inst(exe, "\x48\x8b\x8e\xb8\x12\x00\x00"s, fun_start);
-        //    fun_start = Memory::decode_call(find_inst(exe, "\xe8"s, fun_start));
-        //    g_level_gen_trampoline = (LevelGenFun*)memory.at_exe(fun_start);
-        //}
+        if (const size_t get_room_size_begin = get_address("get_room_size_begin"))
+        {
+            const size_t get_room_size_end = get_address("get_room_size_end");
 
+            const size_t get_room_size_first_jump = get_address("get_room_size_first_jump");
+            const size_t get_room_size_second_jump = get_address("get_room_size_second_jump");
+
+            const size_t get_room_size_addr = (size_t) static_cast<void (*)(const char*, uint32_t&, uint32_t&)>(&get_room_size);
+
+            const std::string redirect_code = fmt::format(
+                "\x50"                         //PUSH       RAX
+                "\x51"                         //PUSH       RCX
+                "\x52"                         //PUSH       RDX
+                "\x41\x50"                     //PUSH       R8
+                "\x41\x51"                     //PUSH       R9
+                "\x41\x52"                     //PUSH       R10
+                "\x41\x53"                     //PUSH       R11
+                "\x41\x53"                     //PUSH       R11
+                "\x48\x8d\x8d\xa0\x02\x00\x00" //LEA        RCX, [RBP + 0x2a0] == room_template_name
+                "\x48\x8d\x95\x58\x05\x00\x00" //LEA        RDX, [RBP + 0x558] == room_width
+                "\x4c\x8d\x85\xb8\x05\x00\x00" //LEA        R8, [RBP + 0x5b8] == room_height
+                "\x48\xb8{}"                   //MOV        RAX, &get_room_size
+                "\xff\xd0"                     //CALL       RAX
+                "\x41\x5b"                     //POP        R11
+                "\x41\x5b"                     //POP        R11
+                "\x41\x5a"                     //POP        R10
+                "\x41\x59"                     //POP        R9
+                "\x41\x58"                     //POP        R8
+                "\x5a"                         //POP        RDX
+                "\x59"                         //POP        RCX
+                "\x58"                         //POP        RAX
+                "\x44\x8b\xad\xd4\x05\x00\x00" //MOV        R13D,dword ptr [RBP + 0x5d4]
+                "\x41\x83\xe5\x08"             //AND        R13D,0x8
+                "\x48\x8b\x85\x50\x05\x00\x00" //MOV        RAX,qword ptr [RBP + 0x550]
+                "\x48\x85\xc0"                 //TEST       RAX,RAX
+                "\x74\x13"                     //JZ         FIRST_JUMP
+                "\x49\x89\xc4"                 //MOV        R12,RAX
+                "\x48\x8b\x9d\x60\x05\x00\x00" //MOV        RBX,qword ptr [RBP + 0x560]
+                "\x48\x8b\xb5\x48\x05\x00\x00" //MOV        RSI,qword ptr [RBP + 0x548]
+                "\xeb\x0c"                     //JMP        SECOND_JUMP
+                /*FIST_JUMP*/ "\x48\xb8{}"     //MOV        RAX, get_room_size_first_jump
+                "\xff\xe0"                     //JMP        RAX
+                /*SECOND_JUMP*/ "\x48\xb8{}"   //MOV        RAX, get_room_size_second_jump
+                "\xff\xe0"sv,                  //JMP        RAX
+                to_le_bytes(get_room_size_addr),
+                to_le_bytes(get_room_size_first_jump),
+                to_le_bytes(get_room_size_second_jump));
+
+            g_get_room_size_redirect = ExecutableMemory{redirect_code};
+
+            std::string code = fmt::format(
+                "\x48\xb8{}"  //MOV         RAX, g_get_room_size_redirect.get()
+                "\xff\xe0"sv, //JMP         RAX
+                to_le_bytes((size_t)g_get_room_size_redirect.get()));
+
+            // Fill with nop, code is not performance-critical either way
+            const size_t original_code_size = get_room_size_end - get_room_size_begin;
+            code.resize(original_code_size, '\x90');
+
+            write_mem_prot(get_room_size_begin, code, true);
+        }
+
+        g_level_gen_trampoline = (LevelGenFun*)get_address("level_gen_entry"sv);
         g_handle_tile_code_trampoline = (HandleTileCodeFun*)get_address("level_gen_handle_tile_code"sv);
         g_setup_level_files_trampoline = (SetupLevelFiles*)get_address("level_gen_setup_level_files"sv);
         g_load_level_file_trampoline = (LoadLevelFile*)get_address("level_gen_load_level_file"sv);
-        // TODO: 1.23.3
-        // Need to redo the room size garbo
         g_do_extra_spawns_trampoline = (DoExtraSpawns*)get_address("level_gen_do_extra_spawns"sv);
         g_generate_room_trampoline = (GenerateRoom*)get_address("level_gen_generate_room"sv);
         g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data"sv);
         g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data"sv);
         g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
 
-        {
-            // TODO: 1.23.3
-            //    {
-            //        const void* get_room_size_addr = &get_room_size;
-            //
-            //        // Manually assembled code, let's hope it won't have to change ever
-            //        std::string code = fmt::format(
-            //            //""                             /// Breakpoint for debugging
-            //            //"\xcc"                         // int 3
-            //            ""                             /// Push all volatile registers
-            //            "\x50"                         // push   rax
-            //            "\x51"                         // push   rcx
-            //            "\x52"                         // push   rdx
-            //            "\x41\x50"                     // push   r8
-            //            "\x41\x51"                     // push   r9
-            //            "\x41\x52"                     // push   r10
-            //            "\x41\x53"                     // push   r11
-            //            ""                             /// Setup call
-            //            "\x89\xd9"                     // mov    ecx, ebx
-            //            "\x48\x8d\x95\x38\xff\xff\xff" // lea    rdx, [rbp-0x100+0x38]
-            //            "\x4c\x8d\x85\x3c\xff\xff\xff" // lea    r8, [rbp-0x100+0x3c]
-            //            ""                             /// Do the call with an absolute address
-            //            "\x48\xb8{}"                   // mov    rax, &get_room_size
-            //            "\xff\xd0"                     // call   rax
-            //            ""                             /// Recover volatile registers
-            //            "\x41\x5b"                     // pop    r11
-            //            "\x41\x5a"                     // pop    r10
-            //            "\x41\x59"                     // pop    r9
-            //            "\x41\x58"                     // pop    r8
-            //            "\x5a"                         // pop    rdx
-            //            "\x59"                         // pop    rcx
-            //            "\x58"                         // pop    rax
-            //            ""                             /// Move room width into its expected register
-            //            "\x48\x8B\x74\x24\x38"         // mov    rsi, QWORD PTR[rsp + 0x38]
-            //            "\x4c\x8b\x64\x24\x3c"         // mov    r12, QWORD PTR[rsp + 0x3c]
-            //            ""                             /// Move room width into a redundant stack variable
-            //            "\x48\x89\x74\x24\x48"         // mov    QWORD PTR[rsp + 0x48], rsi
-            //            ""                             /// Setup some registers for the next loop iteration
-            //            "\x44\x8b\x74\x24\x48"         // mov    r14d, DWORD PTR[rsp + 0x48]
-            //            "\x44\x8b\x7c\x24\x4c"         // mov    r15d, DWORD PTR[rsp + 0x4c]
-            //            "\x48\x8b\x5c\x24\x40"         // mov    rbx, QWORD PTR[rsp + 0x40]
-            //            "\x4c\x8b\x54\x24\x30"         // mov    r10, QWORD PTR[rsp + 0x30]
-            //            "\x4c\x8b\x5c\x24\x28"         // mov    r11, QWORD PTR[rsp + 0x28]
-            //            "\x8b\x7c\x24\x20"             // mov    edi, DWORD PTR[rsp + 0x20]
-            //            ,
-            //            to_le_bytes(get_room_size_addr));
-            //
-            //        // function start, expected at 0x220addd0
-            //        const size_t get_room_size_off = (size_t)g_load_level_file_trampoline + (0x220af23e - 0x220addd0); // at 0x220af23e
-            //        const size_t get_room_size_size = 0x220af32c - 0x220af23e;                                         // until 0x220af32c
-            //
-            //        // Fill with nop, code is not performance-critical either way
-            //        code.resize(get_room_size_size, '\x90');
-            //
-            //        write_mem_prot(get_room_size_off, std::move(code), true);
-            //
-            //        // Replace MessageBox call with a breakpoint for debugging
-            //        std::string breakpoint = "\x90\x90\xcc"s;
-            //        breakpoint.resize(0x33, '\x90');
-            //        write_mem_prot(memory.at_exe(0x220af42b), std::move(breakpoint), true);
-            //    }
-        }
-
-        DetourRestoreAfterWith();
-
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
-        //DetourAttach((void**)&g_level_gen_trampoline, level_gen);
+        DetourAttach((void**)&g_level_gen_trampoline, level_gen);
         DetourAttach((void**)&g_handle_tile_code_trampoline, handle_tile_code);
         DetourAttach((void**)&g_setup_level_files_trampoline, setup_level_files);
         DetourAttach((void**)&g_load_level_file_trampoline, load_level_file);
@@ -1413,6 +1399,24 @@ void LevelGenSystem::init()
 
     for (ThemeInfo* theme : themes)
     {
+        using PopulateLevelFun = void(ThemeInfo * self, uint64_t param_2, uint64_t param_3, uint64_t param_4);
+        hook_vtable<PopulateLevelFun>(
+            theme_dwelling, [](ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
+            {
+                post_room_generation();
+
+                {
+                    std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+                    for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+                    {
+                        provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
+                        provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
+                    }
+                }
+
+                original(self, param_2, param_3, param_4);
+            },
+            0xd);
         hook_vtable<DoProceduralSpawnFun>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {
@@ -1524,11 +1528,28 @@ std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
     return "invalid";
 }
 
+LevelChanceDef& get_or_emplace_level_chance(game_unordered_map<std::uint32_t, LevelChanceDef>& level_chances, uint32_t chance_id)
+{
+    struct LevelChanceNode
+    {
+        void* ptr0;
+        void* ptr1;
+        std::pair<uint32_t, LevelChanceDef> value;
+    };
+    using EmplaceLevelChance = LevelChanceNode**(void*, std::pair<LevelChanceNode*, bool>*, uint32_t);
+    static EmplaceLevelChance* emplace_level_chance = (EmplaceLevelChance*)get_address("level_gen_emplace_level_chance");
+
+    std::pair<LevelChanceNode*, bool> node;
+    emplace_level_chance((void*)&level_chances, &node, chance_id);
+
+    return node.first->value.second;
+}
+
 uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef this_chances = data->level_monster_chances[chance_id];
+        LevelChanceDef this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
@@ -1545,7 +1566,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 
     if (g_trap_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef& this_chances = data->level_trap_chances[chance_id];
+        LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_trap_chances, chance_id);
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
@@ -1566,7 +1587,7 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef& this_chances = data->level_monster_chances[chance_id];
+        LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
         if (inverse_chance == 0)
         {
             this_chances.chances.clear();
@@ -1580,7 +1601,7 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 
     if (g_trap_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef& this_chances = data->level_trap_chances[chance_id];
+        LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_trap_chances, chance_id);
         if (inverse_chance == 0)
         {
             this_chances.chances.clear();

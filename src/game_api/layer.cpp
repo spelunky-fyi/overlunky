@@ -46,7 +46,7 @@ Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, 
 
 void snap_to_floor(Entity* ent, float y)
 {
-    ent->y = y - ent->hitboxy + ent->offsety;
+    ent->y = y + ent->hitboxy - ent->offsety;
     Entity* overlay = ent->overlay;
     while (overlay != nullptr)
     {
@@ -58,8 +58,8 @@ void snap_to_floor(Entity* ent, float y)
 Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
 {
     const EntityDB* type = get_type(static_cast<uint32_t>(id));
-    const float y_center = (float)roundf(y) - 0.5f;
-    const float snapped_y = type->rect_collision.up_plus_down - type->rect_collision.up_minus_down + y_center;
+    const float y_center = roundf(y) - 0.5f;
+    const float snapped_y = y_center + type->rect_collision.hitboxy - type->rect_collision.offsety;
     Entity* ent = spawn_entity(id, x, snapped_y, false, 0.0f, 0.0f, false);
     if ((type->search_flags & 0x700) == 0)
     {
@@ -72,17 +72,21 @@ Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
 {
     using SpawnEntityFun = Entity*(EntityFactory*, size_t, float, float, bool, Entity*, bool);
     static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
-    static auto fun_22872fe0 = (void (*)(void*, Entity*))get_address("fun_22872fe0");
-    static auto fun_2286f240 = (void (*)(void*, Entity*, bool))get_address("fun_2286f240");
+    using AddToLayer = void(Layer*, Entity*);
+    static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
+    using AddItemPtr = void(Entity*, Entity*, bool);
+    static auto add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
 
-    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, *(bool*)this, overlay, true);
-    if (*((bool*)this + 0x64490))
+    Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, is_back_layer, overlay, true);
+
+    const auto param_5 = true;
+    if (((bool*)this)[0x64490] == false && param_5 == false)
     {
-        fun_22872fe0(this, ent);
+        add_item_ptr(((Entity**)this)[0x64440 / 0x8], ent, false);
     }
     else
     {
-        fun_2286f240((void*)((size_t)this + 0x64440), ent, false);
+        add_to_layer(this, ent);
     }
     return ent;
 }
@@ -91,7 +95,11 @@ Entity* Layer::get_grid_entity_at(float x, float y)
 {
     const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
     const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
-    return grid_entities[ix][iy];
+    if (ix < 0x56 && iy < 0x7e)
+    {
+        return grid_entities[iy][ix];
+    }
+    return nullptr;
 }
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)

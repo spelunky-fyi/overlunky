@@ -109,7 +109,16 @@ replace = {
     "variadic_args va": "int, int...",
 }
 comment = []
-not_functions = ["players", "state", "game_manager", "online", "savegame", "options", "meta", "prng"]
+not_functions = [
+    "players",
+    "state",
+    "game_manager",
+    "online",
+    "savegame",
+    "options",
+    "meta",
+    "prng",
+]
 skip = False
 
 
@@ -230,16 +239,19 @@ for file in header_files:
                     m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
                     if m:
                         name = m[3]
-                        if name not in member_funs:
-                            member_funs[name] = []
-                        member_funs[name].append(
-                            {
-                                "return": m[2],
-                                "name": m[3],
-                                "param": m[4],
-                                "comment": comment,
-                            }
-                        )
+                        # move ctor is useless for Lua
+                        is_move_ctr = re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4]) and not m[2]
+                        if not is_move_ctr:
+                            if name not in member_funs:
+                                member_funs[name] = []
+                            member_funs[name].append(
+                                {
+                                    "return": m[2],
+                                    "name": m[3],
+                                    "param": m[4],
+                                    "comment": comment,
+                                }
+                            )
                         comment = []
 
                     m = re.search(

@@ -97,6 +97,39 @@ FunT* vtable_find(T* obj, size_t index)
 }
 }; // namespace
 
+class ExecutableMemory
+{
+  public:
+    ExecutableMemory(std::string_view raw_code);
+
+    ExecutableMemory() = default;
+    ExecutableMemory(const ExecutableMemory&) = delete;
+    ExecutableMemory(ExecutableMemory&&) noexcept = default;
+    ExecutableMemory& operator=(const ExecutableMemory&) = delete;
+    ExecutableMemory& operator=(ExecutableMemory&&) noexcept = default;
+
+    std::byte* get() const
+    {
+        return code.get();
+    }
+
+    template <class Ret, class... Args>
+    using func_ptr = Ret (*)(Args...);
+    template <class Ret, class... Args>
+    explicit operator func_ptr<Ret, Args...>() const
+    {
+        return (Ret(*)(Args...))(code.get());
+    }
+
+  private:
+    struct deleter_t
+    {
+        void operator()(std::byte* mem) const;
+    };
+    using storage_t = std::unique_ptr<std::byte, deleter_t>;
+    storage_t code;
+};
+
 struct Memory
 {
     size_t exe_ptr;

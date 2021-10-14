@@ -1,5 +1,6 @@
 #include "script_util.hpp"
 #include "memory.hpp"
+#include "prng.hpp"
 
 #include <regex>
 
@@ -19,20 +20,6 @@ size_t get_say_context()
 {
     static size_t say_context = get_address("say_context");
     return say_context;
-}
-
-Prng get_seed_prng()
-{
-    ONCE(Prng)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(
-            memory.exe(),
-            "\x48\x89\x5C\x24\x08\x48\x89\x74\x24\x10\x57\x48\x83\xEC\x10\x8B\xC1\x33\xFF\x48\x85\xC0\x41\xB9\x30\x01\x00\x00\x48\xBB\x99\x9A\x6A\x67\xD0\x63\x6C\x9E"s,
-            memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (Prng)off;
-    }
 }
 
 float screenify(float dis)

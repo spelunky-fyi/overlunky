@@ -23,7 +23,15 @@ inline bool& get_is_init()
 
 void do_write_load_opt()
 {
-    write_mem_prot(get_address("write_load_opt"), "\x90\x90"s, true);
+    size_t write_load_addr = get_address("write_load_opt");
+    if (write_load_addr > 0ull)
+    {
+        write_mem_prot(write_load_addr, "\x90\x90"sv, true);
+    }
+    else
+    {
+        assert(get_address("write_load_opt_fixed") > 0ull);
+    }
 }
 bool& get_write_load_opt()
 {
@@ -60,9 +68,8 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
-        DEBUG("TODO: patterns for level_gen and spawn_hooks");
-        //STATE.ptr()->level_gen->init();
-        //init_spawn_hooks();
+        STATE.ptr()->level_gen->init();
+        init_spawn_hooks();
         init_render_api_hooks();
         get_is_init() = true;
     }

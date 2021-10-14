@@ -14,14 +14,6 @@
 
 using namespace std::chrono_literals;
 
-//BOOL WINAPI DllMain(
-//    HINSTANCE hinstDLL, // handle to DLL module
-//    DWORD fdwReason,    // reason for calling function
-//    LPVOID lpReserved)  // reserved
-//{
-//    return TRUE; // Successful DLL_PROCESS_ATTACH.
-//}
-
 BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 {
     switch (ctrl_type)

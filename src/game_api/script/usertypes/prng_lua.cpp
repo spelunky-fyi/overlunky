@@ -10,12 +10,20 @@ void register_usertypes(sol::state& lua)
 {
     auto random = sol::overload(static_cast<float (PRNG::*)()>(&PRNG::random), static_cast<std::optional<std::int64_t> (PRNG::*)(std::int64_t)>(&PRNG::random), static_cast<std::optional<std::int64_t> (PRNG::*)(std::int64_t, std::int64_t)>(&PRNG::random));
 
+    /// Seed the game prng.
+    lua["seed_prng"] = [](int64_t seed)
+    {
+        PRNG::get().seed(seed);
+    };
+
     /// PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
     /// The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
     /// The used buffer is determined by [`PRNG_CLASS`](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
     /// If you don't care what part of the game you affect just use `prng.random`.
     lua.new_usertype<PRNG>(
         "PRNG",
+        "seed",
+        &PRNG::seed,
         "random_float",
         &PRNG::random_float,
         "random_chance",

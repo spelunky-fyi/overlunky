@@ -18,15 +18,3 @@ if(MSVC)
         target_compile_options(injected PRIVATE /Zc:__cplusplus)
         target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 endif()
-
-execute_process(
-  COMMAND git describe --always --dirty=-modified
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-set_property(
-   SOURCE ui.cpp
-   APPEND PROPERTY COMPILE_DEFINITIONS
-     GIT_VERSION=${GIT_VERSION}
-)
