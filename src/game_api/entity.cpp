@@ -388,7 +388,7 @@ void hook_movable_state_machine(Movable* _self)
                 post(self);
             }
         },
-        0x24);
+        0x2);
 }
 void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine)
 {
