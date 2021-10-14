@@ -1,5 +1,6 @@
 #include "spawn_api.hpp"
 
+#include "entities_liquids.hpp"
 #include "entity.hpp"
 #include "layer.hpp"
 #include "level_api.hpp"
@@ -14,17 +15,61 @@
 #include <Windows.h>
 #include <detours.h>
 
+#include <array>
+#include <functional>
+#include <ranges>
+
 std::uint32_t g_SpawnNonReplacable;
 SpawnType g_SpawnTypeFlags;
 std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
+std::function<void(Entity*)> g_temp_entity_spawn_hook;
 
 void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 {
     using spawn_liquid_fun_t = void(void*, float, float, std::uint32_t, bool);
     static auto spawn_liquid_call = (spawn_liquid_fun_t*)get_address("spawn_liquid");
 
+    // In case of lava, construct an Illumination* and assign it to each new lava entity
+    // Do this only during level-gen
+    static const auto lava_types = std::vector{
+        to_id("ENT_TYPE_LIQUID_LAVA"),
+        to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"),
+        to_id("ENT_TYPE_LIQUID_COARSE_LAVA"),
+    };
+
     auto state = State::get().ptr();
-    spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
+    if (state->loading != 2 && std::ranges::find(lava_types, entity_type) != lava_types.end())
+    {
+        std::vector<Lava*> lavas{};
+
+        g_temp_entity_spawn_hook = [&lavas, entity_type](Entity* ent)
+        {
+            if (ent->type->id == entity_type)
+            {
+                lavas.push_back(ent->as<Lava>());
+            }
+        };
+        spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
+        g_temp_entity_spawn_hook = nullptr;
+
+        for (Lava* lava : lavas)
+        {
+            float position[2] = {lava->x, lava->y};
+            float color[4] = {1.782f, 0.575262f, 0.0f, 0.0f}; // green value is randomized!
+            float light_size = 1.0f;
+            uint32_t flags = 0x63;
+
+            using construct_illumination_ptr_fun_t = Illumination*(PointerList*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
+            static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("construct_illumination_ptr");
+
+            auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);
+            lava->emitted_light = ill_ptr;
+        }
+    }
+    else
+    {
+        spawn_liquid_call(state->liquid_physics, x, y, entity_type, false);
+    }
 }
 
 int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap) // ui only
@@ -383,6 +428,10 @@ Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, f
     }
 
     post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
+    if (g_temp_entity_spawn_hook)
+    {
+        g_temp_entity_spawn_hook(spawned_ent);
+    }
 
     if (is_floor_spreading)
     {
