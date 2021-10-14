@@ -55,6 +55,9 @@ class PowerupCapable : public Movable
     /// Checks whether the player/monster has a certain powerup
     bool has_powerup(ENT_TYPE powerup_type);
 
+    /// Return all powerups that the entity has
+    std::vector<ENT_TYPE> get_powerups();
+
     virtual void on_instakill_death() = 0; // seems to only trigger for enemies that die in one hit
 
     virtual void on_blood_collision() = 0; // only triggers when player has kapala

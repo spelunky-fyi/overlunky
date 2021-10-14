@@ -151,6 +151,7 @@ class Entity
     uint32_t more_flags;
     int32_t uid;
     uint16_t animation_frame;
+    /// Don't edit this dirrectly, use `set_draw_depth`
     uint8_t draw_depth;
     uint8_t b3f;
     float x;
@@ -337,15 +338,18 @@ struct Inventory
 
     uint8_t unknown2;
     uint32_t unknown3;
-    uint32_t unknown4;
-    uint8_t unknown5a;
-    uint8_t unknown5b;
-    uint8_t unknown5c;
+    /// Used in level transition to transfer to new player entity, is wrong during the level
+    ENT_TYPE held_item;
+    /// Metadata of the held item (health, is cursed etc.) Used in level transition to transfer to new entity, is wrong during the level
+    int16_t held_item_metadata;
+    uint8_t unknown5c; //padding?
 
     int8_t player_slot;
-
-    uint32_t unknown6;
-    uint32_t unknown7;
+    /// Used in level transition to transfer to new player entity, is wrong during the level
+    ENT_TYPE mount_type;
+    /// Metadata of the mount (health, is cursed etc.) Used in level transition to transfer to new player entity, is wrong during the level
+    int16_t mount_metadata;
+    int16_t unknown_mount_ralated;
 
     std::array<ENT_TYPE, 512> collected_money; // entity types
     std::array<uint32_t, 512> collected_money_values;
@@ -354,39 +358,24 @@ struct Inventory
     uint32_t kills_level;
     uint32_t kills_total;
 
-    uint32_t unknown8;
-    uint32_t unknown9;
-    uint32_t unknown10;
-    uint32_t unknown11;
-    int32_t unknown12;
-    int32_t unknown13;
-    int32_t unknown14;
-    int32_t unknown15;
-
+    std::array<int16_t, 8> unknown_companions_realated;
+    /// Companions poison tick timers, used in level transition to transfer to new player entity, is wrong during the level
+    std::array<int16_t, 8> companion_poison_tick_timers;
     /// Companion ENT_TYPEs, used in level transition to transfer to new player entity, is wrong during the level
     std::array<ENT_TYPE, 8> companions;
-
-    uint32_t unknown24;
-    uint32_t unknown25;
-    uint32_t unknown26;
-    uint32_t unknown27;
-    uint32_t unknown28;
-    uint32_t unknown29;
-    uint32_t unknown30;
-    uint32_t unknown31;
-
+    /// Items ENT_TYPE held by companions, used in level transition to transfer to new player entity, is wrong during the level
+    std::array<ENT_TYPE, 8> companion_held_items;
     /// 0..3, used in level transition to transfer to new player entity, is wrong during the level
     std::array<uint8_t, 8> companion_trust;
     /// Number of companions, this is always up to date, can be edited
     uint8_t companion_count;
     /// Used in level transition to transfer to new player entity, is wrong during the level
     std::array<uint8_t, 8> companion_health;
-
-    uint8_t unknown35;
-    uint8_t unknown36;
-    uint8_t unknown37;
-    uint32_t unknown38;
-    uint32_t unknown39;
+    /// Used in level transition to transfer to new player entity, is wrong during the level
+    std::array<bool, 8> is_companion_cursed;
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
 
     /// Used in level transition to transfer to new player entity, is wrong during the level
     std::array<ENT_TYPE, 30> acquired_powerups;

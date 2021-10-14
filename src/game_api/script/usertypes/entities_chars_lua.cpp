@@ -19,6 +19,8 @@ void register_usertypes(sol::state& lua)
         &PowerupCapable::give_powerup,
         "has_powerup",
         &PowerupCapable::has_powerup,
+        "get_powerups",
+        &PowerupCapable::get_powerups,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -38,6 +40,10 @@ void register_usertypes(sol::state& lua)
         &Inventory::health,
         "kapala_blood_amount",
         &Inventory::kapala_blood_amount,
+        "held_item",
+        &Inventory::held_item,
+        "held_item_metadata",
+        &Inventory::held_item_metadata,
         "player_slot",
         sol::property([](Inventory& i) -> int8_t
                       {
@@ -53,6 +59,10 @@ void register_usertypes(sol::state& lua)
                           else
                               i.player_slot = -1;
                       }),
+        "mount_type",
+        &Inventory::mount_type,
+        "mount_metadata",
+        &Inventory::mount_metadata,
         "kills_level",
         &Inventory::kills_level,
         "kills_total",
@@ -67,12 +77,18 @@ void register_usertypes(sol::state& lua)
         &Inventory::killed_enemies,
         "companion_count",
         &Inventory::companion_count,
+        "companion_poison_tick_timers",
+        &Inventory::companion_poison_tick_timers,
         "companions",
         &Inventory::companions,
+        "companion_held_items",
+        &Inventory::companion_held_items,
         "companion_trust",
         &Inventory::companion_trust,
         "companion_health",
-        &Inventory::companion_health);
+        &Inventory::companion_health,
+        "is_companion_cursed",
+        &Inventory::is_companion_cursed);
 
     lua.new_usertype<Ai>(
         "Ai",

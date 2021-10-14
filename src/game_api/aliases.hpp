@@ -33,3 +33,7 @@ enum class LAYER : int32_t
     PLAYER4 = -4,
     BOTH = -128
 };
+
+enum class IMAGE : int64_t
+{
+};

@@ -47,6 +47,16 @@ void Player::set_short_name(std::u16string name)
     return NCharacterDB::set_character_short_name(NCharacterDB::get_character_index(type->id), name);
 }
 
+std::vector<ENT_TYPE> PowerupCapable::get_powerups()
+{
+    std::vector<ENT_TYPE> return_powerups;
+    for (auto it = powerups.begin(); it != powerups.end(); ++it)
+    {
+        return_powerups.push_back(it->first);
+    }
+    return return_powerups;
+}
+
 std::u16string Player::get_name()
 {
     return NCharacterDB::get_character_full_name(NCharacterDB::get_character_index(type->id));

@@ -995,9 +995,9 @@ void force_hud_flags()
     if (g_state == 0)
         return;
     if (!options["disable_pause"] && !ImGui::GetIO().WantCaptureKeyboard)
-        g_state->hud_flags |= 1U << 19;
+        g_state->level_flags |= 1U << 19;
     else if (!ImGui::GetIO().WantCaptureKeyboard)
-        g_state->hud_flags &= ~(1U << 19);
+        g_state->level_flags &= ~(1U << 19);
 }
 
 void force_noclip()
@@ -3244,7 +3244,7 @@ void render_debug()
     ImGui::InputScalar(
         "Level flags##HudFlagsDebug",
         ImGuiDataType_U32,
-        &g_state->hud_flags,
+        &g_state->level_flags,
         0,
         0,
         "%08X",
@@ -3925,7 +3925,7 @@ void render_entity_props()
     }
     if (ImGui::IsItemHovered())
         ImGui::SetTooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
-    if (ImGui::CollapsingHeader("State"))
+    if (ImGui::CollapsingHeader("State") && g_entity->is_movable())
     {
         render_state("Current state", g_entity->state);
         render_state("Last state", g_entity->last_state);
@@ -4564,7 +4564,7 @@ void render_game_props()
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(hud_flags[i], &g_state->hud_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(level_flags[i], &g_state->level_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Quest flags"))

@@ -350,15 +350,15 @@ void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t 
 
 bool Movable::is_button_pressed(BUTTON button)
 {
-    return (buttons & button) != 0 && (buttons_previous & button) == 0;
+    return (buttons & button) == button && (buttons_previous & button) == 0;
 }
 bool Movable::is_button_held(BUTTON button)
 {
-    return (buttons & button) != 0 && (buttons_previous & button) != 0;
+    return (buttons & button) == button && (buttons_previous & button) == button;
 }
 bool Movable::is_button_released(BUTTON button)
 {
-    return (buttons & button) == 0 && (buttons_previous & button) != 0;
+    return (buttons & button) == 0 && (buttons_previous & button) == button;
 }
 
 void hook_movable_state_machine(Movable* _self)

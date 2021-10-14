@@ -621,9 +621,9 @@ end
     /// As the name is misleading. use entity `move_state` field instead
     lua["get_entity_ai_state"] = get_entity_ai_state;
     /// Get `state.level_flags`
-    lua["get_level_flags"] = get_hud_flags;
+    lua["get_level_flags"] = get_level_flags;
     /// Set `state.level_flags`
-    lua["set_level_flags"] = set_hud_flags;
+    lua["set_level_flags"] = set_level_flags;
     /// Get the ENT_TYPE... of the entity by uid
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level

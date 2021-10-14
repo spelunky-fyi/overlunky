@@ -213,7 +213,7 @@ class LuaBackend
     SoundManager* sound_manager;
     LuaConsole* console;
 
-    std::map<size_t, ScriptImage*> images;
+    std::map<IMAGE, ScriptImage*> images;
 
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();

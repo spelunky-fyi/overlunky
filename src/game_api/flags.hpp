@@ -143,7 +143,7 @@ const char* entity_type_properties_flags[]{
     "32: Unused",
 };
 
-const char* hud_flags[]{
+const char* level_flags[]{
     "1: Upbeat dwelling intro music played",
     "2: ",
     "3: Running tutorial speedrun",
