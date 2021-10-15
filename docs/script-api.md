@@ -937,7 +937,7 @@ end
 - [`int ruleset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ruleset) &ArenaState::ruleset
 - [`array<int, 4> player_lives`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_lives) &ArenaState::player_lives
 - [`array<int, 4> player_totalwins`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_totalwins) &ArenaState::player_totalwins
-- [`array<bool, 4> player_won[4]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_won[4]) &ArenaState::player_won
+- [`array<bool, 4> player_won`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_won) &ArenaState::player_won
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ArenaState::timer
 - [`int timer_ending`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer_ending) &ArenaState::timer_ending
 - [`int wins`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins) &ArenaState::wins
