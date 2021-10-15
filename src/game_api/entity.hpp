@@ -275,7 +275,7 @@ class Entity
 
     virtual ~Entity() = 0;
     virtual void create_rendering_info() = 0;
-    /*UNKNOWN/NEW IN 1.23.3*/ virtual void v2() = 0;
+    virtual void handle_state_machine() = 0;
 
     /// Kills the entity in the most violent way possible, for example cavemen turn into gibs
     virtual void kill(bool, Entity* frm) = 0;

@@ -4615,7 +4615,7 @@ void render_game_props()
             ImGui::SameLine();
             ImGui::Text(": ");
             ImGui::SameLine();
-            if (target == -1)
+            if (std::cmp_equal(target, -1))
             {
                 ImGui::Text("Nothing");
             }
