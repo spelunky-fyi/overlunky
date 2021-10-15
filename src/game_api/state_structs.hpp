@@ -326,13 +326,13 @@ struct ArenaConfigEquippedItems // size: 40 bytes
 struct ArenaState
 {
     uint32_t current_arena;
-    uint8_t player_teams[4];
+    std::array<uint8_t, 4> player_teams;
     uint8_t format;
     uint8_t ruleset;
-    uint8_t player_lives[4];
-    uint8_t player_totalwins[4];
+    std::array<uint8_t, 4> player_lives;
+    std::array<uint8_t, 4> player_totalwins;
     int8_t unknown9;
-    bool player_won[4];
+    std::array<bool, 4> player_won;
     uint8_t unknown14a;
     uint8_t unknown14b;
     uint8_t unknown14c;
@@ -344,7 +344,7 @@ struct ArenaState
     uint8_t lives;
     uint8_t unknown15;
     uint8_t unknown16;
-    uint16_t player_idolheld_countdown[4];
+    std::array<uint16_t, 4> player_idolheld_countdown;
     uint8_t health;
     uint8_t bombs;
     uint8_t ropes;

@@ -930,6 +930,37 @@ end
 - [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
 ### `Items`
 - [`player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) sol::property([](Items&s){returnstd::ref(s.player_select_slots
+### `ArenaState`
+- [`int current_arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_arena) &ArenaState::current_arena
+- [`array<int, 4> player_teams`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_teams) &ArenaState::player_teams
+- [`int format`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=format) &ArenaState::format
+- [`int ruleset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ruleset) &ArenaState::ruleset
+- [`array<int, 4> player_lives`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_lives) &ArenaState::player_lives
+- [`array<int, 4> player_totalwins`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_totalwins) &ArenaState::player_totalwins
+- [`array<bool, 4> player_won[4]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_won[4]) &ArenaState::player_won
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ArenaState::timer
+- [`int timer_ending`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer_ending) &ArenaState::timer_ending
+- [`int wins`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins) &ArenaState::wins
+- [`int lives`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lives) &ArenaState::lives
+- [`array<int, 4> player_idolheld_countdown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_idolheld_countdown) &ArenaState::player_idolheld_countdown
+- [`int health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) &ArenaState::health
+- [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &ArenaState::bombs
+- [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &ArenaState::ropes
+- [`int stun_time`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_time) &ArenaState::stun_time
+- [`int mount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount) &ArenaState::mount
+- [`int arena_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_select) &ArenaState::arena_select
+- [`ArenaConfigArenas arenas`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arenas) &ArenaState::arenas
+- [`int dark_level_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_level_chance) &ArenaState::dark_level_chance
+- [`int crate_frequency`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crate_frequency) &ArenaState::crate_frequency
+- [`ArenaConfigItems items_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items_enabled) &ArenaState::items_enabled
+- [`ArenaConfigItems items_in_crate`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items_in_crate) &ArenaState::items_in_crate
+- [`int held_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item) &ArenaState::held_item
+- [`int equipped_backitem`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=equipped_backitem) &ArenaState::equipped_backitem
+- [`ArenaConfigEquippedItems equipped_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=equipped_items) &ArenaState::equipped_items
+- [`int whip_damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=whip_damage) &ArenaState::whip_damage
+- [`int final_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=final_ghost) &ArenaState::final_ghost
+- [`int breath_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breath_cooldown) &ArenaState::breath_cooldown
+- [`bool punish_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=punish_ball) &ArenaState::punish_ball
 ### `StateMemory`
 - [`int screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`int screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
@@ -1007,6 +1038,7 @@ end
 \
 Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
+- [`ArenaState arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) &StateMemory::arena
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
@@ -1189,6 +1221,7 @@ Changes color based on given uColor
 - [`bool leaves_corpse_behind`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leaves_corpse_behind) &EntityDB::leaves_corpse_behind
 - [`int sound_killed_by_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_player) &EntityDB::sound_killed_by_player
 - [`int sound_killed_by_other`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_other) &EntityDB::sound_killed_by_other
+- [`int description`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) &EntityDB::description
 ### `Entity`
 - [`EntityDB type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Entity::type
 - [`Entity overlay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) overlay
@@ -2368,6 +2401,8 @@ is bomb from powerpack
 ### `Backpack`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool explosion_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_trigger) &Backpack::explosion_trigger
+\
+More like on fire trigger, the explosion happens when the timer reaches > 29
 - [`int explosion_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) &Backpack::explosion_timer
 ### `Jetpack`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
@@ -2380,10 +2415,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 - [`bool is_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) &Hoverpack::is_on
 ### `Cape`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`bool floating_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=floating_down) &VladsCape::floating_down
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
+- [`bool floating_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=floating_down) &Cape::floating_down
 ### `VladsCape`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack) [`Cape`](#cape)
 - [`bool can_double_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_double_jump) &VladsCape::can_double_jump
 ### `Mattock`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
@@ -2397,9 +2432,9 @@ used only for webgun
 - [`int shots2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shots2) &Gun::shots2
 \
 used only for clonegun
-### `WebGun`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Gun`](#gun)
-- [`int in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &WebGun::in_chamber
+- [`int in_chamber`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_chamber) &Gun::in_chamber
+\
+Only for webgun, uid of the webshot entity
 ### `Flame`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Flame::emitted_light
@@ -2578,7 +2613,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &TimedShot::timer
 ### `CloneGunShot`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot) [`TimedShot`](#timedshot)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`LightShot`](#lightshot)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &CloneGunShot::timer
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &CloneGunShot::spawn_y
 ### `PunishBall`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
@@ -2593,7 +2629,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`ENT_TYPE inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Container::inside
 ### `Coffin`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Container`](#container)
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ENT_TYPE inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Coffin::inside
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Coffin::timer
 ### `Fly`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
@@ -2688,7 +2725,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float spin_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spin_speed) &MiniGameAsteroid::spin_speed
 ### `Pot`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Container`](#container)
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ENT_TYPE inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Pot::inside
 - [`bool dont_transfer_dmg`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dont_transfer_dmg) &Pot::dont_transfer_dmg
 ### `CursedPot`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
@@ -2743,7 +2781,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`Powerup`](#powerup)
 - [`int timer3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer3) &AnkhPowerup::timer3
 - [`bool music_on_off`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music_on_off) &AnkhPowerup::music_on_off
 ### `YellowCape`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Cape`](#cape)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack) [`Cape`](#cape)
 ### `Teleporter`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int teleport_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teleport_number) &Teleporter::teleport_number
