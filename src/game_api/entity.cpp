@@ -549,7 +549,7 @@ void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<vo
                 }
                 original(self);
             },
-            0x4);
+            0x5);
     }
     hook_info.on_destroy.push_back({reserved_callback_id, std::move(on_destroy)});
 }
@@ -604,7 +604,7 @@ void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<vo
                 }
                 original(self, opener);
             },
-            0x17);
+            0x18);
     }
     hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
 }
