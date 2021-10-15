@@ -4598,12 +4598,16 @@ void render_game_props()
     }
     if (ImGui::CollapsingHeader("AI targets"))
     {
-        ImGui::Text("TODO: crashes");
-        /*
-        for (const auto& [ai, target] : *(g_state->ai_targets))
+        for (size_t x = 0; x < 8; ++x)
         {
-            auto ai_entity = get_entity_ptr(ai);
-            if (ai_entity == nullptr)
+            auto ai_target = g_state->ai_targets[x];
+            if (ai_target.ai_uid == 0)
+            {
+                continue;
+            }
+            auto ai_entity = get_entity_ptr(ai_target.ai_uid);
+            auto target = ai_target.target_uid;
+            if (ai_entity == nullptr || (ai_entity->type->search_flags & 1) != 1)
             {
                 continue;
             }
@@ -4627,7 +4631,7 @@ void render_game_props()
                     ImGui::Text("Invalid target uid: %s", std::to_string(target).c_str());
                 }
             }
-        }*/
+        }
     }
     ImGui::PopItemWidth();
 }
