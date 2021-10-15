@@ -930,6 +930,97 @@ end
 - [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
 ### `Items`
 - [`player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) sol::property([](Items&s){returnstd::ref(s.player_select_slots
+### `ArenaConfigArenas`
+- [`bool dwelling_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) &ArenaConfigArenas::dwelling_1
+- [`bool dwelling_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_2) &ArenaConfigArenas::dwelling_2
+- [`bool dwelling_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_3) &ArenaConfigArenas::dwelling_3
+- [`bool dwelling_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_4) &ArenaConfigArenas::dwelling_4
+- [`bool dwelling_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_5) &ArenaConfigArenas::dwelling_5
+- [`bool jungle_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_1) &ArenaConfigArenas::jungle_1
+- [`bool jungle_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_2) &ArenaConfigArenas::jungle_2
+- [`bool jungle_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_3) &ArenaConfigArenas::jungle_3
+- [`bool jungle_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_4) &ArenaConfigArenas::jungle_4
+- [`bool jungle_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jungle_5) &ArenaConfigArenas::jungle_5
+- [`bool volcana_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=volcana_1) &ArenaConfigArenas::volcana_1
+- [`bool volcana_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=volcana_2) &ArenaConfigArenas::volcana_2
+- [`bool volcana_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=volcana_3) &ArenaConfigArenas::volcana_3
+- [`bool volcana_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=volcana_4) &ArenaConfigArenas::volcana_4
+- [`bool volcana_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=volcana_5) &ArenaConfigArenas::volcana_5
+- [`bool tidepool_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tidepool_1) &ArenaConfigArenas::tidepool_1
+- [`bool tidepool_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tidepool_2) &ArenaConfigArenas::tidepool_2
+- [`bool tidepool_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tidepool_3) &ArenaConfigArenas::tidepool_3
+- [`bool tidepool_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tidepool_4) &ArenaConfigArenas::tidepool_4
+- [`bool tidepool_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tidepool_5) &ArenaConfigArenas::tidepool_5
+- [`bool temple_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=temple_1) &ArenaConfigArenas::temple_1
+- [`bool temple_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=temple_2) &ArenaConfigArenas::temple_2
+- [`bool temple_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=temple_3) &ArenaConfigArenas::temple_3
+- [`bool temple_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=temple_4) &ArenaConfigArenas::temple_4
+- [`bool temple_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=temple_5) &ArenaConfigArenas::temple_5
+- [`bool icecaves_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=icecaves_1) &ArenaConfigArenas::icecaves_1
+- [`bool icecaves_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=icecaves_2) &ArenaConfigArenas::icecaves_2
+- [`bool icecaves_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=icecaves_3) &ArenaConfigArenas::icecaves_3
+- [`bool icecaves_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=icecaves_4) &ArenaConfigArenas::icecaves_4
+- [`bool icecaves_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=icecaves_5) &ArenaConfigArenas::icecaves_5
+- [`bool neobabylon_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=neobabylon_1) &ArenaConfigArenas::neobabylon_1
+- [`bool neobabylon_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=neobabylon_2) &ArenaConfigArenas::neobabylon_2
+- [`bool neobabylon_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=neobabylon_3) &ArenaConfigArenas::neobabylon_3
+- [`bool neobabylon_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=neobabylon_4) &ArenaConfigArenas::neobabylon_4
+- [`bool neobabylon_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=neobabylon_5) &ArenaConfigArenas::neobabylon_5
+- [`bool sunkencity_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunkencity_1) &ArenaConfigArenas::sunkencity_1
+- [`bool sunkencity_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunkencity_2) &ArenaConfigArenas::sunkencity_2
+- [`bool sunkencity_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunkencity_3) &ArenaConfigArenas::sunkencity_3
+- [`bool sunkencity_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunkencity_4) &ArenaConfigArenas::sunkencity_4
+- [`bool sunkencity_5`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunkencity_5) &ArenaConfigArenas::sunkencity_5
+### `ArenaConfigItems`
+- [`bool rock`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rock) &ArenaConfigItems::rock
+- [`bool pot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pot) &ArenaConfigItems::pot
+- [`bool bombbag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombbag) &ArenaConfigItems::bombbag
+- [`bool bombbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombbox) &ArenaConfigItems::bombbox
+- [`bool ropepile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropepile) &ArenaConfigItems::ropepile
+- [`bool pickup_12bag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pickup_12bag) &ArenaConfigItems::pickup_12bag
+- [`bool pickup_24bag`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pickup_24bag) &ArenaConfigItems::pickup_24bag
+- [`bool cooked_turkey`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooked_turkey) &ArenaConfigItems::cooked_turkey
+- [`bool royal_jelly`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=royal_jelly) &ArenaConfigItems::royal_jelly
+- [`bool torch`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=torch) &ArenaConfigItems::torch
+- [`bool boomerang`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boomerang) &ArenaConfigItems::boomerang
+- [`bool machete`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=machete) &ArenaConfigItems::machete
+- [`bool mattock`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mattock) &ArenaConfigItems::mattock
+- [`bool crossbow`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crossbow) &ArenaConfigItems::crossbow
+- [`bool webgun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=webgun) &ArenaConfigItems::webgun
+- [`bool freezeray`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freezeray) &ArenaConfigItems::freezeray
+- [`bool shotgun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shotgun) &ArenaConfigItems::shotgun
+- [`bool camera`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) &ArenaConfigItems::camera
+- [`bool plasma_cannon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=plasma_cannon) &ArenaConfigItems::plasma_cannon
+- [`bool wooden_shield`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wooden_shield) &ArenaConfigItems::wooden_shield
+- [`bool metal_shield`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=metal_shield) &ArenaConfigItems::metal_shield
+- [`bool teleporter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teleporter) &ArenaConfigItems::teleporter
+- [`bool mine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mine) &ArenaConfigItems::mine
+- [`bool snaptrap`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=snaptrap) &ArenaConfigItems::snaptrap
+- [`bool paste`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=paste) &ArenaConfigItems::paste
+- [`bool climbing_gloves`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=climbing_gloves) &ArenaConfigItems::climbing_gloves
+- [`bool pitchers_mitt`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pitchers_mitt) &ArenaConfigItems::pitchers_mitt
+- [`bool spike_shoes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spike_shoes) &ArenaConfigItems::spike_shoes
+- [`bool spring_shoes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spring_shoes) &ArenaConfigItems::spring_shoes
+- [`bool parachute`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=parachute) &ArenaConfigItems::parachute
+- [`bool cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cape) &ArenaConfigItems::cape
+- [`bool vlads_cape`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vlads_cape) &ArenaConfigItems::vlads_cape
+- [`bool jetpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jetpack) &ArenaConfigItems::jetpack
+- [`bool hoverpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hoverpack) &ArenaConfigItems::hoverpack
+- [`bool telepack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=telepack) &ArenaConfigItems::telepack
+- [`bool powerpack`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=powerpack) &ArenaConfigItems::powerpack
+- [`bool excalibur`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=excalibur) &ArenaConfigItems::excalibur
+- [`bool scepter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scepter) &ArenaConfigItems::scepter
+- [`bool kapala`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala) &ArenaConfigItems::kapala
+- [`bool true_crown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=true_crown) &ArenaConfigItems::true_crown
+### `ArenaConfigEquippedItems`
+- [`bool paste`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=paste) &ArenaConfigEquippedItems::paste
+- [`bool climbing_gloves`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=climbing_gloves) &ArenaConfigEquippedItems::climbing_gloves
+- [`bool pitchers_mitt`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pitchers_mitt) &ArenaConfigEquippedItems::pitchers_mitt
+- [`bool spike_shoes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spike_shoes) &ArenaConfigEquippedItems::spike_shoes
+- [`bool spring_shoes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spring_shoes) &ArenaConfigEquippedItems::spring_shoes
+- [`bool parachute`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=parachute) &ArenaConfigEquippedItems::parachute
+- [`bool kapala`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala) &ArenaConfigEquippedItems::kapala
+- [`bool scepter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scepter) &ArenaConfigEquippedItems::scepter
 ### `ArenaState`
 - [`int current_arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_arena) &ArenaState::current_arena
 - [`array<int, 4> player_teams`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_teams) &ArenaState::player_teams
@@ -939,6 +1030,8 @@ end
 - [`array<int, 4> player_totalwins`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_totalwins) &ArenaState::player_totalwins
 - [`array<bool, 4> player_won`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_won) &ArenaState::player_won
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ArenaState::timer
+\
+The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 10 minutes and 20 == infinite. Can go higher, although this will glitch the menu text. Actual time (seconds) = (state.arena.timer + 1) x 30
 - [`int timer_ending`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer_ending) &ArenaState::timer_ending
 - [`int wins`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins) &ArenaState::wins
 - [`int lives`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lives) &ArenaState::lives

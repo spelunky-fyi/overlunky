@@ -338,6 +338,7 @@ struct ArenaState
     uint8_t unknown14c;
     uint8_t unknown14d;
     uint8_t unknown14e;
+    /// The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 10 minutes and 20 == infinite. Can go higher, although this will glitch the menu text. Actual time (seconds) = (state.arena.timer + 1) x 30
     uint8_t timer;
     uint8_t timer_ending;
     uint8_t wins;
