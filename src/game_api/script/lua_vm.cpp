@@ -674,9 +674,9 @@ end
     /// Drop an entity by uid
     lua["drop"] = drop;
     /// Unequips the currently worn backitem
-    lua["unequip"] = unequip;
-    /// Returns the type of the currently worn backitem, or -1 if wearing nothing
-    lua["worn_backitem_type"] = worn_backitem_type;
+    lua["unequip_backitem"] = unequip_backitem;
+    /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
+    lua["worn_backitem"] = worn_backitem;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates

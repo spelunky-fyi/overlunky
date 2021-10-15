@@ -431,9 +431,12 @@ pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
 ### [`drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop)
 `nil drop(int who_uid, int what_uid)`<br/>
 Drop an entity by uid
-### [`unequip`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip)
-`nil unequip(int who_uid, int what_type)`<br/>
-Unequips a backitem. Specify the type of the backitem, not the uid, e.g. `unequip(players[1].uid, ENT_TYPE.ITEM_JETPACK)`
+### [`unequip_backitem`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem)
+`nil unequip_backitem(int who_uid)`<br/>
+Unequips the currently worn backitem
+### [`worn_backitem`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem)
+`int worn_backitem(int who_uid)`<br/>
+Returns the uid of the currently worn backitem, or -1 if wearing nothing
 ### [`apply_entity_db`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_entity_db)
 `nil apply_entity_db(int uid)`<br/>
 Apply changes made in [get_type](#get_type)() to entity instance by uid.

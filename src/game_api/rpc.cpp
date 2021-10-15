@@ -10,6 +10,7 @@
 #include "virtual_table.hpp"
 #include <cstdarg>
 #include <unordered_set>
+#include <utility>
 
 uint32_t setflag(uint32_t flags, int bit) //shouldn't we change those to #define ?
 {
@@ -986,7 +987,7 @@ void drop(uint32_t who_uid, uint32_t what_uid)
     }
 }
 
-void unequip(uint32_t who_uid)
+void unequip_backitem(uint32_t who_uid)
 {
     static size_t offset = 0;
     if (offset == 0)
@@ -996,21 +997,22 @@ void unequip(uint32_t who_uid)
 
     if (offset != 0)
     {
-        auto backitem = worn_backitem_type(who_uid);
-        if (backitem != -1)
+        auto backitem_uid = worn_backitem(who_uid);
+        if (backitem_uid != -1)
         {
             Movable* ent = (Movable*)get_entity_ptr(who_uid);
-            if (ent != nullptr)
+            Entity* backitem_ent = get_entity_ptr(backitem_uid);
+            if (ent != nullptr && backitem_ent != nullptr)
             {
                 typedef size_t unequip_func(Entity*, uint32_t);
                 static unequip_func* uf = (unequip_func*)(offset);
-                uf(ent, backitem);
+                uf(ent, backitem_ent->type->id);
             }
         }
     }
 }
 
-int32_t worn_backitem_type(uint32_t who_uid)
+int32_t worn_backitem(uint32_t who_uid)
 {
     static const std::unordered_set<uint32_t> backitem_types = {
         to_id("ENT_TYPE_ITEM_JETPACK"),
@@ -1027,12 +1029,17 @@ int32_t worn_backitem_type(uint32_t who_uid)
         for (size_t x = 0; x < ent->items.count; ++x)
         {
             auto item_uid = ent->items.begin[x];
+            if (std::cmp_equal(item_uid, ent->holding_uid))
+            {
+                continue;
+            }
+
             auto item_ent = get_entity_ptr(item_uid);
             if (item_ent != nullptr)
             {
                 if (backitem_types.count(item_ent->type->id) > 0)
                 {
-                    return item_ent->type->id;
+                    return item_uid;
                 }
             }
         }

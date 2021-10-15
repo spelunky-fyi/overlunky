@@ -47,6 +47,18 @@ ApepPart = {
   __name = "sol.ApepPart.user",
   __newindex = "function"
 }
+ArenaConfigArenas = {
+  __name = "sol.ArenaConfigArenas.user"
+}
+ArenaConfigEquippedItems = {
+  __name = "sol.ArenaConfigEquippedItems.user"
+}
+ArenaConfigItems = {
+  __name = "sol.ArenaConfigItems.user"
+}
+ArenaState = {
+  __name = "sol.ArenaState.user"
+}
 Arrow = {
   __index = "function",
   __name = "sol.Arrow.user",
@@ -1405,6 +1417,11 @@ EggSac = {
 EggShipDoor = {
   __index = "function",
   __name = "sol.EggShipDoor.user",
+  __newindex = "function"
+}
+EggShipDoorS = {
+  __index = "function",
+  __name = "sol.EggShipDoorS.user",
   __newindex = "function"
 }
 EggplantMinister = {
@@ -4860,7 +4877,6 @@ entity_get_items_by = function(...) end
 entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end
 entity_remove_item = function(...) end
-equip = function(...) end
 f = {}
 filter_entities = function(...) end
 flip_entity = function(...) end
@@ -5059,7 +5075,7 @@ test_flag = function(...) end
 testflag = function(...) end
 toast = function(...) end
 toast_visible = function(...) end
-unequip = function(...) end
+unequip_backitem = function(...) end
 unlock_door_at = function(...) end
 waddler_count_entity = function(...) end
 waddler_entity_type_in_slot = function(...) end
@@ -5086,5 +5102,6 @@ win_slider_float = function(...) end
 win_slider_int = function(...) end
 win_text = function(...) end
 window = function(...) end
+worn_backitem = function(...) end
 zoom = function(...) end
 
