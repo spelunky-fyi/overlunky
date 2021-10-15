@@ -40,7 +40,7 @@ void register_usertypes(sol::state& lua)
         &ArenaState::player_lives,
         "player_totalwins",
         &ArenaState::player_totalwins,
-        "player_won[4]",
+        "player_won",
         &ArenaState::player_won,
         "timer",
         &ArenaState::timer,
