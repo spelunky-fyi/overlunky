@@ -223,6 +223,7 @@ struct State
     }
 
     void godmode(bool g);
+    void godmode_companions(bool g);
     void darkmode(bool g);
 
     size_t get_zoom_level_address();

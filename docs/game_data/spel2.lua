@@ -4931,6 +4931,7 @@ get_velocity = function(...) end
 get_window_size = function(...) end
 get_zoom_level = function(...) end
 god = function(...) end
+god_companions = function(...) end
 inspect = {
   KEY = {},
   METATABLE = {},

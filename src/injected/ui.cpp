@@ -235,6 +235,7 @@ const unsigned int unsafe_entity_mask = 0xffffffff;
 std::map<std::string, bool> options = {
     {"mouse_control", true},
     {"god_mode", false},
+    {"god_mode_companions", false},
     {"noclip", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
@@ -3173,9 +3174,13 @@ void render_clickhandler()
 void render_options()
 {
     ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
-    if (ImGui::Checkbox("God mode##Godmode", &options["god_mode"]))
+    if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
     {
         godmode(options["god_mode"]);
+    }
+    if (ImGui::Checkbox("God mode (companions)##GodmodeCompanions", &options["god_mode_companions"]))
+    {
+        godmode_companions(options["god_mode_companions"]);
     }
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {

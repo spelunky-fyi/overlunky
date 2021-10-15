@@ -10,6 +10,7 @@
 
 void teleport(float x, float y, bool s, float vx, float vy, bool snap);
 void godmode(bool g);
+void godmode_companions(bool g);
 void darkmode(bool g);
 void zoom(float level);
 void attach_entity(Entity* overlay, Entity* attachee);

@@ -474,8 +474,10 @@ end
     lua["warp"] = warp;
     /// Set seed and reset run.
     lua["set_seed"] = set_seed;
-    /// Enable/disable godmode.
+    /// Enable/disable godmode for players.
     lua["god"] = godmode;
+    /// Enable/disable godmode for companions.
+    lua["god_companions"] = godmode_companions;
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     /// ```lua

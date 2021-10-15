@@ -45,6 +45,11 @@ void godmode(bool g)
     State::get().godmode(g);
 }
 
+void godmode_companions(bool g)
+{
+    State::get().godmode_companions(g);
+}
+
 void darkmode(bool g)
 {
     State::get().darkmode(g);

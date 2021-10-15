@@ -279,7 +279,10 @@ Warp to a level immediately.
 Set seed and reset run.
 ### [`god`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=god)
 `nil god(bool g)`<br/>
-Enable/disable godmode.
+Enable/disable godmode for players.
+### [`god_companions`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=god_companions)
+`nil god_companions(bool g)`<br/>
+Enable/disable godmode for companions.
 ### [`zoom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoom)
 `nil zoom(float level)`<br/>
 Set the zoom level used in levels and shops. 13.5 is the default.

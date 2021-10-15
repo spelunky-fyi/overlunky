@@ -6,6 +6,8 @@
 #include "spawn_api.hpp"
 #include "virtual_table.hpp"
 
+#include <detours.h>
+
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
     return (correct_ushabti + (correct_ushabti / 10) * 2);
@@ -193,31 +195,91 @@ void State::zoom(float level)
     }
 }
 
+static bool g_godmode_player_active = false;
+static bool g_godmode_companions_active = false;
+
+bool is_active_player(Entity* e)
+{
+    auto state = State::get();
+    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
+    {
+        auto player = state.items()->player(i);
+        if (player && player == e)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint32_t);
+OnDamageFun* g_on_damage_trampoline{nullptr};
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount)
+{
+    if (g_godmode_player_active && is_active_player(victim))
+    {
+        return;
+    }
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    {
+        return;
+    }
+    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount);
+}
+
+using OnInstaGibFun = void(Entity*);
+OnInstaGibFun* g_on_instagib_trampoline{nullptr};
+void on_instagib(Entity* victim)
+{
+    if (g_godmode_player_active && is_active_player(victim))
+    {
+        return;
+    }
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    {
+        return;
+    }
+    g_on_instagib_trampoline(victim);
+}
+
+void hook_godmode_functions()
+{
+    static bool functions_hooked = false;
+    if (!functions_hooked)
+    {
+        auto memory = Memory::get();
+        auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
+        auto addr_insta = get_address("insta_gib");
+
+        g_on_damage_trampoline = (OnDamageFun*)addr_damage;
+        g_on_instagib_trampoline = (OnInstaGibFun*)addr_insta;
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        DetourAttach((void**)&g_on_damage_trampoline, &on_damage);
+        DetourAttach((void**)&g_on_instagib_trampoline, &on_instagib);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking on_damage/instagib: {}\n", error);
+        }
+
+        functions_hooked = true;
+    }
+}
+
 void State::godmode(bool g)
 {
-    auto memory = Memory::get();
-    auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
-    auto addr_insta = get_address("insta_gib");
+    hook_godmode_functions();
+    g_godmode_player_active = g;
+}
 
-    static char original_damage_instruction = 0;
-    static char original_instagib_instruction = 0;
-    if (original_damage_instruction == 0)
-    {
-        original_damage_instruction = read_u8(addr_damage);
-        original_instagib_instruction = read_u8(addr_insta);
-    }
-
-    // log::debug!("God {:?}" mode; g);
-    if (g)
-    {
-        write_mem_prot(addr_damage, ("\xC3"s), true);
-        write_mem_prot(addr_insta, ("\xC3"s), true);
-    }
-    else
-    {
-        write_mem_prot(addr_damage, std::string(&original_damage_instruction, 1), true);
-        write_mem_prot(addr_insta, std::string(&original_instagib_instruction, 1), true);
-    }
+void State::godmode_companions(bool g)
+{
+    hook_godmode_functions();
+    g_godmode_companions_active = g;
 }
 
 void State::darkmode(bool g)
