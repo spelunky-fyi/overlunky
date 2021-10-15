@@ -985,6 +985,26 @@ void drop(uint32_t who_uid, uint32_t what_uid)
     }
 }
 
+void unequip(uint32_t who_uid, uint32_t what_type)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unequip");
+    }
+
+    if (offset != 0)
+    {
+        Movable* ent = (Movable*)get_entity_ptr(who_uid);
+        if (ent != nullptr)
+        {
+            typedef size_t unequip_func(Entity*, uint32_t);
+            static unequip_func* uf = (unequip_func*)(offset);
+            uf(ent, what_type);
+        }
+    }
+}
+
 void set_olmec_phase_y_level(uint8_t phase, float y)
 {
     // Sets the Y-level Olmec changes phases. The defaults are :

@@ -824,6 +824,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "unequip"sv,
+        // Put a bp on the player's item count when it's 1, and unequip a jetpack in game
+        // Go one function up in the callstack (it breaks in the routine to update the vector)
+        PatternCommandBuffer{}
+            .find_inst("\x39\x71\x20\x0F\x92\xC2\x48\x0F\x43\xC1\x48"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "insta_gib"sv,
         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
         // then place yourself in Quillback's path
