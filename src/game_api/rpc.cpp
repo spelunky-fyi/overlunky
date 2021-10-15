@@ -9,6 +9,7 @@
 #include "state.hpp"
 #include "virtual_table.hpp"
 #include <cstdarg>
+#include <unordered_set>
 
 uint32_t setflag(uint32_t flags, int bit) //shouldn't we change those to #define ?
 {
@@ -985,7 +986,7 @@ void drop(uint32_t who_uid, uint32_t what_uid)
     }
 }
 
-void unequip(uint32_t who_uid, uint32_t what_type)
+void unequip(uint32_t who_uid)
 {
     static size_t offset = 0;
     if (offset == 0)
@@ -995,14 +996,48 @@ void unequip(uint32_t who_uid, uint32_t what_type)
 
     if (offset != 0)
     {
-        Movable* ent = (Movable*)get_entity_ptr(who_uid);
-        if (ent != nullptr)
+        auto backitem = worn_backitem_type(who_uid);
+        if (backitem != -1)
         {
-            typedef size_t unequip_func(Entity*, uint32_t);
-            static unequip_func* uf = (unequip_func*)(offset);
-            uf(ent, what_type);
+            Movable* ent = (Movable*)get_entity_ptr(who_uid);
+            if (ent != nullptr)
+            {
+                typedef size_t unequip_func(Entity*, uint32_t);
+                static unequip_func* uf = (unequip_func*)(offset);
+                uf(ent, backitem);
+            }
         }
     }
+}
+
+int32_t worn_backitem_type(uint32_t who_uid)
+{
+    static const std::unordered_set<uint32_t> backitem_types = {
+        to_id("ENT_TYPE_ITEM_JETPACK"),
+        to_id("ENT_TYPE_ITEM_HOVERPACK"),
+        to_id("ENT_TYPE_ITEM_POWERPACK"),
+        to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK"),
+        to_id("ENT_TYPE_ITEM_CAPE"),
+        to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
+    };
+
+    Movable* ent = (Movable*)get_entity_ptr(who_uid);
+    if (ent != nullptr)
+    {
+        for (size_t x = 0; x < ent->items.count; ++x)
+        {
+            auto item_uid = ent->items.begin[x];
+            auto item_ent = get_entity_ptr(item_uid);
+            if (item_ent != nullptr)
+            {
+                if (backitem_types.count(item_ent->type->id) > 0)
+                {
+                    return item_ent->type->id;
+                }
+            }
+        }
+    }
+    return -1;
 }
 
 void set_olmec_phase_y_level(uint8_t phase, float y)

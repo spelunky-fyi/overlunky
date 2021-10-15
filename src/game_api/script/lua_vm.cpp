@@ -673,8 +673,10 @@ end
     lua["pick_up"] = pick_up;
     /// Drop an entity by uid
     lua["drop"] = drop;
-    /// Unequips a backitem. Specify the type of the backitem, not the uid, e.g. `unequip(players[1].uid, ENT_TYPE.ITEM_JETPACK)`
+    /// Unequips the currently worn backitem
     lua["unequip"] = unequip;
+    /// Returns the type of the currently worn backitem, or -1 if wearing nothing
+    lua["worn_backitem_type"] = worn_backitem_type;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates
