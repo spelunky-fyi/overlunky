@@ -569,7 +569,7 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
                 }
                 original(self, _some_bool, from);
             },
-            0x2);
+            0x3);
     }
     hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
 }
