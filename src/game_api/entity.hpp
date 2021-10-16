@@ -275,7 +275,7 @@ class Entity
 
     virtual ~Entity() = 0;
     virtual void create_rendering_info() = 0;
-    /*UNKNOWN/NEW IN 1.23.3*/ virtual void v2() = 0;
+    virtual void handle_state_machine() = 0;
 
     /// Kills the entity in the most violent way possible, for example cavemen turn into gibs
     virtual void kill(bool, Entity* frm) = 0;
@@ -303,10 +303,10 @@ class Entity
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
     virtual void v23() = 0;
-    virtual bool on_check_is_looking_up_while_thrown(Entity* thrower) = 0; // used for crates and presents: checks whether looking up to open rather than throw
-    virtual void on_attempt_shop_purchase(Entity* buyer) = 0;              // checks if you have sufficient money, performs the sale if so
-    virtual void on_collision2(Entity* other_entity) = 0;                  // needs investigating, difference between this and on_collision1
-    virtual uint64_t on_save_level_transition_data() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    virtual bool on_open(Entity* opener) = 0;                 // used for crates and presents
+    virtual void on_attempt_shop_purchase(Entity* buyer) = 0; // checks if you have sufficient money, performs the sale if so
+    virtual void on_collision2(Entity* other_entity) = 0;     // needs investigating, difference between this and on_collision1
+    virtual uint64_t on_save_level_transition_data() = 0;     // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual void on_restore_level_transition_data(uint64_t data) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
     virtual void on_walked_off_by(Entity* walker) = 0; // appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr

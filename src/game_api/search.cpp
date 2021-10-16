@@ -824,6 +824,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "unequip"sv,
+        // Put a bp on the player's item count when it's 1, and unequip a jetpack in game
+        // Go one function up in the callstack (it breaks in the routine to update the vector)
+        PatternCommandBuffer{}
+            .find_inst("\x39\x71\x20\x0F\x92\xC2\x48\x0F\x43\xC1\x48"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "insta_gib"sv,
         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
         // then place yourself in Quillback's path
@@ -1094,6 +1103,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "construct_illumination_ptr"sv,
+        // Put a conditional bp on load_item (rdx ENT_TYPE_LIQUID_LAVA) and warp to Volcana
+        // Continue execution once so that a LIQUID_LAVA entity gets made with a missing Illumination*
+        // Put a write bp on that Illumination nullptr, disable the load_item bp and continue execution
+        // The function just above where it breaks constructs the Illumination ptr (rax will be put into
+        // LIQUID_LAVA entity)
         PatternCommandBuffer{}
             .find_inst("\xC7\x44\x24\x20\x9A\x99\x19\x3F"sv)
             .offset(0x13)

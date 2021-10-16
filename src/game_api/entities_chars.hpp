@@ -58,6 +58,12 @@ class PowerupCapable : public Movable
     /// Return all powerups that the entity has
     std::vector<ENT_TYPE> get_powerups();
 
+    /// Unequips the currently worn backitem
+    void unequip_backitem();
+
+    /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
+    int32_t worn_backitem();
+
     virtual void on_instakill_death() = 0; // seems to only trigger for enemies that die in one hit
 
     virtual void on_blood_collision() = 0; // only triggers when player has kapala

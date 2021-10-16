@@ -474,8 +474,10 @@ end
     lua["warp"] = warp;
     /// Set seed and reset run.
     lua["set_seed"] = set_seed;
-    /// Enable/disable godmode.
+    /// Enable/disable godmode for players.
     lua["god"] = godmode;
+    /// Enable/disable godmode for companions.
+    lua["god_companions"] = godmode_companions;
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     /// ```lua
@@ -673,6 +675,10 @@ end
     lua["pick_up"] = pick_up;
     /// Drop an entity by uid
     lua["drop"] = drop;
+    /// Unequips the currently worn backitem
+    lua["unequip_backitem"] = unequip_backitem;
+    /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
+    lua["worn_backitem"] = worn_backitem;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates

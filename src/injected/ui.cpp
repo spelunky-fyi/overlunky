@@ -235,6 +235,7 @@ const unsigned int unsafe_entity_mask = 0xffffffff;
 std::map<std::string, bool> options = {
     {"mouse_control", true},
     {"god_mode", false},
+    {"god_mode_companions", false},
     {"noclip", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
@@ -3173,9 +3174,13 @@ void render_clickhandler()
 void render_options()
 {
     ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
-    if (ImGui::Checkbox("God mode##Godmode", &options["god_mode"]))
+    if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
     {
         godmode(options["god_mode"]);
+    }
+    if (ImGui::Checkbox("God mode (companions)##GodmodeCompanions", &options["god_mode_companions"]))
+    {
+        godmode_companions(options["god_mode_companions"]);
     }
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {
@@ -4598,12 +4603,16 @@ void render_game_props()
     }
     if (ImGui::CollapsingHeader("AI targets"))
     {
-        ImGui::Text("TODO: crashes");
-        /*
-        for (const auto& [ai, target] : *(g_state->ai_targets))
+        for (size_t x = 0; x < 8; ++x)
         {
-            auto ai_entity = get_entity_ptr(ai);
-            if (ai_entity == nullptr)
+            auto ai_target = g_state->ai_targets[x];
+            if (ai_target.ai_uid == 0)
+            {
+                continue;
+            }
+            auto ai_entity = get_entity_ptr(ai_target.ai_uid);
+            auto target = ai_target.target_uid;
+            if (ai_entity == nullptr || (ai_entity->type->search_flags & 1) != 1)
             {
                 continue;
             }
@@ -4611,7 +4620,7 @@ void render_game_props()
             ImGui::SameLine();
             ImGui::Text(": ");
             ImGui::SameLine();
-            if (target == -1)
+            if (std::cmp_equal(target, -1))
             {
                 ImGui::Text("Nothing");
             }
@@ -4627,7 +4636,7 @@ void render_game_props()
                     ImGui::Text("Invalid target uid: %s", std::to_string(target).c_str());
                 }
             }
-        }*/
+        }
     }
     ImGui::PopItemWidth();
 }

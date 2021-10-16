@@ -156,7 +156,7 @@ struct StateMemory
     Layer* layers[2];
     Logic* logic;
     QuestsInfo* quests;
-    std::unordered_map<uint32_t, int32_t>* ai_targets; // e.g. hired hand uid -> snake uid
+    AITarget* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
     PointerList* particle_emitters; // list of ParticleEmitterInfo*
     PointerList* lightsources;      // list of Illumination*
@@ -223,6 +223,7 @@ struct State
     }
 
     void godmode(bool g);
+    void godmode_companions(bool g);
     void darkmode(bool g);
 
     size_t get_zoom_level_address();

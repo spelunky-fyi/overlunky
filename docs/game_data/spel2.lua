@@ -47,6 +47,18 @@ ApepPart = {
   __name = "sol.ApepPart.user",
   __newindex = "function"
 }
+ArenaConfigArenas = {
+  __name = "sol.ArenaConfigArenas.user"
+}
+ArenaConfigEquippedItems = {
+  __name = "sol.ArenaConfigEquippedItems.user"
+}
+ArenaConfigItems = {
+  __name = "sol.ArenaConfigItems.user"
+}
+ArenaState = {
+  __name = "sol.ArenaState.user"
+}
 Arrow = {
   __index = "function",
   __name = "sol.Arrow.user",
@@ -1405,6 +1417,11 @@ EggSac = {
 EggShipDoor = {
   __index = "function",
   __name = "sol.EggShipDoor.user",
+  __newindex = "function"
+}
+EggShipDoorS = {
+  __index = "function",
+  __name = "sol.EggShipDoorS.user",
   __newindex = "function"
 }
 EggplantMinister = {
@@ -4914,6 +4931,7 @@ get_velocity = function(...) end
 get_window_size = function(...) end
 get_zoom_level = function(...) end
 god = function(...) end
+god_companions = function(...) end
 inspect = {
   KEY = {},
   METATABLE = {},
@@ -5058,6 +5076,7 @@ test_flag = function(...) end
 testflag = function(...) end
 toast = function(...) end
 toast_visible = function(...) end
+unequip_backitem = function(...) end
 unlock_door_at = function(...) end
 waddler_count_entity = function(...) end
 waddler_entity_type_in_slot = function(...) end
@@ -5084,5 +5103,6 @@ win_slider_float = function(...) end
 win_slider_int = function(...) end
 win_text = function(...) end
 window = function(...) end
+worn_backitem = function(...) end
 zoom = function(...) end
 

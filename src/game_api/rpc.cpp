@@ -9,6 +9,8 @@
 #include "state.hpp"
 #include "virtual_table.hpp"
 #include <cstdarg>
+#include <unordered_set>
+#include <utility>
 
 uint32_t setflag(uint32_t flags, int bit) //shouldn't we change those to #define ?
 {
@@ -41,6 +43,11 @@ void teleport(float x, float y, bool s, float vx, float vy, bool snap) //ui only
 void godmode(bool g)
 {
     State::get().godmode(g);
+}
+
+void godmode_companions(bool g)
+{
+    State::get().godmode_companions(g);
 }
 
 void darkmode(bool g)
@@ -983,6 +990,56 @@ void drop(uint32_t who_uid, uint32_t what_uid)
     {
         ent->drop(item);
     }
+}
+
+void unequip_backitem(uint32_t who_uid)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unequip");
+    }
+
+    if (offset != 0)
+    {
+        auto backitem_uid = worn_backitem(who_uid);
+        if (backitem_uid != -1)
+        {
+            Movable* ent = (Movable*)get_entity_ptr(who_uid);
+            Entity* backitem_ent = get_entity_ptr(backitem_uid);
+            if (ent != nullptr && backitem_ent != nullptr)
+            {
+                typedef size_t unequip_func(Entity*, uint32_t);
+                static unequip_func* uf = (unequip_func*)(offset);
+                uf(ent, backitem_ent->type->id);
+            }
+        }
+    }
+}
+
+int32_t worn_backitem(uint32_t who_uid)
+{
+    static const std::unordered_set<uint32_t> backitem_types = {
+        to_id("ENT_TYPE_ITEM_JETPACK"),
+        to_id("ENT_TYPE_ITEM_HOVERPACK"),
+        to_id("ENT_TYPE_ITEM_POWERPACK"),
+        to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK"),
+        to_id("ENT_TYPE_ITEM_CAPE"),
+        to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
+    };
+
+    auto ent = get_entity_ptr(who_uid)->as<PowerupCapable>();
+    if (ent != nullptr)
+    {
+        for (const auto& [powerup_type, powerup_entity] : ent->powerups)
+        {
+            if (backitem_types.count(powerup_type) > 0)
+            {
+                return powerup_entity->uid;
+            }
+        }
+    }
+    return -1;
 }
 
 void set_olmec_phase_y_level(uint8_t phase, float y)

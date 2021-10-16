@@ -23,12 +23,17 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 {
     using namespace std::string_view_literals;
     auto path = std::string_view(file_path);
+    static const auto prefix = "Data/Textures/../../"sv;
+    if (path.size() > prefix.size() && path.substr(0, prefix.size()) == prefix)
+    {
+        path = path.substr(prefix.size());
+    }
     auto ext = path.substr(path.find_last_of('.'));
     if (ext == ".png"sv || ext == ".jpeg"sv || ext == ".bmp"sv || ext == ".tga"sv)
     {
         int image_width = 0;
         int image_height = 0;
-        unsigned char* image_data = stbi_load(file_path, &image_width, &image_height, NULL, 4);
+        unsigned char* image_data = stbi_load(path.data(), &image_width, &image_height, NULL, 4);
         if (image_data != nullptr)
         {
             // https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header

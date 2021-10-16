@@ -279,7 +279,10 @@ Warp to a level immediately.
 Set seed and reset run.
 ### [`god`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=god)
 `nil god(bool g)`<br/>
-Enable/disable godmode.
+Enable/disable godmode for players.
+### [`god_companions`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=god_companions)
+`nil god_companions(bool g)`<br/>
+Enable/disable godmode for companions.
 ### [`zoom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoom)
 `nil zoom(float level)`<br/>
 Set the zoom level used in levels and shops. 13.5 is the default.
@@ -431,6 +434,12 @@ pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
 ### [`drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop)
 `nil drop(int who_uid, int what_uid)`<br/>
 Drop an entity by uid
+### [`unequip_backitem`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem)
+`nil unequip_backitem(int who_uid)`<br/>
+Unequips the currently worn backitem
+### [`worn_backitem`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem)
+`int worn_backitem(int who_uid)`<br/>
+Returns the uid of the currently worn backitem, or -1 if wearing nothing
 ### [`apply_entity_db`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_entity_db)
 `nil apply_entity_db(int uid)`<br/>
 Apply changes made in [get_type](#get_type)() to entity instance by uid.
@@ -1436,6 +1445,12 @@ Checks whether the player/monster has a certain powerup
 - [`array<ENT_TYPE> get_powerups()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) &PowerupCapable::get_powerups
 \
 Return all powerups that the entity has
+- [`nil unequip_backitem()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem) &PowerupCapable::unequip_backitem
+\
+Unequips the currently worn backitem
+- [`int worn_backitem()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem) &PowerupCapable::worn_backitem
+\
+Returns the uid of the currently worn backitem, or -1 if wearing nothing
 ### `Inventory`
 - [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs

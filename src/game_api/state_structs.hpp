@@ -642,6 +642,12 @@ struct PointerList
     uint32_t unknown3;
 };
 
+struct AITarget
+{
+    uint32_t ai_uid;
+    uint32_t target_uid;
+};
+
 struct DialogueDetails
 {
     uint32_t line;          // strings table ID
