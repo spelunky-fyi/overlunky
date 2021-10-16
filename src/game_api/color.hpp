@@ -112,7 +112,7 @@ struct Color
     float r{0.0f};
     float g{0.0f};
     float b{0.0f};
-    float a{0.0f};
+    float a{1.0f};
 
     /// Returns RGBA colors in 0..255 range
     std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> get_rgba()
