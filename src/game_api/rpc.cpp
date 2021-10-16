@@ -1028,24 +1028,14 @@ int32_t worn_backitem(uint32_t who_uid)
         to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
     };
 
-    Movable* ent = (Movable*)get_entity_ptr(who_uid);
+    auto ent = get_entity_ptr(who_uid)->as<PowerupCapable>();
     if (ent != nullptr)
     {
-        for (size_t x = 0; x < ent->items.count; ++x)
+        for (const auto& [powerup_type, powerup_entity] : ent->powerups)
         {
-            auto item_uid = ent->items.begin[x];
-            if (std::cmp_equal(item_uid, ent->holding_uid))
+            if (backitem_types.count(powerup_type) > 0)
             {
-                continue;
-            }
-
-            auto item_ent = get_entity_ptr(item_uid);
-            if (item_ent != nullptr)
-            {
-                if (backitem_types.count(item_ent->type->id) > 0)
-                {
-                    return item_uid;
-                }
+                return powerup_entity->uid;
             }
         }
     }
