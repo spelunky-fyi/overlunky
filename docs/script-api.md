@@ -1445,6 +1445,9 @@ Checks whether the player/monster has a certain powerup
 - [`array<ENT_TYPE> get_powerups()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) &PowerupCapable::get_powerups
 \
 Return all powerups that the entity has
+- [`nil unequip_backitem()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem) &PowerupCapable::unequip_backitem
+\
+Unequips the currently worn backitem
 ### `Inventory`
 - [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs

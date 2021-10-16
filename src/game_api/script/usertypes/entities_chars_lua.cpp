@@ -21,6 +21,8 @@ void register_usertypes(sol::state& lua)
         &PowerupCapable::has_powerup,
         "get_powerups",
         &PowerupCapable::get_powerups,
+        "unequip_backitem",
+        &PowerupCapable::unequip_backitem,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
