@@ -227,9 +227,9 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount);
 }
 
-using OnInstaGibFun = void(Entity*);
+using OnInstaGibFun = void(Entity*, size_t);
 OnInstaGibFun* g_on_instagib_trampoline{nullptr};
-void on_instagib(Entity* victim)
+void on_instagib(Entity* victim, size_t unknown)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -239,7 +239,7 @@ void on_instagib(Entity* victim)
     {
         return;
     }
-    g_on_instagib_trampoline(victim);
+    g_on_instagib_trampoline(victim, unknown);
 }
 
 void hook_godmode_functions()
