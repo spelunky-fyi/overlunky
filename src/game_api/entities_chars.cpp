@@ -54,6 +54,11 @@ void PowerupCapable::unequip_backitem()
     ::unequip_backitem(this->uid);
 }
 
+int32_t PowerupCapable::worn_backitem()
+{
+    return ::worn_backitem(this->uid);
+}
+
 void Player::set_name(std::u16string name)
 {
     return NCharacterDB::set_character_full_name(NCharacterDB::get_character_index(type->id), name);

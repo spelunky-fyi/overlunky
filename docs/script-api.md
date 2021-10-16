@@ -1448,6 +1448,9 @@ Return all powerups that the entity has
 - [`nil unequip_backitem()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem) &PowerupCapable::unequip_backitem
 \
 Unequips the currently worn backitem
+- [`int worn_backitem()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem) &PowerupCapable::worn_backitem
+\
+Returns the uid of the currently worn backitem, or -1 if wearing nothing
 ### `Inventory`
 - [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
