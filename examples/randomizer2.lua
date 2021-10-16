@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.1c"
+meta.version = "2.2"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -36,6 +36,7 @@ local real_default_options = {
     status = true,
     hard = true,
     shop = true,
+    liquid_chance = 33,
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -68,6 +69,7 @@ local function register_options()
     register_option_bool("storage", "Random Waddler caches", default_options.storage)
     register_option_bool("status", "Show level progress", default_options.status)
     register_option_bool("hard", "Hard bosses", default_options.hard)
+    register_option_float("liquid_chance", "Swap liquid chance", default_options.liquid_chance, 0, 100)
     register_option_button("zreset", "Reset to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -449,6 +451,8 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
 
+local swapping_liquid = false
+
 set_callback(function()
     if state.theme ~= THEME.DUAT or state.level_gen.spawn_y < 47 or not options.hard then return end
     local box = AABB:new()
@@ -462,8 +466,12 @@ set_callback(function()
     end
     set_interval(function()
         if state.theme ~= THEME.DUAT then return false end
-        if #get_entities_by(0, MASK.LAVA, LAYER.BOTH) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
-            spawn_liquid(ENT_TYPE.LIQUID_LAVA, state.level_gen.spawn_x, state.level_gen.spawn_y - 2)
+        if #get_entities_by(0, MASK.LIQUID, LAYER.BOTH) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
+            local liquid_type = ENT_TYPE.LIQUID_LAVA
+            if swapping_liquid then
+                liquid_type = ENT_TYPE.LIQUID_WATER
+            end
+            spawn_liquid(liquid_type, state.level_gen.spawn_x, state.level_gen.spawn_y - 2)
         elseif #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 36, LAYER.FRONT, 0, 0)
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 2.5, 36, LAYER.FRONT, 0, 0)
@@ -958,7 +966,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         local eid = pick(all_shop_items)
         local etype = get_type(eid)
         if etype.description > 1900 then
-            etype.description = prng:random(1900)
+            etype.description = prng:random(1804, 1858)
         end
         return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
@@ -973,7 +981,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         local eid = pick(shop_mounts)
         local etype = get_type(eid)
         if etype.description > 1900 then
-            etype.description = prng:random(1900)
+            etype.description = prng:random(1804, 1858)
         end
         return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
@@ -1002,7 +1010,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         local eid = pick(all_shop_guns)
         local etype = get_type(eid)
         if etype.description > 1900 then
-            etype.description = prng:random(1900)
+            etype.description = prng:random(1804, 1858)
         end
         return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
@@ -1922,3 +1930,46 @@ set_callback(function(ctx)
         ctx:draw_text(0.9, 0.81, 32, F"{LevelNum}/{#level_order}", 0xBBFFFFFF)
     end
 end, ON.GUIFRAME)
+
+--[[LIQUIDS]]
+set_callback(function()
+    swapping_liquid = state.theme ~= THEME.OLMEC and prng:random() < options.liquid_chance/100
+end, ON.PRE_LEVEL_GENERATION)
+
+local function swap_liquid(liquid_type, x, y)
+    if swapping_liquid then
+        spawn_liquid(liquid_type, x, y)
+        return true
+    end
+    return false
+end
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_WATER, x, y)
+end, "lava")
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_LAVA, x, y)
+end, "water")
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_COARSE_WATER, x, y)
+end, "coarse_lava")
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_COARSE_LAVA, x, y)
+end, "coarse_water")
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if swapping_liquid then
+        return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAKE, x, y, l, 0, 0)
+    end
+    return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAVA, x, y, l, 0, 0)
+end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.LIQUID_IMPOSTOR_LAVA)
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if swapping_liquid then
+        return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAVA, x, y, l, 0, 0)
+    end
+    return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAKE, x, y, l, 0, 0)
+end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.LIQUID_IMPOSTOR_LAKE)
