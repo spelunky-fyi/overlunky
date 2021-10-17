@@ -1052,7 +1052,8 @@ end
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
 
-    /// Convert the hash to stringid (see Mods\Extracted\strings00_hashed.str for the hash value)
+    /// Convert the hash to stringid
+    /// Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
 
     /// Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
@@ -1060,9 +1061,10 @@ end
     lua["get_string"] = get_string;
 
     /// Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// This edits custom string and in game strings but changing the language in settings will reset game strings
     lua["change_string"] = change_string;
 
-    /// Add custome string, currently only for names of shop items (Entitydb->description)
+    /// Add custome string, currently can only used for names of shop items (Entitydb->description)
     /// Returns stringid of the new string
     lua["add_string"] = add_string;
 
