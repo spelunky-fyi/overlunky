@@ -254,17 +254,14 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    // This isn't perfect but at least it fixes the trigger hitboxes for now
     auto [x_pos, y_pos] = position_self();
-    switch ((size_t)overlay)
+    switch (draw_depth)
     {
-    case NULL:
-        return {rendering_info->x, rendering_info->y};
+    case 0:
+        return {x_pos + rendering_info->x_dupe4, y_pos + rendering_info->y_dupe4};
     default:
     {
-        float _x, _y;
-        std::tie(_x, _y) = overlay->position();
-        return {x_pos + _x, y_pos + _y};
+        return {rendering_info->x_dupe4, rendering_info->y_dupe4};
     }
     }
 }
