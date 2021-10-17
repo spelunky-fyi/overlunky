@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
     
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.2"
+meta.version = "2.2a"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -37,6 +37,8 @@ local real_default_options = {
     hard = true,
     shop = true,
     liquid_chance = 33,
+    trap_spikes = 20,
+    trap_fields = 50,
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -70,6 +72,8 @@ local function register_options()
     register_option_bool("status", "Show level progress", default_options.status)
     register_option_bool("hard", "Hard bosses", default_options.hard)
     register_option_float("liquid_chance", "Swap liquid chance", default_options.liquid_chance, 0, 100)
+    register_option_float("trap_spikes", "Replace spikes chance", default_options.trap_spikes, 0, 100)
+    register_option_float("trap_fields", "Replace forcefields chance", default_options.trap_fields, 0, 100)
     register_option_button("zreset", "Reset to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -97,7 +101,7 @@ end, ON.LOAD)
 
 local function get_chance(min, max)
     if max == 0 then return 0 end
-    if min == 0 then min = 0.001 end
+    if min == 0 then min = 0.00001 end
     if min > max then min, max = max, min end
     min = math.floor(1/(min/100))
     max = math.floor(1/(max/100))
@@ -159,6 +163,10 @@ local function get_ushabti_frame()
         y = math.floor(state.correct_ushabti / 10)
     end
     return x + y * 12
+end
+
+local function tile_key(x, y, l)
+    return tostring(math.floor(x)).."-"..tostring(math.floor(y)).."-"..tostring(l)
 end
 
 local theme_name = {}
@@ -441,8 +449,10 @@ set_callback(function(ctx)
     end
 end, ON.POST_ROOM_GENERATION)
 
+local forced_tiles = {}
 set_callback(function()
     level_map = {}
+    forced_tiles = {}
 end, ON.PRE_LEVEL_GENERATION)
 
 set_post_entity_spawn(function(ent)
@@ -1332,6 +1342,7 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
 
+local swapping_spikes = false
 local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
 local function shuffle_tile_codes()
     for k,v in pairs(floor_tilecodes) do
@@ -1345,11 +1356,15 @@ local function shuffle_tile_codes()
             local above = get_grid_entity_at(x, y+1, layer)
             if above ~= -1 then
                 above = get_entity(above)
-                if above.type.id == ENT_TYPE.FLOOR_SPIKES then
+                if above.type.id == ENT_TYPE.FLOOR_SPIKES and not swapping_spikes then
                     return
                 end
             end
-            spawn_grid_entity(floor_tilecodes[type], x, y, layer);
+            if forced_tiles[tile_key(x, y, layer)] ~= nil then
+                spawn_grid_entity(forced_tiles[tile_key(x, y, layer)], x, y, layer);
+            else
+                spawn_grid_entity(floor_tilecodes[type], x, y, layer)
+            end
             return true
         end, type)
     end
@@ -1830,7 +1845,7 @@ end, SPAWN_TYPE.SYSTEMIC, 0, projectiles_arrow)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
-local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM}
+local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM, 90} --TODO
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
     if #storages == 0 and options.storage and not (state.world == 6 and state.level == 3) then
@@ -1973,3 +1988,62 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     end
     return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAKE, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.LIQUID_IMPOSTOR_LAKE)
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_COARSE_LAVA, x, y)
+end, "coarse_water")
+
+--[[SPIKES]]
+local last_spike_room = -1
+local spike_floors = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.FLOOR_TOMB, ENT_TYPE.FLOOR_QUICKSAND}
+local spike_items = {ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_SNAP_TRAP}
+local spike_types = join(spike_floors, spike_items)
+local spike_type = spike_types[1]
+
+local function swap_spikes(x, y, l)
+    local rx, ry = get_room_index(x, y)
+    local rid = 100*rx+ry
+    if rid ~= last_spike_room then
+        last_spike_room = rid
+        swapping_spikes = prng:random() < options.trap_spikes/100
+        spike_type = pick(spike_types)
+    end
+    if options.trap and swapping_spikes and l == LAYER.FRONT then
+        if has(spike_floors, spike_type) then
+            forced_tiles[tile_key(x, y-1, l)] = spike_type
+        else
+            spawn_entity_snapped_to_floor(spike_type, x, y, l)
+        end
+        return true
+    end
+    return false
+end
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_spikes(x, y, l)
+end, "spikes")
+
+set_pre_tile_code_callback(function(x, y, l)
+    if options.trap and prng:random() < options.trap_fields/100 then
+        spawn_grid_entity(pick(traps_floor), x, y, l)
+        return true
+    end
+    return false
+end, "forcefield")
+
+set_pre_tile_code_callback(function(x, y, l)
+    if options.trap and prng:random() < options.trap_fields/100 then
+        spawn_grid_entity(pick(traps_floor), x, y, l)
+        return true
+    end
+    return false
+end, "timed_forcefield")
+
+set_callback(function()
+    for i,v in ipairs(get_entities_by_type(ENT_TYPE.FLOOR_QUICKSAND)) do
+        local decos = entity_get_items_by(v, ENT_TYPE.DECORATION_GENERIC, 0)
+        for j,d in ipairs(decos) do
+            get_entity(d):set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
+        end
+    end
+end, ON.POST_LEVEL_GENERATION)
