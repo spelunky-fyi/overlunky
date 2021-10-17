@@ -75,8 +75,8 @@ class Movable : public Entity
     virtual void v46() = 0;
     virtual void v47() = 0;
     //virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
-    virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
-    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                       // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
+    virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
+    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                                         // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
     virtual void v51() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
@@ -126,8 +126,10 @@ class Movable : public Entity
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
     bool is_poisoned();
 
-    /// Damage the movable by the specified amount, stuns it for the specified amount of frames and applies the velocities
-    void damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
+    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+    void damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint16_t iframes);
+    // the original damage function was added to the API without the iframes param, but for backwards compatibility we preserve the broken one
+    void broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
 
     bool is_button_pressed(BUTTON button);
     bool is_button_held(BUTTON button);

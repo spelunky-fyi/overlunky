@@ -1428,9 +1428,9 @@ airtime = falling_timer
 - [`nil add_money(int money)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) &Movable::add_money
 \
 Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
-- [`nil damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) &Movable::damage
+- [`nil damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) damage
 \
-Damage the movable by the specified amount, stuns it for the specified amount of frames and applies the velocities
+Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
 ### `PowerupCapable`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil remove_powerup(ENT_TYPE powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) &PowerupCapable::remove_powerup
