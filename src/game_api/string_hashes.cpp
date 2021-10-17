@@ -1941,4 +1941,3 @@ std::map<uint32_t, STRINGID> string_hashes = {
     {0xfc82a7df, 1937},
     {0xe983216a, 1938},
 };
-
