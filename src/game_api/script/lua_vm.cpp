@@ -9,6 +9,7 @@
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "strings.hpp"
 
 #include "lua_backend.hpp"
 #include "lua_console.hpp"
@@ -1050,6 +1051,20 @@ end
 
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
+
+    /// Convert the hash to stringid (see Mods\Extracted\strings00_hashed.str for the hash value)
+    lua["hash_to_stringid"] = hash_to_stringid;
+
+    /// Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// Will return the string of currently choosen language
+    lua["get_string"] = get_string;
+
+    /// Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    lua["change_string"] = change_string;
+
+    /// Add custome string, currently only for names of shop items (Entitydb->description)
+    /// Returns stringid of the new string
+    lua["add_string"] = add_string;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

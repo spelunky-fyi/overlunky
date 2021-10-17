@@ -4,12 +4,12 @@
 #include <iostream>
 #include <thread>
 
-#include "fix_entity_descriptions.hpp"
 #include "logger.h"
 #include "memory.h"
 #include "render_api.hpp"
 #include "search.hpp"
 #include "state.hpp"
+#include "strings.hpp"
 #include "ui.hpp"
 #include "window_api.hpp"
 
@@ -80,7 +80,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     }
 
     auto& api = RenderAPI::get();
-    fix_entity_descriptions();
+    strings_init();
     init_ui();
     init_hooks((void*)api.swap_chain());
     size_t env_var_size;

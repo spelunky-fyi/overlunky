@@ -1114,6 +1114,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        "get_shopitem_name"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x15\x58\x1E\x5F\x00"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

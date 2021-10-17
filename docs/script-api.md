@@ -613,6 +613,20 @@ Use this only when no other approach works, this call can be expensive if overus
 ### [`raise`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
 `nil raise()`<br/>
 Raise a signal and probably crash the game
+### [`hash_to_stringid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hash_to_stringid)
+`STRINGID hash_to_stringid(int hash)`<br/>
+Convert the hash to stringid (see Mods\Extracted\strings00_hashed.str for the hash value)
+### [`get_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_string)
+`const string get_string(STRINGID string_id)`<br/>
+Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+Will return the string of currently choosen language
+### [`change_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_string)
+`nil change_string(STRINGID string_id, const string& str)`<br/>
+Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+### [`add_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_string)
+`STRINGID add_string(const string& str)`<br/>
+Add custome string, currently only for names of shop items (Entitydb->description)
+Returns stringid of the new string
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
@@ -1323,7 +1337,7 @@ Changes color based on given uColor
 - [`bool leaves_corpse_behind`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leaves_corpse_behind) &EntityDB::leaves_corpse_behind
 - [`int sound_killed_by_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_player) &EntityDB::sound_killed_by_player
 - [`int sound_killed_by_other`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_other) &EntityDB::sound_killed_by_other
-- [`int description`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) &EntityDB::description
+- [`STRINGID description`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) &EntityDB::description
 ### `Entity`
 - [`EntityDB type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Entity::type
 - [`Entity overlay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) overlay
@@ -4690,5 +4704,6 @@ We use those to clarify what kind of values can be passed and returned from a fu
 ### Flags == int;
 ### uColor == int;
 ### SHORT_TILE_CODE == int;
+### STRINGID == int;
 ## External Function Library
 If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting
