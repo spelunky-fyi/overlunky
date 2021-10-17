@@ -21,7 +21,7 @@ void on_shopitemnameformat(Entity* item, char16_t* buffer)
     if (items_stringid >= wrong_stringid)
     {
         const STRINGID buy_stringid = 1340; // id of the "Buy %s" text //TODO: replace with hash_to_stringid(0x21683743); when dumping script is done
-        constexpr auto buffer_size = 30;    //guess the buffer size, for now
+        constexpr auto buffer_size = 100;   //guess the buffer size, add check if the buffer size is to small?
 
         swprintf_s((wchar_t*)buffer, buffer_size, (wchar_t*)get_string(buy_stringid), get_string(items_stringid));
         return;
@@ -39,7 +39,7 @@ void strings_init()
     }
     fix_entity_descriptions();
 
-    auto addr_insta = get_address("get_shopitem_name");
+    auto addr_insta = get_address("format_shopitem_name");
     g_on_shopnameformat_trampoline = (OnShopItemNameFormatFun*)addr_insta;
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
@@ -60,8 +60,9 @@ const char16_t** get_strings_table()
 
 STRINGID hash_to_stringid(uint32_t hash)
 {
-    if (string_hashes.find(hash) != string_hashes.end())
-        return string_hashes[hash];
+    auto it = string_hashes.find(hash);
+    if (it != string_hashes.end())
+        return it->second;
 
     return wrong_stringid;
 }
@@ -73,9 +74,10 @@ const char16_t* get_string(STRINGID string_id)
 
     if (string_id > wrong_stringid)
     {
-        if (custom_strings.find(string_id) != custom_strings.end())
+        auto it = custom_strings.find(string_id);
+        if (it != custom_strings.end())
         {
-            return custom_strings[string_id].data();
+            return it->second.data();
         }
 
         return u"";
@@ -90,9 +92,10 @@ void change_string(STRINGID string_id, const std::u16string& str)
         return;
     else if (string_id > wrong_stringid)
     {
-        if (custom_strings.find(string_id) != custom_strings.end())
+        auto it = custom_strings.find(string_id);
+        if (it != custom_strings.end())
         {
-            custom_strings[string_id] = str;
+            it->second = std::move(str);
             return;
         }
     }
@@ -117,5 +120,6 @@ STRINGID add_string(const std::u16string& str) // future idea: add more strings 
 {
     STRINGID new_id = wrong_stringid + (STRINGID)custom_strings.size() + 1;
     custom_strings.insert(std::pair<STRINGID, std::u16string>(new_id, str));
+    custom_strings[new_id] = std::move(str);
     return new_id;
 }

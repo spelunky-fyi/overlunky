@@ -1115,7 +1115,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "get_shopitem_name"sv,
+        // Put pb on Entitydb->description and walk into a shop that has this entity
+        "format_shopitem_name"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x8D\x15\x58\x1E\x5F\x00"sv)
             .at_exe()
