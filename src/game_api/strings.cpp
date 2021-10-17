@@ -86,7 +86,7 @@ const char16_t* get_string(STRINGID string_id)
     return strings_table[string_id];
 }
 
-void change_string(STRINGID string_id, const std::u16string& str)
+void change_string(STRINGID string_id, const std::u16string str)
 {
     if (string_id == wrong_stringid)
         return;
@@ -116,7 +116,7 @@ void change_string(STRINGID string_id, const std::u16string& str)
     }
 }
 
-STRINGID add_string(const std::u16string& str) // future idea: add more strings variants for all languages?
+STRINGID add_string(const std::u16string str) // future idea: add more strings variants for all languages?
 {
     STRINGID new_id = wrong_stringid + (STRINGID)custom_strings.size() + 1;
     custom_strings.insert(std::pair<STRINGID, std::u16string>(new_id, str));
