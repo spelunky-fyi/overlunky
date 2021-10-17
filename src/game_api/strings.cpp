@@ -2,16 +2,13 @@
 #include "entity.hpp"
 #include "fix_entity_descriptions.hpp"
 
+#include "string_hashes.cpp"
+
 #include "detours.h"
 #include <cassert>
 
 static STRINGID wrong_stringid = 0;
 std::map<STRINGID, std::u16string> custom_strings;
-std::map<uint32_t, STRINGID> string_hashes = {
-    {0xd41f49aa, 0},
-    {0xcd92c15d, 1}
-    // TODO: make script to dump all automatically
-};
 
 using OnShopItemNameFormatFun = void(Entity*, char16_t*);
 OnShopItemNameFormatFun* g_on_shopnameformat_trampoline{nullptr};
@@ -20,8 +17,8 @@ void on_shopitemnameformat(Entity* item, char16_t* buffer)
     const STRINGID items_stringid = item->type->description;
     if (items_stringid >= wrong_stringid)
     {
-        const STRINGID buy_stringid = 1340; // id of the "Buy %s" text //TODO: replace with hash_to_stringid(0x21683743); when dumping script is done
-        constexpr auto buffer_size = 100;   //guess the buffer size, add check if the buffer size is to small?
+        const STRINGID buy_stringid = hash_to_stringid(0x21683743); // get id of the "Buy %s" text
+        constexpr auto buffer_size = 0x800;                         //add check if the buffer size is to small?
 
         swprintf_s((wchar_t*)buffer, buffer_size, (wchar_t*)get_string(buy_stringid), get_string(items_stringid));
         return;
