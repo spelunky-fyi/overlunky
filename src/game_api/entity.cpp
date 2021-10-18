@@ -258,10 +258,10 @@ std::pair<float, float> Entity::position_render() const
     switch (draw_depth)
     {
     case 0:
-        return {x_pos + rendering_info->x_dupe4, y_pos + rendering_info->y_dupe4};
+        return {x_pos + rendering_info->x, y_pos + rendering_info->y};
     default:
     {
-        return {rendering_info->x_dupe4, rendering_info->y_dupe4};
+        return {rendering_info->x, rendering_info->y};
     }
     }
 }
