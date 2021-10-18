@@ -254,16 +254,13 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    auto [x_pos, y_pos] = position_self();
-    switch (draw_depth)
+    if (overlay != nullptr)
     {
-    case 0:
-        return {x_pos + rendering_info->x, y_pos + rendering_info->y};
-    default:
-    {
-        return {rendering_info->x, rendering_info->y};
+        auto [x_pos, y_pos] = position_self();
+        auto [rx_pos, ry_pos] = overlay->position_render();
+        return {rx_pos + x_pos, ry_pos + y_pos};
     }
-    }
+    return {rendering_info->x, rendering_info->y};
 }
 
 void Entity::remove_item(uint32_t id)
