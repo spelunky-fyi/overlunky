@@ -332,11 +332,12 @@ struct Inventory
     /// Used in level transition to transfer to new player entity, is wrong during the level
     bool cursed;
     /// Used in level transition to transfer to new player entity, is wrong during the level
+    bool elixir_buff;
+    /// Used in level transition to transfer to new player entity, is wrong during the level
     uint8_t health;
     /// Used in level transition to transfer to new player entity, is wrong during the level
     uint8_t kapala_blood_amount;
 
-    uint8_t unknown2;
     uint32_t unknown3;
     /// Used in level transition to transfer to new player entity, is wrong during the level
     ENT_TYPE held_item;

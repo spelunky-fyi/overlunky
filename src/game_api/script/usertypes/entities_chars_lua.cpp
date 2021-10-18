@@ -40,6 +40,8 @@ void register_usertypes(sol::state& lua)
         &Inventory::poison_tick_timer,
         "cursed",
         &Inventory::cursed,
+        "elixir_buff",
+        &Inventory::elixir_buff,
         "health",
         &Inventory::health,
         "kapala_blood_amount",
