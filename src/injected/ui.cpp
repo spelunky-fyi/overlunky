@@ -3693,6 +3693,8 @@ void render_savegame()
         ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
     }
+    ImGui::PopID();
+    
     ImGui::PushID("UnlockAll");
     if (ImGui::CollapsingHeader("Big scary button to unlock everything"))
     {
