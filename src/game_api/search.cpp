@@ -357,6 +357,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "camera_position"sv,
+        // Go stand still in a level. In Cheat Engine, do a few incremental searches for the x-position
+        // (as hex value, look at state.camera in the plugin). There will be several matches: 16 times in
+        // 100 bytes unknown structs, 2 referencing state.camera.adjusted and calculated position
+        // and the final one we want. Put a write bp on that address.
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x11\x05****\xF3\x0F\x10\x42\x14"sv)
+            .decode_pc(4)
+            .at_exe(),
+    },
+    {
         "render_api_callback"sv,
         // Break at startup on SteamAPI_RegisterCallback, it gets called twice, second time
         // to hook the Steam overlay, at the beginning of that function is the pointer we need
