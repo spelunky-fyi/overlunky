@@ -615,18 +615,20 @@ Use this only when no other approach works, this call can be expensive if overus
 Raise a signal and probably crash the game
 ### [`hash_to_stringid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hash_to_stringid)
 `STRINGID hash_to_stringid(int hash)`<br/>
-Convert the hash to stringid (see Mods\Extracted\strings00_hashed.str for the hash value)
+Convert the hash to stringid
+Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
 ### [`get_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_string)
 `const string get_string(STRINGID string_id)`<br/>
 Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 Will return the string of currently choosen language
 ### [`change_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_string)
-`nil change_string(STRINGID string_id, const string& str)`<br/>
+`nil change_string(STRINGID string_id, string str)`<br/>
 Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+This edits custom string and in game strings but changing the language in settings will reset game strings
 ### [`add_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_string)
-`STRINGID add_string(const string& str)`<br/>
-Add custome string, currently only for names of shop items (Entitydb->description)
-Returns stringid of the new string
+`STRINGID add_string(string str)`<br/>
+Add custom string, currently can only be used for names of shop items (Entitydb->description)
+Returns STRINGID of the new string
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
@@ -3359,9 +3361,9 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo unknown4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown4) &ScreenIntro::unknown4
 ### `ScreenPrologue`
 Derived from [`Screen`](#screen)
-- [`int line1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line1) &ScreenPrologue::line1
-- [`int line2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line2) &ScreenPrologue::line2
-- [`int line3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line3) &ScreenPrologue::line3
+- [`STRINGID line1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line1) &ScreenPrologue::line1
+- [`STRINGID line2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line2) &ScreenPrologue::line2
+- [`STRINGID line3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line3) &ScreenPrologue::line3
 ### `ScreenTitle`
 Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo logo_spelunky2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logo_spelunky2) &ScreenTitle::logo_spelunky2
@@ -3401,7 +3403,7 @@ Derived from [`Screen`](#screen)
 - [`array<float, 6> spear_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_position) &ScreenMenu::spear_position
 - [`array<SpearDanglerAnimFrames, 6> spear_dangler`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler) &ScreenMenu::spear_dangler
 - [`float play_scroll_descend_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll_descend_timer) &ScreenMenu::play_scroll_descend_timer
-- [`int scroll_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) &ScreenMenu::scroll_text
+- [`STRINGID scroll_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) &ScreenMenu::scroll_text
 ### `ScreenOptions`
 Derived from [`Screen`](#screen)
 - [`int selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) &ScreenOptions::selected_menu_index
@@ -3415,8 +3417,8 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo top_woodpanel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel) &ScreenOptions::top_woodpanel
 - [`TextureRenderingInfo top_woodpanel_left_scrollhandle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_left_scrollhandle) &ScreenOptions::top_woodpanel_left_scrollhandle
 - [`TextureRenderingInfo top_woodpanel_right_scrollhandle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_right_scrollhandle) &ScreenOptions::top_woodpanel_right_scrollhandle
-- [`int button_right_caption`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_right_caption) &ScreenOptions::button_right_caption
-- [`int button_middle_caption`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_middle_caption) &ScreenOptions::button_middle_caption
+- [`STRINGID button_right_caption`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_right_caption) &ScreenOptions::button_right_caption
+- [`STRINGID button_middle_caption`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_middle_caption) &ScreenOptions::button_middle_caption
 - [`bool top_woodpanel_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_visible) &ScreenOptions::top_woodpanel_visible
 - [`bool bottom_woodpanel_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_visible) &ScreenOptions::bottom_woodpanel_visible
 - [`bool toggle_woodpanel_slidein_animation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_woodpanel_slidein_animation) &ScreenOptions::toggle_woodpanel_slidein_animation
@@ -3448,10 +3450,10 @@ Derived from [`Screen`](#screen)
 - [`float bottom_woodpanel_slideup_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_slideup_timer) &ScreenSeedInput::bottom_woodpanel_slideup_timer
 - [`float bottom_woodpanel_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_y) &ScreenSeedInput::bottom_woodpanel_y
 - [`TextureRenderingInfo bottom_woodpanel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel) &ScreenSeedInput::bottom_woodpanel
-- [`int buttons_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_text_id) &ScreenSeedInput::buttons_text_id
+- [`STRINGID buttons_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_text_id) &ScreenSeedInput::buttons_text_id
 - [`float topleft_woodpanel_esc_slidein_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc_slidein_timer) &ScreenSeedInput::topleft_woodpanel_esc_slidein_timer
-- [`int scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenSeedInput::scroll_text_id
-- [`int start_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_text_id) &ScreenSeedInput::start_text_id
+- [`STRINGID scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenSeedInput::scroll_text_id
+- [`STRINGID start_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_text_id) &ScreenSeedInput::start_text_id
 - [`TextureRenderingInfo main_woodpanel_left_border`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_left_border) &ScreenSeedInput::main_woodpanel_left_border
 - [`TextureRenderingInfo main_woodpanel_center`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_center) &ScreenSeedInput::main_woodpanel_center
 - [`TextureRenderingInfo main_woodpanel_right_border`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_right_border) &ScreenSeedInput::main_woodpanel_right_border
@@ -3469,9 +3471,9 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo top_woodpanel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel) &ScreenCharacterSelect::top_woodpanel
 - [`TextureRenderingInfo left_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_scroll_handle) &ScreenCharacterSelect::left_scroll_handle
 - [`TextureRenderingInfo right_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_scroll_handle) &ScreenCharacterSelect::right_scroll_handle
-- [`int left_button_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_button_text_id) &ScreenCharacterSelect::left_button_text_id
-- [`int right_button_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_button_text_id) &ScreenCharacterSelect::right_button_text_id
-- [`int middle_button_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_button_text_id) &ScreenCharacterSelect::middle_button_text_id
+- [`STRINGID left_button_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_button_text_id) &ScreenCharacterSelect::left_button_text_id
+- [`STRINGID right_button_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_button_text_id) &ScreenCharacterSelect::right_button_text_id
+- [`STRINGID middle_button_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_button_text_id) &ScreenCharacterSelect::middle_button_text_id
 - [`bool top_woodpanel_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_visible) &ScreenCharacterSelect::top_woodpanel_visible
 - [`bool bottom_woodpanel_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_visible) &ScreenCharacterSelect::bottom_woodpanel_visible
 - [`bool toggle_woodpanel_slidein_animation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_woodpanel_slidein_animation) &ScreenCharacterSelect::toggle_woodpanel_slidein_animation
@@ -3583,7 +3585,7 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo speechbubble`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble) &ScreenTransition::speechbubble
 - [`TextureRenderingInfo speechbubble_arrow`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_arrow) &ScreenTransition::speechbubble_arrow
 - [`float mama_tunnel_fade_targetvalue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_fade_targetvalue) &ScreenTransition::mama_tunnel_fade_targetvalue
-- [`int mama_tunnel_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_text_id) &ScreenTransition::mama_tunnel_text_id
+- [`STRINGID mama_tunnel_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_text_id) &ScreenTransition::mama_tunnel_text_id
 - [`bool mama_tunnel_choice_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_choice_visible) &ScreenTransition::mama_tunnel_choice_visible
 - [`bool mama_tunnel_agree_with_gift`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_agree_with_gift) &ScreenTransition::mama_tunnel_agree_with_gift
 - [`bool mama_tunnel_face_invisible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_face_invisible) &ScreenTransition::mama_tunnel_face_invisible
@@ -3643,10 +3645,10 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo woodpanel_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top) &ScreenOnlineLobby::woodpanel_top
 - [`TextureRenderingInfo left_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_scroll_handle) &ScreenOnlineLobby::left_scroll_handle
 - [`TextureRenderingInfo right_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_scroll_handle) &ScreenOnlineLobby::right_scroll_handle
-- [`int scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenOnlineLobby::scroll_text_id
-- [`int btn_left_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_left_text_id) &ScreenOnlineLobby::btn_left_text_id
-- [`int btn_right_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_right_text_id) &ScreenOnlineLobby::btn_right_text_id
-- [`int btn_center_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_center_text_id) &ScreenOnlineLobby::btn_center_text_id
+- [`STRINGID scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenOnlineLobby::scroll_text_id
+- [`STRINGID btn_left_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_left_text_id) &ScreenOnlineLobby::btn_left_text_id
+- [`STRINGID btn_right_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_right_text_id) &ScreenOnlineLobby::btn_right_text_id
+- [`STRINGID btn_center_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_center_text_id) &ScreenOnlineLobby::btn_center_text_id
 - [`bool woodpanel_top_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top_visible) &ScreenOnlineLobby::woodpanel_top_visible
 - [`bool woodpanel_bottom_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_bottom_visible) &ScreenOnlineLobby::woodpanel_bottom_visible
 - [`bool toggle_panels_slidein`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_panels_slidein) &ScreenOnlineLobby::toggle_panels_slidein
@@ -3669,15 +3671,15 @@ Derived from [`Screen`](#screen)
 - [`bool show_code_panel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_code_panel) &ScreenOnlineLobby::show_code_panel
 - [`float enter_code_woodpanel_bottom_slidein_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom_slidein_pos) &ScreenOnlineLobby::enter_code_woodpanel_bottom_slidein_pos
 - [`TextureRenderingInfo enter_code_woodpanel_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom) &ScreenOnlineLobby::enter_code_woodpanel_bottom
-- [`int enter_code_btn_right_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_btn_right_text_id) &ScreenOnlineLobby::enter_code_btn_right_text_id
+- [`STRINGID enter_code_btn_right_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_btn_right_text_id) &ScreenOnlineLobby::enter_code_btn_right_text_id
 - [`bool enter_code_woodpanel_top_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_top_visible) &ScreenOnlineLobby::enter_code_woodpanel_top_visible
 - [`bool enter_code_woodpanel_bottom_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom_visible) &ScreenOnlineLobby::enter_code_woodpanel_bottom_visible
 - [`bool enter_code_toggle_panels_slidein`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_toggle_panels_slidein) &ScreenOnlineLobby::enter_code_toggle_panels_slidein
 - [`int selected_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_character) &ScreenOnlineLobby::selected_character
 - [`int characters_entered_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters_entered_count) &ScreenOnlineLobby::characters_entered_count
 - [`float enter_code_topleft_woodpanel_esc_slidein_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_topleft_woodpanel_esc_slidein_timer) &ScreenOnlineLobby::enter_code_topleft_woodpanel_esc_slidein_timer
-- [`int enter_code_banner_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_banner_text_id) &ScreenOnlineLobby::enter_code_banner_text_id
-- [`int enter_code_OK_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_OK_text_id) &ScreenOnlineLobby::enter_code_OK_text_id
+- [`STRINGID enter_code_banner_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_banner_text_id) &ScreenOnlineLobby::enter_code_banner_text_id
+- [`STRINGID enter_code_OK_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_OK_text_id) &ScreenOnlineLobby::enter_code_OK_text_id
 - [`TextureRenderingInfo enter_code_main_woodpanel_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_left) &ScreenOnlineLobby::enter_code_main_woodpanel_left
 - [`TextureRenderingInfo enter_code_main_woodpanel_center`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_center) &ScreenOnlineLobby::enter_code_main_woodpanel_center
 - [`TextureRenderingInfo enter_code_main_woodpanel_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_right) &ScreenOnlineLobby::enter_code_main_woodpanel_right
@@ -3725,10 +3727,10 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo unknown15`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown15) &ScreenArenaMenu::unknown15
 - [`TextureRenderingInfo left_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_scroll_handle) &ScreenArenaMenu::left_scroll_handle
 - [`TextureRenderingInfo right_scroll_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_scroll_handle) &ScreenArenaMenu::right_scroll_handle
-- [`int scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenArenaMenu::scroll_text_id
-- [`int unknown17_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown17_text_id) &ScreenArenaMenu::unknown17_text_id
-- [`int unknown18_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown18_text_id) &ScreenArenaMenu::unknown18_text_id
-- [`int unknown19_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown19_text_id) &ScreenArenaMenu::unknown19_text_id
+- [`STRINGID scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenArenaMenu::scroll_text_id
+- [`STRINGID unknown17_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown17_text_id) &ScreenArenaMenu::unknown17_text_id
+- [`STRINGID unknown18_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown18_text_id) &ScreenArenaMenu::unknown18_text_id
+- [`STRINGID unknown19_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown19_text_id) &ScreenArenaMenu::unknown19_text_id
 - [`bool top_woodpanel_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_visible) &ScreenArenaMenu::top_woodpanel_visible
 - [`bool bottom_woodpanel_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_visible) &ScreenArenaMenu::bottom_woodpanel_visible
 - [`bool woodpanels_toggle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanels_toggle) &ScreenArenaMenu::woodpanels_toggle
@@ -3770,10 +3772,10 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo woodenpanel_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top) &ScreenArenaStagesSelect::woodenpanel_top
 - [`TextureRenderingInfo woodenpanel_top_left_scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top_left_scroll) &ScreenArenaStagesSelect::woodenpanel_top_left_scroll
 - [`TextureRenderingInfo woodenpanel_top_right_scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top_right_scroll) &ScreenArenaStagesSelect::woodenpanel_top_right_scroll
-- [`int text_id_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) &ScreenArenaStagesSelect::text_id_1
-- [`int text_id_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) &ScreenArenaStagesSelect::text_id_2
-- [`int text_id_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) &ScreenArenaStagesSelect::text_id_3
-- [`int text_id_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) &ScreenArenaStagesSelect::text_id_4
+- [`STRINGID text_id_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) &ScreenArenaStagesSelect::text_id_1
+- [`STRINGID text_id_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) &ScreenArenaStagesSelect::text_id_2
+- [`STRINGID text_id_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) &ScreenArenaStagesSelect::text_id_3
+- [`STRINGID text_id_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) &ScreenArenaStagesSelect::text_id_4
 - [`bool woodenpanel_top_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top_visible) &ScreenArenaStagesSelect::woodenpanel_top_visible
 - [`bool woodenpanel_bottom_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_bottom_visible) &ScreenArenaStagesSelect::woodenpanel_bottom_visible
 - [`bool woodenpanels_toggle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanels_toggle) &ScreenArenaStagesSelect::woodenpanels_toggle
@@ -3812,10 +3814,10 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo unknown11`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown11) &ScreenArenaItems::unknown11
 - [`TextureRenderingInfo top_scroll_left_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_scroll_left_handle) &ScreenArenaItems::top_scroll_left_handle
 - [`TextureRenderingInfo top_scroll_right_handle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_scroll_right_handle) &ScreenArenaItems::top_scroll_right_handle
-- [`int scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenArenaItems::scroll_text_id
-- [`int text_id_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) &ScreenArenaItems::text_id_2
-- [`int text_id_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) &ScreenArenaItems::text_id_3
-- [`int text_id_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) &ScreenArenaItems::text_id_4
+- [`STRINGID scroll_text_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) &ScreenArenaItems::scroll_text_id
+- [`STRINGID text_id_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) &ScreenArenaItems::text_id_2
+- [`STRINGID text_id_3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) &ScreenArenaItems::text_id_3
+- [`STRINGID text_id_4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) &ScreenArenaItems::text_id_4
 - [`bool woodpanel_top_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top_visible) &ScreenArenaItems::woodpanel_top_visible
 - [`bool woodpanel_bottom_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_bottom_visible) &ScreenArenaItems::woodpanel_bottom_visible
 - [`bool woodpanels_toggle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanels_toggle) &ScreenArenaItems::woodpanels_toggle
@@ -3866,8 +3868,8 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo unknown_all_forced`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_all_forced) &ScreenArenaScore::unknown_all_forced
 - [`TextureRenderingInfo woodpanel_left_scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_left_scroll) &ScreenArenaScore::woodpanel_left_scroll
 - [`TextureRenderingInfo woodpanel_right_scroll`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_right_scroll) &ScreenArenaScore::woodpanel_right_scroll
-- [`int text_id_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) &ScreenArenaScore::text_id_1
-- [`int text_id_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) &ScreenArenaScore::text_id_2
+- [`STRINGID text_id_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) &ScreenArenaScore::text_id_1
+- [`STRINGID text_id_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) &ScreenArenaScore::text_id_2
 - [`bool woodpanel_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_visible) &ScreenArenaScore::woodpanel_visible
 - [`bool woodpanel_slide_toggle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_slide_toggle) &ScreenArenaScore::woodpanel_slide_toggle
 - [`int animation_sequence`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_sequence) &ScreenArenaScore::animation_sequence

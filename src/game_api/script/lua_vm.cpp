@@ -1064,8 +1064,8 @@ end
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
     lua["change_string"] = change_string;
 
-    /// Add custome string, currently can only used for names of shop items (Entitydb->description)
-    /// Returns stringid of the new string
+    /// Add custom string, currently can only be used for names of shop items (Entitydb->description)
+    /// Returns STRINGID of the new string
     lua["add_string"] = add_string;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
