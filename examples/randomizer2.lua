@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.2b"
+meta.version = "2.2c"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -2024,7 +2024,7 @@ set_pre_tile_code_callback(function(x, y, l)
 end, "spikes")
 
 set_pre_tile_code_callback(function(x, y, l)
-    if options.trap and prng:random() < options.trap_fields/100 then
+    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 then
         spawn_grid_entity(pick(traps_floor), x, y, l)
         return true
     end
@@ -2032,7 +2032,7 @@ set_pre_tile_code_callback(function(x, y, l)
 end, "forcefield")
 
 set_pre_tile_code_callback(function(x, y, l)
-    if options.trap and prng:random() < options.trap_fields/100 then
+    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 then
         spawn_grid_entity(pick(traps_floor), x, y, l)
         return true
     end
