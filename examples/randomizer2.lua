@@ -1,8 +1,8 @@
 meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
-    
+
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.2a"
+meta.version = "2.2b"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -37,7 +37,7 @@ local real_default_options = {
     hard = true,
     shop = true,
     liquid_chance = 33,
-    trap_spikes = 20,
+    trap_spikes = 25,
     trap_fields = 50,
 }
 local default_options = table.unpack({real_default_options})
@@ -1947,6 +1947,7 @@ set_callback(function(ctx)
 end, ON.GUIFRAME)
 
 --[[LIQUIDS]]
+--[[SPIKES]]
 set_callback(function()
     swapping_liquid = state.theme ~= THEME.OLMEC and prng:random() < options.liquid_chance/100
 end, ON.PRE_LEVEL_GENERATION)
@@ -1993,7 +1994,6 @@ set_pre_tile_code_callback(function(x, y, l)
     return swap_liquid(ENT_TYPE.LIQUID_COARSE_LAVA, x, y)
 end, "coarse_water")
 
---[[SPIKES]]
 local last_spike_room = -1
 local spike_floors = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.FLOOR_TOMB, ENT_TYPE.FLOOR_QUICKSAND}
 local spike_items = {ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_SNAP_TRAP}
@@ -2044,6 +2044,27 @@ set_callback(function()
         local decos = entity_get_items_by(v, ENT_TYPE.DECORATION_GENERIC, 0)
         for j,d in ipairs(decos) do
             get_entity(d):set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
+        end
+    end
+    if swapping_liquid and state.theme == THEME.TIDE_POOL and state.level == 2 then
+        local xmin, ymin, xmax, ymax = get_bounds()
+        local liquid_tiles = {}
+        for x = xmin, xmax, 1 do
+            for y = ymin, ymax, -1 do
+                local box = AABB:new(x, y, x+1, y-1)
+                local blobs = #get_entities_overlapping_hitbox(0, MASK.WATER, box, LAYER.FRONT)
+                if blobs > 0 then
+                liquid_tiles[tostring(math.floor(x)).."-"..tostring(math.floor(y))] = {math.floor(x), math.floor(y), blobs}
+                end
+            end
+        end
+        for i,v in ipairs(get_entities_by_mask(MASK.WATER)) do
+            kill_entity(v)
+        end
+        for i,v in pairs(liquid_tiles) do
+            if v[3] > 16 then
+                spawn_liquid(ENT_TYPE.LIQUID_LAVA, v[1]+1, v[2]+0.1)
+            end
         end
     end
 end, ON.POST_LEVEL_GENERATION)
