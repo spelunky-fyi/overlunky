@@ -8,7 +8,7 @@
 #include <cassert>
 
 static STRINGID wrong_stringid = 0;
-std::map<STRINGID, std::u16string> custom_strings;
+std::unordered_map<STRINGID, std::u16string> custom_strings;
 
 using OnShopItemNameFormatFun = void(Entity*, char16_t*);
 OnShopItemNameFormatFun* g_on_shopnameformat_trampoline{nullptr};

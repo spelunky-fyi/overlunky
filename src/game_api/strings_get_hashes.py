@@ -8,7 +8,7 @@ strings_path = "../../docs/game_data/strings00_hashed.str"
 
 print("#include \"strings.hpp\"")
 print("")
-print("std::map<uint32_t, STRINGID> string_hashes = {")
+print("const std::map<uint32_t, STRINGID> string_hashes = {")
 
 data = open(strings_path, "r").read().split("\n")
 line_number = 0

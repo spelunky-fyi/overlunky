@@ -1,6 +1,6 @@
 #include "strings.hpp"
 
-std::map<uint32_t, STRINGID> string_hashes = {
+const std::map<uint32_t, STRINGID> string_hashes = {
     {0xd41f49aa, 0},
     {0xcd92c15d, 1},
     {0x32ff8ff3, 2},
