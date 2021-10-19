@@ -1116,9 +1116,10 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // Put pb on Entitydb->description and walk into a shop that has this entity
+        // Can also get string_table_here, you will see the id from description used as an offset of the first string in string_table
         "format_shopitem_name"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x15\x58\x1E\x5F\x00"sv)
+            .find_inst("\x48\x83\xEC\x28\x48\x89\xD0\x48\x8B\x49\x08"sv)
             .at_exe()
             .function_start(),
     },
