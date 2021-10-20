@@ -1,6 +1,6 @@
 meta.name = "TAS test"
 meta.version = "WIP"
-meta.description = "Simple test for TASing a seeded run. It does desync, I don't think the game is fully deterministic or there's something wrong."
+meta.description = "Simple test for TASing a seeded run. Works from start to finish, although you might have to wait a frame or two at the start of boss levels because of cutscene skip weirdness."
 meta.author = "Dregu"
 
 local seed = 0
@@ -13,6 +13,7 @@ register_option_bool('pskip', 'Skip level transitions automatically', true)
     warp(state.world, state.level, state.theme)
 end)]]
 register_option_string('seed', 'Seed (empty=random)', '')
+register_option_int('delay', "Send delay", 1, -2, 2)
 register_option_button('zrestart', 'Instant restart', function()
     if options.seed ~= '' then
         seed = tonumber(options.seed, 16)
@@ -60,10 +61,10 @@ set_callback(function()
         frames[state.level_count] = {}
     end
     if options.mode == 1 then -- record
-        frames[state.level_count][state.time_level-1] = read_input(players[1].uid)
-        message('Recording '..string.format('%04x', frames[state.level_count][state.time_level-1])..' '..#frames[state.level_count])
+        frames[state.level_count][state.time_level] = read_input(players[1].uid)
+        message('Recording '..string.format('%04x', frames[state.level_count][state.time_level])..' '..#frames[state.level_count])
     elseif options.mode == 2 and not stopped then -- playback
-        local input = frames[state.level_count][state.time_level]
+        local input = frames[state.level_count][state.time_level+options.delay]
         if input and stolen then
             message('Sending '..string.format('%04x', input)..' '..state.time_level..'/'..#frames[state.level_count])
             send_input(players[1].uid, input)
@@ -87,3 +88,12 @@ set_callback(function()
         frames = {}
     end
 end, ON.RESET)
+
+set_global_interval(function()
+    if state.logic.olmec_cutscene ~= nil then
+        state.logic.olmec_cutscene.timer = 809
+    end
+    if state.logic.tiamat_cutscene ~= nil then
+        state.logic.tiamat_cutscene.timer = 379
+    end
+end, 1)
