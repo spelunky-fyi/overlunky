@@ -1461,6 +1461,9 @@ Used in level transition to transfer to new player entity, is wrong during the l
 - [`bool cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cursed) &Inventory::cursed
 \
 Used in level transition to transfer to new player entity, is wrong during the level
+- [`bool elixir_buff`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir_buff) &Inventory::elixir_buff
+\
+Used in level transition to transfer to new player entity, is wrong during the level
 - [`int health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) &Inventory::health
 \
 Used in level transition to transfer to new player entity, is wrong during the level

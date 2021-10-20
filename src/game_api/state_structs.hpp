@@ -420,8 +420,8 @@ struct LogicMoonChallenge
     uint32_t unknown2;
     uint32_t unknown3;
     uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
+    uint32_t floor_challenge_entrance_uid;
+    uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
@@ -437,8 +437,8 @@ struct LogicStarChallenge
     uint32_t unknown2;
     uint32_t unknown3;
     uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
+    uint32_t floor_challenge_entrance_uid;
+    uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
@@ -456,8 +456,8 @@ struct LogicSunChallenge
     uint32_t unknown2;
     uint32_t unknown3;
     uint32_t unknown4;
-    uint32_t unknown5; // entity uid
-    uint32_t unknown6; // entity uid
+    uint32_t floor_challenge_entrance_uid;
+    uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
@@ -558,12 +558,13 @@ struct Logic
     LogicStarChallenge* tun_star_challenge;
     LogicSunChallenge* tun_sun_challenge;
     size_t volcana_related;
+    size_t tiamat_camp_abzu_hundun_eggplant_world_related;
     LogicOlmecCutscene* olmec_cutscene;
     LogicTiamatCutscene* tiamat_cutscene;
     LogicApepTrigger* apep_trigger;
     size_t unknown16;
     LogicDuatBossesTrigger* duat_bosses_trigger;
-    size_t tiamat_related;
+    size_t unknown17;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
     size_t discovery_info; // black market, vlad, wet fur discovery; shows the toast
     size_t black_market_door;
