@@ -138,15 +138,11 @@ set_global_interval(function()
     end
 end, 1)
 
+-- 43D3D0DD
+
 set_callback(function()
     if options.turbo then
-        if state.fadeout > 0 then
-            state.fadeout = 0
-        end
-        if state.fadein > 0 then
-            state.fadein = 0
-        end
+        state.fadeout = 0
+        state.fadein = 0
     end
-end, ON.GUIFRAME)
-
--- 43D3D0DD
+end, ON.LOADING)
