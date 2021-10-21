@@ -716,6 +716,8 @@ end
     lua["set_journal_enabled"] = set_journal_enabled;
     /// Enables or disables the default position based camp camera bounds, to set them manually yourself
     lua["set_camp_camera_bounds_enabled"] = set_camp_camera_bounds_enabled;
+    /// Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
+    lua["set_explosion_mask"] = set_explosion_mask;
     /// Returns how many of a specific entity type Waddler has stored
     lua["waddler_count_entity"] = waddler_count_entity;
     /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.

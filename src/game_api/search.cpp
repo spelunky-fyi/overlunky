@@ -829,6 +829,18 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "explosion_mask"sv,
+        // Set a conditional bp on load_item for fx_explosion, throw a bomb and let it explode. When the debugger
+        // breaks, continue execution, the pause menu will appear mid-explosion and you'll have a fully formed
+        // fx_explosion entity. Put a read bp on its idle_counter and continue until you've breaked a couple of times.
+        // The big function that breaks contains a call to the internal hitbox-overlap function for which the default
+        // mask is put on the stack (0x18F)
+        PatternCommandBuffer{}
+            .find_inst("\xC7\x44\x24\x30\x8F\x01\x00\x00")
+            .offset(0x04)
+            .at_exe(),
+    },
+    {
         "mount_carry"sv,
         // Set a bp on player's Entity::overlay, then jump on a turkey
         PatternCommandBuffer{}

@@ -1905,6 +1905,18 @@ LockedDoor = {
   __name = "sol.LockedDoor.user",
   __newindex = "function"
 }
+Logic = {
+  __name = "sol.Logic.user"
+}
+LogicDiceShop = {
+  __name = "sol.LogicDiceShop.user"
+}
+LogicOlmecCutscene = {
+  __name = "sol.LogicOlmecCutscene.user"
+}
+LogicTiamatCutscene = {
+  __name = "sol.LogicTiamatCutscene.user"
+}
 MASK = {
   ACTIVEFLOOR = 128,
   ANY = 0,
@@ -5027,6 +5039,7 @@ set_door_target = function(...) end
 set_drop_chance = function(...) end
 set_entity_flags = function(...) end
 set_entity_flags2 = function(...) end
+set_explosion_mask = function(...) end
 set_flag = function(...) end
 set_ghost_spawn_times = function(...) end
 set_global_interval = function(...) end

@@ -1259,6 +1259,16 @@ void set_camp_camera_bounds_enabled(bool b)
     }
 }
 
+void set_explosion_mask(uint32_t mask)
+{
+    static size_t addr = 0;
+    if (addr == 0)
+    {
+        addr = get_address("explosion_mask");
+    }
+    write_mem_prot(addr, mask, true);
+}
+
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();

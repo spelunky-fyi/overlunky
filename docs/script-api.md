@@ -492,6 +492,9 @@ Enables or disables the journal
 ### [`set_camp_camera_bounds_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camp_camera_bounds_enabled)
 `nil set_camp_camera_bounds_enabled(bool b)`<br/>
 Enables or disables the default position based camp camera bounds, to set them manually yourself
+### [`set_explosion_mask`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_explosion_mask)
+`nil set_explosion_mask(int mask)`<br/>
+Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
 ### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
 `int waddler_count_entity(ENT_TYPE entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
@@ -1141,6 +1144,7 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 - [`ArenaState arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) &StateMemory::arena
+- [`Logic logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
@@ -1221,6 +1225,35 @@ see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
 - [`string get_code()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_code) &OnlineLobby::get_code
 \
 Gets the string equivalent of the code
+### `Logic`
+- [`LogicOlmecCutscene olmec_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) &Logic::olmec_cutscene
+- [`LogicTiamatCutscene tiamat_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) &Logic::tiamat_cutscene
+- [`LogicDiceShop diceshop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) &Logic::diceshop
+### `LogicOlmecCutscene`
+- [`Entity olmec`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec) &LogicOlmecCutscene::olmec
+- [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &LogicOlmecCutscene::player
+- [`Entity cinematic_anchor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) &LogicOlmecCutscene::cinematic_anchor
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicOlmecCutscene::timer
+### `LogicTiamatCutscene`
+- [`Entity tiamat`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat) &LogicTiamatCutscene::tiamat
+- [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &LogicTiamatCutscene::player
+- [`Entity cinematic_anchor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) &LogicTiamatCutscene::cinematic_anchor
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicTiamatCutscene::timer
+### `LogicDiceShop`
+- [`int bet_machine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_machine) &LogicDiceShop::bet_machine
+- [`int die1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die1) &LogicDiceShop::die1
+- [`int die2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die2) &LogicDiceShop::die2
+- [`int die_1_value`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die_1_value) &LogicDiceShop::die_1_value
+- [`int die_2_value`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die_2_value) &LogicDiceShop::die_2_value
+- [`int prize_dispenser`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize_dispenser) &LogicDiceShop::prize_dispenser
+- [`int prize`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize) &LogicDiceShop::prize
+- [`int forcefield`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield) &LogicDiceShop::forcefield
+- [`bool bet_active`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_active) &LogicDiceShop::bet_active
+- [`bool forcefield_deactivated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield_deactivated) &LogicDiceShop::forcefield_deactivated
+- [`bool boss_angry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boss_angry) &LogicDiceShop::boss_angry
+- [`int result_announcement_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=result_announcement_timer) &LogicDiceShop::result_announcement_timer
+- [`int won_prizes_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=won_prizes_count) &LogicDiceShop::won_prizes_count
+- [`int balance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=balance) &LogicDiceShop::balance
 ### `PRNG`
 PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
@@ -1250,6 +1283,8 @@ Drop-in replacement for `math.random(i)`
 - [`optional<int> random(int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
 Drop-in replacement for `math.random(min, max)`
+- [`get_pair`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) &PRNG::get_pair
+- [`set_pair`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) &PRNG::set_pair
 ### `Color`
 - [`Color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 \
