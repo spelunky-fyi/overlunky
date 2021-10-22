@@ -357,6 +357,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "camera_position"sv,
+        // Go stand still in a level. In Cheat Engine, do a few incremental searches for the x-position
+        // (as hex value, look at state.camera in the plugin). There will be several matches: 16 times in
+        // 100 bytes unknown structs, 2 referencing state.camera.adjusted and calculated position
+        // and the final one we want. Put a write bp on that address.
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x11\x05****\xF3\x0F\x10\x42\x14"sv)
+            .decode_pc(4)
+            .at_exe(),
+    },
+    {
         "render_api_callback"sv,
         // Break at startup on SteamAPI_RegisterCallback, it gets called twice, second time
         // to hook the Steam overlay, at the beginning of that function is the pointer we need
@@ -435,7 +446,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
         PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x0D\x03\x79\x51\x00"sv)
+            .find_inst("\x48\x8D\x0D****\x48\x89\x0D****\x48\xC7\x05"sv)
             .decode_pc()
             .at_exe(),
     },
@@ -443,7 +454,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "fmod_studio"sv,
         // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
         PatternCommandBuffer{}
-            .find_inst("\xBA\x05\x01\x02\x00"sv)
+            .set_optional(true)
+            .find_inst("\xba\x03\x02\x02\x00"sv)
             .offset(-0x7)
             .decode_pc()
             .at_exe(),
@@ -453,7 +465,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
         // Said name comes from an array that is being looped, said array is a global of type EventParameters
         PatternCommandBuffer{}
-            .find_inst("\x48\x8d\x9d\x30\x01\x00\x00"sv)
+            .set_optional(true)
+            .find_inst("\x48\x8d\x9d\x38\x01\x00\x00"sv)
             .offset(-0x7)
             .decode_pc()
             .offset(0x30)
@@ -465,9 +478,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
         // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
         PatternCommandBuffer{}
-            .find_inst("\x89\x58\x10\x48\x8d\x48\x18\x41\xb8\x88\x01\x00\x00"sv)
-            .offset(0x40)
-            .find_inst("\xf3"sv)
+            .set_optional(true)
+            .find_after_inst("\x48\x89\xf8\x48\xd1\xe8\x83\xe7\x01\x48\x09\xc7\xf3\x48\x0f\x2a\xc7"sv)
+            .find_next_inst("\xf3"sv)
             .decode_pc(4)
             .at_exe(),
     },
@@ -582,7 +595,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "level_gen_spawn_room_from_tile_codes"sv,
         // One of the few calls to handle_tile_code, does a `if (param != 0xec)` before the call
         PatternCommandBuffer{}
-            .find_inst("\xE8****\x45\x89\xF8"sv)
+            .find_inst("\xE8****\x45\x89\xF8\x83\xC7\x01"sv)
             .decode_call()
             .at_exe(),
     },
@@ -762,7 +775,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // be a hardcoded value loaded in rax. At offset 0x10 in rax is another pointer that is the
         // base for the big offset.
         PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x05\xCF\x4F\x15\x00"sv)
+            .find_inst("\x48\x8B\x05****\x48\x81\xC4\xF8\x08\x00\x00"sv)
             .decode_pc()
             .at_exe(),
     },
@@ -1097,7 +1110,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "string_table"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x15\x58\x1E\x5F\x00"sv)
+            .find_inst("\x48\x8D\x15****\x4C\x8B\x0C\xCA"sv)
             .decode_pc()
             .at_exe(),
     },

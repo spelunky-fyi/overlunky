@@ -9,6 +9,12 @@ namespace NSound
 {
 void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 {
+    if (sound_manager == nullptr || !sound_manager->is_init())
+    {
+        DEBUG("Audio API is not available!");
+        return;
+    }
+
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
     {

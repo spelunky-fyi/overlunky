@@ -219,6 +219,10 @@ void register_usertypes(sol::state& lua)
         &Entity::respawn,
         "destroy",
         &Entity::destroy);
+
+    auto damage = sol::overload(
+        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
+        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint16_t)>(&Movable::damage));
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -306,7 +310,7 @@ void register_usertypes(sol::state& lua)
         "add_money",
         &Movable::add_money,
         "damage",
-        &Movable::damage,
+        damage,
         sol::base_classes,
         sol::bases<Entity>());
 

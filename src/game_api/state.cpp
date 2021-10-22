@@ -93,8 +93,7 @@ StateMemory* State::ptr_local() const
 std::pair<float, float> State::click_position(float x, float y)
 {
     float cz = get_zoom_level();
-    float cx = ptr()->camera->calculated_focus_x;
-    float cy = ptr()->camera->calculated_focus_y;
+    auto [cx, cy] = get_camera_position();
     float rx = cx + ZF * cz * x;
     float ry = cy + (ZF / 16.0f * 9.0f) * cz * y;
     return {rx, ry};
@@ -103,8 +102,7 @@ std::pair<float, float> State::click_position(float x, float y)
 std::pair<float, float> State::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
-    float cx = ptr()->camera->calculated_focus_x;
-    float cy = ptr()->camera->calculated_focus_y;
+    auto [cx, cy] = get_camera_position();
     float rx = (x - cx) / cz / ZF;
     float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
@@ -212,9 +210,9 @@ bool is_active_player(Entity* e)
     return false;
 }
 
-using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint32_t);
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint32_t, uint32_t);
 OnDamageFun* g_on_damage_trampoline{nullptr};
-void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount)
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -224,7 +222,7 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     {
         return;
     }
-    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount);
+    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
 }
 
 using OnInstaGibFun = void(Entity*, size_t);
@@ -304,9 +302,15 @@ void State::darkmode(bool g)
 
 std::pair<float, float> State::get_camera_position()
 {
-    float cx = ptr()->camera->calculated_focus_x;
-    float cy = ptr()->camera->calculated_focus_y;
-    return {cx, cy};
+    static size_t addr = 0;
+    if (addr == 0)
+    {
+        addr = get_address("camera_position");
+    }
+
+    auto cx = (float*)addr;
+    auto cy = (float*)(addr + 4);
+    return {*cx, *cy};
 }
 
 void State::set_camera_position(float cx, float cy)

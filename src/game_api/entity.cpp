@@ -254,19 +254,13 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    // This isn't perfect but at least it fixes the trigger hitboxes for now
-    auto [x_pos, y_pos] = position_self();
-    switch ((size_t)overlay)
+    if (overlay != nullptr)
     {
-    case NULL:
-        return {rendering_info->x, rendering_info->y};
-    default:
-    {
-        float _x, _y;
-        std::tie(_x, _y) = overlay->position();
-        return {x_pos + _x, y_pos + _y};
+        auto [x_pos, y_pos] = position_self();
+        auto [rx_pos, ry_pos] = overlay->position_render();
+        return {rx_pos + x_pos, ry_pos + y_pos};
     }
-    }
+    return {rendering_info->x, rendering_info->y};
 }
 
 void Entity::remove_item(uint32_t id)
@@ -330,7 +324,12 @@ bool Movable::is_poisoned()
     return (poison_tick_timer != -1);
 }
 
-void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y)
+void Movable::broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y)
+{
+    damage(damage_dealer_uid, damage_amount, stun_time, velocity_x, velocity_y, 80);
+}
+
+void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint16_t iframes)
 {
     if ((flags & (1 << 28)) > 0)
     {
@@ -345,7 +344,7 @@ void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t 
 
     float velocities[] = {velocity_x, velocity_y};
     float unknown[] = {0.0f, 0.0f};
-    on_regular_damage(dealer, damage_amount, 0x1000, velocities, unknown, stun_time);
+    on_regular_damage(dealer, damage_amount, 0x1000, velocities, unknown, stun_time, iframes);
 }
 
 bool Movable::is_button_pressed(BUTTON button)

@@ -424,7 +424,9 @@ void register_usertypes(sol::state& lua)
         "set_correct_ushabti",
         &StateMemory::set_correct_ushabti,
         "arena",
-        &StateMemory::arena);
+        &StateMemory::arena,
+        "logic",
+        &StateMemory::logic);
     lua.new_usertype<GameManager>(
         "GameManager",
         "game_props",
@@ -569,6 +571,64 @@ void register_usertypes(sol::state& lua)
         &OnlineLobby::code,
         "get_code",
         &OnlineLobby::get_code);
+    lua.new_usertype<Logic>(
+        "Logic",
+        "olmec_cutscene",
+        &Logic::olmec_cutscene,
+        "tiamat_cutscene",
+        &Logic::tiamat_cutscene,
+        "diceshop",
+        &Logic::diceshop);
+    lua.new_usertype<LogicOlmecCutscene>(
+        "LogicOlmecCutscene",
+        "olmec",
+        &LogicOlmecCutscene::olmec,
+        "player",
+        &LogicOlmecCutscene::player,
+        "cinematic_anchor",
+        &LogicOlmecCutscene::cinematic_anchor,
+        "timer",
+        &LogicOlmecCutscene::timer);
+    lua.new_usertype<LogicTiamatCutscene>(
+        "LogicTiamatCutscene",
+        "tiamat",
+        &LogicTiamatCutscene::tiamat,
+        "player",
+        &LogicTiamatCutscene::player,
+        "cinematic_anchor",
+        &LogicTiamatCutscene::cinematic_anchor,
+        "timer",
+        &LogicTiamatCutscene::timer);
+    lua.new_usertype<LogicDiceShop>(
+        "LogicDiceShop",
+        "bet_machine",
+        &LogicDiceShop::bet_machine,
+        "die1",
+        &LogicDiceShop::die1,
+        "die2",
+        &LogicDiceShop::die2,
+        "die_1_value",
+        &LogicDiceShop::die_1_value,
+        "die_2_value",
+        &LogicDiceShop::die_2_value,
+        "prize_dispenser",
+        &LogicDiceShop::prize_dispenser,
+        "prize",
+        &LogicDiceShop::prize,
+        "forcefield",
+        &LogicDiceShop::forcefield,
+        "bet_active",
+        &LogicDiceShop::bet_active,
+        "forcefield_deactivated",
+        &LogicDiceShop::forcefield_deactivated,
+        "boss_angry",
+        &LogicDiceShop::boss_angry,
+        "result_announcement_timer",
+        &LogicDiceShop::result_announcement_timer,
+        "won_prizes_count",
+        &LogicDiceShop::won_prizes_count,
+        "balance",
+        &LogicDiceShop::balance);
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 
