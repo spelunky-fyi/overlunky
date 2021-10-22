@@ -5049,6 +5049,7 @@ set_journal_enabled = function(...) end
 set_kapala_blood_threshold = function(...) end
 set_kapala_hud_icon = function(...) end
 set_level_flags = function(...) end
+set_max_rope_length = function(...) end
 set_olmec_phase_y_level = function(...) end
 set_on_destroy = function(...) end
 set_on_kill = function(...) end

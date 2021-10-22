@@ -495,6 +495,9 @@ Enables or disables the default position based camp camera bounds, to set them m
 ### [`set_explosion_mask`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_explosion_mask)
 `nil set_explosion_mask(int mask)`<br/>
 Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
+### [`set_max_rope_length`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_max_rope_length)
+`nil set_max_rope_length(int length)`<br/>
+Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
 ### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
 `int waddler_count_entity(ENT_TYPE entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
