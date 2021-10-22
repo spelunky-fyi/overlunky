@@ -593,7 +593,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "level_gen_spawn_room_from_tile_codes"sv,
         // One of the few calls to handle_tile_code, does a `if (param != 0xec)` before the call
         PatternCommandBuffer{}
-            .find_inst("\xE8****\x45\x89\xF8"sv)
+            .find_inst("\xE8****\x45\x89\xF8\x83\xC7\x01"sv)
             .decode_call()
             .at_exe(),
     },
