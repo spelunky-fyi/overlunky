@@ -5203,8 +5203,7 @@ std::string make_save_path(std::string_view script_path, std::string_view script
 
 void init_ui()
 {
-    DEBUG("TODO 1.25.0: re-enable SoundManager");
-    g_SoundManager = nullptr; // std::make_unique<SoundManager>(&LoadAudioFile);
+    g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
     g_state = get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
