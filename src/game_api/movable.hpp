@@ -86,8 +86,8 @@ class Movable : public Entity
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // assigns player as last_owner_uid and also manipulates movable.b127
     virtual uint32_t get_last_owner_uid() = 0;               // for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
     virtual void check_out_of_bounds() = 0;                  // kills with the 'still falling' death cause
-    virtual Entity* standing_on() = 0;                       // looks up movable.standing_on_uid in state.instance_id_to_pointer
-    virtual void v60() = 0;
+    virtual void v59() = 0;
+    virtual Entity* standing_on() = 0; // looks up movable.standing_on_uid in state.instance_id_to_pointer
     virtual void on_stomped_on_by(Entity* stomper) = 0;
     virtual void on_thrown_by(Entity* thrower) = 0;      // implemented for special cases like hired hand (player with ai_func), horned lizard...
     virtual void on_clonegunshot_hit(Entity* clone) = 0; // implemented for player/hired hand: copies health to clone etc
