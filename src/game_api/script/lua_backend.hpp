@@ -74,6 +74,7 @@ enum class ON
     RENDER_PRE_PAUSE_MENU,
     RENDER_POST_PAUSE_MENU,
     RENDER_PRE_DRAW_DEPTH,
+    SPEECH_BUBBLE,
 };
 
 struct IntOption
@@ -278,6 +279,8 @@ class LuaBackend
 
     void process_vanilla_render_callbacks(ON event);
     void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
+
+    std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);

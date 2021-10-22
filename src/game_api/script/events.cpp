@@ -132,3 +132,20 @@ void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, c
             return true;
         });
 }
+
+std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
+{
+    std::u16string new_string{};
+    LuaBackend::for_each_backend(
+        [=, &new_string](LuaBackend& backend)
+        {
+            auto this_data = backend.pre_speach_bubble(entity, buffer);
+            if (!this_data.empty())
+            {
+                new_string = std::move(this_data);
+                return false;
+            }
+            return true;
+        });
+    return new_string;
+}

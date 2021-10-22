@@ -1123,6 +1123,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        "npc_dialogue_fun"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x29\x75\xF0\x48\xC7\x45\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

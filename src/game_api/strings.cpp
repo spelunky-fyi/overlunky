@@ -1,6 +1,7 @@
 #include "strings.hpp"
 #include "entity.hpp"
 #include "fix_entity_descriptions.hpp"
+#include "script/events.hpp"
 
 #include "string_hashes.cpp"
 
@@ -18,13 +19,33 @@ void on_shopitemnameformat(Entity* item, char16_t* buffer)
     if (items_stringid >= wrong_stringid)
     {
         const STRINGID buy_stringid = hash_to_stringid(0x21683743); // get id of the "Buy %s" text
-        constexpr auto buffer_size = 0x800;                         //add check if the buffer size is to small?
+        constexpr auto buffer_size = 0x800;                         // maybe TODO: add check if the buffer size is to small?
 
         swprintf_s((wchar_t*)buffer, buffer_size, (wchar_t*)get_string(buy_stringid), get_string(items_stringid));
         return;
     }
 
     g_on_shopnameformat_trampoline(item, buffer);
+}
+
+using OnNPCDialogueFun = void(size_t, Entity*, char16_t*, size_t);
+OnNPCDialogueFun* g_speach_bubble_trampoline{nullptr};
+void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, size_t unknown)
+{
+    std::u16string str = pre_speach_bubble(NPC, buffer);
+    if (str != u"~[:NO_RETURN:]#")
+    {
+        if (str.empty())
+            return;
+
+        const auto data_size = str.size() * sizeof(char16_t);
+        char16_t* new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+        new_string[str.size()] = u'\0';
+        memcpy(new_string, str.data(), data_size);
+
+        //buffer = new_string;
+    }
+    g_speach_bubble_trampoline(func, NPC, buffer, unknown);
 }
 
 void strings_init()
@@ -37,15 +58,19 @@ void strings_init()
     fix_entity_descriptions();
 
     auto addr_insta = get_address("format_shopitem_name");
+    auto addr_npcdialogue = get_address("npc_dialogue_fun");
     g_on_shopnameformat_trampoline = (OnShopItemNameFormatFun*)addr_insta;
+    g_speach_bubble_trampoline = (OnNPCDialogueFun*)addr_npcdialogue;
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
     DetourAttach((void**)&g_on_shopnameformat_trampoline, &on_shopitemnameformat);
+    DetourAttach((void**)&g_speach_bubble_trampoline, &OnNPCDialogue);
+
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)
     {
-        DEBUG("Failed hooking get_shopitem_name: {}\n", error);
+        DEBUG("Failed hooking strings stuff: {}\n", error);
     }
 }
 

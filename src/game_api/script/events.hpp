@@ -25,3 +25,5 @@ void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
 void trigger_vanilla_render_callbacks(ON event);
 void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
+
+std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
