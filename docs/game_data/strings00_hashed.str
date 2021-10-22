@@ -95,14 +95,18 @@
 0x4e9d0a33: Do a run where the randomness is tied to a set seed.
 0xca0a155a: Play Adventure Mode to unlock Seeded Runs!
 0x9648dc6a: Seeded Runs unlocked!
-0xcfd2f4dc: Daily Challenge
-0xd40f5bd8: Try today's daily challenge. You only get one shot!
-0xcd072779: You've already attempted today's challenge. Try again tomorrow!
 0x6a991848: Arena
 0x08253972: Battle against friends or bots in the deadly Arena.
 ########################################
 ## ONLINE OPTIONS                     ##
 ########################################
+0x54cd9471: Adventure Online
+0xab82e39b: Start an Adventure with friends or random players.
+0x02b48b9e: Daily Challenge
+0x20b1eb3e: Try today's daily challenge. You only get one shot!
+0xce1e4289: You've already attempted today's challenge. Try again tomorrow!
+0x465fe538: Custom Arena
+0x12381bbf: Battle friends online using your own custom settings.
 0xc5ff6ec4: Invite
 0x606b22dc: <SYS_ACCEPT/> Ready
 0x7cc7eae9: <SYS_SPECIAL3/> Code
@@ -153,6 +157,7 @@
 0x97e10741: High
 0xf2f05950: Normal
 0x29e8df85: Low
+0x9a10db7d: Overscan
 0x1e07b09f: AUDIO
 0x0a8d040d: SFX Volume
 0x0de10191: Set the volume of sound effects.
@@ -2324,7 +2329,7 @@
 ########################################
 0x218b8bc1: Report
 0x25dbcf8a: Describe the inappropiate content or offensive behaviour.
-0x82926172: Show Gamercard
+0x495e5536: <SYS_ACCEPT/> Show Gamercard
 0x4a63b6fd: Feedback
 0x3ab503a8: Describe the bug or suggestion you have encountered while playing Spelunky 2
 0xf0bf05c3: Data to ensure integrity and authenticity of the run will be made public, contact privacy@blitworks.com for removal requests.

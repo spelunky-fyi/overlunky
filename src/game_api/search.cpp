@@ -1128,7 +1128,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Put pb on Entitydb->description and walk into a shop that has this entity
+        // Put bp on Entitydb->description and walk into a shop that has this entity
         // Can also get string_table_here, you will see the id from description used as an offset of the first string in string_table
         "format_shopitem_name"sv,
         PatternCommandBuffer{}
@@ -1137,6 +1137,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        // Put bp on state->basecamp_dialogue choose base/extra _dialogue, which ever the character you speak to responses ->line
+        // Scroll down, you should see two calls, first one is to format text (the execution can jump around, call it multiple times)
+        // The second call is this function
         "npc_dialogue_fun"sv,
         PatternCommandBuffer{}
             .find_inst("\x29\x75\xF0\x48\xC7\x45\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
