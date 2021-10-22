@@ -450,38 +450,40 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
-    // {
-    //     "fmod_studio"sv,
-    //     // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
-    //     PatternCommandBuffer{}
-    //         .find_inst("\xBA\x05\x01\x02\x00"sv)
-    //         .offset(-0x7)
-    //         .decode_pc()
-    //         .at_exe(),
-    // },
-    // {
-    //     "fmod_event_properties"sv,
-    //     // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
-    //     // Said name comes from an array that is being looped, said array is a global of type EventParameters
-    //     PatternCommandBuffer{}
-    //         .find_inst("\x48\x8d\x9d\x30\x01\x00\x00"sv)
-    //         .offset(-0x7)
-    //         .decode_pc()
-    //         .offset(0x30)
-    //         .at_exe(),
-    // },
-    // {
-    //     "fmod_event_map"sv,
-    //     // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
-    //     // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
-    //     // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
-    //     PatternCommandBuffer{}
-    //         .find_inst("\x89\x58\x10\x48\x8d\x48\x18\x41\xb8\x88\x01\x00\x00"sv)
-    //         .offset(0x40)
-    //         .find_inst("\xf3"sv)
-    //         .decode_pc(4)
-    //         .at_exe(),
-    // },
+    {
+        "fmod_studio"sv,
+        // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .find_inst("\xba\x03\x02\x02\x00"sv)
+            .offset(-0x7)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "fmod_event_properties"sv,
+        // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+        // Said name comes from an array that is being looped, said array is a global of type EventParameters
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .find_inst("\x48\x8d\x9d\x38\x01\x00\x00"sv)
+            .offset(-0x7)
+            .decode_pc()
+            .offset(0x30)
+            .at_exe(),
+    },
+    {
+        "fmod_event_map"sv,
+        // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+        // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
+        // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .find_after_inst("\x48\x89\xf8\x48\xd1\xe8\x83\xe7\x01\x48\x09\xc7\xf3\x48\x0f\x2a\xc7"sv)
+            .find_next_inst("\xf3"sv)
+            .decode_pc(4)
+            .at_exe(),
+    },
     {
         "level_gen_entry"sv,
         // Put a bp on the virtual LevelInfo::populate_level, start a new game, the caller is this function
