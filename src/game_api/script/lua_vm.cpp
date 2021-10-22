@@ -1294,8 +1294,6 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
 {
     static std::shared_ptr<sol::state> global_vm = [sound_manager]()
     {
-        assert(sound_manager != nullptr && "SoundManager needs to be passed to first call to get_lua_vm...");
-
         std::shared_ptr<sol::state> global_vms = std::make_shared<sol::state>();
         sol::state& lua_vm = *global_vms;
         load_libraries(lua_vm);

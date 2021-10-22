@@ -287,6 +287,11 @@ struct SoundManager::Sound
 SoundManager::SoundManager(DecodeAudioFile* decode_function)
     : m_DecodeFunction{decode_function}
 {
+    m_IsInit = true;
+#define AUDIO_INIT_ERROR(format, ...) \
+    DEBUG(format, __VA_ARGS__);       \
+    m_IsInit = false;
+
     if (HMODULE fmod_studio = GetModuleHandle("fmodstudio.dll"))
     {
         m_SoundData.Parameters = (const EventParameters*)get_address("fmod_event_properties"sv);
@@ -304,7 +309,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
             auto err = get_core_system(fmod_studio_system, &m_FmodSystem);
             if (err != FMOD::FMOD_RESULT::OK)
             {
-                DEBUG("Could not get Fmod System, custom audio won't work...");
+                AUDIO_INIT_ERROR("Could not get Fmod System, custom audio won't work...");
             }
         }
 
@@ -319,21 +324,21 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
             auto err = get_bus(fmod_studio_system, bus_name, &bus);
             if (err != FMOD::FMOD_RESULT::OK)
             {
-                DEBUG("Could not get bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
+                AUDIO_INIT_ERROR("Could not get bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
             }
             else
             {
                 err = lock_channel_group(bus);
                 if (err != FMOD::FMOD_RESULT::OK)
                 {
-                    DEBUG("Could not lock channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
+                    AUDIO_INIT_ERROR("Could not lock channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
                 }
                 else
                 {
                     err = flush_commands(fmod_studio_system);
                     if (err != FMOD::FMOD_RESULT::OK)
                     {
-                        DEBUG(
+                        AUDIO_INIT_ERROR(
                             "Could not flush commands after locking channel group for bus '{}', custom audio volume won't be synced with game volume "
                             "properly...",
                             bus_name);
@@ -343,7 +348,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
                         err = get_channel_group(bus, channel_group);
                         if (err != FMOD::FMOD_RESULT::OK)
                         {
-                            DEBUG(
+                            AUDIO_INIT_ERROR(
                                 "Could not obtain channel group for bus '{}', custom audio volume won't be synced with game volume properly...",
                                 bus_name);
                         }
@@ -392,7 +397,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
     }
     else
     {
-        DEBUG("fmodstudio.dll was not loaded, custom audio won't work...");
+        AUDIO_INIT_ERROR("fmodstudio.dll was not loaded, custom audio won't work...");
     }
 
     if (HMODULE fmod = GetModuleHandle("fmod.dll"))
@@ -415,8 +420,10 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
     }
     else
     {
-        DEBUG("fmod.dll was not loaded, custom audio won't work...");
+        AUDIO_INIT_ERROR("fmod.dll was not loaded, custom audio won't work...");
     }
+
+#undef AUDIO_INIT_ERROR
 }
 SoundManager::~SoundManager()
 {

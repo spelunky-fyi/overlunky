@@ -115,6 +115,11 @@ class SoundManager
     SoundManager& operator=(const SoundManager&) = delete;
     SoundManager& operator=(SoundManager&&) = delete;
 
+    bool is_init() const
+    {
+        return m_IsInit;
+    }
+
     CustomSound get_sound(std::string path);
     CustomSound get_sound(const char* path);
     CustomSound get_existing_sound(std::string_view path);
@@ -163,6 +168,8 @@ class SoundManager
     }
 
   private:
+    bool m_IsInit{false};
+
     DecodeAudioFile* m_DecodeFunction{nullptr};
 
     FMOD::System* m_FmodSystem{nullptr};
