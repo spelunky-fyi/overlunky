@@ -297,103 +297,111 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
         m_SoundData.Parameters = (const EventParameters*)get_address("fmod_event_properties"sv);
         m_SoundData.Events = (const EventMap*)get_address("fmod_event_map"sv);
 
-        for (const auto& [id, event] : *m_SoundData.Events)
+        if (m_SoundData.Parameters != nullptr && m_SoundData.Events != nullptr)
         {
-            m_SoundData.FmodEventToEvent[event.Event] = &event;
-            m_SoundData.NameToEvent[event.Name] = &event;
-        }
-
-        auto fmod_studio_system = *(FMODStudio::System**)get_address("fmod_studio"sv);
-        auto get_core_system = reinterpret_cast<FMODStudio::GetCoreSystem*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetCoreSystem"));
-        {
-            auto err = get_core_system(fmod_studio_system, &m_FmodSystem);
-            if (err != FMOD::FMOD_RESULT::OK)
+            for (const auto& [id, event] : *m_SoundData.Events)
             {
-                AUDIO_INIT_ERROR("Could not get Fmod System, custom audio won't work...");
+                m_SoundData.FmodEventToEvent[event.Event] = &event;
+                m_SoundData.NameToEvent[event.Name] = &event;
             }
-        }
 
-        auto flush_commands = reinterpret_cast<FMODStudio::FlushCommands*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_FlushCommands"));
-        auto get_bus = reinterpret_cast<FMODStudio::GetBus*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetBus"));
-        auto lock_channel_group = reinterpret_cast<FMODStudio::LockChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_LockChannelGroup"));
-        auto get_channel_group = reinterpret_cast<FMODStudio::GetChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_GetChannelGroup"));
-
-        auto get_channel_group_from_bus_name = [=](const char* bus_name, FMOD::ChannelGroup** channel_group)
-        {
-            FMODStudio::Bus* bus{nullptr};
-            auto err = get_bus(fmod_studio_system, bus_name, &bus);
-            if (err != FMOD::FMOD_RESULT::OK)
+            auto fmod_studio_system = *(FMODStudio::System**)get_address("fmod_studio"sv);
+            auto get_core_system = reinterpret_cast<FMODStudio::GetCoreSystem*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetCoreSystem"));
             {
-                AUDIO_INIT_ERROR("Could not get bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
-            }
-            else
-            {
-                err = lock_channel_group(bus);
+                auto err = get_core_system(fmod_studio_system, &m_FmodSystem);
                 if (err != FMOD::FMOD_RESULT::OK)
                 {
-                    AUDIO_INIT_ERROR("Could not lock channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
+                    AUDIO_INIT_ERROR("Could not get Fmod System, custom audio won't work...");
+                }
+            }
+
+            auto flush_commands = reinterpret_cast<FMODStudio::FlushCommands*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_FlushCommands"));
+            auto get_bus = reinterpret_cast<FMODStudio::GetBus*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetBus"));
+            auto lock_channel_group = reinterpret_cast<FMODStudio::LockChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_LockChannelGroup"));
+            auto get_channel_group = reinterpret_cast<FMODStudio::GetChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_GetChannelGroup"));
+
+            auto get_channel_group_from_bus_name = [=](const char* bus_name, FMOD::ChannelGroup** channel_group)
+            {
+                FMODStudio::Bus* bus{nullptr};
+                auto err = get_bus(fmod_studio_system, bus_name, &bus);
+                if (err != FMOD::FMOD_RESULT::OK)
+                {
+                    AUDIO_INIT_ERROR("Could not get bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
                 }
                 else
                 {
-                    err = flush_commands(fmod_studio_system);
+                    err = lock_channel_group(bus);
                     if (err != FMOD::FMOD_RESULT::OK)
                     {
-                        AUDIO_INIT_ERROR(
-                            "Could not flush commands after locking channel group for bus '{}', custom audio volume won't be synced with game volume "
-                            "properly...",
-                            bus_name);
+                        AUDIO_INIT_ERROR("Could not lock channel group for bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
                     }
                     else
                     {
-                        err = get_channel_group(bus, channel_group);
+                        err = flush_commands(fmod_studio_system);
                         if (err != FMOD::FMOD_RESULT::OK)
                         {
                             AUDIO_INIT_ERROR(
-                                "Could not obtain channel group for bus '{}', custom audio volume won't be synced with game volume properly...",
+                                "Could not flush commands after locking channel group for bus '{}', custom audio volume won't be synced with game volume "
+                                "properly...",
                                 bus_name);
+                        }
+                        else
+                        {
+                            err = get_channel_group(bus, channel_group);
+                            if (err != FMOD::FMOD_RESULT::OK)
+                            {
+                                AUDIO_INIT_ERROR(
+                                    "Could not obtain channel group for bus '{}', custom audio volume won't be synced with game volume properly...",
+                                    bus_name);
+                            }
                         }
                     }
                 }
-            }
-        };
-        get_channel_group_from_bus_name("bus:/Master_SUM/Master_SFX", &m_SfxChannelGroup);
-        get_channel_group_from_bus_name("bus:/Master_SUM/Master_BGM", &m_MusicChannelGroup);
+            };
+            get_channel_group_from_bus_name("bus:/Master_SUM/Master_SFX", &m_SfxChannelGroup);
+            get_channel_group_from_bus_name("bus:/Master_SUM/Master_BGM", &m_MusicChannelGroup);
 
-        m_EventCreateInstance =
-            reinterpret_cast<FMODStudio::EventDescriptionCreateInstance*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_CreateInstance"));
-        m_EventDescriptionGetParameterDescriptionByName = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByName*>(
-            GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByName"));
-        m_EventDescriptionGetParameterDescriptionByID = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByID*>(
-            GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByID"));
-        m_EventDescriptionSetCallback =
-            reinterpret_cast<FMODStudio::EventDescriptionSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_SetCallback"));
+            m_EventCreateInstance =
+                reinterpret_cast<FMODStudio::EventDescriptionCreateInstance*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_CreateInstance"));
+            m_EventDescriptionGetParameterDescriptionByName = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByName*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByName"));
+            m_EventDescriptionGetParameterDescriptionByID = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByID*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByID"));
+            m_EventDescriptionSetCallback =
+                reinterpret_cast<FMODStudio::EventDescriptionSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_SetCallback"));
 
-        m_EventInstanceStart = reinterpret_cast<FMODStudio::EventInstanceStart*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Start"));
-        m_EventInstanceStop = reinterpret_cast<FMODStudio::EventInstanceStop*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Stop"));
-        m_EventInstanceGetPlaybackState =
-            reinterpret_cast<FMODStudio::EventInstanceGetPlaybackState*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetPlaybackState"));
-        m_EventInstanceSetPaused =
-            reinterpret_cast<FMODStudio::EventInstanceSetPaused*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetPaused"));
-        m_EventInstanceGetPaused =
-            reinterpret_cast<FMODStudio::EventInstanceGetPaused*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetPaused"));
-        m_EventInstanceSetPitch =
-            reinterpret_cast<FMODStudio::EventInstanceSetPitch*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetPitch"));
-        m_EventInstanceSetVolume =
-            reinterpret_cast<FMODStudio::EventInstanceSetVolume*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetVolume"));
-        m_EventInstanceSetCallback =
-            reinterpret_cast<FMODStudio::EventInstanceSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetCallback"));
-        m_EventInstanceSetUserData =
-            reinterpret_cast<FMODStudio::EventInstanceSetUserData*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetUserData"));
-        m_EventInstanceGetUserData =
-            reinterpret_cast<FMODStudio::EventInstanceGetUserData*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetUserData"));
-        m_EventInstanceGetDescription =
-            reinterpret_cast<FMODStudio::EventInstanceGetDescription*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetDescription"));
-        m_EventInstanceGetParameterByID =
-            reinterpret_cast<FMODStudio::EventInstanceGetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetParameterByID"));
-        m_EventInstanceSetParameterByID =
-            reinterpret_cast<FMODStudio::EventInstanceSetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByID"));
+            m_EventInstanceStart = reinterpret_cast<FMODStudio::EventInstanceStart*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Start"));
+            m_EventInstanceStop = reinterpret_cast<FMODStudio::EventInstanceStop*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Stop"));
+            m_EventInstanceGetPlaybackState =
+                reinterpret_cast<FMODStudio::EventInstanceGetPlaybackState*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetPlaybackState"));
+            m_EventInstanceSetPaused =
+                reinterpret_cast<FMODStudio::EventInstanceSetPaused*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetPaused"));
+            m_EventInstanceGetPaused =
+                reinterpret_cast<FMODStudio::EventInstanceGetPaused*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetPaused"));
+            m_EventInstanceSetPitch =
+                reinterpret_cast<FMODStudio::EventInstanceSetPitch*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetPitch"));
+            m_EventInstanceSetVolume =
+                reinterpret_cast<FMODStudio::EventInstanceSetVolume*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetVolume"));
+            m_EventInstanceSetCallback =
+                reinterpret_cast<FMODStudio::EventInstanceSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetCallback"));
+            m_EventInstanceSetUserData =
+                reinterpret_cast<FMODStudio::EventInstanceSetUserData*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetUserData"));
+            m_EventInstanceGetUserData =
+                reinterpret_cast<FMODStudio::EventInstanceGetUserData*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetUserData"));
+            m_EventInstanceGetDescription =
+                reinterpret_cast<FMODStudio::EventInstanceGetDescription*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetDescription"));
+            m_EventInstanceGetParameterByID =
+                reinterpret_cast<FMODStudio::EventInstanceGetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetParameterByID"));
+            m_EventInstanceSetParameterByID =
+                reinterpret_cast<FMODStudio::EventInstanceSetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByID"));
 
-        EventCallbackData::EventInstanceGetDescription = m_EventInstanceGetDescription;
+            EventCallbackData::EventInstanceGetDescription = m_EventInstanceGetDescription;
+        }
+        else
+        {
+            AUDIO_INIT_ERROR(
+                "Could not game's fmod data, custom audio won't work...");
+        }
     }
     else
     {
