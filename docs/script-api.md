@@ -1412,6 +1412,9 @@ Moves the entity from the limbo-layer (where it was previously put by `remove`) 
 - [`nil destroy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy) &Entity::destroy
 \
 Completely removes the entity from existence
+- [`nil activate(Entity activator)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate) &Entity::activate
+\
+Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
