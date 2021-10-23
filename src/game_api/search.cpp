@@ -488,7 +488,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "level_gen_entry"sv,
         // Put a bp on the virtual LevelInfo::populate_level, start a new game, the caller is this function
         PatternCommandBuffer{}
-            .find_inst("\xE8****\x41\x80\x7F**\x7C\x22")
+            .find_inst("\xE8****\x41\x80\x7F**\x7C\x22"sv)
             .decode_call()
             .at_exe(),
     },
@@ -890,7 +890,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "mount_carry"sv,
         // Set a bp on player's Entity::overlay, then jump on a turkey
         PatternCommandBuffer{}
-            .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00")
+            .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00"sv)
             .decode_call()
             .at_exe(),
     },
