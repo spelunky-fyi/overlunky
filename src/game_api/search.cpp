@@ -1146,6 +1146,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        // Put write bp on state->toast
+        "toast_fun"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x55\x56\x48\x81\xEC\x98"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

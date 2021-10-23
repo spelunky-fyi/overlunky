@@ -918,6 +918,32 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
     return std::u16string{u"~[:NO_RETURN:]#"};
 }
 
+std::u16string LuaBackend::pre_toast(char16_t* buffer)
+{
+    if (!get_enabled())
+        return std::u16string{u"~[:NO_RETURN:]#"};
+
+    auto now = get_frame_count();
+    std::lock_guard lock{gil};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::TOAST)
+        {
+            callback.lastRan = now;
+            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, buffer).value_or(std::u16string{u"~[:NO_RETURN:]#"});
+            if (!return_value.empty())
+            {
+                return return_value;
+            }
+        }
+    }
+    return std::u16string{u"~[:NO_RETURN:]#"};
+}
+
 void LuaBackend::for_each_backend(std::function<bool(LuaBackend&)> fun)
 {
     std::lock_guard lock{g_all_backends_mutex};

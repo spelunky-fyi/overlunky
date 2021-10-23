@@ -149,3 +149,20 @@ std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
         });
     return new_string;
 }
+
+std::u16string pre_toast(char16_t* buffer)
+{
+    std::u16string new_string{};
+    LuaBackend::for_each_backend(
+        [=, &new_string](LuaBackend& backend)
+        {
+            auto this_data = backend.pre_toast(buffer);
+            if (!this_data.empty())
+            {
+                new_string = std::move(this_data);
+                return false;
+            }
+            return true;
+        });
+    return new_string;
+}

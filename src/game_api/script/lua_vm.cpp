@@ -1169,7 +1169,9 @@ end
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
         "SPEECH_BUBBLE",
-        ON::SPEECH_BUBBLE);
+        ON::SPEECH_BUBBLE,
+        "TOAST",
+        ON::TOAST);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -1226,11 +1228,16 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
-    // SPEACH_BUBBLE
+    // SPEECH_BUBBLE
     // Params: `Entity speaking_entity, string message`
     // Runs before any speach bubble is created, even the one using `say` function
     // Return behavior: if you don't return anything it will execute the speach bubble funcion normally with default message
-    // if you return empty string, it will not create speach bubble at all, if you return string, it will use that instead of the original
+    // if you return empty string, it will not create the speach bubble at all, if you return string, it will use that instead of the original
+    // TOAST
+    // Params: `string message`
+    // Runs before any toast is created, even the one using `toast` function
+    // Return behavior: if you don't return anything it will execute the toast funcion normally with default message
+    // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
     */
 
     lua.create_named_table(

@@ -48,6 +48,26 @@ void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound
     g_speach_bubble_trampoline(func, NPC, buffer, shoppie_sound_type);
 }
 
+using OnToastFun = void(char16_t*);
+OnToastFun* g_toast_trampoline{nullptr};
+void OnToast(char16_t* buffer)
+{
+    std::u16string str = pre_toast(buffer);
+    if (str != u"~[:NO_RETURN:]#")
+    {
+        if (str.empty())
+            return;
+
+        const auto data_size = str.size() * sizeof(char16_t);
+        char16_t* new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+        new_string[str.size()] = u'\0';
+        memcpy(new_string, str.data(), data_size);
+
+        buffer = new_string;
+    }
+    g_toast_trampoline(buffer);
+}
+
 void strings_init()
 {
     if (wrong_stringid == 0)
@@ -55,17 +75,22 @@ void strings_init()
         //get wrong stringid from bordertile
         wrong_stringid = get_type(1)->description;
     }
-    fix_entity_descriptions();
+    fix_entity_descriptions(wrong_stringid);
 
-    auto addr_insta = get_address("format_shopitem_name");
+    auto addr_format_shopitem = get_address("format_shopitem_name");
     auto addr_npcdialogue = get_address("npc_dialogue_fun");
-    g_on_shopnameformat_trampoline = (OnShopItemNameFormatFun*)addr_insta;
+    auto addr_toastfun = get_address("toast_fun");
+
+    g_on_shopnameformat_trampoline = (OnShopItemNameFormatFun*)addr_format_shopitem;
     g_speach_bubble_trampoline = (OnNPCDialogueFun*)addr_npcdialogue;
+    g_toast_trampoline = (OnToastFun*)addr_toastfun;
+
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
     DetourAttach((void**)&g_on_shopnameformat_trampoline, &on_shopitemnameformat);
     DetourAttach((void**)&g_speach_bubble_trampoline, &OnNPCDialogue);
+    DetourAttach((void**)&g_toast_trampoline, &OnToast);
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)
@@ -98,9 +123,7 @@ const char16_t* get_string(STRINGID string_id)
     {
         auto it = custom_strings.find(string_id);
         if (it != custom_strings.end())
-        {
             return it->second.data();
-        }
 
         return u"";
     }
@@ -116,10 +139,7 @@ void change_string(STRINGID string_id, std::u16string str)
     {
         auto it = custom_strings.find(string_id);
         if (it != custom_strings.end())
-        {
             it->second = std::move(str);
-            return;
-        }
     }
     else
     {

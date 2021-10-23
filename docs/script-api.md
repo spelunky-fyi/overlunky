@@ -1157,6 +1157,7 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 - [`ArenaState arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) &StateMemory::arena
+- [`Logic logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
@@ -1237,6 +1238,35 @@ see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
 - [`string get_code()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_code) &OnlineLobby::get_code
 \
 Gets the string equivalent of the code
+### `Logic`
+- [`LogicOlmecCutscene olmec_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) &Logic::olmec_cutscene
+- [`LogicTiamatCutscene tiamat_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) &Logic::tiamat_cutscene
+- [`LogicDiceShop diceshop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) &Logic::diceshop
+### `LogicOlmecCutscene`
+- [`Entity olmec`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec) &LogicOlmecCutscene::olmec
+- [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &LogicOlmecCutscene::player
+- [`Entity cinematic_anchor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) &LogicOlmecCutscene::cinematic_anchor
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicOlmecCutscene::timer
+### `LogicTiamatCutscene`
+- [`Entity tiamat`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat) &LogicTiamatCutscene::tiamat
+- [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &LogicTiamatCutscene::player
+- [`Entity cinematic_anchor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) &LogicTiamatCutscene::cinematic_anchor
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicTiamatCutscene::timer
+### `LogicDiceShop`
+- [`int bet_machine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_machine) &LogicDiceShop::bet_machine
+- [`int die1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die1) &LogicDiceShop::die1
+- [`int die2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die2) &LogicDiceShop::die2
+- [`int die_1_value`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die_1_value) &LogicDiceShop::die_1_value
+- [`int die_2_value`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die_2_value) &LogicDiceShop::die_2_value
+- [`int prize_dispenser`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize_dispenser) &LogicDiceShop::prize_dispenser
+- [`int prize`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize) &LogicDiceShop::prize
+- [`int forcefield`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield) &LogicDiceShop::forcefield
+- [`bool bet_active`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_active) &LogicDiceShop::bet_active
+- [`bool forcefield_deactivated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield_deactivated) &LogicDiceShop::forcefield_deactivated
+- [`bool boss_angry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boss_angry) &LogicDiceShop::boss_angry
+- [`int result_announcement_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=result_announcement_timer) &LogicDiceShop::result_announcement_timer
+- [`int won_prizes_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=won_prizes_count) &LogicDiceShop::won_prizes_count
+- [`int balance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=balance) &LogicDiceShop::balance
 ### `PRNG`
 PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
@@ -1266,6 +1296,8 @@ Drop-in replacement for `math.random(i)`
 - [`optional<int> random(int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
 Drop-in replacement for `math.random(min, max)`
+- [`get_pair`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) &PRNG::get_pair
+- [`set_pair`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) &PRNG::set_pair
 ### `Color`
 - [`Color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 \
@@ -4316,6 +4348,18 @@ Runs after the pause menu is drawn on screen. In this event, you can draw textur
 \
 Params: `VanillaRenderContext render_ctx, int draw_depth`\
 Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+- [`SPEECH_BUBBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) ON::SPEECH_BUBBLE
+\
+Params: `Entity speaking_entity, string message`\
+Runs before any speach bubble is created, even the one using `say` function\
+Return behavior: if you don't return anything it will execute the speach bubble funcion normally with default message\
+if you return empty string, it will not create the speach bubble at all, if you return string, it will use that instead of the original
+- [`TOAST`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) ON::TOAST
+\
+Params: `string message`\
+Runs before any toast is created, even the one using `toast` function\
+Return behavior: if you don't return anything it will execute the toast funcion normally with default message\
+if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \
