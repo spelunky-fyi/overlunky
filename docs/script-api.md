@@ -1849,6 +1849,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Drill`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Entity top_chain_piece`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_chain_piece) &Drill::top_chain_piece
+- [`nil trigger()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &Drill::trigger
 ### `ThinIce`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int strength`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=strength) &ThinIce::strength

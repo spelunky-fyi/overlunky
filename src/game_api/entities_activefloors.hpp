@@ -104,6 +104,8 @@ class Drill : public Movable
     SoundPosition* sound_pos2;
     Entity* top_chain_piece;
     uint8_t unknown1; // it's forced to 0, for whatever reason
+
+    void trigger();
 };
 
 class ThinIce : public Movable

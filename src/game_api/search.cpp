@@ -1185,6 +1185,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        "construct_soundposition_ptr"sv,
+        // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x49\x89\x86\x30\x01\x00\x00"sv)
+            .decode_call()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
