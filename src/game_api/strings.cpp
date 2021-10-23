@@ -28,9 +28,9 @@ void on_shopitemnameformat(Entity* item, char16_t* buffer)
     g_on_shopnameformat_trampoline(item, buffer);
 }
 
-using OnNPCDialogueFun = void(size_t, Entity*, char16_t*, size_t);
+using OnNPCDialogueFun = void(size_t, Entity*, char16_t*, int);
 OnNPCDialogueFun* g_speach_bubble_trampoline{nullptr};
-void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, size_t unknown)
+void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound_type)
 {
     std::u16string str = pre_speach_bubble(NPC, buffer);
     if (str != u"~[:NO_RETURN:]#")
@@ -43,9 +43,9 @@ void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, size_t unknown)
         new_string[str.size()] = u'\0';
         memcpy(new_string, str.data(), data_size);
 
-        //buffer = new_string;
+        buffer = new_string;
     }
-    g_speach_bubble_trampoline(func, NPC, buffer, unknown);
+    g_speach_bubble_trampoline(func, NPC, buffer, shoppie_sound_type);
 }
 
 void strings_init()

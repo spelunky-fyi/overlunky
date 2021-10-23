@@ -1132,7 +1132,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Can also get string_table_here, you will see the id from description used as an offset of the first string in string_table
         "format_shopitem_name"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x83\xEC\x28\x48\x89\xD0\x48\x8B\x49\x08"sv)
+            .find_inst("\x48\x83\xEC\x28\x48\x89\xD0"sv) //minimum pattern: \x28\x48\x89\xD0\x48
             .at_exe()
             .function_start(),
     },
@@ -1142,7 +1142,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // The second call is this function
         "npc_dialogue_fun"sv,
         PatternCommandBuffer{}
-            .find_inst("\x29\x75\xF0\x48\xC7\x45\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
+            .find_inst("\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
             .at_exe()
             .function_start(),
     },

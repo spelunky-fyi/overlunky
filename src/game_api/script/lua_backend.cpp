@@ -898,8 +898,8 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         return std::u16string{u"~[:NO_RETURN:]#"};
 
     auto now = get_frame_count();
-
     std::lock_guard lock{gil};
+
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -908,8 +908,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         if (callback.screen == ON::SPEECH_BUBBLE)
         {
             callback.lastRan = now;
-
-            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, entity, buffer).value_or(std::u16string{});
+            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, entity, buffer).value_or(std::u16string{u"~[:NO_RETURN:]#"});
             if (!return_value.empty())
             {
                 return return_value;

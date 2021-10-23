@@ -1168,7 +1168,7 @@ end
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
-        "SPEACH_BUBBLE",
+        "SPEECH_BUBBLE",
         ON::SPEECH_BUBBLE);
     /* ON
     // GUIFRAME
