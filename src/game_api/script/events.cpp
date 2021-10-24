@@ -136,33 +136,39 @@ void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, c
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
 {
     std::u16string new_string{};
+    bool return_empty_str = false;
     LuaBackend::for_each_backend(
-        [=, &new_string](LuaBackend& backend)
+        [=, &new_string, &return_empty_str](LuaBackend& backend)
         {
             auto this_data = backend.pre_speach_bubble(entity, buffer);
-            if (!this_data.empty())
+            if (this_data.empty())
+                return_empty_str = true;
+
+            if (new_string.empty() || new_string == u"~[:NO_RETURN:]#")
             {
                 new_string = std::move(this_data);
-                return false;
             }
             return true;
         });
-    return new_string;
+    return return_empty_str ? u"" : new_string;
 }
 
 std::u16string pre_toast(char16_t* buffer)
 {
     std::u16string new_string{};
+    bool return_empty_str = false;
     LuaBackend::for_each_backend(
-        [=, &new_string](LuaBackend& backend)
+        [=, &new_string, &return_empty_str](LuaBackend& backend)
         {
             auto this_data = backend.pre_toast(buffer);
-            if (!this_data.empty())
+            if (this_data.empty())
+                return_empty_str = true;
+
+            if (new_string.empty() || new_string == u"~[:NO_RETURN:]#")
             {
                 new_string = std::move(this_data);
-                return false;
             }
             return true;
         });
-    return new_string;
+    return return_empty_str ? u"" : new_string;
 }

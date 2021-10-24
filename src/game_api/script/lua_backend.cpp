@@ -909,10 +909,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         {
             callback.lastRan = now;
             std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, entity, buffer).value_or(std::u16string{u"~[:NO_RETURN:]#"});
-            if (!return_value.empty())
-            {
-                return return_value;
-            }
+            return return_value;
         }
     }
     return std::u16string{u"~[:NO_RETURN:]#"};
@@ -935,10 +932,7 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
         {
             callback.lastRan = now;
             std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, buffer).value_or(std::u16string{u"~[:NO_RETURN:]#"});
-            if (!return_value.empty())
-            {
-                return return_value;
-            }
+            return return_value;
         }
     }
     return std::u16string{u"~[:NO_RETURN:]#"};
