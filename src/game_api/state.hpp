@@ -76,7 +76,7 @@ struct StateMemory
     uint8_t saved_hamsters;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t unknown1a;
+    uint8_t damage_taken; // total amount of damage taken, excluding cause of death
     uint8_t unknown1b;
     bool world2_coffin_spawned;
     bool world4_coffin_spawned;

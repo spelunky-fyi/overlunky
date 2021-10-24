@@ -329,6 +329,8 @@ void register_usertypes(sol::state& lua)
         &StateMemory::kills_npc,
         "level_count",
         &StateMemory::level_count,
+        "damage_taken",
+        &StateMemory::damage_taken,
         "journal_flags",
         &StateMemory::journal_flags,
         "time_last_level",
