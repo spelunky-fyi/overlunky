@@ -1,4 +1,5 @@
 #include "events.hpp"
+#include "strings.hpp"
 
 void pre_load_level_files()
 {
@@ -144,7 +145,7 @@ std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
             if (this_data.empty())
                 return_empty_str = true;
 
-            if (new_string.empty() || new_string == u"~[:NO_RETURN:]#")
+            if (new_string.empty() || new_string == no_return_str)
             {
                 new_string = std::move(this_data);
             }
@@ -164,7 +165,7 @@ std::u16string pre_toast(char16_t* buffer)
             if (this_data.empty())
                 return_empty_str = true;
 
-            if (new_string.empty() || new_string == u"~[:NO_RETURN:]#")
+            if (new_string.empty() || new_string == no_return_str)
             {
                 new_string = std::move(this_data);
             }

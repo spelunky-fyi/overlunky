@@ -10,12 +10,17 @@
 
 static STRINGID wrong_stringid = 0;
 std::unordered_map<STRINGID, std::u16string> custom_strings;
+std::unordered_map<uint32_t, STRINGID> custom_shopitem_names;
 
 using OnShopItemNameFormatFun = void(Entity*, char16_t*);
 OnShopItemNameFormatFun* g_on_shopnameformat_trampoline{nullptr};
 void on_shopitemnameformat(Entity* item, char16_t* buffer)
 {
-    const STRINGID items_stringid = item->type->description;
+    STRINGID items_stringid = item->type->description;
+    auto it = custom_shopitem_names.find(item->uid);
+    if (it != custom_shopitem_names.end())
+        items_stringid = it->second;
+
     if (items_stringid >= wrong_stringid)
     {
         const STRINGID buy_stringid = hash_to_stringid(0x21683743); // get id of the "Buy %s" text
@@ -28,9 +33,9 @@ void on_shopitemnameformat(Entity* item, char16_t* buffer)
     g_on_shopnameformat_trampoline(item, buffer);
 }
 
-using OnNPCDialogueFun = void(size_t, Entity*, char16_t*, int);
+using OnNPCDialogueFun = void(size_t, Entity*, char16_t*, int, bool);
 OnNPCDialogueFun* g_speach_bubble_trampoline{nullptr};
-void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound_type)
+void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound_type, bool top)
 {
     std::u16string str = pre_speach_bubble(NPC, buffer);
     if (str != u"~[:NO_RETURN:]#")
@@ -45,7 +50,7 @@ void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound
 
         buffer = new_string;
     }
-    g_speach_bubble_trampoline(func, NPC, buffer, shoppie_sound_type);
+    g_speach_bubble_trampoline(func, NPC, buffer, shoppie_sound_type, top);
 }
 
 using OnToastFun = void(char16_t*);
@@ -78,7 +83,7 @@ void strings_init()
     fix_entity_descriptions(wrong_stringid);
 
     auto addr_format_shopitem = get_address("format_shopitem_name");
-    auto addr_npcdialogue = get_address("npc_dialogue_fun");
+    auto addr_npcdialogue = get_address("speech_bubble_fun");
     auto addr_toastfun = get_address("toast_fun");
 
     g_on_shopnameformat_trampoline = (OnShopItemNameFormatFun*)addr_format_shopitem;
@@ -163,4 +168,27 @@ STRINGID add_string(std::u16string str) // future idea: add more strings variant
     STRINGID new_id = wrong_stringid + (STRINGID)custom_strings.size() + 1;
     custom_strings[new_id] = std::move(str);
     return new_id;
+}
+
+void add_custom_name(uint32_t uid, std::u16string name)
+{
+    custom_shopitem_names[uid] = add_string(name);
+}
+
+void clear_custom_name(uint32_t uid)
+{
+    auto it = custom_shopitem_names.find(uid);
+    if (it != custom_shopitem_names.end())
+    {
+        custom_strings.erase(it->second);
+        custom_shopitem_names.erase(it);
+    }
+}
+
+void clear_custom_shopitem_names()
+{
+    for (auto& it : custom_shopitem_names)
+        custom_strings.erase(it.second);
+
+    custom_shopitem_names.clear();
 }

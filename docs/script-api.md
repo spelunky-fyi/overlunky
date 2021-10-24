@@ -629,6 +629,13 @@ This edits custom string and in game strings but changing the language in settin
 `STRINGID add_string(string str)`<br/>
 Add custom string, currently can only be used for names of shop items (Entitydb->description)
 Returns STRINGID of the new string
+### [`add_custom_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_custom_name)
+`nil add_custom_name(int uid, string name)`<br/>
+Adds custom name to the item by uid used in the shops
+This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
+### [`clear_custom_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_custom_name)
+`nil clear_custom_name(int uid)`<br/>
+Clears the name set with `add_custom_name`
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
@@ -4351,15 +4358,17 @@ Runs before the entities of the specified draw_depth are drawn on screen. In thi
 - [`SPEECH_BUBBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) ON::SPEECH_BUBBLE
 \
 Params: `Entity speaking_entity, string message`\
-Runs before any speach bubble is created, even the one using `say` function\
-Return behavior: if you don't return anything it will execute the speach bubble funcion normally with default message\
-if you return empty string, it will not create the speach bubble at all, if you return string, it will use that instead of the original
+Runs before any speech bubble is created, even the one using `say` function\
+Return behavior: if you don't return anything it will execute the speech bubble function normally with default message\
+if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original\
+This first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
 - [`TOAST`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) ON::TOAST
 \
 Params: `string message`\
 Runs before any toast is created, even the one using `toast` function\
-Return behavior: if you don't return anything it will execute the toast funcion normally with default message\
-if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
+Return behavior: if you don't return anything it will execute the toast function normally with default message\
+if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message\
+This first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \

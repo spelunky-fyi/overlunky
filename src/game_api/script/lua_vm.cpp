@@ -1068,6 +1068,13 @@ end
     /// Returns STRINGID of the new string
     lua["add_string"] = add_string;
 
+    /// Adds custom name to the item by uid used in the shops
+    /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
+    lua["add_custom_name"] = add_custom_name;
+
+    /// Clears the name set with `add_custom_name`
+    lua["clear_custom_name"] = clear_custom_name;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

@@ -13,6 +13,7 @@
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "strings.hpp"
 
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/level_lua.hpp"
@@ -196,6 +197,7 @@ bool LuaBackend::update()
         {
             level_timers.clear();
             script_input.clear();
+            clear_custom_shopitem_names();
         }
         if (g_state->screen != state.screen)
         {
@@ -895,7 +897,7 @@ void LuaBackend::pre_entity_destroyed(Entity* entity)
 std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
 {
     if (!get_enabled())
-        return std::u16string{u"~[:NO_RETURN:]#"};
+        return std::u16string{no_return_str};
 
     auto now = get_frame_count();
     std::lock_guard lock{gil};
@@ -908,17 +910,17 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         if (callback.screen == ON::SPEECH_BUBBLE)
         {
             callback.lastRan = now;
-            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, entity, buffer).value_or(std::u16string{u"~[:NO_RETURN:]#"});
+            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, entity, buffer).value_or(std::u16string{no_return_str});
             return return_value;
         }
     }
-    return std::u16string{u"~[:NO_RETURN:]#"};
+    return std::u16string{no_return_str};
 }
 
 std::u16string LuaBackend::pre_toast(char16_t* buffer)
 {
     if (!get_enabled())
-        return std::u16string{u"~[:NO_RETURN:]#"};
+        return std::u16string{no_return_str};
 
     auto now = get_frame_count();
     std::lock_guard lock{gil};
@@ -931,11 +933,11 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
         if (callback.screen == ON::TOAST)
         {
             callback.lastRan = now;
-            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, buffer).value_or(std::u16string{u"~[:NO_RETURN:]#"});
+            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, buffer).value_or(std::u16string{no_return_str});
             return return_value;
         }
     }
-    return std::u16string{u"~[:NO_RETURN:]#"};
+    return std::u16string{no_return_str};
 }
 
 void LuaBackend::for_each_backend(std::function<bool(LuaBackend&)> fun)

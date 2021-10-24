@@ -1140,14 +1140,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put bp on state->basecamp_dialogue choose base/extra _dialogue, which ever the character you speak to responses ->line
         // Scroll down, you should see two calls, first one is to format text (the execution can jump around, call it multiple times)
         // The second call is this function
-        "npc_dialogue_fun"sv,
+        // Or put write bp on state->speech_bubble(pointer), you will end up somewhere in the middle of the function
+        "speech_bubble_fun"sv,
         PatternCommandBuffer{}
             .find_inst("\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
             .at_exe()
             .function_start(),
     },
     {
-        // Put write bp on state->toast
+        // Put write bp on state->toast (pointer), you will end up somewhere in the middle of the function
         "toast_fun"sv,
         PatternCommandBuffer{}
             .find_inst("\x55\x56\x48\x81\xEC\x98"sv)
