@@ -4357,18 +4357,18 @@ Params: `VanillaRenderContext render_ctx, int draw_depth`\
 Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
 - [`SPEECH_BUBBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) ON::SPEECH_BUBBLE
 \
-Params: `Entity speaking_entity, string message`\
+Params: `Entity speaking_entity, string text`\
 Runs before any speech bubble is created, even the one using `say` function\
 Return behavior: if you don't return anything it will execute the speech bubble function normally with default message\
 if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original\
-This first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
 - [`TOAST`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) ON::TOAST
 \
-Params: `string message`\
+Params: `string text`\
 Runs before any toast is created, even the one using `toast` function\
 Return behavior: if you don't return anything it will execute the toast function normally with default message\
 if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message\
-This first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
 ### SPAWN_TYPE
 - [`LEVEL_GEN`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) SPAWN_TYPE_LEVEL_GEN
 \
