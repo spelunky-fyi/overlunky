@@ -183,7 +183,7 @@ void State::zoom(float level)
     write_mem_prot(get_address("default_zoom_level"), level_str, true);
     write_mem_prot(get_address("default_zoom_level_shop"), level_str, true);
     write_mem_prot(get_address("default_zoom_level_camp"), level_str, true);
-    // no idea what triggers the fourth instance of writing 13.5 to current zoom level (see pattern for camp, it's the first match that is skipped)
+    write_mem_prot(get_address("default_zoom_level_telescope"), level_str, true);
 
     // overwrite the current value
     auto zla = get_zoom_level_address();

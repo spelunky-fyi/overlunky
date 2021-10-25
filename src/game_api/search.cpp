@@ -488,7 +488,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "level_gen_entry"sv,
         // Put a bp on the virtual LevelInfo::populate_level, start a new game, the caller is this function
         PatternCommandBuffer{}
-            .find_inst("\xE8****\x41\x80\x7F**\x7C\x22")
+            .find_inst("\xE8****\x41\x80\x7F**\x7C\x22"sv)
             .decode_call()
             .at_exe(),
     },
@@ -810,6 +810,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "default_zoom_level_telescope"sv,
+        // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
+        // Put a write bp on this float with the condition not to break at the RIP where shop/in-game level is written.
+        // Then look through the camp telescope, then stop looking
+        PatternCommandBuffer{}
+            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
+            .offset(0x6)
+            .at_exe(),
+    },
+    {
         "default_zoom_level_camp"sv,
         // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
         // Put a write bp on this float with the condition not to break at the RIP where shop/in-game level is written.
@@ -829,10 +839,58 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "explosion_mask"sv,
+        // Set a conditional bp on load_item for fx_explosion, throw a bomb and let it explode. When the debugger
+        // breaks, continue execution, the pause menu will appear mid-explosion and you'll have a fully formed
+        // fx_explosion entity. Put a read bp on its idle_counter and continue until you've breaked a couple of times.
+        // The big function that breaks contains a call to the internal hitbox-overlap function for which the default
+        // mask is put on the stack (0x18F)
+        PatternCommandBuffer{}
+            .find_inst("\xC7\x44\x24\x30\x8F\x01\x00\x00")
+            .offset(0x04)
+            .at_exe(),
+    },
+    {
+        "attach_thrown_rope_to_background"sv,
+        // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope
+        // A little below that will 6 be written into the entity's segment_nr_inverse
+        PatternCommandBuffer{}
+            .find_inst("\xFF\x50\x30\xC7\x83\x30\x01\x00\x00\x06\x00\x00\x00")
+            .offset(0x09)
+            .at_exe(),
+    },
+    {
+        "process_ropes_one"sv,
+        // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope, continue until all the segments are being made
+        // At the beginning of this big function will be two comparisons to 6 and a comparison to 5
+        PatternCommandBuffer{}
+            .find_inst("\x83\xF9\x06\x75")
+            .offset(0x02)
+            .at_exe(),
+    },
+    {
+        "process_ropes_two"sv,
+        // See process_ropes_one
+        PatternCommandBuffer{}
+            .get_address("process_ropes_one"sv)
+            .find_next_inst("\x83\xF8\x06")
+            .offset(0x02)
+            .at_exe(),
+    },
+    {
+        "process_ropes_three"sv,
+        // See process_ropes_two
+        PatternCommandBuffer{}
+            .get_address("process_ropes_two"sv)
+            .find_next_inst("\x83\xF8\x05")
+            .offset(0x02)
+            .at_exe(),
+    },
+    {
         "mount_carry"sv,
         // Set a bp on player's Entity::overlay, then jump on a turkey
         PatternCommandBuffer{}
-            .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00")
+            .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00"sv)
             .decode_call()
             .at_exe(),
     },
@@ -1124,6 +1182,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_inst("\xC7\x44\x24\x20\x9A\x99\x19\x3F"sv)
             .offset(0x13)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "construct_soundposition_ptr"sv,
+        // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x49\x89\x86\x30\x01\x00\x00"sv)
             .decode_call()
             .at_exe(),
     },
