@@ -1,0 +1,2517 @@
+# This is a comment! Anything after a # does not appear in the game!
+0xd41f49aa: Yes
+0xcd92c15d: No
+0x32ff8ff3: <SYS_ACCEPT/>
+0x0ed9f628: <SYS_BACK/>
+0xa158cd46: <LOG_BOMB/>
+0x3aededa9: <SYS_SPECIAL/>
+0x391b1b44: <SYS_SPECIAL2/>
+0xec1e6738: <SYS_SPECIAL3/>
+0x70ad4e49: <SYS_LEFT/>
+0x870ecccf: <SYS_RIGHT/>
+0x1a6eedcd: <SYS_ACCEPT/> OK
+0x90a2a5d6: <LOG_ACCEPT/> Continue
+0x9efb30a8: Continue
+0xf3806e4d: Cancel
+0x6be572f6: Reset
+0x6f8ba7c1: Disabled
+0xff3d053f: Enabled
+########################################
+## INTRO POEM                         ##
+##   Three lines chosen randomly...   ##
+########################################
+# Line 1
+########################################
+0x637ba759: Still dizzy from my arrival,
+0x76f44c73: Putting the faded photo in my pocket,
+0x1d82bd9c: Pushing aside my fears,
+0xaf6df946: After going over my plan one last time,
+0x73e69c18: My heart pounding in my chest,
+0xcb62841c: With my memories of Earth already fading,
+0x6e5f187f: With my mind already made up,
+0x22eedf5b: Uncertain whether I was ready,
+0x0815ade4: With Fortune smiling down on me,
+########################################
+# Line 2
+########################################
+0x5286275d: I gripped the rope tightly,
+0x987c752f: I took a deep breath,
+0xa7665cea: I pulled out my torch,
+0x3c0b0bfb: I called out to Monty,
+0x0128f1e2: I took one last look at the stars,
+0xb06eb98b: I thought of Mom and Dad,
+0xadc47936: I whispered something now forgotten,
+0x44a9c4f1: I closed my eyes,
+0x27cf4476: I gave thanks to my ancestors,
+########################################
+# Line 3
+########################################
+0x2b2819d4: And descended into the darkness.
+0xe39f18d0: And wondered if I'd ever see them again.
+0x2302c927: And felt a cold chill rising from below.
+0x617daa8e: And ventured into the unknown.
+0x73bb309c: And felt excited for the upcoming adventure.
+0xf8d73f7d: And vowed to return alive.
+0xcd0dd989: And then swore I heard voices coming from below.
+0x2d1dd80c: And that's when it all started.
+0xd9cbcdbd: And felt a wave of calm wash over me.
+########################################
+## PAUSE MENU                         ##
+########################################
+0x05dd5402: PAUSED
+0xa92ed9d8: Resume Game
+0xb49b4eb1: Restart Tutorial
+0x613a75c8: End Adventure
+0x2389e245: End Match
+0x4730d4aa: Instant Restart
+0x27407cc8: Options
+0x0be8d18c: Main Menu
+0x0d9baa78: Exit Game
+0x811c092d: Are you sure you want to restart the tutorial?
+0xe62d4a42: Are you sure you want to end the adventure? All unsaved progress will be lost.
+0xe45e68bc: Are you sure you want to end the match?
+0x11364d31: Are you sure you want to restart? All unsaved progress will be lost.
+0x72202877: Are you sure you want to exit to the Main Menu? All unsaved progress will be lost.
+0x2d6c2a1d: Are you sure you want to exit the game? All unsaved progress will be lost.
+0x2b0bafe0: Level
+0x7162b3ad: Money
+0x7a82990f: Time
+0xa7c1891d: Press <SYS_ACCEPT/> to Begin
+########################################
+## MAIN OPTIONS                       ##
+########################################
+0x49054a7e: Play
+0xa1023681: Online
+0xfe203cc2: Options
+0x34906f28: Leaderboards
+0x8ca20866: Player Profile
+0x9a19dfba: Quit Game
+########################################
+## PLAY OPTIONS                       ##
+########################################
+0x7dafca94: Adventure
+0xc1401c2d: Embark on the main quest. Go alone or with friends!
+0xf66722ba: Seeded Run
+0x4e9d0a33: Do a run where the randomness is tied to a set seed.
+0xca0a155a: Play Adventure Mode to unlock Seeded Runs!
+0x9648dc6a: Seeded Runs unlocked!
+0x6a991848: Arena
+0x08253972: Battle against friends or bots in the deadly Arena.
+########################################
+## ONLINE OPTIONS                     ##
+########################################
+0x54cd9471: Adventure Online
+0xab82e39b: Start an Adventure with friends or random players.
+0x02b48b9e: Daily Challenge
+0x20b1eb3e: Try today's daily challenge. You only get one shot!
+0xce1e4289: You've already attempted today's challenge. Try again tomorrow!
+0x465fe538: Custom Arena
+0x12381bbf: Battle friends online using your own custom settings.
+0xc5ff6ec4: Invite
+0x606b22dc: <SYS_ACCEPT/> Ready
+0x7cc7eae9: <SYS_SPECIAL3/> Code
+0x98938f69: <SYS_SPECIAL2/> Invite                <SYS_SPECIAL3/> Code
+0x0e2136e8: <SYS_SPECIAL/> Search
+0xd3f40ba8: Enter Code
+0xeeaacee0: Your Code:
+########################################
+## OPTIONS                            ##
+########################################
+0xa8a53481: Graphics and Audio
+0x6973ceb6: Controls
+0xd137ca55: Gameplay
+0x5328275f: HUD and Text
+0x8295e4e6: Language
+0x11ed4196: Cross-Progress
+0x6524dc36: Data Management
+0xb6496c73: Credits
+#### Shared values
+########################################
+0xa7816c7c: Off
+0xf19382c9: On
+0xb157c739: Small
+0xb6449765: Medium
+0x43de84ca: Large
+0x262a37ec: <SYS_SPECIAL/> Reset to Defaults
+0xd5d1c1a9: <SYS_ACCEPT/> Apply
+#### GFX and Audio options
+########################################
+0x7b7d1b94: GRAPHICS
+0xd2194e4e: Resolution
+0x7e395c3d: Set the resolution.
+0xd8040d83: Resolution Scale
+0x6bbf1326: Change the internal resolution of the game.
+0x252fd018: Display Mode
+0xb48b160c: Set the display mode.
+0x49e8f93d: Fullscreen
+0xd1e600ea: Borderless Windowed
+0x4ae47562: Windowed
+0x999a46ac: Brightness
+0xf94f8592: Set the screen brightness.
+0x6ebceb0b: Bright Flashes
+0x00949d9f: Set the intensity of bright flash effects.
+0x60276dac: On
+0x54e3f1de: Off
+0x34c3fb0e: Visual Effects
+0x3507de9e: Lower VFX may improve performance.
+0x97e10741: High
+0xf2f05950: Normal
+0x29e8df85: Low
+0x9a10db7d: Overscan
+0x1e07b09f: AUDIO
+0x0a8d040d: SFX Volume
+0x0de10191: Set the volume of sound effects.
+0xabc9395f: Music Volume
+0xe5d737c7: Set the music volume.
+0xddfe1b53: Master Volume
+0x0a8428fc: Set the master volume.
+#### Controls
+########################################
+0x94e66885: Keyboard Config
+0xa7767f8a: Controller Config
+0xa7767f8a: Controller Config
+0x4f1d7e95: Current Player
+0x641b4510: The current player whose controls we're configuring.
+0x311451b8: Player %d
+0x2aadd7af: Up
+0x6d11ddc9: Down
+0x7830d18a: Left
+0xa370f6c7: Right
+0x9cf71a5a: Jump
+0x43091b2b: Attack
+0x54949a1c: Bomb
+0xeebd1071: Rope
+0x574f6455: Pause
+0x252bdc95: Use Door/Buy
+0x60ad4ae3: Walk/Run (Hold)
+0x51b7bdbc: Movement Default
+0xe1d1cf5a: Toggle running or walking by default.
+0xd138f693: Walk
+0xa92df0e3: Run
+0x8d95ee18: Right Stick
+0xb9886e89: Toggle the right stick for movement.
+0x8d95ee18: Right Stick
+0xb9886e89: Toggle the right stick for movement.
+0x2c0b9fd9: Vibration
+0x88a85fe2: Set the controller vibration mode.
+0xb5d6ea6a: Rumble
+0xa7ee418e: Set the controller rumble mode.
+0x60224f78: <SYS_ACCEPT/> Change Key
+0x6b33b386: <SYS_ACCEPT/> Change Button
+0x6b33b386: <SYS_ACCEPT/> Change Button
+0x6b33b386: <SYS_ACCEPT/> Change Button
+0x6b33b386: <SYS_ACCEPT/> Change Button
+0xbb597189: Press the button you'd like to use for %ls
+0xbb597189: Press the button you'd like to use for %ls
+0xbb597189: Press the button you'd like to use for %ls
+0x251b154c: This key is already in use! If you continue, this key will be unset for player %d.
+0xf28ceb91: Unset key for player %d
+0xfbd85ba6: Player %d has some unset actions. Are you sure you want to leave?
+#### Online
+########################################
+0x49d31e0b: ONLINE
+0xc8d2037b: Cross-Play
+0x3202ae45: Enables playing with players using other platforms.
+0x40d5599d: Input Delay
+0x46481a58: Delays game control input to reduce visual glitches.
+0x1cadf401: Output Delay
+0x021ca540: Delays displaying other players' actions to reduce visual glitches.
+0xf27a63c8: Pseudonymization
+0x7f173e79: Use pseudonyms for players from third-party sources.
+#### Cross-Progress
+########################################
+0xc9e5fcaf: Cross-Progress
+0x5fcd59a7: Enable sharing progress with other platforms.
+0x0f7fe436: Auto-Sync
+0x0f8b7fbe: Auto-sync progress with other devices.
+0xa5524275: Request Sync Code
+0x7f459234: Request a code to share progress with another platform.
+0xd29b390d: Enter Sync Code
+0xfff39283: Enter a code from another platform to share progress.
+0xb5704bc0: Sync Progress
+0x1c989a85: Download, merge and upload your progress.
+0xa9039985: Sync Code:
+0x0873bb4e: Requesting Code
+0x98911d5f: Syncing
+#### Gameplay
+########################################
+0xde045e5f: Pet Style
+0x9c219a67: Set which pet appears in each level.
+0x7705aa10: Screen Shake
+0x3c568d53: Set how much screen shake there is.
+0x495bb966: Off
+0x9717a29f: Low
+0x1d49297f: Medium
+0x264ffad3: High
+0xa162ba21: Instant Restart
+0xf4c152e2: Add an Instant Restart option to the Pause Menu.
+0x2c9d59ed: None
+0x0583c46b: Confirm
+0x65cd674e: Don't Confirm
+#### Display
+########################################
+0xa5f5734d: HUD
+0x470e9554: HUD Visibility
+0x6449987a: Set the HUD visibility.
+0x93c13152: Auto-Adjust
+0x452d98b2: Opaque
+0x9c479461: Transparent
+0xfa3ba178: Invisible
+0x7b24d662: HUD Size
+0xc39b8cdc: Set the size of the HUD.
+0x38408988: Level Timer
+0x466249a9: Set how the level timer is displayed.
+0x068edd4c: Level Timer Only
+0x18e34ec9: Level/Total
+0xebc6f108: Off
+0xa780cc2a: Timer Detail
+0x3ff7e08a: Set how detailed the level timer is.
+0xb793c493: Seconds
+0x587d93d5: Milliseconds
+0x2d9e8368: Level Number
+0x82a308f1: Toggle if the level number is displayed.
+0x80ece0d2: Angry Shopkeeper Icon
+0xa3fb4506: Toggle whether an icon is displayed when shopkeepers are angry.
+0xd992f3b4: Button Prompts
+0xc115c09e: Choose whether or not to display button prompts.
+0xd992f3b4: Button Prompts
+0xc115c09e: Choose whether or not to display button prompts.
+0xd992f3b4: Button Prompts
+0xc115c09e: Choose whether or not to display button prompts.
+0x9c2dadb8: Button Icons
+0x4566086c: Force button icons to a particular platform.
+0xcab7d197: Feat Pop-Ups
+0xece2b76b: Toggle if Feat pop-ups are displayed.
+0x4a990207: TEXT BOXES
+0x3060a68c: Text Box Size
+0x6640b8c5: Set the size of text boxes.
+0xfce84cb1: Text Box Duration
+0xd18c3cd8: Set how long a text box is displayed on screen.
+0x1718c664: Very Short
+0x5284866b: Short
+0x2701c1fe: Medium
+0x87b602ec: Long
+0x41bcc81d: Text Box Opacity
+0xee30961e: Set the opacity of text boxes.
+0x4641eea8: Testing description text\nThis is the subdescription text
+0xef10962b: Level Feelings
+0x2be6bc15: Toggle whether level feelings are displayed.
+0xe6165260: Dialogue Text
+0xb15b29f1: Toggle whether dialogue text is displayed.
+0x966c1627: Kali Text
+0x63dba33d: Toggle whether Kali's messages are displayed.
+0xde652cb4: Ghost Text
+0x04b5c631: Toggle whether ghost warnings are displayed.
+0xa7027fc1: <SYS_SPECIAL2/> Preview HUD
+0x1e329b37: <SYS_SPECIAL2/> Preview Text Box
+#### Language
+########################################
+0x769ade4e: New Language
+0x6e3cc1dd: Set the language.
+0xb5c04384: <SYS_ACCEPT/> Apply Language
+#### Data Management
+########################################
+0xd97e397e: Reset Journal
+0xc4136817: Reset Shortcuts
+0x87a040a5: Reset Unlocked Characters
+0xe66f4259: Reset Player Profile
+0x1bffecfc: Reset Wins and Times
+0xd76c64cf: Reset All Save Data
+0xe91d4f4a: This will reset all journal entries except for any unlocked characters.
+0x435229d9: This will reset all shortcuts.
+0xdf711596: This will lock all unlocked characters and remove their journal entries.
+0x3c92b590: This will reset the player profile.
+0x38ef4228: This will reset average time, best time, and wins in the player profile.
+0x3313e998: This will reset all save data.
+0x4ed66a74: Base Camp may also be affected.
+0x04a92dca: Are you sure? This action can't be undone.
+#### Credits
+########################################
+0x33f93a55: <SYS_ACCEPT/> Fast Forward
+########################################
+#### LEADERBOARDS
+########################################
+0x6617fc0c: Top Runs
+0x024562be: Depth
+0x8e6e4728: Fastest Times
+0x15220b78: Normal
+0x88cb15a3: Hard
+0xcffabf45: Special
+0xb3cc86d1: Top Daily Runs
+0xf168e965: Rank
+0x278a4b5c: Player
+0xfdab4e5e: Level
+0xc9139976: Score
+0xebf7656d: Time
+0x06bf7718: Filter
+0x02313b7e: Overall
+0xadba715b: Friends
+0xe4546986: Cross-Play
+0xfe4290e9: Total Players
+0xafc8846c: <SYS_SPECIAL2/> Me
+0xd4a3389b: Watch replay
+0x884e39c7: <SYS_ACCEPT/> Watch replay
+0x3240422f: <SYS_ACCEPT/> Contextual menu
+########################################
+## ENTER SEED SCREEN                  ##
+########################################
+0xf212c5e9: Enter Seed
+0x856ae9ff: <SYS_ACCEPT/> Select    <SYS_SPECIAL/> Delete
+0x2b183d90: <SYS_ACCEPT/> Select    <SYS_SPECIAL/> Delete    <SYS_SPECIAL2/> Random
+0xe8b2057e: Seed: %08X
+########################################
+## CHARACTER SELECTION SCREEN         ##
+########################################
+0x406f5a59: CHOOSE ADVENTURER
+0x311d1e28: Player %d
+0x8476e147: <SYS_ACCEPT/> Start
+0x32d818fb: Back <SYS_BACK/>
+0x9172e844: <LOG_ACTION/> Add Bot
+0x82d172a2: <SYS_SPECIAL/> Add Bot
+0xfaf6794d: <LOG_BOMB/> Remove Bot
+0xef3882ca: <SYS_BACK/> Remove Bot
+0xea57f226: <LOG_SPECIAL/> Change Bot AI
+0x5214fc87: <SYS_SPECIAL3/> Change Bot AI
+0x8cc1ae6d: Chill
+0x05285151: Normal
+0x833fc778: Aggro
+0xaafea10a: Turtle
+0x13f6d670: Tactical
+0xc9dd6aea: Random
+0x53969867: QUICK SELECT
+0x8ed69864: <LOG_ROPE/> Quick Select
+0x939c4f37: <SYS_SPECIAL2/> Quick Select
+0x29f617c0: Press <LOG_START/> to access the Options Menu and change your control scheme.
+0xa0a8f1ca: The walls are shifting...
+########################################
+## ARENA                              ##
+########################################
+0x62fc9c0a: ARENA
+0x880bfedc: Press <LOG_JUMP/> to revive!
+0x2ac4fb36: Rules
+0x40b88174: Format
+0x2101435a: Choose which format to play with.
+0x851186e4: Deathmatch
+0xe79744e5: Hold the Idol
+0xcad21023: Deathmatch: Last person standing.
+0x92f8b1da: Hold the Idol: Hold it as long as possible.
+0x8fca8cc8: Ruleset
+0x8661942d: Choose which ruleset to play with.
+0x7886a3ae: Casual
+0x39a8e1d0: Tournament
+0x5dac4189: Joust
+0x0df20beb: Frantic
+0xa82ec762: Custom <SYS_ACCEPT_SECONDARY/>
+0xdb983fba: Favorite
+0x088d9796: Casual: An easy-going ruleset with items.
+0x8790dcfd: Tournament: Fast-paced, itemless rules.
+0x403d2f12: Joust: Start with a mount and a sword.
+0xe68ccba2: Frantic: Bombs everywhere!
+0xcc321476: Custom: A unique ruleset.
+0x63d3723a: Favorite: Your own house rules.
+0x6ad8e92f: Timer
+0x67b46f8f: Set how long each round lasts.
+0x5c23c9dd: 0:30
+0x7ab0c703: 1:00
+0x4b58dd9e: 1:30
+0x433dfbc6: 2:00
+0x72d5e15b: 2:30
+0x5446ef85: 3:00
+0x65aef518: 3:30
+0x3027824c: 4:00
+0x01cf98d1: 4:30
+0x275c960f: 5:00
+0x16b48c92: 5:30
+0x1ed1aaca: 6:00
+0x2f39b057: 6:30
+0x09aabe89: 7:00
+0x3842a414: 7:30
+0xd6137158: 8:00
+0xe7fb6bc5: 8:30
+0xc168651b: 9:00
+0xf0807f86: 9:30
+0xef79469e: 10:00
+0x67607017: Infinite
+0x15986544: Timer Ending
+0xf0410835: Set what happens when the timer ends.
+0x5ca1f25e: Round Ends
+0x7ee40197: Death Mist
+0x714383c3: Alien Blast
+0x4648b314: Loose Bombs
+0x21488a13: Ghost
+0x610384ce: Random
+0x74462120: Wins
+0x6bb3ca57: Set how many wins are required to decide the victor.
+0xb42cd6eb: Lives
+0xb4f6dfa6: Set how many lives each player has per round.
+0x76675b67: Time to Win
+0x89f570e1: Set how many seconds you have to hold the idol to win.
+0x8ae59c43: 10
+0xbb0d86de: 20
+0x1d7a8d6a: 30
+0xd8ddb3e4: 40
+0x7eaab850: 50
+0x4f42a2cd: 60
+0xe935a979: 70
+0x1f7dd990: 80
+0xb90ad224: 90
+0x9e0583ec: 99
+0x1df93518: Health
+0xac1e6bec: Set how much health each player starts with.
+0x3d898c21: Bombs
+0x69d4a536: Set how many bombs each player starts with.
+0x383e17bd: Ropes
+0xc6ada2bc: Set how many ropes each player starts with.
+0x4e2f3bc9: Stun Time
+0xc948a9b7: Set how long players are stunned for.
+0x75275525: x0.00
+0xb275d5bf: x0.25
+0x271f7a82: x0.50
+0xe04dfa18: x0.75
+0x625c4166: x1.00
+0xa50ec1fc: x1.25
+0x30646ec1: x1.50
+0xf736ee5b: x1.75
+0x5bd17da3: x2.00
+0x36f4e034: Whip Damage
+0x025bdac2: Set how much damage the whip does.
+0xa85f4c78: 0
+0x63039fdd: 1
+0xe597ed73: 2
+0x2ecb3ed6: 3
+0x33ce0e6e: 4
+0xf892ddcb: 5
+0x8ae59c43: 10
+0x9e0583ec: 99
+0x583d138e: Final Ghost
+0x5d845f3a: Set whether a player ghost is created after the final life is lost.
+0xbeb370c6: Off
+0x00365eb2: On
+0x1c8b5152: Breath Cooldown
+0x780c2fdd: Set a cooldown for the ghost breath attack or toggle it off.
+0x67c53d0b: None
+0x52686c0b: 0.25
+0x363db2bd: 0.5
+0x005043ac: 0.75
+0xaa5a2390: 1.0
+0x45137848: 1.25
+0xfa97b223: 1.5
+0x172b57ef: 1.75
+0x24d52473: 2.0
+0xcb2fbf30: Breath Off
+0xb979a7fe: Mount
+0x34183d6e: Choose whether players begin each round mounted.
+0x67c53d0b: None
+0x0810d315: Turkey
+0x869b9f53: Rock Dog
+0x7d74c073: Axolotl
+0x610384ce: Random
+0xeb6542c2: Punish Ball
+0x9e86bac7: Set whether players spawn with a punish ball.
+0xbeb370c6: Off
+0x00365eb2: On
+0x75a66b35: Arena Select
+0x1f18cf52: Choose how arenas are selected between rounds.
+0xb2d5893f: Take Turns
+0xb63e1c9f: Loser Picks
+0xa021ccdc: Random Level
+0xe0f8864c: Arenas
+0x07b5466d: Choose which arenas are available to play in.
+0x8c814a94: Dark Level Chance
+0xd30dfb71: Set the chance a round begins dark.
+0x67c53d0b: None
+0xcea0572b: 10%
+0x4aea59d1: 50%
+0xd6b89de5: Always
+0xe9e9138e: Crate Frequency
+0x3b83a082: Set how frequently crates appear in the arena.
+0x67c53d0b: None
+0x6d2ee3c8: Low
+0x98634876: Medium
+0xfbb61b0b: High
+0x0252efc9: Very High
+0xce51c026: Items
+0xad2dfde9: Choose which items are available in crates and which you start holding.
+0x95e52f01: <SYS_ACCEPT_SECONDARY/>
+0xe0a88588: <SYS_START/> Next
+0xbeb370c6: Off
+0x66c32276: ALL
+0x56a263f7: NONE
+0x6d5ecd0a: ARENA STAGES
+0x59fc8edf: Enable or disable a stage for selection between rounds.
+0x9d954c72: SMALL
+0xd0b3faf1: BIG
+0x233dcdec: Disable all arenas. (At least one arena must be enabled to play.)
+0x082ad893: Enable all arenas.
+0xfd8e82af: Toggle small arenas on/off.
+0xf4d34caf: Toggle big arenas on/off.
+0x7cb85b30: Size: %ls
+0x2e03902d: Small
+0x18a2c65b: Big
+0x170954eb: - Locked Arena -
+0x6ea6204c: Dwelling
+0x08471fc1: Jungle
+0xdc0da3f6: Volcana
+0x47466910: Tide Pool
+0x429adb0f: Temple of Anubis
+0xa6751421: Ice Caves
+0xeb7a0cb6: Neo Babylon
+0x6ad58f53: Sunken City
+0x6a5ddb22: BONEYARD
+0x0f9fabd8: LADDERS
+0xf09c0305: THE BOSS ROOM
+0xa1bf3dee: THE DIG
+0x78d50df8: APARTMENTS
+0x9868310b: VINES
+0xd3b57df7: RUINS
+0x80646ba6: NO ROOTS
+0x4d10a4e3: TOWER TO HEAVEN
+0x23f699d1: PRICKLY
+0x51441c94: TREADMILL
+0xb6cb0c25: PRECARIOUS
+0xf627c2e4: SMELTER
+0xf2a681dc: SCRAPYARD
+0xf0e0aa0a: CHAINED
+0x233e96c2: CLAM BAKE
+0x32a2f940: BARRIER REEF
+0x1232bdb9: POLE DANCE
+0x72a4e2e7: TWO HOUSES
+0xe2e8b729: EIGHT TREASURES
+0xc7336e7b: ROUNDABOUT
+0xda707b69: PYRAMID
+0x0185be5f: BURIAL CHAMBER
+0x8c46dd49: GRINDER
+0x8f2192c9: SAND PIT
+0x4716da4b: ICE BOX
+0x38e92b77: BOUNCE HOUSE
+0x6923c655: SPRUNG
+0x450172eb: THE PLATFORM
+0x0ae6df0f: FORGOTTEN GOD
+0x6172f551: ZAP CAGE
+0xb84e6281: FUNGAL
+0xefb3155f: HOLY MOUNTAIN
+0x429e785f: NEON CITY
+0xf46029eb: POWER PLANT
+0x72dcd561: SCAR TISSUE
+0x6866a80f: INDIGESTION
+0x79b3afa3: TEMPLE OF FROG
+0x77a61888: PIPE DREAM
+0x1f02f714: PASSIONS
+0x688dc274: ARENA SELECT
+0x43de31b1: Choose the next arena to compete in!
+0x8427bb3f: Player %d's Turn
+0x7029e056: <LOG_ACCEPT/> Fight!
+0x7bd47d5d: ARENA ITEMS
+0x1912f655: Level Feature
+0x67e1b7bd: Power-Up
+0x18a78128: Held Item
+0x7100c4ae: Equipment
+0xfb664c95: Backwear
+0x1c86b7a3: Special
+0xa5f84736: <LOG_ACCEPT/> Toggle all items on/off.
+0xc5a71623: <LOG_ACCEPT/> Toggle level features on/off.
+0x67913e64: <LOG_ACCEPT/> Toggle power-ups on/off.
+0x123e9744: <LOG_ACCEPT/> Toggle weapons on/off.
+0x45aae641: <LOG_ACCEPT/> Toggle equipment on/off.
+0xc70926dc: <LOG_ACCEPT/> Toggle backwear on/off.
+0xd5d3c35f: <LOG_ACCEPT/> Toggle special items on/off.
+0xee67271e: <LOG_ACCEPT/> Toggle this item on/off.
+0x62a5788a: <LOG_ACCEPT/> Enable this item as a starting item or simply toggle it on/off.
+0xaf1e75e5: <LOG_SPECIAL/> Skip
+########################################
+## DM RESULTS SCREEN                  ##
+########################################
+0xb5f55e27: <LOG_ACCEPT/> OK
+0xbc545c34: READY!
+0xfda71685: PLAYER 1 WINS!
+0xa5b9bfad: PLAYER 2 WINS!
+0x249cda8a: PLAYER 3 WINS!
+0x1584edfd: PLAYER 4 WINS!
+0x4bd733b2: TEAM 1 WINS!
+0x13c99a9a: TEAM 2 WINS!
+0x92ecffbd: TEAM 3 WINS!
+0xa3f4c8ca: TEAM 4 WINS!
+0xd40b6bbb: DRAW GAME!
+0x7db78d2c: <LOG_ACCEPT/> Next!
+########################################
+## TEAM SELECTION                     ##
+########################################
+0x59f2c26d: CHOOSE TEAMS
+0x34436d11: <LOG_ACCEPT/> Start
+########################################
+## PRE-MATCH HYPE                     ##
+########################################
+0x36480b63: FIRST TO %d
+0x32db310c: HOLD THE IDOL FOR %d SECONDS
+########################################
+## TRANSITION TUNNEL                  ##
+########################################
+0xda7c0c5b: %d-%d COMPLETED!
+0x29d2eb80: This level:
+0x283ddb71: Total:
+0x6ab753ba: Stats
+0x61e63c70: Loot
+0xc719580c: Press <LOG_ACCEPT/> to go to the next level
+########################################
+## GAME OVER                          ##
+########################################
+0x2df22c84: Quick Restart
+0xbf8bff60: Character Select
+0xd9c88b1b: Return to Camp
+0xbfbcd958: Enter New Seed
+0xadb75a98: Exit to Title
+########################################
+## CONTROLLER DISCONNECTION           ##
+########################################
+0xb3552a6c: Controller for player %d has been disconnected. Reconnect the controller or connect a new one and press <LOG_ACCEPT/> to continue.
+0xb3552a6c: Controller for player %d has been disconnected. Reconnect the controller or connect a new one and press <LOG_ACCEPT/> to continue.
+0x47234640: <LOG_CANCEL/> Return to title screen
+0x62369b0f: <LOG_CANCEL/> Return to main menu
+########################################
+## JOURNAL MENU                       ##
+########################################
+0x8832639c: Journal
+0x4f7bcb96: Places
+0xe1e4ca91: People
+0x29b133af: Bestiary
+0x22712e24: Items
+0x2f3b54fb: Traps
+0x6a7afbaa: Story
+0x00d28a8e: Entry %d
+0x039e2f38: Defeated
+0xfc17292a: Killed
+0xa217f155: Killed By
+0x9a293191: N/A
+0xb7fb6d15: You got the Journal!
+0xbc429789: Journal Entry Added
+0xcd07f25b: <LOG_SELECT/> Close Journal
+########################################
+## JOURNAL - PLACES                   ##
+########################################
+0xcc0e6eb9: UNDISCOVERED
+0x27d12fb2: This entry is still waiting to be discovered.
+0x23befaa6: DWELLING
+0xffaf5b39: The air here is warm and dry. It smells of campfire smoke and bat guano.
+0xb780f944: JUNGLE
+0xde31ee39: Despite all odds, this dense, tropical forest appears to be teeming with life.
+0x636fafd0: VOLCANA
+0xac26d76f: It's as hot as Hell in this lava-filled world! Who knew the Moon could have such a place inside it?
+0x6fc68532: OLMEC'S LAIR
+0xed673157: A shrine dedicated to the mighty Olmec. There is a timeless quality to this place of worship.
+0x9c041520: TEMPLE OF ANUBIS
+0xaba13811: A massive tomb built by powerful pharaohs. On its walls are carved the stories of the past, present, and future.
+0x9c58ea10: TIDE POOL
+0x10e9d16a: The ruins of an ancient empire lay here, at the edge of a vast, underground ocean.
+0xbcae6bc4: ICE CAVES
+0xfcf3aec5: Life still thrives within the frozen core of this giant meteorite.
+0xc945ed76: NEO BABYLON
+0x896d206f: The capital city of the Olmites, a place of high technology, untold wonders, and endless stimulation.
+0x479e1fd9: SUNKEN CITY
+0xd6a398f6: In the bottom of the Well, the First City sleeps.
+0xca4c5bc4: COSMIC OCEAN
+0xcba76995: The roiling waters of creation that flow from Hundun's childish weeping. Here one may find the beginning and the end.
+0x90f1550c: THE CITY OF GOLD
+0xca73b867: A legendary place to all treasure hunters! Every brick is made from solid gold.
+0x2cb8c746: DUAT
+0xe76cc0c3: A desert of ash and fire, burning beneath an eternal blood moon. The domain of the god Osiris.
+0x0a9c432d: ABZU
+0x43ae7675: This palatial sanctuary was built over the deepest part of the sea.
+0x897e7adb: TIAMAT'S THRONE
+0x30967fa4: Where Queen Tiamat gave birth to the World. Now a seat of power from which she guides her unruly children.
+0xc03f0807: EGGPLANT WORLD
+0xd514063e: Once the palace of a mighty tyrant, now overgrown with peaceful eggplants.
+0x90ae0669: HUNDUN'S HIDEAWAY
+0x321ae5ba: At the lowest point of the Well is where the Great Dreamer muddles about, always felt but never known.
+########################################
+## JOURNAL - BESTIARY                 ##
+########################################
+0xef03d52e: SNAKE
+0xe26493da: Be careful! It's liable to throw a hissy fit!
+0xe1506c94: SPIDER
+0x436c0442: Much larger than the household variety. Don't let it get the drop on you!
+0x8d2d503b: HANG SPIDER
+0x4994ede0: It could chase you if it had to, but it'd rather not leave its web if possible.
+0x109c9b7d: GIANT SPIDER
+0x6d4acd04: A frightening arachnid the size of a car. She squirts sticky webs to ensnare her prey.
+0x47ad5468: BAT
+0x40cce9da: A common cave resident that nonetheless thinks very highly of itself due to its cute appearance.
+0x8ca8bb05: CAVEMAN
+0x52024ac7: One of our primitive ancestors. His simple life is somewhat enviable.
+0x17301213: SKELETON
+0xf7a80027: We all have one inside us... and yet they're still so spooky!
+0xdd47e73b: SCORPION
+0xd187c227: Sometimes you break open a pot and a nightmare comes out. This is that nightmare.
+0xf248f7b3: HORNED LIZARD
+0xbf4b5d8c: It still hasn't figured out how to stop rolling once it starts.
+0x887c98fd: CAVE MOLE
+0x23abb025: Who's got teeth like spades and needs no shades? CAVE MOLE! CAVE MOLE!
+0x82cf5c3e: QUILLBACK
+0x7428d7eb: The leader of the cavemen. A big bully who wears the pelt of the last cave porcupine.
+0xf4a21fa1: MANTRAP
+0x9853b467: Once it tasted human flesh, it never looked back!
+0x47e6ff66: TIKI MAN
+0x135d95e2: A masked Jungle-dweller who hunts with a large boomerang.
+0xd60e718e: WITCH DOCTOR
+0xb3a283ce: A Tiki Tribe elder who practices black magic. They use an effigy to attack intruders.
+0x360e3626: MOSQUITO
+0x94fbbad9: An annoying pest! Makes me mad just thinking about it.
+0x08420ac1: MONKEY
+0xc0cec3de: A mischievous forest trickster. It simply can't get enough of its own unfunny pranks!
+0x597d0cee: MAGMAR
+0x6398cc50: When an adventurer dies in lava, their spirit can become trapped inside the lava instead of going free.
+0x920b89d2: ROBOT
+0x3f937db2: They patrol Volcana aimlessly, awaiting instructions from long-dead masters.
+0xe82579ef: FIRE BUG
+0x7d1a1c23: A deadly insect that protects itself by igniting gas stored inside its body.
+0x231feff4: IMP
+0xbc159f4e: When Yama disappeared, these lowly servants emerged from Hell seeking employment.
+0xc5ba93c3: LAVAMANDER
+0xa566c0a3: The blood of this lizard-like monster runs so cold that only the immense heat of lava can keep it going.
+0xe8b87e30: VAMPIRE
+0x2cbe7c06: A tortured soul who traded their humanity for eternal life.
+0x7f4524bf: VLAD
+0x02e63fb6: The dark lord of all vampires. He relocated to a large castle deep inside Volcana.
+0x73eb35ee: OLMEC
+0x1faa5313: Once thought to be the cause of a curse that trapped explorers in a cave... but maybe he was just a small part of it?
+0x4394182e: CROCMAN
+0x62b81420: Their powerful bite and teleportation magic makes them a dangerous foe.
+0x7355fe72: COBRA
+0xdea3b868: A hooded serpent with a rather rude habit.
+0x6a6d184a: MUMMY
+0x6556b5d8: This frightening tomb lord emerges from its eternal slumber to protect the Temple from trespassers.
+0xcde334f6: SORCERESS
+0x074384d7: An expert magic user who wields the power of creation.
+0xd61621c9: CAT MUMMY
+0x82950daf: These mummified felines are filled with terrible curses.
+0xd233c600: NECROMANCER
+0x49bafcfd: A master of the dark arts who dedicated his life to studying the Book of the Dead.
+0x15fd2f82: ANUBIS
+0xb9142e90: This legendary jackal-headed god is tasked with guarding the Temple's most hallowed treasures.
+0x03faedd8: AMMIT
+0xab36cc43: A terrifying underworld demon who eats the hearts of unclean souls, causing them to die a second death.
+0x7b43922e: APEP
+0x06694f53: A great snake god who slithers tirelessly throughout Duat, with scales of flint and a stomach full of hot ash.
+0xc6a4d425: ANUBIS II
+0x7e2f9e3b: Having been defeated at the Temple, Anubis returns to the underworld to beg forgiveness of his father, Osiris.
+0xead822ec: OSIRIS
+0x9a55cf99: The ruler of Duat and the ultimate judge of souls who make their way to him.
+0xf76dcbab: JIANGSHI
+0xa9986e24: A reanimated corpse. Its stiff legs force it to hop around.
+0x094beed0: JIANGSHI ASSASSIN
+0xd3aed7e0: This wily jiang-shi was once an imperial assassin.
+0x7c116170: FLYING FISH
+0xee71dc2a: A strange, thrill-seeking fish that will go out of its way to eat "landfood".
+0x36cdfe3b: OCTOPY
+0xb4e15b46: It defends itself with a blinding ink attack and a crown of razor sharp barnacles.
+0xf48d8ef0: HERMIT CRAB
+0x593f2c14: An irritable loner who hates being disturbed. Its saliva is very poisonous!
+0x3f22fe85: PANGXIE
+0x27ca895d: One of Kingu's famous armored guards. His claws can crush wood and stone with ease.
+0x1f6d75b4: GREAT HUMPHEAD
+0xc55c8db4: Endlessly he patrols the salty waters of the Great Lake, waiting for the Empress to return and feed him.
+0x0770a7cb: KINGU
+0x703ba234: Tiamat's loyal companion and unwavering protector. Her mighty shell once withstood the impact of a comet.
+0x3d5fc669: UFO
+0x90013e59: In alien society, being a flying saucer pilot is considered a lowly occupation.
+0xbb4a9036: ALIEN
+0x010e89c8: Tiamat's firstborn. They harbor a deep jealousy of the Olmites, whom they think she favors.
+0xe5905d12: YETI
+0x253e2f33: It loves to toss things and chew gum. But it doesn't know what gum is!
+0xf2ddeef9: YETI KING
+0x518844f8: The king of the yetis is whichever one is biggest.
+0x274cd450: YETI QUEEN
+0x41419b7a: The queen of the yetis is whichever one can defeat the king in battle.
+0xaac1cae4: LAHAMU
+0x8ad385bc: The eldest daughter of Tiamat. A jealous and vindictive warlord with powerful psychic abilities.
+0x57170fbe: PROTO SHOPKEEPER
+0x36b286f3: During the First Wars, Lahamu stole the Original Man to create clones of him with varying degrees of success.
+0x4eead89e: LAMASSU
+0x590e8a41: A mighty demigod created by the Olmites to help them guard Neo Babylon.
+0x0c0ae8c0: OLMITE
+0x32ba4293: Tiamat's secondborn. An inquisitive race that excels at creation.
+0x9aaa38ff: TIAMAT
+0x7f8d0539: The Queen of the World. Though myth and legend have separated her from her descendants, some still hear her call...
+0xf437bd6c: FROG
+0x2242b373: Over the aeons, these bloated amphibians have overrun the Sunken City.
+0x9136d37a: FIRE FROG
+0x03e2c15f: Some of Sunken City frogs have developed an explosive personality.
+0x7e2c5fc9: GOLIATH FROG
+0x4fc3bd09: A frog of legend. It carries its entire family within its mighty belly.
+0x6a465f0d: GRUB
+0x33309040: A lowly creature just trying to make it to the next part of its lifecycle.
+0xec17141b: TADPOLE
+0xb9400831: A baby frog. It's content to splash in murky waters.
+0x5ff96362: GIANT FLY
+0xf7aa0183: A fly of titanic proportions. It looks threatening but seems rather uninterested in us...
+0xf9937370: HUNDUN
+0x6fb7992b: The muddled dreamer Hundun. The cosmic egg Hundun. The majestic child Hundun. The unstoppable Hundun.
+0x9eac4347: EGGPLANT MINISTER
+0xf9949805: The most loyal servants of the King of Hell, who continued to follow though commands no longer left his lips.
+0x99ffba94: EGGPLUP
+0x992a13e5: Once a fierce hound of hell, now a playful puppy.
+0xcde00463: BEE
+0x40b14447: An important part of the cave ecosystem. However, it's much larger and more aggressive than the common honeybee.
+0xec067e26: QUEEN BEE
+0xaa6fd595: The matriarch of the hive. On her abdomen one might find a blob of delicious royal jelly.
+0xcff2329c: SCARAB
+0x31a1979b: A jeweled flying beetle revered by the followers of Anubis and sought after by leprechauns and treasure hunters.
+0x2776a7a7: GOLDEN MONKEY
+0x51f0a3b5: He struck out on adventure but a sorceress used magic to transform him into an idol.
+0x25db06b0: LEPRECHAUN
+0x18776e3c: This greedy sprite seeks out heavy pockets to pilfer for his treasure stash.
+0x37ed79b9: MONTY
+0xd85aecd9: A helpless pug adopted by Tina Flan after her first big adventure. Ana's somewhat faithful companion.
+0x47770a83: PERCY
+0xa65b025f: A helpless cat who snuck aboard Margaret Tunnel's spaceship looking for a warm place to sleep.
+0xdacee22b: POOCHI
+0x55c78e6b: A helpless hamster who Colin Northward brought to the Moon in the name of science. Unfortunately, she escaped.
+0x009367c2: GHIST
+0x810ef14d: If in life the spirit is small and spiteful, in death its presence is weak and hard to know.
+0xf6ae6204: GHOST
+0x3f7e6552: This angry and relentless spirit chases down explorers for reasons unknown.
+0x34959e5f: CELESTIAL JELLY
+0x4ab30155: These mighty titans roam the vast waters of the Cosmic Ocean, leaving behind them great ripples that alter time and space.
+0x6a5c6176: CAVE TURKEY
+0xde1ce3ef: A large, meaty bird, best known for its fleshy wattle, also known as a snood.
+0x51ebfd74: ROCK DOG
+0x664296e9: The skin of this fire-breathing canine is protected by rock-hard plates, hence the name.
+0x5f62aa34: AXOLOTL
+0x78eb9ee0: The Empress encountered these curious creatures during her travels and brought some back as pets. They quickly escaped!
+0xafa45b74: QILIN
+0xc8ae3003: A creature of myth, whose arrival is said to coincide with important events in the history of humans and gods.
+0xbb7f2f2b: MECH RIDER
+0xe796e17e: A MOYA-class mechanized armor designed by aliens to combat the Olmites during the Second Wars.
+########################################
+## JOURNAL - PEOPLE                   ##
+########################################
+0x4cffb84e: Ana Spelunky
+0x501aba18: She's come to the Moon to find her mom and dad. An easygoing young lady with the heart of a hero.
+0x77e0c920: Margaret Tunnel
+0x3e8419e1: A fascination with the ocean led her away from the family business. Her dream is to buy her own pirate ship.
+0xe1043a58: Colin Northward
+0xb524fd65: An inquisitive artist and engineer who's obsessed with Olmec and the Curse of the Caves.
+0x1e3605c7: Roffy D. Sloth
+0x63335ed2: He has a lot of deep thoughts, but not a lot that he wants to say out loud.
+0x9aca0a10: Alto Singh
+0x986a8602: He works in physical education and wants to make sure everyone's taking good care of their health and staying positive.
+0x14edb56e: Liz Mutton
+0xee60d39d: A tough-as-nails adventurer who is hard to warm up to and needs her solitude, but also cares deeply for her friends.
+0xe917def2: Nekka The Eagle
+0x99d74cda: A ferocious warrior chief who wants to confront the gods and question them about the problems of the universe.
+0x341d8303: LISE Project
+0x60c85f81: A robot designed to explore and enjoy herself. After 1000 years she'll return to her creators with the data she's collected.
+0x096d5635: Coco Von Diamonds
+0xd27c281c: The creator of the world-famous Von Diamonds fashion and lifestyle brand. She's on vacation right now.
+0xf9fb4ef8: Manfred Tunnel
+0xb7bfb7dc: He's decided to finally try his hand at spelunking after many years of building shortcuts.
+0xb2ec4ddd: Little Jay
+0x3bb483ca: A self-proclaimed "Spelunkyhead" trying to become a famous explorer. Gets a little overly excited around his heroes.
+0xd0004144: Tina Flan
+0x83fbe983: As a relatively unknown caver she managed to hit King Yama with an eggplant. She tries to downplay her fame!
+0x695b0c1d: Valerie Crump
+0x65c93186: An avid fan of music and video games. She's trying to find creative inspiration through travel.
+0x201f7d9b: Au
+0xa1307fed: A monk with bright golden skin. By challenging his mind and body, he's trying to find peace in a chaotic universe.
+0x8a4ce3f3: Demi Von Diamonds
+0xff4508db: The heiress to the Von Diamonds empire. She's lived a pampered life, but is eager to learn more about the world.
+0x2635de08: Pilot
+0xc712ca50: A strange little spaceman from a far away planet. He can often be found muttering about his UFO, the Campanella.
+0x6553b066: Princess Airyn
+0x9f0228cb: A culinary expert, she travels the world looking for the most exquisite tastes to bring home to her kingdom of Heliotropia.
+0x4e258ed5: Dirk Yamaoka
+0xfe5e9c2e: A master ninja always looking to hone his skills. When the Moon called, he answered without hesitation.
+0x995a90d8: Guy Spelunky
+0x60f3346a: He's spent his life in pursuit of adventure (and treasure). A young man no longer, he's re-evaluating what's most important to him.
+0x5da64272: Classic Guy
+0x8d8715a7: A version of Guy Spelunky from a parallel universe made of large, flat blocks of colors.
+0x1cc8c913: TERRA TUNNEL
+0xb616da04: She met Manfred many years ago, when she rescued him from a cave-in. Together they've built a thriving shortcut-building business!
+0x2e1a8eac: HIRED HAND
+0x9b5c34c2: He's been trapped in the caves for a very long time and is eager to be free once again.
+0x176a1e96: EGGPLANT CHILD
+0xe26713d6: Separated from their mother, they miss her dearly. The embodiment of curiosity and creative potential.
+0x5476e7c6: SHOPKEEPER
+0x6a59b578: A card-carrying member of the Shopkeeper's Association. He HATES shoplifting above all else!
+0x835d95fa: TUN
+0x05fb2b21: A mysterious young woman who keeps a close eye on what's happening in the Caves. Beg's sister.
+0xe4083cc4: YANG
+0x885d7efb: The youngest of Yang's 12 sons, who are all named Yang. He loves turkeys.
+0xd6dd5c2c: MADAME TUSK
+0x69eb4d9f: The most famous resident of the caves, or at least she'd like to think so!
+0xaf96b1ba: WADDLER
+0x3b006540: He runs an item storage and transportation business. Customers have complained of getting their items back sticky.
+0x9cfd144b: CAVEMAN SHOPKEEPER
+0xb41b13f8: An enterprising caveman trying to acquire more shiny things to show off to his friends.
+0xd2ff3c92: GHIST SHOPKEEPER
+0xb9502043: In the darkest corners they peddle their wares, hoping to preserve some small shred of their former life.
+0x958026a6: TUSK'S BODYGUARD
+0xd7a71a02: Madame Tusk pays them extremely well.
+0x86177111: VAN HORSING
+0x0d97bed2: A veteran from the first adventure. He seeks revenge on Vlad for reasons unknown.
+0x99c78be2: SPARROW
+0xded92a7a: Hailing from a prominent ninja family, she defied her parents and turned to thievery to challenge authority.
+0xd0fe2792: PARSLEY
+0x3fef0acf: The youngest of three sisters. She's cheery but has a quick temper.
+0xd905dcb4: PARSNIP
+0x5dbbefbf: The middle child of three sisters. She loves parties and cats.
+0x5d04f321: PARMESAN
+0x4b6cbedc: The eldest of three sisters. She's shy and nurturing.
+0x42d67d26: BEG
+0xd06cf0f0: In his insecurity he was drawn to Hundun and embraced Chaos. Tun's brother.
+0x7d7b68af: EGGPLANT KING
+0x526d8fa2: He was a mighty king... until a brave explorer humbled him. Some might say he's even more powerful now.
+########################################
+## JOURNAL - ITEMS                    ##
+########################################
+0xe3b96385: ROPE PILE
+0x2489406c: 3 ropes to help you get to those hard-to-reach places.
+0x8c9045c8: BOMB BAG
+0x0d851863: A large sack filled with 3 bombs.
+0xa579e4fa: BOMB BOX
+0x60f82605: A flame-resistant box of 12 bombs. The gift every adventurer wants to receive!
+0x6095b55b: PASTE
+0xe2d466ce: Made from spider's web. Lather it on your bombs to make them sticky!
+0xc54843e5: SPECTACLES
+0xe2aae7d1: Improves your vision and also makes you look slightly more intelligent.
+0x15a319e0: CLIMBING GLOVES
+0x6f58e9bc: The grips of these gloves have small bristles all over them. Just lean into walls to cling to them!
+0x9cdba2e5: PITCHER'S MITT
+0x2cd16b8e: This classic American baseball glove makes you feel like you can throw like a pro.
+0xe44eb429: SPRING SHOES
+0x0b6896b8: A sturdy pair of boots equipped with alien spring technology.
+0xc9d53c49: SPIKE SHOES
+0x706c7abc: A sturdy pair of boots with sharp spikes fitted to the bottom.
+0xa0cfd91e: COMPASS
+0x37386571: This classic explorer's tool will point you right to the exit. How convenient!
+0x30c08657: ALIEN COMPASS
+0xad68a8dd: A special compass designed by aliens to help them return home through the inky darkness of space.
+0xb20d3b44: PARACHUTE
+0x14503039: It will save your life when you least expect it!
+0x8e07923f: UDJAT EYE
+0x782b14e9: The udjat eye is a symbol of great power. It represents the gods' watchful gaze.
+0xcb4fabf7: KAPALA
+0x9ba644df: A skull cup bestowed upon Kali's most loyal devotees. Drinking blood from it can improve one's health and enlightenment.
+0x0489e09e: HEDJET
+0x6dc5380a: A white pharaoh's crown, indicating the wearer's status as an envoy for the gods. It glows brilliantly.
+0xa4f5bb3c: CROWN
+0x2787e7bb: This royal headgear exudes an aura of unquestionable authority. It's much heavier than it looks!
+0x549b6a93: THE TRUE CROWN
+0x00303de5: Also known as the cap and bells. A fitting crown for the followers of Hundun.
+0x1e2f2f7b: EGGPLANT CROWN
+0x3f0e807e: The Eggplant King bequeathed his crown to me. I feel at peace with my place in the universe.
+0x65e79788: ANKH
+0x28a8f1a0: This coveted amulet was created by the gods for followers deemed worthy enough to have their life extended.
+0x013ebb78: TABLET OF DESTINY
+0x2f2ab276: A clay tablet on which many esoteric prophecies are written.
+0x954832ad: SKELETON KEY
+0x3eaa331a: The tool of thieves. It opens any lock without breaking.
+0xf8794ae0: ROYAL JELLY
+0x8b184ac9: A delicacy that's highly sought after for its refined taste and healing properties.
+0x4cbdfa2f: CAPE
+0xc0f3af2c: This dashing fashion accessory can also be used to reduce one's speed while falling.
+0x955a286a: VLAD'S CAPE
+0x575c7878: The blood-red cape of Vlad the Impaler. It offers impressive mobility.
+0x558deda8: JETPACK
+0x25c75593: It's expensive, but many explorers swear by it. Just keep an eye on your fuel levels!
+0x68f34428: TELEPACK
+0x8b073f56: Allows you to teleport while freeing up your hands! Requires your feet to be off the ground, however.
+0x1148f04f: HOVERPACK
+0xe59fc25c: A refinement of Olmite technology. It allows you to hover indefinitely.
+0xab06d70c: POWERPACK
+0xfbd40125: Developed for military use, the power pack imbues its wearer with improved weapon handling abilities.
+0x68caa46b: WEBGUN
+0xa4cf6faa: It shoots synthetic webs that are so close to the real thing that even spiders can't tell the difference!
+0x055c1923: SHOTGUN
+0xa138194c: A basic 12-gauge shotgun. Favored by shopkeepers for self-defense and hunting down shoplifters.
+0x8d6e00ff: FREEZE RAY
+0x7945f68b: They say the mechanism behind its frozen blast was inspired by the sneezes of the now-extinct mammoth.
+0x09c23c96: CLONE GUN
+0xac73e48c: A one-of-a-kind prototype! The technology required to build one is beyond any known civilization.
+0x51204414: CROSSBOW
+0x77e87160: A ranged weapon favored by hunters. It's capable of firing arrows with incredible accuracy.
+0x9709bf59: CAMERA
+0xba45360a: This fancy camera comes with the most powerful flash on the market right now.
+0x2d505f71: TELEPORTER
+0x4e534449: A handheld teleportation device. It's still in beta after all these years!
+0xd2e8c838: MATTOCK
+0x114e888c: A useful digging tool that breaks easily. The Tunnel family prefers shovels.
+0xf8ba7a94: BOOMERANG
+0x9336be01: A curved wooden weapon that will return to its owner after being thrown.
+0x252538f1: MACHETE
+0xa4385245: Its long, broad blade is great for defense or chopping vegetables for dinner.
+0xf9aa1593: EXCALIBUR
+0x3cfa7df1: The sword of legend. Wielded by kings and queens in times of great calamity.
+0x961a5bb3: BROKEN SWORD
+0x66d190a5: Although perhaps it no longer contains its full strength, it's still a formidable weapon.
+0x0b7db2c7: PLASMA CANNON
+0x0cf25ffc: It was built by aliens, but sadly the recoil proved to be too strong for them to use it easily.
+0x77bcca3b: SCEPTER
+0xf41c7d34: A magical tool used by the god Anubis to cleanse souls on their way to judgment.
+0x0be3779f: HOU YI'S BOW
+0x617644c8: With this simple but refined bow, Hou Yi shot down the nine suns that scorched the Earth.
+0x364b19c6: ARROW OF LIGHT
+0x2769501d: A ray of sun reflecting off the Moon's tears.
+0x47c5463f: WOODEN SHIELD
+0x0b6bd1d7: A flimsy wooden shield carried by Tikimen for some basic defense against the harsh Jungle environment.
+0xee1a3c2f: METAL SHIELD
+0x1f97dcfb: A highly durable knight's shield made of tempered steel.
+0xd9fa24ca: IDOL
+0xaba2415e: This valuable golden idol can be brought to the exit or to shops in exchange for gold.
+0x6f3f01c4: THE TUSK IDOL
+0x9597dc47: A walrus idol carved from an extra-large diamond. One of Madame's most precious treasures.
+0xd31680fc: CURSE POT
+0x2c3490d7: A clay pot filled with a toxic substance rumored to be a mixture of ectoplasm and cursed blood.
+0x308c9828: USHABTI
+0xd45e32c1: A funerary figurine created to accompany someone on their journey to the underworld.
+0xc0fac044: EGGPLANT
+0xbade812e: It is fragile yet full of vigor, reminding us to treasure every one of life's moments.
+0x440afd2e: COOKED TURKEY
+0xe307f65c: A turkey that has been cooked just right. The meat is tender and flavorful.
+0x8e312528: ELIXIR
+0xb871237d: A restorative potion said to cure any affliction. Royal jelly is mixed in to reduce the bitterness.
+0xa4d25cb5: FOUR-LEAF CLOVER
+0xcbe77102: A rare clover. It's prized by leprechauns for protection and good fortune.
+########################################
+## JOURNAL - TRAPS                    ##
+########################################
+0xba331459: SPIKES
+0xd4af8a11: Ah, spikes! The classic trap. They come in many shapes and sizes, all painful.
+0x061ac941: ARROW TRAP
+0xe3e4e5ee: An ancient trap of unknown origin. It's responsible for the death of many an explorer.
+0xb5750b3c: TOTEM TRAP
+0xaa5c718e: Quillback built these to train his followers, although they mostly serve to put them "to sleep".
+0xa4ba0406: LOG TRAP
+0x0a23ba28: The trunk of a massive tree, carved by Quillback and strung up to protect his treasure.
+0x260ae13a: SPEAR TRAP
+0x41d9453c: These wooden spear traps can be hard to spot amidst the Jungle foliage.
+0xf13bf991: THORNY VINE
+0x121a2470: The thorns on these thick vines aren't long enough to impale, but they're sharp enough to deliver a nasty poke.
+0x82c9afed: POWDER BOX
+0x3e28b47f: A wooden box hastily filled with black powder. It will explode at the slightest provocation.
+0x2e70151c: FALLING PLATFORM
+0x1beafdb2: A rickety outcropping of rock that won't take very much weight...
+0x2d912a53: SPIKEBALL
+0xcf08098c: A large ball-and-chain that was designed for crushing rock.
+0xc90b7399: LION TRAP
+0x9c44eb29: It's said that the Empress successfully deflected a barbarian horde using only these golden lions.
+0x02879409: GIANT CLAM
+0x34eebb35: Over the years, the Empress's treasure has made its way to the ocean and into the mouths of these oversized molluscs.
+0xfdfc1989: SLIDING WALL
+0x5016bbeb: A door-like mechanism that is activated by a switch.
+0xab211531: CRUSH TRAP
+0x51809287: A solid block of stone designed by pharaohs to flatten would-be tomb robbers.
+0x7206831a: GIANT CRUSH TRAP
+0xcc8a8aa3: An extra large edition of the crush trap, for discerning pharaohs who want that extra crushing power.
+0x86f8fd08: BOULDER
+0x71fcc76b: A frosty boulder released to smash treasure hunters that make it to the Ice Caves.
+0x0a989544: SPRING TRAP
+0x8266d2ce: In alien society, bouncing up and down is a common form of recreation and exercise.
+0xf040b0d6: LANDMINE
+0x19af07e5: An explosive device triggered by proximity. Disable it before it's too late!
+0xd211d467: LASER TRAP
+0xdb5ca7ab: A fixed laser gun triggered by a motion detector.
+0x47153fac: SPARK TRAP
+0x61bd20dd: The enormous amount of excess energy generated by Neo Babylon is channeled into dangerous contraptions such as these.
+0x0f3bf597: FROG TRAP
+0x842e0d30: The spear is so huge that it's hard to imagine that it was meant to be used against human beings...
+0x3ad04c47: STICKY TRAP
+0xa23ce109: A strange growth, whose fleshy protuberance is reminiscent of a uvula.
+0x5d5343c4: BONE DROP
+0x88e7788a: This mass of bones is so large that it's starting to burst out of the ground.
+0x93544370: EGG SAC
+0xbe0546b4: Beneath the thin membrane you can see something writhing around vigorously.
+0x1c839c63: BEAR TRAP
+0x2134722f: The slightest pressure will cause its powerful steel jaws to snap shut, causing massive damage.
+########################################
+## JOURNAL - TABLET OF DESTINY        ##
+########################################
+# "Aspirant" definition: a person who has ambitions to achieve something
+########################################
+0xbb28ec3c: A %ls servant of %ls marked by the %ls shall open the door for the Aspirant.
+0xcc9382d8: cracked
+0xaa26a498: simple
+0x8031ce9c: smiling
+0x367f23bd: tall
+0xccbf9027: clay
+0x824ff23f: gold
+0x3dcee34a: jade
+0x0455277a: wood
+0xce1ffb09: onyx
+0x6ab24666: eye
+0x0e1cca61: ankh
+0x04624884: snake
+0x2f7ce9ba: vortex
+0x449c47c4: bat
+########################################
+## JOURNAL - STORY                    ##
+########################################
+0x154b498f: Wow, it's been 15 years since my last entry! So much has happened since I escaped the Cave of Olmec with his treasure.
+0x97a9390a: Tina and I became parents! We named our daughter Ana. She's a strong kid... and a natural explorer!
+0x8a0e0d13: The dreams began when Ana turned five. In the dream, I'd look out the window at the full Moon and see Olmec's face in it. I tried to ignore it.
+0xec7465cf: I mean, we all saw Olmec sink into that lake of lava...\n\nDidn't we?
+0xe6fab26a: Our curiosity was too much to resist. With Colin's help, Tina and I built a spaceship that could take us to the Moon.
+0xa28c9da3: Ana wants to come, but it feels a little dangerous and I think she should stay and finish out the school year. Besides, we should be back before she knows it! There's probably nothing there anyway...
+0xb1eebb39: It was hard to say goodbye.\n\nPart of me wishes we'd brought Ana with us... she loves space and we keep wanting to show her things in the ship. At least she has Monty to keep her company.
+0x2544d54b: It's unbelievable! There's a giant Olmec on the surface of the Moon! And a cave! A feeling of deja vu swept over us, and we were drawn toward the entrance like iron filings to a magnet. A voice is calling to us... is it Olmec, or something else?
+0x326b7195: We've been in the Moon for what feels like many months already, but it's hard to tell. Just like before, time and death work differently here.\n\nIt feels like we've slipped into another crack in the Universe... like the Cave of Olmec... connected to it, perhaps... but also bigger, much bigger!
+0xcd113fc9: Ana, if you're reading this, then you've probably guessed that Mom and Dad are somewhere down below, trying to find a way out. I'm sorry, we should have brought you with us! But try not to worry. To be honest, we're having fun! Take your time and don't rush. Remember, it's easier to get hurt if you're not careful.
+0x30a134c3: Just remember what we taught you and you'll be fine. This journal is yours now! Make the most of it and we'll see you soon!
+0xe77c4975: Happy Spelunky-ing!
+########################################
+## GAME OVER - DEATHS                 ##
+########################################
+0x252cc834: Game Over
+### Fall damage
+########################################
+0x5a52a061: LONG FALL
+0xd646180e: I broke every bone in my body.
+### Pit
+########################################
+0x938addaa: STILL FALLING
+0xce96fc57: I haven't reached the bottom yet...
+### Bad teleport
+########################################
+0x7ecc0e49: MISSED
+0xb098b089: I teleported right into a wall!
+### Poison
+########################################
+0xc7196407: POISONED
+0x6d246cd8: Ooh, my insides hurt...
+### Alien
+########################################
+0xa7543b0f: PROBED
+0x970a96f8: An alien bumped me a little too hard.
+### Alien Queen
+########################################
+0xa9396304: BRAIN WIPED
+0xcda27397: The queen of the aliens melted my brain.
+### Ammit
+########################################
+0xc8946145: CHOMPED
+0x45e8ca32: An ammit caused me to die a second time.
+### Anubis
+########################################
+0xe640fd5c: CLEANSED
+0x2a8b3bd5: Anubis ripped my soul from its prison of flesh.
+### Anubis 2
+########################################
+0x33f0616c: REVENGED
+0x02a8c5a5: Anubis took great pleasure in erasing me from the underworld.
+### Apep
+########################################
+0xc7219910: EATEN
+0x4a2c091a: The snake god made a snack out of my soul.
+### Bat
+########################################
+0xd3722ff6: BITTEN
+0x9bc56ef4: I was nibbled to death by a bat.
+### Bee
+########################################
+0x821eaa9b: STUNG
+0x1aa69dc3: I must be allergic to bees...
+### Cat Mummy
+########################################
+0x800a9826: BAD KITTY!
+0xb7675db8: A mummy cat decided she didn't like me.
+### Caveman
+########################################
+0xfd1efff3: BEATEN UP
+0x43784d32: A caveman pummeled me to death.
+### Caveman boss
+########################################
+0x7e625cc9: BEATEN UP
+0x38db11f3: Quillback showed me the full extent of his primitive strength!
+### Cobra
+########################################
+0x4a467114: BITTEN
+0x80f31a2c: I succumbed to a cobra's venom.
+### Crab man
+########################################
+0x2e874ffc: CRABBY
+0x87e434ac: I couldn't crack a crab man's shell.
+### Crocman
+########################################
+0x431bacc0: CHOMPED
+0xfed65a87: A crocman tore a big chunk out of me.
+### Female Jiang-shi
+########################################
+0xa0c93113: STOMPED
+0xa699e629: A jiang-shi assassin snapped my neck.
+### Firebug
+########################################
+0x13b3c3e0: TORCHED
+0xb7320380: A firebug roasted me alive.
+### Fire Frog
+########################################
+0x2a85818b: HOPPED ON
+0xde0d02be: A fire frog turned me into a lily pad.
+### Fish
+########################################
+0x1d80ed8a: BAITED
+0xc12de33f: The fisher became the fished...
+### Frog
+########################################
+0x5cbca2b7: HOPPED ON
+0xb709a2e8: A frog turned me into a lily pad.
+### Ghost
+########################################
+0x4437f3f7: HAUNTED
+0x370467a4: Where am I? I can't feel my body...
+### Giant Clam
+########################################
+0x437d997e: BAITED
+0x9896afc7: I was crushed in the jaws of a giant clam.
+### Giant Fish
+########################################
+0xb3ca9701: EATEN
+0xd536257b: The Great Humphead's appetite was temporarily sated.
+### Giant Fly
+########################################
+0x8a8393f5: Ew
+0xa33b417e: A giant fly grossed me out... to death!
+### Giant Frog
+########################################
+0xa306b1b6: DEATH
+0x996fb53a: A giant frog found me annoying.
+### Giant Spider
+########################################
+0x80b69fef: BITTEN
+0x036d846d: A giant spider preyed on me.
+### Grub
+########################################
+0x0b1745e2: INFESTED
+0xb3a0186c: I can still feel it wriggling all over me! Yuck!
+### Hang Spdier
+########################################
+0x05b5a758: BITTEN
+0xe8cd3dd6: A spider bite ended my life.
+### Hermit Crab
+########################################
+0x4c4eaf8d: DEATH
+0xb8d823d2: That hermit crab was a bit crabby.
+### Horned Lizard
+########################################
+0x26fc5327: DEATH
+0xb0a2c39c: A horned lizard finished me off.
+### Hundun
+########################################
+0x43d778d0: ETERNAL CHAOS
+0x75bb5c12: I succumbed to Hundun's dream.
+### Imp
+########################################
+0x76ec5b29: DEATH
+0xc879d1a3: An imp finished me off.
+### Jiang-shi
+########################################
+0xc5e665ad: STOMPED
+0xc90c360e: A jiang-shi hopped on me.
+### Lamassu
+########################################
+0xce9f5a04: TRAMPLED
+0xa954e7a6: A lamassu tap danced on me.
+### Lavamander
+########################################
+0x5cb8f5f7: COOKED
+0x5ae314da: A lavamander had me for dinner.
+### Magma man
+########################################
+0xf5c7c3e9: TORCHED
+0x5d458f25: I was melted by a magma man.
+### Mantrap
+########################################
+0x8383d140: EATEN
+0x446f1b7b: I was devoured by a mantrap.
+### Mega Jellyfish
+########################################
+0x0eba73ed: JELLY SANDWICH
+0xe8af4546: An astral jellyfish transformed me into pure energy.
+### Merchant
+########################################
+0x1febc54e: TUN'S REVENGE
+0xd78fc49e: I shouldn't have angered her!
+### Mole
+########################################
+0xc78f1009: DEATH
+0xcb9ac90e: A mole chewed a hole right through me.
+### Mosquito
+########################################
+0xd9763766: BITTEN
+0x7637fdc1: A mosquito sucked out the last few drops of my blood.
+### Mummy
+########################################
+0x747f4665: DEATH
+0x934f3ae6: A tomb lord took a thousand-year grudge out on me.
+### Necromancer
+########################################
+0x0877a073: NECROMANCED
+0x95563f56: I became another undead pawn for a necromancer.
+### Octopush
+########################################
+0xa7bfdc57: DEATH
+0x5e998192: An octopus gave me eight reasons to feel bad about myself.
+### Olmec
+########################################
+0x33ddab9d: OLMEC'S CURSE
+0xcebda5cd: Olmec proved why he's still the boss.
+### Olmite
+########################################
+0x40e912a2: DEATH
+0xb0a43aac: An olmite made a big brain play and I lost.
+### Osiris
+########################################
+0x78e76a16: JUDGED
+0xb634bb4d: Osiris found me unworthy of joining him in the afterlife.
+### Proto shopkeeper
+########################################
+0xdc9013b5: GNAWED
+0xd419e4f4: That prototype shopkeeper was still pretty effective at killing me!
+### Queen Bee
+########################################
+0xcf30cba9: STUNG
+0x4ff907cb: A queen bee sentenced me to death.
+### Robot
+########################################
+0xeeb0a8cf: DEATH
+0x4139d18f: A robot ended my life without a hint of emotion.
+### Rockdog
+########################################
+0xaed529e1: BITTEN
+0x25914054: A rock dog went straight for my jugular.
+### Scorpion
+########################################
+0xc831938c: STUNG
+0x4d42890f: A scorpion stung me to death.
+### Shopkeeper
+########################################
+0xfa5f5fd3: BEATEN UP
+0x0c69601f: Maybe I shouldn't have angered that shopkeeper...
+### Skeleton
+########################################
+0x8b763a7f: CLAWED
+0x6d7c0e96: A skeleton ripped me apart.
+### Snake
+########################################
+0x0c3152ab: BITTEN
+0xb3e93943: A snake bit me.
+### Sorceress
+########################################
+0xfaaef3c8: ENSORCELLED
+0xe8f77695: A sorceress ended me with a powerful spell.
+### Spider
+########################################
+0x3c39f29e: BITTEN
+0x42e0565a: A spider bite ended my life.
+### Tadpole
+########################################
+0x56121958: TADPOLE
+0x4ad038b6: Despite its cute looks, that tadpole took my life!
+### Tiamat
+########################################
+0xaa1bf742: REJECTED
+0xd0a0af42: I failed to meet the expectations of the Mother Goddess.
+### Tikiman
+########################################
+0x61923355: BEATEN UP
+0x7331200d: A tikiman pummeled me to death.
+### UFO
+########################################
+0xddd94f1e: PROBED
+0xf7372a42: A UFO took my life.
+### Vampire
+########################################
+0x41029c1e: BITTEN
+0xa11c2855: I can feel my humanity draining away from the vampire's bite...
+### Vlad
+########################################
+0x2cc6da45: BITTEN
+0xf9c4063b: I can feel my humanity draining away from Vlad's bite...
+### Witch Doctor
+########################################
+0x8584686f: DEATH
+0xcd3761ad: A witch doctor has ended my life.
+### Witch Doctor Skull
+########################################
+0x2fa9bbeb: DEATH
+0xd175f616: I succumbed to a witch doctor's curse.
+### Yeti
+########################################
+0x9ece8165: DEATH
+0x7909049b: A yeti made me its plaything.
+### Yeti King
+########################################
+0xfb967bab: HAIL TO THE KING
+0x1d795652: The Yeti King is using me as a cushion now.
+### Yeti Queen
+########################################
+0x12cf60d4: HAIL TO THE QUEEN
+0xb89c79fa: The Yeti Queen is wearing me as a scarf now.
+### Arrow
+########################################
+0x34a0ff90: PIERCED
+0x08ef8d49: An arrow pierced a vital organ.
+### Big spear trap
+########################################
+0xe81f5346: IMPALED
+0xe92f2282: A giant spear punched a hole right through me.
+### Boulder
+########################################
+0xf7256030: CRUSHED
+0x48827b2d: Turns out I couldn't outrun a boulder.
+### Crush trap
+########################################
+0x6f247ed0: CRUSHED
+0x4cc25d0c: A crush trap turned me into a pancake.
+### Drill
+########################################
+0xd6955320: CRUSHED
+0x60d9fab4: I was crushed by the giant drill.
+### Elevator
+########################################
+0x8dda2104: CRUSHED
+0x5bf0b681: I should have stood somewhere a little bit safer!
+### Explosion
+########################################
+0xefb4bedd: BLOWN UP
+0x52bc07b7: An explosion sent me flying.
+### Laser trap
+########################################
+0x6fae6bf0: ZAPPED
+0x7313a73b: A laser trap caught me unaware.
+### Lava
+########################################
+0x9c821452: MELTED
+0x8fb42b53: I was burnt to a crisp by some lava.
+### Lion trap
+########################################
+0x02b62963: STABBED
+0x2d260171: A lion trap perforated me.
+### Platform
+########################################
+0xa7101afc: CRUSHED
+0xb021ca88: I was crushed by a falling platform.
+### Powderkeg
+########################################
+0x24d2c6b6: BLOWN UP
+0x8c02b73c: A powder keg blew me to smithereens.
+### Pushblock
+########################################
+0x362788f4: CRUSHED
+0xa81ceb9e: I was crushed by a falling push block.
+### Sacrifice
+########################################
+0x6efc76a8: SACRIFICED
+0x22901107: I was sacrificed to Kali.
+### Skull drop
+########################################
+0x0e34a794: BONKED
+0xd2232344: Strangely enough, my skull was cracked by another skull.
+### Sliding wall
+########################################
+0x882282e8: CRUSHED
+0xaa22d15d: I should have stood somewhere a little bit safer!
+### Bear trap
+########################################
+0xaee5dca8: SNAPPED
+0x081c016f: I was caught in the jaws of death.
+### Spark trap
+########################################
+0x43be3e41: SHOCKED
+0x9f78d1cc: I had a hair-raising experience with a shock trap.
+### Spear trap
+########################################
+0x03f7fb06: STABBED
+0xfe3dd8fe: A spear trap skewered me.
+### Spikeball
+########################################
+0x43ed043e: CRUSHED
+0x90bd2ea4: I was crushed by a spikeball trap.
+### Spikes
+########################################
+0xdb1b0e2f: IMPALED
+0x9ff69164: I fell on some spikes.
+### Thorn vine
+########################################
+0xc0f6312a: PRICKED
+0xfc83e106: I bled out against some sharp thorns.
+### Totem trap
+########################################
+0x8fe4324c: POUNDED
+0x29e02820: A totem trap punched my lights out.
+### Wooden Log Trap
+########################################
+0xb452f661: CRUSHED
+0xa589a3c0: I was a victim of my own greed...
+### Default
+########################################
+0xfa9ebccc: DEATH
+0x6bcb5e95: I met my untimely demise.
+### 3rd Run
+########################################
+0x992acf91: HMMM...
+0x60d4ec4f: This might be harder than I thought!
+### 10th Run
+########################################
+0xebebff02: YET ANOTHER DEATH
+0xf0741254: I'm learning a little bit more each time, though!
+### 100th Run
+########################################
+0x9b0a9e2c: 100 DEATHS
+0xc2245030: You gotta admire my persistence! I know I'll get it eventually!
+### Furthest Run
+########################################
+0xfb684f2f: PROGRESS
+0x083047df: This is the furthest I've ever gotten!
+### High Score Run
+########################################
+0x670dd9fc: HIGH SCORE
+0xeed28125: Wow, I got a new high score! That feels great!
+### Level 1-4 / 2-4 / 4-4
+########################################
+0x48b4c270: SO CLOSE
+0x296c45cb: I was so close to reaching the next area... maybe next time!
+### CoG
+########################################
+0x812e7c40: GILDED
+0x32993207: It's the most exquisite tomb in the Universe...
+### Eggplant World
+########################################
+0x719fb97e: SEEING PURPLE
+0x3b418250: As I sank into the eggplants, a feeling of calm washed over me...
+### Co-op 1-1
+########################################
+0x4b1e303f: HMMM...
+0x39eb2a3a: It's okay! We just need more practice!
+### Co-op 1-4 / 2-4 / 4-4
+########################################
+0x37c595cd: SO CLOSE
+0x98c14b86: We were so close to reaching the next area... maybe next time!
+### Co-op Area < 5
+########################################
+0xe7af771d: GOOD TEAMWORK
+0x5dce8fae: We're starting to get pretty good at working together.
+### Co-op Area < 6-4
+########################################
+0xbd533d25: GREAT TEAMWORK
+0xae0fed01: We didn't make it, but we should be proud of how far we got together.
+### Co-op 6-4
+########################################
+0xf8604c5b: SO CLOSE
+0xcab491f4: Tiamat defeated us! But we'll be victorious next time!
+### Co-op Area < 7-4
+########################################
+0x919c01b3: SUPERB TEAMWORK
+0x179984d5: We work together as if commanded by a single mind!
+### Co-op 7-4
+########################################
+0xf9a2266c: SO CLOSE
+0x332e1b4b: We succumbed to Chaos. But the struggle was worth it!
+### Co-op Area > 7-4
+########################################
+0x5c9b2332: DREAM TEAM
+0x96276d7c: We're one with the Cosmos!
+########################################
+## GAME OVER - PROFILE                ##
+########################################
+0x9edb34fa: Player Profile
+0x4b83796f: Plays
+0x2dde50f8: Wins
+0x8555326f: Deaths
+0x8bc8aefd: Win %:
+0xf86360e7: Average Score:
+0x8139103e: Top Score:
+0x250d2f89: Deepest Level:
+0x2893fe3a: Deadliest Level:
+0x67034615: Average Time:
+0x21270a65: Best Time:
+0x2f9fcf76: Last Game Played
+0x7e0265a9: Player Profile statistics are taken from Adventure Mode and the Daily Challenge during single player play.
+########################################
+## GAME OVER - RUN RECAP              ##
+########################################
+0x0ced29e8: Dear Journal,
+0x194f2eaf: I led a team of %d into the depths.
+0x663afd79: I was a pacifist.
+0x0bf6bb8f: I was vegan.
+0x5f9b18b2: I was a vegetarian.
+0x3ae982b0: I was law-abiding.
+0xee1dcaaa: I was a petty criminal.
+0x63b3af73: I was a wanted criminal.
+0xac52f2ff: I was a crime lord.
+0xa29b1759: I was a king.
+0xe31a370d: I was a queen.
+0xa6997936: I was a fool.
+0x631f8f2e: I was an eggplant.
+0xa41ff305: I didn't care for money.
+0x5be1e9e1: I liked dogs.
+0xe387bbc3: I liked cats.
+0xa158177d: I liked hamsters.
+0x403f47b8: I liked pets.
+0xf8c8d62c: I loved dogs.
+0x40ae840e: I loved cats.
+0x01d1eeb2: I loved hamsters.
+0xe3167875: I loved pets.
+0xf99611ed: I took my first damage in level %d-%d (%ls).
+0x52d42bee: I took my first damage in level %d-%d.
+0x2085be72: I survived death once.
+0x0c8c7051: I slayed Kingu, the Queen's Consort.
+0x0086bb90: I slayed Osiris, the Underworld King.
+0x3877db27: Despite all odds, I defeated Tiamat and escaped to the surface.
+0x6990f16a: Amazingly enough, I defeated Hundun and escaped to the surface.
+0x5961bce3: My skill, knowledge, and bravery allowed me to become one with the Cosmos.
+0x551be6e9: I eventually died in level %d-%d (%ls).
+0xe46f0a0c: I eventually died in level %d-%d.
+0xe8351742: Until Next Time!
+0xebd20f8c: See Ya!
+0x7fd5eb5d: I Have So Many Questions...
+0xfac68c4f: Cool...
+0x8330f768: Stay Positive!
+0x986e8e63: Hmmm...
+0x9b71e71c: Until My Strength Gives Out,
+0x23965f3c: Downloading Data...
+0x9d52a3be: Ciao!
+0x00308517: I Miss My Shovel!
+0x02822644: Can't Wait to Try Again!
+0xe8351742: Until Next Time!
+0xf6ed7ab1: Hugs,
+0x6d9bcadc: Forever Learning,
+0x67cb7e5c: Thanks For Listening!
+0xe6b474bc: Signing Off,
+0xdcfa77d3: Cordially,
+0x3965f7fa: Best Regards,
+0x67011cd8: That's All For Now,
+0xa29b9133: ...
+########################################
+## Shop                               ##
+########################################
+0x21683743: Buy %ls
+0x0ac02341: Hire %ls
+# Shop item names
+0xc38afa7a: Rope Pile
+0xe9fc3894: Bomb Bag
+0xc01599a6: Bomb Box
+0x27d5027f: Spectacles
+0x8b24f84d: Climbing Gloves
+0x7f0c5cc4: Pitcher's Mitt
+0xb41c7e0d: Spring Shoes
+0x165246dc: Spike Shoes
+0x7b90e133: Paste
+0x36fef8a5: Compass
+0xae4684a4: Parachute
+0x0570e4fd: Hedjet
+0x33ec437e: Skeleton Key
+0x27fe3075: Royal Jelly
+0xc3bccc13: Jetpack
+0x713cd853: Cape
+0x765df750: Telepack
+0x0d034faf: Hoverpack
+0xb74d68ec: Powerpack
+0x6933a008: Webgun
+0x936d3898: Shotgun
+0x14318f41: Freeze Ray
+0x4f8ef76c: Crossbow
+0x96f0bb3a: Camera
+0xcfcd1eeb: Teleporter
+0x44d9e983: Mattock
+0xe4f1c574: Boomerang
+0xb314194a: Machete
+0x75a5ec81: Plasma Cannon
+0x2c2b34c3: Metal Shield
+0xf1df9458: Turkey
+0x8ca51b8f: Rock Dog
+0x529acf16: Axolotl
+0x25772488: Monty
+0x0b6c5250: Percy
+0x9354034d: Poochi
+0x8877c61c: Present
+0x8b6ad335: Skull
+0xc8f845da: Rock
+0x275ae39e: Pot
+0x622bec88: Arrow
+0xf1df9458: Turkey
+########################################
+## HUD                                ##
+########################################
+#### Kali
+########################################
+0x7464b785: Kali accepts your sacrifice!
+0x2c02c811: You feel invigorated!
+0x16549024: She bestows a gift upon you!
+0x9e79abf9: She seems ecstatic with you.
+0xa64fc385: She seems happy with you.
+0xb2c2c1b6: She has forgiven you.
+0x555a5250: She seems pleased with you.
+0x3e103a65: She seems angry with you.
+0xaa6e4ece: She seems very angry with you.
+0x4d4b92d7: You have angered Kali!
+0x36f02181: Yet she still seems ecstatic with you.
+0x3460dc3a: Yet she still seems happy with you.
+0xbb0f7ffd: Yet she still seems pleased with you.
+0x8e55cd84: Kali admires your warrior spirit.
+0x0646463c: She fashions a weapon for you!
+0x1d19860c: So you desire a companion? Here you go!
+0x6c33f75e: Kali enjoys a good mystery!
+########################################
+#### General
+########################################
+0x493b1bbf: The scepter fits, but nothing is happening!
+0x12124976: A terrible chill runs up your spine!
+0x9f81909a: You feel protected!
+0x068c0e59: Thanks for getting me out of there!
+########################################
+#### Feelings
+########################################
+0xa30f49ee: Your voice echoes in here...
+0x7764c18e: You hear the beating of drums...
+0xf1d63384: Welcome to the Black Market!
+0x79a111f1: Your blood begins to run cold...
+0xb32774e8: You hear sounds of metal clanking...
+0x5ca03130: There is an air of oppression here...
+0xe8d85bff: You feel a burst of excitement inside you!
+0x0c71a0de: It smells like wet fur in here!
+0x221d8121: You hear the sounds of revelry!
+0x738bd5d6: You feel strangely at peace.
+0x0d204d44: You hear an incessant buzzing...
+0x6d100da8: The dead are restless!
+0xf6a18116: You can't see a thing!
+0xcc67e106: You feel forgiven.
+########################################
+#### Shopkeeper
+########################################
+0x509135d3: Welcome to %ls's %ls!
+0x06995fc2: Welcome, Your Highness! Do you see anything of interest?
+# The following line is meant to be slightly mocking:
+0x0fe1df12: Oh, hello, Your Majesty! See anything you like, heh heh?
+0xa62da384: I'm completely sold out!
+0x7f268657: General Store
+0x1fb3d8e5: Clothing Shop
+0x0054f4ac: Weapon Shop
+0x0ef4894c: Specialty Shop
+0x43d2d51c: Hired Hands Shop
+0x7d0c0571: Pets Shop
+0xe89a14e6: Dice House
+0x2cfad86d: Play Dice
+0xb1b878ff: The Dice House is closed! I'm out of items!
+0x63603fa0: You bet $%d! Now roll the dice!
+0xd6738cf2: You rolled a %d!
+0xac2fb5f2: You lose.
+0x6a1f1b83: You win!
+0x9611263e: You win a prize!
+0x03bad5f4: Stop, thief!
+0xfdec8f09: Vandal!
+0x8059ee17: Cheater!
+0xfb24cb14: Wow, big spender! I'll remember you!
+# Buying an idol from the player:
+0xce60f7d4: I'm happy to take that off your hands!
+########################################
+#### Merchant
+########################################
+0xf908e0ad: Welcome, Reborn. I have wares for sale.
+0xa2a55cff: Ah, one of my brother's foolish followers!
+0xeaf08576: May you hold out against Chaos a little longer.
+0xb93c8769: Welcome to the Moon Challenge, Reborn.
+0x258ce17b: Welcome to the Star Challenge, Reborn.
+0xf3ed89ab: A warning, Reborn... the Sun Challenge may cost you your life.
+0x1e2c4553: Begin Challenge
+0xa13e4a4d: Enter the door to begin the Challenge.
+0xadc3bf4e: %d...
+0x14205ced: The challenge begins!
+0xa2769357: Let there be light!
+0xc0368876: Survive!
+0xb0f3df24: 5 seconds remaining!
+0x8f6adac8: You've won!
+0x444e9fd2: Time's up! You lose...
+0x19841fd9: It was a worthy attempt, Reborn. See you next time.
+0x526c99a0: Challenge completed! Please return to the entrance.
+0xb5202d32: Congratulations on completing the Challenge!
+0xb740d4ad: Perhaps you'll find victory in the next life.
+0xab469848: You've made a regretful choice!
+0xc856d686: You must be a servant of Hundun!
+0xf55f4683: I humbly accept this in trade.
+0x2560631c: Reborn, you've done well to reach this place.
+########################################
+#### Caveman Shopkeeper
+########################################
+0x2a1cb88e: Ugh! Ugh!
+0xf78fd291: UGH! UGH! UGH!
+0xdb6bd595: OOHA! HA!
+0xcf64ddf5: Ooga! Ooga!
+0x4b26be35: AH! AH!
+0x0a747e30: Ooooooga... OOH! OOH!
+########################################
+#### Yang
+########################################
+0x204e87fe: I'm looking for turkeys... wanna help?
+0x1f58ab93: Thank you!
+0xa40307a1: Wow, thanks! Please help yourself to my treasure.
+0xe6208bee: I will avenge my feathered friends!
+0x8197b16b: Stop, thief!
+0xb87715cb: You villain!
+0x4c3b0656: Welcome to Yang's Pet Shop!
+0x58ef4a4b: I'm so happy right now!
+0xcb2f235a: Come back with my turkey, you fiend!
+0xdd2b5c3c: You monster!
+0x5916176e: Ah yes, I'll buy that idol from you!
+0xaeb900d0: Careful friend... that's a one-way door!
+0x55deae49: I'm just doing a little shopping!
+0x297ceb41: I didn't realize they'd be serving turkey here...
+########################################
+#### Madame Tusk
+########################################
+0x6e75ebf9: Hello, my darling! Are you feeling lucky tonight?
+0x98faa092: Sorry, my darling... you've completely cleaned us out!
+0x19eda958: Thank you for the $%d! Let's see what the dice have in store for you!
+0x3d671c25: Ah, a roll of %d!
+0x703afd2b: Better luck next time, my darling.
+0x95a80097: Fortune is smiling on you!
+0x2849a33c: You won a prize, my darling!
+0xde83fc10: High roller, eh! Come see me at my Palace of Pleasure...
+0xdd75cac3: Oh, it's you! Please rest and enjoy my food!
+0xcc18aef6: Oh my, you arrived in such a condition?!
+0xcb4cc676: There's nothing I hate more than a THIEF!
+0x5a25e8f9: Why, you're a nasty piece of work!
+0xb63df8d9: This will be a lovely addition to my collection!
+########################################
+#### Bodyguard
+########################################
+0x6bb95049: Come right in. Madame is expecting you.
+0x3e66db0b: Sorry, you're not on the list.
+0x9c29874e: Stay out!
+0x5bf5f1d0: Someone's trying to rob Madame!
+########################################
+#### Storage Guy
+########################################
+0xbeaa608b: I'm Waddler. I can carry your items deeper into the caves for you.
+0x96976465: What do you think you're doing, buster!
+0x6e092e31: This is as far as I go. I hope I helped you on your journey.
+########################################
+#### Sisters
+########################################
+0x45583667: Thanks! I can't believe I got stuck in here.
+0x6a00d1b1: Here's a little something to help you out!
+0xf1b118a1: I don't have a good feeling about that door.
+0xf37af109: Brrr! I wish I brought a jacket!
+0x2d1e0133: Great party, huh?
+########################################
+#### Old Hunter
+########################################
+0xa5393875: Tusk won't be happy about this, but thank you.
+0x65023224: I've been hunting this fiend a long time!
+0x96335e0f: It's not looking good for me. Take this.
+0xb152cabc: Ha! A pair of unfortunate souls. Take this!
+0x0a9b5830: At least she removed my curse...
+0xf4763f25: I sense danger beyond that door.
+########################################
+#### Thief
+########################################
+0x2c63504d: You're good... but are you good enough to steal from Madame Tusk?
+0xe4814ee8: Big brother! I never thought I'd catch you thieving...
+0x4a0ab729: Too bad. I got here first.
+0x8c95a7a0: I'm impressed! Meet me at the Palace of Pleasure if you really want to get rich...
+0x59034444: If you get past the lasers, I'll split the treasure with you.
+0x502b5a4b: Hey, that's my share!
+0x5a660f56: Good work! We make a great team!
+########################################
+#### Servant of Hundun
+########################################
+0x155a5292: You seem to enjoy Chaos!
+0xd599b0b2: Ah, so you truly love Chaos! Just like me!
+########################################
+#### Terra
+########################################
+0xfae7ef43: Hey there! I'm Mama Tunnel. You can also call me Terra.
+0xd5d5dd42: Hey, sweetheart! Hope your adventure is going great!
+0xe4754344: Hi, handsome! Find anything good?
+0xf9279386: Hiya! How's the adventure going?
+0xd97d0a84: I'm working on a new shortcut, but I ran out of supplies.
+0x9c5f1e68: Mind donating $2,000 so that I can restock?
+0x4ad3cfa7: This shortcut's looking good, but I ran into a room full of traps.
+0x9e8eebc1: It'd probably be best if I just blew it up. Do you have a bomb?
+0x23fbf820: I was so close to finishing the shortcut, and then my mattock broke!
+0x2b724b7d: Can you spare $10,000? I'll need a high-quality replacement.
+0x8d07ac2f: I started a new shortcut, but there's a giant slab of rock in the way.
+0x44d05c63: I'll need a rope to climb over it.
+0x0e2bfcda: You wouldn't believe how many monsters I'm running into.
+0xf4f686dc: Can you bring me a weapon next time you're here?
+0xcdf1e618: Oh, you have a machete! May I have it?
+0x327dc624: Oh, you have a crossbow! May I have it?
+0x18ddbf22: Oh, you have a boomerang! May I have it?
+0x368900bf: Oh, you have a bow! May I have it?
+0x356be5c5: Oh, you have a gun! May I have it?
+0x734c592e: Second shortcut almost finished! But walking back and forth is getting tiring.
+0x516a2ede: If I had something to ride this would go much faster.
+0xaa7156f9: Oh, what a cute %ls! Can I please have her?
+0xbc528238: I started the third shortcut! This is going to be a long one.
+0x2b048bbd: I know it's a lot, but I'll need $50,000 to get this done.
+0x95e945aa: Whew, I could use some help with this last shortcut.
+0xee875976: If I had a Hired Hand it would go a lot faster...
+0x06449d66: Hey, your friend looks pretty strong! Can they help me out?
+0x7aab595e: Almost there! The only thing in the way is a large door with a lock shaped like a scarab.
+0x47f9011e: I heard there's a gold key somewhere near the entrance. Maybe that will fit?
+0xc3c2b838: That key you're holding looks like it will fit perfectly!
+0x41346825: Sure!
+0xe0d25971: Not right now...
+0x47826a01: Thanks! I can't wait to finish this shortcut.
+0x170e2266: Sigh... alright. I could probably use a break, anyway.
+0xfe5c85f8: Aw, it doesn't look like you've got enough!
+########################################
+#### Tiamat
+########################################
+0x92a1dc34: You didn't disappoint me... until next time...
+########################################
+#### Yama
+########################################
+0xe4d71dfa: Every king and queen will someday lose their crown...
+0x93acd63b: Eat your vegetables!
+0x2e7801ed: Ah, you came to finish the job!
+0x70148a3e: Here lies the Empress. May she finally find peace.
+########################################
+## BASE CAMP SHORTCUTS                ##
+########################################
+0xbab72d60: Shortcut Station: Coming Soon! -Mama Tunnel
+0xe634b959: Shortcut to Area 1-4
+0xd756f83b: Shortcut to Area 3
+0x537565ee: Shortcut to Area 5
+0x12645577: New shortcut coming soon! -Mama Tunnel
+########################################
+## BASE CAMP DIALOGS                  ##
+########################################
+0xffc11bca: They're sleeping soundly.
+0x137fef5a: Congratulations!
+0x939ba6a2: I heard you made progress on your last run!
+########################################
+#### Complaints
+########################################
+0x42fbd6a3: Hey!
+0xca0f2a82: WHOA!
+0x05a7c565: Yikes!
+########################################
+#### Ana basic dialogue
+########################################
+0x35dbaa2d: I'm taking a break to catch up on my Summer reading list.
+0xa14f174d: Monty's such a goober!
+0x912e2091: Don't you sometimes want to just scream? AHHHHHH!
+########################################
+#### Margaret basic dialogue
+########################################
+0x99d4d378: My mom always tells me to slow down so I don't miss things.
+0xeff5fd0c: It's nice we have a swimming pool... but I miss the ocean!
+0x9f66e8cb: I should check in on Ana and see how she's doing!
+########################################
+#### Colin basic dialogue
+########################################
+0xcbf6acbd: We call the time loop Olmec's Curse, but its true origin may be something else...
+0x11579683: I guess you could say that Olmec brought us all together!
+0x80eb58c3: You might want to stay back. I think I'm coming down with something.
+########################################
+#### Roffy basic dialogue
+########################################
+0xa86bc28e: I'm doin' good... how, um, are you?
+0xf4548410: (Yawn) Sorry, I only got 10 hours of sleep last night...
+0x855a909b: Cool, yeah... nice.
+########################################
+#### Alto basic dialogue
+########################################
+0xe6e5c740: The key to my success? Staying hydrated.
+0x412afcd7: Practice makes progress!
+0x83aa32c0: No matter what, I always get 10 hours of sleep a night.
+########################################
+#### Liz basic dialogue
+########################################
+0x405953d2: Oh, hey there. How's it going.
+0x25e207da: Just taking a little breather.
+0x33d53951: Sorry, I'm a bit busy right now...
+########################################
+#### Nekka basic dialogue
+########################################
+0xd66a1c71: Deathmatch is a good way to settle an argument.
+0x797e209e: %ls. I admire your courage.
+0xb8c78a95: Every day I promise myself to make it a little farther than the day before.
+########################################
+#### LISE basic dialogue
+########################################
+0xdd66d71f: Something is preventing my sensors from working properly.
+0xc540fba0: Every run I do improves my neural network!
+0xcabed93a: Calculating the chance of victory on your next run... it's %ls%%!
+########################################
+#### Coco basic dialogue
+########################################
+0x4c1ae4d5: I love anything that sparkles!
+0x0565b856: Oh, don't worry, Pearl doesn't bite... very often.
+0x0de41655: I spoiled Demi too as a little girl, but she's turned out just fine!
+########################################
+#### Manfred basic dialogue
+########################################
+0x66d59c26: I miss my shovel... but at least I know she's in good hands!
+0x4577d516: People say dig yourself into a hole like it's a bad thing!
+0x7c901daa: Margaret prefers the open sea to caves, but she couldn't resist this adventure.
+########################################
+#### Jay basic dialogue
+########################################
+0x59ed6c26: Maybe some day they'll make a video game about me!
+0x3d64b7b5: I don't know if I'll ever get used to falling on spikes...
+0xb88165d3: Wanna see my item tier list?
+########################################
+#### Tina basics
+########################################
+0x3ae77aba: Being here makes me feel young again!
+0x5602a2fa: I could use a nice cup of tea right about now.
+0x9be97ab0: Guy says he's scared to fight me in Deathmatch!
+########################################
+#### Valerie basics
+########################################
+0xf4aa34c8: I'm listening to the latest album by Phlogiston!
+0xbfd92992: What kind of music do you like?
+0xb787e78c: (She seems lost in her own little world.)
+########################################
+#### Au basic dialogue
+########################################
+0x9e636c43: Life has meaning in the things that mean something to us.
+0x352f5f99: I can see you've learned a lot since you began this journey.
+0xbfab1d15: Good friendships are like stars... their light shines on us even from afar.
+########################################
+#### Demi basic dialogue
+########################################
+0x29bdb067: I wasn't always a fan of adventuring... it grew on me!
+0x0999b422: I'm getting a bit tired of camp food, to be honest.
+0x23b9626a: Everyone's so supportive down here! It's great!
+########################################
+#### Pilot basic dialogue
+########################################
+0xb6b48c91: Isabell would enjoy this place. Lots of treasure.
+0xf911fa96: I wonder how my dear Campanella is doing.
+0xb22f384a: The gravity on Zoldath is much stronger.
+########################################
+#### Airyn basic dialogue
+########################################
+0x2f0d4eb6: Those axolotls are so cute, aren't they?
+0x2e1f84c7: I'm used to running around in a dress!
+0x7f19ffa8: I can't wait to eat some more royal jelly!
+########################################
+#### Dirk basic dialogue
+########################################
+0xc51e8c78: My sister is the black sheep of our family... but I still care about her.
+0x999433bf: I'm having trouble sleeping, so I'm doing exercise.
+0x76a1b16c: A ninja must be able to adapt to any situation.
+########################################
+#### Guy basic dialogue
+########################################
+0x3200567e: Whew, I'm not as nimble as I used to be.
+0x56bf827b: To think that there's more than one Olmec in the universe!
+0xa015595a: Maybe this will be my last adventure... but maybe not!
+########################################
+#### Spelunky (Classic) basic dialogue
+########################################
+0xd5064b8f: ...
+0x3791d489: ...!
+0x3649a46f: ...?
+########################################
+#### Mama Tunnel basic dialogue
+########################################
+0xf660fd20: I hope the shortcuts are useful, %ls!
+0xb0b305e6: Shoot, I think my shovel's edges are starting to get dull...
+0x70d36869: Keep an eye on Margaret for me, won't you?
+########################################
+#### Ana to others
+########################################
+0x83a1df85: Dad... you look pretty tired, bro.
+0x51fb9348: Love you, Mom!
+0x86669cf4: Margaret, I'm soooooo glad you're here with me.
+0xec590585: Ooh, Colin... I got another idea on how to improve my space ship!
+0x07c02dbd: Can I visit you in Heliotropolis after this, Airyn?
+########################################
+#### Margaret to others
+########################################
+0x60831d13: I can't believe we're actually here!
+0x29278ac9: Hey, Pops! Love ya!
+0xfc58d876: You're so chill, Roffy!
+0xb1a41f58: Oh my gosh, Pearl is so cute. Can I pet her?
+0x8b4aade6: Ah, you're so SHINY!!!
+########################################
+#### Colin to others
+########################################
+0x40579e80: You did a good job with that space ship!
+0x62de9d7a: I'm glad you and Ana are finally reunited!
+0x37328bf3: Ana's a real natural at this stuff... you should be proud!
+0xc7d9284a: Pilot, you must tell me more about how your UFO works.
+0xe72e677b: Who did you say built you, LISE? Your technology is very advanced!
+########################################
+#### Roffy to others
+########################################
+0x879b7935: Do you prefer Liz or Elizabeth? I keep forgetting...
+0x090f1eca: I wish... I could grow a beard like yours, Colin.
+0x61001e2f: Hey, Val! I've been listening to Jane Papaya again. Such a great album.
+0xcdad9085: You're a pirate, huh? That's... really cool.
+########################################
+#### Alto to others
+########################################
+0x87e062a3: Ana, I spent a lot of time spelunking with your parents. You've got your own style... keep it up!
+0xf681264e: Heya, Roff! What's your secret for staying so relaxed? Do you meditate?
+0x484ba793: You got spirit, Jay. You're already a star in my book!
+0x3dd9b5d1: You gotta teach me some ninja skills, Dirk!
+0xf4367b36: Liz! What muscle groups are you targeting these days?.
+########################################
+#### Liz to others
+########################################
+0x0e6110c9: Margaret, you're a good swimmer. Can you give me some lessons at the pool?
+0x77bacce5: You've updated your look, Colin. I like it!
+0x19048966: Oh, you want my autograph? I'll... think about it.
+0x974079f4: Hi, Alto. Do you know a good stretch for sore legs?
+########################################
+#### Nekka to others
+########################################
+0x20aee3b5: In all your travels, have you ever come across a place such as this?
+0xee9fe1e3: Your clothes look rather... cumbersome!
+0x3fa6e843: Dirk... you also come from a warrior clan, yes?
+########################################
+#### LISE to others
+########################################
+0xbce1a6df: Colin, can you calibrate my sensors when you have a chance?
+0xc5219e17: Valerie, can we listen to music together? I'd love to add more albums to my database.
+0x37da49ca: Airyn, I'd love to learn more about sweets! My favorite food is lollipops...
+########################################
+#### Coco to others
+########################################
+0x9c1ecf2d: How are you, darling!
+0xa29c65ee: Roffy, I think you'd be the perfect model for my new line of menswear!
+0x78c616d8: We could use a brilliant mind like yours at Von Diamonds Incorporated!
+0xb8169fbd: Princess, I'd love to design some dresses for you after this is all over!
+0x683cc9e1: Your skin positively glows, Au! You should be on the cover of a magazine!
+########################################
+#### Manfred to others
+########################################
+0xedca24f5: Hey, M! How have your runs been going?
+0x4c540638: Couldn't let you have all the fun, old man! Ha!
+0xe0e4d368: Hey, it's A Plus! You and Margaret make a great team.
+0x735a58e8: Never thought our next family get together would be on the MOON! HAHA!
+########################################
+#### Au to others
+########################################
+0x7f2acf12: LISE, I wish you well on your journey of discovery.
+0x2dd30ebc: Manfred, my old friend. It shows a lot of courage to try something new.
+0x7cb92f2d: Alto, my old friend. Your exuberance keeps everyone's spirits high.
+########################################
+#### Jay to others
+########################################
+0x05d08c00: I read all about your mom and dad's adventures!
+0x3a277b4c: THE Tina Flan?! Did you really throw an eggplant at King Yama?!
+0x0174e3d9: Whoa, Guy Spelunky?! You know I'm your biggest fan, right!
+0x026d01d4: Oh! You look like the games my dad used to play.
+0x5b3d0e2c: Hi, Valerie! Gotten any highscores lately?
+########################################
+#### Tina to others
+########################################
+0xcdd20f5d: Hey, sweetie! Do you need a snack?
+0x401fbabe: I can't help but worry about Ana being here...
+0x2fa51dba: You're actually kinda cute!
+0xdf5ccd8f: Margaret, your mom has told me so much about your adventures!
+########################################
+#### Airyn to others
+########################################
+0x438eb9fa: I've never met a real ninja before! How exciting!
+0xe1f06af3: Val! We should throw a party, don't you think?
+########################################
+#### Dirk to others
+########################################
+0xe68fe691: Your Majesty! Let me know if I can be of service to you.
+0x6d759152: Your warrior spirit is very inspiring. Can we train together some time?
+########################################
+#### Valerie to others
+########################################
+0x7a0ffc56: Ana, can I hang out with you and Margaret some time?
+0xbf11407f: Some day I'd like to try making my own video game!
+0x40e45c4b: Oh, uh... hi, Demi! Um, you're so cool!
+########################################
+#### Demi to others
+########################################
+0x8e44b7d5: I can't believe you brought Pearl here, Mom...
+0x9b36db9a: Have you talked to Yang lately? If only he could see me now!
+0x12dd277a: Dirk, you're so mysterious! I'd love to get to know you better...
+0xab317c59: You're so strong, Nekka! Let's co-op some time?
+########################################
+#### Pilot to others
+########################################
+0x74d4bab0: You remind me of my sister Isabell.
+0x611f74a9: LISE, I'd be interested in seeing any data you've collected about Zoldath.
+0x85fa5aea: I've never met a golden man before.
+########################################
+#### Guy to others
+########################################
+0x40711115: I'm so proud of you, kiddo!
+0xe1079ea1: Now that is just weird!
+0x06776fd8: Hard to believe we're all here together, Manny.
+0xff6791fc: Hi, sweetheart! Life is crazy, huh?
+0x5225fe94: Thanks for helping Ana get to the Moon safely. We owe you one!
+########################################
+#### Spelunky (Classic) to others
+########################################
+0x4a79ef8e: !!!!!!
+########################################
+#### Mama Tunnel to others
+########################################
+0x09d84fd8: Manny, you look like you wish you had a shovel in your hand haha!
+0x094ae435: If you need help, just let Mama know, okay?!
+########################################
+#### Enthusiastic personality generic dialogue
+########################################
+0x20aab463: How are your runs going, %ls?
+0x09bfcc66: I did some co-op runs with %ls... it was a lot of fun!
+0x1b0e844b: Yay, I think my practice is finally paying off!
+0x8d349b91: Which items are underrated? Personally, I like finding %ls.
+0x0ad05d5e: I hate when a promising run gets ended by %ls!
+0x712f5347: Argh, %ls got me again! I need to take a break.
+0x8daed5e6: I found %ls in a crate, but then %ls killed me!
+0x4fa215e7: Ugh, I can't believe I got %ls last run...
+0x84588c1f: %ls died to %ls, too. So I'm not alone!
+0x60b87c94: I'm glad we get to hang out so much, %ls!
+########################################
+#### Direct personality generic dialogue
+########################################
+0xf279ab4d: I hope you're taking care of yourself, %ls.
+0xb8ebf1bd: I've been training in the Arena. Maybe I'll see you there some time?
+0x87e973a0: My last run showed improvement.
+0x44debe14: When I get %ls, I know I'm going to have a good run.
+0x3751b00f: My last run was going well until %ls killed me.
+0x66789ff1: I died to %ls again. I think I'm in a slump.
+0x25a577fd: %ls, when you see %ls at a shop, do you buy it?
+0xdcccaff1: I keep getting %ls. Need to be more careful.
+0x5ff72b5e: %ls has been making good progress. I should ask them for tips.
+0x410f66fa: Nice to have you here, %ls.
+########################################
+#### Generic dialogue - deaths
+########################################
+0x1b79c561: the ghost
+0xf54eb57d: a bat
+0x44eb6ae6: a snake
+0x63582a2a: a spider
+0xb6a2b376: a scorpion
+0x5dad7e9a: a skeleton
+0x36524c04: bees
+0xdc1e64a3: a shopkeeper
+0x32ada853: a bomb
+0x6c971b72: a long fall
+0x2bff4f75: spikes
+0x5dc03bca: lava
+0x284d6846: a trap
+########################################
+#### Generic dialogue - items
+########################################
+0xcd50b75b: spring shoes
+0x5ee35e47: spike shoes
+0xa77de482: a bomb box
+0xf1350dbc: a crossbow
+0x42806487: a freeze ray
+0xb7ee3271: a teleporter
+0x806e71c7: a telepack
+0xc9d8e910: a hoverpack
+0x721183aa: a powerpack
+########################################
+#### Generic dialogue - effects
+########################################
+0x137a2e6d: poisoned
+0x8297de32: cursed
+0x745eafa0: punished by Kali
+0x5e20a8e8: crushed
+0x5fc43feb: stuck
+########################################
+#### Tutorial Speedrun
+########################################
+0x467accbe: Want to try racing the tutorial? Just talk to me again.
+0x0f508f9b: Alright! I'll start timing you when you pass me!
+0x3fd937c9: GO!
+0x0b62a8b5: Hey, where are you going?
+0x0a00881b: I need a break...
+0xf04a6e3e: FINISH! Your time is %ls! Good attempt.
+0x072df0cb: FINISH! Your time is %ls! A new record!
+0x28dbec6d: My best time is 30 seconds. Can you beat it? - Alto
+0xd0b7a991: Fastest Time: %ls
+########################################
+#### Online
+########################################
+0x218b8bc1: Report
+0x25dbcf8a: Describe the inappropiate content or offensive behaviour.
+0x495e5536: <SYS_ACCEPT/> Show Gamercard
+0x4a63b6fd: Feedback
+0x3ab503a8: Describe the bug or suggestion you have encountered while playing Spelunky 2
+0xf0bf05c3: Data to ensure integrity and authenticity of the run will be made public, contact privacy@blitworks.com for removal requests.
+0xba4a610b: The game you have been invited to is Cross-Play enabled, are you sure you want to proceed? Cross-Play will be provisionally enabled if you proceed.
+0x98c8e795: A network error occurred
+0xcf6c2186: Starting in %d
+0x50581689: This leaderboard is currently unavailable, please come back later.
+########################################
+#### Ending
+########################################
+0x7ce688df: Final Score:
+0x280d6a7d: Total Time:
+########################################
+#### Characters short name
+########################################
+0x3ff7e9c4: Ana
+0xccf0d9bd: Margaret
+0x82d41465: Colin
+0x7e83b6b2: Roffy
+0x88487523: Alto
+0x5aac77ad: Liz
+0xa60d40a4: Nekka
+0x8750d016: LISE
+0x37fbe4b4: Coco
+0xae642f9a: Manfred
+0xd350cb9b: Jay
+0x41a519c3: Tina
+0x8d206acc: Valerie
+0xc8dc9663: Au
+0x6d1f8371: Demi
+0x622419f8: Pilot
+0xe06ca433: Airyn
+0x8f36b5d4: Dirk
+0xe8502b82: Guy
+0x154e191e: Classic Guy
+########################################
+#### Shopkeepers' names
+########################################
+0x55618267: Ali
+0x2b21d662: Bob
+0x4bf2ecfd: Cosmo
+0xeaf14d39: Darwin
+0x487c2057: Ear
+0x6df76a2b: Earl
+0x62016f82: Frank
+0x4d827fea: Garth
+0xa2531c54: Hakim
+0x98ac1767: Iggy
+0x91cdab81: Ivan
+0x467d71f2: Jimbo
+0xe8fa2f3d: Kinni
+0xa1926a93: Lou
+0x95293801: Micky
+0x7bb85aef: Nacho
+0x05bf4315: Omar
+0x5b11fe53: Pancho
+0xaafea7d9: Quincy
+0x800cd4e9: Ron
+0xb09dcf02: Sparky
+0xa79c425b: Tarn
+0x4fe302fe: Ulf
+0x9b358f60: Vern
+0x7357e408: Wang
+0xd425073f: Willy
+0x72c3e92d: Xander
+0x11f92172: Yoshi
+0x232d1fb3: Ziggy
+########################################
+#### Hired hands' names
+########################################
+0x446580c0: Atlas
+0xe5ed5157: Barca
+0x4c703494: Clovis
+0x5b0ce6bf: Dunder
+0x001754b3: Eirik
+0xe4322609: Fink
+0x1ea9ebe5: Grom
+0x5cf1f651: Ham
+0x7d4c5e10: Ivan
+0x2d8be119: Javi
+0x24f559ee: Kevin
+0x238b2497: Lurch
+0x33cd08cd: Manfred
+0xbdefb4fa: Nurdle
+0x92285284: Onyx
+0xfaf9a5c0: Pork
+0x467f5248: Quincy
+0x85ad6560: Raster
+0x9db56222: Steve
+0x02b563be: Thundar
+0x0af1e7d3: Ug
+0x5d4f0fe9: Voxel
+0x5135ebfd: Wolf
+0x7d300e7a: Xorn
+0xc1ea8180: Yor
+0x5758a167: Zorgoth
+########################################
+#### Feats
+########################################
+0xff0b67b3: Feats
+0x84a182c6: Hidden
+0x076d410f: You Performed a Feat!
+0x335dbbd4: The Full Spelunky
+0x99ed7316: You Got This
+0x6c1708e8: Feels Good
+0xd8beda05: Skills Improving
+0x80d0d9ae: Persistent
+0xe278e281: Journeyman
+0x80ccae5d: Ironman
+0xe06baa46: Speedlunky
+0x6464cf78: Low Scorer
+0xcbde28a9: Pilgrim
+0x262fb203: Master
+0x0e9f1f7f: Awakened
+0x8980409d: Excavator
+0x657d29b2: Torchbearer
+0xeb2e5da1: Survivor
+0xc3283658: Millionaire
+0x2bc0eb4b: Seen a Lot
+0x8e891caa: Seen It All
+0x54c20c63: Mama's Little Helper
+0x3c7c29ac: Mama's Big Helper
+0x70d9c428: Track Star
+0xdf2be0da: Arena Champion
+0x56e5b480: Turkey Whisperer
+0xe133e6fd: Support a Local Business
+0x3b778ace: VIP
+0xb65fddf1: Shadow Shopper
+0x41598755: Legendary
+0x8b159c56: Her Favorite
+0x682a1e0f: Divine Right
+0xe6aa71ed: A Second Chance
+0xc6d6bd22: Chosen One
+0xcf2bb4d1: Parenthood
+0x6cf3d31d: Obtain all other trophies.
+0xb5f5fa73: Unlock the entrance.
+0x778e6f43: Make it past 1-4 in a non-seeded run.
+0x23683cf1: Make it past Olmec's Lair in a non-seeded run.
+0xecbc9231: Reach the Ice Caves in a non-seeded run.
+0xbd5d3f5b: Complete the game in a non-seeded run.
+0xfa7a2042: Complete the game without using shortcuts in a non-seeded, single-player run.
+0x0c7256c2: Complete the game in 10 minutes or less without shortcuts in a non-seeded, single-player run.
+0x377cea8c: Complete the game without collecting any treasure and without using shortcuts in a non-seeded, single-player run.
+0xe778d9fd: Reach the Sunken City in a non-seeded, single-player run.
+0xb2a2812a: Complete the game by defeating Hundun in a non-seeded, single-player run.
+0x45b2bc29: Reach the Cosmic Ocean in a non-seeded, single-player run.
+0x31547fa7: Complete the Moon Challenge in a non-seeded run.
+0xef3725f4: Complete the Star Challenge in a non-seeded run.
+0x3cec1c34: Complete the Sun Challenge in a non-seeded run.
+0x2ab997ff: End a run with $1,000,000 or more in a non-seeded, single-player run.
+0x725c2b52: Complete 50% of the Journal or more.
+0xfca9d2ba: Complete the Journal.
+0x4bbded37: Unlock the first shortcut.
+0xd770b734: Unlock all three shortcuts.
+0x24490f17: Finish the Tutorial Speedrun in under 30 seconds.
+0xcdf23553: Win a First-to-Five Deathmatch against three bots using the Default ruleset.
+0xda4a472e: Bring two turkeys to Yang in a non-seeded run.
+0xd8a2de40: Buy out Yang's Pet Shop in a non-seeded run.
+0xc3364cf2: Enter Madame Tusk's Palace of Pleasure as a guest (in a non-seeded run).
+0x599285d9: Reach the Black Market in a non-seeded run.
+0x5d24e383: Reach the City of Gold in a non-seeded, single-player run.
+0x72e012a6: Obtain the Kapala in a non-seeded run.
+0x0973f718: Obtain some royal headwear in a non-seeded run.
+0x932f6381: Obtain the Ankh in a non-seeded run.
+0xed6ff194: Obtain the Tablet of Destiny in a non-seeded run.
+0x6d975220: Wake the Eggplant Child in a non-seeded run.
+########################################
+#### Constellations
+########################################
+0x144776d9: Solanum
+0x04e79a0e: Animus
+0x95c4ad49: Canis
+0x2659f41f: Cattus
+0xf3fb3e48: Phodopus
+0xaa2ec1cc: Felix
+0x73146abf: Asinus
+0xb4acd96c: Celeritas
+0x98db2e1c: Major
+0x68824eed: Fidelis
+0x0d682e7b: Criminalus
+0xfc82a7df: Minor
+########################################
+#### Others
+########################################
+0xe983216a: The demo has ended.\nThanks for playing!

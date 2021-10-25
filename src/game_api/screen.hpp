@@ -48,9 +48,9 @@ class ScreenIntro : public Screen // ID: 1
 class ScreenPrologue : public Screen // ID: 2
 {
   public:
-    uint32_t line1; // Strings table ID
-    uint32_t line2; // Strings table ID
-    uint32_t line3; // Strings table ID
+    STRINGID line1; // Strings table ID
+    STRINGID line2; // Strings table ID
+    STRINGID line3; // Strings table ID
 };
 
 class ScreenTitle : public Screen // ID: 3
@@ -149,7 +149,7 @@ class ScreenMenu : public Screen // ID: 4
     std::array<uint32_t, 6> spear_unknown2;
 
     float play_scroll_descend_timer;
-    uint32_t scroll_text;
+    STRINGID scroll_text;
 };
 
 class ScreenOptions : public Screen // ID: 5
@@ -191,8 +191,8 @@ class ScreenOptions : public Screen // ID: 5
     TextureRenderingInfo top_woodpanel_left_scrollhandle;
     TextureRenderingInfo top_woodpanel_right_scrollhandle;
 
-    uint32_t button_right_caption;
-    uint32_t button_middle_caption;
+    STRINGID button_right_caption;
+    STRINGID button_middle_caption;
     bool top_woodpanel_visible;
     bool bottom_woodpanel_visible;
     bool toggle_woodpanel_slidein_animation;
@@ -258,10 +258,10 @@ class ScreenSeedInput : public Screen // ID: 8
     TextureRenderingInfo unknown9;
     TextureRenderingInfo unknown10;
     TextureRenderingInfo unknown11;
-    uint32_t unknown12;
-    uint32_t unknown13;
-    uint32_t buttons_text_id;
-    uint32_t unknown15;
+    STRINGID unknown12;
+    STRINGID unknown13;
+    STRINGID buttons_text_id;
+    STRINGID unknown15;
     uint8_t unknown16;
     uint8_t unknown17;
     uint8_t unknown18;
@@ -279,8 +279,8 @@ class ScreenSeedInput : public Screen // ID: 8
     uint16_t unknown39;
 
     float topleft_woodpanel_esc_slidein_timer;
-    uint32_t scroll_text_id;
-    uint32_t start_text_id;
+    STRINGID scroll_text_id;
+    STRINGID start_text_id;
     TextureRenderingInfo main_woodpanel_left_border;
     TextureRenderingInfo main_woodpanel_center;
     TextureRenderingInfo main_woodpanel_right_border;
@@ -360,9 +360,9 @@ class ScreenCharacterSelect : public Screen // ID: 9
     TextureRenderingInfo unknown32;
     TextureRenderingInfo left_scroll_handle;
     TextureRenderingInfo right_scroll_handle;
-    uint32_t left_button_text_id;
-    uint32_t right_button_text_id;
-    uint32_t middle_button_text_id;
+    STRINGID left_button_text_id;
+    STRINGID right_button_text_id;
+    STRINGID middle_button_text_id;
     bool top_woodpanel_visible;
     bool bottom_woodpanel_visible;
     bool toggle_woodpanel_slidein_animation;
@@ -520,7 +520,7 @@ class ScreenTransition : public Screen // ID: 13
     float unknown7;
     float mama_tunnel_fade_actualvalue;
     float mama_tunnel_fade_targetvalue;
-    uint32_t mama_tunnel_text_id;
+    STRINGID mama_tunnel_text_id;
     uint16_t mama_tunnel_text_buffer[256]; // UTF16 string
     bool mama_tunnel_choice_visible;
     bool mama_tunnel_agree_with_gift;
@@ -682,10 +682,10 @@ class ScreenOnlineLobby : public Screen // ID: 29
     TextureRenderingInfo unknown13;
     TextureRenderingInfo left_scroll_handle;
     TextureRenderingInfo right_scroll_handle;
-    uint32_t scroll_text_id;
-    uint32_t btn_left_text_id;
-    uint32_t btn_right_text_id;
-    uint32_t btn_center_text_id;
+    STRINGID scroll_text_id;
+    STRINGID btn_left_text_id;
+    STRINGID btn_right_text_id;
+    STRINGID btn_center_text_id;
     bool woodpanel_top_visible;
     bool woodpanel_bottom_visible;
     bool toggle_panels_slidein;
@@ -746,10 +746,10 @@ class ScreenOnlineLobby : public Screen // ID: 29
     TextureRenderingInfo unknown62;
     TextureRenderingInfo unknown63;
     TextureRenderingInfo unknown64;
-    uint32_t text_id_1;
-    uint32_t text_id_2;
-    uint32_t enter_code_btn_right_text_id;
-    uint32_t text_id_4;
+    STRINGID text_id_1;
+    STRINGID text_id_2;
+    STRINGID enter_code_btn_right_text_id;
+    STRINGID text_id_4;
     bool enter_code_woodpanel_top_visible;
     bool enter_code_woodpanel_bottom_visible;
     bool enter_code_toggle_panels_slidein;
@@ -762,8 +762,8 @@ class ScreenOnlineLobby : public Screen // ID: 29
     uint16_t code_char_terminator;
     uint32_t characters_entered_count;
     float enter_code_topleft_woodpanel_esc_slidein_timer;
-    uint32_t enter_code_banner_text_id;
-    uint32_t enter_code_OK_text_id;
+    STRINGID enter_code_banner_text_id;
+    STRINGID enter_code_OK_text_id;
     TextureRenderingInfo enter_code_main_woodpanel_left;
     TextureRenderingInfo enter_code_main_woodpanel_center;
     TextureRenderingInfo enter_code_main_woodpanel_right;

@@ -9,6 +9,7 @@
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "strings.hpp"
 
 #include "lua_backend.hpp"
 #include "lua_console.hpp"
@@ -1055,6 +1056,29 @@ end
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
 
+    /// Convert the hash to stringid
+    /// Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+    lua["hash_to_stringid"] = hash_to_stringid;
+
+    /// Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// Will return the string of currently choosen language
+    lua["get_string"] = get_string;
+
+    /// Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// This edits custom string and in game strings but changing the language in settings will reset game strings
+    lua["change_string"] = change_string;
+
+    /// Add custom string, currently can only be used for names of shop items (Entitydb->description)
+    /// Returns STRINGID of the new string
+    lua["add_string"] = add_string;
+
+    /// Adds custom name to the item by uid used in the shops
+    /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
+    lua["add_custom_name"] = add_custom_name;
+
+    /// Clears the name set with `add_custom_name`
+    lua["clear_custom_name"] = clear_custom_name;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -1154,7 +1178,11 @@ end
         "RENDER_POST_PAUSE_MENU",
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
-        ON::RENDER_PRE_DRAW_DEPTH);
+        ON::RENDER_PRE_DRAW_DEPTH,
+        "SPEECH_BUBBLE",
+        ON::SPEECH_BUBBLE,
+        "TOAST",
+        ON::TOAST);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -1211,6 +1239,18 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // SPEECH_BUBBLE
+    // Params: `Entity speaking_entity, string text`
+    // Runs before any speech bubble is created, even the one using `say` function
+    // Return behavior: if you don't return anything it will execute the speech bubble function normally with default message
+    // if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original
+    // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+    // TOAST
+    // Params: `string text`
+    // Runs before any toast is created, even the one using `toast` function
+    // Return behavior: if you don't return anything it will execute the toast function normally with default message
+    // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
+    // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
     */
 
     lua.create_named_table(

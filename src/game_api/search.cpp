@@ -1193,6 +1193,34 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        // Put bp on Entitydb->description and walk into a shop that has this entity
+        // Can also get string_table_here, you will see the id from description used as an offset of the first string in string_table
+        "format_shopitem_name"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x83\xEC\x28\x48\x89\xD0"sv) //minimum pattern: \x28\x48\x89\xD0\x48
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Put bp on state->basecamp_dialogue choose base/extra _dialogue, which ever the character you speak to responses ->line
+        // Scroll down, you should see two calls, first one is to format text (the execution can jump around, call it multiple times)
+        // The second call is this function
+        // Or put write bp on state->speech_bubble(pointer), you will end up somewhere in the middle of the function
+        "speech_bubble_fun"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Put write bp on state->toast (pointer), you will end up somewhere in the middle of the function
+        "toast_fun"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x55\x56\x48\x81\xEC\x98"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

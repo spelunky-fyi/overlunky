@@ -276,13 +276,12 @@ ITEM_METAL_SHIELD	)";
 }
 #endif
 
-void fix_entity_descriptions()
+void fix_entity_descriptions(STRINGID invalid_string_id)
 {
 #ifdef RECREATE_ENTITY_DESCRIPTIONS
     recreate_entity_descriptions();
 #endif
 
-    const uint32_t invalid_string_id = 1944; // Potentially changes with each Spelunky version!
     const std::vector<std::pair<uint32_t, uint32_t>> description_mapping = {
         {512, 1342},
         {513, 1343},

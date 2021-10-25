@@ -4,10 +4,10 @@
 
 struct ArenaRulesString
 {
-    uint32_t text_1_id; // StringsTableID
-    uint32_t text_2_id; // StringsTableID
-    uint32_t text_3_id; // StringsTableID
-    uint32_t text_4_id; // StringsTableID
+    STRINGID text_1_id; // StringsTableID
+    STRINGID text_2_id; // StringsTableID
+    STRINGID text_3_id; // StringsTableID
+    STRINGID text_4_id; // StringsTableID
     uint8_t unknown1;
     uint8_t unknown2;
     uint8_t unknown3;
@@ -31,10 +31,10 @@ class ScreenArenaMenu : public Screen // ID: 21
     TextureRenderingInfo unknown15;
     TextureRenderingInfo left_scroll_handle;
     TextureRenderingInfo right_scroll_handle;
-    uint32_t scroll_text_id;    // StringsTableID
-    uint32_t unknown17_text_id; // StringsTableID
-    uint32_t unknown18_text_id; // StringsTableID
-    uint32_t unknown19_text_id; // StringsTableID
+    STRINGID scroll_text_id;    // StringsTableID
+    STRINGID unknown17_text_id; // StringsTableID
+    STRINGID unknown18_text_id; // StringsTableID
+    STRINGID unknown19_text_id; // StringsTableID
     bool top_woodpanel_visible;
     bool bottom_woodpanel_visible;
     bool woodpanels_toggle;
@@ -92,10 +92,10 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     TextureRenderingInfo unknown10;
     TextureRenderingInfo woodenpanel_top_left_scroll;
     TextureRenderingInfo woodenpanel_top_right_scroll;
-    uint32_t text_id_1; // Strings table ID
-    uint32_t text_id_2; // Strings table ID
-    uint32_t text_id_3; // Strings table ID
-    uint32_t text_id_4; // Strings table ID
+    STRINGID text_id_1; // Strings table ID
+    STRINGID text_id_2; // Strings table ID
+    STRINGID text_id_3; // Strings table ID
+    STRINGID text_id_4; // Strings table ID
     bool woodenpanel_top_visible;
     bool woodenpanel_bottom_visible;
     bool woodenpanels_toggle;
@@ -145,10 +145,10 @@ class ScreenArenaItems : public Screen // ID: 23
     TextureRenderingInfo unknown11;
     TextureRenderingInfo top_scroll_left_handle;
     TextureRenderingInfo top_scroll_right_handle;
-    uint32_t scroll_text_id; // Strings table ID
-    uint32_t text_id_2;      // Strings table ID
-    uint32_t text_id_3;      // Strings table ID
-    uint32_t text_id_4;      // Strings table ID
+    STRINGID scroll_text_id; // Strings table ID
+    STRINGID text_id_2;      // Strings table ID
+    STRINGID text_id_3;      // Strings table ID
+    STRINGID text_id_4;      // Strings table ID
     bool woodpanel_top_visible;
     bool woodpanel_bottom_visible;
     bool woodpanels_toggle;
@@ -291,8 +291,8 @@ class ScreenArenaScore : public Screen // ID: 27
     TextureRenderingInfo woodpanel_left_scroll;
     TextureRenderingInfo woodpanel_right_scroll;
 
-    uint32_t text_id_1; // Strings table ID
-    uint32_t text_id_2; // Strings table ID
+    STRINGID text_id_1; // Strings table ID
+    STRINGID text_id_2; // Strings table ID
     bool woodpanel_visible;
     uint8_t unknown13b;
     bool woodpanel_slide_toggle;

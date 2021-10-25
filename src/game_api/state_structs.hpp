@@ -651,13 +651,13 @@ struct AITarget
 
 struct DialogueDetails
 {
-    uint32_t line;          // strings table ID
+    STRINGID line;          // strings table ID
     uint8_t param_player1;  // character db ID (although they don't always match up with the in game dialogue)
     uint8_t param_player2;  // for %-replacement in line
     uint8_t unknown3;       // most likely padding
     uint8_t unknown4;       // most likely padding
-    uint32_t param_string1; // strings table ID for %-replacement in line
-    uint32_t param_string2;
+    STRINGID param_string1; // strings table ID for %-replacement in line
+    STRINGID param_string2;
 };
 
 struct DialogueDetailsGroup

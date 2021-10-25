@@ -24,8 +24,8 @@ struct CharacterDB
 {
     CharGender gender;
     Color heart_color;
-    uint32_t full_name_string_id;
-    uint32_t short_name_string_id;
+    STRINGID full_name_string_id;
+    STRINGID short_name_string_id;
     std::uint32_t _uint0;
     float bed_position_x;
     float bed_position_y;

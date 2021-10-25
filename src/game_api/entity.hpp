@@ -98,7 +98,7 @@ struct EntityDB
     uint8_t field_99;
     uint8_t field_9A;
     uint8_t field_9B;
-    int32_t description;
+    STRINGID description;
     int32_t sound_killed_by_player;
     int32_t sound_killed_by_other;
     float field_a8;
