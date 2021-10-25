@@ -492,6 +492,12 @@ Enables or disables the journal
 ### [`set_camp_camera_bounds_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camp_camera_bounds_enabled)
 `nil set_camp_camera_bounds_enabled(bool b)`<br/>
 Enables or disables the default position based camp camera bounds, to set them manually yourself
+### [`set_explosion_mask`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_explosion_mask)
+`nil set_explosion_mask(int mask)`<br/>
+Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
+### [`set_max_rope_length`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_max_rope_length)
+`nil set_max_rope_length(int length)`<br/>
+Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
 ### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
 `int waddler_count_entity(ENT_TYPE entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
@@ -1429,6 +1435,9 @@ Moves the entity from the limbo-layer (where it was previously put by `remove`) 
 - [`nil destroy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy) &Entity::destroy
 \
 Completely removes the entity from existence
+- [`nil activate(Entity activator)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate) &Entity::activate
+\
+Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -1863,6 +1872,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Drill`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Entity top_chain_piece`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_chain_piece) &Drill::top_chain_piece
+- [`nil trigger()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &Drill::trigger
 ### `ThinIce`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int strength`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=strength) &ThinIce::strength

@@ -1259,6 +1259,35 @@ void set_camp_camera_bounds_enabled(bool b)
     }
 }
 
+void set_explosion_mask(uint32_t mask)
+{
+    static size_t addr = 0;
+    if (addr == 0)
+    {
+        addr = get_address("explosion_mask");
+    }
+    write_mem_prot(addr, mask, true);
+}
+
+void set_max_rope_length(uint8_t length)
+{
+    uint32_t length_32 = length;
+
+    // there's four instances where the max (default=6) is used
+
+    // 1) When throwing a rope and it attaches to the background, the initial entity is
+    // given a start value in its segment_nr_inverse variable
+    write_mem_prot(get_address("attach_thrown_rope_to_background"), length_32, true);
+
+    // 2) and 3) at the top of the rope processing function are two comparisons to the max
+    write_mem_prot(get_address("process_ropes_one"), length, true);
+    write_mem_prot(get_address("process_ropes_two"), length, true);
+
+    // 4) in the same function at the end of the little loop of process_ropes_two is a comparison to n-1
+    uint8_t length_minus_one_8 = length - 1;
+    write_mem_prot(get_address("process_ropes_three"), length_minus_one_8, true);
+}
+
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();
