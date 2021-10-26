@@ -38,19 +38,21 @@ OnNPCDialogueFun* g_speach_bubble_trampoline{nullptr};
 void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound_type, bool top)
 {
     std::u16string str = pre_speach_bubble(NPC, buffer);
+    char16_t* new_string = NULL;
     if (str != u"~[:NO_RETURN:]#")
     {
         if (str.empty())
             return;
 
         const auto data_size = str.size() * sizeof(char16_t);
-        char16_t* new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+        new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
         new_string[str.size()] = u'\0';
         memcpy(new_string, str.data(), data_size);
 
         buffer = new_string;
     }
     g_speach_bubble_trampoline(func, NPC, buffer, shoppie_sound_type, top);
+    game_free((void*)new_string);
 }
 
 using OnToastFun = void(char16_t*);
@@ -58,19 +60,21 @@ OnToastFun* g_toast_trampoline{nullptr};
 void OnToast(char16_t* buffer)
 {
     std::u16string str = pre_toast(buffer);
+    char16_t* new_string = NULL;
     if (str != u"~[:NO_RETURN:]#")
     {
         if (str.empty())
             return;
 
         const auto data_size = str.size() * sizeof(char16_t);
-        char16_t* new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+        new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
         new_string[str.size()] = u'\0';
         memcpy(new_string, str.data(), data_size);
 
         buffer = new_string;
     }
     g_toast_trampoline(buffer);
+    game_free((void*)new_string);
 }
 
 void strings_init()
@@ -172,6 +176,7 @@ STRINGID add_string(std::u16string str) // future idea: add more strings variant
 
 void add_custom_name(uint32_t uid, std::u16string name)
 {
+    clear_custom_name(uid);
     custom_shopitem_names[uid] = add_string(name);
 }
 

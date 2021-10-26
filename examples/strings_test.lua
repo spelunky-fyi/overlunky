@@ -184,11 +184,11 @@ set_callback(function()
             shop_items[#shop_items + 1] = item; -- add to table
         end
     end
+    if #shop_items > 0 then
+        random_shopitem = shop_items[math.random(#shop_items)] -- chose one at random
     
-    random_shopitem = shop_items[math.random(#shop_items)] -- chose one at random
-    
-    add_custom_name(random_shopitem, "Garbage") -- change random item in shop to Garbage, this will only affect this one entity
-
+        add_custom_name(random_shopitem, "Garbage") -- change random item in shop to Garbage, this will only affect this one entity
+    end
 end, ON.LEVEL)
 
 
