@@ -23,13 +23,17 @@ uint8_t Olmec::broken_floaters()
 
 void Drill::trigger()
 {
-    if (move_state != 0 || overlay == nullptr)
+    if (move_state != 0 || standing_on_uid != -1)
     {
         return;
     }
 
+    if (overlay != nullptr)
+    {
+        overlay->remove_item_ptr(this);
+    }
+
     move_state = 6;
-    overlay->remove_item_ptr(this);
     flags = flags & ~(1U << (10 - 1));
 
     using construct_soundposition_ptr_fun_t = SoundPosition*(uint32_t id, uint32_t unknown);
