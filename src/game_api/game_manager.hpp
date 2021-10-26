@@ -45,11 +45,11 @@ struct GameManager
     ScreenPlayerProfile* screen_player_profile;
     ScreenLeaderboards* screen_leaderboards;
     ScreenSeedInput* screen_seed_input;
-    ScreenCharacterSelect* screen_character_select;
-    size_t unknown_screen_team_select; // available in State
+    size_t unknown_screen_character_select; // available in State
+    size_t unknown_screen_team_select;      // available in State
     ScreenCamp* screen_camp;
     ScreenLevel* screen_level;
-    size_t unknown_screen_transition;    // available in State
+    size_t screen_transition;            // available in State, but it's a different object! this one only has a render_timer
     size_t unknown_screen_death;         // available in State
     size_t unknown_screen_spaceship;     // (also not) available in State
     size_t unknown_screen_win;           // available in State

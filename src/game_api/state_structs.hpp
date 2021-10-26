@@ -786,8 +786,6 @@ struct Dialogue
     uint32_t unknown16;
     uint32_t unknown17;
     uint32_t unknown18;
-    uint32_t unknown19;
-    uint32_t unknown20;
 };
 
 struct SelectPlayerSlot

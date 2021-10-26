@@ -138,8 +138,6 @@ void register_usertypes(sol::state& lua)
         &ScreenMenu::cthulhu_timer,
         "selected_menu_index",
         &ScreenMenu::selected_menu_index,
-        "show_toast_text",
-        &ScreenMenu::show_toast_text,
         "menu_text_opacity",
         &ScreenMenu::menu_text_opacity,
         "menu_text_opacity",

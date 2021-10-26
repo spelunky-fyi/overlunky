@@ -336,7 +336,7 @@ Screen* get_screen_ptr(uint32_t screen_id)
     }
     case 9:
     {
-        return game_manager->screen_character_select;
+        return state->screen_character_select;
     }
     case 10:
     {

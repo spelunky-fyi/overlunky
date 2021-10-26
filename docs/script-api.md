@@ -1153,6 +1153,7 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`Items items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) &StateMemory::items
 - [`int camera_layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) &StateMemory::camera_layer
 - [`ScreenTeamSelect screen_team_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) &StateMemory::screen_team_select
+- [`ScreenCharacterSelect screen_character_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) &StateMemory::screen_character_select
 - [`ScreenTransition screen_transition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) &StateMemory::screen_transition
 - [`ScreenDeath screen_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_death) &StateMemory::screen_death
 - [`ScreenWin screen_win`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_win) &StateMemory::screen_win
@@ -1183,7 +1184,6 @@ Returns animation_frame of the correct ushabti
 - [`ScreenPlayerProfile screen_player_profile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_player_profile) &GameManager::screen_player_profile
 - [`ScreenLeaderboards screen_leaderboards`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_leaderboards) &GameManager::screen_leaderboards
 - [`ScreenSeedInput screen_seed_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_seed_input) &GameManager::screen_seed_input
-- [`ScreenCharacterSelect screen_character_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) &GameManager::screen_character_select
 - [`ScreenCamp screen_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) &GameManager::screen_camp
 - [`ScreenLevel screen_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) &GameManager::screen_level
 - [`ScreenOnlineLoading screen_online_loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_loading) &GameManager::screen_online_loading
@@ -3453,7 +3453,6 @@ Derived from [`Screen`](#screen)
 - [`float cthulhu_disc_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_y) &ScreenMenu::cthulhu_disc_y
 - [`float cthulhu_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_timer) &ScreenMenu::cthulhu_timer
 - [`int selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) &ScreenMenu::selected_menu_index
-- [`bool show_toast_text`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_toast_text) &ScreenMenu::show_toast_text
 - [`float menu_text_opacity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_text_opacity) &ScreenMenu::menu_text_opacity
 - [`float menu_text_opacity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_text_opacity) &ScreenMenu::menu_text_opacity
 - [`array<float, 6> spear_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_position) &ScreenMenu::spear_position
