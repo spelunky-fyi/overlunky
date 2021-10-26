@@ -815,8 +815,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a write bp on this float with the condition not to break at the RIP where shop/in-game level is written.
         // Then look through the camp telescope, then stop looking
         PatternCommandBuffer{}
-            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
-            .offset(0x6)
+            .find_inst("\x48\x8B\x40\x10\xC7\x80"sv)
+            .offset(0xA)
             .at_exe(),
     },
     {
@@ -825,9 +825,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a write bp on this float with the condition not to break at the RIP where shop/in-game level is written.
         // Then warp to camp
         PatternCommandBuffer{}
-            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
-            .find_next_inst("\xC7\x80****\x00\x00\x58\x41"sv)
-            .offset(0x6)
+            .find_inst("\x48\x8B\x40\x10\xC7\x80"sv)
+            .find_next_inst("\x48\x8B\x40\x10\xC7\x80"sv)
+            .offset(0xA)
             .at_exe(),
     },
     {
