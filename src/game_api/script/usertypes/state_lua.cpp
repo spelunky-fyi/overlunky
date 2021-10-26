@@ -573,14 +573,16 @@ void register_usertypes(sol::state& lua)
         &OnlineLobby::code,
         "get_code",
         &OnlineLobby::get_code);
-    lua.new_usertype<Logic>(
-        "Logic",
+    lua.new_usertype<LogicList>(
+        "LogicList",
         "olmec_cutscene",
-        &Logic::olmec_cutscene,
+        &LogicList::olmec_cutscene,
         "tiamat_cutscene",
-        &Logic::tiamat_cutscene,
+        &LogicList::tiamat_cutscene,
         "diceshop",
-        &Logic::diceshop);
+        &LogicList::diceshop);
+    lua.new_usertype<Logic>(
+        "Logic");
     lua.new_usertype<LogicOlmecCutscene>(
         "LogicOlmecCutscene",
         "olmec",
@@ -590,7 +592,9 @@ void register_usertypes(sol::state& lua)
         "cinematic_anchor",
         &LogicOlmecCutscene::cinematic_anchor,
         "timer",
-        &LogicOlmecCutscene::timer);
+        &LogicOlmecCutscene::timer,
+        sol::base_classes,
+        sol::bases<Logic>());
     lua.new_usertype<LogicTiamatCutscene>(
         "LogicTiamatCutscene",
         "tiamat",
@@ -600,7 +604,9 @@ void register_usertypes(sol::state& lua)
         "cinematic_anchor",
         &LogicTiamatCutscene::cinematic_anchor,
         "timer",
-        &LogicTiamatCutscene::timer);
+        &LogicTiamatCutscene::timer,
+        sol::base_classes,
+        sol::bases<Logic>());
     lua.new_usertype<LogicDiceShop>(
         "LogicDiceShop",
         "bet_machine",
@@ -630,7 +636,9 @@ void register_usertypes(sol::state& lua)
         "won_prizes_count",
         &LogicDiceShop::won_prizes_count,
         "balance",
-        &LogicDiceShop::balance);
+        &LogicDiceShop::balance,
+        sol::base_classes,
+        sol::bases<Logic>());
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 

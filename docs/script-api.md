@@ -1171,7 +1171,7 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 - [`ArenaState arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) &StateMemory::arena
-- [`Logic logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
+- [`LogicList logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
@@ -1252,21 +1252,24 @@ see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
 - [`string get_code()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_code) &OnlineLobby::get_code
 \
 Gets the string equivalent of the code
-### `Logic`
-- [`LogicOlmecCutscene olmec_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) &Logic::olmec_cutscene
-- [`LogicTiamatCutscene tiamat_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) &Logic::tiamat_cutscene
-- [`LogicDiceShop diceshop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) &Logic::diceshop
+### `LogicList`
+- [`LogicOlmecCutscene olmec_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) &LogicList::olmec_cutscene
+- [`LogicTiamatCutscene tiamat_cutscene`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) &LogicList::tiamat_cutscene
+- [`LogicDiceShop diceshop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) &LogicList::diceshop
 ### `LogicOlmecCutscene`
+Derived from [`Logic`](#logic)
 - [`Entity olmec`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec) &LogicOlmecCutscene::olmec
 - [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &LogicOlmecCutscene::player
 - [`Entity cinematic_anchor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) &LogicOlmecCutscene::cinematic_anchor
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicOlmecCutscene::timer
 ### `LogicTiamatCutscene`
+Derived from [`Logic`](#logic)
 - [`Entity tiamat`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat) &LogicTiamatCutscene::tiamat
 - [`Entity player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) &LogicTiamatCutscene::player
 - [`Entity cinematic_anchor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) &LogicTiamatCutscene::cinematic_anchor
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicTiamatCutscene::timer
 ### `LogicDiceShop`
+Derived from [`Logic`](#logic)
 - [`int bet_machine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_machine) &LogicDiceShop::bet_machine
 - [`int die1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die1) &LogicDiceShop::die1
 - [`int die2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die2) &LogicDiceShop::die2

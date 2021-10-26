@@ -154,7 +154,7 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    Logic* logic;
+    LogicList* logic;
     QuestsInfo* quests;
     AITarget* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
