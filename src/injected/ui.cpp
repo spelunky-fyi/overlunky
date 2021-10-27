@@ -3644,6 +3644,7 @@ void render_savegame()
     {
         SliderByte("World##LastWorld", (char*)&g_save->world_last, 1, 8);
         SliderByte("Level##LastLevel", (char*)&g_save->level_last, 1, 99);
+        SliderByte("Theme##LastTheme", (char*)&g_save->theme_last, 1, 16);
         ImGui::DragScalar("Score##LastScore", ImGuiDataType_S32, &g_save->score_last, 1000.0f, &s32_zero, &s32_max);
         std::string lasttime = format_time(g_save->time_last);
         if (ImGui::InputText("Time##LastTime", &lasttime))
