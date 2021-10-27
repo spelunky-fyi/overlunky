@@ -1908,22 +1908,13 @@ Logic = {
   __name = "sol.Logic.user"
 }
 LogicDiceShop = {
-  __index = "function",
-  __name = "sol.LogicDiceShop.user",
-  __newindex = "function"
-}
-LogicList = {
-  __name = "sol.LogicList.user"
+  __name = "sol.LogicDiceShop.user"
 }
 LogicOlmecCutscene = {
-  __index = "function",
-  __name = "sol.LogicOlmecCutscene.user",
-  __newindex = "function"
+  __name = "sol.LogicOlmecCutscene.user"
 }
 LogicTiamatCutscene = {
-  __index = "function",
-  __name = "sol.LogicTiamatCutscene.user",
-  __newindex = "function"
+  __name = "sol.LogicTiamatCutscene.user"
 }
 MASK = {
   ACTIVEFLOOR = 128,

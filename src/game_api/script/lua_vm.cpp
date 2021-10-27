@@ -711,6 +711,8 @@ end
     lua["flip_entity"] = flip_entity;
     /// Sets the Y-level at which Olmec changes phases
     lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
+    /// Forces Olmec to stay on phase 0 (stomping)
+    lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
     /// Enables or disables the journal

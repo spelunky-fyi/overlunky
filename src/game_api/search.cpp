@@ -1014,6 +1014,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0x0c),
     },
     {
+        "olmec_transition_phase_1"sv,
+        // Put write bp on olmec.attack_phase (when he's in phase 0)
+        // Look for the condition that jumps over the little section that changes the phase to 1
+        PatternCommandBuffer{}
+            .find_inst("\x0F\x2E\xD1*\x2E\xF3\x0F\x10\x0D"sv)
+            .offset(0x3)
+            .at_exe(),
+    },
+    {
         "blood_multiplication"sv,
         // Put a read bp on Caveman(EntityDB):blood_content and kill one. If you look up a bit you will see
         // the value 2 get loaded into a register, this is the multiplication factor. From 1.23.x

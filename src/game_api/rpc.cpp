@@ -1093,6 +1093,28 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     }
 }
 
+void force_olmec_phase_0(bool b)
+{
+    static size_t offset = 0;
+    static char original_instruction[2] = {0};
+    if (offset == 0)
+    {
+        offset = get_address("olmec_transition_phase_1");
+        for (uint8_t x = 0; x < 2; ++x)
+        {
+            original_instruction[x] = read_u8(offset + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset, "\xEB\x2E"s, true); // jbe -> jmp
+    }
+    else
+    {
+        write_mem_prot(offset, std::string(original_instruction, 2), true);
+    }
+}
+
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
     write_mem_prot(get_address("ghost_spawn_time"), normal, true);

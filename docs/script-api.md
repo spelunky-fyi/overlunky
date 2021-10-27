@@ -483,6 +483,9 @@ Flip entity around by uid. All new entities face right by default.
 ### [`set_olmec_phase_y_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_phase_y_level)
 `nil set_olmec_phase_y_level(int phase, float y)`<br/>
 Sets the Y-level at which Olmec changes phases
+### [`force_olmec_phase_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_olmec_phase_0)
+`nil force_olmec_phase_0(bool b)`<br/>
+Forces Olmec to stay on phase 0 (stomping)
 ### [`set_ghost_spawn_times`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ghost_spawn_times)
 `nil set_ghost_spawn_times(int normal = 10800, int cursed = 9000)`<br/>
 Determines when the ghost appears, either when the player is cursed or not
@@ -3157,7 +3160,7 @@ Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 - [`int level_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_last) &SaveData::level_last
 - [`int score_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_last) &SaveData::score_last
 - [`int time_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last) &SaveData::time_last
-- [`array<int, 9> stickers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) &SaveData::stickers
+- [`array<int, 20> stickers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) &SaveData::stickers
 - [`array<int, 4> players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) &SaveData::players
 ### `CustomSound`
 Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
