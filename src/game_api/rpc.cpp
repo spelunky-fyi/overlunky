@@ -336,7 +336,7 @@ Screen* get_screen_ptr(uint32_t screen_id)
     }
     case 9:
     {
-        return game_manager->screen_character_select;
+        return state->screen_character_select;
     }
     case 10:
     {
@@ -1051,7 +1051,8 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     // Olmecs checks phases in order! The means if you want ufo's from the start
     // you have to put both phase 1 and 2 at e.g. level 199
     // If you want to make Olmec stay in phase 0 (stomping) all the time, you can just set
-    // the phase 1 y level to e.g. 10.
+    // the phase 1 y level to 70. Don't set it too low, from 1.25.0 onwards, Olmec's stomp
+    // activation distance seems to be related to the y-level trigger point.
     static size_t phase1_offset = 0;
     static size_t phase2_offset = 0;
     if (phase1_offset == 0)

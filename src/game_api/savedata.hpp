@@ -33,7 +33,8 @@ struct SaveData
     int32_t score_top;
     uint8_t deepest_area;
     uint8_t deepest_level;
-    int8_t skip4[9182]; //TODO
+    int8_t skip4[1022];                                            //TODO
+    std::array<std::array<uint32_t, 255>, 8> deathcount_per_level; // 8 themes, 255 uint32_t's for each level
     int64_t time_total;
     int32_t time_best;
     std::array<int32_t, 20> character_deaths;
@@ -46,11 +47,16 @@ struct SaveData
     bool seeded_unlocked;
     uint8_t world_last;
     uint8_t level_last;
-    int8_t skip7[2];
+    uint8_t theme_last;
+    int8_t skip7;
     uint32_t score_last;
     uint32_t time_last;
-    std::array<int32_t, 9> stickers;
-    int8_t skip8[324];
+    std::array<int32_t, 20> stickers;
+    int8_t skip8[40];                     // first dword is a mask(?) that determines horizontal spacing between stickers
+    std::array<float, 20> sticker_angles; // rotation angle for each sticker
+    int8_t skip9[40];
+    std::array<float, 20> sticker_vert_offsets; // vertical offset for each sticker
+    int8_t skip10[40];
     std::array<uint8_t, 4> players;
 };
 

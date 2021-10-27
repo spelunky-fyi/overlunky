@@ -815,8 +815,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a write bp on this float with the condition not to break at the RIP where shop/in-game level is written.
         // Then look through the camp telescope, then stop looking
         PatternCommandBuffer{}
-            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
-            .offset(0x6)
+            .find_inst("\x48\x8B\x40\x10\xC7\x80"sv)
+            .offset(0xA)
             .at_exe(),
     },
     {
@@ -825,9 +825,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a write bp on this float with the condition not to break at the RIP where shop/in-game level is written.
         // Then warp to camp
         PatternCommandBuffer{}
-            .find_inst("\xC7\x80****\x00\x00\x58\x41"sv)
-            .find_next_inst("\xC7\x80****\x00\x00\x58\x41"sv)
-            .offset(0x6)
+            .find_inst("\x48\x8B\x40\x10\xC7\x80"sv)
+            .find_next_inst("\x48\x8B\x40\x10\xC7\x80"sv)
+            .offset(0xA)
             .at_exe(),
     },
     {
@@ -846,8 +846,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // The big function that breaks contains a call to the internal hitbox-overlap function for which the default
         // mask is put on the stack (0x18F)
         PatternCommandBuffer{}
-            .find_inst("\xC7\x44\x24\x30\x8F\x01\x00\x00")
-            .offset(0x04)
+            .find_inst("\x0F\x57\xFF\x0F\x57\xDB\x49")
+            .offset(-0x15)
             .at_exe(),
     },
     {
@@ -855,7 +855,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope
         // A little below that will 6 be written into the entity's segment_nr_inverse
         PatternCommandBuffer{}
-            .find_inst("\xFF\x50\x30\xC7\x83\x30\x01\x00\x00\x06\x00\x00\x00")
+            .find_inst("\xFF\x50\x30\xC7\x83\x30\x01\x00\x00*\x00\x00\x00")
             .offset(0x09)
             .at_exe(),
     },
@@ -864,7 +864,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope, continue until all the segments are being made
         // At the beginning of this big function will be two comparisons to 6 and a comparison to 5
         PatternCommandBuffer{}
-            .find_inst("\x83\xF9\x06\x75")
+            .find_inst("\x83\xF9*\x75\x3B")
             .offset(0x02)
             .at_exe(),
     },
@@ -873,7 +873,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // See process_ropes_one
         PatternCommandBuffer{}
             .get_address("process_ropes_one"sv)
-            .find_next_inst("\x83\xF8\x06")
+            .find_next_inst("\x83\xF8*\x0F\x85")
             .offset(0x02)
             .at_exe(),
     },
@@ -882,7 +882,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // See process_ropes_two
         PatternCommandBuffer{}
             .get_address("process_ropes_two"sv)
-            .find_next_inst("\x83\xF8\x05")
+            .find_next_inst("\x83\xF8*\x0F\x87****\x41")
             .offset(0x02)
             .at_exe(),
     },
@@ -945,7 +945,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )
         // Search for 0x2328 and 0x2A30 in very close proximity
         PatternCommandBuffer{}
-            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
             .offset(0xB)
             .at_exe(),
     },
@@ -954,28 +954,28 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // See `ghost_spawn_time` on how to search. New in 1.23.x is the fact that now all four players get checked
         // for curse, and they all have individual ghost trigger timings (all 0x2328 of course)
         PatternCommandBuffer{}
-            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
             .offset(-0x59)
             .at_exe(),
     },
     {
         "ghost_spawn_time_cursed_player2"sv,
         PatternCommandBuffer{}
-            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
             .offset(-0x3B)
             .at_exe(),
     },
     {
         "ghost_spawn_time_cursed_player3"sv,
         PatternCommandBuffer{}
-            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
             .offset(-0x1D)
             .at_exe(),
     },
     {
         "ghost_spawn_time_cursed_player4"sv,
         PatternCommandBuffer{}
-            .find_inst("\xB8\x28\x23\x00\x00\x4C\x39\xCA\x74\x05"sv)
+            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
             .offset(0x1)
             .at_exe(),
     },
@@ -1023,8 +1023,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // be setting Vlad's cape multiplier, and default will be n-1.
         // The pattern occurs twice with seemingly the same code logic, but don't know how to trigger.
         PatternCommandBuffer{}
-            .find_inst("\xBD\x02\x00\x00\x00\x29\xFD"sv)
-            .offset(0x1)
+            .find_inst("\x40\x0F\x94\xC7\xBD****\x29\xFD"sv)
+            .offset(0x5)
             .at_exe(),
     },
     {
@@ -1038,7 +1038,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "kapala_blood_threshold"sv,
         // Put a write bp on KapalaPowerup:amount_of_blood
         PatternCommandBuffer{}
-            .find_inst("\x88\x88\x30\x01\x00\x00\x80\xF9\x07"sv)
+            .find_inst("\x88\x88\x30\x01\x00\x00\x80\xF9"sv)
             .offset(0x8)
             .at_exe(),
     },
@@ -1054,16 +1054,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a conditional bp on load_item (rdx = 0x173 (id of wooden arrow))
         // Trigger a trap
         PatternCommandBuffer{}
-            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x90"sv)
             .offset(0x1)
             .at_exe(),
     },
     {
         "poison_arrowtrap_projectile"sv,
-        // See `arrowtrap_projectile`, second occurrence of pattern
+        // See `arrowtrap_projectile`, but trigger a poison trap
         PatternCommandBuffer{}
-            .find_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
-            .find_next_inst("\xBA\x73\x01\x00\x00\x0F\x28\xD1"sv)
+            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x48\x89\xC6\x48\x8B\x00"sv)
             .offset(0x1)
             .at_exe(),
     },
@@ -1094,8 +1093,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // New in 1.21.x: This is only the first delay to a poison tick, from then on, see `subsequent_poison_timer_tick_default`
         // Note that there is a similar value of 1800 frames being written just above this location, no idea what triggers that
         PatternCommandBuffer{}
-            .find_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
-            .find_next_inst("\x66\xC7\x86\x20\x01\x00\x00\x08\x07"sv)
+            .find_inst("\x66\xC7\x86\x20\x01\x00\x00**\xE9"sv)
+            .find_next_inst("\x66\xC7\x86\x20\x01\x00\x00**\xE9"sv)
             .offset(0x7)
             .at_exe(),
     },
@@ -1104,7 +1103,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a write bp on a poisoned Player(Movable):poison_tick_timer after the first poison tick has occurred
         // and filter out the timer countdown
         PatternCommandBuffer{}
-            .find_inst("\x66\x41\xC7\x87\x20\x01\x00\x00\x08\x07"sv)
+            .find_inst("\x66\x41\xC7\x87\x20\x01\x00\x00**\x49"sv)
             .offset(0x8)
             .at_exe(),
     },
@@ -1154,7 +1153,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a write bp on State.level_flags (3rd byte, containing dark level flag)
         // Filter out all breaks, then load levels until you get a dark one
         PatternCommandBuffer{}
-            .find_inst("\x80\x79\x52\x02\x7E\x2F"sv)
+            .find_inst("\x80\x79\x52\x02**\x4D\x85\xD2"sv)
             .offset(0x4)
             .at_exe(),
     },
