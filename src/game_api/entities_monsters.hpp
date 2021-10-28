@@ -155,7 +155,7 @@ class GoldMonkey : public Monster
 {
   public:
     uint8_t jump_timer;
-    uint8_t padding; // ?
+    uint8_t padding;
     uint16_t poop_timer;
     uint8_t poop_count;
 };
@@ -183,6 +183,7 @@ class Spider : public Monster
   public:
     float ceiling_pos_x;
     float ceiling_pos_y;
+    /// For the giant spider, some times he shot web instead of jumping
     uint8_t jump_timer;
     uint8_t padding1;
     uint16_t padding2;
@@ -326,7 +327,8 @@ class Mantrap : public Monster
 class Skeleton : public Monster
 {
   public:
-    int16_t explosion_timer; // -1 never explodes
+    /// -1 = never explodes
+    int16_t explosion_timer;
 };
 
 class Scarab : public Monster
@@ -658,7 +660,7 @@ class OsirisHand : public Monster
 class Alien : public Monster
 {
   public:
-    uint8_t jump_timer; // when 0 it jumps
+    uint16_t jump_timer; // when 0 it jumps
     uint8_t unknown1;
     uint8_t unknown2; // seen timer here once maybe? it's accessed right as he jumps from the ufo
 };
@@ -874,9 +876,9 @@ class Hundun : public Monster
 class HundunHead : public Monster
 {
   public:
+    /// Posiotion where the head will move on attack
     float attack_position_x;
     float attack_position_y;
-    /// Posiotion where the head will move on attack
     int32_t egg_crack_effect_uid;
     int32_t targeted_player_uid;
     /// also cooldown before attack
@@ -936,8 +938,8 @@ class ProtoShopkeeper : public Monster
 {
   public:
     uint64_t unknown1;
+    /// 1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     uint8_t movement_state;
-    ///1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     uint8_t padding1;
     uint8_t padding2;
     uint8_t blowup_related;

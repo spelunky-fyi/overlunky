@@ -798,7 +798,7 @@ end
         newinput->current = 0;
         newinput->orig_input = player->input_ptr;
         newinput->orig_ai = player->ai;
-        player->input_ptr = reinterpret_cast<size_t>(newinput);
+        player->input_ptr = reinterpret_cast<PlayerInputs*>(newinput);
         player->ai = 0;
         backend->script_input[uid] = newinput;
         // DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);

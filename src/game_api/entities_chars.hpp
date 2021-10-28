@@ -79,14 +79,14 @@ class Player : public PowerupCapable
     int32_t linked_companion_child;  // entity uid
     int32_t linked_companion_parent; // entity uid
     Ai* ai;
-    size_t input_ptr;
-    size_t p160;
+    PlayerInputs* input_ptr;
+    Entity* basecamp_button_entity_pointer;
     int32_t i168;
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y
     uint32_t jump_flags;
-    uint8_t some_timer;
-    uint8_t can_use;
+    uint8_t timer_since_last_jump; //something different happens before or after 6
+    uint8_t can_use; // is compared with bit numbers, so probably flags
 
     void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();

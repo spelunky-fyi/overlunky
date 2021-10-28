@@ -1,7 +1,6 @@
 #pragma once
 
 #include "entity.hpp"
-#include "state_structs.hpp"
 
 #include <functional>
 
@@ -11,15 +10,14 @@ class Movable : public Entity
     std::map<int64_t, int64_t> pa0;
     std::map<int, int> pb0;
     size_t anim_func;
-    int32_t ic8;
-    int32_t icc;
+    int64_t ic8;
     float movex;
     float movey;
     BUTTON buttons;
     BUTTON buttons_previous;
     int16_t unknown_padding; // garbage?
     uint32_t stand_counter;
-    float jump_height_multiplier;
+    float jump_height_multiplier; //entitydb.jump gets multiplied by this value
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
@@ -43,13 +41,13 @@ class Movable : public Entity
         {
             /// Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
             uint16_t lock_input_timer;
-            uint16_t unknown_16; // fading the entity to black, similar to dark_shadow_timer
+            uint16_t wet_effect_timer; // fading the entity to black, similar to dark_shadow_timer
         };
     };
     int16_t poison_tick_timer;
-    uint8_t dark_shadow_timer;
-    uint8_t exit_invincibility_timer;
-    uint8_t invincibility_frames_timer;
+    uint8_t onfire_effect_timer;
+    uint8_t exit_invincibility_timer; // when exiting a door or a pipe, ...
+    uint8_t invincibility_frames_timer; //blinks the entity
     uint8_t frozen_timer;
     uint8_t unknown_damage_counter_a;
     uint8_t unknown_damage_counter_b;

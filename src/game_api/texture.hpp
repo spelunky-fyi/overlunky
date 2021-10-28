@@ -1,11 +1,12 @@
 #pragma once
 
+#include "aliases.hpp"
 #include <array>
 #include <cstdint>
 
 struct Texture
 {
-    std::int64_t id;
+    TEXTURE id;
     const char** name;
     std::uint32_t width;
     std::uint32_t height;

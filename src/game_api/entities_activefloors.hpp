@@ -1,9 +1,7 @@
 #pragma once
 
 #include "entities_items.hpp"
-#include "entity.hpp"
 #include "movable.hpp"
-#include <cstdint>
 
 class Crushtrap : public Movable
 {
@@ -19,7 +17,7 @@ class Crushtrap : public Movable
 class Olmec : public Movable
 {
   public:
-    size_t unknown_pointer;
+    SoundPosition* sound_pos;
     uint32_t target_uid;
     /// 0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
     uint8_t attack_phase;

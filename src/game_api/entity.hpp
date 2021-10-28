@@ -12,6 +12,7 @@
 #include "color.hpp"
 #include "math.hpp"
 #include "memory.hpp"
+#include "state_structs.hpp"
 
 struct RenderInfo;
 struct Texture;
@@ -153,7 +154,7 @@ class Entity
     uint16_t animation_frame;
     /// Don't edit this dirrectly, use `set_draw_depth`
     uint8_t draw_depth;
-    uint8_t b3f;
+    uint8_t b3f; //depth related, changed when going thru doors etc.
     float x;
     float y;
     float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
@@ -174,7 +175,7 @@ class Entity
     float tilew;
     float tileh;
     uint8_t layer;
-    uint8_t b99;
+    uint8_t b99; //this looks like FLOORSTYLED post-processing
     uint8_t b9a;
     uint8_t b9b;
     uint32_t i9c;

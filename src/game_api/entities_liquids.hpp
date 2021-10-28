@@ -1,8 +1,6 @@
 #pragma once
 
 #include "entity.hpp"
-#include "state_structs.hpp"
-#include <cstdint>
 
 class Liquid : public Entity
 {
