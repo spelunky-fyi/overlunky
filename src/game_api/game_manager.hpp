@@ -3,9 +3,22 @@
 #include "screen_arena.hpp"
 #include "thread_utils.hpp"
 
-struct TmpStruct
+struct JournalPopupUI
+{
+    TextureRenderingInfo wiggling_page_icon;
+    TextureRenderingInfo black_background;
+    TextureRenderingInfo button_icon;
+    float wiggling_page_angle;
+    uint32_t chapter_to_show;
+    uint32_t entry_to_show; // use the odd entry of the left hand page
+    uint32_t timer;
+    float slide_position;
+};
+
+struct SaveRelated
 {
     OnHeapPointer<SaveData> savedata;
+    JournalPopupUI journal_popup_ui;
 };
 
 struct GameProps
@@ -29,7 +42,7 @@ struct GameProps
 struct GameManager
 {
     void* backgroundmusic;
-    TmpStruct* tmp;
+    SaveRelated* save_related;
     uint8_t buttons_controls[MAX_PLAYERS];
     uint8_t buttons_movement[MAX_PLAYERS];
     GameProps* game_props;

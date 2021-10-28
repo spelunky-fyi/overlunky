@@ -810,7 +810,7 @@ struct PauseUI
 struct JournalUI
 {
     uint32_t state;
-    uint8_t page_shown;
+    uint8_t chapter_shown;
 
     uint8_t unknown1;
     uint16_t unknown2;

@@ -15,7 +15,8 @@ struct SaveData
     int8_t skip1[2];
     int32_t time_tutorial;
     char last_daily[8];
-    int8_t skip2[4];
+    uint8_t show_longer_journal_popup_count; // the next n times the 'Journal entry added' popup is shown, it's shown for 300 frames instead of 180
+    int8_t skip2[3];
     uint32_t characters;
     int8_t tutorial_state;
     uint8_t shortcuts;
@@ -39,7 +40,12 @@ struct SaveData
     int32_t time_best;
     std::array<int32_t, 20> character_deaths;
     std::array<uint8_t, 3> pets_rescued;
-    int8_t skip6[20];
+
+    // 1-based theme id into this array (0 = invalid theme, 19 = unknown)
+    // bool is set during transition with a theme change, except for CO, basecamp, arena
+    // due to tiamat and hundun, bool for neobab/sunkencity is only set when finishing these as 7-98
+    std::array<bool, 20> completed_themes;
+
     bool completed_normal;
     bool completed_ironman;
     bool completed_hard;

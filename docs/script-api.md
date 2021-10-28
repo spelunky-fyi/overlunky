@@ -1193,6 +1193,18 @@ Returns animation_frame of the correct ushabti
 - [`ScreenOnlineLobby screen_online_lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_lobby) &GameManager::screen_online_lobby
 - [`PauseUI pause_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) &GameManager::pause_ui
 - [`JournalUI journal_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) &GameManager::journal_ui
+- [`SaveRelated save_related`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) &GameManager::save_related
+### `SaveRelated`
+- [`JournalPopupUI journal_popup_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_popup_ui) &SaveRelated::journal_popup_ui
+### `JournalPopupUI`
+- [`TextureRenderingInfo wiggling_page_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_icon) &JournalPopupUI::wiggling_page_icon
+- [`TextureRenderingInfo black_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black_background) &JournalPopupUI::black_background
+- [`TextureRenderingInfo button_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_icon) &JournalPopupUI::button_icon
+- [`float wiggling_page_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_angle) &JournalPopupUI::wiggling_page_angle
+- [`int chapter_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_to_show) &JournalPopupUI::chapter_to_show
+- [`int entry_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entry_to_show) &JournalPopupUI::entry_to_show
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &JournalPopupUI::timer
+- [`float slide_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=slide_position) &JournalPopupUI::slide_position
 ### `GameProps`
 - [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &GameProps::buttons
 - [`bool game_has_focus`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) &GameProps::game_has_focus
@@ -3764,7 +3776,7 @@ Derived from [`Screen`](#screen)
 - [`int visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &PauseUI::visibility
 ### `JournalUI`
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &JournalUI::state
-- [`int page_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_shown) &JournalUI::page_shown
+- [`int chapter_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_shown) &JournalUI::chapter_shown
 - [`int current_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_page) &JournalUI::current_page
 - [`int flipping_to_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipping_to_page) &JournalUI::flipping_to_page
 - [`int max_page_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_page_count) &JournalUI::max_page_count

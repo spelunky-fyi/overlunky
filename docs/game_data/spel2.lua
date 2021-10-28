@@ -1758,6 +1758,9 @@ Jiangshi = {
   __name = "sol.Jiangshi.user",
   __newindex = "function"
 }
+JournalPopupUI = {
+  __name = "sol.JournalPopupUI.user"
+}
 JournalUI = {
   __name = "sol.JournalUI.user"
 }
@@ -1908,13 +1911,22 @@ Logic = {
   __name = "sol.Logic.user"
 }
 LogicDiceShop = {
-  __name = "sol.LogicDiceShop.user"
+  __index = "function",
+  __name = "sol.LogicDiceShop.user",
+  __newindex = "function"
+}
+LogicList = {
+  __name = "sol.LogicList.user"
 }
 LogicOlmecCutscene = {
-  __name = "sol.LogicOlmecCutscene.user"
+  __index = "function",
+  __name = "sol.LogicOlmecCutscene.user",
+  __newindex = "function"
 }
 LogicTiamatCutscene = {
-  __name = "sol.LogicTiamatCutscene.user"
+  __index = "function",
+  __name = "sol.LogicTiamatCutscene.user",
+  __newindex = "function"
 }
 MASK = {
   ACTIVEFLOOR = 128,
@@ -2927,6 +2939,9 @@ SaveContext = {
 }
 SaveData = {
   __name = "sol.SaveData.user"
+}
+SaveRelated = {
+  __name = "sol.SaveRelated.user"
 }
 Scarab = {
   __index = "function",
@@ -4899,6 +4914,7 @@ filter_entities = function(...) end
 flip_entity = function(...) end
 force_co_subtheme = function(...) end
 force_dark_level = function(...) end
+force_olmec_phase_0 = function(...) end
 game_manager = {}
 game_position = function(...) end
 generate_particles = function(...) end

@@ -377,7 +377,7 @@ void State::set_seed(uint32_t seed)
 SaveData* State::savedata()
 {
     auto gm = get_game_manager();
-    return gm->tmp->savedata.decode();
+    return gm->save_related->savedata.decode();
 }
 
 Entity* State::find(uint32_t uid)
