@@ -1466,6 +1466,7 @@ Related to taking damage, also drops you from ladder/rope, can't be set while on
 - [`int some_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_state) &Movable::some_state
 \
 Deprecated, it's the same as lock_input_timer, but this name makes no sense
+- [`int wet_effect_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wet_effect_timer) &Movable::wet_effect_timer
 - [`int airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::falling_timer
 \
 airtime = falling_timer
@@ -1474,7 +1475,8 @@ airtime = falling_timer
 airtime = falling_timer
 - [`bool is_poisoned()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) &Movable::is_poisoned
 - [`nil poison(int frames)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) &Movable::poison
-- [`int dark_shadow_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_shadow_timer) &Movable::dark_shadow_timer
+- [`int dark_shadow_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_shadow_timer) &Movable::onfire_effect_timer
+- [`int onfire_effect_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=onfire_effect_timer) &Movable::onfire_effect_timer
 - [`int exit_invincibility_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_invincibility_timer) &Movable::exit_invincibility_timer
 - [`int invincibility_frames_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invincibility_frames_timer) &Movable::invincibility_frames_timer
 - [`int frozen_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frozen_timer) &Movable::frozen_timer
@@ -2015,6 +2017,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 - [`float ceiling_pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_pos_x) &Spider::ceiling_pos_x
 - [`float ceiling_pos_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_pos_y) &Spider::ceiling_pos_y
 - [`int jump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) &Spider::jump_timer
+\
+For the giant spider, some times he shot web instead of jumping
 - [`float trigger_distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_distance) &Spider::trigger_distance
 \
 only in the x coord
@@ -2122,6 +2126,8 @@ the uid of the entity the mantrap has eaten, in case it can break out, like a sh
 ### `Skeleton`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster)
 - [`int explosion_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) &Skeleton::explosion_timer
+\
+-1 = never explodes
 ### `Scarab`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Scarab::emitted_light
@@ -2442,10 +2448,10 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 ### `HundunHead`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster)
 - [`float attack_position_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_position_x) &HundunHead::attack_position_x
-- [`float attack_position_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_position_y) &HundunHead::attack_position_y
-- [`int egg_crack_effect_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=egg_crack_effect_uid) &HundunHead::egg_crack_effect_uid
 \
 Posiotion where the head will move on attack
+- [`float attack_position_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_position_y) &HundunHead::attack_position_y
+- [`int egg_crack_effect_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=egg_crack_effect_uid) &HundunHead::egg_crack_effect_uid
 - [`int targeted_player_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=targeted_player_uid) &HundunHead::targeted_player_uid
 - [`int looking_for_target_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=looking_for_target_timer) &HundunHead::looking_for_target_timer
 \
@@ -2490,6 +2496,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 ### `ProtoShopkeeper`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster)
 - [`int movement_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movement_state) &ProtoShopkeeper::movement_state
+\
+1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
 - [`int walk_pause_explode_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_explode_timer) &ProtoShopkeeper::walk_pause_explode_timer
 - [`int walking_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking_speed) &ProtoShopkeeper::walking_speed
 \
@@ -2898,6 +2906,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float velocity_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_y) &MiniGameShip::velocity_y
 - [`float swing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swing) &MiniGameShip::swing
 - [`float up_down_normal`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up_down_normal) &MiniGameShip::up_down_normal
+\
+0.0 - down, 1.0 - up, 0.5 - idle
 ### `MiniGameAsteroid`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float spin_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spin_speed) &MiniGameAsteroid::spin_speed
@@ -2974,18 +2984,429 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Shield`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake) &Shield::shake
-### `LavaGlow`
+### `LiquidSurface`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`float glow_radius`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_radius) &LavaGlow::glow_radius
+- [`float glow_radius`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_radius) &LiquidSurface::glow_radius
+- [`float sine_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_pos) &LiquidSurface::sine_pos
+- [`float sine_pos_increment`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_pos_increment) &LiquidSurface::sine_pos_increment
 ### `OlmecFloater`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool both_floaters_intact`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=both_floaters_intact) &OlmecFloater::both_floaters_intact
+- [`bool on_breaking`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_breaking) &OlmecFloater::on_breaking
+### `EggshipCenterJetFlame`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &EggshipCenterJetFlame::emitted_light
+- [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &EggshipCenterJetFlame::particle
+- [`bool smoke_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke_on) &EggshipCenterJetFlame::smoke_on
+### `MiniGameShipOffset`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float offset_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) &MiniGameShipOffset::offset_x
+- [`float offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) &MiniGameShipOffset::offset_y
+- [`float normal_y_offset`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=normal_y_offset) &MiniGameShipOffset::normal_y_offset
+\
+Is added to offset_y
+### `Button`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int button_sprite`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_sprite) &Button::button_sprite
+\
+Flags: 1 - pad: A, key: Z | 2 - pad: X, key: X | 3 - pad: B, key: C | 4- pad: Y, key: D
+5 - pad: LB, key: L Shift | 6 - pad: RB, key: A | 7 - pad: menu?, key: (none) | 8 - pad: copy?, key: Tab
+- [`float visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &Button::visibility
+- [`bool is_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_visible) &Button::is_visible
+\
+It's false for selldialog used in shops
+- [`bool player_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_trigger) &Button::player_trigger
+\
+It's set true even if player does not see the button, like the drill or COG door
+- [`int seen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen) &Button::seen
+\
+-1 - hasn't been seen | 0 - last seen by player 1 | 1 - last seen by player 2 | 2 - last seen by player 3 | 3 - last seen by player 4
+### `FxTornJournalPage`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int page_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_number) &FxTornJournalPage::page_number
+\
+Only in tutorial
+### `FxMainExitDoor`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &FxMainExitDoor::emitted_light
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FxMainExitDoor::timer
+\
+When breaking open in tutorial
+### `Birdies`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `Explosion`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Explosion::emitted_light
+### `FxOuroboroOccluder`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `FxOuroboroDragonPart`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) &FxOuroboroDragonPart::speed
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FxOuroboroDragonPart::timer
+- [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &FxOuroboroDragonPart::particle
+### `Rubble`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `FxCompass`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float sine_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_angle) &FxCompass::sine_angle
+\
+Counts form 0 to 2pi, responsible for moving back and forth
+- [`float visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &FxCompass::visibility
+- [`bool is_active`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_active) &FxCompass::is_active
+\
+Player has compass
+### `SleepBubble`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int show_hide_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_hide_timer) &SleepBubble::show_hide_timer
+### `MovingIcon`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int movement_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movement_timer) &MovingIcon::movement_timer
+\
+Used to move it up and down in sync with others
+### `FxSaleContainer`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Entity fx_value`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_value) &FxSaleContainer::fx_value
+- [`Entity fx_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_icon) &FxSaleContainer::fx_icon
+- [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &FxSaleContainer::fx_button
+- [`float shake_amplitude`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_amplitude) &FxSaleContainer::shake_amplitude
+\
+For effect when you don't have enough money
+- [`bool sound_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_trigger) &FxSaleContainer::sound_trigger
+\
+Also sound_played, keeps re-triggering from time to time
+- [`int pop_in_out_procentage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pop_in_out_procentage) &FxSaleContainer::pop_in_out_procentage
+### `FxPickupEffect`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &FxPickupEffect::spawn_y
+- [`float visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &FxPickupEffect::visibility
+### `FxShotgunBlast`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &FxShotgunBlast::illumination
+### `FxJetpackFlame`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ParticleEmitterInfo particle_smoke`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_smoke) &FxJetpackFlame::particle_smoke
+- [`ParticleEmitterInfo particle_flame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_flame) &FxJetpackFlame::particle_flame
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &FxJetpackFlame::illumination
+### `FxPlayerIndicator`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int attached_to`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_to) &FxPlayerIndicator::attached_to
+- [`float pos_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pos_x) &FxPlayerIndicator::pos_x
+- [`float pos_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pos_y) &FxPlayerIndicator::pos_y
+### `FxSpringtrapRing`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FxSpringtrapRing::timer
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &FxSpringtrapRing::illumination
+### `FxWitchdoctorHint`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `FxNecromancerANKH`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `FxWebbedEffect`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visible) &FxWebbedEffect::visible
+### `FxUnderwaterBubble`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int bubble_source_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bubble_source_uid) &FxUnderwaterBubble::bubble_source_uid
+- [`int direction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction) &FxUnderwaterBubble::direction
+\
+1 / -1
+- [`bool pop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pop) &FxUnderwaterBubble::pop
+\
+Setting it true makes it disappear/fade away
+- [`bool inverted`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inverted) &FxUnderwaterBubble::inverted
+### `FxWaterDrop`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`bool inverted`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inverted) &FxWaterDrop::inverted
+- [`int droplet_source_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=droplet_source_uid) &FxWaterDrop::droplet_source_uid
+### `FxKinguSliding`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &FxKinguSliding::particle
+### `FxAlienBlast`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `FxSparkSmall`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FxSparkSmall::timer
+### `FxTiamatHead`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FxTiamatHead::timer
+### `FxTiamatTorso`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FxTiamatTorso::timer
+- [`float torso_target_size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=torso_target_size) &FxTiamatTorso::torso_target_size
+\
+Slowly increases/decreases to the given value
+### `FxTiamatTail`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float angle_two`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle_two) &FxTiamatTail::angle_two
+\
+Added _two just to not shadow angle in entity, it's angle but the pivot point is at the edge
+- [`float x_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x_pos) &FxTiamatTail::x_pos
+- [`float y_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_pos) &FxTiamatTail::y_pos
+### `FxVatBubble`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float max_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_y) &FxVatBubble::max_y
+### `FxHundunNeckPiece`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int kill_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_timer) &FxHundunNeckPiece::kill_timer
+\
+Short timer after the head is dead
+### `FxJellyfishStar`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float rotation_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_angle) &FxJellyfishStar::rotation_angle
+- [`float radius`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=radius) &FxJellyfishStar::radius
+- [`float speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) &FxJellyfishStar::speed
+### `FxQuickSand`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `FxSorceressAttack`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &FxSorceressAttack::size
+### `FxLamassuAttack`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float attack_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_angle) &FxLamassuAttack::attack_angle
+### `FxFireflyLight`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &FxFireflyLight::illumination
+- [`int light_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_timer) &FxFireflyLight::light_timer
+- [`int cooldown_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooldown_timer) &FxFireflyLight::cooldown_timer
+\
+Timer between light flashes
+### `FxEmpress`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float sine_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_angle) &FxEmpress::sine_angle
+### `FxAnkhRotatingSpark`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`float radius`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=radius) &FxAnkhRotatingSpark::radius
+- [`float inclination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inclination) &FxAnkhRotatingSpark::inclination
+- [`float speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) &FxAnkhRotatingSpark::speed
+\
+0 - 1.0
+- [`float sine_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_angle) &FxAnkhRotatingSpark::sine_angle
+- [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &FxAnkhRotatingSpark::size
+### `FxAnkhBrokenPiece`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Liquid`
 Derived from [`Entity`](#entity)
 - [`Entity fx_surface`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_surface) &Liquid::fx_surface
 ### `Lava`
 Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Lava::emitted_light
+### `BGBackLayerDoor`
+Derived from [`Entity`](#entity)
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &BGBackLayerDoor::illumination
+- [`Illumination illumination2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination2) &BGBackLayerDoor::illumination2
+### `BGSurfaceStar`
+Derived from [`Entity`](#entity)
+- [`int blink_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blink_timer) &BGSurfaceStar::blink_timer
+- [`float relative_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=relative_x) &BGSurfaceStar::relative_x
+- [`float relative_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=relative_y) &BGSurfaceStar::relative_y
+### `BGRelativeElement`
+Derived from [`Entity`](#entity)
+- [`float relative_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=relative_x) &BGRelativeElement::relative_x
+- [`float relative_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=relative_y) &BGRelativeElement::relative_y
+### `BGSurfaceLayer`
+Derived from [`Entity`](#entity) [`BGRelativeElement`](#bgrelativeelement)
+- [`float relative_offset_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=relative_offset_x) &BGSurfaceLayer::relative_offset_x
+- [`float relative_offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=relative_offset_y) &BGSurfaceLayer::relative_offset_y
+### `BGEggshipRoom`
+Derived from [`Entity`](#entity)
+- [`Entity fx_shell`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_shell) &BGEggshipRoom::fx_shell
+- [`Entity fx_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_door) &BGEggshipRoom::fx_door
+- [`Entity platform_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_left) &BGEggshipRoom::platform_left
+- [`Entity platform_middle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_middle) &BGEggshipRoom::platform_middle
+- [`Entity platform_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_right) &BGEggshipRoom::platform_right
+- [`bool player_in`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_in) &BGEggshipRoom::player_in
+### `BGMovingStar`
+Derived from [`Entity`](#entity) [`BGSurfaceStar`](#bgsurfacestar)
+- [`float falling_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falling_speed) &BGMovingStar::falling_speed
+\
+Can make it rise if set to negative
+### `BGTutorialSign`
+Derived from [`Entity`](#entity)
+- [`bool is_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_shown) &BGTutorialSign::is_shown
+### `BGShootingStar`
+Derived from [`Entity`](#entity) [`BGRelativeElement`](#bgrelativeelement)
+- [`float x_increment`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x_increment) &BGShootingStar::x_increment
+- [`float y_increment`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_increment) &BGShootingStar::y_increment
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &BGShootingStar::timer
+- [`int max_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_timer) &BGShootingStar::max_timer
+- [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &BGShootingStar::size
+\
+Gets smaller as the timer gets close to the max_timer
+### `BGShopEntrence`
+Derived from [`Entity`](#entity)
+- [`bool on_entering`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_entering) &BGShopEntrence::on_entering
+### `BGFloatingDebris`
+Derived from [`Entity`](#entity) [`BGSurfaceLayer`](#bgsurfacelayer)
+- [`float distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) &BGFloatingDebris::distance
+\
+Distance it travels up and down from spawn position
+- [`float speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) &BGFloatingDebris::speed
+- [`float sine_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_angle) &BGFloatingDebris::sine_angle
+### `BGShopKeeperPrime`
+Derived from [`Entity`](#entity)
+- [`float normal_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=normal_y) &BGShopKeeperPrime::normal_y
+- [`float sine_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_pos) &BGShopKeeperPrime::sine_pos
+- [`int bubbles_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bubbles_timer) &BGShopKeeperPrime::bubbles_timer
+- [`bool bubble_spawn_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bubble_spawn_trigger) &BGShopKeeperPrime::bubble_spawn_trigger
+- [`int bubble_spawn_delay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bubble_spawn_delay) &BGShopKeeperPrime::bubble_spawn_delay
+### `CrossBeam`
+Derived from [`Entity`](#entity)
+- [`int attached_to_side_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_to_side_uid) &CrossBeam::attached_to_side_uid
+- [`int attached_to_top_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_to_top_uid) &CrossBeam::attached_to_top_uid
+### `DestructibleBG`
+Derived from [`Entity`](#entity)
+### `PalaceSign`
+Derived from [`Entity`](#entity)
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &PalaceSign::illumination
+- [`Illumination arrow_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_illumination) &PalaceSign::arrow_illumination
+- [`int arrow_change_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_change_timer) &PalaceSign::arrow_change_timer
+### `DecoRegeneratingBlock`
+Derived from [`Entity`](#entity)
+### `Portal`
+Derived from [`Entity`](#entity)
+- [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Portal::emitted_light
+- [`int transition_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_timer) &Portal::transition_timer
+- [`int level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) &Portal::level
+- [`int world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) &Portal::world
+- [`int theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) &Portal::theme
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Portal::timer
+### `ShootingStarSpawner`
+Derived from [`Entity`](#entity)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &ShootingStarSpawner::timer
+### `LogicalDoor`
+Derived from [`Entity`](#entity)
+- [`ENT_TYPE door_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_type) &LogicalDoor::door_type
+- [`bool visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visible) &LogicalDoor::not_hidden
+- [`bool platform_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_spawned) &LogicalDoor::platform_spawned
+\
+Is set true when you bomb the door, no matter what door, can't be reset
+### `LogicalSound`
+Derived from [`Entity`](#entity)
+### `LogicalStaticSound`
+Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound)
+### `LogicalLiquidStreamSound`
+Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound) [`LogicalStaticSound`](#logicalstaticsound)
+### `LogicalTrapTrigger`
+Derived from [`Entity`](#entity)
+- [`int min_empty_distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=min_empty_distance) &LogicalTrapTrigger::min_empty_distance
+\
+Used in bigspeartrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
+- [`int trigger_distance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_distance) &LogicalTrapTrigger::trigger_distance
+\
+Value in tiles
+- [`bool vertical`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vertical) &LogicalTrapTrigger::vertical
+### `JungleTrapTrigger`
+Derived from [`Entity`](#entity) [`LogicalTrapTrigger`](#logicaltraptrigger)
+### `WetEffect`
+Derived from [`Entity`](#entity)
+- [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &WetEffect::particle
+### `OnFireEffect`
+Derived from [`Entity`](#entity)
+- [`ParticleEmitterInfo particle_smoke`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_smoke) &OnFireEffect::particle_smoke
+- [`ParticleEmitterInfo particle_flame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_flame) &OnFireEffect::particle_flame
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &OnFireEffect::illumination
+### `PoisonedEffect`
+Derived from [`Entity`](#entity)
+- [`ParticleEmitterInfo particle_burst`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_burst) &PoisonedEffect::particle_burst
+- [`ParticleEmitterInfo particle_base`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_base) &PoisonedEffect::particle_base
+- [`int burst_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=burst_timer) &PoisonedEffect::burst_timer
+- [`bool burst_active`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=burst_active) &PoisonedEffect::burst_active
+\
+If forced to false, it will not play the sound or spawn burst particles
+### `CursedEffect`
+Derived from [`Entity`](#entity)
+- [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &CursedEffect::particle
+### `OuroboroCameraAnchor`
+Derived from [`Entity`](#entity)
+- [`float target_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_x) &OuroboroCameraAnchor::target_x
+- [`float target_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_y) &OuroboroCameraAnchor::target_y
+- [`float velocity_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_x) &OuroboroCameraAnchor::velocity_x
+- [`float velocity_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_y) &OuroboroCameraAnchor::velocity_y
+### `OuroboroCameraZoomin`
+Derived from [`Entity`](#entity)
+- [`float zoomin_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoomin_level) &OuroboroCameraZoomin::zoomin_level
+\
+Can be set to negative, seams to trigger the warp at some value
+### `CinematicAnchor`
+Derived from [`Entity`](#entity)
+- [`Entity blackbar_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blackbar_top) &CinematicAnchor::blackbar_top
+- [`Entity blackbar_bottom`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blackbar_bottom) &CinematicAnchor::blackbar_bottom
+- [`float roll_in`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=roll_in) &CinematicAnchor::roll_in
+\
+0.0 to 1.0
+### `BurningRopeEffect`
+Derived from [`Entity`](#entity)
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &BurningRopeEffect::illumination
+### `DustWallApep`
+Derived from [`Entity`](#entity)
+- [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &DustWallApep::particle
+### `CameraFlash`
+Derived from [`Entity`](#entity)
+- [`Illumination illumination1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination1) &CameraFlash::illumination1
+- [`Illumination illumination2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination2) &CameraFlash::illumination2
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &CameraFlash::timer
+### `RoomLight`
+Derived from [`Entity`](#entity)
+- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &RoomLight::illumination
+### `LimbAnchor`
+Derived from [`Entity`](#entity)
+- [`int move_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_timer) &LimbAnchor::move_timer
+- [`bool flip_vertical`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_vertical) &LimbAnchor::flip_vertical
+### `LogicalConveyorbeltSound`
+Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound)
+### `LogicalAnchovyFlock`
+Derived from [`Entity`](#entity)
+- [`float current_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_speed) &LogicalAnchovyFlock::current_speed
+\
+Increases until max_speed reached
+- [`float max_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_speed) &LogicalAnchovyFlock::max_speed
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicalAnchovyFlock::timer
+### `LogicalSound`
+Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound)
+- [`int mummy_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mummy_uid) &MummyFliesSound::mummy_uid
+- [`int flies`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flies) &MummyFliesSound::flies
+\
+Numbers of flies spawned
+### `QuickSandSound`
+Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound)
+### `IceSlidingSound`
+Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound)
+### `FrostBreathEffect`
+Derived from [`Entity`](#entity)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FrostBreathEffect::timer
+### `BoulderSpawner`
+Derived from [`Entity`](#entity)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &BoulderSpawner::timer
+\
+Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
+### `PipeTravelerSound`
+Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound)
+- [`bool enter_exit`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_exit) &PipeTravelerSound::enter_exit
+### `LogicalDrain`
+Derived from [`Entity`](#entity)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicalDrain::timer
+\
+Little delay between pulling blob of liquid thru
+### `LogicalRegeneratingBlock`
+Derived from [`Entity`](#entity)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicalRegeneratingBlock::timer
+### `SplashBubbleGenerator`
+Derived from [`Entity`](#entity)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &SplashBubbleGenerator::timer
+### `EggplantThrower`
+Derived from [`Entity`](#entity)
+### `LogicalMiniGame`
+Derived from [`Entity`](#entity)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicalMiniGame::timer
+\
+Delay between spwning ufo
+### `DMSpawning`
+Derived from [`Entity`](#entity)
+- [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &DMSpawning::spawn_x
+- [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &DMSpawning::spawn_y
+- [`float sine_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_pos) &DMSpawning::sine_pos
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &DMSpawning::timer
+### `DMAlienBlast`
+Derived from [`Entity`](#entity)
 ### `ParticleDB`
 - [`int id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &ParticleDB::id
 - [`int spawn_count_min`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) &ParticleDB::spawn_count_min
@@ -3972,14 +4393,30 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_bat
 - as_bee
 - as_beg
+- as_bgbacklayerdoor
+- as_bgeggshiproom
+- as_bgfloatingdebris
+- as_bgmovingstar
+- as_bgrelativeelement
+- as_bgshootingstar
+- as_bgshopentrence
+- as_bgshopkeeperprime
+- as_bgsurfacelayer
+- as_bgsurfacestar
+- as_bgtutorialsign
 - as_bigspeartrap
+- as_birdies
 - as_bodyguard
 - as_bomb
 - as_boneblock
 - as_boombox
 - as_boomerang
 - as_boulder
+- as_boulderspawner
 - as_bullet
+- as_burningropeeffect
+- as_button
+- as_cameraflash
 - as_cape
 - as_catmummy
 - as_caveman
@@ -3987,6 +4424,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_chain
 - as_chainedpushblock
 - as_chest
+- as_cinematicanchor
 - as_cityofgolddoor
 - as_clambase
 - as_claw
@@ -4011,13 +4449,22 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_critterslime
 - as_crittersnail
 - as_crocman
+- as_crossbeam
 - as_crushtrap
+- as_cursedeffect
 - as_cursedpot
 - as_decorateddoor
+- as_decoregeneratingblock
+- as_destructiblebg
+- as_dmalienblast
+- as_dmspawning
 - as_door
 - as_drill
+- as_dustwallapep
 - as_eggplantminister
+- as_eggplantthrower
 - as_eggsac
+- as_eggshipcenterjetflame
 - as_eggshipdoor
 - as_eggshipdoors
 - as_elevator
@@ -4025,6 +4472,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_entity
 - as_excalibur
 - as_exitdoor
+- as_explosion
 - as_fallingplatform
 - as_fireball
 - as_firebug
@@ -4039,7 +4487,40 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_forcefield
 - as_forestsister
 - as_frog
+- as_frostbreatheffect
 - as_frozenliquid
+- as_fxalienblast
+- as_fxankhbrokenpiece
+- as_fxankhrotatingspark
+- as_fxcompass
+- as_fxempress
+- as_fxfireflylight
+- as_fxhundunneckpiece
+- as_fxjellyfishstar
+- as_fxjetpackflame
+- as_fxkingusliding
+- as_fxlamassuattack
+- as_fxmainexitdoor
+- as_fxnecromancerankh
+- as_fxouroborodragonpart
+- as_fxouroborooccluder
+- as_fxpickupeffect
+- as_fxplayerindicator
+- as_fxquicksand
+- as_fxsalecontainer
+- as_fxshotgunblast
+- as_fxsorceressattack
+- as_fxsparksmall
+- as_fxspringtrapring
+- as_fxtiamathead
+- as_fxtiamattail
+- as_fxtiamattorso
+- as_fxtornjournalpage
+- as_fxunderwaterbubble
+- as_fxvatbubble
+- as_fxwaterdrop
+- as_fxwebbedeffect
+- as_fxwitchdoctorhint
 - as_generator
 - as_ghist
 - as_ghost
@@ -4063,12 +4544,14 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_hundun
 - as_hundunchest
 - as_hundunhead
+- as_iceslidingsound
 - as_idol
 - as_imp
 - as_jetpack
 - as_jiangshi
 - as_jumpdog
 - as_junglespearcosmetic
+- as_jungletraptrigger
 - as_kapalapowerup
 - as_kingu
 - as_lahamu
@@ -4078,7 +4561,6 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_laserbeam
 - as_lasertrap
 - as_lava
-- as_lavaglow
 - as_lavamander
 - as_leaf
 - as_leprechaun
@@ -4086,8 +4568,20 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_lightarrowplatform
 - as_lightemitter
 - as_lightshot
+- as_limbanchor
 - as_liquid
+- as_liquidsurface
 - as_lockeddoor
+- as_logicalanchovyflock
+- as_logicalconveyorbeltsound
+- as_logicaldoor
+- as_logicaldrain
+- as_logicalliquidstreamsound
+- as_logicalminigame
+- as_logicalregeneratingblock
+- as_logicalsound
+- as_logicalstaticsound
+- as_logicaltraptrigger
 - as_magmaman
 - as_mainexit
 - as_mantrap
@@ -4096,6 +4590,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_megajellyfish
 - as_minigameasteroid
 - as_minigameship
+- as_minigameshipoffset
 - as_mole
 - as_monkey
 - as_monster
@@ -4103,7 +4598,9 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_motherstatue
 - as_mount
 - as_movable
+- as_movingicon
 - as_mummy
+- as_mummyfliessound
 - as_necromancer
 - as_npc
 - as_octopus
@@ -4111,16 +4608,23 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_olmeccannon
 - as_olmecfloater
 - as_olmite
+- as_onfireeffect
 - as_orb
 - as_osirishand
 - as_osirishead
+- as_ouroborocameraanchor
+- as_ouroborocamerazoomin
+- as_palacesign
 - as_parachutepowerup
 - as_pet
 - as_pipe
+- as_pipetravelersound
 - as_player
 - as_playerbag
 - as_playerghost
+- as_poisonedeffect
 - as_poledeco
+- as_portal
 - as_pot
 - as_powerup
 - as_powerupcapable
@@ -4129,19 +4633,24 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_pushblock
 - as_qilin
 - as_quicksand
+- as_quicksandsound
 - as_quillback
 - as_regenblock
 - as_robot
 - as_rockdog
 - as_rollingitem
+- as_roomlight
 - as_roomowner
+- as_rubble
 - as_scarab
 - as_sceptershot
 - as_scorpion
 - as_shield
+- as_shootingstarspawner
 - as_shopkeeper
 - as_skeleton
 - as_skulldroptrap
+- as_sleepbubble
 - as_slidingwallceiling
 - as_snaptrap
 - as_sorceress
@@ -4152,6 +4661,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_specialshot
 - as_spider
 - as_spikeballtrap
+- as_splashbubblegenerator
 - as_stickytrap
 - as_stretchchain
 - as_switch
@@ -4192,6 +4702,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_walltorch
 - as_webgun
 - as_webshot
+- as_weteffect
 - as_witchdoctor
 - as_witchdoctorskull
 - as_woodenlogtrap
