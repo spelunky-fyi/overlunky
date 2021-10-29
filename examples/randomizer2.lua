@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.3"
+meta.version = "2.3a"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -35,6 +35,12 @@ local real_default_options = {
     storage = true,
     status = true,
     hard = true,
+    hard_abzu = true,
+    hard_duat = true,
+    hard_hundun = true,
+    hard_olmec = true,
+    hard_olmec_phase = true,
+    hard_tiamat = true,
     shop = true,
     liquid_chance = 33,
     trap_spikes = 25,
@@ -49,7 +55,7 @@ local real_default_options = {
     bias_09 = 10,
     bias_10 = 8,
     bias_11 = 7,
-    bias_15 = 1
+    bias_15 = 1,
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -81,7 +87,12 @@ local function register_options()
     register_option_bool("projectile", "Random projectiles", default_options.projectile)
     register_option_bool("storage", "Random Waddler caches", default_options.storage)
     register_option_bool("status", "Show level progress", default_options.status)
-    register_option_bool("hard", "Hard bosses", default_options.hard)
+    register_option_bool("hard_abzu", "Hard bosses: Abzu", default_options.hard_abzu)
+    register_option_bool("hard_duat", "Hard bosses: Duat", default_options.hard_duat)
+    register_option_bool("hard_hundun", "Hard bosses: Hundun", default_options.hard_hundun)
+    register_option_bool("hard_olmec", "Hard bosses: Olmec projectiles", default_options.hard_olmec)
+    register_option_bool("hard_olmec_phase", "Hard bosses: Olmec phases", default_options.hard_olmec_phase)
+    register_option_bool("hard_tiamat", "Hard bosses: Tiamat", default_options.hard_tiamat)
     register_option_float("liquid_chance", "Swap liquid chance", default_options.liquid_chance, 0, 100)
     register_option_float("trap_spikes", "Replace spikes chance", default_options.trap_spikes, 0, 100)
     register_option_float("trap_fields", "Replace forcefields chance", default_options.trap_fields, 0, 100)
@@ -127,16 +138,17 @@ local function get_chance(min, max)
     if min > max then min, max = max, min end
     min = math.floor(1/(min/100))
     max = math.floor(1/(max/100))
-    return prng:random(max, min)
-    --return prng:random_int(min, max, PRNG_CLASS.LEVEL_GEN)
+    local chance = prng:random(max, min)
+    if state.theme == THEME.HUNDUN then
+        chance = math.floor(chance*1.67)
+    end
+    return chance
 end
 
 local function pick(from, ignore)
     local item = -1
     for i=1,10 do
-        ----math.randomseed(read_prng()[8]+i)
         item = from[prng:random(#from)]
-        --item = from[prng:random_index(#from, PRNG_CLASS.LEVEL_GEN)]
         if item ~= ignore then
             return item
         end
@@ -240,7 +252,7 @@ local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPE
 local traps_wall = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP}
 local traps_flip = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_LASER_TRAP}
 local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
-local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
+local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
 local valid_floors = join(floor_types, {ENT_TYPE.FLOOR_ICE})
 
@@ -486,7 +498,7 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
 local swapping_liquid = false
 
 set_callback(function()
-    if state.theme ~= THEME.DUAT or state.level_gen.spawn_y < 47 or not options.hard then return end
+    if state.theme ~= THEME.DUAT or state.level_gen.spawn_y < 47 or not options.hard_duat then return end
     local box = AABB:new()
     box.top = state.level_gen.spawn_y - 2
     box.bottom = state.level_gen.spawn_y - 3
@@ -725,13 +737,13 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.ABZU or not options.hard then return end
+    if state.theme ~= THEME.ABZU or not options.hard_abzu then return end
     local x, y, l = get_position(ent.uid)
     spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS})
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    if state.theme ~= THEME.OLMEC or not options.hard then
+    if state.theme ~= THEME.OLMEC or not options.hard_olmec then
         return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
@@ -759,11 +771,19 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_CAVEMAN_BOSS})
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.OLMEC or not options.hard then return end
+    if state.theme ~= THEME.OLMEC or not options.hard_olmec then return end
     local x, y, l = get_position(ent.uid)
     local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
     if #players > 0 then return end
-    spawn_entity_nonreplaceable(pick(olmec_ammo), x, y, l, prng:random()*0.5-0.25, prng:random()*0.1+0.1)
+    local newent = get_entity(spawn_entity_nonreplaceable(pick(olmec_ammo), x, y, l, 0, 0))
+    if newent.stun_timer ~= nil then
+        newent.stun_timer = 15
+        set_timeout(function()
+            newent.velocityx = prng:random()*0.66-0.33
+            newent.velocityy = prng:random()*0.1+0.1
+        end, 1)
+    end
+    ent:destroy()
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_BOMB)
 
 local function get_tiamat()
@@ -815,10 +835,30 @@ local function tiamat_attack()
 end
 
 set_callback(function()
-    if state.theme ~= THEME.TIAMAT or not options.hard then return end
-    --math.randomseed(read_prng()[5])
+    if state.theme ~= THEME.TIAMAT or not options.hard_tiamat then return end
     set_timeout(tiamat_scream, 60)
     set_interval(tiamat_attack, 2)
+end, ON.LEVEL)
+
+local hundun_fireball_timer = -1
+local hundun_
+set_callback(function()
+    if state.theme ~= THEME.HUNDUN or not options.hard_hundun then return end
+    for i,v in ipairs(get_entities_by_type(ENT_TYPE.MONS_HUNDUN)) do
+        local x, y, l = get_position(v)
+        move_entity(v, x, 140, 0, 0)
+        set_timeout(function()
+            move_entity(v, x, y, 0, 0)
+            set_post_statemachine(v, function(ent)
+                ent.hundun_flags = set_flag(ent.hundun_flags, 2)
+                ent.hundun_flags = set_flag(ent.hundun_flags, 3)
+                ent.hundun_flags = set_flag(ent.hundun_flags, 4)
+                if ent.fireball_timer > 40 then
+                    ent.fireball_timer = prng:random(25,40)
+                end
+            end)
+        end, 1)
+    end
 end, ON.LEVEL)
 
 --[[ROOMS]]
@@ -2004,6 +2044,7 @@ set_pre_tile_code_callback(function(x, y, l)
 end, "lava")
 
 set_pre_tile_code_callback(function(x, y, l)
+    if state.theme == THEME.HUNDUN and options.hard_hundun then return false end
     return swap_liquid(ENT_TYPE.LIQUID_LAVA, x, y)
 end, "water")
 
@@ -2111,3 +2152,99 @@ set_callback(function()
         end
     end
 end, ON.POST_LEVEL_GENERATION)
+
+--[[OLMEC PHASES]]
+local olmec_phases = {0, 1, 2}
+local last_olmec_state = -1
+local last_olmec_change = -9999
+local olmec_cooldown = 180
+local olmec_floaters = {}
+local olmec_callback = -1
+
+local function olmec_phase(o)
+    if o.attack_phase == 3 then return end
+    last_olmec_change = state.time_level
+    local old_phase = o.attack_phase
+    local phase = pick(olmec_phases, old_phase)
+    if phase == old_phase then return end
+    if phase ~= 1 then
+        o.flags = clr_flag(o.flags, ENT_FLAG.NO_GRAVITY)
+        o.move_state = 0
+    end
+    o.unknown_attack_state = 0
+    if phase == 2 then
+        o.unknown_attack_state = -2
+    else
+        o.unknown_attack_state = 0
+    end
+    for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_FLOATER)) do
+        local e = get_entity(v)
+        e.health = 1
+        if phase == 1 then
+            e.flags = clr_flag(e.flags, ENT_FLAG.INVISIBLE)
+        else
+            e.flags = set_flag(e.flags, ENT_FLAG.INVISIBLE)
+            e.y = -1.6
+        end
+    end
+    o.attack_phase = phase
+    o.attack_timer = 120
+end
+
+set_callback(function()
+    clear_callback(olmec_callback)
+    olmec_callback = -1
+    olmec_floaters = {}
+    if state.theme == THEME.OLMEC then
+
+
+        if options.hard_olmec_phase then
+            set_olmec_phase_y_level(1, 66)
+            set_olmec_phase_y_level(2, 66)
+            local olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
+            if #olmecs > 0 then
+                local olmec = olmecs[1]
+                set_interval(function()
+                    local ent = get_entity(olmec)
+                    if state.time_level >= last_olmec_change+olmec_cooldown and ((ent.attack_phase == 0 and ent.move_state == 0) or (ent.attack_phase == 1 and ent.move_state == 11) or (ent.attack_phase == 2 and ent.move_state == 0)) and ent.standing_on_uid ~= -1 then
+                        olmec_phase(ent)
+                    end
+                    if ent.attack_phase > 2 then return false end
+                end, 1)
+                for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_SMALL, ENT_TYPE.ITEM_OLMECCANNON_UFO)) do
+                    local e = get_entity(v)
+                    e.flags = clr_flag(e.flags, ENT_FLAG.INVISIBLE)
+                end
+                for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_MEDIUM)) do
+                    local e = get_entity(v)
+                    if e.animation_frame == 13 then
+                        e.flags = clr_flag(e.flags, ENT_FLAG.INVISIBLE)
+                    end
+                end
+                for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_FLOATER)) do
+                    olmec_floaters[#olmec_floaters+1] = v
+                end
+                olmec_callback = set_callback(function(ctx, depth) --TODO: stupid hack
+                    if state.theme ~= THEME.OLMEC then
+                        clear_callback(olmec_callback)
+                        olmec_callback = -1
+                        return
+                    end
+                    if depth == 34 then
+                        for i,v in ipairs(olmec_floaters) do
+                            local e = get_entity(v)
+                            if e ~= nil then
+                                if e.health > 0 then
+                                    e.animation_frame = 38
+                                end
+                            end
+                        end
+                    end
+                end, ON.RENDER_PRE_DRAW_DEPTH)
+            end
+        else
+            set_olmec_phase_y_level(1, 98)
+            set_olmec_phase_y_level(2, 82)
+        end
+    end
+end, ON.LEVEL)
