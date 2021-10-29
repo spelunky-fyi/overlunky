@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.2c"
+meta.version = "2.3"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -39,6 +39,17 @@ local real_default_options = {
     liquid_chance = 33,
     trap_spikes = 25,
     trap_fields = 50,
+    bias_01 = 15,
+    bias_02 = 15,
+    bias_03 = 15,
+    bias_05 = 15,
+    bias_06 = 15,
+    bias_07 = 10,
+    bias_08 = 12,
+    bias_09 = 10,
+    bias_10 = 8,
+    bias_11 = 7,
+    bias_15 = 1
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -74,6 +85,17 @@ local function register_options()
     register_option_float("liquid_chance", "Swap liquid chance", default_options.liquid_chance, 0, 100)
     register_option_float("trap_spikes", "Replace spikes chance", default_options.trap_spikes, 0, 100)
     register_option_float("trap_fields", "Replace forcefields chance", default_options.trap_fields, 0, 100)
+    register_option_int("bias_01", "Theme bias: Dwelling", default_options.bias_01, 0, 15)
+    register_option_int("bias_02", "Theme bias: Jungle", default_options.bias_02, 0, 15)
+    register_option_int("bias_03", "Theme bias: Volcana", default_options.bias_03, 0, 15)
+    register_option_int("bias_05", "Theme bias: Tide Pool", default_options.bias_05, 0, 15)
+    register_option_int("bias_06", "Theme bias: Temple", default_options.bias_06, 0, 15)
+    register_option_int("bias_07", "Theme bias: Ice Caves", default_options.bias_07, 0, 15)
+    register_option_int("bias_08", "Theme bias: Neo Babylon", default_options.bias_08, 0, 15)
+    register_option_int("bias_09", "Theme bias: Sunken City", default_options.bias_09, 0, 15)
+    register_option_int("bias_10", "Theme bias: Cosmic Ocean", default_options.bias_10, 0, 15)
+    register_option_int("bias_11", "Theme bias: City of Gold", default_options.bias_11, 0, 15)
+    register_option_int("bias_15", "Theme bias: Eggplant World", default_options.bias_15, 0, 15)
     register_option_button("zreset", "Reset to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -1044,8 +1066,7 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN,
          ENT_TYPE.MONS_OLD_HUNTER, ENT_TYPE.MONS_THIEF, ENT_TYPE.MONS_MADAMETUSK, ENT_TYPE.MONS_BODYGUARD,
          ENT_TYPE.MONS_HUNDUNS_SERVANT, ENT_TYPE.MONS_GOLDMONKEY, ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MONS_MEGAJELLYFISH,
-         ENT_TYPE.MONS_GHOST_SMALL_SURPRISED,
-         ENT_TYPE.MONS_GHOST_SMALL_HAPPY, ENT_TYPE.MONS_CRITTERDUNGBEETLE, ENT_TYPE.MONS_CRITTERBUTTERFLY,
+         ENT_TYPE.MONS_CRITTERDUNGBEETLE, ENT_TYPE.MONS_CRITTERBUTTERFLY,
          ENT_TYPE.MONS_CRITTERSNAIL, ENT_TYPE.MONS_CRITTERFISH, ENT_TYPE.MONS_CRITTERCRAB, ENT_TYPE.MONS_CRITTERLOCUST,
          ENT_TYPE.MONS_CRITTERPENGUIN, ENT_TYPE.MONS_CRITTERFIREFLY, ENT_TYPE.MONS_CRITTERDRONE,
          ENT_TYPE.MONS_CRITTERSLIME, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_PASTEBOMB, ENT_TYPE.ITEM_IDOL,
@@ -1080,7 +1101,7 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ACTIVEFLOOR_BOULDER,
          ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
          ENT_TYPE.ACTIVEFLOOR_ELEVATOR, ENT_TYPE.FX_EXPLOSION, ENT_TYPE.FX_POWEREDEXPLOSION, ENT_TYPE.MOUNT_TURKEY,
-         ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL}
+         ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_12BAG}
 local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_BOMBBOX,
          ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, ENT_TYPE.ITEM_PICKUP_GIANTFOOD,
          ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECTACLES,
@@ -1089,7 +1110,7 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
          ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE,
          ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN,
          ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH,
-         ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_CAPE,
+         ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.ITEM_CAPE,
          ENT_TYPE.ITEM_VLADS_CAPE, ENT_TYPE.ITEM_JETPACK, ENT_TYPE.ITEM_TELEPORTER_BACKPACK, ENT_TYPE.ITEM_HOVERPACK,
          ENT_TYPE.ITEM_POWERPACK, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_FREEZERAY,
          ENT_TYPE.ITEM_CROSSBOW, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_MATTOCK,
@@ -1234,7 +1255,9 @@ end
 local function fix_chain()
     --math.randomseed(read_prng()[1])
     --insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
-    insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
+    if has(theme, THEME.NEO_BABYLON) then
+        insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
+    end
 end
 
 local function get_chain_item(x, y)
@@ -1372,6 +1395,21 @@ local function shuffle_tile_codes()
     floor_tilecodes["shop_sign"] = floor_tilecodes["floor"]
 end
 
+local function set_theme_biases()
+    theme = {}
+    for i=1,options.bias_01 do theme[#theme+1] = 1 end
+    for i=1,options.bias_02 do theme[#theme+1] = 2 end
+    for i=1,options.bias_03 do theme[#theme+1] = 3 end
+    for i=1,options.bias_05 do theme[#theme+1] = 5 end
+    for i=1,options.bias_06 do theme[#theme+1] = 6 end
+    for i=1,options.bias_07 do theme[#theme+1] = 7 end
+    for i=1,options.bias_08 do theme[#theme+1] = 8 end
+    for i=1,options.bias_09 do theme[#theme+1] = 9 end
+    for i=1,options.bias_10 do theme[#theme+1] = 10 end
+    for i=1,options.bias_11 do theme[#theme+1] = 11 end
+    for i=1,options.bias_15 do theme[#theme+1] = 15 end
+end
+
 local function init_run()
     if test_flag(state.quest_flags, 7) then
         seed_prng(state.seed)
@@ -1388,10 +1426,9 @@ local function init_run()
     boss_warp = false
     local normal_levels = 0
     local done = false
+    set_theme_biases()
     while not done do
-        if prng:random_int(1, 120, 0) == 1 then
-            add_level(7, 2, THEME.EGGPLANT_WORLD)
-        elseif bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and prng:random_int(1, options.door_max_levels, 0) <= normal_levels then
+        if bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and prng:random_int(1, options.door_max_levels, 0) <= normal_levels then
             normal_levels = 0
             local t = pick(insert_bosses)
             local l = 4
@@ -1420,6 +1457,8 @@ local function init_run()
                 l = prng:random_int(5, 97, 0)
             elseif t == THEME.ICE_CAVES then
                 l = 1
+            elseif t == THEME.EGGPLANT_WORLD then
+                l = 2
             else
                 l = prng:random_int(1, 4, 0)
             end
@@ -1845,7 +1884,7 @@ end, SPAWN_TYPE.SYSTEMIC, 0, projectiles_arrow)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
-local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM, 90} --TODO
+local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM, ROOM_TEMPLATE.TUSKDICESHOP, ROOM_TEMPLATE.TUSKDICESHOP_LEFT, ROOM_TEMPLATE.DICESHOP, ROOM_TEMPLATE.DICESHOP_LEFT, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100} --CHALLENGE ROOMS
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
     if #storages == 0 and options.storage and not (state.world == 6 and state.level == 3) then
@@ -2024,7 +2063,9 @@ set_pre_tile_code_callback(function(x, y, l)
 end, "spikes")
 
 set_pre_tile_code_callback(function(x, y, l)
-    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 then
+    local rx, ry = get_room_index(x, y)
+    local rt = get_room_template(rx, ry, l)
+    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 and not has(storage_bad_rooms, rt) then
         spawn_grid_entity(pick(traps_floor), x, y, l)
         return true
     end
@@ -2032,7 +2073,9 @@ set_pre_tile_code_callback(function(x, y, l)
 end, "forcefield")
 
 set_pre_tile_code_callback(function(x, y, l)
-    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 then
+    local rx, ry = get_room_index(x, y)
+    local rt = get_room_template(rx, ry, l)
+    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 and not has(storage_bad_rooms, rt) then
         spawn_grid_entity(pick(traps_floor), x, y, l)
         return true
     end
