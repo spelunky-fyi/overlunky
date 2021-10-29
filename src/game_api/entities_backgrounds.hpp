@@ -5,7 +5,7 @@
 class BGBackLayerDoor : public Entity
 {
   public:
-    Illumination* illumination;
+    Illumination* illumination1;
     Illumination* illumination2;
 };
 

@@ -23,8 +23,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<BGBackLayerDoor>(
         "BGBackLayerDoor",
-        "illumination",
-        &BGBackLayerDoor::illumination,
+        "illumination1",
+        &BGBackLayerDoor::illumination1,
         "illumination2",
         &BGBackLayerDoor::illumination2,
         sol::base_classes,

@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "render_api.hpp"
 #include "spawn_api.hpp"
+#include "strings.hpp"
 #include "virtual_table.hpp"
 
 #include <detours.h>
@@ -74,6 +75,7 @@ State& State::get()
         init_spawn_hooks();
         init_render_api_hooks();
         get_is_init() = true;
+        strings_init();
     }
     return STATE;
 }

@@ -3191,7 +3191,7 @@ Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Lava::emitted_light
 ### `BGBackLayerDoor`
 Derived from [`Entity`](#entity)
-- [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &BGBackLayerDoor::illumination
+- [`Illumination illumination1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination1) &BGBackLayerDoor::illumination1
 - [`Illumination illumination2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination2) &BGBackLayerDoor::illumination2
 ### `BGSurfaceStar`
 Derived from [`Entity`](#entity)

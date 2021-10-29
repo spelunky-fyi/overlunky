@@ -9,7 +9,6 @@
 #include "render_api.hpp"
 #include "search.hpp"
 #include "state.hpp"
-#include "strings.hpp"
 #include "ui.hpp"
 #include "window_api.hpp"
 
@@ -80,7 +79,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     }
 
     auto& api = RenderAPI::get();
-    strings_init();
     init_ui();
     init_hooks((void*)api.swap_chain());
     size_t env_var_size;
