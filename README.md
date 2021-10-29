@@ -7,7 +7,7 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 [![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.23.3-green)
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.0a-green)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.0b-green)
 
 [WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. They are mainly to keep up with the ever changing scripting api and usually contain bugfixes for that. Use at your own discretion, but if you want the latest scripts, get this. ![WHIP commits](https://img.shields.io/github/commits-since/spelunky-fyi/overlunky/latest)
 
