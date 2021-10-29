@@ -606,6 +606,8 @@ void register_usertypes(sol::state& lua)
         &PlayerGhost::player_inputs,
         "inventory",
         &PlayerGhost::inventory,
+        "body_uid",
+        &PlayerGhost::body_uid,
         "shake_timer",
         &PlayerGhost::shake_timer,
         "boost_timer",

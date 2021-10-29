@@ -498,11 +498,17 @@ class PlayerGhost : public LightEmitter
     PlayerInputs* player_inputs;
     Inventory* inventory;
     SoundPosition* sound_pos;
+    /// Is not set to -1 when crushed
+    int32_t body_uid;
     uint16_t unknown_timer;
     uint8_t shake_timer;
     uint8_t boost_timer;
-    int32_t unused; /* unsure */
-    int64_t unknown;
+    uint8_t unknown_timer2;
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
+    int32_t padding4;
+    size_t unknown;
 };
 
 class GhostBreath : public Movable
