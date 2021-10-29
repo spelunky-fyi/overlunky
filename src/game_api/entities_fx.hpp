@@ -3,14 +3,6 @@
 #include "movable.hpp"
 #include "particles.hpp"
 
-class LavaGlow : public Movable
-{
-  public:
-    float glow_radius;
-    float unknown_float;
-    float increment; // just an on frame increment for the value above
-};
-
 class OlmecFloater : public Movable
 {
   public:
@@ -42,24 +34,30 @@ class MiniGameShipOffset : public Movable
     float offset_x;
     float offset_y; // = y but also special_offsety
     float unknown2;
-    float normal_y_offset; //is added to offset_y
+    /// Is added to offset_y
+    float normal_y_offset;
 };
 
 class Button : public Movable
 {
   public:
+    /// Flags: 1 - pad: A, key: Z | 2 - pad: X, key: X | 3 - pad: B, key: C | 4- pad: Y, key: D
+    /// 5 - pad: LB, key: L Shift | 6 - pad: RB, key: A | 7 - pad: menu?, key: (none) | 8 - pad: copy?, key: Tab
     uint8_t button_sprite; // changes the button shown, setting more then one flag defaults to the first
     int8_t unknown2;
     int16_t padding1;
     float visibility;
-    bool is_visible;     // it's false for selldialog used in shops
-    bool player_trigger; // it's set true even if player does not see the button, like the drill or COG door
+    /// It's false for selldialog used in shops
+    bool is_visible;
+    /// It's set true even if player does not see the button, like the drill or COG door
+    bool player_trigger;
     bool unknown4;
     int8_t padding2;
     int32_t player1_on_screen_timer; // a weird one, does not start at 0, sometimes accessed as byte, similar to the jetpack fly_counter, that is not per button, also some buttons use it, some not
     int32_t player2_on_screen_timer; // they all are not even per player, as they run in sync
     int32_t player3_on_screen_timer; // timers sometimes stay, sometimes are set back to -1
     int32_t player4_on_screen_timer;
+    /// -1 - hasn't been seen | 0 - last seen by player 1 | 1 - last seen by player 2 | 2 - last seen by player 3 | 3 - last seen by player 4
     int8_t seen;
     int8_t unknown11;
     int16_t padding3;
@@ -69,14 +67,16 @@ class Button : public Movable
 class FxTornJournalPage : public Movable
 {
   public:
-    int32_t page_number; //only in tutorial
+    /// Only in tutorial
+    int32_t page_number;
 };
 
 class FxMainExitDoor : public Movable
 {
   public:
     Illumination* emitted_light;
-    int32_t timer; //when breaking open in tutorial
+    /// When breaking open in tutorial
+    int32_t timer;
     float unknown; //increments by 0.15
 };
 
@@ -126,9 +126,11 @@ class FxCompass : public Movable
 {
   public:
     float unknown1; //moving distance
-    float angle;    //counts form 0 to 2*pi, responsible for moving back and forth
+    /// Counts form 0 to 2*pi, responsible for moving back and forth
+    float sine_angle;
     float visibility;
-    bool is_active; //player has compass
+    /// Player has compass
+    bool is_active;
 };
 
 class SleepBubble : public Movable
@@ -140,7 +142,8 @@ class SleepBubble : public Movable
 class MovingIcon : public Movable
 {
   public:
-    uint8_t movement_timer; //used to move it up and down
+    /// Used to move it up and down in sync with others
+    uint8_t movement_timer;
 };
 
 class FxSaleContainer : public Movable
@@ -149,8 +152,10 @@ class FxSaleContainer : public Movable
     Entity* fx_value;
     Entity* fx_icon;
     Entity* fx_button;
-    float shake_amplitude; //for effect when you don't have enough money
-    bool sound_trigger;    //also sound_played, keeps re-triggering from time to time
+    /// For effect when you don't have enough money
+    float shake_amplitude;
+    /// Also sound_played, keeps re-triggering from time to time
+    bool sound_trigger;
     uint8_t pop_in_out_procentage;
 };
 
@@ -215,21 +220,23 @@ class FxUnderwaterBubble : public Movable
 {
   public:
     float unknown1;
-    int32_t bubble_source;
+    int32_t bubble_source_uid;
+    /// 1 / -1
     int8_t direction;
-    bool pop;    //setting it true makes it disappear/fade away
-    bool invert; //goes down instead of up
+    /// Setting it true makes it disappear/fade away
+    bool pop;
+    bool inverted; //goes down instead of up
 };
 
 class FxWaterDrop : public Movable
 {
   public:
-    bool invert; //floats up instead of drooping down
+    bool inverted; //floats up instead of drooping down
     bool unknown1;
     int8_t unknown2;
     int8_t unknown3;
     int32_t unknown4;
-    int32_t droplet_source;
+    int32_t droplet_source_uid;
 };
 
 class FxKinguSliding : public Movable
@@ -264,13 +271,15 @@ class FxTiamatTorso : public Movable
   public:
     int16_t timer;
     int16_t padding;
-    float torso_target_size; //slowly increases/decreases to the given value
+    /// Slowly increases/decreases to the given value
+    float torso_target_size;
 };
 
 class FxTiamatTail : public Movable
 {
   public:
-    float angle_two; //added _two just to not shadow angle in entity
+    /// Added _two just to not shadow angle in entity, it's angle but the pivot point is at the edge
+    float angle_two;
     float x_pos;
     float y_pos;
 };
@@ -284,7 +293,8 @@ class FxVatBubble : public Movable
 class FxHundunNeckPiece : public Movable
 {
   public:
-    int16_t kill_timer; //short timer after the head is dead
+    /// Short timer after the head is dead
+    int16_t kill_timer;
 };
 
 class FxJellyfishStar : public Movable
@@ -323,7 +333,8 @@ class FxFireflyLight : public Movable
     Illumination* illumination;
     uint8_t light_timer;
     int8_t padding;
-    uint16_t cooldown_timer; //timer between light flashes
+    /// Timer between light flashes
+    uint16_t cooldown_timer;
 };
 
 class FxEmpress : public Movable
@@ -337,6 +348,7 @@ class FxAnkhRotatingSpark : public Movable
   public:
     float radius;
     float inclination;
+    /// 0 - 1.0
     float speed; //a weird one, it gets values lower then 1.0, if you set 1.0 or bigger it will stop
     float sine_angle;
     float size;

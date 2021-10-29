@@ -19,11 +19,14 @@
 #include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
+#include "usertypes/entities_backgrounds_lua.hpp"
 #include "usertypes/entities_chars_lua.hpp"
+#include "usertypes/entities_decorations_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
 #include "usertypes/entities_fx_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
 #include "usertypes/entities_liquids_lua.hpp"
+#include "usertypes/entities_logical_lua.hpp"
 #include "usertypes/entities_monsters_lua.hpp"
 #include "usertypes/entities_mounts_lua.hpp"
 #include "usertypes/entity_casting_lua.hpp"
@@ -105,6 +108,9 @@ end
     NEntitiesChars::register_usertypes(lua);
     NEntitiesFloors::register_usertypes(lua);
     NEntitiesActiveFloors::register_usertypes(lua);
+    NEntitiesBG::register_usertypes(lua);
+    NEntitiesDecorations::register_usertypes(lua);
+    NEntitiesLogical::register_usertypes(lua);
     NEntitiesMounts::register_usertypes(lua);
     NEntitiesMonsters::register_usertypes(lua);
     NEntitiesItems::register_usertypes(lua);

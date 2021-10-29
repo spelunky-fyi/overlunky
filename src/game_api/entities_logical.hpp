@@ -30,12 +30,19 @@ class ShootingStarSpawner : public Entity
 class LogicalDoor : public Entity
 {
   public:
-    ENT_TYPE connected_door_type;
+    ENT_TYPE door_type;
     int32_t unk2; //always 37?
     bool not_hidden;
-    bool platform_spawned; //is set true when you bomb the door, no matter what door, can't be reset
+    /// Is set true when you bomb the door, no matter what door, can't be reset
+    bool platform_spawned;
     bool unk5;
     bool unk6;
+};
+
+class LogicalSound : public Entity
+{
+  public:
+    SoundPosition* sound_pos;
 };
 
 class LogicalStaticSound : public LogicalSound
@@ -51,17 +58,13 @@ class LogicalLiquidStreamSound : public LogicalStaticSound
     float unknown; //soundpositionpointer unknown10
 };
 
-class LogicalSound : public Entity
-{
-  public:
-    SoundPosition* sound_pos;
-};
-
 class LogicalTrapTrigger : public Entity
 {
   public:
-    int32_t min_empty_distance; //used in bigspeartrap when it has to have minimum 2 free spaces to be able to trigger
-    int32_t trigger_distance;   //in blocks
+    /// Used in bigspeartrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
+    int32_t min_empty_distance;
+    /// Value in tiles
+    int32_t trigger_distance;
     bool vertical;
     int8_t padding1;
     int16_t padding2;
@@ -96,8 +99,9 @@ class PoisonedEffect : public Entity
   public:
     ParticleEmitterInfo* particle_burst;
     ParticleEmitterInfo* particle_base;
-    uint16_t sound_timer;
-    bool sound_active; //if set to false, it will not play the sound or spawn particles
+    uint16_t burst_timer;
+    /// If forced to false, it will not play the sound or spawn burst particles
+    bool burst_active;
 };
 
 class CursedEffect : public Entity
@@ -113,13 +117,14 @@ class OuroboroCameraAnchor : public Entity
     float target_x;
     float target_y;
     float velocity_x;
-    float velocity_Y;
+    float velocity_y;
 };
 
 class OuroboroCameraZoomin : public Entity
 {
   public:
-    float zoomin_level; //can be set to negaative, seams to trigger the warp at some value
+    /// Can be set to negative, seams to trigger the warp at some value
+    float zoomin_level;
 };
 
 class CinematicAnchor : public Entity
@@ -127,7 +132,8 @@ class CinematicAnchor : public Entity
   public:
     Entity* blackbar_top;
     Entity* blackbar_bottom;
-    float roll_in; //0 to 1.0
+    /// 0.0 to 1.0
+    float roll_in;
 };
 
 class BurningRopeEffect : public Entity
@@ -187,7 +193,8 @@ class LogicalConveyorbeltSound : public LogicalSound
 class LogicalAnchovyFlock : public Entity
 {
   public:
-    float current_speed; //increases until max_speed reached
+    /// Increases until max_speed reached
+    float current_speed;
     float max_speed;
     uint16_t timer;
 };
@@ -196,7 +203,8 @@ class MummyFliesSound : public LogicalSound
 {
   public:
     int32_t mummy_uid;
-    uint8_t flies; // numbers of flies spawned
+    /// Numbers of flies spawned
+    uint8_t flies;
     int8_t padding1;
     int16_t padding2;
     UnknownPointerGroup unknown; //why? because of this this entity falls into the larger bucket
@@ -223,7 +231,8 @@ class FrostBreathEffect : public Entity
 class BoulderSpawner : public Entity
 {
   public:
-    int32_t timer;   // can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
+    /// Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
+    int32_t timer;
     int32_t padding; // unsure
     SoundPosition* sound_pos;
 };
@@ -241,7 +250,8 @@ class PipeTravelerSound : public LogicalSound
 class LogicalDrain : public Entity
 {
   public:
-    uint8_t timer; //little delay between pulling blob of liquid thru
+    /// Little delay between pulling blob of liquid thru
+    uint8_t timer;
 };
 
 class LogicalRegeneratingBlock : public Entity
@@ -259,13 +269,14 @@ class SplashBubbleGenerator : public Entity
 class EggplantThrower : public Entity
 {
   public:
-    bool unknown; //allow throw again when it's false? hard to test
+    bool unknown; // Allow throw again when it's false? hard to test
 };
 
 class LogicalMiniGame : public Entity
 {
   public:
-    uint16_t timer; //delay between spwning ufo
+    /// Delay between spwning ufo
+    uint16_t timer;
 };
 
 class DMSpawning : public Entity

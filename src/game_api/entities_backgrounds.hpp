@@ -47,7 +47,8 @@ class BGEggshipRoom : public Entity
 class BGMovingStar : public BGSurfaceStar
 {
   public:
-    float falling_speed; //can make it rise if you set it to negative
+    /// Can make it rise if set to negative
+    float falling_speed;
 };
 
 class BGTutorialSign : public Entity
@@ -63,7 +64,8 @@ class BGShootingStar : public BGRelativeElement
     float y_increment;
     int16_t timer;
     int16_t max_timer;
-    float size;       //gets smaller as the timer gets close to the max_timer
+    /// Gets smaller as the timer gets close to the max_timer
+    float size;
     float light_size; // UNSURE if you make it the same as size it starts to flicker, making this bigger increases the size as well
 };
 
@@ -76,7 +78,8 @@ class BGShopEntrence : public Entity
 class BGFloatingDebris : public BGSurfaceLayer
 {
   public:
-    float distance; //distance it travels up and down from spawn position
+    /// Distance it travels up and down from spawn position
+    float distance;
     float speed;
     float sine_angle;
 };
