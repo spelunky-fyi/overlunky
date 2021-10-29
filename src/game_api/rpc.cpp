@@ -1124,6 +1124,42 @@ void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
     write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), cursed, true);
 }
 
+bool is_inside_active_shop_room(float x, float y, LAYER layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("coord_inside_active_shop_room");
+    }
+    if (offset != 0)
+    {
+        typedef bool coord_inside_shop_func(StateMemory*, uint32_t layer, float x, float y);
+        static coord_inside_shop_func* cisf = (coord_inside_shop_func*)(offset);
+        return cisf(State::get().ptr(), enum_to_layer(layer), x, y);
+    }
+    return false;
+}
+
+bool is_inside_shop_zone(float x, float y, LAYER layer)
+{
+    static size_t offset = 0;
+    static void* rcx = nullptr;
+    if (offset == 0)
+    {
+        offset = get_address("coord_inside_shop_zone");
+        size_t* tmp = (size_t*)get_address("coord_inside_shop_zone_rcx");
+        auto heap_ptr = OnHeapPointer<void*>(*tmp);
+        rcx = heap_ptr.decode();
+    }
+    if (offset != 0)
+    {
+        typedef bool coord_inside_shop_zone_func(void*, uint32_t layer, float x, float y);
+        static coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
+        return ciszf(rcx, enum_to_layer(layer), x, y);
+    }
+    return false;
+}
+
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
 {
     if (dropchance_id < dropchance_entries.size())

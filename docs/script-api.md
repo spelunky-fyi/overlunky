@@ -501,6 +501,12 @@ Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MA
 ### [`set_max_rope_length`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_max_rope_length)
 `nil set_max_rope_length(int length)`<br/>
 Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
+### [`is_inside_active_shop_room`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_inside_active_shop_room)
+`bool is_inside_active_shop_room(float x, float y, LAYER layer)`<br/>
+Checks whether a coordinate is inside a room containing an active shop. This function checks whether the shopkeeper is still alive.
+### [`is_inside_shop_zone`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_inside_shop_zone)
+`bool is_inside_shop_zone(float x, float y, LAYER layer)`<br/>
+Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
 ### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
 `int waddler_count_entity(ENT_TYPE entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
