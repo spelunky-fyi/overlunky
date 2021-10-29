@@ -86,7 +86,7 @@ class Player : public PowerupCapable
     float y_pos; // not sure why, seams to be the same as abs_y
     uint32_t jump_flags;
     uint8_t timer_since_last_jump; //something different happens before or after 6
-    uint8_t can_use; // is compared with bit numbers, so probably flags
+    uint8_t can_use;               // is compared with bit numbers, so probably flags
 
     void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();

@@ -46,7 +46,7 @@ class Movable : public Entity
     };
     int16_t poison_tick_timer;
     uint8_t onfire_effect_timer;
-    uint8_t exit_invincibility_timer; // when exiting a door or a pipe, ...
+    uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
     uint8_t invincibility_frames_timer; //blinks the entity
     uint8_t frozen_timer;
     uint8_t unknown_damage_counter_a;

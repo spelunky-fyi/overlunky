@@ -137,6 +137,5 @@ void register_usertypes(sol::state& lua)
         &BGShopKeeperPrime::bubble_spawn_delay,
         sol::base_classes,
         sol::bases<Entity>());
-
 }
 }; // namespace NEntitiesBG
