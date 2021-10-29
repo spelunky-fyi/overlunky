@@ -2196,8 +2196,6 @@ set_callback(function()
     olmec_callback = -1
     olmec_floaters = {}
     if state.theme == THEME.OLMEC then
-
-
         if options.hard_olmec_phase then
             set_olmec_phase_y_level(1, 66)
             set_olmec_phase_y_level(2, 66)
@@ -2225,12 +2223,12 @@ set_callback(function()
                     olmec_floaters[#olmec_floaters+1] = v
                 end
                 olmec_callback = set_callback(function(ctx, depth) --TODO: stupid hack
-                    if state.theme ~= THEME.OLMEC then
+                    if state.theme ~= THEME.OLMEC or state.screen ~= SCREEN.LEVEL then
                         clear_callback(olmec_callback)
                         olmec_callback = -1
                         return
                     end
-                    if depth == 34 then
+                    if depth == 34 and state.theme == THEME.OLMEC then
                         for i,v in ipairs(olmec_floaters) do
                             local e = get_entity(v)
                             if e ~= nil then
