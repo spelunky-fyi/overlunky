@@ -27,7 +27,7 @@ void register_usertypes(sol::state& lua)
         "input_mapping_controller",
         sol::readonly(&PlayerSlot::input_mapping_controller),
         "player_id",
-        sol::readonly(&PlayerSlot::player_id),
+        sol::readonly(&PlayerSlot::player_slot),
         "is_participating",
         sol::readonly(&PlayerSlot::is_participating));
     lua.new_usertype<InputMapping>(
