@@ -1221,6 +1221,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        // Put bp on state->liquid_physics->(which liquid you want)->liquidtile_liquid_amount and spawn this liquid
+        // you will see something like "rcx+1", address for the "1" is what you want
+        "spawn_liquid_amount"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x8B\x8C\x01\xA0\x00\x00\x00\x8D\x79"sv)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

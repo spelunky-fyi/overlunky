@@ -101,7 +101,7 @@ EntityDB* get_type(uint32_t id)
     return entity_factory_ptr->types + id;
 }
 
-uint32_t to_id(std::string_view name)
+ENT_TYPE to_id(std::string_view name)
 {
     const EntityFactory* entity_factory_ptr = entity_factory();
     if (!entity_factory_ptr)

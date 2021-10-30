@@ -617,7 +617,7 @@ struct LiquidPhysicsParams
     size_t unknown34;
     size_t unknown35;                  //DataPointer? seam to get access validation if you change to something
     uint32_t liquidtile_liquid_amount; //how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
-    float distance_between_spawned_droplets;
+    float blobs_separation;
     int32_t unknown39; //is the last 4 garbage? seams not accessed
     float unknown40;
     float unknown41;

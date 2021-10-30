@@ -127,7 +127,7 @@ struct EntityItem
 
 EntityDB* get_type(uint32_t id);
 
-uint32_t to_id(std::string_view id);
+ENT_TYPE to_id(std::string_view id);
 
 class Vector
 {
