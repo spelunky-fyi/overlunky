@@ -1098,7 +1098,7 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int equipped_backitem`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=equipped_backitem) &ArenaState::equipped_backitem
 - [`ArenaConfigEquippedItems equipped_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=equipped_items) &ArenaState::equipped_items
 - [`int whip_damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=whip_damage) &ArenaState::whip_damage
-- [`int final_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=final_ghost) &ArenaState::final_ghost
+- [`bool final_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=final_ghost) &ArenaState::final_ghost
 - [`int breath_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breath_cooldown) &ArenaState::breath_cooldown
 - [`bool punish_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=punish_ball) &ArenaState::punish_ball
 ### `StateMemory`
@@ -3180,6 +3180,32 @@ Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 - [`int time_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last) &SaveData::time_last
 - [`array<int, 20> stickers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) &SaveData::stickers
 - [`array<int, 4> players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) &SaveData::players
+- [`Constellation constellation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation) &SaveData::constellation
+### `Constellation`
+- [`int star_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=star_count) &Constellation::star_count
+- [`array<ConstellationStar, 45> stars`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stars) &Constellation::stars
+- [`float scale`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) &Constellation::scale
+- [`int line_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line_count) &Constellation::line_count
+- [`array<ConstellationLine, 90> lines`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lines) &Constellation::lines
+- [`float line_red_intensity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line_red_intensity) &Constellation::line_red_intensity
+### `ConstellationStar`
+- [`int type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &ConstellationStar::type
+- [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ConstellationStar::x
+- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ConstellationStar::y
+- [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &ConstellationStar::size
+- [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &ConstellationStar::red
+- [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &ConstellationStar::green
+- [`float blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &ConstellationStar::blue
+- [`float alpha`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alpha) &ConstellationStar::alpha
+- [`float halo_red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_red) &ConstellationStar::halo_red
+- [`float halo_green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_green) &ConstellationStar::halo_green
+- [`float halo_blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_blue) &ConstellationStar::halo_blue
+- [`float halo_alpha`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_alpha) &ConstellationStar::halo_alpha
+- [`bool canis_ring`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=canis_ring) &ConstellationStar::canis_ring
+- [`bool fidelis_ring`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fidelis_ring) &ConstellationStar::fidelis_ring
+### `ConstellationLine`
+- [`int from`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=from) &ConstellationLine::from
+- [`int to`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=to) &ConstellationLine::to
 ### `CustomSound`
 Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
 It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing

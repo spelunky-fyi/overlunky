@@ -280,6 +280,15 @@ Coin = {
 Color = {
   __name = "sol.Color.user"
 }
+Constellation = {
+  __name = "sol.Constellation.user"
+}
+ConstellationLine = {
+  __name = "sol.ConstellationLine.user"
+}
+ConstellationStar = {
+  __name = "sol.ConstellationStar.user"
+}
 Container = {
   __index = "function",
   __name = "sol.Container.user",
@@ -4993,8 +5002,8 @@ io = {
   write = "function"
 }
 is_character_female = function(...) end
-is_coord_inside_active_shop_room = function(...) end
-is_coord_inside_shop_zone = function(...) end
+is_inside_active_shop_room = function(...) end
+is_inside_shop_zone = function(...) end
 is_room_flipped = function(...) end
 json = {
   _version = "0.1.2",

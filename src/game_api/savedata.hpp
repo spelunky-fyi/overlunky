@@ -1,9 +1,79 @@
 #pragma once
 
+#include "state_structs.hpp"
 #include <array>
 #include <cstdint>
 
 #pragma pack(push, 1)
+
+struct SaveGameArenaRuleset
+{
+    uint8_t unknown1;
+    uint8_t unknown12;
+    uint8_t timer;
+    uint8_t timer_ending;
+    uint8_t wins;
+    uint8_t lives;
+    uint8_t unknown7;
+    uint8_t unknown8;
+    std::array<uint16_t, 4> unused_player_idolheld_countdown; // struct is similar to state.arenas so they just copied it, but this is not useful to store in the savegame
+    uint8_t health;
+    uint8_t bombs;
+    uint8_t ropes;
+    uint8_t stun_time;
+    uint8_t mount;
+    uint8_t arena_select;
+    ArenaConfigArenas arenas;
+    uint8_t dark_level_chance;
+    uint8_t crate_frequency;
+    ArenaConfigItems items_enabled;
+    ArenaConfigItems items_in_crate;
+    int8_t held_item;
+    int8_t equipped_backitem;
+    ArenaConfigEquippedItems equipped_items;
+    uint8_t whip_damage;
+    bool final_ghost;
+    uint8_t breath_cooldown;
+    bool punish_ball;
+    uint8_t padding[2];
+};
+
+struct ConstellationStar
+{
+    uint32_t type;
+    float x;
+    float y;
+    float size;
+    float red;
+    float green;
+    float blue;
+    float alpha;
+    float halo_red;
+    float halo_green;
+    float halo_blue;
+    float halo_alpha;
+    bool canis_ring;
+    bool fidelis_ring;
+    uint8_t padding[2];
+    uint32_t unknown14; // might have something to do with how they are laid out on the path, having/being offshoots etc
+};
+
+struct ConstellationLine
+{
+    uint8_t from; // zero based star index into Constellation.stars
+    uint8_t to;
+};
+
+struct Constellation
+{
+    uint32_t star_count;
+    std::array<ConstellationStar, 45> stars;
+    float scale;
+    uint8_t line_count;
+    std::array<ConstellationLine, 90> lines; // You'd only need 44 lines if you have 45 stars, but there is room for 91. Could be to draw two lines on top of each other to make it brighter.
+    uint8_t padding[3];
+    float line_red_intensity; // 0 = normal white, npc_kills 8 - 16 = 0.5 - 1.0 (pink to deep red for criminalis)
+};
 
 struct SaveData
 {
@@ -64,6 +134,8 @@ struct SaveData
     std::array<float, 20> sticker_vert_offsets; // vertical offset for each sticker
     int8_t skip10[40];
     std::array<uint8_t, 4> players;
+    SaveGameArenaRuleset arena_favorite_ruleset;
+    Constellation constellation;
 };
 
 #pragma pack(pop)

@@ -361,7 +361,7 @@ struct ArenaState
     int8_t equipped_backitem;
     ArenaConfigEquippedItems equipped_items;
     uint8_t whip_damage;
-    uint8_t final_ghost;
+    bool final_ghost;
     uint8_t breath_cooldown;
     bool punish_ball;
 };
