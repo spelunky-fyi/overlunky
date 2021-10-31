@@ -238,7 +238,7 @@ void register_usertypes(sol::state& lua)
         sol::bases<Entity>());
 
     lua.new_usertype<MummyFliesSound>(
-        "LogicalSound",
+        "MummyFliesSound",
         "mummy_uid",
         &MummyFliesSound::mummy_uid,
         "flies",
