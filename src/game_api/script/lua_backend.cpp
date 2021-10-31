@@ -94,6 +94,10 @@ void LuaBackend::clear_all_callbacks()
         sound_manager->clear_callback(id);
     }
     vanilla_sound_callbacks.clear();
+    pre_tile_code_callbacks.clear();
+    post_tile_code_callbacks.clear();
+    pre_entity_spawn_callbacks.clear();
+    post_entity_spawn_callbacks.clear();
     for (auto id : chance_callbacks)
     {
         g_state->level_gen->data->unregister_chance_logic_provider(id);
