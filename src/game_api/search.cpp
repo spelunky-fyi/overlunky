@@ -419,11 +419,21 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "spawn_entity"sv,
-        // First call in LoadItem is to this function
+        // First call in `load_item` is to this function
         PatternCommandBuffer{}
             .find_inst("\x44\x88\xb8\xa0\x00\x00\x00\xf3\x0f\x11\x78\x40"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "setup_lake_impostor"sv,
+        // After a call to `load_item` that spawns `0x38f` or `0x392` the spawned entity is passed to this function
+        PatternCommandBuffer{}
+            .find_inst("\x0f\x28\xd6\xe8****\x48\x8b\x86\x20"sv)
+            .find_next_inst("\x0f\x28\xd6\xe8****\x48\x8b\x86\x20"sv)
+            .offset(0x3)
+            .decode_call()
+            .at_exe(),
     },
     {
         "add_item_ptr"sv,
