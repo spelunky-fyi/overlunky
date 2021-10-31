@@ -639,7 +639,7 @@ struct MysteryLiquid3
     size_t unk44;
     size_t list;
     int32_t unknown45a;
-    int32_t unknown45b; //padding
+    int32_t unknown45b;    //padding
     int32_t* liquid_flags; // simple array
     int32_t unknown47a;
     int32_t unknown47b; //padding
@@ -682,8 +682,8 @@ struct LiquidPhysicsParams
     uint32_t unknown22;
     float unknown23;
     uint32_t unknown24;
-    MysteryLiquid3* unknown25;      // MysteryLiquidPointer3 in plugin | resets each level
-    uint32_t liquid_flags; // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
+    MysteryLiquid3* unknown25; // MysteryLiquidPointer3 in plugin | resets each level
+    uint32_t liquid_flags;     // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
     float last_spawn_x;
     float last_spawn_y;
     float spawn_velocity_x;
