@@ -1123,7 +1123,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put write bp on olmec.attack_phase (when he's in phase 0)
         // Look for the condition that jumps over the little section that changes the phase to 1
         PatternCommandBuffer{}
-            .find_inst("\x0F\x2E\xD1*\x2E\xF3\x0F\x10\x0D\xAA"sv)
+            .find_inst("\x0F\x2E\xD1*\x2E\xF3\x0F\x10\x0D"sv)
             .offset(0x3)
             .at_exe(),
     },
@@ -1361,7 +1361,6 @@ size_t load_address(std::string_view address_name)
             return address.value();
         }
     }
-
     const std::string message = fmt::format("Tried to get unknown address '{}'{}", address_name, get_error_information());
     MessageBox(NULL, message.c_str(), NULL, MB_OK);
     return 0ull;
