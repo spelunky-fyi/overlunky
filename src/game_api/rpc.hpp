@@ -21,7 +21,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask);
 int32_t get_grid_entity_at(float x, float y, LAYER layer);
 void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap);
 void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy);
-void move_liquid_abs(uint32_t uid, float x, float y);
+void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy);
 uint32_t get_entity_flags(uint32_t uid);
 void set_entity_flags(uint32_t uid, uint32_t flags);
 uint32_t get_entity_flags2(uint32_t id);

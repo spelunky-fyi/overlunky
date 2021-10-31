@@ -643,7 +643,7 @@ struct MysteryLiquid3
     size_t unknown47;
     std::pair<float, float>* entity_coordinates;
     size_t unknown49;
-    size_t unknown50;
+    std::pair<float, float>* entity_velocities;
     size_t unknown51;
     size_t unknown52;
 };

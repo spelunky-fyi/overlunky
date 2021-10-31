@@ -221,7 +221,7 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
         static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
         if (ent->type->id >= LIQUID_WATER)
         {
-            move_liquid_abs(uid, x, y);
+            move_liquid_abs(uid, x, y, vx, vy);
         }
         else
         {
@@ -230,7 +230,7 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
     }
 }
 
-void move_liquid_abs(uint32_t uid, float x, float y)
+void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
     auto state = State::get();
     auto entity = state.find(uid);
@@ -243,36 +243,47 @@ void move_liquid_abs(uint32_t uid, float x, float y)
         static ENT_TYPE LIQUID_COARSE_LAVA = to_id("ENT_TYPE_LIQUID_COARSE_LAVA"sv);
 
         std::pair<float, float>* coords = nullptr;
+        std::pair<float, float>* velocities = nullptr;
         auto entity_id = entity->type->id;
         if (entity_id == LIQUID_WATER)
         {
             coords = state.ptr()->liquid_physics->water_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->water_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_COARSE_WATER)
         {
             coords = state.ptr()->liquid_physics->coarse_water_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->coarse_water_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_LAVA)
         {
             coords = state.ptr()->liquid_physics->lava_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->lava_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_STAGNANT_LAVA)
         {
             coords = state.ptr()->liquid_physics->stagnant_lava_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->stagnant_lava_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_COARSE_LAVA)
         {
             coords = state.ptr()->liquid_physics->coarse_lava_physics.unknown25->entity_coordinates;
-        }
-        if (coords == nullptr)
-        {
-            return;
+            velocities = state.ptr()->liquid_physics->coarse_lava_physics.unknown25->entity_velocities;
         }
 
         auto liquid = entity->as<Liquid>();
-        std::pair<float, float>* c = &(coords[liquid->unknown1->liquid_id]);
-        c->first = x;
-        c->second = y;
+        if (coords != nullptr)
+        {
+            std::pair<float, float>* c = &(coords[liquid->unknown1->liquid_id]);
+            c->first = x;
+            c->second = y;
+        }
+        if (velocities != nullptr)
+        {
+            std::pair<float, float>* v = &(velocities[liquid->unknown1->liquid_id]);
+            v->first = vx;
+            v->second = vy;
+        }
     }
 }
 
