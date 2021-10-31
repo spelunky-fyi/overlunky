@@ -217,7 +217,17 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
-        ent->teleport_abs(x, y, vx, vy);
+    {
+        static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
+        if (ent->type->id >= LIQUID_WATER)
+        {
+            move_liquid_abs(uid, x, y);
+        }
+        else
+        {
+            ent->teleport_abs(x, y, vx, vy);
+        }
+    }
 }
 
 void move_liquid_abs(uint32_t uid, float x, float y)

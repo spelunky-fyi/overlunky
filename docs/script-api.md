@@ -292,9 +292,6 @@ Enable/disable game engine pause.
 ### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
 `nil move_entity(int uid, float x, float y, float vx, float vy)`<br/>
 Teleport entity to coordinates with optional velocity
-### [`move_liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_liquid)
-`nil move_liquid(int uid, float x, float y)`<br/>
-Teleport liquid entity to coordinates
 ### [`set_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door_target)
 `nil set_door_target(int id, int w, int l, int t)`<br/>
 Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`

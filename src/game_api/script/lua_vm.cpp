@@ -499,8 +499,6 @@ end
     };
     /// Teleport entity to coordinates with optional velocity
     lua["move_entity"] = move_entity_abs;
-    /// Teleport liquid entity to coordinates
-    lua["move_liquid"] = move_liquid_abs;
     /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).
