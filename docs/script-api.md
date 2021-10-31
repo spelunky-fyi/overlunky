@@ -206,13 +206,13 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 `nil spawn_liquid(ENT_TYPE entity_type, float x, float y)`<br/>
 Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
-`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc.
+`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
 `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
 ### [`spawn_liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_liquid)
 `nil spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, int liquid_flags, int amount, float blobs_separation)`<br/>
 Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
-`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc.
+`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
 `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
 ### [`spawn_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 `int spawn_entity(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)`<br/>
@@ -968,11 +968,11 @@ Using the api through these directly is kinda dangerous, but such is life. I got
 -- It's just a weird example OK!
 ids = get_entities_by_mask(MASK.PLAYER) -- This just covers CHARs
 for i,id in ipairs(ids) do
-    e = get_entity(id):as_player() -- cast Entity to Player to access inventory
-    e.health = 99
-    e.inventory.bombs = 99
-    e.inventory.ropes = 99
-    e.type.jump = 0.36
+    e = get_entity(id)     -- casts Entity to Player automatically
+    e.health = 99          -- setting Player::health
+    e.inventory.bombs = 99 -- setting Inventory::bombs
+    e.inventory.ropes = 99 -- setting Inventory::ropes
+    e.type.jump = 0.36     -- setting EntityDB::jump
 end
 ```
 ### `SaveContext`
@@ -3395,7 +3395,7 @@ Derived from [`Entity`](#entity)
 Increases until max_speed reached
 - [`float max_speed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_speed) &LogicalAnchovyFlock::max_speed
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &LogicalAnchovyFlock::timer
-### `LogicalSound`
+### `MummyFliesSound`
 Derived from [`Entity`](#entity) [`LogicalSound`](#logicalsound)
 - [`int mummy_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mummy_uid) &MummyFliesSound::mummy_uid
 - [`int flies`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flies) &MummyFliesSound::flies
@@ -5263,9 +5263,12 @@ Params: `PlayingSound vanilla_sound`
 ### ENT_MORE_FLAG
 - [`HIRED_HAND_REVIVED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.HIRED_HAND_REVIVED) 2
 - [`SWIMMING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.SWIMMING) 11
-- [`FALLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.FALLING) 12
+- [`HIT_GROUND`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.HIT_GROUND) 12
+- [`HIT_WALL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.HIT_WALL) 13
+- [`FALLING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.FALLING) 14
 - [`CURSED_EFFECT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.CURSED_EFFECT) 15
-- [`DISABLE_INPUT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.DISABLE_INPUT) 16
+- [`ELIXIR_BUFF`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.ELIXIR_BUFF) 16
+- [`DISABLE_INPUT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_MORE_FLAG.DISABLE_INPUT) 17
 ### CHAR_STATE
 - [`FLAILING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CHAR_STATE.FLAILING) 0
 - [`STANDING`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CHAR_STATE.STANDING) 1
