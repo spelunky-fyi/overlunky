@@ -74,7 +74,7 @@ struct PlayerSlot
     uint32_t unknown1;
     InputMapping* input_mapping_keyboard;
     InputMapping* input_mapping_controller;
-    uint8_t player_id;
+    uint8_t player_slot;
     bool is_participating;
     uint8_t unknown4; // padding most likely
     uint8_t unknown5; // padding most likely
@@ -638,33 +638,35 @@ struct MysteryLiquid3
     size_t unk43;
     size_t unk44;
     size_t list;
-    size_t unknown45;
-    size_t unknown46;
-    size_t unknown47;
+    int32_t unknown45a;
+    int32_t unknown45b;    //padding
+    int32_t* liquid_flags; // simple array
+    int32_t unknown47a;
+    int32_t unknown47b; //padding
     std::pair<float, float>* entity_coordinates;
-    size_t unknown49;
+    int32_t unknown49a;
+    int32_t unknown49b; //padding
     std::pair<float, float>* entity_velocities;
-    size_t unknown51;
+    int32_t unknown51a;
+    int32_t unknown51b; //padding
     size_t unknown52;
+    size_t unknown53;
 };
 
 struct LiquidPhysicsParams
 {
-    uint8_t unknown1; // anything other than 1 and standing water doesn't visually generate
+    int32_t shader_type; //can also be flags, as for water, any value with bit one is fine
+    uint8_t unknown2;    //shader related, shader id maybe?
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint8_t unknown2;
-    uint8_t padding4;
-    uint8_t padding5;
-    uint8_t padding6;
     float unknown3;
-    float cohesion; // unsure about name; negative number makes the liquid balls come apart more easily?
+    float cohesion; // negative number makes the liquid balls come apart more easily?
     float gravity;  // negative number to invert gravity
     float unknown6;
     float unknown7;
-    float agitation;
-    float unknown9; // starts going nuts at around 2.70
+    float agitation; // is agitation the right word? for me is just how bouncy the liquid is
+    float unknown9;  // starts going nuts at around 2.70, pressure force? it seam to only matter at spawn, when there is a lot of liquid in one place
     float unknown10;
     float unknown11;
     float unknown12;
@@ -680,21 +682,20 @@ struct LiquidPhysicsParams
     uint32_t unknown22;
     float unknown23;
     uint32_t unknown24;
-    MysteryLiquid3* unknown25;
-    float unknown26;
-    float x_right;
-    float y_top;
-    float unknown29;
-    uint32_t unknown30;
+    MysteryLiquid3* unknown25; // MysteryLiquidPointer3 in plugin | resets each level
+    uint32_t liquid_flags;     // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
+    float last_spawn_x;
+    float last_spawn_y;
+    float spawn_velocity_x;
+    float spawn_velocity_y;
     uint32_t unknown31;
     uint32_t unknown32;
     uint32_t unknown33;
     size_t unknown34;
-    uint32_t unknown35;
-    uint32_t unknown36;
-    uint32_t unknown37;
-    float unknown38;
-    uint32_t unknown39; // entity uid
+    size_t unknown35;                  //DataPointer? seam to get access validation if you change to something
+    uint32_t liquidtile_liquid_amount; //how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
+    float blobs_separation;
+    int32_t unknown39; //is the last 4 garbage? seams not accessed
     float unknown40;
     float unknown41;
     uint32_t unknown42;

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "entity.hpp"
-#include "state_structs.hpp"
-#include <cstdint>
 
 class MysteryLiquid1
 {
@@ -23,7 +21,7 @@ class Liquid : public Entity
     uint16_t unknown_readonly1;
     uint16_t unknown_readonly2;
     uint8_t unknown_timer1;
-    uint8_t unknown_timer2;
+    uint8_t pos_update_timer; // when 0, updates x_pos and y_pos
     uint8_t unknown_timer3;
     uint8_t unk21; //probably padding
 };

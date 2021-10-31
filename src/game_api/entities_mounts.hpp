@@ -1,8 +1,6 @@
 #pragma once
 
 #include "movable.hpp"
-#include "particles.hpp"
-#include <cstdint>
 
 class Mount : public Movable
 {
@@ -36,6 +34,7 @@ class Axolotl : public Mount
   public:
     uint8_t attack_cooldown;
     bool can_teleport;
+    uint8_t unknown;
 };
 
 class Mech : public Mount

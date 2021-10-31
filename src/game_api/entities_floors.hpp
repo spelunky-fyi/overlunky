@@ -105,6 +105,7 @@ class CityOfGoldDoor : public DecoratedDoor
 class MainExit : public ExitDoor
 {
   public:
+    int64_t unknown;
     SoundPosition* sound_pos;
     float top_value; // unsure
     float value;     // unsure

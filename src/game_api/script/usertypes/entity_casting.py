@@ -11,7 +11,10 @@ entities_files = ["entity_lua.cpp",
                   "entities_floors_lua.cpp",
                   "entities_activefloors_lua.cpp",
                   "entities_fx_lua.cpp",
-                  "entities_liquids_lua.cpp"]
+                  "entities_liquids_lua.cpp",
+                  "entities_backgrounds_lua.cpp",
+                  "entities_decorations_lua.cpp",
+                  "entities_logical_lua.cpp"]
 as_re = re.compile(r'lua\["Entity"\]\["(as_.*)"\]')
 
 known_casts = []

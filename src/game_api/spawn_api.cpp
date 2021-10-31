@@ -72,6 +72,69 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
     }
 }
 
+void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation = INFINITY)
+{
+    LiquidPhysicsParams* liquid_physics = nullptr;
+    auto state_ptr = State::get().ptr();
+
+    if (entity_type == to_id("ENT_TYPE_LIQUID_WATER"))
+    {
+        liquid_physics = &state_ptr->liquid_physics->water_physics;
+    }
+    else if (entity_type == to_id("ENT_TYPE_LIQUID_COARSE_WATER"))
+    {
+        liquid_physics = &state_ptr->liquid_physics->coarse_water_physics;
+    }
+    else if (entity_type == to_id("ENT_TYPE_LIQUID_LAVA"))
+    {
+        liquid_physics = &state_ptr->liquid_physics->lava_physics;
+    }
+    else if (entity_type == to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"))
+    {
+        liquid_physics = &state_ptr->liquid_physics->stagnant_lava_physics;
+    }
+    else if (entity_type == to_id("ENT_TYPE_LIQUID_COARSE_LAVA"))
+    {
+        liquid_physics = &state_ptr->liquid_physics->coarse_lava_physics;
+    }
+
+    if (liquid_physics != nullptr)
+    {
+        auto some_value = get_address("spawn_liquid_amount");
+        write_mem_prot(some_value, (int8_t)0, true);
+
+        // Save default liquid physics spawn values
+        float tmp_spawn_velocity_x = liquid_physics->spawn_velocity_x,
+              tmp_spawn_velocity_y = liquid_physics->spawn_velocity_y,
+              tmp_blobs_separation = liquid_physics->blobs_separation;
+        uint32_t tmp_liquid_flags = liquid_physics->liquid_flags,
+                 tmp_liquidtile_liquid_amount = liquid_physics->liquidtile_liquid_amount;
+
+        liquid_physics->liquid_flags = liquid_flags;
+        liquid_physics->spawn_velocity_x = velocityx;
+        liquid_physics->spawn_velocity_y = velocityy;
+        liquid_physics->liquidtile_liquid_amount = amount;
+        if (blobs_separation != INFINITY)
+            liquid_physics->blobs_separation = blobs_separation;
+
+        spawn_liquid(entity_type, x, y);
+
+        // Reset to default values
+        liquid_physics->liquid_flags = tmp_liquid_flags;
+        liquid_physics->spawn_velocity_x = tmp_spawn_velocity_x;
+        liquid_physics->spawn_velocity_y = tmp_spawn_velocity_y;
+        liquid_physics->liquidtile_liquid_amount = tmp_liquidtile_liquid_amount;
+        liquid_physics->blobs_separation = tmp_blobs_separation;
+
+        write_mem_prot(some_value, (int8_t)1, true);
+    }
+}
+
+void spawn_liquid_ex(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount)
+{
+    return spawn_liquid(entity_type, x, y, velocityx, velocityy, liquid_flags, amount, INFINITY);
+}
+
 int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap) // ui only
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);

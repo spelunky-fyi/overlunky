@@ -56,7 +56,7 @@ class Cape : public Backpack
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint32_t floating_count; // increments whenever floating
+    uint32_t floating_count; //it's per level, not per cape
 };
 
 class VladsCape : public Cape
@@ -498,11 +498,17 @@ class PlayerGhost : public LightEmitter
     PlayerInputs* player_inputs;
     Inventory* inventory;
     SoundPosition* sound_pos;
+    /// Is not set to -1 when crushed
+    int32_t body_uid;
     uint16_t unknown_timer;
     uint8_t shake_timer;
     uint8_t boost_timer;
-    int32_t unused; /* unsure */
-    int64_t unknown;
+    uint8_t unknown_timer2;
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
+    int32_t padding4;
+    size_t unknown;
 };
 
 class GhostBreath : public Movable
@@ -564,7 +570,7 @@ class SkullDropTrap : public Movable
 class FrozenLiquid : public Movable
 {
   public:
-    int32_t unknown1;
+    int32_t unknown1; //have problem cheeking those, looks like unused memory, but then, it's always zeros on spawn, changing it can crash the game
     int32_t unknown2;
 };
 
@@ -606,8 +612,9 @@ class MiniGameShip : public Movable
     SoundPosition* sound_pos;
     float velocity_x;
     float velocity_y;
-    float swing;
-    float up_down_normal; // 0.0 means down, 1.0 means up, 0.5 idle
+    float swing; // angle change?
+    /// 0.0 - down, 1.0 - up, 0.5 - idle
+    float up_down_normal;
 };
 
 class MiniGameAsteroid : public Movable
@@ -646,7 +653,7 @@ class EggSac : public Movable
 class Goldbar : public Movable
 {
   public:
-    uint8_t unknown; // get's updated every time animation_frame is changes by the game, setting it to 64 or less disables the effect
+    uint8_t unknown_shine; // get's updated every time animation_frame is changes by the game, setting it to 64 or less disables the effect
 };
 
 class Coin : public Movable
