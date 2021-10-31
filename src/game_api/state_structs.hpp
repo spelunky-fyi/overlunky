@@ -638,14 +638,19 @@ struct MysteryLiquid3
     size_t unk43;
     size_t unk44;
     size_t list;
-    size_t unknown45;
-    size_t unknown46;
-    size_t unknown47;
+    int32_t unknown45a;
+    int32_t unknown45b; //padding
+    int32_t* liquid_flags; // simple array
+    int32_t unknown47a;
+    int32_t unknown47b; //padding
     std::pair<float, float>* entity_coordinates;
-    size_t unknown49;
+    int32_t unknown49a;
+    int32_t unknown49b; //padding
     std::pair<float, float>* entity_velocities;
-    size_t unknown51;
+    int32_t unknown51a;
+    int32_t unknown51b; //padding
     size_t unknown52;
+    size_t unknown53;
 };
 
 struct LiquidPhysicsParams
