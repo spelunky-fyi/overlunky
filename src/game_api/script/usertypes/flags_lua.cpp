@@ -70,11 +70,17 @@ void register_usertypes(sol::state& lua)
         2,
         "SWIMMING",
         11,
-        "FALLING",
+        "HIT_GROUND",
         12,
+        "HIT_WALL",
+        13,
+        "FALLING",
+        14,
         "CURSED_EFFECT",
         15,
+        "ELIXIR_BUFF",
+        16,
         "DISABLE_INPUT",
-        16);
+        17);
 }
 }; // namespace NEntityFlags

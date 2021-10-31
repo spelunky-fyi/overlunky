@@ -760,11 +760,11 @@ print(
 -- It's just a weird example OK!
 ids = get_entities_by_mask(MASK.PLAYER) -- This just covers CHARs
 for i,id in ipairs(ids) do
-    e = get_entity(id):as_player() -- cast Entity to Player to access inventory
-    e.health = 99
-    e.inventory.bombs = 99
-    e.inventory.ropes = 99
-    e.type.jump = 0.36
+    e = get_entity(id)     -- casts Entity to Player automatically
+    e.health = 99          -- setting Player::health
+    e.inventory.bombs = 99 -- setting Inventory::bombs
+    e.inventory.ropes = 99 -- setting Inventory::ropes
+    e.type.jump = 0.36     -- setting EntityDB::jump
 end
 ```"""
 )

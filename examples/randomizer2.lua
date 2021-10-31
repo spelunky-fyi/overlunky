@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.3a"
+meta.version = "2.3b"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -1862,6 +1862,7 @@ end
 set_post_entity_spawn(function(ent)
     if not options.projectile then return end
     ent.animation_frame = pick(projectiles_web_ids)
+    ent.flags = set_flag(ent.flags, ENT_FLAG.PASSES_THROUGH_EVERYTHING)
     local webshot = ent.uid
     set_interval(function()
         if get_entity(webshot) ~= nil and get_entity(webshot).layer < 2 and get_entity(webshot).overlay == nil and projectiles_web[get_entity(webshot).animation_frame] ~= nil then
