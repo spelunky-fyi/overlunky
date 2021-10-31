@@ -48,6 +48,82 @@ PIMAGE_NT_HEADERS RtlImageNtHeader(_In_ PVOID Base)
     return proc(Base);
 }
 
+const char* current_spelunky_version()
+{
+    static const char* version = "unknown!";
+    static bool version_searched = false;
+    if (!version_searched)
+    {
+        version_searched = true;
+        auto memory = Memory::get();
+        PIMAGE_NT_HEADERS nt_header = RtlImageNtHeader((PVOID)memory.exe());
+        size_t rdata_start = 0;
+        size_t rdata_size = 0;
+        IMAGE_SECTION_HEADER* section_header = (IMAGE_SECTION_HEADER*)(nt_header + 1);
+        for (int i = 0; i < nt_header->FileHeader.NumberOfSections; i++)
+        {
+            char* name = (char*)section_header->Name;
+            if (memcmp(name, ".rdata", 6) == 0)
+            {
+                rdata_start = (size_t)(memory.exe() + section_header->VirtualAddress);
+                rdata_size = section_header->Misc.VirtualSize;
+                break;
+            }
+            section_header++;
+        }
+        if (rdata_start > 0 && rdata_size > 0)
+        {
+            std::string_view needle = "\x31\x2E**\x2E**\x00"sv;
+            const size_t needle_length = needle.size();
+            const char* rdata = (const char*)rdata_start;
+            size_t offset = 0;
+            for (size_t j = 0; j < rdata_size - needle_length; j++)
+            {
+                bool found = true;
+                for (size_t k = 0; k < needle_length && found; k++)
+                {
+                    found = needle[k] == '*' || needle[k] == *(rdata + j + k);
+                }
+                if (found)
+                {
+                    offset = rdata_start + j;
+                    break;
+                }
+            }
+            if (offset != 0)
+            {
+                version = static_cast<const char*>((void*)offset);
+            }
+        }
+    }
+    return version;
+}
+
+static std::vector<std::string> g_registered_applications = {};
+void register_application_version(const std::string& s)
+{
+    g_registered_applications.emplace_back(s);
+}
+
+std::string application_versions()
+{
+    if (g_registered_applications.empty())
+    {
+        return "No application versions registered";
+    }
+    std::stringstream ss;
+    for (const auto& s : g_registered_applications)
+    {
+        ss << s << "\n";
+    }
+    return ss.str();
+}
+
+std::string get_error_information()
+{
+    return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.25.0b\n\n{}", current_spelunky_version(), application_versions());
+}
+
 size_t find_inst(const char* exe, std::string_view needle, size_t start, std::string_view pattern_name, bool is_required)
 {
     static const std::size_t exe_size = [exe]()
@@ -78,11 +154,11 @@ size_t find_inst(const char* exe, std::string_view needle, size_t start, std::st
     std::string error_message;
     if (pattern_name.empty())
     {
-        error_message = fmt::format("Failed finding pattern '{}' in Spel2.exe", ByteStr{needle});
+        error_message = fmt::format("Failed finding pattern '{}' in Spel2.exe{}", ByteStr{needle}, get_error_information());
     }
     else
     {
-        error_message = fmt::format("Failed finding pattern '{}' ('{}') in Spel2.exe", pattern_name, ByteStr{needle});
+        error_message = fmt::format("Failed finding pattern '{}' ('{}') in Spel2.exe{}", pattern_name, ByteStr{needle}, get_error_information());
     }
 
     if (is_required)
@@ -841,6 +917,35 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "coord_inside_active_shop_room"sv,
+        // Same pattern as default_zoom_level_shop, check the condition before the jump that decides whether to activate
+        // the shop zoom level or regular zoom level
+        PatternCommandBuffer{}
+            .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
+            .offset(-0x24)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "coord_inside_shop_zone"sv,
+        // Can be found in same function as default_zoom_level_shop, check the condition higher up
+        PatternCommandBuffer{}
+            .find_inst("\x40\x8A\xBB\xA0\x00\x00\x00\x89\xFA\xE8"sv)
+            .offset(0x9)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "coord_inside_shop_zone_rcx"sv,
+        // See coord_inside_shop_zone, a little higher up rcx gets set to an on heap pointer
+        PatternCommandBuffer{}
+            .find_inst("\x0F\x84****\x48\x8B\x05****\x4A\x8D\x0C\x08"sv)
+            .find_next_inst("\x0F\x84****\x48\x8B\x05****\x4A\x8D\x0C\x08"sv)
+            .offset(0x6)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
         "enforce_camp_camera_bounds"sv,
         // Go into basecamp, put a write bp on state.camera.bounds.top
         PatternCommandBuffer{}
@@ -1266,7 +1371,7 @@ size_t load_address(std::string_view address_name)
             return address.value();
         }
     }
-    const std::string message = fmt::format("Tried to get unknown address '{}'", address_name);
+    const std::string message = fmt::format("Tried to get unknown address '{}'{}", address_name, get_error_information());
     MessageBox(NULL, message.c_str(), NULL, MB_OK);
     return 0ull;
 }

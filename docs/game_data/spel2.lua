@@ -280,6 +280,15 @@ Coin = {
 Color = {
   __name = "sol.Color.user"
 }
+Constellation = {
+  __name = "sol.Constellation.user"
+}
+ConstellationLine = {
+  __name = "sol.ConstellationLine.user"
+}
+ConstellationStar = {
+  __name = "sol.ConstellationStar.user"
+}
 Container = {
   __index = "function",
   __name = "sol.Container.user",
@@ -1758,6 +1767,9 @@ Jiangshi = {
   __name = "sol.Jiangshi.user",
   __newindex = "function"
 }
+JournalPopupUI = {
+  __name = "sol.JournalPopupUI.user"
+}
 JournalUI = {
   __name = "sol.JournalUI.user"
 }
@@ -1908,13 +1920,22 @@ Logic = {
   __name = "sol.Logic.user"
 }
 LogicDiceShop = {
-  __name = "sol.LogicDiceShop.user"
+  __index = "function",
+  __name = "sol.LogicDiceShop.user",
+  __newindex = "function"
+}
+LogicList = {
+  __name = "sol.LogicList.user"
 }
 LogicOlmecCutscene = {
-  __name = "sol.LogicOlmecCutscene.user"
+  __index = "function",
+  __name = "sol.LogicOlmecCutscene.user",
+  __newindex = "function"
 }
 LogicTiamatCutscene = {
-  __name = "sol.LogicTiamatCutscene.user"
+  __index = "function",
+  __name = "sol.LogicTiamatCutscene.user",
+  __newindex = "function"
 }
 MASK = {
   ACTIVEFLOOR = 128,
@@ -2927,6 +2948,9 @@ SaveContext = {
 }
 SaveData = {
   __name = "sol.SaveData.user"
+}
+SaveRelated = {
+  __name = "sol.SaveRelated.user"
 }
 Scarab = {
   __index = "function",
@@ -4899,6 +4923,7 @@ filter_entities = function(...) end
 flip_entity = function(...) end
 force_co_subtheme = function(...) end
 force_dark_level = function(...) end
+force_olmec_phase_0 = function(...) end
 game_manager = {}
 game_position = function(...) end
 generate_particles = function(...) end
@@ -4977,6 +5002,8 @@ io = {
   write = "function"
 }
 is_character_female = function(...) end
+is_inside_active_shop_room = function(...) end
+is_inside_shop_zone = function(...) end
 is_room_flipped = function(...) end
 json = {
   _version = "0.1.2",
@@ -4993,6 +5020,7 @@ messpect = function(...) end
 modify_sparktraps = function(...) end
 mouse_position = function(...) end
 move_entity = function(...) end
+move_liquid = function(...) end
 online = {}
 options = {}
 os = {

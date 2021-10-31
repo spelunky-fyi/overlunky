@@ -501,6 +501,12 @@ Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MA
 ### [`set_max_rope_length`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_max_rope_length)
 `nil set_max_rope_length(int length)`<br/>
 Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
+### [`is_inside_active_shop_room`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_inside_active_shop_room)
+`bool is_inside_active_shop_room(float x, float y, LAYER layer)`<br/>
+Checks whether a coordinate is inside a room containing an active shop. This function checks whether the shopkeeper is still alive.
+### [`is_inside_shop_zone`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_inside_shop_zone)
+`bool is_inside_shop_zone(float x, float y, LAYER layer)`<br/>
+Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
 ### [`waddler_count_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
 `int waddler_count_entity(ENT_TYPE entity_type)`<br/>
 Returns how many of a specific entity type Waddler has stored
@@ -1092,7 +1098,7 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int equipped_backitem`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=equipped_backitem) &ArenaState::equipped_backitem
 - [`ArenaConfigEquippedItems equipped_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=equipped_items) &ArenaState::equipped_items
 - [`int whip_damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=whip_damage) &ArenaState::whip_damage
-- [`int final_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=final_ghost) &ArenaState::final_ghost
+- [`bool final_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=final_ghost) &ArenaState::final_ghost
 - [`int breath_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breath_cooldown) &ArenaState::breath_cooldown
 - [`bool punish_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=punish_ball) &ArenaState::punish_ball
 ### `StateMemory`
@@ -1193,6 +1199,18 @@ Returns animation_frame of the correct ushabti
 - [`ScreenOnlineLobby screen_online_lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_lobby) &GameManager::screen_online_lobby
 - [`PauseUI pause_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) &GameManager::pause_ui
 - [`JournalUI journal_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) &GameManager::journal_ui
+- [`SaveRelated save_related`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) &GameManager::save_related
+### `SaveRelated`
+- [`JournalPopupUI journal_popup_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_popup_ui) &SaveRelated::journal_popup_ui
+### `JournalPopupUI`
+- [`TextureRenderingInfo wiggling_page_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_icon) &JournalPopupUI::wiggling_page_icon
+- [`TextureRenderingInfo black_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black_background) &JournalPopupUI::black_background
+- [`TextureRenderingInfo button_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_icon) &JournalPopupUI::button_icon
+- [`float wiggling_page_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_angle) &JournalPopupUI::wiggling_page_angle
+- [`int chapter_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_to_show) &JournalPopupUI::chapter_to_show
+- [`int entry_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entry_to_show) &JournalPopupUI::entry_to_show
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &JournalPopupUI::timer
+- [`float slide_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=slide_position) &JournalPopupUI::slide_position
 ### `GameProps`
 - [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &GameProps::buttons
 - [`bool game_has_focus`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) &GameProps::game_has_focus
@@ -3162,6 +3180,32 @@ Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 - [`int time_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last) &SaveData::time_last
 - [`array<int, 20> stickers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) &SaveData::stickers
 - [`array<int, 4> players`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) &SaveData::players
+- [`Constellation constellation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation) &SaveData::constellation
+### `Constellation`
+- [`int star_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=star_count) &Constellation::star_count
+- [`array<ConstellationStar, 45> stars`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stars) &Constellation::stars
+- [`float scale`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) &Constellation::scale
+- [`int line_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line_count) &Constellation::line_count
+- [`array<ConstellationLine, 90> lines`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lines) &Constellation::lines
+- [`float line_red_intensity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line_red_intensity) &Constellation::line_red_intensity
+### `ConstellationStar`
+- [`int type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &ConstellationStar::type
+- [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ConstellationStar::x
+- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ConstellationStar::y
+- [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &ConstellationStar::size
+- [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &ConstellationStar::red
+- [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &ConstellationStar::green
+- [`float blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) &ConstellationStar::blue
+- [`float alpha`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alpha) &ConstellationStar::alpha
+- [`float halo_red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_red) &ConstellationStar::halo_red
+- [`float halo_green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_green) &ConstellationStar::halo_green
+- [`float halo_blue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_blue) &ConstellationStar::halo_blue
+- [`float halo_alpha`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_alpha) &ConstellationStar::halo_alpha
+- [`bool canis_ring`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=canis_ring) &ConstellationStar::canis_ring
+- [`bool fidelis_ring`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fidelis_ring) &ConstellationStar::fidelis_ring
+### `ConstellationLine`
+- [`int from`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=from) &ConstellationLine::from
+- [`int to`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=to) &ConstellationLine::to
 ### `CustomSound`
 Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
 It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
@@ -3764,7 +3808,7 @@ Derived from [`Screen`](#screen)
 - [`int visibility`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) &PauseUI::visibility
 ### `JournalUI`
 - [`int state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) &JournalUI::state
-- [`int page_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_shown) &JournalUI::page_shown
+- [`int chapter_shown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_shown) &JournalUI::chapter_shown
 - [`int current_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_page) &JournalUI::current_page
 - [`int flipping_to_page`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipping_to_page) &JournalUI::flipping_to_page
 - [`int max_page_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_page_count) &JournalUI::max_page_count

@@ -464,7 +464,31 @@ void register_usertypes(sol::state& lua)
         "pause_ui",
         &GameManager::pause_ui,
         "journal_ui",
-        &GameManager::journal_ui);
+        &GameManager::journal_ui,
+        "save_related",
+        &GameManager::save_related);
+    lua.new_usertype<SaveRelated>(
+        "SaveRelated",
+        "journal_popup_ui",
+        &SaveRelated::journal_popup_ui);
+    lua.new_usertype<JournalPopupUI>(
+        "JournalPopupUI",
+        "wiggling_page_icon",
+        &JournalPopupUI::wiggling_page_icon,
+        "black_background",
+        &JournalPopupUI::black_background,
+        "button_icon",
+        &JournalPopupUI::button_icon,
+        "wiggling_page_angle",
+        &JournalPopupUI::wiggling_page_angle,
+        "chapter_to_show",
+        &JournalPopupUI::chapter_to_show,
+        "entry_to_show",
+        &JournalPopupUI::entry_to_show,
+        "timer",
+        &JournalPopupUI::timer,
+        "slide_position",
+        &JournalPopupUI::slide_position);
     lua.new_usertype<GameProps>(
         "GameProps",
         "buttons",

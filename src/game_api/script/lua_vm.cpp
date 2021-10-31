@@ -723,6 +723,10 @@ end
     lua["set_explosion_mask"] = set_explosion_mask;
     /// Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
     lua["set_max_rope_length"] = set_max_rope_length;
+    /// Checks whether a coordinate is inside a room containing an active shop. This function checks whether the shopkeeper is still alive.
+    lua["is_inside_active_shop_room"] = is_inside_active_shop_room;
+    /// Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
+    lua["is_inside_shop_zone"] = is_inside_shop_zone;
     /// Returns how many of a specific entity type Waddler has stored
     lua["waddler_count_entity"] = waddler_count_entity;
     /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
