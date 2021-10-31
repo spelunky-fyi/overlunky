@@ -606,6 +606,48 @@ struct LogicList
     size_t unknown27;
 };
 
+struct MysteryLiquid3
+{
+    bool pause_physics;
+    uint8_t padding[3];
+    int32_t physics_tick_timer; /* unsure */
+    int32_t unknown1;
+    int32_t unknown2;
+    int8_t unknown3;
+    int8_t unknown4;
+    int8_t unknown5;
+    int8_t unknown6;
+    int8_t unknown_7;
+    int8_t unknown8;
+    int8_t unknown9;
+    int8_t unknown10;
+    uint32_t unknown11;
+    float unknown12;
+    float blob_size;
+    float weight;
+    float unknown15;
+    uint32_t entity_count;
+    uint32_t allocated_size;
+    uint32_t unk23;
+    size_t unk1;
+    size_t unk2;
+    uint32_t unk3a;
+    uint32_t unk3b;
+    size_t unk41;
+    size_t unk42;
+    size_t unk43;
+    size_t unk44;
+    size_t list;
+    size_t unknown45;
+    size_t unknown46;
+    size_t unknown47;
+    std::pair<float, float>* entity_coordinates;
+    size_t unknown49;
+    size_t unknown50;
+    size_t unknown51;
+    size_t unknown52;
+};
+
 struct LiquidPhysicsParams
 {
     uint8_t unknown1; // anything other than 1 and standing water doesn't visually generate
@@ -638,7 +680,7 @@ struct LiquidPhysicsParams
     uint32_t unknown22;
     float unknown23;
     uint32_t unknown24;
-    size_t unknown25;
+    MysteryLiquid3* unknown25;
     float unknown26;
     float x_right;
     float y_top;
@@ -661,7 +703,18 @@ struct LiquidPhysicsParams
 struct LiquidPhysics
 {
     size_t unknown1;
-    LiquidPhysicsParams pools[4];
+    union
+    {
+        std::array<LiquidPhysicsParams, 5> pools;
+        struct
+        {
+            LiquidPhysicsParams water_physics;
+            LiquidPhysicsParams coarse_water_physics;
+            LiquidPhysicsParams lava_physics;
+            LiquidPhysicsParams stagnant_lava_physics;
+            LiquidPhysicsParams coarse_lava_physics;
+        };
+    };
 };
 
 struct PointerList
