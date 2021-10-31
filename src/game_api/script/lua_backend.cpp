@@ -425,7 +425,7 @@ bool LuaBackend::update()
                 }
                 case ON::SAVE:
                 {
-                    if (g_state->screen != state.screen && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
+                    if (g_state->loading != state.loading && g_state->loading == 1)
                     {
                         handle_function(callback.func, SaveContext{get_root(), get_name()});
                         callback.lastRan = now;
