@@ -29,7 +29,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+Enter**: Spawn entity
       + **Tab**: Add selected item id to list when making a kit
       + **Mouse left**: Spawn entity at mouse cursor (drag to set velocity)
-      + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position)
+      + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position) / Spawn or throw single liquid blob
       + **Mouse right**: Teleport to mouse cursor (drag to set velocity)
       + **Mouse middle**: Select or drag safe entities around
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)

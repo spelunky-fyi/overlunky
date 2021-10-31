@@ -863,6 +863,14 @@ void spawn_entity_over()
             if (!lock_entity)
                 g_last_id = spawned;
         }
+        else
+        {
+            auto cpos = click_position(g_x, g_y);
+            auto mpos = normalize(ImGui::GetMousePos());
+            auto cpos2 = click_position(mpos.x, mpos.y);
+            g_last_id = g_state->next_entity_uid;
+            spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first+0.3f, cpos.second+0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+        }
     }
 }
 
