@@ -522,7 +522,62 @@ void register_usertypes(sol::state& lua)
         "stickers",
         sol::readonly(&SaveData::stickers),
         "players",
-        sol::readonly(&SaveData::players));
+        sol::readonly(&SaveData::players),
+        "constellation",
+        &SaveData::constellation);
+
+    lua.new_usertype<Constellation>(
+        "Constellation",
+        "star_count",
+        &Constellation::star_count,
+        "stars",
+        &Constellation::stars,
+        "scale",
+        &Constellation::scale,
+        "line_count",
+        &Constellation::line_count,
+        "lines",
+        &Constellation::lines,
+        "line_red_intensity",
+        &Constellation::line_red_intensity);
+
+    lua.new_usertype<ConstellationStar>(
+        "ConstellationStar",
+        "type",
+        &ConstellationStar::type,
+        "x",
+        &ConstellationStar::x,
+        "y",
+        &ConstellationStar::y,
+        "size",
+        &ConstellationStar::size,
+        "red",
+        &ConstellationStar::red,
+        "green",
+        &ConstellationStar::green,
+        "blue",
+        &ConstellationStar::blue,
+        "alpha",
+        &ConstellationStar::alpha,
+        "halo_red",
+        &ConstellationStar::halo_red,
+        "halo_green",
+        &ConstellationStar::halo_green,
+        "halo_blue",
+        &ConstellationStar::halo_blue,
+        "halo_alpha",
+        &ConstellationStar::halo_alpha,
+        "canis_ring",
+        &ConstellationStar::canis_ring,
+        "fidelis_ring",
+        &ConstellationStar::fidelis_ring);
+
+    lua.new_usertype<ConstellationLine>(
+        "ConstellationLine",
+        "from",
+        &ConstellationLine::from,
+        "to",
+        &ConstellationLine::to);
 
     lua.create_named_table("LAYER", "FRONT", 0, "BACK", 1, "PLAYER", -1, "PLAYER1", -1, "PLAYER2", -2, "PLAYER3", -3, "PLAYER4", -4, "BOTH", -128);
     lua.create_named_table(

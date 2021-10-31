@@ -3,7 +3,8 @@ add_executable(injector
     cmd_line.cpp
     cmd_line.h
     injector.cpp
-    injector.h)
+    injector.h
+    ${CMAKE_SOURCE_DIR}/res/injector.rc)
 target_link_libraries(injector PRIVATE
     shared
     overlunky_warnings)

@@ -380,42 +380,37 @@ void spawn_tree(float x, float y, LAYER layer)
     }
 }
 
-Entity* spawn_impostor_lake(AABB aabb, LAYER layer, float top_threshold)
+Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold)
 {
-    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
-
-    std::pair<float, float> offset_position;
-    uint8_t actual_layer = enum_to_layer(layer, offset_position);
-
-    aabb.left += offset_position.first;
-    aabb.right += offset_position.first;
-    aabb.top += offset_position.second;
-    aabb.bottom += offset_position.second;
-
-    auto [x, y] = aabb.center();
-
     static auto impostor_lake_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAKE");
-    Entity* impostor_lake = get_entity_ptr(spawn_entity_abs(impostor_lake_id, x, y, (LAYER)actual_layer, 0.0f, 0.0f));
-    setup_impostor_lake(impostor_lake, aabb, top_threshold);
-    return impostor_lake;
+    static auto impostor_lava_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAVA");
+    if (impostor_type == impostor_lake_id || impostor_type == impostor_lava_id)
+    {
+        push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+        OnScopeExit pop{[]
+                        { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+        std::pair<float, float> offset_position;
+        uint8_t actual_layer = enum_to_layer(layer, offset_position);
+
+        aabb.left += offset_position.first;
+        aabb.right += offset_position.first;
+        aabb.top += offset_position.second;
+        aabb.bottom += offset_position.second;
+
+        auto [x, y] = aabb.center();
+
+        Entity* impostor_lake = get_entity_ptr(spawn_entity_abs(impostor_type, x, y, (LAYER)actual_layer, 0.0f, 0.0f));
+        setup_impostor_lake(impostor_lake, aabb, top_threshold);
+        return impostor_lake;
+    }
+
+    return nullptr;
 }
 void setup_impostor_lake(Entity* lake_impostor, AABB aabb, float top_threshold)
 {
-    auto layer = State::get().layer(0);
-    (void)layer;
-
-    using setup_lake_impostor_fun_t = void(Entity*, float half_width, float half_heigth, float);
-    static auto setup_lake_impostor = (setup_lake_impostor_fun_t*)[]()
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
-        auto location = find_inst(exe, "\x0f\x28\xcf\xf3\x0f\x59\xcd\x0f\x2e\xc1\x7a\x02"s, start);
-        return function_start(memory.at_exe(location));
-    }
-    ();
+    using setup_lake_impostor_fun_t = void(Entity*, float half_width, float half_heigth, float top_threshold);
+    static auto setup_lake_impostor = (setup_lake_impostor_fun_t*)get_address("setup_lake_impostor");
     setup_lake_impostor(lake_impostor, aabb.width() / 2.0f, aabb.height() / 2.0f, top_threshold);
 }
 

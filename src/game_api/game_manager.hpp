@@ -3,9 +3,22 @@
 #include "screen_arena.hpp"
 #include "thread_utils.hpp"
 
-struct TmpStruct
+struct JournalPopupUI
+{
+    TextureRenderingInfo wiggling_page_icon;
+    TextureRenderingInfo black_background;
+    TextureRenderingInfo button_icon;
+    float wiggling_page_angle;
+    uint32_t chapter_to_show;
+    uint32_t entry_to_show; // use the odd entry of the left hand page
+    uint32_t timer;
+    float slide_position;
+};
+
+struct SaveRelated
 {
     OnHeapPointer<SaveData> savedata;
+    JournalPopupUI journal_popup_ui;
 };
 
 struct GameProps
@@ -29,7 +42,7 @@ struct GameProps
 struct GameManager
 {
     void* backgroundmusic;
-    TmpStruct* tmp;
+    SaveRelated* save_related;
     uint8_t buttons_controls[MAX_PLAYERS];
     uint8_t buttons_movement[MAX_PLAYERS];
     GameProps* game_props;
@@ -45,11 +58,11 @@ struct GameManager
     ScreenPlayerProfile* screen_player_profile;
     ScreenLeaderboards* screen_leaderboards;
     ScreenSeedInput* screen_seed_input;
-    ScreenCharacterSelect* screen_character_select;
-    size_t unknown_screen_team_select; // available in State
+    size_t unknown_screen_character_select; // available in State
+    size_t unknown_screen_team_select;      // available in State
     ScreenCamp* screen_camp;
     ScreenLevel* screen_level;
-    size_t unknown_screen_transition;    // available in State
+    size_t screen_transition;            // available in State, but it's a different object! this one only has a render_timer
     size_t unknown_screen_death;         // available in State
     size_t unknown_screen_spaceship;     // (also not) available in State
     size_t unknown_screen_win;           // available in State

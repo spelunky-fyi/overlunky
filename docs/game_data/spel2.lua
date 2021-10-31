@@ -280,6 +280,15 @@ Coin = {
 Color = {
   __name = "sol.Color.user"
 }
+Constellation = {
+  __name = "sol.Constellation.user"
+}
+ConstellationLine = {
+  __name = "sol.ConstellationLine.user"
+}
+ConstellationStar = {
+  __name = "sol.ConstellationStar.user"
+}
 Container = {
   __index = "function",
   __name = "sol.Container.user",
@@ -1758,6 +1767,9 @@ Jiangshi = {
   __name = "sol.Jiangshi.user",
   __newindex = "function"
 }
+JournalPopupUI = {
+  __name = "sol.JournalPopupUI.user"
+}
 JournalUI = {
   __name = "sol.JournalUI.user"
 }
@@ -1908,13 +1920,22 @@ Logic = {
   __name = "sol.Logic.user"
 }
 LogicDiceShop = {
-  __name = "sol.LogicDiceShop.user"
+  __index = "function",
+  __name = "sol.LogicDiceShop.user",
+  __newindex = "function"
+}
+LogicList = {
+  __name = "sol.LogicList.user"
 }
 LogicOlmecCutscene = {
-  __name = "sol.LogicOlmecCutscene.user"
+  __index = "function",
+  __name = "sol.LogicOlmecCutscene.user",
+  __newindex = "function"
 }
 LogicTiamatCutscene = {
-  __name = "sol.LogicTiamatCutscene.user"
+  __index = "function",
+  __name = "sol.LogicTiamatCutscene.user",
+  __newindex = "function"
 }
 MASK = {
   ACTIVEFLOOR = 128,
@@ -2069,9 +2090,11 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
+  SPEECH_BUBBLE = 122,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
+  TOAST = 123,
   TRANSITION = 13,
   WIN = 16
 }
@@ -2925,6 +2948,9 @@ SaveContext = {
 }
 SaveData = {
   __name = "sol.SaveData.user"
+}
+SaveRelated = {
+  __name = "sol.SaveRelated.user"
 }
 Scarab = {
   __index = "function",
@@ -4851,6 +4877,8 @@ YetiQueen = {
   __name = "sol.YetiQueen.user",
   __newindex = "function"
 }
+add_custom_name = function(...) end
+add_string = function(...) end
 apply_entity_db = function(...) end
 attach_ball_and_chain = function(...) end
 attach_entity = function(...) end
@@ -4858,7 +4886,9 @@ cancel_speechbubble = function(...) end
 cancel_toast = function(...) end
 carry = function(...) end
 cast_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n        function cast_entity(entity_raw)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_u...Çç\1\0\4ë<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\14\1\0\2\14\1\2\3å\0\1\2ºÄ\0\0008\2\0Ä\0\1\1\0Ä\1\0\0E\1\2\0F\1\0\0008\0\0ÄH\0\2\0G\1\1\0Ñ\0\4âTYPE_MAP\4Ötype\4ÉidÅ\0\0\0Äë\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2ÄÇãentity_rawÄëâcast_funàëÅÖ_ENV",'@serialized'))
+change_string = function(...) end
 clear_callback = function(...) end
+clear_custom_name = function(...) end
 clear_entity_callback = function(...) end
 clear_screen_callback = function(...) end
 clear_vanilla_sound_callback = function(...) end
@@ -4893,6 +4923,7 @@ filter_entities = function(...) end
 flip_entity = function(...) end
 force_co_subtheme = function(...) end
 force_dark_level = function(...) end
+force_olmec_phase_0 = function(...) end
 game_manager = {}
 game_position = function(...) end
 generate_particles = function(...) end
@@ -4936,6 +4967,7 @@ get_room_template_name = function(...) end
 get_short_tile_code = function(...) end
 get_short_tile_code_definition = function(...) end
 get_sound = function(...) end
+get_string = function(...) end
 get_texture_definition = function(...) end
 get_type = function(...) end
 get_velocity = function(...) end
@@ -4943,6 +4975,7 @@ get_window_size = function(...) end
 get_zoom_level = function(...) end
 god = function(...) end
 god_companions = function(...) end
+hash_to_stringid = function(...) end
 inspect = {
   KEY = {},
   METATABLE = {},
@@ -4969,6 +5002,8 @@ io = {
   write = "function"
 }
 is_character_female = function(...) end
+is_inside_active_shop_room = function(...) end
+is_inside_shop_zone = function(...) end
 is_room_flipped = function(...) end
 json = {
   _version = "0.1.2",
@@ -4985,6 +5020,7 @@ messpect = function(...) end
 modify_sparktraps = function(...) end
 mouse_position = function(...) end
 move_entity = function(...) end
+move_liquid = function(...) end
 online = {}
 options = {}
 os = {

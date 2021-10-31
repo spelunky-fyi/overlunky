@@ -74,8 +74,8 @@ class ScreenTitle : public Screen // ID: 3
 
 struct SpearDanglerAnimFrames
 {
-    uint32_t anim_frame_1;
-    uint32_t anim_frame_2;
+    uint32_t column;
+    uint32_t row;
 };
 
 class ScreenMenu : public Screen // ID: 4
@@ -105,51 +105,47 @@ class ScreenMenu : public Screen // ID: 4
     TextureRenderingInfo spear_dangler_related;
     TextureRenderingInfo play_scroll;
     TextureRenderingInfo info_toast;
+    TextureRenderingInfo unknown15;
 
-    size_t cthulhu_animation;
-    size_t unknown15;
-    size_t unknown16;
-
-    float cthulhu_disc_ring_angle;
-    float cthulhu_disc_split_progress;
-    float cthulhu_disc_y;
-    float cthulhu_timer;
-
+    uint32_t unknown16a;
+    uint32_t unknown16b;
+    uint32_t unknown16c;
+    uint32_t unknown16d;
+    size_t unknown16e;
+    size_t unknown16f;
+    float unknown16g;
+    float unknown16h;
+    float unknown16i;
+    uint32_t unknown16j;
+    size_t unknown16k;
     size_t unknown17;
     size_t unknown18;
     size_t unknown19;
     size_t unknown20;
     size_t unknown21;
     size_t unknown22;
-    size_t unknown23;
-
-    uint32_t selected_menu_index;
-
+    size_t buttons;
+    uint32_t unknown23;
     uint32_t unknown24;
-    uint32_t unknown25;
-    uint8_t unknown26;
-    uint8_t unknown27;
-    uint8_t unknown28;
-    uint8_t unknown29;
-
-    bool show_toast_text;
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    bool unknown30;
-    uint8_t padding4;
-    uint8_t padding5;
-    uint8_t padding6;
-
+    uint32_t selected_menu_index;
+    uint32_t unknown26;
+    uint32_t unknown27;
+    uint32_t unknown28;
+    uint32_t unknown29a;
+    uint32_t unknown29b;
     float menu_text_opacity;
-
     std::array<float, 6> spear_position;
     std::array<SpearDanglerAnimFrames, 6> spear_dangler;
-    std::array<uint32_t, 6> spear_unknown1;
-    std::array<uint32_t, 6> spear_unknown2;
+    std::array<uint32_t, 6> spear_dangle_momentum;
+    std::array<uint32_t, 6> spear_dangle_angle;
 
     float play_scroll_descend_timer;
     STRINGID scroll_text;
+
+    float cthulhu_disc_ring_angle;
+    float cthulhu_disc_split_progress;
+    float cthulhu_disc_y;
+    float cthulhu_timer;
 };
 
 class ScreenOptions : public Screen // ID: 5
@@ -814,7 +810,7 @@ struct PauseUI
 struct JournalUI
 {
     uint32_t state;
-    uint8_t page_shown;
+    uint8_t chapter_shown;
 
     uint8_t unknown1;
     uint16_t unknown2;

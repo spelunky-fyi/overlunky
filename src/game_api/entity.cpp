@@ -260,6 +260,10 @@ std::pair<float, float> Entity::position_render() const
         auto [rx_pos, ry_pos] = overlay->position_render();
         return {rx_pos + x_pos, ry_pos + y_pos};
     }
+    if (rendering_info == nullptr)
+    {
+        return position_self();
+    }
     return {rendering_info->x, rendering_info->y};
 }
 

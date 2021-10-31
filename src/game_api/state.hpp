@@ -125,6 +125,7 @@ struct StateMemory
 
     // screen pointers below are most likely in an array and indexed through the screen ID (-10), hence the nullptrs for
     // screens that are available in GameManager
+    ScreenCharacterSelect* screen_character_select;
     ScreenTeamSelect* screen_team_select;
     ScreenCamp* screen_camp;
     ScreenLevel* screen_level;
@@ -154,7 +155,7 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    Logic* logic;
+    LogicList* logic;
     QuestsInfo* quests;
     AITarget* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;

@@ -395,6 +395,8 @@ void register_usertypes(sol::state& lua)
         &StateMemory::camera_layer,
         "screen_team_select",
         &StateMemory::screen_team_select,
+        "screen_character_select",
+        &StateMemory::screen_character_select,
         "screen_transition",
         &StateMemory::screen_transition,
         "screen_death",
@@ -451,8 +453,6 @@ void register_usertypes(sol::state& lua)
         &GameManager::screen_leaderboards,
         "screen_seed_input",
         &GameManager::screen_seed_input,
-        "screen_character_select",
-        &GameManager::screen_character_select,
         "screen_camp",
         &GameManager::screen_camp,
         "screen_level",
@@ -464,7 +464,31 @@ void register_usertypes(sol::state& lua)
         "pause_ui",
         &GameManager::pause_ui,
         "journal_ui",
-        &GameManager::journal_ui);
+        &GameManager::journal_ui,
+        "save_related",
+        &GameManager::save_related);
+    lua.new_usertype<SaveRelated>(
+        "SaveRelated",
+        "journal_popup_ui",
+        &SaveRelated::journal_popup_ui);
+    lua.new_usertype<JournalPopupUI>(
+        "JournalPopupUI",
+        "wiggling_page_icon",
+        &JournalPopupUI::wiggling_page_icon,
+        "black_background",
+        &JournalPopupUI::black_background,
+        "button_icon",
+        &JournalPopupUI::button_icon,
+        "wiggling_page_angle",
+        &JournalPopupUI::wiggling_page_angle,
+        "chapter_to_show",
+        &JournalPopupUI::chapter_to_show,
+        "entry_to_show",
+        &JournalPopupUI::entry_to_show,
+        "timer",
+        &JournalPopupUI::timer,
+        "slide_position",
+        &JournalPopupUI::slide_position);
     lua.new_usertype<GameProps>(
         "GameProps",
         "buttons",
@@ -573,14 +597,16 @@ void register_usertypes(sol::state& lua)
         &OnlineLobby::code,
         "get_code",
         &OnlineLobby::get_code);
-    lua.new_usertype<Logic>(
-        "Logic",
+    lua.new_usertype<LogicList>(
+        "LogicList",
         "olmec_cutscene",
-        &Logic::olmec_cutscene,
+        &LogicList::olmec_cutscene,
         "tiamat_cutscene",
-        &Logic::tiamat_cutscene,
+        &LogicList::tiamat_cutscene,
         "diceshop",
-        &Logic::diceshop);
+        &LogicList::diceshop);
+    lua.new_usertype<Logic>(
+        "Logic");
     lua.new_usertype<LogicOlmecCutscene>(
         "LogicOlmecCutscene",
         "olmec",
@@ -590,7 +616,9 @@ void register_usertypes(sol::state& lua)
         "cinematic_anchor",
         &LogicOlmecCutscene::cinematic_anchor,
         "timer",
-        &LogicOlmecCutscene::timer);
+        &LogicOlmecCutscene::timer,
+        sol::base_classes,
+        sol::bases<Logic>());
     lua.new_usertype<LogicTiamatCutscene>(
         "LogicTiamatCutscene",
         "tiamat",
@@ -600,7 +628,9 @@ void register_usertypes(sol::state& lua)
         "cinematic_anchor",
         &LogicTiamatCutscene::cinematic_anchor,
         "timer",
-        &LogicTiamatCutscene::timer);
+        &LogicTiamatCutscene::timer,
+        sol::base_classes,
+        sol::bases<Logic>());
     lua.new_usertype<LogicDiceShop>(
         "LogicDiceShop",
         "bet_machine",
@@ -630,7 +660,9 @@ void register_usertypes(sol::state& lua)
         "won_prizes_count",
         &LogicDiceShop::won_prizes_count,
         "balance",
-        &LogicDiceShop::balance);
+        &LogicDiceShop::balance,
+        sol::base_classes,
+        sol::bases<Logic>());
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 

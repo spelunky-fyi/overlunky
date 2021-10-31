@@ -10,6 +10,7 @@
 #include "search.hpp"
 #include "state.hpp"
 #include "ui.hpp"
+#include "version.hpp"
 #include "window_api.hpp"
 
 using namespace std::chrono_literals;
@@ -58,6 +59,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     }
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
+    register_application_version(fmt::format("Overlunky {}", get_version()));
     preload_addresses();
 
     while (true)

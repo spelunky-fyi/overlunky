@@ -361,36 +361,67 @@ struct ArenaState
     int8_t equipped_backitem;
     ArenaConfigEquippedItems equipped_items;
     uint8_t whip_damage;
-    uint8_t final_ghost;
+    bool final_ghost;
     uint8_t breath_cooldown;
     bool punish_ball;
 };
 
-struct LogicOuroboros
+class Logic
 {
-    size_t __vftable;
+  public:
     uint32_t unknown1;
     uint32_t unknown2;
-    size_t unknown3; // sound related?
-    uint16_t timer;
+
+    virtual ~Logic() = 0;
+
+    // Continuously performs the main functionality of the logic instance
+    // Ouroboros : transitions to level when music finished
+    // Basecamp speedrun: keep track of time, player position passing official
+    // Level: spawns ghost when time is up (checks cursed for earlier ghost)
+    // Dice shop: runs the logic of the dice shop
+    // Tun pre challenge: unknown
+    // Moon challenge: handles waitroom forcefields + tracks mattock breakage
+    // Star challenge: handles waitroom forcefields + tracks torches/timer
+    // Sun challenge: handles waitroom forcefields + tracks timer
+    // Volcana/Lava: spawns magmamen at random (and does other things)
+    // Water: unknown
+    // Olmec cutscene: runs the cutscene
+    // Tiamat cutscene: runs the cutscene
+    // Apep trigger: tracks player position, spawns APEP_HEAD
+    // Duat bosses trigger: tracks player position, spawns ANUBIS2 and OSIRIS_HEAD
+    // Tiamat: spawns bubbles
+    // Tusk pleasure palace: triggers aggro on everyone when non-high roller enters door
+    // Discovery: shows the toast
+    // Black market: lifts camera bounds restrictions
+    // Cosmic ocean: spawns jelly when time is up
+    // Arena 1: handles crate spawning
+    // Arena 3: handles death mist
+    virtual void perform() = 0;
 };
 
-struct LogicBasecampSpeedrun
+class LogicOuroboros : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
+    size_t unknown3; // sound related?
+    uint16_t timer;
+
+    virtual ~LogicOuroboros() = 0;
+};
+
+class LogicBasecampSpeedrun : public Logic
+{
+  public:
     uint32_t official; // entity uid of the character that keeps the time
     uint32_t crate;    // entity uid; you must break this crate for the run to be valid, otherwise you're cheating
     uint32_t unknown3;
     uint32_t unknown4;
+
+    virtual ~LogicBasecampSpeedrun() = 0;
 };
 
-struct LogicDiceShop
+class LogicDiceShop : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t boss; // entity uid; either tusk or the shopkeeper
     uint32_t unknown4;
     uint32_t bet_machine; // entity uid
@@ -411,13 +442,13 @@ struct LogicDiceShop
     uint8_t unknown15;
     uint8_t unknown16;
     uint32_t balance; // cash balance of all the games
+
+    virtual ~LogicDiceShop() = 0;
 };
 
-struct LogicMoonChallenge
+class LogicMoonChallenge : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
     uint32_t floor_challenge_entrance_uid;
@@ -428,13 +459,13 @@ struct LogicMoonChallenge
     uint16_t unknown8a;
     uint16_t unknown8b;
     uint32_t mattock; // entity uid
+
+    virtual ~LogicMoonChallenge() = 0;
 };
 
-struct LogicStarChallenge
+class LogicStarChallenge : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
     uint32_t floor_challenge_entrance_uid;
@@ -447,13 +478,13 @@ struct LogicStarChallenge
     size_t one_after_last_torch; // this appears to be the address after the last torch, like an end iterator
     size_t unknown9;
     uint32_t start_countdown;
+
+    virtual ~LogicStarChallenge() = 0;
 };
 
-struct LogicSunChallenge
+class LogicSunChallenge : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
     uint32_t floor_challenge_entrance_uid;
@@ -463,16 +494,13 @@ struct LogicSunChallenge
     uint16_t unknown7;
     uint32_t unknown8;
     uint8_t start_countdown;
+
+    virtual ~LogicSunChallenge() = 0;
 };
 
-struct LogicOlmecCutscene
+class LogicOlmecCutscene : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint8_t unknown2;
-    uint8_t unknown3;
-    uint8_t unknown4;
-    uint8_t unknown5;
+  public:
     uint8_t unknown6a;
     uint8_t unknown6b;
     uint8_t unknown6c;
@@ -486,13 +514,13 @@ struct LogicOlmecCutscene
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
+
+    virtual ~LogicOlmecCutscene() = 0;
 };
 
-struct LogicTiamatCutscene
+class LogicTiamatCutscene : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
     Entity* tiamat;
@@ -502,13 +530,13 @@ struct LogicTiamatCutscene
     int32_t unknown5;
     uint32_t unknown6;
     uint32_t unknown7;
+
+    virtual ~LogicTiamatCutscene() = 0;
 };
 
-struct LogicApepTrigger
+class LogicApepTrigger : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t spawn_cooldown;
     bool cooling_down;
     bool unknown4b;
@@ -516,35 +544,37 @@ struct LogicApepTrigger
     uint32_t unknown4d;
     uint32_t unknown5;
     uint32_t unknown6;
+
+    virtual ~LogicApepTrigger() = 0;
 };
 
-struct LogicDuatBossesTrigger
+class LogicDuatBossesTrigger : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1; // change this and really weird things happen
+  public:
+    virtual ~LogicDuatBossesTrigger() = 0;
 };
 
-struct LogicTuskPleasurePalace
+class LogicTuskPleasurePalace : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t locked_door; // entity uid
     uint32_t unknown4;
+
+    virtual ~LogicTuskPleasurePalace() = 0;
 };
 
-struct LogicArena1
+class LogicArena1 : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t crate_spawn_timer;
     uint32_t unknown4;
     uint32_t unknown5;
     uint32_t unknown6;
+
+    virtual ~LogicArena1() = 0;
 };
 
-struct Logic
+struct LogicList
 {
     uint64_t unknown1;
     LogicOuroboros* ouroboros;
@@ -558,7 +588,7 @@ struct Logic
     LogicStarChallenge* tun_star_challenge;
     LogicSunChallenge* tun_sun_challenge;
     size_t volcana_related;
-    size_t tiamat_camp_abzu_hundun_eggplant_world_related;
+    size_t water_related;
     LogicOlmecCutscene* olmec_cutscene;
     LogicTiamatCutscene* tiamat_cutscene;
     LogicApepTrigger* apep_trigger;
@@ -567,13 +597,55 @@ struct Logic
     size_t unknown17;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
     size_t discovery_info; // black market, vlad, wet fur discovery; shows the toast
-    size_t black_market_door;
+    size_t black_market;
     size_t cosmic_ocean;
     LogicArena1* arena_1;
     size_t arena_2;
     size_t arena_3;
     size_t unknown26;
     size_t unknown27;
+};
+
+struct MysteryLiquid3
+{
+    bool pause_physics;
+    uint8_t padding[3];
+    int32_t physics_tick_timer; /* unsure */
+    int32_t unknown1;
+    int32_t unknown2;
+    int8_t unknown3;
+    int8_t unknown4;
+    int8_t unknown5;
+    int8_t unknown6;
+    int8_t unknown_7;
+    int8_t unknown8;
+    int8_t unknown9;
+    int8_t unknown10;
+    uint32_t unknown11;
+    float unknown12;
+    float blob_size;
+    float weight;
+    float unknown15;
+    uint32_t entity_count;
+    uint32_t allocated_size;
+    uint32_t unk23;
+    size_t unk1;
+    size_t unk2;
+    uint32_t unk3a;
+    uint32_t unk3b;
+    size_t unk41;
+    size_t unk42;
+    size_t unk43;
+    size_t unk44;
+    size_t list;
+    size_t unknown45;
+    size_t unknown46;
+    size_t unknown47;
+    std::pair<float, float>* entity_coordinates;
+    size_t unknown49;
+    std::pair<float, float>* entity_velocities;
+    size_t unknown51;
+    size_t unknown52;
 };
 
 struct LiquidPhysicsParams
@@ -605,7 +677,7 @@ struct LiquidPhysicsParams
     uint32_t unknown22;
     float unknown23;
     uint32_t unknown24;
-    size_t unknown25;      // MysteryLiquidPointer3 in plugin | resets each level
+    MysteryLiquid3* unknown25;      // MysteryLiquidPointer3 in plugin | resets each level
     uint32_t liquid_flags; // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
     float last_spawn_x;
     float last_spawn_y;
@@ -627,11 +699,18 @@ struct LiquidPhysicsParams
 struct LiquidPhysics
 {
     size_t unknown1;
-    LiquidPhysicsParams water_physics;
-    LiquidPhysicsParams coarse_water_physics;
-    LiquidPhysicsParams lava_physics;
-    LiquidPhysicsParams stagnant_lava_physics;
-    LiquidPhysicsParams coarse_lava_physics;
+    union
+    {
+        std::array<LiquidPhysicsParams, 5> pools;
+        struct
+        {
+            LiquidPhysicsParams water_physics;
+            LiquidPhysicsParams coarse_water_physics;
+            LiquidPhysicsParams lava_physics;
+            LiquidPhysicsParams stagnant_lava_physics;
+            LiquidPhysicsParams coarse_lava_physics;
+        };
+    };
 };
 
 struct PointerList
@@ -756,8 +835,6 @@ struct Dialogue
     uint32_t unknown16;
     uint32_t unknown17;
     uint32_t unknown18;
-    uint32_t unknown19;
-    uint32_t unknown20;
 };
 
 struct SelectPlayerSlot
