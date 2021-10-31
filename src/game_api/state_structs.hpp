@@ -712,8 +712,8 @@ struct LiquidPhysics
             LiquidPhysicsParams water_physics;
             LiquidPhysicsParams coarse_water_physics;
             LiquidPhysicsParams lava_physics;
-            LiquidPhysicsParams stagnant_lava_physics;
             LiquidPhysicsParams coarse_lava_physics;
+            LiquidPhysicsParams stagnant_lava_physics;
         };
     };
 };
