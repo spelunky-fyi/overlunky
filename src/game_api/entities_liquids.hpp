@@ -2,22 +2,13 @@
 
 #include "entity.hpp"
 
-class MysteryLiquid1
-{
-  public:
-    size_t prev; // points to the previos element in this ... array?
-    /* MysteryLiquid2* */ size_t unknown;
-    int32_t liquid_id;
-    int32_t unknown4; // garbage?
-};
-
 class Liquid : public Entity
 {
   public:
     Entity* fx_surface;
     float x_pos;
     float y_pos;
-    MysteryLiquid1* unknown1;
+    std::list<int32_t>::const_iterator liquid_id; // the id's change all the time, but the iterator is static
     uint16_t unknown_readonly1;
     uint16_t unknown_readonly2;
     uint8_t unknown_timer1;

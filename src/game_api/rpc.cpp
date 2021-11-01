@@ -274,13 +274,13 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
         auto liquid = entity->as<Liquid>();
         if (coords != nullptr)
         {
-            std::pair<float, float>* c = &(coords[liquid->unknown1->liquid_id]);
+            std::pair<float, float>* c = &(coords[*liquid->liquid_id]);
             c->first = x;
             c->second = y;
         }
         if (velocities != nullptr)
         {
-            std::pair<float, float>* v = &(velocities[liquid->unknown1->liquid_id]);
+            std::pair<float, float>* v = &(velocities[*liquid->liquid_id]);
             v->first = vx;
             v->second = vy;
         }
