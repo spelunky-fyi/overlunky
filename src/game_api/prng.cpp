@@ -15,6 +15,28 @@ PRNG& PRNG::get_local()
     return *prng;
 }
 
+void PRNG::seed(int64_t seed)
+{
+    auto next_pair = [useed = static_cast<uint64_t>(seed)]() mutable
+    {
+        // advance state
+        useed = (uint64_t((useed & 0xffffffff) == 0) - (useed & 0xffffffff)) * -0x61939c2f98956567;
+        useed = (((useed >> 0x1c) ^ useed) >> 0x17) ^ useed;
+
+        // generate next pair
+        PRNG::prng_pair useed_pair;
+        useed_pair.first = useed * -0x61939c2f98956567;
+        useed_pair.second = (useed * -0x7cc4ab2b38000000 | useed_pair.first >> 0x25) * -0x61939c2f98956567;
+        useed_pair.first = (useed_pair.first >> 0x1c ^ useed_pair.first) >> 0x17 ^ useed_pair.first;
+        return useed_pair;
+    };
+
+    for (auto& pair : pairs)
+    {
+        pair = next_pair();
+    }
+}
+
 PRNG::prng_pair PRNG::get_and_advance(PRNG_CLASS type)
 {
     prng_pair& pair = pairs[type];
@@ -45,14 +67,14 @@ std::optional<std::int64_t> PRNG::internal_random_int(std::int64_t min, std::int
         return std::nullopt;
     }
 
-    static auto wrap = [](std::int64_t val, std::int64_t min, std::int64_t max)
+    static auto wrap = [](std::int64_t val, std::int64_t _min, std::int64_t _max)
     {
-        const auto diff = max - min;
+        const auto diff = _max - _min;
 
-        if (val < min)
-            val += diff * ((min - val) / diff + 1);
+        if (val < _min)
+            val += diff * ((_min - val) / diff + 1);
 
-        return min + (val - min) % diff;
+        return _min + (val - _min) % diff;
     };
 
     prng_pair pair = get_and_advance(type);
@@ -83,4 +105,20 @@ std::optional<std::int64_t> PRNG::random_int(std::int64_t min, std::int64_t max,
         return internal_random_int(min, max + 1, type);
     }
     return std::nullopt;
+}
+std::pair<int64_t, int64_t> PRNG::get_pair(size_t index)
+{
+    if (index >= 1 && index <= 10)
+    {
+        return pairs[index - 1];
+    }
+    return {0, 0};
+}
+void PRNG::set_pair(size_t index, int64_t first, int64_t second)
+{
+    if (index >= 1 && index <= 10)
+    {
+        pairs[index - 1].first = first;
+        pairs[index - 1].second = second;
+    }
 }

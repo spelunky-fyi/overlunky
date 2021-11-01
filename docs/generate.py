@@ -10,8 +10,10 @@ header_files = [
     "../src/game_api/rpc.hpp",
     "../src/game_api/spawn_api.hpp",
     "../src/game_api/script.hpp",
+    "../src/game_api/color.hpp",
     "../src/game_api/entity.hpp",
     "../src/game_api/movable.hpp",
+    "../src/game_api/game_manager.hpp",
     "../src/game_api/state.hpp",
     "../src/game_api/state_structs.hpp",
     "../src/game_api/prng.hpp",
@@ -23,14 +25,23 @@ header_files = [
     "../src/game_api/entities_items.hpp",
     "../src/game_api/entities_fx.hpp",
     "../src/game_api/entities_liquids.hpp",
+    "../src/game_api/entities_backgrounds.hpp",
+    "../src/game_api/entities_decorations.hpp",
+    "../src/game_api/entities_logical.hpp",
     "../src/game_api/sound_manager.hpp",
     "../src/game_api/render_api.hpp",
     "../src/game_api/particles.hpp",
     "../src/game_api/savedata.hpp",
     "../src/game_api/level_api.hpp",
+    "../src/game_api/level_api_types.hpp",
     "../src/game_api/items.hpp",
+    "../src/game_api/screen.hpp",
+    "../src/game_api/screen_arena.hpp",
+    "../src/game_api/online.hpp",
+    "../src/game_api/strings.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/save_context.hpp",
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
 ]
@@ -53,17 +64,24 @@ api_files = [
     "../src/game_api/script/usertypes/entities_items_lua.cpp",
     "../src/game_api/script/usertypes/entities_fx_lua.cpp",
     "../src/game_api/script/usertypes/entities_liquids_lua.cpp",
+    "../src/game_api/script/usertypes/entities_backgrounds_lua.cpp",
+    "../src/game_api/script/usertypes/entities_decorations_lua.cpp",
+    "../src/game_api/script/usertypes/entities_logical_lua.cpp",
     "../src/game_api/script/usertypes/particles_lua.cpp",
     "../src/game_api/script/usertypes/level_lua.cpp",
     "../src/game_api/script/usertypes/sound_lua.cpp",
     "../src/game_api/script/usertypes/player_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.cpp",
+    "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/drops_lua.cpp",
     "../src/game_api/script/usertypes/texture_lua.cpp",
     "../src/game_api/script/usertypes/flags_lua.cpp",
     "../src/game_api/script/usertypes/char_state_lua.cpp",
     "../src/game_api/script/usertypes/hitbox_lua.cpp",
+    "../src/game_api/script/usertypes/screen_lua.cpp",
+    "../src/game_api/script/usertypes/screen_arena_lua.cpp",
 ]
 rpc = []
 classes = []
@@ -89,14 +107,26 @@ replace = {
     "const char*": "string",
     "wstring": "string",
     "u16string": "string",
+    "char16_t": "string",
     "pair": "tuple",
     "std::": "",
     "sol::": "",
     "void": "",
+    "constexpr": "",
+    "static": "",
     "variadic_args va": "int, int...",
 }
 comment = []
-not_functions = ["players", "state", "savegame", "options", "meta", "prng"]
+not_functions = [
+    "players",
+    "state",
+    "game_manager",
+    "online",
+    "savegame",
+    "options",
+    "meta",
+    "prng",
+]
 skip = False
 
 
@@ -117,6 +147,11 @@ def rpcfunc(name):
 
 def replace_all(text, dic):
     for i, j in dic.items():
+        pos = text.find(i)
+        br2 = text.find('`', pos + len(i))
+        br1 = text.rfind('`', 0, pos)
+        if pos > 0 and br1 >= 0 and br2 > 0:
+            continue
         text = text.replace(i, j)
     return text
 
@@ -203,19 +238,28 @@ for file in header_files:
                 if m:
                     comment.append(m[1])
                 else:
+                    m = re.search(
+                        r"^\s*:.*$", line
+                    )  # skip lines that start with a colon (constructor parameter initialization)
+                    if m:
+                        continue
+
                     m = re.search(r"\s*(virtual\s)?(.*)\s+([^\(]*)\(([^\)]*)", line)
                     if m:
                         name = m[3]
-                        if name not in member_funs:
-                            member_funs[name] = []
-                        member_funs[name].append(
-                            {
-                                "return": m[2],
-                                "name": m[3],
-                                "param": m[4],
-                                "comment": comment,
-                            }
-                        )
+                        # move ctor is useless for Lua
+                        is_move_ctr = re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4]) and not m[2]
+                        if not is_move_ctr:
+                            if name not in member_funs:
+                                member_funs[name] = []
+                            member_funs[name].append(
+                                {
+                                    "return": m[2],
+                                    "name": m[3],
+                                    "param": m[4],
+                                    "comment": comment,
+                                }
+                            )
                         comment = []
 
                     m = re.search(
@@ -314,11 +358,27 @@ for file in api_files:
             if var[1].startswith("sol::readonly"):
                 var[1] = var[1].replace("sol::readonly(", "")
                 var[1] = var[1][:-1]
+            if var[1].startswith("std::move"):
+                var[1] = var[1].replace("std::move(", "")
+                var[1] = var[1][:-1]
 
             var_name = var[0]
             cpp = var[1]
             cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
-            if cpp_name in underlying_cpp_type["member_funs"]:
+
+            if var[0].startswith("sol::constructors"):
+                for fun in underlying_cpp_type["member_funs"][cpp_type]:
+                    param = fun["param"]
+                    sig = f"{cpp_type}({param})"
+                    vars.append(
+                        {
+                            "name": cpp_type,
+                            "type": "",
+                            "signature": sig,
+                            "comment": fun["comment"],
+                        }
+                    )
+            elif cpp_name in underlying_cpp_type["member_funs"]:
                 for fun in underlying_cpp_type["member_funs"][cpp_name]:
                     ret = fun["return"]
                     param = fun["param"]
@@ -486,15 +546,14 @@ for file in api_files:
         for lib in libs:
             lualibs.append(lib.replace("sol::lib::", ""))
 
-for file in api_files:
-    data = open(file, "r").read().split("\n")
-    for line in data:
-        if not line.endswith("NoAlias"):
-            m = re.search(r"using\s*(\S*)\s*=\s*(\S*)", line)
-            if m:
-                name = m.group(1)
-                type = replace_all(m.group(2), replace)
-                aliases.append({"name": name, "type": type})
+data = open("../src/game_api/aliases.hpp", "r").read().split("\n")
+for line in data:
+    if not line.endswith("NoAlias"):
+        m = re.search(r"using\s*(\S*)\s*=\s*(\S*)", line)
+        if m:
+            name = m.group(1)
+            type = replace_all(m.group(2), replace)
+            aliases.append({"name": name, "type": type})
 
 print("# Overlunky Lua API")
 print(
@@ -611,27 +670,6 @@ for lf in funcs:
         for com in lf["comment"]:
             print(com)
 
-print("## Event functions")
-print(
-    """Define these in your script to be called on an event. For example:
-```lua
-function on_level()
-    toast("Welcome to the level")
-end
-```"""
-)
-for lf in events:
-    if lf["name"].startswith("on_"):
-        print(
-            "### [`"
-            + lf["name"]
-            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
-            + lf["name"]
-            + ")"
-        )
-        for com in lf["comment"]:
-            print(com)
-
 deprecated_funcs = [
     func for func in funcs if func["comment"] and func["comment"][0] == "Deprecated"
 ]
@@ -674,6 +712,19 @@ print("## Deprecated Functions")
 print(
     "#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!"
 )
+
+for lf in events:
+    if lf["name"].startswith("on_"):
+        print(
+            "### [`"
+            + lf["name"]
+            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
+            + lf["name"]
+            + ")"
+        )
+        for com in lf["comment"]:
+            print(com)
+
 for lf in deprecated_funcs:
     lf["comment"].pop(0)
     if len(rpcfunc(lf["cpp"])):
@@ -709,11 +760,11 @@ print(
 -- It's just a weird example OK!
 ids = get_entities_by_mask(MASK.PLAYER) -- This just covers CHARs
 for i,id in ipairs(ids) do
-    e = get_entity(id):as_player() -- cast Entity to Player to access inventory
-    e.health = 99
-    e.inventory.bombs = 99
-    e.inventory.ropes = 99
-    e.type.jump = 0.36
+    e = get_entity(id)     -- casts Entity to Player automatically
+    e.health = 99          -- setting Player::health
+    e.inventory.bombs = 99 -- setting Inventory::bombs
+    e.inventory.ropes = 99 -- setting Inventory::ropes
+    e.type.jump = 0.36     -- setting EntityDB::jump
 end
 ```"""
 )

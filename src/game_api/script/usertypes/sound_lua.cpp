@@ -9,6 +9,12 @@ namespace NSound
 {
 void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 {
+    if (sound_manager == nullptr || !sound_manager->is_init())
+    {
+        DEBUG("Audio API is not available!");
+        return;
+    }
+
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
     {
@@ -39,7 +45,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
     /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
     /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
-    /// properties on the sound. Otherwise you may cause a deadlock.
+    /// properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
     lua["set_vanilla_sound_callback"] = [](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
@@ -47,7 +53,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         {
             std::lock_guard gil_guard{backend->gil};
             if (backend->get_enabled())
-                backend->handle_function(cb, sound);
+                backend->handle_function(cb, std::make_unique<PlayingSound>(sound));
         };
         std::uint32_t id = backend->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
         backend->vanilla_sound_callbacks.push_back(id);
@@ -65,18 +71,26 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         }
     };
 
-    auto play = sol::overload(
-        static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
-        static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
-        static_cast<PlayingSound (CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
-    /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
-    /// It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
-    lua.new_usertype<CustomSound>("CustomSound", "play", play, "get_parameters", &CustomSound::get_parameters);
-    /* CustomSound
-        PlayingSound play(bool start_paused, SOUND_TYPE sound_type)
-        map<VANILLA_SOUND_PARAM,string> get_parameters()
-        */
-    auto sound_set_callback = [](PlayingSound* sound, sol::function callback)
+    {
+        auto play = sol::overload(
+            static_cast<PlayingSound (CustomSound::*)()>(&CustomSound::play),
+            static_cast<PlayingSound (CustomSound::*)(bool)>(&CustomSound::play),
+            static_cast<PlayingSound (CustomSound::*)(bool, SOUND_TYPE)>(&CustomSound::play));
+        auto get_parameters = [](CustomSound& self)
+        {
+            return sol::as_table(self.get_parameters());
+        };
+        /// Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
+        /// It is up to you to not release this as long as any sounds returned by `CustomSound:play()` are still playing
+        lua.new_usertype<CustomSound>(
+            "CustomSound",
+            "play",
+            play,
+            "get_parameters",
+            get_parameters);
+    }
+
+    auto set_callback = [](PlayingSound* sound, sol::function callback)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         auto safe_cb = [backend, callback = std::move(callback)]()
@@ -86,6 +100,10 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
                 backend->handle_function(callback);
         };
         sound->set_callback(std::move(safe_cb));
+    };
+    auto get_parameters = [](PlayingSound& self)
+    {
+        return sol::as_table(self.get_parameters());
     };
     /// Handle to a playing sound, start the sound paused to make sure you can apply changes before playing it
     /// You can just discard this handle if you do not need extended control anymore
@@ -108,27 +126,13 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "set_looping",
         &PlayingSound::set_looping,
         "set_callback",
-        std::move(sound_set_callback),
+        std::move(set_callback),
         "get_parameters",
-        &PlayingSound::get_parameters,
+        get_parameters,
         "get_parameter",
         &PlayingSound::get_parameter,
         "set_parameter",
         &PlayingSound::set_parameter);
-    /* PlayingSound
-        bool is_playing()
-        bool stop()
-        bool set_pause(bool pause)
-        bool set_mute(bool mute)
-        bool set_pitch(float pitch)
-        bool set_pan(float pan)
-        bool set_volume(float volume)
-        bool set_looping(SOUND_LOOP_MODE looping)
-        bool set_callback(function callback)
-        map<VANILLA_SOUND_PARAM,string> get_parameters()
-        optional<float> get_parameter(VANILLA_SOUND_PARAM param)
-        bool set_parameter(VANILLA_SOUND_PARAM param, float value)
-        */
 
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);

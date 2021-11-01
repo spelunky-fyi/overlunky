@@ -6,6 +6,7 @@
 #include <d3d11.h>
 #include <detours.h>
 
+#include "game_allocator.hpp"
 #include "logger.h"
 #include "memory.hpp"
 #include "util.hpp"
@@ -22,12 +23,17 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 {
     using namespace std::string_view_literals;
     auto path = std::string_view(file_path);
+    static const auto prefix = "Data/Textures/../../"sv;
+    if (path.size() > prefix.size() && path.substr(0, prefix.size()) == prefix)
+    {
+        path = path.substr(prefix.size());
+    }
     auto ext = path.substr(path.find_last_of('.'));
     if (ext == ".png"sv || ext == ".jpeg"sv || ext == ".bmp"sv || ext == ".tga"sv)
     {
         int image_width = 0;
         int image_height = 0;
-        unsigned char* image_data = stbi_load(file_path, &image_width, &image_height, NULL, 4);
+        unsigned char* image_data = stbi_load(path.data(), &image_width, &image_height, NULL, 4);
         if (image_data != nullptr)
         {
             // https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
@@ -110,10 +116,10 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
     }
     else
     {
-        auto read_file_from_disk = [](const char* file_path, void* (*allocator)(std::size_t)) -> FileInfo*
+        auto read_file_from_disk = [](const char* filepath, void* (*allocator)(std::size_t)) -> FileInfo*
         {
             FILE* file{nullptr};
-            auto error = fopen_s(&file, file_path, "rb");
+            auto error = fopen_s(&file, filepath, "rb");
             if (error == 0 && file != nullptr)
             {
                 auto close_file = OnScopeExit{[file]()
@@ -135,7 +141,7 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
                     const auto size_read = fread(data, 1, file_size, file);
                     if (size_read != file_size)
                     {
-                        DEBUG("Could not read file {}, this will either crash or cause glitches...", file_path);
+                        DEBUG("Could not read file {}, this will either crash or cause glitches...", filepath);
                     }
 
                     FileInfo* file_info = new (buf) FileInfo();
@@ -155,31 +161,22 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
     return nullptr;
 }
 
-using ReadEncryptedFileFun = FileInfo*(const char* file_path, AllocFun alloc_fun);
+using ReadEncryptedFileFun = FileInfo*(const char* file_path);
 ReadEncryptedFileFun* g_read_encrypted_file_trampoline{nullptr};
-FileInfo* read_encrypted_file(const char* file_path, AllocFun alloc_fun)
+FileInfo* read_encrypted_file(const char* file_path)
 {
-    if (auto file = g_OnLoadFile(file_path, alloc_fun))
+    if (auto file = g_OnLoadFile(file_path, &game_malloc))
     {
         return file;
     }
-    return g_read_encrypted_file_trampoline(file_path, alloc_fun);
+    return g_read_encrypted_file_trampoline(file_path);
 }
 
 void register_on_load_file(LoadFileCallback on_load_file)
 {
     if (g_read_encrypted_file_trampoline == nullptr && on_load_file != nullptr)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto after_bundle = memory.after_bundle;
-
-        auto off = find_inst(exe, "\x4c\x63\x78\x0c\x49\x8b\xcf\x44\x89\x68\x08"s, after_bundle) - 0x30;
-        auto fun_start = decode_pc(exe, find_inst(exe, "\xe8"s, off), 1);
-
-        g_read_encrypted_file_trampoline = (ReadEncryptedFileFun*)memory.at_exe(fun_start);
-
-        DetourRestoreAfterWith();
+        g_read_encrypted_file_trampoline = (ReadEncryptedFileFun*)get_address("read_encrypted_file"sv);
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());

@@ -111,6 +111,8 @@ void register_usertypes(sol::state& lua)
         "FallingPlatform",
         "emitted_light",
         &FallingPlatform::timer,
+        "timer",
+        &FallingPlatform::timer,
         "shaking_factor",
         &FallingPlatform::shaking_factor,
         "y_pos",
@@ -129,6 +131,8 @@ void register_usertypes(sol::state& lua)
         "Drill",
         "top_chain_piece",
         &Drill::top_chain_piece,
+        "trigger",
+        &Drill::trigger,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 

@@ -2,12 +2,17 @@
 
 #include "drops.hpp"
 #include "entities_floors.hpp"
+#include "entities_liquids.hpp"
 #include "entities_mounts.hpp"
 #include "entity.hpp"
+#include "game_manager.hpp"
 #include "logger.h"
 #include "state.hpp"
 #include "virtual_table.hpp"
 #include <cstdarg>
+#include <detours.h>
+#include <unordered_set>
+#include <utility>
 
 uint32_t setflag(uint32_t flags, int bit) //shouldn't we change those to #define ?
 {
@@ -42,6 +47,11 @@ void godmode(bool g)
     State::get().godmode(g);
 }
 
+void godmode_companions(bool g)
+{
+    State::get().godmode_companions(g);
+}
+
 void darkmode(bool g)
 {
     State::get().darkmode(g);
@@ -59,15 +69,21 @@ float get_zoom_level()
 
 void attach_entity(Entity* overlay, Entity* attachee)
 {
-    using AttachEntity = void (*)(Entity*, Entity*);
-    static AttachEntity attach_entity = []()
+    if (attachee->overlay)
     {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x48\x8b\xd0\x48\x8b\xcd\x48\x8b\xd8"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xe8"s, off);
-        return (AttachEntity)memory.at_exe(Memory::decode_call(off));
-    }();
-    attach_entity(overlay, attachee);
+        overlay->remove_item_ptr(attachee);
+    }
+
+    auto [x, y] = overlay->position();
+    attachee->x -= x;
+    attachee->y -= y;
+    attachee->special_offsetx = attachee->x;
+    attachee->special_offsety = attachee->y;
+    attachee->overlay = overlay;
+
+    using AddItemPtr = void(Vector*, Entity*, bool);
+    static AddItemPtr* add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
+    add_item_ptr(&overlay->items, attachee, false);
 }
 
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
@@ -111,22 +127,25 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
     return -1;
 }
 
-void stack_entities(uint32_t bottom_uid, uint32_t top_uid, float (&offset)[2])
+void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)[2])
 {
-    using StackEntities = void (*)(Entity*, Entity*, float(&)[2]);
-    static StackEntities stack_entities = []()
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x49\x8b\xc9\xf3\x0f\x11\x5c\x24\x34"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xe8"s, off);
-        return (StackEntities)memory.at_exe(Memory::decode_call(off));
-    }();
-
     if (Entity* bottom = get_entity_ptr(bottom_uid))
     {
         if (Entity* top = get_entity_ptr(top_uid))
         {
-            stack_entities(bottom, top, offset);
+            if (top->overlay)
+            {
+                top->overlay->remove_item_ptr(top);
+            }
+            attach_entity(bottom, top);
+            top->x = offset[0];
+            top->y = offset[1];
+            top->special_offsetx = offset[0];
+            top->special_offsety = offset[1];
+            if ((bottom->flags >> 0x10) & 0x1) // facing left
+            {
+                top->x *= -1.0f;
+            }
         }
     }
 }
@@ -198,7 +217,74 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
     auto state = State::get();
     auto ent = state.find(uid);
     if (ent)
-        ent->teleport_abs(x, y, vx, vy);
+    {
+        static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
+        if (ent->type->id >= LIQUID_WATER)
+        {
+            move_liquid_abs(uid, x, y, vx, vy);
+        }
+        else
+        {
+            ent->teleport_abs(x, y, vx, vy);
+        }
+    }
+}
+
+void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
+{
+    auto state = State::get();
+    auto entity = state.find(uid);
+    if (entity != nullptr)
+    {
+        static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
+        static ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);
+        static ENT_TYPE LIQUID_LAVA = to_id("ENT_TYPE_LIQUID_LAVA"sv);
+        static ENT_TYPE LIQUID_STAGNANT_LAVA = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"sv);
+        static ENT_TYPE LIQUID_COARSE_LAVA = to_id("ENT_TYPE_LIQUID_COARSE_LAVA"sv);
+
+        std::pair<float, float>* coords = nullptr;
+        std::pair<float, float>* velocities = nullptr;
+        auto entity_id = entity->type->id;
+        if (entity_id == LIQUID_WATER)
+        {
+            coords = state.ptr()->liquid_physics->water_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->water_physics.unknown25->entity_velocities;
+        }
+        else if (entity_id == LIQUID_COARSE_WATER)
+        {
+            coords = state.ptr()->liquid_physics->coarse_water_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->coarse_water_physics.unknown25->entity_velocities;
+        }
+        else if (entity_id == LIQUID_LAVA)
+        {
+            coords = state.ptr()->liquid_physics->lava_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->lava_physics.unknown25->entity_velocities;
+        }
+        else if (entity_id == LIQUID_STAGNANT_LAVA)
+        {
+            coords = state.ptr()->liquid_physics->stagnant_lava_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->stagnant_lava_physics.unknown25->entity_velocities;
+        }
+        else if (entity_id == LIQUID_COARSE_LAVA)
+        {
+            coords = state.ptr()->liquid_physics->coarse_lava_physics.unknown25->entity_coordinates;
+            velocities = state.ptr()->liquid_physics->coarse_lava_physics.unknown25->entity_velocities;
+        }
+
+        auto liquid = entity->as<Liquid>();
+        if (coords != nullptr)
+        {
+            std::pair<float, float>* c = &(coords[liquid->unknown1->liquid_id]);
+            c->first = x;
+            c->second = y;
+        }
+        if (velocities != nullptr)
+        {
+            std::pair<float, float>* v = &(velocities[liquid->unknown1->liquid_id]);
+            v->first = vx;
+            v->second = vy;
+        }
+    }
 }
 
 uint32_t get_entity_flags(uint32_t uid)
@@ -244,13 +330,13 @@ int get_entity_ai_state(uint32_t uid)
     return 0;
 }
 
-uint32_t get_hud_flags()
+uint32_t get_level_flags()
 {
     auto state = State::get();
     return state.flags();
 }
 
-void set_hud_flags(uint32_t flags)
+void set_level_flags(uint32_t flags)
 {
     auto state = State::get();
     state.set_flags(flags);
@@ -274,6 +360,134 @@ void player_status()
     status->bombs = (99);
 }
 
+Screen* get_screen_ptr(uint32_t screen_id)
+{
+    auto game_manager = get_game_manager();
+    auto state = get_state_ptr();
+    switch (screen_id)
+    {
+    case 0:
+    {
+        return game_manager->screen_logo;
+    }
+    case 1:
+    {
+        return game_manager->screen_intro;
+    }
+    case 2:
+    {
+        return game_manager->screen_prologue;
+    }
+    case 3:
+    {
+        return game_manager->screen_title;
+    }
+    case 4:
+    {
+        return game_manager->screen_menu;
+    }
+    case 5:
+    {
+        return game_manager->screen_options;
+    }
+    case 6:
+    {
+        return game_manager->screen_player_profile;
+    }
+    case 7:
+    {
+        return game_manager->screen_leaderboards;
+    }
+    case 8:
+    {
+        return game_manager->screen_seed_input;
+    }
+    case 9:
+    {
+        return state->screen_character_select;
+    }
+    case 10:
+    {
+        return state->screen_team_select;
+    }
+    case 11:
+    {
+        // a screen_camp also exists in State, but its buttons flags do not work, so we use GameManager's one
+        return game_manager->screen_camp;
+    }
+    case 12:
+    {
+        // a screen_level also exists in State
+        return game_manager->screen_level;
+    }
+    case 13:
+    {
+        return state->screen_transition;
+    }
+    case 14:
+    {
+        return state->screen_death;
+    }
+    // 15 = spaceship -> the spots in State and GameManager where this should be are both nullptr -> has no UI
+    case 16:
+    {
+        return state->screen_win;
+    }
+    case 17:
+    {
+        return state->screen_credits;
+    }
+    case 18:
+    {
+        return state->screen_scores;
+    }
+    case 19:
+    {
+        return state->screen_constellation;
+    }
+    case 20:
+    {
+        return state->screen_recap;
+    }
+    case 21:
+    {
+        return state->screen_arena_menu;
+    }
+    case 22:
+    case 24:
+    {
+        return state->screen_arena_stages_select1;
+    }
+    case 23:
+    {
+        return state->screen_arena_items;
+    }
+    case 25:
+    {
+        return state->screen_arena_intro;
+    }
+    case 26:
+    {
+        // the one in GameManager has no UI entries
+        return state->screen_arena_level;
+    }
+    case 27:
+    {
+        return state->screen_arena_score;
+    }
+    case 28:
+    {
+        return game_manager->screen_online_loading;
+    }
+    case 29:
+    {
+        return game_manager->screen_online_lobby;
+    }
+    }
+    DEBUG("Screen pointer requested for unknown screen ID: {}", screen_id);
+    return nullptr;
+}
+
 Entity* get_entity_ptr(uint32_t uid)
 {
     auto state = State::get();
@@ -283,7 +497,7 @@ Entity* get_entity_ptr(uint32_t uid)
     return p;
 }
 
-uint32_t get_entity_type(uint32_t uid)
+ENT_TYPE get_entity_type(uint32_t uid)
 {
     auto state = State::get();
     auto p = state.find(uid);
@@ -320,10 +534,10 @@ std::pair<float, float> screen_position(float x, float y)
     return State::get().screen_position(x, y);
 }
 
-std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2)
+std::tuple<float, float, float, float> screen_aabb(float left, float top, float right, float bottom)
 {
-    auto [sx1, sy1] = screen_position(x1, y1);
-    auto [sx2, sy2] = screen_position(x2, y2);
+    auto [sx1, sy1] = screen_position(left, top);
+    auto [sx2, sy2] = screen_position(right, bottom);
     return std::tuple{sx1, sy1, sx2, sy2};
 }
 
@@ -334,17 +548,32 @@ float screen_distance(float x)
     return b.first - a.first;
 }
 
+std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate)
+{
+    std::vector<uint32_t> filtered_entities{std::move(entities)};
+    auto filter_fun = [&](uint32_t uid)
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            return !predicate(entity);
+        }
+        return false;
+    };
+    std::erase_if(filtered_entities, filter_fun);
+    return filtered_entities;
+}
+
 std::vector<uint32_t> get_entities()
 {
-    return get_entities_by(0, 0, -128);
+    return get_entities_by({}, 0, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 {
-    return get_entities_by(0, 0, layer);
+    return get_entities_by({}, 0, layer);
 }
 
-std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types)
+std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
@@ -362,24 +591,21 @@ std::vector<uint32_t> get_entities_by_type(std::vector<uint32_t> entity_types)
     }
     return found;
 }
-
-template <typename... Args>
-std::vector<uint32_t> get_entities_by_type(Args... args)
+std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type)
 {
-    std::vector<uint32_t> types = {args...};
-    return get_entities_by_type(types);
+    return get_entities_by_type(std::vector<ENT_TYPE>{entity_type});
 }
 
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
 {
-    return get_entities_by(0, mask, -128);
+    return get_entities_by({}, mask, LAYER::BOTH);
 }
 
-std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER layer)
+std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    if (layer == -128) // LAYER.BOTH
+    if (layer == LAYER::BOTH)
     {
         uint8_t layeridx = 2;
         while (layeridx)
@@ -387,7 +613,7 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER
             layeridx--;
             for (auto& item : state.layer(layeridx)->items())
             {
-                if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
+                if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
                 {
                     found.push_back(item->uid);
                 }
@@ -400,7 +626,7 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER
 
         for (auto& item : state.layer(actual_layer)->items())
         {
-            if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
+            if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -408,12 +634,16 @@ std::vector<uint32_t> get_entities_by(uint32_t entity_type, uint32_t mask, LAYER
     }
     return found;
 }
+std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER layer)
+{
+    return get_entities_by(std::vector<ENT_TYPE>{entity_type}, mask, layer);
+}
 
-std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
+std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    if (layer == -128)
+    if (layer == LAYER::BOTH)
     {
         uint8_t layeridx = 2;
         while (layeridx)
@@ -423,7 +653,7 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
             {
                 auto [ix, iy] = item->position();
                 float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-                if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && distance < radius)
+                if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && entity_type_check(entity_types, item->type->id))
                 {
                     found.push_back(item->uid);
                 }
@@ -438,7 +668,7 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-            if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && distance < radius)
+            if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && entity_type_check(entity_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -446,42 +676,58 @@ std::vector<uint32_t> get_entities_at(uint32_t entity_type, uint32_t mask, float
     }
     return found;
 }
+std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
+{
+    return get_entities_at(std::vector<ENT_TYPE>{entity_type}, mask, x, y, layer, radius);
+}
 
-std::vector<uint32_t> get_entities_overlapping_hitbox(uint32_t entity_type, uint32_t mask, AABB hitbox, LAYER layer)
+std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
 {
     auto state = State::get();
     std::vector<uint32_t> result;
-    if (layer == -128)
+    if (layer == LAYER::BOTH)
     {
         std::vector<uint32_t> result2;
-        result = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
-        result2 = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
+        result = get_entities_overlapping_by_pointer(entity_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
+        result2 = get_entities_overlapping_by_pointer(entity_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
         result.insert(result.end(), result2.begin(), result2.end());
     }
     else
     {
         uint8_t actual_layer = enum_to_layer(layer);
-        result = get_entities_overlapping_by_pointer(entity_type, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
+        result = get_entities_overlapping_by_pointer(entity_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
     }
     return result;
 }
-
-std::vector<uint32_t> get_entities_overlapping(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+std::vector<uint32_t> get_entities_overlapping_hitbox(ENT_TYPE entity_type, uint32_t mask, AABB hitbox, LAYER layer)
 {
-    return get_entities_overlapping_hitbox(entity_type, mask, {sx, sy, sx2, sy2}, layer);
+    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, hitbox, layer);
 }
 
-std::vector<uint32_t> get_entities_overlapping_by_pointer(uint32_t entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
+std::vector<uint32_t> get_entities_overlapping(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+{
+    return get_entities_overlapping_hitbox(entity_types, mask, {sx, sy2, sx2, sy}, layer);
+}
+std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+{
+    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, {sx, sy2, sx2, sy}, layer);
+}
+
+std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
 {
     std::vector<uint32_t> found;
     for (auto& item : layer->items())
     {
-        if (((item->type->search_flags & mask) > 0 || mask == 0) && (item->type->id == entity_type || entity_type == 0) && item->overlaps_with(sx, sy, sx2, sy2))
+        if (((item->type->search_flags & mask) > 0 || mask == 0) && entity_type_check(entity_types, item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
         {
             found.push_back(item->uid);
         }
     }
     return found;
+}
+std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
+{
+    return get_entities_overlapping_by_pointer(std::vector<ENT_TYPE>{entity_type}, mask, sx, sy, sx2, sy2, layer);
 }
 
 void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
@@ -489,18 +735,21 @@ void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
     Entity* door = get_entity_ptr(uid);
     if (door == nullptr)
         return;
-    static_cast<Door*>(door)->set_target(w, l, t);
+    door->as<ExitDoor>()->world = w;
+    door->as<ExitDoor>()->level = l;
+    door->as<ExitDoor>()->theme = t;
+    door->as<ExitDoor>()->special_door = true;
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
     Entity* door = get_entity_ptr(uid);
-    if (door == nullptr)
+    if (door == nullptr || !door->as<ExitDoor>()->special_door)
         return std::make_tuple((uint8_t)0, (uint8_t)0, (uint8_t)0);
-    return static_cast<Door*>(door)->get_target();
+    return std::make_tuple(door->as<ExitDoor>()->world, door->as<ExitDoor>()->level, door->as<ExitDoor>()->theme);
 }
 
-void set_contents(uint32_t uid, uint32_t item_entity_type)
+void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
 {
     Entity* container = get_entity_ptr(uid);
     if (container == nullptr)
@@ -537,7 +786,7 @@ bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
     return false;
 };
 
-bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
+bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
 {
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
@@ -550,14 +799,18 @@ bool entity_has_item_type(uint32_t uid, uint32_t entity_type)
             Entity* item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
                 continue;
-            if (item->type->id == entity_type)
+            if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
                 return true;
         }
     }
     return false;
-};
+}
+bool entity_has_item_type(uint32_t uid, ENT_TYPE entity_type)
+{
+    return entity_has_item_type(uid, std::vector<ENT_TYPE>{entity_type});
+}
 
-std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, uint32_t mask)
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask)
 {
     std::vector<uint32_t> found;
     Entity* entity = get_entity_ptr(uid);
@@ -573,7 +826,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, ui
             {
                 continue;
             }
-            if (((item->type->search_flags & mask) || mask == 0) && (item->type->id == entity_type || entity_type == 0))
+            if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -581,10 +834,14 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, uint32_t entity_type, ui
     }
     return found;
 }
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask)
+{
+    return entity_get_items_by(uid, std::vector<ENT_TYPE>{entity_type}, mask);
+}
 
 void lock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
+    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);
@@ -604,7 +861,7 @@ void lock_door_at(float x, float y)
 
 void unlock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at(0, 0, x, y, 0, 1);
+    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);
@@ -637,18 +894,18 @@ void carry(uint32_t mount_uid, uint32_t rider_uid)
     mount->carry(rider);
 }
 
-void kill_entity(uint32_t uid)
+void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
-        ent->kill(true, nullptr);
+        ent->kill(destroy_corpse.value_or(true), nullptr);
 }
 
 void destroy_entity(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
-        ent->destroy(); // TODO
+        ent->destroy();
 }
 
 void apply_entity_db(uint32_t uid)
@@ -699,114 +956,39 @@ void set_seed(uint32_t seed)
     state.set_seed(seed);
 }
 
-void set_arrowtrap_projectile(uint32_t regular_entity_type, uint32_t poison_entity_type)
+void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
 {
-    static size_t offset_poison = 0;
-    static size_t offset_regular = 0;
-    if (offset_poison == 0)
-    {
-        std::string pattern = "\xBA\x73\x01\x00\x00\x48\x8B\x8C\xC1\xC0\x12\x00\x00"s;
-        auto memory = Memory::get();
-        // the pattern occurs twice in the executable
-        // the first instance is for poison arrowtraps
-        // the second is for regular arrowtraps
-        offset_poison = find_inst(memory.exe(), pattern, memory.after_bundle);
-        offset_regular = memory.at_exe(find_inst(memory.exe(), pattern, offset_poison + 1));
-        offset_poison = memory.at_exe(offset_poison);
-    }
-    write_mem_prot(offset_regular + 1, to_le_bytes(regular_entity_type), true);
-    write_mem_prot(offset_poison + 1, to_le_bytes(poison_entity_type), true);
+    write_mem_prot(get_address("arrowtrap_projectile"), regular_entity_type, true);
+    write_mem_prot(get_address("poison_arrowtrap_projectile"), poison_entity_type, true);
 }
 
 void modify_sparktraps(float angle_increment, float distance)
 {
     static size_t angle_increment_offset = 0;
+    static size_t angle_increment_instruction = 0;
     if (angle_increment_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\xF3\x0F\x10\x81\x50\x01\x00\x00\x48\xBE\x4B\x57\x4C\x4F\x80\x3E\x83\xD3"s;
-        size_t angle_instruction_offset = find_inst(memory.exe(), pattern, memory.after_bundle) + 18;
-
-        uint8_t cc_counter = 0;
-        size_t op_counter = angle_instruction_offset;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 8)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-        angle_increment_offset = memory.at_exe(op_counter);
-
-        uint32_t distance_offset_relative = static_cast<uint32_t>(op_counter - (angle_instruction_offset + 8));
-        write_mem_prot(memory.at_exe(angle_instruction_offset + 4), to_le_bytes(distance_offset_relative), true);
+        angle_increment_instruction = get_address("sparktrap_angle_increment");
+        angle_increment_offset = angle_increment_instruction - 0x32;
+        auto distance_offset_relative = static_cast<int32_t>(angle_increment_offset - (angle_increment_instruction + 8));
+        write_mem_prot(angle_increment_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(angle_increment_offset, to_le_bytes(angle_increment), true);
+    write_mem_prot(angle_increment_offset, angle_increment, true);
 
     static size_t distance_offset = 0;
     if (distance_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\xF3\x0F\x10\x83\x50\x01\x00\x00\xF3\x0F\x59\x3D"s;
-
-        // first look up this pattern so we are in the correct function
-        auto offset = find_inst(exe, pattern, memory.after_bundle) + 8;
-
-        // dirty trick: inject the distance float between this function and the next
-        // reason is that the default float being referenced is a const with value 3.0
-        // and this value is used elsewhere (as a compiler optimization)
-        // so if we overwrite this value we crash elsewhere
-        // -> save our own float and adjust the mulss calls to reference this
-        uint8_t cc_counter = 0;
-        size_t op_counter = offset;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-        distance_offset = memory.at_exe(op_counter);
-
-        // now overwrite the mulss instructions 4 times:
-        // mulss xmm7 -> mulss xmm0 -> mulss xmm7 -> mulss xmm0
-        std::string pattern1 = "\xF3\x0F\x59\x3D"s;
-        std::string pattern2 = "\xF3\x0F\x59\x05"s;
-        bool use_pattern1 = true;
-        auto start = offset - 20;
-        for (auto x = 0; x < 4; ++x)
-        {
-            auto mulss_offset = find_inst(exe, use_pattern1 ? pattern1 : pattern2, start);
-            uint32_t distance_offset_relative = static_cast<uint32_t>(op_counter - (mulss_offset + 8));
-            write_mem_prot(memory.at_exe(mulss_offset + 4), to_le_bytes(distance_offset_relative), true);
-            start = mulss_offset + 1;
-            use_pattern1 = !use_pattern1;
-        }
+        auto distance_instruction = angle_increment_instruction + 0x1F;
+        distance_offset = angle_increment_instruction - 0x2E;
+        auto distance_offset_relative = static_cast<int32_t>(distance_offset - (distance_instruction + 8));
+        write_mem_prot(distance_instruction + 4, distance_offset_relative, true);
     }
-    write_mem_prot(distance_offset, to_le_bytes(distance), true);
+    write_mem_prot(distance_offset, distance, true);
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        std::string pattern = "\xFE\x80\x28\x01\x00\x00\x80\xB8\x28\x01\x00\x00\x07"s;
-        offset = memory.at_exe(find_inst(memory.exe(), pattern, memory.after_bundle) + 12);
-    }
-    write_mem_prot(offset, to_le_bytes(threshold), true);
+    write_mem_prot(get_address("kapala_blood_threshold"), threshold, true);
 }
 
 void set_kapala_hud_icon(int8_t icon_index)
@@ -817,70 +999,34 @@ void set_kapala_hud_icon(int8_t icon_index)
 
     if (instruction_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-
-        std::string pattern = "\x0F\xB6\x81\x28\x01\x00\x00\x89\x02\x48\x8B\xC2"s;
-
-        instruction_offset = find_inst(exe, pattern, memory.after_bundle);
-
-        uint8_t cc_counter = 0;
-        size_t op_counter = instruction_offset;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-        icon_index_offset = memory.at_exe(op_counter);
-        distance = static_cast<uint32_t>(op_counter - (instruction_offset + 7));
-        instruction_offset = memory.at_exe(instruction_offset);
+        instruction_offset = get_address("kapala_hud_icon");
+        icon_index_offset = instruction_offset + 0x12;
+        distance = static_cast<uint32_t>(icon_index_offset - (instruction_offset + 7));
     }
 
     if (icon_index < 0) // reset to original
     {
-        write_mem_prot(instruction_offset + 2, to_le_bytes(0x00012881), true);
+        write_mem_prot(instruction_offset + 2, 0x00013089, true);
     }
     else
     {
-        write_mem_prot(instruction_offset + 2, {0x05}, true);
-        write_mem_prot(instruction_offset + 3, to_le_bytes(distance), true);
+        // Instead of loading the value from KapalaPowerup:amount_of_blood (the instruction pointed at by instruction_offset)
+        // we overwrite this with an instruction that loads a byte located a bit after the current function.
+        // So you need to assemble `movzx  <relevant register>,BYTE PTR [rip+<distance>]`
+        write_mem_prot(instruction_offset + 2, {0x0d}, true);
+        write_mem_prot(instruction_offset + 3, distance, true);
         if (icon_index > 6)
         {
             icon_index = 6;
         }
-        write_mem_prot(icon_index_offset, to_le_bytes(icon_index), true);
+        write_mem_prot(icon_index_offset, icon_index, true);
     }
 }
 
-void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier)
+void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscape_multiplier)
 {
-    size_t offset_default1 = 0;
-    size_t offset_vladscape1 = 0;
-    size_t offset_default2 = 0;
-    size_t offset_vladscape2 = 0;
-    if (offset_default1 == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x41\xB8\x02\x00\x00\x00\x84\xC0\x75\x06\x41\xB8\x01\x00\x00\x00"s;
-        auto offset = find_inst(exe, pattern, memory.after_bundle);
-        offset_default1 = memory.at_exe(offset + 12);
-        offset_vladscape1 = memory.at_exe(offset + 2);
-        offset = find_inst(exe, pattern, offset + 1);
-        offset_default2 = memory.at_exe(offset + 12);
-        offset_vladscape2 = memory.at_exe(offset + 2);
-    }
-
-    write_mem_prot(offset_default1, to_le_bytes(default_multiplier), true);
-    write_mem_prot(offset_default2, to_le_bytes(default_multiplier), true);
-    write_mem_prot(offset_vladscape1, to_le_bytes(vladscape_multiplier), true);
-    write_mem_prot(offset_vladscape2, to_le_bytes(vladscape_multiplier), true);
+    // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
+    write_mem_prot(get_address("blood_multiplication"), vladscape_multiplier, true);
 }
 
 SaveData* savedata()
@@ -915,90 +1061,171 @@ void drop(uint32_t who_uid, uint32_t what_uid)
     }
 }
 
+void unequip_backitem(uint32_t who_uid)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unequip");
+    }
+
+    if (offset != 0)
+    {
+        auto backitem_uid = worn_backitem(who_uid);
+        if (backitem_uid != -1)
+        {
+            Movable* ent = (Movable*)get_entity_ptr(who_uid);
+            Entity* backitem_ent = get_entity_ptr(backitem_uid);
+            if (ent != nullptr && backitem_ent != nullptr)
+            {
+                typedef size_t unequip_func(Entity*, uint32_t);
+                static unequip_func* uf = (unequip_func*)(offset);
+                uf(ent, backitem_ent->type->id);
+            }
+        }
+    }
+}
+
+int32_t worn_backitem(uint32_t who_uid)
+{
+    static const std::unordered_set<uint32_t> backitem_types = {
+        to_id("ENT_TYPE_ITEM_JETPACK"),
+        to_id("ENT_TYPE_ITEM_HOVERPACK"),
+        to_id("ENT_TYPE_ITEM_POWERPACK"),
+        to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK"),
+        to_id("ENT_TYPE_ITEM_CAPE"),
+        to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
+    };
+
+    auto ent = get_entity_ptr(who_uid)->as<PowerupCapable>();
+    if (ent != nullptr)
+    {
+        for (const auto& [powerup_type, powerup_entity] : ent->powerups)
+        {
+            if (backitem_types.count(powerup_type) > 0)
+            {
+                return powerup_entity->uid;
+            }
+        }
+    }
+    return -1;
+}
+
 void set_olmec_phase_y_level(uint8_t phase, float y)
 {
     // Sets the Y-level Olmec changes phases. The defaults are :
-    // - phase 1 (bombs) = 99 (+1)  (the game adds 1 to the fixed value for some reason)
+    // - phase 1 (bombs) = 100
     // - phase 2 (ufos) = 83
     // Olmecs checks phases in order! The means if you want ufo's from the start
     // you have to put both phase 1 and 2 at e.g. level 199
     // If you want to make Olmec stay in phase 0 (stomping) all the time, you can just set
-    // the phase 1 y level to e.g. 10.
+    // the phase 1 y level to 70. Don't set it too low, from 1.25.0 onwards, Olmec's stomp
+    // activation distance seems to be related to the y-level trigger point.
     static size_t phase1_offset = 0;
     static size_t phase2_offset = 0;
     if (phase1_offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
+        // from 1.23.x onwards, there are now two instructions per phase that reference the y-level float
+        size_t phase_1_instruction_a = get_address("olmec_transition_phase_1_y_level");
+        size_t phase_1_instruction_b = phase_1_instruction_a + 0xd;
+        phase1_offset = get_address("olmec_transition_phase_1_custom_floats");
 
-        std::string pattern_phase1 = "\xF3\x0F\x10\x15\x1B\x8C\x36\x00"s;
-        std::string pattern_phase2 = "\xF3\x0F\x10\x0D\xE1\x87\x36\x00"s;
-
-        // first look up these patterns so we are in the correct function
-        auto offset1 = find_inst(exe, pattern_phase1, memory.after_bundle);
-        auto offset2 = find_inst(exe, pattern_phase2, memory.after_bundle);
-
-        // find the space inbetween this function and the next
-        uint8_t cc_counter = 0;
-        size_t op_counter = offset1;
-        uint8_t previous_opcode = 0;
-        while (cc_counter < 4)
-        {
-            unsigned char opcode = exe[op_counter];
-            if (opcode == 0xcc && previous_opcode == 0xcc)
-            {
-                cc_counter++;
-            }
-            previous_opcode = opcode;
-            op_counter++;
-        }
-
-        // here's the memory location where we save our floats
-        phase1_offset = op_counter;
-        phase2_offset = phase1_offset + 4;
+        size_t phase_2_instruction_a = get_address("olmec_transition_phase_2_y_level");
+        size_t phase_2_instruction_b = phase_2_instruction_a + 0x11;
+        phase2_offset = phase1_offset + 0x4;
 
         // write the default values to our new floats
-        write_mem_prot(memory.at_exe(phase1_offset), to_le_bytes(99.0f), true);
-        write_mem_prot(memory.at_exe(phase2_offset), to_le_bytes(83.0f), true);
+        write_mem_prot(phase1_offset, 100.0f, true);
+        write_mem_prot(phase2_offset, 83.0f, true);
 
         // calculate the distances between our floats and the movss instructions
-        uint32_t distance_1 = static_cast<uint32_t>(phase1_offset - (offset1 + 8));
-        uint32_t distance_2 = static_cast<uint32_t>(phase2_offset - (offset2 + 8));
+        auto distance_1_a = static_cast<int32_t>(phase1_offset - phase_1_instruction_a);
+        auto distance_1_b = static_cast<int32_t>(phase1_offset - phase_1_instruction_b);
+        auto distance_2_a = static_cast<int32_t>(phase2_offset - phase_2_instruction_a);
+        auto distance_2_b = static_cast<int32_t>(phase2_offset - phase_2_instruction_b);
 
         // overwrite the movss instructions to load our floats
-        write_mem_prot(memory.at_exe(offset1 + 4), to_le_bytes(distance_1), true);
-        write_mem_prot(memory.at_exe(offset2 + 4), to_le_bytes(distance_2), true);
-
-        phase1_offset = memory.at_exe(phase1_offset);
-        phase2_offset = memory.at_exe(phase2_offset);
+        write_mem_prot(phase_1_instruction_a - 4, distance_1_a, true);
+        write_mem_prot(phase_1_instruction_b - 4, distance_1_b, true);
+        write_mem_prot(phase_2_instruction_a - 4, distance_2_a, true);
+        write_mem_prot(phase_2_instruction_b - 4, distance_2_b, true);
     }
 
     if (phase == 1)
     {
-        write_mem_prot(phase1_offset, to_le_bytes(y), true);
+        write_mem_prot(phase1_offset, y, true);
     }
     else if (phase == 2)
     {
-        write_mem_prot(phase2_offset, to_le_bytes(y), true);
+        write_mem_prot(phase2_offset, y, true);
+    }
+}
+
+void force_olmec_phase_0(bool b)
+{
+    static size_t offset = 0;
+    static char original_instruction[2] = {0};
+    if (offset == 0)
+    {
+        offset = get_address("olmec_transition_phase_1");
+        for (uint8_t x = 0; x < 2; ++x)
+        {
+            original_instruction[x] = read_u8(offset + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset, "\xEB\x2E"s, true); // jbe -> jmp
+    }
+    else
+    {
+        write_mem_prot(offset, std::string(original_instruction, 2), true);
     }
 }
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
-    static size_t normal_offset = 0;
-    static size_t cursed_offset = 0;
-    if (normal_offset == 0)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
+    write_mem_prot(get_address("ghost_spawn_time"), normal, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), cursed, true);
+    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), cursed, true);
+}
 
-        std::string pattern = "\xBA\x28\x23\x00\x00\x41\xB8\x30\x2A\x00\x00"s;
-        auto offset = find_inst(exe, pattern, memory.after_bundle);
-        normal_offset = memory.at_exe(offset + 7);
-        cursed_offset = memory.at_exe(offset + 1);
+bool is_inside_active_shop_room(float x, float y, LAYER layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("coord_inside_active_shop_room");
     }
-    write_mem_prot(normal_offset, to_le_bytes(normal), true);
-    write_mem_prot(cursed_offset, to_le_bytes(cursed), true);
+    if (offset != 0)
+    {
+        typedef bool coord_inside_shop_func(StateMemory*, uint32_t layer, float x, float y);
+        static coord_inside_shop_func* cisf = (coord_inside_shop_func*)(offset);
+        return cisf(State::get().ptr(), enum_to_layer(layer), x, y);
+    }
+    return false;
+}
+
+bool is_inside_shop_zone(float x, float y, LAYER layer)
+{
+    static size_t offset = 0;
+    static void* rcx = nullptr;
+    if (offset == 0)
+    {
+        offset = get_address("coord_inside_shop_zone");
+        size_t* tmp = (size_t*)get_address("coord_inside_shop_zone_rcx");
+        auto heap_ptr = OnHeapPointer<void*>(*tmp);
+        rcx = heap_ptr.decode();
+    }
+    if (offset != 0)
+    {
+        typedef bool coord_inside_shop_zone_func(void*, uint32_t layer, float x, float y);
+        static coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
+        return ciszf(rcx, enum_to_layer(layer), x, y);
+    }
+    return false;
 }
 
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
@@ -1020,18 +1247,18 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
         {
             if (entry.chance_sizeof == 4)
             {
-                write_mem_prot(entry.offset, to_le_bytes(new_drop_chance), true);
+                write_mem_prot(entry.offset, new_drop_chance, true);
             }
             else if (entry.chance_sizeof == 1)
             {
                 uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_prot(entry.offset, to_le_bytes(value), true);
+                write_mem_prot(entry.offset, value, true);
             }
         }
     }
 }
 
-void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type)
+void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
 {
     if (new_drop_entity_type == 0)
     {
@@ -1075,7 +1302,7 @@ void replace_drop(uint16_t drop_id, uint32_t new_drop_entity_type)
         {
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
             {
-                write_mem_prot(entry.offsets[x], to_le_bytes(new_drop_entity_type), true);
+                write_mem_prot(entry.offsets[x], new_drop_entity_type, true);
             }
         }
     }
@@ -1086,10 +1313,7 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
     static size_t offset = 0;
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x48\x8B\xD9\xB9\xB0\x01\x00\x00"s;
-        offset = function_start(memory.at_exe(find_inst(exe, pattern, memory.after_bundle)));
+        offset = get_address("generate_particles");
     }
 
     if (offset != 0)
@@ -1105,32 +1329,93 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
     }
 }
 
+static bool g_journal_enabled = true;
+using OnShowJournalFun = void(void*, uint8_t);
+OnShowJournalFun* g_on_show_journal_trampoline{nullptr};
+void on_show_journal(void* journal_ui, uint8_t page_shown)
+{
+    if (!g_journal_enabled && page_shown == 2) // page 2 = journal
+    {
+        return;
+    }
+    g_on_show_journal_trampoline(journal_ui, page_shown);
+}
+
 void set_journal_enabled(bool b)
 {
+    static bool function_hooked = false;
+    if (!function_hooked)
+    {
+        g_on_show_journal_trampoline = (OnShowJournalFun*)get_address("show_journal");
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        DetourAttach((void**)&g_on_show_journal_trampoline, &on_show_journal);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking on_show_journal: {}\n", error);
+        }
+
+        function_hooked = true;
+    }
+    g_journal_enabled = b;
+}
+
+void set_camp_camera_bounds_enabled(bool b)
+{
     static size_t offset = 0;
-    static char original_call_instruction[5] = {0};
+    static char original_instruction[3] = {0};
     if (offset == 0)
     {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        std::string pattern = "\x75\x1F\xF6\xC1\x08"s;
-        offset = memory.at_exe(find_inst(exe, pattern, memory.after_bundle) + 14);
-        for (uint8_t x = 0; x < 5; ++x)
+        offset = get_address("enforce_camp_camera_bounds");
+        for (uint8_t x = 0; x < 3; ++x)
         {
-            original_call_instruction[x] = read_u8(offset + x);
+            original_instruction[x] = read_u8(offset + x);
         }
     }
     if (b)
     {
-        write_mem_prot(offset, std::string(original_call_instruction, 5), true);
+        write_mem_prot(offset, std::string(original_instruction, 3), true);
     }
     else
     {
-        write_mem_prot(offset, "\x90\x90\x90\x90\x90"s, true);
+        write_mem_prot(offset, "\xC3\x90\x90"s, true);
     }
 }
 
-uint8_t waddler_count_entity(uint32_t entity_type)
+void set_explosion_mask(uint32_t mask)
+{
+    static size_t addr = 0;
+    if (addr == 0)
+    {
+        addr = get_address("explosion_mask");
+    }
+    write_mem_prot(addr, mask, true);
+}
+
+void set_max_rope_length(uint8_t length)
+{
+    uint32_t length_32 = length;
+
+    // there's four instances where the max (default=6) is used
+
+    // 1) When throwing a rope and it attaches to the background, the initial entity is
+    // given a start value in its segment_nr_inverse variable
+    write_mem_prot(get_address("attach_thrown_rope_to_background"), length_32, true);
+
+    // 2) and 3) at the top of the rope processing function are two comparisons to the max
+    write_mem_prot(get_address("process_ropes_one"), length, true);
+    write_mem_prot(get_address("process_ropes_two"), length, true);
+
+    // 4) in the same function at the end of the little loop of process_ropes_two is a comparison to n-1
+    uint8_t length_minus_one_8 = length - 1;
+    write_mem_prot(get_address("process_ropes_three"), length_minus_one_8, true);
+}
+
+uint8_t waddler_count_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();
     uint8_t count = 0;
@@ -1144,7 +1429,7 @@ uint8_t waddler_count_entity(uint32_t entity_type)
     return count;
 }
 
-int8_t waddler_store_entity(uint32_t entity_type)
+int8_t waddler_store_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();
     int8_t item_stored_in_slot = -1;
@@ -1160,7 +1445,7 @@ int8_t waddler_store_entity(uint32_t entity_type)
     return item_stored_in_slot;
 }
 
-void waddler_remove_entity(uint32_t entity_type, uint8_t amount_to_remove)
+void waddler_remove_entity(ENT_TYPE entity_type, uint8_t amount_to_remove)
 {
     auto state = get_state_ptr();
 
@@ -1223,18 +1508,32 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     return 0;
 }
 
-uint8_t enum_to_layer(LAYER layer)
+int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 {
-    if (layer == 0)
+    auto offset = get_address("spawn_companion");
+    if (offset != 0)
+    {
+        auto state = get_state_ptr();
+        typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
+        static spawn_companion_func* sc = (spawn_companion_func*)(offset);
+        Player* spawned = sc(state, x, y, enum_to_layer(layer), companion_type);
+        return spawned->uid;
+    }
+    return -1;
+}
+
+uint8_t enum_to_layer(const LAYER layer)
+{
+    if (layer == LAYER::FRONT)
         return 0;
-    else if (layer == 1)
+    else if (layer == LAYER::BACK)
         return 1;
-    else if (layer < -MAX_PLAYERS)
+    else if ((int)layer < -MAX_PLAYERS)
         return 0;
-    else if (layer < 0)
+    else if (layer < LAYER::FRONT)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs(layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
         if (player != nullptr)
         {
             return player->layer;
@@ -1243,24 +1542,24 @@ uint8_t enum_to_layer(LAYER layer)
     return 0;
 }
 
-uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position)
+uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)
 {
-    if (layer == 0)
+    if (layer == LAYER::FRONT)
     {
         player_position = {0.0f, 0.0f};
         return 0;
     }
-    else if (layer == 1)
+    else if (layer == LAYER::BACK)
     {
         player_position = {0.0f, 0.0f};
         return 1;
     }
-    else if (layer < -MAX_PLAYERS)
+    else if ((int)layer < -MAX_PLAYERS)
         return 0;
-    else if (layer < 0)
+    else if (layer < LAYER::FRONT)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs(layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
         if (player != nullptr)
         {
             player_position = player->position();
@@ -1268,4 +1567,12 @@ uint8_t enum_to_layer(LAYER layer, std::pair<float, float>& player_position)
         }
     }
     return 0;
+}
+
+bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE find)
+{
+    if (types_array.empty() || types_array[0] == 0 || std::find(types_array.begin(), types_array.end(), find) != types_array.end())
+        return true;
+
+    return false;
 }

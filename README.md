@@ -5,9 +5,9 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.21.0c-green)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.23.3-green)
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.21.0c-green)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.0b-green)
 
 [WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. They are mainly to keep up with the ever changing scripting api and usually contain bugfixes for that. Use at your own discretion, but if you want the latest scripts, get this. ![WHIP commits](https://img.shields.io/github/commits-since/spelunky-fyi/overlunky/latest)
 
@@ -29,7 +29,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+Enter**: Spawn entity
       + **Tab**: Add selected item id to list when making a kit
       + **Mouse left**: Spawn entity at mouse cursor (drag to set velocity)
-      + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position)
+      + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position) / Spawn or throw single liquid blob
       + **Mouse right**: Teleport to mouse cursor (drag to set velocity)
       + **Mouse middle**: Select or drag safe entities around
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
@@ -105,6 +105,7 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
+    + Try deleting `Spelunky 2/overlunky.ini` or `Spelunky 2/imgui.ini`.
     + Try the WHIP build, it might have already fixed the problem.
   - If your game **crashes** when actually trying to use the tools:
     + See previous section.

@@ -12,6 +12,9 @@ struct PRNG
     static PRNG& get();
     static PRNG& get_local();
 
+    /// Same as `seed_prng`
+    void seed(int64_t seed);
+
     enum PRNG_CLASS
     {
         PROCEDURAL_SPAWNS = 0,
@@ -28,6 +31,9 @@ struct PRNG
 
     using prng_pair = std::pair<std::uint64_t, std::uint64_t>;
     prng_pair get_and_advance(PRNG_CLASS type);
+
+    std::pair<int64_t, int64_t> get_pair(size_t index);
+    void set_pair(size_t index, int64_t first, int64_t second);
 
     /// Generate a random integer in the range `[0, size)`
     std::int64_t internal_random_index(std::int64_t size, PRNG_CLASS type);

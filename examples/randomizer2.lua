@@ -1,26 +1,154 @@
 meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
-    
+
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.0a"
+meta.version = "2.3b"
 meta.author = "Dregu"
+
+--[[OPTIONS]]
+local real_default_options = {
+    tilecode = true,
+    trap = true,
+    trap_max = 4,
+    trap_min = 2,
+    enemy = true,
+    enemy_max = 12,
+    enemy_min = 5,
+    enemy_curse_chance = 5,
+    room_shop_chance = 15,
+    room_big_chance = 15,
+    room_big_min = 8,
+    room_big_max = 15,
+    room_dark = 4,
+    pot_chance = 25,
+    ushabti_chance = 25,
+    stats_health_max = 20,
+    stats_bombs_max = 20,
+    stats_ropes_max = 20,
+    chain = true,
+    door = true,
+    door_min_levels = 3,
+    door_max_levels = 6,
+    door_bosses = 4,
+    door_transitions = false,
+    projectile = true,
+    storage = true,
+    status = true,
+    hard = true,
+    hard_abzu = true,
+    hard_duat = true,
+    hard_hundun = true,
+    hard_olmec = true,
+    hard_olmec_phase = true,
+    hard_tiamat = true,
+    shop = true,
+    liquid_chance = 33,
+    trap_spikes = 25,
+    trap_fields = 50,
+    bias_01 = 15,
+    bias_02 = 15,
+    bias_03 = 15,
+    bias_05 = 15,
+    bias_06 = 15,
+    bias_07 = 10,
+    bias_08 = 12,
+    bias_09 = 10,
+    bias_10 = 8,
+    bias_11 = 7,
+    bias_15 = 1,
+}
+local default_options = table.unpack({real_default_options})
+local function register_options()
+    register_option_bool("tilecode", "Random floor styles", default_options.tilecode)
+    register_option_bool("trap", "Random traps", default_options.trap)
+    register_option_float("trap_max", "Max trap chance", default_options.trap_max, 0, 100)
+    register_option_float("trap_min", "Min trap chance", default_options.trap_min, 0, 100)
+    register_option_bool("enemy", "Random enemies", default_options.enemy)
+    register_option_float("enemy_max", "Max enemy chance", default_options.enemy_max, 0, 100)
+    register_option_float("enemy_min", "Min enemy chance", default_options.enemy_min, 0, 100)
+    register_option_float("enemy_curse_chance", "Enemy handicap chance", default_options.enemy_curse_chance, 0, 100)
+    register_option_float("room_shop_chance", "Extra shop chance", default_options.room_shop_chance, 0, 100)
+    register_option_float("room_big_chance", "Huge level chance", default_options.room_big_chance, 0, 100)
+    register_option_int("room_big_min", "Huge level min height", default_options.room_big_min, 8, 15)
+    register_option_int("room_big_max", "Huge level max height", default_options.room_big_max, 8, 15)
+    register_option_float("room_dark", "Dark level chance", default_options.room_dark, 0, 100)
+    register_option_float("pot_chance", "Pot contents chance", default_options.pot_chance, 0, 100)
+    register_option_float("ushabti_chance", "Correct ushabti chance", default_options.ushabti_chance, 0, 100)
+    register_option_int("stats_health_max", "Max starting health", default_options.stats_health_max, 4, 99)
+    register_option_int("stats_bombs_max", "Max starting bombs", default_options.stats_bombs_max, 4, 99)
+    register_option_int("stats_ropes_max", "Max starting ropes", default_options.stats_ropes_max, 4, 99)
+    register_option_bool("chain", "Random chain/quest/challenge items", default_options.chain)
+    register_option_bool("shop", "Random shop items", default_options.shop)
+    register_option_bool("door", "Random level/boss order", default_options.door)
+    register_option_int("door_min_levels", "Min levels between midbosses", default_options.door_min_levels, 1, 100)
+    register_option_int("door_max_levels", "Max levels between midbosses", default_options.door_max_levels, 1, 100)
+    register_option_int("door_bosses", "Amount of midbosses", default_options.door_bosses, 0, 4)
+    register_option_bool("door_transitions", "Neat transitions (maybe crashy)", default_options.door_transitions)
+    register_option_bool("projectile", "Random projectiles", default_options.projectile)
+    register_option_bool("storage", "Random Waddler caches", default_options.storage)
+    register_option_bool("status", "Show level progress", default_options.status)
+    register_option_bool("hard_abzu", "Hard bosses: Abzu", default_options.hard_abzu)
+    register_option_bool("hard_duat", "Hard bosses: Duat", default_options.hard_duat)
+    register_option_bool("hard_hundun", "Hard bosses: Hundun", default_options.hard_hundun)
+    register_option_bool("hard_olmec", "Hard bosses: Olmec projectiles", default_options.hard_olmec)
+    register_option_bool("hard_olmec_phase", "Hard bosses: Olmec phases", default_options.hard_olmec_phase)
+    register_option_bool("hard_tiamat", "Hard bosses: Tiamat", default_options.hard_tiamat)
+    register_option_float("liquid_chance", "Swap liquid chance", default_options.liquid_chance, 0, 100)
+    register_option_float("trap_spikes", "Replace spikes chance", default_options.trap_spikes, 0, 100)
+    register_option_float("trap_fields", "Replace forcefields chance", default_options.trap_fields, 0, 100)
+    register_option_int("bias_01", "Theme bias: Dwelling", default_options.bias_01, 0, 15)
+    register_option_int("bias_02", "Theme bias: Jungle", default_options.bias_02, 0, 15)
+    register_option_int("bias_03", "Theme bias: Volcana", default_options.bias_03, 0, 15)
+    register_option_int("bias_05", "Theme bias: Tide Pool", default_options.bias_05, 0, 15)
+    register_option_int("bias_06", "Theme bias: Temple", default_options.bias_06, 0, 15)
+    register_option_int("bias_07", "Theme bias: Ice Caves", default_options.bias_07, 0, 15)
+    register_option_int("bias_08", "Theme bias: Neo Babylon", default_options.bias_08, 0, 15)
+    register_option_int("bias_09", "Theme bias: Sunken City", default_options.bias_09, 0, 15)
+    register_option_int("bias_10", "Theme bias: Cosmic Ocean", default_options.bias_10, 0, 15)
+    register_option_int("bias_11", "Theme bias: City of Gold", default_options.bias_11, 0, 15)
+    register_option_int("bias_15", "Theme bias: Eggplant World", default_options.bias_15, 0, 15)
+    register_option_button("zreset", "Reset to defaults", function()
+        default_options = table.unpack({real_default_options})
+        register_options()
+    end)
+end
+register_options()
+
+set_callback(function(ctx)
+    local save_str = json.encode(options)
+    ctx:save(save_str)
+end, ON.SAVE)
+
+set_callback(function(ctx)
+    local load_str = ctx:load()
+    if load_str ~= "" then
+        default_options = json.decode(load_str)
+    end
+    for i,v in pairs(real_default_options) do
+        if default_options[i] == nil then
+            default_options[i] = v
+        end
+    end
+    register_options()
+end, ON.LOAD)
 
 local function get_chance(min, max)
     if max == 0 then return 0 end
-    if min == 0 then min = 0.001 end
+    if min == 0 then min = 0.00001 end
     if min > max then min, max = max, min end
     min = math.floor(1/(min/100))
     max = math.floor(1/(max/100))
-    return prng:random(max, min)
-    --return prng:random_int(min, max, PRNG_CLASS.LEVEL_GEN)
+    local chance = prng:random(max, min)
+    if state.theme == THEME.HUNDUN then
+        chance = math.floor(chance*1.67)
+    end
+    return chance
 end
 
 local function pick(from, ignore)
     local item = -1
     for i=1,10 do
-        ----math.randomseed(read_prng()[8]+i)
         item = from[prng:random(#from)]
-        --item = from[prng:random_index(#from, PRNG_CLASS.LEVEL_GEN)]
         if item ~= ignore then
             return item
         end
@@ -71,12 +199,15 @@ local function get_ushabti_frame()
     return x + y * 12
 end
 
+local function tile_key(x, y, l)
+    return tostring(math.floor(x)).."-"..tostring(math.floor(y)).."-"..tostring(l)
+end
+
 local theme_name = {}
 for i,v in pairs(THEME) do
     theme_name[v] = i
 end
 
-local level_stuff = {}
 local level_map = {}
 
 local function map_level()
@@ -111,18 +242,19 @@ local function map(x, y)
     return 0
 end
 
---[[TRAPS]]
-register_option_float("trap_max", "Max trap chance", 5, 0, 100)
-register_option_float("trap_min", "Min trap chance", 2, 0, 100)
+--[[TILECODES]]
+local floor_types = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOOR_JUNGLE, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_SUNKEN, ENT_TYPE.FLOORSTYLED_BEEHIVE, ENT_TYPE.FLOORSTYLED_VLAD, ENT_TYPE.FLOORSTYLED_MOTHERSHIP, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_PALACE, ENT_TYPE.FLOORSTYLED_GUTS, ENT_TYPE.FLOOR_SURFACE}
+local floor_tilecodes = {floor=-1, minewood_floor=-1, stone_floor=-1, pagoda_floor=-1, babylon_floor=-1, beehive_floor=-1, cog_floor=-1, duat_floor=-1, sunken_floor=-1, icefloor=-1, palace_floor=-1, temple_floor=-1, vlad_floor=-1, shop_wall=-1, pen_floor=-1, shop_sign=-1}
 
-local traps_ceiling = {ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
-local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
-local traps_wall = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP}
+--[[TRAPS]]
+local traps_ceiling = {ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SPIKEBALL_CEILING, ENT_TYPE.FLOOR_FACTORY_GENERATOR, ENT_TYPE.FLOOR_SHOPKEEPER_GENERATOR}
+local traps_floor = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP, ENT_TYPE.ACTIVEFLOOR_ELEVATOR}
+local traps_wall = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_LASER_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP}
 local traps_flip = {ENT_TYPE.FLOOR_ARROW_TRAP, ENT_TYPE.FLOOR_POISONED_ARROW_TRAP, ENT_TYPE.FLOOR_LASER_TRAP}
-local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
-local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
+local traps_generic = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_SPARK_TRAP, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP}
+local traps_item = {ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ACTIVEFLOOR_POWDERKEG}
 local traps_totem = {ENT_TYPE.FLOOR_TOTEM_TRAP, ENT_TYPE.FLOOR_LION_TRAP}
-local valid_floors = {ENT_TYPE.FLOOR_GENERIC, ENT_TYPE.FLOORSTYLED_TEMPLE, ENT_TYPE.FLOORSTYLED_COG, ENT_TYPE.FLOORSTYLED_BABYLON, ENT_TYPE.FLOORSTYLED_DUAT, ENT_TYPE.FLOORSTYLED_STONE, ENT_TYPE.FLOORSTYLED_PAGODA, ENT_TYPE.FLOORSTYLED_MINEWOOD, ENT_TYPE.FLOORSTYLED_BEEHIVE}
+local valid_floors = join(floor_types, {ENT_TYPE.FLOOR_ICE})
 
 local function trap_ceiling_spawn(x, y, l)
     local item = pick(traps_ceiling)
@@ -330,37 +462,32 @@ local trap_frog_chance = define_procedural_spawn("trap_frog", trap_frog_spawn, t
 
 set_callback(function(ctx)
     --math.randomseed(read_prng()[1])
-    ctx:set_procedural_spawn_chance(trap_ceiling_chance, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(trap_floor_chance, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(trap_wall_chance, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(trap_generic_chance, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(trap_item_chance, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(trap_totem_chance, get_chance(options.trap_min, options.trap_max)*2)
-    ctx:set_procedural_spawn_chance(trap_frog_chance, get_chance(options.trap_min, options.trap_max))
+    if options.trap then
+        ctx:set_procedural_spawn_chance(trap_ceiling_chance, math.floor(get_chance(options.trap_min, options.trap_max)*1.5))
+        ctx:set_procedural_spawn_chance(trap_floor_chance, get_chance(options.trap_min, options.trap_max))
+        ctx:set_procedural_spawn_chance(trap_wall_chance, get_chance(options.trap_min, options.trap_max))
+        ctx:set_procedural_spawn_chance(trap_generic_chance, get_chance(options.trap_min, options.trap_max))
+        ctx:set_procedural_spawn_chance(trap_item_chance, get_chance(options.trap_min, options.trap_max))
+        ctx:set_procedural_spawn_chance(trap_totem_chance, get_chance(options.trap_min, options.trap_max)*2)
+        ctx:set_procedural_spawn_chance(trap_frog_chance, get_chance(options.trap_min, options.trap_max))
 
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ARROWTRAP_CHANCE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRUSHER_TRAP_CHANCE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPIKE_BALL_CHANCE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.BIGSPEARTRAP_CHANCE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.JUNGLE_SPEAR_TRAP_CHANCE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.EGGSAC_CHANCE, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.STICKYTRAP_CHANCE, get_chance(options.trap_min, options.trap_max))
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SKULLDROP_CHANCE, get_chance(options.trap_min, options.trap_max))
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ARROWTRAP_CHANCE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRUSHER_TRAP_CHANCE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPIKE_BALL_CHANCE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.BIGSPEARTRAP_CHANCE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.JUNGLE_SPEAR_TRAP_CHANCE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.EGGSAC_CHANCE, get_chance(options.trap_min, options.trap_max))
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.STICKYTRAP_CHANCE, get_chance(options.trap_min, options.trap_max))
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SKULLDROP_CHANCE, get_chance(options.trap_min, options.trap_max))
+    end
 end, ON.POST_ROOM_GENERATION)
 
+local forced_tiles = {}
 set_callback(function()
     level_map = {}
+    forced_tiles = {}
 end, ON.PRE_LEVEL_GENERATION)
-
-set_callback(function()
-    --[[set_interval(function()
-        if options.projectile then
-            set_arrowtrap_projectile(pick(trap_arrows), pick(trap_arrows))
-        end
-    end, 15)]]
-    level_stuff = {}
-end, ON.LEVEL)
 
 set_post_entity_spawn(function(ent)
     if state.theme == THEME.DUAT then
@@ -368,10 +495,52 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
 
+local swapping_liquid = false
+
+set_callback(function()
+    if state.theme ~= THEME.DUAT or state.level_gen.spawn_y < 47 or not options.hard_duat then return end
+    local box = AABB:new()
+    box.top = state.level_gen.spawn_y - 2
+    box.bottom = state.level_gen.spawn_y - 3
+    box.left = state.level_gen.spawn_x - 5
+    box.right = state.level_gen.spawn_x + 5
+    local floor = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, LAYER.FRONT)
+    for i,v in ipairs(floor) do
+        kill_entity(v)
+    end
+    set_interval(function()
+        if state.theme ~= THEME.DUAT then return false end
+        if #get_entities_by(0, MASK.LIQUID, LAYER.BOTH) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
+            local liquid_type = ENT_TYPE.LIQUID_LAVA
+            if swapping_liquid then
+                liquid_type = ENT_TYPE.LIQUID_WATER
+            end
+            spawn_liquid(liquid_type, state.level_gen.spawn_x, state.level_gen.spawn_y - 2)
+        elseif #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
+            spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 36, LAYER.FRONT, 0, 0)
+            spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 2.5, 36, LAYER.FRONT, 0, 0)
+            spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 32.5, 36, LAYER.FRONT, 0, 0)
+            return false
+        end
+    end, 10)
+end, ON.LEVEL)
+
+set_callback(function()
+    if state.theme ~= THEME.DUAT then return end
+    local bones = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_BONEBLOCK)
+    local elevator = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
+    if #elevator > 0 then
+        local ex, ey, el = get_position(elevator[1])
+        for i,v in ipairs(bones) do
+            local x, y, l = get_position(v)
+            if y < ey+5 then
+                kill_entity(v)
+            end
+        end
+    end
+end, ON.FRAME)
+
 --[[ENEMIES]]
-register_option_float("enemy_max", "Max enemy chance", 12, 0, 100)
-register_option_float("enemy_min", "Min enemy chance", 5, 0, 100)
-register_option_float("enemy_curse_chance", "Enemy handicap chance", 5, 0, 100)
 
 local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
@@ -381,7 +550,7 @@ local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CROCMAN, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS,
     ENT_TYPE.MONS_CATMUMMY, ENT_TYPE.MONS_NECROMANCER, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI,
     ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
-    ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER, ENT_TYPE.MONS_SHOPKEEPERCLONE,
+    ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED,
     ENT_TYPE.MONS_AMMIT, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG,
     ENT_TYPE.MONS_JUMPDOG, ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MOUNT_TURKEY,
@@ -391,7 +560,7 @@ local enemies_big = {ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_LAVAMANDER, ENT_T
     ENT_TYPE.MONS_LAMASSU, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY, ENT_TYPE.MONS_CRABMAN,
     ENT_TYPE.MOUNT_MECH}
 local enemies_climb = {ENT_TYPE.MONS_FIREBUG, ENT_TYPE.MONS_MONKEY}
-local enemies_ceiling = {ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_VLAD, ENT_TYPE.MONS_HANGSPIDER}
+local enemies_ceiling = {ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_VAMPIRE, ENT_TYPE.MONS_VLAD, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_HANGSPIDER}
 local enemies_air = {ENT_TYPE.MONS_MOSQUITO, ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_GRUB, ENT_TYPE.MONS_IMP, ENT_TYPE.MONS_UFO, ENT_TYPE.MONS_SCARAB}
 local enemies_kingu = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
@@ -419,6 +588,7 @@ local function enemy_small_spawn(x, y, l)
     end
 end
 local function enemy_small_valid(x, y, l)
+    if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
     local air = get_grid_entity_at(x, y, l)
     if floor ~= -1 and air == -1 then
@@ -431,7 +601,7 @@ local enemy_small_chance = define_procedural_spawn("enemy_small", enemy_small_sp
 
 local function enemy_big_spawn(x, y, l)
     local id = pick(enemies_big)
-    local uid = spawn_entity_snapped_to_floor(id, x-0.5, y+0.5, l)
+    local uid = spawn_entity_snapped_to_floor(id, x, y, l)
     local ent = get_entity(uid)
     if id == ENT_TYPE.MOUNT_MECH then
         local rider = spawn_entity(pick({ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_ALIEN}), x, y, l, 0, 0)
@@ -441,6 +611,7 @@ local function enemy_big_spawn(x, y, l)
     end
 end
 local function enemy_big_valid(x, y, l)
+    if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
     local air = get_grid_entity_at(x, y, l)
     local air2 = get_grid_entity_at(x-1, y, l)
@@ -504,59 +675,60 @@ local function enemy_air_spawn(x, y, l)
     end
 end
 local function enemy_air_valid(x, y, l)
+    if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
     local air = get_grid_entity_at(x, y, l)
     return air == -1
 end
 local enemy_air_chance = define_procedural_spawn("enemy_air", enemy_air_spawn, enemy_air_valid)
 
 set_callback(function(ctx)
-    --math.randomseed(read_prng()[2])
-    ctx:set_procedural_spawn_chance(enemy_small_chance, get_chance(options.enemy_min, options.enemy_max))
-    ctx:set_procedural_spawn_chance(enemy_big_chance, get_chance(options.enemy_min, options.enemy_max) * 6)
-    ctx:set_procedural_spawn_chance(enemy_climb_chance, get_chance(options.enemy_min, options.enemy_max) * 2)
-    ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 4)
-    ctx:set_procedural_spawn_chance(enemy_air_chance, get_chance(options.enemy_min, options.enemy_max) * 12)
+    if options.enemy then
+        ctx:set_procedural_spawn_chance(enemy_small_chance, get_chance(options.enemy_min, options.enemy_max))
+        ctx:set_procedural_spawn_chance(enemy_big_chance, get_chance(options.enemy_min, options.enemy_max) * 6)
+        ctx:set_procedural_spawn_chance(enemy_climb_chance, get_chance(options.enemy_min, options.enemy_max) * 2)
+        ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 5)
+        ctx:set_procedural_spawn_chance(enemy_air_chance, get_chance(options.enemy_min, options.enemy_max) * 12)
 
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SNAKE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPIDER, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.HANGSPIDER, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTSPIDER, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.BAT, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CAVEMAN, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.HORNEDLIZARD, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MOLE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MANTRAP, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.TIKIMAN, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.WITCHDOCTOR, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MOSQUITO, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MONKEY, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ROBOT, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FIREBUG, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.IMP, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LAVAMANDER, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.VAMPIRE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CROCMAN, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.COBRA, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SORCERESS, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CAT, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.NECROMANCER, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.JIANGSHI, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FEMALE_JIANGSHI, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.OCTOPUS, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.HERMITCRAB, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.UFO, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.YETI, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.OLMITE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FROG, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FIREFROG, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.TADPOLE, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTFLY, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LEPRECHAUN, 0)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRABMAN, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SNAKE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPIDER, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.HANGSPIDER, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTSPIDER, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.BAT, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CAVEMAN, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.HORNEDLIZARD, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MOLE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MANTRAP, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.TIKIMAN, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.WITCHDOCTOR, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MOSQUITO, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.MONKEY, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ROBOT, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FIREBUG, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.IMP, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LAVAMANDER, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.VAMPIRE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CROCMAN, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.COBRA, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SORCERESS, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CAT, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.NECROMANCER, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.JIANGSHI, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FEMALE_JIANGSHI, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.OCTOPUS, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.HERMITCRAB, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.UFO, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.YETI, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.OLMITE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FROG, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.FIREFROG, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.TADPOLE, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTFLY, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LEPRECHAUN, 0)
+        ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRABMAN, 0)
+    end
 end, ON.POST_ROOM_GENERATION)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    --math.randomseed(read_prng()[1]+state.time_total)
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_REDSKELETON)
 
@@ -565,15 +737,13 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.ABZU then return end
-    ent = ent:as_movable()
+    if state.theme ~= THEME.ABZU or not options.hard_abzu then return end
     local x, y, l = get_position(ent.uid)
-    --math.randomseed(read_prng()[1]+state.time_total)
     spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
 end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS})
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    if state.theme ~= THEME.OLMEC then
+    if state.theme ~= THEME.OLMEC or not options.hard_olmec then
         return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
@@ -601,12 +771,19 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_CAVEMAN_BOSS})
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.OLMEC then return end
-    ent = ent:as_movable()
+    if state.theme ~= THEME.OLMEC or not options.hard_olmec then return end
     local x, y, l = get_position(ent.uid)
     local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
     if #players > 0 then return end
-    spawn_entity_nonreplaceable(pick(olmec_ammo), x, y, l, prng:random()*0.5-0.25, prng:random()*0.1+0.1)
+    local newent = get_entity(spawn_entity_nonreplaceable(pick(olmec_ammo), x, y, l, 0, 0))
+    if newent.stun_timer ~= nil then
+        newent.stun_timer = 15
+        set_timeout(function()
+            newent.velocityx = prng:random()*0.66-0.33
+            newent.velocityy = prng:random()*0.1+0.1
+        end, 1)
+    end
+    ent:destroy()
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_BOMB)
 
 local function get_tiamat()
@@ -658,18 +835,33 @@ local function tiamat_attack()
 end
 
 set_callback(function()
-    if state.theme ~= THEME.TIAMAT then return end
-    --math.randomseed(read_prng()[5])
+    if state.theme ~= THEME.TIAMAT or not options.hard_tiamat then return end
     set_timeout(tiamat_scream, 60)
     set_interval(tiamat_attack, 2)
 end, ON.LEVEL)
 
+local hundun_fireball_timer = -1
+local hundun_
+set_callback(function()
+    if state.theme ~= THEME.HUNDUN or not options.hard_hundun then return end
+    for i,v in ipairs(get_entities_by_type(ENT_TYPE.MONS_HUNDUN)) do
+        local x, y, l = get_position(v)
+        move_entity(v, x, 140, 0, 0)
+        set_timeout(function()
+            move_entity(v, x, y, 0, 0)
+            set_post_statemachine(v, function(ent)
+                ent.hundun_flags = set_flag(ent.hundun_flags, 2)
+                ent.hundun_flags = set_flag(ent.hundun_flags, 3)
+                ent.hundun_flags = set_flag(ent.hundun_flags, 4)
+                if ent.fireball_timer > 40 then
+                    ent.fireball_timer = prng:random(25,40)
+                end
+            end)
+        end, 1)
+    end
+end, ON.LEVEL)
+
 --[[ROOMS]]
-register_option_float("room_shop_chance", "Extra shop chance", 15, 0, 100)
-register_option_float("room_big_chance", "Huge level chance", 15, 0, 100)
-register_option_int("room_big_min", "Huge level min height", 8, 8, 15)
-register_option_int("room_big_max", "Huge level max height", 15, 8, 15)
-register_option_float("room_dark", "Dark level chance", 4, 0, 100)
 
 local valid_rooms_with_shop_next = {
     [ROOM_TEMPLATE.PATH_NORMAL] = true,
@@ -822,7 +1014,7 @@ local shop_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.C
 
 set_callback(function()
     local in_shop = {}
-    local items = get_entities_by_mask(MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER)
+    local items = get_entities_by(0, MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER, LAYER.BOTH)
     for i,v in ipairs(items) do
         local e = get_entity(v)
         if test_flag(e.flags, ENT_FLAG.SHOP_ITEM) then
@@ -832,31 +1024,46 @@ set_callback(function()
     for i,v in ipairs(in_shop) do
         --math.randomseed(read_prng()[8]+i)
         v.price = prng:random(1000, math.min(20000, 2*get_money())+prng:random(1500, 6000))
+        if prng:random(100) == 1 then
+            v.price = 0
+        end
     end
 end, ON.POST_LEVEL_GENERATION)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
-    if has(shop_rooms, roomtype) then
+    if has(shop_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
-        return spawn_entity_nonreplaceable(pick(all_shop_items), x, y, l, 0, 0)
+        local eid = pick(all_shop_items)
+        local etype = get_type(eid)
+        if etype.description > 1900 then
+            etype.description = prng:random(1804, 1858)
+        end
+        return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
+    return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, shop_items)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
-    if has(shop_rooms, roomtype) then
+    if has(shop_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
-        return spawn_entity_nonreplaceable(pick(shop_mounts), x, y, l, 0, 0)
+        local eid = pick(shop_mounts)
+        local etype = get_type(eid)
+        if etype.description > 1900 then
+            etype.description = prng:random(1804, 1858)
+        end
+        return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
+    return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, MASK.MOUNT, shop_mounts)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
-    if has(shop_rooms, roomtype) then
+    if has(shop_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local item = prng:random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
         if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
@@ -864,20 +1071,25 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         end
         return spawn_entity_nonreplaceable(item, x, y, l, 0, 0)
     end
+    return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.CHAR_HIREDHAND)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
-    if has(shop_rooms, roomtype) then
+    if has(shop_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
-        return spawn_entity_nonreplaceable(pick(all_shop_guns), x, y, l, 0, 0)
+        local eid = pick(all_shop_guns)
+        local etype = get_type(eid)
+        if etype.description > 1900 then
+            etype.description = prng:random(1804, 1858)
+        end
+        return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
+    return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, shop_guns)
 
 --[[CONTAINERS]]
-register_option_float("pot_chance", "Pot contents chance", 25, 0, 100)
-register_option_float("ushabti_chance", "Correct ushabti chance", 25, 0, 100)
 
 local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANGSPIDER, ENT_TYPE.MONS_GIANTSPIDER,
          ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_REDSKELETON,
@@ -894,8 +1106,7 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN,
          ENT_TYPE.MONS_OLD_HUNTER, ENT_TYPE.MONS_THIEF, ENT_TYPE.MONS_MADAMETUSK, ENT_TYPE.MONS_BODYGUARD,
          ENT_TYPE.MONS_HUNDUNS_SERVANT, ENT_TYPE.MONS_GOLDMONKEY, ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MONS_MEGAJELLYFISH,
-         ENT_TYPE.MONS_GHOST_SMALL_SURPRISED,
-         ENT_TYPE.MONS_GHOST_SMALL_HAPPY, ENT_TYPE.MONS_CRITTERDUNGBEETLE, ENT_TYPE.MONS_CRITTERBUTTERFLY,
+         ENT_TYPE.MONS_CRITTERDUNGBEETLE, ENT_TYPE.MONS_CRITTERBUTTERFLY,
          ENT_TYPE.MONS_CRITTERSNAIL, ENT_TYPE.MONS_CRITTERFISH, ENT_TYPE.MONS_CRITTERCRAB, ENT_TYPE.MONS_CRITTERLOCUST,
          ENT_TYPE.MONS_CRITTERPENGUIN, ENT_TYPE.MONS_CRITTERFIREFLY, ENT_TYPE.MONS_CRITTERDRONE,
          ENT_TYPE.MONS_CRITTERSLIME, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_PASTEBOMB, ENT_TYPE.ITEM_IDOL,
@@ -930,7 +1141,7 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ACTIVEFLOOR_BOULDER,
          ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
          ENT_TYPE.ACTIVEFLOOR_ELEVATOR, ENT_TYPE.FX_EXPLOSION, ENT_TYPE.FX_POWEREDEXPLOSION, ENT_TYPE.MOUNT_TURKEY,
-         ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL}
+         ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_12BAG}
 local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_BOMBBOX,
          ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, ENT_TYPE.ITEM_PICKUP_GIANTFOOD,
          ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECTACLES,
@@ -939,7 +1150,7 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
          ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE,
          ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN,
          ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH,
-         ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_CAPE,
+         ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.ITEM_CAPE,
          ENT_TYPE.ITEM_VLADS_CAPE, ENT_TYPE.ITEM_JETPACK, ENT_TYPE.ITEM_TELEPORTER_BACKPACK, ENT_TYPE.ITEM_HOVERPACK,
          ENT_TYPE.ITEM_POWERPACK, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_FREEZERAY,
          ENT_TYPE.ITEM_CROSSBOW, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_MATTOCK,
@@ -949,7 +1160,6 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
 local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PICKUP_BOMBBOX}
 
 set_post_entity_spawn(function(ent)
-    ent = ent:as_container()
     --math.randomseed(read_prng()[5]+ent.uid)
     if prng:random() < options.pot_chance/100 then
         ent.inside = pick(pot_items)
@@ -957,7 +1167,6 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_POT)
 
 set_post_entity_spawn(function(ent)
-    ent = ent:as_container()
     --math.randomseed(read_prng()[6]+ent.uid)
     if state.theme == THEME.ABZU and prng:random() < 0.5 then
         ent.inside = pick(abzu_crate_items)
@@ -986,9 +1195,6 @@ set_callback(function()
 end, ON.POST_LEVEL_GENERATION)
 
 --[[STATS]]
-register_option_int("stats_health_max", "Max starting health", 20, 4, 99)
-register_option_int("stats_bombs_max", "Max starting bombs", 20, 4, 99)
-register_option_int("stats_ropes_max", "Max starting ropes", 20, 4, 99)
 
 set_callback(function()
     --math.randomseed(read_prng()[1])
@@ -1000,10 +1206,6 @@ set_callback(function()
 end, ON.START)
 
 --[[DOORS]]
-register_option_int("door_min_levels", "Min levels between midbosses", 3, 1, 100)
-register_option_int("door_max_levels", "Max levels between midbosses", 6, 1, 100)
-register_option_int("door_bosses", "Amount of midbosses", 4, 0, 4)
-register_option_bool("door_transitions", "Neat transitions (maybe crashy)", false)
 
 local level_order = {}
 
@@ -1036,7 +1238,7 @@ for i,v in ipairs(bosses) do
 end
 
 local function set_doors()
-    if #players > 0 then
+    if #players > 0 and options.door then
         local px, py, pl = get_position(players[1].uid)
         local doors = get_entities_at(ENT_TYPE.FLOOR_DOOR_EXIT, 0, px, py, pl, 15)
         for i,v in ipairs(doors) do
@@ -1075,7 +1277,7 @@ local function add_boss(boss)
 end
 
 local function kill_boss(boss)
-    if not has(bosses_killed, boss) then
+    if not has(bosses_killed, boss) and options.door then
         bosses_killed[#bosses_killed+1] = boss
         toast("Boss defeated!\nBosses remaining: "..tostring(bosses_left()))
     end
@@ -1093,7 +1295,9 @@ end
 local function fix_chain()
     --math.randomseed(read_prng()[1])
     --insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
-    insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
+    if has(theme, THEME.NEO_BABYLON) then
+        insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
+    end
 end
 
 local function get_chain_item(x, y)
@@ -1104,7 +1308,7 @@ local function get_chain_item(x, y)
 end
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.VOLCANA then return end
+    if state.theme ~= THEME.VOLCANA or not options.chain then return end
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
     local room = get_room_template(rx, ry, l)
@@ -1115,7 +1319,7 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_DIAMOND)
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.DWELLING then return end
+    if state.theme ~= THEME.DWELLING or not options.chain then return end
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
     local room = get_room_template(rx, ry, l)
@@ -1126,6 +1330,7 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)
 
 set_callback(function()
+    if not options.chain then return end
     if state.theme == THEME.VOLCANA then
         local crowns = get_entities_by(ENT_TYPE.ITEM_PICKUP_CROWN, 0, LAYER.BACK)
         for i,v in ipairs(crowns) do
@@ -1153,6 +1358,7 @@ set_callback(function()
 end, ON.LEVEL)
 
 set_post_entity_spawn(function(ent)
+    if not options.chain then return end
     if state.theme ~= THEME.ABZU and state.theme ~= THEME.DUAT then return end
     if #chain_items > 0 then
         local x, y, l = get_position(ent.uid)
@@ -1162,6 +1368,7 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY)
 
 set_post_entity_spawn(function(ent)
+    if not options.chain then return end
     local x, y, l = get_position(ent.uid)
     if l == LAYER.BACK and state.world == 2 then
         kill_entity(ent.uid)
@@ -1169,10 +1376,12 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_HOUYIBOW)
 set_post_entity_spawn(function(ent)
+    if not options.chain then return end
     kill_entity(ent.uid)
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_METAL_ARROW)
 
 set_post_entity_spawn(function(ent)
+    if not options.chain then return end
     local x, y, l = get_position(ent.uid)
     if state.theme == THEME.SUNKEN_CITY and l == LAYER.BACK then
         kill_entity(ent.uid)
@@ -1181,19 +1390,65 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_LIGHT_ARROW)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    if state.theme == THEME.ICE_CAVES and l == LAYER.BACK then
+    if state.theme == THEME.ICE_CAVES and l == LAYER.BACK and options.chain then
         return spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_PLASMACANNON)
 
 set_post_entity_spawn(function(ent)
+    if not options.chain then return end
     local x, y, l = get_position(ent.uid)
     if state.world == 4 and l == LAYER.BACK then
         kill_entity(ent.uid)
         spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
+
+local swapping_spikes = false
+local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
+local function shuffle_tile_codes()
+    for k,v in pairs(floor_tilecodes) do
+        floor_tilecodes[k] = pick(floor_types, ENT_TYPE.FLOORSTYLED_COG)
+        if prng:random() < 0.15 and has(ice_themes, state.theme_next) then
+            floor_tilecodes[k] = ENT_TYPE.FLOOR_ICE
+        end
+        local type = k
+        set_pre_tile_code_callback(function(x, y, layer)
+            --if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
+            local above = get_grid_entity_at(x, y+1, layer)
+            if above ~= -1 then
+                above = get_entity(above)
+                if above.type.id == ENT_TYPE.FLOOR_SPIKES and not swapping_spikes then
+                    return
+                end
+            end
+            if forced_tiles[tile_key(x, y, layer)] ~= nil then
+                spawn_grid_entity(forced_tiles[tile_key(x, y, layer)], x, y, layer);
+            else
+                spawn_grid_entity(floor_tilecodes[type], x, y, layer)
+            end
+            return true
+        end, type)
+    end
+    floor_tilecodes["shop_wall"] = floor_tilecodes["floor"]
+    floor_tilecodes["shop_sign"] = floor_tilecodes["floor"]
+end
+
+local function set_theme_biases()
+    theme = {}
+    for i=1,options.bias_01 do theme[#theme+1] = 1 end
+    for i=1,options.bias_02 do theme[#theme+1] = 2 end
+    for i=1,options.bias_03 do theme[#theme+1] = 3 end
+    for i=1,options.bias_05 do theme[#theme+1] = 5 end
+    for i=1,options.bias_06 do theme[#theme+1] = 6 end
+    for i=1,options.bias_07 do theme[#theme+1] = 7 end
+    for i=1,options.bias_08 do theme[#theme+1] = 8 end
+    for i=1,options.bias_09 do theme[#theme+1] = 9 end
+    for i=1,options.bias_10 do theme[#theme+1] = 10 end
+    for i=1,options.bias_11 do theme[#theme+1] = 11 end
+    for i=1,options.bias_15 do theme[#theme+1] = 15 end
+end
 
 local function init_run()
     if test_flag(state.quest_flags, 7) then
@@ -1211,10 +1466,9 @@ local function init_run()
     boss_warp = false
     local normal_levels = 0
     local done = false
+    set_theme_biases()
     while not done do
-        if prng:random_int(1, 120, 0) == 1 then
-            add_level(7, 2, THEME.EGGPLANT_WORLD)
-        elseif bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and prng:random_int(1, options.door_max_levels, 0) <= normal_levels then
+        if bosses_added < options.door_bosses and #insert_bosses > 0 and normal_levels >= options.door_min_levels and prng:random_int(1, options.door_max_levels, 0) <= normal_levels then
             normal_levels = 0
             local t = pick(insert_bosses)
             local l = 4
@@ -1243,6 +1497,8 @@ local function init_run()
                 l = prng:random_int(5, 97, 0)
             elseif t == THEME.ICE_CAVES then
                 l = 1
+            elseif t == THEME.EGGPLANT_WORLD then
+                l = 2
             else
                 l = prng:random_int(1, 4, 0)
             end
@@ -1269,6 +1525,7 @@ local function init_run()
         { w = 2, l = 1, t = THEME.JUNGLE, b = false },
         { w = 7, l = 4, t = THEME.HUNDUN, b = true },
     }]]
+    if options.tilecode == true then shuffle_tile_codes() end
 end
 
 local function dead_olmec()
@@ -1299,7 +1556,7 @@ local function dead_hundun()
     if state.theme == THEME.HUNDUN then
         local hunduns = get_entities_by_type(ENT_TYPE.MONS_HUNDUN)
         if #hunduns > 0 then
-            if get_entity_ai_state(hunduns[1]) == 4 then -- this hundun is just chillin on the floor
+            if get_entity(hunduns[1]).move_state == 4 then -- this hundun is just chillin on the floor
                 kill_boss(THEME.HUNDUN)
             end
         end
@@ -1319,6 +1576,7 @@ local function dead_osiris()
 end
 
 local function duat_door()
+    if not options.door then return end
     -- spawn duat skip door
     spawn_door(17, 106, 0, level_order[state.level_count+1].w, level_order[state.level_count+1].l, level_order[state.level_count+1].t)
     spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
@@ -1370,55 +1628,61 @@ end, ON.LEVEL)
 
 set_callback(function()
     --message("Transition")
-    toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(bosses_left()))
-    --message("Transition - Setting next level")
-    local num = state.level_count+1
-    if test_flag(state.quest_flags, 1) then
-        num = 1
-    end
-    if #level_order > state.level_count then
-        state.world_next = level_order[num].w
-        state.level_next = level_order[num].l
-        state.theme_next = level_order[num].t
-        --state.quest_flags = 0
+    if options.door then
+        toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(bosses_left()))
+        --message("Transition - Setting next level")
+        local num = state.level_count+1
+        if test_flag(state.quest_flags, 1) then
+            num = 1
+        end
+        if #level_order > state.level_count then
+            state.world_next = level_order[num].w
+            state.level_next = level_order[num].l
+            state.theme_next = level_order[num].t
+            --state.quest_flags = 0
+        end
     end
 end, ON.TRANSITION)
 
 set_callback(function()
     --message("Loading")
     if state.screen_next ~= ON.LEVEL and (state.screen_next ~= ON.TRANSITION or not options.door_transitions) then return end
+    --if state.loading ~= 1 then return end
     if (#level_order == 0 or test_flag(state.quest_flags, 1)) then
         --message("Running init")
         init_run()
     end
-    local num = state.level_count+1
-    if test_flag(state.quest_flags, 1) then
-        num = 1
-    end
-    if boss_warp then
-        while level_order[num].b ~= true and #level_order >= num do
-            num = num + 1
+    if options.door then
+        local num = state.level_count+1
+        if test_flag(state.quest_flags, 1) then
+            num = 1
         end
-        state.level_count = num-1
+        if boss_warp then
+            while level_order[num].b ~= true and #level_order >= num do
+                num = num + 1
+            end
+            state.level_count = num-1
+        end
+        if num > 1 and #level_order >= num and level_order[num].t == THEME.COSMIC_OCEAN and level_order[num-1].t == THEME.JUNGLE then
+            return
+        end
+        if #level_order > state.level_count then
+            state.world_next = level_order[num].w
+            state.level_next = level_order[num].l
+            state.theme_next = level_order[num].t
+            --prinspect("going to", level_order[num].w, level_order[num].l, theme_name[level_order[num].t])
+        elseif #level_order <= state.level_count and state.theme_next ~= THEME.COSMIC_OCEAN then
+            --prinspect("last level, going to", co_level)
+            state.world_next = 8
+            state.level_next = co_level
+            state.theme_next = THEME.COSMIC_OCEAN
+        end
     end
-    if num > 1 and #level_order >= num and level_order[num].t == THEME.COSMIC_OCEAN and level_order[num-1].t == THEME.JUNGLE then
-        return
-    end
-    if #level_order > state.level_count then
-        state.world_next = level_order[num].w
-        state.level_next = level_order[num].l
-        state.theme_next = level_order[num].t
-        --prinspect("going to", level_order[num].w, level_order[num].l, theme_name[level_order[num].t])
-    elseif #level_order <= state.level_count and state.theme_next ~= THEME.COSMIC_OCEAN then
-        --prinspect("last level, going to", co_level)
-        state.world_next = 8
-        state.level_next = co_level
-        state.theme_next = THEME.COSMIC_OCEAN
-    end
+    if options.tilecode then shuffle_tile_codes() end
 end, ON.LOADING)
 
 set_callback(function(ctx)
-    if boss_warp and state.screen == ON.TRANSITION then
+    if boss_warp and state.screen == ON.TRANSITION and options.door then
         local color = prng:random(0, 0xffffffff)
         local _, size = get_window_size()
         size = size / 5
@@ -1519,6 +1783,20 @@ set_callback(function()
         else
             boss_warp = false
         end
+    elseif state.theme == THEME.VOLCANA and test_flag(state.presence_flags, 3) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
+    elseif state.theme == THEME.JUNGLE and test_flag(state.presence_flags, 2) then
+        local _, y, _ = get_position(players[1].uid)
+        if y < 90 then
+            boss_warp = true
+        else
+            boss_warp = false
+        end
     else
         boss_warp = false
     end
@@ -1546,17 +1824,63 @@ set_callback(function()
 end, ON.FRAME)
 
 set_callback(function()
-    toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(bosses_left()))
+    if options.door then
+        toast("Died after "..tostring(state.level_count).." levels!\nBosses remaining: "..tostring(bosses_left()))
+    end
 end, ON.DEATH)
 
 --[[PROJECTILES]]
-register_option_bool("projectile", "Random projectiles", true)
 
 local projectiles = {ENT_TYPE.ITEM_BULLET, ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT}
 local projectiles_pc = {ENT_TYPE.ITEM_BULLET, ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_CLONEGUNSHOT, ENT_TYPE.ITEM_PLASMACANNON_SHOT}
 local projectiles_clone = {ENT_TYPE.ITEM_LASERTRAP_SHOT, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_CLONEGUNSHOT}
 local projectiles_arrow = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_METAL_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW}
-
+local projectiles_web = {
+    [0]=ENT_TYPE.ITEM_CHEST,
+    [12]=ENT_TYPE.ITEM_NUGGET,
+    [16]=ENT_TYPE.ITEM_ROCK,
+    [17]=ENT_TYPE.ITEM_WOODEN_ARROW,
+    [19]=ENT_TYPE.ITEM_POT,
+    [49]=ENT_TYPE.ITEM_WEBGUN,
+    [54]=ENT_TYPE.ITEM_TELEPORTER,
+    [55]=ENT_TYPE.ITEM_BOOMERANG,
+    [63]=ENT_TYPE.ITEM_SKULL,
+    [68]=ENT_TYPE.ITEM_METAL_ARROW,
+    [80]=ENT_TYPE.ITEM_BOMB,
+    [107]=ENT_TYPE.ITEM_PUNISHBALL,
+    [112]=ENT_TYPE.ITEM_MACHETE,
+    [169]=ENT_TYPE.ITEM_LIGHT_ARROW,
+    [173]=ENT_TYPE.ITEM_EGGPLANT,
+    [195]=ENT_TYPE.ITEM_BROKENEXCALIBUR,
+    [225]=ENT_TYPE.ITEM_GIANTSPIDER_WEBSHOT,
+    [226]=ENT_TYPE.ITEM_ACIDSPIT,
+}
+local projectiles_web_ids = {}
+for i,v in pairs(projectiles_web) do
+    projectiles_web_ids[#projectiles_web_ids+1] = i
+end
+set_post_entity_spawn(function(ent)
+    if not options.projectile then return end
+    ent.animation_frame = pick(projectiles_web_ids)
+    ent.flags = set_flag(ent.flags, ENT_FLAG.PASSES_THROUGH_EVERYTHING)
+    local webshot = ent.uid
+    set_interval(function()
+        if get_entity(webshot) ~= nil and get_entity(webshot).layer < 2 and get_entity(webshot).overlay == nil and projectiles_web[get_entity(webshot).animation_frame] ~= nil then
+            local webshot_ent = get_entity(webshot)
+            local x, y, l = get_position(webshot)
+            local vx, vy = webshot_ent.velocityx, webshot_ent.velocityy
+            local af = webshot_ent.animation_frame
+            local owner = webshot_ent.last_owner_uid
+            move_entity(webshot, 0, 0, 0, 0)
+            local newshot = spawn(projectiles_web[af], x, y, l, vx, vy)
+            local newent = get_entity(newshot)
+            newent.last_owner_uid = owner
+            return false
+        elseif get_entity(webshot) == nil then
+            return false
+        end
+    end, 1)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_WEBSHOT)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if options.projectile then
@@ -1601,23 +1925,27 @@ end, SPAWN_TYPE.SYSTEMIC, 0, projectiles_arrow)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
-register_option_bool("storage", "Random Waddler caches", true)
+local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM, ROOM_TEMPLATE.TUSKDICESHOP, ROOM_TEMPLATE.TUSKDICESHOP_LEFT, ROOM_TEMPLATE.DICESHOP, ROOM_TEMPLATE.DICESHOP_LEFT, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100} --CHALLENGE ROOMS
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
-    if #storages == 0 and options.storage then
+    if #storages == 0 and options.storage and not (state.world == 6 and state.level == 3) then
         local spots = {}
         for x=3,state.width*10+2 do
             for y=122,122-state.height*8+1,-1 do
-                local floor = get_grid_entity_at(x, y, LAYER.BACK)
-                local floor2 = get_grid_entity_at(x+1, y, LAYER.BACK)
-                local air = get_grid_entity_at(x, y+1, LAYER.BACK)
-                local air2 = get_grid_entity_at(x+1, y+1, LAYER.BACK)
-                if air == -1 and air2 == -1 and floor ~= -1 and floor2 ~= -1 then
-                    floor = get_entity(floor)
-                    floor2 = get_entity(floor2)
-                    local items = get_entities_at(0, MASK.ITEM | MASK.ACTIVEFLOOR, x+0.5, y+0.5, LAYER.BACK, 2)
-                    if #items == 0 and floor.type.id == ENT_TYPE.FLOOR_GENERIC and floor2.type.id == ENT_TYPE.FLOOR_GENERIC then
-                        spots[#spots+1] = { x = x, y = y }
+                local rx, ry = get_room_index(x, y)
+                local roomtype = get_room_template(rx, ry, LAYER.BACK)
+                if not has(storage_bad_rooms, roomtype) then
+                    local floor = get_grid_entity_at(x, y, LAYER.BACK)
+                    local floor2 = get_grid_entity_at(x+1, y, LAYER.BACK)
+                    local air = get_grid_entity_at(x, y+1, LAYER.BACK)
+                    local air2 = get_grid_entity_at(x+1, y+1, LAYER.BACK)
+                    if air == -1 and air2 == -1 and floor ~= -1 and floor2 ~= -1 then
+                        floor = get_entity(floor)
+                        floor2 = get_entity(floor2)
+                        local items = get_entities_at(0, MASK.ITEM | MASK.ACTIVEFLOOR, x+0.5, y+0.5, LAYER.BACK, 2)
+                        if #items == 0 and has(valid_floors, floor.type.id) and has(valid_floors, floor2.type.id) then
+                            spots[#spots+1] = { x = x, y = y }
+                        end
                     end
                 end
             end
@@ -1669,3 +1997,253 @@ set_callback(function()
         end, 1)
     end
 end, ON.WIN)
+
+FakeWorld = 1
+FakeLevel = 1
+LevelNum = 1
+set_callback(function()
+    if not options.status then return end
+    local worldcount = 1
+    local levelcount = 1
+    for i,v in ipairs(level_order) do
+        if v.b and state.level_count+1 > i then
+            levelcount = 1
+            worldcount = worldcount + 1
+        elseif state.level_count+1 == i then
+            FakeWorld = worldcount
+            FakeLevel = levelcount
+        else
+            levelcount = levelcount + 1
+        end
+    end
+    LevelNum = state.level_count+1
+end, ON.LEVEL)
+
+set_callback(function(ctx)
+    if options.door and options.status and state.screen >= ON.LEVEL and state.level_count+1 <= #level_order and state.loading == 0 then
+        --ctx:draw_text(-0.065, 0.98, 28, F"{FakeWorld}-{FakeLevel}   {LevelNum}/{#level_order}", 0x44FFFFFF)
+        ctx:draw_text(0.9, 0.81, 32, F"{LevelNum}/{#level_order}", 0xBBFFFFFF)
+    end
+end, ON.GUIFRAME)
+
+--[[LIQUIDS]]
+--[[SPIKES]]
+set_callback(function()
+    swapping_liquid = state.theme ~= THEME.OLMEC and prng:random() < options.liquid_chance/100
+end, ON.PRE_LEVEL_GENERATION)
+
+local function swap_liquid(liquid_type, x, y)
+    if swapping_liquid then
+        spawn_liquid(liquid_type, x, y)
+        return true
+    end
+    return false
+end
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_WATER, x, y)
+end, "lava")
+
+set_pre_tile_code_callback(function(x, y, l)
+    if state.theme == THEME.HUNDUN and options.hard_hundun then return false end
+    return swap_liquid(ENT_TYPE.LIQUID_LAVA, x, y)
+end, "water")
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_COARSE_WATER, x, y)
+end, "coarse_lava")
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_COARSE_LAVA, x, y)
+end, "coarse_water")
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if swapping_liquid then
+        return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAKE, x, y, l, 0, 0)
+    end
+    return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAVA, x, y, l, 0, 0)
+end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.LIQUID_IMPOSTOR_LAVA)
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if swapping_liquid then
+        return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAVA, x, y, l, 0, 0)
+    end
+    return spawn_entity_nonreplaceable(ENT_TYPE.LIQUID_IMPOSTOR_LAKE, x, y, l, 0, 0)
+end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.LIQUID_IMPOSTOR_LAKE)
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_liquid(ENT_TYPE.LIQUID_COARSE_LAVA, x, y)
+end, "coarse_water")
+
+local last_spike_room = -1
+local spike_floors = {ENT_TYPE.FLOOR_JUNGLE_SPEAR_TRAP, ENT_TYPE.FLOOR_TIMED_FORCEFIELD, ENT_TYPE.FLOOR_TOMB, ENT_TYPE.FLOOR_QUICKSAND}
+local spike_items = {ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.FLOOR_SPRING_TRAP, ENT_TYPE.ITEM_SNAP_TRAP}
+local spike_types = join(spike_floors, spike_items)
+local spike_type = spike_types[1]
+
+local function swap_spikes(x, y, l)
+    local rx, ry = get_room_index(x, y)
+    local rid = 100*rx+ry
+    if rid ~= last_spike_room then
+        last_spike_room = rid
+        swapping_spikes = prng:random() < options.trap_spikes/100
+        spike_type = pick(spike_types)
+    end
+    if options.trap and swapping_spikes and l == LAYER.FRONT then
+        if has(spike_floors, spike_type) then
+            forced_tiles[tile_key(x, y-1, l)] = spike_type
+        else
+            spawn_entity_snapped_to_floor(spike_type, x, y, l)
+        end
+        return true
+    end
+    return false
+end
+
+set_pre_tile_code_callback(function(x, y, l)
+    return swap_spikes(x, y, l)
+end, "spikes")
+
+set_pre_tile_code_callback(function(x, y, l)
+    local rx, ry = get_room_index(x, y)
+    local rt = get_room_template(rx, ry, l)
+    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 and not has(storage_bad_rooms, rt) then
+        spawn_grid_entity(pick(traps_floor), x, y, l)
+        return true
+    end
+    return false
+end, "forcefield")
+
+set_pre_tile_code_callback(function(x, y, l)
+    local rx, ry = get_room_index(x, y)
+    local rt = get_room_template(rx, ry, l)
+    if l == LAYER.FRONT and options.trap and prng:random() < options.trap_fields/100 and not has(storage_bad_rooms, rt) then
+        spawn_grid_entity(pick(traps_floor), x, y, l)
+        return true
+    end
+    return false
+end, "timed_forcefield")
+
+set_callback(function()
+    for i,v in ipairs(get_entities_by_type(ENT_TYPE.FLOOR_QUICKSAND)) do
+        local decos = entity_get_items_by(v, ENT_TYPE.DECORATION_GENERIC, 0)
+        for j,d in ipairs(decos) do
+            get_entity(d):set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
+        end
+    end
+    if swapping_liquid and state.theme == THEME.TIDE_POOL and state.level == 2 then
+        local xmin, ymin, xmax, ymax = get_bounds()
+        local liquid_tiles = {}
+        for x = xmin, xmax, 1 do
+            for y = ymin, ymax, -1 do
+                local box = AABB:new(x, y, x+1, y-1)
+                local blobs = #get_entities_overlapping_hitbox(0, MASK.WATER, box, LAYER.FRONT)
+                if blobs > 0 then
+                liquid_tiles[tostring(math.floor(x)).."-"..tostring(math.floor(y))] = {math.floor(x), math.floor(y), blobs}
+                end
+            end
+        end
+        for i,v in ipairs(get_entities_by_mask(MASK.WATER)) do
+            kill_entity(v)
+        end
+        for i,v in pairs(liquid_tiles) do
+            if v[3] > 16 then
+                spawn_liquid(ENT_TYPE.LIQUID_LAVA, v[1]+1, v[2]+0.1)
+            end
+        end
+    end
+end, ON.POST_LEVEL_GENERATION)
+
+--[[OLMEC PHASES]]
+local olmec_phases = {0, 1, 2}
+local last_olmec_state = -1
+local last_olmec_change = -9999
+local olmec_cooldown = 180
+local olmec_floaters = {}
+local olmec_callback = -1
+
+local function olmec_phase(o)
+    if o.attack_phase == 3 then return end
+    last_olmec_change = state.time_level
+    local old_phase = o.attack_phase
+    local phase = pick(olmec_phases, old_phase)
+    if phase == old_phase then return end
+    if phase ~= 1 then
+        o.flags = clr_flag(o.flags, ENT_FLAG.NO_GRAVITY)
+        o.move_state = 0
+    end
+    o.unknown_attack_state = 0
+    if phase == 2 then
+        o.unknown_attack_state = -2
+    else
+        o.unknown_attack_state = 0
+    end
+    for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_FLOATER)) do
+        local e = get_entity(v)
+        e.health = 1
+        if phase == 1 then
+            e.flags = clr_flag(e.flags, ENT_FLAG.INVISIBLE)
+        else
+            e.flags = set_flag(e.flags, ENT_FLAG.INVISIBLE)
+            e.y = -1.6
+        end
+    end
+    o.attack_phase = phase
+    o.attack_timer = 120
+end
+
+set_callback(function()
+    clear_callback(olmec_callback)
+    olmec_callback = -1
+    olmec_floaters = {}
+    if state.theme == THEME.OLMEC then
+        if options.hard_olmec_phase then
+            set_olmec_phase_y_level(1, 66)
+            set_olmec_phase_y_level(2, 66)
+            local olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
+            if #olmecs > 0 then
+                local olmec = olmecs[1]
+                set_interval(function()
+                    local ent = get_entity(olmec)
+                    if state.time_level >= last_olmec_change+olmec_cooldown and ((ent.attack_phase == 0 and ent.move_state == 0) or (ent.attack_phase == 1 and ent.move_state == 11) or (ent.attack_phase == 2 and ent.move_state == 0)) and ent.standing_on_uid ~= -1 then
+                        olmec_phase(ent)
+                    end
+                    if ent.attack_phase > 2 then return false end
+                end, 1)
+                for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_SMALL, ENT_TYPE.ITEM_OLMECCANNON_UFO)) do
+                    local e = get_entity(v)
+                    e.flags = clr_flag(e.flags, ENT_FLAG.INVISIBLE)
+                end
+                for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_MEDIUM)) do
+                    local e = get_entity(v)
+                    if e.animation_frame == 13 then
+                        e.flags = clr_flag(e.flags, ENT_FLAG.INVISIBLE)
+                    end
+                end
+                for i,v in ipairs(get_entities_by_type(ENT_TYPE.FX_OLMECPART_FLOATER)) do
+                    olmec_floaters[#olmec_floaters+1] = v
+                end
+                olmec_callback = set_callback(function(ctx, depth) --TODO: stupid hack
+                    if state.theme ~= THEME.OLMEC or state.screen ~= SCREEN.LEVEL then
+                        clear_callback(olmec_callback)
+                        olmec_callback = -1
+                        return
+                    end
+                    if depth == 34 and state.theme == THEME.OLMEC then
+                        for i,v in ipairs(olmec_floaters) do
+                            local e = get_entity(v)
+                            if e ~= nil then
+                                if e.health > 0 then
+                                    e.animation_frame = 38
+                                end
+                            end
+                        end
+                    end
+                end, ON.RENDER_PRE_DRAW_DEPTH)
+            end
+        else
+            set_olmec_phase_y_level(1, 98)
+            set_olmec_phase_y_level(2, 82)
+        end
+    end
+end, ON.LEVEL)

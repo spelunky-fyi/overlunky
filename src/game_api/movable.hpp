@@ -1,7 +1,6 @@
 #pragma once
 
 #include "entity.hpp"
-#include "state_structs.hpp"
 
 #include <functional>
 
@@ -11,13 +10,14 @@ class Movable : public Entity
     std::map<int64_t, int64_t> pa0;
     std::map<int, int> pb0;
     size_t anim_func;
-    int32_t ic8;
-    int32_t icc;
+    int64_t ic8;
     float movex;
     float movey;
-    uint32_t buttons;
+    BUTTON buttons;
+    BUTTON buttons_previous;
+    int16_t unknown_padding; // garbage?
     uint32_t stand_counter;
-    float jump_height_multiplier;
+    float jump_height_multiplier; //entitydb.jump gets multiplied by this value
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
@@ -33,38 +33,49 @@ class Movable : public Entity
     uint8_t health;
     uint16_t stun_timer;
     uint16_t stun_state;
-    uint32_t some_state;
+    union
+    { // weird fix to not break compatibility with already exposed some_state
+        /// Deprecated, it's the same as lock_input_timer, but this name makes no sense
+        uint32_t some_state;
+        struct
+        {
+            /// Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
+            uint16_t lock_input_timer;
+            uint16_t wet_effect_timer; // fading the entity to black, similar to dark_shadow_timer
+        };
+    };
     int16_t poison_tick_timer;
-    uint8_t dark_shadow_timer;
-    uint8_t exit_invincibility_timer;
-    uint8_t invincibility_frames_timer;
+    uint8_t onfire_effect_timer;
+    uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
+    uint8_t invincibility_frames_timer; //blinks the entity
     uint8_t frozen_timer;
     uint8_t unknown_damage_counter_a;
     uint8_t unknown_damage_counter_b;
-    uint8_t i120a;
-    uint8_t i120b;
-    uint8_t i120c;
+    uint8_t i120a; // timer, damage related
+    uint8_t i120b; // timer
+    uint8_t i120c; // timer
     uint8_t i120d;
     uint8_t b124;
-    uint8_t airtime;
-    uint8_t b126;
+    /// airtime = falling_timer
+    uint8_t falling_timer;
+    uint8_t b126; // timer, after layer change?
     uint8_t b127;
 
     virtual bool can_jump() = 0;
-    virtual void v37() = 0;
+    virtual void v38() = 0;
     virtual float sprint_factor() = 0;
     virtual void calculate_jump_height() = 0; // when disabled, jump height is very high
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0;
     virtual void apply_velocity(float* velocities) = 0; // param is pointer to an array of two floats: velocity x and y
     virtual int8_t stomp_damage() = 0;                  // calculates the amount of stomp damage applied (checks spike shoes, movable.state and stand_counter resulting in different damage values)
     virtual int8_t stomp_damage_trampoline() = 0;       // simply jumps to the 43rd virtual function, aka stomp_damage...
-    virtual void adjust_health(int8_t amount) = 0;      // called for dealing damage (neg amount) by the game, but not for gaining health (turkey, motherstatue), even though that works too (and there is even a max health check of 0x63)
-    virtual void v45() = 0;
+    virtual bool is_on_fire() = 0;
     virtual void v46() = 0;
-    virtual void on_flying_object_collision(Entity* victim) = 0;                                          // stuff like flying rocks, broken arrows hitting the player
-    virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint8_t unknown = 1) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost); unknown param = 2 when hired hand gets hit by player
-    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                               // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
-    virtual void v50() = 0;
+    virtual void v47() = 0;
+    //virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
+    virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
+    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                                         // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
+    virtual void v51() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
     virtual void light_on_fire() = 0;
@@ -73,7 +84,8 @@ class Movable : public Entity
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // assigns player as last_owner_uid and also manipulates movable.b127
     virtual uint32_t get_last_owner_uid() = 0;               // for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
     virtual void check_out_of_bounds() = 0;                  // kills with the 'still falling' death cause
-    virtual Entity* standing_on() = 0;                       // looks up movable.standing_on_uid in state.instance_id_to_pointer
+    virtual void v59() = 0;
+    virtual Entity* standing_on() = 0; // looks up movable.standing_on_uid in state.instance_id_to_pointer
     virtual void on_stomped_on_by(Entity* stomper) = 0;
     virtual void on_thrown_by(Entity* thrower) = 0;      // implemented for special cases like hired hand (player with ai_func), horned lizard...
     virtual void on_clonegunshot_hit(Entity* clone) = 0; // implemented for player/hired hand: copies health to clone etc
@@ -83,7 +95,10 @@ class Movable : public Entity
     virtual void pick_up(Entity* entity_to_pick_up) = 0;
     virtual void on_picked_up_by(Entity* entity_picking_up) = 0;
     virtual void drop(Entity* entity_to_drop) = 0; // also used when throwing
-    virtual void collect_treasure(uint32_t treasure_value) = 0;
+
+    /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
+    virtual void add_money(uint32_t money) = 0;
+
     virtual void apply_movement() = 0;              // disable this function and things can't move, some spin in place
     virtual void damage_entity(Entity* victim) = 0; // can't trigger, maybe extra params are needed
     virtual bool is_monster_or_player() = 0;
@@ -101,16 +116,25 @@ class Movable : public Entity
     virtual void v84() = 0;                          // triggers when tusk is angered, calls get_last_owner_uid
     virtual void gravity_related() = 0;
     virtual void v86() = 0;
+    virtual void v87() = 0;
+    virtual void stack_plus_28_is_0() = 0;   // unknown; triggers on item_rubble
+    virtual void on_crushed_by(Entity*) = 0; // e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
+    virtual void on_fall_onto(uint32_t unknown, Entity* fell_on_entity) = 0;
 
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
     bool is_poisoned();
 
-    bool is_button_pressed(uint32_t button);
-    bool is_button_held(uint32_t button);
-    bool is_button_released(uint32_t button);
+    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+    void damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint16_t iframes);
+    // the original damage function was added to the API without the iframes param, but for backwards compatibility we preserve the broken one
+    void broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
 
-    std::uint32_t set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine);
-    std::uint32_t set_post_statemachine(std::function<void(Movable*)> post_state_machine);
+    bool is_button_pressed(BUTTON button);
+    bool is_button_held(BUTTON button);
+    bool is_button_released(BUTTON button);
+
+    void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
+    void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
 };
 
 class PlayerTracker

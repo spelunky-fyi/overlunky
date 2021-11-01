@@ -161,6 +161,8 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
+    lua.create_named_table("GHOST_BEHAVIOR", "SAD", GHOST_BEHAVIOR::SAD, "MEDIUM_SAD", GHOST_BEHAVIOR::MEDIUM_SAD, "MEDIUM_HAPPY", GHOST_BEHAVIOR::MEDIUM_HAPPY, "SMALL_ANGRY", GHOST_BEHAVIOR::SMALL_ANGRY, "SMALL_SURPRISED", GHOST_BEHAVIOR::SMALL_SURPRISED, "SMALL_SAD", GHOST_BEHAVIOR::SMALL_SAD, "SMALL_HAPPY", GHOST_BEHAVIOR::SMALL_HAPPY);
+
     lua.new_usertype<Ghost>(
         "Ghost",
         "split_timer",
@@ -274,6 +276,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Yang>(
         "Yang",
+        "turkeys_in_den",
+        &Yang::turkeys_in_den,
         "first_message_shown",
         &Yang::first_message_shown,
         "quest_incomplete",
@@ -653,8 +657,8 @@ void register_usertypes(sol::state& lua)
         "Sorceress",
         "inbetween_attack_timer",
         &Sorceress::inbetween_attack_timer,
-        "airtime",
-        &Sorceress::airtime,
+        "in_air_timer",
+        &Sorceress::in_air_timer,
         "halo_emitted_light",
         &Sorceress::halo_emitted_light,
         "fx_entity",

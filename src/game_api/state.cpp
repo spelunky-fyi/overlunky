@@ -4,102 +4,18 @@
 #include "logger.h"
 #include "render_api.hpp"
 #include "spawn_api.hpp"
+#include "strings.hpp"
+#include "virtual_table.hpp"
 
-size_t get_dark()
+#include <detours.h>
+
+uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto addr_dark = memory.after_bundle;
-        addr_dark = find_inst(memory.exe(), "\x44\xC5\x80\xA0\x12\x0A\x00\x00\xFD"s, memory.after_bundle);
-        return res = memory.at_exe(addr_dark) + 9;
-    }
+    return (correct_ushabti + (correct_ushabti / 10) * 2);
 }
-
-size_t get_zoom()
+void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 {
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto addr_zoom = memory.after_bundle;
-        for (int _ = 0; _ < 3; _++)
-        {
-            addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-        }
-        return res = memory.at_exe(addr_zoom) + 10;
-    }
-}
-
-size_t get_zoom_shop()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto addr_zoom = memory.after_bundle;
-        for (int _ = 0; _ < 2; _++)
-        {
-            addr_zoom = find_inst(memory.exe(), "\x48\x8B\x48\x10\xC7\x81"s, addr_zoom + 1);
-        }
-        return res = memory.at_exe(addr_zoom) + 10;
-    }
-}
-
-size_t get_location()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto exe = memory.exe();
-        auto start = memory.after_bundle;
-        auto location = find_inst(exe, "\x49\x0F\x44\xC0"s, start);
-        location = find_inst(exe, "\x49\x0F\x44\xC0"s, location + 1);
-        location = memory.at_exe(decode_pc(exe, find_inst(exe, "\x48\x8B"s, location - 0x10)));
-        return res = location;
-    }
-}
-
-size_t get_damage()
-{
-    ONCE(size_t)
-    {
-        // TODO: get vtable of character and calculate the offset
-        auto memory = Memory::get();
-        auto off = memory.after_bundle;
-        while (true)
-        {
-            // sub rsp, 0x90; xor reg, reg
-            off = find_inst(memory.exe(), "\x48\x81\xEC\x90\x00\x00\x00"s, off + 1);
-            if (read_u8(memory.at_exe(off + 7)) == 0x33 || read_u8(memory.at_exe(off + 8)) == 0x33)
-            {
-                break;
-            }
-        }
-
-        return res = function_start(memory.at_exe(off));
-    }
-}
-
-size_t get_insta()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto off = memory.after_bundle;
-        off = find_inst(memory.exe(), "\x40\x53\x56\x41\x54\x41\x55\x48\x83\xEC\x68"s,
-                        off + 1); // Spel2.exe+21E37920
-        return res = function_start(memory.at_exe(off));
-    }
-}
-
-size_t get_camera()
-{
-    ONCE(size_t)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\xC7\x87\xCC\x00\x00\x00\x00\x00"s, memory.after_bundle);
-        off = find_inst(memory.exe(), "\xF3\x0F\x11\x05"s, off) + 1;
-        return res = memory.at_exe(decode_pc(memory.exe(), off));
-    }
+    correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
 }
 
 inline bool& get_is_init()
@@ -110,11 +26,15 @@ inline bool& get_is_init()
 
 void do_write_load_opt()
 {
-    auto memory = Memory::get();
-    auto exe = memory.exe();
-    auto start = memory.after_bundle;
-    auto off_send = find_inst(exe, "\x45\x8D\x41\x50"s, start) + 7;
-    write_mem_prot(memory.at_exe(off_send), "\x31\xC0\x31\xD2\x90\x90"s, true);
+    size_t write_load_addr = get_address("write_load_opt");
+    if (write_load_addr > 0ull)
+    {
+        write_mem_prot(write_load_addr, "\x90\x90"sv, true);
+    }
+    else
+    {
+        assert(get_address("write_load_opt_fixed") > 0ull);
+    }
 }
 bool& get_write_load_opt()
 {
@@ -149,17 +69,13 @@ State& State::get()
         {
             do_write_load_opt();
         }
-        auto addr_location = get_location();
-        auto addr_damage = get_damage();
-        auto addr_insta = get_insta();
-        auto addr_zoom = get_zoom();
-        auto addr_zoom_shop = get_zoom_shop();
-        auto addr_dark = get_dark();
-        STATE = State{addr_location, addr_damage, addr_insta, addr_zoom, addr_zoom_shop, addr_dark};
+        auto addr_location = get_address("state_location");
+        STATE = State{addr_location};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
         init_render_api_hooks();
         get_is_init() = true;
+        strings_init();
     }
     return STATE;
 }
@@ -179,8 +95,7 @@ StateMemory* State::ptr_local() const
 std::pair<float, float> State::click_position(float x, float y)
 {
     float cz = get_zoom_level();
-    float cx = read_f32(get_camera());
-    float cy = read_f32(get_camera() + 4);
+    auto [cx, cy] = get_camera_position();
     float rx = cx + ZF * cz * x;
     float ry = cy + (ZF / 16.0f * 9.0f) * cz * y;
     return {rx, ry};
@@ -189,40 +104,223 @@ std::pair<float, float> State::click_position(float x, float y)
 std::pair<float, float> State::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
-    float cx = read_f32(get_camera());
-    float cy = read_f32(get_camera() + 4);
+    auto [cx, cy] = get_camera_position();
     float rx = (x - cx) / cz / ZF;
     float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
 }
 
+size_t State::get_zoom_level_address()
+{
+    size_t obj1 = get_address("zoom_level");
+
+    size_t obj2 = read_u64(obj1);
+    if (obj2 == 0)
+    {
+        return 0;
+    }
+
+    size_t obj3 = read_u64(obj2 + 0x10);
+    if (obj3 == 0)
+    {
+        return 0;
+    }
+    return obj3 + get_address("zoom_level_offset");
+}
+
 float State::get_zoom_level()
 {
-    auto memory = Memory::get();
-    auto offset = memory.at_exe(0x22334A00); //TODO: patterns or something. Also this pointer is kinda slow, it doesn't work before intro cutscene.
-    offset = read_u64(offset);
-    if (offset != 0)
+    static size_t offset = 0;
+    if (offset == 0)
     {
-        offset += 0x804ec;
-        return read_f32(offset);
+        auto addr = get_zoom_level_address();
+        if (addr == 0)
+        {
+            return 13.5;
+        }
+        offset = addr;
+    }
+    return read_f32(offset);
+}
+
+void State::zoom(float level)
+{
+    auto roomx = ptr()->w;
+    if (level == 0.0)
+    {
+        switch (roomx)
+        {
+        case 1:
+            level = 9.50f;
+            break;
+        case 2:
+            level = 16.29f;
+            break;
+        case 3:
+            level = 23.08f;
+            break;
+        case 4:
+            level = 29.87f;
+            break;
+        case 5:
+            level = 36.66f;
+            break;
+        case 6:
+            level = 43.45f;
+            break;
+        case 7:
+            level = 50.24f;
+            break;
+        case 8:
+            level = 57.03f;
+            break;
+        default:
+            level = 13.5f;
+        }
+    }
+
+    const auto level_str = to_le_bytes(level);
+
+    // overwrite the defaults
+    write_mem_prot(get_address("default_zoom_level"), level_str, true);
+    write_mem_prot(get_address("default_zoom_level_shop"), level_str, true);
+    write_mem_prot(get_address("default_zoom_level_camp"), level_str, true);
+    write_mem_prot(get_address("default_zoom_level_telescope"), level_str, true);
+
+    // overwrite the current value
+    auto zla = get_zoom_level_address();
+    if (zla != 0)
+    {
+        write_mem_prot(zla, level_str, true);
+    }
+}
+
+static bool g_godmode_player_active = false;
+static bool g_godmode_companions_active = false;
+
+bool is_active_player(Entity* e)
+{
+    auto state = State::get();
+    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
+    {
+        auto player = state.items()->player(i);
+        if (player && player == e)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint32_t, uint32_t);
+OnDamageFun* g_on_damage_trampoline{nullptr};
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes)
+{
+    if (g_godmode_player_active && is_active_player(victim))
+    {
+        return;
+    }
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    {
+        return;
+    }
+    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+}
+
+using OnInstaGibFun = void(Entity*, size_t);
+OnInstaGibFun* g_on_instagib_trampoline{nullptr};
+void on_instagib(Entity* victim, size_t unknown)
+{
+    if (g_godmode_player_active && is_active_player(victim))
+    {
+        return;
+    }
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    {
+        return;
+    }
+    g_on_instagib_trampoline(victim, unknown);
+}
+
+void hook_godmode_functions()
+{
+    static bool functions_hooked = false;
+    if (!functions_hooked)
+    {
+        auto memory = Memory::get();
+        auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
+        auto addr_insta = get_address("insta_gib");
+
+        g_on_damage_trampoline = (OnDamageFun*)addr_damage;
+        g_on_instagib_trampoline = (OnInstaGibFun*)addr_insta;
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        DetourAttach((void**)&g_on_damage_trampoline, &on_damage);
+        DetourAttach((void**)&g_on_instagib_trampoline, &on_instagib);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking on_damage/instagib: {}\n", error);
+        }
+
+        functions_hooked = true;
+    }
+}
+
+void State::godmode(bool g)
+{
+    hook_godmode_functions();
+    g_godmode_player_active = g;
+}
+
+void State::godmode_companions(bool g)
+{
+    hook_godmode_functions();
+    g_godmode_companions_active = g;
+}
+
+void State::darkmode(bool g)
+{
+    static size_t addr_dark = 0;
+    static char original_instructions[2] = {0};
+    if (addr_dark == 0)
+    {
+        addr_dark = get_address("force_dark_level");
+        original_instructions[0] = read_u8(addr_dark);
+        original_instructions[1] = read_u8(addr_dark + 1);
+    }
+    if (g)
+    {
+        write_mem_prot(addr_dark, ("\x90\x90"s), true);
     }
     else
     {
-        return 13.5;
+        write_mem_prot(addr_dark, std::string(original_instructions, 2), true);
     }
 }
 
 std::pair<float, float> State::get_camera_position()
 {
-    float cx = read_f32(get_camera());
-    float cy = read_f32(get_camera() + 4);
-    return {cx, cy};
+    static size_t addr = 0;
+    if (addr == 0)
+    {
+        addr = get_address("camera_position");
+    }
+
+    auto cx = (float*)addr;
+    auto cy = (float*)(addr + 4);
+    return {*cx, *cy};
 }
 
 void State::set_camera_position(float cx, float cy)
 {
-    write_mem_prot(get_camera(), to_le_bytes(cx), true);
-    write_mem_prot(get_camera() + 4, to_le_bytes(cy), true);
+    auto camera = ptr()->camera;
+    camera->focused_entity_uid = -1;
+    camera->focus_x = cx;
+    camera->focus_y = cy;
 }
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
@@ -233,7 +331,7 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     {
         ptr()->items->player_select_slots[0].activated = true;
         ptr()->items->player_select_slots[0].character = savedata()->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 270; //TODO: magic numbers
+        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 285; //TODO: magic numbers
         ptr()->items->player_count = 1;
     }
     ptr()->world_next = w;
@@ -281,5 +379,33 @@ void State::set_seed(uint32_t seed)
 SaveData* State::savedata()
 {
     auto gm = get_game_manager();
-    return gm->tmp->savedata.decode();
+    return gm->save_related->savedata.decode();
+}
+
+Entity* State::find(uint32_t uid)
+{
+    // Ported from MauveAlert's python code in the CAT tracker
+    auto mask = ptr()->uid_to_entity_mask;
+    uint32_t target_uid_plus_one = uid + 1;
+    uint32_t cur_index = target_uid_plus_one & mask;
+    while (true)
+    {
+        auto entry = ptr()->uid_to_entity_data[cur_index];
+        if (entry.uid_plus_one == target_uid_plus_one)
+        {
+            return entry.entity;
+        }
+
+        if (entry.uid_plus_one == 0)
+        {
+            return nullptr;
+        }
+
+        if ((target_uid_plus_one & mask) > (entry.uid_plus_one & mask))
+        {
+            return nullptr;
+        }
+
+        cur_index = (cur_index + 1) & mask;
+    }
 }

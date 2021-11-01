@@ -1,10 +1,15 @@
 #include "lua_vm.hpp"
 
+#include <csignal>
+
 #include "entities_items.hpp"
 #include "entity.hpp"
+#include "game_manager.hpp"
+#include "online.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "strings.hpp"
 
 #include "lua_backend.hpp"
 #include "lua_console.hpp"
@@ -14,11 +19,14 @@
 #include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
+#include "usertypes/entities_backgrounds_lua.hpp"
 #include "usertypes/entities_chars_lua.hpp"
+#include "usertypes/entities_decorations_lua.hpp"
 #include "usertypes/entities_floors_lua.hpp"
 #include "usertypes/entities_fx_lua.hpp"
 #include "usertypes/entities_items_lua.hpp"
 #include "usertypes/entities_liquids_lua.hpp"
+#include "usertypes/entities_logical_lua.hpp"
 #include "usertypes/entities_monsters_lua.hpp"
 #include "usertypes/entities_mounts_lua.hpp"
 #include "usertypes/entity_casting_lua.hpp"
@@ -31,10 +39,13 @@
 #include "usertypes/player_lua.hpp"
 #include "usertypes/prng_lua.hpp"
 #include "usertypes/save_context.hpp"
+#include "usertypes/screen_arena_lua.hpp"
+#include "usertypes/screen_lua.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
 #include "usertypes/socket_lua.hpp"
+#include "usertypes/vanilla_render_lua.hpp"
 
 #include "lua_libs/lua_libs.hpp"
 
@@ -93,11 +104,15 @@ end
     NSound::register_usertypes(lua, sound_manager);
     NLevel::register_usertypes(lua);
     NGui::register_usertypes(lua);
+    NVanillaRender::register_usertypes(lua);
     NTexture::register_usertypes(lua);
     NEntity::register_usertypes(lua);
     NEntitiesChars::register_usertypes(lua);
     NEntitiesFloors::register_usertypes(lua);
     NEntitiesActiveFloors::register_usertypes(lua);
+    NEntitiesBG::register_usertypes(lua);
+    NEntitiesDecorations::register_usertypes(lua);
+    NEntitiesLogical::register_usertypes(lua);
     NEntitiesMounts::register_usertypes(lua);
     NEntitiesMonsters::register_usertypes(lua);
     NEntitiesItems::register_usertypes(lua);
@@ -107,6 +122,8 @@ end
     NSaveContext::register_usertypes(lua);
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
+    NScreen::register_usertypes(lua);
+    NScreenArena::register_usertypes(lua);
     NPlayer::register_usertypes(lua);
     NDrops::register_usertypes(lua);
     NCharacterState::register_usertypes(lua);
@@ -121,6 +138,10 @@ end
     /// end
     /// ```
     lua["state"] = get_state_ptr();
+    /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
+    lua["game_manager"] = get_game_manager();
+    /// The Online object has information about the online lobby and its players
+    lua["online"] = get_online();
     /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Player*>(get_players());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
@@ -182,7 +203,7 @@ end
         }
     };
 
-    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
@@ -201,7 +222,7 @@ end
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
-    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
@@ -247,12 +268,6 @@ end
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->required_scripts.push_back(sanitize(id));
     };
-    /// Seed the game prng.
-    lua["seed_prng"] = [](int64_t seed)
-    {
-        auto seed_prng = get_seed_prng();
-        seed_prng(seed);
-    };
     /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
     /// ```lua
     /// -- this should always print the same table D877...E555
@@ -269,7 +284,7 @@ end
     lua["toast"] = [](std::wstring message)
     {
         auto toast = get_toast();
-        toast(NULL, message.data());
+        toast(message.data());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::wstring message, int unk_type, bool top)
@@ -278,7 +293,7 @@ end
         auto entity = get_entity_ptr(entity_uid);
         if (entity == nullptr)
             return;
-        say(NULL, entity, message.data(), unk_type, top);
+        say((void*)get_say_context(), entity, message.data(), unk_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
@@ -373,9 +388,14 @@ end
             backend->options[name] = {desc, "", ButtonOption{callback}};
             lua["options"][name] = -1;
         });
-
-    /// Spawn a "block" of liquids, always spawns in the front layer and will have fun effects if `entity_type` is not a liquid.
+    auto spawn_liquid = sol::overload(
+        static_cast<void (*)(ENT_TYPE, float, float)>(::spawn_liquid),
+        static_cast<void (*)(ENT_TYPE, float, float, float, float, uint32_t, uint32_t)>(::spawn_liquid_ex),
+        static_cast<void (*)(ENT_TYPE, float, float, float, float, uint32_t, uint32_t, float)>(::spawn_liquid));
+    /// Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
     /// Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
+    /// `liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
+    /// `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
     lua["spawn_liquid"] = spawn_liquid;
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
@@ -418,10 +438,14 @@ end
     lua["spawn_apep"] = spawn_apep;
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
-    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// NoDoc
+    /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
+    /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
+    lua["spawn_impostor_lake"] = spawn_impostor_lake;
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
-    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity)`
+    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
@@ -439,9 +463,9 @@ end
         backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
         return backend->cbcount++;
     };
-    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `0` to ignore that.
+    /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
-    /// The callback signature is `nil post_entity_spawn(entity)`
+    /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<uint32_t> types;
@@ -464,9 +488,17 @@ end
     lua["warp"] = warp;
     /// Set seed and reset run.
     lua["set_seed"] = set_seed;
-    /// Enable/disable godmode.
+    /// Enable/disable godmode for players.
     lua["god"] = godmode;
-    /// Try to force next levels to be dark.
+    /// Enable/disable godmode for companions.
+    lua["god_companions"] = godmode_companions;
+    /// Deprecated
+    /// Set level flag 18 on post room generation instead, to properly force every level to dark
+    /// ```lua
+    /// set_callback(function()
+    ///     state.level_flags = set_flag(state.level_flags, 18)
+    /// end, ON.POST_ROOM_GENERATION)
+    /// ```
     lua["force_dark_level"] = darkmode;
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
@@ -524,9 +556,18 @@ end
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
     /// Deprecated
-    /// Use get_entities_by(0, 0, LAYER.BOTH)
+    /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
-    /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that.
+    /// Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
+    lua["filter_entities"] = [&lua](std::vector<uint32_t> entities, sol::function predicate) -> std::vector<uint32_t> {
+        return filter_entities(std::move(entities), [&lua, pred = std::move(predicate)](Entity* entity) -> bool
+                               { return pred(lua["cast_entity"](entity)); });
+    };
+
+    auto get_entities_by = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, LAYER)>(::get_entities_by),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, LAYER)>(::get_entities_by));
+    /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     lua["get_entities_by"] = get_entities_by;
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
     /// You can even pass a table! Example:
@@ -557,17 +598,29 @@ end
         return std::vector<uint32_t>({});
     };
     /// Deprecated
-    /// Use get_entities_by(0, mask, LAYER.BOTH)
+    /// Use `get_entities_by(0, mask, LAYER.BOTH)` instead
     lua["get_entities_by_mask"] = get_entities_by_mask;
     /// Deprecated
-    /// Use get_entities_by(0, 0, layer)
+    /// Use `get_entities_by(0, MASK.ANY, layer)` instead
     lua["get_entities_by_layer"] = get_entities_by_layer;
-    /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that.
+
+    auto get_entities_at = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, float, float, LAYER, float)>(::get_entities_at),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, float, float, LAYER, float)>(::get_entities_at));
+    /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     lua["get_entities_at"] = get_entities_at;
+
+    auto get_entities_overlapping = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, float, float, float, float, LAYER)>(::get_entities_overlapping),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, float, float, float, float, LAYER)>(::get_entities_overlapping));
     /// Deprecated
     /// Use `get_entities_overlapping_hitbox` instead
     lua["get_entities_overlapping"] = get_entities_overlapping;
-    /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that.
+
+    auto get_entities_overlapping_hitbox = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, AABB, LAYER)>(::get_entities_overlapping_hitbox),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, AABB, LAYER)>(::get_entities_overlapping_hitbox));
+    /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     lua["get_entities_overlapping_hitbox"] = get_entities_overlapping_hitbox;
     /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
     /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
@@ -580,13 +633,14 @@ end
     lua["get_entity_flags2"] = get_entity_flags2;
     /// Set the `more_flags` field from entity by uid
     lua["set_entity_flags2"] = set_entity_flags2;
-    /// Get the `move_state` field from entity by uid
+    /// Deprecated
+    /// As the name is misleading. use entity `move_state` field instead
     lua["get_entity_ai_state"] = get_entity_ai_state;
     /// Get `state.level_flags`
-    lua["get_level_flags"] = get_hud_flags;
+    lua["get_level_flags"] = get_level_flags;
     /// Set `state.level_flags`
-    lua["set_level_flags"] = set_hud_flags;
-    /// Get the ENT_TYPE... for entity by uid
+    lua["set_level_flags"] = set_level_flags;
+    /// Get the ENT_TYPE... of the entity by uid
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
     lua["get_zoom_level"] = get_zoom_level;
@@ -609,13 +663,23 @@ end
     lua["attach_ball_and_chain"] = attach_ball_and_chain;
     /// Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
     lua["spawn_entity_over"] = spawn_entity_over;
+    /// Short for [spawn_entity_over](#spawn_entity_over)
+    lua["spawn_over"] = spawn_entity_over;
     /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
     lua["entity_has_item_uid"] = entity_has_item_uid;
-    /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory
+
+    auto entity_has_item_type = sol::overload(
+        static_cast<bool (*)(uint32_t, ENT_TYPE)>(::entity_has_item_type),
+        static_cast<bool (*)(uint32_t, std::vector<ENT_TYPE>)>(::entity_has_item_type));
+    /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
     lua["entity_has_item_type"] = entity_has_item_type;
-    /// Gets all items of `entity_type` and `mask` from an entity's inventory. Set `entity_type` and `mask` to 0 to return all inventory items.
+
+    auto entity_get_items_by = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(uint32_t, ENT_TYPE, uint32_t)>(::entity_get_items_by),
+        static_cast<std::vector<uint32_t> (*)(uint32_t, std::vector<ENT_TYPE>, uint32_t)>(::entity_get_items_by));
+    /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
     lua["entity_get_items_by"] = entity_get_items_by;
-    /// Kills an entity by uid.
+    /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
     /// ```lua
@@ -625,6 +689,10 @@ end
     lua["pick_up"] = pick_up;
     /// Drop an entity by uid
     lua["drop"] = drop;
+    /// Unequips the currently worn backitem
+    lua["unequip_backitem"] = unequip_backitem;
+    /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
+    lua["worn_backitem"] = worn_backitem;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
     lua["apply_entity_db"] = apply_entity_db;
     /// Try to lock the exit at coordinates
@@ -649,16 +717,29 @@ end
     /// Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
     /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
     lua["modify_sparktraps"] = modify_sparktraps;
-    /// Sets the multiplication factor for blood droplets (default/no Vlad's cape = 1, with Vlad's cape = 2)
+    /// Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
+    /// Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
     lua["set_blood_multiplication"] = set_blood_multiplication;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
     /// Sets the Y-level at which Olmec changes phases
     lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
+    /// Forces Olmec to stay on phase 0 (stomping)
+    lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
+    /// Enables or disables the default position based camp camera bounds, to set them manually yourself
+    lua["set_camp_camera_bounds_enabled"] = set_camp_camera_bounds_enabled;
+    /// Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
+    lua["set_explosion_mask"] = set_explosion_mask;
+    /// Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
+    lua["set_max_rope_length"] = set_max_rope_length;
+    /// Checks whether a coordinate is inside a room containing an active shop. This function checks whether the shopkeeper is still alive.
+    lua["is_inside_active_shop_room"] = is_inside_active_shop_room;
+    /// Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
+    lua["is_inside_shop_zone"] = is_inside_shop_zone;
     /// Returns how many of a specific entity type Waddler has stored
     lua["waddler_count_entity"] = waddler_count_entity;
     /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
@@ -671,6 +752,8 @@ end
     lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
     /// Gets the entity type of the item in the provided slot
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
+    /// Spawn a companion (hired hand, player character, eggplant child)
+    lua["spawn_companion"] = spawn_companion;
 
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float
@@ -733,9 +816,9 @@ end
         newinput->next = 0;
         newinput->current = 0;
         newinput->orig_input = player->input_ptr;
-        newinput->orig_ai = player->ai_func;
-        player->input_ptr = reinterpret_cast<size_t>(newinput);
-        player->ai_func = 0;
+        newinput->orig_ai = player->ai;
+        player->input_ptr = reinterpret_cast<PlayerInputs*>(newinput);
+        player->ai = 0;
         backend->script_input[uid] = newinput;
         // DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
     };
@@ -750,11 +833,11 @@ end
             return;
         // DEBUG("Return input: {:x} -> {:x}", player->input_ptr, backend->script_input[uid]->orig_input);
         player->input_ptr = backend->script_input[uid]->orig_input;
-        player->ai_func = backend->script_input[uid]->orig_ai;
+        player->ai = backend->script_input[uid]->orig_ai;
         backend->script_input.erase(uid);
     };
     /// Send input
-    lua["send_input"] = [](int uid, BUTTONS buttons)
+    lua["send_input"] = [](int uid, INPUTS buttons)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
@@ -764,7 +847,7 @@ end
         }
     };
     /// Read input
-    lua["read_input"] = [](int uid) -> BUTTONS
+    lua["read_input"] = [](int uid) -> INPUTS
     {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
@@ -777,7 +860,7 @@ end
         return (uint16_t)0;
     };
     /// Read input that has been previously stolen with steal_input
-    lua["read_stolen_input"] = [](int uid)
+    lua["read_stolen_input"] = [](int uid) -> INPUTS
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
@@ -800,6 +883,63 @@ end
         return (uint16_t)0;
     };
 
+    /// Clears a callback that is specific to a screen.
+    lua["clear_screen_callback"] = [](int screen_id, CallbackId cb_id)
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->clear_screen_hooks.push_back({screen_id, cb_id});
+    };
+
+    /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+    /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
+    lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Screen* screen = get_screen_ptr(screen_id))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = screen->reserve_callback_id();
+            screen->set_pre_render(
+                id,
+                [=, fun = std::move(fun)](Screen* self)
+                {
+                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
+                    {
+                        return false;
+                    }
+
+                    VanillaRenderContext render_ctx;
+                    return backend->handle_function_with_return<bool>(fun, self, render_ctx).value_or(false);
+                });
+            backend->screen_hooks.push_back({screen_id, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+    /// Sets a callback that is called right after the screen is drawn.
+    lua["set_post_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Screen* screen = get_screen_ptr(screen_id))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = screen->reserve_callback_id();
+            screen->set_post_render(
+                id,
+                [=, fun = std::move(fun)](Screen* self)
+                {
+                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
+                    {
+                        return;
+                    }
+                    VanillaRenderContext render_ctx;
+                    backend->handle_function(fun, self, render_ctx);
+                });
+            backend->screen_hooks.push_back({screen_id, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+
     /// Clears a callback that is specific to an entity.
     lua["clear_entity_callback"] = [](int uid, CallbackId cb_id)
     {
@@ -815,9 +955,14 @@ end
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = movable->set_pre_statemachine(
-                [backend, &lua, fun = std::move(fun)](Movable* self)
+            std::uint32_t id = movable->reserve_callback_id();
+            movable->set_pre_statemachine(
+                id,
+                [=, &lua, fun = std::move(fun)](Movable* self)
                 {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
                 });
             backend->hook_entity_dtor(movable);
@@ -834,12 +979,42 @@ end
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = movable->set_post_statemachine(
-                [backend, &lua, fun = std::move(fun)](Movable* self)
+            std::uint32_t id = movable->reserve_callback_id();
+            movable->set_post_statemachine(
+                id,
+                [=, &lua, fun = std::move(fun)](Movable* self)
                 {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
                     backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(movable);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+    /// The callback signature is `nil on_destroy(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_destroy"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_destroy(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
+                    backend->handle_function(fun, lua["cast_entity"](self));
+                });
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -854,9 +1029,14 @@ end
         if (Entity* entity = get_entity_ptr(uid))
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = entity->set_on_kill(
-                [backend, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_kill(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
                 {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
                 });
             backend->hook_entity_dtor(entity);
@@ -875,9 +1055,14 @@ end
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
-            std::uint32_t id = entity->set_on_open(
-                [backend, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_open(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
                 {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
                 });
             backend->hook_entity_dtor(entity);
@@ -886,6 +1071,34 @@ end
         }
         return sol::nullopt;
     };
+
+    /// Raise a signal and probably crash the game
+    lua["raise"] = std::raise;
+
+    /// Convert the hash to stringid
+    /// Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+    lua["hash_to_stringid"] = hash_to_stringid;
+
+    /// Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// Will return the string of currently choosen language
+    lua["get_string"] = get_string;
+
+    /// Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// This edits custom string and in game strings but changing the language in settings will reset game strings
+    lua["change_string"] = change_string;
+
+    /// Add custom string, currently can only be used for names of shop items (Entitydb->description)
+    /// Returns STRINGID of the new string
+    lua["add_string"] = add_string;
+
+    /// Adds custom name to the item by uid used in the shops
+    /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
+    lua["add_custom_name"] = add_custom_name;
+
+    /// Clears the name set with `add_custom_name`
+    lua["clear_custom_name"] = clear_custom_name;
+
+    lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
         "ON",
@@ -967,10 +1180,28 @@ end
         ON::POST_ROOM_GENERATION,
         "POST_LEVEL_GENERATION",
         ON::POST_LEVEL_GENERATION,
+        "PRE_GET_RANDOM_ROOM",
+        ON::PRE_GET_RANDOM_ROOM,
+        "PRE_HANDLE_ROOM_TILES",
+        ON::PRE_HANDLE_ROOM_TILES,
         "SCRIPT_ENABLE",
         ON::SCRIPT_ENABLE,
         "SCRIPT_DISABLE",
-        ON::SCRIPT_DISABLE);
+        ON::SCRIPT_DISABLE,
+        "RENDER_PRE_HUD",
+        ON::RENDER_PRE_HUD,
+        "RENDER_POST_HUD",
+        ON::RENDER_POST_HUD,
+        "RENDER_PRE_PAUSE_MENU",
+        ON::RENDER_PRE_PAUSE_MENU,
+        "RENDER_POST_PAUSE_MENU",
+        ON::RENDER_POST_PAUSE_MENU,
+        "RENDER_PRE_DRAW_DEPTH",
+        ON::RENDER_PRE_DRAW_DEPTH,
+        "SPEECH_BUBBLE",
+        ON::SPEECH_BUBBLE,
+        "TOAST",
+        ON::TOAST);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -995,12 +1226,50 @@ end
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
     // Runs right level generation is done, before any entities are updated
+    // PRE_GET_RANDOM_ROOM
+    // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
+    // Return: `string room_data`
+    // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
+    // If the size of the string returned does not match with the room templates expected size the room is discarded.
+    // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
+    // PRE_HANDLE_ROOM_TILES
+    // Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`
+    // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
+    // Runs after a random room was selected and right before it would spawn entities for each tile code
+    // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
     // SAVE
     // Params: `SaveContext save_ctx`
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
     // LOAD
     // Params: `LoadContext load_ctx`
     // Runs as soon as your script is loaded, including reloads, then never again
+    // RENDER_PRE_HUD
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_POST_HUD
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_PAUSE_MENU
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_POST_PAUSE_MENU
+    // Params: `VanillaRenderContext render_ctx`
+    // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_DRAW_DEPTH
+    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // SPEECH_BUBBLE
+    // Params: `Entity speaking_entity, string text`
+    // Runs before any speech bubble is created, even the one using `say` function
+    // Return behavior: if you don't return anything it will execute the speech bubble function normally with default message
+    // if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original
+    // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+    // TOAST
+    // Params: `string text`
+    // Runs before any toast is created, even the one using `toast` function
+    // Return behavior: if you don't return anything it will execute the toast function normally with default message
+    // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
+    // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
     */
 
     lua.create_named_table(
@@ -1011,6 +1280,8 @@ end
         SPAWN_TYPE_LEVEL_GEN_TILE_CODE,
         "LEVEL_GEN_PROCEDURAL",
         SPAWN_TYPE_LEVEL_GEN_PROCEDURAL,
+        "LEVEL_GEN_FLOOR_SPREADING",
+        SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING,
         "LEVEL_GEN_GENERAL",
         SPAWN_TYPE_LEVEL_GEN_GENERAL,
         "SCRIPT",
@@ -1026,6 +1297,8 @@ end
     // Similar to LEVEL_GEN but only triggers on tile code spawns.
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+    // LEVEL_GEN_FLOOR_SPREADING
+    // Only procs during floor spreading, both horizontal and vertical
     // LEVEL_GEN_GENERAL
     // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT
@@ -1035,7 +1308,17 @@ end
     // ANY
     // Covers all of the above.
     */
-    lua.create_named_table("CONST", "ENGINE_FPS", 60);
+    /// Some arbitrary constants of the engine
+    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8);
+    /* CONST
+    // ENGINE_FPS
+    // The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.
+    // Independent of rendering framerate, so it does not correlate with the call rate of `ON.GUIFRAME` and similar.
+    // ROOM_WIDTH
+    // Width of a 1x1 room, both in world coordinates and in tiles.
+    // ROOM_HEIGHT
+    // Height of a 1x1 room, both in world coordinates and in tiles.
+    */
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.create_named_table(
         "WIN_STATE",
@@ -1047,6 +1330,24 @@ end
         2,
         "COSMIC_OCEAN_WIN",
         3);
+
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    lua.create_named_table(
+        "VANILLA_TEXT_ALIGNMENT",
+        "LEFT",
+        0,
+        "CENTER",
+        1,
+        "RIGHT",
+        2);
+
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    lua.create_named_table(
+        "VANILLA_FONT_STYLE",
+        "ITALIC",
+        1,
+        "BOLD",
+        2);
 }
 
 std::vector<std::string> safe_fields{};
@@ -1056,8 +1357,6 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
 {
     static std::shared_ptr<sol::state> global_vm = [sound_manager]()
     {
-        assert(sound_manager != nullptr && "SoundManager needs to be passed to first call to get_lua_vm...");
-
         std::shared_ptr<sol::state> global_vms = std::make_shared<sol::state>();
         sol::state& lua_vm = *global_vms;
         load_libraries(lua_vm);

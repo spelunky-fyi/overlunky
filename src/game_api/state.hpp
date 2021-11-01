@@ -4,14 +4,16 @@
 #include "layer.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"
+#include "screen.hpp"
+#include "screen_arena.hpp"
 #include "state_structs.hpp"
 #include "thread_utils.hpp"
 
 const float ZF = 0.737f;
-using LAYER = int;
 
 struct Layer;
 struct LevelGenSystem;
+class ThemeInfo;
 
 struct StateMemory
 {
@@ -36,7 +38,7 @@ struct StateMemory
     uint8_t i3cb;
     uint8_t i3cc;
     uint8_t i3cd;
-    uint32_t speedrun_character;         // who administers the speedrun in base camp
+    ENT_TYPE speedrun_character;         // who administers the speedrun in base camp
     uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
     uint8_t padding4;
     uint8_t padding5;
@@ -65,7 +67,7 @@ struct StateMemory
     uint8_t theme_next;
     uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t b73;
-    uint32_t end_spaceship_character; // who pops out the spaceship for a tiamat/hundun win
+    ENT_TYPE end_spaceship_character; // who pops out the spaceship for a tiamat/hundun win
     uint8_t shoppie_aggro;
     uint8_t shoppie_aggro_levels;
     uint8_t merchant_aggro;
@@ -74,7 +76,7 @@ struct StateMemory
     uint8_t saved_hamsters;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t unknown1a;
+    uint8_t damage_taken; // total amount of damage taken, excluding cause of death
     uint8_t unknown1b;
     bool world2_coffin_spawned;
     bool world4_coffin_spawned;
@@ -82,7 +84,7 @@ struct StateMemory
     uint8_t unknown2b;
     uint8_t unknown2c;
     uint8_t unknown2d;
-    uint32_t waddler_storage[99];
+    ENT_TYPE waddler_storage[99];
     int16_t waddler_storage_meta[99]; // to store mattock durability for example
     uint16_t journal_progression_count;
     JournalProgressionSlot journal_progression_slots[40];
@@ -96,7 +98,7 @@ struct StateMemory
     uint8_t unknown5d;
     ArenaState arena;
     uint32_t journal_flags;
-    int32_t first_damage_cause; // entity type that caused first damage, for the journal
+    ENT_TYPE first_damage_cause; // entity type that caused first damage, for the journal
     int8_t first_damage_world;
     int8_t first_damage_level;
     uint8_t i9f4c;
@@ -105,14 +107,14 @@ struct StateMemory
     uint32_t time_level;
     uint32_t time_speedrun;
     uint32_t money_last_levels;
-    int32_t hud_flags;
+    int32_t level_flags;
     uint32_t presence_flags;
-    uint32_t coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
+    ENT_TYPE coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
     uint8_t cause_of_death;
     uint8_t padding10;
     uint8_t padding11;
     uint8_t padding12;
-    uint32_t cause_of_death_entity_type;
+    ENT_TYPE cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
     size_t toast;
     size_t speechbubble;
@@ -120,26 +122,31 @@ struct StateMemory
     uint32_t toast_timer;
     int32_t speechbubble_owner;
     Dialogue basecamp_dialogue;
-    size_t arena_choose_teams_screen;
-    size_t unknown8_during_basecamp;
-    size_t unknown9_during_level;
-    size_t level_transition_screen;
-    size_t unknown11;
-    size_t unknown12;
-    size_t victory_walk_screen;
-    size_t credits_screen;
-    size_t final_score_screen;
-    size_t cosmic_ocean_win_screen;
-    size_t dear_journal_screen;
-    size_t unknown13;
-    size_t unknown14_screen;
-    size_t unknown15;
-    size_t unknown16_screen;
-    size_t arena_lineup_screen;
-    size_t arena_gameplay_screen;
-    size_t arena_scorepillars_screen;
-    size_t unknown17;
-    size_t unknown18;
+
+    // screen pointers below are most likely in an array and indexed through the screen ID (-10), hence the nullptrs for
+    // screens that are available in GameManager
+    ScreenCharacterSelect* screen_character_select;
+    ScreenTeamSelect* screen_team_select;
+    ScreenCamp* screen_camp;
+    ScreenLevel* screen_level;
+    ScreenTransition* screen_transition;
+    ScreenDeath* screen_death;
+    size_t unknown_screen_spaceship; // potentially ScreenSpaceship, but is nullptr (there is no UI rendering on spaceship anyway)
+    ScreenWin* screen_win;
+    ScreenCredits* screen_credits;
+    ScreenScores* screen_scores;
+    ScreenConstellation* screen_constellation;
+    ScreenRecap* screen_recap;
+    ScreenArenaMenu* screen_arena_menu;
+    ScreenArenaStagesSelect* screen_arena_stages_select1;
+    ScreenArenaItems* screen_arena_items;
+    ScreenArenaStagesSelect* screen_arena_stages_select2;
+    ScreenArenaIntro* screen_arena_intro;
+    ScreenArenaLevel* screen_arena_level;
+    ScreenArenaScore* screen_arena_score;
+    size_t unknown_screen_online_loading; // potentially ScreenOnlineLoading, available in GameManager
+    size_t unknown_screen_online_lobby;   // potentially ScreenOnlineLobby, available in GameManager
+
     uint32_t next_entity_uid;
     uint16_t unknown20;
     uint16_t screen_change_counter; // increments every time screen changes; used in online sync together with next_entity_uid and unknown20 as a 64bit number
@@ -148,19 +155,27 @@ struct StateMemory
     Items* items;
     LevelGenSystem* level_gen;
     Layer* layers[2];
-    Logic* logic;
+    LogicList* logic;
     QuestsInfo* quests;
-    std::unordered_map<uint32_t, int32_t>* ai_targets; // e.g. hired hand uid -> snake uid
+    AITarget* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
     PointerList* particle_emitters; // list of ParticleEmitterInfo*
     PointerList* lightsources;      // list of Illumination*
     size_t unknown27;
-    std::unordered_map<uint32_t, Entity*> instance_id_to_pointer;
-    size_t unknown28;
-    size_t unknown29;
+
+    // This is a Robin Hood Table
+    size_t uid_to_entity_mask;
+    RobinHoodTableEntry* uid_to_entity_data;
+
+    size_t backlayer_player_related1;
+    size_t backlayer_player_related2;
+
     size_t unknown30;
     uint32_t layer_transition_effect_timer;
-    uint32_t camera_layer;
+    uint8_t camera_layer;
+    uint8_t unknown31a;
+    uint8_t unknown31b;
+    uint8_t unknown31c;
     size_t unknown32;
     size_t unknown33;
     size_t unknown34;
@@ -169,16 +184,20 @@ struct StateMemory
     uint32_t time_startup;
     uint32_t special_visibility_flags;
     Camera* camera;
+
+    ThemeInfo* current_theme()
+    {
+        return *((ThemeInfo**)&i6c);
+    }
+
+    /// Returns animation_frame of the correct ushabti
+    uint16_t get_correct_ushabti();
+    void set_correct_ushabti(uint16_t animation_frame);
 };
 
 struct State
 {
     size_t location;
-    size_t addr_damage;
-    size_t addr_insta;
-    size_t addr_zoom;
-    size_t addr_zoom_shop;
-    size_t addr_dark;
 
     static void set_write_load_opt(bool allow);
 
@@ -204,90 +223,25 @@ struct State
         return (Items*)(pointer);
     }
 
-    void godmode(bool g)
-    {
-        // log::debug!("God {:?}" mode; g);
-        if (g)
-        {
-            write_mem_prot(addr_damage, ("\xC3"s), true);
-            write_mem_prot(addr_insta, ("\xC3"s), true);
-        }
-        else
-        {
-            write_mem_prot(addr_damage, ("\x48"s), true);
-            write_mem_prot(addr_insta, ("\x40"s), true);
-        }
-    }
+    void godmode(bool g);
+    void godmode_companions(bool g);
+    void darkmode(bool g);
 
-    void darkmode(bool g)
-    {
-        // log::debug!("God {:?}" mode; g);
-        if (g)
-        {
-            write_mem_prot(addr_dark, ("\x90\x90"s), true);
-        }
-        else
-        {
-            write_mem_prot(addr_dark, ("\xEB\x2E"s), true);
-        }
-    }
-
-    void zoom(float level)
-    {
-        // This technically sets camp zoom but not interactively :(
-        // auto addr_zoom = find_inst(memory.exe(), &hex!("C7 80 E8 04 08 00"),
-        // memory.after_bundle); write_mem_prot(memory.at_exe(addr_zoom + 6),
-        // to_le_bytes(level), true); addr_zoom = memory.after_bundle;
-
-        auto roomx = ptr()->w;
-        if (level == 0.0)
-        {
-            switch (roomx)
-            {
-            case 1:
-                level = 9.50f;
-                break;
-            case 2:
-                level = 16.29f;
-                break;
-            case 3:
-                level = 23.08f;
-                break;
-            case 4:
-                level = 29.87f;
-                break;
-            case 5:
-                level = 36.66f;
-                break;
-            case 6:
-                level = 43.45f;
-                break;
-            case 7:
-                level = 50.24f;
-                break;
-            case 8:
-                level = 57.03f;
-                break;
-            default:
-                level = 13.5f;
-            }
-        }
-        write_mem_prot(addr_zoom, to_le_bytes(level), true);
-        write_mem_prot(addr_zoom_shop, to_le_bytes(level), true);
-    }
+    size_t get_zoom_level_address();
+    float get_zoom_level();
+    void zoom(float level);
 
     std::pair<float, float> click_position(float x, float y);
     std::pair<float, float> screen_position(float x, float y);
-    float get_zoom_level();
 
     uint32_t flags()
     {
-        return ptr()->hud_flags;
+        return ptr()->level_flags;
     }
 
     void set_flags(uint32_t f)
     {
-        ptr()->hud_flags = f;
+        ptr()->level_flags = f;
     }
 
     void set_pause(uint8_t p)
@@ -310,14 +264,7 @@ struct State
         return prng;
     }
 
-    Entity* find(uint32_t unique_id)
-    {
-        auto& map = ptr()->instance_id_to_pointer;
-        auto it = map.find(unique_id);
-        if (it == map.end())
-            return nullptr;
-        return it->second;
-    }
+    Entity* find(uint32_t uid);
 
     std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);

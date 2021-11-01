@@ -30,3 +30,8 @@ struct DropChanceEntry
 extern std::vector<DropEntry> drop_entries;
 
 extern std::vector<DropChanceEntry> dropchance_entries;
+
+//#define PERFORM_DROPS_TEST
+#ifdef PERFORM_DROPS_TEST
+void test_drops();
+#endif

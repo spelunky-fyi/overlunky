@@ -7,19 +7,13 @@
 #include "logger.h"
 #include "memory.h"
 #include "render_api.hpp"
+#include "search.hpp"
 #include "state.hpp"
 #include "ui.hpp"
+#include "version.hpp"
 #include "window_api.hpp"
 
 using namespace std::chrono_literals;
-
-//BOOL WINAPI DllMain(
-//    HINSTANCE hinstDLL, // handle to DLL module
-//    DWORD fdwReason,    // reason for calling function
-//    LPVOID lpReserved)  // reserved
-//{
-//    return TRUE; // Successful DLL_PROCESS_ATTACH.
-//}
 
 BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 {
@@ -64,6 +58,9 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
         fclose(fp);
     }
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
+
+    register_application_version(fmt::format("Overlunky {}", get_version()));
+    preload_addresses();
 
     while (true)
     {

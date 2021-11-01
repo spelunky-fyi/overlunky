@@ -41,7 +41,7 @@ auto get_animations_as_string_map(const EntityDB& ent)
 }
 
 FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Animation, texture, count, interval, key, repeat);
-FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Rect, masks, up_minus_down, side, up_plus_down);
+FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Rect, offsetx, offsety, hitboxx, hitboxy);
 void to_json(float_json& j, const EntityDB& ent)
 {
     j = float_json{
@@ -63,8 +63,8 @@ void to_json(float_json& j, const EntityDB& ent)
         {"tile_y", ent.tile_y},
         {"damage", ent.damage},
         {"life", ent.life},
-        {"attachOffsetX", ent.attachOffsetX},
-        {"attachOffsetY", ent.attachOffsetY},
+        {"attachOffsetX", ent.default_special_offsetx},
+        {"attachOffsetY", ent.default_special_offsety},
         {"animations", get_animations_as_string_map(ent)},
     };
 }
@@ -133,7 +133,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
                 break;
 
 #define HAX_FIX_FLOAT(x)                           \
-    if (std::abs(x) < 1e-20 || std::abs(x) > 1e10) \
+    if (std::abs(x) < 1e-10 || std::abs(x) > 1e10) \
     x = 0.0f
             HAX_FIX_FLOAT(db->width);
             HAX_FIX_FLOAT(db->height);
@@ -144,13 +144,13 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
             HAX_FIX_FLOAT(db->max_speed);
             HAX_FIX_FLOAT(db->sprint_factor);
             HAX_FIX_FLOAT(db->jump);
-            HAX_FIX_FLOAT(db->glow_red);
-            HAX_FIX_FLOAT(db->glow_green);
-            HAX_FIX_FLOAT(db->glow_blue);
-            HAX_FIX_FLOAT(db->glow_alpha);
+            HAX_FIX_FLOAT(db->default_color.r);
+            HAX_FIX_FLOAT(db->default_color.g);
+            HAX_FIX_FLOAT(db->default_color.b);
+            HAX_FIX_FLOAT(db->default_color.a);
             HAX_FIX_FLOAT(db->field_a8);
-            HAX_FIX_FLOAT(db->attachOffsetX);
-            HAX_FIX_FLOAT(db->attachOffsetY);
+            HAX_FIX_FLOAT(db->default_special_offsetx);
+            HAX_FIX_FLOAT(db->default_special_offsety);
 #undef HAX_FIX_FLOAT
 
             entities[ent.name] = *db;
@@ -299,21 +299,25 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {
-        auto tile_codes = state->level_gen->data->tile_codes();
-        for (const auto& tile_code : tile_codes)
+        for (const auto& tile_code : state->level_gen->data->tile_codes)
         {
-            file << tile_code.second.id << ": " << tile_code.first << "\n";
+            std::string clean_tile_code_name = tile_code.first.c_str();
+            std::transform(
+                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
+                { return (unsigned char)std::toupper(c); });
+            std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+            file << clean_tile_code_name << ": " << tile_code.second.id << "\n";
         }
     }
 
     if (auto file = std::ofstream("game_data/spawn_chances.txt"))
     {
         std::multimap<std::uint32_t, std::string> ordered_chances;
-        for (auto* chances : {&state->level_gen->data->monster_chances(), &state->level_gen->data->trap_chances()})
+        for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
         {
             for (const auto& spawn_chanc : *chances)
             {
-                std::string clean_chance_name = spawn_chanc.first;
+                std::string clean_chance_name = spawn_chanc.first.c_str();
                 std::transform(
                     clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
                     { return (unsigned char)std::toupper(c); });
@@ -327,11 +331,20 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
 
     if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
-        auto templates = state->level_gen->data->room_templates();
+        auto templates = state->level_gen->data->room_templates;
+        templates["empty_backlayer"] = {9};
+        templates["boss_arena"] = {22};
+        templates["shop_jail_backlayer"] = {44};
+        templates["waddler"] = {86};
+        templates["ghistshop_backlayer"] = {87};
+        templates["challange_entrance_backlayer"] = {90};
+        templates["blackmarket"] = {118};
+        templates["mothership_room"] = {125};
+
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {
-            std::string clean_room_name = room_template.first;
+            std::string clean_room_name = room_template.first.c_str();
             std::transform(
                 clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
                 { return (unsigned char)std::toupper(c); });

@@ -12,12 +12,12 @@ namespace NTexture
 void register_usertypes(sol::state& lua)
 {
     /// Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
-    lua["get_texture_definition"] = [](uint32_t texture_id) -> TextureDefinition
+    lua["get_texture_definition"] = [](TEXTURE texture_id) -> TextureDefinition
     {
         return RenderAPI::get().get_texture_definition(texture_id);
     };
     /// Defines a new texture that can be used in Entity::set_texture
-    lua["define_texture"] = [](TextureDefinition texture_data) -> uint64_t
+    lua["define_texture"] = [](TextureDefinition texture_data) -> TEXTURE
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));

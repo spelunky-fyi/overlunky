@@ -26,7 +26,7 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_CAVEMAN)
 
 -- Tame all turkeys
 set_post_entity_spawn(function(entity)
-    entity:as_mount():tame(true)
+    entity:tame(true)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MOUNT_TURKEY)
 
 -- Throw bombs instead of whipping

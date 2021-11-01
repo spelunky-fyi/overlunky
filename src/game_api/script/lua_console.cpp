@@ -8,8 +8,8 @@
 
 #include <sol/sol.hpp>
 
-LuaConsole::LuaConsole(SoundManager* sound_manager)
-    : LuaBackend(sound_manager, this)
+LuaConsole::LuaConsole(SoundManager* soundmanager)
+    : LuaBackend(soundmanager, this)
 {
     lua["__script_id"] = "console_proxy.lua";
 
@@ -38,7 +38,22 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"TimedPowderkeg", "as_pushblock"},
             {"UnchainedSpikeBall", "as_movable"},
             {"WoodenlogTrap", "as_movable"},
-            {"Player", "as_movable"},
+            {"BGSurfaceStar", "as_entity"},
+            {"BGFloatingDebris", "as_bgsurfacelayer"},
+            {"BGBackLayerDoor", "as_entity"},
+            {"BGSurfaceLayer", "as_bgrelativeelement"},
+            {"BGEggshipRoom", "as_entity"},
+            {"BGShopEntrence", "as_entity"},
+            {"BGMovingStar", "as_bgsurfacestar"},
+            {"BGRelativeElement", "as_entity"},
+            {"BGShootingStar", "as_bgrelativeelement"},
+            {"BGTutorialSign", "as_entity"},
+            {"BGShopKeeperPrime", "as_entity"},
+            {"Player", "as_powerupcapable"},
+            {"CrossBeam", "as_entity"},
+            {"DestructibleBG", "as_entity"},
+            {"PalaceSign", "as_entity"},
+            {"DecoRegeneratingBlock", "as_entity"},
             {"Floor", "as_entity"},
             {"PoleDeco", "as_floor"},
             {"Altar", "as_floor"},
@@ -48,6 +63,7 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"ConveyorBelt", "as_transferfloor"},
             {"CityOfGoldDoor", "as_decorateddoor"},
             {"DecoratedDoor", "as_exitdoor"},
+            {"EggShipDoorS", "as_eggshipdoor"},
             {"EggShipDoor", "as_door"},
             {"Door", "as_floor"},
             {"ExitDoor", "as_door"},
@@ -58,7 +74,7 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"LaserTrap", "as_floor"},
             {"TotemTrap", "as_floor"},
             {"MotherStatue", "as_floor"},
-            {"Pipe", "as_transferfloor"},
+            {"Pipe", "as_floor"},
             {"QuickSand", "as_floor"},
             {"SlidingWallCeiling", "as_floor"},
             {"SparkTrap", "as_floor"},
@@ -67,12 +83,51 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"TeleportingBorder", "as_floor"},
             {"TentacleBottom", "as_floor"},
             {"TimedForceField", "as_forcefield"},
-            {"LavaGlow", "as_movable"},
+            {"FxAlienBlast", "as_movable"},
+            {"FxAnkhBrokenPiece", "as_movable"},
+            {"FxAnkhRotatingSpark", "as_movable"},
+            {"Birdies", "as_movable"},
+            {"Button", "as_movable"},
+            {"FxCompass", "as_movable"},
+            {"FxFireflyLight", "as_movable"},
+            {"MovingIcon", "as_movable"},
+            {"EggshipCenterJetFlame", "as_movable"},
+            {"FxEmpress", "as_movable"},
+            {"Explosion", "as_movable"},
+            {"FxHundunNeckPiece", "as_movable"},
+            {"FxJetpackFlame", "as_movable"},
+            {"FxKinguSliding", "as_movable"},
+            {"FxLamassuAttack", "as_movable"},
+            {"LiquidSurface", "as_movable"},
+            {"FxMainExitDoor", "as_movable"},
+            {"FxJellyfishStar", "as_movable"},
+            {"MiniGameShipOffset", "as_movable"},
+            {"FxNecromancerANKH", "as_movable"},
             {"OlmecFloater", "as_movable"},
+            {"FxOuroboroDragonPart", "as_movable"},
+            {"FxOuroboroOccluder", "as_movable"},
+            {"FxPickupEffect", "as_movable"},
+            {"FxPlayerIndicator", "as_movable"},
+            {"FxQuickSand", "as_movable"},
+            {"FxSaleContainer", "as_movable"},
+            {"FxShotgunBlast", "as_movable"},
+            {"SleepBubble", "as_movable"},
             {"Flame", "as_movable"},
+            {"FxSorceressAttack", "as_movable"},
+            {"FxSparkSmall", "as_movable"},
+            {"FxSpringtrapRing", "as_movable"},
             {"LightEmitter", "as_movable"},
+            {"FxTiamatHead", "as_movable"},
+            {"FxTiamatTail", "as_movable"},
+            {"FxTiamatTorso", "as_movable"},
+            {"FxTornJournalPage", "as_movable"},
+            {"FxUnderwaterBubble", "as_movable"},
+            {"FxVatBubble", "as_movable"},
+            {"FxWaterDrop", "as_movable"},
+            {"FxWebbedEffect", "as_movable"},
+            {"FxWitchdoctorHint", "as_movable"},
             {"Container", "as_movable"},
-            {"Coffin", "as_container"},
+            {"Coffin", "as_movable"},
             {"WallTorch", "as_torch"},
             {"AxolotlShot", "as_movable"},
             {"Spear", "as_movable"},
@@ -85,7 +140,7 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"Chain", "as_movable"},
             {"Chest", "as_movable"},
             {"ClimbableRope", "as_movable"},
-            {"CloneGunShot", "as_timedshot"},
+            {"CloneGunShot", "as_lightshot"},
             {"CookFire", "as_movable"},
             {"AcidBubble", "as_movable"},
             {"Claw", "as_movable"},
@@ -131,13 +186,15 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"PlayerBag", "as_movable"},
             {"PlayerGhost", "as_lightemitter"},
             {"GhostBreath", "as_movable"},
-            {"Pot", "as_container"},
+            {"Pot", "as_movable"},
             {"Backpack", "as_movable"},
-            {"AnkhPowerup", "as_movable"},
-            {"KapalaPowerup", "as_movable"},
-            {"ParachutePowerup", "as_movable"},
-            {"TrueCrownPowerup", "as_movable"},
+            {"AnkhPowerup", "as_powerup"},
+            {"Powerup", "as_movable"},
+            {"KapalaPowerup", "as_powerup"},
+            {"ParachutePowerup", "as_powerup"},
+            {"TrueCrownPowerup", "as_powerup"},
             {"PunishBall", "as_movable"},
+            {"Rubble", "as_movable"},
             {"ScepterShot", "as_lightemitter"},
             {"SpecialShot", "as_lightemitter"},
             {"SkullDropTrap", "as_movable"},
@@ -145,6 +202,7 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"SnapTrap", "as_movable"},
             {"Spark", "as_flame"},
             {"Teleporter", "as_movable"},
+            {"TeleporterBackpack", "as_backpack"},
             {"Telescope", "as_movable"},
             {"Tentacle", "as_chain"},
             {"TiamatShot", "as_lightemitter"},
@@ -154,10 +212,44 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"Ushabti", "as_movable"},
             {"VladsCape", "as_cape"},
             {"FlameSize", "as_flame"},
-            {"WebGun", "as_gun"},
             {"WebShot", "as_movable"},
-            {"Liquid", "as_entity"},
             {"Lava", "as_liquid"},
+            {"Liquid", "as_entity"},
+            {"LogicalAnchovyFlock", "as_entity"},
+            {"LogicalTrapTrigger", "as_entity"},
+            {"LogicalDoor", "as_entity"},
+            {"BoulderSpawner", "as_entity"},
+            {"BurningRopeEffect", "as_entity"},
+            {"CameraFlash", "as_entity"},
+            {"CinematicAnchor", "as_entity"},
+            {"LogicalConveyorbeltSound", "as_logicalsound"},
+            {"CursedEffect", "as_entity"},
+            {"DMAlienBlast", "as_entity"},
+            {"DMSpawning", "as_entity"},
+            {"LogicalSound", "as_entity"},
+            {"DustWallApep", "as_entity"},
+            {"EggplantThrower", "as_entity"},
+            {"FrostBreathEffect", "as_entity"},
+            {"IceSlidingSound", "as_logicalsound"},
+            {"JungleTrapTrigger", "as_logicaltraptrigger"},
+            {"LogicalDrain", "as_entity"},
+            {"LimbAnchor", "as_entity"},
+            {"LogicalMiniGame", "as_entity"},
+            {"MummyFliesSound", "as_logicalsound"},
+            {"OnFireEffect", "as_entity"},
+            {"OuroboroCameraAnchor", "as_entity"},
+            {"OuroboroCameraZoomin", "as_entity"},
+            {"PipeTravelerSound", "as_logicalsound"},
+            {"PoisonedEffect", "as_entity"},
+            {"Portal", "as_entity"},
+            {"LogicalStaticSound", "as_logicalsound"},
+            {"QuickSandSound", "as_logicalsound"},
+            {"LogicalRegeneratingBlock", "as_entity"},
+            {"RoomLight", "as_entity"},
+            {"ShootingStarSpawner", "as_entity"},
+            {"SplashBubbleGenerator", "as_entity"},
+            {"LogicalLiquidStreamSound", "as_logicalstaticsound"},
+            {"WetEffect", "as_entity"},
             {"Alien", "as_monster"},
             {"Lahamu", "as_monster"},
             {"Ammit", "as_monster"},
@@ -237,7 +329,7 @@ LuaConsole::LuaConsole(SoundManager* sound_manager)
             {"Shopkeeper", "as_roomowner"},
             {"NPC", "as_monster"},
             {"ForestSister", "as_npc"},
-            {"Monster", "as_movable"},
+            {"Monster", "as_powerupcapable"},
             {"Sorceress", "as_walkingmonster"},
             {"Waddler", "as_roomowner"},
             {"Tadpole", "as_monster"},
@@ -359,13 +451,13 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         "while"sv,
                     };
 
-                    std::vector<std::string_view> possible_options;
+                    std::vector<std::string_view> possibleoptions;
 
                     for (std::string_view opt : additional_options)
                     {
                         if (opt.starts_with(to_complete_end))
                         {
-                            possible_options.push_back(opt);
+                            possibleoptions.push_back(opt);
                         }
                     }
 
@@ -376,15 +468,15 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             const std::string_view str = k.as<std::string_view>();
                             if (str.starts_with(to_complete_end) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                             {
-                                possible_options.push_back(str);
+                                possibleoptions.push_back(str);
                             }
                         }
                     }
-                    return possible_options;
+                    return possibleoptions;
                 }
                 else
                 {
-                    std::vector<std::string_view> possible_options;
+                    std::vector<std::string_view> possibleoptions;
 
                     // Need to collect these in a vector, otherwise the state somehow breaks
                     std::vector<sol::userdata> source_obj{};
@@ -404,7 +496,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         }
                         else
                         {
-                            return possible_options;
+                            return possibleoptions;
                         }
                     }
 
@@ -418,7 +510,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                                 const std::string_view str = k.as<std::string_view>();
                                 if ((grab_all || str.starts_with(to_complete_end)) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
                                 {
-                                    possible_options.push_back(str);
+                                    possibleoptions.push_back(str);
                                 }
                             }
                         }
@@ -454,7 +546,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             break;
                         }
                     }
-                    return possible_options;
+                    return possibleoptions;
                 }
             }(to_complete_end, to_complete_base);
         }
@@ -775,14 +867,14 @@ const std::filesystem::path& LuaConsole::get_root_path() const
 void LuaConsole::register_command(LuaBackend* provider, std::string command_name, sol::function cmd)
 {
     lua[command_name] = std::move(cmd);
-    console_commands[std::move(command_name)] = provider;
+    console_commands_list[std::move(command_name)] = provider;
 }
 void LuaConsole::unregister_command(LuaBackend* provider, std::string command_name)
 {
-    if (console_commands[command_name] == provider)
+    if (console_commands_list[command_name] == provider)
     {
         lua[command_name] = sol::nil;
-        console_commands.erase(std::move(command_name));
+        console_commands_list.erase(std::move(command_name));
     }
 }
 

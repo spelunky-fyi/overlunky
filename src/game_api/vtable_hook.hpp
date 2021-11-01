@@ -94,3 +94,15 @@ void hook_vtable(T* obj, HookFunT&& hook_fun, std::size_t vtable_index, std::siz
         { DetourT::s_Functions.erase((T*)self); },
         dtor_index);
 }
+
+template <class VTableFunT, class T, class HookFunT>
+void hook_vtable_no_dtor(T* obj, HookFunT&& hook_fun, std::size_t vtable_index)
+{
+    using DetourT = VTableDetour<VTableFunT>;
+    void*** vtable = (void***)obj;
+    if (!get_hook_function(vtable, vtable_index))
+    {
+        DetourT::s_Originals[*vtable] = (VTableFunT*)register_hook_function(vtable, vtable_index, (void*)&DetourT::detour);
+    }
+    DetourT::s_Functions[obj] = hook_fun;
+}

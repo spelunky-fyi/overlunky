@@ -75,7 +75,7 @@ const char* entity_flags[]{
 
 const char* more_flags[]{
     "1: ",
-    "2: ",
+    "2: Revived (HH)",
     "3: ",
     "4: ",
     "5: ",
@@ -85,12 +85,12 @@ const char* more_flags[]{
     "9: ",
     "10: ",
     "11: Swimming",
-    "12: ",
-    "13: ",
+    "12: Hit ground (bomb)",
+    "13: Hit wall (bomb)",
     "14: Falling",
     "15: Cursed effect",
-    "16: Disable input",
-    "17: ",
+    "16: Elixir buff",
+    "17: Disable input",
     "18: ",
     "19: ",
     "20: ",
@@ -143,7 +143,7 @@ const char* entity_type_properties_flags[]{
     "32: Unused",
 };
 
-const char* hud_flags[]{
+const char* level_flags[]{
     "1: Upbeat dwelling intro music played",
     "2: ",
     "3: Running tutorial speedrun",
@@ -287,7 +287,7 @@ const char* illumination_flags[]{
     "1: Disable light1",
     "2: Enable light2",
     "3: Enable light3",
-    "4: ",
+    "4: Enable light4",
     "5: ",
     "6: ",
     "7: Modulate brightness_multiplier",

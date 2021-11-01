@@ -1,5 +1,6 @@
 #include "entity_lua.hpp"
 #include "entity.hpp"
+#include "movable.hpp"
 
 #include <sol/sol.hpp>
 
@@ -7,7 +8,57 @@ namespace NEntity
 {
 void register_usertypes(sol::state& lua)
 {
-    lua.new_usertype<Color>("Color", "r", &Color::r, "g", &Color::g, "b", &Color::b, "a", &Color::a);
+    lua.new_usertype<Color>(
+        "Color",
+        sol::constructors<Color(), Color(const Color&), Color(float, float, float, float)>{},
+        "r",
+        &Color::r,
+        "g",
+        &Color::g,
+        "b",
+        &Color::b,
+        "a",
+        &Color::a,
+        "white",
+        &Color::white,
+        "silver",
+        &Color::silver,
+        "gray",
+        &Color::gray,
+        "black",
+        &Color::black,
+        "red",
+        &Color::red,
+        "maroon",
+        &Color::maroon,
+        "yellow",
+        &Color::yellow,
+        "olive",
+        &Color::olive,
+        "lime",
+        &Color::lime,
+        "green",
+        &Color::green,
+        "aqua",
+        &Color::aqua,
+        "teal",
+        &Color::teal,
+        "blue",
+        &Color::blue,
+        "navy",
+        &Color::navy,
+        "fuchsia",
+        &Color::fuchsia,
+        "purple",
+        &Color::purple,
+        "get_rgba",
+        &Color::get_rgba,
+        "set_rgba",
+        &Color::set_rgba,
+        "get_ucolor",
+        &Color::get_ucolor,
+        "set_ucolor",
+        &Color::set_ucolor);
     lua.new_usertype<Animation>(
         "Animation",
         "first_tile",
@@ -73,8 +124,27 @@ void register_usertypes(sol::state& lua)
         "sound_killed_by_player",
         &EntityDB::sound_killed_by_player,
         "sound_killed_by_other",
-        &EntityDB::sound_killed_by_other);
+        &EntityDB::sound_killed_by_other,
+        "description",
+        &EntityDB::description);
 
+    auto get_overlay = [&lua](Entity& entity)
+    {
+        return lua["cast_entity"](entity.overlay);
+    };
+    auto set_overlay = [](Entity& entity, Entity* overlay)
+    {
+        return entity.overlay = overlay;
+    };
+    auto overlay = sol::property(get_overlay, set_overlay);
+    auto topmost = [&lua](Entity& entity)
+    {
+        return lua["cast_entity"](entity.topmost());
+    };
+    auto topmost_mount = [&lua](Entity& entity)
+    {
+        return lua["cast_entity"](entity.topmost_mount());
+    };
     auto overlaps_with = sol::overload(
         static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
         static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
@@ -84,7 +154,7 @@ void register_usertypes(sol::state& lua)
         "type",
         &Entity::type,
         "overlay",
-        &Entity::overlay,
+        std::move(overlay),
         "flags",
         &Entity::flags,
         "more_flags",
@@ -93,6 +163,8 @@ void register_usertypes(sol::state& lua)
         &Entity::uid,
         "animation_frame",
         &Entity::animation_frame,
+        "draw_depth",
+        &Entity::draw_depth,
         "x",
         &Entity::x,
         "y",
@@ -103,6 +175,10 @@ void register_usertypes(sol::state& lua)
         &Entity::w,
         "height",
         &Entity::h,
+        "special_offsetx",
+        &Entity::special_offsetx,
+        "special_offsety",
+        &Entity::special_offsety,
         "tile_width",
         &Entity::tilew,
         "tile_height",
@@ -120,9 +196,9 @@ void register_usertypes(sol::state& lua)
         "offsety",
         &Entity::offsety,
         "topmost",
-        &Entity::topmost,
+        topmost,
         "topmost_mount",
-        &Entity::topmost_mount,
+        topmost_mount,
         "overlaps_with",
         overlaps_with,
         "get_texture",
@@ -138,7 +214,17 @@ void register_usertypes(sol::state& lua)
         "set_layer",
         &Entity::set_layer,
         "remove",
-        &Entity::remove);
+        &Entity::remove,
+        "respawn",
+        &Entity::respawn,
+        "destroy",
+        &Entity::destroy,
+        "activate",
+        &Entity::activate);
+
+    auto damage = sol::overload(
+        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
+        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint16_t)>(&Movable::damage));
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -147,6 +233,8 @@ void register_usertypes(sol::state& lua)
         &Movable::movey,
         "buttons",
         &Movable::buttons,
+        "buttons_previous",
+        &Movable::buttons_previous,
         "stand_counter",
         &Movable::stand_counter,
         "jump_height_multiplier",
@@ -177,16 +265,24 @@ void register_usertypes(sol::state& lua)
         &Movable::stun_timer,
         "stun_state",
         &Movable::stun_state,
+        "lock_input_timer",
+        &Movable::lock_input_timer,
         "some_state",
         &Movable::some_state,
+        "wet_effect_timer",
+        &Movable::wet_effect_timer,
         "airtime",
-        &Movable::airtime,
+        &Movable::falling_timer,
+        "falling_timer",
+        &Movable::falling_timer,
         "is_poisoned",
         &Movable::is_poisoned,
         "poison",
         &Movable::poison,
         "dark_shadow_timer",
-        &Movable::dark_shadow_timer,
+        &Movable::onfire_effect_timer,
+        "onfire_effect_timer",
+        &Movable::onfire_effect_timer,
         "exit_invincibility_timer",
         &Movable::exit_invincibility_timer,
         "invincibility_frames_timer",
@@ -217,6 +313,10 @@ void register_usertypes(sol::state& lua)
         &Movable::can_jump,
         "standing_on",
         &Movable::standing_on,
+        "add_money",
+        &Movable::add_money,
+        "damage",
+        damage,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -267,6 +367,8 @@ void register_usertypes(sol::state& lua)
         0x2000,
         "LAVA",
         0x4000,
+        "LIQUID",
+        0x6000,
         "ANY",
         0x0);
 }

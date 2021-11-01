@@ -248,7 +248,7 @@ Entity* Floor::find_corner_decoration(FLOOR_SIDE side)
     }
     return nullptr;
 }
-void Floor::add_decoration_opt(FLOOR_SIDE side, int32_t decoration_entity_type, Layer* layer_ptr)
+void Floor::add_decoration_opt(FLOOR_SIDE side, ENT_TYPE decoration_entity_type, Layer* layer_ptr)
 {
     if (side > RIGHT)
     {
@@ -634,21 +634,6 @@ bool Floor::get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2])
         break;
     }
     return true;
-}
-
-void Door::set_target(uint8_t world, uint8_t l, uint8_t t)
-{
-    uint8_t array[5] = {1, l, 1, world, t};
-    DEBUG("Making door go to {}-{}, {}", world, l, t);
-    write_mem(pointer() + 0xc1, std::string((char*)array, sizeof(array)));
-}
-
-std::tuple<uint8_t, uint8_t, uint8_t> Door::get_target()
-{
-    uint8_t l = read_u8(pointer() + 0xc2);
-    uint8_t world = read_u8(pointer() + 0xc4);
-    uint8_t t = read_u8(pointer() + 0xc5);
-    return std::make_tuple(world, l, t);
 }
 
 void Arrowtrap::rearm()

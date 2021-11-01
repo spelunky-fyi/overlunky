@@ -12,7 +12,7 @@ set_callback(function(draw_ctx)
     x, y, l = get_position(players[1].uid)
     sx, sy = screen_position(x, y)
     radius = screen_distance(1) -- one tile
-    draw_ctx:raw_circle(sx, sy, radius, 3, rgba(255, 0, 0, 255))
+    draw_ctx:draw_circle(sx, sy, radius, 3, rgba(255, 0, 0, 255))
 end, ON.GUIFRAME)
 
 -- no players allowed
@@ -37,10 +37,11 @@ end, ON.GUIFRAME)
 set_callback(function(draw_ctx)
     if #players < 1 then return end
     x, y, l = get_position(players[1].uid)
-    ents = get_entities_at(0, 255, x, y, l, 30)
+    mask = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.EXPLOSION | MASK.ROPE | MASK.FX | MASK.ACTIVEFLOOR
+    ents = get_entities_at(0, mask, x, y, l, 30)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v):as_movable()
+        e = get_entity(v)
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if e.health > 0 then
             draw_ctx:draw_text(sx, sy, 0, tostring(v).."\n"..tostring(e.health).." HP", rgba(255, 255, 255, 255))
@@ -55,7 +56,7 @@ set_callback(function(draw_ctx)
     ents = get_entities_by_type(ENT_TYPE.LOGICAL_DOOR)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v):as_movable()
+        e = get_entity(v)
         sx, sy = screen_position(x-e.hitboxx, y-e.hitboxy+e.offsety)
         if l == pl then
             draw_ctx:draw_text(sx, sy, 0, tostring(v), rgba(255, 255, 255, 255))
@@ -70,10 +71,10 @@ end, ON.GUIFRAME)
 set_callback(function(draw_ctx)
     if #players < 1 then return end
     px, py, pl = get_position(players[1].uid)
-    ents = get_entities_by_mask(0x100)
+    ents = get_entities_by(0, MASK.FLOOR, LAYER.BOTH)
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
-        e = get_entity(v):as_movable()
+        e = get_entity(v)
         if test_flag(e.flags, 24) and l == pl then
             sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
             sx2, sy2 = screen_position(x+e.hitboxx+e.offsetx, y-e.hitboxy+e.offsety) -- bottom right

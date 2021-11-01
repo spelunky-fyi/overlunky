@@ -1,64 +1,23 @@
 #pragma once
-#include <Windows.h>
 
-#include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
-#include <string>
+#include <string_view>
 
-namespace
-{
-[[maybe_unused]] size_t decode_pc(char* exe, size_t offset, uint8_t opcode_offset = 3)
-{
-    off_t rel = *(int32_t*)(&exe[offset + opcode_offset]);
-    return offset + rel + opcode_offset + 4;
-}
+using namespace std::string_view_literals;
 
-[[maybe_unused]] size_t decode_imm(char* exe, size_t offset, uint8_t opcode_offset = 3)
-{
-    return *(uint32_t*)(&exe[offset + opcode_offset]);
-}
+size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset = 3, uint8_t opcode_suffix_offset = 0, uint8_t opcode_addr_size = 4);
+size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset = 3);
 
-// Find the location of the instruction (needle) with wildcard support
-size_t find_inst(char* exe, std::string_view needle, size_t start)
-{
-    const std::size_t exe_size = 0x1000000000; // this would be nice to pass as a param
-    const std::size_t needle_length = needle.size();
+// Find the location of the instruction (needle) with wildcard (* or \x2a) support
+// Optional pattern_name for better error messages
+// If is_required is true the function will call std::terminate when the needle can't be found
+// Else it will throw std::logic_error
+size_t find_inst(const char* exe, std::string_view needle, size_t start, std::string_view pattern_name = ""sv, bool is_required = true);
 
-    for (std::size_t j = start; j < exe_size - needle_length; j++)
-    {
-        bool found = true;
-        for (std::size_t k = 0; k < needle_length && found; k++)
-        {
-            found = needle[k] == '*' || needle[k] == *((char*)exe + j + k);
-        }
+size_t find_after_bundle(size_t exe);
 
-        if (found)
-        {
-            return j;
-        }
-    }
-    return SIZE_MAX;
-}
+void preload_addresses();
+size_t get_address(std::string_view address_name);
 
-size_t find_after_bundle(size_t exe)
-{
-    auto offset = 0x1000;
-
-    while (true)
-    {
-        uint32_t* cur = (uint32_t*)(exe + offset);
-        uint32_t l0 = cur[0], l1 = cur[1];
-        if (l0 == 0 && l1 == 0)
-        {
-            break;
-        }
-        offset += (8 + l0 + l1);
-    }
-
-    uint8_t delim[] = {0x48, 0x81, 0xEC, 0xE8, 0x00, 0x00, 0x00};
-    std::string delim_s = std::string((char*)delim, sizeof(delim));
-    return find_inst((char*)exe, delim_s, offset);
-}
-}; // namespace
+void register_application_version(const std::string& s);

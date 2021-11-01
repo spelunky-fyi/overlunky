@@ -3,6 +3,8 @@
 .vscode
 /cmake-build-debug/
 /cmake-build-relwithdebinfo/
-build
+build*
 out
 .vs
+/CMakePresets.json
+*.aps

@@ -16,13 +16,6 @@ option(BUILD_OVERLUNKY CACHE ON)
 option(BUILD_INFO_DUMP CACHE ON)
 option(BUILD_SPEL2_DLL CACHE OFF)
 
-execute_process(
-  COMMAND git describe --always --dirty=-modified
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-add_compile_definitions(GIT_VERSION=${GIT_VERSION})
 add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
 add_compile_definitions(NOMINMAX)
 add_compile_definitions(WIN32_LEAN_AND_MEAN)

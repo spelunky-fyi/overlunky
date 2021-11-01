@@ -3,6 +3,7 @@
 #include "drops.hpp"
 #include "entities_chars.hpp"
 #include "entity.hpp"
+#include "level_api_types.hpp"
 #include "script.hpp"
 #include "window_api.hpp"
 
@@ -20,13 +21,6 @@
 
 #include <imgui.h>
 #include <sol/sol.hpp>
-
-using CallbackId = uint32_t;
-using Flags = std::uint32_t;
-using SPAWN_TYPE = int;                       // NoAlias
-using VANILLA_SOUND = std::string;            // NoAlias
-using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
-using BUTTONS = std::uint16_t;                // NoAlias
 
 enum class ON
 {
@@ -71,8 +65,17 @@ enum class ON
     PRE_LEVEL_GENERATION,
     POST_ROOM_GENERATION,
     POST_LEVEL_GENERATION,
+    PRE_GET_RANDOM_ROOM,
+    PRE_HANDLE_ROOM_TILES,
     SCRIPT_ENABLE,
-    SCRIPT_DISABLE
+    SCRIPT_DISABLE,
+    RENDER_PRE_HUD,
+    RENDER_POST_HUD,
+    RENDER_PRE_PAUSE_MENU,
+    RENDER_POST_PAUSE_MENU,
+    RENDER_PRE_DRAW_DEPTH,
+    SPEECH_BUBBLE,
+    TOAST,
 };
 
 struct IntOption
@@ -198,6 +201,8 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
     std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
+    std::vector<std::pair<int, std::uint32_t>> screen_hooks;
+    std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<std::string> required_scripts;
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
@@ -210,7 +215,7 @@ class LuaBackend
     SoundManager* sound_manager;
     LuaConsole* console;
 
-    std::map<size_t, ScriptImage*> images;
+    std::map<IMAGE, ScriptImage*> images;
 
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
@@ -247,6 +252,10 @@ class LuaBackend
     void draw(ImDrawList* dl);
     void render_options();
 
+    bool is_callback_cleared(int32_t callback_id);
+    bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
+    bool is_screen_callback_cleared(std::pair<int, uint32_t> callback_id);
+
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 
@@ -255,11 +264,25 @@ class LuaBackend
     void post_room_generation();
     void post_level_generation();
 
+    std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
+    struct PreHandleRoomTilesResult
+    {
+        bool stop_callback;
+        std::optional<LevelGenRoomData> modded_room_data;
+    };
+    PreHandleRoomTilesResult pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template);
+
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
     void hook_entity_dtor(Entity* entity);
     void pre_entity_destroyed(Entity* entity);
+
+    void process_vanilla_render_callbacks(ON event);
+    void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
+
+    std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
+    std::u16string pre_toast(char16_t* buffer);
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);
@@ -302,9 +325,12 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
         try
         {
             auto return_type = lua_result.get_type();
-            return return_type == sol::type::none || return_type == sol::type::nil
-                       ? std::optional<Ret>{}
-                       : std::optional{static_cast<Ret>(lua_result)};
+            if (return_type == sol::type::none || return_type == sol::type::nil)
+            {
+                return std::optional<Ret>{};
+            }
+            Ret return_value = lua_result;
+            return return_value;
         }
         catch (...)
         {

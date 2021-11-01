@@ -19,6 +19,12 @@ void register_usertypes(sol::state& lua)
         &PowerupCapable::give_powerup,
         "has_powerup",
         &PowerupCapable::has_powerup,
+        "get_powerups",
+        &PowerupCapable::get_powerups,
+        "unequip_backitem",
+        &PowerupCapable::unequip_backitem,
+        "worn_backitem",
+        &PowerupCapable::worn_backitem,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -30,12 +36,80 @@ void register_usertypes(sol::state& lua)
         &Inventory::bombs,
         "ropes",
         &Inventory::ropes,
+        "poison_tick_timer",
+        &Inventory::poison_tick_timer,
+        "cursed",
+        &Inventory::cursed,
+        "elixir_buff",
+        &Inventory::elixir_buff,
+        "health",
+        &Inventory::health,
+        "kapala_blood_amount",
+        &Inventory::kapala_blood_amount,
+        "held_item",
+        &Inventory::held_item,
+        "held_item_metadata",
+        &Inventory::held_item_metadata,
+        "player_slot",
+        sol::property([](Inventory& i) -> int8_t
+                      {
+                          if (i.player_slot >= 0)
+                              return i.player_slot + 1;
+                          else
+                              return i.player_slot;
+                      },
+                      [](Inventory& i, int8_t s)
+                      {
+                          if (s > 0)
+                              i.player_slot = s - 1;
+                          else
+                              i.player_slot = -1;
+                      }),
+        "mount_type",
+        &Inventory::mount_type,
+        "mount_metadata",
+        &Inventory::mount_metadata,
         "kills_level",
         &Inventory::kills_level,
         "kills_total",
         &Inventory::kills_total,
         "collected_money_total",
-        &Inventory::collected_money_total);
+        &Inventory::collected_money_total,
+        "collected_money",
+        &Inventory::collected_money,
+        "collected_money_values",
+        &Inventory::collected_money_values,
+        "killed_enemies",
+        &Inventory::killed_enemies,
+        "companion_count",
+        &Inventory::companion_count,
+        "companion_poison_tick_timers",
+        &Inventory::companion_poison_tick_timers,
+        "companions",
+        &Inventory::companions,
+        "companion_held_items",
+        &Inventory::companion_held_items,
+        "companion_trust",
+        &Inventory::companion_trust,
+        "companion_health",
+        &Inventory::companion_health,
+        "is_companion_cursed",
+        &Inventory::is_companion_cursed);
+
+    lua.new_usertype<Ai>(
+        "Ai",
+        "target",
+        &Ai::target,
+        "target_uid",
+        &Ai::target_uid,
+        "timer",
+        &Ai::timer,
+        "state",
+        &Ai::state,
+        "trust",
+        &Ai::trust,
+        "whipped",
+        &Ai::whipped);
 
     lua.new_usertype<Player>(
         "Player",
@@ -47,6 +121,8 @@ void register_usertypes(sol::state& lua)
         &Player::linked_companion_parent,
         "linked_companion_child",
         &Player::linked_companion_child,
+        "ai",
+        &Player::ai,
         "set_jetpack_fuel",
         &Player::set_jetpack_fuel,
         "kapala_blood_amount",

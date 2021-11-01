@@ -1,17 +1,14 @@
 #pragma once
 
+#include "game_allocator.hpp"
+#include "level_api_types.hpp"
 #include "state.hpp"
+
 #include <cstdint>
 #include <optional>
 #include <string>
 #include <unordered_map>
 
-struct ShortTileCodeDef
-{
-    std::uint32_t id;
-    std::uint8_t chance;
-    std::uint32_t alt_id;
-};
 struct TileCodeDef
 {
     std::uint32_t id;
@@ -20,13 +17,30 @@ struct RoomTemplateDef
 {
     std::uint16_t id;
 };
+struct RoomData
+{
+    bool flag0 : 1; // ???
+    bool flag1 : 1; // ???
+    bool flag2 : 1; // ???
+    bool flipped : 1;
+    bool dual : 1;
+    // 3-bit padding
+    uint8_t room_width;
+    uint8_t room_height;
+    // padding
+    const char* room_data;
+};
+struct RoomTemplateData
+{
+    game_vector<RoomData> datas;
+};
 struct ChanceDef
 {
     std::uint32_t id;
 };
 struct LevelChanceDef
 {
-    std::vector<uint32_t> chances;
+    game_vector<uint32_t> chances;
 };
 
 struct SpawnLogicProvider
@@ -41,6 +55,7 @@ enum class RoomTemplateType
     Entrance = 1,
     Exit = 2,
     Shop = 3,
+    MachineRoom = 4,
 };
 
 struct LevelGenData
@@ -49,6 +64,11 @@ struct LevelGenData
 
     std::optional<std::uint32_t> get_tile_code(const std::string& tile_code);
     std::uint32_t define_tile_code(std::string tile_code);
+
+    std::optional<uint8_t> get_short_tile_code(ShortTileCodeDef short_tile_code_def);
+    std::optional<ShortTileCodeDef> get_short_tile_code_def(uint8_t short_tile_code);
+    void change_short_tile_code(uint8_t short_tile_code, ShortTileCodeDef short_tile_code_def);
+    std::optional<uint8_t> define_short_tile_code(ShortTileCodeDef short_tile_code_def);
 
     std::optional<std::uint32_t> get_chance(const std::string& chance);
     std::uint32_t define_chance(std::string chance);
@@ -63,40 +83,48 @@ struct LevelGenData
 
     std::optional<std::uint16_t> get_room_template(const std::string& room_template);
     std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
+    bool set_room_template_size(std::uint16_t room_template, uint16_t width, uint16_t height);
     RoomTemplateType get_room_template_type(std::uint16_t room_template);
 
-    // TODO: Get offsets from binary instead of hardcoding them
-    const std::unordered_map<std::uint8_t, ShortTileCodeDef>& short_tile_codes() const
+    union
     {
-        return *(const std::unordered_map<std::uint8_t, ShortTileCodeDef>*)((size_t)this + 0x48);
-    }
-    const std::unordered_map<std::string, TileCodeDef>& tile_codes() const
-    {
-        return *(const std::unordered_map<std::string, TileCodeDef>*)((size_t)this + 0x88);
-    }
+        uint32_t level_config[18];
+        struct
+        {
+            uint32_t back_room_chance;
+            uint32_t back_room_interconnection_chance;
+            uint32_t back_room_hidden_door_chance;
+            uint32_t back_room_hidden_door_cache_chance;
+            uint32_t mount_chance;
+            uint32_t altar_room_chance;
+            uint32_t idol_room_chance;
+            uint32_t floor_side_spread_chance;
+            uint32_t floor_bottom_spread_chance;
+            uint32_t background_chance;
+            uint32_t ground_background_chance;
+            uint32_t machine_bigroom_chance;
+            uint32_t machine_wideroom_chance;
+            uint32_t machine_tallroom_chance;
+            uint32_t machine_rewardroom_chance;
+            uint32_t max_liquid_particles;
+            uint32_t flagged_liquid_rooms;
+            uint32_t unknown_config;
+        };
+    };
 
-    const std::unordered_map<std::string, RoomTemplateDef>& room_templates() const
-    {
-        return *(const std::unordered_map<std::string, RoomTemplateDef>*)((size_t)this + 0xC8);
-    }
+    game_unordered_map<std::uint8_t, ShortTileCodeDef> short_tile_codes;
+    game_unordered_map<game_string, TileCodeDef> tile_codes;
+    game_unordered_map<game_string, RoomTemplateDef> room_templates;
 
-    const std::unordered_map<std::string, ChanceDef>& monster_chances() const
-    {
-        return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x1330);
-    }
-    const std::unordered_map<std::string, ChanceDef>& trap_chances() const
-    {
-        return *(const std::unordered_map<std::string, ChanceDef>*)((size_t)this + 0x13b0);
-    }
+    game_unordered_map<std::uint16_t, RoomTemplateData> room_template_datas;
+    std::byte padding1[0x6b8];
+    std::array<RoomTemplateData, 8 * 15> set_room_datas;
 
-    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_monster_chances() const
-    {
-        return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x1370);
-    }
-    const std::unordered_map<std::uint32_t, LevelChanceDef>& level_trap_chances() const
-    {
-        return *(const std::unordered_map<std::uint32_t, LevelChanceDef>*)((size_t)this + 0x13f0);
-    }
+    game_unordered_map<game_string, ChanceDef> monster_chances;
+    game_unordered_map<std::uint32_t, LevelChanceDef> level_monster_chances;
+
+    game_unordered_map<game_string, ChanceDef> trap_chances;
+    game_unordered_map<std::uint32_t, LevelChanceDef> level_trap_chances;
 };
 
 struct DoorCoords
@@ -155,6 +183,9 @@ class ThemeInfo
 
     // metal clanking and air of oppression
     virtual void set_theme_specific_level_feeling() = 0;
+
+    // Note: Inserted somewhere between initialize_flags and populate_level
+    virtual bool unknown_v12() = 0;
 
     // disable this and only the player is spawned in the level
     virtual void populate_level() = 0;
@@ -227,13 +258,13 @@ class ThemeInfo
     virtual uint32_t random_block_floorstyle_2() = 0;
 
     // all return false, except olmec, temple, neobab, cog, duat
-    virtual bool unknown_v29() = 0;
+    virtual bool unknown_v30() = 0;
 
     // determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme
     // returns 85 by default, except for: olmec: 15, cog: 23
     virtual uint32_t transition_tunnel_block_modifier() = 0;
 
-    virtual uint32_t unknown_v31() = 0;
+    virtual uint32_t unknown_v32() = 0;
 
     // always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
     virtual uint32_t backwall_entity_id() = 0;
@@ -288,7 +319,7 @@ class ThemeInfo
     // ...
     // the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number
     // that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
-    virtual uint32_t get_dynamic_floor_texture_id(int8_t texture_id) = 0;
+    virtual uint32_t get_dynamic_floor_texture_id(int32_t texture_id) = 0;
 
     // manipulates state.level_next, world_next and theme_next; triggers when exiting a level
     // for dwelling, it just increments level_next because the world/theme choice is made by which door you pick
@@ -301,7 +332,7 @@ class ThemeInfo
     virtual uint32_t get_zero_based_level_height() = 0;
 
     // returns a value that appears to affect room generation and is based on current world,level
-    virtual uint32_t unknown_v46() = 0;
+    virtual uint32_t unknown_v47() = 0;
 
     // used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues
     // also implemented for neobab (i think in the zoos)
@@ -377,13 +408,13 @@ struct LevelGenSystem
             LevelGenRooms* rooms_backlayer;
         };
     };
-    LevelGenRoomsMeta* rooms_meta_26;
+    LevelGenRoomsMeta* flipped_rooms;
     LevelGenRoomsMeta* rooms_meta_27;
-    LevelGenRoomsMeta* rooms_meta_28;
+    LevelGenRoomsMeta* set_room_front_layer;
+    LevelGenRoomsMeta* set_room_back_layer;
     LevelGenRoomsMeta* backlayer_room_exists;
-    LevelGenRoomsMeta* rooms_meta_29;
-    LevelGenRoomsMeta* rooms_meta_31;
-    LevelGenRoomsMeta* rooms_meta_32;
+    LevelGenRoomsMeta* machine_room_origin;
+    LevelGenRoomsMeta* dual_room;
     LevelGenRoomsMeta* rooms_meta_33;
     LevelGenRoomsMeta* rooms_meta_34;
     std::uint32_t spawn_room_x;
@@ -404,20 +435,27 @@ struct LevelGenSystem
     uint8_t unknown46;
     uint8_t unknown47;
     uint8_t unknown48;
-    uint32_t unknown49;
+    uint8_t unknown49;
     uint32_t unknown50;
     uint32_t unknown51;
+    uint32_t unknown52;
 
     std::pair<int, int> get_room_index(float x, float y);
     std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);
-    std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, LAYER l);
-    bool set_room_template(uint32_t x, uint32_t y, LAYER l, uint16_t room_template);
+    std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l);
+    bool set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template);
+
+    bool is_room_flipped(uint32_t x, uint32_t y);
+    bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
+    bool mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room);
 
     std::string_view get_room_template_name(uint16_t room_template);
 
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 };
+
+bool default_spawn_is_valid(float x, float y, uint8_t layer);
 
 void override_next_levels(std::vector<std::string> next_levels);
 void add_next_levels(std::vector<std::string> next_levels);

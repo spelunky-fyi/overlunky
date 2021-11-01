@@ -12,6 +12,8 @@
 
 #include <imgui.h>
 
+#include "entities_chars.hpp"
+
 ImVec2 screenify(ImVec2 pos);
 float screenify(float dis);
 ImVec2 normalize(ImVec2 pos);
@@ -41,8 +43,8 @@ struct ScriptInput
 {
     uint16_t next;
     uint16_t current;
-    size_t orig_input;
-    size_t orig_ai;
+    PlayerInputs* orig_input;
+    Ai* orig_ai;
 };
 
 struct ScriptImage

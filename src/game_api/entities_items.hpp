@@ -8,6 +8,7 @@
 class Backpack : public Movable
 {
   public:
+    /// More like on fire trigger, the explosion happens when the timer reaches > 29
     bool explosion_trigger;
     uint8_t explosion_timer; // counts from 0 to 30
     uint16_t unknown1;
@@ -18,8 +19,8 @@ class Jetpack : public Backpack
 {
   public:
     bool flame_on; // Can be used as is_on
-    uint8_t unknown1;
-    uint16_t unknown2;
+    uint8_t unknown11;
+    uint16_t unknown21;
     uint32_t fly_time; // it's per level, not even per jetpack lol, it also adds at when it explodes
     uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
 };
@@ -40,7 +41,7 @@ class Hoverpack : public Backpack
 class Bomb : public Movable
 {
   public:
-    size_t unknown1;
+    SoundPosition* sound_pos;
     /// 1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     float scale_hor;
     float scale_ver;
@@ -48,15 +49,14 @@ class Bomb : public Movable
     bool is_big_bomb;
 };
 
-class Cape : public Movable
+class Cape : public Backpack
 {
   public:
-    size_t unknown;
     bool floating_down;
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint32_t floating_count; // increments whenever floating
+    uint32_t floating_count; //it's per level, not per cape
 };
 
 class VladsCape : public Cape
@@ -80,12 +80,12 @@ class Gun : public Movable
     /// used only for clonegun
     uint8_t shots2;
     uint8_t b12b;
+    /// Only for webgun, uid of the webshot entity
+    int32_t in_chamber;
 };
 
 class WebGun : public Gun
 {
-  public:
-    int32_t in_chamber;
 };
 
 class UdjatSocket : public Movable
@@ -176,9 +176,9 @@ class JungleSpearCosmetic : public Movable
 
 struct UnknownPointerGroup
 {
-    uint32_t unknown_uid1;
-    uint32_t unknown_uid2;
-    uint32_t unknown_uid3;
+    size_t unknown_uid1; // it's pointer to the uid
+    size_t unknown_uid2;
+    size_t unknown_uid3;
 };
 
 class WebShot : public Movable
@@ -261,7 +261,7 @@ class Spark : public Flame
     Entity* fx_entity;
     float rotation_center_x;
     float rotation_center_y;
-    float angle;
+    float rotation_angle;
     /// slowly goes down to default 1.0, is 0.0 when not on screen
     float size;
     /// 0.0 when not on screen
@@ -332,7 +332,7 @@ class Chest : public Movable
 class Treasure : public Movable
 {
   public:
-    uint32_t state; /* unsure */
+    uint32_t unknown_state; /* unsure */
     /// spawns a dust effect and adds money for the total
     bool cashed;
     int8_t unknown1;
@@ -421,9 +421,10 @@ class TimedShot : public LightShot
     uint8_t timer;
 };
 
-class CloneGunShot : public TimedShot
+class CloneGunShot : public LightShot
 {
   public:
+    uint8_t timer;
     int8_t unused1;
     int16_t unused2;
     float spawn_y;
@@ -434,7 +435,7 @@ class PunishBall : public Movable
 {
   public:
     int32_t attached_to_uid;
-    uint8_t state; /* unsure */
+    uint8_t unknown_state; /* unsure */
     uint8_t unused1;
     uint16_t unused2;
     float x_pos;
@@ -451,15 +452,16 @@ class Chain : public Movable
 class Container : public Movable
 {
   public:
-    uint32_t inside;
+    ENT_TYPE inside;
 
-    std::uint32_t set_on_open(std::function<void(Container*, Movable*)> on_open);
+    void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
-class Coffin : public Container
+class Coffin : public Movable
 {
   public:
-    int8_t timer;
+    ENT_TYPE inside;
+    uint8_t timer;
     int8_t shake_state; /* unsure */
 };
 
@@ -496,11 +498,17 @@ class PlayerGhost : public LightEmitter
     PlayerInputs* player_inputs;
     Inventory* inventory;
     SoundPosition* sound_pos;
+    /// Is not set to -1 when crushed
+    int32_t body_uid;
     uint16_t unknown_timer;
     uint8_t shake_timer;
     uint8_t boost_timer;
-    int32_t unused; /* unsure */
-    int64_t unknown;
+    uint8_t unknown_timer2;
+    uint8_t padding1;
+    uint8_t padding2;
+    uint8_t padding3;
+    int32_t padding4;
+    size_t unknown;
 };
 
 class GhostBreath : public Movable
@@ -562,7 +570,7 @@ class SkullDropTrap : public Movable
 class FrozenLiquid : public Movable
 {
   public:
-    int32_t unknown1;
+    int32_t unknown1; //have problem cheeking those, looks like unused memory, but then, it's always zeros on spawn, changing it can crash the game
     int32_t unknown2;
 };
 
@@ -604,8 +612,9 @@ class MiniGameShip : public Movable
     SoundPosition* sound_pos;
     float velocity_x;
     float velocity_y;
-    float swing;
-    float up_down_normal; // 0.0 means down, 1.0 means up, 0.5 idle
+    float swing; // angle change?
+    /// 0.0 - down, 1.0 - up, 0.5 - idle
+    float up_down_normal;
 };
 
 class MiniGameAsteroid : public Movable
@@ -614,9 +623,10 @@ class MiniGameAsteroid : public Movable
     float spin_speed;
 };
 
-class Pot : public Container
+class Pot : public Movable
 {
   public:
+    ENT_TYPE inside;
     bool dont_transfer_dmg; // if false, spawned entity will receive dmg that the pot received
 };
 
@@ -643,7 +653,7 @@ class EggSac : public Movable
 class Goldbar : public Movable
 {
   public:
-    uint8_t unknown; // get's updated every time animation_frame is changes by the game, setting it to 64 or less disables the effect
+    uint8_t unknown_shine; // get's updated every time animation_frame is changes by the game, setting it to 64 or less disables the effect
 };
 
 class Coin : public Movable
@@ -735,8 +745,8 @@ class Boomerang : public Movable
     ParticleEmitterInfo* trail;
     float distance;
     float rotation;
-    float wall_collision; /* unsure */
-    uint8_t state;        /* unsure */
+    float wall_collision;  /* unsure */
+    uint8_t unknown_state; /* unsure */
     uint8_t unused1;
     uint16_t unused2;
     int32_t returns_to_uid; // entity to return to

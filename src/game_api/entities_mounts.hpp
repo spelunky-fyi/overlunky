@@ -1,8 +1,6 @@
 #pragma once
 
 #include "movable.hpp"
-#include "particles.hpp"
-#include <cstdint>
 
 class Mount : public Movable
 {
@@ -36,16 +34,17 @@ class Axolotl : public Mount
   public:
     uint8_t attack_cooldown;
     bool can_teleport;
+    uint8_t unknown;
 };
 
 class Mech : public Mount
 {
   public:
-    SoundPosition* sound_pos;
+    SoundPosition* sound_position;
     SoundPosition* explosion_sound_pos;
-    uint64_t unknown1;
+    uint64_t unknown11;
     uint8_t gun_cooldown;
-    uint8_t unknown2;
+    uint8_t unknown21;
     bool walking;
     bool breaking_wall;
 };
@@ -53,6 +52,6 @@ class Mech : public Mount
 class Qilin : public Mount
 {
   public:
-    SoundPosition* sound_pos;
-    uint8_t attack_cooldown;
+    SoundPosition* sound_position;
+    uint8_t attack_cooldown; // not actually used? you can fire again before it's 0
 };

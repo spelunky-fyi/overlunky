@@ -18,7 +18,7 @@ class LuaConsole : public LuaBackend
     {
     }
 
-    std::unordered_map<std::string, LuaBackend*> console_commands;
+    std::unordered_map<std::string, LuaBackend*> console_commands_list;
 
     bool enabled{false};
     bool set_focus{false};

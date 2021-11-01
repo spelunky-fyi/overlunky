@@ -17,6 +17,10 @@ void SetWriteLoadOptimization(bool write_load_opt)
     State::set_write_load_opt(write_load_opt);
 }
 
+void InitMemoryDatabase()
+{
+    preload_addresses();
+}
 void InitSwapChainHooks(IDXGISwapChain* swap_chain)
 {
     init_hooks(swap_chain);
@@ -319,46 +323,39 @@ SpelunkyScreen SpelunkyState_GetScreen()
 
 std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, float x, float y, float vel_x, float vel_y)
 {
-    return spawn_entity_abs(entity_id, x, y, layer, vel_x, vel_y);
+    return spawn_entity_abs(entity_id, x, y, (LAYER)layer, vel_x, vel_y);
 }
 
 const char16_t* Spelunky_GetCharacterFullName(std::uint32_t character_index)
 {
-    return get_character_full_name(character_index);
+    return NCharacterDB::get_character_full_name(character_index);
 }
 const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index)
 {
-    return get_character_short_name(character_index);
+    return NCharacterDB::get_character_short_name(character_index);
 }
 void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
-    static_assert(sizeof(Color) == sizeof(color));
-
-    Color col = get_character_heart_color(character_index);
-    memcpy(color, &col, sizeof(Color));
+    NCharacterDB::get_character_heart_color(character_index).to_float(color);
 }
 bool Spelunky_GetCharacterGender(std::uint32_t character_index)
 {
-    return get_character_gender(character_index);
+    return NCharacterDB::get_character_gender(character_index);
 }
 
 void Spelunky_SetCharacterFullName(std::uint32_t character_index, const char16_t* name)
 {
-    set_character_full_name(character_index, name);
+    NCharacterDB::set_character_full_name(character_index, name);
 }
 void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_t* name)
 {
-    set_character_short_name(character_index, name);
+    NCharacterDB::set_character_short_name(character_index, name);
 }
 void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
 {
-    static_assert(sizeof(Color) == sizeof(color));
-
-    Color col;
-    memcpy(&col, color, sizeof(Color));
-    set_character_heart_color(character_index, col);
+    NCharacterDB::set_character_heart_color(character_index, Color{color});
 }
 void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female)
 {
-    set_character_gender(character_index, female);
+    NCharacterDB::set_character_gender(character_index, female);
 }

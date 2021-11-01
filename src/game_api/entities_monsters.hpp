@@ -31,6 +31,41 @@ class RoomOwner : public Monster
     bool was_hurt;
     uint16_t padding1;
     uint32_t padding2;
+
+    virtual void increase_killcount() = 0; // increases state.kills_npc
+
+    virtual void on_aggro() = 0; // updates state.quests in case of npc
+
+    virtual void unknown_v96() = 0;
+
+    virtual void on_shop_entered() = 0;
+
+    virtual void on_player_picked_up_shopitem() = 0; // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
+
+    virtual void on_fire_weapon() = 0; // if deactivated, they can pick up weapons but won't shoot them
+
+    virtual void on_criminal_act_committed() = 0; // shows the appropriate message (vandal, cheater, ...)
+
+    // for shopkeepers: checks state.shoppie_aggro_levels
+    // if you return false, but you have attacked them before, they will be patrolling but won't attack you on sight
+    virtual bool should_attack_on_sight() = 0;
+
+    virtual bool is_angry_flag_set() = 0; // checks state.level_flags 10-16 depending on the monster
+
+    // for shopkeeper: sets shopkeeper.shotgun_attack_delay to 6
+    // triggers only at the start when aggroed
+    // does nothing for yang, waddler, tun
+    virtual void set_initial_attack_delay() = 0;
+
+    virtual Entity* on_spawn_weapon() = 0; // return the weapon entity that will be used to attack the player
+
+    virtual uint32_t weapon_type() = 0; // the entity type of the weapon that will be spawned to attack the player
+
+    virtual void unknown_v106_attack_weapon_related() = 0;
+
+    virtual void unknown_v107() = 0; // for shopkeepers, it loops over (some of) the items for sale
+
+    virtual void on_death_treasure_drop() = 0; // random number calc, e.g. whether the shopkeeper drops gold bars on death
 };
 
 class WalkingMonster : public Monster
@@ -39,7 +74,7 @@ class WalkingMonster : public Monster
     int32_t chatting_to_uid;
     /// alternates between walking and pausing every time it reaches zero
     int16_t walk_pause_timer;
-    /// used fo chatting with other monsters, attack cooldowns etc.
+    /// used for chatting with other monsters, attack cooldowns etc.
     int16_t cooldown_timer;
 };
 
@@ -59,6 +94,17 @@ class NPC : public Monster
     uint32_t padding3;
 };
 
+enum class GHOST_BEHAVIOR : uint8_t
+{
+    SAD = 0,
+    MEDIUM_SAD = 0,
+    MEDIUM_HAPPY = 1,
+    SMALL_ANGRY = 0,
+    SMALL_SURPRISED = 1,
+    SMALL_SAD = 2,
+    SMALL_HAPPY = 3
+};
+
 class Ghost : public Monster
 {
   public:
@@ -68,9 +114,7 @@ class Ghost : public Monster
     uint8_t unknown2;
     float velocity_multiplier;
     uint16_t unknown3; // layer change related
-    /// 0 = SMALL_ANGRY aka standard chasing, 1 = SMALL_SURPRISED, 2 = SMALL_SAD, 3 = SMALL_HAPPY
-    /// 4 and above = will move up and down, moving slightly more in one direction
-    uint8_t ghost_behaviour;
+    GHOST_BEHAVIOR ghost_behaviour;
     uint8_t unknown6;
     bool unknown7;
     uint8_t unknown8;
@@ -111,7 +155,7 @@ class GoldMonkey : public Monster
 {
   public:
     uint8_t jump_timer;
-    uint8_t padding; // ?
+    uint8_t padding;
     uint16_t poop_timer;
     uint8_t poop_count;
 };
@@ -130,7 +174,7 @@ class Mole : public Monster
     uint8_t counter_nonburrowing;
     uint8_t countdown_for_appearing;
     uint8_t unknown_two_while_burrowed;
-    /// 0 non_borrowed, 1 - unknown, 2 - borrowed, 3 - state_change
+    /// 0 - non_burrowed, 1 - unknown, 2 - burrowed, 3 - state_change
     uint8_t digging_state;
 };
 
@@ -139,6 +183,7 @@ class Spider : public Monster
   public:
     float ceiling_pos_x;
     float ceiling_pos_y;
+    /// For the giant spider, some times he shot web instead of jumping
     uint8_t jump_timer;
     uint8_t padding1;
     uint16_t padding2;
@@ -165,22 +210,23 @@ class Shopkeeper : public RoomOwner
     uint8_t unknown3; // accessed on stun/dmg? probably bool
     bool shop_owner;
     bool unknown5a; // sometimes set to true
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
+    uint8_t padding11;
+    uint8_t padding21;
+    uint8_t padding31;
 };
 
 class Yang : public RoomOwner
 {
   public:
-    std::map<int64_t, int64_t> unknown2;
+    /// Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    std::set<int32_t> turkeys_in_den; // probably a Map, but the second value is just 1 or 0, not really useful
     uint8_t unknown4;
     uint8_t unknown5;
     /// I'm looking for turkeys, wanna help?
     bool first_message_shown;
-    /// set to false when the quest is over (Yang dead or second turkey delivered)
+    /// Is set to false when the quest is over (Yang dead or second turkey delivered)
     bool quest_incomplete;
-    /// tusk palace/black market/one way door - message shown
+    /// Tusk palace/black market/one way door - message shown
     bool special_message_shown;
     uint8_t padding4;
     uint8_t padding5;
@@ -281,7 +327,8 @@ class Mantrap : public Monster
 class Skeleton : public Monster
 {
   public:
-    int16_t explosion_timer; // -1 never explodes
+    /// -1 = never explodes
+    int16_t explosion_timer;
 };
 
 class Scarab : public Monster
@@ -412,12 +459,12 @@ class Vampire : public Monster
     float sleep_pos_x;
     float sleep_pos_y;
     uint32_t walk_pause_timer; // alternates between walking and pausing when timer reaches zero
+    int32_t _padding;
 };
 
 class Vlad : public Vampire
 {
   public:
-    uint32_t unknown1;
     /// triggers when Vlad teleports, when timer running he can't teleport and will stun when hit
     uint8_t teleport_timer;
     /// or is awake
@@ -526,7 +573,7 @@ class Sorceress : public WalkingMonster
 {
   public:
     uint32_t inbetween_attack_timer;
-    float airtime;                    // why float?
+    float in_air_timer;               // why float?
     Illumination* halo_emitted_light; // not the shot but the halo, try putting a color at 10
     Entity* fx_entity;
     SoundPosition* sound_pos;
@@ -613,7 +660,7 @@ class OsirisHand : public Monster
 class Alien : public Monster
 {
   public:
-    uint8_t jump_timer; // when 0 it jumps
+    uint16_t jump_timer; // when 0 it jumps
     uint8_t unknown1;
     uint8_t unknown2; // seen timer here once maybe? it's accessed right as he jumps from the ufo
 };
@@ -724,8 +771,8 @@ class Frog : public Monster
 {
   public:
     int32_t grub_being_eaten_uid;
-    uint32_t jump_timer; // when 0 it jumps
-    bool pause;          // not actually used?
+    uint8_t jump_timer; // when 0 it jumps
+    bool pause;         // not actually used?
     int16_t padding;
 };
 
@@ -829,9 +876,9 @@ class Hundun : public Monster
 class HundunHead : public Monster
 {
   public:
+    /// Posiotion where the head will move on attack
     float attack_position_x;
     float attack_position_y;
-    /// Posiotion where the head will move on attack
     int32_t egg_crack_effect_uid;
     int32_t targeted_player_uid;
     /// also cooldown before attack
@@ -865,7 +912,7 @@ class Scorpion : public Monster
 class Hermitcrab : public Monster
 {
   public:
-    uint32_t carried_entity_type;
+    ENT_TYPE carried_entity_type;
     int32_t carried_entity_uid;
     uint16_t walk_spit_timer; // depending on movable.state either the countdown how many acid bubbles spat (3) or walking timer
     /// whether it is hidden behind the carried block or not, if true you can damage him
@@ -891,8 +938,8 @@ class ProtoShopkeeper : public Monster
 {
   public:
     uint64_t unknown1;
+    /// 1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     uint8_t movement_state;
-    ///1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     uint8_t padding1;
     uint8_t padding2;
     uint8_t blowup_related;

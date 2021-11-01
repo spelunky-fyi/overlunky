@@ -21,6 +21,7 @@
 #pragma warning(push, 0)
 #include <toml.hpp>
 #pragma warning(pop)
+#include <fmt/core.h>
 
 #include "console.hpp"
 #include "entities_chars.hpp"
@@ -38,9 +39,12 @@
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "version.hpp"
 #include "window_api.hpp"
 
 #include "decode_audio_file.hpp"
+
+#pragma warning(disable : 4366)
 
 template <class T>
 concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
@@ -190,7 +194,8 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, dark_mode = false,
-     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false;
+     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
+std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
 Inventory* g_inventory = 0;
@@ -210,10 +215,10 @@ const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
 
 std::string fontfile = "segoeuib.ttf";
-std::vector<float> fontsize;
+std::vector<float> fontsize = {18.0f, 32.0f, 72.0f};
 
 [[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
-[[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17;
+[[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17, u8_draw_depth_max = 53;
 [[maybe_unused]] const short s16_zero = 0, s16_one = 1, s16_min = -32768, s16_max = 32767;
 [[maybe_unused]] const ImU16 u16_zero = 0, u16_one = 1, u16_min = 0, u16_max = 65535;
 [[maybe_unused]] const ImS32 s32_zero = 0, s32_one = 1, s32_min = INT_MIN / 2, s32_max = INT_MAX / 2, s32_hi_a = INT_MAX / 2 - 100, s32_hi_b = INT_MAX / 2;
@@ -230,6 +235,7 @@ const unsigned int unsafe_entity_mask = 0xffffffff;
 std::map<std::string, bool> options = {
     {"mouse_control", true},
     {"god_mode", false},
+    {"god_mode_companions", false},
     {"noclip", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
@@ -640,7 +646,9 @@ void load_config(std::string file)
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
     fontfile = toml::find_or<std::string>(opts, "font_file", "segoeuib.ttf");
-    fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {18.0f, 32.0f, 72.0f});
+    auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {18.0f, 32.0f, 72.0f});
+    if (ini_fontsize.size() >= 3)
+        fontsize = ini_fontsize;
     godmode(options["god_mode"]);
     save_config(file);
 }
@@ -790,7 +798,14 @@ void spawn_entities(bool s, std::string list = "")
     {
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_CHAR") != std::string::npos)
+        {
+            std::pair<float, float> cpos = click_position(g_x, g_y);
+            int spawned = spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, LAYER::PLAYER);
+            if (!lock_entity)
+                g_last_id = spawned;
+        }
+        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
             bool snap = options["snap_to_grid"];
             if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_FLOOR") != std::string::npos)
@@ -847,6 +862,14 @@ void spawn_entity_over()
             int spawned = spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
             if (!lock_entity)
                 g_last_id = spawned;
+        }
+        else
+        {
+            auto cpos = click_position(g_x, g_y);
+            auto mpos = normalize(ImGui::GetMousePos());
+            auto cpos2 = click_position(mpos.x, mpos.y);
+            g_last_id = g_state->next_entity_uid;
+            spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
         }
     }
 }
@@ -955,10 +978,24 @@ void set_zoom()
 
 void force_zoom()
 {
-    if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width))
+    if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
         g_level_width = g_state->w;
+    }
+    if ((g_zoom > 13.5f || g_zoom == 0.0f) && g_state != 0 && g_state->screen == 11 && (enable_camp_camera || g_state->time_level == 1))
+    {
+        enable_camp_camera = false;
+        set_camp_camera_bounds_enabled(false);
+        g_state->camera->bounds_left = 0.5;
+        g_state->camera->bounds_right = 74.5;
+        g_state->camera->bounds_top = 124.5;
+        g_state->camera->bounds_bottom = 56.5;
+    }
+    else if (g_zoom == 13.5f && g_state != 0 && g_state->screen == 11 && g_state->time_level == 1)
+    {
+        enable_camp_camera = true;
+        set_camp_camera_bounds_enabled(true);
     }
 }
 
@@ -967,9 +1004,9 @@ void force_hud_flags()
     if (g_state == 0)
         return;
     if (!options["disable_pause"] && !ImGui::GetIO().WantCaptureKeyboard)
-        g_state->hud_flags |= 1U << 19;
+        g_state->level_flags |= 1U << 19;
     else if (!ImGui::GetIO().WantCaptureKeyboard)
-        g_state->hud_flags &= ~(1U << 19);
+        g_state->level_flags &= ~(1U << 19);
 }
 
 void force_noclip()
@@ -1012,9 +1049,13 @@ void frame_advance()
 
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
+    const auto ana_id = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    const auto ana_type = get_type(ana_id);
+    const auto ana_texture = ana_type->texture;
+
     g_state->items->player_select_slots[0].activated = true;
-    g_state->items->player_select_slots[0].character = g_save->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + 270; //TODO: magic numbers
+    g_state->items->player_select_slots[0].character = g_save->players[0] + ana_id;
+    g_state->items->player_select_slots[0].texture_id = g_save->players[0] + ana_texture;
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
     g_state->screen_next = screen;
@@ -1039,9 +1080,10 @@ void warp_inc(uint8_t w, uint8_t l, uint8_t t)
 
 void warp_next_level(size_t num)
 {
-    std::vector<Target*> targets;
-    Target* target = new Target;
-    target->world = 0;
+    std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> targets; // tuple = world, level, theme
+    uint8_t target_world = 0;
+    uint8_t target_level = 0;
+    uint8_t target_theme = 0;
     int tnum = g_state->world * 100 + g_state->level;
     switch (tnum)
     {
@@ -1049,74 +1091,74 @@ void warp_next_level(size_t num)
     case 301:
         break;
     case 501:
-        target->world = 6;
-        target->level = 1;
-        target->theme = 8;
+        target_world = 6;
+        target_level = 1;
+        target_theme = 8;
         break;
     case 204:
-        target->world = 3;
-        target->level = 1;
-        target->theme = 4;
+        target_world = 3;
+        target_level = 1;
+        target_theme = 4;
         break;
     case 403:
         if (g_state->theme == 11)
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 6;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 6;
         }
         else
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 5;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 5;
         }
         break;
     case 404:
-        target->world = 5;
-        target->level = 1;
-        target->theme = 7;
+        target_world = 5;
+        target_level = 1;
+        target_theme = 7;
         break;
     case 603:
-        target->world = 6;
-        target->level = 4;
-        target->theme = 14;
+        target_world = 6;
+        target_level = 4;
+        target_theme = 14;
         break;
     case 604:
-        target->world = 7;
-        target->level = 1;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 1;
+        target_theme = 9;
         break;
     case 702:
-        target->world = 7;
-        target->level = 3;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 3;
+        target_theme = 9;
         break;
     case 703:
-        target->world = 7;
-        target->level = 4;
-        target->theme = 16;
+        target_world = 7;
+        target_level = 4;
+        target_theme = 16;
         break;
     case 704:
-        target->world = 8;
-        target->level = 5;
-        target->theme = 10;
+        target_world = 8;
+        target_level = 5;
+        target_theme = 10;
         break;
     default:
-        target->world = g_state->world;
-        target->level = g_state->level + 1;
-        target->theme = g_state->theme;
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
         break;
     }
     if (g_state->theme == 17)
     {
-        target->world = 1;
-        target->level = 1;
-        target->theme = 1;
+        target_world = 1;
+        target_level = 1;
+        target_theme = 1;
     }
-    if (target->world > 0)
+    if (target_world > 0)
     {
-        targets.push_back(target);
+        targets.emplace_back(target_world, target_level, target_theme);
     }
 
     std::vector<uint32_t> doortypes;
@@ -1126,30 +1168,29 @@ void warp_next_level(size_t num)
     auto doors = get_entities_by_type(doortypes);
     for (auto doorid : doors)
     {
-        uint8_t world, level, theme;
         ExitDoor* doorent = (ExitDoor*)get_entity_ptr(doorid);
-        std::tie(world, level, theme) = doorent->get_target();
         if (!doorent->special_door)
             continue;
-        target = new Target;
-        target->world = world;
-        target->level = level;
-        target->theme = theme;
-        targets.push_back(target);
+        targets.emplace_back(doorent->world, doorent->level, doorent->theme);
     }
 
     if (g_state->theme == 11)
     {
-        target = new Target;
-        target->world = 4;
-        target->level = 4;
-        target->theme = 12;
-        targets.push_back(target);
+        uint8_t world = 4;
+        uint8_t level = 4;
+        uint8_t theme = 12;
+        targets.emplace_back(world, level, theme);
     }
     if (num > targets.size() - 1 && targets.size() > 0)
+    {
         num = targets.size() - 1;
+    }
     if (targets.size() > num)
-        warp_inc(targets.at(num)->world, targets.at(num)->level, targets.at(num)->theme);
+    {
+        uint8_t world, level, theme;
+        std::tie(world, level, theme) = targets.at(num);
+        warp_inc(world, level, theme);
+    }
 }
 
 bool pressed(std::string keyname, WPARAM wParam)
@@ -1800,9 +1841,9 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (g_players.size() > 0)
         {
-            unsigned int layer_to = 0;
+            auto layer_to = LAYER::FRONT;
             if (g_players.at(0)->layer == 0)
-                layer_to = 1;
+                layer_to = LAYER::BACK;
             g_players.at(0)->set_layer(layer_to);
         }
     }
@@ -2062,8 +2103,9 @@ void render_narnia()
     ImGui::SameLine(100.0f);
     int n = 0;
 
-    Target* target = new Target;
-    target->world = 0;
+    uint8_t target_world = 0;
+    uint8_t target_level = 0;
+    uint8_t target_theme = 0;
     int tnum = g_state->world * 100 + g_state->level;
     switch (tnum)
     {
@@ -2071,77 +2113,77 @@ void render_narnia()
     case 301:
         break;
     case 501:
-        target->world = 6;
-        target->level = 1;
-        target->theme = 8;
+        target_world = 6;
+        target_level = 1;
+        target_theme = 8;
         break;
     case 204:
-        target->world = 3;
-        target->level = 1;
-        target->theme = 4;
+        target_world = 3;
+        target_level = 1;
+        target_theme = 4;
         break;
     case 403:
         if (g_state->theme == 11)
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 6;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 6;
         }
         else
         {
-            target->world = 4;
-            target->level = 4;
-            target->theme = 5;
+            target_world = 4;
+            target_level = 4;
+            target_theme = 5;
         }
         break;
     case 404:
-        target->world = 5;
-        target->level = 1;
-        target->theme = 7;
+        target_world = 5;
+        target_level = 1;
+        target_theme = 7;
         break;
     case 603:
-        target->world = 6;
-        target->level = 4;
-        target->theme = 14;
+        target_world = 6;
+        target_level = 4;
+        target_theme = 14;
         break;
     case 604:
-        target->world = 7;
-        target->level = 1;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 1;
+        target_theme = 9;
         break;
     case 702:
-        target->world = 7;
-        target->level = 3;
-        target->theme = 9;
+        target_world = 7;
+        target_level = 3;
+        target_theme = 9;
         break;
     case 703:
-        target->world = 7;
-        target->level = 4;
-        target->theme = 16;
+        target_world = 7;
+        target_level = 4;
+        target_theme = 16;
         break;
     case 704:
-        target->world = 8;
-        target->level = 5;
-        target->theme = 10;
+        target_world = 8;
+        target_level = 5;
+        target_theme = 10;
         break;
     default:
-        target->world = g_state->world;
-        target->level = g_state->level + 1;
-        target->theme = g_state->theme;
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
         break;
     }
     if (g_state->theme == 17)
     {
-        target->world = 1;
-        target->level = 1;
-        target->theme = 1;
+        target_world = 1;
+        target_level = 1;
+        target_theme = 1;
     }
-    if (target->world > 0)
+    if (target_world > 0)
     {
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target->world, target->level, target->theme);
+            warp_inc(target_world, target_level, target_theme);
         }
         n++;
     }
@@ -2153,12 +2195,10 @@ void render_narnia()
     auto doors = get_entities_by_type(doortypes);
     for (auto doorid : doors)
     {
-        Movable* doorent = (Movable*)get_entity_ptr(doorid);
-        target = reinterpret_cast<Target*>(&doorent->anim_func);
-        if (!target->enabled)
+        ExitDoor* target = (ExitDoor*)get_entity_ptr(doorid);
+        if (!target->special_door)
             continue;
-
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
         if (n > 0)
             ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
@@ -2170,16 +2210,15 @@ void render_narnia()
 
     if (g_state->theme == 11)
     {
-        target = new Target;
-        target->world = 4;
-        target->level = 4;
-        target->theme = 12;
+        target_world = 4;
+        target_level = 4;
+        target_theme = 12;
 
-        std::string buf = std::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
         ImGui::SameLine();
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target->world, target->level, target->theme);
+            warp_inc(target_world, target_level, target_theme);
         }
         n++;
     }
@@ -2414,6 +2453,17 @@ void render_camera()
         ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
         ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
         ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
+        if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
+        {
+            set_camp_camera_bounds_enabled(enable_camp_camera);
+            if (!enable_camp_camera && g_state->screen == 11)
+            {
+                g_state->camera->bounds_left = 0.5;
+                g_state->camera->bounds_right = 74.5;
+                g_state->camera->bounds_top = 124.5;
+                g_state->camera->bounds_bottom = 56.5;
+            }
+        }
     }
 }
 
@@ -2509,22 +2559,19 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
     }
-    if (!g_players.empty())
+    for (unsigned int x = 0; x < g_state->w; ++x)
     {
-        for (unsigned int x = 0; x < g_state->w; ++x)
+        for (unsigned int y = 0; y < g_state->h; ++y)
         {
-            for (unsigned int y = 0; y < g_state->h; ++y)
+            auto room_temp = g_state->level_gen->get_room_template(x, y, g_state->camera_layer);
+            if (room_temp.has_value())
             {
-                auto room_temp = g_state->level_gen->get_room_template(x, y, g_players.at(0)->layer);
-                if (room_temp.has_value())
-                {
-                    auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
-                    auto room_pos = g_state->level_gen->get_room_pos(x, y);
-                    auto pos = screen_position(room_pos.first, room_pos.second);
-                    ImVec2 spos = screenify({pos.first, pos.second});
-                    std::string room_text = std::format("{:d},{:d} {:s}", x, y, room_name);
-                    draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
-                }
+                auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
+                auto room_pos = g_state->level_gen->get_room_pos(x, y);
+                auto pos = screen_position(room_pos.first, room_pos.second);
+                ImVec2 spos = screenify({pos.first, pos.second});
+                std::string room_text = fmt::format("{:d},{:d} {:s} ({:d})", x, y, room_name, room_temp.value());
+                draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
             }
         }
     }
@@ -2628,7 +2675,13 @@ void render_messages()
         {
             if (fade_script_messages && now - 12s > message.time)
                 continue;
-            queue.push_back(std::make_tuple(script->get_name(), message.message, message.time, message.color));
+            std::istringstream messages(message.message);
+            while (!messages.eof())
+            {
+                std::string mline;
+                getline(messages, mline);
+                queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
+            }
         }
     }
     for (auto&& message : g_Console->consume_messages())
@@ -2637,7 +2690,13 @@ void render_messages()
     }
     for (auto message : g_ConsoleMessages)
     {
-        queue.push_back(std::make_tuple("Console", message.message, message.time, message.color));
+        std::istringstream messages(message.message);
+        while (!messages.eof())
+        {
+            std::string mline;
+            getline(messages, mline);
+            queue.push_back(std::make_tuple("Console", mline, message.time, message.color));
+        }
     }
     std::erase_if(g_ConsoleMessages, [&](auto message)
                   { return fade_script_messages && now - 12s > message.time; });
@@ -2654,7 +2713,7 @@ void render_messages()
         NULL,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
 
     const float font_size = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
@@ -2722,7 +2781,7 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto entity : get_entities_by(0, 255, -1))
+        for (auto entity : get_entities_by(0, 255, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)
@@ -2730,7 +2789,7 @@ void render_clickhandler()
             if (entity_names[type].find("FX") == std::string::npos)
                 render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
         }
-        for (auto entity : get_entities_by(0, 0x100, -1))
+        for (auto entity : get_entities_by(0, 0x100, LAYER::PLAYER))
         {
             auto type = entity_type(entity);
             if (type == 0)
@@ -2749,7 +2808,7 @@ void render_clickhandler()
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
             //std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
-            std::string buf = std::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
+            std::string buf = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
             //char buf2[32];
             //sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
             dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
@@ -2765,7 +2824,7 @@ void render_clickhandler()
                 render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
                 auto ptype = entity_type(hovered);
                 const char* pname = entity_names[ptype].c_str();
-                std::string buf3 = std::format("{}, {}", hovered, pname);
+                std::string buf3 = fmt::format("{}, {}", hovered, pname);
                 dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
             }
         }
@@ -3123,9 +3182,13 @@ void render_clickhandler()
 void render_options()
 {
     ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
-    if (ImGui::Checkbox("God mode##Godmode", &options["god_mode"]))
+    if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
     {
         godmode(options["god_mode"]);
+    }
+    if (ImGui::Checkbox("God mode (companions)##GodmodeCompanions", &options["god_mode_companions"]))
+    {
+        godmode_companions(options["god_mode_companions"]);
     }
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {
@@ -3194,7 +3257,7 @@ void render_debug()
     ImGui::InputScalar(
         "Level flags##HudFlagsDebug",
         ImGuiDataType_U32,
-        &g_state->hud_flags,
+        &g_state->level_flags,
         0,
         0,
         "%08X",
@@ -3301,7 +3364,7 @@ void render_scripts()
         size_t slash = script->get_file().find_last_of("/\\");
         if (slash != std::string::npos)
             filename = script->get_file().substr(slash + 1);
-        std::string name = std::format("{} ({})", script->get_name(), filename);
+        std::string name = fmt::format("{} ({})", script->get_name(), filename);
         if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
@@ -3392,6 +3455,35 @@ void render_scripts()
         render_script_files();
     }
     ImGui::PopItemWidth();
+}
+
+std::string format_time(int64_t frames)
+{
+    struct tm newtime;
+    time_t secs = frames / 60;
+    char time[32];
+    gmtime_s(&newtime, &secs);
+    size_t endpos = std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
+    snprintf(time + endpos, sizeof time - endpos, ".%03d", (int)((frames % 60) * 1000 / 60));
+    return time;
+}
+
+int parse_time(std::string time)
+{
+    std::tm tm = {};
+    std::stringstream ss(time);
+    ss >> std::get_time(&tm, "%H:%M:%S");
+    const auto pos = time.find_last_of(".");
+    int frames = 0;
+    if (pos != std::string::npos)
+    {
+        double dec = 0;
+        std::stringstream sff(time.substr(pos));
+        sff >> dec;
+        dec += 0.001;
+        frames = static_cast<int>(dec * 60);
+    }
+    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec) + frames;
 }
 
 void render_savegame()
@@ -3492,10 +3584,19 @@ void render_savegame()
     ImGui::PushID("Characters");
     if (ImGui::CollapsingHeader("Characters"))
     {
+        ImGui::Text("");
+        ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+        ImGui::Text("Deaths");
         for (int i = 0; i < 20; ++i)
         {
             ImGui::PushID(i);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
             ImGui::CheckboxFlags(people_flags[i], &g_save->characters, int_pow(2, i));
+            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::PushID("character_deaths");
+            ImGui::DragInt("", &g_save->character_deaths[i], 0.5f, 0, INT_MAX);
+            ImGui::PopID();
+            ImGui::PopItemWidth();
             ImGui::PopID();
         }
     }
@@ -3516,8 +3617,8 @@ void render_savegame()
     }
     ImGui::PopID();
 
-    ImGui::PushID("Profile");
-    if (ImGui::CollapsingHeader("Profile"))
+    ImGui::PushID("Player Profile");
+    if (ImGui::CollapsingHeader("Player Profile"))
     {
         ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5f);
         ImGui::DragInt("Plays", &g_save->plays);
@@ -3529,10 +3630,100 @@ void render_savegame()
         ImGui::DragInt("Top score", &g_save->score_top, 1000.0f, 0, INT_MAX);
         SliderByte("Deepest area", (char*)&g_save->deepest_area, 1, 8);
         SliderByte("Deepest level", (char*)&g_save->deepest_level, 1, 99);
+        std::string besttime = format_time(g_save->time_best);
+        if (ImGui::InputText("Best time##BestTime", &besttime))
+        {
+            g_save->time_best = parse_time(besttime);
+        }
+        std::string totaltime = format_time(g_save->time_total);
+        if (ImGui::InputText("Total time##BestTime", &totaltime))
+        {
+            g_save->time_total = parse_time(totaltime);
+        }
+        ImGui::Checkbox("Completed normal", &g_save->completed_normal);
+        ImGui::Checkbox("Completed ironman", &g_save->completed_ironman);
+        ImGui::Checkbox("Completed hard", &g_save->completed_hard);
         ImGui::PopItemWidth();
     }
     ImGui::PopID();
-    ImGui::TextWrapped("To be continued...");
+
+    ImGui::PushID("Last Game Played");
+    if (ImGui::CollapsingHeader("Last Game Played"))
+    {
+        SliderByte("World##LastWorld", (char*)&g_save->world_last, 1, 8);
+        SliderByte("Level##LastLevel", (char*)&g_save->level_last, 1, 99);
+        SliderByte("Theme##LastTheme", (char*)&g_save->theme_last, 1, 16);
+        ImGui::DragScalar("Score##LastScore", ImGuiDataType_S32, &g_save->score_last, 1000.0f, &s32_zero, &s32_max);
+        std::string lasttime = format_time(g_save->time_last);
+        if (ImGui::InputText("Time##LastTime", &lasttime))
+        {
+            g_save->time_last = parse_time(lasttime);
+        }
+        for (int i = 0; i < 9; ++i)
+        {
+            ImGui::PushID(i);
+            ImGui::InputInt("Sticker", &g_save->stickers[i]);
+            ImGui::PopID();
+        }
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("Miscellaneous");
+    if (ImGui::CollapsingHeader("Miscellaneous"))
+    {
+        bool tutorialcomplete = g_save->tutorial_state > 2;
+        if (ImGui::Checkbox("Tutorial completed", &tutorialcomplete))
+        {
+            if (tutorialcomplete)
+                g_save->tutorial_state = 4;
+            else
+                g_save->tutorial_state = 0;
+        }
+        ImGui::Checkbox("Seeded runs unlocked", &g_save->seeded_unlocked);
+        ImGui::Checkbox("Profile seen", &g_save->profile_seen);
+        for (int s = 0; s < 4; ++s)
+        {
+            auto lbl = fmt::format("Player {}", s + 1);
+            int plr = g_save->players[s];
+            if (ImGui::BeginCombo(lbl.c_str(), people_flags[plr]))
+            {
+                for (uint8_t i = 0; i < 20; ++i)
+                {
+                    bool isSelected = (plr == g_save->players[s]);
+                    if (ImGui::Selectable(people_flags[i], isSelected))
+                    {
+                        g_save->players[s] = i;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }
+        ImGui::SliderScalar("Rescued dogs", ImGuiDataType_U8, &g_save->pets_rescued[0], &u8_min, &u8_max);
+        ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
+        ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("UnlockAll");
+    if (ImGui::CollapsingHeader("Big scary button to unlock everything"))
+    {
+        ImGui::PushFont(bigfont);
+        ImGui::PushItemWidth(ImGui::GetContentRegionMax().x);
+        if (ImGui::Button("Unlock Everything*", {ImGui::GetContentRegionMax().x, 0}))
+        {
+            g_save->tutorial_state = 4;
+            g_save->profile_seen = true;
+            g_save->seeded_unlocked = true;
+            g_save->characters = 0xfffff;
+            g_save->shortcuts = 0xa;
+            g_save->deepest_area = 7;
+            g_save->deepest_level = 4;
+        }
+        ImGui::PopItemWidth();
+        ImGui::PopFont();
+        ImGui::TextWrapped("*Tutorial, seeded, characters, shortcuts, camp");
+    }
+    ImGui::PopID();
 }
 
 void render_powerup(int uid, const char* section)
@@ -3727,41 +3918,34 @@ void render_entity_props()
         g_entity->overlay = nullptr;
         g_entity->y -= 1000.0;
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Move the entity under the level,\nlike it just fell in to the void.");
     ImGui::SameLine();
     if (ImGui::Button("Kill##KillEntity"))
     {
         g_entity->kill(true, nullptr);
     }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Kill the entity,\nlike it received damage and died.");
     ImGui::SameLine();
-    if (ImGui::Button("Remove##RemoveEntity"))
+    if (ImGui::Button("Rem##RemoveEntity"))
     {
         g_entity->remove();
     }
-    if (ImGui::CollapsingHeader("State"))
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Move the entity to limbo layer,\nlike it exists but doesn't do anything.");
+    ImGui::SameLine();
+    if (ImGui::Button("Dstr##DestroyEntity"))
+    {
+        g_entity->destroy();
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
+    if (ImGui::CollapsingHeader("State") && g_entity->is_movable())
     {
         render_state("Current state", g_entity->state);
         render_state("Last state", g_entity->last_state);
         render_ai("AI state", g_entity->move_state);
-        if (ImGui::Button("Change"))
-        {
-            unsigned int layer_to = 0;
-            if (g_entity->layer == 0)
-                layer_to = 1;
-            g_entity->set_layer(layer_to);
-        }
-        ImGui::SameLine();
-        switch (g_entity->layer)
-        {
-        case 0:
-            ImGui::Text("Layer: FRONT");
-            break;
-        case 1:
-            ImGui::Text("Layer: BACK");
-            break;
-        default:
-            ImGui::Text("Layer: UNKNOWN");
-            break;
-        }
         if (g_entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
@@ -3813,20 +3997,40 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Position"))
     {
+        if (ImGui::Button("Change"))
+        {
+            auto layer_to = LAYER::FRONT;
+            if (g_entity->layer == 0)
+                layer_to = LAYER::BACK;
+            g_entity->set_layer(layer_to);
+        }
+        ImGui::SameLine();
+        switch (g_entity->layer)
+        {
+        case 0:
+            ImGui::Text("Layer: FRONT");
+            break;
+        case 1:
+            ImGui::Text("Layer: BACK");
+            break;
+        default:
+            ImGui::Text("Layer: UNKNOWN");
+            break;
+        }
         ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2f, 1.0f);
         ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2f, 1.0f);
         ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2f, 1.0f);
         ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2f, 1.0f);
         ImGui::InputFloat("Angle##EntityAngle", &g_entity->angle, 0.2f, 1.0f);
-        SliderByte("Airtime##EntityAirtime", (char*)&g_entity->airtime, 0, 98);
+        SliderByte("Falling timer##EntityFallingTimer", (char*)&g_entity->falling_timer, 0, 98);
         uint8_t falldamage = 0;
-        if (g_entity->airtime >= 98)
+        if (g_entity->falling_timer >= 98)
             falldamage = 4;
-        else if (g_entity->airtime >= 78)
+        else if (g_entity->falling_timer >= 78)
             falldamage = 3;
-        else if (g_entity->airtime >= 58)
+        else if (g_entity->falling_timer >= 58)
             falldamage = 2;
-        else if (g_entity->airtime >= 38)
+        else if (g_entity->falling_timer >= 38)
             falldamage = 1;
         const char* damagenum[] = {"0", "1", "2", "4", "99"};
         SliderByte("Fall damage##EntityFallDamage", (char*)&falldamage, 0, 4, damagenum[falldamage]);
@@ -3834,7 +4038,7 @@ void render_entity_props()
     if (ImGui::CollapsingHeader("Stats"))
     {
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&g_entity->health, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("Price##Price", ImGuiDataType_U8, (char*)&g_entity->price, 0.5f, &u32_zero, &u32_max);
+        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&g_entity->price, 0.5f, &s32_min, &s32_max);
         if (g_inventory != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
@@ -3886,11 +4090,12 @@ void render_entity_props()
                 coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
             ImGui::Text("%s", entity_names[coffin->inside].c_str());
-            ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U32, (int*)&coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
+            ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U8, &coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
         else if (
             g_entity_type == to_id("ENT_TYPE_ITEM_CRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_PRESENT") ||
-            g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT"))
+            g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT") ||
+            g_entity_type == to_id("ENT_TYPE_ITEM_DMCRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"))
         {
             auto container = (Container*)g_entity;
             ImGui::Text("Item in container:");
@@ -3903,15 +4108,16 @@ void render_entity_props()
         }
         else if (g_entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
         {
-            ImGui::SliderInt("Uses left##MattockUses", (int*)&g_entity[1], 1, 255);
+            auto mattock = (Mattock*)g_entity;
+            ImGui::SliderScalar("Uses left##MattockUses", ImGuiDataType_U8, &mattock->remaining, &u8_min, &u8_max);
         }
         else if (
             g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
             g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
-            Target* target = reinterpret_cast<Target*>(&g_entity->anim_func);
+            auto target = (ExitDoor*)g_entity;
             ImGui::Text("Door target:");
-            ImGui::Checkbox("Enabled##DoorEnabled", (bool*)&target->enabled);
+            ImGui::Checkbox("Enabled##DoorEnabled", &target->special_door);
             ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Theme##DoorThemenumber", ImGuiDataType_U8, &target->theme, 0.2f, &u8_one, &u8_seventeen);
@@ -3985,6 +4191,18 @@ void render_entity_props()
             {
                 g_entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
+
+            if (g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && g_entity->ai != 0)
+            {
+                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &g_entity->ai->state, &u8_min, &s8_max);
+                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &g_entity->ai->trust, &u8_min, &s8_max);
+                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &g_entity->ai->whipped, &u8_min, &s8_max);
+                if (g_entity->ai->target_uid != -1)
+                {
+                    ImGui::Text("Target:");
+                    render_uid(g_entity->ai->target_uid, "Ai");
+                }
+            }
         }
     }
     if (ImGui::CollapsingHeader("Style"))
@@ -3996,7 +4214,10 @@ void render_entity_props()
         ImGui::DragFloat("Box height##EntityBoxHeight", &g_entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset X##EntityOffsetX", &g_entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset Y##EntityOffsetY", &g_entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
-        ImGui::DragScalar("Animation Frame##EntityAnimationFrame", ImGuiDataType_U16, &g_entity->animation_frame, 0.2f, &u16_zero, &u16_max);
+        ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &g_entity->animation_frame, 0.2f, &u16_zero, &u16_max);
+        uint8_t draw_depth = g_entity->draw_depth;
+        if (ImGui::DragScalar("Draw depth##EntityDrawDepth", ImGuiDataType_U8, &draw_depth, 0.2f, &u8_zero, &u8_draw_depth_max))
+            g_entity->set_draw_depth(draw_depth);
     }
     if (ImGui::CollapsingHeader("Flags"))
     {
@@ -4032,30 +4253,13 @@ void render_entity_props()
         }
         for (int i = 0; i < 6; i++)
         {
-            ImGui::CheckboxFlags(button_flags[i], &g_entity->buttons, int_pow(2, i));
+            int buttons = g_entity->buttons;
+            ImGui::CheckboxFlags(button_flags[i], &buttons, int_pow(2, i));
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }
     }
     ImGui::PopItemWidth();
-}
-
-std::string format_time(int frames)
-{
-    struct tm newtime;
-    time_t secs = frames / 60;
-    char time[10];
-    gmtime_s(&newtime, &secs);
-    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
-    return time;
-}
-
-int parse_time(std::string time)
-{
-    std::tm tm = {};
-    std::stringstream ss(time);
-    ss >> std::get_time(&tm, "%H:%M:%S");
-    return 60 * (tm.tm_hour * 60 * 60 + tm.tm_min * 60 + tm.tm_sec);
 }
 
 void force_time()
@@ -4098,6 +4302,19 @@ void force_time()
     {
         g_state->time_total = g_total_time;
     }
+
+    if (quest_yang_state.has_value())
+        g_state->quests->yang_state = quest_yang_state.value();
+    if (quest_sisters_state.has_value())
+        g_state->quests->jungle_sisters_flags = quest_sisters_state.value();
+    if (quest_horsing_state.has_value())
+        g_state->quests->van_horsing_state = quest_horsing_state.value();
+    if (quest_sparrow_state.has_value())
+        g_state->quests->sparrow_state = quest_sparrow_state.value();
+    if (quest_tusk_state.has_value())
+        g_state->quests->madame_tusk_state = quest_tusk_state.value();
+    if (quest_beg_state.has_value())
+        g_state->quests->beg_state = quest_beg_state.value();
 }
 
 void render_timer()
@@ -4205,6 +4422,147 @@ void render_game_props()
             darkmode(dark_mode);
         }
     }
+    if (ImGui::CollapsingHeader("Quests"))
+    {
+        ImGui::Indent(16.0f);
+
+        if (ImGui::CollapsingHeader("Yang"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestYang", &freeze_quest_yang))
+            {
+                if (freeze_quest_yang)
+                    quest_yang_state = g_state->quests->yang_state;
+                else
+                    quest_yang_state.reset();
+            }
+            int yang_state = static_cast<int>(g_state->quests->yang_state);
+            ImGui::RadioButton("Angry##QuestYangAngry", &yang_state, -1);
+            ImGui::RadioButton("Not started##QuestYangDefault", &yang_state, 0);
+            ImGui::RadioButton("Pen spawned##QuestYangPen", &yang_state, 2);
+            ImGui::RadioButton("Delivered##QuestYangDelivered", &yang_state, 3);
+            ImGui::RadioButton("Shop spawned##QuestYangShop", &yang_state, 4);
+            ImGui::RadioButton("1 turkey bought##QuestYang1", &yang_state, 5);
+            ImGui::RadioButton("2 turkeys bought##QuestYang2", &yang_state, 6);
+            ImGui::RadioButton("3 turkeys bought##QuestYang3", &yang_state, 7);
+            g_state->quests->yang_state = static_cast<int8_t>(yang_state);
+        }
+
+        if (ImGui::CollapsingHeader("Jungle Sisters"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestSisters", &freeze_quest_sisters))
+            {
+                if (freeze_quest_sisters)
+                    quest_sisters_state = g_state->quests->jungle_sisters_flags;
+                else
+                    quest_sisters_state.reset();
+            }
+            int sisters_state = static_cast<int>(g_state->quests->jungle_sisters_flags);
+            bool angry = sisters_state == -1;
+            if (ImGui::Checkbox("Angry##QuestSistersAngry", &angry))
+            {
+                if (angry)
+                    sisters_state = -1;
+                else
+                    sisters_state = 0;
+            }
+            if (!angry)
+            {
+                ImGui::CheckboxFlags("Saved Parsley##QuestSistersParsley", &sisters_state, 1);
+                ImGui::CheckboxFlags("Saved Parsnip##QuestSistersParsnip", &sisters_state, 2);
+                ImGui::CheckboxFlags("Saved Parmesan##QuestSistersParmesan", &sisters_state, 4);
+                ImGui::CheckboxFlags("Met at Tide Pool door##QuestSistersTidePool", &sisters_state, 8);
+                ImGui::CheckboxFlags("Met in wet fur##QuestSistersIceCaves", &sisters_state, 32);
+                ImGui::CheckboxFlags("Met in palace##QuestSistersNeoBabylon", &sisters_state, 16);
+            }
+            g_state->quests->jungle_sisters_flags = static_cast<int8_t>(sisters_state);
+        }
+
+        if (ImGui::CollapsingHeader("Van Horsing"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestHorsing", &freeze_quest_horsing))
+            {
+                if (freeze_quest_horsing)
+                    quest_horsing_state = g_state->quests->van_horsing_state;
+                else
+                    quest_horsing_state.reset();
+            }
+            int horsing_state = static_cast<int>(g_state->quests->van_horsing_state);
+            ImGui::RadioButton("Angry##QuestHorsingAngry", &horsing_state, -1);
+            ImGui::RadioButton("Not started##QuestHorsingDefault", &horsing_state, 0);
+            ImGui::RadioButton("Cell spawned##QuestHorsingCell", &horsing_state, 1);
+            ImGui::RadioButton("Got diamond##QuestHorsingDiamond", &horsing_state, 2);
+            ImGui::RadioButton("Spawned in Castle##QuestHorsingVlad", &horsing_state, 3);
+            ImGui::RadioButton("Shot Vlad##QuestHorsingVladShot", &horsing_state, 4);
+            ImGui::RadioButton("Spawned in Temple##QuestHorsingTemple", &horsing_state, 5);
+            ImGui::RadioButton("Got alien compass##QuestHorsingComplass", &horsing_state, 6);
+            ImGui::RadioButton("Palace basement ending##QuestHorsingTusk", &horsing_state, 7);
+            g_state->quests->van_horsing_state = static_cast<int8_t>(horsing_state);
+        }
+
+        if (ImGui::CollapsingHeader("Sparrow"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestSparrow", &freeze_quest_sparrow))
+            {
+                if (freeze_quest_sparrow)
+                    quest_sparrow_state = g_state->quests->sparrow_state;
+                else
+                    quest_sparrow_state.reset();
+            }
+            int sparrow_state = static_cast<int>(g_state->quests->sparrow_state);
+            ImGui::RadioButton("Angry##QuestSparrowAngry", &sparrow_state, -1);
+            ImGui::RadioButton("Not started##QuestSparrowDefault", &sparrow_state, 0);
+            ImGui::RadioButton("Thief##QuestSparrowThief", &sparrow_state, 1);
+            ImGui::RadioButton("Finished level as thief##QuestSparrowThiefLevel", &sparrow_state, 2);
+            ImGui::RadioButton("Spawned in first hideout##QuestSparrowFirst", &sparrow_state, 3);
+            ImGui::RadioButton("Got ropes##QuestSparrowRopes", &sparrow_state, 4);
+            ImGui::RadioButton("Stole Tusk idol##QuestSparrowTusk", &sparrow_state, 5);
+            ImGui::RadioButton("Spawned in Neo Babylon##QuestSparrowSecond", &sparrow_state, 6);
+            ImGui::RadioButton("Met in Neo Babylon##QuestSparrowSecondComplete", &sparrow_state, 7);
+            ImGui::RadioButton("Palace basement ending##QuestSparrowTusk", &sparrow_state, 8);
+            g_state->quests->sparrow_state = static_cast<int8_t>(sparrow_state);
+        }
+
+        if (ImGui::CollapsingHeader("Madame Tusk"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestTusk", &freeze_quest_tusk))
+            {
+                if (freeze_quest_tusk)
+                    quest_tusk_state = g_state->quests->madame_tusk_state;
+                else
+                    quest_tusk_state.reset();
+            }
+            int tusk_state = static_cast<int>(g_state->quests->madame_tusk_state);
+            ImGui::RadioButton("Angry##QuestTuskAngry", &tusk_state, -2);
+            ImGui::RadioButton("Dead##QuestTuskDead", &tusk_state, -1);
+            ImGui::RadioButton("Not started##QuestTuskDefault", &tusk_state, 0);
+            ImGui::RadioButton("Dice house spawned##QuestTuskDice", &tusk_state, 1);
+            ImGui::RadioButton("High roller##QuestTuskHighRoller", &tusk_state, 2);
+            ImGui::RadioButton("Palace ending##QuestTuskPalace", &tusk_state, 3);
+            g_state->quests->madame_tusk_state = static_cast<int8_t>(tusk_state);
+        }
+
+        if (ImGui::CollapsingHeader("Beg"))
+        {
+            if (ImGui::Checkbox("Freeze current state##FreezeQuestBeg", &freeze_quest_beg))
+            {
+                if (freeze_quest_beg)
+                    quest_beg_state = g_state->quests->beg_state;
+                else
+                    quest_beg_state.reset();
+            }
+            int beg_state = static_cast<int>(g_state->quests->beg_state);
+            ImGui::RadioButton("Angry##QuestBegAngry", &beg_state, -1);
+            ImGui::RadioButton("Not started##QuestBegDefault", &beg_state, 0);
+            ImGui::RadioButton("Altar destroyed##QuestBegAltar", &beg_state, 1);
+            ImGui::RadioButton("Spawned with bombs##QuestBegBombs", &beg_state, 2);
+            ImGui::RadioButton("Got bombs##QuestBegGotBombs", &beg_state, 3);
+            ImGui::RadioButton("Spawned with true crown##QuestBegCrown", &beg_state, 4);
+            ImGui::RadioButton("Got true crown##QuestBegGotCrown", &beg_state, 5);
+            g_state->quests->beg_state = static_cast<int8_t>(beg_state);
+        }
+
+        ImGui::Unindent(16.0f);
+    }
     if (ImGui::CollapsingHeader("Street cred"))
     {
         ImGui::DragScalar("Shoppie aggro##ShoppieAggro", ImGuiDataType_U8, &g_state->shoppie_aggro, 0.5f, &u8_min, &u8_max, "%d");
@@ -4223,7 +4581,7 @@ void render_game_props()
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(hud_flags[i], &g_state->hud_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(level_flags[i], &g_state->level_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Quest flags"))
@@ -4256,10 +4614,16 @@ void render_game_props()
     }
     if (ImGui::CollapsingHeader("AI targets"))
     {
-        for (const auto& [ai, target] : *(g_state->ai_targets))
+        for (size_t x = 0; x < 8; ++x)
         {
-            auto ai_entity = get_entity_ptr(ai);
-            if (ai_entity == nullptr)
+            auto ai_target = g_state->ai_targets[x];
+            if (ai_target.ai_uid == 0)
+            {
+                continue;
+            }
+            auto ai_entity = get_entity_ptr(ai_target.ai_uid);
+            auto target = ai_target.target_uid;
+            if (ai_entity == nullptr || (ai_entity->type->search_flags & 1) != 1)
             {
                 continue;
             }
@@ -4267,7 +4631,7 @@ void render_game_props()
             ImGui::SameLine();
             ImGui::Text(": ");
             ImGui::SameLine();
-            if (target == -1)
+            if (std::cmp_equal(target, -1))
             {
                 ImGui::Text("Nothing");
             }
@@ -4365,7 +4729,7 @@ void render_keyconfig()
         ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         ImGui::PushFont(bigfont);
-        std::string buf = std::format("Enter new key/button combo for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
+        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
         ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
         dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
         ImGui::PopFont();
@@ -4512,7 +4876,7 @@ void imgui_init(ImGuiContext*)
 void imgui_draw()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    std::string buf = std::format("Overlunky {}", TOSTRING(GIT_VERSION));
+    std::string buf = fmt::format("Overlunky {}", get_version());
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 

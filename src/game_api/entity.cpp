@@ -14,6 +14,7 @@
 #include "texture.hpp"
 #include "vtable_hook.hpp"
 
+using namespace std::chrono_literals;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
 template <class FunT>
@@ -26,6 +27,7 @@ struct EntityHooksInfo
 {
     void* entity;
     std::uint32_t cbcount;
+    std::vector<HookWithId<void(Entity*)>> on_dtor;
     std::vector<HookWithId<void(Entity*)>> on_destroy;
     std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
@@ -33,17 +35,6 @@ struct EntityHooksInfo
     std::vector<HookWithId<void(Container*, Movable*)>> on_open;
 };
 std::vector<EntityHooksInfo> g_entity_hooks;
-
-size_t cache_entities_ptr = 0;
-
-size_t entities_offset()
-{
-    ONCE(size_t)
-    {
-        auto mem = Memory::get();
-        return res = decode_imm(mem.exe(), find_inst(mem.exe(), "\x48\x8D\x8B"s, find_inst(mem.exe(), "\x29\x5C\x8F\x3D"s, mem.after_bundle)));
-    }
-}
 
 struct EntityBucket
 {
@@ -61,97 +52,63 @@ struct EntityPool
     EntityBucket* _some_bucket;
     EntityBucket* bucket;
 };
-struct EntityStore
+struct EntityFactory
 {
-    EntityDB types[0x391];
-    bool type_set[0x391];
+    EntityDB types[0x395];
+    bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map;
     EntityMap entity_map;
     void* _ptr_7;
 };
 
-size_t entities_ptr()
+EntityFactory* entity_factory()
 {
-    if (cache_entities_ptr == 0)
+    static EntityFactory* cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
+    while (cache_entity_factory == 0)
     {
-        auto mem = Memory::get();
-        cache_entities_ptr =
-            mem.at_exe(decode_pc(mem.exe(), find_inst(mem.exe(), "\x48\xB8\x02\x55\xA7\x74\x52\x9D\x51\x43"s, mem.after_bundle) - 7));
+        std::this_thread::sleep_for(500ms);
+        cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
     }
-    return cache_entities_ptr;
-}
-
-AddLayer get_add_layer()
-{
-    ONCE(AddLayer)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x40\x56\x41\x54\x48\x83\xec\x58\x4c\x8b\xe1\x48\x8b\xf2\x48\x83\xc1\x08\xe8\xd9\xe1\xff\xff"s, memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (AddLayer)off;
-    }
-}
-
-RemoveLayer get_remove_layer()
-{
-    ONCE(RemoveLayer)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x40\x53\x56\x41\x55\x48\x83\xec\x50\x4c\x8b\xe9\x48\x8b\xf2\x48\x83\xc1\x08"s, memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (RemoveLayer)off;
-    }
+    return cache_entity_factory;
 }
 
 std::vector<EntityItem> list_entities()
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
-    size_t off = entities_offset();
-    // Special case: map_ptr might be 0 if it's not initialized.
-    // This only occurs in list_entities; for others, do not check the pointer
-    // to see if this assumption works.
-    if (!map_ptr)
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (!entity_factory_ptr)
         return {};
 
-    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
+    const EntityMap& map = entity_factory_ptr->entity_map;
 
     std::vector<EntityItem> result;
-    for (const auto& kv : *map)
+    for (const auto& [name, id] : map)
     {
-        result.emplace_back(kv.first, kv.second);
-        // auto entities = reinterpret_cast<EntityDB *>(map_ptr);
-        // EntityDB *entity = &entities[kv.second];
-        // printf("%d\n", entity->id);
+        result.emplace_back(name, id);
     }
-
     return result;
 }
 
 EntityDB* get_type(uint32_t id)
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
+    EntityFactory* entity_factory_ptr = entity_factory();
+
     // Special case: map_ptr might be 0 if it's not initialized.
     // This only occurs in list_entities; for others, do not check the pointer
     // to see if this assumption works.
-    if (!map_ptr)
+    if (!entity_factory_ptr)
         return nullptr;
 
-    //auto map = reinterpret_cast<EntityMap*>(map_ptr + entities_offset());
-
-    std::vector<EntityItem> result;
-    auto entities = reinterpret_cast<EntityDB*>(map_ptr);
-    return &entities[id];
+    return entity_factory_ptr->types + id;
 }
 
-uint32_t to_id(std::string_view name)
+ENT_TYPE to_id(std::string_view name)
 {
-    size_t map_ptr = *(size_t*)entities_ptr();
-    size_t off = entities_offset();
-    if (!map_ptr)
-        return 0;
-    auto map = reinterpret_cast<EntityMap*>(map_ptr + off);
-    auto it = map->find(std::string(name));
-    return it != map->end() ? it->second : -1;
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (!entity_factory_ptr)
+        return {};
+    const EntityMap& map = entity_factory_ptr->entity_map;
+    auto it = map.find(std::string(name));
+    return it != map.end() ? it->second : -1;
 }
 
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
@@ -216,8 +173,10 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
 
 void Entity::set_layer(LAYER layer_to)
 {
-    if (layer == layer_to || layer_to > 1 || layer_to < 0)
+    uint8_t dest_layer = enum_to_layer(layer_to);
+    if (layer == dest_layer)
         return;
+
     auto state = State::get();
     if (this != this->topmost_mount())
         this->topmost_mount()->set_layer(layer_to);
@@ -225,13 +184,17 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == 0 || layer == 1)
     {
         auto ptr_from = state.ptr()->layers[layer];
-        auto remove_layer_func = get_remove_layer();
-        remove_layer_func(ptr_from, this);
+
+        using RemoveFromLayer = void(Layer*, Entity*);
+        static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
+        remove_from_layer(ptr_from, this);
     }
 
-    auto ptr_to = state.ptr()->layers[layer_to];
-    auto add_layer_func = get_add_layer();
-    add_layer_func(ptr_to, this);
+    auto ptr_to = state.ptr()->layers[dest_layer];
+
+    using AddToLayer = void(Layer*, Entity*);
+    static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
+    add_to_layer(ptr_to, this);
 
     int* pitems = (int*)items.begin;
     for (uint8_t idx = 0; idx < items.count; ++idx)
@@ -243,36 +206,45 @@ void Entity::set_layer(LAYER layer_to)
 
 void Entity::remove()
 {
-    auto state = State::get();
-    auto ptr_from = state.ptr()->layers[layer];
-    auto remove_layer_func = get_remove_layer();
-    remove_layer_func(ptr_from, this);
-
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    if (layer != 2)
     {
-        auto item = get_entity_ptr(pitems[idx]);
-        item->remove();
+        auto state = State::get();
+        auto ptr_from = state.ptr()->layers[layer];
+        if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
+        {
+            using RemoveFromLayer = void(Layer*, Entity*);
+            static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
+            remove_from_layer(ptr_from, this);
+
+            int* pitems = (int*)items.begin;
+            for (uint8_t idx = 0; idx < items.count; ++idx)
+            {
+                auto item = get_entity_ptr(pitems[idx]);
+                item->remove();
+            }
+        }
+        layer = 2;
     }
+}
+
+void Entity::respawn(LAYER layer_to)
+{
+    set_layer(layer_to);
 }
 
 std::pair<float, float> Entity::position()
 {
-    // Return the resolved position
-    // overlay exists if player is riding something / etc
     auto [x_pos, y_pos] = position_self();
-    // log::debug!("Item #{}: Position is {}, {}", unique_id(), x, y);
-    switch ((size_t)overlay)
+
+    // overlay exists if player is riding something / etc
+    Entity* overlay_nested = overlay;
+    while (overlay_nested != nullptr)
     {
-    case NULL:
-        return {x_pos, y_pos};
-    default:
-    {
-        float _x, _y;
-        std::tie(_x, _y) = overlay->position();
-        return {x_pos + _x, y_pos + _y};
+        x_pos += overlay_nested->x;
+        y_pos += overlay_nested->y;
+        overlay_nested = overlay_nested->overlay;
     }
-    }
+    return {x_pos, y_pos};
 }
 
 std::pair<float, float> Entity::position_self() const
@@ -282,19 +254,17 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    // This isn't perfect but at least it fixes the trigger hitboxes for now
-    auto [x_pos, y_pos] = position_self();
-    switch ((size_t)overlay)
+    if (overlay != nullptr)
     {
-    case NULL:
-        return {rendering_info->x, rendering_info->y};
-    default:
+        auto [x_pos, y_pos] = position_self();
+        auto [rx_pos, ry_pos] = overlay->position_render();
+        return {rx_pos + x_pos, ry_pos + y_pos};
+    }
+    if (rendering_info == nullptr)
     {
-        float _x, _y;
-        std::tie(_x, _y) = overlay->position();
-        return {x_pos + _x, y_pos + _y};
+        return position_self();
     }
-    }
+    return {rendering_info->x, rendering_info->y};
 }
 
 void Entity::remove_item(uint32_t id)
@@ -336,11 +306,12 @@ uint8_t Player::kapala_blood_amount()
 
 void Movable::poison(int16_t frames)
 {
-    static size_t offset = 0;
-    if (offset == 0)
+    static size_t offset_first = 0;
+    static size_t offset_subsequent = 0;
+    if (offset_first == 0)
     {
-        auto memory = Memory::get();
-        offset = memory.at_exe(find_inst(memory.exe(), "\xB8\x08\x07\x00\x00\x66\x89\x87\x18\x01\x00\x00"s, memory.after_bundle));
+        offset_first = get_address("first_poison_tick_timer_default");
+        offset_subsequent = get_address("subsequent_poison_tick_timer_default");
     }
     poison_tick_timer = frames;
 
@@ -348,7 +319,8 @@ void Movable::poison(int16_t frames)
     {
         frames = 1800;
     }
-    write_mem_prot(offset + 1, to_le_bytes(frames), true);
+    write_mem_prot(offset_first, frames, true);
+    write_mem_prot(offset_subsequent, frames, true);
 }
 
 bool Movable::is_poisoned()
@@ -356,23 +328,46 @@ bool Movable::is_poisoned()
     return (poison_tick_timer != -1);
 }
 
-bool Movable::is_button_pressed(uint32_t button)
+void Movable::broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y)
 {
-    return (buttons & button) != 0 && (buttons & (button << 8)) == 0;
-}
-bool Movable::is_button_held(uint32_t button)
-{
-    return (buttons & button) != 0 && (buttons & (button << 8)) != 0;
-}
-bool Movable::is_button_released(uint32_t button)
-{
-    return (buttons & button) == 0 && (buttons & (button << 8)) != 0;
+    damage(damage_dealer_uid, damage_amount, stun_time, velocity_x, velocity_y, 80);
 }
 
-void hook_movable_state_machine(Movable* self)
+void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint16_t iframes)
+{
+    if ((flags & (1 << 28)) > 0)
+    {
+        return;
+    }
+
+    auto dealer = get_entity_ptr(damage_dealer_uid);
+    if (dealer == nullptr)
+    {
+        return;
+    }
+
+    float velocities[] = {velocity_x, velocity_y};
+    float unknown[] = {0.0f, 0.0f};
+    on_regular_damage(dealer, damage_amount, 0x1000, velocities, unknown, stun_time, iframes);
+}
+
+bool Movable::is_button_pressed(BUTTON button)
+{
+    return (buttons & button) == button && (buttons_previous & button) == 0;
+}
+bool Movable::is_button_held(BUTTON button)
+{
+    return (buttons & button) == button && (buttons_previous & button) == button;
+}
+bool Movable::is_button_released(BUTTON button)
+{
+    return (buttons & button) == 0 && (buttons_previous & button) == button;
+}
+
+void hook_movable_state_machine(Movable* _self)
 {
     hook_vtable<void(Movable*)>(
-        self,
+        _self,
         [](Movable* self, void (*original)(Movable*))
         {
             EntityHooksInfo& hook_info = self->get_hooks();
@@ -396,32 +391,25 @@ void hook_movable_state_machine(Movable* self)
                 post(self);
             }
         },
-        0x24);
+        0x2);
 }
-std::uint32_t Movable::set_pre_statemachine(std::function<bool(Movable*)> pre_state_machine)
+void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty())
+    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
-    hook_info.pre_statemachine.push_back({hook_info.cbcount++, std::move(pre_state_machine)});
-    return hook_info.pre_statemachine.back().id;
+    hook_info.pre_statemachine.push_back({reserved_callback_id, std::move(pre_state_machine)});
 }
-std::uint32_t Movable::set_post_statemachine(std::function<void(Movable*)> post_state_machine)
+void Movable::set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.post_statemachine.empty())
+    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
     {
         hook_movable_state_machine(this);
     }
-    hook_info.post_statemachine.push_back({hook_info.cbcount++, std::move(post_state_machine)});
-    return hook_info.post_statemachine.back().id;
-}
-
-void Entity::destroy()
-{
-    delete this; // TODO
+    hook_info.post_statemachine.push_back({reserved_callback_id, std::move(post_state_machine)});
 }
 
 std::tuple<float, float, uint8_t> get_position(uint32_t uid)
@@ -470,19 +458,19 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
         auto [x, y, l] = (use_render_pos ? get_render_position : get_position)(uid);
         return AABB{
             x - ent->hitboxx + ent->offsetx,
-            y - ent->hitboxy + ent->offsety,
-            x + ent->hitboxx + ent->offsetx,
             y + ent->hitboxy + ent->offsety,
+            x + ent->hitboxx + ent->offsetx,
+            y - ent->hitboxy + ent->offsety,
         };
     }
     return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
-std::uint64_t Entity::get_texture()
+TEXTURE Entity::get_texture()
 {
     return texture->id;
 }
-bool Entity::set_texture(std::uint64_t texture_id)
+bool Entity::set_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
     {
@@ -498,13 +486,15 @@ void Entity::unhook(std::uint32_t id)
                            { return hook.entity == this; });
     if (it != g_entity_hooks.end())
     {
+        std::erase_if(it->on_dtor, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->on_destroy, [id](auto& hook)
+                      { return hook.id == id; });
         std::erase_if(it->on_kill, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->post_statemachine, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->on_destroy, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->on_open, [id](auto& hook)
                       { return hook.id == id; });
@@ -518,15 +508,15 @@ EntityHooksInfo& Entity::get_hooks()
     {
         hook_dtor(this, [](void* self)
                   {
-                      auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
-                                             { return hook.entity == self; });
-                      if (it != g_entity_hooks.end())
+                      auto _it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
+                                              { return hook.entity == self; });
+                      if (_it != g_entity_hooks.end())
                       {
-                          for (auto& cb : it->on_destroy)
+                          for (auto& cb : _it->on_dtor)
                           {
                               cb.fun((Entity*)self);
                           }
-                          g_entity_hooks.erase(it);
+                          g_entity_hooks.erase(_it);
                       }
                   });
         g_entity_hooks.push_back({this});
@@ -535,13 +525,38 @@ EntityHooksInfo& Entity::get_hooks()
     return *it;
 }
 
-std::uint32_t Entity::set_on_destroy(std::function<void(Entity*)> cb)
+std::uint32_t Entity::set_on_dtor(std::function<void(Entity*)> cb)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    hook_info.on_destroy.push_back({hook_info.cbcount++, std::move(cb)});
-    return hook_info.on_destroy.back().id;
+    hook_info.on_dtor.push_back({hook_info.cbcount++, std::move(cb)});
+    return hook_info.on_dtor.back().id;
 }
-std::uint32_t Entity::set_on_kill(std::function<void(Entity*, Entity*)> on_kill)
+std::uint32_t Entity::reserve_callback_id()
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    return hook_info.cbcount++;
+}
+void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.on_destroy.empty())
+    {
+        hook_vtable<void(Entity*)>(
+            this,
+            [](Entity* self, void (*original)(Entity*))
+            {
+                EntityHooksInfo& _hook_info = self->get_hooks();
+                for (auto& [id, on_destroy] : _hook_info.on_destroy)
+                {
+                    on_destroy(self);
+                }
+                original(self);
+            },
+            0x5);
+    }
+    hook_info.on_destroy.push_back({reserved_callback_id, std::move(on_destroy)});
+}
+void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_kill.empty())
@@ -550,17 +565,16 @@ std::uint32_t Entity::set_on_kill(std::function<void(Entity*, Entity*)> on_kill)
             this,
             [](Entity* self, bool _some_bool, Entity* from, void (*original)(Entity*, bool, Entity*))
             {
-                EntityHooksInfo& hook_info = self->get_hooks();
-                for (auto& [id, on_kill] : hook_info.on_kill)
+                EntityHooksInfo& _hook_info = self->get_hooks();
+                for (auto& [id, on_kill] : _hook_info.on_kill)
                 {
                     on_kill(self, from);
                 }
                 original(self, _some_bool, from);
             },
-            0x2);
+            0x3);
     }
-    hook_info.on_kill.push_back({hook_info.cbcount++, std::move(on_kill)});
-    return hook_info.on_kill.back().id;
+    hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
 }
 
 bool Entity::is_movable()
@@ -574,7 +588,7 @@ bool Entity::is_movable()
     return false;
 }
 
-std::uint32_t Container::set_on_open(std::function<void(Container*, Movable*)> on_open)
+void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_open.empty())
@@ -585,16 +599,15 @@ std::uint32_t Container::set_on_open(std::function<void(Container*, Movable*)> o
             {
                 if (opener->movey > 0)
                 {
-                    EntityHooksInfo& hook_info = self->get_hooks();
-                    for (auto& [id, on_open] : hook_info.on_open)
+                    EntityHooksInfo& _hook_info = self->get_hooks();
+                    for (auto& [id, on_open] : _hook_info.on_open)
                     {
                         on_open(self, opener);
                     }
                 }
                 original(self, opener);
             },
-            0x17);
+            0x18);
     }
-    hook_info.on_open.push_back({hook_info.cbcount++, std::move(on_open)});
-    return hook_info.on_open.back().id;
+    hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
 }

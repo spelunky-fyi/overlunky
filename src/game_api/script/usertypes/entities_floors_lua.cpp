@@ -17,6 +17,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_cityofgolddoor"] = &Entity::as<CityOfGoldDoor>;
     lua["Entity"]["as_mainexit"] = &Entity::as<MainExit>;
     lua["Entity"]["as_eggshipdoor"] = &Entity::as<EggShipDoor>;
+    lua["Entity"]["as_eggshipdoors"] = &Entity::as<EggShipDoorS>;
     lua["Entity"]["as_arrowtrap"] = &Entity::as<Arrowtrap>;
     lua["Entity"]["as_totemtrap"] = &Entity::as<TotemTrap>;
     lua["Entity"]["as_lasertrap"] = &Entity::as<LaserTrap>;
@@ -57,6 +58,8 @@ void register_usertypes(sol::state& lua)
         &Floor::add_decoration,
         "remove_decoration",
         &Floor::remove_decoration,
+        "decorate_internal",
+        &Floor::decorate_internal,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -136,10 +139,15 @@ void register_usertypes(sol::state& lua)
         "EggShipDoor",
         "timer",
         &EggShipDoor::timer,
-        "entered",
-        &EggShipDoor::entered,
         sol::base_classes,
         sol::bases<Entity, Floor, Door>());
+
+    lua.new_usertype<EggShipDoorS>(
+        "EggShipDoorS",
+        "entered",
+        &EggShipDoorS::entered,
+        sol::base_classes,
+        sol::bases<Entity, Floor, Door, EggShipDoor>());
 
     lua.new_usertype<Arrowtrap>(
         "Arrowtrap",
@@ -201,6 +209,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TransferFloor>(
         "TransferFloor",
+        "transferred_entities",
+        &TransferFloor::transferred_entities,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
@@ -218,7 +228,7 @@ void register_usertypes(sol::state& lua)
         "end_pipe",
         &Pipe::end_pipe,
         sol::base_classes,
-        sol::bases<Entity, Floor, TransferFloor>());
+        sol::bases<Entity, Floor>());
 
     lua.new_usertype<Generator>(
         "Generator",
@@ -275,6 +285,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<MotherStatue>(
         "MotherStatue",
+        "players_standing",
+        &MotherStatue::players_standing,
         "player1_standing",
         &MotherStatue::player1_standing,
         "player2_standing",
@@ -283,6 +295,8 @@ void register_usertypes(sol::state& lua)
         &MotherStatue::player3_standing,
         "player4_standing",
         &MotherStatue::player4_standing,
+        "players_health_received",
+        &MotherStatue::players_health_received,
         "player1_health_received",
         &MotherStatue::player1_health_received,
         "player2_health_received",
@@ -291,6 +305,8 @@ void register_usertypes(sol::state& lua)
         &MotherStatue::player3_health_received,
         "player4_health_received",
         &MotherStatue::player4_health_received,
+        "players_health_timer",
+        &MotherStatue::players_health_timer,
         "player1_health_timer",
         &MotherStatue::player1_health_timer,
         "player2_health_timer",
@@ -356,6 +372,8 @@ void register_usertypes(sol::state& lua)
         &TentacleBottom::attached_piece_uid,
         "tentacle_uid",
         &TentacleBottom::tentacle_uid,
+        "state",
+        &TentacleBottom::state,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 

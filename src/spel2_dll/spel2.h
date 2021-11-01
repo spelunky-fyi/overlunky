@@ -51,6 +51,7 @@ class SpelunkyConsole;
 
 void SetWriteLoadOptimization(bool write_load_opt);
 
+void InitMemoryDatabase();
 void InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
 void InitSoundManager(Spelunky_DecodeAudioFile decode_function);
 

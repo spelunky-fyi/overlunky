@@ -1,42 +1,25 @@
 #include "script_util.hpp"
 #include "memory.hpp"
+#include "prng.hpp"
 
 #include <regex>
 
 Toast get_toast()
 {
-    ONCE(Toast)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x49\x8B\x0C\x3F\xB8\x60\x01\x00\x00"s, memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (Toast)off;
-    }
+    static Toast toast = (Toast)get_address("toast");
+    return toast;
 }
 
 Say get_say()
 {
-    ONCE(Say)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(memory.exe(), "\x02\x00\x41\xBC\xE0\x01\x00\x00\x49\x8B\x0C\x3C\xB8\x60\x01\x00\x00"s, memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (Say)off;
-    }
+    static Say say = (Say)get_address("say");
+    return say;
 }
 
-Prng get_seed_prng()
+size_t get_say_context()
 {
-    ONCE(Prng)
-    {
-        auto memory = Memory::get();
-        auto off = find_inst(
-            memory.exe(),
-            "\x48\x89\x5C\x24\x08\x48\x89\x74\x24\x10\x57\x48\x83\xEC\x10\x8B\xC1\x33\xFF\x48\x85\xC0\x41\xB9\x30\x01\x00\x00\x48\xBB\x99\x9A\x6A\x67\xD0\x63\x6C\x9E"s,
-            memory.after_bundle);
-        off = function_start(memory.at_exe(off));
-        return res = (Prng)off;
-    }
+    static size_t say_context = get_address("say_context");
+    return say_context;
 }
 
 float screenify(float dis)
@@ -106,8 +89,8 @@ void AddImageRotated(ImDrawList* draw_list, ImTextureID user_texture_id, const I
     auto rot = [sin_a, cos_a, add, sub](const ImVec2& vec, const ImVec2& pivot)
     {
         const ImVec2 off = sub(vec, pivot);
-        const ImVec2 rot{off.x * cos_a - off.y * sin_a, off.x * sin_a + off.y * cos_a};
-        return add(rot, pivot);
+        const ImVec2 _rot{off.x * cos_a - off.y * sin_a, off.x * sin_a + off.y * cos_a};
+        return add(_rot, pivot);
     };
 
     const ImVec2 center = mul(add(p_min, p_max), 0.5f);

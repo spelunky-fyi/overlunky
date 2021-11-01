@@ -1,9 +1,7 @@
 #pragma once
 
 #include "entities_items.hpp"
-#include "entity.hpp"
 #include "movable.hpp"
-#include <cstdint>
 
 class Crushtrap : public Movable
 {
@@ -19,7 +17,7 @@ class Crushtrap : public Movable
 class Olmec : public Movable
 {
   public:
-    size_t unknown_pointer;
+    SoundPosition* sound_pos;
     uint32_t target_uid;
     /// 0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
     uint8_t attack_phase;
@@ -60,6 +58,7 @@ class PushBlock : public Movable
     SoundPosition* sound_pos;
     ParticleEmitterInfo* dust_particle;
     float dest_pos_x;
+    uint32_t unused;
 };
 
 class BoneBlock : public Movable
@@ -71,7 +70,6 @@ class BoneBlock : public Movable
 class ChainedPushBlock : public PushBlock
 {
   public:
-    uint32_t unused;
     bool is_chained; // changing this when chained does nothing, when unchained it's forced to 0
 };
 
@@ -85,6 +83,7 @@ class LightArrowPlatform : public Movable
 class FallingPlatform : public Movable
 {
   public:
+    /// The name `emitted_light` is false here, don't use it, it should be called `timer`
     int32_t timer;
     float shaking_factor;
     float y_pos;
@@ -103,6 +102,8 @@ class Drill : public Movable
     SoundPosition* sound_pos2;
     Entity* top_chain_piece;
     uint8_t unknown1; // it's forced to 0, for whatever reason
+
+    void trigger();
 };
 
 class ThinIce : public Movable
@@ -125,7 +126,7 @@ class Elevator : public Movable
 class ClamBase : public Movable
 {
   public:
-    uint32_t treasure_type;
+    ENT_TYPE treasure_type;
     int32_t treasure_uid; // set to nothing when spawning in overlunky
     float treasure_x_pos;
     float treasure_y_pos;
@@ -141,7 +142,6 @@ class RegenBlock : public Movable
 class TimedPowderkeg : public PushBlock
 {
   public:
-    uint32_t unused;
     /// timer till explosion, -1 = pause, counts down
     int32_t timer;
 };

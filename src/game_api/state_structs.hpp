@@ -1,11 +1,17 @@
 #pragma once
 
+#include "aliases.hpp"
 #include <array>
 #include <cstdint>
 
-#define MAX_PLAYERS 4
-
 class Entity;
+
+struct RobinHoodTableEntry
+{
+    uint32_t uid_plus_one;
+    uint32_t padding;
+    Entity* entity;
+};
 
 struct LightParams
 {
@@ -17,10 +23,19 @@ struct LightParams
 
 struct Illumination
 {
-    LightParams light1;
-    LightParams light2;
-    LightParams light3;
-    LightParams light4;
+    union
+    {
+        /// Table of light1, light2, ... etc.
+        std::array<LightParams, 4> lights;
+        struct
+        {
+            LightParams light1;
+            LightParams light2;
+            LightParams light3;
+            ///It's rendered on objects around, not as an actual bright spot
+            LightParams light4;
+        };
+    };
     float brightness;
     float brightness_multiplier;
     float light_pos_x;
@@ -30,7 +45,8 @@ struct Illumination
     float distortion;
     int32_t entity_uid;
     uint32_t timer;
-    uint32_t flags; // see flags.hpp illumination_flags
+    /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+    uint32_t flags;
     uint32_t unknown1;
     uint32_t unknown2;
 };
@@ -53,12 +69,12 @@ struct InputMapping
 
 struct PlayerSlot
 {
-    uint16_t buttons_gameplay;
-    uint16_t buttons;
+    INPUTS buttons_gameplay;
+    INPUTS buttons;
     uint32_t unknown1;
     InputMapping* input_mapping_keyboard;
     InputMapping* input_mapping_controller;
-    uint8_t player_id;
+    uint8_t player_slot;
     bool is_participating;
     uint8_t unknown4; // padding most likely
     uint8_t unknown5; // padding most likely
@@ -163,7 +179,7 @@ struct JournalProgressionSlot
     int8_t grid_position; // -1 = unassigned, will be assigned when opening the journal and gets the zoom effect
     uint8_t unknown3;
     uint8_t unknown4;
-    uint32_t entity;
+    ENT_TYPE entity;
     float x;
     float y;
     float angle;
@@ -175,7 +191,7 @@ struct ThemeProgression
     uint8_t visited_themes[9];
 };
 
-struct ArenaConfigArenas
+struct ArenaConfigArenas // size: 40 bytes
 {
     bool dwelling_1;
     bool dwelling_2;
@@ -219,15 +235,19 @@ struct ArenaConfigArenas
     bool sunkencity_5;
 };
 
-struct ArenaConfigItems
+struct ArenaConfigItems // size: 40 bytes
 {
     bool rock;
     bool pot;
     bool bombbag;
     bool bombbox;
     bool ropepile;
+    bool pickup_12bag;
+    bool pickup_24bag;
     bool cooked_turkey;
     bool royal_jelly;
+    bool torch;
+    bool boomerang;
     bool machete;
     bool mattock;
     bool crossbow;
@@ -236,7 +256,11 @@ struct ArenaConfigItems
     bool shotgun;
     bool camera;
     bool plasma_cannon;
+    bool wooden_shield;
+    bool metal_shield;
     bool teleporter;
+    bool mine;
+    bool snaptrap;
     bool paste;
     bool climbing_gloves;
     bool pitchers_mitt;
@@ -250,45 +274,78 @@ struct ArenaConfigItems
     bool telepack;
     bool powerpack;
     bool excalibur;
+    bool scepter;
     bool kapala;
+    bool true_crown;
 };
 
-struct ArenaConfigEquippedItems
+struct ArenaConfigEquippedItems // size: 40 bytes
 {
-    bool paste;
-    bool climbing_gloves;
-    bool pitchers_mitt;
-    bool spike_shoes;
-    bool spring_shoes;
-    bool parachute;
-    bool dummy1; // the backitems and excalibur have spaces here but are unused
+    bool dummy1; // the other items have spaces here but are unused
     bool dummy2;
     bool dummy3;
     bool dummy4;
     bool dummy5;
     bool dummy6;
     bool dummy7;
+    bool dummy8;
+    bool dummy9;
+    bool dummy10;
+    bool dummy11;
+    bool dummy12;
+    bool dummy13;
+    bool dummy14;
+    bool dummy15;
+    bool dummy16;
+    bool dummy17;
+    bool dummy18;
+    bool dummy19;
+    bool dummy20;
+    bool dummy21;
+    bool dummy22;
+    bool dummy23;
+    bool dummy24;
+    bool paste;
+    bool climbing_gloves;
+    bool pitchers_mitt;
+    bool spike_shoes;
+    bool spring_shoes;
+    bool parachute;
+    bool dummy25;
+    bool dummy26;
+    bool dummy27;
+    bool dummy28;
+    bool dummy29;
+    bool dummy30;
+    bool dummy31;
+    bool dummy32;
     bool kapala;
+    bool scepter;
 };
 
 struct ArenaState
 {
     uint32_t current_arena;
-    uint8_t player_teams[4];
+    std::array<uint8_t, 4> player_teams;
     uint8_t format;
     uint8_t ruleset;
-    uint8_t player_lives[4];
-    uint8_t player_totalwins[4];
+    std::array<uint8_t, 4> player_lives;
+    std::array<uint8_t, 4> player_totalwins;
     int8_t unknown9;
-    bool player_won[4];
-    uint8_t unknown14;
+    std::array<bool, 4> player_won;
+    uint8_t unknown14a;
+    uint8_t unknown14b;
+    uint8_t unknown14c;
+    uint8_t unknown14d;
+    uint8_t unknown14e;
+    /// The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 10 minutes and 20 == infinite. Can go higher, although this will glitch the menu text. Actual time (seconds) = (state.arena.timer + 1) x 30
     uint8_t timer;
     uint8_t timer_ending;
     uint8_t wins;
     uint8_t lives;
     uint8_t unknown15;
     uint8_t unknown16;
-    uint16_t player_idolheld_countdown[4];
+    std::array<uint16_t, 4> player_idolheld_countdown;
     uint8_t health;
     uint8_t bombs;
     uint8_t ropes;
@@ -298,57 +355,73 @@ struct ArenaState
     ArenaConfigArenas arenas;
     uint8_t dark_level_chance;
     uint8_t crate_frequency;
-    ArenaConfigItems items;
+    ArenaConfigItems items_enabled;
+    ArenaConfigItems items_in_crate;
     int8_t held_item;
     int8_t equipped_backitem;
-    uint8_t unknown25;
-    uint8_t unknown26;
-    uint8_t unknown27;
-    uint8_t unknown28;
-    uint8_t unknown29;
-    uint8_t unknown30;
-    uint8_t unknown31;
-    uint8_t unknown32;
-    uint8_t unknown33;
-    uint8_t unknown34;
-    uint8_t unknown35;
-    uint8_t unknown36;
-    uint8_t unknown37;
-    uint8_t unknown38;
-    uint8_t unknown39;
-    uint8_t unknown40;
     ArenaConfigEquippedItems equipped_items;
     uint8_t whip_damage;
-    uint8_t unknown41;
-    uint8_t unknown42;
-    uint8_t unknown43;
+    bool final_ghost;
+    uint8_t breath_cooldown;
+    bool punish_ball;
 };
 
-struct LogicOuroboros
+class Logic
 {
-    size_t __vftable;
+  public:
     uint32_t unknown1;
     uint32_t unknown2;
+
+    virtual ~Logic() = 0;
+
+    // Continuously performs the main functionality of the logic instance
+    // Ouroboros : transitions to level when music finished
+    // Basecamp speedrun: keep track of time, player position passing official
+    // Level: spawns ghost when time is up (checks cursed for earlier ghost)
+    // Dice shop: runs the logic of the dice shop
+    // Tun pre challenge: unknown
+    // Moon challenge: handles waitroom forcefields + tracks mattock breakage
+    // Star challenge: handles waitroom forcefields + tracks torches/timer
+    // Sun challenge: handles waitroom forcefields + tracks timer
+    // Volcana/Lava: spawns magmamen at random (and does other things)
+    // Water: unknown
+    // Olmec cutscene: runs the cutscene
+    // Tiamat cutscene: runs the cutscene
+    // Apep trigger: tracks player position, spawns APEP_HEAD
+    // Duat bosses trigger: tracks player position, spawns ANUBIS2 and OSIRIS_HEAD
+    // Tiamat: spawns bubbles
+    // Tusk pleasure palace: triggers aggro on everyone when non-high roller enters door
+    // Discovery: shows the toast
+    // Black market: lifts camera bounds restrictions
+    // Cosmic ocean: spawns jelly when time is up
+    // Arena 1: handles crate spawning
+    // Arena 3: handles death mist
+    virtual void perform() = 0;
+};
+
+class LogicOuroboros : public Logic
+{
+  public:
     size_t unknown3; // sound related?
     uint16_t timer;
+
+    virtual ~LogicOuroboros() = 0;
 };
 
-struct LogicBasecampSpeedrun
+class LogicBasecampSpeedrun : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t official; // entity uid of the character that keeps the time
     uint32_t crate;    // entity uid; you must break this crate for the run to be valid, otherwise you're cheating
     uint32_t unknown3;
     uint32_t unknown4;
+
+    virtual ~LogicBasecampSpeedrun() = 0;
 };
 
-struct LogicDiceShop
+class LogicDiceShop : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t boss; // entity uid; either tusk or the shopkeeper
     uint32_t unknown4;
     uint32_t bet_machine; // entity uid
@@ -369,34 +442,34 @@ struct LogicDiceShop
     uint8_t unknown15;
     uint8_t unknown16;
     uint32_t balance; // cash balance of all the games
+
+    virtual ~LogicDiceShop() = 0;
 };
 
-struct LogicMoonChallenge
+class LogicMoonChallenge : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
+    uint32_t floor_challenge_entrance_uid;
+    uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
     uint16_t unknown8a;
     uint16_t unknown8b;
     uint32_t mattock; // entity uid
+
+    virtual ~LogicMoonChallenge() = 0;
 };
 
-struct LogicStarChallenge
+class LogicStarChallenge : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
+    uint32_t floor_challenge_entrance_uid;
+    uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
@@ -405,32 +478,29 @@ struct LogicStarChallenge
     size_t one_after_last_torch; // this appears to be the address after the last torch, like an end iterator
     size_t unknown9;
     uint32_t start_countdown;
+
+    virtual ~LogicStarChallenge() = 0;
 };
 
-struct LogicSunChallenge
+class LogicSunChallenge : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
-    uint32_t unknown5; // entity uid
-    uint32_t unknown6; // entity uid
+    uint32_t floor_challenge_entrance_uid;
+    uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
     uint32_t unknown8;
     uint8_t start_countdown;
+
+    virtual ~LogicSunChallenge() = 0;
 };
 
-struct LogicOlmecCutscene
+class LogicOlmecCutscene : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint8_t unknown2;
-    uint8_t unknown3;
-    uint8_t unknown4;
-    uint8_t unknown5;
+  public:
     uint8_t unknown6a;
     uint8_t unknown6b;
     uint8_t unknown6c;
@@ -444,13 +514,13 @@ struct LogicOlmecCutscene
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
+
+    virtual ~LogicOlmecCutscene() = 0;
 };
 
-struct LogicTiamatCutscene
+class LogicTiamatCutscene : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t unknown3;
     uint32_t unknown4;
     Entity* tiamat;
@@ -460,13 +530,13 @@ struct LogicTiamatCutscene
     int32_t unknown5;
     uint32_t unknown6;
     uint32_t unknown7;
+
+    virtual ~LogicTiamatCutscene() = 0;
 };
 
-struct LogicApepTrigger
+class LogicApepTrigger : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t spawn_cooldown;
     bool cooling_down;
     bool unknown4b;
@@ -474,35 +544,37 @@ struct LogicApepTrigger
     uint32_t unknown4d;
     uint32_t unknown5;
     uint32_t unknown6;
+
+    virtual ~LogicApepTrigger() = 0;
 };
 
-struct LogicDuatBossesTrigger
+class LogicDuatBossesTrigger : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1; // change this and really weird things happen
+  public:
+    virtual ~LogicDuatBossesTrigger() = 0;
 };
 
-struct LogicTuskPleasurePalace
+class LogicTuskPleasurePalace : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t locked_door; // entity uid
     uint32_t unknown4;
+
+    virtual ~LogicTuskPleasurePalace() = 0;
 };
 
-struct LogicArena1
+class LogicArena1 : public Logic
 {
-    size_t __vftable;
-    uint32_t unknown1;
-    uint32_t unknown2;
+  public:
     uint32_t crate_spawn_timer;
     uint32_t unknown4;
     uint32_t unknown5;
     uint32_t unknown6;
+
+    virtual ~LogicArena1() = 0;
 };
 
-struct Logic
+struct LogicList
 {
     uint64_t unknown1;
     LogicOuroboros* ouroboros;
@@ -516,15 +588,16 @@ struct Logic
     LogicStarChallenge* tun_star_challenge;
     LogicSunChallenge* tun_sun_challenge;
     size_t volcana_related;
+    size_t water_related;
     LogicOlmecCutscene* olmec_cutscene;
     LogicTiamatCutscene* tiamat_cutscene;
     LogicApepTrigger* apep_trigger;
     size_t unknown16;
     LogicDuatBossesTrigger* duat_bosses_trigger;
-    size_t tiamat_related;
+    size_t unknown17;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
     size_t discovery_info; // black market, vlad, wet fur discovery; shows the toast
-    size_t black_market_door;
+    size_t black_market;
     size_t cosmic_ocean;
     LogicArena1* arena_1;
     size_t arena_2;
@@ -533,23 +606,67 @@ struct Logic
     size_t unknown27;
 };
 
+struct MysteryLiquid3
+{
+    bool pause_physics;
+    uint8_t padding[3];
+    int32_t physics_tick_timer; /* unsure */
+    int32_t unknown1;
+    int32_t unknown2;
+    int8_t unknown3;
+    int8_t unknown4;
+    int8_t unknown5;
+    int8_t unknown6;
+    int8_t unknown_7;
+    int8_t unknown8;
+    int8_t unknown9;
+    int8_t unknown10;
+    uint32_t unknown11;
+    float unknown12;
+    float blob_size;
+    float weight;
+    float unknown15;
+    uint32_t entity_count;
+    uint32_t allocated_size;
+    uint32_t unk23;
+    size_t unk1;
+    size_t unk2;
+    uint32_t unk3a;
+    uint32_t unk3b;
+    size_t unk41;
+    size_t unk42;
+    size_t unk43;
+    size_t unk44;
+    size_t list;
+    int32_t unknown45a;
+    int32_t unknown45b;    //padding
+    int32_t* liquid_flags; // simple array
+    int32_t unknown47a;
+    int32_t unknown47b; //padding
+    std::pair<float, float>* entity_coordinates;
+    int32_t unknown49a;
+    int32_t unknown49b; //padding
+    std::pair<float, float>* entity_velocities;
+    int32_t unknown51a;
+    int32_t unknown51b; //padding
+    size_t unknown52;
+    size_t unknown53;
+};
+
 struct LiquidPhysicsParams
 {
-    uint8_t unknown1; // anything other than 1 and standing water doesn't visually generate
+    int32_t shader_type; //can also be flags, as for water, any value with bit one is fine
+    uint8_t unknown2;    //shader related, shader id maybe?
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint8_t unknown2;
-    uint8_t padding4;
-    uint8_t padding5;
-    uint8_t padding6;
     float unknown3;
-    float cohesion; // unsure about name; negative number makes the liquid balls come apart more easily?
+    float cohesion; // negative number makes the liquid balls come apart more easily?
     float gravity;  // negative number to invert gravity
     float unknown6;
     float unknown7;
-    float agitation;
-    float unknown9; // starts going nuts at around 2.70
+    float agitation; // is agitation the right word? for me is just how bouncy the liquid is
+    float unknown9;  // starts going nuts at around 2.70, pressure force? it seam to only matter at spawn, when there is a lot of liquid in one place
     float unknown10;
     float unknown11;
     float unknown12;
@@ -565,21 +682,20 @@ struct LiquidPhysicsParams
     uint32_t unknown22;
     float unknown23;
     uint32_t unknown24;
-    size_t unknown25;
-    float unknown26;
-    float x_right;
-    float y_top;
-    float unknown29;
-    uint32_t unknown30;
+    MysteryLiquid3* unknown25; // MysteryLiquidPointer3 in plugin | resets each level
+    uint32_t liquid_flags;     // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
+    float last_spawn_x;
+    float last_spawn_y;
+    float spawn_velocity_x;
+    float spawn_velocity_y;
     uint32_t unknown31;
     uint32_t unknown32;
     uint32_t unknown33;
     size_t unknown34;
-    uint32_t unknown35;
-    uint32_t unknown36;
-    uint32_t unknown37;
-    float unknown38;
-    uint32_t unknown39; // entity uid
+    size_t unknown35;                  //DataPointer? seam to get access validation if you change to something
+    uint32_t liquidtile_liquid_amount; //how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
+    float blobs_separation;
+    int32_t unknown39; //is the last 4 garbage? seams not accessed
     float unknown40;
     float unknown41;
     uint32_t unknown42;
@@ -588,7 +704,18 @@ struct LiquidPhysicsParams
 struct LiquidPhysics
 {
     size_t unknown1;
-    LiquidPhysicsParams pools[4];
+    union
+    {
+        std::array<LiquidPhysicsParams, 5> pools;
+        struct
+        {
+            LiquidPhysicsParams water_physics;
+            LiquidPhysicsParams coarse_water_physics;
+            LiquidPhysicsParams lava_physics;
+            LiquidPhysicsParams coarse_lava_physics;
+            LiquidPhysicsParams stagnant_lava_physics;
+        };
+    };
 };
 
 struct PointerList
@@ -600,15 +727,21 @@ struct PointerList
     uint32_t unknown3;
 };
 
+struct AITarget
+{
+    uint32_t ai_uid;
+    uint32_t target_uid;
+};
+
 struct DialogueDetails
 {
-    uint32_t line;          // strings table ID
+    STRINGID line;          // strings table ID
     uint8_t param_player1;  // character db ID (although they don't always match up with the in game dialogue)
     uint8_t param_player2;  // for %-replacement in line
     uint8_t unknown3;       // most likely padding
     uint8_t unknown4;       // most likely padding
-    uint32_t param_string1; // strings table ID for %-replacement in line
-    uint32_t param_string2;
+    STRINGID param_string1; // strings table ID for %-replacement in line
+    STRINGID param_string2;
 };
 
 struct DialogueDetailsGroup
@@ -707,8 +840,6 @@ struct Dialogue
     uint32_t unknown16;
     uint32_t unknown17;
     uint32_t unknown18;
-    uint32_t unknown19;
-    uint32_t unknown20;
 };
 
 struct SelectPlayerSlot
@@ -717,6 +848,6 @@ struct SelectPlayerSlot
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint32_t character;  // Entity DB ID
+    ENT_TYPE character;  // Entity DB ID
     uint32_t texture_id; // Texture DB ID
 };
