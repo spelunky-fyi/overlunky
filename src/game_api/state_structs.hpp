@@ -718,15 +718,6 @@ struct LiquidPhysics
     };
 };
 
-struct PointerList
-{
-    size_t begin;
-    size_t end; // one past the last pointer, like end iterator
-    size_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
-};
-
 struct AITarget
 {
     uint32_t ai_uid;

@@ -814,13 +814,8 @@ struct JournalUI
 
     uint8_t unknown1;
     uint16_t unknown2;
-    size_t unknown3; // this and below: pointer list of Page objects/contents of the pages
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
-    size_t unknown7;
-    size_t unknown8;
-
+    std::vector<size_t> pages;
+    std::vector<size_t> unknown3;
     uint32_t current_page;
     uint32_t flipping_to_page;
     uint32_t unknown10;
@@ -833,7 +828,9 @@ struct JournalUI
     size_t unknown16;
     size_t unknown17;
     size_t unknown18;
-    size_t unknown19; // ptr
+    size_t unknown19;
+    size_t unknown20; // ptr
+    size_t unknown21;
 
     TextureRenderingInfo book_background;
     TextureRenderingInfo arrow_left;

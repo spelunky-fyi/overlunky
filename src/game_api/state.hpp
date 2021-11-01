@@ -159,8 +159,8 @@ struct StateMemory
     QuestsInfo* quests;
     AITarget* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
-    PointerList* particle_emitters; // list of ParticleEmitterInfo*
-    PointerList* lightsources;      // list of Illumination*
+    std::vector<ParticleEmitterInfo*>* particle_emitters;
+    std::vector<Illumination*>* lightsources;
     size_t unknown27;
 
     // This is a Robin Hood Table

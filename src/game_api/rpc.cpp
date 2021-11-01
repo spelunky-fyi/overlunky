@@ -1308,7 +1308,10 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
     }
 }
 
-void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
+static std::unordered_map<uint32_t, ParticleEmitterInfo*> g_generated_particle_emitters = {};
+static uint32_t g_generated_particle_emitter_counter = 0;
+
+uint32_t generate_particles(uint32_t particle_emitter_id, uint32_t uid)
 {
     static size_t offset = 0;
     if (offset == 0)
@@ -1322,10 +1325,24 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
         if (entity != nullptr)
         {
             auto state = get_state_ptr();
-            typedef size_t generate_particles_func(PointerList*, uint32_t, Entity*);
+            typedef ParticleEmitterInfo* generate_particles_func(std::vector<ParticleEmitterInfo*>*, uint32_t, Entity*);
             static generate_particles_func* gpf = (generate_particles_func*)(offset);
-            gpf(state->particle_emitters, particle_emitter_id, entity);
+            auto emitter = gpf(state->particle_emitters, particle_emitter_id, entity);
+            auto emitter_id = g_generated_particle_emitter_counter++;
+            g_generated_particle_emitters[emitter_id] = emitter;
+            return emitter_id;
         }
+    }
+    return 0;
+}
+
+void extinguish_particles(uint32_t generated_particles_id)
+{
+    if (g_generated_particle_emitters.count(generated_particles_id) > 0)
+    {
+        auto emitter = g_generated_particle_emitters.at(generated_particles_id);
+        auto state = State::get().ptr();
+        std::erase(*state->particle_emitters, emitter);
     }
 }
 

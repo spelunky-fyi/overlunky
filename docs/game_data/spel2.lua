@@ -87,6 +87,61 @@ BEG = {
   SPAWNED_WITH_TRUECROWN = 4,
   TRUECROWN_THROWN = 5
 }
+BGBackLayerDoor = {
+  __index = "function",
+  __name = "sol.BGBackLayerDoor.user",
+  __newindex = "function"
+}
+BGEggshipRoom = {
+  __index = "function",
+  __name = "sol.BGEggshipRoom.user",
+  __newindex = "function"
+}
+BGFloatingDebris = {
+  __index = "function",
+  __name = "sol.BGFloatingDebris.user",
+  __newindex = "function"
+}
+BGMovingStar = {
+  __index = "function",
+  __name = "sol.BGMovingStar.user",
+  __newindex = "function"
+}
+BGRelativeElement = {
+  __index = "function",
+  __name = "sol.BGRelativeElement.user",
+  __newindex = "function"
+}
+BGShootingStar = {
+  __index = "function",
+  __name = "sol.BGShootingStar.user",
+  __newindex = "function"
+}
+BGShopEntrence = {
+  __index = "function",
+  __name = "sol.BGShopEntrence.user",
+  __newindex = "function"
+}
+BGShopKeeperPrime = {
+  __index = "function",
+  __name = "sol.BGShopKeeperPrime.user",
+  __newindex = "function"
+}
+BGSurfaceLayer = {
+  __index = "function",
+  __name = "sol.BGSurfaceLayer.user",
+  __newindex = "function"
+}
+BGSurfaceStar = {
+  __index = "function",
+  __name = "sol.BGSurfaceStar.user",
+  __newindex = "function"
+}
+BGTutorialSign = {
+  __index = "function",
+  __name = "sol.BGTutorialSign.user",
+  __newindex = "function"
+}
 BUTTON = {
   BOMB = 4,
   DOOR = 32,
@@ -120,6 +175,11 @@ BigSpearTrap = {
   __name = "sol.BigSpearTrap.user",
   __newindex = "function"
 }
+Birdies = {
+  __index = "function",
+  __name = "sol.Birdies.user",
+  __newindex = "function"
+}
 Bodyguard = {
   __index = "function",
   __name = "sol.Bodyguard.user",
@@ -150,9 +210,24 @@ Boulder = {
   __name = "sol.Boulder.user",
   __newindex = "function"
 }
+BoulderSpawner = {
+  __index = "function",
+  __name = "sol.BoulderSpawner.user",
+  __newindex = "function"
+}
 Bullet = {
   __index = "function",
   __name = "sol.Bullet.user",
+  __newindex = "function"
+}
+BurningRopeEffect = {
+  __index = "function",
+  __name = "sol.BurningRopeEffect.user",
+  __newindex = "function"
+}
+Button = {
+  __index = "function",
+  __name = "sol.Button.user",
   __newindex = "function"
 }
 CAUSE_OF_DEATH = {
@@ -202,6 +277,11 @@ COSUBTHEME = {
 Camera = {
   __name = "sol.Camera.user"
 }
+CameraFlash = {
+  __index = "function",
+  __name = "sol.CameraFlash.user",
+  __newindex = "function"
+}
 Cape = {
   __index = "function",
   __name = "sol.Cape.user",
@@ -235,6 +315,11 @@ ChainedPushBlock = {
 Chest = {
   __index = "function",
   __name = "sol.Chest.user",
+  __newindex = "function"
+}
+CinematicAnchor = {
+  __index = "function",
+  __name = "sol.CinematicAnchor.user",
   __newindex = "function"
 }
 CityOfGoldDoor = {
@@ -369,9 +454,19 @@ Crocman = {
   __name = "sol.Crocman.user",
   __newindex = "function"
 }
+CrossBeam = {
+  __index = "function",
+  __name = "sol.CrossBeam.user",
+  __newindex = "function"
+}
 Crushtrap = {
   __index = "function",
   __name = "sol.Crushtrap.user",
+  __newindex = "function"
+}
+CursedEffect = {
+  __index = "function",
+  __name = "sol.CursedEffect.user",
   __newindex = "function"
 }
 CursedPot = {
@@ -381,6 +476,16 @@ CursedPot = {
 }
 CustomSound = {
   __name = "sol.CustomSound.user"
+}
+DMAlienBlast = {
+  __index = "function",
+  __name = "sol.DMAlienBlast.user",
+  __newindex = "function"
+}
+DMSpawning = {
+  __index = "function",
+  __name = "sol.DMSpawning.user",
+  __newindex = "function"
 }
 DROP = {
   ALTAR_DICE_CLIMBINGGLOVES = 0,
@@ -484,9 +589,19 @@ DROPCHANCE = {
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
 }
+DecoRegeneratingBlock = {
+  __index = "function",
+  __name = "sol.DecoRegeneratingBlock.user",
+  __newindex = "function"
+}
 DecoratedDoor = {
   __index = "function",
   __name = "sol.DecoratedDoor.user",
+  __newindex = "function"
+}
+DestructibleBG = {
+  __index = "function",
+  __name = "sol.DestructibleBG.user",
   __newindex = "function"
 }
 Door = {
@@ -500,6 +615,11 @@ DoorCoords = {
 Drill = {
   __index = "function",
   __name = "sol.Drill.user",
+  __newindex = "function"
+}
+DustWallApep = {
+  __index = "function",
+  __name = "sol.DustWallApep.user",
   __newindex = "function"
 }
 ENT_FLAG = {
@@ -534,9 +654,12 @@ ENT_FLAG = {
 }
 ENT_MORE_FLAG = {
   CURSED_EFFECT = 15,
-  DISABLE_INPUT = 16,
-  FALLING = 12,
+  DISABLE_INPUT = 17,
+  ELIXIR_BUFF = 16,
+  FALLING = 14,
   HIRED_HAND_REVIVED = 2,
+  HIT_GROUND = 12,
+  HIT_WALL = 13,
   SWIMMING = 11
 }
 ENT_TYPE = {
@@ -1437,6 +1560,16 @@ EggplantMinister = {
   __name = "sol.EggplantMinister.user",
   __newindex = "function"
 }
+EggplantThrower = {
+  __index = "function",
+  __name = "sol.EggplantThrower.user",
+  __newindex = "function"
+}
+EggshipCenterJetFlame = {
+  __index = "function",
+  __name = "sol.EggshipCenterJetFlame.user",
+  __newindex = "function"
+}
 Elevator = {
   __index = "function",
   __name = "sol.Elevator.user",
@@ -1461,6 +1594,11 @@ Excalibur = {
 ExitDoor = {
   __index = "function",
   __name = "sol.ExitDoor.user",
+  __newindex = "function"
+}
+Explosion = {
+  __index = "function",
+  __name = "sol.Explosion.user",
   __newindex = "function"
 }
 F = {}
@@ -1547,9 +1685,174 @@ Frog = {
   __name = "sol.Frog.user",
   __newindex = "function"
 }
+FrostBreathEffect = {
+  __index = "function",
+  __name = "sol.FrostBreathEffect.user",
+  __newindex = "function"
+}
 FrozenLiquid = {
   __index = "function",
   __name = "sol.FrozenLiquid.user",
+  __newindex = "function"
+}
+FxAlienBlast = {
+  __index = "function",
+  __name = "sol.FxAlienBlast.user",
+  __newindex = "function"
+}
+FxAnkhBrokenPiece = {
+  __index = "function",
+  __name = "sol.FxAnkhBrokenPiece.user",
+  __newindex = "function"
+}
+FxAnkhRotatingSpark = {
+  __index = "function",
+  __name = "sol.FxAnkhRotatingSpark.user",
+  __newindex = "function"
+}
+FxCompass = {
+  __index = "function",
+  __name = "sol.FxCompass.user",
+  __newindex = "function"
+}
+FxEmpress = {
+  __index = "function",
+  __name = "sol.FxEmpress.user",
+  __newindex = "function"
+}
+FxFireflyLight = {
+  __index = "function",
+  __name = "sol.FxFireflyLight.user",
+  __newindex = "function"
+}
+FxHundunNeckPiece = {
+  __index = "function",
+  __name = "sol.FxHundunNeckPiece.user",
+  __newindex = "function"
+}
+FxJellyfishStar = {
+  __index = "function",
+  __name = "sol.FxJellyfishStar.user",
+  __newindex = "function"
+}
+FxJetpackFlame = {
+  __index = "function",
+  __name = "sol.FxJetpackFlame.user",
+  __newindex = "function"
+}
+FxKinguSliding = {
+  __index = "function",
+  __name = "sol.FxKinguSliding.user",
+  __newindex = "function"
+}
+FxLamassuAttack = {
+  __index = "function",
+  __name = "sol.FxLamassuAttack.user",
+  __newindex = "function"
+}
+FxMainExitDoor = {
+  __index = "function",
+  __name = "sol.FxMainExitDoor.user",
+  __newindex = "function"
+}
+FxNecromancerANKH = {
+  __index = "function",
+  __name = "sol.FxNecromancerANKH.user",
+  __newindex = "function"
+}
+FxOuroboroDragonPart = {
+  __index = "function",
+  __name = "sol.FxOuroboroDragonPart.user",
+  __newindex = "function"
+}
+FxOuroboroOccluder = {
+  __index = "function",
+  __name = "sol.FxOuroboroOccluder.user",
+  __newindex = "function"
+}
+FxPickupEffect = {
+  __index = "function",
+  __name = "sol.FxPickupEffect.user",
+  __newindex = "function"
+}
+FxPlayerIndicator = {
+  __index = "function",
+  __name = "sol.FxPlayerIndicator.user",
+  __newindex = "function"
+}
+FxQuickSand = {
+  __index = "function",
+  __name = "sol.FxQuickSand.user",
+  __newindex = "function"
+}
+FxSaleContainer = {
+  __index = "function",
+  __name = "sol.FxSaleContainer.user",
+  __newindex = "function"
+}
+FxShotgunBlast = {
+  __index = "function",
+  __name = "sol.FxShotgunBlast.user",
+  __newindex = "function"
+}
+FxSorceressAttack = {
+  __index = "function",
+  __name = "sol.FxSorceressAttack.user",
+  __newindex = "function"
+}
+FxSparkSmall = {
+  __index = "function",
+  __name = "sol.FxSparkSmall.user",
+  __newindex = "function"
+}
+FxSpringtrapRing = {
+  __index = "function",
+  __name = "sol.FxSpringtrapRing.user",
+  __newindex = "function"
+}
+FxTiamatHead = {
+  __index = "function",
+  __name = "sol.FxTiamatHead.user",
+  __newindex = "function"
+}
+FxTiamatTail = {
+  __index = "function",
+  __name = "sol.FxTiamatTail.user",
+  __newindex = "function"
+}
+FxTiamatTorso = {
+  __index = "function",
+  __name = "sol.FxTiamatTorso.user",
+  __newindex = "function"
+}
+FxTornJournalPage = {
+  __index = "function",
+  __name = "sol.FxTornJournalPage.user",
+  __newindex = "function"
+}
+FxUnderwaterBubble = {
+  __index = "function",
+  __name = "sol.FxUnderwaterBubble.user",
+  __newindex = "function"
+}
+FxVatBubble = {
+  __index = "function",
+  __name = "sol.FxVatBubble.user",
+  __newindex = "function"
+}
+FxWaterDrop = {
+  __index = "function",
+  __name = "sol.FxWaterDrop.user",
+  __newindex = "function"
+}
+FxWebbedEffect = {
+  __index = "function",
+  __name = "sol.FxWebbedEffect.user",
+  __newindex = "function"
+}
+FxWitchdoctorHint = {
+  __index = "function",
+  __name = "sol.FxWitchdoctorHint.user",
   __newindex = "function"
 }
 GHOST_BEHAVIOR = {
@@ -1707,6 +2010,11 @@ INPUTS = {
   UP = 1024,
   WHIP = 2
 }
+IceSlidingSound = {
+  __index = "function",
+  __name = "sol.IceSlidingSound.user",
+  __newindex = "function"
+}
 Idol = {
   __index = "function",
   __name = "sol.Idol.user",
@@ -1783,6 +2091,11 @@ JungleSpearCosmetic = {
   __name = "sol.JungleSpearCosmetic.user",
   __newindex = "function"
 }
+JungleTrapTrigger = {
+  __index = "function",
+  __name = "sol.JungleTrapTrigger.user",
+  __newindex = "function"
+}
 KapalaPowerup = {
   __index = "function",
   __name = "sol.KapalaPowerup.user",
@@ -1857,11 +2170,6 @@ Lava = {
   __name = "sol.Lava.user",
   __newindex = "function"
 }
-LavaGlow = {
-  __index = "function",
-  __name = "sol.LavaGlow.user",
-  __newindex = "function"
-}
 Lavamander = {
   __index = "function",
   __name = "sol.Lavamander.user",
@@ -1903,9 +2211,19 @@ LightShot = {
   __name = "sol.LightShot.user",
   __newindex = "function"
 }
+LimbAnchor = {
+  __index = "function",
+  __name = "sol.LimbAnchor.user",
+  __newindex = "function"
+}
 Liquid = {
   __index = "function",
   __name = "sol.Liquid.user",
+  __newindex = "function"
+}
+LiquidSurface = {
+  __index = "function",
+  __name = "sol.LiquidSurface.user",
   __newindex = "function"
 }
 LoadContext = {
@@ -1935,6 +2253,56 @@ LogicOlmecCutscene = {
 LogicTiamatCutscene = {
   __index = "function",
   __name = "sol.LogicTiamatCutscene.user",
+  __newindex = "function"
+}
+LogicalAnchovyFlock = {
+  __index = "function",
+  __name = "sol.LogicalAnchovyFlock.user",
+  __newindex = "function"
+}
+LogicalConveyorbeltSound = {
+  __index = "function",
+  __name = "sol.LogicalConveyorbeltSound.user",
+  __newindex = "function"
+}
+LogicalDoor = {
+  __index = "function",
+  __name = "sol.LogicalDoor.user",
+  __newindex = "function"
+}
+LogicalDrain = {
+  __index = "function",
+  __name = "sol.LogicalDrain.user",
+  __newindex = "function"
+}
+LogicalLiquidStreamSound = {
+  __index = "function",
+  __name = "sol.LogicalLiquidStreamSound.user",
+  __newindex = "function"
+}
+LogicalMiniGame = {
+  __index = "function",
+  __name = "sol.LogicalMiniGame.user",
+  __newindex = "function"
+}
+LogicalRegeneratingBlock = {
+  __index = "function",
+  __name = "sol.LogicalRegeneratingBlock.user",
+  __newindex = "function"
+}
+LogicalSound = {
+  __index = "function",
+  __name = "sol.LogicalSound.user",
+  __newindex = "function"
+}
+LogicalStaticSound = {
+  __index = "function",
+  __name = "sol.LogicalStaticSound.user",
+  __newindex = "function"
+}
+LogicalTrapTrigger = {
+  __index = "function",
+  __name = "sol.LogicalTrapTrigger.user",
   __newindex = "function"
 }
 MASK = {
@@ -1996,6 +2364,11 @@ MiniGameShip = {
   __name = "sol.MiniGameShip.user",
   __newindex = "function"
 }
+MiniGameShipOffset = {
+  __index = "function",
+  __name = "sol.MiniGameShipOffset.user",
+  __newindex = "function"
+}
 Mole = {
   __index = "function",
   __name = "sol.Mole.user",
@@ -2031,9 +2404,19 @@ Movable = {
   __name = "sol.Movable.user",
   __newindex = "function"
 }
+MovingIcon = {
+  __index = "function",
+  __name = "sol.MovingIcon.user",
+  __newindex = "function"
+}
 Mummy = {
   __index = "function",
   __name = "sol.Mummy.user",
+  __newindex = "function"
+}
+MummyFliesSound = {
+  __index = "function",
+  __name = "sol.MummyFliesSound.user",
   __newindex = "function"
 }
 NPC = {
@@ -2123,6 +2506,11 @@ Olmite = {
   __name = "sol.Olmite.user",
   __newindex = "function"
 }
+OnFireEffect = {
+  __index = "function",
+  __name = "sol.OnFireEffect.user",
+  __newindex = "function"
+}
 Online = {
   __name = "sol.Online.user"
 }
@@ -2145,6 +2533,16 @@ OsirisHand = {
 OsirisHead = {
   __index = "function",
   __name = "sol.OsirisHead.user",
+  __newindex = "function"
+}
+OuroboroCameraAnchor = {
+  __index = "function",
+  __name = "sol.OuroboroCameraAnchor.user",
+  __newindex = "function"
+}
+OuroboroCameraZoomin = {
+  __index = "function",
+  __name = "sol.OuroboroCameraZoomin.user",
   __newindex = "function"
 }
 PARTICLEEMITTER = {
@@ -2466,6 +2864,11 @@ PROCEDURAL_CHANCE = {
   WITCHDOCTOR = 235,
   YETI = 268
 }
+PalaceSign = {
+  __index = "function",
+  __name = "sol.PalaceSign.user",
+  __newindex = "function"
+}
 ParachutePowerup = {
   __index = "function",
   __name = "sol.ParachutePowerup.user",
@@ -2488,6 +2891,11 @@ Pet = {
 Pipe = {
   __index = "function",
   __name = "sol.Pipe.user",
+  __newindex = "function"
+}
+PipeTravelerSound = {
+  __index = "function",
+  __name = "sol.PipeTravelerSound.user",
   __newindex = "function"
 }
 Player = {
@@ -2517,9 +2925,19 @@ PlayerSlotSettings = {
 PlayingSound = {
   __name = "sol.PlayingSound.user"
 }
+PoisonedEffect = {
+  __index = "function",
+  __name = "sol.PoisonedEffect.user",
+  __newindex = "function"
+}
 PoleDeco = {
   __index = "function",
   __name = "sol.PoleDeco.user",
+  __newindex = "function"
+}
+Portal = {
+  __index = "function",
+  __name = "sol.Portal.user",
   __newindex = "function"
 }
 PostRoomGenerationContext = {
@@ -2572,6 +2990,11 @@ QuestsInfo = {
 QuickSand = {
   __index = "function",
   __name = "sol.QuickSand.user",
+  __newindex = "function"
+}
+QuickSandSound = {
+  __index = "function",
+  __name = "sol.QuickSandSound.user",
   __newindex = "function"
 }
 Quillback = {
@@ -2866,9 +3289,19 @@ RollingItem = {
   __name = "sol.RollingItem.user",
   __newindex = "function"
 }
+RoomLight = {
+  __index = "function",
+  __name = "sol.RoomLight.user",
+  __newindex = "function"
+}
 RoomOwner = {
   __index = "function",
   __name = "sol.RoomOwner.user",
+  __newindex = "function"
+}
+Rubble = {
+  __index = "function",
+  __name = "sol.Rubble.user",
   __newindex = "function"
 }
 SCREEN = {
@@ -3121,6 +3554,11 @@ Shield = {
   __name = "sol.Shield.user",
   __newindex = "function"
 }
+ShootingStarSpawner = {
+  __index = "function",
+  __name = "sol.ShootingStarSpawner.user",
+  __newindex = "function"
+}
 Shopkeeper = {
   __index = "function",
   __name = "sol.Shopkeeper.user",
@@ -3137,6 +3575,11 @@ Skeleton = {
 SkullDropTrap = {
   __index = "function",
   __name = "sol.SkullDropTrap.user",
+  __newindex = "function"
+}
+SleepBubble = {
+  __index = "function",
+  __name = "sol.SleepBubble.user",
   __newindex = "function"
 }
 SlidingWallCeiling = {
@@ -3187,6 +3630,11 @@ Spider = {
 SpikeballTrap = {
   __index = "function",
   __name = "sol.SpikeballTrap.user",
+  __newindex = "function"
+}
+SplashBubbleGenerator = {
+  __index = "function",
+  __name = "sol.SplashBubbleGenerator.user",
   __newindex = "function"
 }
 StateMemory = {
@@ -4827,6 +5275,11 @@ WebShot = {
   __name = "sol.WebShot.user",
   __newindex = "function"
 }
+WetEffect = {
+  __index = "function",
+  __name = "sol.WetEffect.user",
+  __newindex = "function"
+}
 WitchDoctor = {
   __index = "function",
   __name = "sol.WitchDoctor.user",
@@ -4918,6 +5371,7 @@ entity_get_items_by = function(...) end
 entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end
 entity_remove_item = function(...) end
+extinguish_particles = function(...) end
 f = {}
 filter_entities = function(...) end
 flip_entity = function(...) end
@@ -5020,7 +5474,6 @@ messpect = function(...) end
 modify_sparktraps = function(...) end
 mouse_position = function(...) end
 move_entity = function(...) end
-move_liquid = function(...) end
 online = {}
 options = {}
 os = {
