@@ -2,6 +2,8 @@
 
 #include "level_api_types.hpp"
 #include "lua_backend.hpp"
+#include "render_api.hpp"
+#include "screen.hpp"
 
 #include <cstdint>
 #include <optional>
@@ -25,6 +27,7 @@ void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
 void trigger_vanilla_render_callbacks(ON event);
 void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
+void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
 std::u16string pre_toast(char16_t* buffer);

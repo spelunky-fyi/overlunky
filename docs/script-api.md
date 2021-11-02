@@ -3806,10 +3806,10 @@ Draw text using the built-in renderer. Use in combination with ON.RENDER_✱ eve
 Measure the provided text using the built-in renderer
 - [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU events
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 - [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU events
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 - [`nil draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
 \
 Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
@@ -4255,6 +4255,7 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo unknown23`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) &JournalUI::unknown23
 - [`TextureRenderingInfo entire_book`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) &JournalUI::entire_book
 - [`int page_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) &JournalUI::page_timer
+- [`JournalPage get_journal_page(size_t page_number)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_journal_page) &JournalUI::get_journal_page
 ### `ScreenArenaMenu`
 Derived from [`Screen`](#screen)
 - [`ScreenZoomAnimation brick_background_animation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_background_animation) &ScreenArenaMenu::brick_background_animation
@@ -4942,6 +4943,10 @@ Runs after the pause menu is drawn on screen. In this event, you can draw textur
 \
 Params: `VanillaRenderContext render_ctx, int draw_depth`\
 Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+- [`RENDER_POST_JOURNAL_PAGE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_JOURNAL_PAGE) ON::RENDER_POST_JOURNAL_PAGE
+\
+Params: `VanillaRenderContext render_ctx`\
+Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
 - [`SPEECH_BUBBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) ON::SPEECH_BUBBLE
 \
 Params: `Entity speaking_entity, string text`\
@@ -5236,6 +5241,21 @@ Params: `PlayingSound vanilla_sound`
 - [`START_FAILED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_CALLBACK_TYPE.START_FAILED) FMODStudio::EventCallbackType::StartFailed
 \
 Params: `PlayingSound vanilla_sound`
+### JOURNAL_PAGE_TYPE
+- [`PROGRESS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PROGRESS) JournalPageType::Progress
+- [`JOURNAL_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.JOURNAL_MENU) JournalPageType::JournalMenu
+- [`PLACES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLACES) JournalPageType::Places
+- [`PEOPLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PEOPLE) JournalPageType::People
+- [`BESTIARY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.BESTIARY) JournalPageType::Bestiary
+- [`ITEMS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.ITEMS) JournalPageType::Items
+- [`TRAPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.TRAPS) JournalPageType::Traps
+- [`STORY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.STORY) JournalPageType::Story
+- [`FEATS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.FEATS) JournalPageType::Feats
+- [`DEATH_CAUSE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_CAUSE) JournalPageType::DeathCause
+- [`DEATH_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_MENU) JournalPageType::DeathMenu
+- [`RECAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.RECAP) JournalPageType::Recap
+- [`PLAYER_PROFILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLAYER_PROFILE) JournalPageType::PlayerProfile
+- [`LAST_GAME_PLAYED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.LAST_GAME_PLAYED) JournalPageType::LastGamePlayed
 ### ENT_FLAG
 - [`INVISIBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_FLAG.INVISIBLE) 1
 - [`INDESTRUCTIBLE_OR_SPECIAL_FLOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_FLAG.INDESTRUCTIBLE_OR_SPECIAL_FLOOR) 2

@@ -99,5 +99,36 @@ void register_usertypes(sol::state& lua)
         &TextureRenderingInfo::source_bottom_right_x,
         "source_bottom_right_y",
         &TextureRenderingInfo::source_bottom_right_y);
+
+    lua.create_named_table(
+        "JOURNAL_PAGE_TYPE",
+        "PROGRESS",
+        JournalPageType::Progress,
+        "JOURNAL_MENU",
+        JournalPageType::JournalMenu,
+        "PLACES",
+        JournalPageType::Places,
+        "PEOPLE",
+        JournalPageType::People,
+        "BESTIARY",
+        JournalPageType::Bestiary,
+        "ITEMS",
+        JournalPageType::Items,
+        "TRAPS",
+        JournalPageType::Traps,
+        "STORY",
+        JournalPageType::Story,
+        "FEATS",
+        JournalPageType::Feats,
+        "DEATH_CAUSE",
+        JournalPageType::DeathCause,
+        "DEATH_MENU",
+        JournalPageType::DeathMenu,
+        "RECAP",
+        JournalPageType::Recap,
+        "PLAYER_PROFILE",
+        JournalPageType::PlayerProfile,
+        "LAST_GAME_PLAYED",
+        JournalPageType::LastGamePlayed);
 };
 } // namespace NVanillaRender

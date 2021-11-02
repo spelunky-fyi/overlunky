@@ -1317,6 +1317,119 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "vftable_JournalPageJournalMenu"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x0D****\x48\x89\x08\x48\x8D\x48\x58"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageProgress"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x89\x06\x48\xC7\x46\x58\x00\x00\x00\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPagePlace"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x4C\x8D\x2D****\x4C\x8D\x3D****\x0F"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPagePeople"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x8B\x9D\x30\x08\x00\x00\x48\x89\x03"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageBestiary"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x8B\xBD\x30\x08\x00\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageItems"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x8B\xB5\x30\x08\x00\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageTraps"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x8B\x9D\x30\x08\x00\x00"sv)
+            .find_next_inst("\x48\x8D\x05****\x48\x8B\x9D\x30\x08\x00\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageStory"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x4C\x8D\x35****\x44\x0F\x28\x15"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageFeats"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x89\x01\x48\x89\x4D\xE0"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageDeathCause"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x49\x89\x04\x24\x0F\x57\xC0"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageDeathMenu"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x89\x01\x48\x89\xCE"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageRecap"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x89\x01\x48\x8D\x79\x58"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPagePlayerProfile"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x49\x89\x04\x24\x49\xC7"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "vftable_JournalPageLastGamePlayed"sv,
+        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8D\x05****\x48\x89\x03\xC7\x83\xD8\x00\x00\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
         // Put bp on Entitydb->description and walk into a shop that has this entity
         // Can also get string_table_here, you will see the id from description used as an offset of the first string in string_table
         "format_shopitem_name"sv,

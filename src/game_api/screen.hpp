@@ -60,12 +60,12 @@ class ScreenTitle : public Screen // ID: 3
     TextureRenderingInfo ana;
     TextureRenderingInfo ana_right_eyeball_torch_reflection; // right from her perspective
     TextureRenderingInfo ana_left_eyeball_torch_reflection;  // left from her perspective
-    ParticleEmitterInfo particle_torchflame_smoke;
-    ParticleEmitterInfo particle_torchflame_backflames;
-    ParticleEmitterInfo particle_torchflame_flames;
-    ParticleEmitterInfo particle_torchflame_backflames_animated;
-    ParticleEmitterInfo particle_torchflame_flames_animated;
-    ParticleEmitterInfo particle_torchflame_ash;
+    ParticleEmitterInfo* particle_torchflame_smoke;
+    ParticleEmitterInfo* particle_torchflame_backflames;
+    ParticleEmitterInfo* particle_torchflame_flames;
+    ParticleEmitterInfo* particle_torchflame_backflames_animated;
+    ParticleEmitterInfo* particle_torchflame_flames_animated;
+    ParticleEmitterInfo* particle_torchflame_ash;
     uint32_t unknown7;
     float unknown8;
     size_t unknown9;
@@ -807,6 +807,29 @@ struct PauseUI
     uint32_t visibility;
 };
 
+enum class JournalPageType
+{
+    Progress,
+    JournalMenu,
+    Places,
+    People,
+    Bestiary,
+    Items,
+    Traps,
+    Story,
+    Feats,
+    DeathCause,
+    DeathMenu,
+    Recap,
+    PlayerProfile,
+    LastGamePlayed,
+};
+
+struct JournalPage
+{
+    size_t __vftable;
+};
+
 struct JournalUI
 {
     uint32_t state;
@@ -814,7 +837,7 @@ struct JournalUI
 
     uint8_t unknown1;
     uint16_t unknown2;
-    std::vector<size_t> pages;
+    std::vector<JournalPage*> pages;
     std::vector<size_t> unknown3;
     uint32_t current_page;
     uint32_t flipping_to_page;
@@ -847,4 +870,6 @@ struct JournalUI
     size_t unknown29;
     float unknown31;
     uint32_t unknown30;
+
+    JournalPage* get_journal_page(size_t page_number);
 };

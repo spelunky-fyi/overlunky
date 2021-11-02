@@ -134,6 +134,16 @@ void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, c
         });
 }
 
+void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.process_vanilla_render_journal_page_callbacks(event, page_type, page);
+            return true;
+        });
+}
+
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
 {
     std::u16string new_string{};

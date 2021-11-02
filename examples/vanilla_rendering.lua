@@ -115,6 +115,18 @@ end, ON.RENDER_PRE_DRAW_DEPTH)
 set_pre_render_screen(SCREEN.TITLE, function(screen, render_ctx)
     s = screen:as_screen_title()
     s.ana:set_destination(AABB:new(-0.1, 0, 0.15, -0.4))
+    s.particle_torchflame_flames.x = 0.05
+    s.particle_torchflame_flames.y = 0.0
+    s.particle_torchflame_backflames.x = 0.05
+    s.particle_torchflame_backflames.y = 0.0
+    s.particle_torchflame_smoke.x = 0.0
+    s.particle_torchflame_smoke.y = 0.0
+    s.particle_torchflame_backflames_animated.x = 0.05
+    s.particle_torchflame_backflames_animated.y = 0.0
+    s.particle_torchflame_flames_animated.x = 0.05
+    s.particle_torchflame_flames_animated.y = 0.0
+    s.particle_torchflame_ash.x = 0.05
+    s.particle_torchflame_ash.y = 0.0
 end)
 
 -- drawing text on top of the screen should be done in the post_render_screen callback:
@@ -129,3 +141,41 @@ set_pre_render_screen(SCREEN.LEVEL, function(screen, render_ctx)
         game_manager.journal_ui.entire_book:set_destination(AABB:new(0, 0, 0.95, -0.95))
     end
 end)
+
+set_callback(function(render_ctx, page_type, page)
+    if page_type == JOURNAL_PAGE_TYPE.JOURNAL_MENU then
+        render_ctx:draw_text("Text on the journal menu", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.PROGRESS then
+        render_ctx:draw_text("Text on the progress page", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.PLACES then
+        -- If you draw when the page_type equals PLACES, then it will be drawn on every place page
+        -- If you want to draw on a specific page, compare the page you get as a parameter to the callback (the page being rendered right now)
+        -- to the page you want to render, in this case page 3
+        -- The page number is a zero-based index, and you have to count the journal progress and journal menu page as well, so Jungle is page 3
+        if game_manager.journal_ui:get_journal_page(3) == page then
+            render_ctx:draw_text("Text on the Jungle place page", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+        end
+    elseif page_type == JOURNAL_PAGE_TYPE.PEOPLE then
+        render_ctx:draw_text("Text on all people pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.BESTIARY then
+        render_ctx:draw_text("Text on all bestiary pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.ITEMS then
+        render_ctx:draw_text("Text on all items pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.TRAPS then
+        render_ctx:draw_text("Text on all traps pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.STORY then
+        render_ctx:draw_text("Text on all story pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.FEATS then
+        render_ctx:draw_text("Text on all feats pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.DEATH_CAUSE then
+        render_ctx:draw_text("Text on the deathcause page", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.DEATH_MENU then
+        render_ctx:draw_text("Text on the death menu", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.RECAP then
+        render_ctx:draw_text("Text on the recap page", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.PLAYER_PROFILE then
+        render_ctx:draw_text("Text on the player profile page", 0.0, 0.0, 0.0018, 0.0018, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    elseif page_type == JOURNAL_PAGE_TYPE.LAST_GAME_PLAYED then
+        render_ctx:draw_text("Text on the last game played page", 0.0, 0.2, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+    end
+end, ON.RENDER_POST_JOURNAL_PAGE)

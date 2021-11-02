@@ -795,7 +795,9 @@ void register_usertypes(sol::state& lua)
         "entire_book",
         &JournalUI::entire_book,
         "page_timer",
-        &JournalUI::page_timer);
+        &JournalUI::page_timer,
+        "get_journal_page",
+        &JournalUI::get_journal_page);
 
     lua.create_named_table(
         "SCREEN",
