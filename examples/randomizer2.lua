@@ -1409,7 +1409,7 @@ local swapping_spikes = false
 local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
 local function shuffle_tile_codes()
     for k,v in pairs(floor_tilecodes) do
-        if prng:random() < 0.015 then
+        if prng:random() < 0.05 and k ~= "floor" then
             floor_tilecodes[k] = ENT_TYPE.FLOORSTYLED_COG
         elseif prng:random() < 0.12 and has(ice_themes, state.theme_next) then
             floor_tilecodes[k] = ENT_TYPE.FLOOR_ICE
