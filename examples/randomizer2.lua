@@ -1409,9 +1409,12 @@ local swapping_spikes = false
 local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
 local function shuffle_tile_codes()
     for k,v in pairs(floor_tilecodes) do
-        floor_tilecodes[k] = pick(floor_types, ENT_TYPE.FLOORSTYLED_COG)
-        if prng:random() < 0.15 and has(ice_themes, state.theme_next) then
+        if prng:random() < 0.015 then
+            floor_tilecodes[k] = ENT_TYPE.FLOORSTYLED_COG
+        elseif prng:random() < 0.12 and has(ice_themes, state.theme_next) then
             floor_tilecodes[k] = ENT_TYPE.FLOOR_ICE
+        else
+            floor_tilecodes[k] = pick(floor_types)
         end
         local type = k
         set_pre_tile_code_callback(function(x, y, layer)
@@ -1434,6 +1437,14 @@ local function shuffle_tile_codes()
     floor_tilecodes["shop_wall"] = floor_tilecodes["floor"]
     floor_tilecodes["shop_sign"] = floor_tilecodes["floor"]
 end
+
+set_pre_entity_spawn(function(type, x, y, l, overlay, flags)
+    if options.tilecode then
+        return spawn_critical(floor_tilecodes["floor"], x, y, l, 0, 0)
+    else
+        return spawn_critical(type, x, y, l, 0, 0)
+    end
+end, SPAWN_TYPE.LEVEL_GEN_FLOOR_SPREADING, 0, nil)
 
 local function set_theme_biases()
     theme = {}
