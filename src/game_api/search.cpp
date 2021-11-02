@@ -1340,7 +1340,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put write bp on state->toast (pointer), you will end up somewhere in the middle of the function
         "toast_fun"sv,
         PatternCommandBuffer{}
-            .find_inst("\x55\x56\x48\x81\xEC\x98"sv)
+            .find_inst("\xF3\x0F\x59\xD6\x48\xC7\x44\x24\x20\x00\x00\x00\x00\xB9\x01\x00\x00\x00\x48"sv)
             .at_exe()
             .function_start(),
     },

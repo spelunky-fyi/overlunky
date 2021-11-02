@@ -628,29 +628,29 @@ struct MysteryLiquid3
     float unknown15;
     uint32_t entity_count;
     uint32_t allocated_size;
-    uint32_t unk23;
-    size_t unk1;
-    size_t unk2;
-    uint32_t unk3a;
-    uint32_t unk3b;
-    size_t unk41;
-    size_t unk42;
-    size_t unk43;
-    size_t unk44;
-    size_t list;
-    int32_t unknown45a;
-    int32_t unknown45b;    //padding
-    int32_t* liquid_flags; // simple array
-    int32_t unknown47a;
-    int32_t unknown47b; //padding
-    std::pair<float, float>* entity_coordinates;
-    int32_t unknown49a;
-    int32_t unknown49b; //padding
-    std::pair<float, float>* entity_velocities;
-    int32_t unknown51a;
-    int32_t unknown51b; //padding
-    size_t unknown52;
-    size_t unknown53;
+    uint32_t unk23;         // padding probably
+    std::list<size_t> unk1; //seams to be empty, or have one element 0?
+    uint32_t resize_value;  // used to resive the arrays?
+    uint32_t unk3b;         // padding probably
+    std::list<int32_t> liquid_ids;
+    std::list<int32_t> unknown44;                        // all of them are -1
+    std::list<int32_t>::const_iterator* list_liquid_ids; // list of all iterators of liquid_ids?
+    int32_t unknown45a;                                  // size related for the array above
+    int32_t unknown45b;                                  // padding
+    int32_t* liquid_flags;                               // array
+    int32_t unknown47a;                                  // size related for the array above
+    int32_t unknown47b;                                  // padding
+    std::pair<float, float>* entity_coordinates;         // array
+    int32_t unknown49a;                                  // size related for the array above
+    int32_t unknown49b;                                  //padding
+    std::pair<float, float>* entity_velocities;          // array
+    int32_t unknown51a;                                  // size related for the array above
+    int32_t unknown51b;                                  //padding
+    std::pair<float, float>* unknown52;                  // not sure about the type, it's defenetly a 64bit
+    std::pair<float, float>* unknown53;
+    size_t unknown54;
+    std::pair<float, float>* unknown55;
+    // 3 more size_t here
 };
 
 struct LiquidPhysicsParams
