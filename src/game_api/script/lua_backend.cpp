@@ -212,7 +212,7 @@ bool LuaBackend::update()
         {
             on_frame.value()();
         }
-        if (g_state->screen == (int)ON::CAMP && state.screen != (int)ON::CAMP)
+        if (g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3)
         {
             if (on_camp)
                 on_camp.value()();
@@ -360,6 +360,11 @@ bool LuaBackend::update()
                 callback.lastRan = now;
             }
             else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3)
+            {
+                handle_function(callback.func);
+                callback.lastRan = now;
+            }
+            else if (callback.screen == ON::CAMP && g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
