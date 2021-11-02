@@ -1343,6 +1343,10 @@ void extinguish_particles(uint32_t generated_particles_id)
         auto emitter = g_generated_particle_emitters.at(generated_particles_id);
         auto state = State::get().ptr();
         std::erase(*state->particle_emitters, emitter);
+        // While this perfectly works in removing the particles, this leaks sizeof(ParticleEmitterInfo)
+        // as it's a vector of pointers, so no dtor called automatically. Finding the dtor is hard because it's a non virtual object
+        // and object contents don't change when being destroyed, memory is just abandoned.
+        // Function disabled in LUA until dtor found.
     }
 }
 

@@ -691,9 +691,6 @@ Get the [ParticleDB](#particledb) details of the specified ID
 ### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 `int generate_particles(int particle_emitter_id, int uid)`<br/>
 Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`)
-### [`extinguish_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extinguish_particles)
-`nil extinguish_particles(int generated_particles_id)`<br/>
-Extinguish a particle emitter previously created with `generate_particles` (use the return value of `generate_particles` as the parameter in this function)
 ### [`default_spawn_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
 `bool default_spawn_is_valid(float x, float y, int layer)`<br/>
 Default function in spawn definitions to check whether a spawn is valid or not

@@ -5371,7 +5371,6 @@ entity_get_items_by = function(...) end
 entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end
 entity_remove_item = function(...) end
-extinguish_particles = function(...) end
 f = {}
 filter_entities = function(...) end
 flip_entity = function(...) end
