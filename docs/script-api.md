@@ -689,8 +689,8 @@ Same as `Player.set_heart_color`
 `ParticleDB get_particle_type(int id)`<br/>
 Get the [ParticleDB](#particledb) details of the specified ID
 ### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
-`int generate_particles(int particle_emitter_id, int uid)`<br/>
-Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`)
+`ParticleEmitterInfo generate_particles(int particle_emitter_id, int uid)`<br/>
+Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around.
 ### [`default_spawn_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
 `bool default_spawn_is_valid(float x, float y, int layer)`<br/>
 Default function in spawn definitions to check whether a spawn is valid or not
@@ -3476,6 +3476,11 @@ Derived from [`Entity`](#entity)
 ### `ParticleEmitterInfo`
 - [`ParticleDB particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type) &ParticleEmitterInfo::particle_type
 - [`int particle_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count) &ParticleEmitterInfo::particle_count
+- [`int entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) &ParticleEmitterInfo::entity_uid
+- [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ParticleEmitterInfo::x
+- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ParticleEmitterInfo::y
+- [`float offset_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) &ParticleEmitterInfo::offset_x
+- [`float offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) &ParticleEmitterInfo::offset_y
 ### `PreLoadLevelFilesContext`
 - [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
 \

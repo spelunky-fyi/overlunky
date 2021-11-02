@@ -11,7 +11,7 @@ void register_usertypes(sol::state& lua)
 {
     /// Get the [ParticleDB](#particledb) details of the specified ID
     lua["get_particle_type"] = get_particle_type;
-    /// Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`)
+    /// Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around.
     lua["generate_particles"] = generate_particles;
 
     // DISABLED UNTIL MEMORY LEAK FIXED (see rpc.cpp)
@@ -86,7 +86,17 @@ void register_usertypes(sol::state& lua)
         "particle_type",
         &ParticleEmitterInfo::particle_type,
         "particle_count",
-        &ParticleEmitterInfo::particle_count);
+        &ParticleEmitterInfo::particle_count,
+        "entity_uid",
+        &ParticleEmitterInfo::entity_uid,
+        "x",
+        &ParticleEmitterInfo::x,
+        "y",
+        &ParticleEmitterInfo::y,
+        "offset_x",
+        &ParticleEmitterInfo::offset_x,
+        "offset_y",
+        &ParticleEmitterInfo::offset_y);
 
     lua.create_named_table("PARTICLEEMITTER"
                            //, "TITLE_TORCHFLAME_SMOKE", 1
