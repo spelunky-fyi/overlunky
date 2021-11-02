@@ -1910,14 +1910,16 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     return spawn(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUNSHOT)
 
-set_pre_entity_spawn(function(type, x, y, l, overlay)
+set_post_entity_spawn(function(ent, flags)
     if options.projectile then
-        return spawn_entity_nonreplaceable(pick(projectiles_arrow), x, y, l, 0, 0)
+        set_arrowtrap_projectile(pick(projectiles_arrow), pick(projectiles_arrow))
+    else
+        set_arrowtrap_projectile(ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_WOODEN_ARROW)
     end
-    return spawn(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.SYSTEMIC, 0, projectiles_arrow)
 
---[[set_pre_entity_spawn(function(type, x, y, l, overlay)
+--[[ this was a horrible idea
+set_pre_entity_spawn(function(type, x, y, l, overlay)
     if options.projectile then
         return spawn_entity_nonreplaceable(pick(projectiles_clone), x, y, l, 0, 0)
     end
