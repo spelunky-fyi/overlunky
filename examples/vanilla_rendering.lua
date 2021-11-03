@@ -159,6 +159,9 @@ set_callback(function(render_ctx, page_type, page)
         render_ctx:draw_text("Text on all people pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
     elseif page_type == JOURNAL_PAGE_TYPE.BESTIARY then
         render_ctx:draw_text("Text on all bestiary pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
+        -- hide all main images in bestiary (as if they were undiscovered)
+        local p = page:as_journal_page_bestiary();
+        p.show_main_image = false
     elseif page_type == JOURNAL_PAGE_TYPE.ITEMS then
         render_ctx:draw_text("Text on all items pages", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
     elseif page_type == JOURNAL_PAGE_TYPE.TRAPS then

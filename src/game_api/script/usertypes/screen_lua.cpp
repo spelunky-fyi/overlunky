@@ -799,6 +799,237 @@ void register_usertypes(sol::state& lua)
         "get_journal_page",
         &JournalUI::get_journal_page);
 
+    lua.new_usertype<JournalPage>(
+        "JournalPage",
+        "background",
+        &JournalPage::background,
+        "page_number",
+        &JournalPage::page_number);
+
+    lua["JournalPage"]["as_journal_page_progress"] = &JournalPage::as<JournalPageProgress>;
+    lua["JournalPage"]["as_journal_page_journalmenu"] = &JournalPage::as<JournalPageJournalMenu>;
+    lua["JournalPage"]["as_journal_page_places"] = &JournalPage::as<JournalPagePlaces>;
+    lua["JournalPage"]["as_journal_page_people"] = &JournalPage::as<JournalPagePeople>;
+    lua["JournalPage"]["as_journal_page_bestiary"] = &JournalPage::as<JournalPageBestiary>;
+    lua["JournalPage"]["as_journal_page_items"] = &JournalPage::as<JournalPageItems>;
+    lua["JournalPage"]["as_journal_page_traps"] = &JournalPage::as<JournalPageTraps>;
+    lua["JournalPage"]["as_journal_page_story"] = &JournalPage::as<JournalPageStory>;
+    lua["JournalPage"]["as_journal_page_feats"] = &JournalPage::as<JournalPageFeats>;
+    lua["JournalPage"]["as_journal_page_deathcause"] = &JournalPage::as<JournalPageDeathCause>;
+    lua["JournalPage"]["as_journal_page_deathmenu"] = &JournalPage::as<JournalPageDeathMenu>;
+    lua["JournalPage"]["as_journal_page_recap"] = &JournalPage::as<JournalPageRecap>;
+    lua["JournalPage"]["as_journal_page_playerprofile"] = &JournalPage::as<JournalPagePlayerProfile>;
+    lua["JournalPage"]["as_journal_page_lastgameplayed"] = &JournalPage::as<JournalPageLastGamePlayed>;
+
+    lua.new_usertype<JournalPageProgress>(
+        "JournalPageProgress",
+        "coffeestain_top",
+        &JournalPageProgress::coffeestain_top,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPageJournalMenu>(
+        "JournalPageJournalMenu",
+        "selected_menu_index",
+        &JournalPageJournalMenu::selected_menu_index,
+        "journal_text_info",
+        &JournalPageJournalMenu::journal_text_info,
+        "completion_badge",
+        &JournalPageJournalMenu::completion_badge,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPageDiscoverable>(
+        "JournalPageDiscoverable",
+        "show_main_image",
+        &JournalPageDiscoverable::show_main_image,
+        "title_text_info",
+        &JournalPageDiscoverable::title_text_info,
+        "entry_text_info",
+        &JournalPageDiscoverable::entry_text_info,
+        "chapter_title_text_info",
+        &JournalPageDiscoverable::chapter_title_text_info,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPagePlaces>(
+        "JournalPagePlaces",
+        "main_image",
+        &JournalPagePlaces::main_image,
+        sol::base_classes,
+        sol::bases<JournalPage, JournalPageDiscoverable>());
+
+    lua.new_usertype<JournalPagePeople>(
+        "JournalPagePeople",
+        "character_background",
+        &JournalPagePeople::character_background,
+        "character_icon",
+        &JournalPagePeople::character_icon,
+        "character_drawing",
+        &JournalPagePeople::character_drawing,
+        sol::base_classes,
+        sol::bases<JournalPage, JournalPageDiscoverable>());
+
+    lua.new_usertype<JournalPageBestiary>(
+        "JournalPageBestiary",
+        "monster_background",
+        &JournalPageBestiary::monster_background,
+        "monster_icon",
+        &JournalPageBestiary::monster_icon,
+        "defeated_killedby_black_bars",
+        &JournalPageBestiary::defeated_killedby_black_bars,
+        "defeated_text_info",
+        &JournalPageBestiary::defeated_text_info,
+        "defeated_value_text_info",
+        &JournalPageBestiary::defeated_value_text_info,
+        "killedby_text_info",
+        &JournalPageBestiary::killedby_text_info,
+        "killedby_value_text_info",
+        &JournalPageBestiary::killedby_value_text_info,
+        sol::base_classes,
+        sol::bases<JournalPage, JournalPageDiscoverable>());
+
+    lua.new_usertype<JournalPageItems>(
+        "JournalPageItems",
+        "item_icon",
+        &JournalPageItems::item_icon,
+        "item_background",
+        &JournalPageItems::item_background,
+        sol::base_classes,
+        sol::bases<JournalPage, JournalPageDiscoverable>());
+
+    lua.new_usertype<JournalPageTraps>(
+        "JournalPageTraps",
+        "trap_icon",
+        &JournalPageTraps::trap_icon,
+        "trap_background",
+        &JournalPageTraps::trap_background,
+        sol::base_classes,
+        sol::bases<JournalPage, JournalPageDiscoverable>());
+
+    lua.new_usertype<JournalPageStory>(
+        "JournalPageStory",
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPageFeats>(
+        "JournalPageFeats",
+        "chapter_title_text_info",
+        &JournalPageFeats::chapter_title_text_info,
+        "feat_icons",
+        &JournalPageFeats::feat_icons,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPageDeathCause>(
+        "JournalPageDeathCause",
+        "death_cause_text_info",
+        &JournalPageDeathCause::death_cause_text_info,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPageDeathMenu>(
+        "JournalPageDeathMenu",
+        "selected_menu_index",
+        &JournalPageDeathMenu::selected_menu_index,
+        "game_over_text_info",
+        &JournalPageDeathMenu::game_over_text_info,
+        "level_text_info",
+        &JournalPageDeathMenu::level_text_info,
+        "level_value_text_info",
+        &JournalPageDeathMenu::level_value_text_info,
+        "money_text_info",
+        &JournalPageDeathMenu::money_text_info,
+        "money_value_text_info",
+        &JournalPageDeathMenu::money_value_text_info,
+        "time_text_info",
+        &JournalPageDeathMenu::time_text_info,
+        "time_value_text_info",
+        &JournalPageDeathMenu::time_value_text_info,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPageRecap>(
+        "JournalPageRecap",
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPagePlayerProfile>(
+        "JournalPagePlayerProfile",
+        "player_icon",
+        &JournalPagePlayerProfile::player_icon,
+        "player_icon_id",
+        &JournalPagePlayerProfile::player_icon_id,
+        "player_profile_text_info",
+        &JournalPagePlayerProfile::player_profile_text_info,
+        "plays_text_info",
+        &JournalPagePlayerProfile::plays_text_info,
+        "plays_value_text_info",
+        &JournalPagePlayerProfile::plays_value_text_info,
+        "wins_text_info",
+        &JournalPagePlayerProfile::wins_text_info,
+        "wins_value_text_info",
+        &JournalPagePlayerProfile::wins_value_text_info,
+        "deaths_text_info",
+        &JournalPagePlayerProfile::deaths_text_info,
+        "deaths_value_text_info",
+        &JournalPagePlayerProfile::deaths_value_text_info,
+        "win_pct_text_info",
+        &JournalPagePlayerProfile::win_pct_text_info,
+        "win_pct_value_text_info",
+        &JournalPagePlayerProfile::win_pct_value_text_info,
+        "average_score_text_info",
+        &JournalPagePlayerProfile::average_score_text_info,
+        "average_score_value_text_info",
+        &JournalPagePlayerProfile::average_score_value_text_info,
+        "top_score_text_info",
+        &JournalPagePlayerProfile::top_score_text_info,
+        "top_score_value_text_info",
+        &JournalPagePlayerProfile::top_score_value_text_info,
+        "deepest_level_text_info",
+        &JournalPagePlayerProfile::deepest_level_text_info,
+        "deepest_level_value_text_info",
+        &JournalPagePlayerProfile::deepest_level_value_text_info,
+        "deadliest_level_text_info",
+        &JournalPagePlayerProfile::deadliest_level_text_info,
+        "deadliest_level_value_text_info",
+        &JournalPagePlayerProfile::deadliest_level_value_text_info,
+        "average_time_text_info",
+        &JournalPagePlayerProfile::average_time_text_info,
+        "average_time_value_text_info",
+        &JournalPagePlayerProfile::average_time_value_text_info,
+        "best_time_text_info",
+        &JournalPagePlayerProfile::best_time_text_info,
+        "best_time_value_text_info",
+        &JournalPagePlayerProfile::best_time_value_text_info,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
+    lua.new_usertype<JournalPageLastGamePlayed>(
+        "JournalPageLastGamePlayed",
+        "main_image",
+        &JournalPageLastGamePlayed::main_image,
+        "last_game_played_text_info",
+        &JournalPageLastGamePlayed::last_game_played_text_info,
+        "level_text_info",
+        &JournalPageLastGamePlayed::level_text_info,
+        "level_value_text_info",
+        &JournalPageLastGamePlayed::level_value_text_info,
+        "money_text_info",
+        &JournalPageLastGamePlayed::money_text_info,
+        "money_value_text_info",
+        &JournalPageLastGamePlayed::money_value_text_info,
+        "time_text_info",
+        &JournalPageLastGamePlayed::time_text_info,
+        "time_value_text_info",
+        &JournalPageLastGamePlayed::time_value_text_info,
+        "sticker_count",
+        &JournalPageLastGamePlayed::sticker_count,
+        "stickers",
+        &JournalPageLastGamePlayed::stickers,
+        sol::base_classes,
+        sol::bases<JournalPage>());
+
     lua.create_named_table(
         "SCREEN",
         "LOGO",
@@ -910,5 +1141,36 @@ void register_usertypes(sol::state& lua)
         9,
         "DEATH",
         10);
+
+    lua.create_named_table(
+        "JOURNAL_PAGE_TYPE",
+        "PROGRESS",
+        JournalPageType::Progress,
+        "JOURNAL_MENU",
+        JournalPageType::JournalMenu,
+        "PLACES",
+        JournalPageType::Places,
+        "PEOPLE",
+        JournalPageType::People,
+        "BESTIARY",
+        JournalPageType::Bestiary,
+        "ITEMS",
+        JournalPageType::Items,
+        "TRAPS",
+        JournalPageType::Traps,
+        "STORY",
+        JournalPageType::Story,
+        "FEATS",
+        JournalPageType::Feats,
+        "DEATH_CAUSE",
+        JournalPageType::DeathCause,
+        "DEATH_MENU",
+        JournalPageType::DeathMenu,
+        "RECAP",
+        JournalPageType::Recap,
+        "PLAYER_PROFILE",
+        JournalPageType::PlayerProfile,
+        "LAST_GAME_PLAYED",
+        JournalPageType::LastGamePlayed);
 }
 } // namespace NScreen

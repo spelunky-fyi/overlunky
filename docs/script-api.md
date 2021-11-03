@@ -3836,6 +3836,13 @@ Draw a texture in world coordinates from top-left to bottom-right using the buil
 - [`float source_bottom_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_left_y) &TextureRenderingInfo::source_bottom_left_y
 - [`float source_bottom_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_right_x) &TextureRenderingInfo::source_bottom_right_x
 - [`float source_bottom_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_right_y) &TextureRenderingInfo::source_bottom_right_y
+### `TextRenderingInfo`
+- [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &TextRenderingInfo::x
+- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &TextRenderingInfo::y
+- [`int text_length`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) &TextRenderingInfo::text_length
+- [`float width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &TextRenderingInfo::width
+- [`float height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &TextRenderingInfo::height
+- [`Texture font`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) &TextRenderingInfo::font
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
@@ -4256,6 +4263,106 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo entire_book`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) &JournalUI::entire_book
 - [`int page_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) &JournalUI::page_timer
 - [`JournalPage get_journal_page(size_t page_number)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_journal_page) &JournalUI::get_journal_page
+### `JournalPage`
+- [`TextureRenderingInfo background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background) &JournalPage::background
+- [`int page_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_number) &JournalPage::page_number
+### `JournalPageProgress`
+Derived from [`JournalPage`](#journalpage)
+- [`TextureRenderingInfo coffeestain_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffeestain_top) &JournalPageProgress::coffeestain_top
+### `JournalPageJournalMenu`
+Derived from [`JournalPage`](#journalpage)
+- [`int selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) &JournalPageJournalMenu::selected_menu_index
+- [`TextRenderingInfo journal_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_text_info) &JournalPageJournalMenu::journal_text_info
+- [`TextureRenderingInfo completion_badge`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=completion_badge) &JournalPageJournalMenu::completion_badge
+### `JournalPageDiscoverable`
+Derived from [`JournalPage`](#journalpage)
+- [`bool show_main_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_main_image) &JournalPageDiscoverable::show_main_image
+- [`TextRenderingInfo title_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=title_text_info) &JournalPageDiscoverable::title_text_info
+- [`TextRenderingInfo entry_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entry_text_info) &JournalPageDiscoverable::entry_text_info
+- [`TextRenderingInfo chapter_title_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_title_text_info) &JournalPageDiscoverable::chapter_title_text_info
+### `JournalPagePlaces`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo main_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_image) &JournalPagePlaces::main_image
+### `JournalPagePeople`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo character_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_background) &JournalPagePeople::character_background
+- [`TextureRenderingInfo character_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_icon) &JournalPagePeople::character_icon
+- [`TextureRenderingInfo character_drawing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_drawing) &JournalPagePeople::character_drawing
+### `JournalPageBestiary`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo monster_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=monster_background) &JournalPageBestiary::monster_background
+- [`TextureRenderingInfo monster_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=monster_icon) &JournalPageBestiary::monster_icon
+- [`TextureRenderingInfo defeated_killedby_black_bars`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_killedby_black_bars) &JournalPageBestiary::defeated_killedby_black_bars
+- [`TextRenderingInfo defeated_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_text_info) &JournalPageBestiary::defeated_text_info
+- [`TextRenderingInfo defeated_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_value_text_info) &JournalPageBestiary::defeated_value_text_info
+- [`TextRenderingInfo killedby_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killedby_text_info) &JournalPageBestiary::killedby_text_info
+- [`TextRenderingInfo killedby_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killedby_value_text_info) &JournalPageBestiary::killedby_value_text_info
+### `JournalPageItems`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo item_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_icon) &JournalPageItems::item_icon
+- [`TextureRenderingInfo item_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_background) &JournalPageItems::item_background
+### `JournalPageTraps`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo trap_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_icon) &JournalPageTraps::trap_icon
+- [`TextureRenderingInfo trap_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_background) &JournalPageTraps::trap_background
+### `JournalPageStory`
+Derived from [`JournalPage`](#journalpage)
+### `JournalPageFeats`
+Derived from [`JournalPage`](#journalpage)
+- [`TextRenderingInfo chapter_title_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_title_text_info) &JournalPageFeats::chapter_title_text_info
+- [`TextureRenderingInfo feat_icons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=feat_icons) &JournalPageFeats::feat_icons
+### `JournalPageDeathCause`
+Derived from [`JournalPage`](#journalpage)
+- [`TextRenderingInfo death_cause_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=death_cause_text_info) &JournalPageDeathCause::death_cause_text_info
+### `JournalPageDeathMenu`
+Derived from [`JournalPage`](#journalpage)
+- [`int selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) &JournalPageDeathMenu::selected_menu_index
+- [`TextRenderingInfo game_over_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_over_text_info) &JournalPageDeathMenu::game_over_text_info
+- [`TextRenderingInfo level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_text_info) &JournalPageDeathMenu::level_text_info
+- [`TextRenderingInfo level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_value_text_info) &JournalPageDeathMenu::level_value_text_info
+- [`TextRenderingInfo money_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_text_info) &JournalPageDeathMenu::money_text_info
+- [`TextRenderingInfo money_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_value_text_info) &JournalPageDeathMenu::money_value_text_info
+- [`TextRenderingInfo time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_text_info) &JournalPageDeathMenu::time_text_info
+- [`TextRenderingInfo time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_value_text_info) &JournalPageDeathMenu::time_value_text_info
+### `JournalPageRecap`
+Derived from [`JournalPage`](#journalpage)
+### `JournalPagePlayerProfile`
+Derived from [`JournalPage`](#journalpage)
+- [`TextureRenderingInfo player_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_icon) &JournalPagePlayerProfile::player_icon
+- [`int player_icon_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_icon_id) &JournalPagePlayerProfile::player_icon_id
+- [`TextRenderingInfo player_profile_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_profile_text_info) &JournalPagePlayerProfile::player_profile_text_info
+- [`TextRenderingInfo plays_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=plays_text_info) &JournalPagePlayerProfile::plays_text_info
+- [`TextRenderingInfo plays_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=plays_value_text_info) &JournalPagePlayerProfile::plays_value_text_info
+- [`TextRenderingInfo wins_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_text_info) &JournalPagePlayerProfile::wins_text_info
+- [`TextRenderingInfo wins_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_value_text_info) &JournalPagePlayerProfile::wins_value_text_info
+- [`TextRenderingInfo deaths_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deaths_text_info) &JournalPagePlayerProfile::deaths_text_info
+- [`TextRenderingInfo deaths_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deaths_value_text_info) &JournalPagePlayerProfile::deaths_value_text_info
+- [`TextRenderingInfo win_pct_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pct_text_info) &JournalPagePlayerProfile::win_pct_text_info
+- [`TextRenderingInfo win_pct_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pct_value_text_info) &JournalPagePlayerProfile::win_pct_value_text_info
+- [`TextRenderingInfo average_score_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_score_text_info) &JournalPagePlayerProfile::average_score_text_info
+- [`TextRenderingInfo average_score_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_score_value_text_info) &JournalPagePlayerProfile::average_score_value_text_info
+- [`TextRenderingInfo top_score_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_score_text_info) &JournalPagePlayerProfile::top_score_text_info
+- [`TextRenderingInfo top_score_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_score_value_text_info) &JournalPagePlayerProfile::top_score_value_text_info
+- [`TextRenderingInfo deepest_level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level_text_info) &JournalPagePlayerProfile::deepest_level_text_info
+- [`TextRenderingInfo deepest_level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level_value_text_info) &JournalPagePlayerProfile::deepest_level_value_text_info
+- [`TextRenderingInfo deadliest_level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deadliest_level_text_info) &JournalPagePlayerProfile::deadliest_level_text_info
+- [`TextRenderingInfo deadliest_level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deadliest_level_value_text_info) &JournalPagePlayerProfile::deadliest_level_value_text_info
+- [`TextRenderingInfo average_time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_time_text_info) &JournalPagePlayerProfile::average_time_text_info
+- [`TextRenderingInfo average_time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_time_value_text_info) &JournalPagePlayerProfile::average_time_value_text_info
+- [`TextRenderingInfo best_time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=best_time_text_info) &JournalPagePlayerProfile::best_time_text_info
+- [`TextRenderingInfo best_time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=best_time_value_text_info) &JournalPagePlayerProfile::best_time_value_text_info
+### `JournalPageLastGamePlayed`
+Derived from [`JournalPage`](#journalpage)
+- [`TextureRenderingInfo main_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_image) &JournalPageLastGamePlayed::main_image
+- [`TextRenderingInfo last_game_played_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_game_played_text_info) &JournalPageLastGamePlayed::last_game_played_text_info
+- [`TextRenderingInfo level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_text_info) &JournalPageLastGamePlayed::level_text_info
+- [`TextRenderingInfo level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_value_text_info) &JournalPageLastGamePlayed::level_value_text_info
+- [`TextRenderingInfo money_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_text_info) &JournalPageLastGamePlayed::money_text_info
+- [`TextRenderingInfo money_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_value_text_info) &JournalPageLastGamePlayed::money_value_text_info
+- [`TextRenderingInfo time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_text_info) &JournalPageLastGamePlayed::time_text_info
+- [`TextRenderingInfo time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_value_text_info) &JournalPageLastGamePlayed::time_value_text_info
+- [`int sticker_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sticker_count) &JournalPageLastGamePlayed::sticker_count
+- [`array<TextureRenderingInfo, 20> stickers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) &JournalPageLastGamePlayed::stickers
 ### `ScreenArenaMenu`
 Derived from [`Screen`](#screen)
 - [`ScreenZoomAnimation brick_background_animation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_background_animation) &ScreenArenaMenu::brick_background_animation
@@ -5241,21 +5348,6 @@ Params: `PlayingSound vanilla_sound`
 - [`START_FAILED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_CALLBACK_TYPE.START_FAILED) FMODStudio::EventCallbackType::StartFailed
 \
 Params: `PlayingSound vanilla_sound`
-### JOURNAL_PAGE_TYPE
-- [`PROGRESS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PROGRESS) JournalPageType::Progress
-- [`JOURNAL_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.JOURNAL_MENU) JournalPageType::JournalMenu
-- [`PLACES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLACES) JournalPageType::Places
-- [`PEOPLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PEOPLE) JournalPageType::People
-- [`BESTIARY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.BESTIARY) JournalPageType::Bestiary
-- [`ITEMS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.ITEMS) JournalPageType::Items
-- [`TRAPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.TRAPS) JournalPageType::Traps
-- [`STORY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.STORY) JournalPageType::Story
-- [`FEATS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.FEATS) JournalPageType::Feats
-- [`DEATH_CAUSE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_CAUSE) JournalPageType::DeathCause
-- [`DEATH_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_MENU) JournalPageType::DeathMenu
-- [`RECAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.RECAP) JournalPageType::Recap
-- [`PLAYER_PROFILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLAYER_PROFILE) JournalPageType::PlayerProfile
-- [`LAST_GAME_PLAYED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.LAST_GAME_PLAYED) JournalPageType::LastGamePlayed
 ### ENT_FLAG
 - [`INVISIBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_FLAG.INVISIBLE) 1
 - [`INDESTRUCTIBLE_OR_SPECIAL_FLOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_FLAG.INDESTRUCTIBLE_OR_SPECIAL_FLOOR) 2
@@ -5366,6 +5458,21 @@ Params: `PlayingSound vanilla_sound`
 - [`STORY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.STORY) 8
 - [`RECAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.RECAP) 9
 - [`DEATH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.DEATH) 10
+### JOURNAL_PAGE_TYPE
+- [`PROGRESS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PROGRESS) JournalPageType::Progress
+- [`JOURNAL_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.JOURNAL_MENU) JournalPageType::JournalMenu
+- [`PLACES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLACES) JournalPageType::Places
+- [`PEOPLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PEOPLE) JournalPageType::People
+- [`BESTIARY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.BESTIARY) JournalPageType::Bestiary
+- [`ITEMS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.ITEMS) JournalPageType::Items
+- [`TRAPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.TRAPS) JournalPageType::Traps
+- [`STORY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.STORY) JournalPageType::Story
+- [`FEATS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.FEATS) JournalPageType::Feats
+- [`DEATH_CAUSE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_CAUSE) JournalPageType::DeathCause
+- [`DEATH_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_MENU) JournalPageType::DeathMenu
+- [`RECAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.RECAP) JournalPageType::Recap
+- [`PLAYER_PROFILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLAYER_PROFILE) JournalPageType::PlayerProfile
+- [`LAST_GAME_PLAYED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.LAST_GAME_PLAYED) JournalPageType::LastGamePlayed
 ## Aliases
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 ### CallbackId == int;
