@@ -124,7 +124,7 @@ std::string get_error_information()
     return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.25.0b\n\n{}", current_spelunky_version(), application_versions());
 }
 
-size_t find_inst(const char* exe, std::string_view needle, size_t start, std::string_view pattern_name, bool is_required)
+size_t find_inst(const char* exe, std::string_view needle, size_t start, std::optional<size_t> end, std::string_view pattern_name, bool is_required)
 {
     static const std::size_t exe_size = [exe]()
     {
@@ -136,8 +136,9 @@ size_t find_inst(const char* exe, std::string_view needle, size_t start, std::st
     }();
 
     const std::size_t needle_length = needle.size();
+    const std::size_t search_end = end.value_or(exe_size);
 
-    for (std::size_t j = start; j < exe_size - needle_length; j++)
+    for (std::size_t j = start; j < search_end - needle_length; j++)
     {
         bool found = true;
         for (std::size_t k = 0; k < needle_length && found; k++)
@@ -214,7 +215,7 @@ class PatternCommandBuffer
     }
     PatternCommandBuffer& find_inst(std::string_view pattern)
     {
-        commands.push_back({CommandType::FindInst, {.pattern = pattern}});
+        commands.push_back({CommandType::FindInst, {.find_inst_args = {pattern}}});
         return *this;
     }
     PatternCommandBuffer& find_after_inst(std::string_view pattern)
@@ -224,6 +225,19 @@ class PatternCommandBuffer
     PatternCommandBuffer& find_next_inst(std::string_view pattern)
     {
         return offset(0x1).find_inst(pattern);
+    }
+    PatternCommandBuffer& find_inst_in_range(std::string_view pattern, size_t range)
+    {
+        commands.push_back({CommandType::FindInst, {.find_inst_args = {.pattern = pattern, .range = range}}});
+        return *this;
+    }
+    PatternCommandBuffer& find_after_inst_in_range(std::string_view pattern, size_t range)
+    {
+        return find_inst_in_range(pattern, range).offset(pattern.size());
+    }
+    PatternCommandBuffer& find_next_inst_in_range(std::string_view pattern, size_t range)
+    {
+        return offset(0x1).find_inst_in_range(pattern, range);
     }
     PatternCommandBuffer& offset(int64_t offset)
     {
@@ -293,7 +307,14 @@ class PatternCommandBuffer
             case CommandType::FindInst:
                 try
                 {
-                    offset = ::find_inst(exe, data.pattern, offset, address_name, !optional);
+                    if (data.find_inst_args.range.has_value())
+                    {
+                        offset = ::find_inst(exe, data.find_inst_args.pattern, offset, offset + data.find_inst_args.range.value(), address_name, !optional);
+                    }
+                    else
+                    {
+                        offset = ::find_inst(exe, data.find_inst_args.pattern, offset, std::nullopt, address_name, !optional);
+                    }
                 }
                 catch (const std::logic_error&)
                 {
@@ -341,6 +362,11 @@ class PatternCommandBuffer
             return {opcode_offset, opcode_suffix_offset, opcode_addr_size};
         }
     };
+    struct FindInstArgs
+    {
+        std::string_view pattern;
+        std::optional<size_t> range;
+    };
 
     enum class CommandType
     {
@@ -358,7 +384,7 @@ class PatternCommandBuffer
     {
         bool optional;
         std::string_view address_name;
-        std::string_view pattern;
+        FindInstArgs find_inst_args;
         int64_t offset;
         DecodePcArgs decode_pc_args;
         uint8_t decode_imm_prefix;
@@ -611,7 +637,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .set_optional(true)
             .get_address("level_gen_load_level_file"sv)
-            .find_inst("\x44\x8b\xad\xd4\x05\x00\x00"sv)
+            .find_inst_in_range("\x44\x8b\xbd\xe4\x05\x00\x00"sv, 0xa00)
             .at_exe(),
     },
     {
@@ -620,7 +646,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .set_optional(true)
             .get_address("get_room_size_begin"sv)
-            .find_next_inst("\x74"sv)
+            .find_next_inst_in_range("\x74"sv, 0x20)
             .decode_pc(1, 0, 1)
             .at_exe(),
     },
@@ -630,8 +656,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .set_optional(true)
             .get_address("get_room_size_begin"sv)
-            .find_next_inst("\x74"sv)
-            .find_next_inst("\xeb"sv)
+            .find_next_inst_in_range("\x74"sv, 0x20)
+            .find_next_inst_in_range("\xeb"sv, 0x20)
             .decode_pc(1, 0, 1)
             .at_exe(),
     },
@@ -641,8 +667,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .set_optional(true)
             .get_address("get_room_size_begin"sv)
-            .find_next_inst("\x74"sv)
-            .find_after_inst("\xeb*"sv)
+            .find_next_inst_in_range("\x74"sv, 0x20)
+            .find_after_inst_in_range("\xeb*"sv, 0x20)
             .at_exe(),
     },
     {
@@ -742,7 +768,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .set_optional(true)
             .get_address("spawn_entity"sv)
-            .find_inst("\x83\xf8\xfc"sv)
+            .find_inst_in_range("\x83\xf8\xfc"sv, 0x250)
             .at_exe(),
     },
     {
@@ -751,7 +777,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .set_optional(true)
             .get_address("fetch_texture_begin"sv)
-            .find_next_inst("\x66\x89\x46\x3c"sv)
+            .find_next_inst_in_range("\x66\x89\x46\x3c"sv, 0x250)
             .at_exe(),
     },
     {
