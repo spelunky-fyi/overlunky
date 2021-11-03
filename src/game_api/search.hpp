@@ -13,7 +13,7 @@ size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset = 3);
 // Optional pattern_name for better error messages
 // If is_required is true the function will call std::terminate when the needle can't be found
 // Else it will throw std::logic_error
-size_t find_inst(const char* exe, std::string_view needle, size_t start, std::string_view pattern_name = ""sv, bool is_required = true);
+size_t find_inst(const char* exe, std::string_view needle, size_t start, std::optional<size_t> end = std::nullopt, std::string_view pattern_name = ""sv, bool is_required = true);
 
 size_t find_after_bundle(size_t exe);
 
