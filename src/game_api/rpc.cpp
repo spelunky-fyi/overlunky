@@ -1308,12 +1308,12 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
     }
 }
 
-ParticleEmitterInfo* generate_particles(uint32_t particle_emitter_id, uint32_t uid)
+ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid)
 {
     static size_t offset = 0;
     if (offset == 0)
     {
-        offset = get_address("generate_particles");
+        offset = get_address("generate_world_particles");
     }
 
     if (offset != 0)
@@ -1327,10 +1327,59 @@ ParticleEmitterInfo* generate_particles(uint32_t particle_emitter_id, uint32_t u
             return gpf(state->particle_emitters, particle_emitter_id, entity);
         }
     }
-    return 0;
+    return nullptr;
 }
 
-void extinguish_particles(ParticleEmitterInfo* particle_emitter)
+ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, float x, float y)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("generate_screen_particles");
+    }
+
+    if (offset != 0)
+    {
+        typedef ParticleEmitterInfo* generate_particles_func(uint32_t, float, float, size_t);
+        static generate_particles_func* gpf = (generate_particles_func*)(offset);
+        return gpf(particle_emitter_id, x, y, 0);
+    }
+    return nullptr;
+}
+
+void advance_screen_particles(ParticleEmitterInfo* particle_emitter)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("advance_screen_particles");
+    }
+
+    if (offset != 0)
+    {
+        typedef void advance_particles_func(ParticleEmitterInfo*);
+        static advance_particles_func* apf = (advance_particles_func*)(offset);
+        apf(particle_emitter);
+    }
+}
+
+void render_screen_particles(ParticleEmitterInfo* particle_emitter)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("render_screen_particles");
+    }
+
+    if (offset != 0)
+    {
+        typedef void render_particles_func(ParticleEmitterInfo*, size_t, size_t, size_t);
+        static render_particles_func* rpf = (render_particles_func*)(offset);
+        rpf(particle_emitter, 0, 0, 0);
+    }
+}
+
+void extinguish_world_particles(ParticleEmitterInfo* particle_emitter)
 {
     auto state = State::get().ptr();
     std::erase(*state->particle_emitters, particle_emitter);

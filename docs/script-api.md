@@ -688,9 +688,18 @@ Same as `Player.set_heart_color`
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 `ParticleDB get_particle_type(int id)`<br/>
 Get the [ParticleDB](#particledb) details of the specified ID
-### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
-`ParticleEmitterInfo generate_particles(int particle_emitter_id, int uid)`<br/>
-Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around.
+### [`generate_world_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_world_particles)
+`ParticleEmitterInfo generate_world_particles(int particle_emitter_id, int uid)`<br/>
+Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
+### [`generate_screen_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_screen_particles)
+`ParticleEmitterInfo generate_screen_particles(int particle_emitter_id, float x, float y)`<br/>
+Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
+### [`advance_screen_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=advance_screen_particles)
+`nil advance_screen_particles(ParticleEmitterInfo particle_emitter)`<br/>
+Advances the state of the screen particle emitter (simulates the next positions, ... of all the particles in the emitter). Only used with screen particle emitters. See the `particles.lua` example script for more details.
+### [`render_screen_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_screen_particles)
+`nil render_screen_particles(ParticleEmitterInfo particle_emitter)`<br/>
+Renders the particles to the screen. Only used with screen particle emitters. See the `particles.lua` example script for more details.
 ### [`default_spawn_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
 `bool default_spawn_is_valid(float x, float y, int layer)`<br/>
 Default function in spawn definitions to check whether a spawn is valid or not
@@ -883,6 +892,9 @@ As the name is misleading. use entity `move_state` field instead
 ### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
 `nil set_camera_position(float cx, float cy)`<br/>
 this doesn't actually work at all. See State -> Camera the for proper camera handling
+### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
+`ParticleEmitterInfo generate_particles(int particle_emitter_id, int uid)`<br/>
+Use `generate_world_particles`
 ### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
 `nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`<br/>
 Use `GuiDrawContext.draw_line` instead

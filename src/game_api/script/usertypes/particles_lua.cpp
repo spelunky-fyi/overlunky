@@ -11,12 +11,22 @@ void register_usertypes(sol::state& lua)
 {
     /// Get the [ParticleDB](#particledb) details of the specified ID
     lua["get_particle_type"] = get_particle_type;
-    /// Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around.
-    lua["generate_particles"] = generate_particles;
+    /// Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
+    lua["generate_world_particles"] = generate_world_particles;
+    /// Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
+    lua["generate_screen_particles"] = generate_screen_particles;
+    /// Advances the state of the screen particle emitter (simulates the next positions, ... of all the particles in the emitter). Only used with screen particle emitters. See the `particles.lua` example script for more details.
+    lua["advance_screen_particles"] = advance_screen_particles;
+    /// Renders the particles to the screen. Only used with screen particle emitters. See the `particles.lua` example script for more details.
+    lua["render_screen_particles"] = render_screen_particles;
 
     // DISABLED UNTIL MEMORY LEAK FIXED (see rpc.cpp)
-    /// Extinguish a particle emitter previously created with `generate_particles` (use the return value of `generate_particles` as the parameter in this function)
+    // Extinguish a particle emitter previously created with `generate_particles` (use the return value of `generate_particles` as the parameter in this function)
     //l/u/a/["extinguish_particles"] = extinguish_particles;
+
+    /// Deprecated
+    /// Use `generate_world_particles`
+    lua["generate_particles"] = generate_world_particles;
 
     lua.new_usertype<ParticleDB>(
         "ParticleDB",

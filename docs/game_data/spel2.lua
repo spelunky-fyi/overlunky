@@ -2091,6 +2091,84 @@ Jiangshi = {
   __name = "sol.Jiangshi.user",
   __newindex = "function"
 }
+JournalPage = {
+  __name = "sol.JournalPage.user"
+}
+JournalPageBestiary = {
+  __index = "function",
+  __name = "sol.JournalPageBestiary.user",
+  __newindex = "function"
+}
+JournalPageDeathCause = {
+  __index = "function",
+  __name = "sol.JournalPageDeathCause.user",
+  __newindex = "function"
+}
+JournalPageDeathMenu = {
+  __index = "function",
+  __name = "sol.JournalPageDeathMenu.user",
+  __newindex = "function"
+}
+JournalPageDiscoverable = {
+  __index = "function",
+  __name = "sol.JournalPageDiscoverable.user",
+  __newindex = "function"
+}
+JournalPageFeats = {
+  __index = "function",
+  __name = "sol.JournalPageFeats.user",
+  __newindex = "function"
+}
+JournalPageItems = {
+  __index = "function",
+  __name = "sol.JournalPageItems.user",
+  __newindex = "function"
+}
+JournalPageJournalMenu = {
+  __index = "function",
+  __name = "sol.JournalPageJournalMenu.user",
+  __newindex = "function"
+}
+JournalPageLastGamePlayed = {
+  __index = "function",
+  __name = "sol.JournalPageLastGamePlayed.user",
+  __newindex = "function"
+}
+JournalPagePeople = {
+  __index = "function",
+  __name = "sol.JournalPagePeople.user",
+  __newindex = "function"
+}
+JournalPagePlaces = {
+  __index = "function",
+  __name = "sol.JournalPagePlaces.user",
+  __newindex = "function"
+}
+JournalPagePlayerProfile = {
+  __index = "function",
+  __name = "sol.JournalPagePlayerProfile.user",
+  __newindex = "function"
+}
+JournalPageProgress = {
+  __index = "function",
+  __name = "sol.JournalPageProgress.user",
+  __newindex = "function"
+}
+JournalPageRecap = {
+  __index = "function",
+  __name = "sol.JournalPageRecap.user",
+  __newindex = "function"
+}
+JournalPageStory = {
+  __index = "function",
+  __name = "sol.JournalPageStory.user",
+  __newindex = "function"
+}
+JournalPageTraps = {
+  __index = "function",
+  __name = "sol.JournalPageTraps.user",
+  __newindex = "function"
+}
 JournalPopupUI = {
   __name = "sol.JournalPopupUI.user"
 }
@@ -4534,6 +4612,9 @@ Terra = {
   __name = "sol.Terra.user",
   __newindex = "function"
 }
+TextRenderingInfo = {
+  __name = "sol.TextRenderingInfo.user"
+}
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
 }
@@ -5349,6 +5430,7 @@ YetiQueen = {
 }
 add_custom_name = function(...) end
 add_string = function(...) end
+advance_screen_particles = function(...) end
 apply_entity_db = function(...) end
 attach_ball_and_chain = function(...) end
 attach_entity = function(...) end
@@ -5388,6 +5470,7 @@ entity_get_items_by = function(...) end
 entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end
 entity_remove_item = function(...) end
+extinguish_screen_particles = function(...) end
 f = {}
 filter_entities = function(...) end
 flip_entity = function(...) end
@@ -5397,6 +5480,8 @@ force_olmec_phase_0 = function(...) end
 game_manager = {}
 game_position = function(...) end
 generate_particles = function(...) end
+generate_screen_particles = function(...) end
+generate_world_particles = function(...) end
 get_bounds = function(...) end
 get_camera_position = function(...) end
 get_character_heart_color = function(...) end
@@ -5521,6 +5606,7 @@ register_option_combo = function(...) end
 register_option_float = function(...) end
 register_option_int = function(...) end
 register_option_string = function(...) end
+render_screen_particles = function(...) end
 replace_drop = function(...) end
 return_input = function(...) end
 rgba = function(...) end

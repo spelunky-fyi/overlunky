@@ -1045,7 +1045,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        "generate_particles"sv,
+        "generate_world_particles"sv,
         // Put read bp on State.particle_emitters, conditionally exclude the couple bp's it hits for just being in the level,
         // jump and when landing the floorpoof particle emitter id will be loaded into rdx. The subsequent call is the
         // generate_particles function.
@@ -1053,6 +1053,32 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x4D\x8D\x66\x08\x49\x8B\x5E\x08"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "generate_screen_particles"sv,
+        // Put write bp on GameManager.screen_title.particle_whatever and go to the title screen
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x48\x89\x86\x40\x01\x00\x00\xF3\x0F\x10\x0D"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "advance_screen_particles"sv,
+        // See `generate_screen_particles`, a little bit below, the five pointers coming from the generate function are
+        // passed to another function
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x48\x8B\x8E\x38\x01\x00\x00\xE8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "render_screen_particles"sv,
+        // Go to the title screen, put a read bp on one of the particle emitter pointers and filter out the simulate call
+        // Next break it hits is the render function (in the same function where the version string gets drawn on the screen)
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x48\x8B\x8E\x40\x01\x00\x00\x31\xD2"sv)
+            .decode_call()
+            .at_exe(),
     },
     {
         "ghost_spawn_time"sv,
