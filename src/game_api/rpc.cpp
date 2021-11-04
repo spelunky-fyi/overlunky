@@ -1308,12 +1308,12 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
     }
 }
 
-void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
+ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid)
 {
     static size_t offset = 0;
     if (offset == 0)
     {
-        offset = get_address("generate_particles");
+        offset = get_address("generate_world_particles");
     }
 
     if (offset != 0)
@@ -1322,9 +1322,90 @@ void generate_particles(uint32_t particle_emitter_id, uint32_t uid)
         if (entity != nullptr)
         {
             auto state = get_state_ptr();
-            typedef size_t generate_particles_func(PointerList*, uint32_t, Entity*);
+            typedef ParticleEmitterInfo* generate_particles_func(std::vector<ParticleEmitterInfo*>*, uint32_t, Entity*);
             static generate_particles_func* gpf = (generate_particles_func*)(offset);
-            gpf(state->particle_emitters, particle_emitter_id, entity);
+            return gpf(state->particle_emitters, particle_emitter_id, entity);
+        }
+    }
+    return nullptr;
+}
+
+ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, float x, float y)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("generate_screen_particles");
+    }
+
+    if (offset != 0)
+    {
+        typedef ParticleEmitterInfo* generate_particles_func(uint32_t, float, float, size_t);
+        static generate_particles_func* gpf = (generate_particles_func*)(offset);
+        return gpf(particle_emitter_id, x, y, 0);
+    }
+    return nullptr;
+}
+
+void advance_screen_particles(ParticleEmitterInfo* particle_emitter)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("advance_screen_particles");
+    }
+
+    if (offset != 0)
+    {
+        typedef void advance_particles_func(ParticleEmitterInfo*);
+        static advance_particles_func* apf = (advance_particles_func*)(offset);
+        apf(particle_emitter);
+    }
+}
+
+void render_screen_particles(ParticleEmitterInfo* particle_emitter)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("render_screen_particles");
+    }
+
+    if (offset != 0)
+    {
+        typedef void render_particles_func(ParticleEmitterInfo*, size_t, size_t, size_t);
+        static render_particles_func* rpf = (render_particles_func*)(offset);
+        rpf(particle_emitter, 0, 0, 0);
+    }
+}
+
+void extinguish_particles(ParticleEmitterInfo* particle_emitter)
+{
+    // removing from state only applies to world emitters, but it just won't find the screen one in the vector, so no big deal
+    auto state = State::get().ptr();
+    std::erase(*state->particle_emitters, particle_emitter);
+
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("free_particleemitterinfo");
+    }
+
+    if (offset != 0)
+    {
+        typedef void free_particleemitter_func(ParticleEmitterInfo*);
+        static free_particleemitter_func* fpf = (free_particleemitter_func*)(offset);
+        if (particle_emitter != nullptr)
+        {
+            if (particle_emitter->unknown26 != 0)
+            {
+                fpf((ParticleEmitterInfo*)particle_emitter->unknown26);
+            }
+            if (particle_emitter->unknown4 != 0)
+            {
+                fpf((ParticleEmitterInfo*)particle_emitter->unknown4);
+            }
+            fpf(particle_emitter);
         }
     }
 }

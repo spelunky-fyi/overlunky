@@ -153,7 +153,7 @@ struct TextRenderingInfo
     uint16_t unknown8;
     int32_t unknown9;
     size_t unknown10;
-    size_t unknown11;
+    Texture* font;
 };
 
 struct TextureRenderingInfo

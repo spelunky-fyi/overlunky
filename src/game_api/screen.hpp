@@ -60,12 +60,12 @@ class ScreenTitle : public Screen // ID: 3
     TextureRenderingInfo ana;
     TextureRenderingInfo ana_right_eyeball_torch_reflection; // right from her perspective
     TextureRenderingInfo ana_left_eyeball_torch_reflection;  // left from her perspective
-    ParticleEmitterInfo particle_torchflame_smoke;
-    ParticleEmitterInfo particle_torchflame_backflames;
-    ParticleEmitterInfo particle_torchflame_flames;
-    ParticleEmitterInfo particle_torchflame_backflames_animated;
-    ParticleEmitterInfo particle_torchflame_flames_animated;
-    ParticleEmitterInfo particle_torchflame_ash;
+    ParticleEmitterInfo* particle_torchflame_smoke;
+    ParticleEmitterInfo* particle_torchflame_backflames;
+    ParticleEmitterInfo* particle_torchflame_flames;
+    ParticleEmitterInfo* particle_torchflame_backflames_animated;
+    ParticleEmitterInfo* particle_torchflame_flames_animated;
+    ParticleEmitterInfo* particle_torchflame_ash;
     uint32_t unknown7;
     float unknown8;
     size_t unknown9;
@@ -807,6 +807,258 @@ struct PauseUI
     uint32_t visibility;
 };
 
+enum class JournalPageType
+{
+    Progress,
+    JournalMenu,
+    Places,
+    People,
+    Bestiary,
+    Items,
+    Traps,
+    Story,
+    Feats,
+    DeathCause,
+    DeathMenu,
+    Recap,
+    PlayerProfile,
+    LastGamePlayed,
+};
+
+class JournalPage
+{
+  public:
+    TextureRenderingInfo background;
+    uint32_t page_number;
+    uint32_t unknown2;
+
+    virtual ~JournalPage() = 0;
+    virtual void v1() = 0;
+    virtual void v2() = 0;
+    virtual void v3() = 0;
+    virtual void render() = 0;
+
+    template <typename T>
+    T* as()
+    {
+        return static_cast<T*>(this);
+    }
+};
+
+class JournalPageProgress : public JournalPage
+{
+  public:
+    TextureRenderingInfo coffeestain_top;
+
+    virtual ~JournalPageProgress() = 0;
+};
+
+class JournalPageJournalMenu : public JournalPage
+{
+  public:
+    float unknown3;
+    float unknown4;
+    float unknown5;
+    float unknown6;
+    float unknown7;
+    float unknown8;
+    float unknown9;
+    float unknown10;
+    uint32_t unknown11;
+    float unknown12;
+    size_t unknown13;
+    size_t unknown15;
+    size_t unknown17;
+    size_t unknown19;
+    size_t unknown21;
+    uint32_t selected_menu_index;
+    uint32_t unknown23;
+    TextRenderingInfo* journal_text_info;
+    TextureRenderingInfo completion_badge;
+
+    virtual ~JournalPageJournalMenu() = 0;
+};
+
+class JournalPageDiscoverable : public JournalPage
+{
+  public:
+    bool show_main_image;
+    uint8_t unknown3b;
+    uint8_t unknown3c;
+    uint8_t unknown3d;
+    uint32_t unknown4;
+    uint32_t unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7;
+    float unknown8;
+    uint32_t unknown9;
+    float unknown10;
+    TextRenderingInfo* title_text_info;
+    size_t unknown12;
+    TextRenderingInfo* entry_text_info;
+    TextRenderingInfo* chapter_title_text_info;
+
+    virtual ~JournalPageDiscoverable() = 0;
+};
+
+class JournalPagePlaces : public JournalPageDiscoverable
+{
+  public:
+    TextureRenderingInfo main_image;
+
+    virtual ~JournalPagePlaces() = 0;
+};
+
+class JournalPagePeople : public JournalPageDiscoverable
+{
+  public:
+    TextureRenderingInfo character_background;
+    TextureRenderingInfo character_icon;
+    TextureRenderingInfo character_drawing;
+
+    virtual ~JournalPagePeople() = 0;
+};
+
+class JournalPageBestiary : public JournalPageDiscoverable
+{
+  public:
+    TextureRenderingInfo monster_background;
+    TextureRenderingInfo monster_icon;
+    TextureRenderingInfo defeated_killedby_black_bars;
+    TextRenderingInfo* defeated_text_info;
+    TextRenderingInfo* defeated_value_text_info;
+    TextRenderingInfo* killedby_text_info;
+    TextRenderingInfo* killedby_value_text_info;
+
+    virtual ~JournalPageBestiary() = 0;
+};
+
+class JournalPageItems : public JournalPageDiscoverable
+{
+  public:
+    TextureRenderingInfo item_icon;
+    TextureRenderingInfo item_background;
+
+    virtual ~JournalPageItems() = 0;
+};
+
+class JournalPageTraps : public JournalPageDiscoverable
+{
+  public:
+    TextureRenderingInfo trap_icon;
+    TextureRenderingInfo trap_background;
+
+    virtual ~JournalPageTraps() = 0;
+};
+
+class JournalPageStory : public JournalPage
+{
+  public:
+    virtual ~JournalPageStory() = 0;
+};
+
+class JournalPageFeats : public JournalPage
+{
+  public:
+    TextRenderingInfo* chapter_title_text_info;
+    TextureRenderingInfo feat_icons;
+
+    virtual ~JournalPageFeats() = 0;
+};
+
+class JournalPageDeathCause : public JournalPage
+{
+  public:
+    TextRenderingInfo* death_cause_text_info;
+
+    virtual ~JournalPageDeathCause() = 0;
+};
+
+class JournalPageDeathMenu : public JournalPage
+{
+  public:
+    float unknown3;
+    float unknown4;
+    float unknown5;
+    float unknown6;
+    float unknown7;
+    float unknown8;
+    float unknown9;
+    float unknown10;
+    uint32_t unknown11;
+    float unknown12;
+    size_t unknown13;
+    size_t unknown14;
+    size_t unknown15;
+    size_t unknown16;
+    size_t unknown17;
+    uint32_t selected_menu_index;
+    uint32_t unknown18;
+    TextRenderingInfo* game_over_text_info;
+    TextRenderingInfo* level_text_info;
+    TextRenderingInfo* level_value_text_info;
+    TextRenderingInfo* money_text_info;
+    TextRenderingInfo* money_value_text_info;
+    TextRenderingInfo* time_text_info;
+    TextRenderingInfo* time_value_text_info;
+
+    virtual ~JournalPageDeathMenu() = 0;
+};
+
+class JournalPageRecap : public JournalPage
+{
+  public:
+    virtual ~JournalPageRecap() = 0;
+};
+
+class JournalPagePlayerProfile : public JournalPage
+{
+  public:
+    TextureRenderingInfo player_icon;
+    uint32_t player_icon_id;
+    float unknown4;
+    TextRenderingInfo* player_profile_text_info;
+    TextRenderingInfo* plays_text_info;
+    TextRenderingInfo* plays_value_text_info;
+    TextRenderingInfo* wins_text_info;
+    TextRenderingInfo* wins_value_text_info;
+    TextRenderingInfo* deaths_text_info;
+    TextRenderingInfo* deaths_value_text_info;
+    TextRenderingInfo* win_pct_text_info;
+    TextRenderingInfo* win_pct_value_text_info;
+    TextRenderingInfo* average_score_text_info;
+    TextRenderingInfo* average_score_value_text_info;
+    TextRenderingInfo* top_score_text_info;
+    TextRenderingInfo* top_score_value_text_info;
+    TextRenderingInfo* deepest_level_text_info;
+    TextRenderingInfo* deepest_level_value_text_info;
+    TextRenderingInfo* deadliest_level_text_info;
+    TextRenderingInfo* deadliest_level_value_text_info;
+    TextRenderingInfo* average_time_text_info;
+    TextRenderingInfo* average_time_value_text_info;
+    TextRenderingInfo* best_time_text_info;
+    TextRenderingInfo* best_time_value_text_info;
+
+    virtual ~JournalPagePlayerProfile() = 0;
+};
+
+class JournalPageLastGamePlayed : public JournalPage
+{
+  public:
+    TextureRenderingInfo main_image;
+    TextRenderingInfo* last_game_played_text_info;
+    TextRenderingInfo* level_text_info;
+    TextRenderingInfo* level_value_text_info;
+    TextRenderingInfo* money_text_info;
+    TextRenderingInfo* money_value_text_info;
+    TextRenderingInfo* time_text_info;
+    TextRenderingInfo* time_value_text_info;
+    uint32_t sticker_count;
+    std::array<TextureRenderingInfo, 20> stickers;
+
+    virtual ~JournalPageLastGamePlayed() = 0;
+};
+
 struct JournalUI
 {
     uint32_t state;
@@ -814,13 +1066,8 @@ struct JournalUI
 
     uint8_t unknown1;
     uint16_t unknown2;
-    size_t unknown3; // this and below: pointer list of Page objects/contents of the pages
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
-    size_t unknown7;
-    size_t unknown8;
-
+    std::vector<JournalPage*> pages;
+    std::vector<size_t> unknown3;
     uint32_t current_page;
     uint32_t flipping_to_page;
     uint32_t unknown10;
@@ -833,7 +1080,9 @@ struct JournalUI
     size_t unknown16;
     size_t unknown17;
     size_t unknown18;
-    size_t unknown19; // ptr
+    size_t unknown19;
+    size_t unknown20; // ptr
+    size_t unknown21;
 
     TextureRenderingInfo book_background;
     TextureRenderingInfo arrow_left;

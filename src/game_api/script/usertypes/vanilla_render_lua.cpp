@@ -99,5 +99,20 @@ void register_usertypes(sol::state& lua)
         &TextureRenderingInfo::source_bottom_right_x,
         "source_bottom_right_y",
         &TextureRenderingInfo::source_bottom_right_y);
+
+    lua.new_usertype<TextRenderingInfo>(
+        "TextRenderingInfo",
+        "x",
+        &TextRenderingInfo::x,
+        "y",
+        &TextRenderingInfo::y,
+        "text_length",
+        sol::readonly(&TextRenderingInfo::text_length),
+        "width",
+        &TextRenderingInfo::width,
+        "height",
+        &TextRenderingInfo::height,
+        "font",
+        &TextRenderingInfo::font);
 };
 } // namespace NVanillaRender

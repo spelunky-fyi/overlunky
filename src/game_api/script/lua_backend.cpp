@@ -883,6 +883,22 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     }
 }
 
+void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == event)
+        {
+            handle_function(callback.func, render_ctx, page_type, page);
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::hook_entity_dtor(Entity* entity)
 {
     if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)
