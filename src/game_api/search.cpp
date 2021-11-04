@@ -673,11 +673,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "level_gen_do_extra_spawns"sv,
-        // The only function that calls Mount::carry twice, on one call site it spawns entity 0xe1
+        // Put a conditional bp in `spawn_entity` on `entity_type == to_id("ENT_TYPE_ITEM_LOCKEDCHEST_KEY")`
+        // Callstack should be `do_extra_spawns` -> `ThemeInfo::virtual_50` -> `load_item` -> `spawn_entity`
+        // Note that there is no `0xcc` padding before this function so we can't use `function_start`, at
+        // least for 1.25.0b and maybe later
         PatternCommandBuffer{}
-            .find_inst("\xf3\x0f\x11\x84\x24\xdc\x00\x00\x00"sv)
-            .at_exe()
-            .function_start(),
+            .find_inst("\xff\x90\x90\x01\x00\x00\x8b\x05****\x65"sv)
+            .offset(-0xcc)
+            .find_inst("\x41\x57\x41\x56\x41\x55\x41\x54")
+            .at_exe(),
     },
     {
         "level_gen_generate_room"sv,

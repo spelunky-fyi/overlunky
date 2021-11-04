@@ -802,11 +802,11 @@ void load_level_file(LevelGenData* level_gen_data, const char* level_file_name)
     }
 }
 
-using DoExtraSpawns = void(ThemeInfo*, std::uint32_t, std::uint32_t, std::uint32_t, std::uint32_t, std::uint8_t);
+using DoExtraSpawns = void(ThemeInfo*, std::uint32_t, std::uint32_t, std::uint32_t, std::uint8_t);
 DoExtraSpawns* g_do_extra_spawns_trampoline{nullptr};
-void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_width, std::uint32_t border_height, std::uint32_t level_width, std::uint32_t level_height, std::uint8_t layer)
+void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_size, std::uint32_t level_width, std::uint32_t level_height, std::uint8_t layer)
 {
-    g_do_extra_spawns_trampoline(theme, border_width, border_height, level_width, level_height, layer);
+    g_do_extra_spawns_trampoline(theme, border_size, level_width, level_height, layer);
 
     PRNG& prng = PRNG::get_local();
 
@@ -818,10 +818,10 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_width, std::uint32_t
             provider.transient_valid_positions.clear();
         }
 
-        for (std::uint32_t ix = border_width; ix != level_width; ix++)
+        for (std::uint32_t ix = border_size; ix != level_width; ix++)
         {
             const float x = static_cast<float>(ix);
-            for (std::uint32_t iy = border_height; iy != level_height; iy++)
+            for (std::uint32_t iy = border_size; iy != level_height; iy++)
             {
                 const float y = 122.0f - static_cast<float>(iy);
                 for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
