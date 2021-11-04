@@ -1379,15 +1379,35 @@ void render_screen_particles(ParticleEmitterInfo* particle_emitter)
     }
 }
 
-void extinguish_world_particles(ParticleEmitterInfo* particle_emitter)
+void extinguish_particles(ParticleEmitterInfo* particle_emitter)
 {
+    // removing from state only applies to world emitters, but it just won't find the screen one in the vector, so no big deal
     auto state = State::get().ptr();
     std::erase(*state->particle_emitters, particle_emitter);
-    // While this perfectly works in removing the particles, this leaks sizeof(ParticleEmitterInfo)
-    // as it's a vector of pointers, so no dtor called automatically. Finding the dtor is hard because it's a non virtual object
-    // and object contents don't change when being destroyed, memory is just abandoned.
-    // Function disabled in LUA until dtor found.
-    // Workaround: move particle emitter off screen
+
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("free_particleemitterinfo");
+    }
+
+    if (offset != 0)
+    {
+        typedef void free_particleemitter_func(ParticleEmitterInfo*);
+        static free_particleemitter_func* fpf = (free_particleemitter_func*)(offset);
+        if (particle_emitter != nullptr)
+        {
+            if (particle_emitter->unknown26 != 0)
+            {
+                fpf((ParticleEmitterInfo*)particle_emitter->unknown26);
+            }
+            if (particle_emitter->unknown4 != 0)
+            {
+                fpf((ParticleEmitterInfo*)particle_emitter->unknown4);
+            }
+            fpf(particle_emitter);
+        }
+    }
 }
 
 static bool g_journal_enabled = true;

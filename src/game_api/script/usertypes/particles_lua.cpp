@@ -19,10 +19,8 @@ void register_usertypes(sol::state& lua)
     lua["advance_screen_particles"] = advance_screen_particles;
     /// Renders the particles to the screen. Only used with screen particle emitters. See the `particles.lua` example script for more details.
     lua["render_screen_particles"] = render_screen_particles;
-
-    // DISABLED UNTIL MEMORY LEAK FIXED (see rpc.cpp)
-    // Extinguish a particle emitter previously created with `generate_particles` (use the return value of `generate_particles` as the parameter in this function)
-    //l/u/a/["extinguish_particles"] = extinguish_particles;
+    /// Extinguish a particle emitter (use the return value of `generate_world_particles` or `generate_screen_particles` as the parameter in this function)
+    lua["extinguish_particles"] = extinguish_particles;
 
     /// Deprecated
     /// Use `generate_world_particles`

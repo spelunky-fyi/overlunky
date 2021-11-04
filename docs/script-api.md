@@ -700,6 +700,9 @@ Advances the state of the screen particle emitter (simulates the next positions,
 ### [`render_screen_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_screen_particles)
 `nil render_screen_particles(ParticleEmitterInfo particle_emitter)`<br/>
 Renders the particles to the screen. Only used with screen particle emitters. See the `particles.lua` example script for more details.
+### [`extinguish_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extinguish_particles)
+`nil extinguish_particles(ParticleEmitterInfo particle_emitter)`<br/>
+Extinguish a particle emitter (use the return value of `generate_world_particles` or `generate_screen_particles` as the parameter in this function)
 ### [`default_spawn_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
 `bool default_spawn_is_valid(float x, float y, int layer)`<br/>
 Default function in spawn definitions to check whether a spawn is valid or not

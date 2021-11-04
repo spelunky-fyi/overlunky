@@ -98,7 +98,7 @@ ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint
 ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, float x, float y);
 void advance_screen_particles(ParticleEmitterInfo* particle_emitter);
 void render_screen_particles(ParticleEmitterInfo* particle_emitter);
-void extinguish_world_particles(ParticleEmitterInfo* particle_emitter);
+void extinguish_particles(ParticleEmitterInfo* particle_emitter);
 void set_journal_enabled(bool b);
 void set_camp_camera_bounds_enabled(bool b);
 void set_explosion_mask(uint32_t mask);

@@ -1081,6 +1081,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "free_particleemitterinfo"sv,
+        // See `generate_screen_particles`, above that, the pointers to the particleemitters are checked, as well as fields inside
+        // the particleemitter, and the same function is called if they are not null
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x48\x8B\xBE\x38\x01\x00\x00\x48\x85\xFF"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "ghost_spawn_time"sv,
         // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
         // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )
