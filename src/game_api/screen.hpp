@@ -1099,6 +1099,4 @@ struct JournalUI
     size_t unknown29;
     float unknown31;
     uint32_t unknown30;
-
-    JournalPage* get_journal_page(size_t page_number);
 };

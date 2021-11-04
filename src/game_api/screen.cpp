@@ -128,12 +128,3 @@ void ScreenOnlineLobby::set_code(const std::string& code)
     }
     characters_entered_count = 8;
 }
-
-JournalPage* JournalUI::get_journal_page(size_t page_number)
-{
-    if (page_number < pages.size())
-    {
-        return pages.at(page_number);
-    }
-    return nullptr;
-}

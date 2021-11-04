@@ -4262,7 +4262,6 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo unknown23`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) &JournalUI::unknown23
 - [`TextureRenderingInfo entire_book`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) &JournalUI::entire_book
 - [`int page_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) &JournalUI::page_timer
-- [`JournalPage get_journal_page(size_t page_number)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_journal_page) &JournalUI::get_journal_page
 ### `JournalPage`
 - [`TextureRenderingInfo background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background) &JournalPage::background
 - [`int page_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_number) &JournalPage::page_number
@@ -5052,8 +5051,24 @@ Params: `VanillaRenderContext render_ctx, int draw_depth`\
 Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
 - [`RENDER_POST_JOURNAL_PAGE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_JOURNAL_PAGE) ON::RENDER_POST_JOURNAL_PAGE
 \
-Params: `VanillaRenderContext render_ctx`\
-Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`\
+Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx\
+The page_type parameter values can be found in the JOURNAL_PAGE_TYPE ENUM\
+The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:\
+`page:as_journal_page_progress()`\
+`page:as_journal_page_journalmenu()`\
+`page:as_journal_page_places()`\
+`page:as_journal_page_people()`\
+`page:as_journal_page_bestiary()`\
+`page:as_journal_page_items()`\
+`page:as_journal_page_traps()`\
+`page:as_journal_page_story()`\
+`page:as_journal_page_feats()`\
+`page:as_journal_page_deathcause()`\
+`page:as_journal_page_deathmenu()`\
+`page:as_journal_page_recap()`\
+`page:as_journal_page_playerprofile()`\
+`page:as_journal_page_lastgameplayed()`
 - [`SPEECH_BUBBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) ON::SPEECH_BUBBLE
 \
 Params: `Entity speaking_entity, string text`\

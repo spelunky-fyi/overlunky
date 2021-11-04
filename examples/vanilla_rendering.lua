@@ -149,10 +149,10 @@ set_callback(function(render_ctx, page_type, page)
         render_ctx:draw_text("Text on the progress page", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
     elseif page_type == JOURNAL_PAGE_TYPE.PLACES then
         -- If you draw when the page_type equals PLACES, then it will be drawn on every place page
-        -- If you want to draw on a specific page, compare the page you get as a parameter to the callback (the page being rendered right now)
-        -- to the page you want to render, in this case page 3
+        -- If you want to draw on a specific page, compare the page_number of the current page to the page you want to render, in this case page 3
         -- The page number is a zero-based index, and you have to count the journal progress and journal menu page as well, so Jungle is page 3
-        if game_manager.journal_ui:get_journal_page(3) == page then
+        -- In this case, we don't have to cast the page with as_journal_page_places() because page_number is available in the base class JournalPage
+        if page.page_number == 3 then
             render_ctx:draw_text("Text on the Jungle place page", 0.0, 0.0, 0.0018, 0.0018, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
         end
     elseif page_type == JOURNAL_PAGE_TYPE.PEOPLE then
