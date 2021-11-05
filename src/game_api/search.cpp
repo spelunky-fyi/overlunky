@@ -100,9 +100,9 @@ const char* current_spelunky_version()
 }
 
 static std::vector<std::string> g_registered_applications = {};
-void register_application_version(const std::string& s)
+void register_application_version(std::string s)
 {
-    g_registered_applications.emplace_back(s);
+    g_registered_applications.emplace_back(std::move(s));
 }
 
 std::string application_versions()

@@ -21,4 +21,4 @@ size_t find_after_bundle(size_t exe);
 void preload_addresses();
 size_t get_address(std::string_view address_name);
 
-void register_application_version(const std::string& s);
+void register_application_version(std::string s);

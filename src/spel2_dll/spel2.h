@@ -49,28 +49,29 @@ using Spelunky_GetImageFilePathFunc = bool (*)(const char* root_path, const char
 class SpelunkyScript;
 class SpelunkyConsole;
 
-void SetWriteLoadOptimization(bool write_load_opt);
+void Spelunky_SetWriteLoadOptimization(bool write_load_opt);
 
-void InitMemoryDatabase();
-void InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
-void InitSoundManager(Spelunky_DecodeAudioFile decode_function);
+void Spelunky_RegisterApplicationVersion(const char* version);
+void Spelunky_InitMemoryDatabase();
+void Spelunky_InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
+void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function);
 
-void ShowCursor();
-void HideCursor();
+void Spelunky_ShowCursor();
+void Spelunky_HideCursor();
 
-void RegisterOnInputFunc(OnInputFunc on_input);
-void RegisterImguiInitFunc(ImguiInitFunc imgui_init);
-void RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw);
-void RegisterPreDrawFunc(PreDrawFunc pre_draw);
-void RegisterPostDrawFunc(PostDrawFunc post_draw);
+void Spelunky_RegisterOnInputFunc(OnInputFunc on_input);
+void Spelunky_RegisterImguiInitFunc(ImguiInitFunc imgui_init);
+void Spelunky_RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw);
+void Spelunky_RegisterPreDrawFunc(PreDrawFunc pre_draw);
+void Spelunky_RegisterPostDrawFunc(PostDrawFunc post_draw);
 
-void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
+void Spelunky_RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
 
-void RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file);
-void RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path);
+void Spelunky_RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file);
+void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path);
 
-SpelunkyScript* CreateScript(const char* file_path, bool enabled);
-void FreeScript(SpelunkyScript* script);
+SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled);
+void Spelunky_FreeScript(SpelunkyScript* script);
 
 void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char* file_path);
 
