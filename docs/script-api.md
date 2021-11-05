@@ -662,6 +662,7 @@ Clears the name set with `add_custom_name`
 ### [`call_transition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=call_transition)
 `nil call_transition()`<br/>
 Calls the transition function, this works depending of the `state` so just like when the player enters normal exit door
+It does not incement any of the state `level_next`, `world_next`, `theme_next`
 ### [`enter_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
 `nil enter_door(Entity player, Entity door)`<br/>
 Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without uncloaking them

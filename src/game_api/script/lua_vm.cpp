@@ -1097,6 +1097,7 @@ end
     lua["clear_custom_name"] = clear_custom_name;
 
     /// Calls the transition function, this works depending of the `state` so just like when the player enters normal exit door
+    /// It does not incement any of the state `level_next`, `world_next`, `theme_next`
     lua["call_transition"] = call_transition;
 
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without uncloaking them
