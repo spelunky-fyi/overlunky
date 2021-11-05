@@ -1101,7 +1101,7 @@ void warp_next_level(size_t num)
         target_theme = 4;
         break;
     case 403:
-        if (g_state->theme == 11)
+        if (g_state->theme == 6 || g_state->theme == 11)
         {
             target_world = 4;
             target_level = 4;
@@ -2123,7 +2123,7 @@ void render_narnia()
         target_theme = 4;
         break;
     case 403:
-        if (g_state->theme == 11)
+        if (g_state->theme == 6 || g_state->theme == 11)
         {
             target_world = 4;
             target_level = 4;
