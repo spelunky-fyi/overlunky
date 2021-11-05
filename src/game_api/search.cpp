@@ -1530,6 +1530,22 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_after_inst("\x8B\x8C\x01\xA0\x00\x00\x00\x8D\x79"sv)
             .at_exe(),
     },
+    {
+        // Put write bp on state->loading, enter a door, you will end of at the end of this function
+        "transition_func"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x88\x55\xFF\x48\x89\x4D\xF0"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Do the same thing as for transition_func but execute to the return, it will put you in this function
+        "door_entry"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x83\xEC\x38\x48\x89\xD7\x48\x89\xCE\x48\x8B\x42\x08"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

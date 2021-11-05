@@ -1657,3 +1657,20 @@ bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE 
 
     return false;
 }
+
+void enter_door(Entity* player, Entity* door)
+{
+    auto addr = get_address("door_entry");
+    typedef void transition_fun(Entity*, Entity*);
+    static transition_fun* door_entry = (transition_fun*)(addr);
+    door_entry(door, player);
+}
+
+void call_transition()
+{
+    auto addr = get_address("transition_func");
+    auto state_ptr = get_state_ptr();
+    typedef void transition_fun(StateMemory*);
+    static transition_fun* transition = (transition_fun*)(addr);
+    transition(state_ptr);
+}
