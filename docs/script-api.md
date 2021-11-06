@@ -664,7 +664,7 @@ Clears the name set with `add_custom_name`
 Calls the transition function, this works depending of the `state` so just like when the player enters normal exit door
 It does not incement any of the state `level_next`, `world_next`, `theme_next`
 ### [`enter_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
-`nil enter_door(Entity player, Entity door)`<br/>
+`nil enter_door(int player_uid, int door_uid)`<br/>
 Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without uncloaking them
 Doesn't really work for layer doors
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
