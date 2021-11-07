@@ -6,6 +6,7 @@
 #include "entities_mounts.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "state.hpp"
 #include "virtual_table.hpp"
@@ -1671,11 +1672,27 @@ void enter_door(int32_t player_uid, int32_t door_uid)
     door_entry(door, player);
 }
 
-void call_transition()
+void call_transition(uint8_t special_transition)
 {
     auto addr = get_address("transition_func");
     auto state_ptr = get_state_ptr();
     typedef void transition_fun(StateMemory*);
     static transition_fun* transition = (transition_fun*)(addr);
+
+    if (special_transition == 2) // Duat
+    {
+        state_ptr->test = state_ptr->level_gen->theme_city_of_gold; //TODO: change test to current_theme
+    }
+    else if (special_transition == 1) // Cosmic Ocean
+    {
+        state_ptr->level_gen->theme_cosmicocean->sub_theme = state_ptr->level_gen->theme_dwelling; // make sure to set it to something
+        state_ptr->test = state_ptr->level_gen->theme_cosmicocean;                                 //TODO: change test to current_theme
+    }
+    else if (special_transition == 3) // Tiamat -> Sunken City (olmec ship)
+    {
+        state_ptr->test = state_ptr->level_gen->theme_basecamp; //TODO: change test to current_theme // For some reason basecamp does the trick
+    }
     transition(state_ptr);
+    if (special_transition == 2)    // Duat
+        state_ptr->theme_next = 12; // Duat
 }

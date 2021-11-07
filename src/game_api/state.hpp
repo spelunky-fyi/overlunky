@@ -14,7 +14,7 @@ const float ZF = 0.737f;
 struct Layer;
 struct LevelGenSystem;
 class ThemeInfo;
-
+#pragma pack(push, 1)
 struct StateMemory
 {
     size_t p00;
@@ -61,8 +61,7 @@ struct StateMemory
     uint8_t world_next;
     uint8_t level;
     uint8_t level_next;
-    int32_t i6c; // i6c and i70 are a pointer to ThemeInfo (todo)
-    int32_t i70;
+    ThemeInfo* test;
     uint8_t theme;
     uint8_t theme_next;
     uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
@@ -187,13 +186,14 @@ struct StateMemory
 
     ThemeInfo* current_theme()
     {
-        return *((ThemeInfo**)&i6c);
+        return test;
     }
 
     /// Returns animation_frame of the correct ushabti
     uint16_t get_correct_ushabti();
     void set_correct_ushabti(uint16_t animation_frame);
 };
+#pragma pack(pop)
 
 struct State
 {
