@@ -25,7 +25,7 @@ function transition_to_duat()
     transition_started = false
 end
 
-set_callback(function(render_ctx, page_type, page)
+set_callback(function()
     local altars = get_entities_by_type(ENT_TYPE.FLOOR_ALTAR)
     for i, altar_uid in ipairs(altars) do
         -- Collision 2 on FLOOR_ALTAR is what does all the sacrificing stuff, so we do our own stuff just before that
