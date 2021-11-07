@@ -633,6 +633,16 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when a container is opened via up+door.
 The callback signature is `nil on_open(Entity self, Entity opener)`
 Use this only when no other approach works, this call can be expensive if overused.
+### [`set_pre_collision1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision1)
+`optional<CallbackId> set_pre_collision1(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
+### [`set_pre_collision2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision2)
+`optional<CallbackId> set_pre_collision2(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
 ### [`raise`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
 `nil raise()`<br/>
 Raise a signal and probably crash the game

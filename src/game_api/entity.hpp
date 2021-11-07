@@ -267,6 +267,8 @@ class Entity
     std::uint32_t reserve_callback_id();
     void set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy);
     void set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill);
+    void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
+    void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
 
     template <typename T>
     T* as()

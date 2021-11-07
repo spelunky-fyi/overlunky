@@ -33,6 +33,8 @@ struct EntityHooksInfo
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
     std::vector<HookWithId<void(Movable*)>> post_statemachine;
     std::vector<HookWithId<void(Container*, Movable*)>> on_open;
+    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision1;
+    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision2;
 };
 std::vector<EntityHooksInfo> g_entity_hooks;
 
@@ -498,6 +500,10 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->on_open, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->pre_collision1, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->pre_collision2, [id](auto& hook)
+                      { return hook.id == id; });
     }
 }
 EntityHooksInfo& Entity::get_hooks()
@@ -610,4 +616,64 @@ void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<vo
             0x18);
     }
     hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
+}
+
+void Entity::set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_collision1.empty())
+    {
+        hook_vtable<void(Entity*, Entity*)>(
+            this,
+            [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
+            {
+                EntityHooksInfo& hook_info = self->get_hooks();
+
+                bool skip_orig = false;
+                for (auto& [id, pre] : hook_info.pre_collision1)
+                {
+                    if (pre(self, collision_entity))
+                    {
+                        skip_orig = true;
+                    }
+                }
+
+                if (!skip_orig)
+                {
+                    original(self, collision_entity);
+                }
+            },
+            0x4);
+    }
+    hook_info.pre_collision1.push_back({reserved_callback_id, std::move(pre_collision1)});
+}
+
+void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_collision2.empty())
+    {
+        hook_vtable<void(Entity*, Entity*)>(
+            this,
+            [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
+            {
+                EntityHooksInfo& hook_info = self->get_hooks();
+
+                bool skip_orig = false;
+                for (auto& [id, pre] : hook_info.pre_collision2)
+                {
+                    if (pre(self, collision_entity))
+                    {
+                        skip_orig = true;
+                    }
+                }
+
+                if (!skip_orig)
+                {
+                    original(self, collision_entity);
+                }
+            },
+            0x1A);
+    }
+    hook_info.pre_collision2.push_back({reserved_callback_id, std::move(pre_collision2)});
 }

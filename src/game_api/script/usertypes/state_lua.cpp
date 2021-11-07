@@ -24,6 +24,9 @@ void register_usertypes(sol::state& lua)
         "player_select",
         sol::property([](Items& s)
                       { return std::ref(s.player_select_slots); }),
+        "player_inventory",
+        sol::property([](Items& s)
+                      { return std::ref(s.player_inventories); }),
         "player_count",
         &Items::player_count);
     lua.new_usertype<ArenaConfigArenas>(
