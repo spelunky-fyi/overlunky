@@ -627,10 +627,10 @@ void Entity::set_pre_collision1(std::uint32_t reserved_callback_id, std::functio
             this,
             [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
             {
-                EntityHooksInfo& hook_info = self->get_hooks();
+                EntityHooksInfo& _hook_info = self->get_hooks();
 
                 bool skip_orig = false;
-                for (auto& [id, pre] : hook_info.pre_collision1)
+                for (auto& [id, pre] : _hook_info.pre_collision1)
                 {
                     if (pre(self, collision_entity))
                     {
@@ -657,10 +657,10 @@ void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::functio
             this,
             [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
             {
-                EntityHooksInfo& hook_info = self->get_hooks();
+                EntityHooksInfo& _hook_info = self->get_hooks();
 
                 bool skip_orig = false;
-                for (auto& [id, pre] : hook_info.pre_collision2)
+                for (auto& [id, pre] : _hook_info.pre_collision2)
                 {
                     if (pre(self, collision_entity))
                     {
