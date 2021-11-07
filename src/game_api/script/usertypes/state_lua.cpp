@@ -319,6 +319,8 @@ void register_usertypes(sol::state& lua)
         &StateMemory::theme_next,
         "theme_start",
         &StateMemory::theme_start,
+        "force_current_theme",
+        &StateMemory::force_current_theme,
         "shoppie_aggro",
         &StateMemory::shoppie_aggro,
         "shoppie_aggro_next",

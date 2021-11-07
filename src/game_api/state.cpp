@@ -195,6 +195,15 @@ void State::zoom(float level)
     }
 }
 
+void StateMemory::force_current_theme(uint32_t t)
+{
+    if (theme > 0 && theme < 19)
+    {
+        auto state = State::get().ptr();
+        state->current_theme = state->level_gen->themes[t - 1];
+    }
+}
+
 static bool g_godmode_player_active = false;
 static bool g_godmode_companions_active = false;
 

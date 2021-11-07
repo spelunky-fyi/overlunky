@@ -15,6 +15,7 @@ struct Layer;
 struct LevelGenSystem;
 class ThemeInfo;
 
+#pragma pack(push, 1) // disable struct padding
 struct StateMemory
 {
     size_t p00;
@@ -61,8 +62,7 @@ struct StateMemory
     uint8_t world_next;
     uint8_t level;
     uint8_t level_next;
-    int32_t i6c; // i6c and i70 are a pointer to ThemeInfo (todo)
-    int32_t i70;
+    ThemeInfo* current_theme;
     uint8_t theme;
     uint8_t theme_next;
     uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
@@ -185,15 +185,14 @@ struct StateMemory
     uint32_t special_visibility_flags;
     Camera* camera;
 
-    ThemeInfo* current_theme()
-    {
-        return *((ThemeInfo**)&i6c);
-    }
+    /// This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
+    void force_current_theme(uint32_t t);
 
     /// Returns animation_frame of the correct ushabti
     uint16_t get_correct_ushabti();
     void set_correct_ushabti(uint16_t animation_frame);
 };
+#pragma pack(pop)
 
 struct State
 {
