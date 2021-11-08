@@ -27,6 +27,7 @@
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
+#include "entities_logical.hpp"
 #include "entity.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
@@ -1101,7 +1102,7 @@ void warp_next_level(size_t num)
         target_theme = 4;
         break;
     case 403:
-        if (g_state->theme == 11)
+        if (g_state->theme == 6 || g_state->theme == 11)
         {
             target_world = 4;
             target_level = 4;
@@ -2123,7 +2124,7 @@ void render_narnia()
         target_theme = 4;
         break;
     case 403:
-        if (g_state->theme == 11)
+        if (g_state->theme == 6 || g_state->theme == 11)
         {
             target_world = 4;
             target_level = 4;
@@ -4118,6 +4119,16 @@ void render_entity_props()
             auto target = (ExitDoor*)g_entity;
             ImGui::Text("Door target:");
             ImGui::Checkbox("Enabled##DoorEnabled", &target->special_door);
+            ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
+            ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
+            ImGui::DragScalar("Theme##DoorThemenumber", ImGuiDataType_U8, &target->theme, 0.2f, &u8_one, &u8_seventeen);
+            ImGui::SameLine();
+            ImGui::Text("%s", theme_name(target->theme));
+        }
+        else if (g_entity_type == to_id("ENT_TYPE_LOGICAL_PORTAL"))
+        {
+            auto target = (Portal*)g_entity;
+            ImGui::Text("Portal target:");
             ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Theme##DoorThemenumber", ImGuiDataType_U8, &target->theme, 0.2f, &u8_one, &u8_seventeen);
