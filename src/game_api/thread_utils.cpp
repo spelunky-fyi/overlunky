@@ -7,7 +7,7 @@
 
 HANDLE get_main_thread()
 {
-    ONCE(HANDLE)
+    static const auto main_thread = []
     {
         HANDLE main_thread = NULL;
 
@@ -26,72 +26,40 @@ HANDLE get_main_thread()
             }
             keep = Thread32Next(snapshot, &entry);
         }
+
         if (main_thread == NULL)
         {
             DEBUG("Didn't not get the thread. Process id: {}", pid);
-            return NULL;
         }
 
-        return res = main_thread;
-    }
+        return main_thread;
+    }();
+    return main_thread;
+}
+
+size_t* get_thread_heap_base(HANDLE thread)
+{
+    THREAD_BASIC_INFORMATION tib{};
+    using FuncPtr = NTSTATUS(NTAPI*)(
+        IN HANDLE ThreadHandle,
+        IN THREADINFOCLASS ThreadInformationClass,
+        OUT PVOID ThreadInformation,
+        IN ULONG ThreadInformationLength,
+        OUT PULONG ReturnLength OPTIONAL);
+    static const auto NtQueryInformationThread_ptr = reinterpret_cast<FuncPtr>(GetProcAddress(GetModuleHandle("ntdll.dll"), "NtQueryInformationThread"));
+    NtQueryInformationThread_ptr(thread, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
+    return (size_t*)(read_u64(((uint64_t*)tib.TebBaseAddress)[11]) + 0x120);
 }
 
 size_t heap_base()
 {
-    static size_t this_thread_heap_base = []
-    {
-        auto main = get_main_thread();
-        THREAD_BASIC_INFORMATION tib = {};
-        using FuncPtr = NTSTATUS(NTAPI*)(
-            IN HANDLE ThreadHandle,
-            IN THREADINFOCLASS ThreadInformationClass,
-            OUT PVOID ThreadInformation,
-            IN ULONG ThreadInformationLength,
-            OUT PULONG ReturnLength OPTIONAL);
-        static FuncPtr NtQueryInformationThread_ptr;
-        if (NtQueryInformationThread_ptr == nullptr)
-        {
-            NtQueryInformationThread_ptr = reinterpret_cast<FuncPtr>(GetProcAddress(LoadLibraryA("ntdll.dll"), "NtQueryInformationThread"));
-        }
-        {
-            NtQueryInformationThread_ptr(main, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
-
-            auto result = ((uint64_t*)tib.TebBaseAddress)[11];
-            return read_u64(read_u64(result) + 0x120);
-        }
-    }();
-    return this_thread_heap_base;
+    static const auto main = get_main_thread();
+    static const size_t* this_thread_heap_base_addr = get_thread_heap_base(main);
+    return *this_thread_heap_base_addr;
 }
 
 size_t local_heap_base()
 {
-    thread_local size_t this_thread_heap_base = []
-    {
-        auto thread = GetCurrentThread();
-        if (thread == get_main_thread())
-        {
-            return heap_base();
-        }
-        {
-            THREAD_BASIC_INFORMATION tib = {};
-            using FuncPtr = NTSTATUS(NTAPI*)(
-                IN HANDLE ThreadHandle,
-                IN THREADINFOCLASS ThreadInformationClass,
-                OUT PVOID ThreadInformation,
-                IN ULONG ThreadInformationLength,
-                OUT PULONG ReturnLength OPTIONAL);
-            static FuncPtr NtQueryInformationThread_ptr;
-            if (NtQueryInformationThread_ptr == nullptr)
-            {
-                NtQueryInformationThread_ptr = reinterpret_cast<FuncPtr>(GetProcAddress(LoadLibraryA("ntdll.dll"), "NtQueryInformationThread"));
-            }
-            {
-                NtQueryInformationThread_ptr(thread, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
-
-                auto result = ((uint64_t*)tib.TebBaseAddress)[11];
-                return read_u64(read_u64(result) + 0x120);
-            }
-        }
-    }();
-    return this_thread_heap_base;
+    thread_local const size_t* this_thread_heap_base_addr = get_thread_heap_base(GetCurrentThread());
+    return *this_thread_heap_base_addr;
 }
