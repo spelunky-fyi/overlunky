@@ -6,21 +6,10 @@
 #include <cstdint>
 
 HANDLE get_main_thread();
-
-typedef struct _THREAD_BASIC_INFORMATION
-{
-    NTSTATUS ExitStatus;
-    PVOID TebBaseAddress;
-    CLIENT_ID ClientId;
-    KAFFINITY AffinityMask;
-    KPRIORITY Priority;
-    KPRIORITY BasePriority;
-} THREAD_BASIC_INFORMATION, *PTHREAD_BASIC_INFORMATION;
-
 size_t heap_base();
 size_t local_heap_base();
 
-// I found some places that use offset from heap base, so wrote this class
+// Used for objects that are allocated with the game's custom allocator
 template <typename T>
 class OnHeapPointer
 {
