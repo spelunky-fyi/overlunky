@@ -220,6 +220,8 @@ class Entity
     void remove();
     /// Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
     void respawn(LAYER layer);
+    /// Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
+    void perform_teleport(uint8_t delta_x, uint8_t delta_y);
 
     Entity* topmost()
     {

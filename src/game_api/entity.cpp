@@ -215,6 +215,13 @@ void Entity::respawn(LAYER layer_to)
     set_layer(layer_to);
 }
 
+void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
+{
+    using TeleportFun = void(Entity*, uint8_t, uint8_t);
+    static TeleportFun* tp = (TeleportFun*)get_address("teleport");
+    tp(this, delta_x, delta_y);
+}
+
 std::pair<float, float> Entity::position()
 {
     auto [x_pos, y_pos] = position_self();
@@ -539,6 +546,7 @@ void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<vo
                 {
                     on_destroy(self);
                 }
+                DEBUG("on destroy {} {}", self->uid, self->type->id);
                 original(self);
             },
             0x5);

@@ -1058,6 +1058,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "teleport"sv,
+        // Put a bp on `load_item` for ENT_TYPE_FX_TELEPORTSHADOW, do a teleport, the calling function is the one
+        PatternCommandBuffer{}
+            .find_inst("\xB9\x7E\xFC\xFF\xFF\x03\x48\x14\x4C\x89\xE6"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "spawn_companion"sv,
         // Break on `load_item` with a condition of `rdx == 0xD7` (or whatever the id of a hired hand is).
         // Slap the coffin underneath Quillback
