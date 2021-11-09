@@ -1044,6 +1044,33 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+    /// The callback signature is `bool on_player_instagib(Entity self)`
+    /// The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+    /// This is so that when the entity dies (from other causes), the death screen still gets shown.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_player_instagib"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_player_instagib(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
     /// The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
     /// Note that damage_dealer can be nil ! (long fall, ...)

@@ -482,6 +482,8 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->on_kill, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->on_player_instagib, [id](auto& hook)
+                      { return hook.id == id; });
         std::erase_if(it->on_damage, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
@@ -546,7 +548,6 @@ void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<vo
                 {
                     on_destroy(self);
                 }
-                DEBUG("on destroy {} {}", self->uid, self->type->id);
                 original(self);
             },
             0x5);
@@ -572,6 +573,13 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
             0x3);
     }
     hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
+}
+
+void Entity::set_on_player_instagib(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> on_instagib)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    // no hooking here, because the instagib function is hooked in rpc.cpp
+    hook_info.on_player_instagib.push_back({reserved_callback_id, std::move(on_instagib)});
 }
 
 void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint8_t, uint8_t)> on_damage)

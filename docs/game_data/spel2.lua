@@ -5645,6 +5645,7 @@ set_on_damage = function(...) end
 set_on_destroy = function(...) end
 set_on_kill = function(...) end
 set_on_open = function(...) end
+set_on_player_instagib = function(...) end
 set_post_entity_spawn = function(...) end
 set_post_render_screen = function(...) end
 set_post_statemachine = function(...) end

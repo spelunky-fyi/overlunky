@@ -626,6 +626,14 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
 The callback signature is `nil on_kill(Entity self, Entity killer)`
 Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_player_instagib`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_player_instagib)
+`optional<CallbackId> set_on_player_instagib(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+The callback signature is `bool on_player_instagib(Entity self)`
+The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+This is so that when the entity dies (from other causes), the death screen still gets shown.
+Use this only when no other approach works, this call can be expensive if overused.
 ### [`set_on_damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_damage)
 `optional<CallbackId> set_on_damage(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.

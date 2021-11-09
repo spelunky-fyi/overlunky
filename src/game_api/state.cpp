@@ -263,7 +263,28 @@ void on_instagib(Entity* victim, size_t unknown)
     {
         return;
     }
-    g_on_instagib_trampoline(victim, unknown);
+
+    // because on_instagib is only hooked here, we have to check whether a script has hooked this function as well
+    EntityHooksInfo& _hook_info = victim->get_hooks();
+    bool skip_orig = false;
+    for (auto& [id, backend_on_player_instagib] : _hook_info.on_player_instagib)
+    {
+        if (backend_on_player_instagib(victim))
+        {
+            skip_orig = true;
+        }
+    }
+
+    // The instagib function needs to be called when the entity is dead, otherwise the death screen will never be opened
+    if (victim->as<Movable>()->health == 0)
+    {
+        skip_orig = false;
+    }
+
+    if (!skip_orig)
+    {
+        g_on_instagib_trampoline(victim, unknown);
+    }
 }
 
 void hook_godmode_functions()
