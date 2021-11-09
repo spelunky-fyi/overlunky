@@ -17,25 +17,6 @@
 using namespace std::chrono_literals;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
-template <class FunT>
-struct HookWithId
-{
-    std::uint32_t id;
-    std::function<FunT> fun;
-};
-struct EntityHooksInfo
-{
-    void* entity;
-    std::uint32_t cbcount;
-    std::vector<HookWithId<void(Entity*)>> on_dtor;
-    std::vector<HookWithId<void(Entity*)>> on_destroy;
-    std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
-    std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
-    std::vector<HookWithId<void(Movable*)>> post_statemachine;
-    std::vector<HookWithId<void(Container*, Movable*)>> on_open;
-    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision1;
-    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision2;
-};
 std::vector<EntityHooksInfo> g_entity_hooks;
 
 struct EntityBucket
@@ -494,6 +475,8 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->on_kill, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->on_damage, [id](auto& hook)
+                      { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->post_statemachine, [id](auto& hook)
@@ -581,6 +564,43 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
             0x3);
     }
     hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
+}
+
+void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint8_t, uint8_t)> on_damage)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.on_damage.empty())
+    {
+        if ((this->type->search_flags & 0x1) == 0x1)
+        {
+            // Can't hook player::on_damage here, because this is permanently hooked for the god function.
+            // The god function takes care of calling the script hooks in rpc.cpp
+        }
+        else
+        {
+            hook_vtable<void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint8_t, uint8_t)>(
+                this,
+                [](Entity* self, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint8_t stun_amount, uint8_t iframes, void (*original)(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint8_t, uint8_t))
+                {
+                    EntityHooksInfo& _hook_info = self->get_hooks();
+                    bool skip_orig = false;
+                    for (auto& [id, on_damage] : _hook_info.on_damage)
+                    {
+                        if (on_damage(self, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
+                        {
+                            skip_orig = true;
+                        }
+                    }
+
+                    if (!skip_orig)
+                    {
+                        original(self, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+                    }
+                },
+                0x30);
+        }
+    }
+    hook_info.on_damage.push_back({reserved_callback_id, std::move(on_damage)});
 }
 
 bool Entity::is_movable()

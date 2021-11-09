@@ -221,9 +221,9 @@ bool is_active_player(Entity* e)
     return false;
 }
 
-using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint32_t, uint32_t);
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint8_t, uint8_t);
 OnDamageFun* g_on_damage_trampoline{nullptr};
-void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes)
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint8_t stun_amount, uint8_t iframes)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -233,7 +233,22 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     {
         return;
     }
-    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+
+    // because Player::on_damage is always hooked here, we have to check whether a script has hooked this function as well
+    EntityHooksInfo& _hook_info = victim->get_hooks();
+    bool skip_orig = false;
+    for (auto& [id, backend_on_damage] : _hook_info.on_damage)
+    {
+        if (backend_on_damage(victim, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
+        {
+            skip_orig = true;
+        }
+    }
+
+    if (!skip_orig)
+    {
+        g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+    }
 }
 
 using OnInstaGibFun = void(Entity*, size_t);

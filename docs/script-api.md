@@ -626,6 +626,14 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
 The callback signature is `nil on_kill(Entity self, Entity killer)`
 Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_damage)
+`optional<CallbackId> set_on_damage(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+Note that damage_dealer can be nil ! (long fall, ...)
+DO NOT CALL `self:damage()` in the callback !
+Use this only when no other approach works, this call can be expensive if overused.
 ### [`set_on_open`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
 `optional<CallbackId> set_on_open(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.

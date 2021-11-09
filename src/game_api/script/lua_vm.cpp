@@ -1044,6 +1044,33 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+    /// The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+    /// Note that damage_dealer can be nil ! (long fall, ...)
+    /// DO NOT CALL `self:damage()` in the callback !
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_damage(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* damage_dealer, int8_t damage_amount, float velocity_x, float velocity_y, uint8_t stun_amount, uint8_t iframes)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](damage_dealer), damage_amount, velocity_x, velocity_y, stun_amount, iframes).value_or(false);
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// `uid` has to be the uid of a `Container` or else stuff will break.
     /// Sets a callback that is called right when a container is opened via up+door.
     /// The callback signature is `nil on_open(Entity self, Entity opener)`
@@ -1089,6 +1116,7 @@ end
                 });
             backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
+            return id;
         }
         return sol::nullopt;
     };
@@ -1112,6 +1140,7 @@ end
                 });
             backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
+            return id;
         }
         return sol::nullopt;
     };

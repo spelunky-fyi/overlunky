@@ -12,7 +12,7 @@ function transition_to_duat()
     -- The player is dead though, so we set it directly in the player inventory
     state.items.player_inventory[1].health = original_health
 
-    state.screen_next = ON.TRANSITION
+    state.screen_next = SCREEN.TRANSITION
     state.world_next = 4
     state.level_next = 4
     state.theme_next = THEME.DUAT
