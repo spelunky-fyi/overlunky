@@ -1144,6 +1144,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "generate_illumination"sv,
+        // Put a bp on load_item lamassu (or any other entity that has an internal Illumination*), follow into the first call of load_item
+        // until the memory gets allocated, then put a write bp on the emmitted_light var inside the newly allocated memory.
+        PatternCommandBuffer{}
+            .find_inst("\xE8****\x48\x89\x86\x60\x01\x00\x00"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "refresh_illumination_heap_offset"sv,
+        // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
         "ghost_spawn_time"sv,
         // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
         // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )

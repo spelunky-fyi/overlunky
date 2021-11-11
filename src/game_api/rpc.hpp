@@ -101,6 +101,10 @@ ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, flo
 void advance_screen_particles(ParticleEmitterInfo* particle_emitter);
 void render_screen_particles(ParticleEmitterInfo* particle_emitter);
 void extinguish_particles(ParticleEmitterInfo* particle_emitter);
+Illumination* create_illumination_internal(Color color, float size, float x, float y, int32_t uid);
+Illumination* create_illumination(Color color, float size, float x, float y);
+Illumination* create_illumination(Color color, float size, uint32_t uid);
+void refresh_illumination(Illumination* illumination);
 void set_journal_enabled(bool b);
 void set_camp_camera_bounds_enabled(bool b);
 void set_explosion_mask(uint32_t mask);

@@ -3,6 +3,7 @@
 #include "game_manager.hpp"
 #include "level_api.hpp"
 #include "online.hpp"
+#include "rpc.hpp"
 #include "state.hpp"
 
 #include <sol/sol.hpp>
@@ -540,6 +541,15 @@ void register_usertypes(sol::state& lua)
         &Illumination::entity_uid,
         "flags",
         &Illumination::flags);
+
+    auto create_illumination = sol::overload(
+        static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
+        static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
+    /// Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+    lua["create_illumination"] = create_illumination;
+    /// Refreshes an Illumination, keeps it from fading out
+    lua["refresh_illumination"] = refresh_illumination;
+
     lua.new_usertype<Camera>(
         "Camera",
         "bounds_left",

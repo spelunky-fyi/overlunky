@@ -697,6 +697,15 @@ This is better alternative to `add_string` but instead of changing the name for 
 ### [`clear_custom_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_custom_name)
 `nil clear_custom_name(int uid)`<br/>
 Clears the name set with `add_custom_name`
+### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
+`Illumination create_illumination(Color color, float size, float x, float y)`<br/>
+Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
+`Illumination create_illumination(Color color, float size, int uid)`<br/>
+Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+### [`refresh_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=refresh_illumination)
+`nil refresh_illumination(Illumination illumination)`<br/>
+Refreshes an Illumination, keeps it from fading out
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
