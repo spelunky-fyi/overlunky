@@ -1105,7 +1105,7 @@ end
     /// Function does not increment any of the state `level_next`, `world_next`, so doing just call_transition in 1-1 will transition you to a new 1-1
     lua["call_transition"] = call_transition;
 
-    /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without uncloaking them
+    /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
     /// Doesn't really work for layer doors
     lua["enter_door"] = enter_door;
 

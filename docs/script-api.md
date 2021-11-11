@@ -670,7 +670,7 @@ Set it to 0 for standard transition
 Function does not increment any of the state `level_next`, `world_next`, so doing just call_transition in 1-1 will transition you to a new 1-1
 ### [`enter_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
 `nil enter_door(int player_uid, int door_uid)`<br/>
-Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without uncloaking them
+Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
 Doesn't really work for layer doors
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
