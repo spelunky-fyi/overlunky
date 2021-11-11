@@ -497,6 +497,12 @@ Forces Olmec to stay on phase 0 (stomping)
 ### [`set_ghost_spawn_times`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ghost_spawn_times)
 `nil set_ghost_spawn_times(int normal = 10800, int cursed = 9000)`<br/>
 Determines when the ghost appears, either when the player is cursed or not
+### [`set_time_ghost_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_ghost_enabled)
+`nil set_time_ghost_enabled(bool b)`<br/>
+Determines whether the time ghost appears, including the showing of the ghost toast
+### [`set_time_jelly_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_jelly_enabled)
+`nil set_time_jelly_enabled(bool b)`<br/>
+Determines whether the time jelly appears in cosmic ocean
 ### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
 `nil set_journal_enabled(bool b)`<br/>
 Enables or disables the journal

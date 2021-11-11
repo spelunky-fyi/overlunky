@@ -92,6 +92,8 @@ int32_t worn_backitem(uint32_t who_uid);
 void set_olmec_phase_y_level(uint8_t phase, float y);
 void force_olmec_phase_0(bool b);
 void set_ghost_spawn_times(uint32_t normal = 10800, uint32_t cursed = 9000);
+void set_time_ghost_enabled(bool b);
+void set_time_jelly_enabled(bool b);
 void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance);
 void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type);
 ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid);

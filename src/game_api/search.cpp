@@ -9,6 +9,7 @@
 
 #include "logger.h"
 #include "memory.hpp"
+#include "virtual_table.hpp"
 
 // Decodes the program counter inside an instruction
 // The default simple variant is 3 bytes instruction, 4 bytes rel. address, 0 bytes suffix:
@@ -213,6 +214,11 @@ class PatternCommandBuffer
         commands.push_back({CommandType::GetAddress, {.address_name = address_name}});
         return *this;
     }
+    PatternCommandBuffer& get_virtual_function_address(VTABLE_OFFSET table_offset, VIRT_FUNC function_index)
+    {
+        commands.push_back({CommandType::GetVirtualFunctionAddress, {.get_vfunc_addr_args = {.table_offset = table_offset, .function_index = function_index}}});
+        return *this;
+    }
     PatternCommandBuffer& find_inst(std::string_view pattern)
     {
         commands.push_back({CommandType::FindInst, {.find_inst_args = {pattern}}});
@@ -304,6 +310,9 @@ class PatternCommandBuffer
                     offset -= (size_t)exe;
                 }
                 break;
+            case CommandType::GetVirtualFunctionAddress:
+                offset = ::get_virtual_function_address(data.get_vfunc_addr_args.table_offset, static_cast<uint32_t>(data.get_vfunc_addr_args.function_index));
+                break;
             case CommandType::FindInst:
                 try
                 {
@@ -367,11 +376,17 @@ class PatternCommandBuffer
         std::string_view pattern;
         std::optional<size_t> range;
     };
+    struct GetVirtualFunctionAddressArgs
+    {
+        VTABLE_OFFSET table_offset;
+        VIRT_FUNC function_index;
+    };
 
     enum class CommandType
     {
         SetOptional,
         GetAddress,
+        GetVirtualFunctionAddress,
         FindInst,
         Offset,
         DecodePC,
@@ -388,6 +403,7 @@ class PatternCommandBuffer
         int64_t offset;
         DecodePcArgs decode_pc_args;
         uint8_t decode_imm_prefix;
+        GetVirtualFunctionAddressArgs get_vfunc_addr_args;
     };
     struct Command
     {
@@ -1131,10 +1147,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "ghost_spawn_time"sv,
         // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
         // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )
-        // Search for 0x2328 and 0x2A30 in very close proximity
+        // Search for 0x2328 and 0x2A30 in very close proximity, it's in the ghost trigger logic perform virtual
         PatternCommandBuffer{}
-            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
-            .offset(0xB)
+            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+            .find_next_inst("\x74\x05\xB8"sv)
+            .offset(0x3)
             .at_exe(),
     },
     {
@@ -1142,29 +1159,39 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // See `ghost_spawn_time` on how to search. New in 1.23.x is the fact that now all four players get checked
         // for curse, and they all have individual ghost trigger timings (all 0x2328 of course)
         PatternCommandBuffer{}
-            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
-            .offset(-0x59)
+            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+            .find_next_inst("\x30\xB8"sv)
+            .offset(0x2)
             .at_exe(),
     },
     {
         "ghost_spawn_time_cursed_player2"sv,
         PatternCommandBuffer{}
-            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
-            .offset(-0x3B)
+            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+            .find_next_inst("\x30\xB8"sv)
+            .find_next_inst("\x30\xB8"sv)
+            .offset(0x2)
             .at_exe(),
     },
     {
         "ghost_spawn_time_cursed_player3"sv,
         PatternCommandBuffer{}
-            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
-            .offset(-0x1D)
+            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+            .find_next_inst("\x30\xB8"sv)
+            .find_next_inst("\x30\xB8"sv)
+            .find_next_inst("\x30\xB8"sv)
+            .offset(0x2)
             .at_exe(),
     },
     {
         "ghost_spawn_time_cursed_player4"sv,
         PatternCommandBuffer{}
-            .find_inst("\xB8****\x4C\x39\xCA\x74\x05\xB8****\x80\x3D"sv)
-            .offset(0x1)
+            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+            .find_next_inst("\x30\xB8"sv)
+            .find_next_inst("\x30\xB8"sv)
+            .find_next_inst("\x30\xB8"sv)
+            .find_next_inst("\x30\xB8"sv)
+            .offset(0x2)
             .at_exe(),
     },
     {

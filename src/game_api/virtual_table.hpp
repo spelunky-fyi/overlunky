@@ -23,6 +23,7 @@ enum class VIRT_FUNC
     ENTITY_OPEN = 24,
     ENTITY_COLLISION2 = 26,
     MOVABLE_DAMAGE = 48,
+    LOGIC_PERFORM = 1,
 };
 
 enum class VTABLE_OFFSET
@@ -986,4 +987,4 @@ enum class VTABLE_OFFSET
     QUEST_BEG = 52346,
 };
 
-size_t get_virtual_function_address(VTABLE_OFFSET tableEntry, uint32_t relativeOffset);
+size_t get_virtual_function_address(VTABLE_OFFSET table_entry, uint32_t function_index);

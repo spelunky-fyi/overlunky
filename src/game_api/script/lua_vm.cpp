@@ -726,6 +726,10 @@ end
     lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Determines whether the time ghost appears, including the showing of the ghost toast
+    lua["set_time_ghost_enabled"] = set_time_ghost_enabled;
+    /// Determines whether the time jelly appears in cosmic ocean
+    lua["set_time_jelly_enabled"] = set_time_jelly_enabled;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
     /// Enables or disables the default position based camp camera bounds, to set them manually yourself
