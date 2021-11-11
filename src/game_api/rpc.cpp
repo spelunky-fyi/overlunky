@@ -207,7 +207,6 @@ int32_t get_grid_entity_at(float x, float y, LAYER layer)
 
 void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto state = State::get();
     auto ent = get_entity_ptr(uid);
     if (ent)
         ent->teleport(x, y, s, vx, vy, snap);
@@ -215,7 +214,6 @@ void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, boo
 
 void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
-    auto state = State::get();
     auto ent = get_entity_ptr(uid);
     if (ent)
     {
@@ -233,7 +231,7 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 
 void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
-    auto state = State::get();
+    auto state = State::get().ptr();
     auto entity = get_entity_ptr(uid);
     if (entity)
     {
@@ -248,28 +246,28 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
         auto entity_id = entity->type->id;
         if (entity_id == LIQUID_WATER)
         {
-            coords = state.ptr()->liquid_physics->water_physics.unknown25->entity_coordinates;
-            velocities = state.ptr()->liquid_physics->water_physics.unknown25->entity_velocities;
+            coords = state->liquid_physics->water_physics.unknown25->entity_coordinates;
+            velocities = state->liquid_physics->water_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_COARSE_WATER)
         {
-            coords = state.ptr()->liquid_physics->coarse_water_physics.unknown25->entity_coordinates;
-            velocities = state.ptr()->liquid_physics->coarse_water_physics.unknown25->entity_velocities;
+            coords = state->liquid_physics->coarse_water_physics.unknown25->entity_coordinates;
+            velocities = state->liquid_physics->coarse_water_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_LAVA)
         {
-            coords = state.ptr()->liquid_physics->lava_physics.unknown25->entity_coordinates;
-            velocities = state.ptr()->liquid_physics->lava_physics.unknown25->entity_velocities;
+            coords = state->liquid_physics->lava_physics.unknown25->entity_coordinates;
+            velocities = state->liquid_physics->lava_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_STAGNANT_LAVA)
         {
-            coords = state.ptr()->liquid_physics->stagnant_lava_physics.unknown25->entity_coordinates;
-            velocities = state.ptr()->liquid_physics->stagnant_lava_physics.unknown25->entity_velocities;
+            coords = state->liquid_physics->stagnant_lava_physics.unknown25->entity_coordinates;
+            velocities = state->liquid_physics->stagnant_lava_physics.unknown25->entity_velocities;
         }
         else if (entity_id == LIQUID_COARSE_LAVA)
         {
-            coords = state.ptr()->liquid_physics->coarse_lava_physics.unknown25->entity_coordinates;
-            velocities = state.ptr()->liquid_physics->coarse_lava_physics.unknown25->entity_velocities;
+            coords = state->liquid_physics->coarse_lava_physics.unknown25->entity_coordinates;
+            velocities = state->liquid_physics->coarse_lava_physics.unknown25->entity_velocities;
         }
 
         auto liquid = entity->as<Liquid>();
@@ -290,7 +288,6 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
 
 uint32_t get_entity_flags(uint32_t uid)
 {
-    auto state = State::get();
     auto ent = get_entity_ptr(uid);
     if (ent)
         return ent->flags;
@@ -299,7 +296,6 @@ uint32_t get_entity_flags(uint32_t uid)
 
 void set_entity_flags(uint32_t uid, uint32_t flags)
 {
-    auto state = State::get();
     auto ent = get_entity_ptr(uid);
     if (ent)
         ent->flags = flags;
@@ -307,7 +303,6 @@ void set_entity_flags(uint32_t uid, uint32_t flags)
 
 uint32_t get_entity_flags2(uint32_t uid)
 {
-    auto state = State::get();
     auto ent = get_entity_ptr(uid);
     if (ent)
         return ent->more_flags;
@@ -316,7 +311,6 @@ uint32_t get_entity_flags2(uint32_t uid)
 
 void set_entity_flags2(uint32_t uid, uint32_t flags)
 {
-    auto state = State::get();
     auto ent = get_entity_ptr(uid);
     if (ent)
         ent->more_flags = flags;
@@ -324,7 +318,6 @@ void set_entity_flags2(uint32_t uid, uint32_t flags)
 
 int get_entity_ai_state(uint32_t uid)
 {
-    auto state = State::get();
     auto ent = get_entity_ptr(uid)->as<Movable>();
     if (ent && ent->is_movable())
         return ent->move_state;
@@ -500,7 +493,6 @@ Entity* get_entity_ptr(uint32_t uid)
 
 ENT_TYPE get_entity_type(uint32_t uid)
 {
-    auto state = State::get();
     auto p = get_entity_ptr(uid);
     if (p)
         return p->type->id;
