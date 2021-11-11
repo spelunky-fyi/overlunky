@@ -608,12 +608,14 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_post_statemachine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_statemachine)
 `optional<CallbackId> set_post_statemachine(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_on_destroy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_destroy)
 `optional<CallbackId> set_on_destroy(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -642,6 +644,7 @@ The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int
 Note that damage_dealer can be nil ! (long fall, ...)
 DO NOT CALL `self:damage()` in the callback !
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_on_open`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
 `optional<CallbackId> set_on_open(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -649,16 +652,19 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when a container is opened via up+door.
 The callback signature is `nil on_open(Entity self, Entity opener)`
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_pre_collision1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision1)
 `optional<CallbackId> set_pre_collision1(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_pre_collision2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision2)
 `optional<CallbackId> set_pre_collision2(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`raise`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
 `nil raise()`<br/>
 Raise a signal and probably crash the game

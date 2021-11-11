@@ -948,6 +948,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -972,6 +973,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1076,6 +1078,7 @@ end
     /// Note that damage_dealer can be nil ! (long fall, ...)
     /// DO NOT CALL `self:damage()` in the callback !
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1102,6 +1105,7 @@ end
     /// Sets a callback that is called right when a container is opened via up+door.
     /// The callback signature is `nil on_open(Entity self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
@@ -1126,6 +1130,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1150,6 +1155,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
