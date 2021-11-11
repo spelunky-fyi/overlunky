@@ -57,7 +57,7 @@ std::vector<uint32_t> get_entities_overlapping(std::vector<ENT_TYPE> entity_type
 std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer);
 std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer);
 std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer);
-void set_door_target(uint32_t id, uint8_t w, uint8_t l, uint8_t t);
+void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t);
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid);
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type);
 void entity_remove_item(uint32_t id, uint32_t item_uid);

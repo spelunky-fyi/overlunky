@@ -208,7 +208,7 @@ int32_t get_grid_entity_at(float x, float y, LAYER layer)
 void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get();
-    auto ent = state.find(uid);
+    auto ent = get_entity_ptr(uid);
     if (ent)
         ent->teleport(x, y, s, vx, vy, snap);
 }
@@ -216,7 +216,7 @@ void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, boo
 void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
     auto state = State::get();
-    auto ent = state.find(uid);
+    auto ent = get_entity_ptr(uid);
     if (ent)
     {
         static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
@@ -234,8 +234,8 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
     auto state = State::get();
-    auto entity = state.find(uid);
-    if (entity != nullptr)
+    auto entity = get_entity_ptr(uid);
+    if (entity)
     {
         static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
         static ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);
@@ -291,7 +291,7 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
 uint32_t get_entity_flags(uint32_t uid)
 {
     auto state = State::get();
-    auto ent = state.find(uid);
+    auto ent = get_entity_ptr(uid);
     if (ent)
         return ent->flags;
     return 0;
@@ -300,7 +300,7 @@ uint32_t get_entity_flags(uint32_t uid)
 void set_entity_flags(uint32_t uid, uint32_t flags)
 {
     auto state = State::get();
-    auto ent = state.find(uid);
+    auto ent = get_entity_ptr(uid);
     if (ent)
         ent->flags = flags;
 }
@@ -308,7 +308,7 @@ void set_entity_flags(uint32_t uid, uint32_t flags)
 uint32_t get_entity_flags2(uint32_t uid)
 {
     auto state = State::get();
-    auto ent = state.find(uid);
+    auto ent = get_entity_ptr(uid);
     if (ent)
         return ent->more_flags;
     return 0;
@@ -317,7 +317,7 @@ uint32_t get_entity_flags2(uint32_t uid)
 void set_entity_flags2(uint32_t uid, uint32_t flags)
 {
     auto state = State::get();
-    auto ent = state.find(uid);
+    auto ent = get_entity_ptr(uid);
     if (ent)
         ent->more_flags = flags;
 }
@@ -325,8 +325,8 @@ void set_entity_flags2(uint32_t uid, uint32_t flags)
 int get_entity_ai_state(uint32_t uid)
 {
     auto state = State::get();
-    auto ent = state.find(uid)->as<Movable>();
-    if (ent)
+    auto ent = get_entity_ptr(uid)->as<Movable>();
+    if (ent && ent->is_movable())
         return ent->move_state;
     return 0;
 }
@@ -501,10 +501,11 @@ Entity* get_entity_ptr(uint32_t uid)
 ENT_TYPE get_entity_type(uint32_t uid)
 {
     auto state = State::get();
-    auto p = state.find(uid);
-    if (p == nullptr || IsBadWritePtr(p, 0x178))
-        return UINT32_MAX;
-    return p->type->id;
+    auto p = get_entity_ptr(uid);
+    if (p)
+        return p->type->id;
+
+    return UINT32_MAX;
 }
 
 StateMemory* get_state_ptr()
@@ -733,13 +734,13 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, 
 
 void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 {
-    Entity* door = get_entity_ptr(uid);
-    if (door == nullptr)
-        return;
-    door->as<ExitDoor>()->world = w;
-    door->as<ExitDoor>()->level = l;
-    door->as<ExitDoor>()->theme = t;
-    door->as<ExitDoor>()->special_door = true;
+    if (auto door = get_entity_ptr(uid)->as<ExitDoor>())
+    {
+        door->world = w;
+        door->level = l;
+        door->theme = t;
+        door->special_door = true;
+    }
 }
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
@@ -1691,6 +1692,10 @@ void call_transition(uint8_t special_transition)
     else if (special_transition == 3) // Tiamat -> Sunken City (olmec ship)
     {
         state_ptr->test = state_ptr->level_gen->theme_basecamp; //TODO: change test to current_theme // For some reason basecamp does the trick
+    }
+    else if (special_transition == 4)
+    {
+        state_ptr->test = state_ptr->level_gen->theme_duat;
     }
     transition(state_ptr);
     if (special_transition == 2)    // Duat

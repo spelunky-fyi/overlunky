@@ -267,9 +267,11 @@ std::pair<float, float> Entity::position_render() const
     return {rendering_info->x, rendering_info->y};
 }
 
-void Entity::remove_item(uint32_t id)
+void Entity::remove_item(uint32_t item_uid)
 {
-    remove_item_ptr(State::get().find(id));
+    auto entity = get_entity_ptr(item_uid);
+    if (entity)
+        remove_item_ptr(entity);
 }
 
 void Player::set_jetpack_fuel(uint8_t fuel)

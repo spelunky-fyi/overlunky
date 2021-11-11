@@ -253,7 +253,7 @@ class Entity
 
     std::pair<float, float> position_self() const;
     std::pair<float, float> position_render() const;
-    void remove_item(uint32_t id);
+    void remove_item(uint32_t item_uid);
 
     TEXTURE get_texture();
     bool set_texture(TEXTURE texture_id);

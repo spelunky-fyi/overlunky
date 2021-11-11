@@ -1098,8 +1098,9 @@ end
 
     /// Calls the transition function, the `special_transition`:
     /// Set it to 1 to get the CO transition (it has last frame visual glitch with the borders)
-    /// Set it to 2 for transition to duat, important: it will change `state.theme_next` to DUAT so you have to change that manually in the ON.TRANSITION callback if you want it to lead to a different theme
+    /// Set it to 2 for transition to duat (all players as ghosts), important: it will change `state.theme_next` to DUAT so you have to change that manually in the ON.TRANSITION callback if you want it to lead to a different theme
     /// Set it to 3 for the olmec ship transition (from Tiamat to Sunken City)
+    /// Set it to 4 for transition from Duat (similar to CO but different background)
     /// Set it to 0 for standard transition
     /// Function does not increment any of the state `level_next`, `world_next`, so doing just call_transition in 1-1 will transition you to a new 1-1
     lua["call_transition"] = call_transition;

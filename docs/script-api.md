@@ -301,10 +301,10 @@ Enable/disable game engine pause.
 `nil move_entity(int uid, float x, float y, float vx, float vy)`<br/>
 Teleport entity to coordinates with optional velocity
 ### [`set_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door_target)
-`nil set_door_target(int id, int w, int l, int t)`<br/>
+`nil set_door_target(int uid, int w, int l, int t)`<br/>
 Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
 ### [`set_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door)
-`nil set_door(int id, int w, int l, int t)`<br/>
+`nil set_door(int uid, int w, int l, int t)`<br/>
 Short for [set_door_target](#set_door_target).
 ### [`get_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_door_target)
 `tuple<int, int, int> get_door_target(int uid)`<br/>
@@ -663,8 +663,9 @@ Clears the name set with `add_custom_name`
 `nil call_transition(int special_transition)`<br/>
 Calls the transition function, the `special_transition`:
 Set it to 1 to get the CO transition (it has last frame visual glitch with the borders)
-Set it to 2 for transition to duat, important: it will change `state.theme_next` to DUAT so you have to change that manually in the ON.TRANSITION callback if you want it to lead to a different theme
+Set it to 2 for transition to duat (all players as ghosts), important: it will change `state.theme_next` to DUAT so you have to change that manually in the ON.TRANSITION callback if you want it to lead to a different theme
 Set it to 3 for the olmec ship transition (from Tiamat to Sunken City)
+Set it to 4 for transition from Duat (similar to CO but different background)
 Set it to 0 for standard transition
 Function does not increment any of the state `level_next`, `world_next`, so doing just call_transition in 1-1 will transition you to a new 1-1
 ### [`enter_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
