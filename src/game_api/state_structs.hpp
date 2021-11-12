@@ -369,15 +369,18 @@ struct ArenaState
 class Logic
 {
   public:
-    uint32_t unknown1;
-    uint32_t unknown2;
+    uint32_t logic_index; // array index into state.logic, where this instance resides
+    uint32_t padding;
 
     virtual ~Logic() = 0;
 
     // Continuously performs the main functionality of the logic instance
-    // Ouroboros : transitions to level when music finished
+    // Tutorial: handles dropping of the torch and rope in intro routine
+    // Ouroboros: transitions to level when music finished
     // Basecamp speedrun: keep track of time, player position passing official
-    // Level: spawns ghost when time is up (checks cursed for earlier ghost)
+    // Ghost trigger: spawns ghost when time is up (checks cursed for earlier ghost)
+    // Ghost toast trigger: shows the 'A terrible chill...' toast after 90 frames
+    // Tun aggro: spawns Tun after 30 seconds
     // Dice shop: runs the logic of the dice shop
     // Tun pre challenge: unknown
     // Moon challenge: handles waitroom forcefields + tracks mattock breakage
@@ -388,6 +391,7 @@ class Logic
     // Olmec cutscene: runs the cutscene
     // Tiamat cutscene: runs the cutscene
     // Apep trigger: tracks player position, spawns APEP_HEAD
+    // COG Ankh sacrifice: countdown timer (100 frames) from the moment you die, triggers transitioning to duat
     // Duat bosses trigger: tracks player position, spawns ANUBIS2 and OSIRIS_HEAD
     // Tiamat: spawns bubbles
     // Tusk pleasure palace: triggers aggro on everyone when non-high roller enters door
@@ -417,6 +421,14 @@ class LogicBasecampSpeedrun : public Logic
     uint32_t unknown4;
 
     virtual ~LogicBasecampSpeedrun() = 0;
+};
+
+class LogicGhostToast : public Logic
+{
+  public:
+    uint32_t toast_timer;
+
+    virtual ~LogicGhostToast() = 0;
 };
 
 class LogicDiceShop : public Logic
@@ -474,9 +486,7 @@ class LogicStarChallenge : public Logic
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
     uint32_t unknown8;
-    Entity** torches;
-    size_t one_after_last_torch; // this appears to be the address after the last torch, like an end iterator
-    size_t unknown9;
+    std::vector<Entity*> torches;
     uint32_t start_countdown;
 
     virtual ~LogicStarChallenge() = 0;
@@ -548,6 +558,14 @@ class LogicApepTrigger : public Logic
     virtual ~LogicApepTrigger() = 0;
 };
 
+class LogicCOGAnkhSacrifice : public Logic
+{
+    uint8_t unknown3;
+    uint8_t timer;
+
+    virtual ~LogicCOGAnkhSacrifice() = 0;
+};
+
 class LogicDuatBossesTrigger : public Logic
 {
   public:
@@ -574,36 +592,52 @@ class LogicArena1 : public Logic
     virtual ~LogicArena1() = 0;
 };
 
+class LogicArenaAlienBlast : public Logic
+{
+  public:
+    uint32_t timer;
+
+    virtual ~LogicArenaAlienBlast() = 0;
+};
+
+class LogicArenaLooseBombs : public Logic
+{
+  public:
+    uint32_t timer;
+
+    virtual ~LogicArenaLooseBombs() = 0;
+};
+
 struct LogicList
 {
-    uint64_t unknown1;
+    Logic* tutorial;
     LogicOuroboros* ouroboros;
     LogicBasecampSpeedrun* basecamp_speedrun;
-    size_t level_info; // unsure; every level seems to have this, except big boss levels and CO
-    size_t unknown5;
-    size_t unknown6;
+    Logic* ghost_trigger;
+    LogicGhostToast* ghost_toast_trigger;
+    Logic* tun_aggro;
     LogicDiceShop* diceshop;
-    size_t tun_pre_challenge;
+    Logic* tun_pre_challenge;
     LogicMoonChallenge* tun_moon_challenge;
     LogicStarChallenge* tun_star_challenge;
     LogicSunChallenge* tun_sun_challenge;
-    size_t volcana_related;
-    size_t water_related;
+    Logic* volcana_related;
+    Logic* water_related;
     LogicOlmecCutscene* olmec_cutscene;
     LogicTiamatCutscene* tiamat_cutscene;
     LogicApepTrigger* apep_trigger;
-    size_t unknown16;
+    LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
     LogicDuatBossesTrigger* duat_bosses_trigger;
-    size_t unknown17;
+    Logic* tiamat;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
-    size_t discovery_info; // black market, vlad, wet fur discovery; shows the toast
-    size_t black_market;
-    size_t cosmic_ocean;
+    Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
+    Logic* black_market;
+    Logic* cosmic_ocean;
     LogicArena1* arena_1;
-    size_t arena_2;
-    size_t arena_3;
-    size_t unknown26;
-    size_t unknown27;
+    Logic* arena_2;
+    Logic* arena_3;
+    LogicArenaAlienBlast* arena_alien_blast;
+    LogicArenaLooseBombs* arena_loose_bombs;
 };
 
 struct MysteryLiquid3

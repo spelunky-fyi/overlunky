@@ -497,6 +497,12 @@ Forces Olmec to stay on phase 0 (stomping)
 ### [`set_ghost_spawn_times`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ghost_spawn_times)
 `nil set_ghost_spawn_times(int normal = 10800, int cursed = 9000)`<br/>
 Determines when the ghost appears, either when the player is cursed or not
+### [`set_time_ghost_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_ghost_enabled)
+`nil set_time_ghost_enabled(bool b)`<br/>
+Determines whether the time ghost appears, including the showing of the ghost toast
+### [`set_time_jelly_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_jelly_enabled)
+`nil set_time_jelly_enabled(bool b)`<br/>
+Determines whether the time jelly appears in cosmic ocean
 ### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
 `nil set_journal_enabled(bool b)`<br/>
 Enables or disables the journal
@@ -608,12 +614,14 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_post_statemachine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_statemachine)
 `optional<CallbackId> set_post_statemachine(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_on_destroy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_destroy)
 `optional<CallbackId> set_on_destroy(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -626,6 +634,23 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
 The callback signature is `nil on_kill(Entity self, Entity killer)`
 Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_player_instagib`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_player_instagib)
+`optional<CallbackId> set_on_player_instagib(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+The callback signature is `bool on_player_instagib(Entity self)`
+The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+This is so that when the entity dies (from other causes), the death screen still gets shown.
+Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_damage)
+`optional<CallbackId> set_on_damage(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+Note that damage_dealer can be nil ! (long fall, ...)
+DO NOT CALL `self:damage()` in the callback !
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_on_open`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
 `optional<CallbackId> set_on_open(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -633,6 +658,19 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when a container is opened via up+door.
 The callback signature is `nil on_open(Entity self, Entity opener)`
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+### [`set_pre_collision1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision1)
+`optional<CallbackId> set_pre_collision1(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+### [`set_pre_collision2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision2)
+`optional<CallbackId> set_pre_collision2(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`raise`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
 `nil raise()`<br/>
 Raise a signal and probably crash the game
@@ -659,6 +697,15 @@ This is better alternative to `add_string` but instead of changing the name for 
 ### [`clear_custom_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_custom_name)
 `nil clear_custom_name(int uid)`<br/>
 Clears the name set with `add_custom_name`
+### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
+`Illumination create_illumination(Color color, float size, float x, float y)`<br/>
+Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
+`Illumination create_illumination(Color color, float size, int uid)`<br/>
+Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+### [`refresh_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=refresh_illumination)
+`nil refresh_illumination(Illumination illumination)`<br/>
+Refreshes an Illumination, keeps it from fading out
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
@@ -1147,6 +1194,9 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) &StateMemory::theme
 - [`int theme_next`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_next) &StateMemory::theme_next
 - [`int theme_start`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) &StateMemory::theme_start
+- [`nil force_current_theme(int t)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) &StateMemory::force_current_theme
+\
+This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
 - [`int shoppie_aggro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro) &StateMemory::shoppie_aggro
 - [`int shoppie_aggro_next`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro_next) &StateMemory::shoppie_aggro_levels
 - [`int merchant_aggro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=merchant_aggro) &StateMemory::merchant_aggro
@@ -1486,6 +1536,9 @@ Completely removes the entity from existence
 - [`nil activate(Entity activator)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate) &Entity::activate
 \
 Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
+- [`nil perform_teleport(int delta_x, int delta_y)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=perform_teleport) &Entity::perform_teleport
+\
+Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex

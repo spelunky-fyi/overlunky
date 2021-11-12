@@ -150,8 +150,6 @@ void LuaBackend::clear_all_callbacks()
     lua["on_death"] = sol::lua_nil;
     lua["on_win"] = sol::lua_nil;
     lua["on_screen"] = sol::lua_nil;
-    lua["on_render_pre_hud"] = sol::lua_nil;
-    lua["on_render_post_hud"] = sol::lua_nil;
 }
 
 bool LuaBackend::reset()

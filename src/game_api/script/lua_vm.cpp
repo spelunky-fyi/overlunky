@@ -726,6 +726,10 @@ end
     lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Determines whether the time ghost appears, including the showing of the ghost toast
+    lua["set_time_ghost_enabled"] = set_time_ghost_enabled;
+    /// Determines whether the time jelly appears in cosmic ocean
+    lua["set_time_jelly_enabled"] = set_time_jelly_enabled;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
     /// Enables or disables the default position based camp camera bounds, to set them manually yourself
@@ -948,6 +952,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -972,6 +977,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1044,10 +1050,66 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+    /// The callback signature is `bool on_player_instagib(Entity self)`
+    /// The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+    /// This is so that when the entity dies (from other causes), the death screen still gets shown.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_player_instagib"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_player_instagib(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+    /// The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+    /// Note that damage_dealer can be nil ! (long fall, ...)
+    /// DO NOT CALL `self:damage()` in the callback !
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_damage(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* damage_dealer, int8_t damage_amount, float velocity_x, float velocity_y, uint8_t stun_amount, uint8_t iframes)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](damage_dealer), damage_amount, velocity_x, velocity_y, stun_amount, iframes).value_or(false);
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// `uid` has to be the uid of a `Container` or else stuff will break.
     /// Sets a callback that is called right when a container is opened via up+door.
     /// The callback signature is `nil on_open(Entity self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
@@ -1064,6 +1126,56 @@ end
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
                 });
             backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_collision1(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_collision2(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
+                });
+            backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }

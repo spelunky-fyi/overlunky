@@ -466,8 +466,7 @@ using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
-    auto* current_theme = State::get().ptr_local()->current_theme();
-    const auto theme_floor = current_theme->random_block_floorstyle();
+    const auto theme_floor = State::get().ptr_local()->current_theme->random_block_floorstyle();
     const bool is_floor_spreading = (entity_type == theme_floor) && (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) && !(g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
     if (is_floor_spreading)
     {
