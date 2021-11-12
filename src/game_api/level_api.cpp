@@ -1398,7 +1398,6 @@ RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_templat
     return RoomTemplateType::None;
 }
 
-using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
 void LevelGenSystem::init()
 {
     data->init();
@@ -1423,6 +1422,7 @@ void LevelGenSystem::init()
                 original(self, param_2, param_3, param_4);
             },
             0xd);
+        using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
         hook_vtable<DoProceduralSpawnFun>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {

@@ -6,13 +6,6 @@
 
 #include "vtable_hook.hpp"
 
-template <class FunT>
-struct HookWithId
-{
-    std::uint32_t id;
-    std::function<FunT> fun;
-};
-
 struct ScreenHooksInfo
 {
     Screen* screen;

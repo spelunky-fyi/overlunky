@@ -1186,6 +1186,61 @@ void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
     write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), cursed, true);
 }
 
+void set_time_ghost_enabled(bool b)
+{
+    static size_t offset_trigger = 0;
+    static size_t offset_toast_trigger = 0;
+    static char original_instruction_trigger[4] = {0};
+    static char original_instruction_toast_trigger[4] = {0};
+    if (offset_trigger == 0)
+    {
+        auto memory = Memory::get();
+        offset_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
+        for (uint8_t x = 0; x < 4; ++x)
+        {
+            original_instruction_trigger[x] = read_u8(offset_trigger + x);
+        }
+        offset_toast_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TOAST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
+        for (uint8_t x = 0; x < 4; ++x)
+        {
+            original_instruction_toast_trigger[x] = read_u8(offset_toast_trigger + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset_trigger, std::string(original_instruction_trigger, 4), true);
+        write_mem_prot(offset_toast_trigger, std::string(original_instruction_toast_trigger, 4), true);
+    }
+    else
+    {
+        write_mem_prot(offset_trigger, "\xC3\x90\x90\x90"s, true);
+        write_mem_prot(offset_toast_trigger, "\xC3\x90\x90\x90"s, true);
+    }
+}
+
+void set_time_jelly_enabled(bool b)
+{
+    static size_t offset = 0;
+    static char original_instruction[4] = {0};
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_COSMIC_OCEAN, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
+        for (uint8_t x = 0; x < 4; ++x)
+        {
+            original_instruction[x] = read_u8(offset + x);
+        }
+    }
+    if (b)
+    {
+        write_mem_prot(offset, std::string(original_instruction, 4), true);
+    }
+    else
+    {
+        write_mem_prot(offset, "\xC3\x90\x90\x90"s, true);
+    }
+}
+
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
 {
     static size_t offset = 0;
@@ -1402,6 +1457,59 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
             fpf(particle_emitter);
         }
     }
+}
+
+Illumination* create_illumination_internal(Color color, float size, float x, float y, int32_t uid)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("generate_illumination");
+    }
+
+    if (offset != 0)
+    {
+        auto state = get_state_ptr();
+
+        float position[] = {x, y};
+
+        typedef Illumination* create_illumination_func(std::vector<Illumination*>*, float*, Color*, uint32_t r9, float size, uint8_t flags, uint32_t uid, uint8_t);
+        static create_illumination_func* cif = (create_illumination_func*)(offset);
+        auto emitted_light = cif(state->lightsources, position, &color, 0x2, size, 32, uid, 0x0);
+
+        // turn on Enabled flag
+        emitted_light->flags = emitted_light->flags | (1U << (25 - 1));
+
+        return emitted_light;
+    }
+    return nullptr;
+}
+
+Illumination* create_illumination(Color color, float size, float x, float y)
+{
+    return create_illumination_internal(color, size, x, y, -1);
+}
+
+Illumination* create_illumination(Color color, float size, uint32_t uid)
+{
+    auto entity = get_entity_ptr(uid);
+    if (entity != nullptr)
+    {
+        return create_illumination_internal(color, size, entity->abs_x, entity->abs_y, uid);
+    }
+    return nullptr;
+}
+
+void refresh_illumination(Illumination* illumination)
+{
+    static uint32_t* offset = 0;
+    if (offset == 0)
+    {
+        size_t** heap_offset = (size_t**)get_address("refresh_illumination_heap_offset");
+        auto illumination_counter = OnHeapPointer<uint32_t>(**heap_offset);
+        offset = illumination_counter.decode();
+    }
+    illumination->timer = *offset;
 }
 
 static bool g_journal_enabled = true;
@@ -1674,20 +1782,20 @@ void call_transition(uint8_t special_transition)
 
     if (special_transition == 2) // Duat
     {
-        state_ptr->test = state_ptr->level_gen->theme_city_of_gold; //TODO: change test to current_theme
+        state_ptr->current_theme = state_ptr->level_gen->theme_city_of_gold;
     }
     else if (special_transition == 1) // Cosmic Ocean
     {
         state_ptr->level_gen->theme_cosmicocean->sub_theme = state_ptr->level_gen->theme_dwelling; // make sure to set it to something
-        state_ptr->test = state_ptr->level_gen->theme_cosmicocean;                                 //TODO: change test to current_theme
+        state_ptr->current_theme = state_ptr->level_gen->theme_cosmicocean;
     }
     else if (special_transition == 3) // Tiamat -> Sunken City (olmec ship)
     {
-        state_ptr->test = state_ptr->level_gen->theme_basecamp; //TODO: change test to current_theme // For some reason basecamp does the trick
+        state_ptr->current_theme = state_ptr->level_gen->theme_basecamp; // For some reason basecamp does the trick
     }
     else if (special_transition == 4)
     {
-        state_ptr->test = state_ptr->level_gen->theme_duat;
+        state_ptr->current_theme = state_ptr->level_gen->theme_duat;
     }
     transition(state_ptr);
     if (special_transition == 2)    // Duat

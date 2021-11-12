@@ -12,20 +12,24 @@
 SoundManager* g_SoundManager{nullptr};
 SpelunkyConsole* g_Console{nullptr};
 
-void SetWriteLoadOptimization(bool write_load_opt)
+void Spelunky_SetWriteLoadOptimization(bool write_load_opt)
 {
     State::set_write_load_opt(write_load_opt);
 }
 
-void InitMemoryDatabase()
+void Spelunky_RegisterApplicationVersion(const char* version)
+{
+    register_application_version(version);
+}
+void Spelunky_InitMemoryDatabase()
 {
     preload_addresses();
 }
-void InitSwapChainHooks(IDXGISwapChain* swap_chain)
+void Spelunky_InitSwapChainHooks(IDXGISwapChain* swap_chain)
 {
     init_hooks(swap_chain);
 }
-void InitSoundManager(Spelunky_DecodeAudioFile decode_function)
+void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function)
 {
     static Spelunky_DecodeAudioFile local_decode_function = decode_function;
     g_SoundManager = new SoundManager(
@@ -42,37 +46,37 @@ void InitSoundManager(Spelunky_DecodeAudioFile decode_function)
         });
 }
 
-void ShowCursor()
+void Spelunky_ShowCursor()
 {
     show_cursor();
 }
-void HideCursor()
+void Spelunky_HideCursor()
 {
     hide_cursor();
 }
 
-void RegisterOnInputFunc(OnInputFunc on_input)
+void Spelunky_RegisterOnInputFunc(OnInputFunc on_input)
 {
     register_on_input(on_input);
 }
-void RegisterImguiInitFunc(ImguiInitFunc imgui_init)
+void Spelunky_RegisterImguiInitFunc(ImguiInitFunc imgui_init)
 {
     register_imgui_init(imgui_init);
 }
-void RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw)
+void Spelunky_RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw)
 {
     register_imgui_draw(imgui_draw);
 }
-void RegisterPreDrawFunc(PreDrawFunc pre_draw)
+void Spelunky_RegisterPreDrawFunc(PreDrawFunc pre_draw)
 {
     register_pre_draw(pre_draw);
 }
-void RegisterPostDrawFunc(PostDrawFunc post_draw)
+void Spelunky_RegisterPostDrawFunc(PostDrawFunc post_draw)
 {
     register_post_draw(post_draw);
 }
 
-void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
+void Spelunky_RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
 {
     static Spelunky_MakeSavePathFunc local_make_save_path_func;
     local_make_save_path_func = make_save_path;
@@ -88,11 +92,11 @@ void RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
         });
 }
 
-void RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file)
+void Spelunky_RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file)
 {
     register_on_load_file((LoadFileCallback*)on_load_file);
 }
-void RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path)
+void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path)
 {
     static Spelunky_GetImageFilePathFunc local_get_image_file_path;
     local_get_image_file_path = get_image_file_path;
@@ -142,7 +146,7 @@ std::string read_whole_file(const char* file_path)
     return {};
 }
 
-SpelunkyScript* CreateScript(const char* file_path, bool enabled)
+SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled)
 {
     std::string code = read_whole_file(file_path);
     if (!code.empty())
@@ -151,7 +155,7 @@ SpelunkyScript* CreateScript(const char* file_path, bool enabled)
     }
     return nullptr;
 }
-void FreeScript(SpelunkyScript* script)
+void Spelunky_FreeScript(SpelunkyScript* script)
 {
     delete script;
 }
