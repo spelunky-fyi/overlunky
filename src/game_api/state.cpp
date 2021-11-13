@@ -197,9 +197,11 @@ void State::zoom(float level)
 
 void StateMemory::force_current_theme(uint32_t t)
 {
-    if (theme > 0 && theme < 19)
+    if (t > 0 && t < 19)
     {
         auto state = State::get().ptr();
+        if (t == 10 && !state->level_gen->theme_cosmicocean->sub_theme)
+            state->level_gen->theme_cosmicocean->sub_theme = state->level_gen->theme_dwelling; // just set it to something, can't edit this atm
         state->current_theme = state->level_gen->themes[t - 1];
     }
 }
