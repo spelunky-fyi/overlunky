@@ -63,9 +63,7 @@ class Door : public Floor
 {
   public:
     uint8_t counter; // counts down as you go thru it
-    int8_t unused1;
-    int16_t unused2;
-    int32_t unused3;
+    int8_t unused1[7];
     Entity* fx_button;
 };
 

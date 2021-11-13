@@ -45,8 +45,17 @@ struct Illumination
     float distortion;
     int32_t entity_uid;
     uint32_t timer;
-    /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
-    uint32_t flags;
+    union
+    {
+        /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+        uint32_t flags;
+        struct
+        {
+            uint16_t light_flags; // no reason to expose this
+            uint8_t layer;
+            bool enabled;
+        };
+    };
     uint32_t unknown1;
     uint32_t unknown2;
 };

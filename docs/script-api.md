@@ -1326,6 +1326,8 @@ It's rendered on objects around, not as an actual bright spot
 - [`int flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) &Illumination::flags
 \
 see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+- [`bool enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) &Illumination::enabled
+- [`int layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Illumination::layer
 ### `Camera`
 - [`float bounds_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_left) &Camera::bounds_left
 - [`float bounds_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_right) &Camera::bounds_right

@@ -540,7 +540,11 @@ void register_usertypes(sol::state& lua)
         "entity_uid",
         &Illumination::entity_uid,
         "flags",
-        &Illumination::flags);
+        &Illumination::flags,
+        "enabled",
+        &Illumination::enabled,
+        "layer",
+        &Illumination::layer);
 
     auto create_illumination = sol::overload(
         static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
