@@ -162,7 +162,7 @@ const char* level_flags[]{
     "16: Angry Waddler",
     "17: Shop level?",
     "18: Dark level (draw halo)",
-    "19: ",
+    "19: Altar destroyed",
     "20: Allow pause",
     "21: Hide hud, transition",
     "22: Hide hud, camp",
