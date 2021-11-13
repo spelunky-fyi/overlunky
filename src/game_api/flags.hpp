@@ -299,7 +299,7 @@ const char* illumination_flags[]{
     "13: ",
     "14: ",
     "15: ",
-    "16: "
+    "16: ",
 };
 
 const char* special_visibility_flags[]{
