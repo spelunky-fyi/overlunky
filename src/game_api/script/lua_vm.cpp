@@ -1091,7 +1091,7 @@ end
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_damage(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self, Entity* damage_dealer, int8_t damage_amount, float velocity_x, float velocity_y, uint8_t stun_amount, uint8_t iframes)
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* damage_dealer, int8_t damage_amount, float velocity_x, float velocity_y, uint16_t stun_amount, uint8_t iframes)
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;

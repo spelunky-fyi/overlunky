@@ -582,7 +582,7 @@ void Entity::set_on_player_instagib(std::uint32_t reserved_callback_id, std::fun
     hook_info.on_player_instagib.push_back({reserved_callback_id, std::move(on_instagib)});
 }
 
-void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint8_t, uint8_t)> on_damage)
+void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_damage.empty())
@@ -594,9 +594,9 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
         }
         else
         {
-            hook_vtable<void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint8_t, uint8_t)>(
+            hook_vtable<void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>(
                 this,
-                [](Entity* self, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint8_t stun_amount, uint8_t iframes, void (*original)(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint8_t, uint8_t))
+                [](Entity* self, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes, void (*original)(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t))
                 {
                     EntityHooksInfo& _hook_info = self->get_hooks();
                     bool skip_orig = false;
