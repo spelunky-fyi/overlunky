@@ -176,11 +176,7 @@ struct StateMemory
     uint8_t unknown31a;
     uint8_t unknown31b;
     uint8_t unknown31c;
-    size_t unknown32;
-    size_t unknown33;
-    size_t unknown34;
-    size_t unknown35;
-    size_t unknown36;
+    ShopsInfo shops;
     uint32_t time_startup;
     uint32_t special_visibility_flags;
     Camera* camera;

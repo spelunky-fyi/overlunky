@@ -5,6 +5,7 @@
 #include <detours.h>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 
 static std::ofstream g_network_log_fs;
@@ -89,7 +90,7 @@ void dump_packet(const char* buf, int len)
     };
 
     g_network_log_fs << "\t" << std::hex << std::setfill('0');
-    size_t x;
+    int x;
     for (x = 0; x < len; ++x)
     {
         if (x > 0 && x % 8 == 0)
