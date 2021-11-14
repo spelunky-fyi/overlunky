@@ -1637,6 +1637,8 @@ Returns the uid of the currently worn backitem, or -1 if wearing nothing
 - [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
 - [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
+\
+To access/edit anything below use `ON.PRE_LEVEL_GENERATION`
 - [`int poison_tick_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) &Inventory::poison_tick_timer
 \
 Used in level transition to transfer to new player entity, is wrong during the level
@@ -4979,7 +4981,7 @@ end, ON.LEVEL)
 ### ENT_TYPE
 - [`FLOOR_BORDERTILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.FLOOR_BORDERTILE) 1
 - ...check [entities.txt](game_data/entities.txt)...
-- [`LIQUID_STAGNANT_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_STAGNANT_LAVA) 898
+- [`LIQUID_COARSE_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_COARSE_LAVA) 915
 ### PARTICLEEMITTER
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
 - ...check [particle_emitters.txt](game_data/particle_emitters.txt)...

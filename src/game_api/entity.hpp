@@ -361,6 +361,7 @@ struct Inventory
 {
     uint32_t money;
     uint8_t bombs;
+    /// To access/edit anything below use `ON.PRE_LEVEL_GENERATION`
     uint8_t ropes;
     /// Used in level transition to transfer to new player entity, is wrong during the level
     int16_t poison_tick_timer;
