@@ -5,6 +5,7 @@
 #include "entities_items.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "network.hpp"
 #include "online.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
@@ -1207,6 +1208,8 @@ end
 
     /// Clears the name set with `add_custom_name`
     lua["clear_custom_name"] = clear_custom_name;
+
+    lua["hook_network"] = hook_network;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

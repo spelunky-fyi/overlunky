@@ -1,5 +1,6 @@
 #pragma once
 
+#include <WinSock2.h>
 #include <array>
 #include <cstdint>
 
@@ -63,6 +64,22 @@ struct OnlineLobby
     std::string get_code();
 };
 
+// These are sockaddr_in, but that struct has the extra 8 bytes at
+// the end, which is not avaiable in the Online struct (so just cast it)
+struct SockAddrIn
+{
+    uint16_t family;
+    uint16_t port;
+    uint32_t address;
+};
+
+struct Server
+{
+    SockAddrIn sock_addr;
+    int64_t unknown_query;
+    int64_t unknown_response;
+};
+
 class Online
 {
   public:
@@ -80,7 +97,7 @@ class Online
     uint32_t unknown12;
     uint32_t unknown13;
     uint32_t unknown14;
-    uint32_t unknown15;
+    uint32_t socket;
     uint32_t unknown16;
     uint32_t unknown17;
     uint32_t unknown18;
@@ -88,10 +105,8 @@ class Online
     uint32_t unknown20;
     uint32_t unknown21;
     uint32_t unknown22;
-    uint32_t unknown23;
-    uint32_t unknown24;
-    uint32_t unknown25;
-    uint32_t unknown26;
+    SockAddrIn sock_addr_unknown1;
+    SockAddrIn sock_addr_unknown2; // to edge server
     uint32_t unknown27;
     uint32_t unknown28;
     uint32_t unknown29;
@@ -109,7 +124,24 @@ class Online
     OnlinePlayerShort local_player;
     OnlineLobby lobby;
     OnlineLobby lobby_dupe;
-    // some more stuff
+    std::array<Server, 32> servers;
+    uint32_t unknown40;
+    uint32_t unknown41;
+    size_t unknown42;
+    uint32_t unknown43;
+    uint32_t unknown44;
+    uint32_t unknown45;
+    uint32_t unknown46;
+    SockAddrIn sock_addr_game;
+    size_t unknown47;
+    size_t unknown48;
+    size_t unknown49;
+    size_t unknown50;
+    size_t unknown51;
+    size_t unknown52;
+    size_t unknown53;
+    size_t unknown54;
+    size_t unknown55;
 
     virtual ~Online() = 0;
 };
