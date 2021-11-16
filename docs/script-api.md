@@ -3306,6 +3306,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Liquid`
 Derived from [`Entity`](#entity)
 - [`Entity fx_surface`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_surface) &Liquid::fx_surface
+- [`int get_liquid_flags()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquid_flags) &Liquid::get_liquid_flags
+- [`nil set_liquid_flags(int flags)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_liquid_flags) &Liquid::set_liquid_flags
 ### `Lava`
 Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Lava::emitted_light
@@ -4632,6 +4634,7 @@ Derived from [`Screen`](#screen)
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
 
 To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)
+You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
 
 For reference, the available `as_<typename>` functions are listed below:
 - as_acidbubble

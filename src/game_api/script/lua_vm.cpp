@@ -446,7 +446,7 @@ end
     /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
-        std::vector<uint32_t> types;
+        std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();
         if (va_type == sol::type::number)
         {
@@ -456,9 +456,10 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+        std::vector<ENT_TYPE> proper_types = get_proper_types(types);
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
+        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
@@ -466,7 +467,7 @@ end
     /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
-        std::vector<uint32_t> types;
+        std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();
         if (va_type == sol::type::number)
         {
@@ -476,9 +477,10 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+        std::vector<ENT_TYPE> proper_types = get_proper_types(types);
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
+        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
 

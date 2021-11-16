@@ -17,7 +17,7 @@
 struct RenderInfo;
 struct Texture;
 
-enum REPEAT_TYPE : uint8_t
+enum class REPEAT_TYPE : uint8_t
 {
     NoRepeat,
     Linear,

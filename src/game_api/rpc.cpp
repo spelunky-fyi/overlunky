@@ -1,5 +1,6 @@
 #include "rpc.hpp"
 
+#include "custom_types.hpp"
 #include "drops.hpp"
 #include "entities_floors.hpp"
 #include "entities_liquids.hpp"
@@ -217,7 +218,6 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
     auto ent = get_entity_ptr(uid);
     if (ent)
     {
-        static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
         if (ent->is_liquid())
         {
             move_liquid_abs(uid, x, y, vx, vy);
@@ -528,13 +528,14 @@ std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
+    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
     uint8_t layer = 2;
     while (layer)
     {
         layer--;
         for (auto& item : state.layer(layer)->items())
         {
-            if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
+            if (entity_type_check(proper_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -556,10 +557,11 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    auto push_entities = [&mask, &entity_types, &found, &state](uint8_t l)
+    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
+    auto push_entities = [&mask, &proper_types, &found, &state](uint8_t l)
     {
         for (auto& item : state.layer(l)->items())
-            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(entity_types, item->type->id))
+            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
                 found.push_back(item->uid);
     };
 
@@ -583,13 +585,14 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    auto push_entities = [&x, &y, &radius, &mask, &entity_types, &found, &state](uint8_t l)
+    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
+    auto push_entities = [&x, &y, &radius, &mask, &proper_types, &found, &state](uint8_t l)
     {
         for (auto& item : state.layer(l)->items())
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-            if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && entity_type_check(entity_types, item->type->id))
+            if ((mask == 0 || (item->type->search_flags & mask)) && distance < radius && entity_type_check(proper_types, item->type->id))
                 found.push_back(item->uid);
         }
     };
@@ -613,17 +616,18 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> enti
 {
     auto state = State::get();
     std::vector<uint32_t> result;
+    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
     if (layer == LAYER::BOTH)
     {
         std::vector<uint32_t> result2;
-        result = get_entities_overlapping_by_pointer(entity_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
-        result2 = get_entities_overlapping_by_pointer(entity_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
+        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
+        result2 = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
         result.insert(result.end(), result2.begin(), result2.end());
     }
     else
     {
         uint8_t actual_layer = enum_to_layer(layer);
-        result = get_entities_overlapping_by_pointer(entity_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
+        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
     }
     return result;
 }
@@ -646,7 +650,7 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
     std::vector<uint32_t> found;
     for (auto& item : layer->items())
     {
-        if (((item->type->search_flags & mask) > 0 || mask == 0) && entity_type_check(entity_types, item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
+        if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(entity_types, item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
         {
             found.push_back(item->uid);
         }
@@ -722,13 +726,14 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
         return false;
     if (entity->items.count > 0)
     {
+        const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
         int* pitems = (int*)entity->items.begin;
         for (unsigned int i = 0; i < entity->items.count; i++)
         {
             Entity* item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
                 continue;
-            if (entity_type_check(entity_types, item->type->id))
+            if (entity_type_check(proper_types, item->type->id))
                 return true;
         }
     }
@@ -747,6 +752,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
         return found;
     if (entity->items.count > 0)
     {
+        const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
         uint32_t* pitems = entity->items.begin;
         for (unsigned int i = 0; i < entity->items.count; i++)
         {
@@ -755,7 +761,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
             {
                 continue;
             }
-            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(entity_types, item->type->id))
+            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -1693,6 +1699,23 @@ bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE 
         return true;
 
     return false;
+}
+
+std::vector<ENT_TYPE> get_proper_types(const std::vector<ENT_TYPE>& types_array)
+{
+    std::vector<ENT_TYPE> proper_types;
+    proper_types.reserve(types_array.size());
+    for (auto el : types_array)
+    {
+        if (el >= (uint32_t)CUSTOM_TYPE::ACIDBUBBLE)
+        {
+            auto extra_types = get_custom_entity_types((CUSTOM_TYPE)el);
+            proper_types.insert(proper_types.end(), extra_types.begin(), extra_types.end());
+        }
+        else
+            proper_types.push_back(el);
+    }
+    return proper_types;
 }
 
 void enter_door(int32_t player_uid, int32_t door_uid)

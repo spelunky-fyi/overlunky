@@ -1,4 +1,5 @@
 #include "entity_lua.hpp"
+#include "custom_types.hpp"
 #include "entity.hpp"
 #include "movable.hpp"
 
@@ -335,6 +336,11 @@ void register_usertypes(sol::state& lua)
         auto name = item.name.substr(9, item.name.size());
         lua["ENT_TYPE"][name] = item.id;
     }
+    for (auto elm : get_custom_types_map())
+    {
+        lua["ENT_TYPE"][elm.second] = elm.first;
+    }
+
     lua.create_named_table("REPEAT_TYPE", "NO_REPEAT", REPEAT_TYPE::NoRepeat, "LINEAR", REPEAT_TYPE::Linear, "BACK_AND_FORTH", REPEAT_TYPE::BackAndForth);
     lua.create_named_table("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
     lua.create_named_table(

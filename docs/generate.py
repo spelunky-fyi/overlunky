@@ -811,6 +811,7 @@ print("")
 print(
     "To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)"
 )
+print("You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks")
 print("")
 print("For reference, the available `as_<typename>` functions are listed below:")
 for known_cast in known_casts:
