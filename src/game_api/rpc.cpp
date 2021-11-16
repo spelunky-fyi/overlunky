@@ -205,7 +205,7 @@ int32_t get_grid_entity_at(float x, float y, LAYER layer)
     return -1;
 }
 
-void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap)
+void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap) // ui only
 {
     auto ent = get_entity_ptr(uid);
     if (ent)
@@ -218,7 +218,7 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
     if (ent)
     {
         static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
-        if (ent->type->id >= LIQUID_WATER)
+        if (ent->is_liquid())
         {
             move_liquid_abs(uid, x, y, vx, vy);
         }
@@ -231,57 +231,14 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 
 void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
-    auto state = State::get().ptr();
-    auto entity = get_entity_ptr(uid);
+    auto entity = get_entity_ptr(uid)->as<Liquid>();
     if (entity)
     {
-        static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
-        static ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);
-        static ENT_TYPE LIQUID_LAVA = to_id("ENT_TYPE_LIQUID_LAVA"sv);
-        static ENT_TYPE LIQUID_STAGNANT_LAVA = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"sv);
-        static ENT_TYPE LIQUID_COARSE_LAVA = to_id("ENT_TYPE_LIQUID_COARSE_LAVA"sv);
-
-        std::pair<float, float>* coords = nullptr;
-        std::pair<float, float>* velocities = nullptr;
-        auto entity_id = entity->type->id;
-        if (entity_id == LIQUID_WATER)
+        auto liquid_engine = State::get().get_correct_liquid_engine(entity->type->id);
+        if (liquid_engine)
         {
-            coords = state->liquid_physics->water_physics.unknown25->entity_coordinates;
-            velocities = state->liquid_physics->water_physics.unknown25->entity_velocities;
-        }
-        else if (entity_id == LIQUID_COARSE_WATER)
-        {
-            coords = state->liquid_physics->coarse_water_physics.unknown25->entity_coordinates;
-            velocities = state->liquid_physics->coarse_water_physics.unknown25->entity_velocities;
-        }
-        else if (entity_id == LIQUID_LAVA)
-        {
-            coords = state->liquid_physics->lava_physics.unknown25->entity_coordinates;
-            velocities = state->liquid_physics->lava_physics.unknown25->entity_velocities;
-        }
-        else if (entity_id == LIQUID_STAGNANT_LAVA)
-        {
-            coords = state->liquid_physics->stagnant_lava_physics.unknown25->entity_coordinates;
-            velocities = state->liquid_physics->stagnant_lava_physics.unknown25->entity_velocities;
-        }
-        else if (entity_id == LIQUID_COARSE_LAVA)
-        {
-            coords = state->liquid_physics->coarse_lava_physics.unknown25->entity_coordinates;
-            velocities = state->liquid_physics->coarse_lava_physics.unknown25->entity_velocities;
-        }
-
-        auto liquid = entity->as<Liquid>();
-        if (coords != nullptr)
-        {
-            std::pair<float, float>* c = &(coords[*liquid->liquid_id]);
-            c->first = x;
-            c->second = y;
-        }
-        if (velocities != nullptr)
-        {
-            std::pair<float, float>* v = &(velocities[*liquid->liquid_id]);
-            v->first = vx;
-            v->second = vy;
+            liquid_engine->entity_coordinates[*entity->liquid_id] = {x, y};
+            liquid_engine->entity_velocities[*entity->liquid_id] = {vx, vy};
         }
     }
 }
@@ -599,32 +556,21 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
 {
     auto state = State::get();
     std::vector<uint32_t> found;
+    auto push_entities = [&mask, &entity_types, &found, &state](uint8_t l)
+    {
+        for (auto& item : state.layer(l)->items())
+            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(entity_types, item->type->id))
+                found.push_back(item->uid);
+    };
+
     if (layer == LAYER::BOTH)
     {
-        uint8_t layeridx = 2;
-        while (layeridx)
-        {
-            layeridx--;
-            for (auto& item : state.layer(layeridx)->items())
-            {
-                if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
-                {
-                    found.push_back(item->uid);
-                }
-            }
-        }
+        push_entities(0);
+        push_entities(1);
     }
     else
     {
-        uint8_t actual_layer = enum_to_layer(layer);
-
-        for (auto& item : state.layer(actual_layer)->items())
-        {
-            if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
-            {
-                found.push_back(item->uid);
-            }
-        }
+        push_entities(enum_to_layer(layer));
     }
     return found;
 }
@@ -637,36 +583,24 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    if (layer == LAYER::BOTH)
+    auto push_entities = [&x, &y, &radius, &mask, &entity_types, &found, &state](uint8_t l)
     {
-        uint8_t layeridx = 2;
-        while (layeridx)
-        {
-            layeridx--;
-            for (auto& item : state.layer(layeridx)->items())
-            {
-                auto [ix, iy] = item->position();
-                float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-                if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && entity_type_check(entity_types, item->type->id))
-                {
-                    found.push_back(item->uid);
-                }
-            }
-        }
-    }
-    else
-    {
-        uint8_t actual_layer = enum_to_layer(layer);
-
-        for (auto& item : state.layer(actual_layer)->items())
+        for (auto& item : state.layer(l)->items())
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
             if (((item->type->search_flags & mask) > 0 || mask == 0) && distance < radius && entity_type_check(entity_types, item->type->id))
-            {
                 found.push_back(item->uid);
-            }
         }
+    };
+    if (layer == LAYER::BOTH)
+    {
+        push_entities(0);
+        push_entities(1);
+    }
+    else
+    {
+        push_entities(enum_to_layer(layer));
     }
     return found;
 }
@@ -737,10 +671,11 @@ void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
 {
-    Entity* door = get_entity_ptr(uid);
-    if (door == nullptr || !door->as<ExitDoor>()->special_door)
+    auto door = get_entity_ptr(uid)->as<ExitDoor>();
+    if (door == nullptr || !door->special_door)
         return std::make_tuple((uint8_t)0, (uint8_t)0, (uint8_t)0);
-    return std::make_tuple(door->as<ExitDoor>()->world, door->as<ExitDoor>()->level, door->as<ExitDoor>()->theme);
+
+    return std::make_tuple(door->world, door->level, door->theme);
 }
 
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
@@ -793,7 +728,7 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
             Entity* item = get_entity_ptr(pitems[i]);
             if (item == nullptr)
                 continue;
-            if (std::find(entity_types.begin(), entity_types.end(), item->type->id) != entity_types.end())
+            if (entity_type_check(entity_types, item->type->id))
                 return true;
         }
     }
@@ -820,7 +755,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
             {
                 continue;
             }
-            if (((item->type->search_flags & mask) || mask == 0) && entity_type_check(entity_types, item->type->id))
+            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(entity_types, item->type->id))
             {
                 found.push_back(item->uid);
             }
@@ -882,7 +817,7 @@ uint32_t get_frame_count()
 void carry(uint32_t mount_uid, uint32_t rider_uid)
 {
     auto mount = get_entity_ptr(mount_uid)->as<Mount>();
-    auto rider = get_entity_ptr(rider_uid)->as<Player>();
+    auto rider = get_entity_ptr(rider_uid)->as<Movable>();
     if (mount == nullptr || rider == nullptr)
         return;
     mount->carry(rider);
@@ -1252,7 +1187,7 @@ bool is_inside_active_shop_room(float x, float y, LAYER layer)
     {
         typedef bool coord_inside_shop_func(StateMemory*, uint32_t layer, float x, float y);
         static coord_inside_shop_func* cisf = (coord_inside_shop_func*)(offset);
-        return cisf(State::get().ptr(), enum_to_layer(layer), x, y);
+        return cisf(get_state_ptr(), enum_to_layer(layer), x, y);
     }
     return false;
 }
@@ -1431,7 +1366,7 @@ void render_screen_particles(ParticleEmitterInfo* particle_emitter)
 void extinguish_particles(ParticleEmitterInfo* particle_emitter)
 {
     // removing from state only applies to world emitters, but it just won't find the screen one in the vector, so no big deal
-    auto state = State::get().ptr();
+    auto state = get_state_ptr();
     std::erase(*state->particle_emitters, particle_emitter);
 
     static size_t offset = 0;

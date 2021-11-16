@@ -432,6 +432,12 @@ std::tuple<float, float> get_velocity(uint32_t uid)
             vx = mov->velocityx;
             vy = mov->velocityy;
         }
+        else if (ent->is_liquid())
+        {
+            auto liquid_engine = State::get().get_correct_liquid_engine(ent->type->id);
+            vx = liquid_engine->entity_velocities->first;
+            vy = liquid_engine->entity_velocities->second;
+        }
         if (ent->overlay)
         {
             auto [ovx, ovy] = get_velocity(ent->overlay->uid);
@@ -623,11 +629,26 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
 
 bool Entity::is_movable()
 {
+    static ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
     if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
         return true;
     else if (type->search_flags & 0x1000) // LOGICAL - as it has some movable entities
-        if (type->id < 842)               // actually check if it's not logical
+        if (type->id < first_logical)     // actually check if it's not logical
             return true;
+
+    return false;
+}
+
+bool Entity::is_liquid()
+{
+    static const ENT_TYPE liquid_water = to_id("ENT_TYPE_LIQUID_WATER");
+    static const ENT_TYPE liquid_coarse_water = to_id("ENT_TYPE_LIQUID_COARSE_WATER");
+    static const ENT_TYPE liquid_lava = to_id("ENT_TYPE_LIQUID_LAVA");
+    static const ENT_TYPE liquid_stagnant_lava = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA");
+    static const ENT_TYPE liquid_coarse_lava = to_id("ENT_TYPE_LIQUID_COARSE_LAVA");
+
+    if (type->id == liquid_water || type->id == liquid_coarse_water || type->id == liquid_lava || type->id == liquid_stagnant_lava || type->id == liquid_coarse_lava)
+        return true;
 
     return false;
 }

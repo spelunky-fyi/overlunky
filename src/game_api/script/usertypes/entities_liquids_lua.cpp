@@ -16,6 +16,10 @@ void register_usertypes(sol::state& lua)
         "Liquid",
         "fx_surface",
         &Liquid::fx_surface,
+        "get_liquid_flags",
+        &Liquid::get_liquid_flags,
+        "set_liquid_flags",
+        &Liquid::set_liquid_flags,
         sol::base_classes,
         sol::bases<Entity>());
 

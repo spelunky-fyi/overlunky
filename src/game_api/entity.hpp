@@ -289,6 +289,7 @@ class Entity
     struct EntityHooksInfo& get_hooks();
 
     bool is_movable();
+    bool is_liquid();
 
     std::uint32_t set_on_dtor(std::function<void(Entity*)> cb);
     std::uint32_t reserve_callback_id();

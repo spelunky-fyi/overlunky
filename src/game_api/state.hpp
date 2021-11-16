@@ -270,4 +270,5 @@ struct State
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
     SaveData* savedata();
+    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
 };

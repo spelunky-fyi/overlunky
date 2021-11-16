@@ -37,7 +37,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
         to_id("ENT_TYPE_LIQUID_COARSE_LAVA"),
     };
 
-    auto state = State::get().ptr();
+    auto state = get_state_ptr();
     if (state->loading != 2 && std::ranges::find(lava_types, entity_type) != lava_types.end())
     {
         std::vector<Lava*> lavas{};
@@ -74,28 +74,33 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 
 void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation = INFINITY)
 {
-    LiquidPhysicsParams* liquid_physics = nullptr;
-    auto state_ptr = State::get().ptr();
+    LiquidTileSpawnData* liquid_physics = nullptr;
+    auto state_ptr = get_state_ptr();
+    static ENT_TYPE liquid_water = to_id("ENT_TYPE_LIQUID_WATER");
+    static ENT_TYPE liquid_coarse_water = to_id("ENT_TYPE_LIQUID_COARSE_WATER");
+    static ENT_TYPE liquid_lava = to_id("ENT_TYPE_LIQUID_LAVA");
+    static ENT_TYPE liquid_stagnant_lava = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA");
+    static ENT_TYPE liquid_coarse_lava = to_id("ENT_TYPE_LIQUID_COARSE_LAVA");
 
-    if (entity_type == to_id("ENT_TYPE_LIQUID_WATER"))
+    if (entity_type == liquid_water)
     {
-        liquid_physics = &state_ptr->liquid_physics->water_physics;
+        liquid_physics = &state_ptr->liquid_physics->water_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_COARSE_WATER"))
+    else if (entity_type == liquid_coarse_water)
     {
-        liquid_physics = &state_ptr->liquid_physics->coarse_water_physics;
+        liquid_physics = &state_ptr->liquid_physics->coarse_water_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_LAVA"))
+    else if (entity_type == liquid_lava)
     {
-        liquid_physics = &state_ptr->liquid_physics->lava_physics;
+        liquid_physics = &state_ptr->liquid_physics->lava_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"))
+    else if (entity_type == liquid_stagnant_lava)
     {
-        liquid_physics = &state_ptr->liquid_physics->stagnant_lava_physics;
+        liquid_physics = &state_ptr->liquid_physics->stagnant_lava_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_COARSE_LAVA"))
+    else if (entity_type == liquid_coarse_lava)
     {
-        liquid_physics = &state_ptr->liquid_physics->coarse_lava_physics;
+        liquid_physics = &state_ptr->liquid_physics->coarse_lava_tile_spawn_data;
     }
 
     if (liquid_physics != nullptr)
