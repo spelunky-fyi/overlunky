@@ -328,7 +328,6 @@ enum class CUSTOM_TYPE : uint32_t
     WADDLER,
     WALKINGMONSTER,
     WALLTORCH,
-    WEBGUN,
     WEBSHOT,
     WETEFFECT,
     WITCHDOCTOR,
