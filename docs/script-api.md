@@ -1059,6 +1059,12 @@ end
 - [`ENT_TYPE character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &SelectPlayerSlot::character
 - [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
 ### `Items`
+- [`int player_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) &Items::player_count
+- [`int saved_pets_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets_count) &Items::saved_pets_count
+- [`array<ENT_TYPE, 4> saved_pets`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) &Items::saved_pets
+- [`array<bool, 4> is_pet_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) &Items::is_pet_cursed
+- [`array<bool, 4> is_pet_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) &Items::is_pet_poisoned
+- [`player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) /*&Items::player_inventories*/
 - [`player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) sol::property([](Items&s){returnstd::ref(s.player_select_slots
 ### `ArenaConfigArenas`
 - [`bool dwelling_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) &ArenaConfigArenas::dwelling_1
@@ -2283,6 +2289,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 ### `Quillback`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Quillback::particle
+- [`bool seen_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen_player) &Quillback::seen_player
 ### `Leprechaun`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
 - [`int hump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hump_timer) &Leprechaun::hump_timer

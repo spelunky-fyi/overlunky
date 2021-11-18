@@ -22,12 +22,6 @@ void register_usertypes(sol::state& lua)
         &SelectPlayerSlot::texture_id);
     lua.new_usertype<Items>(
         "Items",
-        "player_select",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_select_slots); }),
-        "player_inventory",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_inventories); }),
         "player_count",
         &Items::player_count,
         "saved_pets_count",
@@ -37,7 +31,15 @@ void register_usertypes(sol::state& lua)
         "is_pet_cursed",
         &Items::is_pet_cursed,
         "is_pet_poisoned",
-        &Items::is_pet_poisoned);
+        &Items::is_pet_poisoned,
+        //"player_inventory",
+        /*&Items::player_inventories*/
+        "player_select",
+        sol::property([](Items& s)
+                      { return std::ref(s.player_select_slots); }),
+        "player_inventory",
+        sol::property([](Items& s)
+                      { return std::ref(s.player_inventories); }));
     lua.new_usertype<ArenaConfigArenas>(
         "ArenaConfigArenas",
         "dwelling_1",
