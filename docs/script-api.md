@@ -1064,8 +1064,8 @@ end
 - [`array<ENT_TYPE, 4> saved_pets`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) &Items::saved_pets
 - [`array<bool, 4> is_pet_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) &Items::is_pet_cursed
 - [`array<bool, 4> is_pet_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) &Items::is_pet_poisoned
-- [`player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) /*&Items::player_inventories*/
-- [`player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) sol::property([](Items&s){returnstd::ref(s.player_select_slots
+- [`array<Inventory, MAX_PLAYERS> player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) &Items::player_inventories
+- [`array<SelectPlayerSlot, MAX_PLAYERS> player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) &Items::player_select_slots
 ### `ArenaConfigArenas`
 - [`bool dwelling_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) &ArenaConfigArenas::dwelling_1
 - [`bool dwelling_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_2) &ArenaConfigArenas::dwelling_2

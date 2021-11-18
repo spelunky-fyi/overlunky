@@ -8,8 +8,8 @@ struct Items
 {
     void* __vftable;
     Player* players[MAX_PLAYERS];
-    Inventory player_inventories[MAX_PLAYERS];
-    SelectPlayerSlot player_select_slots[MAX_PLAYERS];
+    std::array<Inventory, MAX_PLAYERS> player_inventories;
+    std::array<SelectPlayerSlot, MAX_PLAYERS> player_select_slots;
 
     std::array<ENT_TYPE, 4> saved_pets;
     std::array<bool, 4> is_pet_cursed;

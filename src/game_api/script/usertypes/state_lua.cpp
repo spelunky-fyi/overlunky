@@ -32,8 +32,14 @@ void register_usertypes(sol::state& lua)
         &Items::is_pet_cursed,
         "is_pet_poisoned",
         &Items::is_pet_poisoned,
-        //"player_inventory",
-        /*&Items::player_inventories*/
+
+        // had to be done this way as autodoc doesn't like sol::property stuff
+        /*"player_inventory",
+        &Items::player_inventories,*/
+        /*"player_select",
+        &Items::player_select_slots,*/
+        //); stop autodoc here
+
         "player_select",
         sol::property([](Items& s)
                       { return std::ref(s.player_select_slots); }),
