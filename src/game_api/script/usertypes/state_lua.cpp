@@ -29,7 +29,15 @@ void register_usertypes(sol::state& lua)
         sol::property([](Items& s)
                       { return std::ref(s.player_inventories); }),
         "player_count",
-        &Items::player_count);
+        &Items::player_count,
+        "saved_pets_count",
+        &Items::saved_pets_count,
+        "saved_pets",
+        &Items::saved_pets,
+        "is_pet_cursed",
+        &Items::is_pet_cursed,
+        "is_pet_poisoned",
+        &Items::is_pet_poisoned);
     lua.new_usertype<ArenaConfigArenas>(
         "ArenaConfigArenas",
         "dwelling_1",
