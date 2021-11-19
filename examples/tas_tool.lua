@@ -280,6 +280,10 @@ set_callback(function(ctx)
             ctx:draw_line(x1, y1, x2, y2, 2, col)
         end
     end
+
+    if last_hud and state.pause > 0 then
+        state.pause = 0
+    end
 end, ON.GUIFRAME)
 
 set_callback(function()
@@ -323,26 +327,32 @@ set_callback(function()
     end
 end, ON.LEVEL)
 
+set_post_entity_spawn(function(ent, flags)
+    local next = levels[state.level_count+1]
+    ent.health = next.h
+    if ent.inventory then
+        ent.inventory.bombs = next.b
+        ent.inventory.ropes = next.r
+    end
+
+    for i,v in ipairs(next.power) do
+        local m = string.find(names[v], "PACK")
+        if not m and not ent:has_powerup(v) then
+            ent:give_powerup(v)
+        end
+    end
+    if next.back ~= -1 and ent:worn_backitem() == -1 then
+        pick_up(ent.uid, spawn(next.back, 0, 0, LAYER.PLAYER, 0, 0))
+    end
+    if next.held ~= -1 and ent.holding_uid == -1 then
+        pick_up(ent.uid, spawn(next.held, 0, 0, LAYER.PLAYER, 0, 0))
+    end
+end, SPAWN_TYPE.LEVEL_GEN, MASK.PLAYER, nil)
+
 set_callback(function()
     if rerecord_level ~= -1 and state.level_count >= rerecord_level then
         local next = levels[state.level_count+1]
         state.time_total = next.time
-        players[1].health = next.h
-        players[1].inventory.bombs = next.b
-        players[1].inventory.ropes = next.r
-
-        for i,v in ipairs(next.power) do
-            local m = string.find(names[v], "PACK")
-            if not m and not players[1]:has_powerup(v) then
-                players[1]:give_powerup(v)
-            end
-        end
-        if next.back ~= -1 and players[1]:worn_backitem() == -1 then
-            pick_up(players[1].uid, spawn(next.back, 0, 0, LAYER.PLAYER, 0, 0))
-        end
-        if next.held ~= -1 and players[1].holding_uid == -1 then
-            pick_up(players[1].uid, spawn(next.held, 0, 0, LAYER.PLAYER, 0, 0))
-        end
         print("Rerecord level reached")
         set_timeout(function()
             rerecord_level = -1
@@ -354,84 +364,89 @@ set_callback(function()
     end
 
     select_level = state.level_count+1
-end, ON.POST_LEVEL_GENERATION)
 
-set_callback(function()
-    if #players < 1 then return end
-    if frames[state.level_count+1] == nil then
-        frames[state.level_count+1] = {}
-        pos[state.level_count+1] = {}
-        select_level = state.level_count+1
-    end
-    if (mode == 2 and not stopped) or (mode == 1 and state.time_level < rerecord_frame) then -- playback
-        local input = frames[state.level_count+1][state.time_level+1]
-        if input and stolen and state.time_level > 1 then
-            message('Sending '..string.format('%04x', input)..' '..state.time_level..'/'..#frames[state.level_count+1])
-            send_input(players[1].uid, input)
-        elseif stolen and state.time_level >= #frames[state.level_count+1] and players[1].state ~= CHAR_STATE.ENTERING and state.loading == 0 then
-            message('Playback ended, recording')
-            return_input(players[1].uid)
-            stolen = false
-            stopped = true
+    set_post_statemachine(players[1].uid, function(ent)
+        if #players < 1 then return end
+        if frames[state.level_count+1] == nil then
+            frames[state.level_count+1] = {}
+            pos[state.level_count+1] = {}
+            select_level = state.level_count+1
+        end
+        if (mode == 2 and not stopped) or (mode == 1 and state.time_level < rerecord_frame) then -- playback
+            local delay = 1
+            local input = frames[state.level_count+1][state.time_level+delay]
+            if input and stolen and state.time_level > 1 then
+                message('Sending '..string.format('%04x', input)..' '..state.time_level+delay..'/'..#frames[state.level_count+1])
+                send_input(players[1].uid, input)
+            elseif stolen and state.time_level >= #frames[state.level_count+1] and players[1].state ~= CHAR_STATE.ENTERING and state.loading == 0 then
+                message('Playback ended, recording')
+                return_input(players[1].uid)
+                stolen = false
+                stopped = true
+                if pause then
+                    state.pause = 0x20
+                end
+                mode = 1
+            elseif stolen and state.time_level <= 1 then
+                send_input(players[1].uid, 0)
+            end
+        end
+        if mode == 1 and state.time_level == rerecord_frame then
             if pause then
                 state.pause = 0x20
             end
-            mode = 1
-        end
-    end
-    if mode == 1 and state.time_level == rerecord_frame then
-        if pause then
-            state.pause = 0x20
+
+            if stolen then
+                message('Rerecording from frame')
+                return_input(players[1].uid)
+                stolen = false
+                stopped = true
+            end
+            rerecording = false
         end
 
-        if stolen then
-            message('Rerecording from frame')
-            return_input(players[1].uid)
-            stolen = false
-            stopped = true
-        end
-        rerecording = false
-    end
-
-    if mode == 1 and state.time_level >= rerecord_frame and state.time_level > 1 and not last_hud then -- record
-        if #frames[state.level_count+1] > state.time_level + 3 then
-            print('Cleared old frames')
-            for i,v in pairs(frames[state.level_count+1]) do
-                if i > rerecord_frame + 1 then
-                    frames[state.level_count+1][i] = nil
-                    pos[state.level_count+1][i] = nil
+        if mode == 1 and state.time_level >= rerecord_frame and state.time_level > 1 and not last_hud then -- record
+            if #frames[state.level_count+1] > state.time_level + 3 then
+                print('Cleared old frames')
+                for i,v in pairs(frames[state.level_count+1]) do
+                    if i > rerecord_frame + 1 then
+                        frames[state.level_count+1][i] = nil
+                        pos[state.level_count+1][i] = nil
+                    end
                 end
             end
+            local delay = 0
+            frames[state.level_count+1][state.time_level+delay] = read_input(players[1].uid)
+            message('Recording '..string.format('%04x', frames[state.level_count+1][state.time_level+delay])..' '..state.time_level)
         end
-        frames[state.level_count+1][state.time_level] = read_input(players[1].uid)
-        message('Recording '..string.format('%04x', frames[state.level_count+1][state.time_level])..' '..state.time_level)
-    end
 
-    last_hud = test_flag(state.level_flags, 21)
-    for i,p in ipairs(players) do
-        if test_flag(p.more_flags, ENT_MORE_FLAG.DISABLE_INPUT) and state.time_level > 1 then
-            p.more_flags = clr_flag(p.more_flags, ENT_MORE_FLAG.DISABLE_INPUT)
+        last_hud = test_flag(state.level_flags, 21)
+        for i,p in ipairs(players) do
+            if test_flag(p.more_flags, ENT_MORE_FLAG.DISABLE_INPUT) and state.time_level > 1 then
+                p.more_flags = clr_flag(p.more_flags, ENT_MORE_FLAG.DISABLE_INPUT)
+            end
         end
-    end
-    local x, y, l = get_position(players[1].uid)
-    pos[state.level_count+1][state.time_level] = {x=x, y=y, l=l}
+        local x, y, l = get_position(players[1].uid)
+        pos[state.level_count+1][state.time_level] = {x=x, y=y, l=l}
 
-    if light and state.illumination ~= nil then
-        if state.camera_layer == LAYER.BACK then
-            state.illumination.flags = set_flag(state.illumination.flags, 17)
-        else
-            state.illumination.flags = clr_flag(state.illumination.flags, 17)
+        if light and state.illumination ~= nil then
+            if state.camera_layer == LAYER.BACK then
+                state.illumination.flags = set_flag(state.illumination.flags, 17)
+            else
+                state.illumination.flags = clr_flag(state.illumination.flags, 17)
+            end
         end
-    end
-end, ON.FRAME)
+    end)
+
+end, ON.POST_LEVEL_GENERATION)
 
 set_callback(function()
+    if state.items.player_inventory[1].health < 1 then
+        state.items.player_inventory[1].health = levels[state.level_count+1].h
+    end
+
     if not rerecording then
         rerecord_frame = 0
-    else
-        if state.items.player_inventory[1].health < 1 then
-            state.items.player_inventory[1].health = levels[state.level_count+1].h
-        end
     end
 
     if load_prng then
@@ -444,10 +459,10 @@ set_callback(function()
     else
         if rng[state.level_count+1] == nil then
             rng[state.level_count+1] = {}
-        end
-        for i=1,20 do
-            local a,b = prng:get_pair(i)
-            rng[state.level_count+1][i] = { a=a, b=b }
+            for i=1,20 do
+                local a,b = prng:get_pair(i)
+                rng[state.level_count+1][i] = { a=a, b=b }
+            end
         end
     end
 
@@ -478,7 +493,21 @@ set_callback(function()
     end
 end, ON.TRANSITION)
 
-set_global_interval(function()
+set_callback(function()
+    local olmec = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
+    if #olmec > 0 then
+        set_post_statemachine(olmec[1], function(ent)
+            if state.logic.olmec_cutscene then
+                state.logic.olmec_cutscene.timer = 809
+                if pause and mode == 1 and state.time_level >= rerecord_frame then
+                    state.pause = 0x20
+                end
+            end
+        end)
+    end
+end, ON.POST_LEVEL_GENERATION)
+
+--[[set_global_interval(function()
     if state.logic.olmec_cutscene ~= nil then
         state.logic.olmec_cutscene.timer = 809
         if pause and mode == 1 then
@@ -490,18 +519,7 @@ set_global_interval(function()
             end, ON.GUIFRAME)
         end
     end
-    if state.logic.tiamat_cutscene ~= nil then
-        state.logic.tiamat_cutscene.timer = 379
-        if pause and mode == 1 then
-            cutcb = set_callback(function()
-                if state.pause == 0 then
-                    clear_callback(cutcb)
-                    state.pause = 0x20
-                end
-            end, ON.GUIFRAME)
-        end
-    end
-end, 1)
+end, 1)]]
 
 set_callback(function()
     if turbo then
