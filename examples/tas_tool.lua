@@ -31,6 +31,14 @@ local draw = true
 local file_text = "tas"
 local last_hud = false
 local select_level = 1
+local cred = {
+    shoppie_aggro=0,
+    shoppie_aggro_next=0,
+    merchant_aggro=0,
+    kali_favor=0,
+    kali_status=0,
+    kali_altars_destroyed=0
+}
 
 register_option_button("open", "Show TAS window", function()
     window_open = true
@@ -49,6 +57,14 @@ local function clear_run()
     rerecord_frame = 0
     rerecording = false
     select_level = 1
+    cred = {
+        shoppie_aggro=0,
+        shoppie_aggro_next=0,
+        merchant_aggro=0,
+        kali_favor=0,
+        kali_status=0,
+        kali_altars_destroyed=0
+    }
 end
 
 local function fix_sparse_array(arr)
@@ -99,7 +115,7 @@ set_callback(function(ctx)
             ctx:win_text("Recording and playback")
             local opts = {}
             for i,v in pairs(levels) do
-                opts[#opts+1] = tostring(v[1]).."-"..tostring(v[2])
+                opts[#opts+1] = tostring(v.w).."-"..tostring(v.l)
             end
             select_level = ctx:win_combo("Level", select_level, table.concat(opts, '\0')..'\0\0')
             local frame_count = state.time_level
@@ -181,7 +197,7 @@ set_callback(function(ctx)
             if (rerecord_frame > 0 and i >= rerecord_frame) or not cpos[i] or not cpos[i-1] then break end
             local x1, y1 = screen_position(cpos[i-1].x, cpos[i-1].y)
             local x2, y2 = screen_position(cpos[i].x, cpos[i].y)
-            local col = cpos[i].l == state.camera_layer and 0xff0000aa or 0xff000066
+            local col = cpos[i].l == state.camera_layer and 0xff0000aa or 0x660000aa
             ctx:draw_line(x1, y1, x2, y2, 2, col)
         end
     end
@@ -191,7 +207,24 @@ set_callback(function()
     if not rerecording then
         rerecord_frame = 0
     end
+    if state.level_count > 0 and state.level_count >= rerecord_level and levels[state.level_count+1] then
+        --[[crashes
+        if levels[state.level_count+1].held > 0 then
+            state.items.player_inventory[1].held_item = levels[state.level_count+1].held
+        end]]
+    end
 end, ON.PRE_LEVEL_GENERATION)
+
+set_callback(function()
+    if state.loading == 1 and state.screen == SCREEN.LEVEL then
+        cred.shoppie_aggro = state.shoppie_aggro
+        cred.shoppie_aggro_next = state.shoppie_aggro_next
+        cred.merchant_aggro = state.merchant_aggro
+        cred.kali_favor = state.kali_favor
+        cred.kali_status = state.kali_status
+        cred.kali_altars_destroyed = state.kali_altars_destroyed
+    end
+end, ON.LOADING)
 
 set_callback(function()
     if rerecord_level ~= -1 and state.level_count ~= rerecord_level then
@@ -199,13 +232,16 @@ set_callback(function()
         state.level_count = state.level_count + 1
         local next = levels[state.level_count+1]
         state.screen_next = SCREEN.LEVEL
-        state.world_next = next[1]
-        state.level_next = next[2]
-        state.theme_next = next[3]
-        state.time_total = next[9]
-        state.shoppie_aggro = next[10]
-        state.shoppie_aggro_next = next[11]
-        state.merchant_aggro = next[12]
+        state.world_next = next.w
+        state.level_next = next.l
+        state.theme_next = next.t
+        state.time_total = next.time
+        state.shoppie_aggro = next.shoppie_aggro
+        state.shoppie_aggro_next = next.shoppie_aggro_next
+        state.merchant_aggro = next.merchant_aggro
+        state.kali_favor = next.kali_favor
+        state.kali_status = next.kali_status
+        state.kali_altars_destroyed = next.kali_altars_destroyed
         state.loading = 1
     else
         if rerecord_level == -1 then
@@ -222,30 +258,10 @@ set_callback(function()
             for i,v in ipairs(players[1]:get_powerups()) do
                 powerups[i] = v
             end
-            levels[state.level_count+1] = { state.world, state.level, state.theme, players[1].health, players[1].inventory.bombs, players[1].inventory.ropes, powerups, holding, state.time_total, state.shoppie_aggro, state.shoppie_aggro_next, state.merchant_aggro, backitem }
+            levels[state.level_count+1] = { w=state.world, l=state.level, t=state.theme, h=players[1].health, b=players[1].inventory.bombs, r=players[1].inventory.ropes, power=powerups, held=holding, time=state.time_total, shoppie_aggro=cred.shoppie_aggro, shoppie_aggro_next=cred.shoppie_aggro_next, merchant_aggro=cred.merchant_aggro, kali_favor=cred.kali_favor, kali_status=cred.kali_status, kali_altars_destroyed=cred.kali_altars_destroyed, back=backitem }
         elseif state.level_count >= rerecord_level then
             print("Rerecord level reached")
             rerecord_level = -1
-            local next = levels[state.level_count+1]
-            state.time_total = next[9]
-            players[1].health = next[4]
-            players[1].inventory.bombs = next[5]
-            players[1].inventory.ropes = next[6]
-            players[1].health = next[4]
-            players[1].inventory.bombs = next[5]
-            players[1].inventory.ropes = next[6]
-            for i,v in ipairs(next[7]) do
-                local m = string.find(names[v], "PACK")
-                if not m then
-                    players[1]:give_powerup(v)
-                end
-            end
-            if next[8] ~= -1 then
-                pick_up(players[1].uid, spawn(next[8], 0, 0, LAYER.PLAYER, 0, 0))
-            end
-            if next[13] ~= -1 then
-                pick_up(players[1].uid, spawn(next[13], 0, 0, LAYER.PLAYER, 0, 0))
-            end
         end
         if mode == 1 and pause and state.time_level >= rerecord_frame then -- record
             if state.pause == 0 then
@@ -259,6 +275,28 @@ set_callback(function()
     end
     select_level = state.level_count+1
 end, ON.LEVEL)
+
+set_callback(function()
+    if rerecord_level ~= -1 and state.level_count >= rerecord_level then
+        local next = levels[state.level_count+1]
+        state.time_total = next.time
+        players[1].health = next.h
+        players[1].inventory.bombs = next.b
+        players[1].inventory.ropes = next.r
+        for i,v in ipairs(next.power) do
+            local m = string.find(names[v], "PACK")
+            if not m then
+                players[1]:give_powerup(v)
+            end
+        end
+        if next.back ~= -1 then
+            pick_up(players[1].uid, spawn(next.back, 0, 0, LAYER.PLAYER, 0, 0))
+        end
+        if next.held ~= -1 then
+            pick_up(players[1].uid, spawn(next.held, 0, 0, LAYER.PLAYER, 0, 0))
+        end
+    end
+end, ON.POST_LEVEL_GENERATION)
 
 set_callback(function()
     if #players < 1 then return end
@@ -356,6 +394,7 @@ set_callback(function()
     if turbo then
         state.fadeout = 0
         state.fadein = 0
+        state.fadevalue = 0
     end
 end, ON.LOADING)
 
