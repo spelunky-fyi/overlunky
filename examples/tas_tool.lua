@@ -26,6 +26,11 @@ register_option_button("open", "Show TAS window", function()
     window_open = true
 end)
 
+local names = {}
+for i,v in pairs(ENT_TYPE) do
+  names[v] = i
+end
+
 local function clear_run()
     frames = {}
     pos = {}
@@ -140,7 +145,11 @@ set_callback(function()
             if holding ~= -1 then
                 holding = get_entity(holding).type.id
             end
-            levels[state.level_count] = { state.world, state.level, state.theme, players[1].health, players[1].inventory.bombs, players[1].inventory.ropes, players[1]:get_powerups(), holding, state.time_total, state.shoppie_aggro, state.shoppie_aggro_next, state.merchant_aggro }
+            local backitem = worn_backitem(players[1].uid)
+            if backitem ~= -1 then
+                backitem = get_entity(backitem).type.id
+            end
+            levels[state.level_count] = { state.world, state.level, state.theme, players[1].health, players[1].inventory.bombs, players[1].inventory.ropes, players[1]:get_powerups(), holding, state.time_total, state.shoppie_aggro, state.shoppie_aggro_next, state.merchant_aggro, backitem }
         elseif state.level_count >= rerecord_level then
             prinspect("Rerecord level reached")
             rerecord_level = -1
@@ -153,10 +162,16 @@ set_callback(function()
             players[1].inventory.bombs = next[5]
             players[1].inventory.ropes = next[6]
             for i,v in ipairs(next[7]) do
-                players[1]:give_powerup(v)
+                local m = string.find(names[v], "PACK")
+                if not m then
+                    players[1]:give_powerup(v)
+                end
             end
-            if levels[state.level_count][8] ~= -1 then
+            if next[8] ~= -1 then
                 pick_up(players[1].uid, spawn(next[8], 0, 0, LAYER.PLAYER, 0, 0))
+            end
+            if next[13] ~= -1 then
+                pick_up(players[1].uid, spawn(next[13], 0, 0, LAYER.PLAYER, 0, 0))
             end
         end
         if mode == 1 and pause and state.time_level >= rerecord_frame then -- record
