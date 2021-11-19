@@ -16,6 +16,7 @@
 #include "lua_require.hpp"
 #include "script_util.hpp"
 
+#include "usertypes/arena_lua.hpp"
 #include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
@@ -118,6 +119,7 @@ end
     NEntitiesLiquids::register_usertypes(lua);
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
+    NArena::register_usertypes(lua);
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
     NScreen::register_usertypes(lua);

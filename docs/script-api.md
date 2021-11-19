@@ -1054,18 +1054,6 @@ end
 - [`bool save(string data)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) &SaveContext::Save
 ### `LoadContext`
 - [`string load()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load) &LoadContext::Load
-### `SelectPlayerSlot`
-- [`bool activated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activated) &SelectPlayerSlot::activated
-- [`ENT_TYPE character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &SelectPlayerSlot::character
-- [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
-### `Items`
-- [`int player_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) &Items::player_count
-- [`int saved_pets_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets_count) &Items::saved_pets_count
-- [`array<ENT_TYPE, 4> saved_pets`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) &Items::saved_pets
-- [`array<bool, 4> is_pet_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) &Items::is_pet_cursed
-- [`array<bool, 4> is_pet_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) &Items::is_pet_poisoned
-- [`array<Inventory, MAX_PLAYERS> player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) &Items::player_inventories
-- [`array<SelectPlayerSlot, MAX_PLAYERS> player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) &Items::player_select_slots
 ### `ArenaConfigArenas`
 - [`bool dwelling_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) &ArenaConfigArenas::dwelling_1
 - [`bool dwelling_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_2) &ArenaConfigArenas::dwelling_2
@@ -1190,6 +1178,18 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`bool final_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=final_ghost) &ArenaState::final_ghost
 - [`int breath_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breath_cooldown) &ArenaState::breath_cooldown
 - [`bool punish_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=punish_ball) &ArenaState::punish_ball
+### `SelectPlayerSlot`
+- [`bool activated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activated) &SelectPlayerSlot::activated
+- [`ENT_TYPE character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &SelectPlayerSlot::character
+- [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
+### `Items`
+- [`int player_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) &Items::player_count
+- [`int saved_pets_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets_count) &Items::saved_pets_count
+- [`array<ENT_TYPE, 4> saved_pets`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) &Items::saved_pets
+- [`array<bool, 4> is_pet_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) &Items::is_pet_cursed
+- [`array<bool, 4> is_pet_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) &Items::is_pet_poisoned
+- [`array<Inventory, MAX_PLAYERS> player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) &Items::player_inventories
+- [`array<SelectPlayerSlot, MAX_PLAYERS> player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) &Items::player_select_slots
 ### `StateMemory`
 - [`int screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`int screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
