@@ -327,32 +327,26 @@ set_callback(function()
     end
 end, ON.LEVEL)
 
-set_post_entity_spawn(function(ent, flags)
-    local next = levels[state.level_count+1]
-    ent.health = next.h
-    if ent.inventory then
-        ent.inventory.bombs = next.b
-        ent.inventory.ropes = next.r
-    end
-
-    for i,v in ipairs(next.power) do
-        local m = string.find(names[v], "PACK")
-        if not m and not ent:has_powerup(v) then
-            ent:give_powerup(v)
-        end
-    end
-    if next.back ~= -1 and ent:worn_backitem() == -1 then
-        pick_up(ent.uid, spawn(next.back, 0, 0, LAYER.PLAYER, 0, 0))
-    end
-    if next.held ~= -1 and ent.holding_uid == -1 then
-        pick_up(ent.uid, spawn(next.held, 0, 0, LAYER.PLAYER, 0, 0))
-    end
-end, SPAWN_TYPE.LEVEL_GEN, MASK.PLAYER, nil)
-
 set_callback(function()
     if rerecord_level ~= -1 and state.level_count >= rerecord_level then
         local next = levels[state.level_count+1]
         state.time_total = next.time
+        players[1].health = next.h
+        players[1].inventory.bombs = next.b
+        players[1].inventory.ropes = next.r
+
+        for i,v in ipairs(next.power) do
+            local m = string.find(names[v], "PACK")
+            if not m and not players[1]:has_powerup(v) then
+                players[1]:give_powerup(v)
+            end
+        end
+        if next.back ~= -1 and players[1]:worn_backitem() == -1 then
+            pick_up(players[1].uid, spawn(next.back, 0, 0, LAYER.PLAYER, 0, 0))
+        end
+        if next.held ~= -1 and players[1].holding_uid == -1 then
+            pick_up(players[1].uid, spawn(next.held, 0, 0, LAYER.PLAYER, 0, 0))
+        end
         print("Rerecord level reached")
         set_timeout(function()
             rerecord_level = -1
@@ -415,9 +409,8 @@ set_callback(function()
                     end
                 end
             end
-            local delay = 0
-            frames[state.level_count+1][state.time_level+delay] = read_input(players[1].uid)
-            message('Recording '..string.format('%04x', frames[state.level_count+1][state.time_level+delay])..' '..state.time_level)
+            frames[state.level_count+1][state.time_level] = read_input(players[1].uid)
+            message('Recording '..string.format('%04x', frames[state.level_count+1][state.time_level])..' '..state.time_level)
         end
 
         last_hud = test_flag(state.level_flags, 21)
@@ -459,10 +452,10 @@ set_callback(function()
     else
         if rng[state.level_count+1] == nil then
             rng[state.level_count+1] = {}
-            for i=1,20 do
-                local a,b = prng:get_pair(i)
-                rng[state.level_count+1][i] = { a=a, b=b }
-            end
+        end
+        for i=1,20 do
+            local a,b = prng:get_pair(i)
+            rng[state.level_count+1][i] = { a=a, b=b }
         end
     end
 
