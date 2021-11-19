@@ -16,6 +16,7 @@ local seed = 0
 local frames = {}
 local pos = {}
 local levels = {}
+local rng = {}
 local stopped = true
 local stolen = false
 local cutcb = -1
@@ -28,17 +29,12 @@ local pause = true
 local skip = true
 local turbo = true
 local draw = true
+local light = true
 local file_text = "tas"
 local last_hud = false
 local select_level = 1
-local cred = {
-    shoppie_aggro=0,
-    shoppie_aggro_next=0,
-    merchant_aggro=0,
-    kali_favor=0,
-    kali_status=0,
-    kali_altars_destroyed=0
-}
+local cred = {}
+local load_prng = false
 
 register_option_button("open", "Show TAS window", function()
     window_open = true
@@ -57,14 +53,7 @@ local function clear_run()
     rerecord_frame = 0
     rerecording = false
     select_level = 1
-    cred = {
-        shoppie_aggro=0,
-        shoppie_aggro_next=0,
-        merchant_aggro=0,
-        kali_favor=0,
-        kali_status=0,
-        kali_altars_destroyed=0
-    }
+    prev_level = -1
 end
 
 local function fix_sparse_array(arr)
@@ -77,6 +66,28 @@ local function fix_sparse_array(arr)
         local input = arr[i]
         if not arr[i] then input = 0 end
         new_arr[i] = input
+    end
+    return new_arr
+end
+
+local function rng_to_string(arr)
+    local new_arr = {}
+    for i,v in ipairs(arr) do
+        new_arr[i] = {}
+        for j,w in ipairs(v) do
+            new_arr[i][#new_arr[i]+1] = { a=string.format("%d", w.a), b=string.format("%d", w.b) }
+        end
+    end
+    return new_arr
+end
+
+local function rng_from_string(arr)
+    local new_arr = {}
+    for i,v in ipairs(arr) do
+        new_arr[i] = {}
+        for j,w in ipairs(v) do
+            new_arr[i][#new_arr[i]+1] = { a=tonumber(w.a, 10), b=tonumber(w.b, 10) }
+        end
     end
     return new_arr
 end
@@ -124,18 +135,79 @@ set_callback(function(ctx)
             end
             rerecord_frame = ctx:win_slider_int("##Frame", rerecord_frame, 0, frame_count)
             ctx:win_inline()
-            if ctx:win_button("Rerecord level from frame") then
+            --[[if ctx:win_button("Rerecord level from frame") then
                 mode = 1
                 rerecord_level = select_level - 1
                 rerecording = true
                 set_seed(seed)
+            end]]
+
+            if ctx:win_button("Rerecord level from frame") then
+                load_prng = true
+                mode = 1
+                rerecord_level = select_level - 1
+                rerecording = true
+
+                state.level_count = rerecord_level
+                local next = levels[state.level_count+1]
+                state.screen_next = SCREEN.LEVEL
+                state.world_next = next.w
+                state.level_next = next.l
+                state.theme_next = next.t
+                state.time_total = next.time
+                state.shoppie_aggro = next.shoppie_aggro
+                state.shoppie_aggro_next = next.shoppie_aggro_next
+                state.merchant_aggro = next.merchant_aggro
+                state.kali_favor = next.kali_favor
+                state.kali_status = next.kali_status
+                state.kali_altars_destroyed = next.kali_altars_destroyed
+
+                state.level_flags = next.level_flags
+                state.quest_flags = next.quest_flags
+                state.journal_flags = next.journal_flags
+                state.special_visibility_flags = next.special_visibility_flags
+
+                state.quests.yang_state = next.quest_yang
+                state.quests.jungle_sisters_flags = next.quest_sisters
+                state.quests.van_horsing_state = next.quest_horsing
+                state.quests.sparrow_state = next.quest_sparrow
+                state.quests.madame_tusk_state = next.quest_tusk
+                state.quests.beg_state = next.quest_beg
+                state.loading = 1
             end
 
             if ctx:win_button("Playback level") then
+                load_prng = true
                 mode = 2
                 rerecord_level = select_level - 1
                 rerecording = false
-                set_seed(seed)
+
+                state.level_count = rerecord_level
+                local next = levels[state.level_count+1]
+                state.screen_next = SCREEN.LEVEL
+                state.world_next = next.w
+                state.level_next = next.l
+                state.theme_next = next.t
+                state.time_total = next.time
+                state.shoppie_aggro = next.shoppie_aggro
+                state.shoppie_aggro_next = next.shoppie_aggro_next
+                state.merchant_aggro = next.merchant_aggro
+                state.kali_favor = next.kali_favor
+                state.kali_status = next.kali_status
+                state.kali_altars_destroyed = next.kali_altars_destroyed
+
+                state.level_flags = next.level_flags
+                state.quest_flags = next.quest_flags
+                state.journal_flags = next.journal_flags
+                state.special_visibility_flags = next.special_visibility_flags
+
+                state.quests.yang_state = next.quest_yang
+                state.quests.jungle_sisters_flags = next.quest_sisters
+                state.quests.van_horsing_state = next.quest_horsing
+                state.quests.sparrow_state = next.quest_sparrow
+                state.quests.madame_tusk_state = next.quest_tusk
+                state.quests.beg_state = next.quest_beg
+                state.loading = 1
             end
             ctx:win_inline()
             if ctx:win_button("Playback run") then
@@ -155,7 +227,8 @@ set_callback(function(ctx)
                 for i,v in ipairs(frames) do
                     frames[i] = fix_sparse_array(v)
                 end
-                local save_data = json.encode{ seed=seed_text, frames=frames, levels=levels }
+                local srng = rng_to_string(rng)
+                local save_data = json.encode{ seed=seed_text, frames=frames, levels=levels, rng=srng }
                 local fo = io.open(F"{file_text}.json", "w+")
                 fo:write(save_data)
                 fo:close()
@@ -170,6 +243,7 @@ set_callback(function(ctx)
                 seed_text = load_data["seed"]
                 levels = table.unpack({load_data["levels"]})
                 frames = table.unpack({load_data["frames"]})
+                rng = rng_from_string(load_data["rng"])
                 pos = {}
                 for i,v in ipairs(frames) do
                     pos[i] = {}
@@ -189,6 +263,7 @@ set_callback(function(ctx)
             skip = ctx:win_check("Skip level transitions", skip)
             turbo = ctx:win_check("Skip fades", turbo)
             draw = ctx:win_check("Draw history", draw)
+            light = ctx:win_check("Illuminate dark levels", light)
         end)
     end
     if draw and pos[state.level_count+1] and #pos[state.level_count+1] > 3 then
@@ -204,29 +279,6 @@ set_callback(function(ctx)
 end, ON.GUIFRAME)
 
 set_callback(function()
-    if not rerecording then
-        rerecord_frame = 0
-    end
-    if state.level_count > 0 and state.level_count >= rerecord_level and levels[state.level_count+1] then
-        --[[crashes
-        if levels[state.level_count+1].held > 0 then
-            state.items.player_inventory[1].held_item = levels[state.level_count+1].held
-        end]]
-    end
-end, ON.PRE_LEVEL_GENERATION)
-
-set_callback(function()
-    if state.loading == 1 and state.screen == SCREEN.LEVEL then
-        cred.shoppie_aggro = state.shoppie_aggro
-        cred.shoppie_aggro_next = state.shoppie_aggro_next
-        cred.merchant_aggro = state.merchant_aggro
-        cred.kali_favor = state.kali_favor
-        cred.kali_status = state.kali_status
-        cred.kali_altars_destroyed = state.kali_altars_destroyed
-    end
-end, ON.LOADING)
-
-set_callback(function()
     if rerecord_level ~= -1 and state.level_count ~= rerecord_level then
         print("Skipping level")
         state.level_count = state.level_count + 1
@@ -236,12 +288,6 @@ set_callback(function()
         state.level_next = next.l
         state.theme_next = next.t
         state.time_total = next.time
-        state.shoppie_aggro = next.shoppie_aggro
-        state.shoppie_aggro_next = next.shoppie_aggro_next
-        state.merchant_aggro = next.merchant_aggro
-        state.kali_favor = next.kali_favor
-        state.kali_status = next.kali_status
-        state.kali_altars_destroyed = next.kali_altars_destroyed
         state.loading = 1
     else
         if rerecord_level == -1 then
@@ -258,7 +304,7 @@ set_callback(function()
             for i,v in ipairs(players[1]:get_powerups()) do
                 powerups[i] = v
             end
-            levels[state.level_count+1] = { w=state.world, l=state.level, t=state.theme, h=players[1].health, b=players[1].inventory.bombs, r=players[1].inventory.ropes, power=powerups, held=holding, time=state.time_total, shoppie_aggro=cred.shoppie_aggro, shoppie_aggro_next=cred.shoppie_aggro_next, merchant_aggro=cred.merchant_aggro, kali_favor=cred.kali_favor, kali_status=cred.kali_status, kali_altars_destroyed=cred.kali_altars_destroyed, back=backitem }
+            levels[state.level_count+1] = { w=state.world, l=state.level, t=state.theme, h=players[1].health, b=players[1].inventory.bombs, r=players[1].inventory.ropes, power=powerups, held=holding, time=state.time_total, shoppie_aggro=cred.shoppie_aggro, shoppie_aggro_next=cred.shoppie_aggro_next, merchant_aggro=cred.merchant_aggro, kali_favor=cred.kali_favor, kali_status=cred.kali_status, kali_altars_destroyed=cred.kali_altars_destroyed, back=backitem, level_flags=cred.level_flags, quest_flags=cred.quest_flags, journal_flags=cred.journal_flags, presence_flags=cred.presence_flags, special_visibility_flags=cred.special_visibility_flags, quest_yang=cred.quest_yang, quest_sisters=cred.quest_sisters, quest_horsing=cred.quest_horsing, quest_sparrow=cred.quest_sparrow, quest_tusk=cred.quest_tusk, quest_beg=cred.quest_beg }
         elseif state.level_count >= rerecord_level then
             print("Rerecord level reached")
             rerecord_level = -1
@@ -285,18 +331,21 @@ set_callback(function()
         players[1].inventory.ropes = next.r
         for i,v in ipairs(next.power) do
             local m = string.find(names[v], "PACK")
-            if not m then
+            if not m and not players[1]:has_powerup(v) then
                 players[1]:give_powerup(v)
             end
         end
-        if next.back ~= -1 then
+        if next.back ~= -1 and players[1]:worn_backitem() == -1 then
             pick_up(players[1].uid, spawn(next.back, 0, 0, LAYER.PLAYER, 0, 0))
         end
-        if next.held ~= -1 then
+        if next.held ~= -1 and players[1].holding_uid == -1 then
             pick_up(players[1].uid, spawn(next.held, 0, 0, LAYER.PLAYER, 0, 0))
         end
     end
-end, ON.POST_LEVEL_GENERATION)
+    if test_flag(state.level_flags, 18) and light and state.illumination == nil then
+        state.illumination = create_illumination(Color:white(), 20000, 172, 252)
+    end
+end, ON.LEVEL) -- this should really be POST_LEVEL_GENERATION, but Inventory held crap is duplicating these
 
 set_callback(function()
     if #players < 1 then return end
@@ -357,7 +406,63 @@ set_callback(function()
     end
     local x, y, l = get_position(players[1].uid)
     pos[state.level_count+1][state.time_level] = {x=x, y=y, l=l}
+
+    if light and state.illumination ~= nil then
+        if state.camera_layer == LAYER.BACK then
+            state.illumination.flags = set_flag(state.illumination.flags, 17)
+        else
+            state.illumination.flags = clr_flag(state.illumination.flags, 17)
+        end
+    end
 end, ON.FRAME)
+
+set_callback(function()
+    if not rerecording then
+        rerecord_frame = 0
+    end
+
+    if load_prng then
+        load_prng = false
+        if rng[rerecord_level+1] ~= nil then
+            for i,v in ipairs(rng[rerecord_level+1]) do
+                prng:set_pair(i, v.a, v.b)
+            end
+        end
+    else
+        if rng[state.level_count+1] == nil then
+            rng[state.level_count+1] = {}
+        end
+        for i=1,20 do
+            local a,b = prng:get_pair(i)
+            rng[state.level_count+1][i] = { a=a, b=b }
+        end
+    end
+
+    cred.shoppie_aggro = state.shoppie_aggro
+    cred.shoppie_aggro_next = state.shoppie_aggro_next
+    cred.merchant_aggro = state.merchant_aggro
+    cred.kali_favor = state.kali_favor
+    cred.kali_status = state.kali_status
+    cred.kali_altars_destroyed = state.kali_altars_destroyed
+
+    cred.level_flags = state.level_flags
+    cred.quest_flags = state.quest_flags
+    cred.journal_flags = state.journal_flags
+    cred.presence_flags = state.presence_flags
+    cred.special_visibility_flags = state.special_visibility_flags
+
+    cred.quest_yang = state.quests.yang_state
+    cred.quest_sisters = state.quests.jungle_sisters_flags
+    cred.quest_horsing = state.quests.van_horsing_state
+    cred.quest_sparrow = state.quests.sparrow_state
+    cred.quest_tusk = state.quests.madame_tusk_state
+    cred.quest_beg = state.quests.beg_state
+
+    if state.items.player_inventory[1].health < 1 then
+        state.items.player_inventory[1].health = levels[rerecord_level+1].h
+    end
+
+end, ON.PRE_LEVEL_GENERATION)
 
 set_callback(function()
     if skip then
@@ -404,4 +509,4 @@ set_post_entity_spawn(function(ent, flags)
     end
 end, SPAWN_TYPE.LEVEL_GEN, MASK.PLAYER, nil)
 
--- 43D3D0DD
+-- 1-2 tpjp E27E0F26
