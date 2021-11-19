@@ -49,8 +49,9 @@ struct StateMemory
     int8_t kali_favor;
     int8_t kali_status;
     int8_t kali_altars_destroyed;
-    uint8_t b4f;
-    int32_t i50;
+    /// 0 - none, 1 - item, 3 - kapala
+    int8_t kali_gifts;
+    int32_t i50;              // kali related?
     int32_t money_shop_total; // total $ spent at shops, persists between levels, number will be negative
     uint8_t world_start;
     uint8_t level_start;
@@ -65,29 +66,32 @@ struct StateMemory
     ThemeInfo* current_theme;
     uint8_t theme;
     uint8_t theme_next;
-    uint8_t win_state; // 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
+    /// 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
+    uint8_t win_state;
     uint8_t b73;
-    ENT_TYPE end_spaceship_character; // who pops out the spaceship for a tiamat/hundun win
+    /// Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
+    ENT_TYPE end_spaceship_character;
     uint8_t shoppie_aggro;
     uint8_t shoppie_aggro_levels;
     uint8_t merchant_aggro;
+    /// Run totals
     uint8_t saved_dogs;
     uint8_t saved_cats;
     uint8_t saved_hamsters;
     uint8_t kills_npc;
     uint8_t level_count;
-    uint8_t damage_taken; // total amount of damage taken, excluding cause of death
-    uint8_t unknown1b;
+    /// Total amount of damage taken, excluding cause of death
+    uint16_t damage_taken;
     bool world2_coffin_spawned;
     bool world4_coffin_spawned;
     bool world6_coffin_spawned;
     uint8_t unknown2b;
     uint8_t unknown2c;
     uint8_t unknown2d;
-    ENT_TYPE waddler_storage[99];
-    int16_t waddler_storage_meta[99]; // to store mattock durability for example
+    std::array<ENT_TYPE, 99> waddler_storage;
+    std::array<int16_t, 99> waddler_storage_meta; // to store mattock durability for example
     uint16_t journal_progression_count;
-    JournalProgressionSlot journal_progression_slots[40];
+    std::array<JournalProgressionSlot, 40> journal_progression_slots;
     uint8_t skip2[844];
     ThemeProgression theme_progression;
     uint8_t unknown3;

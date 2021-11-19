@@ -293,6 +293,7 @@ void register_usertypes(sol::state& lua)
         &ArenaState::breath_cooldown,
         "punish_ball",
         &ArenaState::punish_ball);
+
     lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -317,6 +318,8 @@ void register_usertypes(sol::state& lua)
         &StateMemory::kali_status,
         "kali_altars_destroyed",
         &StateMemory::kali_altars_destroyed,
+        "kali_gifts",
+        &StateMemory::kali_gifts,
         "seed",
         &StateMemory::seed,
         "time_total",
@@ -452,7 +455,34 @@ void register_usertypes(sol::state& lua)
         "arena",
         &StateMemory::arena,
         "logic",
-        &StateMemory::logic);
+        &StateMemory::logic,
+        "speedrun_character",
+        &StateMemory::speedrun_character,
+        "speedrun_activation_trigger",
+        &StateMemory::speedrun_activation_trigger,
+        "end_spaceship_character",
+        &StateMemory::end_spaceship_character,
+        "world2_coffin_spawned",
+        &StateMemory::world2_coffin_spawned,
+        "world4_coffin_spawned",
+        &StateMemory::world4_coffin_spawned,
+        "world6_coffin_spawned",
+        &StateMemory::world6_coffin_spawned,
+        "first_damage_cause",
+        &StateMemory::first_damage_cause,
+        "first_damage_world",
+        &StateMemory::first_damage_world,
+        "first_damage_level",
+        &StateMemory::first_damage_level,
+        "time_speedrun",
+        &StateMemory::time_speedrun,
+        "coffin_contents",
+        &StateMemory::coffin_contents,
+        "screen_change_counter",
+        &StateMemory::screen_change_counter,
+        "time_startup",
+        &StateMemory::time_startup);
+
     lua.new_usertype<GameManager>(
         "GameManager",
         "game_props",

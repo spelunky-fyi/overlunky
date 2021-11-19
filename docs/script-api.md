@@ -1202,6 +1202,9 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int kali_favor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_favor) &StateMemory::kali_favor
 - [`int kali_status`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_status) &StateMemory::kali_status
 - [`int kali_altars_destroyed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_altars_destroyed) &StateMemory::kali_altars_destroyed
+- [`int kali_gifts`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_gifts) &StateMemory::kali_gifts
+\
+0 - none, 1 - item, 3 - kapala
 - [`int seed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) &StateMemory::seed
 - [`int time_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) &StateMemory::time_total
 - [`int world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) &StateMemory::world
@@ -1222,6 +1225,8 @@ This function should only be used in a very specific circumstance (forcing the e
 - [`int kills_npc`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_npc) &StateMemory::kills_npc
 - [`int level_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_count) &StateMemory::level_count
 - [`int damage_taken`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage_taken) &StateMemory::damage_taken
+\
+Total amount of damage taken, excluding cause of death
 - [`int journal_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_flags) &StateMemory::journal_flags
 - [`int time_last_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) &StateMemory::time_last_level
 - [`int time_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) &StateMemory::time_level
@@ -1234,9 +1239,13 @@ This function should only be used in a very specific circumstance (forcing the e
 - [`int fadein`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadein) &StateMemory::fadein
 - [`int loading_black_screen_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading_black_screen_timer) &StateMemory::loading_black_screen_timer
 - [`int saved_dogs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_dogs) &StateMemory::saved_dogs
+\
+Run totals
 - [`int saved_cats`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_cats) &StateMemory::saved_cats
 - [`int saved_hamsters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_hamsters) &StateMemory::saved_hamsters
 - [`int win_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) &StateMemory::win_state
+\
+0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
 - [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &StateMemory::illumination
 - [`int money_last_levels`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) &StateMemory::money_last_levels
 - [`int money_shop_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) &StateMemory::money_shop_total
@@ -1274,6 +1283,21 @@ Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 - [`ArenaState arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) &StateMemory::arena
 - [`LogicList logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
+- [`ENT_TYPE speedrun_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) &StateMemory::speedrun_character
+- [`int speedrun_activation_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) &StateMemory::speedrun_activation_trigger
+- [`ENT_TYPE end_spaceship_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) &StateMemory::end_spaceship_character
+\
+Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
+- [`bool world2_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world2_coffin_spawned) &StateMemory::world2_coffin_spawned
+- [`bool world4_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world4_coffin_spawned) &StateMemory::world4_coffin_spawned
+- [`bool world6_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world6_coffin_spawned) &StateMemory::world6_coffin_spawned
+- [`ENT_TYPE first_damage_cause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_cause) &StateMemory::first_damage_cause
+- [`int first_damage_world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_world) &StateMemory::first_damage_world
+- [`int first_damage_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_level) &StateMemory::first_damage_level
+- [`int time_speedrun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_speedrun) &StateMemory::time_speedrun
+- [`ENT_TYPE coffin_contents`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) &StateMemory::coffin_contents
+- [`int screen_change_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) &StateMemory::screen_change_counter
+- [`int time_startup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) &StateMemory::time_startup
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
