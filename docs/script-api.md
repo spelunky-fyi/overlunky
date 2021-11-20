@@ -1616,6 +1616,7 @@ Related to taking damage, also drops you from ladder/rope, can't be set while on
 \
 Deprecated, it's the same as lock_input_timer, but this name makes no sense
 - [`int wet_effect_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wet_effect_timer) &Movable::wet_effect_timer
+- [`int poison_tick_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) &Movable::poison_tick_timer
 - [`int airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::falling_timer
 \
 airtime = falling_timer

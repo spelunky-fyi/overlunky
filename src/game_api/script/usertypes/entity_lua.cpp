@@ -274,6 +274,8 @@ void register_usertypes(sol::state& lua)
         &Movable::some_state,
         "wet_effect_timer",
         &Movable::wet_effect_timer,
+        "poison_tick_timer",
+        &Movable::poison_tick_timer,
         "airtime",
         &Movable::falling_timer,
         "falling_timer",
