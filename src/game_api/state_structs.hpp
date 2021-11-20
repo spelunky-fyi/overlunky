@@ -51,13 +51,15 @@ struct Illumination
         uint32_t flags;
         struct
         {
-            uint16_t light_flags; // no reason to expose this
+            uint8_t light_flags; // no reason to expose this
+
+            /// Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
+            /// Rectangle always uses light1, even when it's disabled in flags
+            uint8_t type_flags;
             uint8_t layer;
             bool enabled;
         };
     };
-    uint32_t unknown1;
-    uint32_t unknown2;
 };
 
 struct InputMapping

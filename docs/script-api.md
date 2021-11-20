@@ -1356,6 +1356,10 @@ It's rendered on objects around, not as an actual bright spot
 - [`int flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) &Illumination::flags
 \
 see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+- [`int type_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type_flags) &Illumination::type_flags
+\
+Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
+Rectangle always uses light1, even when it's disabled in flags
 - [`bool enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) &Illumination::enabled
 - [`int layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Illumination::layer
 ### `Camera`

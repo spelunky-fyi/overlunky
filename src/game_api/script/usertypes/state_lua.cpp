@@ -340,6 +340,8 @@ void register_usertypes(sol::state& lua)
         &Illumination::entity_uid,
         "flags",
         &Illumination::flags,
+        "type_flags",
+        &Illumination::type_flags,
         "enabled",
         &Illumination::enabled,
         "layer",
