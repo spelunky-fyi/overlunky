@@ -1225,6 +1225,10 @@ end
     /// Doesn't really work for layer doors
     lua["enter_door"] = enter_door;
 
+    /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, the default one are: {MONS_VAMPIRE, MONS_WITCHDOCTOR, MONS_NECROMANCER, MONS_SORCERESS}
+    /// If you don't wont to change all you can set it as 0, exampe: `change_sunchallenge_spawn({0,0,0,ENT_TYPE.MONS_COBRA})` - will only change sorceress to cobra
+    lua["change_sunchallenge_spawn"] = change_sunchallenge_spawn;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

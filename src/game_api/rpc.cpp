@@ -1759,3 +1759,11 @@ void call_transition(uint8_t special_transition)
     if (special_transition == 2)    // Duat
         state_ptr->theme_next = 12; // Duat
 }
+
+void change_sunchallenge_spawn(std::array<ENT_TYPE, 4> ent_types)
+{
+    ENT_TYPE* types_array = (ENT_TYPE*)get_address("sun_chalenge_generator_ent_types");
+    for (int i = 0; i < 4; i++)
+        if (types_array[i])
+            write_mem_prot(&types_array[i], ent_types[i], true);
+}

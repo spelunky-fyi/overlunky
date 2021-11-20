@@ -1598,6 +1598,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        // It's pointer to table[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
+        "sun_chalenge_generator_ent_types"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\x89\x4A\x38\x48\xC1\xE8\x1C\x83\xE0\x0C"sv)
+            .decode_pc()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
