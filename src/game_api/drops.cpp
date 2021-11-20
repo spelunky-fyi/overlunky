@@ -94,6 +94,7 @@ std::vector<DropEntry> drop_entries{
     {"YETIKING_ICESPIRE", "\xE8\x01\x00\x00"s, VTABLE_OFFSET::MONS_YETIKING, 104},
     {"YETIQUEEN_POWERPACK", "\x3E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETIQUEEN, 105},
     {"YETI_PITCHERSMITT", "\x0E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETI, 3},
+    {"FACTORY_GENERATOR", "\x48\x89\xF9\xBA****\x48\x83\xC4\x38\x5F\x5E"s, VTABLE_OFFSET::NONE, 0, 4},
 };
 
 std::vector<DropChanceEntry> dropchance_entries{

@@ -16,7 +16,7 @@ void register_usertypes(sol::state& lua)
 
     lua.create_named_table("DROPCHANCE"
                            //, "BONEBLOCK_SKELETONKEY", 0
-                           //, "", ...see__drops.hpp__for__a__list__of__possible__dropchances...
+                           //, "", ...see__[drops.cpp](../src/game_api/drops.cpp\]__for__a__list__of__possible__dropchances...
                            //, "YETI_PITCHERSMITT", 10
     );
     for (size_t x = 0; x < dropchance_entries.size(); ++x)
@@ -26,7 +26,7 @@ void register_usertypes(sol::state& lua)
 
     lua.create_named_table("DROP"
                            //, "ALTAR_DICE_CLIMBINGGLOVES", 0
-                           //, "", ...see__drops.hpp__for__a__list__of__possible__drops...
+                           //, "", ...see__[drops.cpp](../src/game_api/drops.cpp\]__for__a__list__of__possible__drops...
                            //, "YETI_PITCHERSMITT", 85
     );
     for (size_t x = 0; x < drop_entries.size(); ++x)
