@@ -1768,3 +1768,11 @@ void change_sunchallenge_spawn(std::array<ENT_TYPE, 4> ent_types)
         if (types_array[i])
             write_mem_prot(&types_array[i], ent_types[i], true);
 }
+
+void change_diceshop_prizes(std::array<ENT_TYPE, 25> ent_types)
+{
+    ENT_TYPE* types_array = (ENT_TYPE*)get_address("dice_shop_prizes");
+    for (int i = 0; i < 25; ++i)
+        if (types_array[i])
+            write_mem_prot(&types_array[i], ent_types[i], true);
+}

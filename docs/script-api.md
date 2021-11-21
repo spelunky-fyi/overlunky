@@ -713,7 +713,12 @@ Doesn't really work for layer doors
 ### [`change_sunchallenge_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawn)
 `nil change_sunchallenge_spawn(array<ENT_TYPE, 4> ent_types)`<br/>
 Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, the default one are: {MONS_VAMPIRE, MONS_WITCHDOCTOR, MONS_NECROMANCER, MONS_SORCERESS}
-If you don't wont to change all you can set it as 0, exampe: `change_sunchallenge_spawn({0,0,0,ENT_TYPE.MONS_COBRA})` - will only change sorceress to cobra
+### [`change_diceshop_prizes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_diceshop_prizes)
+`nil change_diceshop_prizes(array<ENT_TYPE, 25> ent_types)`<br/>
+Change ENT_TYPE's spawned in dice shops (tusk as well), there are 25
+the default one are: {ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_COMPASS, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_PARACHUTE, ITEM_PICKUP_PASTE, ITEM_PICKUP_SPECTACLES, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_PITCHERSMITT, ITEM_PICKUP_CLIMBINGGLOVES,
+ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ITEM_BOOMERANG, ITEM_MACHETE, ITEM_SHOTGUN, ITEM_CROSSBOW, ITEM_WEBGUN, ITEM_FREEZERAY, ITEM_MATTOCK, ITEM_CAMERA, ITEM_PURCHASABLE_HOVERPACK, ITEM_PURCHASABLE_JETPACK,
+ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_TELEPORTER, ITEM_PURCHASABLE_POWERPACK}
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example

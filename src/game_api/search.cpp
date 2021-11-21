@@ -1606,6 +1606,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
+    {
+        // Set bp on prize_dispenser->itemid_2 and roll a 7
+        // array[25]
+        "dice_shop_prizes"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x41\x88\x8C\x24\x36\x01\x00\x00\x41\x0F\xB6\x84\x04\x30\x01\x00\x00"sv)
+            .decode_pc()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
