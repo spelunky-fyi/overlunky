@@ -99,6 +99,16 @@ std::vector<DropEntry> drop_entries{
 
     /// Keep in mind that shopkeeper generator spawns two types of entities, the second one will be this + 1
     {"SHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"s, VTABLE_OFFSET::NONE, 0, 2},
+    // set conditional bp on load_item for spider, break some scrap until you hit bp, execute return, you will see spaider id right above the spawn function
+    {"SCRAP_SPIDER", "\xC6\x44\x24\x20\x00\xBA\xDD\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    // scroll up to find the same pattern but for snake
+    {"SCRAP_SNAKE", "\xC6\x44\x24\x20\x00\xBA\xDC\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    // just above the snake you can find cobra and scorpion id, with jump to the spawn function after snake
+    {"SCRAP_COBRA", "\xC6\x44\x24\x20\x00\xBA\xF8\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"SCRAP_SCORPION", "\xC6\x44\x24\x20\x00\xBA\xE5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    // little higher up, same thing for alien
+    {"SCRAP_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},     // there are two identical patterns, this one is first
+    {"UFO_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6, 1, 1}, // and this one is the second
 };
 
 std::vector<DropChanceEntry> dropchance_entries{

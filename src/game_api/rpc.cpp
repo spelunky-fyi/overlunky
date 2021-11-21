@@ -1263,15 +1263,16 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
             auto memory = Memory::get();
             size_t offset = 0;
             size_t exe_offset = 0;
-            if (entry.vtable_offset == VTABLE_OFFSET::NONE)
+            auto n_skips = entry.skip;
+            do
             {
-                exe_offset = memory.at_exe(find_inst(memory.exe(), entry.pattern, memory.after_bundle) + entry.value_offset);
-            }
-            else
-            {
-                offset = find_inst(memory.exe(), entry.pattern, get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)) + entry.value_offset;
-                exe_offset = memory.at_exe(offset);
-            }
+                if (entry.vtable_offset == VTABLE_OFFSET::NONE)
+                    offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : memory.after_bundle) + entry.value_offset;
+                else
+                    offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)) + entry.value_offset;
+
+            } while (n_skips--);
+            exe_offset = memory.at_exe(offset);
 
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
             {
@@ -1763,7 +1764,7 @@ void call_transition(uint8_t special_transition)
 void change_sunchallenge_spawn(std::array<ENT_TYPE, 4> ent_types)
 {
     ENT_TYPE* types_array = (ENT_TYPE*)get_address("sun_chalenge_generator_ent_types");
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; ++i)
         if (types_array[i])
             write_mem_prot(&types_array[i], ent_types[i], true);
 }
