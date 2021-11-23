@@ -48,6 +48,7 @@ struct StateMemory
     uint32_t h;
     int8_t kali_favor;
     int8_t kali_status;
+    /// Also affects if the player has punish ball, if the punish ball is destroyed it is set to -1
     int8_t kali_altars_destroyed;
     /// 0 - none, 1 - item, 3 - kapala
     int8_t kali_gifts;
