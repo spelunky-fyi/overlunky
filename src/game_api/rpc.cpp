@@ -1833,8 +1833,8 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
     auto offset = get_address("dice_shop_prizes_id_roll");
     bool original_instr = (*(uint8_t*)offset == 0x89);
 
-    if (original_instr && ent_types.size() == 25 ||                     // if it's the unchanged instruction and we set the same number of ent_type's
-        !original_instr && *(uint8_t*)(offset + 5) == ent_types.size()) // or new instruction but the same size
+    if ((original_instr && ent_types.size() == 25) ||                     // if it's the unchanged instruction and we set the same number of ent_type's
+        (!original_instr && *(uint8_t*)(offset + 5) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
             if (ent_types[i])
