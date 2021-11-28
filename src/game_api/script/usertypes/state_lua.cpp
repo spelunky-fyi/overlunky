@@ -455,8 +455,38 @@ void register_usertypes(sol::state& lua)
         &StateMemory::set_correct_ushabti,
         "arena",
         &StateMemory::arena,
+        /* state got so big that adding stuff here will couse `compiler out of heap space`
+        * to solve this, we add stuff in this comment for the autodoc, and then for real below to the `state_usertype`
+
+        "speedrun_character",
+        &StateMemory::speedrun_character,
+        "speedrun_activation_trigger",
+        &StateMemory::speedrun_activation_trigger,
+        "end_spaceship_character",
+        &StateMemory::end_spaceship_character,
+        "world2_coffin_spawned",
+        &StateMemory::world2_coffin_spawned,
+        "world4_coffin_spawned",
+        &StateMemory::world4_coffin_spawned,
+        "world6_coffin_spawned",
+        &StateMemory::world6_coffin_spawned,
+        "first_damage_cause",
+        &StateMemory::first_damage_cause,
+        "first_damage_world",
+        &StateMemory::first_damage_world,
+        "first_damage_level",
+        &StateMemory::first_damage_level,
+        "time_speedrun",
+        &StateMemory::time_speedrun,
+        "coffin_contents",
+        &StateMemory::coffin_contents,
+        "screen_change_counter",
+        &StateMemory::screen_change_counter,
+        "time_startup",
+        &StateMemory::time_startup,
+        */
         "logic",
-        &StateMemory::logic);
+        &StateMemory::logic); //had to have something at the at for the "comma" before the big comment block
 
     state_usertype["speedrun_character"] = &StateMemory::speedrun_character;
     state_usertype["speedrun_activation_trigger"] = &StateMemory::speedrun_activation_trigger;
