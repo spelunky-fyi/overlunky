@@ -295,7 +295,7 @@ void register_usertypes(sol::state& lua)
         sol::property([](Items& s)
                       { return std::ref(s.player_inventories); }));
 
-    lua.new_usertype<StateMemory>(
+    auto state_usertype = lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
         &StateMemory::screen_last,
@@ -457,6 +457,20 @@ void register_usertypes(sol::state& lua)
         &StateMemory::arena,
         "logic",
         &StateMemory::logic);
+
+    state_usertype["speedrun_character"] = &StateMemory::speedrun_character;
+    state_usertype["speedrun_activation_trigger"] = &StateMemory::speedrun_activation_trigger;
+    state_usertype["end_spaceship_character"] = &StateMemory::end_spaceship_character;
+    state_usertype["world2_coffin_spawned"] = &StateMemory::world2_coffin_spawned;
+    state_usertype["world4_coffin_spawned"] = &StateMemory::world4_coffin_spawned;
+    state_usertype["world6_coffin_spawned"] = &StateMemory::world6_coffin_spawned;
+    state_usertype["first_damage_cause"] = &StateMemory::first_damage_cause;
+    state_usertype["first_damage_world"] = &StateMemory::first_damage_world;
+    state_usertype["first_damage_level"] = &StateMemory::first_damage_level;
+    state_usertype["time_speedrun"] = &StateMemory::time_speedrun;
+    state_usertype["coffin_contents"] = &StateMemory::coffin_contents;
+    state_usertype["screen_change_counter"] = &StateMemory::screen_change_counter;
+    state_usertype["time_startup"] = &StateMemory::time_startup;
 
     lua.new_usertype<GameManager>(
         "GameManager",
