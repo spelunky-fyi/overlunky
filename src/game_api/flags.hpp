@@ -293,6 +293,7 @@ const char* illumination_flags[]{
     "6: ",
     "7: Modulate brightness_multiplier",
     "8: ",
+    // type_flags 1-8:
     "9: Follow camera",
     "10: Follow entity",
     "11: Static, Rectangle, Full brightness",

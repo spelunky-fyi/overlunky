@@ -1882,6 +1882,4 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
             write_mem_prot(array_offset, rel, true);
         }
     }
-    //const std::string message = fmt::format("array {:x} old_size {}", (size_t)old_types_array, old_size);
-    //MessageBox(NULL, message.c_str(), NULL, MB_OK);
 }

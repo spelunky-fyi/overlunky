@@ -14,7 +14,7 @@ struct DropEntry
     uint32_t vtable_rel_offset;
     uint8_t value_offset = 0;      // the offset of the value to be replaced within the pattern
     uint8_t vtable_occurrence = 1; // when a value occurs more than once in the same virtual table function, choose how many times to replace
-    uint8_t skip = 0;              // if there are idencital pattern, hom many to skip
+    uint8_t skip = 0;              // if there are idencital pattern, how many to skip
     size_t offsets[3] = {0};
 };
 
