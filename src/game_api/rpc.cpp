@@ -1836,7 +1836,7 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
     if (original_instr && ent_types.size() == 25 ||                     // if it's the unchanged instruction and we set the same number of ent_type's
         !original_instr && *(uint8_t*)(offset + 5) == ent_types.size()) // or new instruction but the same size
     {
-        for (int i = 0; i < ent_types.size(); ++i)
+        for (unsigned int i = 0; i < ent_types.size(); ++i)
             if (ent_types[i])
                 write_mem_prot(&old_types_array[i], ent_types[i], true);
     }
@@ -1844,7 +1844,7 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
     {
         if (original_instr)
         {
-            std::string new_code = std::format("\x50\x31\xC0\x41\xB3{}\x88\xD0\x41\xF6\xF3\x88\xE2\x58"sv, to_le_bytes((uint8_t)ent_types.size()));
+            std::string new_code = fmt::format("\x50\x31\xC0\x41\xB3{}\x88\xD0\x41\xF6\xF3\x88\xE2\x58"sv, to_le_bytes((uint8_t)ent_types.size()));
             //push rax
             //xor eax, eax
             //mov r11b, (size)
