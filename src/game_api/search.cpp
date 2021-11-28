@@ -1599,20 +1599,31 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // It's pointer to table[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
+        // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
+        // execute to the return two times, you should see this array right above
+        // It's pointer to array[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
         "sun_chalenge_generator_ent_types"sv,
         PatternCommandBuffer{}
-            .find_after_inst("\x48\x89\x4A\x38\x48\xC1\xE8\x1C\x83\xE0\x0C"sv)
-            .decode_pc()
+            .find_after_inst("\x48\x89\x4A\x38\x48\xC1\xE8\x1C\x83\xE0"sv)
+            .offset(0x4)
             .at_exe(),
     },
     {
-        // Set bp on prize_dispenser->itemid_2 and roll a 7
+        // Set bp on prize_dispenser->itemid_2 and roll a 7, you should see this array right above
         // array[25]
         "dice_shop_prizes"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x41\x88\x8C\x24\x36\x01\x00\x00\x41\x0F\xB6\x84\x04\x30\x01\x00\x00"sv)
-            .decode_pc()
+            .offset(0x3)
+            .at_exe(),
+    },
+    {
+        // Set condition bp on load_item for ITEM_DICE_PRIZE_DISPENSER, execute first call
+        // go to the address in RAX (new entity) and set write bp on +0x130 (or execute till you see function that writes to this address)
+        // we want address after (rol rsi,1B) - it should be 14 bytes that we want to change and then - (mov qword ptr ds:[rax+20],rdi | mov qword ptr ds:[rax+28],rsi)
+        "dice_shop_prizes_id_roll"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x49\x0F\xAF\xF8\x48\x29\xD6\x48\xC1\xC6\x1B"sv)
             .at_exe(),
     },
 };

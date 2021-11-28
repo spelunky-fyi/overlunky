@@ -1236,13 +1236,15 @@ end
     /// Doesn't really work for layer doors
     lua["enter_door"] = enter_door;
 
-    /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, the default one are: {MONS_VAMPIRE, MONS_WITCHDOCTOR, MONS_NECROMANCER, MONS_SORCERESS}
+    /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, the default ones are: {MONS_VAMPIRE, MONS_WITCHDOCTOR, MONS_NECROMANCER, MONS_SORCERESS}
+    /// Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they would have slightly higher chance)
     lua["change_sunchallenge_spawn"] = change_sunchallenge_spawn;
 
-    /// Change ENT_TYPE's spawned in dice shops (tusk as well), there are 25
-    /// the default one are: {ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_COMPASS, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_PARACHUTE, ITEM_PICKUP_PASTE, ITEM_PICKUP_SPECTACLES, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_PITCHERSMITT, ITEM_PICKUP_CLIMBINGGLOVES,
+    /// Change ENT_TYPE's spawned in dice shops (tusk as well), by default there are 25
+    /// the default ones are: {ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_COMPASS, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_PARACHUTE, ITEM_PICKUP_PASTE, ITEM_PICKUP_SPECTACLES, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_PITCHERSMITT, ITEM_PICKUP_CLIMBINGGLOVES,
     /// ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ITEM_BOOMERANG, ITEM_MACHETE, ITEM_SHOTGUN, ITEM_CROSSBOW, ITEM_WEBGUN, ITEM_FREEZERAY, ITEM_MATTOCK, ITEM_CAMERA, ITEM_PURCHASABLE_HOVERPACK, ITEM_PURCHASABLE_JETPACK,
     /// ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_TELEPORTER, ITEM_PURCHASABLE_POWERPACK}
+    /// You can change it to any number of entities from 6 to 255
     lua["change_diceshop_prizes"] = change_diceshop_prizes;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);

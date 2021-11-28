@@ -711,14 +711,16 @@ Function does not increment any of the state `level_next`, `world_next`, so doin
 Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
 Doesn't really work for layer doors
 ### [`change_sunchallenge_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawn)
-`nil change_sunchallenge_spawn(array<ENT_TYPE, 4> ent_types)`<br/>
-Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, the default one are: {MONS_VAMPIRE, MONS_WITCHDOCTOR, MONS_NECROMANCER, MONS_SORCERESS}
+`nil change_sunchallenge_spawn(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, the default ones are: {MONS_VAMPIRE, MONS_WITCHDOCTOR, MONS_NECROMANCER, MONS_SORCERESS}
+Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they would have slightly higher chance)
 ### [`change_diceshop_prizes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_diceshop_prizes)
-`nil change_diceshop_prizes(array<ENT_TYPE, 25> ent_types)`<br/>
-Change ENT_TYPE's spawned in dice shops (tusk as well), there are 25
-the default one are: {ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_COMPASS, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_PARACHUTE, ITEM_PICKUP_PASTE, ITEM_PICKUP_SPECTACLES, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_PITCHERSMITT, ITEM_PICKUP_CLIMBINGGLOVES,
+`nil change_diceshop_prizes(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned in dice shops (tusk as well), by default there are 25
+the default ones are: {ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_COMPASS, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_PARACHUTE, ITEM_PICKUP_PASTE, ITEM_PICKUP_SPECTACLES, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_PITCHERSMITT, ITEM_PICKUP_CLIMBINGGLOVES,
 ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ITEM_BOOMERANG, ITEM_MACHETE, ITEM_SHOTGUN, ITEM_CROSSBOW, ITEM_WEBGUN, ITEM_FREEZERAY, ITEM_MATTOCK, ITEM_CAMERA, ITEM_PURCHASABLE_HOVERPACK, ITEM_PURCHASABLE_JETPACK,
 ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_TELEPORTER, ITEM_PURCHASABLE_POWERPACK}
+You can change it to any number of entities from 6 to 255
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
@@ -1195,6 +1197,8 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int player_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) &Items::player_count
 - [`int saved_pets_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets_count) &Items::saved_pets_count
 - [`array<ENT_TYPE, 4> saved_pets`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) &Items::saved_pets
+\
+Pet information for level transition
 - [`array<bool, 4> is_pet_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) &Items::is_pet_cursed
 - [`array<bool, 4> is_pet_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) &Items::is_pet_poisoned
 - [`array<Inventory, MAX_PLAYERS> player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) &Items::player_inventories
@@ -1211,6 +1215,8 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int kali_favor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_favor) &StateMemory::kali_favor
 - [`int kali_status`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_status) &StateMemory::kali_status
 - [`int kali_altars_destroyed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_altars_destroyed) &StateMemory::kali_altars_destroyed
+\
+Also affects if the player has punish ball, if the punish ball is destroyed it is set to -1
 - [`int kali_gifts`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_gifts) &StateMemory::kali_gifts
 \
 0 - none, 1 - item, 3 - kapala
@@ -1292,21 +1298,6 @@ Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 - [`ArenaState arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) &StateMemory::arena
 - [`LogicList logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
-- [`ENT_TYPE speedrun_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) &StateMemory::speedrun_character
-- [`int speedrun_activation_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) &StateMemory::speedrun_activation_trigger
-- [`ENT_TYPE end_spaceship_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) &StateMemory::end_spaceship_character
-\
-Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
-- [`bool world2_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world2_coffin_spawned) &StateMemory::world2_coffin_spawned
-- [`bool world4_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world4_coffin_spawned) &StateMemory::world4_coffin_spawned
-- [`bool world6_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world6_coffin_spawned) &StateMemory::world6_coffin_spawned
-- [`ENT_TYPE first_damage_cause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_cause) &StateMemory::first_damage_cause
-- [`int first_damage_world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_world) &StateMemory::first_damage_world
-- [`int first_damage_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_level) &StateMemory::first_damage_level
-- [`int time_speedrun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_speedrun) &StateMemory::time_speedrun
-- [`ENT_TYPE coffin_contents`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) &StateMemory::coffin_contents
-- [`int screen_change_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) &StateMemory::screen_change_counter
-- [`int time_startup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) &StateMemory::time_startup
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
