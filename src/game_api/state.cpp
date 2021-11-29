@@ -197,9 +197,11 @@ void State::zoom(float level)
 
 void StateMemory::force_current_theme(uint32_t t)
 {
-    if (theme > 0 && theme < 19)
+    if (t > 0 && t < 19)
     {
         auto state = State::get().ptr();
+        if (t == 10 && !state->level_gen->theme_cosmicocean->sub_theme)
+            state->level_gen->theme_cosmicocean->sub_theme = state->level_gen->theme_dwelling; // just set it to something, can't edit this atm
         state->current_theme = state->level_gen->themes[t - 1];
     }
 }
@@ -221,9 +223,9 @@ bool is_active_player(Entity* e)
     return false;
 }
 
-using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint8_t, uint8_t);
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t);
 OnDamageFun* g_on_damage_trampoline{nullptr};
-void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint8_t stun_amount, uint8_t iframes)
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
