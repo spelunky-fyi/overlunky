@@ -1604,6 +1604,7 @@ Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, ac
 \
 Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
 - [`get_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) &Entity::get_metadata
+- [`nil apply_metadata(int metadata)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) &Entity::apply_metadata
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
