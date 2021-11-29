@@ -342,7 +342,7 @@ class Entity
     virtual void activate(Entity* activator) = 0;
 
     virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1
-    virtual uint64_t on_save_level_transition_data() = 0; // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    virtual uint16_t get_metadata() = 0; // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual void on_restore_level_transition_data(uint64_t data) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
     virtual void on_walked_off_by(Entity* walker) = 0; // appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr

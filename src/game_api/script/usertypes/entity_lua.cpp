@@ -223,7 +223,9 @@ void register_usertypes(sol::state& lua)
         "activate",
         &Entity::activate,
         "perform_teleport",
-        &Entity::perform_teleport);
+        &Entity::perform_teleport,
+        "get_metadata",
+        &Entity::get_metadata);
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
