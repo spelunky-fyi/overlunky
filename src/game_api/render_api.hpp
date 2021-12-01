@@ -56,7 +56,7 @@ struct RenderInfo
     float x;
     float y;
     uint32_t unknown3;
-    uint32_t unknown4;
+    float unknown4;
     uint32_t unknown5;
     uint32_t unknown6;
     uint32_t unknown7;
@@ -68,15 +68,24 @@ struct RenderInfo
     float x_dupe2;
     float y_dupe2;
     uint32_t unknown11;
-    uint32_t unknown12;
-    uint32_t unknown13;
+    uint8_t unknown12a;
+    uint8_t unknown12b;
+    bool unknown12c;
+    bool unknown12d;
+    bool unknown13a;
+    uint8_t unknown13b;
+    uint8_t unknown13c;
+    uint8_t unknown13d;
     uint32_t unknown14;
     uint8_t unknown15_counter;
     uint8_t unknown16_counter;
     bool unknown17;
     bool unknown18;
     uint32_t unknown19;
-    uint32_t shader;
+    uint8_t shader; //0 - 36, game crash at around 55
+    uint8_t unknown20a;
+    uint8_t unknown20b;
+    uint8_t unknown20c;
 
     // destination in world coords
     float destination_bottom_left_x; // entity.x - (entity.w/2)
@@ -122,7 +131,6 @@ struct RenderInfo
     size_t unknown42;
     size_t unknown43;
     size_t unknown44;
-    size_t unknown45;
     bool render_as_non_liquid; // for liquids, forced to false, for non-liquids: sprite goes crazy when moving about
     uint8_t unknown47;
     uint8_t unknown48;
@@ -136,6 +144,8 @@ struct RenderInfo
     uint32_t unknown55;
     float darkness; // 0.0 = completely black ; 1.0 = normal (dark effect like when on fire)
     uint32_t unknown56;
+    uint32_t unknown57;
+    uint32_t unknown58; //end, next RenderInfo below
 };
 
 struct TextRenderingInfo
