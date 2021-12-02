@@ -24,6 +24,7 @@
 #include <fmt/core.h>
 
 #include "console.hpp"
+#include "custom_types.hpp"
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
@@ -2611,33 +2612,54 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     }
 }
 
-void render_hitbox(Movable* ent, bool cross, ImColor color)
+void render_olmec(Entity* ent, ImColor color)
 {
-    if (IsBadReadPtr(ent, 0x178))
-        return;
-    if (ent->items.count > 0)
+    std::pair<float, float> render_position = {0.0f, 0.0f};
+    int* pitems = (int*)ent->items.begin;
+    for (unsigned int i = 0; i < ent->items.count; i++) // get the olmec position from one of the fx
     {
-        int* pitems = (int*)ent->items.begin;
-        for (unsigned int i = 0; i < ent->items.count; i++)
+        auto ent_item = get_entity_ptr(pitems[i]);
+        if (ent_item)
         {
-            auto type = entity_type(pitems[i]);
-            if (type == 0)
-                continue;
-            if (entity_names[type].find("FX") == std::string::npos)
-                render_hitbox(entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
+            render_position = ent_item->position_render();
+            render_position.first -= ent_item->x;
+            render_position.second -= ent_item->y;
+            break;
         }
     }
-    const auto type = entity_type(ent->uid);
-    if (!type || ((type >= to_id("ENT_TYPE_ITEM_POWERUP_PASTE") && type <= to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY")) || type == to_id("ENT_TYPE_FX_PICKUPEFFECT")))
-        return; // powerups
-    std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
-    std::pair<float, float> boxa =
-        screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
-    std::pair<float, float> boxb =
-        screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
-    ImVec2 spos = screenify({pos.first, pos.second});
-    ImVec2 sboxa = screenify({boxa.first, boxa.second});
-    ImVec2 sboxb = screenify({boxb.first, boxb.second});
+    if (render_position.first == 0.0f)
+        return;
+
+    auto [boxa_x, boxa_y] =
+        screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
+    auto [boxb_x, boxb_y] =
+        screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+    ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
+    ImVec2 sboxa = screenify({boxa_x, boxa_y});
+    ImVec2 sboxb = screenify({boxb_x, boxb_y});
+    auto* draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+}
+
+void render_hitbox(Entity* ent, bool cross, ImColor color, bool fixed)
+{
+    const auto type = ent->type->id;
+    if (!type)
+        return;
+
+    std::pair<float, float> render_position;
+    if (fixed)
+        render_position = ent->position();
+    else
+        render_position = ent->position_render();
+
+    auto [boxa_x, boxa_y] =
+        screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
+    auto [boxb_x, boxb_y] =
+        screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+    ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
+    ImVec2 sboxa = screenify({boxa_x, boxa_y});
+    ImVec2 sboxb = screenify({boxb_x, boxb_y});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
@@ -2815,27 +2837,57 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto entity : get_entities_by(0, 255, LAYER::PLAYER))
+        for (auto entity : get_entities_by(0, 0xBF, LAYER::PLAYER))
         {
-            auto type = entity_type(entity);
-            if (type == 0)
+            auto ent = get_entity_ptr(entity);
+            if (!ent)
                 continue;
-            if (entity_names[type].find("FX") == std::string::npos)
-                render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
-        }
-        for (auto entity : get_entities_by(0, 0x100, LAYER::PLAYER))
-        {
-            auto type = entity_type(entity);
-            if (type == 0)
+
+            if (ent->type->id == to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"))
+            {
+                render_olmec(ent, ImColor(0, 255, 255, 150));
+                continue; // TODO draw olmec, somehow
+            }
+
+            if (ent->rendering_info->stop_render)
                 continue;
-            if (entity_names[type].find("TRAP") != std::string::npos)
-                render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
+
+            render_hitbox(ent, false, ImColor(0, 255, 255, 150), false);
         }
         g_players = get_players();
         for (auto player : g_players)
         {
-            render_hitbox(player, false, ImColor(255, 0, 255, 200));
+            render_hitbox(player, false, ImColor(255, 0, 255, 200), false);
         }
+
+        std::vector<ENT_TYPE> additional_fixed_entities = {
+            (ENT_TYPE)CUSTOM_TYPE::LOGICALTRAPTRIGGER,
+            to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
+            to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
+            to_id("ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER"),
+            to_id("ENT_TYPE_FLOOR_SURFACE_HIDDEN"),
+            to_id("ENT_TYPE_FLOOR_YAMA_PLATFORM"),
+            to_id("ENT_TYPE_FLOOR_ARROW_TRAP"),
+            to_id("ENT_TYPE_FLOOR_POISONED_ARROW_TRAP"),
+            to_id("ENT_TYPE_FLOOR_TOTEM_TRAP"),
+            to_id("ENT_TYPE_FLOOR_JUNGLE_SPEAR_TRAP"),
+            to_id("ENT_TYPE_FLOOR_LION_TRAP"),
+            to_id("ENT_TYPE_FLOOR_LASER_TRAP"),
+            to_id("ENT_TYPE_FLOOR_SPARK_TRAP"),
+            to_id("ENT_TYPE_FLOOR_SPIKEBALL_CEILING"),
+            to_id("ENT_TYPE_FLOOR_SPRING_TRAP"),
+            to_id("ENT_TYPE_FLOOR_BIGSPEAR_TRAP"),
+            to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
+        };
+        for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
+        {
+            auto ent = get_entity_ptr(entity);
+            if (entity_names[ent->type->id].find("TRIGGER") != std::string::npos)
+                render_hitbox(ent, false, ImColor(255, 0, 0, 150), true);
+            else
+                render_hitbox(ent, false, ImColor(0, 255, 255, 150), true);
+        }
+
         if (ImGui::IsMousePosValid())
         {
             ImVec2 mpos = normalize(io.MousePos);
@@ -2855,7 +2907,7 @@ void render_clickhandler()
             auto hovered = get_entity_at(cpos.first, cpos.second, false, 2, mask);
             if (hovered != -1)
             {
-                render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
+                render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200), false);
                 auto ptype = entity_type(hovered);
                 const char* pname = entity_names[ptype].c_str();
                 std::string buf3 = fmt::format("{}, {}", hovered, pname);
@@ -2865,7 +2917,7 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"] && update_entity())
     {
-        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
+        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200), false);
     }
     for (auto& [name, script] : g_scripts)
     {

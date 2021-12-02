@@ -68,11 +68,11 @@ struct RenderInfo
     float x_dupe2;
     float y_dupe2;
     uint32_t unknown11;
-    uint8_t unknown12a;
-    uint8_t unknown12b;
+    uint8_t unknown_timer1; // can someone test this at higher refresh rate if it's tided to the fps or Hz?
+    uint8_t unknown_timer2; // for some entities this stops when the entity is not on screen but the above one don't
     bool unknown12c;
     bool unknown12d;
-    bool unknown13a;
+    bool stop_render; // stops all the rendering stuff, the value is forced thou
     uint8_t unknown13b;
     uint8_t unknown13c;
     uint8_t unknown13d;

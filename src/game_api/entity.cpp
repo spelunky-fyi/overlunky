@@ -244,16 +244,6 @@ std::pair<float, float> Entity::position_self() const
 
 std::pair<float, float> Entity::position_render() const
 {
-    if (overlay != nullptr)
-    {
-        auto [x_pos, y_pos] = position_self();
-        auto [rx_pos, ry_pos] = overlay->position_render();
-        return {rx_pos + x_pos, ry_pos + y_pos};
-    }
-    if (rendering_info == nullptr)
-    {
-        return position_self();
-    }
     return {rendering_info->x, rendering_info->y};
 }
 
@@ -415,8 +405,8 @@ std::tuple<float, float, uint8_t> get_position(uint32_t uid)
 std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
-    if (ent)
-        return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer);
+    if (ent && !ent->rendering_info->stop_render)
+        return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
     return {0.0f, 0.0f, (uint8_t)0};
 }
 
