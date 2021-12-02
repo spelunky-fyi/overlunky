@@ -2634,7 +2634,6 @@ void render_olmec(Entity* ent, ImColor color)
         screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
         screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
-    ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
     auto* draw_list = ImGui::GetWindowDrawList();
