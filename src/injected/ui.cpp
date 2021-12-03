@@ -172,13 +172,6 @@ struct Window
 };
 std::map<std::string, Window*> windows;
 
-// Global state
-struct EntityCache
-{
-    Movable* entity;
-    int type;
-};
-
 static ImFont *font, *bigfont, *hugefont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f;
@@ -205,8 +198,6 @@ Inventory* g_inventory = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
 std::map<int, std::string> entity_names;
-std::map<int, EntityCache> entity_cache;
-int cache_player = 0;
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 
@@ -265,7 +256,7 @@ int int_pow(int base, unsigned int exp)
     return result;
 }
 
-ImVec4 hue_shift(ImVec4 in, float hue)
+ImVec4 hue_shift(ImVec4 in, float hue) // unused
 {
     float U = cos(hue * 3.14159265f / 180);
     float W = sin(hue * 3.14159265f / 180);
@@ -432,11 +423,6 @@ std::string key_string(int64_t keycode)
 bool SliderByte(const char* label, char* value, char min = 0, char max = 0, const char* format = "%lld")
 {
     return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
-}
-
-bool DragByte(const char* label, char* value, float speed = 1.0f, char min = 0, char max = 0, const char* format = "%lld")
-{
-    return ImGui::DragScalar(label, ImGuiDataType_U8, value, speed, &min, &max, format);
 }
 
 void refresh_script_files()
@@ -727,7 +713,7 @@ void detach(std::string window)
     windows[window]->detached = true;
 }
 
-void attach(std::string window)
+void attach(std::string window) // unused
 {
     if (windows.find(window) == windows.end())
         return;
@@ -767,31 +753,10 @@ uint32_t entity_type(int uid)
     return get_entity_type(uid);
 }
 
-Movable* entity_ptr(int uid)
-{
-    return (Movable*)get_entity_ptr(uid);
-}
-
 bool update_players()
 {
     g_players = get_players();
     return true;
-}
-
-bool update_entity_cache()
-{
-    if (g_players.size() > 0)
-    {
-        if (g_players.at(0)->uid != cache_player)
-        {
-            entity_cache.clear();
-            cache_player = g_players.at(0)->uid;
-            return true;
-        }
-        return false;
-    }
-    cache_player = 0;
-    return false;
 }
 
 void spawn_entities(bool s, std::string list = "")
@@ -906,18 +871,6 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
     return 0;
 }
 
-const char* entity_name(uint32_t id)
-{
-    for (unsigned int i = 0; i < g_items.size(); i++)
-    {
-        if (g_items[i].id == id)
-        {
-            return g_items[i].name.c_str();
-        }
-    }
-    return "";
-}
-
 bool update_entity()
 {
     if (!visible("tool_entity_properties") && !options["draw_hitboxes"])
@@ -925,7 +878,7 @@ bool update_entity()
     if (g_last_id > -1)
     {
         g_entity_type = entity_type(g_last_id);
-        g_entity = (Player*)entity_ptr(g_last_id);
+        g_entity = (Player*)get_entity_ptr(g_last_id);
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if (g_entity == nullptr || IsBadWritePtr(g_entity, 0x178))
         {
@@ -1381,7 +1334,7 @@ bool dragging(std::string keyname)
     return wParam == keycode;
 }
 
-bool dragged(std::string keyname)
+bool dragged(std::string keyname) // unused
 {
     //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1417,7 +1370,7 @@ float drag_delta(std::string keyname)
     return false;
 }
 
-float held_duration(std::string keyname)
+float held_duration(std::string keyname) // unused
 {
     //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1937,12 +1890,6 @@ void update_filter(std::string s)
     scroll_top = true;
 }
 
-void render_int(const char* label, int state)
-{
-    std::string strstate = std::to_string(state);
-    return ImGui::LabelText(label, "%s", strstate.c_str());
-}
-
 void render_list()
 {
     // ImGui::ListBox with filter
@@ -2010,13 +1957,6 @@ void render_themes()
         ImGui::PopID();
     }
     ImGui::EndCombo();
-}
-
-std::string unique_label(std::string label)
-{
-    label += "##";
-    label += std::to_string(rand());
-    return label;
 }
 
 void render_input()
@@ -2845,7 +2785,7 @@ void render_clickhandler()
             if (ent->type->id == to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"))
             {
                 render_olmec(ent, ImColor(0, 255, 255, 150));
-                continue; // TODO draw olmec, somehow
+                continue;
             }
 
             if (ent->rendering_info->stop_render)
@@ -2906,7 +2846,7 @@ void render_clickhandler()
             auto hovered = get_entity_at(cpos.first, cpos.second, false, 2, mask);
             if (hovered != -1)
             {
-                render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200), false);
+                render_hitbox(get_entity_ptr(hovered), true, ImColor(50, 50, 255, 200), false);
                 auto ptype = entity_type(hovered);
                 const char* pname = entity_names[ptype].c_str();
                 std::string buf3 = fmt::format("{}, {}", hovered, pname);
@@ -3064,7 +3004,7 @@ void render_clickhandler()
                 mask = unsafe_entity_mask;
             }
             g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
-            g_held_entity = entity_ptr(g_held_id);
+            g_held_entity = get_entity_ptr(g_held_id)->as<Movable>();
             if (g_held_entity)
                 g_held_flags = g_held_entity->flags;
             if (!lock_entity)
@@ -4043,7 +3983,7 @@ void render_entity_props()
             ImGui::SameLine();
             if (ImGui::Button("Drop##DropHolding"))
             {
-                Movable* holding = entity_ptr(g_entity->holding_uid);
+                Movable* holding = get_entity_ptr(g_entity->holding_uid)->as<Movable>();
                 holding->x = g_entity->x;
                 holding->y = g_entity->y;
                 holding->overlay = 0;
