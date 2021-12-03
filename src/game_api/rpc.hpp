@@ -123,6 +123,5 @@ uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_positio
 bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE find);
 std::vector<ENT_TYPE> get_proper_types(const std::vector<ENT_TYPE>& types_array);
 void enter_door(int32_t player_uid, int32_t door_uid);
-void call_transition(uint8_t special_transition);
 void change_sunchallenge_spawn(std::vector<ENT_TYPE> ent_types);
 void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types);

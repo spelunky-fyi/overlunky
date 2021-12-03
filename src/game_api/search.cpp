@@ -1583,14 +1583,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Put write bp on state->loading, enter a door, you will end of at the end of this function
-        "transition_func"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x88\x55\xFF\x48\x89\x4D\xF0"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
         // Do the same thing as for transition_func but execute to the return, it will put you in this function
         "door_entry"sv,
         PatternCommandBuffer{}

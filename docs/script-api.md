@@ -697,15 +697,6 @@ This is better alternative to `add_string` but instead of changing the name for 
 ### [`clear_custom_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_custom_name)
 `nil clear_custom_name(int uid)`<br/>
 Clears the name set with `add_custom_name`
-### [`call_transition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=call_transition)
-`nil call_transition(int special_transition)`<br/>
-Calls the transition function, the `special_transition`:
-Set it to 1 to get the CO transition (it has last frame visual glitch with the borders)
-Set it to 2 for transition to duat (all players as ghosts), important: it will change `state.theme_next` to DUAT so you have to change that manually in the ON.TRANSITION callback if you want it to lead to a different theme
-Set it to 3 for the olmec ship transition (from Tiamat to Sunken City)
-Set it to 4 for transition from Duat (similar to CO but different background)
-Set it to 0 for standard transition
-Function does not increment any of the state `level_next`, `world_next`, so doing just call_transition in 1-1 will transition you to a new 1-1
 ### [`enter_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
 `nil enter_door(int player_uid, int door_uid)`<br/>
 Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
