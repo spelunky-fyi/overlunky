@@ -57,7 +57,7 @@ void GuiDrawContext::draw_rect_filled(float left, float top, float right, float 
 };
 void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 {
-    draw_rect_filled(rect.left, rect.bottom, rect.right, rect.top, rounding, color);
+    draw_rect_filled(rect.left, rect.top, rect.right, rect.bottom, rounding, color);
 }
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
