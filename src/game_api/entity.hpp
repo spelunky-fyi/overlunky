@@ -129,6 +129,7 @@ struct EntityDB
     int32_t sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
+    /// Array of [Animation](#Animation) types, had to use `pairs` loop to loop thru
     AnimationMap animations;
     float default_special_offsetx;
     float default_special_offsety;
