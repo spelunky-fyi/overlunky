@@ -95,7 +95,7 @@ std::vector<DropEntry> drop_entries{
     {"YETIQUEEN_POWERPACK", "\x3E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETIQUEEN, 105},
     {"YETI_PITCHERSMITT", "\x0E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETI, 3},
     // set write bp on Generator.spawned_uid, when it's being set to -1, execute return, find item_scrap id close to this location
-    {"FACTORY_GENERATOR", "\x48\x89\xF9\xBA****\x48\x83\xC4\x38\x5F\x5E"s, VTABLE_OFFSET::NONE, 0, 4},
+    {"FACTORY_GENERATOR_SCRAP", "\x48\x89\xF9\xBA****\x48\x83\xC4\x38\x5F\x5E"s, VTABLE_OFFSET::NONE, 0, 4},
 
     /// Keep in mind that shopkeeper generator spawns two types of entities, the second one will be this + 1
     {"SHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"s, VTABLE_OFFSET::NONE, 0, 2},
@@ -109,6 +109,10 @@ std::vector<DropEntry> drop_entries{
     // little higher up, same thing for alien
     {"SCRAP_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},     // there are two identical patterns, this one is first
     {"UFO_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6, 1, 1}, // and this one is the second
+    // set write bp on Altar->unknown (second byte after timer)
+    // die and ushabti depend on the animation_frame, and idol has one bit flip so it can get the same result for idol and tusk idol so i din't expose those
+    {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 5},
+    {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 5, 1, 2},
 };
 
 std::vector<DropChanceEntry> dropchance_entries{
