@@ -1687,7 +1687,7 @@ Returns the uid of the currently worn backitem, or -1 if wearing nothing
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
 - [`int time_of_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_of_death) &Inventory::time_of_death
 \
-is set to state.time_total when player dies
+Is set to state.time_total when player dies
 - [`player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) sol::property([](Inventory&i)-&gt;int8_t{if(i.player_slot&gt;=0)returni.player_slot+1;elsereturni.player_slot;}
 - [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
 \

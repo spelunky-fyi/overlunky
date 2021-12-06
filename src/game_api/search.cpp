@@ -1619,6 +1619,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        // Start local coop, kill one of the players, go to state->items->inventory of that player, set write bp on `time_of death`
+        // Spawn coffin, and set it's `respawn_player` to true, open the coffin, you should hit the bp right above the this function call
         "spawn_player"sv,
         PatternCommandBuffer{}
             .find_inst("\x4F\x8D\x0C\x7F\x42\x80\xBC\x89\xB8\x54\x00\x00\x00"sv)

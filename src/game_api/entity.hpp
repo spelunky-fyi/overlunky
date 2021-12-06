@@ -370,7 +370,7 @@ struct Inventory
     bool elixir_buff;
     uint8_t health;
     uint8_t kapala_blood_amount;
-    /// is set to state.time_total when player dies
+    /// Is set to state.time_total when player dies
     uint32_t time_of_death;
     ENT_TYPE held_item;
     /// Metadata of the held item (health, is cursed etc.)
