@@ -1618,6 +1618,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_after_inst("\x49\x0F\xAF\xF8\x48\x29\xD6\x48\xC1\xC6\x1B"sv)
             .at_exe(),
     },
+    {
+        "spawn_player"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4F\x8D\x0C\x7F\x42\x80\xBC\x89\xB8\x54\x00\x00\x00"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

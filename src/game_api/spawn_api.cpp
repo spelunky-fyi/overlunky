@@ -520,3 +520,12 @@ void init_spawn_hooks()
         }
     }
 }
+
+void spawn_player(int8_t player_slot, float x, float y)
+{
+    if (player_slot < 1 || player_slot > 4)
+        return;
+    using spawn_player_fun = void(Items*, uint8_t ps, float pos_x, float pos_y);
+    static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
+    spawn_player(get_state_ptr()->items, player_slot - 1, x, y);
+}

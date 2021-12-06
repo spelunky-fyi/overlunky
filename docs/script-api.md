@@ -268,6 +268,10 @@ Spawns apep with the choice if it going left or right, if you want the game to c
 ### [`spawn_tree`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
 `nil spawn_tree(float x, float y, LAYER layer)`<br/>
 Spawns and grows a tree
+### [`spawn_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_player)
+`nil spawn_player(int player_slot, float x, float y)`<br/>
+Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
+If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
@@ -1681,37 +1685,26 @@ Returns the uid of the currently worn backitem, or -1 if wearing nothing
 ### `Inventory`
 - [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
+- [`int time_of_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_of_death) &Inventory::time_of_death
+\
+is set to state.time_total when player dies
+- [`player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) sol::property([](Inventory&i)-&gt;int8_t{if(i.player_slot&gt;=0)returni.player_slot+1;elsereturni.player_slot;}
 - [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
 \
-To access/edit anything below use `ON.PRE_LEVEL_GENERATION`
+To access/edit anything below use `ON.PRE_LEVEL_GENERATION`, those are used to transfer information to new player entity
 - [`int poison_tick_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) &Inventory::poison_tick_timer
-\
-Used in level transition to transfer to new player entity, is wrong during the level
 - [`bool cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cursed) &Inventory::cursed
-\
-Used in level transition to transfer to new player entity, is wrong during the level
 - [`bool elixir_buff`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir_buff) &Inventory::elixir_buff
-\
-Used in level transition to transfer to new player entity, is wrong during the level
 - [`int health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) &Inventory::health
-\
-Used in level transition to transfer to new player entity, is wrong during the level
 - [`int kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Inventory::kapala_blood_amount
-\
-Used in level transition to transfer to new player entity, is wrong during the level
 - [`ENT_TYPE held_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item) &Inventory::held_item
-\
-Used in level transition to transfer to new player entity, is wrong during the level
 - [`int held_item_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item_metadata) &Inventory::held_item_metadata
 \
-Metadata of the held item (health, is cursed etc.) Used in level transition to transfer to new entity, is wrong during the level
-- [`player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) sol::property([](Inventory&i)-&gt;int8_t{if(i.player_slot&gt;=0)returni.player_slot+1;elsereturni.player_slot;}
+Metadata of the held item (health, is cursed etc.)
 - [`ENT_TYPE mount_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_type) &Inventory::mount_type
-\
-Used in level transition to transfer to new player entity, is wrong during the level
 - [`int mount_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_metadata) &Inventory::mount_metadata
 \
-Metadata of the mount (health, is cursed etc.) Used in level transition to transfer to new player entity, is wrong during the level
+Metadata of the mount (health, is cursed etc.)
 - [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
 - [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
 - [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total
@@ -2980,6 +2973,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`ENT_TYPE inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Coffin::inside
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Coffin::timer
+- [`bool player_respawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_respawn) &Coffin::player_respawn
 ### `Fly`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Fly::timer

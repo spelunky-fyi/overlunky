@@ -363,30 +363,23 @@ struct Inventory
 {
     uint32_t money;
     uint8_t bombs;
-    /// To access/edit anything below use `ON.PRE_LEVEL_GENERATION`
+    /// To access/edit anything below use `ON.PRE_LEVEL_GENERATION`, those are used to transfer information to new player entity
     uint8_t ropes;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
     int16_t poison_tick_timer;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
     bool cursed;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
     bool elixir_buff;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
     uint8_t health;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
     uint8_t kapala_blood_amount;
-
-    uint32_t unknown3;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// is set to state.time_total when player dies
+    uint32_t time_of_death;
     ENT_TYPE held_item;
-    /// Metadata of the held item (health, is cursed etc.) Used in level transition to transfer to new entity, is wrong during the level
+    /// Metadata of the held item (health, is cursed etc.)
     int16_t held_item_metadata;
     uint8_t unknown5c; //padding?
 
     int8_t player_slot;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
     ENT_TYPE mount_type;
-    /// Metadata of the mount (health, is cursed etc.) Used in level transition to transfer to new player entity, is wrong during the level
+    /// Metadata of the mount (health, is cursed etc.)
     int16_t mount_metadata;
     int16_t unknown_mount_ralated;
 
