@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.3c"
+meta.version = "2.3d"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -15,6 +15,10 @@ local real_default_options = {
     enemy_max = 12,
     enemy_min = 5,
     enemy_curse_chance = 5,
+    friend = true,
+    friend_evil = true,
+    friend_max = 1.5,
+    friend_min = 0.2,
     room_shop_chance = 15,
     room_big_chance = 15,
     room_big_min = 8,
@@ -67,6 +71,10 @@ local function register_options()
     register_option_float("enemy_max", "Max enemy chance", default_options.enemy_max, 0, 100)
     register_option_float("enemy_min", "Min enemy chance", default_options.enemy_min, 0, 100)
     register_option_float("enemy_curse_chance", "Enemy handicap chance", default_options.enemy_curse_chance, 0, 100)
+    register_option_bool("friend", "Random friends", default_options.friend)
+    register_option_bool("friend_evil", "Evil doppelgängers", default_options.friend_evil)
+    register_option_float("friend_max", "Max friend chance", default_options.friend_max, 0, 100)
+    register_option_float("friend_min", "Min friend chance", default_options.friend_min, 0, 100)
     register_option_float("room_shop_chance", "Extra shop chance", default_options.room_shop_chance, 0, 100)
     register_option_float("room_big_chance", "Huge level chance", default_options.room_big_chance, 0, 100)
     register_option_int("room_big_min", "Huge level min height", default_options.room_big_min, 8, 15)
@@ -583,6 +591,8 @@ local random_crap = {ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_P
 local olmec_ammo = join(join(random_crap, enemies_small), traps_item)
 local tiamat_ammo = {ENT_TYPE.ITEM_ACIDSPIT, ENT_TYPE.ITEM_INKSPIT, ENT_TYPE.ITEM_FLY, ENT_TYPE.ITEM_FIREBALL, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_LAMASSU_LASER_SHOT}
 local crab_items = {ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_EGGPLANT, ENT_TYPE.ITEM_IDOL, ENT_TYPE.ITEM_KEY, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ITEM_LAVAPOT, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_USHABTI, ENT_TYPE.MONS_YANG}
+local friends = {ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_MARGARET_TUNNEL, ENT_TYPE.CHAR_COLIN_NORTHWARD, ENT_TYPE.CHAR_ROFFY_D_SLOTH, ENT_TYPE.CHAR_BANDA, ENT_TYPE.CHAR_GREEN_GIRL, ENT_TYPE.CHAR_AMAZON, ENT_TYPE.CHAR_LISE_SYSTEM, ENT_TYPE.CHAR_COCO_VON_DIAMONDS, ENT_TYPE.CHAR_MANFRED_TUNNEL, ENT_TYPE.CHAR_OTAKU, ENT_TYPE.CHAR_TINA_FLAN, ENT_TYPE.CHAR_VALERIE_CRUMP, ENT_TYPE.CHAR_AU, ENT_TYPE.CHAR_DEMI_VON_DIAMONDS, ENT_TYPE.CHAR_PILOT, ENT_TYPE.CHAR_PRINCESS_AIRYN, ENT_TYPE.CHAR_DIRK_YAMAOKA, ENT_TYPE.CHAR_GUY_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY, ENT_TYPE.CHAR_HIREDHAND, ENT_TYPE.CHAR_EGGPLANT_CHILD}
+friends = {ENT_TYPE.CHAR_MANFRED_TUNNEL}
 
 local function enemy_small_spawn(x, y, l)
     local uid = spawn_entity_snapped_to_floor(pick(enemies_small), x, y, l)
@@ -683,10 +693,54 @@ local function enemy_air_spawn(x, y, l)
 end
 local function enemy_air_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
+    if state.theme == THEME.TIAMAT then return false end
     local air = get_grid_entity_at(x, y, l)
     return air == -1
 end
 local enemy_air_chance = define_procedural_spawn("enemy_air", enemy_air_spawn, enemy_air_valid)
+
+local friend_spawned = false
+local function friend_spawn(x, y, l)
+    if not friend_spawned then
+        local uid = spawn_companion(pick(friends), x, y, l)
+        local ent = get_entity(uid)
+        if prng:random() < options.enemy_curse_chance/100 then
+            attach_ball_and_chain(uid, 0.5, 0)
+        end
+        friend_spawned = true
+    end
+end
+local function friend_valid(x, y, l)
+    local floor = get_grid_entity_at(x, y-1, l)
+    local air = get_grid_entity_at(x, y, l)
+    if floor ~= -1 and air == -1 then
+        floor = get_entity(floor)
+        return has(valid_floors, floor.type.id)
+    end
+    return false
+end
+local friend_chance = define_procedural_spawn("friend", friend_spawn, friend_valid)
+set_callback(function()
+    if options.friend and options.friend_evil then
+        set_interval(function()
+            for i,p in ipairs(players) do
+                for j,v in ipairs(get_entities_by_type(p.type.id)) do
+                    local ent = get_entity(v)
+                    if ent.ai ~= nil then
+                        ent.ai.state = 8
+                        ent.ai.target_uid = p.uid
+                        --ent:set_cursed(true)
+                        ent.color.g = 0.3
+                        ent.color.b = 0.3
+                        if p.stun_timer > 0 and ent.stun_timer == 0 then
+                            ent:stun(p.stun_timer + 15)
+                        end
+                    end
+                end
+            end
+        end, 15)
+    end
+end, ON.LEVEL)
 
 set_callback(function(ctx)
     if options.enemy then
@@ -732,6 +786,15 @@ set_callback(function(ctx)
         ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTFLY, 0)
         ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LEPRECHAUN, 0)
         ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRABMAN, 0)
+    end
+
+    if options.friend then
+        ctx:set_procedural_spawn_chance(friend_chance, get_chance(options.friend_min, options.friend_max))
+        if state.items.player_inventory[1].companion_count > 0 then
+            friend_spawned = true
+        else
+            friend_spawned = false
+        end
     end
 end, ON.POST_ROOM_GENERATION)
 
@@ -1113,7 +1176,7 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN,
          ENT_TYPE.MONS_OLD_HUNTER, ENT_TYPE.MONS_THIEF, ENT_TYPE.MONS_MADAMETUSK, ENT_TYPE.MONS_BODYGUARD,
          ENT_TYPE.MONS_HUNDUNS_SERVANT, ENT_TYPE.MONS_GOLDMONKEY, ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MONS_MEGAJELLYFISH,
-         ENT_TYPE.MONS_CRITTERDUNGBEETLE, ENT_TYPE.MONS_CRITTERBUTTERFLY,
+         ENT_TYPE.MONS_CRITTERDUNGBEETLE,
          ENT_TYPE.MONS_CRITTERSNAIL, ENT_TYPE.MONS_CRITTERFISH, ENT_TYPE.MONS_CRITTERCRAB, ENT_TYPE.MONS_CRITTERLOCUST,
          ENT_TYPE.MONS_CRITTERPENGUIN, ENT_TYPE.MONS_CRITTERFIREFLY, ENT_TYPE.MONS_CRITTERDRONE,
          ENT_TYPE.MONS_CRITTERSLIME, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_PASTEBOMB, ENT_TYPE.ITEM_IDOL,
@@ -2274,3 +2337,10 @@ set_callback(function()
         end
     end
 end, ON.LEVEL)
+
+set_callback(function()
+    if state.loading == 1 then
+        clear_callback(olmec_callback)
+        olmec_callback = -1
+    end
+end, ON.LOADING)
