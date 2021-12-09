@@ -837,6 +837,11 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 ### [`define_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_texture)
 `TEXTURE define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
+If a texture with the same definition already exists the texture will be reloaded from disk.
+### [`reload_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_texture)
+`nil reload_texture(string texture_path)`<br/>
+Reloads a texture from disk, use this only as a development tool for example in the console
+Note that `define_texture` will also reload the texture if it already exists
 ### [`get_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox)
 `AABB get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)`<br/>
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
