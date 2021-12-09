@@ -3,6 +3,7 @@
 #include "character_def.hpp"
 #include "console.hpp"
 #include "file_api.hpp"
+#include "render_api.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
@@ -362,4 +363,9 @@ void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&colo
 void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female)
 {
     NCharacterDB::set_character_gender(character_index, female);
+}
+
+void Spelunky_ReloadTexture(const char* texture_name)
+{
+    RenderAPI::get().reload_texture(texture_name);
 }
