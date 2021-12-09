@@ -195,6 +195,17 @@ void State::zoom(float level)
     }
 }
 
+void StateMemory::force_current_theme(uint32_t t)
+{
+    if (t > 0 && t < 19)
+    {
+        auto state = State::get().ptr();
+        if (t == 10 && !state->level_gen->theme_cosmicocean->sub_theme)
+            state->level_gen->theme_cosmicocean->sub_theme = state->level_gen->theme_dwelling; // just set it to something, can't edit this atm
+        state->current_theme = state->level_gen->themes[t - 1];
+    }
+}
+
 static bool g_godmode_player_active = false;
 static bool g_godmode_companions_active = false;
 
@@ -212,9 +223,9 @@ bool is_active_player(Entity* e)
     return false;
 }
 
-using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint32_t, uint32_t);
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t);
 OnDamageFun* g_on_damage_trampoline{nullptr};
-void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes)
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -224,7 +235,22 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     {
         return;
     }
-    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+
+    // because Player::on_damage is always hooked here, we have to check whether a script has hooked this function as well
+    EntityHooksInfo& _hook_info = victim->get_hooks();
+    bool skip_orig = false;
+    for (auto& [id, backend_on_damage] : _hook_info.on_damage)
+    {
+        if (backend_on_damage(victim, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
+        {
+            skip_orig = true;
+        }
+    }
+
+    if (!skip_orig)
+    {
+        g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+    }
 }
 
 using OnInstaGibFun = void(Entity*, size_t);
@@ -239,7 +265,28 @@ void on_instagib(Entity* victim, size_t unknown)
     {
         return;
     }
-    g_on_instagib_trampoline(victim, unknown);
+
+    // because on_instagib is only hooked here, we have to check whether a script has hooked this function as well
+    EntityHooksInfo& _hook_info = victim->get_hooks();
+    bool skip_orig = false;
+    for (auto& [id, backend_on_player_instagib] : _hook_info.on_player_instagib)
+    {
+        if (backend_on_player_instagib(victim))
+        {
+            skip_orig = true;
+        }
+    }
+
+    // The instagib function needs to be called when the entity is dead, otherwise the death screen will never be opened
+    if (victim->as<Movable>()->health == 0)
+    {
+        skip_orig = false;
+    }
+
+    if (!skip_orig)
+    {
+        g_on_instagib_trampoline(victim, unknown);
+    }
 }
 
 void hook_godmode_functions()

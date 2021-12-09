@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.3b"
+meta.version = "2.3c"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -496,14 +496,21 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
 
 local swapping_liquid = false
+local duat_spawn_x = -1
+local duat_spawn_y = -1
 
 set_callback(function()
-    if state.theme ~= THEME.DUAT or state.level_gen.spawn_y < 47 or not options.hard_duat then return end
+    if state.theme ~= THEME.DUAT then return end
+    duat_spawn_x = state.level_gen.spawn_x
+    duat_spawn_y = state.level_gen.spawn_y
+    state.level_gen.spawn_x = 17
+    state.level_gen.spawn_y = 106
+    if state.level_gen.spawn_y < 47 or not options.hard_duat then return end
     local box = AABB:new()
-    box.top = state.level_gen.spawn_y - 2
-    box.bottom = state.level_gen.spawn_y - 3
-    box.left = state.level_gen.spawn_x - 5
-    box.right = state.level_gen.spawn_x + 5
+    box.top = duat_spawn_y - 2
+    box.bottom = duat_spawn_y - 3
+    box.left = duat_spawn_x - 5
+    box.right = duat_spawn_x + 5
     local floor = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, LAYER.FRONT)
     for i,v in ipairs(floor) do
         kill_entity(v)
@@ -515,7 +522,7 @@ set_callback(function()
             if swapping_liquid then
                 liquid_type = ENT_TYPE.LIQUID_WATER
             end
-            spawn_liquid(liquid_type, state.level_gen.spawn_x, state.level_gen.spawn_y - 2)
+            spawn_liquid(liquid_type, duat_spawn_x, duat_spawn_y - 2)
         elseif #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 36, LAYER.FRONT, 0, 0)
             spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 2.5, 36, LAYER.FRONT, 0, 0)
@@ -1831,6 +1838,13 @@ set_callback(function()
             end
         end
         last_room = roomtype
+    end
+
+    -- stupid crash fix
+    if #get_entities_by_type(ENT_TYPE.MONS_YETIKING) > 0 then
+        for i,v in ipairs(get_entities_by_type(ENT_TYPE.MONS_CRITTERBUTTERFLY)) do
+            get_entity(v):destroy()
+        end
     end
 end, ON.FRAME)
 

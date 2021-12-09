@@ -220,7 +220,9 @@ void register_usertypes(sol::state& lua)
         "destroy",
         &Entity::destroy,
         "activate",
-        &Entity::activate);
+        &Entity::activate,
+        "perform_teleport",
+        &Entity::perform_teleport);
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),

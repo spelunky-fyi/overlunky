@@ -76,6 +76,7 @@ std::map<std::string, int64_t> keys{
     {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
     {"toggle_grid", OL_KEY_CTRL | OL_KEY_SHIFT | 'G'},
     {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
+    {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
     {"tool_entity", VK_F1},
@@ -248,7 +249,7 @@ std::map<std::string, bool> options = {
     {"tabbed_interface", true},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
-};
+    {"lights", false}};
 
 int int_pow(int base, unsigned int exp)
 {
@@ -977,6 +978,24 @@ void set_zoom()
     zoom(g_zoom);
 }
 
+void force_lights()
+{
+    if (options["lights"])
+    {
+        if (!g_state->illumination && g_state->screen == 12)
+        {
+            g_state->illumination = create_illumination(Color::white(), 20000.0f, 172, 252);
+        }
+        if (g_state->illumination)
+        {
+            if (g_state->camera_layer == 1)
+                g_state->illumination->flags |= 1U << 16;
+            else
+                g_state->illumination->flags &= ~(1U << 16);
+        }
+    }
+}
+
 void force_zoom()
 {
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
@@ -1658,6 +1677,20 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["disable_pause"] = !options["disable_pause"];
         force_hud_flags();
+    }
+    else if (pressed("toggle_lights", wParam))
+    {
+        options["lights"] = !options["lights"];
+        if (options["lights"] && g_state->illumination)
+        {
+            g_state->illumination->flags |= (1U << 24);
+        }
+        else if (!options["lights"] && g_state->illumination)
+        {
+            g_state->illumination->flags &= ~(1U << 16);
+            if ((g_state->level_flags & (1U << 17)) > 0)
+                g_state->illumination->flags &= ~(1U << 24);
+        }
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -3233,6 +3266,7 @@ void render_options()
     }
     ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
     ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
+    ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
     if (ImGui::Button("Edit style"))
     {
         toggle("tool_style");
@@ -5186,6 +5220,7 @@ void post_draw()
     force_hud_flags();
     force_time();
     force_noclip();
+    force_lights();
     frame_advance();
 }
 
