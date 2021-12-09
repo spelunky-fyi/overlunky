@@ -150,7 +150,7 @@ void RenderAPI::reload_texture(const char* texture_name)
         }
     }
 
-    std::string_view name_view{ texture_name };
+    std::string_view name_view{texture_name};
     auto* textures = get_textures();
     for (auto& texture : textures->textures)
     {
