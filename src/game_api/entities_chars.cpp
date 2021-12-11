@@ -43,9 +43,9 @@ std::vector<ENT_TYPE> PowerupCapable::get_powerups()
 {
     std::vector<ENT_TYPE> return_powerups;
     return_powerups.reserve(powerups.size());
-    for (auto it = powerups.begin(); it != powerups.end(); ++it)
+    for (auto& it : powerups)
     {
-        return_powerups.push_back(it->first);
+        return_powerups.push_back(it.first);
     }
     return return_powerups;
 }

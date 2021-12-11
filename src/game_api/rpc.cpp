@@ -166,7 +166,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
     if (player == nullptr)
         return -1;
     std::vector<std::tuple<int32_t, float, Entity*>> found;
-    for (auto& item : state.layer(player->layer)->items())
+    for (auto& item : state.layer(player->layer)->all_entities)
     {
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
@@ -516,41 +516,26 @@ std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::funct
 
 std::vector<uint32_t> get_entities()
 {
-    return get_entities_by({}, 0, LAYER::BOTH);
+    return get_entities_by(0, 0, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 {
-    return get_entities_by({}, 0, layer);
+    return get_entities_by(0, 0, layer);
 }
 
 std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
 {
-    auto state = State::get();
-    std::vector<uint32_t> found;
-    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
-    uint8_t layer = 2;
-    while (layer)
-    {
-        layer--;
-        for (auto& item : state.layer(layer)->items())
-        {
-            if (entity_type_check(proper_types, item->type->id))
-            {
-                found.push_back(item->uid);
-            }
-        }
-    }
-    return found;
+    return get_entities_by(entity_types, 0, LAYER::BOTH);
 }
 std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type)
 {
-    return get_entities_by_type(std::vector<ENT_TYPE>{entity_type});
+    return get_entities_by(std::vector<ENT_TYPE>{entity_type}, 0, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
 {
-    return get_entities_by({}, mask, LAYER::BOTH);
+    return get_entities_by(0, mask, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
@@ -560,19 +545,37 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
     auto push_entities = [&mask, &proper_types, &found, &state](uint8_t l)
     {
-        for (auto& item : state.layer(l)->items())
+        for (auto& item : state.layer(l)->all_entities)
             if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
                 found.push_back(item->uid);
     };
 
     if (layer == LAYER::BOTH)
     {
-        push_entities(0);
-        push_entities(1);
+        if ((!entity_types.size() || !entity_types[0]) && !mask) // all entities
+        {
+            found.reserve((size_t)state.layer(0)->all_entities.size + (size_t)state.layer(1)->all_entities.size);
+            found.insert(found.end(), state.layer(0)->all_entities.uid_begin(), state.layer(0)->all_entities.uid_end());
+            found.insert(found.end(), state.layer(1)->all_entities.uid_begin(), state.layer(1)->all_entities.uid_end());
+        }
+        else
+        {
+            push_entities(0);
+            push_entities(1);
+        }
     }
     else
     {
-        push_entities(enum_to_layer(layer));
+        uint8_t correct_layer = enum_to_layer(layer);
+        if ((!entity_types.size() || !entity_types[0]) && !mask) // all entities
+        {
+            found.reserve(state.layer(correct_layer)->all_entities.size);
+            found.insert(found.begin(), state.layer(correct_layer)->all_entities.uid_begin(), state.layer(correct_layer)->all_entities.uid_end());
+        }
+        else
+        {
+            push_entities(correct_layer);
+        }
     }
     return found;
 }
@@ -588,7 +591,7 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
     auto push_entities = [&x, &y, &radius, &mask, &proper_types, &found, &state](uint8_t l)
     {
-        for (auto& item : state.layer(l)->items())
+        for (auto& item : state.layer(l)->all_entities)
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
@@ -648,7 +651,7 @@ std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t ma
 std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
 {
     std::vector<uint32_t> found;
-    for (auto& item : layer->items())
+    for (auto& item : layer->all_entities)
     {
         if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(entity_types, item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
         {
