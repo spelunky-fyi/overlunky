@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.3d"
+meta.version = "2.3e"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -57,9 +57,10 @@ local real_default_options = {
     bias_07 = 10,
     bias_08 = 12,
     bias_09 = 10,
-    bias_10 = 8,
-    bias_11 = 7,
+    bias_10 = 9,
+    bias_11 = 6,
     bias_15 = 1,
+    drill = 25
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -115,6 +116,7 @@ local function register_options()
     register_option_int("bias_10", "Theme bias: Cosmic Ocean", default_options.bias_10, 0, 15)
     register_option_int("bias_11", "Theme bias: City of Gold", default_options.bias_11, 0, 15)
     register_option_int("bias_15", "Theme bias: Eggplant World", default_options.bias_15, 0, 15)
+    register_option_int("drill", "Drill chance (x2 in echoes)", default_options.drill, 0, 100)
     register_option_button("zreset", "Reset to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -2285,6 +2287,7 @@ set_callback(function()
     clear_callback(olmec_callback)
     olmec_callback = -1
     olmec_floaters = {}
+    last_olmec_change = -9999
     if state.theme == THEME.OLMEC then
         if options.hard_olmec_phase then
             set_olmec_phase_y_level(1, 66)
@@ -2343,3 +2346,43 @@ set_callback(function()
         olmec_callback = -1
     end
 end, ON.LOADING)
+
+--[[DRILL]]
+local drill_char
+local socket_char
+local drill_spawned = false
+local drill_themes = {THEME.DWELLING, THEME.JUNGLE, THEME.VOLCANA, THEME.TIDE_POOL, THEME.TEMPLE, THEME.CITY_OF_GOLD}
+local valid_drill_rooms = {ROOM_TEMPLATE.SIDE, ROOM_TEMPLATE.PATH_NORMAL, ROOM_TEMPLATE.PATH_DROP}
+local exit_rooms = {ROOM_TEMPLATE.EXIT, ROOM_TEMPLATE.EXIT_NOTOP}
+
+set_callback(function(ctx)
+    if options.drill > 0 then
+        local drill_code = ShortTileCodeDef:new()
+        drill_code.tile_code = TILE_CODE.DRILL
+        local socket_code = ShortTileCodeDef:new()
+        socket_code.tile_code = TILE_CODE.UDJAT_SOCKET
+        drill_char = ctx:define_short_tile_code(drill_code)
+        socket_char = ctx:define_short_tile_code(socket_code)
+    end
+    drill_spawned = test_flag(state.presence_flags, 3)
+end, ON.POST_ROOM_GENERATION)
+
+set_callback(function(x, y, l, r)
+    local drill_chance = options.drill
+    if state.height > 4 then
+        drill_chance = drill_chance * 2
+    end
+    if not drill_spawned and drill_char and socket_char and y == 0 and l == LAYER.FRONT and has(valid_drill_rooms, r) and has(drill_themes, state.theme) and not has(exit_rooms, get_room_template(x, state.height-1, LAYER.FRONT)) and prng:random() < drill_chance/100 then
+        drill_spawned = true
+        return [[
+1==XX==222
+2==XX==000
+02=]]..string.char(drill_char)..[[0==0==
+00=00=000=
+00=00=0]]..string.char(socket_char)..[[0=
+0000000=00
+===00=====
+2220011111
+        ]]
+    end
+end, ON.PRE_GET_RANDOM_ROOM)
