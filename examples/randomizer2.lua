@@ -60,7 +60,7 @@ local real_default_options = {
     bias_10 = 9,
     bias_11 = 6,
     bias_15 = 1,
-    drill = 25
+    drill = 16
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -2351,9 +2351,17 @@ end, ON.LOADING)
 local drill_char
 local socket_char
 local drill_spawned = false
-local drill_themes = {THEME.DWELLING, THEME.JUNGLE, THEME.VOLCANA, THEME.TIDE_POOL, THEME.TEMPLE, THEME.CITY_OF_GOLD}
+local drill_themes = {THEME.DWELLING, THEME.JUNGLE, THEME.VOLCANA, THEME.TIDE_POOL, THEME.TEMPLE}
 local valid_drill_rooms = {ROOM_TEMPLATE.SIDE, ROOM_TEMPLATE.PATH_NORMAL, ROOM_TEMPLATE.PATH_DROP}
 local exit_rooms = {ROOM_TEMPLATE.EXIT, ROOM_TEMPLATE.EXIT_NOTOP}
+
+local function flip(str)
+    local ret = ""
+    for line in str:gmatch("([^\n]*)\n?") do
+        ret = ret .. string.reverse(line)
+    end
+    return ret
+end
 
 set_callback(function(ctx)
     if options.drill > 0 then
@@ -2374,7 +2382,7 @@ set_callback(function(x, y, l, r)
     end
     if not drill_spawned and drill_char and socket_char and y == 0 and l == LAYER.FRONT and has(valid_drill_rooms, r) and has(drill_themes, state.theme) and not has(exit_rooms, get_room_template(x, state.height-1, LAYER.FRONT)) and prng:random() < drill_chance/100 then
         drill_spawned = true
-        return [[
+        local data = [[
 1==XX==222
 2==XX==000
 02=]]..string.char(drill_char)..[[0==0==
@@ -2382,7 +2390,10 @@ set_callback(function(x, y, l, r)
 00=00=0]]..string.char(socket_char)..[[0=
 0000000=00
 ===00=====
-2220011111
-        ]]
+2220011111]]
+        if prng:random() < 0.5 then
+            data = flip(data)
+        end
+        return data
     end
 end, ON.PRE_GET_RANDOM_ROOM)
