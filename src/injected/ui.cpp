@@ -2817,6 +2817,7 @@ void render_clickhandler()
             to_id("ENT_TYPE_FLOOR_SPRING_TRAP"),
             to_id("ENT_TYPE_FLOOR_BIGSPEAR_TRAP"),
             to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
+            to_id("ENT_TYPE_FLOOR_DUSTWALL"),
         };
         for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
         {
