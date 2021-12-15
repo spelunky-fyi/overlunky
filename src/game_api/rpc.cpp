@@ -299,18 +299,6 @@ void set_pause(uint8_t pause)
     state.set_pause(pause);
 }
 
-void player_status()
-{
-    auto state = State::get();
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    auto status = player->inventory_ptr;
-    DEBUG("Player {}", (void*)status, status->ropes, status->bombs);
-    status->ropes = (99);
-    status->bombs = (99);
-}
-
 Screen* get_screen_ptr(uint32_t screen_id)
 {
     auto game_manager = get_game_manager();
@@ -1737,12 +1725,22 @@ void enter_door(int32_t player_uid, int32_t door_uid)
 
 void change_sunchallenge_spawn(std::vector<ENT_TYPE> ent_types)
 {
-    uint32_t ent_types_size = static_cast<uint32_t>(ent_types.size());
-    if (ent_types_size == 0)
-        return;
+    static bool modified = false;
 
+    uint32_t ent_types_size = static_cast<uint32_t>(ent_types.size());
     const auto offset = get_address("sun_chalenge_generator_ent_types");
-    const uint8_t old_size = ((*(uint8_t*)(offset - 4)) >> 2) + 1;
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(offset) + offset + 4);
+
+    if (ent_types_size == 0)
+    {
+        if (modified)
+            VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+        reverse_mem("sunchallenge_spawn");
+        return;
+    }
+
+    const uint8_t old_size = ((read_u8(offset - 4)) >> 2) + 1;
 
     if (ent_types_size >= 32)
         ent_types_size = 32;
@@ -1759,100 +1757,90 @@ void change_sunchallenge_spawn(std::vector<ENT_TYPE> ent_types)
         };
         ent_types_size = get_previous_power_of_two(ent_types_size);
     }
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(*(int32_t*)offset + offset + 4);
+
     if (old_size == ent_types_size)
     {
         for (uint32_t i = 0; i < ent_types_size; ++i)
             if (ent_types[i])
-                write_mem_prot(&old_types_array[i], ent_types[i], true);
+                write_mem_reversible("sunchallenge_spawn", (size_t)&old_types_array[i], ent_types[i], true);
 
         return;
     }
 
-    VirtualFree(old_types_array, 0, MEM_RELEASE);
-
     const auto data_size = ent_types_size * sizeof(ENT_TYPE);
-    ENT_TYPE* new_array = nullptr;
-
-    /// find address before the instruction in 32bit range
-    const auto exe_addr = Memory::get().exe_ptr;
-    auto test_addr = offset + 0x100000 - INT32_MAX;
-    if (test_addr <= 0)
-        test_addr = 8;
-
-    for (; test_addr < exe_addr; test_addr += 0x100000)
-    {
-        new_array = (ENT_TYPE*)VirtualAlloc((LPVOID)test_addr, data_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-        if (new_array)
-            break;
-    }
-
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(offset + 4, data_size);
     if (new_array)
     {
+        if (modified)
+            VirtualFree(old_types_array, 0, MEM_RELEASE);
+
         memcpy(new_array, ent_types.data(), data_size);
         int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
-        write_mem_prot(offset, rel, true);
+        write_mem_reversible("sunchallenge_spawn", offset, rel, true);
 
         // the game does bitwise "and" with value 12 (0xC), so it would get 0, 4, 8 or 12 (4 positions in table)
         int8_t new_value = static_cast<int8_t>((ent_types_size - 1) << 2);
-        write_mem_prot(offset - 4, new_value, true);
+        write_mem_reversible("sunchallenge_spawn", offset - 4, new_value, true);
+        modified = true;
     }
 }
 
 void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
 {
-    if (ent_types.size() > 255 || ent_types.size() < 6) // has to be min 6 as the game needs 6 uniqe item ids for prize_dispenser
-        return;
-    const auto array_offset = get_address("dice_shop_prizes");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(*(int32_t*)array_offset + array_offset + 4);
     auto offset = get_address("dice_shop_prizes_id_roll");
-    bool original_instr = (*(uint8_t*)offset == 0x89);
+    const auto array_offset = get_address("dice_shop_prizes");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+    bool original_instr = (read_u8(offset) == 0x89);
 
-    if ((original_instr && ent_types.size() == 25) ||                     // if it's the unchanged instruction and we set the same number of ent_type's
-        (!original_instr && *(uint8_t*)(offset + 5) == ent_types.size())) // or new instruction but the same size
+    if (ent_types.size() > 255 || ent_types.size() < 6) // has to be min 6 as the game needs 6 uniqe item ids for prize_dispenser
+    {
+        if (!ent_types.size())
+        {
+            if (!original_instr)
+                VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+            reverse_mem("diceshop_prizes");
+        }
+        return;
+    }
+
+    if ((original_instr && ent_types.size() == 25) ||                 // if it's the unchanged instruction and we set the same number of ent_type's
+        (!original_instr && read_u8(offset + 5) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
             if (ent_types[i])
-                write_mem_prot(&old_types_array[i], ent_types[i], true);
+                write_mem_reversible("diceshop_prizes", (size_t)&old_types_array[i], ent_types[i], true);
 
         return;
     }
-    if (original_instr)
-    {
-        std::string new_code = fmt::format("\x50\x31\xC0\x41\xB3{}\x88\xD0\x41\xF6\xF3\x88\xE2\x58"sv, to_le_bytes((uint8_t)ent_types.size()));
-        //push rax
-        //xor eax, eax
-        //mov r11b, (size)
-        //mov al, dl
-        //divb r11b
-        //mov dl, ah
-        //pop rax
-        write_mem_prot(offset, new_code, true);
-    }
-    else
-    {
-        write_mem_prot(offset + 5, (uint8_t)ent_types.size(), true);
-    }
-    VirtualFree(old_types_array, 0, MEM_RELEASE);
+
     const auto data_size = ent_types.size() * sizeof(ENT_TYPE);
-    ENT_TYPE* new_array = nullptr;
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(offset + 4, data_size);
 
-    /// find address before the instruction in 32bit range
-    const auto exe_addr = Memory::get().exe_ptr;
-    auto test_addr = offset + 0x100000 - INT32_MAX;
-    if (test_addr <= 0)
-        test_addr = 8;
-
-    for (; test_addr < exe_addr; test_addr += 0x100000)
-    {
-        new_array = (ENT_TYPE*)VirtualAlloc((LPVOID)test_addr, data_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-        if (new_array)
-            break;
-    }
     if (new_array)
     {
+        if (!original_instr)
+            VirtualFree(old_types_array, 0, MEM_RELEASE);
+
         memcpy(new_array, ent_types.data(), data_size);
         int32_t rel = static_cast<int32_t>((size_t)new_array - (array_offset + 4));
-        write_mem_prot(array_offset, rel, true);
+        write_mem_reversible("diceshop_prizes", array_offset, rel, true);
+
+        if (original_instr)
+        {
+            std::string new_code = fmt::format("\x50\x31\xC0\x41\xB3{}\x88\xD0\x41\xF6\xF3\x88\xE2\x58"sv, to_le_bytes((uint8_t)ent_types.size()));
+            //push rax
+            //xor eax, eax
+            //mov r11b, (size)
+            //mov al, dl
+            //divb r11b
+            //mov dl, ah
+            //pop rax
+            write_mem_reversible("diceshop_prizes", offset, new_code, true);
+        }
+        else
+        {
+            write_mem_reversible("diceshop_prizes", offset + 5, (uint8_t)ent_types.size(), true);
+        }
     }
 }

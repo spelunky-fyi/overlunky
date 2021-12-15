@@ -29,7 +29,6 @@ void set_entity_flags2(uint32_t uid, uint32_t flags);
 void set_level_flags(uint32_t flags);
 uint32_t get_level_flags();
 void set_pause(uint8_t pause);
-void player_status();
 Screen* get_screen_ptr(uint32_t screen_id);
 Entity* get_entity_ptr(uint32_t uid);
 ENT_TYPE get_entity_type(uint32_t uid);
