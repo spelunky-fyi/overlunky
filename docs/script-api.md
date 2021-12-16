@@ -707,15 +707,24 @@ Calls the enter door function, position doesn't matter, can also enter closed do
 Doesn't really work for layer doors
 ### [`change_sunchallenge_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawn)
 `nil change_sunchallenge_spawn(array<ENT_TYPE> ent_types)`<br/>
-Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, the default ones are: {MONS_VAMPIRE, MONS_WITCHDOCTOR, MONS_NECROMANCER, MONS_SORCERESS}
-Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they would have slightly higher chance)
+Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
+{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
+Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
+Use empty table as argument to reset to the game default
 ### [`change_diceshop_prizes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_diceshop_prizes)
 `nil change_diceshop_prizes(array<ENT_TYPE> ent_types)`<br/>
-Change ENT_TYPE's spawned in dice shops (tusk as well), by default there are 25
-the default ones are: {ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_COMPASS, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_PARACHUTE, ITEM_PICKUP_PASTE, ITEM_PICKUP_SPECTACLES, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_PITCHERSMITT, ITEM_PICKUP_CLIMBINGGLOVES,
-ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ITEM_BOOMERANG, ITEM_MACHETE, ITEM_SHOTGUN, ITEM_CROSSBOW, ITEM_WEBGUN, ITEM_FREEZERAY, ITEM_MATTOCK, ITEM_CAMERA, ITEM_PURCHASABLE_HOVERPACK, ITEM_PURCHASABLE_JETPACK,
-ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_TELEPORTER, ITEM_PURCHASABLE_POWERPACK}
-You can change it to any number of entities from 6 to 255
+Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+{ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
+ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
+ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
+Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
+Use empty table as argument to reset to the game default
+### [`change_altar_damage_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawn)
+`nil change_altar_damage_spawn(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
+{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
+Max 255 types
+Use empty table as argument to reset to the game default
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
