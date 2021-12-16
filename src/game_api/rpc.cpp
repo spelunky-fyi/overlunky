@@ -1890,7 +1890,7 @@ void change_altar_damage_spawn(std::vector<ENT_TYPE> ent_types)
             //mov R9, RAX
             write_mem_reversible("altar_damage_spawn", code_offset, new_code, true);
             write_mem_reversible("altar_damage_spawn", instruction_shr, "\x49\xC1\xE9\x08"sv, true); //shr r9,0x8
-            write_mem_reversible("altar_damage_spawn", instruction_to_modifiy, (uint8_t)0x8C, true);          // r9+r12 => r12+r9*4
+            write_mem_reversible("altar_damage_spawn", instruction_to_modifiy, (uint8_t)0x8C, true); // r9+r12 => r12+r9*4
         }
         else
         {
