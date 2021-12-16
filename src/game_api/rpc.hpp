@@ -124,3 +124,4 @@ std::vector<ENT_TYPE> get_proper_types(const std::vector<ENT_TYPE>& types_array)
 void enter_door(int32_t player_uid, int32_t door_uid);
 void change_sunchallenge_spawn(std::vector<ENT_TYPE> ent_types);
 void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types);
+void change_altar_damage_spawn(std::vector<ENT_TYPE> ent_types);

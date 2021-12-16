@@ -1619,13 +1619,21 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Start local coop, kill one of the players, go to state->items->inventory of that player, set write bp on `time_of death`
+        // Start local coop, kill one of the players, go to state->items->inventory of that player, set write bp on `time_of_death`
         // Spawn coffin, and set it's `respawn_player` to true, open the coffin, you should hit the bp right above the this function call
         "spawn_player"sv,
         PatternCommandBuffer{}
             .find_inst("\x4F\x8D\x0C\x7F\x42\x80\xBC\x89\xB8\x54\x00\x00\x00"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        // Set conditional bp on load_item with vampire id, break altar
+        // execute out of load_item, scroll up to find bunch of const addresses, on of which is array containing 5 id's (as of writing this comment, the address in not align to 8 bytes)
+        "altar_break_ent_types"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x45\x31\xFF\x4C\x8D\x25"sv)
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

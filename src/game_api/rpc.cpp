@@ -1761,8 +1761,7 @@ void change_sunchallenge_spawn(std::vector<ENT_TYPE> ent_types)
     if (old_size == ent_types_size)
     {
         for (uint32_t i = 0; i < ent_types_size; ++i)
-            if (ent_types[i])
-                write_mem_reversible("sunchallenge_spawn", (size_t)&old_types_array[i], ent_types[i], true);
+            write_mem_reversible("sunchallenge_spawn", (size_t)&old_types_array[i], ent_types[i], true);
 
         return;
     }
@@ -1808,14 +1807,13 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
         (!original_instr && read_u8(offset + 5) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
-            if (ent_types[i])
-                write_mem_reversible("diceshop_prizes", (size_t)&old_types_array[i], ent_types[i], true);
+            write_mem_reversible("diceshop_prizes", (size_t)&old_types_array[i], ent_types[i], true);
 
         return;
     }
 
     const auto data_size = ent_types.size() * sizeof(ENT_TYPE);
-    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(offset + 4, data_size);
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(array_offset + 4, data_size);
 
     if (new_array)
     {
@@ -1841,6 +1839,62 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
         else
         {
             write_mem_reversible("diceshop_prizes", offset + 5, (uint8_t)ent_types.size(), true);
+        }
+    }
+}
+
+void change_altar_damage_spawn(std::vector<ENT_TYPE> ent_types)
+{
+    if (ent_types.size() > 255)
+        return;
+
+    const auto array_offset = get_address("altar_break_ent_types");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+    const auto code_offset = array_offset + 0xDD;
+    const auto instruction_shr = array_offset + 0x13D;
+    const auto instruction_to_modifiy = array_offset + 0x204;
+    const auto original_instr = (read_u8(instruction_shr) == 0x41);
+    if (ent_types.empty())
+    {
+        if (!original_instr)
+            VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+        reverse_mem("altar_damage_spawn");
+        return;
+    }
+    if (!original_instr && read_u8(code_offset + 2) == ent_types.size())
+    {
+        // original array is used for something else as well, so i never edit that content
+        for (uint32_t i = 0; i < ent_types.size(); ++i)
+            write_mem_reversible("altar_damage_spawn", (size_t)&old_types_array[i], ent_types[i], true);
+
+        return;
+    }
+    const auto data_size = ent_types.size() * sizeof(ENT_TYPE);
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(array_offset + 4, data_size);
+    if (new_array)
+    {
+        if (!original_instr)
+            VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+        memcpy(new_array, ent_types.data(), data_size);
+        int32_t rel = static_cast<int32_t>((size_t)new_array - (array_offset + 4));
+        write_mem_reversible("altar_damage_spawn", array_offset, rel, true);
+
+        if (original_instr)
+        {
+            std::string new_code = fmt::format("\x41\xB1{}\x48\xC1\xE8\x38\x41\xF6\xF1\x49\x89\xC1"sv, to_le_bytes((uint8_t)ent_types.size()));
+            //mov R9b, (size)
+            //shr RAX, 0x38
+            //divb R9b
+            //mov R9, RAX
+            write_mem_reversible("altar_damage_spawn", code_offset, new_code, true);
+            write_mem_reversible("altar_damage_spawn", instruction_shr, "\x49\xC1\xE9\x08"sv, true); //shr r9,0x8
+            write_mem_reversible("altar_damage_spawn", instruction_to_modifiy, (uint8_t)0x8C, true);          // r9+r12 => r12+r9*4
+        }
+        else
+        {
+            write_mem_reversible("altar_damage_spawn", code_offset + 2, (uint8_t)ent_types.size(), true);
         }
     }
 }
