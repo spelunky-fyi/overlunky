@@ -143,7 +143,7 @@ struct ReversibleMemory
 
 std::unordered_map<std::string, std::vector<ReversibleMemory>> original_memory;
 
-void write_mem_reversible(std::string name, size_t addr, std::string_view payload, bool prot)
+[[maybe_unused]] void write_mem_reversible(std::string name, size_t addr, std::string_view payload, bool prot)
 {
     if (!original_memory.contains(name))
     {
@@ -174,7 +174,7 @@ requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>
 {
     write_mem_reversible(name, addr, to_le_bytes(payload), prot);
 }
-void reverse_mem(std::string name)
+[[maybe_unused]] void reverse_mem(std::string name)
 {
     if (original_memory.contains(name))
     {
@@ -222,7 +222,7 @@ FunT* vtable_find(T* obj, size_t index)
     return reinterpret_cast<FunT*>(&ptr[0][index]);
 }
 
-LPVOID alloc_mem_rel32(size_t addr, size_t size)
+[[maybe_unused]] LPVOID alloc_mem_rel32(size_t addr, size_t size)
 {
     const size_t limit_addr = Memory::get().exe_ptr;
     LPVOID new_array = nullptr;
