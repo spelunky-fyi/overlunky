@@ -725,6 +725,9 @@ Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
 {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
 Max 255 types
 Use empty table as argument to reset to the game default
+### [`poison_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_entity)
+`nil poison_entity(int entity_uid)`<br/>
+Poisons entity, to cure poison set `poison_tick_timer` to -1
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
@@ -903,9 +906,11 @@ Current mouse cursor position in screen coordinates.
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+Use `-1` as dropchance_id to reset all to default
 ### [`replace_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_drop)
 `nil replace_drop(int drop_id, ENT_TYPE new_drop_entity_type)`<br/>
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
 ### [`get_texture_definition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture_definition)
 `TextureDefinition get_texture_definition(TEXTURE texture_id)`<br/>
 Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`

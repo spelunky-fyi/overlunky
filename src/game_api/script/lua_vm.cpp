@@ -1237,6 +1237,9 @@ end
     /// Use empty table as argument to reset to the game default
     lua["change_altar_damage_spawn"] = change_altar_damage_spawn;
 
+    /// Poisons entity, to cure poison set `poison_tick_timer` to -1
+    lua["poison_entity"] = poison_entity;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

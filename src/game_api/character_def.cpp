@@ -4,6 +4,7 @@
 #include "game_allocator.hpp"
 #include "logger.h"
 #include "memory.hpp"
+#include "strings.hpp"
 
 #include <array>
 #include <cassert>
@@ -98,15 +99,13 @@ std::uint32_t get_character_index(std::uint32_t entity_type)
 
 const char16_t* get_character_full_name(std::uint32_t character_index)
 {
-    static const auto string_table = (const char16_t**)get_address("string_table");
     auto& char_def = get_character_definition(character_index);
-    return string_table[char_def.full_name_string_id];
+    return get_string(char_def.full_name_string_id);
 }
 const char16_t* get_character_short_name(std::uint32_t character_index)
 {
-    static const auto string_table = (const char16_t**)get_address("string_table");
     auto& char_def = get_character_definition(character_index);
-    return string_table[char_def.short_name_string_id];
+    return get_string(char_def.short_name_string_id);
 }
 Color get_character_heart_color(std::uint32_t character_index)
 {
@@ -118,36 +117,15 @@ bool get_character_gender(std::uint32_t character_index)
     auto& char_def = get_character_definition(character_index);
     return char_def.gender == CharGender::Female;
 }
-
-void set_character_full_name(std::uint32_t character_index, std::u16string_view name)
+void set_character_full_name(std::uint32_t character_index, std::u16string name)
 {
-    static const auto string_table = (const char16_t**)get_address("string_table");
-
     auto& char_def = get_character_definition(character_index);
-    const char16_t** full_name = string_table + char_def.full_name_string_id;
-
-    const auto data_size = name.size() * sizeof(char16_t);
-    char16_t* new_full_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-    new_full_name[name.size()] = u'\0';
-    memcpy(new_full_name, name.data(), data_size);
-
-    game_free((void*)*full_name);
-    *full_name = new_full_name;
+    change_string(char_def.full_name_string_id, name);
 }
-void set_character_short_name(std::uint32_t character_index, std::u16string_view name)
+void set_character_short_name(std::uint32_t character_index, std::u16string name)
 {
-    static const auto string_table = (const char16_t**)get_address("string_table");
-
     auto& char_def = get_character_definition(character_index);
-    const char16_t** short_name = string_table + char_def.short_name_string_id;
-
-    const auto data_size = name.size() * sizeof(char16_t);
-    char16_t* new_short_name = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-    new_short_name[name.size()] = u'\0';
-    memcpy(new_short_name, name.data(), data_size);
-
-    game_free((void*)*short_name);
-    *short_name = new_short_name;
+    change_string(char_def.short_name_string_id, name);
 }
 void set_character_heart_color(std::uint32_t character_index, Color color)
 {

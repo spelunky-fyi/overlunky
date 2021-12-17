@@ -1635,6 +1635,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_after_inst("\x45\x31\xFF\x4C\x8D\x25"sv)
             .at_exe(),
     },
+    {
+        // Set write bp on Movable.poison_tick_timer, get hit by cobra's acid spit
+        "poison_entity"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8B\x4E\x08\xF6\x41\x51\x04"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

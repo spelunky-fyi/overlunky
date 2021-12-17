@@ -1211,7 +1211,7 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
 
 void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
 {
-    if (dropchance_id < dropchance_entries.size())
+    if (dropchance_id < (int32_t)dropchance_entries.size())
     {
         if (dropchance_id < 0)
         {
@@ -1247,7 +1247,7 @@ void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
 
 void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
 {
-    if (drop_id < drop_entries.size())
+    if (drop_id < (int32_t)drop_entries.size())
     {
         if (drop_id < 0)
         {
@@ -1912,5 +1912,16 @@ void change_altar_damage_spawn(std::vector<ENT_TYPE> ent_types)
         {
             write_mem_reversible("altar_damage_spawn", code_offset + 2, (uint8_t)ent_types.size(), true);
         }
+    }
+}
+
+void poison_entity(int32_t entity_uid)
+{
+    auto ent = get_entity_ptr(entity_uid);
+    if (ent)
+    {
+        using PoisonEntity_fun = void(Entity*, bool);
+        auto poison_entity = (PoisonEntity_fun*)get_address("poison_entity");
+        poison_entity(ent, true);
     }
 }
