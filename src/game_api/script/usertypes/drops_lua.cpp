@@ -10,8 +10,10 @@ namespace NDrops
 void register_usertypes(sol::state& lua)
 {
     /// Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+    /// Use `-1` as dropchance_id to reset all to default
     lua["set_drop_chance"] = set_drop_chance;
     /// Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+    /// Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
     lua["replace_drop"] = replace_drop;
 
     lua.create_named_table("DROPCHANCE"

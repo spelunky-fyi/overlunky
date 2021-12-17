@@ -1209,10 +1209,16 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     return false;
 }
 
-void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
+void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
 {
     if (dropchance_id < dropchance_entries.size())
     {
+        if (dropchance_id < 0)
+        {
+            if (dropchance_id == -1)
+                reverse_mem("drop_chance");
+            return;
+        }
         auto& entry = dropchance_entries.at(dropchance_id);
         if (entry.offset == 0)
         {
@@ -1228,27 +1234,37 @@ void set_drop_chance(uint16_t dropchance_id, uint32_t new_drop_chance)
         {
             if (entry.chance_sizeof == 4)
             {
-                write_mem_prot(entry.offset, new_drop_chance, true);
+                write_mem_reversible("drop_chance", entry.offset, new_drop_chance, true);
             }
             else if (entry.chance_sizeof == 1)
             {
                 uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_prot(entry.offset, value, true);
+                write_mem_reversible("drop_chance", entry.offset, value, true);
             }
         }
     }
 }
 
-void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
+void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
 {
-    if (new_drop_entity_type == 0)
-    {
-        return;
-    }
-
     if (drop_id < drop_entries.size())
     {
+        if (drop_id < 0)
+        {
+            if (drop_id == -1)
+                reverse_mem("replace_drop");
+
+            return;
+        }
         auto& entry = drop_entries.at(drop_id);
+        if (new_drop_entity_type == 0)
+        {
+            for (int x = 0; x < 3; ++x)
+                if (entry.offsets[0])
+                    reverse_mem("replace_drop", entry.offsets[x]);
+
+            return;
+        }
         if (entry.offsets[0] == 0)
         {
             auto memory = Memory::get();
@@ -1284,7 +1300,7 @@ void replace_drop(uint16_t drop_id, ENT_TYPE new_drop_entity_type)
         {
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
             {
-                write_mem_prot(entry.offsets[x], new_drop_entity_type, true);
+                write_mem_reversible("replace_drop", entry.offsets[x], new_drop_entity_type, true);
             }
         }
     }

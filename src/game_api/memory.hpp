@@ -174,14 +174,13 @@ requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>
 {
     write_mem_reversible(name, addr, to_le_bytes(payload), prot);
 }
-[[maybe_unused]] void reverse_mem(std::string name)
+[[maybe_unused]] void reverse_mem(std::string name, size_t addr = NULL)
 {
     if (original_memory.contains(name))
     {
         for (auto& it : original_memory[name])
-        {
-            write_mem_prot(it.address, std::string_view{it.old_data.data(), it.old_data.size()}, it.prot_used);
-        }
+            if (!addr || addr == it.address)
+                write_mem_prot(it.address, std::string_view{it.old_data.data(), it.old_data.size()}, it.prot_used);
     }
 }
 
