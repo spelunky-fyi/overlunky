@@ -95,7 +95,7 @@ void write_mem_prot(size_t addr, std::string payload, bool prot);
 void write_mem(size_t addr, std::string payload);
 size_t function_start(size_t off);
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot);
-void reverse_mem(std::string name, size_t addr = NULL);
+void recover_mem(std::string name, size_t addr = NULL);
 
 template <typename T>
 requires std::is_trivially_copyable_v<T>

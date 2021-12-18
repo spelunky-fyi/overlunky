@@ -1216,7 +1216,7 @@ void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
         if (dropchance_id < 0)
         {
             if (dropchance_id == -1)
-                reverse_mem("drop_chance");
+                recover_mem("drop_chance");
             return;
         }
         auto& entry = dropchance_entries.at(dropchance_id);
@@ -1252,7 +1252,7 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         if (drop_id < 0)
         {
             if (drop_id == -1)
-                reverse_mem("replace_drop");
+                recover_mem("replace_drop");
 
             return;
         }
@@ -1261,7 +1261,7 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         {
             for (int x = 0; x < 3; ++x)
                 if (entry.offsets[0])
-                    reverse_mem("replace_drop", entry.offsets[x]);
+                    recover_mem("replace_drop", entry.offsets[x]);
 
             return;
         }
@@ -1752,7 +1752,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
         if (modified)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
 
-        reverse_mem("sunchallenge_spawn");
+        recover_mem("sunchallenge_spawn");
         return;
     }
 
@@ -1814,7 +1814,7 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
             if (!original_instr)
                 VirtualFree(old_types_array, 0, MEM_RELEASE);
 
-            reverse_mem("diceshop_prizes");
+            recover_mem("diceshop_prizes");
         }
         return;
     }
@@ -1875,7 +1875,7 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
         if (!original_instr)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
 
-        reverse_mem("altar_damage_spawn");
+        recover_mem("altar_damage_spawn");
         return;
     }
     if (!original_instr && read_u8(code_offset + 2) == ent_types.size())

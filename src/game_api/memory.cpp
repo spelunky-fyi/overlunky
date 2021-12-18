@@ -126,7 +126,7 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
     write_mem_prot(addr, payload, prot);
 }
 
-void reverse_mem(std::string name, size_t addr)
+void recover_mem(std::string name, size_t addr)
 {
     if (original_memory.contains(name))
     {
