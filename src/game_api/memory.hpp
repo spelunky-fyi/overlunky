@@ -7,6 +7,7 @@
 #include "search.hpp"
 
 using namespace std::string_literals;
+
 class ExecutableMemory
 {
   public:
@@ -39,7 +40,6 @@ class ExecutableMemory
     using storage_t = std::unique_ptr<std::byte, deleter_t>;
     storage_t code;
 };
-
 struct Memory
 {
     size_t exe_ptr;
@@ -81,13 +81,21 @@ struct Memory
         return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
     }
 };
+struct ReversibleMemory
+{
+    size_t address;
+    char* old_data;
+    size_t size;
+    bool prot_used;
+};
 
-namespace
-{
-size_t round_up(size_t i, size_t div)
-{
-    return ((i + div - 1) / div) * div;
-}
+LPVOID alloc_mem_rel32(size_t addr, size_t size);
+void write_mem_prot(size_t addr, std::string_view payload, bool prot);
+void write_mem_prot(size_t addr, std::string payload, bool prot);
+void write_mem(size_t addr, std::string payload);
+size_t function_start(size_t off);
+void write_mem_reversible(std::string name, size_t addr, std::string_view payload, bool prot);
+void reverse_mem(std::string name, size_t addr = NULL);
 
 template <typename T>
 requires std::is_trivially_copyable_v<T>
@@ -96,92 +104,20 @@ requires std::is_trivially_copyable_v<T>
     return std::string_view{reinterpret_cast<const char*>(&payload), sizeof(payload)};
 }
 
-void write_mem_prot(size_t addr, std::string_view payload, bool prot)
-{
-    DWORD old_protect = 0;
-    auto page = addr & ~0xFFF;
-    auto size = round_up((addr + payload.size() - page), 0x1000);
-    if (prot)
-    {
-        VirtualProtect((void*)page, size, PAGE_EXECUTE_READWRITE, &old_protect);
-    }
-    memcpy((void*)addr, payload.data(), payload.size());
-    if (prot)
-    {
-        VirtualProtect((LPVOID)page, size, old_protect, &old_protect);
-    }
-}
-
-template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_prot(size_t addr, const T& payload, bool prot)
-{
-    write_mem_prot(addr, to_le_bytes(payload), prot);
-}
-
-template <class T>
-requires std::is_trivially_copyable_v<T> void write_mem_prot(void* addr, const T& payload, bool prot)
-{
-    write_mem_prot((size_t)addr, to_le_bytes(payload), prot);
-}
-
-void write_mem_prot(size_t addr, std::string payload, bool prot)
-{
-    write_mem_prot(addr, std::string_view{payload}, prot);
-}
-
-[[maybe_unused]] void write_mem(size_t addr, std::string payload)
-{
-    write_mem_prot(addr, payload, false);
-}
-
-struct ReversibleMemory
-{
-    size_t address;
-    std::vector<char> old_data;
-    bool prot_used;
-};
-
-std::unordered_map<std::string, std::vector<ReversibleMemory>> original_memory;
-
-[[maybe_unused]] void write_mem_reversible(std::string name, size_t addr, std::string_view payload, bool prot)
-{
-    if (!original_memory.contains(name))
-    {
-        std::vector<char> old_data((char*)addr, (char*)addr + payload.size());
-        original_memory[name] = std::vector<ReversibleMemory>{{addr, old_data, prot}};
-    }
-    else
-    {
-        bool new_addr = true;
-        for (auto& it : original_memory[name])
-        {
-            if (it.address == addr)
-            {
-                new_addr = false;
-                break;
-            }
-        }
-        if (new_addr)
-        {
-            std::vector<char> old_data((char*)addr, (char*)addr + payload.size());
-            original_memory[name].push_back(ReversibleMemory{addr, old_data, prot});
-        }
-    }
-    write_mem_prot(addr, payload, prot);
-}
 template <class T>
 requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_reversible(std::string name, size_t addr, const T& payload, bool prot)
 {
     write_mem_reversible(name, addr, to_le_bytes(payload), prot);
 }
-[[maybe_unused]] void reverse_mem(std::string name, size_t addr = NULL)
+template <class T>
+requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_prot(size_t addr, const T& payload, bool prot)
 {
-    if (original_memory.contains(name))
-    {
-        for (auto& it : original_memory[name])
-            if (!addr || addr == it.address)
-                write_mem_prot(it.address, std::string_view{it.old_data.data(), it.old_data.size()}, it.prot_used);
-    }
+    write_mem_prot(addr, to_le_bytes(payload), prot);
+}
+template <class T>
+requires std::is_trivially_copyable_v<T> void write_mem_prot(void* addr, const T& payload, bool prot)
+{
+    write_mem_prot((size_t)addr, to_le_bytes(payload), prot);
 }
 
 #define DEFINE_ACCESSOR(name, type)                       \
@@ -202,16 +138,6 @@ DEFINE_ACCESSOR(i64, int64_t);
 
 DEFINE_ACCESSOR(f32, float);
 
-[[maybe_unused]] size_t function_start(size_t off)
-{
-    off &= ~0xf;
-    while (read_u8(off - 1) != 0xcc)
-    {
-        off -= 0x10;
-    }
-    return off;
-}
-
 template <class FunT, typename T>
 FunT* vtable_find(T* obj, size_t index)
 {
@@ -220,28 +146,6 @@ FunT* vtable_find(T* obj, size_t index)
         return static_cast<FunT*>(nullptr);
     return reinterpret_cast<FunT*>(&ptr[0][index]);
 }
-
-[[maybe_unused]] LPVOID alloc_mem_rel32(size_t addr, size_t size)
-{
-    const size_t limit_addr = Memory::get().exe_ptr;
-    LPVOID new_array = nullptr;
-    size_t test_addr;
-
-    test_addr = addr + 0x10000; // dunno why
-    if (test_addr <= INT32_MAX)
-        test_addr = 8;
-    else
-        test_addr -= INT32_MAX;
-
-    for (; test_addr < limit_addr; test_addr += 0x100000)
-    {
-        new_array = VirtualAlloc((LPVOID)test_addr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-        if (new_array)
-            break;
-    }
-    return new_array;
-}
-}; // namespace
 
 #define ONCE(type)            \
     static bool once = false; \
