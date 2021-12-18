@@ -89,7 +89,7 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
     return new_array;
 }
 
-std::unordered_map<std::string, std::vector<ReversibleMemory>> original_memory;
+std::unordered_map<std::string, std::vector<RecoverableMemory>> original_memory;
 
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
 {
@@ -99,7 +99,7 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
         if (old_data)
         {
             memcpy(old_data, (char*)addr, payload.size());
-            original_memory[name] = std::vector<ReversibleMemory>{{addr, old_data, payload.size(), prot}};
+            original_memory[name] = std::vector<RecoverableMemory>{{addr, old_data, payload.size(), prot}};
         }
     }
     else
@@ -119,7 +119,7 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
             if (old_data)
             {
                 memcpy(old_data, (char*)addr, payload.size());
-                original_memory[name].push_back(ReversibleMemory{addr, old_data, payload.size(), prot});
+                original_memory[name].push_back(RecoverableMemory{addr, old_data, payload.size(), prot});
             }
         }
     }

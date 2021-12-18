@@ -81,7 +81,7 @@ struct Memory
         return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
     }
 };
-struct ReversibleMemory
+struct RecoverableMemory
 {
     size_t address;
     char* old_data;
