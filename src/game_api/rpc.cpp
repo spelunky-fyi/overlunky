@@ -1234,12 +1234,12 @@ void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
         {
             if (entry.chance_sizeof == 4)
             {
-                write_mem_reversible("drop_chance", entry.offset, new_drop_chance, true);
+                write_mem_recoverable("drop_chance", entry.offset, new_drop_chance, true);
             }
             else if (entry.chance_sizeof == 1)
             {
                 uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_reversible("drop_chance", entry.offset, value, true);
+                write_mem_recoverable("drop_chance", entry.offset, value, true);
             }
         }
     }
@@ -1300,7 +1300,7 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         {
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
             {
-                write_mem_reversible("replace_drop", entry.offsets[x], new_drop_entity_type, true);
+                write_mem_recoverable("replace_drop", entry.offsets[x], new_drop_entity_type, true);
             }
         }
     }
@@ -1777,7 +1777,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
     if (old_size == ent_types_size)
     {
         for (uint32_t i = 0; i < ent_types_size; ++i)
-            write_mem_reversible("sunchallenge_spawn", (size_t)&old_types_array[i], ent_types[i], true);
+            write_mem_recoverable("sunchallenge_spawn", (size_t)&old_types_array[i], ent_types[i], true);
 
         return;
     }
@@ -1791,11 +1791,11 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
 
         memcpy(new_array, ent_types.data(), data_size);
         int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
-        write_mem_reversible("sunchallenge_spawn", offset, rel, true);
+        write_mem_recoverable("sunchallenge_spawn", offset, rel, true);
 
         // the game does bitwise "and" with value 12 (0xC), so it would get 0, 4, 8 or 12 (4 positions in table)
         int8_t new_value = static_cast<int8_t>((ent_types_size - 1) << 2);
-        write_mem_reversible("sunchallenge_spawn", offset - 4, new_value, true);
+        write_mem_recoverable("sunchallenge_spawn", offset - 4, new_value, true);
         modified = true;
     }
 }
@@ -1823,7 +1823,7 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
         (!original_instr && read_u8(offset + 5) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
-            write_mem_reversible("diceshop_prizes", (size_t)&old_types_array[i], ent_types[i], true);
+            write_mem_recoverable("diceshop_prizes", (size_t)&old_types_array[i], ent_types[i], true);
 
         return;
     }
@@ -1838,7 +1838,7 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
 
         memcpy(new_array, ent_types.data(), data_size);
         int32_t rel = static_cast<int32_t>((size_t)new_array - (array_offset + 4));
-        write_mem_reversible("diceshop_prizes", array_offset, rel, true);
+        write_mem_recoverable("diceshop_prizes", array_offset, rel, true);
 
         if (original_instr)
         {
@@ -1850,11 +1850,11 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
             //divb r11b
             //mov dl, ah
             //pop rax
-            write_mem_reversible("diceshop_prizes", offset, new_code, true);
+            write_mem_recoverable("diceshop_prizes", offset, new_code, true);
         }
         else
         {
-            write_mem_reversible("diceshop_prizes", offset + 5, (uint8_t)ent_types.size(), true);
+            write_mem_recoverable("diceshop_prizes", offset + 5, (uint8_t)ent_types.size(), true);
         }
     }
 }
@@ -1882,7 +1882,7 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
     {
         // original array is used for something else as well, so i never edit that content
         for (uint32_t i = 0; i < ent_types.size(); ++i)
-            write_mem_reversible("altar_damage_spawn", (size_t)&old_types_array[i], ent_types[i], true);
+            write_mem_recoverable("altar_damage_spawn", (size_t)&old_types_array[i], ent_types[i], true);
 
         return;
     }
@@ -1895,7 +1895,7 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
 
         memcpy(new_array, ent_types.data(), data_size);
         int32_t rel = static_cast<int32_t>((size_t)new_array - (array_offset + 4));
-        write_mem_reversible("altar_damage_spawn", array_offset, rel, true);
+        write_mem_recoverable("altar_damage_spawn", array_offset, rel, true);
 
         if (original_instr)
         {
@@ -1904,13 +1904,13 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
             //shr RAX, 0x38
             //divb R9b
             //mov R9, RAX
-            write_mem_reversible("altar_damage_spawn", code_offset, new_code, true);
-            write_mem_reversible("altar_damage_spawn", instruction_shr, "\x49\xC1\xE9\x08"sv, true); //shr r9,0x8
-            write_mem_reversible("altar_damage_spawn", instruction_to_modifiy, (uint8_t)0x8C, true); // r9+r12 => r12+r9*4
+            write_mem_recoverable("altar_damage_spawn", code_offset, new_code, true);
+            write_mem_recoverable("altar_damage_spawn", instruction_shr, "\x49\xC1\xE9\x08"sv, true); //shr r9,0x8
+            write_mem_recoverable("altar_damage_spawn", instruction_to_modifiy, (uint8_t)0x8C, true); // r9+r12 => r12+r9*4
         }
         else
         {
-            write_mem_reversible("altar_damage_spawn", code_offset + 2, (uint8_t)ent_types.size(), true);
+            write_mem_recoverable("altar_damage_spawn", code_offset + 2, (uint8_t)ent_types.size(), true);
         }
     }
 }

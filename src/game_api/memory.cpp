@@ -91,7 +91,7 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
 
 std::unordered_map<std::string, std::vector<ReversibleMemory>> original_memory;
 
-void write_mem_reversible(std::string name, size_t addr, std::string_view payload, bool prot)
+void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
 {
     if (!original_memory.contains(name))
     {

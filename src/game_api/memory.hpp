@@ -94,7 +94,7 @@ void write_mem_prot(size_t addr, std::string_view payload, bool prot);
 void write_mem_prot(size_t addr, std::string payload, bool prot);
 void write_mem(size_t addr, std::string payload);
 size_t function_start(size_t off);
-void write_mem_reversible(std::string name, size_t addr, std::string_view payload, bool prot);
+void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot);
 void reverse_mem(std::string name, size_t addr = NULL);
 
 template <typename T>
@@ -105,9 +105,9 @@ requires std::is_trivially_copyable_v<T>
 }
 
 template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_reversible(std::string name, size_t addr, const T& payload, bool prot)
+requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_recoverable(std::string name, size_t addr, const T& payload, bool prot)
 {
-    write_mem_reversible(name, addr, to_le_bytes(payload), prot);
+    write_mem_recoverable(name, addr, to_le_bytes(payload), prot);
 }
 template <class T>
 requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_prot(size_t addr, const T& payload, bool prot)
