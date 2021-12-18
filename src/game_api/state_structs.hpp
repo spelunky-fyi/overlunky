@@ -752,21 +752,33 @@ struct LiquidTileSpawnData
 struct LiquidPhysics
 {
     size_t unknown1; // MysteryLiquidPointer1 in plugin
-    LiquidPhysicsParams water_physics_defaults;
-    LiquidPhysicsEngine* water_physics_engine;
-    LiquidTileSpawnData water_tile_spawn_data;
-    LiquidPhysicsParams coarse_water_physics_defaults;
-    LiquidPhysicsEngine* coarse_water_physics_engine;
-    LiquidTileSpawnData coarse_water_tile_spawn_data;
-    LiquidPhysicsParams lava_physics_defaults;
-    LiquidPhysicsEngine* lava_physics_engine;
-    LiquidTileSpawnData lava_tile_spawn_data;
-    LiquidPhysicsParams coarse_lava_physics_defaults;
-    LiquidPhysicsEngine* coarse_lava_physics_engine;
-    LiquidTileSpawnData coarse_lava_tile_spawn_data;
-    LiquidPhysicsParams stagnant_lava_physics_defaults;
-    LiquidPhysicsEngine* stagnant_lava_physics_engine;
-    LiquidTileSpawnData stagnant_lava_tile_spawn_data;
+    union
+    {
+        struct
+        {
+            LiquidPhysicsParams physics_defaults;
+            LiquidPhysicsEngine* physics_engine;
+            LiquidTileSpawnData tile_spawn_data;
+        } pools[5];
+        struct
+        {
+            LiquidPhysicsParams water_physics_defaults;
+            LiquidPhysicsEngine* water_physics_engine;
+            LiquidTileSpawnData water_tile_spawn_data;
+            LiquidPhysicsParams coarse_water_physics_defaults;
+            LiquidPhysicsEngine* coarse_water_physics_engine;
+            LiquidTileSpawnData coarse_water_tile_spawn_data;
+            LiquidPhysicsParams lava_physics_defaults;
+            LiquidPhysicsEngine* lava_physics_engine;
+            LiquidTileSpawnData lava_tile_spawn_data;
+            LiquidPhysicsParams coarse_lava_physics_defaults;
+            LiquidPhysicsEngine* coarse_lava_physics_engine;
+            LiquidTileSpawnData coarse_lava_tile_spawn_data;
+            LiquidPhysicsParams stagnant_lava_physics_defaults;
+            LiquidPhysicsEngine* stagnant_lava_physics_engine;
+            LiquidTileSpawnData stagnant_lava_tile_spawn_data;
+        };
+    };
 };
 
 struct AITarget
