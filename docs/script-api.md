@@ -687,7 +687,7 @@ Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values
 Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 Will return the string of currently choosen language
 ### [`change_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_string)
-`nil change_string(STRINGID string_id, string str)`<br/>
+`nil change_string(STRINGID string_id, string_view str)`<br/>
 Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 This edits custom string and in game strings but changing the language in settings will reset game strings
 ### [`add_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_string)
@@ -705,8 +705,8 @@ Clears the name set with `add_custom_name`
 `nil enter_door(int player_uid, int door_uid)`<br/>
 Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
 Doesn't really work for layer doors
-### [`change_sunchallenge_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawn)
-`nil change_sunchallenge_spawn(array<ENT_TYPE> ent_types)`<br/>
+### [`change_sunchallenge_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawns)
+`nil change_sunchallenge_spawns(array<ENT_TYPE> ent_types)`<br/>
 Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
 {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
 Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
@@ -719,8 +719,8 @@ ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE,
 ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
 Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
 Use empty table as argument to reset to the game default
-### [`change_altar_damage_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawn)
-`nil change_altar_damage_spawn(array<ENT_TYPE> ent_types)`<br/>
+### [`change_altar_damage_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawns)
+`nil change_altar_damage_spawns(array<ENT_TYPE> ent_types)`<br/>
 Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
 {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
 Max 255 types
@@ -1702,7 +1702,7 @@ Returns the uid of the currently worn backitem, or -1 if wearing nothing
 - [`int time_of_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_of_death) &Inventory::time_of_death
 \
 Is set to state.time_total when player dies
-- [`player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) sol::property([](Inventory&i)-&gt;int8_t{if(i.player_slot&gt;=0)returni.player_slot+1;elsereturni.player_slot;}
+- [`int player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) /*&Inventory::player_slot
 - [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
 \
 To access/edit anything below use `ON.PRE_LEVEL_GENERATION`, those are used to transfer information to new player entity

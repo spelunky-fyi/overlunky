@@ -438,9 +438,9 @@ Entity* get_entity_ptr(uint32_t uid)
 
 ENT_TYPE get_entity_type(uint32_t uid)
 {
-    auto p = get_entity_ptr(uid);
-    if (p)
-        return p->type->id;
+    auto entity = get_entity_ptr(uid);
+    if (entity)
+        return entity->type->id;
 
     return UINT32_MAX;
 }
@@ -504,12 +504,12 @@ std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::funct
 
 std::vector<uint32_t> get_entities()
 {
-    return get_entities_by(0, 0, LAYER::BOTH);
+    return get_entities_by({}, 0, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 {
-    return get_entities_by(0, 0, layer);
+    return get_entities_by({}, 0, layer);
 }
 
 std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
@@ -523,7 +523,7 @@ std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type)
 
 std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
 {
-    return get_entities_by(0, mask, LAYER::BOTH);
+    return get_entities_by({}, mask, LAYER::BOTH);
 }
 
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
@@ -1739,7 +1739,7 @@ void enter_door(int32_t player_uid, int32_t door_uid)
     door_entry(door, player);
 }
 
-void change_sunchallenge_spawn(std::vector<ENT_TYPE> ent_types)
+void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
 {
     static bool modified = false;
 
@@ -1859,7 +1859,7 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
     }
 }
 
-void change_altar_damage_spawn(std::vector<ENT_TYPE> ent_types)
+void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
 {
     if (ent_types.size() > 255)
         return;

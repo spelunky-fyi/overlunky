@@ -460,11 +460,11 @@ Entity* State::find(uint32_t uid)
 LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
 {
     const auto state = ptr();
-    static ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
-    static ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);
-    static ENT_TYPE LIQUID_LAVA = to_id("ENT_TYPE_LIQUID_LAVA"sv);
-    static ENT_TYPE LIQUID_STAGNANT_LAVA = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"sv);
-    static ENT_TYPE LIQUID_COARSE_LAVA = to_id("ENT_TYPE_LIQUID_COARSE_LAVA"sv);
+    static const ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
+    static const ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);
+    static const ENT_TYPE LIQUID_LAVA = to_id("ENT_TYPE_LIQUID_LAVA"sv);
+    static const ENT_TYPE LIQUID_STAGNANT_LAVA = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"sv);
+    static const ENT_TYPE LIQUID_COARSE_LAVA = to_id("ENT_TYPE_LIQUID_COARSE_LAVA"sv);
     if (liquid_type == LIQUID_WATER)
     {
         return state->liquid_physics->water_physics_engine;

@@ -1221,7 +1221,7 @@ end
     /// {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
     /// Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
     /// Use empty table as argument to reset to the game default
-    lua["change_sunchallenge_spawn"] = change_sunchallenge_spawn;
+    lua["change_sunchallenge_spawns"] = change_sunchallenge_spawns;
 
     /// Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
     /// {ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
@@ -1235,7 +1235,7 @@ end
     /// {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
     /// Max 255 types
     /// Use empty table as argument to reset to the game default
-    lua["change_altar_damage_spawn"] = change_altar_damage_spawn;
+    lua["change_altar_damage_spawns"] = change_altar_damage_spawns;
 
     /// Poisons entity, to cure poison set `poison_tick_timer` to -1
     lua["poison_entity"] = poison_entity;

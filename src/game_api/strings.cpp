@@ -140,7 +140,7 @@ const char16_t* get_string(STRINGID string_id)
     return strings_table[string_id];
 }
 
-void change_string(STRINGID string_id, std::u16string str)
+void change_string(STRINGID string_id, std::u16string_view str)
 {
     if (string_id == wrong_stringid)
         return;
@@ -148,7 +148,7 @@ void change_string(STRINGID string_id, std::u16string str)
     {
         auto it = custom_strings.find(string_id);
         if (it != custom_strings.end())
-            it->second = std::move(str);
+            it->second = str;
     }
     else
     {

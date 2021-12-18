@@ -619,7 +619,7 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
 
 bool Entity::is_movable()
 {
-    static ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
+    static const ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
     if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
         return true;
     else if (type->search_flags & 0x1000) // LOGICAL - as it has some movable entities

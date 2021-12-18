@@ -117,15 +117,15 @@ bool get_character_gender(std::uint32_t character_index)
     auto& char_def = get_character_definition(character_index);
     return char_def.gender == CharGender::Female;
 }
-void set_character_full_name(std::uint32_t character_index, std::u16string name)
+void set_character_full_name(std::uint32_t character_index, std::u16string_view name)
 {
     auto& char_def = get_character_definition(character_index);
-    change_string(char_def.full_name_string_id, name);
+    change_string(char_def.full_name_string_id, name.data());
 }
-void set_character_short_name(std::uint32_t character_index, std::u16string name)
+void set_character_short_name(std::uint32_t character_index, std::u16string_view name)
 {
     auto& char_def = get_character_definition(character_index);
-    change_string(char_def.short_name_string_id, name);
+    change_string(char_def.short_name_string_id, name.data());
 }
 void set_character_heart_color(std::uint32_t character_index, Color color)
 {

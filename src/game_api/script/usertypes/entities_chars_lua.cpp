@@ -36,7 +36,9 @@ void register_usertypes(sol::state& lua)
         &Inventory::bombs,
         "time_of_death",
         &Inventory::time_of_death,
-        "player_slot",
+        "player_slot", /*
+        &Inventory::player_slot,
+                       */
         sol::property([](Inventory& i) -> int8_t
                       {
                           if (i.player_slot >= 0)
