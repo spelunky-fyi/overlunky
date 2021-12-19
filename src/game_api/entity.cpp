@@ -242,11 +242,6 @@ std::pair<float, float> Entity::position_self() const
     return std::pair<float, float>(x, y);
 }
 
-std::pair<float, float> Entity::position_render() const
-{
-    return {rendering_info->x, rendering_info->y};
-}
-
 void Entity::remove_item(uint32_t item_uid)
 {
     auto entity = get_entity_ptr(item_uid);
@@ -399,6 +394,7 @@ std::tuple<float, float, uint8_t> get_position(uint32_t uid)
     Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
+
     return {0.0f, 0.0f, (uint8_t)0};
 }
 
@@ -407,6 +403,7 @@ std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
     Entity* ent = get_entity_ptr(uid);
     if (ent && ent->rendering_info != nullptr && !ent->rendering_info->stop_render)
         return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
+
     return {0.0f, 0.0f, (uint8_t)0};
 }
 

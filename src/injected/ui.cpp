@@ -2561,9 +2561,9 @@ void render_olmec(Entity* ent, ImColor color)
         auto ent_item = get_entity_ptr(pitems[i]);
         if (ent_item)
         {
-            render_position = ent_item->position_render();
-            render_position.first -= ent_item->x;
-            render_position.second -= ent_item->y;
+            auto rend = get_render_position(ent->uid);
+            render_position.first = std::get<0>(rend) - ent_item->x;
+            render_position.second = std::get<1>(rend) - ent_item->y;
             break;
         }
     }
@@ -2583,14 +2583,19 @@ void render_olmec(Entity* ent, ImColor color)
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool fixed)
 {
     const auto type = ent->type->id;
-    if (!type || ent->is_liquid())
+    if (!type)
         return;
 
     std::pair<float, float> render_position;
     if (fixed)
         render_position = ent->position();
     else
-        render_position = ent->position_render();
+    {
+        auto rend = get_render_position(ent->uid);
+        render_position.first = std::get<0>(rend);
+        render_position.second = std::get<1>(rend);
+
+    }
 
     auto [boxa_x, boxa_y] =
         screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
