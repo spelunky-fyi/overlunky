@@ -2594,7 +2594,6 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool fixed)
         auto rend = get_render_position(ent->uid);
         render_position.first = std::get<0>(rend);
         render_position.second = std::get<1>(rend);
-
     }
 
     auto [boxa_x, boxa_y] =
