@@ -2561,10 +2561,11 @@ void render_olmec(Entity* ent, ImColor color)
         auto ent_item = get_entity_ptr(pitems[i]);
         if (ent_item)
         {
-            auto rend = get_render_position(ent->uid);
+            auto rend = get_render_position(ent_item->uid);
             render_position.first = std::get<0>(rend) - ent_item->x;
             render_position.second = std::get<1>(rend) - ent_item->y;
-            break;
+            if (render_position.first != 0 && render_position.second != 0)
+                break;
         }
     }
     if (render_position.first == 0.0f)
@@ -2580,21 +2581,18 @@ void render_olmec(Entity* ent, ImColor color)
     draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 }
 
-void render_hitbox(Entity* ent, bool cross, ImColor color, bool fixed)
+void render_hitbox(Entity* ent, bool cross, ImColor color)
 {
     const auto type = ent->type->id;
     if (!type)
         return;
 
     std::pair<float, float> render_position;
-    if (fixed)
+    auto rend = get_render_position(ent->uid);
+    render_position.first = std::get<0>(rend);
+    render_position.second = std::get<1>(rend);
+    if (render_position.first == 0 && render_position.second == 0)
         render_position = ent->position();
-    else
-    {
-        auto rend = get_render_position(ent->uid);
-        render_position.first = std::get<0>(rend);
-        render_position.second = std::get<1>(rend);
-    }
 
     auto [boxa_x, boxa_y] =
         screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
@@ -2795,12 +2793,12 @@ void render_clickhandler()
             if (ent->rendering_info->stop_render)
                 continue;
 
-            render_hitbox(ent, false, ImColor(0, 255, 255, 150), false);
+            render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
         g_players = get_players();
         for (auto player : g_players)
         {
-            render_hitbox(player, false, ImColor(255, 0, 255, 200), false);
+            render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
 
         std::vector<ENT_TYPE> additional_fixed_entities = {
@@ -2827,9 +2825,9 @@ void render_clickhandler()
         {
             auto ent = get_entity_ptr(entity);
             if (entity_names[ent->type->id].find("TRIGGER") != std::string::npos)
-                render_hitbox(ent, false, ImColor(255, 0, 0, 150), true);
+                render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             else
-                render_hitbox(ent, false, ImColor(0, 255, 255, 150), true);
+                render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
 
         if (ImGui::IsMousePosValid())
@@ -2851,7 +2849,7 @@ void render_clickhandler()
             auto hovered = get_entity_at(cpos.first, cpos.second, false, 2, mask);
             if (hovered != -1)
             {
-                render_hitbox(get_entity_ptr(hovered), true, ImColor(50, 50, 255, 200), false);
+                render_hitbox(get_entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
                 auto ptype = entity_type(hovered);
                 const char* pname = entity_names[ptype].c_str();
                 std::string buf3 = fmt::format("{}, {}", hovered, pname);
@@ -2861,7 +2859,7 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"] && update_entity())
     {
-        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200), false);
+        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
     }
     for (auto& [name, script] : g_scripts)
     {
