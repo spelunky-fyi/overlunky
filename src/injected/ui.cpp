@@ -2556,20 +2556,21 @@ void render_olmec(Entity* ent, ImColor color)
 {
     std::pair<float, float> render_position = {0.0f, 0.0f};
     int* pitems = (int*)ent->items.begin;
+    bool got_rendering = false;
     for (unsigned int i = 0; i < ent->items.count; i++) // get the olmec position from one of the fx
     {
         auto ent_item = get_entity_ptr(pitems[i]);
-        if (ent_item)
+        if (ent_item && ent_item->rendering_info && !ent_item->rendering_info->stop_render)
         {
             auto rend = get_render_position(ent_item->uid);
             render_position.first = std::get<0>(rend) - ent_item->x;
             render_position.second = std::get<1>(rend) - ent_item->y;
-            if (render_position.first != 0 && render_position.second != 0)
-                break;
+            got_rendering = true;
+            break;
         }
     }
-    if (render_position.first == 0.0f)
-        return;
+    if (!got_rendering)
+        render_position = ent->position();
 
     auto [boxa_x, boxa_y] =
         screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
@@ -2588,10 +2589,13 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         return;
 
     std::pair<float, float> render_position;
-    auto rend = get_render_position(ent->uid);
-    render_position.first = std::get<0>(rend);
-    render_position.second = std::get<1>(rend);
-    if (render_position.first == 0 && render_position.second == 0)
+    if (ent->rendering_info && !ent->rendering_info->stop_render)
+    {
+        auto rend = get_render_position(ent->uid);
+        render_position.first = std::get<0>(rend);
+        render_position.second = std::get<1>(rend);
+    }
+    else
         render_position = ent->position();
 
     auto [boxa_x, boxa_y] =
