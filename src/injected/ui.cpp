@@ -2583,7 +2583,7 @@ void render_olmec(Entity* ent, ImColor color)
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool fixed)
 {
     const auto type = ent->type->id;
-    if (!type)
+    if (!type || ent->is_liquid())
         return;
 
     std::pair<float, float> render_position;
@@ -3032,7 +3032,9 @@ void render_clickhandler()
             {
                 if (g_held_entity)
                 {
-                    g_held_entity->standing_on_uid = -1;
+                    if (g_held_entity->is_movable())
+                        g_held_entity->standing_on_uid = -1;
+
                     g_held_entity->flags |= 1U << 4;
                     g_held_entity->flags |= 1U << 9;
                 }

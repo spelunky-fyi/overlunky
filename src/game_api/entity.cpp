@@ -148,7 +148,7 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
     y = dy;
     if (is_movable())
     {
-        auto movable_ent = (Movable*)pointer();
+        auto movable_ent = this->as<Movable>();
         movable_ent->velocityx = vx;
         movable_ent->velocityy = vy;
     }
