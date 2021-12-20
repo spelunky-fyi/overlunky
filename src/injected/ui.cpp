@@ -251,6 +251,100 @@ std::map<std::string, bool> options = {
     {"warp_increments_level_count", true},
     {"lights", false}};
 
+bool g_speedhack_hooked = false;
+float g_speedhack_multiplier = 1.0;
+LARGE_INTEGER g_speedhack_prev;
+LARGE_INTEGER g_speedhack_current;
+LARGE_INTEGER g_speedhack_fake;
+PVOID g_oldqpc;
+
+#define PtrFromRva( base, rva ) ( ( ( PBYTE ) base ) + rva )
+
+// I didn't write this one, I just found it in the shady parts of the internet
+// This could probably be done with detours and speedhack should be part of the api anyway...
+BOOL HookIAT(const char *szModuleName, const char *szFuncName, PVOID pNewFunc, PVOID *pOldFunc)
+{
+    PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)GetModuleHandle(NULL);
+    PIMAGE_NT_HEADERS pNtHeader = (PIMAGE_NT_HEADERS)PtrFromRva(pDosHeader, pDosHeader->e_lfanew);
+
+    // Make sure we have valid data
+    if (pNtHeader->Signature != IMAGE_NT_SIGNATURE)
+        return FALSE;
+
+    // Grab a pointer to the import data directory
+    PIMAGE_IMPORT_DESCRIPTOR pImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)PtrFromRva(pDosHeader, pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+
+        for (UINT uIndex = 0; pImportDescriptor[uIndex].Characteristics != 0; uIndex++)
+        {
+            char *szDllName = (char*)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].Name);
+
+            // Is this our module?
+            if (_strcmpi(szDllName, szModuleName) != 0)
+                continue;
+
+            if (!pImportDescriptor[uIndex].FirstThunk || !pImportDescriptor[uIndex].OriginalFirstThunk)
+                return FALSE;
+
+            PIMAGE_THUNK_DATA pThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].FirstThunk);
+            PIMAGE_THUNK_DATA pOrigThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].OriginalFirstThunk);
+
+            for (; pOrigThunk->u1.Function != NULL; pOrigThunk++, pThunk++)
+            {
+                // We can't process ordinal imports just named
+                if (pOrigThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG)
+                    continue;
+
+                PIMAGE_IMPORT_BY_NAME import = (PIMAGE_IMPORT_BY_NAME)PtrFromRva(pDosHeader, pOrigThunk->u1.AddressOfData);
+
+                // Is this our function?
+                if (_strcmpi(szFuncName, (char*)import->Name) != 0)
+                    continue;
+
+                DWORD dwJunk = 0;
+                MEMORY_BASIC_INFORMATION mbi;
+
+                // Make the memory section writable
+                VirtualQuery(pThunk, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+                if (!VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &mbi.Protect))
+                    return FALSE;
+
+                // Save the old pointer
+                *pOldFunc = (PVOID*)(DWORD_PTR)pThunk->u1.Function;
+
+// Write the new pointer based on CPU type
+#ifdef _WIN64
+                pThunk->u1.Function = (ULONGLONG)(DWORD_PTR)pNewFunc;
+#else
+                pThunk->u1.Function = (DWORD)(DWORD_PTR)pNewFunc;
+#endif
+
+                if (VirtualProtect(mbi.BaseAddress, mbi.RegionSize, mbi.Protect, &dwJunk))
+                    return TRUE;
+            }
+        }
+    return FALSE;
+}
+
+bool __stdcall QueryPerformanceCounterHook(LARGE_INTEGER* counter)
+{
+    QueryPerformanceCounter(&g_speedhack_current);
+    g_speedhack_fake.QuadPart += (long long)((g_speedhack_current.QuadPart - g_speedhack_prev.QuadPart) * g_speedhack_multiplier);
+    g_speedhack_prev = g_speedhack_current;
+    *counter =  g_speedhack_fake;
+    return true;
+}
+
+void speedhack()
+{
+    if (!g_speedhack_hooked)
+    {
+        QueryPerformanceCounter(&g_speedhack_prev);
+        g_speedhack_fake = g_speedhack_prev;
+        HookIAT("kernel32.dll", "QueryPerformanceCounter", QueryPerformanceCounterHook, &g_oldqpc);
+        g_speedhack_hooked = true;
+    }
+}
+
 int int_pow(int base, unsigned int exp)
 {
     int result = 1;
@@ -3286,6 +3380,10 @@ void render_options()
 void render_debug()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    if (ImGui::InputFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 0.1f))
+    {
+        speedhack();
+    }
     ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Save##SavePointer", ImGuiDataType_U64, &g_save_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
