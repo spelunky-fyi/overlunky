@@ -406,6 +406,61 @@ void register_usertypes(sol::state& lua)
         auto pos = normalize(ImGui::GetMousePos());
         return std::make_pair(pos.x, pos.y);
     };
+    lua.new_usertype<ImVec2>(
+        "ImVec2",
+        "x",
+        &ImVec2::x,
+        "y",
+        &ImVec2::y);
+
+    /// Low level ImGui input stuff.
+    /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
+    /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+    /// - Note: This doc generator just completely barfs on everything I write here, so go read the source. There's more fields here but I don't know how to make this stupid shit to show them.
+    lua.new_usertype<ImGuiIO>(
+        "ImGuiIO",
+        "displaysize",
+        &ImGuiIO::DisplaySize,
+        "framerate",
+        &ImGuiIO::Framerate,
+        "wantkeyboard",
+        &ImGuiIO::WantCaptureKeyboard,
+        "keydown",
+        &ImGui::IsKeyDown,
+        "keypressed",
+        &ImGui::IsKeyPressed,
+        "keyreleased",
+        &ImGui::IsKeyReleased,
+        "keyctrl",
+        &ImGuiIO::KeyCtrl,
+        "keyshift",
+        &ImGuiIO::KeyShift,
+        "keyalt",
+        &ImGuiIO::KeyAlt,
+        "keysuper",
+        &ImGuiIO::KeySuper,
+        "wantmouse",
+        &ImGuiIO::WantCaptureMouse,
+        "mousepos",
+        &ImGuiIO::MousePos,
+        "mousedown",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.MouseDown); }),
+        "mouseclicked",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.MouseClicked); }),
+        "mousedoubleclicked",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.MouseDoubleClicked); }),
+        "mousewheel",
+        &ImGuiIO::MouseWheel,
+        "keysdown",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.KeysDown); }));
+
+    /// Returns [ImGuiIO](#imguiio) for low level keyboard and mouse stuff.
+    lua["get_io"] = ImGui::GetIO;
 
     /// Deprecated
     /// Use `GuiDrawContext.draw_line` instead

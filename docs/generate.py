@@ -44,6 +44,7 @@ header_files = [
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/save_context.hpp",
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
+    "../src/imgui/imgui.h",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
