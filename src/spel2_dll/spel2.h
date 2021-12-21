@@ -44,6 +44,10 @@ struct SpelunkyFileInfo
     int _member_4{0};
 };
 using Spelunky_LoadFileFunc = SpelunkyFileInfo* (*)(const char* file_path, SpelunkyAllocFun alloc_fun);
+using Spelunky_ReadFromFileOriginal = void (*)(const char* file, void** out_data, size_t* out_data_size);
+using Spelunky_ReadFromFileFunc = void (*)(const char* file, void** out_data, size_t* out_data_size, SpelunkyAllocFun alloc_fun, Spelunky_ReadFromFileOriginal original);
+using Spelunky_WriteToFileOriginal = void (*)(const char* backup_file, const char* file, void* data, size_t data_size);
+using Spelunky_WriteToFileFunc = void (*)(const char* backup_file, const char* file, void* data, size_t data_size, Spelunky_WriteToFileOriginal original);
 using Spelunky_GetImageFilePathFunc = bool (*)(const char* root_path, const char* relative_path, char* out_buffer, size_t out_buffer_size);
 
 class SpelunkyScript;
@@ -67,7 +71,12 @@ void Spelunky_RegisterPostDrawFunc(PostDrawFunc post_draw);
 
 void Spelunky_RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
 
+// Hook loading a file into memory, used when reading packed assets
 void Spelunky_RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file);
+// Hook read/write raw files from/to disk, e.g. save game or config files
+void Spelunky_RegisterOnReadFromFileFunc(Spelunky_ReadFromFileFunc on_read_from_file);
+void Spelunky_RegisterOnWriteToFileFunc(Spelunky_WriteToFileFunc on_write_to_file);
+// Converts a image path to a real path, use for example when reading files from places other than the game folder
 void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path);
 
 SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled);

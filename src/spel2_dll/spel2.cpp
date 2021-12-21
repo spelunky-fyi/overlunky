@@ -97,6 +97,14 @@ void Spelunky_RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file)
 {
     register_on_load_file((LoadFileCallback*)on_load_file);
 }
+void Spelunky_RegisterOnReadFromFileFunc(Spelunky_ReadFromFileFunc on_read_from_file)
+{
+    register_on_read_from_file(on_read_from_file);
+}
+void Spelunky_RegisterOnWriteToFileFunc(Spelunky_WriteToFileFunc on_write_to_file)
+{
+    register_on_write_to_file(on_write_to_file);
+}
 void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path)
 {
     static Spelunky_GetImageFilePathFunc local_get_image_file_path;

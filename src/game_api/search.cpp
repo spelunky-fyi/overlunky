@@ -1582,6 +1582,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_after_inst("\x8B\x8C\x01\xA0\x00\x00\x00\x8D\x79"sv)
             .at_exe(),
     },
+    {
+        // Next to `write_to_file` this is the only usage of `fopen`
+        // Couldn't find any useful XREF in Ghidra so this pattern is exactly the function start
+        "read_from_file"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x41\x57\x41\x56\x56\x57\x53\x48\x81\xec\x20\x01\x00\x00\x4c\x89\xc3\x49\x89\xd7\x49\x89\xce"sv)
+            .at_exe(),
+    },
+    {
+        // Find a function being called as `save_to_file("input.bak", "input.cfg", data_ptr, data_size)`
+        "write_to_file"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4d\x89\xf0\x4d\x89\xe1\xe8****\xe9"sv)
+            .find_inst("\xe8")
+            .decode_call()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
