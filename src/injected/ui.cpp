@@ -2588,20 +2588,11 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     if (!type)
         return;
 
-    std::pair<float, float> render_position;
-    if (ent->rendering_info && !ent->rendering_info->stop_render)
-    {
-        auto rend = get_render_position(ent->uid);
-        render_position.first = std::get<0>(rend);
-        render_position.second = std::get<1>(rend);
-    }
-    else
-        render_position = ent->position();
-
+    auto render_position = get_render_position(ent->uid);
     auto [boxa_x, boxa_y] =
-        screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
+        screen_position(std::get<0>(render_position) - ent->hitboxx + ent->offsetx, std::get<1>(render_position) - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
-        screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+        screen_position(std::get<0>(render_position) + ent->hitboxx + ent->offsetx, std::get<1>(render_position) + ent->hitboxy + ent->offsety);
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
