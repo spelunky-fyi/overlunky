@@ -1605,7 +1605,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_after_inst("\xff\x90\xd0\x00\x00\x00\x48\x8d\xbd\xe0\x03\x00\x00"sv)
             .find_inst("\x48\x8d")
-            .decode_pc(2)
+            .decode_pc()
             .at_exe(),
     },
 };
