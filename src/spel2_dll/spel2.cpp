@@ -47,6 +47,14 @@ void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function)
             };
         });
 }
+void Spelunky_DestroySoundManager()
+{
+    if (g_SoundManager != nullptr)
+    {
+        delete g_SoundManager;
+        g_SoundManager = nullptr;
+    }
+}
 
 void Spelunky_ShowCursor()
 {

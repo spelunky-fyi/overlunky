@@ -60,6 +60,7 @@ void Spelunky_RegisterApplicationVersion(const char* version);
 void Spelunky_InitMemoryDatabase();
 void Spelunky_InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
 void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function);
+void Spelunky_DestroySoundManager();
 
 void Spelunky_ShowCursor();
 void Spelunky_HideCursor();
