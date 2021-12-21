@@ -8,6 +8,7 @@
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "steam_api.hpp"
 #include "window_api.hpp"
 
 SoundManager* g_SoundManager{nullptr};
@@ -119,6 +120,11 @@ void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_f
             }
             return "";
         });
+}
+
+void Spelunky_DisableSteamAchievements()
+{
+    disable_steam_achievements();
 }
 
 std::string read_whole_file(const char* file_path)

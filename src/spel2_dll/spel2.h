@@ -79,6 +79,8 @@ void Spelunky_RegisterOnWriteToFileFunc(Spelunky_WriteToFileFunc on_write_to_fil
 // Converts a image path to a real path, use for example when reading files from places other than the game folder
 void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path);
 
+void Spelunky_DisableSteamAchievements();
+
 SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled);
 void Spelunky_FreeScript(SpelunkyScript* script);
 

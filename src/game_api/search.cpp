@@ -1599,6 +1599,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        // Find a string containing STEAMUSERSTATS, the enclosing function returns an `ISteamUserStats**` in `param_1`
+        "get_steam_user_stats"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\xff\x90\xd0\x00\x00\x00\x48\x8d\xbd\xe0\x03\x00\x00"sv)
+            .find_inst("\x48\x8d")
+            .decode_pc(2)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
