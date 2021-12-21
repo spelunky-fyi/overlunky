@@ -461,6 +461,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "destroy_game_manager"sv,
+        // Called soon after `DispatchMessageA` if `message == 0x12`
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\x8b\x8d\xe8\x10\x00\x00\x48\x8b\x71\x08"sv)
+            .find_inst("\xe8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "write_load_opt"sv,
         PatternCommandBuffer{}
             .set_optional(true)

@@ -77,6 +77,10 @@ void Spelunky_RegisterPostDrawFunc(PostDrawFunc post_draw)
 {
     register_post_draw(post_draw);
 }
+void Spelunky_RegisterOnQuitFunc(OnQuitFunc on_quit)
+{
+    register_on_quit(on_quit);
+}
 
 void Spelunky_RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
 {

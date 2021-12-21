@@ -3,6 +3,7 @@
 #include <backends/imgui_impl_dx11.h>
 #include <backends/imgui_impl_win32.h>
 #include <d3d11.h>
+#include <detours.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -32,6 +33,7 @@ ImguiInitCallback g_ImguiInitCallback{nullptr};
 ImguiDrawCallback g_ImguiDrawCallback{nullptr};
 PreDrawCallback g_PreDrawCallback{nullptr};
 PostDrawCallback g_PostDrawCallback{nullptr};
+OnQuitCallback g_OnQuitCallback{nullptr};
 
 constexpr USHORT g_HidKeyboard = 6;
 HWND g_LastRegisteredRawInputWindow{nullptr};
@@ -39,6 +41,17 @@ HWND g_LastRegisteredRawInputWindow{nullptr};
 auto g_MouseLastActivity = std::chrono::system_clock::now();
 ImVec2 g_CursorLastPos = ImVec2(0, 0);
 std::atomic<std::int32_t> g_ShowCursor{0};
+
+using DestroyGameManager = void(void*);
+DestroyGameManager* g_destroy_game_manager_trampoline{nullptr};
+void destroy_game_manager(void* game_manager)
+{
+    if (g_OnQuitCallback)
+    {
+        g_OnQuitCallback();
+    }
+    g_destroy_game_manager_trampoline(game_manager);
+}
 
 HWND HID_GetRegisteredDeviceWindow(USHORT usage)
 {
@@ -283,6 +296,21 @@ bool init_hooks(void* swap_chain_ptr)
     // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L254
     hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
 
+    {
+        g_destroy_game_manager_trampoline = (DestroyGameManager*)get_address("destroy_game_manager"sv);
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        DetourAttach((void**)&g_destroy_game_manager_trampoline, destroy_game_manager);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking DestroyGameManager: {}\n", error);
+        }
+    }
+
     return true;
 }
 
@@ -305,6 +333,10 @@ void register_pre_draw(PreDrawCallback pre_draw)
 void register_post_draw(PostDrawCallback post_draw)
 {
     g_PostDrawCallback = post_draw;
+}
+void register_on_quit(OnQuitCallback on_quit)
+{
+    g_OnQuitCallback = on_quit;
 }
 
 HWND get_window()

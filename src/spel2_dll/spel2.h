@@ -30,6 +30,7 @@ using ImguiInitFunc = void (*)(struct ImGuiContext*);
 using ImguiDrawFunc = void (*)();
 using PreDrawFunc = void (*)();
 using PostDrawFunc = void (*)();
+using OnQuitFunc = void (*)();
 
 using Spelunky_MakeSavePathFunc = bool (*)(
     const char* script_path, size_t script_path_size, const char* script_name, size_t script_name_size, char* out_buffer, size_t out_buffer_size);
@@ -68,6 +69,7 @@ void Spelunky_RegisterImguiInitFunc(ImguiInitFunc imgui_init);
 void Spelunky_RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw);
 void Spelunky_RegisterPreDrawFunc(PreDrawFunc pre_draw);
 void Spelunky_RegisterPostDrawFunc(PostDrawFunc post_draw);
+void Spelunky_RegisterOnQuitFunc(OnQuitFunc on_quit);
 
 void Spelunky_RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
 
