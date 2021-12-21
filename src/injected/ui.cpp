@@ -2796,7 +2796,7 @@ void render_clickhandler()
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
 
-        std::vector<ENT_TYPE> additional_fixed_entities = {
+        auto additional_fixed_entities = {
             (ENT_TYPE)CUSTOM_TYPE::LOGICALTRAPTRIGGER,
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
@@ -2815,6 +2815,7 @@ void render_clickhandler()
             to_id("ENT_TYPE_FLOOR_BIGSPEAR_TRAP"),
             to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
             to_id("ENT_TYPE_FLOOR_DUSTWALL"),
+            to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
         };
         for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
         {
