@@ -874,12 +874,11 @@ Create image from file. Returns a tuple containing id, width and height.
 Current mouse cursor position in screen coordinates.
 ### [`get_io`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_io)
 `// Access via get_io()`<br/>
-Low level ImGui input stuff.
+Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
 - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
 - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-- Note: This doc generator just completely barfs on everything I write here, so go read the source. There's more fields here but I don't know how to make this stupid shit to show them.
-Returns [ImGuiIO](#imguiio) for low level keyboard and mouse stuff.
+- Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
@@ -1054,7 +1053,9 @@ end
 - [`ENT_TYPE character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &SelectPlayerSlot::character
 - [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
 ### `Items`
-- [`player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) sol::property([](Items&s){returnstd::ref(s.player_select_slots
+- [`player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) sol::property([](Items&s){returnstd::ref(s.player_select_slots)/**/;})
+- [`player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) sol::property([](Items&s){returnstd::ref(s.player_inventories)/**/;})
+- [`int player_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) &Items::player_count
 ### `ArenaConfigArenas`
 - [`bool dwelling_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) &ArenaConfigArenas::dwelling_1
 - [`bool dwelling_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_2) &ArenaConfigArenas::dwelling_2
@@ -3878,24 +3879,24 @@ Current mouse cursor position in screen coordinates.
 - [`x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ImVec2::x
 - [`float                                   x, y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ImVec2::y
 ### `ImGuiIO`
-Low level ImGui input stuff.
-- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
-- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-- Note: This doc generator just completely barfs on everything I write here, so go read the source. There's more fields here but I don't know how to make this stupid shit to show them.
 - [`ImVec2      displaysize`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) &ImGuiIO::DisplaySize
 - [`float       framerate`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) &ImGuiIO::Framerate
 - [`bool        wantkeyboard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) &ImGuiIO::WantCaptureKeyboard
-- [`keydown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) &ImGui::IsKeyDown
-- [`keypressed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) &ImGui::IsKeyPressed
-- [`keyreleased`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) &ImGui::IsKeyReleased
+- [`keysdown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) sol::property([](ImGuiIO&io){returnstd::ref(io.KeysDown)/**/;})
+- [`keydown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) keydown
+- [`keypressed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) keypressed
+- [`keyreleased`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) keyreleased
 - [`bool        keyctrl`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) &ImGuiIO::KeyCtrl
 - [`bool        keyshift`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) &ImGuiIO::KeyShift
 - [`bool        keyalt`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) &ImGuiIO::KeyAlt
 - [`bool        keysuper`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) &ImGuiIO::KeySuper
 - [`bool        wantmouse`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) &ImGuiIO::WantCaptureMouse
 - [`ImVec2      mousepos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) &ImGuiIO::MousePos
-- [`mousedown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDown
+- [`mousedown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDown)/**/;})
+- [`mouseclicked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseClicked)/**/;})
+- [`mousedoubleclicked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDoubleClicked)/**/;})
+- [`float       mousewheel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) &ImGuiIO::MouseWheel
+- [`gamepad`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})
 ### `VanillaRenderContext`
 - [`nil draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &VanillaRenderContext::draw_text
 \

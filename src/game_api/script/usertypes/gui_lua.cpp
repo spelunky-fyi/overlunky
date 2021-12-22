@@ -479,11 +479,41 @@ void register_usertypes(sol::state& lua)
         sol::property([](XINPUT_GAMEPAD& p) -> float
                       { return (float)p.sThumbRY / 32768.f; }));
 
-    /// Low level ImGui input stuff.
-    /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
-    /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-    /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-    /// - Note: This doc generator just completely barfs on everything I write here, so go read the source. There's more fields here but I don't know how to make this stupid shit to show them.
+    auto keydown = sol::overload(
+        [](int keycode)
+        {
+            return ImGui::IsKeyDown(keycode);
+        },
+        [](char key)
+        {
+            return ImGui::IsKeyDown((int)key);
+        });
+    auto keypressed = sol::overload(
+        [](int keycode)
+        {
+            return ImGui::IsKeyPressed(keycode, false);
+        },
+        [](int keycode, bool repeat)
+        {
+            return ImGui::IsKeyPressed(keycode, repeat);
+        },
+        [](char key)
+        {
+            return ImGui::IsKeyPressed((int)key, false);
+        },
+        [](char key, bool repeat)
+        {
+            return ImGui::IsKeyPressed((int)key, repeat);
+        });
+    auto keyreleased = sol::overload(
+        [](int keycode)
+        {
+            return ImGui::IsKeyReleased(keycode);
+        },
+        [](char key)
+        {
+            return ImGui::IsKeyReleased((int)key);
+        });
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
@@ -492,12 +522,15 @@ void register_usertypes(sol::state& lua)
         &ImGuiIO::Framerate,
         "wantkeyboard",
         &ImGuiIO::WantCaptureKeyboard,
+        "keysdown",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.KeysDown) /**/; }),
         "keydown",
-        &ImGui::IsKeyDown,
+        keydown,
         "keypressed",
-        &ImGui::IsKeyPressed,
+        keypressed,
         "keyreleased",
-        &ImGui::IsKeyReleased,
+        keyreleased,
         "keyctrl",
         &ImGuiIO::KeyCtrl,
         "keyshift",
@@ -512,26 +545,27 @@ void register_usertypes(sol::state& lua)
         &ImGuiIO::MousePos,
         "mousedown",
         sol::property([](ImGuiIO& io)
-                      { return std::ref(io.MouseDown); }),
+                      { return std::ref(io.MouseDown) /**/; }),
         "mouseclicked",
         sol::property([](ImGuiIO& io)
-                      { return std::ref(io.MouseClicked); }),
+                      { return std::ref(io.MouseClicked) /**/; }),
         "mousedoubleclicked",
         sol::property([](ImGuiIO& io)
-                      { return std::ref(io.MouseDoubleClicked); }),
+                      { return std::ref(io.MouseDoubleClicked) /**/; }),
         "mousewheel",
         &ImGuiIO::MouseWheel,
-        "keysdown",
-        sol::property([](ImGuiIO& io)
-                      { return std::ref(io.KeysDown); }),
         "gamepad",
         sol::property([]()
                       {
                           g_WantUpdateHasGamepad = true;
-                          return get_gamepad();
+                          return get_gamepad() /**/;
                       }));
 
-    /// Returns [ImGuiIO](#imguiio) for low level keyboard and mouse stuff.
+    /// Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+    /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
+    /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+    /// - Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
     lua["get_io"] = ImGui::GetIO;
 
     /// Deprecated
