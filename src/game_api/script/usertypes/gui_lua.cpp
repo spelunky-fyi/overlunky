@@ -19,7 +19,12 @@ static HMODULE g_XInputDLL = NULL;
 static PFN_XInputGetCapabilities g_XInputGetCapabilities = NULL;
 static PFN_XInputGetState g_XInputGetState = NULL;
 
-XINPUT_GAMEPAD get_gamepad()
+struct Gamepad : XINPUT_GAMEPAD
+{
+    bool enabled;
+};
+
+Gamepad get_gamepad()
 {
     if (g_WantUpdateHasGamepad)
     {
@@ -31,9 +36,9 @@ XINPUT_GAMEPAD get_gamepad()
     XINPUT_STATE xinput_state;
     if (g_HasGamepad && g_XInputGetState && g_XInputGetState(0, &xinput_state) == ERROR_SUCCESS)
     {
-        return xinput_state.Gamepad;
+        return {xinput_state.Gamepad, true};
     }
-    return XINPUT_GAMEPAD{0};
+    return Gamepad{0};
 }
 
 const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
@@ -456,27 +461,29 @@ void register_usertypes(sol::state& lua)
         "y",
         &ImVec2::y);
 
-    lua.new_usertype<XINPUT_GAMEPAD>(
-        "XINPUT_GAMEPAD",
+    lua.new_usertype<Gamepad>(
+        "Gamepad",
+        "enabled",
+        &Gamepad::enabled,
         "buttons",
-        &XINPUT_GAMEPAD::wButtons,
+        &Gamepad::wButtons,
         "lt",
-        sol::property([](XINPUT_GAMEPAD& p) -> float
+        sol::property([](Gamepad& p) -> float
                       { return (float)p.bLeftTrigger / 255.f; }),
         "rt",
-        sol::property([](XINPUT_GAMEPAD& p) -> float
+        sol::property([](Gamepad& p) -> float
                       { return (float)p.bRightTrigger / 255.f; }),
         "lx",
-        sol::property([](XINPUT_GAMEPAD& p) -> float
+        sol::property([](Gamepad& p) -> float
                       { return (float)p.sThumbLX / 32768.f; }),
         "ly",
-        sol::property([](XINPUT_GAMEPAD& p) -> float
+        sol::property([](Gamepad& p) -> float
                       { return (float)p.sThumbLY / 32768.f; }),
         "rx",
-        sol::property([](XINPUT_GAMEPAD& p) -> float
+        sol::property([](Gamepad& p) -> float
                       { return (float)p.sThumbRX / 32768.f; }),
         "ry",
-        sol::property([](XINPUT_GAMEPAD& p) -> float
+        sol::property([](Gamepad& p) -> float
                       { return (float)p.sThumbRY / 32768.f; }));
 
     auto keydown = sol::overload(

@@ -43,13 +43,17 @@ set_callback(function()
     print(F'Wheel going {dir}')
   end
 
-  -- Draw raw gamepad data
-  draw_circle_filled(iio.gamepad.rx, iio.gamepad.ry, 0.02, 0x660000ff)
+  -- Draw raw gamepad data if one is connected
+  if iio.gamepad.enabled then
+    draw_circle_filled(iio.gamepad.rx, iio.gamepad.ry, 0.02, 0x660000ff)
+  end
 end, ON.GUIFRAME)
 
 -- XInput Gamepad
 set_callback(function()
   if #players < 1 then return end
+  if not iio.gamepad.enabled then return end
+
   local x, y, l = get_position(players[1].uid)
 
   -- Fly around with right stick
