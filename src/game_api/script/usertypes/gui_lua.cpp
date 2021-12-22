@@ -10,6 +10,32 @@
 
 #include "logger.h"
 
+#include <xinput.h>
+typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
+typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
+static bool g_HasGamepad = false;
+static bool g_WantUpdateHasGamepad = false;
+static HMODULE g_XInputDLL = NULL;
+static PFN_XInputGetCapabilities g_XInputGetCapabilities = NULL;
+static PFN_XInputGetState g_XInputGetState = NULL;
+
+XINPUT_GAMEPAD get_gamepad()
+{
+    if (g_WantUpdateHasGamepad)
+    {
+        XINPUT_CAPABILITIES caps;
+        g_HasGamepad = g_XInputGetCapabilities ? (g_XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &caps) == ERROR_SUCCESS) : false;
+        //g_WantUpdateHasGamepad = false;
+    }
+
+    XINPUT_STATE xinput_state;
+    if (g_HasGamepad && g_XInputGetState && g_XInputGetState(0, &xinput_state) == ERROR_SUCCESS)
+    {
+        return xinput_state.Gamepad;
+    }
+    return XINPUT_GAMEPAD{0};
+}
+
 const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
 GuiDrawContext::GuiDrawContext(LuaBackend* _backend, ImDrawList* _draw_list)
@@ -269,6 +295,23 @@ namespace NGui
 {
 void register_usertypes(sol::state& lua)
 {
+    const char* xinput_dll_names[] =
+        {
+            "xinput1_4.dll",   // Windows 8+
+            "xinput1_3.dll",   // DirectX SDK
+            "xinput9_1_0.dll", // Windows Vista, Windows 7
+            "xinput1_2.dll",   // DirectX SDK
+            "xinput1_1.dll"    // DirectX SDK
+        };
+    for (int n = 0; n < IM_ARRAYSIZE(xinput_dll_names); n++)
+        if (HMODULE dll = ::LoadLibraryA(xinput_dll_names[n]))
+        {
+            g_XInputDLL = dll;
+            g_XInputGetCapabilities = (PFN_XInputGetCapabilities)::GetProcAddress(dll, "XInputGetCapabilities");
+            g_XInputGetState = (PFN_XInputGetState)::GetProcAddress(dll, "XInputGetState");
+            break;
+        }
+
     auto draw_rect = sol::overload(
         static_cast<void (GuiDrawContext::*)(float, float, float, float, float, float, uColor)>(&GuiDrawContext::draw_rect),
         static_cast<void (GuiDrawContext::*)(AABB, float, float, uColor)>(&GuiDrawContext::draw_rect));
@@ -413,6 +456,29 @@ void register_usertypes(sol::state& lua)
         "y",
         &ImVec2::y);
 
+    lua.new_usertype<XINPUT_GAMEPAD>(
+        "XINPUT_GAMEPAD",
+        "buttons",
+        &XINPUT_GAMEPAD::wButtons,
+        "lt",
+        sol::property([](XINPUT_GAMEPAD& p) -> float
+                      { return (float)p.bLeftTrigger / 255.f; }),
+        "rt",
+        sol::property([](XINPUT_GAMEPAD& p) -> float
+                      { return (float)p.bRightTrigger / 255.f; }),
+        "lx",
+        sol::property([](XINPUT_GAMEPAD& p) -> float
+                      { return (float)p.sThumbLX / 32768.f; }),
+        "ly",
+        sol::property([](XINPUT_GAMEPAD& p) -> float
+                      { return (float)p.sThumbLY / 32768.f; }),
+        "rx",
+        sol::property([](XINPUT_GAMEPAD& p) -> float
+                      { return (float)p.sThumbRX / 32768.f; }),
+        "ry",
+        sol::property([](XINPUT_GAMEPAD& p) -> float
+                      { return (float)p.sThumbRY / 32768.f; }));
+
     /// Low level ImGui input stuff.
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
     /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
@@ -457,7 +523,13 @@ void register_usertypes(sol::state& lua)
         &ImGuiIO::MouseWheel,
         "keysdown",
         sol::property([](ImGuiIO& io)
-                      { return std::ref(io.KeysDown); }));
+                      { return std::ref(io.KeysDown); }),
+        "gamepad",
+        sol::property([]()
+                      {
+                          g_WantUpdateHasGamepad = true;
+                          return get_gamepad();
+                      }));
 
     /// Returns [ImGuiIO](#imguiio) for low level keyboard and mouse stuff.
     lua["get_io"] = ImGui::GetIO;
