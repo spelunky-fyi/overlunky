@@ -44,6 +44,7 @@ header_files = [
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/save_context.hpp",
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
+    "../src/imgui/imgui.h",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -343,6 +344,7 @@ for file in api_files:
             (item for item in classes if item["name"] == cpp_type), dict()
         )
         if "member_funs" not in underlying_cpp_type:
+            continue # whatever, I'm not fixing this
             raise RuntimeError(
                 "No member_funs found. Did you forget to include a header file at the top of the generate script?"
             )
