@@ -1698,54 +1698,99 @@ Unequips the currently worn backitem
 Returns the uid of the currently worn backitem, or -1 if wearing nothing
 ### `Inventory`
 - [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
+\
+Sum of the money collected in current level
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
+- [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
+- [`int player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) /*&Inventory::player_slot
+- [`int poison_tick_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) &Inventory::poison_tick_timer
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`bool cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cursed) &Inventory::cursed
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`bool elixir_buff`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir_buff) &Inventory::elixir_buff
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`int health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) &Inventory::health
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`int kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Inventory::kapala_blood_amount
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int time_of_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_of_death) &Inventory::time_of_death
 \
-Is set to state.time_total when player dies
-- [`int player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) /*&Inventory::player_slot
-- [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
-\
-To access/edit anything below use `ON.PRE_LEVEL_GENERATION`, those are used to transfer information to new player entity
-- [`int poison_tick_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) &Inventory::poison_tick_timer
-- [`bool cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cursed) &Inventory::cursed
-- [`bool elixir_buff`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir_buff) &Inventory::elixir_buff
-- [`int health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) &Inventory::health
-- [`int kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Inventory::kapala_blood_amount
+Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
 - [`ENT_TYPE held_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item) &Inventory::held_item
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int held_item_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item_metadata) &Inventory::held_item_metadata
 \
 Metadata of the held item (health, is cursed etc.)
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`ENT_TYPE mount_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_type) &Inventory::mount_type
+\
+Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int mount_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_metadata) &Inventory::mount_metadata
 \
 Metadata of the mount (health, is cursed etc.)
+Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
 - [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
 - [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total
+\
+Total money collected during previous levels (not the current one)
 - [`array<ENT_TYPE, 512> collected_money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) &Inventory::collected_money
+\
+Types of gold/gems collected during this level, used later to display during the transition
 - [`array<int, 512> collected_money_values`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_values) &Inventory::collected_money_values
+\
+Values of gold/gems collected during this level, used later to display during the transition
 - [`array<ENT_TYPE, 256> killed_enemies`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) &Inventory::killed_enemies
+\
+Types of enemies killed during this level, used later to display during the transition
 - [`int companion_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_count) &Inventory::companion_count
 \
-Number of companions, this is always up to date, can be edited
-- [`array<int, 8> companion_poison_tick_timers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_poison_tick_timers) &Inventory::companion_poison_tick_timers
-\
-Companions poison tick timers, used in level transition to transfer to new player entity, is wrong during the level
+Number of companions, it will determinate how many companions will be transfered to next level
+Increments when player acquires new companion, decrements when one of them dies
 - [`array<ENT_TYPE, 8> companions`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companions) &Inventory::companions
 \
-Companion ENT_TYPEs, used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<ENT_TYPE, 8> companion_held_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_items) &Inventory::companion_held_items
 \
-Items ENT_TYPE held by companions, used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`array<int, 8> companion_held_item_metadatas`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_item_metadatas) &Inventory::companion_held_item_metadatas
+\
+Metadata of items held by companions (health, is cursed etc.)
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<int, 8> companion_trust`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_trust) &Inventory::companion_trust
 \
-0..3, used in level transition to transfer to new player entity, is wrong during the level
+(0..3) Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<int, 8> companion_health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_health) &Inventory::companion_health
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`array<int, 8> companion_poison_tick_timers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_poison_tick_timers) &Inventory::companion_poison_tick_timers
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<bool, 8> is_companion_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_companion_cursed) &Inventory::is_companion_cursed
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 ### `Ai`
 - [`Entity target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target) &Ai::target
 - [`int target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_uid) &Ai::target_uid

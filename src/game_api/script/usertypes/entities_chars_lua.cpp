@@ -34,8 +34,8 @@ void register_usertypes(sol::state& lua)
         &Inventory::money,
         "bombs",
         &Inventory::bombs,
-        "time_of_death",
-        &Inventory::time_of_death,
+        "ropes",
+        &Inventory::ropes,
         "player_slot", /*
         &Inventory::player_slot,
                        */
@@ -53,8 +53,6 @@ void register_usertypes(sol::state& lua)
                           else
                               i.player_slot = -1;
                       }),
-        "ropes",
-        &Inventory::ropes,
         "poison_tick_timer",
         &Inventory::poison_tick_timer,
         "cursed",
@@ -65,6 +63,8 @@ void register_usertypes(sol::state& lua)
         &Inventory::health,
         "kapala_blood_amount",
         &Inventory::kapala_blood_amount,
+        "time_of_death",
+        &Inventory::time_of_death,
         "held_item",
         &Inventory::held_item,
         "held_item_metadata",
@@ -87,16 +87,18 @@ void register_usertypes(sol::state& lua)
         &Inventory::killed_enemies,
         "companion_count",
         &Inventory::companion_count,
-        "companion_poison_tick_timers",
-        &Inventory::companion_poison_tick_timers,
         "companions",
         &Inventory::companions,
         "companion_held_items",
         &Inventory::companion_held_items,
+        "companion_held_item_metadatas",
+        &Inventory::companion_held_item_metadatas,
         "companion_trust",
         &Inventory::companion_trust,
         "companion_health",
         &Inventory::companion_health,
+        "companion_poison_tick_timers",
+        &Inventory::companion_poison_tick_timers,
         "is_companion_cursed",
         &Inventory::is_companion_cursed);
 
