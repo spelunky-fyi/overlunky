@@ -1617,6 +1617,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
+    {
         // Do the same thing as for transition_func but execute to the return, it will put you in this function
         "door_entry"sv,
         PatternCommandBuffer{}
