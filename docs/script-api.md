@@ -1555,9 +1555,7 @@ Changes color based on given uColor
 - [`int life`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) &EntityDB::life
 - [`int blood_content`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) &EntityDB::blood_content
 - [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &EntityDB::texture
-- [`AnimationMap animations`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) &EntityDB::animations
-\
-Array of [Animation](#Animation) types, had to use `pairs` loop to loop thru
+- [`map<int, Animation> animations`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) &EntityDB::animations
 - [`int properties_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=properties_flags) &EntityDB::properties_flags
 - [`int default_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_flags) &EntityDB::default_flags
 - [`int default_more_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_more_flags) &EntityDB::default_more_flags

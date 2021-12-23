@@ -70,7 +70,6 @@ struct EntityHooksInfo
 // Creates an instance of this entity
 using EntityCreate = Entity* (*)();
 using EntityDestroy = void (*)(Entity*);
-using AnimationMap = std::unordered_map<uint8_t, Animation>;
 
 struct EntityDB
 {
@@ -129,8 +128,7 @@ struct EntityDB
     int32_t sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
-    /// Array of [Animation](#Animation) types, had to use `pairs` loop to loop thru
-    AnimationMap animations;
+    std::unordered_map<uint8_t, Animation> animations;
     float default_special_offsetx;
     float default_special_offsety;
     uint8_t init;
