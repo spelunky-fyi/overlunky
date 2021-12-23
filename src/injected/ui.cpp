@@ -41,6 +41,7 @@
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "steam_api.hpp"
 #include "version.hpp"
 #include "window_api.hpp"
 
@@ -161,6 +162,20 @@ std::map<std::string, int64_t> keys{
     {"quick_start", 'Q'},
     {"quick_restart", OL_KEY_CTRL | 'Q'},
     {"quick_camp", OL_KEY_CTRL | 'C'},
+    {"speedhack_increase", OL_KEY_CTRL | OL_KEY_SHIFT | VK_PRIOR},
+    {"speedhack_decrease", OL_KEY_CTRL | OL_KEY_SHIFT | VK_NEXT},
+    {"speedhack_10pct", OL_KEY_CTRL | OL_KEY_SHIFT | '1'},
+    {"speedhack_20pct", OL_KEY_CTRL | OL_KEY_SHIFT | '2'},
+    {"speedhack_30pct", OL_KEY_CTRL | OL_KEY_SHIFT | '3'},
+    {"speedhack_40pct", OL_KEY_CTRL | OL_KEY_SHIFT | '4'},
+    {"speedhack_50pct", OL_KEY_CTRL | OL_KEY_SHIFT | '5'},
+    {"speedhack_60pct", OL_KEY_CTRL | OL_KEY_SHIFT | '6'},
+    {"speedhack_70pct", OL_KEY_CTRL | OL_KEY_SHIFT | '7'},
+    {"speedhack_80pct", OL_KEY_CTRL | OL_KEY_SHIFT | '8'},
+    {"speedhack_90pct", OL_KEY_CTRL | OL_KEY_SHIFT | '9'},
+    {"speedhack_normal", OL_KEY_CTRL | OL_KEY_SHIFT | '0'},
+    {"speedhack_turbo", VK_PRIOR},
+    {"speedhack_slow", VK_NEXT},
     //{ "", 0x },
 };
 
@@ -228,6 +243,7 @@ const unsigned int unsafe_entity_mask = 0xffffffff;
 
 std::map<std::string, bool> options = {
     {"mouse_control", true},
+    {"keyboard_control", true},
     {"god_mode", false},
     {"god_mode_companions", false},
     {"noclip", false},
@@ -241,10 +257,12 @@ std::map<std::string, bool> options = {
     {"tabbed_interface", true},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
-    {"lights", false}};
+    {"lights", false},
+    {"disable_achievements", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
+float g_speedhack_old_multiplier;
 LARGE_INTEGER g_speedhack_prev;
 LARGE_INTEGER g_speedhack_current;
 LARGE_INTEGER g_speedhack_fake;
@@ -326,8 +344,9 @@ bool __stdcall QueryPerformanceCounterHook(LARGE_INTEGER* counter)
     return true;
 }
 
-void speedhack()
+void speedhack(float multiplier = g_speedhack_multiplier)
 {
+    g_speedhack_multiplier = multiplier;
     if (!g_speedhack_hooked)
     {
         QueryPerformanceCounter(&g_speedhack_prev);
@@ -733,6 +752,8 @@ void load_config(std::string file)
     if (ini_fontsize.size() >= 3)
         fontsize = ini_fontsize;
     godmode(options["god_mode"]);
+    if (options["disable_achievements"])
+        disable_steam_achievements();
     save_config(file);
 }
 
@@ -1484,11 +1505,26 @@ float held_duration(std::string keyname) // unused
 
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
+    if (nCode == WM_KEYUP)
+    {
+        if (pressed("speedhack_turbo", wParam))
+        {
+            speedhack(g_speedhack_old_multiplier);
+            g_speedhack_old_multiplier = 1.0f;
+        }
+        else if (pressed("speedhack_slow", wParam))
+        {
+            speedhack(g_speedhack_old_multiplier);
+            g_speedhack_old_multiplier = 1.0f;
+        }
+    }
+
     if (nCode != WM_KEYDOWN)
     {
         return false;
     }
 
+    int repeat = (lParam >> 30) & 1U;
     auto& io = ImGui::GetIO();
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
@@ -1514,13 +1550,19 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         return true;
     }
 
-    //int repeat = (lParam >> 30) & 1U;
-
     if (pressed("hide_ui", wParam))
     {
         hide_ui = !hide_ui;
     }
-    else if (pressed("tool_entity", wParam))
+    else if (pressed("tool_options", wParam))
+    {
+        toggle("tool_options");
+    }
+
+    if (!options["keyboard_control"])
+        return false;
+
+    if (pressed("tool_entity", wParam))
     {
         if (toggle("tool_entity"))
         {
@@ -1545,10 +1587,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("tool_game_properties", wParam))
     {
         toggle("tool_game_properties");
-    }
-    else if (pressed("tool_options", wParam))
-    {
-        toggle("tool_options");
     }
     else if (pressed("tool_debug", wParam))
     {
@@ -1948,6 +1986,71 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("quick_camp", wParam))
     {
         quick_start(11, 1, 1, 1);
+    }
+    else if (pressed("speedhack_increase", wParam))
+    {
+        g_speedhack_multiplier += 0.1f;
+        if (g_speedhack_multiplier > 10.f)
+            g_speedhack_multiplier = 10.f;
+        speedhack();
+    }
+    else if (pressed("speedhack_decrease", wParam))
+    {
+        g_speedhack_multiplier -= 0.1f;
+        if (g_speedhack_multiplier < 0.1f)
+            g_speedhack_multiplier = 0.1f;
+        speedhack();
+    }
+    else if (pressed("speedhack_10pct", wParam))
+    {
+        g_speedhack_multiplier = 0.1f;
+        speedhack(0.1f);
+    }
+    else if (pressed("speedhack_20pct", wParam))
+    {
+        speedhack(0.2f);
+    }
+    else if (pressed("speedhack_30pct", wParam))
+    {
+        speedhack(0.3f);
+    }
+    else if (pressed("speedhack_40pct", wParam))
+    {
+        speedhack(0.4f);
+    }
+    else if (pressed("speedhack_50pct", wParam))
+    {
+        speedhack(0.5f);
+    }
+    else if (pressed("speedhack_60pct", wParam))
+    {
+        speedhack(0.6f);
+    }
+    else if (pressed("speedhack_70pct", wParam))
+    {
+        speedhack(0.7f);
+    }
+    else if (pressed("speedhack_80pct", wParam))
+    {
+        speedhack(0.8f);
+    }
+    else if (pressed("speedhack_90pct", wParam))
+    {
+        speedhack(0.9f);
+    }
+    else if (pressed("speedhack_normal", wParam))
+    {
+        speedhack(1.0f);
+    }
+    else if (pressed("speedhack_turbo", wParam) && !repeat)
+    {
+        g_speedhack_old_multiplier = g_speedhack_multiplier;
+        speedhack(5.f); //TODO: configurable
+    }
+    else if (pressed("speedhack_slow", wParam) && !repeat)
+    {
+        g_speedhack_old_multiplier = g_speedhack_multiplier;
+        speedhack(0.2f); //TODO: configurable
     }
     else
     {
@@ -3306,7 +3409,7 @@ void render_clickhandler()
 
 void render_options()
 {
-    ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
+    ImGui::Text("Game cheats");
     if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
     {
         godmode(options["god_mode"]);
@@ -3334,12 +3437,32 @@ void render_options()
             }
         }
     }
-    ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
-    ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
+    ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
     {
         force_hud_flags();
     }
+    if (ImGui::Checkbox("Disable Steam achievements", &options["disable_achievements"]))
+    {
+        if (options["disable_achievements"])
+            disable_steam_achievements();
+        else
+            enable_steam_achievements();
+    }
+    if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
+    {
+        speedhack();
+    }
+    ImGui::Separator();
+
+    ImGui::Text("User interface");
+    ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
+    ImGui::Checkbox("Keyboard controls##keyevents", &options["keyboard_control"]);
+    ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
+    ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
+    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
+    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
+
     if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
     {
         options["stack_vertically"] = false;
@@ -3355,9 +3478,7 @@ void render_options()
         options["stack_horizontally"] = false;
         options["stack_vertically"] = false;
     }
-    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
-    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
-    ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
+
     if (ImGui::Button("Edit style"))
     {
         toggle("tool_style");
@@ -3377,10 +3498,6 @@ void render_options()
 void render_debug()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    if (ImGui::InputFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 0.1f))
-    {
-        speedhack();
-    }
     ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Save##SavePointer", ImGuiDataType_U64, &g_save_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
