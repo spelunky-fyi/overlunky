@@ -10,13 +10,15 @@ namespace NDrops
 void register_usertypes(sol::state& lua)
 {
     /// Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+    /// Use `-1` as dropchance_id to reset all to default
     lua["set_drop_chance"] = set_drop_chance;
     /// Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+    /// Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
     lua["replace_drop"] = replace_drop;
 
     lua.create_named_table("DROPCHANCE"
                            //, "BONEBLOCK_SKELETONKEY", 0
-                           //, "", ...see__drops.hpp__for__a__list__of__possible__dropchances...
+                           //, "", ...see__[drops.cpp](../src/game_api/drops.cpp\]__for__a__list__of__possible__dropchances...
                            //, "YETI_PITCHERSMITT", 10
     );
     for (size_t x = 0; x < dropchance_entries.size(); ++x)
@@ -26,7 +28,7 @@ void register_usertypes(sol::state& lua)
 
     lua.create_named_table("DROP"
                            //, "ALTAR_DICE_CLIMBINGGLOVES", 0
-                           //, "", ...see__drops.hpp__for__a__list__of__possible__drops...
+                           //, "", ...see__[drops.cpp](../src/game_api/drops.cpp\]__for__a__list__of__possible__drops...
                            //, "YETI_PITCHERSMITT", 85
     );
     for (size_t x = 0; x < drop_entries.size(); ++x)

@@ -12,24 +12,6 @@ namespace NState
 {
 void register_usertypes(sol::state& lua)
 {
-    lua.new_usertype<SelectPlayerSlot>(
-        "SelectPlayerSlot",
-        "activated",
-        &SelectPlayerSlot::activated,
-        "character",
-        &SelectPlayerSlot::character,
-        "texture",
-        &SelectPlayerSlot::texture_id);
-    lua.new_usertype<Items>(
-        "Items",
-        "player_select",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_select_slots); }),
-        "player_inventory",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_inventories); }),
-        "player_count",
-        &Items::player_count);
     lua.new_usertype<ArenaConfigArenas>(
         "ArenaConfigArenas",
         "dwelling_1",
@@ -277,7 +259,43 @@ void register_usertypes(sol::state& lua)
         &ArenaState::breath_cooldown,
         "punish_ball",
         &ArenaState::punish_ball);
-    lua.new_usertype<StateMemory>(
+
+    lua.new_usertype<SelectPlayerSlot>(
+        "SelectPlayerSlot",
+        "activated",
+        &SelectPlayerSlot::activated,
+        "character",
+        &SelectPlayerSlot::character,
+        "texture",
+        &SelectPlayerSlot::texture_id);
+    lua.new_usertype<Items>(
+        "Items",
+        "player_count",
+        &Items::player_count,
+        "saved_pets_count",
+        &Items::saved_pets_count,
+        "saved_pets",
+        &Items::saved_pets,
+        "is_pet_cursed",
+        &Items::is_pet_cursed,
+        "is_pet_poisoned",
+        &Items::is_pet_poisoned,
+
+        // had to be done this way as autodoc doesn't like sol::property stuff
+        /*"player_inventory",
+        &Items::player_inventories,*/
+        /*"player_select",
+        &Items::player_select_slots,*/
+        //); stop autodoc here
+
+        "player_select",
+        sol::property([](Items& s)
+                      { return std::ref(s.player_select_slots); }),
+        "player_inventory",
+        sol::property([](Items& s)
+                      { return std::ref(s.player_inventories); }));
+
+    auto state_usertype = lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
         &StateMemory::screen_last,
@@ -301,6 +319,8 @@ void register_usertypes(sol::state& lua)
         &StateMemory::kali_status,
         "kali_altars_destroyed",
         &StateMemory::kali_altars_destroyed,
+        "kali_gifts",
+        &StateMemory::kali_gifts,
         "seed",
         &StateMemory::seed,
         "time_total",
@@ -435,8 +455,53 @@ void register_usertypes(sol::state& lua)
         &StateMemory::set_correct_ushabti,
         "arena",
         &StateMemory::arena,
+        /* state got so big that adding stuff here will couse `compiler out of heap space`
+        * to solve this, we add stuff in this comment for the autodoc, and then for real below to the `state_usertype`
+
+        "speedrun_character",
+        &StateMemory::speedrun_character,
+        "speedrun_activation_trigger",
+        &StateMemory::speedrun_activation_trigger,
+        "end_spaceship_character",
+        &StateMemory::end_spaceship_character,
+        "world2_coffin_spawned",
+        &StateMemory::world2_coffin_spawned,
+        "world4_coffin_spawned",
+        &StateMemory::world4_coffin_spawned,
+        "world6_coffin_spawned",
+        &StateMemory::world6_coffin_spawned,
+        "first_damage_cause",
+        &StateMemory::first_damage_cause,
+        "first_damage_world",
+        &StateMemory::first_damage_world,
+        "first_damage_level",
+        &StateMemory::first_damage_level,
+        "time_speedrun",
+        &StateMemory::time_speedrun,
+        "coffin_contents",
+        &StateMemory::coffin_contents,
+        "screen_change_counter",
+        &StateMemory::screen_change_counter,
+        "time_startup",
+        &StateMemory::time_startup,
+        */
         "logic",
-        &StateMemory::logic);
+        &StateMemory::logic); //had to have something at the at for the "comma" before the big comment block
+
+    state_usertype["speedrun_character"] = &StateMemory::speedrun_character;
+    state_usertype["speedrun_activation_trigger"] = &StateMemory::speedrun_activation_trigger;
+    state_usertype["end_spaceship_character"] = &StateMemory::end_spaceship_character;
+    state_usertype["world2_coffin_spawned"] = &StateMemory::world2_coffin_spawned;
+    state_usertype["world4_coffin_spawned"] = &StateMemory::world4_coffin_spawned;
+    state_usertype["world6_coffin_spawned"] = &StateMemory::world6_coffin_spawned;
+    state_usertype["first_damage_cause"] = &StateMemory::first_damage_cause;
+    state_usertype["first_damage_world"] = &StateMemory::first_damage_world;
+    state_usertype["first_damage_level"] = &StateMemory::first_damage_level;
+    state_usertype["time_speedrun"] = &StateMemory::time_speedrun;
+    state_usertype["coffin_contents"] = &StateMemory::coffin_contents;
+    state_usertype["screen_change_counter"] = &StateMemory::screen_change_counter;
+    state_usertype["time_startup"] = &StateMemory::time_startup;
+
     lua.new_usertype<GameManager>(
         "GameManager",
         "game_props",
@@ -540,7 +605,13 @@ void register_usertypes(sol::state& lua)
         "entity_uid",
         &Illumination::entity_uid,
         "flags",
-        &Illumination::flags);
+        &Illumination::flags,
+        "type_flags",
+        &Illumination::type_flags,
+        "enabled",
+        &Illumination::enabled,
+        "layer",
+        &Illumination::layer);
 
     auto create_illumination = sol::overload(
         static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),

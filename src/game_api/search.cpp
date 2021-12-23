@@ -1617,6 +1617,66 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
+        // Do the same thing as for transition_func but execute to the return, it will put you in this function
+        "door_entry"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x83\xEC\x38\x48\x89\xD7\x48\x89\xCE\x48\x8B\x42\x08"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
+        // execute to the return two times, you should see this array right above
+        // It's pointer to array[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
+        "sun_chalenge_generator_ent_types"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\x89\x4A\x38\x48\xC1\xE8\x1C\x83\xE0"sv)
+            .offset(0x4)
+            .at_exe(),
+    },
+    {
+        // Set bp on prize_dispenser->itemid_2 and roll a 7, you should see this array right above
+        // array[25]
+        "dice_shop_prizes"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x41\x88\x8C\x24\x36\x01\x00\x00\x41\x0F\xB6\x84\x04\x30\x01\x00\x00"sv)
+            .offset(0x3)
+            .at_exe(),
+    },
+    {
+        // Set condition bp on load_item for ITEM_DICE_PRIZE_DISPENSER, execute first call
+        // go to the address in RAX (new entity) and set write bp on +0x130 (or execute till you see function that writes to this address)
+        // we want address after (rol rsi,1B) - it should be 14 bytes that we want to change and then - (mov qword ptr ds:[rax+20],rdi | mov qword ptr ds:[rax+28],rsi)
+        "dice_shop_prizes_id_roll"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x49\x0F\xAF\xF8\x48\x29\xD6\x48\xC1\xC6\x1B"sv)
+            .at_exe(),
+    },
+    {
+        // Start local coop, kill one of the players, go to state->items->inventory of that player, set write bp on `time_of_death`
+        // Spawn coffin, and set it's `respawn_player` to true, open the coffin, you should hit the bp right above the this function call
+        "spawn_player"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4F\x8D\x0C\x7F\x42\x80\xBC\x89\xB8\x54\x00\x00\x00"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Set conditional bp on load_item with vampire id, break altar
+        // execute out of load_item, scroll up to find bunch of const addresses, on of which is array containing 5 id's (as of writing this comment, the address in not align to 8 bytes)
+        "altar_break_ent_types"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x45\x31\xFF\x4C\x8D\x25"sv)
+            .at_exe(),
+    },
+    {
+        // Set write bp on Movable.poison_tick_timer, get hit by cobra's acid spit
+        "poison_entity"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8B\x4E\x08\xF6\x41\x51\x04"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

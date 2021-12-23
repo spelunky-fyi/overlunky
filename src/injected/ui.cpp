@@ -24,6 +24,7 @@
 #include <fmt/core.h>
 
 #include "console.hpp"
+#include "custom_types.hpp"
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
@@ -171,13 +172,6 @@ struct Window
 };
 std::map<std::string, Window*> windows;
 
-// Global state
-struct EntityCache
-{
-    Movable* entity;
-    int type;
-};
-
 static ImFont *font, *bigfont, *hugefont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f;
@@ -204,8 +198,6 @@ Inventory* g_inventory = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
 std::map<int, std::string> entity_names;
-std::map<int, EntityCache> entity_cache;
-int cache_player = 0;
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 
@@ -251,6 +243,100 @@ std::map<std::string, bool> options = {
     {"warp_increments_level_count", true},
     {"lights", false}};
 
+bool g_speedhack_hooked = false;
+float g_speedhack_multiplier = 1.0;
+LARGE_INTEGER g_speedhack_prev;
+LARGE_INTEGER g_speedhack_current;
+LARGE_INTEGER g_speedhack_fake;
+PVOID g_oldqpc;
+
+#define PtrFromRva(base, rva) (((PBYTE)base) + rva)
+
+// I didn't write this one, I just found it in the shady parts of the internet
+// This could probably be done with detours and speedhack should be part of the api anyway...
+BOOL HookIAT(const char* szModuleName, const char* szFuncName, PVOID pNewFunc, PVOID* pOldFunc)
+{
+    PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)GetModuleHandle(NULL);
+    PIMAGE_NT_HEADERS pNtHeader = (PIMAGE_NT_HEADERS)PtrFromRva(pDosHeader, pDosHeader->e_lfanew);
+
+    // Make sure we have valid data
+    if (pNtHeader->Signature != IMAGE_NT_SIGNATURE)
+        return FALSE;
+
+    // Grab a pointer to the import data directory
+    PIMAGE_IMPORT_DESCRIPTOR pImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)PtrFromRva(pDosHeader, pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+
+    for (UINT uIndex = 0; pImportDescriptor[uIndex].Characteristics != 0; uIndex++)
+    {
+        char* szDllName = (char*)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].Name);
+
+        // Is this our module?
+        if (_strcmpi(szDllName, szModuleName) != 0)
+            continue;
+
+        if (!pImportDescriptor[uIndex].FirstThunk || !pImportDescriptor[uIndex].OriginalFirstThunk)
+            return FALSE;
+
+        PIMAGE_THUNK_DATA pThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].FirstThunk);
+        PIMAGE_THUNK_DATA pOrigThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].OriginalFirstThunk);
+
+        for (; pOrigThunk->u1.Function != NULL; pOrigThunk++, pThunk++)
+        {
+            // We can't process ordinal imports just named
+            if (pOrigThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG)
+                continue;
+
+            PIMAGE_IMPORT_BY_NAME import = (PIMAGE_IMPORT_BY_NAME)PtrFromRva(pDosHeader, pOrigThunk->u1.AddressOfData);
+
+            // Is this our function?
+            if (_strcmpi(szFuncName, (char*)import->Name) != 0)
+                continue;
+
+            DWORD dwJunk = 0;
+            MEMORY_BASIC_INFORMATION mbi;
+
+            // Make the memory section writable
+            VirtualQuery(pThunk, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+            if (!VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &mbi.Protect))
+                return FALSE;
+
+            // Save the old pointer
+            *pOldFunc = (PVOID*)(DWORD_PTR)pThunk->u1.Function;
+
+// Write the new pointer based on CPU type
+#ifdef _WIN64
+            pThunk->u1.Function = (ULONGLONG)(DWORD_PTR)pNewFunc;
+#else
+            pThunk->u1.Function = (DWORD)(DWORD_PTR)pNewFunc;
+#endif
+
+            if (VirtualProtect(mbi.BaseAddress, mbi.RegionSize, mbi.Protect, &dwJunk))
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+bool __stdcall QueryPerformanceCounterHook(LARGE_INTEGER* counter)
+{
+    QueryPerformanceCounter(&g_speedhack_current);
+    g_speedhack_fake.QuadPart += (long long)((g_speedhack_current.QuadPart - g_speedhack_prev.QuadPart) * g_speedhack_multiplier);
+    g_speedhack_prev = g_speedhack_current;
+    *counter = g_speedhack_fake;
+    return true;
+}
+
+void speedhack()
+{
+    if (!g_speedhack_hooked)
+    {
+        QueryPerformanceCounter(&g_speedhack_prev);
+        g_speedhack_fake = g_speedhack_prev;
+        HookIAT("kernel32.dll", "QueryPerformanceCounter", QueryPerformanceCounterHook, &g_oldqpc);
+        g_speedhack_hooked = true;
+    }
+}
+
 int int_pow(int base, unsigned int exp)
 {
     int result = 1;
@@ -264,7 +350,7 @@ int int_pow(int base, unsigned int exp)
     return result;
 }
 
-ImVec4 hue_shift(ImVec4 in, float hue)
+ImVec4 hue_shift(ImVec4 in, float hue) // unused
 {
     float U = cos(hue * 3.14159265f / 180);
     float W = sin(hue * 3.14159265f / 180);
@@ -431,11 +517,6 @@ std::string key_string(int64_t keycode)
 bool SliderByte(const char* label, char* value, char min = 0, char max = 0, const char* format = "%lld")
 {
     return ImGui::SliderScalar(label, ImGuiDataType_U8, value, &min, &max, format);
-}
-
-bool DragByte(const char* label, char* value, float speed = 1.0f, char min = 0, char max = 0, const char* format = "%lld")
-{
-    return ImGui::DragScalar(label, ImGuiDataType_U8, value, speed, &min, &max, format);
 }
 
 void refresh_script_files()
@@ -726,7 +807,7 @@ void detach(std::string window)
     windows[window]->detached = true;
 }
 
-void attach(std::string window)
+void attach(std::string window) // unused
 {
     if (windows.find(window) == windows.end())
         return;
@@ -766,31 +847,10 @@ uint32_t entity_type(int uid)
     return get_entity_type(uid);
 }
 
-Movable* entity_ptr(int uid)
-{
-    return (Movable*)get_entity_ptr(uid);
-}
-
 bool update_players()
 {
     g_players = get_players();
     return true;
-}
-
-bool update_entity_cache()
-{
-    if (g_players.size() > 0)
-    {
-        if (g_players.at(0)->uid != cache_player)
-        {
-            entity_cache.clear();
-            cache_player = g_players.at(0)->uid;
-            return true;
-        }
-        return false;
-    }
-    cache_player = 0;
-    return false;
 }
 
 void spawn_entities(bool s, std::string list = "")
@@ -905,18 +965,6 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
     return 0;
 }
 
-const char* entity_name(uint32_t id)
-{
-    for (unsigned int i = 0; i < g_items.size(); i++)
-    {
-        if (g_items[i].id == id)
-        {
-            return g_items[i].name.c_str();
-        }
-    }
-    return "";
-}
-
 bool update_entity()
 {
     if (!visible("tool_entity_properties") && !options["draw_hitboxes"])
@@ -924,7 +972,7 @@ bool update_entity()
     if (g_last_id > -1)
     {
         g_entity_type = entity_type(g_last_id);
-        g_entity = (Player*)entity_ptr(g_last_id);
+        g_entity = (Player*)get_entity_ptr(g_last_id);
         g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
         if (g_entity == nullptr || IsBadWritePtr(g_entity, 0x178))
         {
@@ -1380,7 +1428,7 @@ bool dragging(std::string keyname)
     return wParam == keycode;
 }
 
-bool dragged(std::string keyname)
+bool dragged(std::string keyname) // unused
 {
     //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1416,7 +1464,7 @@ float drag_delta(std::string keyname)
     return false;
 }
 
-float held_duration(std::string keyname)
+float held_duration(std::string keyname) // unused
 {
     //int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1936,12 +1984,6 @@ void update_filter(std::string s)
     scroll_top = true;
 }
 
-void render_int(const char* label, int state)
-{
-    std::string strstate = std::to_string(state);
-    return ImGui::LabelText(label, "%s", strstate.c_str());
-}
-
 void render_list()
 {
     // ImGui::ListBox with filter
@@ -2009,13 +2051,6 @@ void render_themes()
         ImGui::PopID();
     }
     ImGui::EndCombo();
-}
-
-std::string unique_label(std::string label)
-{
-    label += "##";
-    label += std::to_string(rand());
-    return label;
 }
 
 void render_input()
@@ -2611,33 +2646,50 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     }
 }
 
-void render_hitbox(Movable* ent, bool cross, ImColor color)
+void render_olmec(Entity* ent, ImColor color)
 {
-    if (IsBadReadPtr(ent, 0x178))
-        return;
-    if (ent->items.count > 0)
+    std::pair<float, float> render_position = {0.0f, 0.0f};
+    int* pitems = (int*)ent->items.begin;
+    bool got_rendering = false;
+    for (unsigned int i = 0; i < ent->items.count; i++) // get the olmec position from one of the fx
     {
-        int* pitems = (int*)ent->items.begin;
-        for (unsigned int i = 0; i < ent->items.count; i++)
+        auto ent_item = get_entity_ptr(pitems[i]);
+        if (ent_item && ent_item->rendering_info && !ent_item->rendering_info->stop_render)
         {
-            auto type = entity_type(pitems[i]);
-            if (type == 0)
-                continue;
-            if (entity_names[type].find("FX") == std::string::npos)
-                render_hitbox(entity_ptr(pitems[i]), false, ImColor(255, 0, 0, 150));
+            auto rend = get_render_position(ent_item->uid);
+            render_position.first = std::get<0>(rend) - ent_item->x;
+            render_position.second = std::get<1>(rend) - ent_item->y;
+            got_rendering = true;
+            break;
         }
     }
-    const auto type = entity_type(ent->uid);
-    if (!type || ((type >= to_id("ENT_TYPE_ITEM_POWERUP_PASTE") && type <= to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY")) || type == to_id("ENT_TYPE_FX_PICKUPEFFECT")))
-        return; // powerups
-    std::pair<float, float> pos = screen_position(ent->position().first, ent->position().second);
-    std::pair<float, float> boxa =
-        screen_position(ent->position_render().first - ent->hitboxx + ent->offsetx, ent->position_render().second - ent->hitboxy + ent->offsety);
-    std::pair<float, float> boxb =
-        screen_position(ent->position_render().first + ent->hitboxx + ent->offsetx, ent->position_render().second + ent->hitboxy + ent->offsety);
-    ImVec2 spos = screenify({pos.first, pos.second});
-    ImVec2 sboxa = screenify({boxa.first, boxa.second});
-    ImVec2 sboxb = screenify({boxb.first, boxb.second});
+    if (!got_rendering)
+        render_position = ent->position();
+
+    auto [boxa_x, boxa_y] =
+        screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
+    auto [boxb_x, boxb_y] =
+        screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+    ImVec2 sboxa = screenify({boxa_x, boxa_y});
+    ImVec2 sboxb = screenify({boxb_x, boxb_y});
+    auto* draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+}
+
+void render_hitbox(Entity* ent, bool cross, ImColor color)
+{
+    const auto type = ent->type->id;
+    if (!type)
+        return;
+
+    auto render_position = get_render_position(ent->uid);
+    auto [boxa_x, boxa_y] =
+        screen_position(std::get<0>(render_position) - ent->hitboxx + ent->offsetx, std::get<1>(render_position) - ent->hitboxy + ent->offsety);
+    auto [boxb_x, boxb_y] =
+        screen_position(std::get<0>(render_position) + ent->hitboxx + ent->offsetx, std::get<1>(render_position) + ent->hitboxy + ent->offsety);
+    ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
+    ImVec2 sboxa = screenify({boxa_x, boxa_y});
+    ImVec2 sboxb = screenify({boxb_x, boxb_y});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
@@ -2749,6 +2801,9 @@ void render_messages()
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
 
+    if (ImGui::IsWindowHovered())
+        io.WantCaptureMouse = options["mouse_control"];
+
     const float font_size = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
     unsigned int logsize = (std::min)(30, (int)((io.DisplaySize.y - 300) / font_size));
@@ -2792,6 +2847,8 @@ void render_clickhandler()
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
+    if (ImGui::IsWindowHovered())
+        io.WantCaptureMouse = options["mouse_control"];
     if (io.MouseWheel != 0 && ImGui::IsWindowHovered())
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
@@ -2815,27 +2872,59 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto entity : get_entities_by(0, 255, LAYER::PLAYER))
+        for (auto entity : get_entities_by(0, 0xBF, LAYER::PLAYER))
         {
-            auto type = entity_type(entity);
-            if (type == 0)
+            auto ent = get_entity_ptr(entity);
+            if (!ent)
                 continue;
-            if (entity_names[type].find("FX") == std::string::npos)
-                render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
-        }
-        for (auto entity : get_entities_by(0, 0x100, LAYER::PLAYER))
-        {
-            auto type = entity_type(entity);
-            if (type == 0)
+
+            if (ent->type->id == to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"))
+            {
+                render_olmec(ent, ImColor(0, 255, 255, 150));
                 continue;
-            if (entity_names[type].find("TRAP") != std::string::npos)
-                render_hitbox(entity_ptr(entity), false, ImColor(0, 255, 255, 150));
+            }
+
+            if (ent->rendering_info->stop_render)
+                continue;
+
+            render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
         g_players = get_players();
         for (auto player : g_players)
         {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
+
+        auto additional_fixed_entities = {
+            (ENT_TYPE)CUSTOM_TYPE::LOGICALTRAPTRIGGER,
+            to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
+            to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
+            to_id("ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER"),
+            to_id("ENT_TYPE_FLOOR_SURFACE_HIDDEN"),
+            to_id("ENT_TYPE_FLOOR_YAMA_PLATFORM"),
+            to_id("ENT_TYPE_FLOOR_ARROW_TRAP"),
+            to_id("ENT_TYPE_FLOOR_POISONED_ARROW_TRAP"),
+            to_id("ENT_TYPE_FLOOR_TOTEM_TRAP"),
+            to_id("ENT_TYPE_FLOOR_JUNGLE_SPEAR_TRAP"),
+            to_id("ENT_TYPE_FLOOR_LION_TRAP"),
+            to_id("ENT_TYPE_FLOOR_LASER_TRAP"),
+            to_id("ENT_TYPE_FLOOR_SPARK_TRAP"),
+            to_id("ENT_TYPE_FLOOR_SPIKEBALL_CEILING"),
+            to_id("ENT_TYPE_FLOOR_SPRING_TRAP"),
+            to_id("ENT_TYPE_FLOOR_BIGSPEAR_TRAP"),
+            to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
+            to_id("ENT_TYPE_FLOOR_DUSTWALL"),
+            to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
+        };
+        for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
+        {
+            auto ent = get_entity_ptr(entity);
+            if (entity_names[ent->type->id].find("TRIGGER") != std::string::npos)
+                render_hitbox(ent, false, ImColor(255, 0, 0, 150));
+            else
+                render_hitbox(ent, false, ImColor(0, 255, 255, 150));
+        }
+
         if (ImGui::IsMousePosValid())
         {
             ImVec2 mpos = normalize(io.MousePos);
@@ -2855,7 +2944,7 @@ void render_clickhandler()
             auto hovered = get_entity_at(cpos.first, cpos.second, false, 2, mask);
             if (hovered != -1)
             {
-                render_hitbox(entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
+                render_hitbox(get_entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
                 auto ptype = entity_type(hovered);
                 const char* pname = entity_names[ptype].c_str();
                 std::string buf3 = fmt::format("{}, {}", hovered, pname);
@@ -3013,7 +3102,7 @@ void render_clickhandler()
                 mask = unsafe_entity_mask;
             }
             g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
-            g_held_entity = entity_ptr(g_held_id);
+            g_held_entity = get_entity_ptr(g_held_id)->as<Movable>();
             if (g_held_entity)
                 g_held_flags = g_held_entity->flags;
             if (!lock_entity)
@@ -3040,7 +3129,9 @@ void render_clickhandler()
             {
                 if (g_held_entity)
                 {
-                    g_held_entity->standing_on_uid = -1;
+                    if (g_held_entity->is_movable())
+                        g_held_entity->standing_on_uid = -1;
+
                     g_held_entity->flags |= 1U << 4;
                     g_held_entity->flags |= 1U << 9;
                 }
@@ -3286,6 +3377,10 @@ void render_options()
 void render_debug()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    if (ImGui::InputFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 0.1f))
+    {
+        speedhack();
+    }
     ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar("Save##SavePointer", ImGuiDataType_U64, &g_save_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
@@ -3992,7 +4087,7 @@ void render_entity_props()
             ImGui::SameLine();
             if (ImGui::Button("Drop##DropHolding"))
             {
-                Movable* holding = entity_ptr(g_entity->holding_uid);
+                Movable* holding = get_entity_ptr(g_entity->holding_uid)->as<Movable>();
                 holding->x = g_entity->x;
                 holding->y = g_entity->y;
                 holding->overlay = 0;

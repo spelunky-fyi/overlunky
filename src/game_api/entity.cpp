@@ -148,7 +148,7 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
     y = dy;
     if (is_movable())
     {
-        auto movable_ent = (Movable*)pointer();
+        auto movable_ent = this->as<Movable>();
         movable_ent->velocityx = vx;
         movable_ent->velocityy = vy;
     }
@@ -242,24 +242,11 @@ std::pair<float, float> Entity::position_self() const
     return std::pair<float, float>(x, y);
 }
 
-std::pair<float, float> Entity::position_render() const
+void Entity::remove_item(uint32_t item_uid)
 {
-    if (overlay != nullptr)
-    {
-        auto [x_pos, y_pos] = position_self();
-        auto [rx_pos, ry_pos] = overlay->position_render();
-        return {rx_pos + x_pos, ry_pos + y_pos};
-    }
-    if (rendering_info == nullptr)
-    {
-        return position_self();
-    }
-    return {rendering_info->x, rendering_info->y};
-}
-
-void Entity::remove_item(uint32_t id)
-{
-    remove_item_ptr(State::get().find(id));
+    auto entity = get_entity_ptr(item_uid);
+    if (entity)
+        remove_item_ptr(entity);
 }
 
 void Player::set_jetpack_fuel(uint8_t fuel)
@@ -407,6 +394,7 @@ std::tuple<float, float, uint8_t> get_position(uint32_t uid)
     Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
+
     return {0.0f, 0.0f, (uint8_t)0};
 }
 
@@ -414,7 +402,12 @@ std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent)
-        return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer);
+    {
+        if (ent->rendering_info != nullptr && !ent->rendering_info->stop_render)
+            return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
+        else
+            return get_position(uid);
+    }
     return {0.0f, 0.0f, (uint8_t)0};
 }
 
@@ -429,6 +422,12 @@ std::tuple<float, float> get_velocity(uint32_t uid)
             Movable* mov = ent->as<Movable>();
             vx = mov->velocityx;
             vy = mov->velocityy;
+        }
+        else if (ent->is_liquid())
+        {
+            auto liquid_engine = State::get().get_correct_liquid_engine(ent->type->id);
+            vx = liquid_engine->entity_velocities->first;
+            vy = liquid_engine->entity_velocities->second;
         }
         if (ent->overlay)
         {
@@ -621,11 +620,26 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
 
 bool Entity::is_movable()
 {
+    static const ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
     if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
         return true;
     else if (type->search_flags & 0x1000) // LOGICAL - as it has some movable entities
-        if (type->id < 842)               // actually check if it's not logical
+        if (type->id < first_logical)     // actually check if it's not logical
             return true;
+
+    return false;
+}
+
+bool Entity::is_liquid()
+{
+    static const ENT_TYPE liquid_water = to_id("ENT_TYPE_LIQUID_WATER");
+    static const ENT_TYPE liquid_coarse_water = to_id("ENT_TYPE_LIQUID_COARSE_WATER");
+    static const ENT_TYPE liquid_lava = to_id("ENT_TYPE_LIQUID_LAVA");
+    static const ENT_TYPE liquid_stagnant_lava = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA");
+    static const ENT_TYPE liquid_coarse_lava = to_id("ENT_TYPE_LIQUID_COARSE_LAVA");
+
+    if (type->id == liquid_water || type->id == liquid_coarse_water || type->id == liquid_lava || type->id == liquid_stagnant_lava || type->id == liquid_coarse_lava)
+        return true;
 
     return false;
 }

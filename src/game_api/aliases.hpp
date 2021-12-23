@@ -18,6 +18,7 @@ using ROOM_TEMPLATE_TYPE = int32_t;           // NoAlias
 using PROCEDURAL_CHANCE = uint32_t;           // NoAlias
 using LEVEL_CONFIG = uint32_t;                // NoAlias
 using TILE_CODE = uint32_t;                   // NoAlias
+using IMAGE = int64_t;                        // NoAlias
 using SHORT_TILE_CODE = uint8_t;
 using STRINGID = uint32_t;
 
@@ -33,8 +34,4 @@ enum class LAYER : int32_t
     PLAYER3 = -3,
     PLAYER4 = -4,
     BOTH = -128
-};
-
-enum class IMAGE : int64_t
-{
 };

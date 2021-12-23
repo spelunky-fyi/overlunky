@@ -284,6 +284,7 @@ const char* presence_flags[]{
 };
 
 const char* illumination_flags[]{
+    // this is actually two 8bit flags as they have different behaviors
     "1: Disable light1",
     "2: Enable light2",
     "3: Enable light3",
@@ -292,30 +293,15 @@ const char* illumination_flags[]{
     "6: ",
     "7: Modulate brightness_multiplier",
     "8: ",
-    "9: ",
-    "10: ",
-    "11: ",
-    "12: ",
-    "13: ",
-    "14: ",
-    "15: ",
-    "16: ",
-    "17: Back layer",
-    "18: ",
-    "19: ",
-    "20: ",
-    "21: ",
-    "22: ",
-    "23: ",
-    "24: ",
-    "25: Enabled",
-    "26: ",
-    "27: ",
-    "28: ",
-    "29: ",
-    "30: ",
-    "31: ",
-    "32: ",
+    // type_flags 1-8:
+    "9: Follow camera",
+    "10: Follow entity",
+    "11: Static, Rectangle, Full brightness",
+    "12: unused",
+    "13: unused",
+    "14: unused",
+    "15: unused",
+    "16: unused",
 };
 
 const char* special_visibility_flags[]{

@@ -440,13 +440,16 @@ end
     /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
     /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
     lua["spawn_impostor_lake"] = spawn_impostor_lake;
+    /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
+    /// If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+    lua["spawn_player"] = spawn_player;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
     /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
-        std::vector<uint32_t> types;
+        std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();
         if (va_type == sol::type::number)
         {
@@ -456,9 +459,10 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+        std::vector<ENT_TYPE> proper_types = get_proper_types(types);
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
+        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
@@ -466,7 +470,7 @@ end
     /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
-        std::vector<uint32_t> types;
+        std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();
         if (va_type == sol::type::number)
         {
@@ -476,9 +480,10 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+        std::vector<ENT_TYPE> proper_types = get_proper_types(types);
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
+        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
 
@@ -1207,6 +1212,33 @@ end
 
     /// Clears the name set with `add_custom_name`
     lua["clear_custom_name"] = clear_custom_name;
+
+    /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+    /// Doesn't really work for layer doors
+    lua["enter_door"] = enter_door;
+
+    /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
+    /// {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
+    /// Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
+    /// Use empty table as argument to reset to the game default
+    lua["change_sunchallenge_spawns"] = change_sunchallenge_spawns;
+
+    /// Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+    /// {ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
+    /// ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
+    /// ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
+    /// Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
+    /// Use empty table as argument to reset to the game default
+    lua["change_diceshop_prizes"] = change_diceshop_prizes;
+
+    /// Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
+    /// {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
+    /// Max 255 types
+    /// Use empty table as argument to reset to the game default
+    lua["change_altar_damage_spawns"] = change_altar_damage_spawns;
+
+    /// Poisons entity, to cure poison set `poison_tick_timer` to -1
+    lua["poison_entity"] = poison_entity;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
