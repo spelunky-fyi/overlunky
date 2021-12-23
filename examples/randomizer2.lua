@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.3e"
+meta.version = "2.4"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -20,12 +20,17 @@ local real_default_options = {
     friend_max = 1.5,
     friend_min = 0.2,
     room_shop_chance = 15,
-    room_big_chance = 15,
-    room_big_min = 8,
-    room_big_max = 15,
+    room_big_chance = 25,
+    room_big_minx = 2,
+    room_big_maxx = 6,
+    room_big_miny = 2,
+    room_big_maxy = 12,
     room_dark = 4,
     pot_chance = 25,
     ushabti_chance = 25,
+    stats_health_min = 8,
+    stats_bombs_min = 8,
+    stats_ropes_min = 8,
     stats_health_max = 20,
     stats_bombs_max = 20,
     stats_ropes_max = 20,
@@ -56,11 +61,11 @@ local real_default_options = {
     bias_06 = 15,
     bias_07 = 10,
     bias_08 = 12,
-    bias_09 = 10,
-    bias_10 = 9,
+    bias_09 = 8,
+    bias_10 = 10,
     bias_11 = 6,
     bias_15 = 1,
-    drill = 16
+    drill = 20
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -77,12 +82,17 @@ local function register_options()
     register_option_float("friend_max", "Max friend chance", default_options.friend_max, 0, 100)
     register_option_float("friend_min", "Min friend chance", default_options.friend_min, 0, 100)
     register_option_float("room_shop_chance", "Extra shop chance", default_options.room_shop_chance, 0, 100)
-    register_option_float("room_big_chance", "Huge level chance", default_options.room_big_chance, 0, 100)
-    register_option_int("room_big_min", "Huge level min height", default_options.room_big_min, 8, 15)
-    register_option_int("room_big_max", "Huge level max height", default_options.room_big_max, 8, 15)
+    register_option_float("room_big_chance", "Level size chance", default_options.room_big_chance, 0, 100)
+    register_option_int("room_big_minx", "Level min width", default_options.room_big_minx, 2, 8)
+    register_option_int("room_big_maxx", "Level max width", default_options.room_big_maxx, 2, 8)
+    register_option_int("room_big_miny", "Level min height", default_options.room_big_miny, 2, 15)
+    register_option_int("room_big_maxy", "Level max height", default_options.room_big_maxy, 2, 15)
     register_option_float("room_dark", "Dark level chance", default_options.room_dark, 0, 100)
     register_option_float("pot_chance", "Pot contents chance", default_options.pot_chance, 0, 100)
     register_option_float("ushabti_chance", "Correct ushabti chance", default_options.ushabti_chance, 0, 100)
+    register_option_int("stats_health_min", "Min starting health", default_options.stats_health_min, 4, 99)
+    register_option_int("stats_bombs_min", "Min starting bombs", default_options.stats_bombs_min, 4, 99)
+    register_option_int("stats_ropes_min", "Min starting ropes", default_options.stats_ropes_min, 4, 99)
     register_option_int("stats_health_max", "Max starting health", default_options.stats_health_max, 4, 99)
     register_option_int("stats_bombs_max", "Max starting bombs", default_options.stats_bombs_max, 4, 99)
     register_option_int("stats_ropes_max", "Max starting ropes", default_options.stats_ropes_max, 4, 99)
@@ -947,83 +957,70 @@ local valid_rooms_with_shop_next = {
 }
 local new_rooms = {ROOM_TEMPLATE.SHOP}
 local new_rooms_left = {ROOM_TEMPLATE.SHOP_LEFT}
+local big_level = false
+local new_width = 4
+local new_height = 4
+
+set_callback(function()
+    if state.screen_next ~= SCREEN.LEVEL then return end
+    big_level = false
+    if ((state.width == 4 and state.height == 4) or (state.width == 4 and state.height == 5 and state.theme == THEME.SUNKEN_CITY) or state.theme == THEME.CITY_OF_GOLD or state.theme == THEME.COSMIC_OCEAN) and prng:random() < options.room_big_chance/100 then
+        local capminx = 2
+        local capmaxx = 8
+        local capminy = 2
+        local capmaxy = 15
+        if state.theme == THEME.COSMIC_OCEAN then
+            capminx = 4
+            capminy = 3
+        elseif state.theme == THEME.CITY_OF_GOLD then
+            capminx = 2
+            capmaxx = 8
+            capminy = 4
+        end
+        local minx = math.max(capminx, options.room_big_minx)
+        local maxx = math.min(capmaxx, options.room_big_maxx)
+        local miny = math.max(capminy, options.room_big_miny)
+        local maxy = math.min(capmaxy, options.room_big_maxy)
+        if minx > maxx then minx = maxx end
+        if miny > maxy then miny = maxy end
+        if maxx < capminx then maxx = capminx end
+        if maxy < capminy then maxy = capminy end
+        new_width = prng:random(minx, maxx)
+        new_height = prng:random(miny, maxy)
+        if new_width == 2 and new_height == 2 then
+            if prng:random() < 0.5 then
+                new_width = 4
+            else
+                new_height = 4
+            end
+        elseif new_width >= 7 and new_height >= 8 then
+            if prng:random() < 0.5 then
+                new_height = 5
+            elseif rng:random() < 0.5 then
+                new_width = 5
+            end
+        end
+        local realx = new_width
+        local realy = new_height
+        if state.theme == THEME.COSMIC_OCEAN then
+            realx = realx - 2
+            realy = realy - 2
+        end
+        if (state.level == 1 and state.theme ~= THEME.VOLCANA and state.theme ~= THEME.SUNKEN_CITY) or (new_width >= 4 and new_height >= 4) then
+            state.width = new_width
+            state.height = new_height
+            big_level = true
+        end
+    end
+end, ON.PRE_LEVEL_GENERATION)
 
 set_callback(function(ctx)
-    --math.randomseed(read_prng()[5])
-    local orig_width = state.width
-    local orig_height = state.height
+    if state.screen ~= SCREEN.LEVEL then return end
     local exit_x = 1
-    local exit_y = 3
-    local big_ocean = false
-    if state.world < 7 and not (state.world == 6 and state.level == 2) and state.width == 4 and state.height == 4 and prng:random() < options.room_big_chance/100 then
-        state.width = prng:random(4,5)
-        state.height = prng:random(math.max(8, options.room_big_min), math.min(15, options.room_big_max))
-        toast("My voice REALLY echoes in here!")
-    elseif state.theme == THEME.COSMIC_OCEAN and prng:random() < options.room_big_chance/100 then
-        state.width = prng:random(4, 8)
-        state.height = prng:random(3, 8)
-        big_ocean = true
-    end
-    for x = 0, state.width - 1 do
-        for y = 0, state.height - 1 do
-            local here = get_room_template(x, y, 0)
-            if (here == ROOM_TEMPLATE.EXIT or here == ROOM_TEMPLATE.EXIT_NOTOP) and state.height > orig_height then
-                ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.PATH_DROP_NOTOP)
-                exit_x = x
-                exit_y = y
-            end
-        end
-    end
-    if state.height > orig_height and state.world < 7 then
-        local no_exit = true
-        local x = exit_x
-        local y = exit_y
-        local dirs = {"left", "down", "right"}
-        local last_dir = "down"
-        local dir = "down"
-        while no_exit do
-            last_dir = dir
-            if last_dir == "left" then
-                dir = dirs[prng:random(1, 2)]
-            elseif last_dir == "right" then
-                dir = dirs[prng:random(2, 3)]
-            else
-                dir = dirs[prng:random(3)]
-            end
-            if (dir == "left" and x == 0) or (dir == "right" and x == state.width - 1) then
-                dir = "down"
-            end
-            if dir == "down" and y < state.height - 1 then
-                if last_dir == "down" then
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.PATH_DROP_NOTOP)
-                else
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.PATH_DROP)
-                end
-                y = y + 1
-            elseif dir == "left" and x > 0 then
-                if last_dir == "down" then
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.PATH_NOTOP)
-                else
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.PATH_NORMAL)
-                end
-                x = x - 1
-            elseif dir == "right" and x < state.width - 1 then
-                if last_dir == "down" then
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.PATH_NOTOP)
-                else
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.PATH_NORMAL)
-                end
-                x = x + 1
-            else
-                if last_dir == "down" then
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.EXIT_NOTOP)
-                else
-                    ctx:set_room_template(x, y, 0, ROOM_TEMPLATE.EXIT)
-                end
-                no_exit = false
-            end
-        end
-    elseif big_ocean then
+    local exit_y = 1
+    if big_level and state.theme == THEME.COSMIC_OCEAN then
+        state.width = new_width
+        state.height = new_height
         for x = 0, state.width - 1 do
             for y = 0, state.height - 1 do
                 if x == 0 or y == 0 or x == state.width - 1 or y == state.height - 1 then
@@ -1071,11 +1068,20 @@ set_callback(function(ctx)
     if prng:random() < options.room_dark/100 then
         state.level_flags = set_flag(state.level_flags, 18)
     end
+    if big_level then
+        if state.theme == THEME.COSMIC_OCEAN then
+            if (state.width-2) * (state.height-2) >= 24 then
+                toast("My voice would probably echo in here,\nbut in space no one can hear you scream.")
+            end
+        elseif state.width * state.height >= 28 then
+            toast("My voice REALLY echoes in here!")
+        end
+    end
 end, ON.POST_ROOM_GENERATION)
 
 --[[SHOPS]]
 local shop_items = {ENT_TYPE.ITEM_PICKUP_ROPEPILE, ENT_TYPE.ITEM_PICKUP_BOMBBAG, ENT_TYPE.ITEM_PICKUP_BOMBBOX, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_SPECTACLES, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_COMPASS, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_MATTOCK, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_PURCHASABLE_CAPE, ENT_TYPE.ITEM_PURCHASABLE_HOVERPACK, ENT_TYPE.ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ENT_TYPE.ITEM_PURCHASABLE_POWERPACK, ENT_TYPE.ITEM_PURCHASABLE_JETPACK, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY}
-local extra_shop_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP} --scepter, vlads cape and the swords don't work
+local extra_shop_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP} --scepter, vlads cape and the swords don't work
 local all_shop_items = join(shop_items, extra_shop_items)
 local shop_guns = {ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_CROSSBOW}
 local extra_shop_guns = {ENT_TYPE.ITEM_CLONEGUN}
@@ -1200,7 +1206,7 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SEEDEDRUNSUNLOCKER, ENT_TYPE.ITEM_PICKUP_SPECTACLES,
          ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES,
          ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_COMPASS,
-         ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE,
+         ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_UDJATEYE,
          ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN,
          ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH,
          ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_PLAYERBAG,
@@ -1218,7 +1224,7 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
          ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECTACLES,
          ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES,
          ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_COMPASS,
-         ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE,
+         ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_UDJATEYE,
          ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN,
          ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH,
          ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.ITEM_CAPE,
@@ -1270,9 +1276,18 @@ end, ON.POST_LEVEL_GENERATION)
 set_callback(function()
     --math.randomseed(read_prng()[1])
     for i,p in ipairs(players) do
-        p.health = prng:random_int(4, options.stats_health_max, 1)
-        p.inventory.bombs = prng:random_int(4, options.stats_bombs_max, 1)
-        p.inventory.ropes = prng:random_int(4, options.stats_ropes_max, 1)
+        local hmin = options.stats_health_min
+        local hmax = options.stats_health_max
+        local bmin = options.stats_bombs_min
+        local bmax = options.stats_bombs_max
+        local rmin = options.stats_ropes_min
+        local rmax = options.stats_ropes_max
+        if hmin > hmax then hmin = hmax end
+        if bmin > bmax then bmin = bmax end
+        if rmin > bmax then rmin = rmax end
+        p.health = prng:random_int(hmin, hmax, 1)
+        p.inventory.bombs = prng:random_int(bmin, bmax, 1)
+        p.inventory.ropes = prng:random_int(rmin, rmax, 1)
     end
 end, ON.START)
 
@@ -1583,6 +1598,9 @@ local function init_run()
                 l = 2
             else
                 l = prng:random_int(1, 4, 0)
+            end
+            if t < 10 and prng:random() < 0.25 then
+                l = 1
             end
             local w = world[t]
             add_level(w, l, t)
