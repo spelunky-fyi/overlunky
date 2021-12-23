@@ -45,10 +45,21 @@ struct Illumination
     float distortion;
     int32_t entity_uid;
     uint32_t timer;
-    /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
-    uint32_t flags;
-    uint32_t unknown1;
-    uint32_t unknown2;
+    union
+    {
+        /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+        uint32_t flags;
+        struct
+        {
+            uint8_t light_flags; // no reason to expose this
+
+            /// Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
+            /// Rectangle always uses light1, even when it's disabled in flags
+            uint8_t type_flags;
+            uint8_t layer;
+            bool enabled;
+        };
+    };
 };
 
 struct InputMapping
@@ -640,7 +651,7 @@ struct LogicList
     LogicArenaLooseBombs* arena_loose_bombs;
 };
 
-struct MysteryLiquid3
+struct LiquidPhysicsEngine
 {
     bool pause_physics;
     uint8_t padding[3];
@@ -671,7 +682,7 @@ struct MysteryLiquid3
     std::list<int32_t>::const_iterator* list_liquid_ids; // list of all iterators of liquid_ids?
     int32_t unknown45a;                                  // size related for the array above
     int32_t unknown45b;                                  // padding
-    int32_t* liquid_flags;                               // array
+    uint32_t* liquid_flags;                              // array
     int32_t unknown47a;                                  // size related for the array above
     int32_t unknown47b;                                  // padding
     std::pair<float, float>* entity_coordinates;         // array
@@ -716,8 +727,11 @@ struct LiquidPhysicsParams
     uint32_t unknown22;
     float unknown23;
     uint32_t unknown24;
-    MysteryLiquid3* unknown25; // MysteryLiquidPointer3 in plugin | resets each level
-    uint32_t liquid_flags;     // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
+};
+
+struct LiquidTileSpawnData
+{
+    uint32_t liquid_flags; // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
     float last_spawn_x;
     float last_spawn_y;
     float spawn_velocity_x;
@@ -725,9 +739,9 @@ struct LiquidPhysicsParams
     uint32_t unknown31;
     uint32_t unknown32;
     uint32_t unknown33;
-    size_t unknown34;
-    size_t unknown35;                  //DataPointer? seam to get access validation if you change to something
-    uint32_t liquidtile_liquid_amount; //how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
+    size_t unknown34;                  // MysteryLiquidPointer2 in plugin, contains last spawn entity
+    size_t unknown35;                  // DataPointer? seam to get access validation if you change to something
+    uint32_t liquidtile_liquid_amount; // how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
     float blobs_separation;
     int32_t unknown39; //is the last 4 garbage? seams not accessed
     float unknown40;
@@ -737,17 +751,32 @@ struct LiquidPhysicsParams
 
 struct LiquidPhysics
 {
-    size_t unknown1;
+    size_t unknown1; // MysteryLiquidPointer1 in plugin
     union
     {
-        std::array<LiquidPhysicsParams, 5> pools;
         struct
         {
-            LiquidPhysicsParams water_physics;
-            LiquidPhysicsParams coarse_water_physics;
-            LiquidPhysicsParams lava_physics;
-            LiquidPhysicsParams coarse_lava_physics;
-            LiquidPhysicsParams stagnant_lava_physics;
+            LiquidPhysicsParams physics_defaults;
+            LiquidPhysicsEngine* physics_engine;
+            LiquidTileSpawnData tile_spawn_data;
+        } pools[5];
+        struct
+        {
+            LiquidPhysicsParams water_physics_defaults;
+            LiquidPhysicsEngine* water_physics_engine;
+            LiquidTileSpawnData water_tile_spawn_data;
+            LiquidPhysicsParams coarse_water_physics_defaults;
+            LiquidPhysicsEngine* coarse_water_physics_engine;
+            LiquidTileSpawnData coarse_water_tile_spawn_data;
+            LiquidPhysicsParams lava_physics_defaults;
+            LiquidPhysicsEngine* lava_physics_engine;
+            LiquidTileSpawnData lava_tile_spawn_data;
+            LiquidPhysicsParams coarse_lava_physics_defaults;
+            LiquidPhysicsEngine* coarse_lava_physics_engine;
+            LiquidTileSpawnData coarse_lava_tile_spawn_data;
+            LiquidPhysicsParams stagnant_lava_physics_defaults;
+            LiquidPhysicsEngine* stagnant_lava_physics_engine;
+            LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
 };

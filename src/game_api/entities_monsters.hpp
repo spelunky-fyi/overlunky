@@ -394,7 +394,7 @@ class Quillback : public WalkingMonster
     ParticleEmitterInfo* particle;
     int16_t unknown_state; // accessed as byte and word, so, flags?, changed mostly when breaking floors
     uint8_t unknown_timer;
-    uint8_t unknown3; // forced to 1 when rolling, otherwise compared with 0
+    bool seen_player;
 };
 
 class Leprechaun : public WalkingMonster

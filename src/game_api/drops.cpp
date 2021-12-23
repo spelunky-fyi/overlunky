@@ -63,6 +63,7 @@ std::vector<DropEntry> drop_entries{
     {"ROBOT_METALSHIELD", "\x50\x02\x00\x00"s, VTABLE_OFFSET::MONS_ROBOT, 3},
     {"SCEPTER_ANUBISSPECIALSHOT", "\x79\x01\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS, 101}, // anubis regular shot = new_drop_uid - 1 !
     {"SCEPTER_PLAYERSHOT", "\x7A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_SCEPTER, 24},
+    // It's actually any goldcoin drop, so: shopkeeper, ghist, tun, yang and madame tusk
     {"SHOPKEEPER_GOLDCOIN", "\xBA\xF6\x01\x00\x00\xE8****\x48\x89\xC7\xC7\x44\x24"s, VTABLE_OFFSET::NONE, 0, 1},
     {"SKELETON_SKELETONKEY", "\x1D\x02\x00\x00"s, VTABLE_OFFSET::MONS_SKELETON, 3},
     {"SKELETON_SKULL", "\xE2\x01\x00\x00"s, VTABLE_OFFSET::MONS_SKELETON, 3},
@@ -94,6 +95,36 @@ std::vector<DropEntry> drop_entries{
     {"YETIKING_ICESPIRE", "\xE8\x01\x00\x00"s, VTABLE_OFFSET::MONS_YETIKING, 104},
     {"YETIQUEEN_POWERPACK", "\x3E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETIQUEEN, 105},
     {"YETI_PITCHERSMITT", "\x0E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETI, 3},
+    // set write bp on Generator.spawned_uid, when it's being set to -1, execute return, find item_scrap id close to this location
+    {"FACTORY_GENERATOR_SCRAP", "\x48\x89\xF9\xBA****\x48\x83\xC4\x38\x5F\x5E"s, VTABLE_OFFSET::NONE, 0, 4},
+
+    /// Keep in mind that shopkeeper generator spawns two types of entities, the second one will be this + 1
+    {"SHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"s, VTABLE_OFFSET::NONE, 0, 2},
+    // set conditional bp on load_item for spider, break some scrap until you hit bp, execute return, you will see spaider id right above the spawn function
+    {"SCRAP_SPIDER", "\xC6\x44\x24\x20\x00\xBA\xDD\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    // scroll up to find the same pattern but for snake
+    {"SCRAP_SNAKE", "\xC6\x44\x24\x20\x00\xBA\xDC\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    // just above the snake you can find cobra and scorpion id, with jump to the spawn function after snake
+    {"SCRAP_COBRA", "\xC6\x44\x24\x20\x00\xBA\xF8\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"SCRAP_SCORPION", "\xC6\x44\x24\x20\x00\xBA\xE5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    // little higher up, same thing for alien
+    {"SCRAP_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},     // there are two identical patterns, this one is first
+    {"UFO_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6, 1, 1}, // and this one is the second
+    // set write bp on Altar->unknown (second byte after timer)
+    // die and ushabti depend on the animation_frame, and idol has one bit flip so it can get the same result for idol and tusk idol so i din't expose those
+    {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
+    {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 2},
+    {"SACRIFICE_EGGPLANT", "\x48\x8B\x42\x08\x81\x78\x14\xE7\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 7},
+    {"YAMA_EGGPLANTCROWN", "\xC6\x44\x24\x20\x00\xBA\x19\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"YAMA_GIANTFOOD", "\xC6\x44\x24\x20\x00\xBA\x07\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"YANG_KEY", "\xBA\x8F\x01\x00\x00"s, VTABLE_OFFSET::MONS_YANG, 0, 1},
+    {"MADAME_TUSK_KEY", "\xBA\x8F\x01\x00\x00"s, VTABLE_OFFSET::MONS_MADAMETUSK, 0, 1},
+    {"ANUBIS2_ANUBIS_COFFIN", "\xBA\xC5\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 1},
+    {"ANUBIS_COFFIN_VAMPIRE", "\x83\xF9\x02\xBA\xF5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
+    {"ANUBIS_COFFIN_SORCERESS", "\x83\xF9\x01\xB8\xFA\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
+    {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"s, VTABLE_OFFSET::NONE, 0, 1},
+    /// It spawns two types of entities (frog and firefrog), the second one will be this + 1
+    {"GIANTFROG_FROG", "\x81\xC2\x1B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 2},
 };
 
 std::vector<DropChanceEntry> dropchance_entries{

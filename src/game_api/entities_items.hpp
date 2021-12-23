@@ -463,6 +463,7 @@ class Coffin : public Movable
     ENT_TYPE inside;
     uint8_t timer;
     int8_t shake_state; /* unsure */
+    bool player_respawn;
 };
 
 class Fly : public Movable

@@ -540,6 +540,8 @@ void register_usertypes(sol::state& lua)
         &Coffin::inside,
         "timer",
         &Coffin::timer,
+        "player_respawn",
+        &Coffin::player_respawn,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 

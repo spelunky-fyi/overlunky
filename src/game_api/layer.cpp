@@ -173,11 +173,3 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
 
     return apep_head;
 }
-
-std::vector<Entity*> Layer::items() const
-{
-    std::vector<Entity*> res(items_.size);
-    Entity** ptr = items_.begin;
-    std::copy(ptr, ptr + res.size(), &res[0]);
-    return res;
-}

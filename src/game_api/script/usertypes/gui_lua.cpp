@@ -88,7 +88,7 @@ void GuiDrawContext::draw_rect_filled(float left, float top, float right, float 
 };
 void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 {
-    draw_rect_filled(rect.left, rect.bottom, rect.right, rect.top, rounding, color);
+    draw_rect_filled(rect.left, rect.top, rect.right, rect.bottom, rounding, color);
 }
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
@@ -125,19 +125,19 @@ void GuiDrawContext::draw_text(float x, float y, float size, std::string text, u
     }
     backend->draw_list->AddText(font, size, a, color, text.c_str());
 };
-void GuiDrawContext::draw_image(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
+void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
 {
     if (!backend->images.contains(image))
         return;
-    ImVec2 a = screenify({x1, y1});
-    ImVec2 b = screenify({x2, y2});
+    ImVec2 a = screenify({left, top});
+    ImVec2 b = screenify({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     backend->draw_list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
 };
 void GuiDrawContext::draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)
 {
-    draw_image(image, rect.left, rect.bottom, rect.right, rect.top, uv_rect.left, uv_rect.bottom, uv_rect.right, uv_rect.top, color);
+    draw_image(image, rect.left, rect.top, rect.right, rect.bottom, uv_rect.left, uv_rect.top, uv_rect.right, uv_rect.bottom, color);
 }
 void GuiDrawContext::draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
 {
