@@ -30,6 +30,7 @@ using ImguiInitFunc = void (*)(struct ImGuiContext*);
 using ImguiDrawFunc = void (*)();
 using PreDrawFunc = void (*)();
 using PostDrawFunc = void (*)();
+using OnQuitFunc = void (*)();
 
 using Spelunky_MakeSavePathFunc = bool (*)(
     const char* script_path, size_t script_path_size, const char* script_name, size_t script_name_size, char* out_buffer, size_t out_buffer_size);
@@ -44,6 +45,10 @@ struct SpelunkyFileInfo
     int _member_4{0};
 };
 using Spelunky_LoadFileFunc = SpelunkyFileInfo* (*)(const char* file_path, SpelunkyAllocFun alloc_fun);
+using Spelunky_ReadFromFileOriginal = void (*)(const char* file, void** out_data, size_t* out_data_size);
+using Spelunky_ReadFromFileFunc = void (*)(const char* file, void** out_data, size_t* out_data_size, SpelunkyAllocFun alloc_fun, Spelunky_ReadFromFileOriginal original);
+using Spelunky_WriteToFileOriginal = void (*)(const char* backup_file, const char* file, void* data, size_t data_size);
+using Spelunky_WriteToFileFunc = void (*)(const char* backup_file, const char* file, void* data, size_t data_size, Spelunky_WriteToFileOriginal original);
 using Spelunky_GetImageFilePathFunc = bool (*)(const char* root_path, const char* relative_path, char* out_buffer, size_t out_buffer_size);
 
 class SpelunkyScript;
@@ -55,6 +60,7 @@ void Spelunky_RegisterApplicationVersion(const char* version);
 void Spelunky_InitMemoryDatabase();
 void Spelunky_InitSwapChainHooks(struct IDXGISwapChain* swap_chain);
 void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function);
+void Spelunky_DestroySoundManager();
 
 void Spelunky_ShowCursor();
 void Spelunky_HideCursor();
@@ -64,11 +70,19 @@ void Spelunky_RegisterImguiInitFunc(ImguiInitFunc imgui_init);
 void Spelunky_RegisterImguiDrawFunc(ImguiDrawFunc imgui_draw);
 void Spelunky_RegisterPreDrawFunc(PreDrawFunc pre_draw);
 void Spelunky_RegisterPostDrawFunc(PostDrawFunc post_draw);
+void Spelunky_RegisterOnQuitFunc(OnQuitFunc on_quit);
 
 void Spelunky_RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path);
 
+// Hook loading a file into memory, used when reading packed assets
 void Spelunky_RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file);
+// Hook read/write raw files from/to disk, e.g. save game or config files
+void Spelunky_RegisterOnReadFromFileFunc(Spelunky_ReadFromFileFunc on_read_from_file);
+void Spelunky_RegisterOnWriteToFileFunc(Spelunky_WriteToFileFunc on_write_to_file);
+// Converts a image path to a real path, use for example when reading files from places other than the game folder
 void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path);
+
+void Spelunky_DisableSteamAchievements();
 
 SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled);
 void Spelunky_FreeScript(SpelunkyScript* script);
@@ -161,3 +175,5 @@ void Spelunky_SetCharacterFullName(std::uint32_t character_index, const char16_t
 void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_t* name);
 void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4]);
 void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female);
+
+void Spelunky_ReloadTexture(const char* texture_name);

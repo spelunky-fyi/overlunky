@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 void* register_hook_function(void*** vtable, size_t index, void* hook_function);
-void unregister_hook_function(void*** vtable, size_t index, void* hook_function);
+void unregister_hook_function(void*** vtable, size_t index);
 void* get_hook_function(void*** vtable, size_t index);
 
 struct VDestructorDetour

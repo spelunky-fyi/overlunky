@@ -5608,6 +5608,7 @@ register_option_combo = function(...) end
 register_option_float = function(...) end
 register_option_int = function(...) end
 register_option_string = function(...) end
+reload_texture = function(...) end
 render_screen_particles = function(...) end
 replace_drop = function(...) end
 return_input = function(...) end

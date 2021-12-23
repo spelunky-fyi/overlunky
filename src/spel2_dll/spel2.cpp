@@ -3,10 +3,12 @@
 #include "character_def.hpp"
 #include "console.hpp"
 #include "file_api.hpp"
+#include "render_api.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "steam_api.hpp"
 #include "window_api.hpp"
 
 SoundManager* g_SoundManager{nullptr};
@@ -45,6 +47,14 @@ void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function)
             };
         });
 }
+void Spelunky_DestroySoundManager()
+{
+    if (g_SoundManager != nullptr)
+    {
+        delete g_SoundManager;
+        g_SoundManager = nullptr;
+    }
+}
 
 void Spelunky_ShowCursor()
 {
@@ -75,6 +85,10 @@ void Spelunky_RegisterPostDrawFunc(PostDrawFunc post_draw)
 {
     register_post_draw(post_draw);
 }
+void Spelunky_RegisterOnQuitFunc(OnQuitFunc on_quit)
+{
+    register_on_quit(on_quit);
+}
 
 void Spelunky_RegisterMakeSavePathFunc(Spelunky_MakeSavePathFunc make_save_path)
 {
@@ -96,6 +110,14 @@ void Spelunky_RegisterOnLoadFileFunc(Spelunky_LoadFileFunc on_load_file)
 {
     register_on_load_file((LoadFileCallback*)on_load_file);
 }
+void Spelunky_RegisterOnReadFromFileFunc(Spelunky_ReadFromFileFunc on_read_from_file)
+{
+    register_on_read_from_file(on_read_from_file);
+}
+void Spelunky_RegisterOnWriteToFileFunc(Spelunky_WriteToFileFunc on_write_to_file)
+{
+    register_on_write_to_file(on_write_to_file);
+}
 void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_file_path)
 {
     static Spelunky_GetImageFilePathFunc local_get_image_file_path;
@@ -110,6 +132,11 @@ void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_f
             }
             return "";
         });
+}
+
+void Spelunky_DisableSteamAchievements()
+{
+    disable_steam_achievements();
 }
 
 std::string read_whole_file(const char* file_path)
@@ -362,4 +389,9 @@ void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&colo
 void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female)
 {
     NCharacterDB::set_character_gender(character_index, female);
+}
+
+void Spelunky_ReloadTexture(const char* texture_name)
+{
+    RenderAPI::get().reload_texture(texture_name);
 }

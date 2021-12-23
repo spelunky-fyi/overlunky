@@ -59,9 +59,10 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         data.sub_image_height = data.height;
     }
 
+    auto* textures = get_textures();
+
     std::lock_guard lock{custom_textures_lock};
 
-    auto* textures = get_textures();
     Texture new_texture{
         static_cast<int64_t>(textures->texture_map.size() + custom_textures.size() + 1),
         nullptr,
@@ -92,6 +93,7 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
         if (existing_name == data.texture_path && is_same(texture, new_texture))
         {
+            reload_texture(texture.name);
             return texture.id;
         }
     }
@@ -100,6 +102,7 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     {
         if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
         {
+            reload_texture(texture.name);
             return texture.id;
         }
     }
@@ -129,6 +132,43 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     custom_textures[new_texture.id] = new_texture;
 
     return new_texture.id;
+}
+
+void RenderAPI::reload_texture(const char* texture_name)
+{
+    {
+        std::lock_guard lock{custom_textures_lock};
+        for (auto& [id, texture] : custom_textures)
+        {
+            std::string_view existing_name{*texture.name};
+            existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
+            if (existing_name == texture_name)
+            {
+                reload_texture(texture.name);
+                return;
+            }
+        }
+    }
+
+    std::string_view name_view{texture_name};
+    auto* textures = get_textures();
+    for (auto& texture : textures->textures)
+    {
+        if (texture.name && *texture.name == name_view)
+        {
+            reload_texture(texture.name);
+            return;
+        }
+    }
+}
+void RenderAPI::reload_texture(const char** texture_name)
+{
+    class Renderer;
+    using LoadTextureFunT = void(Renderer*, const char**);
+
+    auto renderer_ptr = (Renderer*)renderer();
+    auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, 0x2D);
+    load_texture(renderer_ptr, texture_name);
 }
 
 using VanillaRenderHudFun = void(size_t, float, float, size_t);

@@ -16,6 +16,8 @@
 #include "stb_image.h"
 
 LoadFileCallback* g_OnLoadFile{nullptr};
+ReadFromFileCallback* g_ReadFromFile{nullptr};
+WriteToFileCallback* g_WriteToFile{nullptr};
 GetImageFilePathCallback* g_GetImageFilePath{nullptr};
 MakeSavePathCallback g_MakeSavePathCallback{nullptr};
 
@@ -172,6 +174,18 @@ FileInfo* read_encrypted_file(const char* file_path)
     return g_read_encrypted_file_trampoline(file_path);
 }
 
+ReadFromFileOrig* g_read_from_file_trampoline{nullptr};
+void read_from_file(const char* file, void** out_data, size_t* out_data_size)
+{
+    g_ReadFromFile(file, out_data, out_data_size, &game_malloc, g_read_from_file_trampoline);
+}
+
+WriteToFileOrig* g_write_to_file_trampoline{nullptr};
+void write_to_file(const char* backup_file, const char* file, void* data, size_t data_size)
+{
+    g_WriteToFile(backup_file, file, data, data_size, g_write_to_file_trampoline);
+}
+
 void register_on_load_file(LoadFileCallback on_load_file)
 {
     if (g_read_encrypted_file_trampoline == nullptr && on_load_file != nullptr)
@@ -190,6 +204,44 @@ void register_on_load_file(LoadFileCallback on_load_file)
         }
     }
     g_OnLoadFile = on_load_file;
+}
+void register_on_read_from_file(ReadFromFileCallback on_read_from_file)
+{
+    if (g_read_from_file_trampoline == nullptr && on_read_from_file != nullptr)
+    {
+        g_read_from_file_trampoline = (ReadFromFileOrig*)get_address("read_from_file"sv);
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        DetourAttach((void**)&g_read_from_file_trampoline, read_from_file);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking ReadFromFile: {}\n", error);
+        }
+    }
+    g_ReadFromFile = on_read_from_file;
+}
+void register_on_write_to_file(WriteToFileCallback on_write_to_file)
+{
+    if (g_write_to_file_trampoline == nullptr && on_write_to_file != nullptr)
+    {
+        g_write_to_file_trampoline = (WriteToFileOrig*)get_address("write_to_file"sv);
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        DetourAttach((void**)&g_write_to_file_trampoline, write_to_file);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking WriteToFile: {}\n", error);
+        }
+    }
+    g_WriteToFile = on_write_to_file;
 }
 void register_get_image_file_path(GetImageFilePathCallback get_image_file_path)
 {

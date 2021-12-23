@@ -461,6 +461,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "destroy_game_manager"sv,
+        // Called soon after `DispatchMessageA` if `message == 0x12`
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\x8b\x8d\xe8\x10\x00\x00\x48\x8b\x71\x08"sv)
+            .find_inst("\xe8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "write_load_opt"sv,
         PatternCommandBuffer{}
             .set_optional(true)
@@ -1580,6 +1589,32 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "spawn_liquid_amount"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x8B\x8C\x01\xA0\x00\x00\x00\x8D\x79"sv)
+            .at_exe(),
+    },
+    {
+        // Next to `write_to_file` this is the only usage of `fopen`
+        // Couldn't find any useful XREF in Ghidra so this pattern is exactly the function start
+        "read_from_file"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x41\x57\x41\x56\x56\x57\x53\x48\x81\xec\x20\x01\x00\x00\x4c\x89\xc3\x49\x89\xd7\x49\x89\xce"sv)
+            .at_exe(),
+    },
+    {
+        // Find a function being called as `save_to_file("input.bak", "input.cfg", data_ptr, data_size)`
+        "write_to_file"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4d\x89\xf0\x4d\x89\xe1\xe8****\xe9"sv)
+            .find_inst("\xe8")
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        // Find a string containing STEAMUSERSTATS, the enclosing function returns an `ISteamUserStats**` in `param_1`
+        "get_steam_user_stats"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\xff\x90\xd0\x00\x00\x00\x48\x8d\xbd\xe0\x03\x00\x00"sv)
+            .find_inst("\x48\x8d")
+            .decode_pc()
             .at_exe(),
     },
     {
