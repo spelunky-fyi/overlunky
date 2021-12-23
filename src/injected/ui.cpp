@@ -2844,7 +2844,7 @@ void render_messages()
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
 
     if (ImGui::IsWindowHovered())
-        io.WantCaptureMouse = false;
+        io.WantCaptureMouse = options["mouse_control"];
 
     const float font_size = (ImGui::GetCurrentWindow()->CalcFontSize() + ImGui::GetStyle().ItemSpacing.y);
 
@@ -2890,7 +2890,7 @@ void render_clickhandler()
             ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
     if (ImGui::IsWindowHovered())
-        io.WantCaptureMouse = false;
+        io.WantCaptureMouse = options["mouse_control"];
     if (io.MouseWheel != 0 && ImGui::IsWindowHovered())
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
