@@ -718,6 +718,7 @@ Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there 
 ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
 ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
 Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
+If you use this function in the level with diceshop in it, you have to update `item_ids` in the (ITEM_DICE_PRIZE_DISPENSER)[#PrizeDispenser]
 Use empty table as argument to reset to the game default
 ### [`change_altar_damage_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawns)
 `nil change_altar_damage_spawns(array<ENT_TYPE> ent_types)`<br/>
@@ -3213,6 +3214,13 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Shield`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake) &Shield::shake
+### `PrizeDispenser`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`array<int, 6> item_ids`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_ids) &PrizeDispenser::item_ids
+\
+Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes
+so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
+- [`int prizes_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prizes_spawned) &PrizeDispenser::prizes_spawned
 ### `LiquidSurface`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float glow_radius`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_radius) &LiquidSurface::glow_radius
@@ -5020,6 +5028,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_pot
 - as_powerup
 - as_powerupcapable
+- as_prizedispenser
 - as_protoshopkeeper
 - as_punishball
 - as_pushblock

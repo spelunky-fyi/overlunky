@@ -146,6 +146,7 @@ LuaConsole::LuaConsole(SoundManager* soundmanager)
             {"Claw", "as_movable"},
             {"StretchChain", "as_movable"},
             {"CursedPot", "as_movable"},
+            {"PrizeDispenser", "as_movable"},
             {"EggSac", "as_movable"},
             {"TreasureHook", "as_movable"},
             {"EmpressGrave", "as_movable"},
