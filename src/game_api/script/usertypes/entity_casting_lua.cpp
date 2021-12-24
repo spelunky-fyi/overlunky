@@ -451,7 +451,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][447] = lua["Entity"]["as_ghostbreath"];           // ITEM_PLAYERGHOST_BREATH
     lua["TYPE_MAP"][448] = lua["Entity"]["as_movable"];               // ITEM_DIE
     lua["TYPE_MAP"][449] = lua["Entity"]["as_movable"];               // ITEM_DICE_BET
-    lua["TYPE_MAP"][450] = lua["Entity"]["as_movable"];               // ITEM_DICE_PRIZE_DISPENSER
+    lua["TYPE_MAP"][450] = lua["Entity"]["as_prizedispenser"];        // ITEM_DICE_PRIZE_DISPENSER
     lua["TYPE_MAP"][451] = lua["Entity"]["as_laserbeam"];             // ITEM_LASERBEAM
     lua["TYPE_MAP"][452] = lua["Entity"]["as_laserbeam"];             // ITEM_HORIZONTALLASERBEAM
     lua["TYPE_MAP"][453] = lua["Entity"]["as_coffin"];                // ITEM_ANUBIS_COFFIN

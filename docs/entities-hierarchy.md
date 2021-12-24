@@ -436,7 +436,7 @@ The list below shows the type hierarchy for each entity in the game. This makes 
 - 447 ITEM_PLAYERGHOST_BREATH = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [GhostBreath](script-api.md#GhostBreath)
 - 448 ITEM_DIE = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
 - 449 ITEM_DICE_BET = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
-- 450 ITEM_DICE_PRIZE_DISPENSER = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable)
+- 450 ITEM_DICE_PRIZE_DISPENSER = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [PrizeDispenser](script-api.md#PrizeDispenser)
 - 451 ITEM_LASERBEAM = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [LaserBeam](script-api.md#LaserBeam)
 - 452 ITEM_HORIZONTALLASERBEAM = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [LaserBeam](script-api.md#LaserBeam)
 - 453 ITEM_ANUBIS_COFFIN = [Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) > [Coffin](script-api.md#Coffin)
