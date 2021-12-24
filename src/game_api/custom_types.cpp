@@ -1,7 +1,7 @@
 #include "custom_types.hpp"
 #include "entity.hpp"
 
-const std::map<CUSTOM_TYPE, std::string> custom_type_names = {
+const std::map<CUSTOM_TYPE, std::string_view> custom_type_names = {
     {CUSTOM_TYPE::ACIDBUBBLE, "ACIDBUBBLE"},
     {CUSTOM_TYPE::ALIEN, "ALIEN"},
     {CUSTOM_TYPE::ALTAR, "ALTAR"},
@@ -337,7 +337,17 @@ const std::map<CUSTOM_TYPE, std::string> custom_type_names = {
     {CUSTOM_TYPE::YETIQUEEN, "YETIQUEEN"},
 };
 
-std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
+template <CUSTOM_TYPE CustomEntityType, class... StrArgs>
+requires (std::is_same_v<const char*, StrArgs> && ...)
+std::span<const ENT_TYPE> make_custom_entity_type_list(StrArgs... ent_type_ids)
+{
+    static const std::array<ENT_TYPE, sizeof...(StrArgs)> s_entity_types{
+        to_id(ent_type_ids)...,
+    };
+    return {s_entity_types.begin(), s_entity_types.end()};
+}
+
+std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
 {
     if (type < CUSTOM_TYPE::ACIDBUBBLE)
         return {};
@@ -345,776 +355,716 @@ std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
     switch (type)
     {
     case CUSTOM_TYPE::ACIDBUBBLE:
-        return {to_id("ENT_TYPE_ITEM_CRABMAN_ACIDBUBBLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ACIDBUBBLE>("ENT_TYPE_ITEM_CRABMAN_ACIDBUBBLE");
     case CUSTOM_TYPE::ALIEN:
-        return {to_id("ENT_TYPE_MONS_ALIEN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ALIEN>("ENT_TYPE_MONS_ALIEN");
     case CUSTOM_TYPE::ALTAR:
-        return {
-            to_id("ENT_TYPE_FLOOR_ALTAR"),
-            to_id("ENT_TYPE_FLOOR_DUAT_ALTAR"),
-            to_id("ENT_TYPE_FLOOR_EGGPLANT_ALTAR"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::ALTAR>(
+            "ENT_TYPE_FLOOR_ALTAR",
+            "ENT_TYPE_FLOOR_DUAT_ALTAR",
+            "ENT_TYPE_FLOOR_EGGPLANT_ALTAR");
     case CUSTOM_TYPE::AMMIT:
-        return {to_id("ENT_TYPE_MONS_AMMIT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::AMMIT>("ENT_TYPE_MONS_AMMIT");
     case CUSTOM_TYPE::ANKHPOWERUP:
-        return {to_id("ENT_TYPE_ITEM_POWERUP_ANKH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ANKHPOWERUP>("ENT_TYPE_ITEM_POWERUP_ANKH");
     case CUSTOM_TYPE::ANUBIS:
-        return {
-            to_id("ENT_TYPE_MONS_ANUBIS"),
-            to_id("ENT_TYPE_MONS_ANUBIS2"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::ANUBIS>(
+            "ENT_TYPE_MONS_ANUBIS",
+            "ENT_TYPE_MONS_ANUBIS2");
     case CUSTOM_TYPE::APEPHEAD:
-        return {to_id("ENT_TYPE_MONS_APEP_HEAD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::APEPHEAD>("ENT_TYPE_MONS_APEP_HEAD");
     case CUSTOM_TYPE::APEPPART:
-        return {
-            to_id("ENT_TYPE_MONS_APEP_HEAD"),
-            to_id("ENT_TYPE_MONS_APEP_BODY"),
-            to_id("ENT_TYPE_MONS_APEP_TAIL"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::APEPPART>(
+            "ENT_TYPE_MONS_APEP_HEAD",
+            "ENT_TYPE_MONS_APEP_BODY",
+            "ENT_TYPE_MONS_APEP_TAIL");
     case CUSTOM_TYPE::ARROW:
-        return {
-            to_id("ENT_TYPE_ITEM_WOODEN_ARROW"),
-            to_id("ENT_TYPE_ITEM_METAL_ARROW"),
-            to_id("ENT_TYPE_ITEM_LIGHT_ARROW"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::ARROW>(
+            "ENT_TYPE_ITEM_WOODEN_ARROW",
+            "ENT_TYPE_ITEM_METAL_ARROW",
+            "ENT_TYPE_ITEM_LIGHT_ARROW");
     case CUSTOM_TYPE::ARROWTRAP:
-        return {
-            to_id("ENT_TYPE_FLOOR_ARROW_TRAP"),
-            to_id("ENT_TYPE_FLOOR_POISONED_ARROW_TRAP"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::ARROWTRAP>(
+            "ENT_TYPE_FLOOR_ARROW_TRAP",
+            "ENT_TYPE_FLOOR_POISONED_ARROW_TRAP");
     case CUSTOM_TYPE::AXOLOTL:
-        return {to_id("ENT_TYPE_MOUNT_AXOLOTL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::AXOLOTL>("ENT_TYPE_MOUNT_AXOLOTL");
     case CUSTOM_TYPE::AXOLOTLSHOT:
-        return {to_id("ENT_TYPE_ITEM_AXOLOTL_BUBBLESHOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::AXOLOTLSHOT>("ENT_TYPE_ITEM_AXOLOTL_BUBBLESHOT");
     case CUSTOM_TYPE::BACKPACK:
-        return {
-            to_id("ENT_TYPE_ITEM_CAPE"),
-            to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
-            to_id("ENT_TYPE_ITEM_JETPACK"),
-            to_id("ENT_TYPE_ITEM_JETPACK_MECH"),
-            to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK"),
-            to_id("ENT_TYPE_ITEM_HOVERPACK"),
-            to_id("ENT_TYPE_ITEM_POWERPACK"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BACKPACK>(
+            "ENT_TYPE_ITEM_CAPE",
+            "ENT_TYPE_ITEM_VLADS_CAPE",
+            "ENT_TYPE_ITEM_JETPACK",
+            "ENT_TYPE_ITEM_JETPACK_MECH",
+            "ENT_TYPE_ITEM_TELEPORTER_BACKPACK",
+            "ENT_TYPE_ITEM_HOVERPACK",
+            "ENT_TYPE_ITEM_POWERPACK");
     case CUSTOM_TYPE::BAT:
-        return {to_id("ENT_TYPE_MONS_BAT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BAT>("ENT_TYPE_MONS_BAT");
     case CUSTOM_TYPE::BEE:
-        return {
-            to_id("ENT_TYPE_MONS_BEE"),
-            to_id("ENT_TYPE_MONS_QUEENBEE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BEE>(
+            "ENT_TYPE_MONS_BEE",
+            "ENT_TYPE_MONS_QUEENBEE");
     case CUSTOM_TYPE::BEG:
-        return {to_id("ENT_TYPE_MONS_HUNDUNS_SERVANT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BEG>("ENT_TYPE_MONS_HUNDUNS_SERVANT");
     case CUSTOM_TYPE::BGBACKLAYERDOOR:
-        return {to_id("ENT_TYPE_BG_DOOR_BACK_LAYER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGBACKLAYERDOOR>("ENT_TYPE_BG_DOOR_BACK_LAYER");
     case CUSTOM_TYPE::BGEGGSHIPROOM:
-        return {to_id("ENT_TYPE_BG_EGGSHIP_ROOM")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGEGGSHIPROOM>("ENT_TYPE_BG_EGGSHIP_ROOM");
     case CUSTOM_TYPE::BGFLOATINGDEBRIS:
-        return {
-            to_id("ENT_TYPE_BG_DUAT_FLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_DUAT_FARFLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_COSMIC_FLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_COSMIC_FARFLOATINGDEBRIS"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGFLOATINGDEBRIS>(
+            "ENT_TYPE_BG_DUAT_FLOATINGDEBRIS",
+            "ENT_TYPE_BG_DUAT_FARFLOATINGDEBRIS",
+            "ENT_TYPE_BG_COSMIC_FLOATINGDEBRIS",
+            "ENT_TYPE_BG_COSMIC_FARFLOATINGDEBRIS");
     case CUSTOM_TYPE::BGMOVINGSTAR:
-        return {to_id("ENT_TYPE_BG_SURFACE_MOVING_STAR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGMOVINGSTAR>("ENT_TYPE_BG_SURFACE_MOVING_STAR");
     case CUSTOM_TYPE::BGRELATIVEELEMENT:
-        return {
-            to_id("ENT_TYPE_BG_SURFACE_SHOOTING_STAR"),
-            to_id("ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL"),
-            to_id("ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL_PARTICLE"),
-            to_id("ENT_TYPE_BG_SURFACE_NEBULA"),
-            to_id("ENT_TYPE_BG_SURFACE_LAYER"),
-            to_id("ENT_TYPE_BG_SURFACE_ENTITY"),
-            to_id("ENT_TYPE_BG_SURFACE_OLMEC_LAYER"),
-            to_id("ENT_TYPE_BG_DUAT_LAYER"),
-            to_id("ENT_TYPE_BG_DUAT_PYRAMID_LAYER"),
-            to_id("ENT_TYPE_BG_DUAT_FLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_DUAT_FARFLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_COSMIC_FLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_COSMIC_FARFLOATINGDEBRIS"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGRELATIVEELEMENT>(
+            "ENT_TYPE_BG_SURFACE_SHOOTING_STAR",
+            "ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL",
+            "ENT_TYPE_BG_SURFACE_SHOOTING_STAR_TRAIL_PARTICLE",
+            "ENT_TYPE_BG_SURFACE_NEBULA",
+            "ENT_TYPE_BG_SURFACE_LAYER",
+            "ENT_TYPE_BG_SURFACE_ENTITY",
+            "ENT_TYPE_BG_SURFACE_OLMEC_LAYER",
+            "ENT_TYPE_BG_DUAT_LAYER",
+            "ENT_TYPE_BG_DUAT_PYRAMID_LAYER",
+            "ENT_TYPE_BG_DUAT_FLOATINGDEBRIS",
+            "ENT_TYPE_BG_DUAT_FARFLOATINGDEBRIS",
+            "ENT_TYPE_BG_COSMIC_FLOATINGDEBRIS",
+            "ENT_TYPE_BG_COSMIC_FARFLOATINGDEBRIS");
     case CUSTOM_TYPE::BGSHOOTINGSTAR:
-        return {to_id("ENT_TYPE_BG_SURFACE_SHOOTING_STAR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGSHOOTINGSTAR>("ENT_TYPE_BG_SURFACE_SHOOTING_STAR");
     case CUSTOM_TYPE::BGSHOPENTRENCE:
-        return {to_id("ENT_TYPE_BG_SHOP_ENTRANCEDOOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGSHOPENTRENCE>("ENT_TYPE_BG_SHOP_ENTRANCEDOOR");
     case CUSTOM_TYPE::BGSHOPKEEPERPRIME:
-        return {to_id("ENT_TYPE_BG_VAT_SHOPKEEPER_PRIME")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGSHOPKEEPERPRIME>("ENT_TYPE_BG_VAT_SHOPKEEPER_PRIME");
     case CUSTOM_TYPE::BGSURFACELAYER:
-        return {
-            to_id("ENT_TYPE_BG_SURFACE_LAYER"),
-            to_id("ENT_TYPE_BG_SURFACE_ENTITY"),
-            to_id("ENT_TYPE_BG_SURFACE_OLMEC_LAYER"),
-            to_id("ENT_TYPE_BG_DUAT_LAYER"),
-            to_id("ENT_TYPE_BG_DUAT_PYRAMID_LAYER"),
-            to_id("ENT_TYPE_BG_DUAT_FLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_DUAT_FARFLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_COSMIC_FLOATINGDEBRIS"),
-            to_id("ENT_TYPE_BG_COSMIC_FARFLOATINGDEBRIS"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGSURFACELAYER>(
+            "ENT_TYPE_BG_SURFACE_LAYER",
+            "ENT_TYPE_BG_SURFACE_ENTITY",
+            "ENT_TYPE_BG_SURFACE_OLMEC_LAYER",
+            "ENT_TYPE_BG_DUAT_LAYER",
+            "ENT_TYPE_BG_DUAT_PYRAMID_LAYER",
+            "ENT_TYPE_BG_DUAT_FLOATINGDEBRIS",
+            "ENT_TYPE_BG_DUAT_FARFLOATINGDEBRIS",
+            "ENT_TYPE_BG_COSMIC_FLOATINGDEBRIS",
+            "ENT_TYPE_BG_COSMIC_FARFLOATINGDEBRIS");
     case CUSTOM_TYPE::BGSURFACESTAR:
-        return {
-            to_id("ENT_TYPE_BG_SURFACE_STAR"),
-            to_id("ENT_TYPE_BG_SURFACE_MOVING_STAR"),
-            to_id("ENT_TYPE_BG_CONSTELLATION_STAR"),
-            to_id("ENT_TYPE_BG_CONSTELLATION_CONNECTION"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGSURFACESTAR>(
+            "ENT_TYPE_BG_SURFACE_STAR",
+            "ENT_TYPE_BG_SURFACE_MOVING_STAR",
+            "ENT_TYPE_BG_CONSTELLATION_STAR",
+            "ENT_TYPE_BG_CONSTELLATION_CONNECTION");
     case CUSTOM_TYPE::BGTUTORIALSIGN:
-        return {
-            to_id("ENT_TYPE_BG_TUTORIAL_SIGN_BACK"),
-            to_id("ENT_TYPE_BG_TUTORIAL_SIGN_FRONT"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BGTUTORIALSIGN>(
+            "ENT_TYPE_BG_TUTORIAL_SIGN_BACK",
+            "ENT_TYPE_BG_TUTORIAL_SIGN_FRONT");
     case CUSTOM_TYPE::BIGSPEARTRAP:
-        return {to_id("ENT_TYPE_FLOOR_BIGSPEAR_TRAP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BIGSPEARTRAP>("ENT_TYPE_FLOOR_BIGSPEAR_TRAP");
     case CUSTOM_TYPE::BIRDIES:
-        return {to_id("ENT_TYPE_FX_BIRDIES")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BIRDIES>("ENT_TYPE_FX_BIRDIES");
     case CUSTOM_TYPE::BODYGUARD:
-        return {to_id("ENT_TYPE_MONS_BODYGUARD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BODYGUARD>("ENT_TYPE_MONS_BODYGUARD");
     case CUSTOM_TYPE::BOMB:
-        return {
-            to_id("ENT_TYPE_ITEM_BOMB"),
-            to_id("ENT_TYPE_ITEM_PASTEBOMB"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::BOMB>(
+            "ENT_TYPE_ITEM_BOMB",
+            "ENT_TYPE_ITEM_PASTEBOMB");
     case CUSTOM_TYPE::BONEBLOCK:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_BONEBLOCK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BONEBLOCK>("ENT_TYPE_ACTIVEFLOOR_BONEBLOCK");
     case CUSTOM_TYPE::BOOMBOX:
-        return {to_id("ENT_TYPE_ITEM_BOOMBOX")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BOOMBOX>("ENT_TYPE_ITEM_BOOMBOX");
     case CUSTOM_TYPE::BOOMERANG:
-        return {to_id("ENT_TYPE_ITEM_BOOMERANG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BOOMERANG>("ENT_TYPE_ITEM_BOOMERANG");
     case CUSTOM_TYPE::BOULDER:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_BOULDER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BOULDER>("ENT_TYPE_ACTIVEFLOOR_BOULDER");
     case CUSTOM_TYPE::BOULDERSPAWNER:
-        return {to_id("ENT_TYPE_LOGICAL_BOULDERSPAWNER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BOULDERSPAWNER>("ENT_TYPE_LOGICAL_BOULDERSPAWNER");
     case CUSTOM_TYPE::BULLET:
-        return {to_id("ENT_TYPE_ITEM_BULLET")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BULLET>("ENT_TYPE_ITEM_BULLET");
     case CUSTOM_TYPE::BURNINGROPEEFFECT:
-        return {to_id("ENT_TYPE_LOGICAL_BURNING_ROPE_EFFECT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BURNINGROPEEFFECT>("ENT_TYPE_LOGICAL_BURNING_ROPE_EFFECT");
     case CUSTOM_TYPE::BUTTON:
-        return {to_id("ENT_TYPE_FX_BUTTON")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::BUTTON>("ENT_TYPE_FX_BUTTON");
     case CUSTOM_TYPE::CAMERAFLASH:
-        return {to_id("ENT_TYPE_LOGICAL_CAMERA_FLASH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CAMERAFLASH>("ENT_TYPE_LOGICAL_CAMERA_FLASH");
     case CUSTOM_TYPE::CAPE:
-        return {
-            to_id("ENT_TYPE_ITEM_CAPE"),
-            to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::CAPE>(
+            "ENT_TYPE_ITEM_CAPE",
+            "ENT_TYPE_ITEM_VLADS_CAPE");
     case CUSTOM_TYPE::CATMUMMY:
-        return {to_id("ENT_TYPE_MONS_CATMUMMY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CATMUMMY>("ENT_TYPE_MONS_CATMUMMY");
     case CUSTOM_TYPE::CAVEMAN:
-        return {to_id("ENT_TYPE_MONS_CAVEMAN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CAVEMAN>("ENT_TYPE_MONS_CAVEMAN");
     case CUSTOM_TYPE::CAVEMANSHOPKEEPER:
-        return {to_id("ENT_TYPE_MONS_CAVEMAN_SHOPKEEPER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CAVEMANSHOPKEEPER>("ENT_TYPE_MONS_CAVEMAN_SHOPKEEPER");
     case CUSTOM_TYPE::CHAIN:
-        return {
-            to_id("ENT_TYPE_ITEM_CHAIN"),
-            to_id("ENT_TYPE_ITEM_CHAIN_LASTPIECE"),
-            to_id("ENT_TYPE_ITEM_SLIDINGWALL_CHAIN"),
-            to_id("ENT_TYPE_ITEM_SLIDINGWALL_CHAIN_LASTPIECE"),
-            to_id("ENT_TYPE_ITEM_STICKYTRAP_PIECE"),
-            to_id("ENT_TYPE_ITEM_STICKYTRAP_LASTPIECE"),
-            to_id("ENT_TYPE_ITEM_TENTACLE"),
-            to_id("ENT_TYPE_ITEM_TENTACLE_PIECE"),
-            to_id("ENT_TYPE_ITEM_TENTACLE_LAST_PIECE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::CHAIN>(
+            "ENT_TYPE_ITEM_CHAIN",
+            "ENT_TYPE_ITEM_CHAIN_LASTPIECE",
+            "ENT_TYPE_ITEM_SLIDINGWALL_CHAIN",
+            "ENT_TYPE_ITEM_SLIDINGWALL_CHAIN_LASTPIECE",
+            "ENT_TYPE_ITEM_STICKYTRAP_PIECE",
+            "ENT_TYPE_ITEM_STICKYTRAP_LASTPIECE",
+            "ENT_TYPE_ITEM_TENTACLE",
+            "ENT_TYPE_ITEM_TENTACLE_PIECE",
+            "ENT_TYPE_ITEM_TENTACLE_LAST_PIECE");
     case CUSTOM_TYPE::CHAINEDPUSHBLOCK:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_CHAINEDPUSHBLOCK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CHAINEDPUSHBLOCK>("ENT_TYPE_ACTIVEFLOOR_CHAINEDPUSHBLOCK");
     case CUSTOM_TYPE::CHEST:
-        return {to_id("ENT_TYPE_ITEM_CHEST")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CHEST>("ENT_TYPE_ITEM_CHEST");
     case CUSTOM_TYPE::CINEMATICANCHOR:
-        return {to_id("ENT_TYPE_LOGICAL_CINEMATIC_ANCHOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CINEMATICANCHOR>("ENT_TYPE_LOGICAL_CINEMATIC_ANCHOR");
     case CUSTOM_TYPE::CITYOFGOLDDOOR:
-        return {to_id("ENT_TYPE_FLOOR_DOOR_COG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CITYOFGOLDDOOR>("ENT_TYPE_FLOOR_DOOR_COG");
     case CUSTOM_TYPE::CLAMBASE:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_GIANTCLAM_BASE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CLAMBASE>("ENT_TYPE_ACTIVEFLOOR_GIANTCLAM_BASE");
     case CUSTOM_TYPE::CLAW:
-        return {to_id("ENT_TYPE_ITEM_CRABMAN_CLAW")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CLAW>("ENT_TYPE_ITEM_CRABMAN_CLAW");
     case CUSTOM_TYPE::CLIMBABLEROPE:
-        return {
-            to_id("ENT_TYPE_ITEM_CLIMBABLE_ROPE"),
-            to_id("ENT_TYPE_ITEM_UNROLLED_ROPE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::CLIMBABLEROPE>(
+            "ENT_TYPE_ITEM_CLIMBABLE_ROPE",
+            "ENT_TYPE_ITEM_UNROLLED_ROPE");
     case CUSTOM_TYPE::CLONEGUNSHOT:
-        return {to_id("ENT_TYPE_ITEM_CLONEGUNSHOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CLONEGUNSHOT>("ENT_TYPE_ITEM_CLONEGUNSHOT");
     case CUSTOM_TYPE::COBRA:
-        return {to_id("ENT_TYPE_MONS_COBRA")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::COBRA>("ENT_TYPE_MONS_COBRA");
     case CUSTOM_TYPE::COFFIN:
-        return {
-            to_id("ENT_TYPE_ITEM_COFFIN"),
-            to_id("ENT_TYPE_ITEM_ANUBIS_COFFIN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::COFFIN>(
+            "ENT_TYPE_ITEM_COFFIN",
+            "ENT_TYPE_ITEM_ANUBIS_COFFIN");
     case CUSTOM_TYPE::COIN:
-        return {to_id("ENT_TYPE_ITEM_GOLDCOIN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::COIN>("ENT_TYPE_ITEM_GOLDCOIN");
     case CUSTOM_TYPE::CONTAINER:
-        return {
-            to_id("ENT_TYPE_ITEM_CRATE"),
-            to_id("ENT_TYPE_ITEM_DMCRATE"),
-            to_id("ENT_TYPE_ITEM_PRESENT"),
-            to_id("ENT_TYPE_ITEM_GHIST_PRESENT"),
-            to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::CONTAINER>(
+            "ENT_TYPE_ITEM_CRATE",
+            "ENT_TYPE_ITEM_DMCRATE",
+            "ENT_TYPE_ITEM_PRESENT",
+            "ENT_TYPE_ITEM_GHIST_PRESENT",
+            "ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE");
     case CUSTOM_TYPE::CONVEYORBELT:
-        return {
-            to_id("ENT_TYPE_FLOOR_CONVEYORBELT_LEFT"),
-            to_id("ENT_TYPE_FLOOR_CONVEYORBELT_RIGHT"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::CONVEYORBELT>(
+            "ENT_TYPE_FLOOR_CONVEYORBELT_LEFT",
+            "ENT_TYPE_FLOOR_CONVEYORBELT_RIGHT");
     case CUSTOM_TYPE::COOKFIRE:
-        return {to_id("ENT_TYPE_ITEM_COOKFIRE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::COOKFIRE>("ENT_TYPE_ITEM_COOKFIRE");
     case CUSTOM_TYPE::CRABMAN:
-        return {to_id("ENT_TYPE_MONS_CRABMAN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRABMAN>("ENT_TYPE_MONS_CRABMAN");
     case CUSTOM_TYPE::CRITTER:
-        return {
-            to_id("ENT_TYPE_MONS_CRITTERDUNGBEETLE"),
-            to_id("ENT_TYPE_MONS_CRITTERBUTTERFLY"),
-            to_id("ENT_TYPE_MONS_CRITTERSNAIL"),
-            to_id("ENT_TYPE_MONS_CRITTERFISH"),
-            to_id("ENT_TYPE_MONS_CRITTERANCHOVY"),
-            to_id("ENT_TYPE_MONS_CRITTERCRAB"),
-            to_id("ENT_TYPE_MONS_CRITTERLOCUST"),
-            to_id("ENT_TYPE_MONS_CRITTERPENGUIN"),
-            to_id("ENT_TYPE_MONS_CRITTERFIREFLY"),
-            to_id("ENT_TYPE_MONS_CRITTERDRONE"),
-            to_id("ENT_TYPE_MONS_CRITTERSLIME"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTER>(
+            "ENT_TYPE_MONS_CRITTERDUNGBEETLE",
+            "ENT_TYPE_MONS_CRITTERBUTTERFLY",
+            "ENT_TYPE_MONS_CRITTERSNAIL",
+            "ENT_TYPE_MONS_CRITTERFISH",
+            "ENT_TYPE_MONS_CRITTERANCHOVY",
+            "ENT_TYPE_MONS_CRITTERCRAB",
+            "ENT_TYPE_MONS_CRITTERLOCUST",
+            "ENT_TYPE_MONS_CRITTERPENGUIN",
+            "ENT_TYPE_MONS_CRITTERFIREFLY",
+            "ENT_TYPE_MONS_CRITTERDRONE",
+            "ENT_TYPE_MONS_CRITTERSLIME");
     case CUSTOM_TYPE::CRITTERBEETLE:
-        return {to_id("ENT_TYPE_MONS_CRITTERDUNGBEETLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERBEETLE>("ENT_TYPE_MONS_CRITTERDUNGBEETLE");
     case CUSTOM_TYPE::CRITTERBUTTERFLY:
-        return {to_id("ENT_TYPE_MONS_CRITTERBUTTERFLY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERBUTTERFLY>("ENT_TYPE_MONS_CRITTERBUTTERFLY");
     case CUSTOM_TYPE::CRITTERCRAB:
-        return {to_id("ENT_TYPE_MONS_CRITTERCRAB")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERCRAB>("ENT_TYPE_MONS_CRITTERCRAB");
     case CUSTOM_TYPE::CRITTERDRONE:
-        return {to_id("ENT_TYPE_MONS_CRITTERDRONE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERDRONE>("ENT_TYPE_MONS_CRITTERDRONE");
     case CUSTOM_TYPE::CRITTERFIREFLY:
-        return {to_id("ENT_TYPE_MONS_CRITTERFIREFLY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERFIREFLY>("ENT_TYPE_MONS_CRITTERFIREFLY");
     case CUSTOM_TYPE::CRITTERFISH:
-        return {to_id("ENT_TYPE_MONS_CRITTERFISH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERFISH>("ENT_TYPE_MONS_CRITTERFISH");
     case CUSTOM_TYPE::CRITTERLOCUST:
-        return {to_id("ENT_TYPE_MONS_CRITTERLOCUST")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERLOCUST>("ENT_TYPE_MONS_CRITTERLOCUST");
     case CUSTOM_TYPE::CRITTERPENGUIN:
-        return {to_id("ENT_TYPE_MONS_CRITTERPENGUIN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERPENGUIN>("ENT_TYPE_MONS_CRITTERPENGUIN");
     case CUSTOM_TYPE::CRITTERSLIME:
-        return {to_id("ENT_TYPE_MONS_CRITTERSLIME")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERSLIME>("ENT_TYPE_MONS_CRITTERSLIME");
     case CUSTOM_TYPE::CRITTERSNAIL:
-        return {to_id("ENT_TYPE_MONS_CRITTERSNAIL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRITTERSNAIL>("ENT_TYPE_MONS_CRITTERSNAIL");
     case CUSTOM_TYPE::CROCMAN:
-        return {to_id("ENT_TYPE_MONS_CROCMAN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CROCMAN>("ENT_TYPE_MONS_CROCMAN");
     case CUSTOM_TYPE::CROSSBEAM:
-        return {to_id("ENT_TYPE_DECORATION_CROSS_BEAM")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CROSSBEAM>("ENT_TYPE_DECORATION_CROSS_BEAM");
     case CUSTOM_TYPE::CRUSHTRAP:
-        return {
-            to_id("ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP"),
-            to_id("ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP_LARGE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::CRUSHTRAP>(
+            "ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP",
+            "ENT_TYPE_ACTIVEFLOOR_CRUSH_TRAP_LARGE");
     case CUSTOM_TYPE::CURSEDEFFECT:
-        return {to_id("ENT_TYPE_LOGICAL_CURSED_EFFECT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CURSEDEFFECT>("ENT_TYPE_LOGICAL_CURSED_EFFECT");
     case CUSTOM_TYPE::CURSEDPOT:
-        return {to_id("ENT_TYPE_ITEM_CURSEDPOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::CURSEDPOT>("ENT_TYPE_ITEM_CURSEDPOT");
     case CUSTOM_TYPE::DECORATEDDOOR:
-        return {
-            to_id("ENT_TYPE_FLOOR_DOOR_COG"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::DECORATEDDOOR>(
+            "ENT_TYPE_FLOOR_DOOR_COG",
+            "ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
     case CUSTOM_TYPE::DECOREGENERATINGBLOCK:
-        return {
-            to_id("ENT_TYPE_DECORATION_REGENERATING_SMALL_BLOCK"),
-            to_id("ENT_TYPE_DECORATION_REGENERATING_BORDER"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::DECOREGENERATINGBLOCK>(
+            "ENT_TYPE_DECORATION_REGENERATING_SMALL_BLOCK",
+            "ENT_TYPE_DECORATION_REGENERATING_BORDER");
     case CUSTOM_TYPE::DESTRUCTIBLEBG:
-        return {to_id("ENT_TYPE_DECORATION_DUAT_DESTRUCTIBLE_BG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::DESTRUCTIBLEBG>("ENT_TYPE_DECORATION_DUAT_DESTRUCTIBLE_BG");
     case CUSTOM_TYPE::DMALIENBLAST:
-        return {to_id("ENT_TYPE_LOGICAL_DM_ALIEN_BLAST")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::DMALIENBLAST>("ENT_TYPE_LOGICAL_DM_ALIEN_BLAST");
     case CUSTOM_TYPE::DMSPAWNING:
-        return {
-            to_id("ENT_TYPE_LOGICAL_DM_CRATE_SPAWNING"),
-            to_id("ENT_TYPE_LOGICAL_DM_IDOL_SPAWNING"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::DMSPAWNING>(
+            "ENT_TYPE_LOGICAL_DM_CRATE_SPAWNING",
+            "ENT_TYPE_LOGICAL_DM_IDOL_SPAWNING");
     case CUSTOM_TYPE::DOOR:
-        return {
-            to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EXIT"),
-            to_id("ENT_TYPE_FLOOR_DOOR_MAIN_EXIT"),
-            to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT"),
-            to_id("ENT_TYPE_FLOOR_DOOR_LAYER"),
-            to_id("ENT_TYPE_FLOOR_DOOR_LAYER_DROP_HELD"),
-            to_id("ENT_TYPE_FLOOR_DOOR_GHISTSHOP"),
-            to_id("ENT_TYPE_FLOOR_DOOR_LOCKED"),
-            to_id("ENT_TYPE_FLOOR_DOOR_LOCKED_PEN"),
-            to_id("ENT_TYPE_FLOOR_DOOR_COG"),
-            to_id("ENT_TYPE_FLOOR_DOOR_MOAI_STATUE"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP_ATREZZO"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP_ROOM"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::DOOR>(
+            "ENT_TYPE_FLOOR_DOOR_ENTRANCE",
+            "ENT_TYPE_FLOOR_DOOR_EXIT",
+            "ENT_TYPE_FLOOR_DOOR_MAIN_EXIT",
+            "ENT_TYPE_FLOOR_DOOR_STARTING_EXIT",
+            "ENT_TYPE_FLOOR_DOOR_LAYER",
+            "ENT_TYPE_FLOOR_DOOR_LAYER_DROP_HELD",
+            "ENT_TYPE_FLOOR_DOOR_GHISTSHOP",
+            "ENT_TYPE_FLOOR_DOOR_LOCKED",
+            "ENT_TYPE_FLOOR_DOOR_LOCKED_PEN",
+            "ENT_TYPE_FLOOR_DOOR_COG",
+            "ENT_TYPE_FLOOR_DOOR_MOAI_STATUE",
+            "ENT_TYPE_FLOOR_DOOR_EGGSHIP",
+            "ENT_TYPE_FLOOR_DOOR_EGGSHIP_ATREZZO",
+            "ENT_TYPE_FLOOR_DOOR_EGGSHIP_ROOM",
+            "ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
     case CUSTOM_TYPE::DRILL:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_DRILL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::DRILL>("ENT_TYPE_ACTIVEFLOOR_DRILL");
     case CUSTOM_TYPE::DUSTWALLAPEP:
-        return {to_id("ENT_TYPE_LOGICAL_DUSTWALL_APEP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::DUSTWALLAPEP>("ENT_TYPE_LOGICAL_DUSTWALL_APEP");
     case CUSTOM_TYPE::EGGPLANTMINISTER:
-        return {to_id("ENT_TYPE_MONS_EGGPLANT_MINISTER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::EGGPLANTMINISTER>("ENT_TYPE_MONS_EGGPLANT_MINISTER");
     case CUSTOM_TYPE::EGGPLANTTHROWER:
-        return {to_id("ENT_TYPE_LOGICAL_EGGPLANT_THROWER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::EGGPLANTTHROWER>("ENT_TYPE_LOGICAL_EGGPLANT_THROWER");
     case CUSTOM_TYPE::EGGSAC:
-        return {to_id("ENT_TYPE_ITEM_EGGSAC")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::EGGSAC>("ENT_TYPE_ITEM_EGGSAC");
     case CUSTOM_TYPE::EGGSHIPCENTERJETFLAME:
-        return {to_id("ENT_TYPE_FX_EGGSHIP_CENTERJETFLAME")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::EGGSHIPCENTERJETFLAME>("ENT_TYPE_FX_EGGSHIP_CENTERJETFLAME");
     case CUSTOM_TYPE::EGGSHIPDOOR:
-        return {
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP_ATREZZO"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP_ROOM"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::EGGSHIPDOOR>(
+            "ENT_TYPE_FLOOR_DOOR_EGGSHIP",
+            "ENT_TYPE_FLOOR_DOOR_EGGSHIP_ATREZZO",
+            "ENT_TYPE_FLOOR_DOOR_EGGSHIP_ROOM");
     case CUSTOM_TYPE::EGGSHIPDOORS:
-        return {to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::EGGSHIPDOORS>("ENT_TYPE_FLOOR_DOOR_EGGSHIP");
     case CUSTOM_TYPE::ELEVATOR:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_ELEVATOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ELEVATOR>("ENT_TYPE_ACTIVEFLOOR_ELEVATOR");
     case CUSTOM_TYPE::EMPRESSGRAVE:
-        return {to_id("ENT_TYPE_ITEM_EMPRESS_GRAVE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::EMPRESSGRAVE>("ENT_TYPE_ITEM_EMPRESS_GRAVE");
     case CUSTOM_TYPE::ENTITY:
-        return {0};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ENTITY>();
     case CUSTOM_TYPE::EXCALIBUR:
-        return {to_id("ENT_TYPE_ITEM_EXCALIBUR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::EXCALIBUR>("ENT_TYPE_ITEM_EXCALIBUR");
     case CUSTOM_TYPE::EXITDOOR:
-        return {
-            to_id("ENT_TYPE_FLOOR_DOOR_EXIT"),
-            to_id("ENT_TYPE_FLOOR_DOOR_MAIN_EXIT"),
-            to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT"),
-            to_id("ENT_TYPE_FLOOR_DOOR_COG"),
-            to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::EXITDOOR>(
+            "ENT_TYPE_FLOOR_DOOR_EXIT",
+            "ENT_TYPE_FLOOR_DOOR_MAIN_EXIT",
+            "ENT_TYPE_FLOOR_DOOR_STARTING_EXIT",
+            "ENT_TYPE_FLOOR_DOOR_COG",
+            "ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
     case CUSTOM_TYPE::EXPLOSION:
-        return {
-            to_id("ENT_TYPE_FX_EXPLOSION"),
-            to_id("ENT_TYPE_FX_POWEREDEXPLOSION"),
-            to_id("ENT_TYPE_FX_MODERNEXPLOSION"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::EXPLOSION>(
+            "ENT_TYPE_FX_EXPLOSION",
+            "ENT_TYPE_FX_POWEREDEXPLOSION",
+            "ENT_TYPE_FX_MODERNEXPLOSION");
     case CUSTOM_TYPE::FALLINGPLATFORM:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_FALLING_PLATFORM")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FALLINGPLATFORM>("ENT_TYPE_ACTIVEFLOOR_FALLING_PLATFORM");
     case CUSTOM_TYPE::FIREBALL:
-        return {
-            to_id("ENT_TYPE_ITEM_FIREBALL"),
-            to_id("ENT_TYPE_ITEM_HUNDUN_FIREBALL"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FIREBALL>(
+            "ENT_TYPE_ITEM_FIREBALL",
+            "ENT_TYPE_ITEM_HUNDUN_FIREBALL");
     case CUSTOM_TYPE::FIREBUG:
-        return {to_id("ENT_TYPE_MONS_FIREBUG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FIREBUG>("ENT_TYPE_MONS_FIREBUG");
     case CUSTOM_TYPE::FIREBUGUNCHAINED:
-        return {to_id("ENT_TYPE_MONS_FIREBUG_UNCHAINED")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FIREBUGUNCHAINED>("ENT_TYPE_MONS_FIREBUG_UNCHAINED");
     case CUSTOM_TYPE::FIREFROG:
-        return {to_id("ENT_TYPE_MONS_FIREFROG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FIREFROG>("ENT_TYPE_MONS_FIREFROG");
     case CUSTOM_TYPE::FISH:
-        return {to_id("ENT_TYPE_MONS_FISH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FISH>("ENT_TYPE_MONS_FISH");
     case CUSTOM_TYPE::FLAME:
-        return {
-            to_id("ENT_TYPE_ITEM_WHIP_FLAME"),
-            to_id("ENT_TYPE_ITEM_SPARK"),
-            to_id("ENT_TYPE_ITEM_FLAMETHROWER_FIREBALL"),
-            to_id("ENT_TYPE_ITEM_WALLTORCHFLAME"),
-            to_id("ENT_TYPE_ITEM_TORCHFLAME"),
-            to_id("ENT_TYPE_ITEM_LAMPFLAME"),
-            to_id("ENT_TYPE_FX_SMALLFLAME"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FLAME>(
+            "ENT_TYPE_ITEM_WHIP_FLAME",
+            "ENT_TYPE_ITEM_SPARK",
+            "ENT_TYPE_ITEM_FLAMETHROWER_FIREBALL",
+            "ENT_TYPE_ITEM_WALLTORCHFLAME",
+            "ENT_TYPE_ITEM_TORCHFLAME",
+            "ENT_TYPE_ITEM_LAMPFLAME",
+            "ENT_TYPE_FX_SMALLFLAME");
     case CUSTOM_TYPE::FLAMESIZE:
-        return {
-            to_id("ENT_TYPE_ITEM_WHIP_FLAME"),
-            to_id("ENT_TYPE_ITEM_WALLTORCHFLAME"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FLAMESIZE>(
+            "ENT_TYPE_ITEM_WHIP_FLAME",
+            "ENT_TYPE_ITEM_WALLTORCHFLAME");
     case CUSTOM_TYPE::FLOOR:
     {
-        static std::vector<ENT_TYPE> result;
-        if (result.empty())
+        const static std::vector<ENT_TYPE> types = []()
         {
             auto idx = to_id("ENT_TYPE_FLOOR_BORDERTILE");
             const auto end = to_id("ENT_TYPE_FLOORSTYLED_GUTS") + 1;
+
+            std::vector<ENT_TYPE> result;
             result.reserve(end - idx + 2);
             for (; idx < end; idx++)
                 result.push_back(idx);
 
             result.push_back(to_id("ENT_TYPE_EMBED_GOLD"));
             result.push_back(to_id("ENT_TYPE_EMBED_GOLD_BIG"));
-        }
-        return result;
+
+            return result;
+        }();
+        return {types.begin(), types.end()};
     }
     case CUSTOM_TYPE::FLY:
-        return {to_id("ENT_TYPE_ITEM_FLY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FLY>("ENT_TYPE_ITEM_FLY");
     case CUSTOM_TYPE::FLYHEAD:
-        return {to_id("ENT_TYPE_ITEM_GIANTFLY_HEAD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FLYHEAD>("ENT_TYPE_ITEM_GIANTFLY_HEAD");
     case CUSTOM_TYPE::FORCEFIELD:
-        return {
-            to_id("ENT_TYPE_FLOOR_FORCEFIELD"),
-            to_id("ENT_TYPE_FLOOR_DICE_FORCEFIELD"),
-            to_id("ENT_TYPE_FLOOR_CHALLENGE_ENTRANCE"),
-            to_id("ENT_TYPE_FLOOR_CHALLENGE_WAITROOM"),
-            to_id("ENT_TYPE_FLOOR_TIMED_FORCEFIELD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FORCEFIELD>(
+            "ENT_TYPE_FLOOR_FORCEFIELD",
+            "ENT_TYPE_FLOOR_DICE_FORCEFIELD",
+            "ENT_TYPE_FLOOR_CHALLENGE_ENTRANCE",
+            "ENT_TYPE_FLOOR_CHALLENGE_WAITROOM",
+            "ENT_TYPE_FLOOR_TIMED_FORCEFIELD");
     case CUSTOM_TYPE::FORESTSISTER:
-        return {
-            to_id("ENT_TYPE_MONS_SISTER_PARSLEY"),
-            to_id("ENT_TYPE_MONS_SISTER_PARSNIP"),
-            to_id("ENT_TYPE_MONS_SISTER_PARMESAN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FORESTSISTER>(
+            "ENT_TYPE_MONS_SISTER_PARSLEY",
+            "ENT_TYPE_MONS_SISTER_PARSNIP",
+            "ENT_TYPE_MONS_SISTER_PARMESAN");
     case CUSTOM_TYPE::FROG:
-        return {
-            to_id("ENT_TYPE_MONS_FROG"),
-            to_id("ENT_TYPE_MONS_FIREFROG"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FROG>(
+            "ENT_TYPE_MONS_FROG",
+            "ENT_TYPE_MONS_FIREFROG");
     case CUSTOM_TYPE::FROSTBREATHEFFECT:
-        return {to_id("ENT_TYPE_LOGICAL_FROST_BREATH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FROSTBREATHEFFECT>("ENT_TYPE_LOGICAL_FROST_BREATH");
     case CUSTOM_TYPE::FROZENLIQUID:
-        return {to_id("ENT_TYPE_ITEM_FROZEN_LIQUID")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FROZENLIQUID>("ENT_TYPE_ITEM_FROZEN_LIQUID");
     case CUSTOM_TYPE::FXALIENBLAST:
-        return {
-            to_id("ENT_TYPE_FX_ALIENBLAST_RETICULE_INTERNAL"),
-            to_id("ENT_TYPE_FX_ALIENBLAST_RETICULE_EXTERNAL"),
-            to_id("ENT_TYPE_FX_ALIENBLAST"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXALIENBLAST>(
+            "ENT_TYPE_FX_ALIENBLAST_RETICULE_INTERNAL",
+            "ENT_TYPE_FX_ALIENBLAST_RETICULE_EXTERNAL",
+            "ENT_TYPE_FX_ALIENBLAST");
     case CUSTOM_TYPE::FXANKHBROKENPIECE:
-        return {to_id("ENT_TYPE_FX_ANKH_BROKENPIECE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXANKHBROKENPIECE>("ENT_TYPE_FX_ANKH_BROKENPIECE");
     case CUSTOM_TYPE::FXANKHROTATINGSPARK:
-        return {to_id("ENT_TYPE_FX_ANKH_ROTATINGSPARK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXANKHROTATINGSPARK>("ENT_TYPE_FX_ANKH_ROTATINGSPARK");
     case CUSTOM_TYPE::FXCOMPASS:
-        return {
-            to_id("ENT_TYPE_FX_COMPASS"),
-            to_id("ENT_TYPE_FX_SPECIALCOMPASS"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXCOMPASS>(
+            "ENT_TYPE_FX_COMPASS",
+            "ENT_TYPE_FX_SPECIALCOMPASS");
     case CUSTOM_TYPE::FXEMPRESS:
-        return {to_id("ENT_TYPE_FX_EMPRESS")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXEMPRESS>("ENT_TYPE_FX_EMPRESS");
     case CUSTOM_TYPE::FXFIREFLYLIGHT:
-        return {to_id("ENT_TYPE_FX_CRITTERFIREFLY_LIGHT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXFIREFLYLIGHT>("ENT_TYPE_FX_CRITTERFIREFLY_LIGHT");
     case CUSTOM_TYPE::FXHUNDUNNECKPIECE:
-        return {to_id("ENT_TYPE_FX_HUNDUN_NECK_PIECE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXHUNDUNNECKPIECE>("ENT_TYPE_FX_HUNDUN_NECK_PIECE");
     case CUSTOM_TYPE::FXJELLYFISHSTAR:
-        return {to_id("ENT_TYPE_FX_MEGAJELLYFISH_STAR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXJELLYFISHSTAR>("ENT_TYPE_FX_MEGAJELLYFISH_STAR");
     case CUSTOM_TYPE::FXJETPACKFLAME:
-        return {to_id("ENT_TYPE_FX_JETPACKFLAME")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXJETPACKFLAME>("ENT_TYPE_FX_JETPACKFLAME");
     case CUSTOM_TYPE::FXKINGUSLIDING:
-        return {to_id("ENT_TYPE_FX_KINGU_SLIDING")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXKINGUSLIDING>("ENT_TYPE_FX_KINGU_SLIDING");
     case CUSTOM_TYPE::FXLAMASSUATTACK:
-        return {to_id("ENT_TYPE_FX_LAMASSU_ATTACK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXLAMASSUATTACK>("ENT_TYPE_FX_LAMASSU_ATTACK");
     case CUSTOM_TYPE::FXMAINEXITDOOR:
-        return {to_id("ENT_TYPE_FX_MAIN_EXIT_DOOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXMAINEXITDOOR>("ENT_TYPE_FX_MAIN_EXIT_DOOR");
     case CUSTOM_TYPE::FXNECROMANCERANKH:
-        return {to_id("ENT_TYPE_FX_NECROMANCER_ANKH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXNECROMANCERANKH>("ENT_TYPE_FX_NECROMANCER_ANKH");
     case CUSTOM_TYPE::FXOUROBORODRAGONPART:
-        return {
-            to_id("ENT_TYPE_FX_OUROBORO_HEAD"),
-            to_id("ENT_TYPE_FX_OUROBORO_TAIL"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXOUROBORODRAGONPART>(
+            "ENT_TYPE_FX_OUROBORO_HEAD",
+            "ENT_TYPE_FX_OUROBORO_TAIL");
     case CUSTOM_TYPE::FXOUROBOROOCCLUDER:
-        return {to_id("ENT_TYPE_FX_OUROBORO_OCCLUDER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXOUROBOROOCCLUDER>("ENT_TYPE_FX_OUROBORO_OCCLUDER");
     case CUSTOM_TYPE::FXPICKUPEFFECT:
-        return {to_id("ENT_TYPE_FX_PICKUPEFFECT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXPICKUPEFFECT>("ENT_TYPE_FX_PICKUPEFFECT");
     case CUSTOM_TYPE::FXPLAYERINDICATOR:
-        return {to_id("ENT_TYPE_FX_PLAYERINDICATOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXPLAYERINDICATOR>("ENT_TYPE_FX_PLAYERINDICATOR");
     case CUSTOM_TYPE::FXQUICKSAND:
-        return {
-            to_id("ENT_TYPE_FX_QUICKSAND_DUST"),
-            to_id("ENT_TYPE_FX_QUICKSAND_RUBBLE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXQUICKSAND>(
+            "ENT_TYPE_FX_QUICKSAND_DUST",
+            "ENT_TYPE_FX_QUICKSAND_RUBBLE");
     case CUSTOM_TYPE::FXSALECONTAINER:
-        return {to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXSALECONTAINER>("ENT_TYPE_FX_SALEDIALOG_CONTAINER");
     case CUSTOM_TYPE::FXSHOTGUNBLAST:
-        return {to_id("ENT_TYPE_FX_SHOTGUNBLAST")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXSHOTGUNBLAST>("ENT_TYPE_FX_SHOTGUNBLAST");
     case CUSTOM_TYPE::FXSORCERESSATTACK:
-        return {to_id("ENT_TYPE_FX_SORCERESS_ATTACK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXSORCERESSATTACK>("ENT_TYPE_FX_SORCERESS_ATTACK");
     case CUSTOM_TYPE::FXSPARKSMALL:
-        return {to_id("ENT_TYPE_FX_SPARK_SMALL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXSPARKSMALL>("ENT_TYPE_FX_SPARK_SMALL");
     case CUSTOM_TYPE::FXSPRINGTRAPRING:
-        return {to_id("ENT_TYPE_FX_SPRINGTRAP_RING")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXSPRINGTRAPRING>("ENT_TYPE_FX_SPRINGTRAP_RING");
     case CUSTOM_TYPE::FXTIAMATHEAD:
-        return {to_id("ENT_TYPE_FX_TIAMAT_HEAD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXTIAMATHEAD>("ENT_TYPE_FX_TIAMAT_HEAD");
     case CUSTOM_TYPE::FXTIAMATTAIL:
-        return {
-            to_id("ENT_TYPE_FX_TIAMAT_TAIL"),
-            to_id("ENT_TYPE_FX_TIAMAT_TAIL_DECO1"),
-            to_id("ENT_TYPE_FX_TIAMAT_TAIL_DECO2"),
-            to_id("ENT_TYPE_FX_TIAMAT_TAIL_DECO3"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXTIAMATTAIL>(
+            "ENT_TYPE_FX_TIAMAT_TAIL",
+            "ENT_TYPE_FX_TIAMAT_TAIL_DECO1",
+            "ENT_TYPE_FX_TIAMAT_TAIL_DECO2",
+            "ENT_TYPE_FX_TIAMAT_TAIL_DECO3");
     case CUSTOM_TYPE::FXTIAMATTORSO:
-        return {to_id("ENT_TYPE_FX_TIAMAT_TORSO")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXTIAMATTORSO>("ENT_TYPE_FX_TIAMAT_TORSO");
     case CUSTOM_TYPE::FXTORNJOURNALPAGE:
-        return {to_id("ENT_TYPE_FX_TORNJOURNALPAGE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXTORNJOURNALPAGE>("ENT_TYPE_FX_TORNJOURNALPAGE");
     case CUSTOM_TYPE::FXUNDERWATERBUBBLE:
-        return {to_id("ENT_TYPE_FX_UNDERWATER_BUBBLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXUNDERWATERBUBBLE>("ENT_TYPE_FX_UNDERWATER_BUBBLE");
     case CUSTOM_TYPE::FXVATBUBBLE:
-        return {to_id("ENT_TYPE_FX_VAT_BUBBLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXVATBUBBLE>("ENT_TYPE_FX_VAT_BUBBLE");
     case CUSTOM_TYPE::FXWATERDROP:
-        return {to_id("ENT_TYPE_FX_WATER_DROP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXWATERDROP>("ENT_TYPE_FX_WATER_DROP");
     case CUSTOM_TYPE::FXWEBBEDEFFECT:
-        return {to_id("ENT_TYPE_FX_WEBBEDEFFECT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXWEBBEDEFFECT>("ENT_TYPE_FX_WEBBEDEFFECT");
     case CUSTOM_TYPE::FXWITCHDOCTORHINT:
-        return {to_id("ENT_TYPE_FX_WITCHDOCTOR_HINT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::FXWITCHDOCTORHINT>("ENT_TYPE_FX_WITCHDOCTOR_HINT");
     case CUSTOM_TYPE::GENERATOR:
-        return {
-            to_id("ENT_TYPE_FLOOR_FACTORY_GENERATOR"),
-            to_id("ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR"),
-            to_id("ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::GENERATOR>(
+            "ENT_TYPE_FLOOR_FACTORY_GENERATOR",
+            "ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR",
+            "ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR");
     case CUSTOM_TYPE::GHIST:
-        return {
-            to_id("ENT_TYPE_MONS_GHIST"),
-            to_id("ENT_TYPE_MONS_GHIST_SHOPKEEPER"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::GHIST>(
+            "ENT_TYPE_MONS_GHIST",
+            "ENT_TYPE_MONS_GHIST_SHOPKEEPER");
     case CUSTOM_TYPE::GHOST:
-        return {
-            to_id("ENT_TYPE_MONS_GHOST"),
-            to_id("ENT_TYPE_MONS_GHOST_MEDIUM_SAD"),
-            to_id("ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY"),
-            to_id("ENT_TYPE_MONS_GHOST_SMALL_ANGRY"),
-            to_id("ENT_TYPE_MONS_GHOST_SMALL_SAD"),
-            to_id("ENT_TYPE_MONS_GHOST_SMALL_SURPRISED"),
-            to_id("ENT_TYPE_MONS_GHOST_SMALL_HAPPY"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::GHOST>(
+            "ENT_TYPE_MONS_GHOST",
+            "ENT_TYPE_MONS_GHOST_MEDIUM_SAD",
+            "ENT_TYPE_MONS_GHOST_MEDIUM_HAPPY",
+            "ENT_TYPE_MONS_GHOST_SMALL_ANGRY",
+            "ENT_TYPE_MONS_GHOST_SMALL_SAD",
+            "ENT_TYPE_MONS_GHOST_SMALL_SURPRISED",
+            "ENT_TYPE_MONS_GHOST_SMALL_HAPPY");
     case CUSTOM_TYPE::GHOSTBREATH:
-        return {to_id("ENT_TYPE_ITEM_PLAYERGHOST_BREATH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::GHOSTBREATH>("ENT_TYPE_ITEM_PLAYERGHOST_BREATH");
     case CUSTOM_TYPE::GIANTCLAMTOP:
-        return {to_id("ENT_TYPE_ITEM_GIANTCLAM_TOP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::GIANTCLAMTOP>("ENT_TYPE_ITEM_GIANTCLAM_TOP");
     case CUSTOM_TYPE::GIANTFISH:
-        return {to_id("ENT_TYPE_MONS_GIANTFISH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::GIANTFISH>("ENT_TYPE_MONS_GIANTFISH");
     case CUSTOM_TYPE::GIANTFLY:
-        return {to_id("ENT_TYPE_MONS_GIANTFLY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::GIANTFLY>("ENT_TYPE_MONS_GIANTFLY");
     case CUSTOM_TYPE::GIANTFROG:
-        return {to_id("ENT_TYPE_MONS_GIANTFROG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::GIANTFROG>("ENT_TYPE_MONS_GIANTFROG");
     case CUSTOM_TYPE::GOLDBAR:
-        return {
-            to_id("ENT_TYPE_ITEM_GOLDBAR"),
-            to_id("ENT_TYPE_ITEM_GOLDBARS"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::GOLDBAR>(
+            "ENT_TYPE_ITEM_GOLDBAR",
+            "ENT_TYPE_ITEM_GOLDBARS");
     case CUSTOM_TYPE::GOLDMONKEY:
-        return {to_id("ENT_TYPE_MONS_GOLDMONKEY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::GOLDMONKEY>("ENT_TYPE_MONS_GOLDMONKEY");
     case CUSTOM_TYPE::GRUB:
-        return {to_id("ENT_TYPE_MONS_GRUB")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::GRUB>("ENT_TYPE_MONS_GRUB");
     case CUSTOM_TYPE::GUN:
-        return {
-            to_id("ENT_TYPE_ITEM_WEBGUN"),
-            to_id("ENT_TYPE_ITEM_SHOTGUN"),
-            to_id("ENT_TYPE_ITEM_FREEZERAY"),
-            to_id("ENT_TYPE_ITEM_CAMERA"),
-            to_id("ENT_TYPE_ITEM_PLASMACANNON"),
-            to_id("ENT_TYPE_ITEM_SCEPTER"),
-            to_id("ENT_TYPE_ITEM_CLONEGUN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::GUN>(
+            "ENT_TYPE_ITEM_WEBGUN",
+            "ENT_TYPE_ITEM_SHOTGUN",
+            "ENT_TYPE_ITEM_FREEZERAY",
+            "ENT_TYPE_ITEM_CAMERA",
+            "ENT_TYPE_ITEM_PLASMACANNON",
+            "ENT_TYPE_ITEM_SCEPTER",
+            "ENT_TYPE_ITEM_CLONEGUN");
     case CUSTOM_TYPE::HANGANCHOR:
-        return {to_id("ENT_TYPE_ITEM_HANGANCHOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HANGANCHOR>("ENT_TYPE_ITEM_HANGANCHOR");
     case CUSTOM_TYPE::HANGSPIDER:
-        return {to_id("ENT_TYPE_MONS_HANGSPIDER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HANGSPIDER>("ENT_TYPE_MONS_HANGSPIDER");
     case CUSTOM_TYPE::HANGSTRAND:
-        return {to_id("ENT_TYPE_ITEM_HANGSTRAND")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HANGSTRAND>("ENT_TYPE_ITEM_HANGSTRAND");
     case CUSTOM_TYPE::HERMITCRAB:
-        return {to_id("ENT_TYPE_MONS_HERMITCRAB")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HERMITCRAB>("ENT_TYPE_MONS_HERMITCRAB");
     case CUSTOM_TYPE::HONEY:
-        return {to_id("ENT_TYPE_ITEM_HONEY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HONEY>("ENT_TYPE_ITEM_HONEY");
     case CUSTOM_TYPE::HORIZONTALFORCEFIELD:
-        return {to_id("ENT_TYPE_FLOOR_HORIZONTAL_FORCEFIELD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HORIZONTALFORCEFIELD>("ENT_TYPE_FLOOR_HORIZONTAL_FORCEFIELD");
     case CUSTOM_TYPE::HORNEDLIZARD:
-        return {to_id("ENT_TYPE_MONS_HORNEDLIZARD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HORNEDLIZARD>("ENT_TYPE_MONS_HORNEDLIZARD");
     case CUSTOM_TYPE::HOVERPACK:
-        return {to_id("ENT_TYPE_ITEM_HOVERPACK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HOVERPACK>("ENT_TYPE_ITEM_HOVERPACK");
     case CUSTOM_TYPE::HUNDUN:
-        return {to_id("ENT_TYPE_MONS_HUNDUN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HUNDUN>("ENT_TYPE_MONS_HUNDUN");
     case CUSTOM_TYPE::HUNDUNCHEST:
-        return {to_id("ENT_TYPE_ITEM_ENDINGTREASURE_HUNDUN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::HUNDUNCHEST>("ENT_TYPE_ITEM_ENDINGTREASURE_HUNDUN");
     case CUSTOM_TYPE::HUNDUNHEAD:
-        return {
-            to_id("ENT_TYPE_MONS_HUNDUN_BIRDHEAD"),
-            to_id("ENT_TYPE_MONS_HUNDUN_SNAKEHEAD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::HUNDUNHEAD>(
+            "ENT_TYPE_MONS_HUNDUN_BIRDHEAD",
+            "ENT_TYPE_MONS_HUNDUN_SNAKEHEAD");
     case CUSTOM_TYPE::ICESLIDINGSOUND:
-        return {to_id("ENT_TYPE_LOGICAL_ICESLIDING_SOUND_SOURCE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ICESLIDINGSOUND>("ENT_TYPE_LOGICAL_ICESLIDING_SOUND_SOURCE");
     case CUSTOM_TYPE::IDOL:
-        return {
-            to_id("ENT_TYPE_ITEM_IDOL"),
-            to_id("ENT_TYPE_ITEM_MADAMETUSK_IDOL"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::IDOL>(
+            "ENT_TYPE_ITEM_IDOL",
+            "ENT_TYPE_ITEM_MADAMETUSK_IDOL");
     case CUSTOM_TYPE::IMP:
-        return {to_id("ENT_TYPE_MONS_IMP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::IMP>("ENT_TYPE_MONS_IMP");
     case CUSTOM_TYPE::JETPACK:
-        return {
-            to_id("ENT_TYPE_ITEM_JETPACK"),
-            to_id("ENT_TYPE_ITEM_JETPACK_MECH"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::JETPACK>(
+            "ENT_TYPE_ITEM_JETPACK",
+            "ENT_TYPE_ITEM_JETPACK_MECH");
     case CUSTOM_TYPE::JIANGSHI:
-        return {
-            to_id("ENT_TYPE_MONS_JIANGSHI"),
-            to_id("ENT_TYPE_MONS_FEMALE_JIANGSHI"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::JIANGSHI>(
+            "ENT_TYPE_MONS_JIANGSHI",
+            "ENT_TYPE_MONS_FEMALE_JIANGSHI");
     case CUSTOM_TYPE::JUMPDOG:
-        return {to_id("ENT_TYPE_MONS_JUMPDOG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::JUMPDOG>("ENT_TYPE_MONS_JUMPDOG");
     case CUSTOM_TYPE::JUNGLESPEARCOSMETIC:
-        return {to_id("ENT_TYPE_ITEM_JUNGLE_SPEAR_COSMETIC")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::JUNGLESPEARCOSMETIC>("ENT_TYPE_ITEM_JUNGLE_SPEAR_COSMETIC");
     case CUSTOM_TYPE::JUNGLETRAPTRIGGER:
-        return {to_id("ENT_TYPE_LOGICAL_JUNGLESPEAR_TRAP_TRIGGER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::JUNGLETRAPTRIGGER>("ENT_TYPE_LOGICAL_JUNGLESPEAR_TRAP_TRIGGER");
     case CUSTOM_TYPE::KAPALAPOWERUP:
-        return {to_id("ENT_TYPE_ITEM_POWERUP_KAPALA")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::KAPALAPOWERUP>("ENT_TYPE_ITEM_POWERUP_KAPALA");
     case CUSTOM_TYPE::KINGU:
-        return {to_id("ENT_TYPE_MONS_KINGU")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::KINGU>("ENT_TYPE_MONS_KINGU");
     case CUSTOM_TYPE::LAHAMU:
-        return {to_id("ENT_TYPE_MONS_ALIENQUEEN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LAHAMU>("ENT_TYPE_MONS_ALIENQUEEN");
     case CUSTOM_TYPE::LAMASSU:
-        return {to_id("ENT_TYPE_MONS_LAMASSU")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LAMASSU>("ENT_TYPE_MONS_LAMASSU");
     case CUSTOM_TYPE::LAMPFLAME:
-        return {to_id("ENT_TYPE_ITEM_LAMPFLAME")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LAMPFLAME>("ENT_TYPE_ITEM_LAMPFLAME");
     case CUSTOM_TYPE::LANDMINE:
-        return {to_id("ENT_TYPE_ITEM_LANDMINE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LANDMINE>("ENT_TYPE_ITEM_LANDMINE");
     case CUSTOM_TYPE::LASERBEAM:
-        return {
-            to_id("ENT_TYPE_ITEM_LASERBEAM"),
-            to_id("ENT_TYPE_ITEM_HORIZONTALLASERBEAM"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LASERBEAM>(
+            "ENT_TYPE_ITEM_LASERBEAM",
+            "ENT_TYPE_ITEM_HORIZONTALLASERBEAM");
     case CUSTOM_TYPE::LASERTRAP:
-        return {to_id("ENT_TYPE_FLOOR_LASER_TRAP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LASERTRAP>("ENT_TYPE_FLOOR_LASER_TRAP");
     case CUSTOM_TYPE::LAVA:
-        return {
-            to_id("ENT_TYPE_LIQUID_LAVA"),
-            to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"),
-            to_id("ENT_TYPE_LIQUID_COARSE_LAVA"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LAVA>(
+            "ENT_TYPE_LIQUID_LAVA",
+            "ENT_TYPE_LIQUID_STAGNANT_LAVA",
+            "ENT_TYPE_LIQUID_COARSE_LAVA");
     case CUSTOM_TYPE::LAVAMANDER:
-        return {to_id("ENT_TYPE_MONS_LAVAMANDER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LAVAMANDER>("ENT_TYPE_MONS_LAVAMANDER");
     case CUSTOM_TYPE::LEAF:
-        return {to_id("ENT_TYPE_ITEM_LEAF")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LEAF>("ENT_TYPE_ITEM_LEAF");
     case CUSTOM_TYPE::LEPRECHAUN:
-        return {to_id("ENT_TYPE_MONS_LEPRECHAUN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LEPRECHAUN>("ENT_TYPE_MONS_LEPRECHAUN");
     case CUSTOM_TYPE::LIGHTARROW:
-        return {to_id("ENT_TYPE_ITEM_LIGHT_ARROW")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LIGHTARROW>("ENT_TYPE_ITEM_LIGHT_ARROW");
     case CUSTOM_TYPE::LIGHTARROWPLATFORM:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_LIGHTARROWPLATFORM")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LIGHTARROWPLATFORM>("ENT_TYPE_ACTIVEFLOOR_LIGHTARROWPLATFORM");
     case CUSTOM_TYPE::LIGHTEMITTER:
-        return {
-            to_id("ENT_TYPE_ITEM_SCEPTER_ANUBISSHOT"),
-            to_id("ENT_TYPE_ITEM_SCEPTER_ANUBISSPECIALSHOT"),
-            to_id("ENT_TYPE_ITEM_SCEPTER_PLAYERSHOT"),
-            to_id("ENT_TYPE_ITEM_TIAMAT_SHOT"),
-            to_id("ENT_TYPE_ITEM_REDLANTERNFLAME"),
-            to_id("ENT_TYPE_ITEM_LANDMINE"),
-            to_id("ENT_TYPE_ITEM_PLAYERGHOST"),
-            to_id("ENT_TYPE_ITEM_PALACE_CANDLE_FLAME"),
-            to_id("ENT_TYPE_ITEM_LAVAPOT"),
-            to_id("ENT_TYPE_FX_TELEPORTSHADOW"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LIGHTEMITTER>(
+            "ENT_TYPE_ITEM_SCEPTER_ANUBISSHOT",
+            "ENT_TYPE_ITEM_SCEPTER_ANUBISSPECIALSHOT",
+            "ENT_TYPE_ITEM_SCEPTER_PLAYERSHOT",
+            "ENT_TYPE_ITEM_TIAMAT_SHOT",
+            "ENT_TYPE_ITEM_REDLANTERNFLAME",
+            "ENT_TYPE_ITEM_LANDMINE",
+            "ENT_TYPE_ITEM_PLAYERGHOST",
+            "ENT_TYPE_ITEM_PALACE_CANDLE_FLAME",
+            "ENT_TYPE_ITEM_LAVAPOT",
+            "ENT_TYPE_FX_TELEPORTSHADOW");
     case CUSTOM_TYPE::LIGHTSHOT:
-        return {
-            to_id("ENT_TYPE_ITEM_PLASMACANNON_SHOT"),
-            to_id("ENT_TYPE_ITEM_UFO_LASER_SHOT"),
-            to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"),
-            to_id("ENT_TYPE_ITEM_SORCERESS_DAGGER_SHOT"),
-            to_id("ENT_TYPE_ITEM_LASERTRAP_SHOT"),
-            to_id("ENT_TYPE_ITEM_FIREBALL"),
-            to_id("ENT_TYPE_ITEM_HUNDUN_FIREBALL"),
-            to_id("ENT_TYPE_ITEM_FREEZERAYSHOT"),
-            to_id("ENT_TYPE_ITEM_CLONEGUNSHOT"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LIGHTSHOT>(
+            "ENT_TYPE_ITEM_PLASMACANNON_SHOT",
+            "ENT_TYPE_ITEM_UFO_LASER_SHOT",
+            "ENT_TYPE_ITEM_LAMASSU_LASER_SHOT",
+            "ENT_TYPE_ITEM_SORCERESS_DAGGER_SHOT",
+            "ENT_TYPE_ITEM_LASERTRAP_SHOT",
+            "ENT_TYPE_ITEM_FIREBALL",
+            "ENT_TYPE_ITEM_HUNDUN_FIREBALL",
+            "ENT_TYPE_ITEM_FREEZERAYSHOT",
+            "ENT_TYPE_ITEM_CLONEGUNSHOT");
     case CUSTOM_TYPE::LIMBANCHOR:
-        return {to_id("ENT_TYPE_LOGICAL_LIMB_ANCHOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LIMBANCHOR>("ENT_TYPE_LOGICAL_LIMB_ANCHOR");
     case CUSTOM_TYPE::LIQUID:
-        return {
-            to_id("ENT_TYPE_LIQUID_WATER"),
-            to_id("ENT_TYPE_LIQUID_COARSE_WATER"),
-            to_id("ENT_TYPE_LIQUID_LAVA"),
-            to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"),
-            to_id("ENT_TYPE_LIQUID_COARSE_LAVA"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LIQUID>(
+            "ENT_TYPE_LIQUID_WATER",
+            "ENT_TYPE_LIQUID_COARSE_WATER",
+            "ENT_TYPE_LIQUID_LAVA",
+            "ENT_TYPE_LIQUID_STAGNANT_LAVA",
+            "ENT_TYPE_LIQUID_COARSE_LAVA");
     case CUSTOM_TYPE::LIQUIDSURFACE:
-        return {
-            to_id("ENT_TYPE_FX_LAVA_GLOW"),
-            to_id("ENT_TYPE_FX_WATER_SURFACE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LIQUIDSURFACE>(
+            "ENT_TYPE_FX_LAVA_GLOW",
+            "ENT_TYPE_FX_WATER_SURFACE");
     case CUSTOM_TYPE::LOCKEDDOOR:
-        return {
-            to_id("ENT_TYPE_FLOOR_DOOR_LOCKED"),
-            to_id("ENT_TYPE_FLOOR_DOOR_LOCKED_PEN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOCKEDDOOR>(
+            "ENT_TYPE_FLOOR_DOOR_LOCKED",
+            "ENT_TYPE_FLOOR_DOOR_LOCKED_PEN");
     case CUSTOM_TYPE::LOGICALANCHOVYFLOCK:
-        return {to_id("ENT_TYPE_LOGICAL_ANCHOVY_FLOCK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALANCHOVYFLOCK>("ENT_TYPE_LOGICAL_ANCHOVY_FLOCK");
     case CUSTOM_TYPE::LOGICALCONVEYORBELTSOUND:
-        return {to_id("ENT_TYPE_LOGICAL_CONVEYORBELT_SOUND_SOURCE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALCONVEYORBELTSOUND>("ENT_TYPE_LOGICAL_CONVEYORBELT_SOUND_SOURCE");
     case CUSTOM_TYPE::LOGICALDOOR:
-        return {
-            to_id("ENT_TYPE_LOGICAL_DOOR"),
-            to_id("ENT_TYPE_LOGICAL_BLACKMARKET_DOOR"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALDOOR>(
+            "ENT_TYPE_LOGICAL_DOOR",
+            "ENT_TYPE_LOGICAL_BLACKMARKET_DOOR");
     case CUSTOM_TYPE::LOGICALDRAIN:
-        return {
-            to_id("ENT_TYPE_LOGICAL_WATER_DRAIN"),
-            to_id("ENT_TYPE_LOGICAL_LAVA_DRAIN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALDRAIN>(
+            "ENT_TYPE_LOGICAL_WATER_DRAIN",
+            "ENT_TYPE_LOGICAL_LAVA_DRAIN");
     case CUSTOM_TYPE::LOGICALLIQUIDSTREAMSOUND:
-        return {
-            to_id("ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALLIQUIDSTREAMSOUND>(
+            "ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE");
     case CUSTOM_TYPE::LOGICALMINIGAME:
-        return {to_id("ENT_TYPE_LOGICAL_MINIGAME")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALMINIGAME>("ENT_TYPE_LOGICAL_MINIGAME");
     case CUSTOM_TYPE::LOGICALREGENERATINGBLOCK:
-        return {to_id("ENT_TYPE_LOGICAL_REGENERATING_BLOCK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALREGENERATINGBLOCK>("ENT_TYPE_LOGICAL_REGENERATING_BLOCK");
     case CUSTOM_TYPE::LOGICALSOUND:
-        return {
-            to_id("ENT_TYPE_LOGICAL_DOOR_AMBIENT_SOUND"),
-            to_id("ENT_TYPE_LOGICAL_STATICLAVA_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_CONVEYORBELT_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_MUMMYFLIES_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_QUICKSAND_AMBIENT_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_QUICKSAND_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_DUSTWALL_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_ICESLIDING_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_PIPE_TRAVELER_SOUND_SOURCE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALSOUND>(
+            "ENT_TYPE_LOGICAL_DOOR_AMBIENT_SOUND",
+            "ENT_TYPE_LOGICAL_STATICLAVA_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_CONVEYORBELT_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_MUMMYFLIES_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_QUICKSAND_AMBIENT_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_QUICKSAND_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_DUSTWALL_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_ICESLIDING_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_PIPE_TRAVELER_SOUND_SOURCE");
     case CUSTOM_TYPE::LOGICALSTATICSOUND:
-        return {
-            to_id("ENT_TYPE_LOGICAL_STATICLAVA_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE"),
-            to_id("ENT_TYPE_LOGICAL_QUICKSAND_AMBIENT_SOUND_SOURCE"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALSTATICSOUND>(
+            "ENT_TYPE_LOGICAL_STATICLAVA_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE",
+            "ENT_TYPE_LOGICAL_QUICKSAND_AMBIENT_SOUND_SOURCE");
     case CUSTOM_TYPE::LOGICALTRAPTRIGGER:
-        return {
-            to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER"),
-            to_id("ENT_TYPE_LOGICAL_TOTEM_TRAP_TRIGGER"),
-            to_id("ENT_TYPE_LOGICAL_JUNGLESPEAR_TRAP_TRIGGER"),
-            to_id("ENT_TYPE_LOGICAL_SPIKEBALL_TRIGGER"),
-            to_id("ENT_TYPE_LOGICAL_TENTACLE_TRIGGER"),
-            to_id("ENT_TYPE_LOGICAL_BIGSPEAR_TRAP_TRIGGER"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::LOGICALTRAPTRIGGER>(
+            "ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER",
+            "ENT_TYPE_LOGICAL_TOTEM_TRAP_TRIGGER",
+            "ENT_TYPE_LOGICAL_JUNGLESPEAR_TRAP_TRIGGER",
+            "ENT_TYPE_LOGICAL_SPIKEBALL_TRIGGER",
+            "ENT_TYPE_LOGICAL_TENTACLE_TRIGGER",
+            "ENT_TYPE_LOGICAL_BIGSPEAR_TRAP_TRIGGER");
     case CUSTOM_TYPE::MAGMAMAN:
-        return {to_id("ENT_TYPE_MONS_MAGMAMAN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MAGMAMAN>("ENT_TYPE_MONS_MAGMAMAN");
     case CUSTOM_TYPE::MAINEXIT:
-        return {to_id("ENT_TYPE_FLOOR_DOOR_MAIN_EXIT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MAINEXIT>("ENT_TYPE_FLOOR_DOOR_MAIN_EXIT");
     case CUSTOM_TYPE::MANTRAP:
-        return {to_id("ENT_TYPE_MONS_MANTRAP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MANTRAP>("ENT_TYPE_MONS_MANTRAP");
     case CUSTOM_TYPE::MATTOCK:
-        return {to_id("ENT_TYPE_ITEM_MATTOCK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MATTOCK>("ENT_TYPE_ITEM_MATTOCK");
     case CUSTOM_TYPE::MECH:
-        return {to_id("ENT_TYPE_MOUNT_MECH")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MECH>("ENT_TYPE_MOUNT_MECH");
     case CUSTOM_TYPE::MEGAJELLYFISH:
-        return {
-            to_id("ENT_TYPE_MONS_MEGAJELLYFISH"),
-            to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::MEGAJELLYFISH>(
+            "ENT_TYPE_MONS_MEGAJELLYFISH",
+            "ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND");
     case CUSTOM_TYPE::MINIGAMEASTEROID:
-        return {
-            to_id("ENT_TYPE_ITEM_MINIGAME_ASTEROID_BG"),
-            to_id("ENT_TYPE_ITEM_MINIGAME_ASTEROID"),
-            to_id("ENT_TYPE_ITEM_MINIGAME_BROKEN_ASTEROID"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::MINIGAMEASTEROID>(
+            "ENT_TYPE_ITEM_MINIGAME_ASTEROID_BG",
+            "ENT_TYPE_ITEM_MINIGAME_ASTEROID",
+            "ENT_TYPE_ITEM_MINIGAME_BROKEN_ASTEROID");
     case CUSTOM_TYPE::MINIGAMESHIP:
-        return {to_id("ENT_TYPE_ITEM_MINIGAME_SHIP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MINIGAMESHIP>("ENT_TYPE_ITEM_MINIGAME_SHIP");
     case CUSTOM_TYPE::MINIGAMESHIPOFFSET:
-        return {
-            to_id("ENT_TYPE_FX_MINIGAME_SHIP_DOOR"),
-            to_id("ENT_TYPE_FX_MINIGAME_SHIP_CENTERJETFLAME"),
-            to_id("ENT_TYPE_FX_MINIGAME_SHIP_JETFLAME"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::MINIGAMESHIPOFFSET>(
+            "ENT_TYPE_FX_MINIGAME_SHIP_DOOR",
+            "ENT_TYPE_FX_MINIGAME_SHIP_CENTERJETFLAME",
+            "ENT_TYPE_FX_MINIGAME_SHIP_JETFLAME");
     case CUSTOM_TYPE::MOLE:
-        return {to_id("ENT_TYPE_MONS_MOLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MOLE>("ENT_TYPE_MONS_MOLE");
     case CUSTOM_TYPE::MONKEY:
-        return {to_id("ENT_TYPE_MONS_MONKEY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MONKEY>("ENT_TYPE_MONS_MONKEY");
     case CUSTOM_TYPE::MONSTER:
     {
-        static std::vector<ENT_TYPE> result;
-        if (result.empty())
+        const static std::vector<ENT_TYPE> types = []()
         {
             auto idx = to_id("ENT_TYPE_MONS_PET_TUTORIAL");
             const auto end = to_id("ENT_TYPE_MONS_GHOST_SMALL_HAPPY") + 1;
+
+            std::vector<ENT_TYPE> result;
             result.reserve(end - idx + 14);
             for (; idx < end; idx++)
             {
@@ -1140,32 +1090,30 @@ std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
                                             to_id("ENT_TYPE_MONS_CRITTERDRONE"),
                                             to_id("ENT_TYPE_MONS_CRITTERSLIME"),
                                         });
-        }
-        return result;
+            return result;
+        }();
+        return {types.begin(), types.end()};
     }
     case CUSTOM_TYPE::MOSQUITO:
-        return {to_id("ENT_TYPE_MONS_MOSQUITO")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MOSQUITO>("ENT_TYPE_MONS_MOSQUITO");
     case CUSTOM_TYPE::MOTHERSTATUE:
-        return {to_id("ENT_TYPE_FLOOR_MOTHER_STATUE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MOTHERSTATUE>("ENT_TYPE_FLOOR_MOTHER_STATUE");
     case CUSTOM_TYPE::MOUNT:
-        return {
-            to_id("ENT_TYPE_MOUNT_TURKEY"),
-            to_id("ENT_TYPE_MOUNT_ROCKDOG"),
-            to_id("ENT_TYPE_MOUNT_AXOLOTL"),
-            to_id("ENT_TYPE_MOUNT_MECH"),
-            to_id("ENT_TYPE_MOUNT_QILIN"),
-            to_id("ENT_TYPE_MOUNT_BASECAMP_CHAIR"),
-            to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::MOUNT>(
+            "ENT_TYPE_MOUNT_TURKEY",
+            "ENT_TYPE_MOUNT_ROCKDOG",
+            "ENT_TYPE_MOUNT_AXOLOTL",
+            "ENT_TYPE_MOUNT_MECH",
+            "ENT_TYPE_MOUNT_QILIN",
+            "ENT_TYPE_MOUNT_BASECAMP_CHAIR",
+            "ENT_TYPE_MOUNT_BASECAMP_COUCH");
     case CUSTOM_TYPE::MOVABLE:
     {
-        static std::vector<ENT_TYPE> result;
-        if (result.empty())
+        const static std::vector<ENT_TYPE> types = []()
         {
-            result.reserve(550); // more or less
             auto idx = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
             const auto end = to_id("ENT_TYPE_FX_ANKH_BROKENPIECE") + 1;
-            const auto gaps = {
+            const std::array gaps = {
                 to_id("ENT_TYPE_CHAR_HIREDHAND") - 1,
                 to_id("ENT_TYPE_MONS_PET_TUTORIAL") - 1,
                 to_id("ENT_TYPE_MONS_PET_TUTORIAL") - 2,
@@ -1194,6 +1142,8 @@ std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
                 to_id("ENT_TYPE_FX_ANKH_ROTATINGSPARK") - 1,
             };
 
+            std::vector<ENT_TYPE> result;
+            result.reserve(550); // more or less
             for (; idx < end; idx++)
             {
                 if (std::find(gaps.begin(), gaps.end(), idx) != gaps.end())
@@ -1201,84 +1151,81 @@ std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
 
                 result.push_back(idx);
             }
-        }
-        return result;
+            return result;
+        }();
+        return {types.begin(), types.end()};
     }
     case CUSTOM_TYPE::MOVINGICON:
-        return {
-            to_id("ENT_TYPE_FX_SALEICON"),
-            to_id("ENT_TYPE_FX_DIEINDICATOR"),
-            to_id("ENT_TYPE_FX_STORAGE_INDICATOR"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::MOVINGICON>(
+            "ENT_TYPE_FX_SALEICON",
+            "ENT_TYPE_FX_DIEINDICATOR",
+            "ENT_TYPE_FX_STORAGE_INDICATOR");
     case CUSTOM_TYPE::MUMMY:
-        return {to_id("ENT_TYPE_MONS_MUMMY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MUMMY>("ENT_TYPE_MONS_MUMMY");
     case CUSTOM_TYPE::MUMMYFLIESSOUND:
-        return {to_id("ENT_TYPE_LOGICAL_MUMMYFLIES_SOUND_SOURCE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::MUMMYFLIESSOUND>("ENT_TYPE_LOGICAL_MUMMYFLIES_SOUND_SOURCE");
     case CUSTOM_TYPE::NECROMANCER:
-        return {to_id("ENT_TYPE_MONS_NECROMANCER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::NECROMANCER>("ENT_TYPE_MONS_NECROMANCER");
     case CUSTOM_TYPE::NPC:
-        return {
-            to_id("ENT_TYPE_MONS_SHOPKEEPERCLONE"),
-            to_id("ENT_TYPE_MONS_SISTER_PARSLEY"),
-            to_id("ENT_TYPE_MONS_SISTER_PARSNIP"),
-            to_id("ENT_TYPE_MONS_SISTER_PARMESAN"),
-            to_id("ENT_TYPE_MONS_OLD_HUNTER"),
-            to_id("ENT_TYPE_MONS_THIEF"),
-            to_id("ENT_TYPE_MONS_BODYGUARD"),
-            to_id("ENT_TYPE_MONS_HUNDUNS_SERVANT"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::NPC>(
+            "ENT_TYPE_MONS_SHOPKEEPERCLONE",
+            "ENT_TYPE_MONS_SISTER_PARSLEY",
+            "ENT_TYPE_MONS_SISTER_PARSNIP",
+            "ENT_TYPE_MONS_SISTER_PARMESAN",
+            "ENT_TYPE_MONS_OLD_HUNTER",
+            "ENT_TYPE_MONS_THIEF",
+            "ENT_TYPE_MONS_BODYGUARD",
+            "ENT_TYPE_MONS_HUNDUNS_SERVANT");
     case CUSTOM_TYPE::OCTOPUS:
-        return {to_id("ENT_TYPE_MONS_OCTOPUS")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::OCTOPUS>("ENT_TYPE_MONS_OCTOPUS");
     case CUSTOM_TYPE::OLMEC:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::OLMEC>("ENT_TYPE_ACTIVEFLOOR_OLMEC");
     case CUSTOM_TYPE::OLMECCANNON:
-        return {
-            to_id("ENT_TYPE_ITEM_OLMECCANNON_BOMBS"),
-            to_id("ENT_TYPE_ITEM_OLMECCANNON_UFO"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::OLMECCANNON>(
+            "ENT_TYPE_ITEM_OLMECCANNON_BOMBS",
+            "ENT_TYPE_ITEM_OLMECCANNON_UFO");
     case CUSTOM_TYPE::OLMECFLOATER:
-        return {to_id("ENT_TYPE_FX_OLMECPART_FLOATER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::OLMECFLOATER>("ENT_TYPE_FX_OLMECPART_FLOATER");
     case CUSTOM_TYPE::OLMITE:
-        return {
-            to_id("ENT_TYPE_MONS_OLMITE_HELMET"),
-            to_id("ENT_TYPE_MONS_OLMITE_BODYARMORED"),
-            to_id("ENT_TYPE_MONS_OLMITE_NAKED"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::OLMITE>(
+            "ENT_TYPE_MONS_OLMITE_HELMET",
+            "ENT_TYPE_MONS_OLMITE_BODYARMORED",
+            "ENT_TYPE_MONS_OLMITE_NAKED");
     case CUSTOM_TYPE::ONFIREEFFECT:
-        return {to_id("ENT_TYPE_LOGICAL_ONFIRE_EFFECT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ONFIREEFFECT>("ENT_TYPE_LOGICAL_ONFIRE_EFFECT");
     case CUSTOM_TYPE::ORB:
-        return {to_id("ENT_TYPE_ITEM_FLOATING_ORB")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ORB>("ENT_TYPE_ITEM_FLOATING_ORB");
     case CUSTOM_TYPE::OSIRISHAND:
-        return {to_id("ENT_TYPE_MONS_OSIRIS_HAND")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::OSIRISHAND>("ENT_TYPE_MONS_OSIRIS_HAND");
     case CUSTOM_TYPE::OSIRISHEAD:
-        return {to_id("ENT_TYPE_MONS_OSIRIS_HEAD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::OSIRISHEAD>("ENT_TYPE_MONS_OSIRIS_HEAD");
     case CUSTOM_TYPE::OUROBOROCAMERAANCHOR:
-        return {to_id("ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::OUROBOROCAMERAANCHOR>("ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR");
     case CUSTOM_TYPE::OUROBOROCAMERAZOOMIN:
-        return {to_id("ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR_ZOOMIN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::OUROBOROCAMERAZOOMIN>("ENT_TYPE_LOGICAL_OUROBORO_CAMERA_ANCHOR_ZOOMIN");
     case CUSTOM_TYPE::PALACESIGN:
-        return {to_id("ENT_TYPE_DECORATION_PALACE_SIGN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PALACESIGN>("ENT_TYPE_DECORATION_PALACE_SIGN");
     case CUSTOM_TYPE::PARACHUTEPOWERUP:
-        return {to_id("ENT_TYPE_ITEM_POWERUP_PARACHUTE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PARACHUTEPOWERUP>("ENT_TYPE_ITEM_POWERUP_PARACHUTE");
     case CUSTOM_TYPE::PET:
-        return {
-            to_id("ENT_TYPE_MONS_PET_TUTORIAL"),
-            to_id("ENT_TYPE_MONS_PET_DOG"),
-            to_id("ENT_TYPE_MONS_PET_CAT"),
-            to_id("ENT_TYPE_MONS_PET_HAMSTER"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::PET>(
+            "ENT_TYPE_MONS_PET_TUTORIAL",
+            "ENT_TYPE_MONS_PET_DOG",
+            "ENT_TYPE_MONS_PET_CAT",
+            "ENT_TYPE_MONS_PET_HAMSTER");
     case CUSTOM_TYPE::PIPE:
-        return {to_id("ENT_TYPE_FLOOR_PIPE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PIPE>("ENT_TYPE_FLOOR_PIPE");
     case CUSTOM_TYPE::PIPETRAVELERSOUND:
-        return {to_id("ENT_TYPE_LOGICAL_PIPE_TRAVELER_SOUND_SOURCE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PIPETRAVELERSOUND>("ENT_TYPE_LOGICAL_PIPE_TRAVELER_SOUND_SOURCE");
     case CUSTOM_TYPE::PLAYER:
     {
-        static std::vector<ENT_TYPE> result;
-        if (result.empty())
+        const static std::vector<ENT_TYPE> types = []()
         {
             auto idx = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
             const auto end = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") + 1;
             const auto gap = to_id("ENT_TYPE_CHAR_HIREDHAND") - 1;
+
+            std::vector<ENT_TYPE> result;
             result.reserve(end - idx);
             for (; idx < end; idx++)
             {
@@ -1287,45 +1234,47 @@ std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
 
                 result.push_back(idx);
             }
-        }
-        return result;
+            return result;
+        }();
+        return {types.begin(), types.end()};
     }
     case CUSTOM_TYPE::PLAYERBAG:
-        return {to_id("ENT_TYPE_ITEM_PICKUP_PLAYERBAG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PLAYERBAG>("ENT_TYPE_ITEM_PICKUP_PLAYERBAG");
     case CUSTOM_TYPE::PLAYERGHOST:
-        return {to_id("ENT_TYPE_ITEM_PLAYERGHOST")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PLAYERGHOST>("ENT_TYPE_ITEM_PLAYERGHOST");
     case CUSTOM_TYPE::POISONEDEFFECT:
-        return {to_id("ENT_TYPE_LOGICAL_POISONED_EFFECT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::POISONEDEFFECT>("ENT_TYPE_LOGICAL_POISONED_EFFECT");
     case CUSTOM_TYPE::POLEDECO:
-        return {
-            to_id("ENT_TYPE_FLOORSTYLED_MINEWOOD"),
-            to_id("ENT_TYPE_FLOORSTYLED_PAGODA"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::POLEDECO>(
+            "ENT_TYPE_FLOORSTYLED_MINEWOOD",
+            "ENT_TYPE_FLOORSTYLED_PAGODA");
     case CUSTOM_TYPE::PORTAL:
-        return {to_id("ENT_TYPE_LOGICAL_PORTAL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PORTAL>("ENT_TYPE_LOGICAL_PORTAL");
     case CUSTOM_TYPE::POT:
-        return {to_id("ENT_TYPE_ITEM_POT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::POT>("ENT_TYPE_ITEM_POT");
     case CUSTOM_TYPE::POWERUP:
     {
-        static std::vector<ENT_TYPE> result;
-        if (result.empty())
+        const static std::vector<ENT_TYPE> types = []()
         {
             auto idx = to_id("ENT_TYPE_ITEM_POWERUP_PASTE");
             const auto end = to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY") + 1;
+
+            std::vector<ENT_TYPE> result;
             result.reserve(end - idx);
             for (; idx < end; idx++)
                 result.push_back(idx);
-        }
-        return result;
+            return result;
+        }();
+        return {types.begin(), types.end()};
     }
     case CUSTOM_TYPE::POWERUPCAPABLE:
     {
-        static std::vector<ENT_TYPE> result;
-        if (result.empty())
+        const static std::vector<ENT_TYPE> types = []()
         {
+            std::vector<ENT_TYPE> result;
             auto idx = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
             const auto end = to_id("ENT_TYPE_MONS_CRITTERSLIME") + 1;
-            const auto missing_ids = {
+            const std::array missing_ids = {
                 to_id("ENT_TYPE_CHAR_HIREDHAND") - 1,
                 to_id("ENT_TYPE_MONS_PET_TUTORIAL") - 1,
                 to_id("ENT_TYPE_MONS_PET_TUTORIAL") - 2,
@@ -1344,42 +1293,43 @@ std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
 
                 result.push_back(idx);
             }
-        }
-        return result;
+            return result;
+        }();
+        return {types.begin(), types.end()};
     }
     case CUSTOM_TYPE::PROTOSHOPKEEPER:
-        return {to_id("ENT_TYPE_MONS_PROTOSHOPKEEPER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PROTOSHOPKEEPER>("ENT_TYPE_MONS_PROTOSHOPKEEPER");
     case CUSTOM_TYPE::PUNISHBALL:
-        return {to_id("ENT_TYPE_ITEM_PUNISHBALL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::PUNISHBALL>("ENT_TYPE_ITEM_PUNISHBALL");
     case CUSTOM_TYPE::PUSHBLOCK:
-        return {
-            to_id("ENT_TYPE_ACTIVEFLOOR_PUSHBLOCK"),
-            to_id("ENT_TYPE_ACTIVEFLOOR_POWDERKEG"),
-            to_id("ENT_TYPE_ACTIVEFLOOR_CHAINEDPUSHBLOCK"),
-            to_id("ENT_TYPE_ACTIVEFLOOR_TIMEDPOWDERKEG"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::PUSHBLOCK>(
+            "ENT_TYPE_ACTIVEFLOOR_PUSHBLOCK",
+            "ENT_TYPE_ACTIVEFLOOR_POWDERKEG",
+            "ENT_TYPE_ACTIVEFLOOR_CHAINEDPUSHBLOCK",
+            "ENT_TYPE_ACTIVEFLOOR_TIMEDPOWDERKEG");
     case CUSTOM_TYPE::QILIN:
-        return {to_id("ENT_TYPE_MOUNT_QILIN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::QILIN>("ENT_TYPE_MOUNT_QILIN");
     case CUSTOM_TYPE::QUICKSAND:
-        return {to_id("ENT_TYPE_FLOOR_QUICKSAND")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::QUICKSAND>("ENT_TYPE_FLOOR_QUICKSAND");
     case CUSTOM_TYPE::QUICKSANDSOUND:
-        return {to_id("ENT_TYPE_LOGICAL_QUICKSAND_SOUND_SOURCE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::QUICKSANDSOUND>("ENT_TYPE_LOGICAL_QUICKSAND_SOUND_SOURCE");
     case CUSTOM_TYPE::QUILLBACK:
-        return {to_id("ENT_TYPE_MONS_CAVEMAN_BOSS")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::QUILLBACK>("ENT_TYPE_MONS_CAVEMAN_BOSS");
     case CUSTOM_TYPE::REGENBLOCK:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_REGENERATINGBLOCK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::REGENBLOCK>("ENT_TYPE_ACTIVEFLOOR_REGENERATINGBLOCK");
     case CUSTOM_TYPE::ROBOT:
-        return {to_id("ENT_TYPE_MONS_ROBOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ROBOT>("ENT_TYPE_MONS_ROBOT");
     case CUSTOM_TYPE::ROCKDOG:
-        return {to_id("ENT_TYPE_MOUNT_ROCKDOG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ROCKDOG>("ENT_TYPE_MOUNT_ROCKDOG");
     case CUSTOM_TYPE::ROLLINGITEM:
     {
-        static std::vector<ENT_TYPE> result;
-        if (result.empty())
+        const static std::vector<ENT_TYPE> types = []()
         {
             auto idx = to_id("ENT_TYPE_ITEM_PICKUP_TORNJOURNALPAGE");
             const auto end = to_id("ENT_TYPE_ITEM_PICKUP_SKELETON_KEY") + 1;
             const auto gap = to_id("ENT_TYPE_ITEM_PICKUP_SPECTACLES") - 1;
+
+            std::vector<ENT_TYPE> result;
             result.reserve(end - idx);
             for (; idx < end; idx++)
             {
@@ -1388,228 +1338,213 @@ std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
 
                 result.push_back(idx);
             }
-        }
-        return result;
+            return result;
+        }();
+        return {types.begin(), types.end()};
     }
     case CUSTOM_TYPE::ROOMLIGHT:
-        return {to_id("ENT_TYPE_LOGICAL_ROOM_LIGHT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::ROOMLIGHT>("ENT_TYPE_LOGICAL_ROOM_LIGHT");
     case CUSTOM_TYPE::ROOMOWNER:
-        return {
-            to_id("ENT_TYPE_MONS_SHOPKEEPER"),
-            to_id("ENT_TYPE_MONS_MERCHANT"),
-            to_id("ENT_TYPE_MONS_YANG"),
-            to_id("ENT_TYPE_MONS_MADAMETUSK"),
-            to_id("ENT_TYPE_MONS_STORAGEGUY"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::ROOMOWNER>(
+            "ENT_TYPE_MONS_SHOPKEEPER",
+            "ENT_TYPE_MONS_MERCHANT",
+            "ENT_TYPE_MONS_YANG",
+            "ENT_TYPE_MONS_MADAMETUSK",
+            "ENT_TYPE_MONS_STORAGEGUY");
     case CUSTOM_TYPE::RUBBLE:
-        return {to_id("ENT_TYPE_ITEM_RUBBLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::RUBBLE>("ENT_TYPE_ITEM_RUBBLE");
     case CUSTOM_TYPE::SCARAB:
-        return {to_id("ENT_TYPE_MONS_SCARAB")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SCARAB>("ENT_TYPE_MONS_SCARAB");
     case CUSTOM_TYPE::SCEPTERSHOT:
-        return {
-            to_id("ENT_TYPE_ITEM_SCEPTER_ANUBISSHOT"),
-            to_id("ENT_TYPE_ITEM_SCEPTER_PLAYERSHOT"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::SCEPTERSHOT>(
+            "ENT_TYPE_ITEM_SCEPTER_ANUBISSHOT",
+            "ENT_TYPE_ITEM_SCEPTER_PLAYERSHOT");
     case CUSTOM_TYPE::SCORPION:
-        return {to_id("ENT_TYPE_MONS_SCORPION")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SCORPION>("ENT_TYPE_MONS_SCORPION");
     case CUSTOM_TYPE::SHIELD:
-        return {
-            to_id("ENT_TYPE_ITEM_WOODEN_SHIELD"),
-            to_id("ENT_TYPE_ITEM_METAL_SHIELD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::SHIELD>(
+            "ENT_TYPE_ITEM_WOODEN_SHIELD",
+            "ENT_TYPE_ITEM_METAL_SHIELD");
     case CUSTOM_TYPE::SHOOTINGSTARSPAWNER:
-        return {to_id("ENT_TYPE_LOGICAL_SHOOTING_STARS_SPAWNER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SHOOTINGSTARSPAWNER>("ENT_TYPE_LOGICAL_SHOOTING_STARS_SPAWNER");
     case CUSTOM_TYPE::SHOPKEEPER:
-        return {to_id("ENT_TYPE_MONS_SHOPKEEPER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SHOPKEEPER>("ENT_TYPE_MONS_SHOPKEEPER");
     case CUSTOM_TYPE::SKELETON:
-        return {
-            to_id("ENT_TYPE_MONS_SKELETON"),
-            to_id("ENT_TYPE_MONS_REDSKELETON"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::SKELETON>(
+            "ENT_TYPE_MONS_SKELETON",
+            "ENT_TYPE_MONS_REDSKELETON");
     case CUSTOM_TYPE::SKULLDROPTRAP:
-        return {to_id("ENT_TYPE_ITEM_SKULLDROPTRAP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SKULLDROPTRAP>("ENT_TYPE_ITEM_SKULLDROPTRAP");
     case CUSTOM_TYPE::SLEEPBUBBLE:
-        return {to_id("ENT_TYPE_FX_SLEEP_BUBBLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SLEEPBUBBLE>("ENT_TYPE_FX_SLEEP_BUBBLE");
     case CUSTOM_TYPE::SLIDINGWALLCEILING:
-        return {to_id("ENT_TYPE_FLOOR_SLIDINGWALL_CEILING")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SLIDINGWALLCEILING>("ENT_TYPE_FLOOR_SLIDINGWALL_CEILING");
     case CUSTOM_TYPE::SNAPTRAP:
-        return {to_id("ENT_TYPE_ITEM_SNAP_TRAP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SNAPTRAP>("ENT_TYPE_ITEM_SNAP_TRAP");
     case CUSTOM_TYPE::SORCERESS:
-        return {to_id("ENT_TYPE_MONS_SORCERESS")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SORCERESS>("ENT_TYPE_MONS_SORCERESS");
     case CUSTOM_TYPE::SOUNDSHOT:
-        return {
-            to_id("ENT_TYPE_ITEM_UFO_LASER_SHOT"),
-            to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"),
-            to_id("ENT_TYPE_ITEM_FIREBALL"),
-            to_id("ENT_TYPE_ITEM_HUNDUN_FIREBALL"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::SOUNDSHOT>(
+            "ENT_TYPE_ITEM_UFO_LASER_SHOT",
+            "ENT_TYPE_ITEM_LAMASSU_LASER_SHOT",
+            "ENT_TYPE_ITEM_FIREBALL",
+            "ENT_TYPE_ITEM_HUNDUN_FIREBALL");
     case CUSTOM_TYPE::SPARK:
-        return {to_id("ENT_TYPE_ITEM_SPARK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SPARK>("ENT_TYPE_ITEM_SPARK");
     case CUSTOM_TYPE::SPARKTRAP:
-        return {to_id("ENT_TYPE_FLOOR_SPARK_TRAP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SPARKTRAP>("ENT_TYPE_FLOOR_SPARK_TRAP");
     case CUSTOM_TYPE::SPEAR:
-        return {
-            to_id("ENT_TYPE_ITEM_TOTEM_SPEAR"),
-            to_id("ENT_TYPE_ITEM_LION_SPEAR"),
-            to_id("ENT_TYPE_ITEM_BIG_SPEAR"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::SPEAR>(
+            "ENT_TYPE_ITEM_TOTEM_SPEAR",
+            "ENT_TYPE_ITEM_LION_SPEAR",
+            "ENT_TYPE_ITEM_BIG_SPEAR");
     case CUSTOM_TYPE::SPECIALSHOT:
-        return {to_id("ENT_TYPE_ITEM_SCEPTER_ANUBISSPECIALSHOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SPECIALSHOT>("ENT_TYPE_ITEM_SCEPTER_ANUBISSPECIALSHOT");
     case CUSTOM_TYPE::SPIDER:
-        return {
-            to_id("ENT_TYPE_MONS_SPIDER"),
-            to_id("ENT_TYPE_MONS_GIANTSPIDER"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::SPIDER>(
+            "ENT_TYPE_MONS_SPIDER",
+            "ENT_TYPE_MONS_GIANTSPIDER");
     case CUSTOM_TYPE::SPIKEBALLTRAP:
-        return {to_id("ENT_TYPE_FLOOR_SPIKEBALL_CEILING")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SPIKEBALLTRAP>("ENT_TYPE_FLOOR_SPIKEBALL_CEILING");
     case CUSTOM_TYPE::SPLASHBUBBLEGENERATOR:
-        return {to_id("ENT_TYPE_LOGICAL_SPLASH_BUBBLE_GENERATOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::SPLASHBUBBLEGENERATOR>("ENT_TYPE_LOGICAL_SPLASH_BUBBLE_GENERATOR");
     case CUSTOM_TYPE::STICKYTRAP:
-        return {to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::STICKYTRAP>("ENT_TYPE_FLOOR_STICKYTRAP_CEILING");
     case CUSTOM_TYPE::STRETCHCHAIN:
-        return {
-            to_id("ENT_TYPE_ITEM_CRABMAN_CLAWCHAIN"),
-            to_id("ENT_TYPE_ITEM_PUNISHCHAIN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::STRETCHCHAIN>(
+            "ENT_TYPE_ITEM_CRABMAN_CLAWCHAIN",
+            "ENT_TYPE_ITEM_PUNISHCHAIN");
     case CUSTOM_TYPE::SWITCH:
-        return {
-            to_id("ENT_TYPE_ITEM_SLIDINGWALL_SWITCH"),
-            to_id("ENT_TYPE_ITEM_SLIDINGWALL_SWITCH_REWARD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::SWITCH>(
+            "ENT_TYPE_ITEM_SLIDINGWALL_SWITCH",
+            "ENT_TYPE_ITEM_SLIDINGWALL_SWITCH_REWARD");
     case CUSTOM_TYPE::TADPOLE:
-        return {to_id("ENT_TYPE_MONS_TADPOLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TADPOLE>("ENT_TYPE_MONS_TADPOLE");
     case CUSTOM_TYPE::TELEPORTER:
-        return {to_id("ENT_TYPE_ITEM_TELEPORTER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TELEPORTER>("ENT_TYPE_ITEM_TELEPORTER");
     case CUSTOM_TYPE::TELEPORTERBACKPACK:
-        return {to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TELEPORTERBACKPACK>("ENT_TYPE_ITEM_TELEPORTER_BACKPACK");
     case CUSTOM_TYPE::TELEPORTINGBORDER:
-        return {to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TELEPORTINGBORDER>("ENT_TYPE_FLOOR_TELEPORTINGBORDER");
     case CUSTOM_TYPE::TELESCOPE:
-        return {to_id("ENT_TYPE_ITEM_TELESCOPE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TELESCOPE>("ENT_TYPE_ITEM_TELESCOPE");
     case CUSTOM_TYPE::TENTACLE:
-        return {to_id("ENT_TYPE_ITEM_TENTACLE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TENTACLE>("ENT_TYPE_ITEM_TENTACLE");
     case CUSTOM_TYPE::TENTACLEBOTTOM:
-        return {to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TENTACLEBOTTOM>("ENT_TYPE_FLOOR_TENTACLE_BOTTOM");
     case CUSTOM_TYPE::TERRA:
-        return {to_id("ENT_TYPE_MONS_MARLA_TUNNEL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TERRA>("ENT_TYPE_MONS_MARLA_TUNNEL");
     case CUSTOM_TYPE::THINICE:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_THINICE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::THINICE>("ENT_TYPE_ACTIVEFLOOR_THINICE");
     case CUSTOM_TYPE::TIAMAT:
-        return {to_id("ENT_TYPE_MONS_TIAMAT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TIAMAT>("ENT_TYPE_MONS_TIAMAT");
     case CUSTOM_TYPE::TIAMATSHOT:
-        return {to_id("ENT_TYPE_ITEM_TIAMAT_SHOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TIAMATSHOT>("ENT_TYPE_ITEM_TIAMAT_SHOT");
     case CUSTOM_TYPE::TIMEDFORCEFIELD:
-        return {to_id("ENT_TYPE_FLOOR_TIMED_FORCEFIELD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TIMEDFORCEFIELD>("ENT_TYPE_FLOOR_TIMED_FORCEFIELD");
     case CUSTOM_TYPE::TIMEDPOWDERKEG:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_TIMEDPOWDERKEG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TIMEDPOWDERKEG>("ENT_TYPE_ACTIVEFLOOR_TIMEDPOWDERKEG");
     case CUSTOM_TYPE::TIMEDSHOT:
-        return {to_id("ENT_TYPE_ITEM_FREEZERAYSHOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TIMEDSHOT>("ENT_TYPE_ITEM_FREEZERAYSHOT");
     case CUSTOM_TYPE::TORCH:
-        return {
-            to_id("ENT_TYPE_ITEM_WALLTORCH"),
-            to_id("ENT_TYPE_ITEM_LITWALLTORCH"),
-            to_id("ENT_TYPE_ITEM_AUTOWALLTORCH"),
-            to_id("ENT_TYPE_ITEM_TORCH"),
-            to_id("ENT_TYPE_ITEM_LAMP"),
-            to_id("ENT_TYPE_ITEM_REDLANTERN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::TORCH>(
+            "ENT_TYPE_ITEM_WALLTORCH",
+            "ENT_TYPE_ITEM_LITWALLTORCH",
+            "ENT_TYPE_ITEM_AUTOWALLTORCH",
+            "ENT_TYPE_ITEM_TORCH",
+            "ENT_TYPE_ITEM_LAMP",
+            "ENT_TYPE_ITEM_REDLANTERN");
     case CUSTOM_TYPE::TORCHFLAME:
-        return {to_id("ENT_TYPE_ITEM_TORCHFLAME")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TORCHFLAME>("ENT_TYPE_ITEM_TORCHFLAME");
     case CUSTOM_TYPE::TOTEMTRAP:
-        return {
-            to_id("ENT_TYPE_FLOOR_TOTEM_TRAP"),
-            to_id("ENT_TYPE_FLOOR_LION_TRAP"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::TOTEMTRAP>(
+            "ENT_TYPE_FLOOR_TOTEM_TRAP",
+            "ENT_TYPE_FLOOR_LION_TRAP");
     case CUSTOM_TYPE::TRANSFERFLOOR:
-        return {
-            to_id("ENT_TYPE_FLOOR_CONVEYORBELT_LEFT"),
-            to_id("ENT_TYPE_FLOOR_CONVEYORBELT_RIGHT"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::TRANSFERFLOOR>(
+            "ENT_TYPE_FLOOR_CONVEYORBELT_LEFT",
+            "ENT_TYPE_FLOOR_CONVEYORBELT_RIGHT");
     case CUSTOM_TYPE::TRAPPART:
-        return {
-            to_id("ENT_TYPE_ITEM_STICKYTRAP_BALL"),
-            to_id("ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL"),
-            to_id("ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::TRAPPART>(
+            "ENT_TYPE_ITEM_STICKYTRAP_BALL",
+            "ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL",
+            "ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL");
     case CUSTOM_TYPE::TREASURE:
-        return {
-            to_id("ENT_TYPE_ITEM_ENDINGTREASURE_TIAMAT"),
-            to_id("ENT_TYPE_ITEM_ENDINGTREASURE_HUNDUN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::TREASURE>(
+            "ENT_TYPE_ITEM_ENDINGTREASURE_TIAMAT",
+            "ENT_TYPE_ITEM_ENDINGTREASURE_HUNDUN");
     case CUSTOM_TYPE::TREASUREHOOK:
-        return {to_id("ENT_TYPE_ITEM_EGGSHIP_HOOK")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TREASUREHOOK>("ENT_TYPE_ITEM_EGGSHIP_HOOK");
     case CUSTOM_TYPE::TRUECROWNPOWERUP:
-        return {to_id("ENT_TYPE_ITEM_POWERUP_TRUECROWN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TRUECROWNPOWERUP>("ENT_TYPE_ITEM_POWERUP_TRUECROWN");
     case CUSTOM_TYPE::TUN:
-        return {to_id("ENT_TYPE_MONS_MERCHANT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TUN>("ENT_TYPE_MONS_MERCHANT");
     case CUSTOM_TYPE::TV:
-        return {to_id("ENT_TYPE_ITEM_TV")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::TV>("ENT_TYPE_ITEM_TV");
     case CUSTOM_TYPE::UDJATSOCKET:
-        return {to_id("ENT_TYPE_ITEM_UDJAT_SOCKET")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::UDJATSOCKET>("ENT_TYPE_ITEM_UDJAT_SOCKET");
     case CUSTOM_TYPE::UFO:
-        return {to_id("ENT_TYPE_MONS_UFO")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::UFO>("ENT_TYPE_MONS_UFO");
     case CUSTOM_TYPE::UNCHAINEDSPIKEBALL:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::UNCHAINEDSPIKEBALL>("ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL");
     case CUSTOM_TYPE::USHABTI:
-        return {to_id("ENT_TYPE_ITEM_USHABTI")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::USHABTI>("ENT_TYPE_ITEM_USHABTI");
     case CUSTOM_TYPE::VAMPIRE:
-        return {
-            to_id("ENT_TYPE_MONS_VAMPIRE"),
-            to_id("ENT_TYPE_MONS_VLAD"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::VAMPIRE>(
+            "ENT_TYPE_MONS_VAMPIRE",
+            "ENT_TYPE_MONS_VLAD");
     case CUSTOM_TYPE::VANHORSING:
-        return {to_id("ENT_TYPE_MONS_OLD_HUNTER")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::VANHORSING>("ENT_TYPE_MONS_OLD_HUNTER");
     case CUSTOM_TYPE::VLAD:
-        return {to_id("ENT_TYPE_MONS_VLAD")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::VLAD>("ENT_TYPE_MONS_VLAD");
     case CUSTOM_TYPE::VLADSCAPE:
-        return {to_id("ENT_TYPE_ITEM_VLADS_CAPE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::VLADSCAPE>("ENT_TYPE_ITEM_VLADS_CAPE");
     case CUSTOM_TYPE::WADDLER:
-        return {to_id("ENT_TYPE_MONS_STORAGEGUY")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::WADDLER>("ENT_TYPE_MONS_STORAGEGUY");
     case CUSTOM_TYPE::WALKINGMONSTER:
-        return {
-            to_id("ENT_TYPE_MONS_CAVEMAN"),
-            to_id("ENT_TYPE_MONS_CAVEMAN_SHOPKEEPER"),
-            to_id("ENT_TYPE_MONS_CAVEMAN_BOSS"),
-            to_id("ENT_TYPE_MONS_TIKIMAN"),
-            to_id("ENT_TYPE_MONS_WITCHDOCTOR"),
-            to_id("ENT_TYPE_MONS_ROBOT"),
-            to_id("ENT_TYPE_MONS_CROCMAN"),
-            to_id("ENT_TYPE_MONS_SORCERESS"),
-            to_id("ENT_TYPE_MONS_NECROMANCER"),
-            to_id("ENT_TYPE_MONS_OCTOPUS"),
-            to_id("ENT_TYPE_MONS_YETI"),
-            to_id("ENT_TYPE_MONS_OLMITE_HELMET"),
-            to_id("ENT_TYPE_MONS_OLMITE_BODYARMORED"),
-            to_id("ENT_TYPE_MONS_OLMITE_NAKED"),
-            to_id("ENT_TYPE_MONS_LEPRECHAUN"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::WALKINGMONSTER>(
+            "ENT_TYPE_MONS_CAVEMAN",
+            "ENT_TYPE_MONS_CAVEMAN_SHOPKEEPER",
+            "ENT_TYPE_MONS_CAVEMAN_BOSS",
+            "ENT_TYPE_MONS_TIKIMAN",
+            "ENT_TYPE_MONS_WITCHDOCTOR",
+            "ENT_TYPE_MONS_ROBOT",
+            "ENT_TYPE_MONS_CROCMAN",
+            "ENT_TYPE_MONS_SORCERESS",
+            "ENT_TYPE_MONS_NECROMANCER",
+            "ENT_TYPE_MONS_OCTOPUS",
+            "ENT_TYPE_MONS_YETI",
+            "ENT_TYPE_MONS_OLMITE_HELMET",
+            "ENT_TYPE_MONS_OLMITE_BODYARMORED",
+            "ENT_TYPE_MONS_OLMITE_NAKED",
+            "ENT_TYPE_MONS_LEPRECHAUN");
     case CUSTOM_TYPE::WALLTORCH:
-        return {
-            to_id("ENT_TYPE_ITEM_WALLTORCH"),
-            to_id("ENT_TYPE_ITEM_LITWALLTORCH"),
-            to_id("ENT_TYPE_ITEM_AUTOWALLTORCH"),
-        };
+        return make_custom_entity_type_list<CUSTOM_TYPE::WALLTORCH>(
+            "ENT_TYPE_ITEM_WALLTORCH",
+            "ENT_TYPE_ITEM_LITWALLTORCH",
+            "ENT_TYPE_ITEM_AUTOWALLTORCH");
     case CUSTOM_TYPE::WEBSHOT:
-        return {to_id("ENT_TYPE_ITEM_WEBSHOT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::WEBSHOT>("ENT_TYPE_ITEM_WEBSHOT");
     case CUSTOM_TYPE::WETEFFECT:
-        return {to_id("ENT_TYPE_LOGICAL_WET_EFFECT")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::WETEFFECT>("ENT_TYPE_LOGICAL_WET_EFFECT");
     case CUSTOM_TYPE::WITCHDOCTOR:
-        return {to_id("ENT_TYPE_MONS_WITCHDOCTOR")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::WITCHDOCTOR>("ENT_TYPE_MONS_WITCHDOCTOR");
     case CUSTOM_TYPE::WITCHDOCTORSKULL:
-        return {to_id("ENT_TYPE_MONS_WITCHDOCTORSKULL")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::WITCHDOCTORSKULL>("ENT_TYPE_MONS_WITCHDOCTORSKULL");
     case CUSTOM_TYPE::WOODENLOGTRAP:
-        return {to_id("ENT_TYPE_ACTIVEFLOOR_WOODENLOG_TRAP")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::WOODENLOGTRAP>("ENT_TYPE_ACTIVEFLOOR_WOODENLOG_TRAP");
     case CUSTOM_TYPE::YAMA:
-        return {to_id("ENT_TYPE_MONS_YAMA")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::YAMA>("ENT_TYPE_MONS_YAMA");
     case CUSTOM_TYPE::YANG:
-        return {to_id("ENT_TYPE_MONS_YANG")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::YANG>("ENT_TYPE_MONS_YANG");
     case CUSTOM_TYPE::YELLOWCAPE:
-        return {to_id("ENT_TYPE_ITEM_CAPE")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::YELLOWCAPE>("ENT_TYPE_ITEM_CAPE");
     case CUSTOM_TYPE::YETIKING:
-        return {to_id("ENT_TYPE_MONS_YETIKING")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::YETIKING>("ENT_TYPE_MONS_YETIKING");
     case CUSTOM_TYPE::YETIQUEEN:
-        return {to_id("ENT_TYPE_MONS_YETIQUEEN")};
+        return make_custom_entity_type_list<CUSTOM_TYPE::YETIQUEEN>("ENT_TYPE_MONS_YETIQUEEN");
     }
+
     return {};
 }
 
@@ -1622,7 +1557,7 @@ bool is_type_movable(ENT_TYPE type)
     return false;
 }
 
-const std::map<CUSTOM_TYPE, std::string> get_custom_types_map()
+const std::map<CUSTOM_TYPE, std::string_view>& get_custom_types_map()
 {
     return custom_type_names;
 }

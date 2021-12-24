@@ -120,7 +120,7 @@ int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer);
 uint8_t enum_to_layer(const LAYER layer);
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE find);
-std::vector<ENT_TYPE> get_proper_types(const std::vector<ENT_TYPE>& types_array);
+std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types);
 void enter_door(int32_t player_uid, int32_t door_uid);
 void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types);
 void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types);
