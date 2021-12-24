@@ -526,7 +526,30 @@ void spawn_player(int8_t player_slot, float x, float y)
 {
     if (player_slot < 1 || player_slot > 4)
         return;
+
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
     using spawn_player_fun = void(Items*, uint8_t ps, float pos_x, float pos_y);
     static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
     spawn_player(get_state_ptr()->items, player_slot - 1, x, y);
+}
+
+int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
+{
+    auto offset = get_address("spawn_companion");
+    if (offset != 0)
+    {
+        push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+        OnScopeExit pop{[]
+                        { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+        auto state = get_state_ptr();
+        typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
+        static spawn_companion_func* sc = (spawn_companion_func*)(offset);
+        Player* spawned = sc(state, x, y, enum_to_layer(layer), companion_type);
+        return spawned->uid;
+    }
+    return -1;
 }
