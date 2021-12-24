@@ -744,6 +744,27 @@ local function friend_valid(x, y, l)
     return false
 end
 local friend_chance = define_procedural_spawn("friend", friend_spawn, friend_valid)
+
+local function snowman_spawn(x, y, l)
+    local uid = spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_ICESPIRE, x, y, l, 0, 0);
+    local ent = get_entity(uid)
+    if prng:random() < 0.5 then
+        flip_entity(uid)
+    end
+    ent.animation_frame = 221
+    ent.offsety = ent.offsety + 0.05
+end
+local function snowman_valid(x, y, l)
+    local floor = get_grid_entity_at(x, y-1, l)
+    local air = get_grid_entity_at(x, y, l)
+    if floor ~= -1 and air == -1 then
+        floor = get_entity(floor)
+        return has(valid_floors, floor.type.id)
+    end
+    return false
+end
+local snowman_chance = define_procedural_spawn("snowman", snowman_spawn, snowman_valid)
+
 set_callback(function()
     if options.friend and options.friend_evil then
         set_interval(function()
@@ -820,6 +841,8 @@ set_callback(function(ctx)
             friend_spawned = false
         end
     end
+
+    ctx:set_procedural_spawn_chance(snowman_chance, get_chance(options.enemy_min, options.enemy_max) * 5)
 
     change_sunchallenge_spawns(enemies_challenge)
     change_altar_damage_spawns(enemies_challenge)
