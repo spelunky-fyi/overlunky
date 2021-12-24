@@ -3421,6 +3421,11 @@ PreHandleRoomTilesContext = {
 PreLoadLevelFilesContext = {
   __name = "sol.PreLoadLevelFilesContext.user"
 }
+PrizeDispenser = {
+  __index = "function",
+  __name = "sol.PrizeDispenser.user",
+  __newindex = "function"
+}
 ProtoShopkeeper = {
   __index = "function",
   __name = "sol.ProtoShopkeeper.user",
