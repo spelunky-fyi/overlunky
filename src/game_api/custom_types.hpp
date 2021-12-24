@@ -1,6 +1,8 @@
 #pragma once
 
 #include "aliases.hpp"
+#include <span>
+#include <string_view>
 #include <vector>
 
 enum class CUSTOM_TYPE : uint32_t
@@ -340,6 +342,6 @@ enum class CUSTOM_TYPE : uint32_t
     YETIQUEEN,
 };
 
-std::vector<ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type);
+std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type);
 bool is_type_movable(ENT_TYPE type);
-const std::map<CUSTOM_TYPE, std::string> get_custom_types_map();
+const std::map<CUSTOM_TYPE, std::string_view>& get_custom_types_map();
