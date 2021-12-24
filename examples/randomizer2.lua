@@ -1478,11 +1478,14 @@ end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY)
 set_post_entity_spawn(function(ent)
     if not options.chain then return end
     local x, y, l = get_position(ent.uid)
-    if l == LAYER.BACK and state.world == 2 then
+    local rx, ry = get_room_index(x, y)
+    local room = get_room_template(rx, ry, l)
+    if l == LAYER.BACK and state.world == 2 and room == ROOM_TEMPLATE.CHALLENGE_SPECIAL then
         kill_entity(ent.uid)
         spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_HOUYIBOW)
+
 set_post_entity_spawn(function(ent)
     if not options.chain then return end
     kill_entity(ent.uid)
