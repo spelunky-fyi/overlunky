@@ -125,6 +125,9 @@ std::vector<DropEntry> drop_entries{
     {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"s, VTABLE_OFFSET::NONE, 0, 1},
     /// It spawns two types of entities (frog and firefrog), the second one will be this + 1
     {"GIANTFROG_FROG", "\x81\xC2\x1B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 2},
+    {"EGGSAC_GRUB_1", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1}, // 4 exact patterns, the first 3 is the spawn
+    {"EGGSAC_GRUB_2", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 1},
+    {"EGGSAC_GRUB_3", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 2},
 };
 
 std::vector<DropChanceEntry> dropchance_entries{
