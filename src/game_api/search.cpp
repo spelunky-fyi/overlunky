@@ -1596,6 +1596,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Couldn't find any useful XREF in Ghidra so this pattern is exactly the function start
         "read_from_file"sv,
         PatternCommandBuffer{}
+            .set_optional(true)
             .find_inst("\x41\x57\x41\x56\x56\x57\x53\x48\x81\xec\x20\x01\x00\x00\x4c\x89\xc3\x49\x89\xd7\x49\x89\xce"sv)
             .at_exe(),
     },
