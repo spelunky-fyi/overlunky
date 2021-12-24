@@ -1088,6 +1088,7 @@ local extra_shop_guns = {ENT_TYPE.ITEM_CLONEGUN}
 local all_shop_guns = join(shop_guns, extra_shop_guns)
 local shop_mounts = {ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.MOUNT_MECH, ENT_TYPE.MOUNT_QILIN, ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_TURKEY}
 local shop_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.CAVEMANSHOP_LEFT}
+local shop_replace_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.CAVEMANSHOP_LEFT}
 
 set_callback(function()
     local in_shop = {}
@@ -1125,7 +1126,7 @@ end, SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, shop_items)
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
-    if has(shop_rooms, roomtype) and options.shop then
+    if has(shop_replace_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(shop_mounts)
         local etype = get_type(eid)
@@ -1140,7 +1141,7 @@ end, SPAWN_TYPE.LEVEL_GEN, MASK.MOUNT, shop_mounts)
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
-    if has(shop_rooms, roomtype) and options.shop then
+    if has(shop_replace_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local item = prng:random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
         if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
@@ -1154,7 +1155,7 @@ end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.CHAR_HIREDHAND)
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
-    if has(shop_rooms, roomtype) and options.shop then
+    if has(shop_replace_rooms, roomtype) and options.shop then
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(all_shop_guns)
         local etype = get_type(eid)
