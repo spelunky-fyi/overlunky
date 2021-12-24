@@ -1640,20 +1640,6 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     return 0;
 }
 
-int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
-{
-    auto offset = get_address("spawn_companion");
-    if (offset != 0)
-    {
-        auto state = get_state_ptr();
-        typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
-        static spawn_companion_func* sc = (spawn_companion_func*)(offset);
-        Player* spawned = sc(state, x, y, enum_to_layer(layer), companion_type);
-        return spawned->uid;
-    }
-    return -1;
-}
-
 uint8_t enum_to_layer(const LAYER layer)
 {
     if (layer == LAYER::FRONT)
