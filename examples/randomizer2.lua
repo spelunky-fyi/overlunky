@@ -581,7 +581,7 @@ local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED,
     ENT_TYPE.MONS_AMMIT, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG,
     ENT_TYPE.MONS_JUMPDOG, ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MOUNT_TURKEY,
-    ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL}
+    ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN}
 local enemies_big = {ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_LAVAMANDER, ENT_TYPE.MONS_MUMMY, ENT_TYPE.MONS_ANUBIS,
     ENT_TYPE.MONS_GIANTFISH, ENT_TYPE.MONS_YETIKING, ENT_TYPE.MONS_YETIQUEEN, ENT_TYPE.MONS_ALIENQUEEN,
     ENT_TYPE.MONS_LAMASSU, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY, ENT_TYPE.MONS_CRABMAN,
@@ -1260,7 +1260,7 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_POT)
 
 set_post_entity_spawn(function(ent)
     --math.randomseed(read_prng()[6]+ent.uid)
-    if state.theme == THEME.ABZU and prng:random() < 0.5 then
+    if state.theme == THEME.ABZU and prng:random() < 0.75 then
         ent.inside = pick(abzu_crate_items)
     else
         ent.inside = pick(crate_items)
@@ -1283,6 +1283,12 @@ set_callback(function()
             item = ENT_TYPE.CHAR_HIREDHAND
         end
         ent.inside = item
+    end
+    if state.theme == THEME.OLMEC then
+        for i,v in ipairs(get_entities_by_type(ENT_TYPE.ITEM_CRATE)) do
+            local ent = get_entity(v)
+            ent.inside = pick(crate_items)
+        end
     end
     change_diceshop_prizes(crate_items)
 end, ON.POST_LEVEL_GENERATION)
