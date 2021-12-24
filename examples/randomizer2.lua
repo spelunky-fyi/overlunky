@@ -399,7 +399,9 @@ local function trap_item_valid(x, y, l)
     if (map(x, y) & MASK.LAVA) > 0 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
     local air = get_grid_entity_at(x, y, l)
-    if floor ~= -1 and air == -1 then
+    local left = get_grid_entity_at(x-1, y, l)
+    local right = get_grid_entity_at(x+1, y, l)
+    if floor ~= -1 and air == -1 and left == -1 and right == -1 then
         floor = get_entity(floor)
         return has(valid_floors, floor.type.id)
     end
