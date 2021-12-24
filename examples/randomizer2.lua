@@ -396,14 +396,20 @@ local function trap_item_spawn(x, y, l)
 end
 local function trap_item_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
-    if (map(x, y) & MASK.LAVA) > 0 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
-    local air = get_grid_entity_at(x, y, l)
-    local left = get_grid_entity_at(x-1, y, l)
-    local right = get_grid_entity_at(x+1, y, l)
-    if floor ~= -1 and air == -1 and left == -1 and right == -1 then
+    local box = AABB:new()
+    box.left = x-1
+    box.right = x+1
+    box.top = y+1
+    box.bottom = y
+    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, l)
+    local left = get_grid_entity_at(x-1, y-1, l)
+    local right = get_grid_entity_at(x+1, y-1, l)
+    if floor ~= -1 and #air == 0 and left ~= -1 and right ~= -1 then
         floor = get_entity(floor)
-        return has(valid_floors, floor.type.id)
+        left = get_entity(left)
+        right = get_entity(right)
+        return has(valid_floors, floor.type.id) and has(valid_floors, left.type.id) and has(valid_floors, right.type.id)
     end
     return false
 end
@@ -483,7 +489,6 @@ end
 local trap_frog_chance = define_procedural_spawn("trap_frog", trap_frog_spawn, trap_frog_valid)
 
 set_callback(function(ctx)
-    --math.randomseed(read_prng()[1])
     if options.trap then
         ctx:set_procedural_spawn_chance(trap_ceiling_chance, math.floor(get_chance(options.trap_min, options.trap_max)*1.5))
         ctx:set_procedural_spawn_chance(trap_floor_chance, get_chance(options.trap_min, options.trap_max))
