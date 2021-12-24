@@ -718,7 +718,7 @@ Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there 
 ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
 ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
 Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
-If you use this function in the level with diceshop in it, you have to update `item_ids` in the (ITEM_DICE_PRIZE_DISPENSER)[#PrizeDispenser]
+If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser)
 Use empty table as argument to reset to the game default
 ### [`change_altar_damage_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawns)
 `nil change_altar_damage_spawns(array<ENT_TYPE> ent_types)`<br/>
