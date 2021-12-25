@@ -116,13 +116,13 @@ std::vector<DropEntry> drop_entries{
     /* set write bp on Altar->unknown (second byte after timer)*/
     // die and ushabti depend on the animation_frame, and idol has one bit flip so it can get the same result for idol and tusk idol so i din't expose those
     {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
-    {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 2},
+    {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00\x0F\x85"s, VTABLE_OFFSET::FLOOR_ALTAR, 2, 1},
     {"SACRIFICE_EGGPLANT", "\x48\x8B\x42\x08\x81\x78\x14\xE7\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 7},
     {"YAMA_EGGPLANTCROWN", "\xC6\x44\x24\x20\x00\xBA\x19\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"YAMA_GIANTFOOD", "\xC6\x44\x24\x20\x00\xBA\x07\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"YANG_KEY", "\xBA\x8F\x01\x00\x00"s, VTABLE_OFFSET::MONS_YANG, 0, 1},
     {"MADAME_TUSK_KEY", "\xBA\x8F\x01\x00\x00"s, VTABLE_OFFSET::MONS_MADAMETUSK, 0, 1},
-    {"ANUBIS2_ANUBIS_COFFIN", "\xBA\xC5\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 1},
+    {"ANUBIS2_ANUBIS_COFFIN", "\xBA\xC5\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
     {"ANUBIS_COFFIN_VAMPIRE", "\x83\xF9\x02\xBA\xF5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_SORCERESS", "\x83\xF9\x01\xB8\xFA\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"s, VTABLE_OFFSET::NONE, 0, 1},
