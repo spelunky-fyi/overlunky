@@ -131,7 +131,6 @@ std::vector<DropEntry> drop_entries{
     {"EGGSAC_GRUB_1", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1}, // 4 exact patterns, the first 3 is the spawn
     {"EGGSAC_GRUB_2", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 1},
     {"EGGSAC_GRUB_3", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 2},
-    {"BOULDERSPAWNER_BOULDER", "\xBA\x57\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
 };
 
 std::vector<DropChanceEntry> dropchance_entries{
