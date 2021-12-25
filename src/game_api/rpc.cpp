@@ -1260,7 +1260,7 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         if (new_drop_entity_type == 0)
         {
             for (int x = 0; x < 3; ++x)
-                if (entry.offsets[0])
+                if (entry.offsets[x])
                     recover_mem("replace_drop", entry.offsets[x]);
 
             return;
