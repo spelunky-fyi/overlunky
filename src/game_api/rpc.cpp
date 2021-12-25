@@ -1270,15 +1270,15 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
             auto memory = Memory::get();
             size_t offset = 0;
             size_t exe_offset = 0;
-            auto n_skips = entry.skip;
-            do
+            const auto drop_name{"DROP." + entry.caption};
+            if (entry.vtable_offset == VTABLE_OFFSET::NONE)
             {
-                if (entry.vtable_offset == VTABLE_OFFSET::NONE)
-                    offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : memory.after_bundle) + entry.value_offset;
-                else
-                    offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)) + entry.value_offset;
-
-            } while (n_skips--);
+                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : memory.after_bundle, std::nullopt, drop_name) + entry.value_offset;
+            }
+            else
+            {
+                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset), std::nullopt, drop_name) + entry.value_offset;
+            }
             exe_offset = memory.at_exe(offset);
 
             for (auto x = 0; x < entry.vtable_occurrence; ++x)

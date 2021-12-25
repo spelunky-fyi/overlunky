@@ -111,8 +111,8 @@ std::vector<DropEntry> drop_entries{
     {"SCRAP_SNAKE", "\xC6\x44\x24\x20\x00\xBA\xDC\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"SCRAP_COBRA", "\xC6\x44\x24\x20\x00\xBA\xF8\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"SCRAP_SCORPION", "\xC6\x44\x24\x20\x00\xBA\xE5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
-    {"SCRAP_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},     // there are two identical patterns, this one is first
-    {"UFO_ALIEN", "\xC6\x44\x24\x20\x00\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6, 1, 1}, // and this one is the second
+    {"SCRAP_ALIEN", "\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"UFO_ALIEN", "\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::MONS_UFO, 3, 1},
     /* set write bp on Altar->unknown (second byte after timer)*/
     // die and ushabti depend on the animation_frame, and idol has one bit flip so it can get the same result for idol and tusk idol so i din't expose those
     {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
@@ -128,9 +128,9 @@ std::vector<DropEntry> drop_entries{
     {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"s, VTABLE_OFFSET::NONE, 0, 1},
     /// It spawns two types of entities (frog and firefrog), the second one will be this + 1
     {"GIANTFROG_FROG", "\x81\xC2\x1B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 2},
-    {"EGGSAC_GRUB_1", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1}, // 4 exact patterns, the first 3 is the spawn
-    {"EGGSAC_GRUB_2", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 1},
-    {"EGGSAC_GRUB_3", "\xBA\x1E\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1, 1, 2},
+    {"EGGSAC_GRUB_1", "\xBA\x1E\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"EGGSAC_GRUB_2", "\xBA\x1E\x01\x00\x00\x0F\x28\xD6\x41\x0F\x28\xDF"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"EGGSAC_GRUB_3", "\xBA\x1E\x01\x00\x00\x0F\x28\xD6\x41\x0F\x28\xD9"s, VTABLE_OFFSET::NONE, 0, 1},
 };
 
 std::vector<DropChanceEntry> dropchance_entries{
