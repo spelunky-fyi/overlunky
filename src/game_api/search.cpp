@@ -1679,6 +1679,21 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        // Set conditional bp on KEY spawn, execute til return, scroll up untill you find instruction writing const into r14
+        "waddler_drop_array"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x45\x0F\x57\xDB\x4C\x8D\x35"sv)
+            .at_exe(),
+    },
+    {
+        // inside the same function as the above pattern, there should be: add r13, 1 | cmp r13, 3  (3 being the size)
+        "waddler_drop_size"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\xF3\x0F\x11\x88\x0C\x01\x00\x00\x49\x83\xC5\x01"sv)
+            .offset(3)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

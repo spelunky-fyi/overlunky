@@ -1907,6 +1907,51 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
     }
 }
 
+void change_waddler_drop(std::vector<ENT_TYPE> ent_types)
+{
+    static bool modified = false;
+
+    const auto offset = get_address("waddler_drop_size");
+    const auto array_offset = get_address("waddler_drop_array");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+
+    if (ent_types.size() > 255 || ent_types.size() < 1)
+    {
+        if (!ent_types.size())
+        {
+            if (modified)
+                VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+            recover_mem("waddler_drop");
+        }
+        return;
+    }
+
+    if ((!modified && ent_types.size() == 3) ||            // if it's the unchanged instruction and we set the same number of ent_type's
+        (modified && read_u8(offset) == ent_types.size())) // or new instruction but the same size
+    {
+        for (unsigned int i = 0; i < ent_types.size(); ++i)
+            write_mem_recoverable("waddler_drop", (size_t)&old_types_array[i], ent_types[i], true);
+
+        return;
+    }
+
+    const auto data_size = ent_types.size() * sizeof(ENT_TYPE);
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(array_offset + 4, data_size);
+
+    if (new_array)
+    {
+        if (modified)
+            VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+        memcpy(new_array, ent_types.data(), data_size);
+        int32_t rel = static_cast<int32_t>((size_t)new_array - (array_offset + 4));
+        write_mem_recoverable("waddler_drop", array_offset, rel, true);
+        write_mem_recoverable("waddler_drop", offset, (uint8_t)ent_types.size(), true);
+        modified = true;
+    }
+}
+
 void poison_entity(int32_t entity_uid)
 {
     auto ent = get_entity_ptr(entity_uid);

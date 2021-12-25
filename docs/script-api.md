@@ -726,6 +726,12 @@ Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
 {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
 Max 255 types
 Use empty table as argument to reset to the game default
+### [`change_waddler_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_waddler_drop)
+`nil change_waddler_drop(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+Max 255 types
+Use empty table as argument to reset to the game default
 ### [`poison_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_entity)
 `nil poison_entity(int entity_uid)`<br/>
 Poisons entity, to cure poison set `poison_tick_timer` to -1

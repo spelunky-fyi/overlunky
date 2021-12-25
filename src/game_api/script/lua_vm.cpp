@@ -1238,6 +1238,12 @@ end
     /// Use empty table as argument to reset to the game default
     lua["change_altar_damage_spawns"] = change_altar_damage_spawns;
 
+    /// Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+    /// {ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+    /// Max 255 types
+    /// Use empty table as argument to reset to the game default
+    lua["change_waddler_drop"] = change_waddler_drop;
+
     /// Poisons entity, to cure poison set `poison_tick_timer` to -1
     lua["poison_entity"] = poison_entity;
 

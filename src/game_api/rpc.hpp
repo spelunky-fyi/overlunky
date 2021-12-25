@@ -124,4 +124,5 @@ void enter_door(int32_t player_uid, int32_t door_uid);
 void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types);
 void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types);
 void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types);
+void change_waddler_drop(std::vector<ENT_TYPE> ent_types);
 void poison_entity(int32_t entity_uid);
