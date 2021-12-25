@@ -1702,7 +1702,11 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
         if (ent_types[i] >= (uint32_t)CUSTOM_TYPE::ACIDBUBBLE)
         {
             auto extra_types = get_custom_entity_types(static_cast<CUSTOM_TYPE>(ent_types[i]));
-            if (!extra_types.empty())
+            if (extra_types.size() == 1)
+            {
+                ent_types[i] = extra_types[0];
+            }
+            else if (!extra_types.empty())
             {
                 auto it = ent_types.begin() + i;
                 it = ent_types.erase(it);
@@ -1711,7 +1715,7 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
             }
         }
     }
-    return std::move(ent_types);
+    return ent_types;
 }
 
 void enter_door(int32_t player_uid, int32_t door_uid)
