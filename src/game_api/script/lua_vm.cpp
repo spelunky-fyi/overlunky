@@ -459,7 +459,7 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
-        std::vector<ENT_TYPE> proper_types = get_proper_types(types);
+        std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
@@ -480,7 +480,7 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
-        std::vector<ENT_TYPE> proper_types = get_proper_types(types);
+        std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});

@@ -514,7 +514,7 @@ std::vector<uint32_t> get_entities_by_layer(LAYER layer)
 
 std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
 {
-    return get_entities_by(entity_types, 0, LAYER::BOTH);
+    return get_entities_by(std::move(entity_types), 0, LAYER::BOTH);
 }
 std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type)
 {
@@ -530,7 +530,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
+    const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     auto push_entities = [&mask, &proper_types, &found, &state](uint8_t l)
     {
         for (auto& item : state.layer(l)->all_entities)
@@ -540,7 +540,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
 
     if (layer == LAYER::BOTH)
     {
-        if ((!entity_types.size() || !entity_types[0]) && !mask) // all entities
+        if ((!proper_types.size() || !proper_types[0]) && !mask) // all entities
         {
             found.reserve((size_t)state.layer(0)->all_entities.size + (size_t)state.layer(1)->all_entities.size);
             found.insert(found.end(), state.layer(0)->all_entities.uid_begin(), state.layer(0)->all_entities.uid_end());
@@ -555,7 +555,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     else
     {
         uint8_t correct_layer = enum_to_layer(layer);
-        if ((!entity_types.size() || !entity_types[0]) && !mask) // all entities
+        if ((!proper_types.size() || !proper_types[0]) && !mask) // all entities
         {
             found.reserve(state.layer(correct_layer)->all_entities.size);
             found.insert(found.begin(), state.layer(correct_layer)->all_entities.uid_begin(), state.layer(correct_layer)->all_entities.uid_end());
@@ -576,7 +576,7 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
 {
     auto state = State::get();
     std::vector<uint32_t> found;
-    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
+    const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     auto push_entities = [&x, &y, &radius, &mask, &proper_types, &found, &state](uint8_t l)
     {
         for (auto& item : state.layer(l)->all_entities)
@@ -607,7 +607,7 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> enti
 {
     auto state = State::get();
     std::vector<uint32_t> result;
-    const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
+    const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     if (layer == LAYER::BOTH)
     {
         std::vector<uint32_t> result2;
@@ -629,7 +629,7 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(ENT_TYPE entity_type, uint
 
 std::vector<uint32_t> get_entities_overlapping(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
-    return get_entities_overlapping_hitbox(entity_types, mask, {sx, sy2, sx2, sy}, layer);
+    return get_entities_overlapping_hitbox(std::move(entity_types), mask, {sx, sy2, sx2, sy}, layer);
 }
 std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 {
@@ -641,7 +641,7 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
     std::vector<uint32_t> found;
     for (auto& item : layer->all_entities)
     {
-        if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(entity_types, item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
+        if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(std::move(entity_types), item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
         {
             found.push_back(item->uid);
         }
@@ -717,7 +717,7 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
         return false;
     if (entity->items.count > 0)
     {
-        const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
+        const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
         int* pitems = (int*)entity->items.begin;
         for (unsigned int i = 0; i < entity->items.count; i++)
         {
@@ -743,7 +743,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
         return found;
     if (entity->items.count > 0)
     {
-        const std::vector<ENT_TYPE> proper_types = get_proper_types(entity_types);
+        const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
         uint32_t* pitems = entity->items.begin;
         for (unsigned int i = 0; i < entity->items.count; i++)
         {
@@ -1695,21 +1695,23 @@ bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE 
     return false;
 }
 
-std::vector<ENT_TYPE> get_proper_types(const std::vector<ENT_TYPE>& types_array)
+std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 {
-    std::vector<ENT_TYPE> proper_types;
-    proper_types.reserve(types_array.size());
-    for (auto el : types_array)
+    for (size_t i = 0; i < ent_types.size(); i++)
     {
-        if (el >= (uint32_t)CUSTOM_TYPE::ACIDBUBBLE)
+        if (ent_types[i] >= (uint32_t)CUSTOM_TYPE::ACIDBUBBLE)
         {
-            auto extra_types = get_custom_entity_types((CUSTOM_TYPE)el);
-            proper_types.insert(proper_types.end(), extra_types.begin(), extra_types.end());
+            auto extra_types = get_custom_entity_types(static_cast<CUSTOM_TYPE>(ent_types[i]));
+            if (!extra_types.empty())
+            {
+                auto it = ent_types.begin() + i;
+                it = ent_types.erase(it);
+                ent_types.insert(it, extra_types.begin(), extra_types.end());
+                i += extra_types.size() - 1;
+            }
         }
-        else
-            proper_types.push_back(el);
     }
-    return proper_types;
+    return std::move(ent_types);
 }
 
 void enter_door(int32_t player_uid, int32_t door_uid)

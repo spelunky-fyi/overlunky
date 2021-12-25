@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.4"
+meta.version = "2.4a"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -396,14 +396,20 @@ local function trap_item_spawn(x, y, l)
 end
 local function trap_item_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
-    if (map(x, y) & MASK.LAVA) > 0 then return false end
     local floor = get_grid_entity_at(x, y-1, l)
-    local air = get_grid_entity_at(x, y, l)
-    local left = get_grid_entity_at(x-1, y, l)
-    local right = get_grid_entity_at(x+1, y, l)
-    if floor ~= -1 and air == -1 and left == -1 and right == -1 then
+    local box = AABB:new()
+    box.left = x-1
+    box.right = x+1
+    box.top = y+1
+    box.bottom = y
+    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, l)
+    local left = get_grid_entity_at(x-1, y-1, l)
+    local right = get_grid_entity_at(x+1, y-1, l)
+    if floor ~= -1 and #air == 0 and left ~= -1 and right ~= -1 then
         floor = get_entity(floor)
-        return has(valid_floors, floor.type.id)
+        left = get_entity(left)
+        right = get_entity(right)
+        return has(valid_floors, floor.type.id) and has(valid_floors, left.type.id) and has(valid_floors, right.type.id)
     end
     return false
 end
@@ -483,7 +489,6 @@ end
 local trap_frog_chance = define_procedural_spawn("trap_frog", trap_frog_spawn, trap_frog_valid)
 
 set_callback(function(ctx)
-    --math.randomseed(read_prng()[1])
     if options.trap then
         ctx:set_procedural_spawn_chance(trap_ceiling_chance, math.floor(get_chance(options.trap_min, options.trap_max)*1.5))
         ctx:set_procedural_spawn_chance(trap_floor_chance, get_chance(options.trap_min, options.trap_max))
@@ -578,7 +583,7 @@ local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_FIREBUG_UNCHAINED,
     ENT_TYPE.MONS_CROCMAN, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS,
     ENT_TYPE.MONS_CATMUMMY, ENT_TYPE.MONS_NECROMANCER, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI,
-    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
+    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
     ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED,
     ENT_TYPE.MONS_AMMIT, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG,
@@ -604,14 +609,14 @@ local enemies_kingu = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
 local random_crap = {ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_PUNISHBALL, ENT_TYPE.ITEM_ROCK}
 local olmec_ammo = join(join(random_crap, enemies_small), traps_item)
 local tiamat_ammo = {ENT_TYPE.ITEM_ACIDSPIT, ENT_TYPE.ITEM_INKSPIT, ENT_TYPE.ITEM_FLY, ENT_TYPE.ITEM_FIREBALL, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_LAMASSU_LASER_SHOT}
-local crab_items = {ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_EGGPLANT, ENT_TYPE.ITEM_IDOL, ENT_TYPE.ITEM_KEY, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ITEM_LAVAPOT, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_USHABTI, ENT_TYPE.MONS_YANG}
+local crab_items = {ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_EGGPLANT, ENT_TYPE.ITEM_IDOL, ENT_TYPE.ITEM_KEY, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ITEM_LAVAPOT, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_USHABTI, ENT_TYPE.MONS_YANG, ENT_TYPE.ITEM_ICESPIRE}
 local friends = {ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_MARGARET_TUNNEL, ENT_TYPE.CHAR_COLIN_NORTHWARD, ENT_TYPE.CHAR_ROFFY_D_SLOTH, ENT_TYPE.CHAR_BANDA, ENT_TYPE.CHAR_GREEN_GIRL, ENT_TYPE.CHAR_AMAZON, ENT_TYPE.CHAR_LISE_SYSTEM, ENT_TYPE.CHAR_COCO_VON_DIAMONDS, ENT_TYPE.CHAR_MANFRED_TUNNEL, ENT_TYPE.CHAR_OTAKU, ENT_TYPE.CHAR_TINA_FLAN, ENT_TYPE.CHAR_VALERIE_CRUMP, ENT_TYPE.CHAR_AU, ENT_TYPE.CHAR_DEMI_VON_DIAMONDS, ENT_TYPE.CHAR_PILOT, ENT_TYPE.CHAR_PRINCESS_AIRYN, ENT_TYPE.CHAR_DIRK_YAMAOKA, ENT_TYPE.CHAR_GUY_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY, ENT_TYPE.CHAR_HIREDHAND, ENT_TYPE.CHAR_EGGPLANT_CHILD}
 local enemies_challenge = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
     ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_MANTRAP, ENT_TYPE.MONS_TIKIMAN, ENT_TYPE.MONS_WITCHDOCTOR,
     ENT_TYPE.MONS_MONKEY, ENT_TYPE.MONS_MAGMAMAN, ENT_TYPE.MONS_FIREBUG_UNCHAINED,
     ENT_TYPE.MONS_CROCMAN, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS, ENT_TYPE.MONS_NECROMANCER, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI,
-    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
+    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
     ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_LEPRECHAUN}
 
@@ -764,6 +769,12 @@ local function snowman_valid(x, y, l)
     return false
 end
 local snowman_chance = define_procedural_spawn("snowman", snowman_spawn, snowman_valid)
+set_post_entity_spawn(function(ent)
+    if ent.overlay and ent.overlay.type.id == ENT_TYPE.MONS_HERMITCRAB then
+        ent.animation_frame = 221
+        ent.offsety = ent.offsety + 0.05
+    end
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_ICESPIRE)
 
 set_callback(function()
     if options.friend and options.friend_evil then
@@ -842,7 +853,7 @@ set_callback(function(ctx)
         end
     end
 
-    ctx:set_procedural_spawn_chance(snowman_chance, get_chance(options.enemy_min, options.enemy_max) * 5)
+    ctx:set_procedural_spawn_chance(snowman_chance, get_chance(options.enemy_min, options.enemy_max) * 8)
 
     change_sunchallenge_spawns(enemies_challenge)
     change_altar_damage_spawns(enemies_challenge)
@@ -854,6 +865,9 @@ end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_REDSKELETON)
 
 set_post_entity_spawn(function(ent)
     ent.carried_entity_type = pick(crab_items)
+    if prng:random() < 0.25 then
+        ent.carried_entity_type = ENT_TYPE.ITEM_ICESPIRE
+    end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
@@ -1128,6 +1142,26 @@ local all_shop_guns = join(shop_guns, extra_shop_guns)
 local shop_mounts = {ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.MOUNT_MECH, ENT_TYPE.MOUNT_QILIN, ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_TURKEY}
 local shop_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.CAVEMANSHOP_LEFT}
 local shop_replace_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.CAVEMANSHOP_LEFT}
+local shop_names = {
+    [ENT_TYPE.ITEM_LIGHT_ARROW] = "Light Arrow",
+    [ENT_TYPE.ITEM_PICKUP_GIANTFOOD] = "Vegan Face Meat",
+    [ENT_TYPE.ITEM_PICKUP_ELIXIR] = "Elixir",
+    [ENT_TYPE.ITEM_PICKUP_CLOVER] = "Clover",
+    [ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS] = "Alien Compass",
+    [ENT_TYPE.ITEM_PICKUP_UDJATEYE] = "Udjat Eye",
+    [ENT_TYPE.ITEM_PICKUP_KAPALA] = "Kapala",
+    [ENT_TYPE.ITEM_PICKUP_CROWN] = "Crown",
+    [ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN] = "Eggplant Crown",
+    [ENT_TYPE.ITEM_PICKUP_TRUECROWN] = "True Crown",
+    [ENT_TYPE.ITEM_PICKUP_ANKH] = "Ankh",
+    [ENT_TYPE.ITEM_CLONEGUN] = "Clone Gun",
+    [ENT_TYPE.ITEM_HOUYIBOW] = "Hawkeye Bow",
+    [ENT_TYPE.ITEM_WOODEN_SHIELD] = "TOTALLY METAL SHIELD",
+    [ENT_TYPE.ITEM_LANDMINE] = "Who put this here!?",
+    [ENT_TYPE.ITEM_SNAP_TRAP] = "Who put this here?!",
+    [ENT_TYPE.MOUNT_QILIN] = "Updog"
+}
+local wrong_stringid = 1948
 
 set_callback(function()
     local in_shop = {}
@@ -1145,6 +1179,15 @@ set_callback(function()
             v.price = 0
         end
     end
+
+    local etype = get_type(ENT_TYPE.MOUNT_QILIN)
+    if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
+        if shop_names[etype.id] ~= nil then
+            etype.description = add_string(shop_names[etype.id])
+        else
+            etype.description = prng:random(1804, 1858)
+        end
+    end
 end, ON.POST_LEVEL_GENERATION)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
@@ -1154,8 +1197,12 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(all_shop_items)
         local etype = get_type(eid)
-        if etype.description > 1900 then
-            etype.description = prng:random(1804, 1858)
+        if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
+            if shop_names[etype.id] ~= nil then
+                etype.description = add_string(shop_names[etype.id])
+            else
+                etype.description = prng:random(1804, 1858)
+            end
         end
         return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
@@ -1169,8 +1216,12 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(shop_mounts)
         local etype = get_type(eid)
-        if etype.description > 1900 then
-            etype.description = prng:random(1804, 1858)
+        if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
+            if shop_names[etype.id] ~= nil then
+                etype.description = add_string(shop_names[etype.id])
+            else
+                etype.description = prng:random(1804, 1858)
+            end
         end
         return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
@@ -1198,8 +1249,12 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
         --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(all_shop_guns)
         local etype = get_type(eid)
-        if etype.description > 1900 then
-            etype.description = prng:random(1804, 1858)
+        if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
+            if shop_names[etype.id] ~= nil then
+                etype.description = add_string(shop_names[etype.id])
+            else
+                etype.description = prng:random(1804, 1858)
+            end
         end
         return spawn_entity_nonreplaceable(eid, x, y, l, 0, 0)
     end
