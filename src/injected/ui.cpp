@@ -3018,6 +3018,7 @@ void render_clickhandler()
             to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
             to_id("ENT_TYPE_FLOOR_DUSTWALL"),
             to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
+            to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
         };
         for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
         {
