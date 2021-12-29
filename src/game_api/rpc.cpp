@@ -1745,6 +1745,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
 
         recover_mem("sunchallenge_spawn");
+        modified = false;
         return;
     }
 
@@ -1923,6 +1924,7 @@ void change_waddler_drop(std::vector<ENT_TYPE> ent_types)
                 VirtualFree(old_types_array, 0, MEM_RELEASE);
 
             recover_mem("waddler_drop");
+            modified = false;
         }
         return;
     }
