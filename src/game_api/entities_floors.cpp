@@ -236,10 +236,8 @@ Entity* Floor::find_corner_decoration(FLOOR_SIDE side)
         {-0.42f, -0.42f},
         {+0.42f, -0.42f}};
 
-    int* pitems = (int*)items.begin;
-    for (uint8_t i = 0; i < items.count; ++i)
+    for (auto item : items)
     {
-        Entity* item = get_entity_ptr(pitems[i]);
         auto [x_pos, y_pos] = item->position_self();
         if (std::abs(x_pos - offsets[side - 4][0]) < 0.0001f && std::abs(y_pos - offsets[side - 4][1]) < 0.0001f)
         {
@@ -646,6 +644,23 @@ void Arrowtrap::rearm()
         if ((flags & (1 << 16)) > 0)
         {
             trigger->flags |= (1 << 16);
+        }
+    }
+}
+
+void Arrowtrap::trigger(int32_t who_uid)
+{
+    auto who = get_entity_ptr(who_uid);
+    static const ENT_TYPE logical_trigger = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER");
+    if (who)
+    {
+        for (auto item : items)
+        {
+            if (item->type->id == logical_trigger)
+            {
+                item->on_collision2(who);
+                return;
+            }
         }
     }
 }

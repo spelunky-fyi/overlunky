@@ -131,6 +131,8 @@ class Arrowtrap : public Floor
     bool arrow_shot;
 
     void rearm();
+    /// The uid must be movable entity for ownership transfers
+    void trigger(int32_t who_uid);
 };
 
 class TotemTrap : public Floor

@@ -145,6 +145,8 @@ std::vector<DropEntry> drop_entries{
     {"LAMASSU_RUBY", "\xBD\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1},
     {"LAMASSU_EMERALD", "\xBA\xF2\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1}, // there is a second line with 1F2 value, not sure if that the type as well
     {"LAMASSU_DIAMOND", "\xB8\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1},
+    //{"ARROWTRAP_WOODENARROW", "\xBA\x73\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_ARROW_TRAP, 40, 1}, // crashes the game, same to the poisoned
+
 };
 
 std::vector<DropChanceEntry> dropchance_entries{

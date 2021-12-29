@@ -1903,6 +1903,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`EggShipDoor
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
 - [`nil rearm()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rearm) &Arrowtrap::rearm
+- [`nil trigger(int who_uid)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &Arrowtrap::trigger
+\
+The uid must be movable entity for ownership transfers
 ### `TotemTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`ENT_TYPE spawn_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) &TotemTrap::spawn_entity_type

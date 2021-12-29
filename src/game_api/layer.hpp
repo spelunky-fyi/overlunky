@@ -1,12 +1,18 @@
 #pragma once
-#include "entity.hpp"
 
-struct Entities
+class Entity;
+
+struct EntityList
 {
     Entity** ent_list;
     uint32_t* uids;
     uint32_t cap;
     uint32_t size;
+
+    constexpr bool empty()
+    {
+        return !!size;
+    };
 
     constexpr Entity** begin()
     {
@@ -16,6 +22,18 @@ struct Entities
     {
         return ent_list + size;
     };
+    constexpr Entity* at(uint32_t idx)
+    {
+        return ent_list[idx];
+    };
+    constexpr Entity* front()
+    {
+        return *ent_list;
+    };
+    constexpr Entity* back()
+    {
+        return ent_list[size - 1];
+    };
 
     constexpr uint32_t* uid_begin()
     {
@@ -24,6 +42,15 @@ struct Entities
     constexpr uint32_t* uid_end()
     {
         return uids + size;
+    };
+
+    constexpr bool contains(Entity* ent)
+    {
+        return (std::find(begin(), end(), ent) != end());
+    };
+    constexpr bool contains(uint32_t uid)
+    {
+        return (std::find(uid_begin(), uid_end(), uid) != uid_end());
     };
 
     std::pair<Entity*, uint32_t> operator[](const uint32_t idx) const
@@ -36,9 +63,9 @@ struct Layer
 {
     bool is_back_layer;
     // int8_t padding[7];
-    Entities all_entities;
+    EntityList all_entities;
     //char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
-    Entities unknown_entities1;
+    EntityList unknown_entities1;
     size_t unknown1;
     std::map<int, int> unknown2;
 
@@ -48,15 +75,15 @@ struct Layer
 
     char stuff1[0x3FD08]; // Just wanna get to expired_items_
 
-    Entities unknown_entities2; // debris, explosions, laserbeams etc. ?
-    Entities unknown_entities3; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
+    EntityList unknown_entities2; // debris, explosions, laserbeams etc. ?
+    EntityList unknown_entities3; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
     size_t unknown3;
     size_t unknown4;
     size_t unknown5;
     size_t unknown6;
     // List of items that were destroyed and are waiting to have the dtor called
     // and then be returned to the entity pool
-    Entities expired_entities;
+    EntityList expired_entities;
     bool is_layer_loading;
     bool unknown14;
     uint8_t unknown15;
@@ -64,7 +91,7 @@ struct Layer
     uint32_t unknown17;
     uint32_t unknown18;
     uint32_t unknown19;
-    size_t unknown20;
+    size_t entity_items_begin; // begin of the memory that holds the items of entities
     size_t unknown21;
     size_t unknown22;
     bool unknown23;

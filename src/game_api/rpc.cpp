@@ -83,7 +83,7 @@ void attach_entity(Entity* overlay, Entity* attachee)
     attachee->special_offsety = attachee->y;
     attachee->overlay = overlay;
 
-    using AddItemPtr = void(Vector*, Entity*, bool);
+    using AddItemPtr = void(EntityList*, Entity*, bool);
     static AddItemPtr* add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
     add_item_ptr(&overlay->items, attachee, false);
 }
@@ -558,7 +558,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
         if ((!proper_types.size() || !proper_types[0]) && !mask) // all entities
         {
             found.reserve(state.layer(correct_layer)->all_entities.size);
-            found.insert(found.begin(), state.layer(correct_layer)->all_entities.uid_begin(), state.layer(correct_layer)->all_entities.uid_end());
+            found.insert(found.end(), state.layer(correct_layer)->all_entities.uid_begin(), state.layer(correct_layer)->all_entities.uid_end());
         }
         else
         {
@@ -698,16 +698,8 @@ bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return false;
-    if (entity->items.count > 0)
-    {
-        auto pitems = entity->items.begin;
-        for (unsigned int i = 0; i < entity->items.count; i++)
-        {
-            if (pitems[i] == item_uid)
-                return true;
-        }
-    }
-    return false;
+
+    return entity->items.contains(item_uid);
 };
 
 bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
@@ -715,15 +707,11 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return false;
-    if (entity->items.count > 0)
+    if (entity->items.size > 0)
     {
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        int* pitems = (int*)entity->items.begin;
-        for (unsigned int i = 0; i < entity->items.count; i++)
+        for (auto item : entity->items)
         {
-            Entity* item = get_entity_ptr(pitems[i]);
-            if (item == nullptr)
-                continue;
             if (entity_type_check(proper_types, item->type->id))
                 return true;
         }
@@ -741,20 +729,22 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return found;
-    if (entity->items.count > 0)
+    if (entity->items.size > 0)
     {
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        uint32_t* pitems = entity->items.begin;
-        for (unsigned int i = 0; i < entity->items.count; i++)
+        if ((!proper_types.size() || !proper_types[0]) && !mask) // all items
         {
-            Entity* item = get_entity_ptr(pitems[i]);
-            if (item == nullptr)
+            found.reserve(entity->items.size);
+            found.insert(found.end(), entity->items.uid_begin(), entity->items.uid_end());
+        }
+        else
+        {
+            for (auto item : entity->items)
             {
-                continue;
-            }
-            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
-            {
-                found.push_back(item->uid);
+                if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
+                {
+                    found.push_back(item->uid);
+                }
             }
         }
     }
@@ -847,12 +837,10 @@ void flip_entity(uint32_t uid)
     if (ent == nullptr)
         return;
     ent->flags = flipflag(ent->flags, 17);
-    if (ent->items.count > 0)
+    if (ent->items.size > 0)
     {
-        int* items = (int*)ent->items.begin;
-        for (unsigned int i = 0; i < ent->items.count; i++)
+        for (auto item : ent->items)
         {
-            Entity* item = get_entity_ptr(items[i]);
             item->flags = flipflag(item->flags, 17);
         }
     }

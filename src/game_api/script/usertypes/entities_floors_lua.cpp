@@ -155,6 +155,8 @@ void register_usertypes(sol::state& lua)
         &Arrowtrap::arrow_shot,
         "rearm",
         &Arrowtrap::rearm,
+        "trigger",
+        &Arrowtrap::trigger,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 

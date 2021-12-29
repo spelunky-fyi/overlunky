@@ -10,6 +10,7 @@
 
 #include "aliases.hpp"
 #include "color.hpp"
+#include "layer.hpp"
 #include "math.hpp"
 #include "memory.hpp"
 #include "state_structs.hpp"
@@ -153,25 +154,12 @@ EntityDB* get_type(uint32_t id);
 
 ENT_TYPE to_id(std::string_view id);
 
-class Vector
-{
-  public:
-    uint32_t* heap;
-    uint32_t* begin;
-    uint32_t size, count;
-
-    bool empty()
-    {
-        return !!count;
-    }
-};
-
 class Entity
 {
   public:
     EntityDB* type;
     Entity* overlay;
-    Vector items;
+    EntityList items;
     uint32_t flags;
     uint32_t more_flags;
     int32_t uid;
