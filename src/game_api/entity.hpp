@@ -321,8 +321,8 @@ class Entity
     virtual void v20() = 0;
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
-    virtual void v23() = 0;
-    virtual bool on_open(Entity* opener) = 0; // used for crates and presents
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // spawns LASERTRAP_SHOT from LASERTRAP
+    virtual bool on_open(Entity* opener) = 0;                                // used for crates and presents
 
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0;

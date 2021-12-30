@@ -39,6 +39,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_horizontalforcefield"] = &Entity::as<HorizontalForceField>;
     lua["Entity"]["as_tentaclebottom"] = &Entity::as<TentacleBottom>;
     lua["Entity"]["as_poledeco"] = &Entity::as<PoleDeco>;
+    lua["Entity"]["as_junglespeartrap"] = &Entity::as<JungleSpearTrap>;
 
     lua.new_usertype<Floor>(
         "Floor",
@@ -166,6 +167,8 @@ void register_usertypes(sol::state& lua)
         &TotemTrap::spawn_entity_type,
         "first_sound_id",
         &TotemTrap::first_sound_id,
+        "trigger",
+        &TotemTrap::trigger,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
@@ -269,6 +272,8 @@ void register_usertypes(sol::state& lua)
         &BigSpearTrap::spear_uid,
         "left_part",
         &BigSpearTrap::left_part,
+        "trigger",
+        &BigSpearTrap::trigger,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
@@ -385,6 +390,13 @@ void register_usertypes(sol::state& lua)
         &PoleDeco::deco_up,
         "deco_down",
         &PoleDeco::deco_down,
+        sol::base_classes,
+        sol::bases<Entity, Floor>());
+
+    lua.new_usertype<JungleSpearTrap>(
+        "JungleSpearTrap",
+        "trigger",
+        &JungleSpearTrap::trigger,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 }

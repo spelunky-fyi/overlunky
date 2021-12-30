@@ -137,6 +137,7 @@ std::vector<DropEntry> drop_entries{
     {"QUILLBACK_BOMBBAG", "\xBA\x01\x02\x00\x00"s, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"QUILLBACK_COOKEDTURKEY", "\xBA\x06\x02\x00\x00"s, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"LAVAPOT_MAGMAMAN", "\xBA\xEF\x00\x00\x00"s, VTABLE_OFFSET::ITEM_LAVAPOT, 3, 1},
+    /// Always spawns 5
     {"LAVAMANDER_RUBY", "\xBA\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAVAMANDER, 3, 1}, //41 80 FE 05 - 05 ammount
     {"CATMUMMY_DIAMOND", "\xBA\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_CATMUMMY, 3, 1},
     /// Has to be ENT_TYPE_CHAR_*
@@ -145,8 +146,11 @@ std::vector<DropEntry> drop_entries{
     {"LAMASSU_RUBY", "\xBD\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1},
     {"LAMASSU_EMERALD", "\xBA\xF2\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1}, // there is a second line with 1F2 value, not sure if that the type as well
     {"LAMASSU_DIAMOND", "\xB8\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1},
-    //{"ARROWTRAP_WOODENARROW", "\xBA\x73\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_ARROW_TRAP, 40, 1}, // crashes the game, same to the poisoned
-
+    /// Needs to be an arrow, otherwise it may crash the game on spawn or interaction
+    {"ARROWTRAP_WOODENARROW", "\xBA\x73\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_ARROW_TRAP, 40, 1},
+    /// Needs to be an arrow, otherwise it may crash the game on spawn or interaction, arrow can still be poisoned after spawn
+    {"POISONEDARROWTRAP_WOODENARROW", "\xBA\x73\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_POISONED_ARROW_TRAP, 40, 1},
+    {"LASERTRAP_SHOT", "\xBA\x7E\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_LASER_TRAP, 23, 1},
 };
 
 std::vector<DropChanceEntry> dropchance_entries{

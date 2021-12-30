@@ -57,7 +57,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][40] = lua["Entity"]["as_arrowtrap"];            // FLOOR_ARROW_TRAP
     lua["TYPE_MAP"][41] = lua["Entity"]["as_arrowtrap"];            // FLOOR_POISONED_ARROW_TRAP
     lua["TYPE_MAP"][42] = lua["Entity"]["as_totemtrap"];            // FLOOR_TOTEM_TRAP
-    lua["TYPE_MAP"][43] = lua["Entity"]["as_floor"];                // FLOOR_JUNGLE_SPEAR_TRAP
+    lua["TYPE_MAP"][43] = lua["Entity"]["as_junglespeartrap"];      // FLOOR_JUNGLE_SPEAR_TRAP
     lua["TYPE_MAP"][44] = lua["Entity"]["as_totemtrap"];            // FLOOR_LION_TRAP
     lua["TYPE_MAP"][45] = lua["Entity"]["as_lasertrap"];            // FLOOR_LASER_TRAP
     lua["TYPE_MAP"][46] = lua["Entity"]["as_sparktrap"];            // FLOOR_SPARK_TRAP

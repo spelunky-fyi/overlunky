@@ -470,9 +470,6 @@ Get the current timestamp in milliseconds since the Unix Epoch.
 ### [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry)
 `nil carry(int mount_uid, int rider_uid)`<br/>
 Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
-### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
-`nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)`<br/>
-Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
 ### [`set_kapala_blood_threshold`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_kapala_blood_threshold)
 `nil set_kapala_blood_threshold(int threshold)`<br/>
 Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
@@ -991,6 +988,9 @@ Use `get_entities_overlapping_hitbox` instead
 ### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
 `int get_entity_ai_state(int uid)`<br/>
 As the name is misleading. use entity `move_state` field instead
+### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
+`nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)`<br/>
+Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
 ### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
 `nil set_camera_position(float cx, float cy)`<br/>
 this doesn't actually work at all. See State -> Camera the for proper camera handling
@@ -1910,6 +1910,9 @@ The uid must be movable entity for ownership transfers
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`ENT_TYPE spawn_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) &TotemTrap::spawn_entity_type
 - [`int first_sound_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) &TotemTrap::first_sound_id
+- [`nil trigger(int who_uid, int direction)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &TotemTrap::trigger
+\
+The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right
 ### `LaserTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LaserTrap::emitted_light
@@ -1976,6 +1979,10 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool left_part`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_part) &BigSpearTrap::left_part
 \
 setting the left part to 0 or right part to 1 destroys the trap
+- [`nil trigger(int who_uid, int direction)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &BigSpearTrap::trigger
+\
+The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
+direction: 1 = left, 2 = right
 ### `StickyTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid
@@ -2042,6 +2049,11 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int deco_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_up) &PoleDeco::deco_up
 - [`int deco_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_down) &PoleDeco::deco_down
+### `JungleSpearTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`nil trigger(int who_uid, int direction)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &JungleSpearTrap::trigger
+\
+The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down
 ### `Crushtrap`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
@@ -4960,6 +4972,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_jiangshi
 - as_jumpdog
 - as_junglespearcosmetic
+- as_junglespeartrap
 - as_jungletraptrigger
 - as_kapalapowerup
 - as_kingu

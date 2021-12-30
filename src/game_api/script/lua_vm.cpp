@@ -709,7 +709,8 @@ end
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
     /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
-    /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
+    /// Deprecated
+    /// Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
     /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
     lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
