@@ -37,8 +37,11 @@ std::vector<DropEntry> drop_entries{
     {"GHOSTJAR_DIAMOND", "\xF1\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CURSEDPOT, 3},
     {"GHOST_DIAMOND", "\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_GHOST, 26},
     {"GIANTSPIDER_PASTE", "\x11\x02\x00\x00"s, VTABLE_OFFSET::MONS_GIANTSPIDER, 3},
-    {"GOLDENMONKEY_SMALLRUBY", "\xF9\x01\x00\x00"s, VTABLE_OFFSET::MONS_GOLDMONKEY, 78},
-    {"GOLDENMONKEY_SMALLSAPPHIRE", "\xF8\x01\x00\x00"s, VTABLE_OFFSET::MONS_GOLDMONKEY, 78},
+    /// Has a chance to be +3 (NUGGET_SMALL)
+    {"GOLDENMONKEY_SMALLEMERALD", "\x8D\x94\x6D\xF7\x01\x00\x00"s, VTABLE_OFFSET::MONS_GOLDMONKEY, 78, 3},
+    {"GOLDENMONKEY_SMALLSAPPHIRE", "\xBA\xF8\x01\x00\x00"s, VTABLE_OFFSET::MONS_GOLDMONKEY, 78, 1},
+    {"GOLDENMONKEY_SMALLRUBY", "\xBA\xF9\x01\x00\x00"s, VTABLE_OFFSET::MONS_GOLDMONKEY, 78, 1},
+    {"GOLDENMONKEY_NUGGET", "\xBA\xF5\x01\x00\x00"s, VTABLE_OFFSET::MONS_GOLDMONKEY, 78, 1},
     {"HANGINGSPIDER_WEBGUN", "\x40\x02\x00\x00"s, VTABLE_OFFSET::MONS_HANGSPIDER, 3},
     {"ICECAVE_BOULDER", "\x57\x02\x00\x00"s, VTABLE_OFFSET::LOGICAL_BOULDERSPAWNER, 2},
     {"JIANGSHIASSASSIN_SPIKESHOES", "\x10\x02\x00\x00"s, VTABLE_OFFSET::MONS_FEMALE_JIANGSHI, 3},
@@ -52,31 +55,28 @@ std::vector<DropEntry> drop_entries{
     {"MOLE_MATTOCK", "\x46\x02\x00\x00"s, VTABLE_OFFSET::MONS_MOLE, 3},
     {"MOSQUITO_HOVERPACK", "\x3C\x02\x00\x00"s, VTABLE_OFFSET::MONS_MOSQUITO, 3},
     {"MUMMY_DIAMOND", "\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_MUMMY, 3},
-    {"MUMMY_FLY", "\xB4\x01\x00\x00"s, VTABLE_OFFSET::LOGICAL_MUMMYFLIES_SOUND_SOURCE, 2},
     {"NECROMANCER_RUBY", "\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_NECROMANCER, 3},
-    {"OLMEC_BOMB", "\x5B\x01\x00\x00"s, VTABLE_OFFSET::ITEM_OLMECCANNON_BOMBS, 93},
     {"OLMEC_CAVEMAN_1", "\xBA\xE1\x00\x00\x00\xE8\x58\xB3\xD7\xFF"s, VTABLE_OFFSET::NONE, 0, 1},
     {"OLMEC_CAVEMAN_2", "\xBA\xE1\x00\x00\x00\xE8\xA4\xB2\xD7\xFF"s, VTABLE_OFFSET::NONE, 0, 1},
     {"OLMEC_CAVEMAN_3", "\xBA\xE1\x00\x00\x00\xE8\xD4\xB1\xD7\xFF"s, VTABLE_OFFSET::NONE, 0, 1},
-    {"OLMEC_UFO", "\x0A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_OLMECCANNON_UFO, 93},
     {"OSIRIS_EMERALDS", "\x20\x00\xBA\xF2\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"OSIRIS_TABLETOFDESTINY", "\xBA\x1C\x02\x00\x00\xE8****\x8B\x0D"s, VTABLE_OFFSET::NONE, 0, 1},
     {"OSIRIS_PORTAL", "\xBA\x64\x03\x00\x00\xE8****\x66\xC7"s, VTABLE_OFFSET::NONE, 0, 1},
-    {"PANGXIE_ACIDBUBBLE", "\xBA\x88\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
     /// Has a chance to spawn metal shield, in which it just +1 to this value
     {"PANGXIE_WOODENSHIELD", "\xBA\x4F\x02\x00\x00"s, VTABLE_OFFSET::MONS_CRABMAN, 3, 1},
     {"QUEENBEE_ROYALJELLY", "\x05\x02\x00\x00"s, VTABLE_OFFSET::MONS_QUEENBEE, 3},
     {"ROBOT_METALSHIELD", "\x50\x02\x00\x00"s, VTABLE_OFFSET::MONS_ROBOT, 3},
-    /// Anubis regular shot = new_drop_uid - 1 !
-    {"SCEPTER_ANUBISSPECIALSHOT", "\x79\x01\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS, 101},
-    {"SCEPTER_PLAYERSHOT", "\x7A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_SCEPTER, 24},
-    /// It's actually any goldcoin drop, so: shopkeeper, ghist, tun, yang and madame tusk
-    {"SHOPKEEPER_GOLDCOIN", "\xBA\xF6\x01\x00\x00\xE8****\x48\x89\xC7\xC7\x44\x24"s, VTABLE_OFFSET::NONE, 0, 1},
+    /// It's actually any goldcoin drop, so: shopkeeper, tun, yang and madame tusk
+    {"SHOPKEEPER_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_YANG, 109, 1},
+    /// GHIST and GHIST_SHOPKEEPER
+    {"GHIST_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_GHIST_SHOPKEEPER, 105, 1},
     {"SKELETON_SKELETONKEY", "\x1D\x02\x00\x00"s, VTABLE_OFFSET::MONS_SKELETON, 3},
     {"SKELETON_SKULL", "\xE2\x01\x00\x00"s, VTABLE_OFFSET::MONS_SKELETON, 3},
     {"SORCERESS_RUBY", "\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_SORCERESS, 3},
     {"SPARROW_ROPEPILE", "\x00\x02\x00\x00"s, VTABLE_OFFSET::MONS_THIEF, 104},
     {"SPARROW_SKELETONKEY", "\x1D\x02\x00\x00"s, VTABLE_OFFSET::MONS_THIEF, 3},
+
+    /// TIAMAT_SHOT spawns:
     {"TIAMAT_BAT", "\xE0\x00\x00\x00"s, VTABLE_OFFSET::ITEM_TIAMAT_SHOT, 78},
     {"TIAMAT_BEE", "\x16\x01\x00\x00"s, VTABLE_OFFSET::ITEM_TIAMAT_SHOT, 78},
     {"TIAMAT_CAVEMAN", "\xE1\x00\x00\x00"s, VTABLE_OFFSET::ITEM_TIAMAT_SHOT, 78},
@@ -91,6 +91,8 @@ std::vector<DropEntry> drop_entries{
     {"TIAMAT_SNAKE", "\xDC\x00\x00\x00"s, VTABLE_OFFSET::ITEM_TIAMAT_SHOT, 78},
     {"TIAMAT_UFO", "\x0A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_TIAMAT_SHOT, 78},
     {"TIAMAT_YETI", "\xBA\x0C\x01\x00\x00"s, VTABLE_OFFSET::ITEM_TIAMAT_SHOT, 78, 1},
+    /// ---
+
     {"TORCH_SMALLNUGGET", "\xFA\x01\x00\x00"s, VTABLE_OFFSET::ITEM_LITWALLTORCH, 93},
     {"TURKEY_COOKEDTURKEY", "\x06\x02\x00\x00"s, VTABLE_OFFSET::MOUNT_TURKEY, 48},
     {"UFO_PARACHUTE", "\x14\x02\x00\x00"s, VTABLE_OFFSET::MONS_UFO, 78},
@@ -99,7 +101,6 @@ std::vector<DropEntry> drop_entries{
     {"VAN_HORSING_DIAMOND", "\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_OLD_HUNTER, 104},
     {"VLAD_VLADSCAPE", "\x35\x02\x00\x00"s, VTABLE_OFFSET::MONS_VLAD, 3},
     {"YETIKING_FREEZERAY", "\x42\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETIKING, 105},
-    {"YETIKING_ICESPIRE", "\xE8\x01\x00\x00"s, VTABLE_OFFSET::MONS_YETIKING, 104},
     {"YETIQUEEN_POWERPACK", "\x3E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETIQUEEN, 105},
     {"YETI_PITCHERSMITT", "\x0E\x02\x00\x00"s, VTABLE_OFFSET::MONS_YETI, 3},
     /* set write bp on Generator.spawned_uid, when it's being set to -1, execute return, find item_scrap id close to this location */
@@ -115,9 +116,11 @@ std::vector<DropEntry> drop_entries{
     {"SCRAP_COBRA", "\xC6\x44\x24\x20\x00\xBA\xF8\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"SCRAP_SCORPION", "\xC6\x44\x24\x20\x00\xBA\xE5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"SCRAP_ALIEN", "\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
+    /// Will spawn with parachute, so has to be PowerupCapable entity
     {"UFO_ALIEN", "\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::MONS_UFO, 3, 1},
     /* set write bp on Altar->unknown (second byte after timer)*/
-    // die and ushabti depend on the animation_frame, and idol has one bit flip so it can get the same result for idol and tusk idol so i din't expose those
+    // die and ushabti depend on the animation_frame
+    //TODO: idol has one bit flip so it can get the same result for idol and tusk idol so i din't expose those
     {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00\x0F\x85"s, VTABLE_OFFSET::FLOOR_ALTAR, 2, 1},
     {"SACRIFICE_EGGPLANT", "\x48\x8B\x42\x08\x81\x78\x14\xE7\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 7},
@@ -125,7 +128,6 @@ std::vector<DropEntry> drop_entries{
     {"YAMA_GIANTFOOD", "\xC6\x44\x24\x20\x00\xBA\x07\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"YANG_KEY", "\xBA\x8F\x01\x00\x00"s, VTABLE_OFFSET::MONS_YANG, 0, 1},
     {"MADAME_TUSK_KEY", "\xBA\x8F\x01\x00\x00"s, VTABLE_OFFSET::MONS_MADAMETUSK, 0, 1},
-    {"ANUBIS2_ANUBIS_COFFIN", "\xBA\xC5\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
     {"ANUBIS_COFFIN_VAMPIRE", "\x83\xF9\x02\xBA\xF5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_SORCERESS", "\x83\xF9\x01\xB8\xFA\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"s, VTABLE_OFFSET::NONE, 0, 1},
@@ -146,11 +148,79 @@ std::vector<DropEntry> drop_entries{
     {"LAMASSU_RUBY", "\xBD\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1},
     {"LAMASSU_EMERALD", "\xBA\xF2\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1}, // there is a second line with 1F2 value, not sure if that the type as well
     {"LAMASSU_DIAMOND", "\xB8\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 3, 1},
+    {"DUATALTAR_BOMBBAG", "\xBE\x01\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_DUAT_ALTAR, 36, 1},
+    {"DUATALTAR_BOMBBOX", "\xBE\x02\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_DUAT_ALTAR, 36, 1},
+    {"DUATALTAR_COOKEDTURKEY", "\xBE\x06\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_DUAT_ALTAR, 36, 1},
+    {"FLOORSTYLEDCOG_NUGGET", "\xBA\xF5\x01\x00\x00"s, VTABLE_OFFSET::FLOORSTYLED_COG, 3, 1},
+    /// COG
+    {"CRUSHTRAP_NUGGET", "\xBA\xF5\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_CRUSH_TRAP_LARGE, 3, 1},
+    /// COG
+    {"SLIDINGWALL_NUGGET", "\xBA\xF5\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_SLIDINGWALL, 3, 1},
+    /// Can sapwn this + 5 (for NUGGET_SMALL)
+    {"EMBED_NUGGET", "\x81\xC2\xF5\x01\x00\x00"s, VTABLE_OFFSET::EMBED_GOLD, 3, 2},
+    /// Can be +1 for SAPPHIRE_SMALL
+    {"CHEST_SMALLEMERALD", "\xBA\xF7\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"CHEST_EMERALD", "\xBA\xF2\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"CHEST_SAPPHIRE", "\xBA\xF3\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"CHEST_RUBY", "\xBA\xF4\x01\x00\x00\xEB"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"CHEST_SMALLRUBY", "\xBA\xF9\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"CHEST_LEPRECHAUN", "\xBA\x36\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"CHEST_BOMB", "\xBA\x5B\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    /// Game does this (this value | 0x1) to get SAPPHIRE (so depending on the chosen ENT_TYPE it can be + 1 or + 0)
+    {"VAULTCHEST_EMERALD", "\x81\xCA\xF2\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CHEST, 3, 2},
+    {"VAULTCHEST_DIAMOND", "\xBA\xF1\x01\x00\x00\xEB"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"VAULTCHEST_RUBY", "\xBA\xF4\x01\x00\x00\x48"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
+    {"LOCKEDCHEST_UDJATEYE", "\xBA\x15\x02\x00\x00"s, VTABLE_OFFSET::ITEM_LOCKEDCHEST, 26, 1},
+    {"USHABTI_QILIN", "\xBA\x15\x02\x00\x00"s, VTABLE_OFFSET::ITEM_USHABTI, 77, 1},
+    {"POTOFGOLD_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::ITEM_POTOFGOLD, 88, 1}, // 88 is just the closest function
+    /// Cutscene after beating hundun
+    {"CUTSCENE_GOLDCOIN", "\xBA\xF6\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1}, // this relies on the fact that this it is the first pattern
+
+    ///
+    /// Attacks:
+    ///
+
     /// Needs to be an arrow, otherwise it may crash the game on spawn or interaction
     {"ARROWTRAP_WOODENARROW", "\xBA\x73\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_ARROW_TRAP, 40, 1},
     /// Needs to be an arrow, otherwise it may crash the game on spawn or interaction, arrow can still be poisoned after spawn
     {"POISONEDARROWTRAP_WOODENARROW", "\xBA\x73\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_POISONED_ARROW_TRAP, 40, 1},
     {"LASERTRAP_SHOT", "\xBA\x7E\x01\x00\x00"s, VTABLE_OFFSET::FLOOR_LASER_TRAP, 23, 1},
+    {"ANUBIS2_ANUBIS_COFFIN", "\xBA\xC5\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"MUMMY_FLY", "\xB4\x01\x00\x00"s, VTABLE_OFFSET::LOGICAL_MUMMYFLIES_SOUND_SOURCE, 2},
+    {"GIANTSPIDER_WEBSHOT", "\xBA\x70\x01\x00\x00"s, VTABLE_OFFSET::MONS_GIANTSPIDER, 78, 1},
+    {"OLMEC_BOMB", "\x5B\x01\x00\x00"s, VTABLE_OFFSET::ITEM_OLMECCANNON_BOMBS, 93},
+    {"OLMEC_UFO", "\x0A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_OLMECCANNON_UFO, 93},
+    {"YETIKING_ICESPIRE", "\xE8\x01\x00\x00"s, VTABLE_OFFSET::MONS_YETIKING, 104},
+    /// Anubis regular shot = new_drop_uid - 1 !
+    {"SCEPTER_ANUBISSPECIALSHOT", "\x79\x01\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS, 101},
+    {"SCEPTER_PLAYERSHOT", "\x7A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_SCEPTER, 24},
+    {"PLASMACANNON_SHOT", "\xBA\x77\x01\x00\x00"s, VTABLE_OFFSET::ITEM_PLASMACANNON, 24, 1},
+    {"FREEZERAY_SHOT", "\xBA\xA9\x01\x00\x00"s, VTABLE_OFFSET::ITEM_FREEZERAY, 24, 1},
+    {"CLONEGUN_SHOT", "\xBA\xAA\x01\x00\x00"s, VTABLE_OFFSET::ITEM_CLONEGUN, 24, 1},
+    /// It spawns 6 bullets
+    {"SHOTGUN_BULLET", "\xBA\xA8\x01\x00\x00"s, VTABLE_OFFSET::ITEM_SHOTGUN, 24, 1},
+    {"UFO_LASERSHOT", "\xBA\x7B\x01\x00\x00"s, VTABLE_OFFSET::MONS_UFO, 75, 1}, // 75 is just the closest function
+    {"LAMASSU_LASERSHOT", "\xBA\x7C\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAMASSU, 78, 1},
+    {"SORCERESS_DAGGERSHOT", "\xBA\x7D\x01\x00\x00"s, VTABLE_OFFSET::MONS_SORCERESS, 78, 1},
+    {"TIAMAT_TIAMATSHOT", "\xBA\x80\x01\x00\x00"s, VTABLE_OFFSET::MONS_TIAMAT, 78, 1},
+    {"ROCKDOG_FIREBALL", "\xBA\x81\x01\x00\x00"s, VTABLE_OFFSET::MOUNT_ROCKDOG, 75, 1}, // 75 is just the closest function
+    {"QILIN_FIREBALL", "\xBA\x81\x01\x00\x00"s, VTABLE_OFFSET::MOUNT_QILIN, 75, 1},     // 75 is just the closest function
+    {"AXOLOTL_BUBBLE", "\xBA\xC8\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"HUNDUN_FIREBALL", "\xBA\x82\x01\x00\x00"s, VTABLE_OFFSET::MONS_HUNDUN_BIRDHEAD, 78, 1},
+    {"FIREBUG_FIREBALL", "\xBA\x83\x01\x00\x00"s, VTABLE_OFFSET::MONS_FIREBUG, 75, 1}, // 75 is just the closest function
+    {"COBRA_ACIDSPIT", "\xBA\x85\x01\x00\x00"s, VTABLE_OFFSET::MONS_COBRA, 78, 1},
+    {"OCTOPUS_INKSPIT", "\xBA\x86\x01\x00\x00"s, VTABLE_OFFSET::MONS_OCTOPUS, 78, 1},
+    {"HERMITCRAB_ACIDBUBBLE", "\xBA\x87\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"PANGXIE_ACIDBUBBLE", "\xBA\x88\x01\x00\x00"s, VTABLE_OFFSET::MONS_CRABMAN, 78, 1},
+
+    ///
+    /// Special:
+    ///
+
+    /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
+    {"MOTHERSTATUE_HEALTH", "\xBB\x04\x00\x00\x00"s, VTABLE_OFFSET::FLOOR_MOTHER_STATUE, 2, 1},
+
+    /// maybe TODO: if someone wants all the explosions (from damage/death/crush) and catmummy cursing cloud could also be added
 };
 
 std::vector<DropChanceEntry> dropchance_entries{
