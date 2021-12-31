@@ -179,6 +179,7 @@ std::vector<DropEntry> drop_entries{
     {"POTOFGOLD_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::ITEM_POTOFGOLD, 88, 1}, // 88 is just the closest function
     /// Cutscene after beating hundun
     {"CUTSCENE_GOLDCOIN", "\xBA\xF6\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1}, // this relies on the fact that this it is the first pattern
+    /// Can spawn 0..3
     {"REDLANTERN_SMALLNUGGET", "\xBA\xFA\x01\x00\x00"s, VTABLE_OFFSET::ITEM_REDLANTERN, 3, 1},
     /// Has a chance to be +5 (NUGGET_SMALL)
     {"CANDLE_NUGGET", "\x81\xC2\xF5\x01\x00\x00"s, VTABLE_OFFSET::ITEM_PALACE_CANDLE, 3, 2},
@@ -226,6 +227,11 @@ std::vector<DropEntry> drop_entries{
     {"ALIENQUEEN_ALIENBLAST_RI", "\xBA\xB4\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
     /// ALIENBLAST_RETICULE_EXTERNAL
     {"ALIENQUEEN_ALIENBLAST_RE", "\xBA\xB5\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"CATMUMMY_CURSINGCLOUD", "\xBA\xB8\x01\x00\x00"s, VTABLE_OFFSET::MONS_CATMUMMY, 3, 1},
+    /// ANUBIS_SPECIAL_SHOT_RETICULE
+    {"ANUBIS_SPECIALSHOT_R", "\xBA\xDF\x02\x00\x00\xE8****\x48"s, VTABLE_OFFSET::NONE, 0, 1},
+    /// ANUBIS_SPECIAL_SHOT_RETICULE
+    {"ANUBIS2_SPECIALSHOT_R", "\xBA\xDF\x02\x00\x00\xE8****\x8B"s, VTABLE_OFFSET::NONE, 0, 1},
 
     ///
     /// Special:
@@ -246,7 +252,7 @@ std::vector<DropEntry> drop_entries{
     can't do ankh as it is a byte, and some complex stuff
     can't do initial health (camp, level, duat) as it's a word/byte */
 
-    /// maybe TODO: if someone wants all the explosions (from damage/death/crush) and catmummy cursing cloud, could also be added
+    /// maybe TODO: if someone wants all the explosions (from damage/death/crush), could also be added
 };
 
 std::vector<DropChanceEntry> dropchance_entries{
