@@ -66,7 +66,7 @@ std::vector<DropEntry> drop_entries{
     {"PANGXIE_WOODENSHIELD", "\xBA\x4F\x02\x00\x00"s, VTABLE_OFFSET::MONS_CRABMAN, 3, 1},
     {"QUEENBEE_ROYALJELLY", "\x05\x02\x00\x00"s, VTABLE_OFFSET::MONS_QUEENBEE, 3},
     {"ROBOT_METALSHIELD", "\x50\x02\x00\x00"s, VTABLE_OFFSET::MONS_ROBOT, 3},
-    /// It's actually any goldcoin drop, so: shopkeeper, tun, yang and madame tusk
+    /// It's actually for all RoomOwner's, so: shopkeeper, tun, yang and madame tusk
     {"SHOPKEEPER_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_YANG, 109, 1},
     /// GHIST and GHIST_SHOPKEEPER
     {"GHIST_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_GHIST_SHOPKEEPER, 105, 1},
@@ -118,9 +118,12 @@ std::vector<DropEntry> drop_entries{
     {"SCRAP_ALIEN", "\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
     /// Will spawn with parachute, so has to be PowerupCapable entity
     {"UFO_ALIEN", "\xBA\x0B\x01\x00\x00"s, VTABLE_OFFSET::MONS_UFO, 3, 1},
-    /* set write bp on Altar->unknown (second byte after timer)*/
-    // die and ushabti depend on the animation_frame
-    //TODO: idol has one bit flip so it can get the same result for idol and tusk idol so i din't expose those
+    /* set write bp on Altar->unknown (second byte after timer)
+    {"SACRIFICE_DIE", "\x3D\xC0\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame
+    {"SACRIFICE_USHABTI", "\x3D\xBA\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame */
+    /// Game does: (this value & 0xFFFFFFFE) to get idol and tusk idol
+    /// Essentially clearing last bit, so it's ether this entity + 1 or -1, depending of the chosen type
+    {"SACRIFICE_IDOL", "\x81\xF9\x64\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 2},
     {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00\x0F\x85"s, VTABLE_OFFSET::FLOOR_ALTAR, 2, 1},
     {"SACRIFICE_EGGPLANT", "\x48\x8B\x42\x08\x81\x78\x14\xE7\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 7},
@@ -151,6 +154,7 @@ std::vector<DropEntry> drop_entries{
     {"DUATALTAR_BOMBBAG", "\xBE\x01\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_DUAT_ALTAR, 36, 1},
     {"DUATALTAR_BOMBBOX", "\xBE\x02\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_DUAT_ALTAR, 36, 1},
     {"DUATALTAR_COOKEDTURKEY", "\xBE\x06\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_DUAT_ALTAR, 36, 1},
+    /// Also LION_TRAP
     {"FLOORSTYLEDCOG_NUGGET", "\xBA\xF5\x01\x00\x00"s, VTABLE_OFFSET::FLOORSTYLED_COG, 3, 1},
     /// COG
     {"CRUSHTRAP_NUGGET", "\xBA\xF5\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_CRUSH_TRAP_LARGE, 3, 1},
@@ -175,6 +179,11 @@ std::vector<DropEntry> drop_entries{
     {"POTOFGOLD_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::ITEM_POTOFGOLD, 88, 1}, // 88 is just the closest function
     /// Cutscene after beating hundun
     {"CUTSCENE_GOLDCOIN", "\xBA\xF6\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1}, // this relies on the fact that this it is the first pattern
+    {"REDLANTERN_SMALLNUGGET", "\xBA\xFA\x01\x00\x00"s, VTABLE_OFFSET::ITEM_REDLANTERN, 3, 1},
+    /// Has a chance to be +5 (NUGGET_SMALL)
+    {"CANDLE_NUGGET", "\x81\xC2\xF5\x01\x00\x00"s, VTABLE_OFFSET::ITEM_PALACE_CANDLE, 3, 2},
+    {"COOKFIRE_TORCH", "\xBA\xA0\x01\x00\x00"s, VTABLE_OFFSET::ITEM_COOKFIRE, 3, 1},
+    {"SKULLDROPTRAP_SKULL", "\xBA\xEA\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
 
     ///
     /// Attacks:
@@ -212,15 +221,32 @@ std::vector<DropEntry> drop_entries{
     {"OCTOPUS_INKSPIT", "\xBA\x86\x01\x00\x00"s, VTABLE_OFFSET::MONS_OCTOPUS, 78, 1},
     {"HERMITCRAB_ACIDBUBBLE", "\xBA\x87\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 1},
     {"PANGXIE_ACIDBUBBLE", "\xBA\x88\x01\x00\x00"s, VTABLE_OFFSET::MONS_CRABMAN, 78, 1},
+    {"ALIENQUEEN_ALIENBLAST", "\xBA\xB6\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
+    /// ALIENBLAST_RETICULE_INTERNAL
+    {"ALIENQUEEN_ALIENBLAST_RI", "\xBA\xB4\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
+    /// ALIENBLAST_RETICULE_EXTERNAL
+    {"ALIENQUEEN_ALIENBLAST_RE", "\xBA\xB5\x02\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
 
     ///
     /// Special:
     ///
 
     /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
-    {"MOTHERSTATUE_HEALTH", "\xBB\x04\x00\x00\x00"s, VTABLE_OFFSET::FLOOR_MOTHER_STATUE, 2, 1},
+    {"MOTHERSTATUE_HEALTH", "\xBB\x04\x00\x00\x00\xD3"s, VTABLE_OFFSET::FLOOR_MOTHER_STATUE, 2, 1},
+    /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
+    {"COOKEDTURKEY_HEALTH", "\xBA\x01\x00\x00\x00\x48\x0F\xBA\xE1\x2E\xBD"s, VTABLE_OFFSET::ITEM_PICKUP_GIANTFOOD, 94, 1},
+    /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
+    {"GIANTFOOD_HEALTH", "\xBD\x0A\x00\x00\x00\xD3"s, VTABLE_OFFSET::ITEM_PICKUP_GIANTFOOD, 94, 1},
+    /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
+    {"ROYALJELLY_HEALTH", "\xBD\x06\x00\x00\x00\xD3"s, VTABLE_OFFSET::ITEM_PICKUP_GIANTFOOD, 94, 1},
+    /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
+    {"KAPALA_HEALTH", "\xBA\x01\x00\x00\x00\xB8\x01"s, VTABLE_OFFSET::NONE, 0, 1},
+    /* can't do elixir as there are some calculations for cursed, poisoned etc.
+    can't do pet, it has some complex calculation for some reason
+    can't do ankh as it is a byte, and some complex stuff
+    can't do initial health (camp, level, duat) as it's a word/byte */
 
-    /// maybe TODO: if someone wants all the explosions (from damage/death/crush) and catmummy cursing cloud could also be added
+    /// maybe TODO: if someone wants all the explosions (from damage/death/crush) and catmummy cursing cloud, could also be added
 };
 
 std::vector<DropChanceEntry> dropchance_entries{
