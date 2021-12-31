@@ -1247,6 +1247,11 @@ end
     /// Poisons entity, to cure poison set `poison_tick_timer` to -1
     lua["poison_entity"] = poison_entity;
 
+    /// Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+    /// `beat_add_health` has divisor of `health`, they also can't be 0, otherwise the function does nothing,
+    /// If you set `health` above the game max health it will be forced to game max health
+    lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

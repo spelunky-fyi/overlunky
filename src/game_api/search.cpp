@@ -1687,11 +1687,18 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // inside the same function as the above pattern, there should be: add r13, 1 | cmp r13, 3  (3 being the size)
+        // Inside the same function as the above pattern, there should be: add r13, 1 | cmp r13, 3  (3 being the size)
         "waddler_drop_size"sv,
         PatternCommandBuffer{}
             .find_after_inst("\xF3\x0F\x11\x88\x0C\x01\x00\x00\x49\x83\xC5\x01"sv)
             .offset(3)
+            .at_exe(),
+    },
+    {
+        // Get ankh, die, when you get respawned on the door, but still not have health, set write bp on Movable.health, looking for (cmp eax,3)
+        "ankh_health"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x41\x0F\xB6\x87\x17\x01\x00\x00\x83\xF8"sv)
             .at_exe(),
     },
 };

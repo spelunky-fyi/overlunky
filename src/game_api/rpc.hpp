@@ -126,3 +126,4 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types);
 void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types);
 void change_waddler_drop(std::vector<ENT_TYPE> ent_types);
 void poison_entity(int32_t entity_uid);
+void modify_ankh_health_gain(uint8_t max_health, uint8_t beat_add_health);

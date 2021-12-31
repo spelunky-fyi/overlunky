@@ -1952,3 +1952,52 @@ void poison_entity(int32_t entity_uid)
         poison_entity(ent, true);
     }
 }
+
+void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
+{
+    static size_t offsets[4];
+    auto size_minus_one = get_address("ankh_health");
+    if (size_minus_one && health && beat_add_health)
+    {
+        if (!offsets[0])
+        {
+            auto memory = Memory::get();
+            size_t offset = size_minus_one - memory.exe_ptr;
+            const auto limit_size = offset + 0x200;
+
+            offsets[0] = find_inst(memory.exe(), "\x41\x80\xBF\x17\x01\x00\x00"sv, offset, limit_size, "ankh_health_gain_1");
+            offsets[1] = find_inst(memory.exe(), "\x41\x80\xBF\x17\x01\x00\x00"sv, offsets[0] + 7, limit_size, "ankh_health_gain_2");
+            offsets[2] = find_inst(memory.exe(), "\x0F\x42\xCA\x83\xC0"sv, offset, limit_size, "ankh_health_gain_3");
+            offsets[3] = find_inst(memory.exe(), "\x8A\x83\x17\x01\x00\x00\x3C"sv, offset, std::nullopt, "ankh_health_gain_4"); // this is some bs
+            if (!offsets[0] || !offsets[1] || !offsets[2] || !offsets[3])
+            {
+                memset(offsets, 0, sizeof(offsets));
+                return;
+            }
+            offsets[0] = memory.at_exe(offsets[0] + 7); // add pattern size
+            offsets[1] = memory.at_exe(offsets[1] + 7);
+            offsets[2] = memory.at_exe(offsets[2] + 5);
+            offsets[3] = memory.at_exe(offsets[3] + 7);
+        }
+        const uint8_t game_maxhp = read_u8(offsets[2] - 14);
+        if (health > game_maxhp)
+            health = game_maxhp;
+
+        if (health % beat_add_health == 0)
+        {
+            write_mem_prot(size_minus_one, (uint8_t)(health - 1), true);
+            write_mem_prot(offsets[0], health, true);
+            write_mem_prot(offsets[1], health, true);
+            write_mem_prot(offsets[2], beat_add_health, true);
+            if (health < 4)
+            {
+                write_mem_recoverable("ankh_health", offsets[3], (uint8_t)0, true);
+            }
+            else
+            {
+                if (read_u8(offsets[3]) != 3)
+                    recover_mem("ankh_health");
+            }
+        }
+    }
+}
