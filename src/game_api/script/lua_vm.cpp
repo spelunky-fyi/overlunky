@@ -1248,7 +1248,7 @@ end
     lua["poison_entity"] = poison_entity;
 
     /// Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
-    /// `beat_add_health` has divisor of `health`, they also can't be 0, otherwise the function does nothing,
+    /// `beat_add_health` has divisor of `health`, and can't be 0, otherwise the function does nothing, Set `health` to return to game default values,
     /// If you set `health` above the game max health it will be forced to game max health
     lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
 

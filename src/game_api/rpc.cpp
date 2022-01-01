@@ -1957,7 +1957,12 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
 {
     static size_t offsets[4];
     auto size_minus_one = get_address("ankh_health");
-    if (size_minus_one && health && beat_add_health)
+    if (!health)
+    {
+        recover_mem("ankh_health");
+        return;
+    }
+    if (size_minus_one && beat_add_health)
     {
         if (!offsets[0])
         {
@@ -1971,7 +1976,7 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
             offsets[3] = find_inst(memory.exe(), "\x8A\x83\x17\x01\x00\x00\x3C"sv, offset, std::nullopt, "ankh_health_gain_4"); // this is some bs
             if (!offsets[0] || !offsets[1] || !offsets[2] || !offsets[3])
             {
-                memset(offsets, 0, sizeof(offsets));
+                offsets[0] = 0;
                 return;
             }
             offsets[0] = memory.at_exe(offsets[0] + 7); // add pattern size
@@ -1985,10 +1990,10 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
 
         if (health % beat_add_health == 0)
         {
-            write_mem_prot(size_minus_one, (uint8_t)(health - 1), true);
-            write_mem_prot(offsets[0], health, true);
-            write_mem_prot(offsets[1], health, true);
-            write_mem_prot(offsets[2], beat_add_health, true);
+            write_mem_recoverable("ankh_health", size_minus_one, (uint8_t)(health - 1), true);
+            write_mem_recoverable("ankh_health", offsets[0], health, true);
+            write_mem_recoverable("ankh_health", offsets[1], health, true);
+            write_mem_recoverable("ankh_health", offsets[2], beat_add_health, true);
             if (health < 4)
             {
                 write_mem_recoverable("ankh_health", offsets[3], (uint8_t)0, true);
@@ -1996,7 +2001,7 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
             else
             {
                 if (read_u8(offsets[3]) != 3)
-                    recover_mem("ankh_health");
+                    recover_mem("ankh_health", offsets[3]);
             }
         }
     }
