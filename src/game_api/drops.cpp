@@ -135,7 +135,9 @@ std::vector<DropEntry> drop_entries{
     {"ANUBIS_COFFIN_SORCERESS", "\x83\xF9\x01\xB8\xFA\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"s, VTABLE_OFFSET::NONE, 0, 1},
     /// It spawns two types of entities (frog and firefrog), the second one will be this + 1
-    {"GIANTFROG_FROG", "\x81\xC2\x1B\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 2},
+    /// Crashes the game with most entities
+    {"GIANTFROG_FROG", "\x81\xC2\x1B\x01\x00\x00"s, VTABLE_OFFSET::MONS_GIANTFROG, 78, 0, 2},
+    {"GIANTFROG_TADPOLE", "\xBA\x1F\x01\x00\x00"s, VTABLE_OFFSET::MONS_GIANTFROG, 78, 1},
     {"EGGSAC_GRUB_1", "\xBA\x1E\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
     {"EGGSAC_GRUB_2", "\xBA\x1E\x01\x00\x00\x0F\x28\xD6\x41\x0F\x28\xDF"s, VTABLE_OFFSET::NONE, 0, 1},
     {"EGGSAC_GRUB_3", "\xBA\x1E\x01\x00\x00\x0F\x28\xD6\x41\x0F\x28\xD9"s, VTABLE_OFFSET::NONE, 0, 1},
