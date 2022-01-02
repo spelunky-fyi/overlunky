@@ -188,6 +188,9 @@ std::vector<DropEntry> drop_entries{
     {"COOKFIRE_TORCH", "\xBA\xA0\x01\x00\x00"s, VTABLE_OFFSET::ITEM_COOKFIRE, 3, 1},
     {"SKULLDROPTRAP_SKULL", "\xBA\xEA\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
     {"COFFIN_SKULL", "\xBA\xE2\x01\x00\x00"s, VTABLE_OFFSET::ITEM_COFFIN, 88, 1},
+    /// Game does this (this value | 0x1) to get BOMBBAG (so depending on the chosen ENT_TYPE it can be + 1 or + 0)
+    {"OLMEC_SISTERS_ROPEPILE", "\x0D\x00\x02\x00\x00"s, VTABLE_OFFSET::QUEST_JUNGLE_SISTERS, 1, 1},
+    {"OLMEC_SISTERS_BOMBBOX", "\xBA\x02\x02\x00\x00"s, VTABLE_OFFSET::QUEST_JUNGLE_SISTERS, 1, 1},
 
     ///
     /// Attacks:
@@ -253,7 +256,7 @@ std::vector<DropEntry> drop_entries{
     /* can't do elixir as there are some calculations for cursed, poisoned etc.
     can't do pet, it has some complex calculation for some reason
     can't do ankh as it is a byte, and some complex stuff
-    can't do initial health (camp, level, duat) as it's a word/byte */
+    can't do initial health (camp, level, duat, coffin) as it's a word/byte */
 
     /// maybe TODO: if someone wants all the explosions (from damage/death/crush), could also be added
 };
