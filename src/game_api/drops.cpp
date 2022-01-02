@@ -187,6 +187,7 @@ std::vector<DropEntry> drop_entries{
     {"CANDLE_NUGGET", "\x81\xC2\xF5\x01\x00\x00"s, VTABLE_OFFSET::ITEM_PALACE_CANDLE, 3, 2},
     {"COOKFIRE_TORCH", "\xBA\xA0\x01\x00\x00"s, VTABLE_OFFSET::ITEM_COOKFIRE, 3, 1},
     {"SKULLDROPTRAP_SKULL", "\xBA\xEA\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"COFFIN_SKULL", "\xBA\xE2\x01\x00\x00"s, VTABLE_OFFSET::ITEM_COFFIN, 88, 1},
 
     ///
     /// Attacks:
