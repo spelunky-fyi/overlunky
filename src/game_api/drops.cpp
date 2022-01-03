@@ -122,7 +122,7 @@ std::vector<DropEntry> drop_entries{
     {"SACRIFICE_DIE", "\x3D\xC0\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame
     {"SACRIFICE_USHABTI", "\x3D\xBA\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame */
     /// Game does: (this value & 0xFFFFFFFE) to get idol and tusk idol
-    /// Essentially clearing last bit, so it's ether this entity + 1 or -1, depending of the chosen type
+    /// Essentially clearing last bit, so it's ether this entity + 1 or -1 or just one entity, depending of the chosen type
     {"SACRIFICE_IDOL", "\x81\xF9\x64\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 2},
     {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 4},
     {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00\x0F\x85"s, VTABLE_OFFSET::FLOOR_ALTAR, 2, 1},
@@ -136,11 +136,11 @@ std::vector<DropEntry> drop_entries{
     {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"s, VTABLE_OFFSET::NONE, 0, 1},
     /// It spawns two types of entities (frog and firefrog), the second one will be this + 1
     /// Crashes the game with most entities
-    {"GIANTFROG_FROG", "\x81\xC2\x1B\x01\x00\x00"s, VTABLE_OFFSET::MONS_GIANTFROG, 78, 0, 2},
+    {"GIANTFROG_FROG", "\x81\xC2\x1B\x01\x00\x00"s, VTABLE_OFFSET::MONS_GIANTFROG, 78, 2},
     {"GIANTFROG_TADPOLE", "\xBA\x1F\x01\x00\x00"s, VTABLE_OFFSET::MONS_GIANTFROG, 78, 1},
     {"EGGSAC_GRUB_1", "\xBA\x1E\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
-    {"EGGSAC_GRUB_2", "\xBA\x1E\x01\x00\x00\x0F\x28\xD6\x41\x0F\x28\xDF"s, VTABLE_OFFSET::NONE, 0, 1},
-    {"EGGSAC_GRUB_3", "\xBA\x1E\x01\x00\x00\x0F\x28\xD6\x41\x0F\x28\xD9"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"EGGSAC_GRUB_2", "\xBA\x1E\x01\x00\x00\x41\x0F\x28\xD0"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"EGGSAC_GRUB_3", "\xBA\x1E\x01\x00\x00\x0F\x28\xD6"s, VTABLE_OFFSET::NONE, 0, 1},
     {"QUILLBACK_BOMBBAG", "\xBA\x01\x02\x00\x00"s, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"QUILLBACK_COOKEDTURKEY", "\xBA\x06\x02\x00\x00"s, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"LAVAPOT_MAGMAMAN", "\xBA\xEF\x00\x00\x00"s, VTABLE_OFFSET::ITEM_LAVAPOT, 3, 1},
@@ -177,7 +177,7 @@ std::vector<DropEntry> drop_entries{
     {"VAULTCHEST_DIAMOND", "\xBA\xF1\x01\x00\x00\xEB"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
     {"VAULTCHEST_RUBY", "\xBA\xF4\x01\x00\x00\x48"s, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
     {"LOCKEDCHEST_UDJATEYE", "\xBA\x15\x02\x00\x00"s, VTABLE_OFFSET::ITEM_LOCKEDCHEST, 26, 1},
-    {"USHABTI_QILIN", "\xBA\x15\x02\x00\x00"s, VTABLE_OFFSET::ITEM_USHABTI, 77, 1},
+    {"USHABTI_QILIN", "\xBA\x87\x03\x00\x00"s, VTABLE_OFFSET::ITEM_USHABTI, 77, 1},
     {"POTOFGOLD_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::ITEM_POTOFGOLD, 88, 1}, // 88 is just the closest function
     /// Cutscene after beating hundun
     {"CUTSCENE_GOLDCOIN", "\xBA\xF6\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1}, // this relies on the fact that this it is the first pattern
@@ -256,7 +256,9 @@ std::vector<DropEntry> drop_entries{
     /* can't do elixir as there are some calculations for cursed, poisoned etc.
     can't do pet, it has some complex calculation for some reason
     can't do ankh as it is a byte, and some complex stuff
-    can't do initial health (camp, level, duat, coffin) as it's a word/byte */
+    can't do initial health (camp, level, duat, coffin) as it's a word/byte 
+    can't do drops for: humphead, yetiking, yetiqueen, alien queen, pangxie (gems) those are stored in array, need special funciton for that
+    */
 
     /// maybe TODO: if someone wants all the explosions (from damage/death/crush), could also be added
 };
