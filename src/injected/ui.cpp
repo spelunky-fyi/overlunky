@@ -2996,7 +2996,7 @@ void render_clickhandler()
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
 
-        auto additional_fixed_entities = {
+        const auto additional_fixed_entities = {
             (ENT_TYPE)CUSTOM_TYPE::LOGICALTRAPTRIGGER,
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
@@ -3017,6 +3017,7 @@ void render_clickhandler()
             to_id("ENT_TYPE_FLOOR_DUSTWALL"),
             to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
             to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
+            to_id("ENT_TYPE_FLOOR_SPIKES"),
         };
         for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
         {
