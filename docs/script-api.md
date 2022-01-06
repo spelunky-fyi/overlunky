@@ -740,8 +740,8 @@ Poisons entity, to cure poison set `poison_tick_timer` to -1
 ### [`modify_ankh_health_gain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_ankh_health_gain)
 `nil modify_ankh_health_gain(int max_health, int beat_add_health)`<br/>
 Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
-`beat_add_health` has divisor of `health`, and can't be 0, otherwise the function does nothing, Set `health` to return to game default values,
-If you set `health` above the game max health it will be forced to game max health
+`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+If you set `health` above the game max health it will be forced down to the game max
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
