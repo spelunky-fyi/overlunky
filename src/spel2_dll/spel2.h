@@ -84,6 +84,8 @@ void Spelunky_RegisterGetImagePathFunc(Spelunky_GetImageFilePathFunc get_image_f
 
 void Spelunky_DisableSteamAchievements();
 
+struct ID3D11Device* SpelunkyGetD3D11Device();
+
 SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled);
 void Spelunky_FreeScript(SpelunkyScript* script);
 

@@ -139,6 +139,11 @@ void Spelunky_DisableSteamAchievements()
     disable_steam_achievements();
 }
 
+ID3D11Device* SpelunkyGetD3D11Device()
+{
+    return get_device();
+}
+
 std::string read_whole_file(const char* file_path)
 {
     FILE* file{nullptr};
