@@ -269,6 +269,7 @@ class Entity
     void remove_item(uint32_t item_uid);
 
     TEXTURE get_texture();
+    /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     bool set_texture(TEXTURE texture_id);
 
     void unhook(std::uint32_t id);
