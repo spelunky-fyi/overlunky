@@ -513,8 +513,13 @@ end
         else
             set_pause(0);
     };
+    auto move_entity_abs = sol::overload(
+        static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
+        static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
     /// Teleport entity to coordinates with optional velocity
     lua["move_entity"] = move_entity_abs;
+    /// Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
+    lua["move_grid_entity"] = move_grid_entity;
     /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).

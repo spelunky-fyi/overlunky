@@ -229,6 +229,25 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
     }
 }
 
+void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER layer)
+{
+    auto ent = get_entity_ptr(uid);
+    if (ent)
+    {
+        std::pair<float, float> offset;
+        enum_to_layer(layer, offset);
+        if (ent->is_liquid())
+        {
+            move_liquid_abs(uid, offset.first + x, offset.second + y, vx, vy);
+        }
+        else
+        {
+            ent->teleport_abs(offset.first + x, offset.second + y, vx, vy);
+            ent->set_layer(layer);
+        }
+    }
+}
+
 void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
     auto entity = get_entity_ptr(uid)->as<Liquid>();
@@ -2002,6 +2021,33 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
             {
                 if (read_u8(offsets[3]) != 3)
                     recover_mem("ankh_health", offsets[3]);
+            }
+        }
+    }
+}
+
+void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
+{
+    if (auto entity = get_entity_ptr(uid))
+    {
+        auto state = State::get();
+        const auto [c_x, c_y] = entity->position_self();
+        const Entity* ent = state.layer(entity->layer)->get_grid_entity_at(c_x, c_y);
+        if (ent == entity) // check if it's grid entity
+        {
+            const uint32_t grid_x = static_cast<uint32_t>(c_x + 0.5f);
+            const uint32_t grid_y = static_cast<uint32_t>(c_y + 0.5f);
+            std::pair<float, float> offset;
+            const auto actual_layer = enum_to_layer(layer, offset);
+            const uint32_t ix = static_cast<uint32_t>(offset.first + x + 0.5f);
+            const uint32_t iy = static_cast<uint32_t>(offset.second + y + 0.5f);
+
+            if (ix < 0x56 && iy < 0x7e)
+            {
+                state.layer(entity->layer)->grid_entities[grid_y][grid_x] = nullptr;
+                entity->teleport_abs(static_cast<float>(ix), static_cast<float>(iy), 0, 0);
+                entity->set_layer(layer);
+                state.layer(actual_layer)->grid_entities[iy][ix] = entity;
             }
         }
     }

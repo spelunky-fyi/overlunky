@@ -304,6 +304,12 @@ Enable/disable game engine pause.
 ### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
 `nil move_entity(int uid, float x, float y, float vx, float vy)`<br/>
 Teleport entity to coordinates with optional velocity
+### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
+`nil move_entity(int uid, float x, float y, float vx, float vy, LAYER layer)`<br/>
+Teleport entity to coordinates with optional velocity
+### [`move_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_grid_entity)
+`nil move_grid_entity(int uid, float x, float y, LAYER layer)`<br/>
+Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
 ### [`set_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door_target)
 `nil set_door_target(int uid, int w, int l, int t)`<br/>
 Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
@@ -731,6 +737,11 @@ Use empty table as argument to reset to the game default
 ### [`poison_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_entity)
 `nil poison_entity(int entity_uid)`<br/>
 Poisons entity, to cure poison set `poison_tick_timer` to -1
+### [`modify_ankh_health_gain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_ankh_health_gain)
+`nil modify_ankh_health_gain(int max_health, int beat_add_health)`<br/>
+Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+`beat_add_health` has divisor of `health`, and can't be 0, otherwise the function does nothing, Set `health` to return to game default values,
+If you set `health` above the game max health it will be forced to game max health
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
