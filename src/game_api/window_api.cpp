@@ -290,6 +290,10 @@ void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index)
 bool init_hooks(void* swap_chain_ptr)
 {
     g_SwapChain = reinterpret_cast<IDXGISwapChain*>(swap_chain_ptr);
+    if (SUCCEEDED(g_SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_Device)))
+    {
+        g_Device->GetImmediateContext(&g_Context);
+    }
 
     // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
     hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
