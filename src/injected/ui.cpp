@@ -78,6 +78,7 @@ std::map<std::string, int64_t> keys{
     {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
     {"toggle_grid", OL_KEY_CTRL | OL_KEY_SHIFT | 'G'},
     {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
+    {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
@@ -205,7 +206,7 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, dark_mode = false,
-     enable_noclip = false, hide_script_messages = false, fade_script_messages = true, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
@@ -258,7 +259,11 @@ std::map<std::string, bool> options = {
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
     {"lights", false},
-    {"disable_achievements", true}};
+    {"disable_achievements", true},
+    {"disable_savegame", false},
+    {"draw_hud", true},
+    {"draw_script_messages", true},
+    {"fade_script_messages", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -1758,6 +1763,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             paused = false;
         }
     }
+    else if (pressed("toggle_hud", wParam))
+    {
+        options["draw_hud"] = !options["draw_hud"];
+    }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
         if (g_state->pause == 0x20)
@@ -2869,7 +2878,7 @@ void render_messages()
     {
         for (auto message : script->get_messages())
         {
-            if (fade_script_messages && now - 12s > message.time)
+            if (options["fade_script_messages"] && now - 12s > message.time)
                 continue;
             std::istringstream messages(message.message);
             while (!messages.eof())
@@ -2895,7 +2904,7 @@ void render_messages()
         }
     }
     std::erase_if(g_ConsoleMessages, [&](auto message)
-                  { return fade_script_messages && now - 12s > message.time; });
+                  { return options["fade_script_messages"] && now - 12s > message.time; });
 
     ImGuiIO& io = ImGui::GetIO();
     ImGui::PushFont(bigfont);
@@ -2927,7 +2936,7 @@ void render_messages()
     for (auto message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
-        if (!fade_script_messages)
+        if (!options["fade_script_messages"])
         {
             alpha = 0.8f;
         }
@@ -3469,6 +3478,7 @@ void render_options()
     ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
     ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
     ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
+    ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
 
     if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
     {
@@ -3599,8 +3609,8 @@ void render_scripts()
         "Note: The Lua API is unstable, not ready and it WILL change, probably a lot. You can play around with it, but don't be surprised if none of "
         "your scripts work next week.");
     ImGui::PopTextWrapPos();
-    ImGui::Checkbox("Hide script messages##HideScriptMessages", &hide_script_messages);
-    ImGui::Checkbox("Fade script messages##FadeScriptMessages", &fade_script_messages);
+    ImGui::Checkbox("Draw script messages##DrawScriptMessages", &options["draw_script_messages"]);
+    ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
     if (ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
         refresh_script_files();
     if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
@@ -5071,6 +5081,18 @@ void render_spawner()
     render_list();
 }
 
+void render_prohud()
+{
+    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{}", get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause);
+    ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    textsize = ImGui::CalcTextSize(buf.c_str());
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+}
+
 void render_tool(std::string tool)
 {
     if (tool == "tool_entity")
@@ -5158,7 +5180,10 @@ void imgui_draw()
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
-    if (!hide_script_messages)
+    if (options["draw_hud"])
+        render_prohud();
+
+    if (options["draw_script_messages"])
         render_messages();
     render_clickhandler();
 
