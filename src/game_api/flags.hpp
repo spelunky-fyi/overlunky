@@ -74,7 +74,7 @@ const char* entity_flags[]{
 };
 
 const char* more_flags[]{
-    "1: ",
+    "1: Take damage on collision after throw",
     "2: Revived (HH)",
     "3: ",
     "4: ",
