@@ -154,10 +154,10 @@ class TotemTrap : public Floor
     uint16_t unused2;
     uint32_t unused3;
     uint8_t timer; // unsure
-    /// The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right
-    void trigger(int32_t who_uid, uint8_t direction)
+    /// The uid must be movable entity for ownership transfers
+    void trigger(int32_t who_uid, bool left)
     {
-        return trigger_trap(this, who_uid, direction);
+        return trigger_trap(this, who_uid, left ? 1 : 2);
     }
 };
 
@@ -270,10 +270,9 @@ class BigSpearTrap : public Floor
     /// setting the left part to 0 or right part to 1 destroys the trap
     bool left_part;
     /// The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
-    /// direction: 1 = left, 2 = right
-    void trigger(int32_t who_uid, uint8_t direction)
+    void trigger(int32_t who_uid, bool left)
     {
-        return trigger_trap(this, who_uid, direction);
+        return trigger_trap(this, who_uid, left ? 1 : 2);
     }
 };
 

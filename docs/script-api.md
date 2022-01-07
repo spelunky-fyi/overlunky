@@ -1922,9 +1922,9 @@ The uid must be movable entity for ownership transfers
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`ENT_TYPE spawn_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) &TotemTrap::spawn_entity_type
 - [`int first_sound_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) &TotemTrap::first_sound_id
-- [`nil trigger(int who_uid, int direction)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &TotemTrap::trigger
+- [`nil trigger(int who_uid, bool left)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &TotemTrap::trigger
 \
-The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right
+The uid must be movable entity for ownership transfers
 ### `LaserTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LaserTrap::emitted_light
@@ -1991,10 +1991,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool left_part`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_part) &BigSpearTrap::left_part
 \
 setting the left part to 0 or right part to 1 destroys the trap
-- [`nil trigger(int who_uid, int direction)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &BigSpearTrap::trigger
+- [`nil trigger(int who_uid, bool left)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &BigSpearTrap::trigger
 \
 The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
-direction: 1 = left, 2 = right
 ### `StickyTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid

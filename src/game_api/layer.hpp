@@ -11,7 +11,7 @@ struct EntityList
 
     constexpr bool empty()
     {
-        return !!size;
+        return size == 0;
     };
 
     constexpr Entity** begin()
@@ -46,11 +46,11 @@ struct EntityList
 
     constexpr bool contains(Entity* ent)
     {
-        return (std::find(begin(), end(), ent) != end());
+        return std::find(begin(), end(), ent) != end();
     };
     constexpr bool contains(uint32_t uid)
     {
-        return (std::find(uid_begin(), uid_end(), uid) != uid_end());
+        return std::find(uid_begin(), uid_end(), uid) != uid_end();
     };
 
     std::pair<Entity*, uint32_t> operator[](const uint32_t idx) const
