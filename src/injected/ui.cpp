@@ -260,7 +260,7 @@ std::map<std::string, bool> options = {
     {"warp_increments_level_count", true},
     {"lights", false},
     {"disable_achievements", true},
-    {"disable_savegame", false},
+    {"disable_savegame", true},
     {"draw_hud", true},
     {"draw_script_messages", true},
     {"fade_script_messages", true}};
@@ -358,6 +358,21 @@ void speedhack(float multiplier = g_speedhack_multiplier)
         g_speedhack_fake = g_speedhack_prev;
         HookIAT("kernel32.dll", "QueryPerformanceCounter", QueryPerformanceCounterHook, &g_oldqpc);
         g_speedhack_hooked = true;
+    }
+}
+
+void hook_savegame()
+{
+    static bool savegame_hooked = false;
+    if (!savegame_hooked)
+    {
+        register_on_write_to_file([](const char* backup_file, const char* file, void* data, size_t data_size, WriteToFileOrig* original)
+                                  {
+                                      if (file == "savegame.sav"sv and options["disable_savegame"])
+                                          return;
+                                      original(backup_file, file, data, data_size);
+                                  });
+        savegame_hooked = true;
     }
 }
 
@@ -759,6 +774,8 @@ void load_config(std::string file)
     godmode(options["god_mode"]);
     if (options["disable_achievements"])
         disable_steam_achievements();
+    if (options["disable_savegame"])
+        hook_savegame();
     save_config(file);
 }
 
@@ -3458,12 +3475,17 @@ void render_options()
     {
         force_hud_flags();
     }
-    if (ImGui::Checkbox("Disable Steam achievements", &options["disable_achievements"]))
+    if (ImGui::Checkbox("Block Steam achievements", &options["disable_achievements"]))
     {
         if (options["disable_achievements"])
             disable_steam_achievements();
         else
             enable_steam_achievements();
+    }
+    if (ImGui::Checkbox("Block game saves", &options["disable_savegame"]))
+    {
+        if (options["disable_savegame"])
+            hook_savegame();
     }
     if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
     {
@@ -3752,6 +3774,10 @@ int parse_time(std::string time)
 
 void render_savegame()
 {
+    if (options["disable_savegame"])
+    {
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Note: You have blocked game saves in the options...");
+    }
     ImGui::PushID("Journal");
     if (ImGui::CollapsingHeader("Journal"))
     {
