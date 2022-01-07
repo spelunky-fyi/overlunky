@@ -896,6 +896,13 @@ void spawn_entities(bool s, std::string list = "")
                 snap = true;
                 g_vx = 0;
                 g_vy = 0;
+                std::pair<float, float> cpos = click_position(g_x, g_y);
+                auto old_block_id = get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
+                if (old_block_id != -1)
+                {
+                    auto old_block = get_entity_ptr(old_block_id);
+                    old_block->destroy();
+                }
             }
             int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
             if (options["spawn_floor_decorated"])
