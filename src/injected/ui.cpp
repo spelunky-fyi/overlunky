@@ -262,7 +262,7 @@ std::map<std::string, bool> options = {
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
-float g_speedhack_old_multiplier;
+float g_speedhack_old_multiplier = 1.0;
 LARGE_INTEGER g_speedhack_prev;
 LARGE_INTEGER g_speedhack_current;
 LARGE_INTEGER g_speedhack_fake;
