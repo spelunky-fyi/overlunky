@@ -3882,11 +3882,25 @@ void render_savegame()
         {
             g_save->time_best = parse_time(besttime);
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetBestTime"))
+            g_save->time_best = -1;
         std::string totaltime = format_time(g_save->time_total);
         if (ImGui::InputText("Total time##BestTime", &totaltime))
         {
             g_save->time_total = parse_time(totaltime);
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetTotalTime"))
+            g_save->time_total = -1;
+        std::string tutorialtime = format_time(g_save->time_tutorial);
+        if (ImGui::InputText("Tutorial time##TutorialTime", &tutorialtime))
+        {
+            g_save->time_tutorial = parse_time(tutorialtime);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetTutorialTime"))
+            g_save->time_tutorial = -1;
         ImGui::Checkbox("Completed normal", &g_save->completed_normal);
         ImGui::Checkbox("Completed ironman", &g_save->completed_ironman);
         ImGui::Checkbox("Completed hard", &g_save->completed_hard);
