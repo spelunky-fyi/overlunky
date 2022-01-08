@@ -27,6 +27,7 @@ local real_default_options = {
     room_big_maxy = 12,
     room_dark = 4,
     pot_chance = 25,
+    treasure_chance = 18,
     ushabti_chance = 25,
     stats_health_min = 8,
     stats_bombs_min = 8,
@@ -89,6 +90,7 @@ local function register_options()
     register_option_int("room_big_maxy", "Level max height", default_options.room_big_maxy, 2, 15)
     register_option_float("room_dark", "Dark level chance", default_options.room_dark, 0, 100)
     register_option_float("pot_chance", "Pot contents chance", default_options.pot_chance, 0, 100)
+    register_option_float("treasure_chance", "Treasure chance", default_options.treasure_chance, 0, 100)
     register_option_float("ushabti_chance", "Correct ushabti chance", default_options.ushabti_chance, 0, 100)
     register_option_int("stats_health_min", "Min starting health", default_options.stats_health_min, 4, 99)
     register_option_int("stats_bombs_min", "Min starting bombs", default_options.stats_bombs_min, 4, 99)
@@ -311,7 +313,7 @@ local function trap_floor_spawn(x, y, l)
     if floor ~= -1 then
         kill_entity(floor)
     end
-    if prng:random() < 0.03 or (state.theme == THEME.ABZU and prng:random() < 0.06) then
+    if prng:random() < 0.04 or (state.theme == THEME.ABZU and prng:random() < 0.06) then
         floor = spawn_grid_entity(ENT_TYPE.FLOOR_EXCALIBUR_STONE, x, y, l)
         spawn_entity_over(ENT_TYPE.ITEM_EXCALIBUR, floor, 0, 0)
         return
@@ -1601,6 +1603,14 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_LIGHT_ARROW)
 
+set_post_entity_spawn(function(ent)
+    local x, y, l = get_position(ent.uid)
+    if state.theme == THEME.ICE_CAVES and l == LAYER.BACK then
+        kill_entity(ent.uid)
+        spawn_entity_nonreplaceable(pick(crate_items), x, y, l, 0, 0)
+    end
+end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_PICKUP_CLOVER)
+
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme == THEME.ICE_CAVES and l == LAYER.BACK and options.chain then
         return spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
@@ -1616,6 +1626,34 @@ set_post_entity_spawn(function(ent)
         spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
+
+set_pre_tile_code_callback(function(x, y, layer)
+    if prng:random() < options.treasure_chance / 100 then
+        spawn_critical(pick(join(crate_items, enemies_small)), x, y, layer, 0, 0)
+        return true
+    end
+end, "treasure")
+
+set_pre_tile_code_callback(function(x, y, layer)
+    if prng:random() < options.treasure_chance / 100 then
+        spawn_critical(pick(join(crate_items, enemies_small)), x, y, layer, 0, 0)
+        return true
+    end
+end, "treasure_chest")
+
+set_pre_tile_code_callback(function(x, y, layer)
+    if prng:random() < options.treasure_chance / 100 then
+        spawn_critical(pick(join(crate_items, enemies_small)), x, y, layer, 0, 0)
+        return true
+    end
+end, "treasure_vaultchest")
+
+set_pre_tile_code_callback(function(x, y, layer)
+    if prng:random() < options.treasure_chance / 500 then
+        spawn_critical(pick(orig_chain_items), x, y, layer, 0, 0)
+        return true
+    end
+end, "treasure_vaultchest")
 
 local swapping_spikes = false
 local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
@@ -2531,7 +2569,7 @@ set_callback(function(x, y, l, r)
 2==XX==000
 02=]]..string.char(drill_char)..[[0==0==
 00=00=000=
-00=00=0]]..string.char(socket_char)..[[0=
+00=00=0]]..string.char(socket_char)..[[00
 0000000=00
 ===00=====
 2220011111]]
@@ -2541,7 +2579,7 @@ set_callback(function(x, y, l, r)
 000==XX==2
 ==0==]]..string.char(drill_char)..[[0=20
 =000=00=00
-=0]]..string.char(socket_char)..[[0=00=00
+00]]..string.char(socket_char)..[[0=00=00
 00=0000000
 =====00===
 1111100222]]
