@@ -2529,7 +2529,15 @@ set_callback(function(x, y, l, r)
 ===00=====
 2220011111]]
         if prng:random() < 0.5 then
-            data = flip(data)
+            data = [[
+222==XX==1
+000==XX==2
+==0==]]..string.char(drill_char)..[[0=20
+=000=00=00
+=0]]..string.char(socket_char)..[[0=00=00
+00=0000000
+=====00===
+1111100222]]
         end
         return data
     end
