@@ -595,7 +595,7 @@ local enemies_small = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED,
     ENT_TYPE.MONS_AMMIT, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG,
     ENT_TYPE.MONS_JUMPDOG, ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MOUNT_TURKEY,
-    ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN}
+    ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL}
 local enemies_big = {ENT_TYPE.MONS_CAVEMAN_BOSS, ENT_TYPE.MONS_LAVAMANDER, ENT_TYPE.MONS_MUMMY, ENT_TYPE.MONS_ANUBIS,
     ENT_TYPE.MONS_GIANTFISH, ENT_TYPE.MONS_YETIKING, ENT_TYPE.MONS_YETIQUEEN, ENT_TYPE.MONS_ALIENQUEEN,
     ENT_TYPE.MONS_LAMASSU, ENT_TYPE.MONS_QUEENBEE, ENT_TYPE.MONS_GIANTFLY, ENT_TYPE.MONS_CRABMAN,
@@ -625,9 +625,14 @@ local enemies_challenge = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
     ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_LEPRECHAUN}
+local enemies_sisters = {ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN}
 
 local function enemy_small_spawn(x, y, l)
-    local uid = spawn_entity_snapped_to_floor(pick(enemies_small), x, y, l)
+    local enemy = pick(enemies_small)
+    if prng:random() < 0.03 or (state.theme == THEME.JUNGLE and prng:random() < 0.08) then
+        enemy = pick(enemies_sisters)
+    end
+    local uid = spawn_entity_snapped_to_floor(enemy, x, y, l)
     local ent = get_entity(uid)
     if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
@@ -993,8 +998,8 @@ set_callback(function()
                 ent.hundun_flags = set_flag(ent.hundun_flags, 2)
                 ent.hundun_flags = set_flag(ent.hundun_flags, 3)
                 ent.hundun_flags = set_flag(ent.hundun_flags, 4)
-                if ent.fireball_timer > 40 then
-                    ent.fireball_timer = prng:random(25,40)
+                if ent.fireball_timer > 120 then
+                    ent.fireball_timer = prng:random(45, 120)
                 end
             end)
         end, 1)
@@ -1204,6 +1209,23 @@ set_callback(function()
         end
     end
 end, ON.POST_LEVEL_GENERATION)
+
+set_post_entity_spawn(function(ent)
+    set_timeout(function()
+        ent.price = prng:random(1000, math.min(10000, 2*get_money())+prng:random(1000, 2000))
+    end, 1)
+    set_interval(function()
+        if state.logic.diceshop == nil then
+            return false
+        end
+        if state.logic.diceshop.bet_active == true then
+            for i,v in ipairs(get_entities_by_type(ENT_TYPE.ITEM_DICE_BET)) do
+                local bet = get_entity(v)
+                bet.price = prng:random(1000, math.min(10000, 2*get_money())+prng:random(1500, 3000))
+            end
+        end
+    end, 15)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_DICE_BET)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
