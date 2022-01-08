@@ -2,7 +2,7 @@ meta.name = "Randomizer Two"
 meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.4b"
+meta.version = "2.5"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -27,7 +27,7 @@ local real_default_options = {
     room_big_maxy = 12,
     room_dark = 4,
     pot_chance = 25,
-    treasure_chance = 18,
+    treasure_chance = 33,
     ushabti_chance = 25,
     stats_health_min = 8,
     stats_bombs_min = 8,
