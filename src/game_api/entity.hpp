@@ -323,12 +323,12 @@ class Entity
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
     virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // spawns LASERTRAP_SHOT from LASERTRAP
-    virtual bool on_open(Entity* opener) = 0;                                // used for crates and presents, and for weapons to shot
-
+    /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    virtual bool trigger_action(Entity* user) = 0;
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0;
 
-    virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1
+    virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical tiggers
     virtual uint16_t get_metadata() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual void apply_metadata(uint16_t metadata) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09

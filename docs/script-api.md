@@ -1643,6 +1643,9 @@ Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, ac
 - [`nil perform_teleport(int delta_x, int delta_y)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=perform_teleport) &Entity::perform_teleport
 \
 Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
+- [`bool trigger_action(Entity user)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_action) &Entity::trigger_action
+\
+Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
 - [`get_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) &Entity::get_metadata
 - [`nil apply_metadata(int metadata)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) &Entity::apply_metadata
 ### `Movable`
