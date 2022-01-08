@@ -1146,6 +1146,10 @@ end, ON.POST_ROOM_GENERATION)
 set_post_entity_spawn(function(ent)
     if test_flag(state.level_flags, 18) then
         local light = spawn_entity_over(ENT_TYPE.LOGICAL_ROOM_LIGHT, ent.uid, 0, 0)
+        set_on_kill(ent.uid, function()
+            local e = get_entity(light)
+            e.illumination.enabled = false
+        end)
         local e = get_entity(light)
         e.illumination.light1.green = 0
         e.illumination.light1.size = 2
