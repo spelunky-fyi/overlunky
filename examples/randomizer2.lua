@@ -295,12 +295,17 @@ local function trap_ceiling_valid(x, y, l)
         return false
     end
     if (map(x, y+1) & MASK.LAVA) > 0 then return false end
+    if (map(x, y-1) & MASK.ACTIVEFLOOR) > 0 then return false end
     local rx, ry = get_room_index(x, y)
     if y == state.level_gen.spawn_y and (ry >= state.level_gen.spawn_room_y and ry <= state.level_gen.spawn_room_y-1) then return false end
+    local box = AABB:new()
+    box.left = x-1
+    box.right = x+1
+    box.top = y-1
+    box.bottom = y-2
+    local air = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, l)
     local floor = get_grid_entity_at(x, y, l)
-    local below = get_grid_entity_at(x, y-1, l)
-    local below2 = get_grid_entity_at(x, y-2, l)
-    if floor ~= -1 and below == -1 and below2 == -1 then
+    if floor ~= -1 and #air == 0 then
         floor = get_entity(floor)
         return has(valid_floors, floor.type.id)
     end
