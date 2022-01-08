@@ -311,6 +311,11 @@ local function trap_floor_spawn(x, y, l)
     if floor ~= -1 then
         kill_entity(floor)
     end
+    if prng:random() < 0.03 or (state.theme == THEME.ABZU and prng:random() < 0.06) then
+        floor = spawn_grid_entity(ENT_TYPE.FLOOR_EXCALIBUR_STONE, x, y, l)
+        spawn_entity_over(ENT_TYPE.ITEM_EXCALIBUR, floor, 0, 0)
+        return
+    end
     spawn_grid_entity(pick(traps_floor), x, y, l)
 end
 local function trap_floor_valid(x, y, l)
