@@ -29,7 +29,7 @@ local real_default_options = {
     room_big_maxy = 12,
     room_dark = 4,
     pot_chance = 25,
-    treasure_chance = 33,
+    treasure_chance = 40,
     ushabti_chance = 25,
     stats_health_min = 8,
     stats_bombs_min = 8,
@@ -67,8 +67,9 @@ local real_default_options = {
     bias_09 = 8,
     bias_10 = 10,
     bias_11 = 6,
-    bias_15 = 1,
-    drill = 20
+    bias_15 = 4,
+    drill = 20,
+    kali = true
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -131,6 +132,7 @@ local function register_options()
     register_option_int("bias_11", "Theme bias: City of Gold", default_options.bias_11, 0, 15)
     register_option_int("bias_15", "Theme bias: Eggplant World", default_options.bias_15, 0, 15)
     register_option_int("drill", "Drill chance (x2 in echoes)", default_options.drill, 0, 100)
+    register_option_bool("kali", "Random kali items", default_options.kali)
     register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -633,6 +635,7 @@ local enemies_challenge = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_LEPRECHAUN}
 local enemies_sisters = {ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN}
+local enemies_generator = {ENT_TYPE.MONS_PROTOSHOPKEEPER, ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_ALIEN, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_TIKIMAN}
 
 local function enemy_small_spawn(x, y, l)
     local enemy = pick(enemies_small)
@@ -672,6 +675,8 @@ local function enemy_big_spawn(x, y, l)
         carry(uid, rider)
     elseif prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
+    elseif prng:random() < options.enemy_curse_chance/100 then
+        poison_entity(uid)
     end
 end
 local function enemy_big_valid(x, y, l)
@@ -701,6 +706,9 @@ local function enemy_climb_spawn(x, y, l)
         if prng:random() < options.enemy_curse_chance/100 then
             ent:set_cursed(true)
         end
+        if prng:random() < options.enemy_curse_chance/100 then
+            poison_entity(uid)
+        end
     end
 end
 local function enemy_climb_valid(x, y, l)
@@ -718,6 +726,9 @@ local function enemy_ceiling_spawn(x, y, l)
     local ent = get_entity(uid)
     if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
+    end
+    if prng:random() < options.enemy_curse_chance/100 then
+        poison_entity(uid)
     end
 end
 local function enemy_ceiling_valid(x, y, l)
@@ -737,6 +748,9 @@ local function enemy_air_spawn(x, y, l)
     if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
     end
+    if prng:random() < options.enemy_curse_chance/100 then
+        poison_entity(uid)
+    end
 end
 local function enemy_air_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
@@ -753,6 +767,9 @@ local function friend_spawn(x, y, l)
         local ent = get_entity(uid)
         if prng:random() < options.enemy_curse_chance/100 then
             attach_ball_and_chain(uid, 0.5, 0)
+        end
+        if prng:random() < options.enemy_curse_chance/100 then
+            poison_entity(uid)
         end
         friend_spawned = true
     end
@@ -820,8 +837,8 @@ set_callback(function(ctx)
     if options.enemy then
         ctx:set_procedural_spawn_chance(enemy_small_chance, get_chance(options.enemy_min, options.enemy_max))
         ctx:set_procedural_spawn_chance(enemy_big_chance, get_chance(options.enemy_min, options.enemy_max) * 6)
-        ctx:set_procedural_spawn_chance(enemy_climb_chance, get_chance(options.enemy_min, options.enemy_max) * 2)
-        ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 5)
+        ctx:set_procedural_spawn_chance(enemy_climb_chance, get_chance(options.enemy_min, options.enemy_max) * 3)
+        ctx:set_procedural_spawn_chance(enemy_ceiling_chance, get_chance(options.enemy_min, options.enemy_max) * 3)
         ctx:set_procedural_spawn_chance(enemy_air_chance, get_chance(options.enemy_min, options.enemy_max) * 12)
 
         ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SNAKE, 0)
@@ -860,6 +877,14 @@ set_callback(function(ctx)
         ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTFLY, 0)
         ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LEPRECHAUN, 0)
         ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRABMAN, 0)
+
+        change_sunchallenge_spawns(enemies_challenge)
+        change_altar_damage_spawns(enemies_challenge)
+        if prng:random() < 0.007 then
+            replace_drop(DROP.SHOPKEEPER_GENERATOR_1, ENT_TYPE.MONS_GOLDMONKEY)
+        else
+            replace_drop(DROP.SHOPKEEPER_GENERATOR_1, pick(enemies_generator))
+        end
     end
 
     if options.friend then
@@ -871,10 +896,7 @@ set_callback(function(ctx)
         end
     end
 
-    ctx:set_procedural_spawn_chance(snowman_chance, get_chance(options.enemy_min, options.enemy_max) * 8)
-
-    change_sunchallenge_spawns(enemies_challenge)
-    change_altar_damage_spawns(enemies_challenge)
+    ctx:set_procedural_spawn_chance(snowman_chance, get_chance(options.enemy_min, options.enemy_max) * 10)
 end, ON.POST_ROOM_GENERATION)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
@@ -1544,32 +1566,80 @@ local function fix_chain()
     end
 end
 
-local function get_chain_item(x, y)
+local function get_chain_item()
     if #chain_items > 0 then
         return table.remove(chain_items, 1)
     end
     return pick(crate_items)
 end
 
+--[[TODO
+    ANUBIS_COFFIN_SORCERESS
+    ANUBIS_COFFIN_VAMPIRE
+    ANUBIS_COFFIN_WITCHDOCTOR
+    KINGU_OCTOPUS
+    KINGU_JIANGSHI
+    KINGU_FEMALE_JIANGSHI
+    HUMPHEAD_HIREDHAND
+    DUATALTAR_*
+    LOCKEDCHEST_UDJATEYE
+    OLMEC_SISTERS_*
+    HUNDUN_FIREBALL
+    TIAMAT_*
+]]
+
+set_pre_tile_code_callback(function(x, y, layer)
+    spawn_critical(get_chain_item(), x, y, layer, 0, 0)
+    return true
+end, "ankh")
+
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.VOLCANA or not options.chain then return end
+    if not options.chain then return end
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
     local room = get_room_template(rx, ry, l)
-    if room == ROOM_TEMPLATE.OLDHUNTER_REWARDROOM then
-        kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, (prng:random()-0.5)*0.2, 0.2)
+    if l == LAYER.BACK and room == ROOM_TEMPLATE.OLDHUNTER_REWARDROOM then
+        replace_drop(DROP.VAN_HORSING_DIAMOND, get_chain_item())
+    elseif l == LAYER.BACK and room == ROOM_TEMPLATE.OLDHUNTER_CURSEDROOM then
+        replace_drop(DROP.VAN_HORSING_COMPASS, get_chain_item())
     end
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_DIAMOND)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_OLD_HUNTER)
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.DWELLING or not options.chain then return end
+    if not options.chain then return end
+    local x, y, l = get_position(ent.uid)
+    local rx, ry = get_room_index(x, y)
+    local room = get_room_template(rx, ry, l)
+    if l == LAYER.BACK and room == ROOM_TEMPLATE.QUEST_THIEF1 then
+        replace_drop(DROP.SPARROW_ROPEPILE, get_chain_item())
+    elseif l == LAYER.BACK and room == ROOM_TEMPLATE.QUEST_THIEF2 then
+        replace_drop(DROP.SPARROW_SKELETONKEY, get_chain_item())
+    end
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_THIEF)
+
+local yama_food = {ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_LANDMINE}
+set_post_entity_spawn(function(ent)
+    replace_drop(DROP.YAMA_EGGPLANTCROWN, get_chain_item())
+    replace_drop(DROP.YAMA_GIANTFOOD, pick(yama_food))
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_YAMA)
+
+set_post_entity_spawn(function(ent)
+    replace_drop(DROP.BEG_BOMBBAG, pick(crate_items))
+    replace_drop(DROP.BEG_TRUECROWN, pick(crate_items))
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HUNDUNS_SERVANT)
+
+set_post_entity_spawn(function(ent)
+    replace_drop(DROP.GHOSTJAR_DIAMOND, pick(crate_items))
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)
+
+set_post_entity_spawn(function(ent)
+    if not options.chain then return end
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
     local room = get_room_template(rx, ry, l)
     if room == ROOM_TEMPLATE.UDJATTOP then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, (prng:random()-0.5)*0.2, 0.2)
+        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, (prng:random()-0.5)*0.2, 0.2)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)
 
@@ -1580,36 +1650,34 @@ set_callback(function()
         for i,v in ipairs(crowns) do
             local x, y, l = get_position(v)
             kill_entity(v)
-            local item = spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+            local item = spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
             item = get_entity(item)
             item.flags = set_flag(item.flags, ENT_FLAG.NO_GRAVITY)
-        end
-    elseif state.theme == THEME.OLMEC then
-        local ankhs = get_entities_by(ENT_TYPE.ITEM_PICKUP_ANKH, 0, LAYER.BACK)
-        for i,v in ipairs(ankhs) do
-            local x, y, l = get_position(v)
-            kill_entity(v)
-            local item = spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
         end
     elseif state.theme == THEME.TIDE_POOL then
         local notes = get_entities_by(ENT_TYPE.ITEM_MADAMETUSK_IDOLNOTE, 0, LAYER.BACK)
         for i,v in ipairs(notes) do
             local x, y, l = get_position(v)
             kill_entity(v)
-            local item = spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+            local item = spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
         end
+    end
+    if state.theme == THEME.DUAT then
+        replace_drop(DROP.OSIRIS_TABLETOFDESTINY, get_chain_item())
+    elseif state.theme == THEME.ABZU then
+        replace_drop(DROP.KINGU_TABLETOFDESTINY, get_chain_item())
     end
 end, ON.LEVEL)
 
-set_post_entity_spawn(function(ent)
-    if not options.chain then return end
-    if state.theme ~= THEME.ABZU and state.theme ~= THEME.DUAT then return end
-    if #chain_items > 0 then
-        local x, y, l = get_position(ent.uid)
-        kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
-    end
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY)
+local items_kapala = {ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_ELIXIR}
+set_callback(function()
+    if not options.kali then return end
+    set_interval(function()
+        replace_drop(DROP.ALTAR_ROCK_WOODENARROW, pick(join(crate_items, enemies_small)))
+        replace_drop(DROP.ALTAR_PRESENT_EGGPLANT, pick(orig_chain_items))
+        replace_drop(DROP.ALTAR_KAPALA, pick(items_kapala))
+    end, 30)
+end, ON.LEVEL)
 
 set_post_entity_spawn(function(ent)
     if not options.chain then return end
@@ -1618,13 +1686,18 @@ set_post_entity_spawn(function(ent)
     local room = get_room_template(rx, ry, l)
     if l == LAYER.BACK and state.world == 2 and room == ROOM_TEMPLATE.CHALLENGE_SPECIAL then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_HOUYIBOW)
 
 set_post_entity_spawn(function(ent)
     if not options.chain then return end
-    kill_entity(ent.uid)
+    local x, y, l = get_position(ent.uid)
+    local rx, ry = get_room_index(x, y)
+    local room = get_room_template(rx, ry, l)
+    if room > ROOM_TEMPLATE.CHALLENGE_BOTTOM then
+        kill_entity(ent.uid)
+    end
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_METAL_ARROW)
 
 set_post_entity_spawn(function(ent)
@@ -1632,13 +1705,13 @@ set_post_entity_spawn(function(ent)
     local x, y, l = get_position(ent.uid)
     if state.theme == THEME.SUNKEN_CITY and l == LAYER.BACK then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_LIGHT_ARROW)
 
 set_post_entity_spawn(function(ent)
     local x, y, l = get_position(ent.uid)
-    if state.theme == THEME.ICE_CAVES and l == LAYER.BACK then
+    if l == LAYER.BACK then
         kill_entity(ent.uid)
         spawn_entity_nonreplaceable(pick(crate_items), x, y, l, 0, 0)
     end
@@ -1646,7 +1719,7 @@ end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_PICKUP_CLOVER)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme == THEME.ICE_CAVES and l == LAYER.BACK and options.chain then
-        return spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+        return spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_PLASMACANNON)
@@ -1656,7 +1729,7 @@ set_post_entity_spawn(function(ent)
     local x, y, l = get_position(ent.uid)
     if state.world == 4 and l == LAYER.BACK then
         kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(get_chain_item(x, y), x, y, l, 0, 0)
+        spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
 
