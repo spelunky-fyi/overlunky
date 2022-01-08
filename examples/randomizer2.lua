@@ -1,8 +1,10 @@
 meta.name = "Randomizer Two"
-meta.description = [[Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
+meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) IF YOU GET ANY RED ERRORS AT THE INTRO, OR THE BLEEDING EDGE FEATURES WON'T WORK!
+
+Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.5"
+meta.version = "2.5a"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -129,7 +131,7 @@ local function register_options()
     register_option_int("bias_11", "Theme bias: City of Gold", default_options.bias_11, 0, 15)
     register_option_int("bias_15", "Theme bias: Eggplant World", default_options.bias_15, 0, 15)
     register_option_int("drill", "Drill chance (x2 in echoes)", default_options.drill, 0, 100)
-    register_option_button("zreset", "Reset to defaults", function()
+    register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
     end)
@@ -1688,11 +1690,12 @@ end, "treasure_vaultchest")
 
 local swapping_spikes = false
 local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
+local ice_subthemes = {COSUBTHEME.DWELLING, COSUBTHEME.ICE_CAVES, COSUBTHEME.TEMPLE}
 local function shuffle_tile_codes()
     for k,v in pairs(floor_tilecodes) do
         if prng:random() < 0.05 and k ~= "floor" then
             floor_tilecodes[k] = ENT_TYPE.FLOORSTYLED_COG
-        elseif prng:random() < 0.12 and has(ice_themes, state.theme_next) then
+        elseif prng:random() < 0.10 and has(ice_themes, state.theme_next) and (state.theme ~= THEME.COSMIC_OCEAN or has(ice_subthemes, get_co_subtheme())) then
             floor_tilecodes[k] = ENT_TYPE.FLOOR_ICE
         else
             floor_tilecodes[k] = pick(floor_types)
