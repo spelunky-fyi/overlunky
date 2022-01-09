@@ -70,7 +70,7 @@ local real_default_options = {
     bias_15 = 4,
     drill = 20,
     kali = true,
-    jellyless = false
+    jellyless_chance = 50
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -134,7 +134,7 @@ local function register_options()
     register_option_int("bias_15", "Theme bias: Eggplant World", default_options.bias_15, 0, 15)
     register_option_int("drill", "Drill chance (x2 in echoes)", default_options.drill, 0, 100)
     register_option_bool("kali", "Random kali items", default_options.kali)
-    register_option_bool("jellyless", "Easy CO: Remove jellyfish and orbs", default_options.jellyless)
+    register_option_float("jellyless_chance", "Easy CO chance (no jelly)", default_options.jellyless_chance, 0, 100)
     register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -638,6 +638,13 @@ local enemies_challenge = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_LEPRECHAUN}
 local enemies_sisters = {ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN}
 local enemies_generator = {ENT_TYPE.MONS_PROTOSHOPKEEPER, ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_ALIEN, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_TIKIMAN}
+
+set_pre_entity_spawn(function(type, x, y, l, overlay)
+    if state.time_level < 2 and prng:random() < options.jellyless_chance/100 then
+        return spawn_critical(ENT_TYPE.FX_SHADOW, x, y, l, 0, 0)
+    end
+    return spawn_critical(type, x, y, l, 0, 0)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_MEGAJELLYFISH)
 
 local function enemy_small_spawn(x, y, l)
     local enemy = pick(enemies_small)
@@ -1857,9 +1864,6 @@ local function init_run()
                 l = 3
             elseif t == THEME.COSMIC_OCEAN then
                 l = prng:random_int(5, 97, 0)
-                if options.jellyless then
-                    l = prng:random_int(101, 199, 0)
-                end
             elseif t == THEME.ICE_CAVES then
                 l = 1
             elseif t == THEME.EGGPLANT_WORLD then
