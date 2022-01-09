@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.5a"
+meta.version = "2.5b"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -69,7 +69,8 @@ local real_default_options = {
     bias_11 = 6,
     bias_15 = 4,
     drill = 20,
-    kali = true
+    kali = true,
+    jellyless = false
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -133,6 +134,7 @@ local function register_options()
     register_option_int("bias_15", "Theme bias: Eggplant World", default_options.bias_15, 0, 15)
     register_option_int("drill", "Drill chance (x2 in echoes)", default_options.drill, 0, 100)
     register_option_bool("kali", "Random kali items", default_options.kali)
+    register_option_bool("jellyless", "Easy CO: Remove jellyfish and orbs", default_options.jellyless)
     register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -1855,6 +1857,9 @@ local function init_run()
                 l = 3
             elseif t == THEME.COSMIC_OCEAN then
                 l = prng:random_int(5, 97, 0)
+                if options.jellyless then
+                    l = prng:random_int(101, 199, 0)
+                end
             elseif t == THEME.ICE_CAVES then
                 l = 1
             elseif t == THEME.EGGPLANT_WORLD then
