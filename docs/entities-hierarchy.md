@@ -42,7 +42,7 @@ The list below shows the type hierarchy for each entity in the game. This makes 
 - 040 FLOOR_ARROW_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor) > [Arrowtrap](script-api.md#Arrowtrap)
 - 041 FLOOR_POISONED_ARROW_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor) > [Arrowtrap](script-api.md#Arrowtrap)
 - 042 FLOOR_TOTEM_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor) > [TotemTrap](script-api.md#TotemTrap)
-- 043 FLOOR_JUNGLE_SPEAR_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor)
+- 043 FLOOR_JUNGLE_SPEAR_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor) > [JungleSpearTrap](script-api.md#JungleSpearTrap)
 - 044 FLOOR_LION_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor) > [TotemTrap](script-api.md#TotemTrap)
 - 045 FLOOR_LASER_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor) > [LaserTrap](script-api.md#LaserTrap)
 - 046 FLOOR_SPARK_TRAP = [Entity](script-api.md#Entity) > [Floor](script-api.md#Floor) > [SparkTrap](script-api.md#SparkTrap)

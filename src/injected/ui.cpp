@@ -2785,11 +2785,9 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 void render_olmec(Entity* ent, ImColor color)
 {
     std::pair<float, float> render_position = {0.0f, 0.0f};
-    int* pitems = (int*)ent->items.begin;
     bool got_rendering = false;
-    for (unsigned int i = 0; i < ent->items.count; i++) // get the olmec position from one of the fx
+    for (auto ent_item : ent->items) // get the olmec position from one of the fx
     {
-        auto ent_item = get_entity_ptr(pitems[i]);
         if (ent_item && ent_item->rendering_info && !ent_item->rendering_info->stop_render)
         {
             auto rend = get_render_position(ent_item->uid);
@@ -3031,7 +3029,7 @@ void render_clickhandler()
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
 
-        auto additional_fixed_entities = {
+        const auto additional_fixed_entities = {
             (ENT_TYPE)CUSTOM_TYPE::LOGICALTRAPTRIGGER,
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
@@ -3051,6 +3049,8 @@ void render_clickhandler()
             to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
             to_id("ENT_TYPE_FLOOR_DUSTWALL"),
             to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
+            to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
+            to_id("ENT_TYPE_FLOOR_SPIKES"),
         };
         for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
         {
@@ -4354,12 +4354,11 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Items"))
     {
-        if (g_entity->items.count > 0)
+        if (g_entity->items.size > 0)
         {
-            int* pitems = (int*)g_entity->items.begin;
-            for (unsigned int i = 0; i < g_entity->items.count; i++)
+            for (auto i = g_entity->items.uid_begin(); i < g_entity->items.uid_end(); ++i)
             {
-                render_uid(pitems[i], "EntityItems", true);
+                render_uid(*i, "EntityItems", true);
             }
         }
     }

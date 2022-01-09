@@ -236,6 +236,8 @@ void register_usertypes(sol::state& lua)
         &Entity::activate,
         "perform_teleport",
         &Entity::perform_teleport,
+        "trigger_action",
+        &Entity::trigger_action,
         "get_metadata",
         &Entity::get_metadata,
         "apply_metadata",

@@ -83,7 +83,7 @@ void attach_entity(Entity* overlay, Entity* attachee)
     attachee->special_offsety = attachee->y;
     attachee->overlay = overlay;
 
-    using AddItemPtr = void(Vector*, Entity*, bool);
+    using AddItemPtr = void(EntityList*, Entity*, bool);
     static AddItemPtr* add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
     add_item_ptr(&overlay->items, attachee, false);
 }
@@ -225,6 +225,25 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
         else
         {
             ent->teleport_abs(x, y, vx, vy);
+        }
+    }
+}
+
+void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER layer)
+{
+    auto ent = get_entity_ptr(uid);
+    if (ent)
+    {
+        std::pair<float, float> offset;
+        enum_to_layer(layer, offset);
+        if (ent->is_liquid())
+        {
+            move_liquid_abs(uid, offset.first + x, offset.second + y, vx, vy);
+        }
+        else
+        {
+            ent->teleport_abs(offset.first + x, offset.second + y, vx, vy);
+            ent->set_layer(layer);
         }
     }
 }
@@ -558,7 +577,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
         if ((!proper_types.size() || !proper_types[0]) && !mask) // all entities
         {
             found.reserve(state.layer(correct_layer)->all_entities.size);
-            found.insert(found.begin(), state.layer(correct_layer)->all_entities.uid_begin(), state.layer(correct_layer)->all_entities.uid_end());
+            found.insert(found.end(), state.layer(correct_layer)->all_entities.uid_begin(), state.layer(correct_layer)->all_entities.uid_end());
         }
         else
         {
@@ -698,16 +717,8 @@ bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return false;
-    if (entity->items.count > 0)
-    {
-        auto pitems = entity->items.begin;
-        for (unsigned int i = 0; i < entity->items.count; i++)
-        {
-            if (pitems[i] == item_uid)
-                return true;
-        }
-    }
-    return false;
+
+    return entity->items.contains(item_uid);
 };
 
 bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
@@ -715,15 +726,11 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return false;
-    if (entity->items.count > 0)
+    if (entity->items.size > 0)
     {
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        int* pitems = (int*)entity->items.begin;
-        for (unsigned int i = 0; i < entity->items.count; i++)
+        for (auto item : entity->items)
         {
-            Entity* item = get_entity_ptr(pitems[i]);
-            if (item == nullptr)
-                continue;
             if (entity_type_check(proper_types, item->type->id))
                 return true;
         }
@@ -741,20 +748,22 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return found;
-    if (entity->items.count > 0)
+    if (entity->items.size > 0)
     {
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        uint32_t* pitems = entity->items.begin;
-        for (unsigned int i = 0; i < entity->items.count; i++)
+        if ((!proper_types.size() || !proper_types[0]) && !mask) // all items
         {
-            Entity* item = get_entity_ptr(pitems[i]);
-            if (item == nullptr)
+            found.reserve(entity->items.size);
+            found.insert(found.end(), entity->items.uid_begin(), entity->items.uid_end());
+        }
+        else
+        {
+            for (auto item : entity->items)
             {
-                continue;
-            }
-            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
-            {
-                found.push_back(item->uid);
+                if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
+                {
+                    found.push_back(item->uid);
+                }
             }
         }
     }
@@ -847,12 +856,10 @@ void flip_entity(uint32_t uid)
     if (ent == nullptr)
         return;
     ent->flags = flipflag(ent->flags, 17);
-    if (ent->items.count > 0)
+    if (ent->items.size > 0)
     {
-        int* items = (int*)ent->items.begin;
-        for (unsigned int i = 0; i < ent->items.count; i++)
+        for (auto item : ent->items)
         {
-            Entity* item = get_entity_ptr(items[i]);
             item->flags = flipflag(item->flags, 17);
         }
     }
@@ -1260,7 +1267,7 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         if (new_drop_entity_type == 0)
         {
             for (int x = 0; x < 3; ++x)
-                if (entry.offsets[0])
+                if (entry.offsets[x])
                     recover_mem("replace_drop", entry.offsets[x]);
 
             return;
@@ -1270,15 +1277,15 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
             auto memory = Memory::get();
             size_t offset = 0;
             size_t exe_offset = 0;
-            auto n_skips = entry.skip;
-            do
+            const auto drop_name{"DROP." + entry.caption};
+            if (entry.vtable_offset == VTABLE_OFFSET::NONE)
             {
-                if (entry.vtable_offset == VTABLE_OFFSET::NONE)
-                    offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : memory.after_bundle) + entry.value_offset;
-                else
-                    offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)) + entry.value_offset;
-
-            } while (n_skips--);
+                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : memory.after_bundle, std::nullopt, drop_name) + entry.value_offset;
+            }
+            else
+            {
+                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset), std::nullopt, drop_name) + entry.value_offset;
+            }
             exe_offset = memory.at_exe(offset);
 
             for (auto x = 0; x < entry.vtable_occurrence; ++x)
@@ -1702,7 +1709,11 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
         if (ent_types[i] >= (uint32_t)CUSTOM_TYPE::ACIDBUBBLE)
         {
             auto extra_types = get_custom_entity_types(static_cast<CUSTOM_TYPE>(ent_types[i]));
-            if (!extra_types.empty())
+            if (extra_types.size() == 1)
+            {
+                ent_types[i] = extra_types[0];
+            }
+            else if (!extra_types.empty())
             {
                 auto it = ent_types.begin() + i;
                 it = ent_types.erase(it);
@@ -1711,7 +1722,7 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
             }
         }
     }
-    return std::move(ent_types);
+    return ent_types;
 }
 
 void enter_door(int32_t player_uid, int32_t door_uid)
@@ -1741,6 +1752,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
 
         recover_mem("sunchallenge_spawn");
+        modified = false;
         return;
     }
 
@@ -1903,6 +1915,52 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
     }
 }
 
+void change_waddler_drop(std::vector<ENT_TYPE> ent_types)
+{
+    static bool modified = false;
+
+    const auto offset = get_address("waddler_drop_size");
+    const auto array_offset = get_address("waddler_drop_array");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+
+    if (ent_types.size() > 255 || ent_types.size() < 1)
+    {
+        if (!ent_types.size())
+        {
+            if (modified)
+                VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+            recover_mem("waddler_drop");
+            modified = false;
+        }
+        return;
+    }
+
+    if ((!modified && ent_types.size() == 3) ||            // if it's the unchanged instruction and we set the same number of ent_type's
+        (modified && read_u8(offset) == ent_types.size())) // or new instruction but the same size
+    {
+        for (unsigned int i = 0; i < ent_types.size(); ++i)
+            write_mem_recoverable("waddler_drop", (size_t)&old_types_array[i], ent_types[i], true);
+
+        return;
+    }
+
+    const auto data_size = ent_types.size() * sizeof(ENT_TYPE);
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(array_offset + 4, data_size);
+
+    if (new_array)
+    {
+        if (modified)
+            VirtualFree(old_types_array, 0, MEM_RELEASE);
+
+        memcpy(new_array, ent_types.data(), data_size);
+        int32_t rel = static_cast<int32_t>((size_t)new_array - (array_offset + 4));
+        write_mem_recoverable("waddler_drop", array_offset, rel, true);
+        write_mem_recoverable("waddler_drop", offset, (uint8_t)ent_types.size(), true);
+        modified = true;
+    }
+}
+
 void poison_entity(int32_t entity_uid)
 {
     auto ent = get_entity_ptr(entity_uid);
@@ -1911,5 +1969,86 @@ void poison_entity(int32_t entity_uid)
         using PoisonEntity_fun = void(Entity*, bool);
         auto poison_entity = (PoisonEntity_fun*)get_address("poison_entity");
         poison_entity(ent, true);
+    }
+}
+
+void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
+{
+    static size_t offsets[4];
+    auto size_minus_one = get_address("ankh_health");
+    if (!health)
+    {
+        recover_mem("ankh_health");
+        return;
+    }
+    if (size_minus_one && beat_add_health)
+    {
+        if (!offsets[0])
+        {
+            auto memory = Memory::get();
+            size_t offset = size_minus_one - memory.exe_ptr;
+            const auto limit_size = offset + 0x200;
+
+            offsets[0] = find_inst(memory.exe(), "\x41\x80\xBF\x17\x01\x00\x00"sv, offset, limit_size, "ankh_health_gain_1");
+            offsets[1] = find_inst(memory.exe(), "\x41\x80\xBF\x17\x01\x00\x00"sv, offsets[0] + 7, limit_size, "ankh_health_gain_2");
+            offsets[2] = find_inst(memory.exe(), "\x0F\x42\xCA\x83\xC0"sv, offset, limit_size, "ankh_health_gain_3");
+            offsets[3] = find_inst(memory.exe(), "\x8A\x83\x17\x01\x00\x00\x3C"sv, offset, std::nullopt, "ankh_health_gain_4"); // this is some bs
+            if (!offsets[0] || !offsets[1] || !offsets[2] || !offsets[3])
+            {
+                offsets[0] = 0;
+                return;
+            }
+            offsets[0] = memory.at_exe(offsets[0] + 7); // add pattern size
+            offsets[1] = memory.at_exe(offsets[1] + 7);
+            offsets[2] = memory.at_exe(offsets[2] + 5);
+            offsets[3] = memory.at_exe(offsets[3] + 7);
+        }
+        const uint8_t game_maxhp = read_u8(offsets[2] - 14);
+        if (health > game_maxhp)
+            health = game_maxhp;
+
+        if (health % beat_add_health == 0)
+        {
+            write_mem_recoverable("ankh_health", size_minus_one, (uint8_t)(health - 1), true);
+            write_mem_recoverable("ankh_health", offsets[0], health, true);
+            write_mem_recoverable("ankh_health", offsets[1], health, true);
+            write_mem_recoverable("ankh_health", offsets[2], beat_add_health, true);
+            if (health < 4)
+            {
+                write_mem_recoverable("ankh_health", offsets[3], (uint8_t)0, true);
+            }
+            else
+            {
+                if (read_u8(offsets[3]) != 3)
+                    recover_mem("ankh_health", offsets[3]);
+            }
+        }
+    }
+}
+
+void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
+{
+    if (auto entity = get_entity_ptr(uid))
+    {
+        auto state = State::get();
+        const auto [c_x, c_y] = entity->position_self();
+        const Entity* ent = state.layer(entity->layer)->get_grid_entity_at(c_x, c_y);
+        if (ent == entity) // check if it's grid entity
+        {
+            const uint32_t grid_x = static_cast<uint32_t>(c_x + 0.5f);
+            const uint32_t grid_y = static_cast<uint32_t>(c_y + 0.5f);
+            std::pair<float, float> offset;
+            const auto actual_layer = enum_to_layer(layer, offset);
+            const uint32_t ix = static_cast<uint32_t>(offset.first + x + 0.5f);
+            const uint32_t iy = static_cast<uint32_t>(offset.second + y + 0.5f);
+
+            if (ix < 0x56 && iy < 0x7e)
+            {
+                state.layer(entity->layer)->grid_entities[grid_y][grid_x] = nullptr;
+                entity->teleport_abs(static_cast<float>(ix), static_cast<float>(iy), 0, 0);
+                entity->set_layer(layer);
+                state.layer(actual_layer)->grid_entities[iy][ix] = entity;
+            }
+        }
     }
 }

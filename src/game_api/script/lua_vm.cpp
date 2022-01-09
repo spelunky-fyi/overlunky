@@ -513,8 +513,13 @@ end
         else
             set_pause(0);
     };
+    auto move_entity_abs = sol::overload(
+        static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
+        static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
     /// Teleport entity to coordinates with optional velocity
     lua["move_entity"] = move_entity_abs;
+    /// Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
+    lua["move_grid_entity"] = move_grid_entity;
     /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).
@@ -709,7 +714,8 @@ end
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
     /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
-    /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
+    /// Deprecated
+    /// Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
     /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
     lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
@@ -1110,9 +1116,8 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// `uid` has to be the uid of a `Container` or else stuff will break.
-    /// Sets a callback that is called right when a container is opened via up+door.
-    /// The callback signature is `nil on_open(Entity self, Entity opener)`
+    /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+    /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
@@ -1238,8 +1243,19 @@ end
     /// Use empty table as argument to reset to the game default
     lua["change_altar_damage_spawns"] = change_altar_damage_spawns;
 
+    /// Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+    /// {ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+    /// Max 255 types
+    /// Use empty table as argument to reset to the game default
+    lua["change_waddler_drop"] = change_waddler_drop;
+
     /// Poisons entity, to cure poison set `poison_tick_timer` to -1
     lua["poison_entity"] = poison_entity;
+
+    /// Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+    /// `beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+    /// If you set `health` above the game max health it will be forced down to the game max
+    lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

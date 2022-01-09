@@ -10,6 +10,7 @@
 
 #include "aliases.hpp"
 #include "color.hpp"
+#include "layer.hpp"
 #include "math.hpp"
 #include "memory.hpp"
 #include "state_structs.hpp"
@@ -153,25 +154,12 @@ EntityDB* get_type(uint32_t id);
 
 ENT_TYPE to_id(std::string_view id);
 
-class Vector
-{
-  public:
-    uint32_t* heap;
-    uint32_t* begin;
-    uint32_t size, count;
-
-    bool empty()
-    {
-        return !!count;
-    }
-};
-
 class Entity
 {
   public:
     EntityDB* type;
     Entity* overlay;
-    Vector items;
+    EntityList items;
     uint32_t flags;
     uint32_t more_flags;
     int32_t uid;
@@ -281,6 +269,7 @@ class Entity
     void remove_item(uint32_t item_uid);
 
     TEXTURE get_texture();
+    /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     bool set_texture(TEXTURE texture_id);
 
     void unhook(std::uint32_t id);
@@ -333,13 +322,13 @@ class Entity
     virtual void v20() = 0;
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
-    virtual void v23() = 0;
-    virtual bool on_open(Entity* opener) = 0; // used for crates and presents
-
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // spawns LASERTRAP_SHOT from LASERTRAP
+    /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    virtual bool trigger_action(Entity* user) = 0;
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0;
 
-    virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1
+    virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical tiggers
     virtual uint16_t get_metadata() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual void apply_metadata(uint16_t metadata) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09

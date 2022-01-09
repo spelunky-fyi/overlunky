@@ -431,6 +431,8 @@ SaveData* State::savedata()
 
 Entity* State::find(uint32_t uid)
 {
+    if (uid < 0)
+        return nullptr;
     // Ported from MauveAlert's python code in the CAT tracker
     auto mask = ptr()->uid_to_entity_mask;
     uint32_t target_uid_plus_one = uid + 1;
