@@ -1588,6 +1588,11 @@ set_pre_tile_code_callback(function(x, y, layer)
     return true
 end, "ankh")
 
+set_pre_tile_code_callback(function(x, y, layer)
+    spawn_critical(pick(crate_items), x, y, layer, 0, 0)
+    return true
+end, "clover")
+
 set_post_entity_spawn(function(ent)
     if not options.chain then return end
     local x, y, l = get_position(ent.uid)
@@ -1703,16 +1708,6 @@ set_post_entity_spawn(function(ent)
         spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_LIGHT_ARROW)
-
-set_post_entity_spawn(function(ent)
-    local x, y, l = get_position(ent.uid)
-    local rx, ry = get_room_index(x, y)
-    local room = get_room_template(rx, ry, l)
-    if l == LAYER.BACK and not has(shop_rooms, room) and prng:random() < 0.5 then
-        kill_entity(ent.uid)
-        spawn_entity_nonreplaceable(pick(crate_items), x, y, l, 0, 0)
-    end
-end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_PICKUP_CLOVER)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme == THEME.ICE_CAVES and l == LAYER.BACK and options.chain then
