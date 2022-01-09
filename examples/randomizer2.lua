@@ -2332,8 +2332,8 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
---[[ TODO: destroying these is randomly crashing the game, maybe because they're still spawning in owned floors
 local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM, ROOM_TEMPLATE.TUSKDICESHOP, ROOM_TEMPLATE.TUSKDICESHOP_LEFT, ROOM_TEMPLATE.DICESHOP, ROOM_TEMPLATE.DICESHOP_LEFT, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100} --CHALLENGE ROOMS
+--[[ TODO: destroying these is randomly crashing the game, maybe because they're still spawning in owned floors
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
     if #storages == 0 and options.storage and not (state.world == 6 and state.level == 3) then
