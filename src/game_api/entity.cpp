@@ -179,10 +179,8 @@ void Entity::set_layer(LAYER layer_to)
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
     add_to_layer(ptr_to, this);
 
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    for (auto item : items)
     {
-        auto item = get_entity_ptr(pitems[idx]);
         item->set_layer(layer_to);
     }
 }
@@ -199,10 +197,8 @@ void Entity::remove()
             static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
             remove_from_layer(ptr_from, this);
 
-            int* pitems = (int*)items.begin;
-            for (uint8_t idx = 0; idx < items.count; ++idx)
+            for (auto item : items)
             {
-                auto item = get_entity_ptr(pitems[idx]);
                 item->remove();
             }
         }
@@ -252,14 +248,11 @@ void Entity::remove_item(uint32_t item_uid)
 void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    for (auto item : items)
     {
-        auto ent_type = get_entity_type(pitems[idx]);
-        if (ent_type == jetpackID)
+        if (item->type->id == jetpackID)
         {
-            auto jetpack = get_entity_ptr(pitems[idx])->as<Jetpack>();
-            jetpack->fuel = fuel;
+            item->as<Jetpack>()->fuel = fuel;
             break;
         }
     }
@@ -268,14 +261,11 @@ void Player::set_jetpack_fuel(uint8_t fuel)
 uint8_t Player::kapala_blood_amount()
 {
     static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    for (auto item : items)
     {
-        auto ent_type = get_entity_type(pitems[idx]);
-        if (ent_type == kapalaPowerupID)
+        if (item->type->id == kapalaPowerupID)
         {
-            auto kapala = get_entity_ptr(pitems[idx])->as<KapalaPowerup>();
-            return kapala->amount_of_blood;
+            return item->as<KapalaPowerup>()->amount_of_blood;
         }
     }
     return 0;

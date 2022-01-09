@@ -236,10 +236,8 @@ Entity* Floor::find_corner_decoration(FLOOR_SIDE side)
         {-0.42f, -0.42f},
         {+0.42f, -0.42f}};
 
-    int* pitems = (int*)items.begin;
-    for (uint8_t i = 0; i < items.count; ++i)
+    for (auto item : items)
     {
-        Entity* item = get_entity_ptr(pitems[i]);
         auto [x_pos, y_pos] = item->position_self();
         if (std::abs(x_pos - offsets[side - 4][0]) < 0.0001f && std::abs(y_pos - offsets[side - 4][1]) < 0.0001f)
         {
@@ -646,6 +644,45 @@ void Arrowtrap::rearm()
         if ((flags & (1 << 16)) > 0)
         {
             trigger->flags |= (1 << 16);
+        }
+    }
+}
+
+void trigger_trap(Entity* trap, int32_t who_uid, uint8_t direction)
+{
+    auto who = get_entity_ptr(who_uid);
+    static const ENT_TYPE ar_logical_trigger = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER"); // + 5
+    static const ENT_TYPE bs_logical_trigger = to_id("ENT_TYPE_LOGICAL_BIGSPEAR_TRAP_TRIGGER");
+    if (who)
+    {
+        for (auto item : trap->items)
+        {
+            if ((item->type->id >= ar_logical_trigger && item->type->id < ar_logical_trigger + 6) || item->type->id == bs_logical_trigger)
+            {
+                if (direction == 1) // left
+                {
+                    if (item->x >= 0)
+                        continue;
+                }
+                else if (direction == 2) // right
+                {
+                    if (item->x <= 0)
+                        continue;
+                }
+                else if (direction == 3) // up
+                {
+                    if (item->y <= 0)
+                        continue;
+                }
+                else if (direction == 4) // down
+                {
+                    if (item->y >= 0)
+                        continue;
+                }
+
+                item->on_collision2(who);
+                return;
+            }
         }
     }
 }

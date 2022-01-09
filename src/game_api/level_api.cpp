@@ -462,6 +462,7 @@ std::array g_community_tile_codes{
             };
             g_attachee_requiring_entities.push_back({{{x, y - 1}}, do_spawn});
         }},
+    CommunityTileCode{"boombox", "ENT_TYPE_ITEM_BOOMBOX"},
     //CommunityTileCode{
     //    "lake_imposter",
     //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",

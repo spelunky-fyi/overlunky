@@ -17,6 +17,8 @@ enum FLOOR_SIDE
     BOTTOM_RIGHT,
 };
 
+void trigger_trap(Entity* trap, int32_t who_uid, uint8_t direction = 0);
+
 class Floor : public Entity
 {
   public:
@@ -131,6 +133,11 @@ class Arrowtrap : public Floor
     bool arrow_shot;
 
     void rearm();
+    /// The uid must be movable entity for ownership transfers
+    void trigger(int32_t who_uid)
+    {
+        return trigger_trap(this, who_uid);
+    }
 };
 
 class TotemTrap : public Floor
@@ -147,6 +154,11 @@ class TotemTrap : public Floor
     uint16_t unused2;
     uint32_t unused3;
     uint8_t timer; // unsure
+    /// The uid must be movable entity for ownership transfers
+    void trigger(int32_t who_uid, bool left)
+    {
+        return trigger_trap(this, who_uid, left ? 1 : 2);
+    }
 };
 
 class LaserTrap : public Floor
@@ -156,6 +168,12 @@ class LaserTrap : public Floor
     /// after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
     uint8_t reset_timer;
     bool phase_2;
+    /// The uid must be movable entity for ownership transfers
+    /// doesn't work for some reason :( TODO: fix?
+    void trigger(int32_t who_uid)
+    {
+        return trigger_trap(this, who_uid);
+    }
 };
 
 class SparkTrap : public Floor
@@ -251,6 +269,11 @@ class BigSpearTrap : public Floor
     uint8_t active; /*unsure*/ // forced to 1
     /// setting the left part to 0 or right part to 1 destroys the trap
     bool left_part;
+    /// The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
+    void trigger(int32_t who_uid, bool left)
+    {
+        return trigger_trap(this, who_uid, left ? 1 : 2);
+    }
 };
 
 class StickyTrap : public Floor
@@ -364,4 +387,14 @@ class PoleDeco : public Floor
   public:
     int32_t deco_up;
     int32_t deco_down;
+};
+
+class JungleSpearTrap : public Floor
+{
+  public:
+    /// The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down
+    void trigger(int32_t who_uid, uint8_t direction)
+    {
+        return trigger_trap(this, who_uid, direction);
+    }
 };

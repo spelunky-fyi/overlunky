@@ -304,6 +304,12 @@ Enable/disable game engine pause.
 ### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
 `nil move_entity(int uid, float x, float y, float vx, float vy)`<br/>
 Teleport entity to coordinates with optional velocity
+### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
+`nil move_entity(int uid, float x, float y, float vx, float vy, LAYER layer)`<br/>
+Teleport entity to coordinates with optional velocity
+### [`move_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_grid_entity)
+`nil move_grid_entity(int uid, float x, float y, LAYER layer)`<br/>
+Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
 ### [`set_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door_target)
 `nil set_door_target(int uid, int w, int l, int t)`<br/>
 Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
@@ -470,9 +476,6 @@ Get the current timestamp in milliseconds since the Unix Epoch.
 ### [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry)
 `nil carry(int mount_uid, int rider_uid)`<br/>
 Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
-### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
-`nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)`<br/>
-Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
 ### [`set_kapala_blood_threshold`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_kapala_blood_threshold)
 `nil set_kapala_blood_threshold(int threshold)`<br/>
 Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
@@ -658,9 +661,8 @@ Check [here](virtual-availability.md) to see whether you can use this callback o
 ### [`set_on_open`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
 `optional<CallbackId> set_on_open(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-`uid` has to be the uid of a `Container` or else stuff will break.
-Sets a callback that is called right when a container is opened via up+door.
-The callback signature is `nil on_open(Entity self, Entity opener)`
+Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+The callback signature is `nil on_open(Entity entity_self, Entity opener)`
 Use this only when no other approach works, this call can be expensive if overused.
 Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_pre_collision1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision1)
@@ -726,9 +728,20 @@ Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
 {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
 Max 255 types
 Use empty table as argument to reset to the game default
+### [`change_waddler_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_waddler_drop)
+`nil change_waddler_drop(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+Max 255 types
+Use empty table as argument to reset to the game default
 ### [`poison_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_entity)
 `nil poison_entity(int entity_uid)`<br/>
 Poisons entity, to cure poison set `poison_tick_timer` to -1
+### [`modify_ankh_health_gain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_ankh_health_gain)
+`nil modify_ankh_health_gain(int max_health, int beat_add_health)`<br/>
+Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+If you set `health` above the game max health it will be forced down to the game max
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
@@ -985,6 +998,9 @@ Use `get_entities_overlapping_hitbox` instead
 ### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
 `int get_entity_ai_state(int uid)`<br/>
 As the name is misleading. use entity `move_state` field instead
+### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
+`nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)`<br/>
+Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
 ### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
 `nil set_camera_position(float cx, float cy)`<br/>
 this doesn't actually work at all. See State -> Camera the for proper camera handling
@@ -1604,6 +1620,8 @@ Use `overlaps_with(AABB hitbox)` instead
 - [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
 - [`TEXTURE get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
 - [`bool set_texture(TEXTURE texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
+\
+Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
 - [`nil set_draw_depth(int draw_depth)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) &Entity::set_draw_depth
 - [`nil liberate_from_shop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) &Entity::liberate_from_shop
 - [`Entity get_held_entity()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) &Entity::get_held_entity
@@ -1625,6 +1643,9 @@ Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, ac
 - [`nil perform_teleport(int delta_x, int delta_y)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=perform_teleport) &Entity::perform_teleport
 \
 Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
+- [`bool trigger_action(Entity user)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_action) &Entity::trigger_action
+\
+Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
 - [`get_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) &Entity::get_metadata
 - [`nil apply_metadata(int metadata)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) &Entity::apply_metadata
 ### `Movable`
@@ -1897,10 +1918,16 @@ Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`EggShipDoor
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
 - [`nil rearm()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rearm) &Arrowtrap::rearm
+- [`nil trigger(int who_uid)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &Arrowtrap::trigger
+\
+The uid must be movable entity for ownership transfers
 ### `TotemTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`ENT_TYPE spawn_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) &TotemTrap::spawn_entity_type
 - [`int first_sound_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) &TotemTrap::first_sound_id
+- [`nil trigger(int who_uid, bool left)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &TotemTrap::trigger
+\
+The uid must be movable entity for ownership transfers
 ### `LaserTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LaserTrap::emitted_light
@@ -1967,6 +1994,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool left_part`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_part) &BigSpearTrap::left_part
 \
 setting the left part to 0 or right part to 1 destroys the trap
+- [`nil trigger(int who_uid, bool left)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &BigSpearTrap::trigger
+\
+The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
 ### `StickyTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid
@@ -2033,6 +2063,11 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int deco_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_up) &PoleDeco::deco_up
 - [`int deco_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_down) &PoleDeco::deco_down
+### `JungleSpearTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`nil trigger(int who_uid, int direction)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &JungleSpearTrap::trigger
+\
+The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down
 ### `Crushtrap`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
@@ -4951,6 +4986,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_jiangshi
 - as_jumpdog
 - as_junglespearcosmetic
+- as_junglespeartrap
 - as_jungletraptrigger
 - as_kapalapowerup
 - as_kingu

@@ -65,6 +65,8 @@ class RoomOwner : public Monster
 
     virtual void unknown_v107() = 0; // for shopkeepers, it loops over (some of) the items for sale
 
+    virtual void unknown_v108() = 0;
+
     virtual void on_death_treasure_drop() = 0; // random number calc, e.g. whether the shopkeeper drops gold bars on death
 };
 

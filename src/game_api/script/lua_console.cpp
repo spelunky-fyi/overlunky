@@ -71,6 +71,7 @@ LuaConsole::LuaConsole(SoundManager* soundmanager)
             {"MainExit", "as_exitdoor"},
             {"Generator", "as_floor"},
             {"HorizontalForceField", "as_floor"},
+            {"JungleSpearTrap", "as_floor"},
             {"LaserTrap", "as_floor"},
             {"TotemTrap", "as_floor"},
             {"MotherStatue", "as_floor"},
