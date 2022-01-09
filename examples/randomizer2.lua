@@ -1187,7 +1187,7 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_FLOATING_ORB)
 
 --[[SHOPS]]
 local shop_items = {ENT_TYPE.ITEM_PICKUP_ROPEPILE, ENT_TYPE.ITEM_PICKUP_BOMBBAG, ENT_TYPE.ITEM_PICKUP_BOMBBOX, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_SPECTACLES, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_COMPASS, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_MATTOCK, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_PURCHASABLE_CAPE, ENT_TYPE.ITEM_PURCHASABLE_HOVERPACK, ENT_TYPE.ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ENT_TYPE.ITEM_PURCHASABLE_POWERPACK, ENT_TYPE.ITEM_PURCHASABLE_JETPACK, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY}
-local extra_shop_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP} --scepter, vlads cape and the swords don't work
+local extra_shop_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_SNAP_TRAP}
 local all_shop_items = join(shop_items, extra_shop_items)
 local shop_guns = {ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_CROSSBOW}
 local extra_shop_guns = {ENT_TYPE.ITEM_CLONEGUN}
@@ -1217,6 +1217,15 @@ local shop_names = {
 local wrong_stringid = 1948
 
 set_callback(function()
+    for i,v in ipairs(shop_names) do
+        local etype = get_type(i)
+        if etype.description == wrong_stringid or etype.description == wrong_stringid+1 or get_string(etype.description) ~= v then
+            etype.description = add_string(v)
+        end
+    end
+end, ON.START)
+
+set_callback(function()
     local in_shop = {}
     local items = get_entities_by(0, MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER, LAYER.BOTH)
     for i,v in ipairs(items) do
@@ -1226,19 +1235,9 @@ set_callback(function()
         end
     end
     for i,v in ipairs(in_shop) do
-        --math.randomseed(read_prng()[8]+i)
         v.price = prng:random(1000, math.min(20000, 2*get_money())+prng:random(1500, 6000))
         if prng:random(100) == 1 then
             v.price = 0
-        end
-    end
-
-    local etype = get_type(ENT_TYPE.MOUNT_QILIN)
-    if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
-        if shop_names[etype.id] ~= nil then
-            etype.description = add_string(shop_names[etype.id])
-        else
-            etype.description = prng:random(1804, 1858)
         end
     end
 end, ON.POST_LEVEL_GENERATION)
@@ -1264,7 +1263,6 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_rooms, roomtype) and options.shop then
-        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(all_shop_items)
         local etype = get_type(eid)
         if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
@@ -1283,7 +1281,6 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_replace_rooms, roomtype) and options.shop then
-        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(shop_mounts)
         local etype = get_type(eid)
         if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
@@ -1302,7 +1299,6 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_replace_rooms, roomtype) and options.shop then
-        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local item = prng:random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
         if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
             item = ENT_TYPE.CHAR_EGGPLANT_CHILD
@@ -1316,7 +1312,6 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
     local rx, ry = get_room_index(x, y)
     local roomtype = get_room_template(rx, ry, l)
     if has(shop_replace_rooms, roomtype) and options.shop then
-        --math.randomseed(read_prng()[8]+math.floor(x)+math.floor(y))
         local eid = pick(all_shop_guns)
         local etype = get_type(eid)
         if etype.description == wrong_stringid or etype.description == wrong_stringid+1 then
@@ -1711,7 +1706,9 @@ end, SPAWN_TYPE.LEVEL_GEN, 0, ENT_TYPE.ITEM_LIGHT_ARROW)
 
 set_post_entity_spawn(function(ent)
     local x, y, l = get_position(ent.uid)
-    if l == LAYER.BACK then
+    local rx, ry = get_room_index(x, y)
+    local room = get_room_template(rx, ry, l)
+    if l == LAYER.BACK and not has(shop_rooms, room) and prng:random() < 0.5 then
         kill_entity(ent.uid)
         spawn_entity_nonreplaceable(pick(crate_items), x, y, l, 0, 0)
     end
