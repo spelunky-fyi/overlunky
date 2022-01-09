@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.5b"
+meta.version = "2.5c"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -110,7 +110,7 @@ local function register_options()
     register_option_int("door_bosses", "Amount of midbosses", default_options.door_bosses, 0, 4)
     register_option_bool("door_transitions", "Neat transitions (maybe crashy)", default_options.door_transitions)
     register_option_bool("projectile", "Random projectiles", default_options.projectile)
-    register_option_bool("storage", "Random Waddler caches", default_options.storage)
+    --register_option_bool("storage", "Random Waddler caches", default_options.storage) --TODO
     register_option_bool("status", "Show level progress", default_options.status)
     register_option_bool("hard_abzu", "Hard bosses: Abzu", default_options.hard_abzu)
     register_option_bool("hard_duat", "Hard bosses: Duat", default_options.hard_duat)
@@ -2311,6 +2311,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_LASERTRAP_SHOT)]]
 
 --[[STORAGE]]
+--[[ TODO: destroying these is randomly crashing the game, maybe because they're still spawning in owned floors
 local storage_bad_rooms = {ROOM_TEMPLATE.SHOP, ROOM_TEMPLATE.SHOP_LEFT, ROOM_TEMPLATE.VAULT, ROOM_TEMPLATE.CURIOSHOP, ROOM_TEMPLATE.CURIOSHOP_LEFT, ROOM_TEMPLATE.CAVEMANSHOP, ROOM_TEMPLATE.SHOP_ATTIC, ROOM_TEMPLATE.SHOP_ATTIC_LEFT, ROOM_TEMPLATE.SHOP_BASEMENT, ROOM_TEMPLATE.SHOP_BASEMENT_LEFT, ROOM_TEMPLATE.TUSKFRONTDICESHOP, ROOM_TEMPLATE.TUSKFRONTDICESHOP_LEFT, ROOM_TEMPLATE.PEN_ROOM, ROOM_TEMPLATE.TUSKDICESHOP, ROOM_TEMPLATE.TUSKDICESHOP_LEFT, ROOM_TEMPLATE.DICESHOP, ROOM_TEMPLATE.DICESHOP_LEFT, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100} --CHALLENGE ROOMS
 set_callback(function()
     local storages = get_entities_by_type(ENT_TYPE.FLOOR_STORAGE)
@@ -2354,7 +2355,7 @@ set_callback(function()
             --prinspect("Storage at", spot.x, spot.y)
         end
     end
-end, ON.POST_LEVEL_GENERATION)
+end, ON.POST_LEVEL_GENERATION)]]
 
 --[[STUFF]]
 local ending_timer = 0
