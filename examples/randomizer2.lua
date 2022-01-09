@@ -70,7 +70,7 @@ local real_default_options = {
     bias_15 = 4,
     drill = 20,
     kali = true,
-    jellyless_chance = 50
+    jellyless_chance = 40
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -640,7 +640,12 @@ local enemies_sisters = {ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARS
 local enemies_generator = {ENT_TYPE.MONS_PROTOSHOPKEEPER, ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_ALIEN, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_TIKIMAN}
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    if state.time_level < 2 and prng:random() < options.jellyless_chance/100 then
+    local divider = 100
+    if test_flag(state.level_flags, 18) then
+        divider = 75
+    end
+    divider = divider - (state.height + state.width)*2
+    if state.time_level < 2 and prng:random() < options.jellyless_chance/divider then
         return spawn_critical(ENT_TYPE.FX_SHADOW, x, y, l, 0, 0)
     end
     return spawn_critical(type, x, y, l, 0, 0)
