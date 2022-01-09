@@ -927,8 +927,29 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 set_post_entity_spawn(function(ent)
     if state.theme ~= THEME.ABZU or not options.hard_abzu then return end
     local x, y, l = get_position(ent.uid)
-    spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
+    if y > 105 then
+        if prng:random() < 0.6 then ent:destroy() end
+        spawn_entity_nonreplaceable(pick(enemies_kingu), x, y, l, prng:random()*0.3-0.15, prng:random()*0.1+0.1)
+    end
 end, SPAWN_TYPE.SYSTEMIC, 0, {ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI, ENT_TYPE.MONS_OCTOPUS})
+
+--[[TODO: everything spawns behind the shell and some enemies crash
+set_post_entity_spawn(function(ent)
+    set_interval(function()
+        replace_drop(DROP.KINGU_FEMALE_JIANGSHI, pick(enemies_kingu))
+        replace_drop(DROP.KINGU_JIANGSHI, pick(enemies_kingu))
+        replace_drop(DROP.KINGU_OCTOPUS, pick(enemies_kingu))
+    end, 30)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_KINGU)
+]]
+
+set_post_entity_spawn(function(ent)
+    set_interval(function()
+        replace_drop(DROP.ANUBIS_COFFIN_SORCERESS, pick(enemies_small))
+        replace_drop(DROP.ANUBIS_COFFIN_VAMPIRE, pick(enemies_small))
+        replace_drop(DROP.ANUBIS_COFFIN_WITCHDOCTOR, pick(enemies_small))
+    end, 30)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_ANUBIS2)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme ~= THEME.OLMEC or not options.hard_olmec then
