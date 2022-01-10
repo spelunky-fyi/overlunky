@@ -93,7 +93,7 @@ const char* more_flags[]{
     "17: Disable input",
     "18: Shop item held by player",
     "19: ",
-    "20: ",
+    "20: Yangs turkey",
     "21: ",
     "22: Disable collision damage",
     "23: ",
