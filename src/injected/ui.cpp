@@ -58,6 +58,7 @@ std::unique_ptr<SpelunkyConsole> g_Console;
 std::deque<ScriptMessage> g_ConsoleMessages;
 
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
+std::map<std::string, std::unique_ptr<SpelunkyScript>> g_ui_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
@@ -197,7 +198,7 @@ int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filter
     g_force_width = 0, g_force_height = 0, g_pause_at = -1;
 unsigned int g_entity_type = 0, g_level_width = 0, g_level_height = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
-uint32_t g_held_flags = 0;
+uint32_t g_held_flags = 0, g_dark_mode = 0;
 uintptr_t g_entity_addr = 0, g_state_addr = 0, g_save_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
@@ -205,7 +206,7 @@ std::vector<std::string> saved_entities;
 std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
-     freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false, dark_mode = false,
+     freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
      enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Player* g_entity = 0;
@@ -896,6 +897,21 @@ bool update_players()
     return true;
 }
 
+void set_flag(uint32_t& flags, int bit)
+{
+    flags |= (1U << (bit - 1));
+}
+
+void clr_flag(uint32_t& flags, int bit)
+{
+    flags &= ~(1U << (bit - 1));
+}
+
+bool test_flag(uint32_t flags, int bit)
+{
+    return (flags & (1U << (bit - 1))) > 0;
+}
+
 void spawn_entities(bool s, std::string list = "")
 {
     const auto pos = text.find_first_of(" ");
@@ -1086,11 +1102,17 @@ void force_lights()
         }
         if (g_state->illumination)
         {
+            g_state->illumination->enabled = true;
             if (g_state->camera_layer == 1)
                 g_state->illumination->flags |= 1U << 16;
             else
                 g_state->illumination->flags &= ~(1U << 16);
         }
+    }
+    else
+    {
+        if (g_state->illumination && test_flag(g_state->level_flags, 18))
+            g_state->illumination->enabled = false;
     }
 }
 
@@ -3108,6 +3130,20 @@ void render_clickhandler()
         render_script(script.get(), draw_list);
     }
     render_script(g_Console.get(), draw_list);
+
+    for (auto& [name, script] : g_ui_scripts)
+    {
+        fix_script_requires(script.get());
+    }
+    for (auto& [name, script] : g_ui_scripts)
+    {
+        update_script(script.get());
+    }
+    for (auto& [name, script] : g_ui_scripts)
+    {
+        render_script(script.get(), draw_list);
+    }
+
     if (g_Console->has_new_history())
     {
         g_Console->save_history("console_history.txt");
@@ -3471,6 +3507,18 @@ void render_options()
         }
     }
     ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
+    if (ImGui::CheckboxFlags("Force dark levels", &g_dark_mode, 1))
+    {
+        clr_flag(g_dark_mode, 2);
+        g_ui_scripts["light"]->set_enabled(false);
+        g_ui_scripts["dark"]->set_enabled(test_flag(g_dark_mode, 1));
+    }
+    if (ImGui::CheckboxFlags("Force lit levels", &g_dark_mode, 2))
+    {
+        clr_flag(g_dark_mode, 1);
+        g_ui_scripts["dark"]->set_enabled(false);
+        g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
+    }
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
     {
         force_hud_flags();
@@ -4730,10 +4778,6 @@ void render_game_props()
         ImGui::SameLine();
         ImGui::Text("%s", theme_name(g_state->theme_start));
         ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char*)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
-        if (ImGui::Checkbox("Force dark level##ToggleDarkMode", &dark_mode))
-        {
-            darkmode(dark_mode);
-        }
     }
     if (ImGui::CollapsingHeader("Quests"))
     {
@@ -5196,6 +5240,27 @@ void imgui_init(ImGuiContext*)
     windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
     windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
     windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", false, false});
+
+    if (g_ui_scripts.find("dark") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            "set_callback(function() state.level_flags = set_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)",
+            "dark",
+            g_SoundManager.get(),
+            g_Console.get(),
+            false);
+        g_ui_scripts["dark"] = std::unique_ptr<SpelunkyScript>(script);
+    }
+    if (g_ui_scripts.find("light") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            "set_callback(function() state.level_flags = clr_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)",
+            "light",
+            g_SoundManager.get(),
+            g_Console.get(),
+            false);
+        g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
+    }
 }
 
 void imgui_draw()
@@ -5242,7 +5307,9 @@ void imgui_draw()
                     if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
                     {
                         active_tab = tab;
+                        ImGui::BeginChild("ScrollableTool");
                         render_tool(tab);
+                        ImGui::EndChild();
                         ImGui::EndTabItem();
                     }
                 }
