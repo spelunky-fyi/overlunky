@@ -264,7 +264,8 @@ std::map<std::string, bool> options = {
     {"disable_savegame", true},
     {"draw_hud", true},
     {"draw_script_messages", true},
-    {"fade_script_messages", true}};
+    {"fade_script_messages", true},
+    {"draw_hitboxes_interpolated", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -2838,7 +2839,11 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     if (!type)
         return;
 
-    auto render_position = get_render_position(ent->uid);
+    std::tuple<float, float, int8_t> render_position;
+    if (options["draw_hitboxes_interpolated"])
+        render_position = get_render_position(ent->uid);
+    else
+        render_position = get_position(ent->uid);
     auto [boxa_x, boxa_y] =
         screen_position(std::get<0>(render_position) - ent->hitboxx + ent->offsetx, std::get<1>(render_position) - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
@@ -3513,7 +3518,7 @@ void render_options()
         g_ui_scripts["light"]->set_enabled(false);
         g_ui_scripts["dark"]->set_enabled(test_flag(g_dark_mode, 1));
     }
-    if (ImGui::CheckboxFlags("Force lit levels", &g_dark_mode, 2))
+    if (ImGui::CheckboxFlags("Disable dark levels", &g_dark_mode, 2))
     {
         clr_flag(g_dark_mode, 1);
         g_ui_scripts["dark"]->set_enabled(false);
@@ -3547,6 +3552,8 @@ void render_options()
     ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
     ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
     ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
+    ImGui::SameLine();
+    ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
     ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
     ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
 
