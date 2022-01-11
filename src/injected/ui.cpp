@@ -2173,6 +2173,74 @@ void tooltip(const char* tip, const char* key)
     }
 }
 
+void render_uid(int uid, const char* section, bool rembtn = false)
+{
+    std::string uidc = std::to_string(uid);
+    auto ptype = entity_type(uid);
+    if (ptype == 0)
+        return;
+    std::string typec = std::to_string(ptype);
+    std::string pname = entity_names[ptype];
+    ImGui::PushID(section);
+    if (ImGui::Button(uidc.c_str()))
+    {
+        g_last_id = uid;
+        update_entity();
+    }
+    ImGui::SameLine();
+    ImGui::Text("%s", typec.c_str());
+    ImGui::SameLine();
+    ImGui::Text("%s", pname.c_str());
+    if (rembtn)
+    {
+        ImGui::SameLine();
+        ImGui::PushID(uid);
+        if (ImGui::Button("X"))
+            g_entity->remove_item(uid);
+        ImGui::PopID();
+    }
+    ImGui::PopID();
+}
+
+void render_light(const char* name, LightParams* light)
+{
+    ImGui::PushID(name);
+    float color[4] = {light->red, light->green, light->blue};
+    if (ImGui::ColorEdit3(name, color))
+    {
+        light->red = color[0];
+        light->green = color[1];
+        light->blue = color[2];
+    }
+    ImGui::DragFloat("Size##LightSize", &light->size, 0.5f);
+    ImGui::PopID();
+}
+
+void render_illumination(Illumination* light, const char* sect = "")
+{
+    ImGui::PushID(sect);
+    if (light->entity_uid != -1)
+        render_uid(light->entity_uid, sect);
+    ImGui::Checkbox("Enabled##LightEnabled", &light->enabled);
+    ImGui::Checkbox("Back layer##LightLayer", (bool*)&light->layer);
+    render_light("Light 1##Light1", &light->light1);
+    render_light("Light 2##Light2", &light->light2);
+    render_light("Light 3##Light3", &light->light3);
+    render_light("Light 4##Light4", &light->light4);
+    ImGui::DragFloat("Brightness##LightBrightness", &light->brightness, 0.01f);
+    ImGui::DragFloat("Brightness multiplier##LightBrightnessMulti", &light->brightness_multiplier, 0.01f);
+    ImGui::InputFloat("Position X##LightPosX", &light->light_pos_x);
+    ImGui::InputFloat("Position Y##LightPosY", &light->light_pos_y);
+    ImGui::InputFloat("Offset X##LightPosX", &light->offset_x);
+    ImGui::InputFloat("Offset Y##LightPosY", &light->offset_y);
+    ImGui::DragFloat("Distortion##LightDistortion", &light->distortion, 0.01f);
+    for (int i = 0; i < 11; i++)
+    {
+        ImGui::CheckboxFlags(illumination_flags[i], &light->flags, int_pow(2, i));
+    }
+    ImGui::PopID();
+}
+
 void render_list()
 {
     // ImGui::ListBox with filter
@@ -2623,35 +2691,6 @@ void render_narnia()
     ImGui::SameLine(100.0f);
     if (ImGui::Button("Camp##WarpCamp"))
         warp_inc(1, 1, 17);
-}
-
-void render_uid(int uid, const char* section, bool rembtn = false)
-{
-    std::string uidc = std::to_string(uid);
-    auto ptype = entity_type(uid);
-    if (ptype == 0)
-        return;
-    std::string typec = std::to_string(ptype);
-    std::string pname = entity_names[ptype];
-    ImGui::PushID(section);
-    if (ImGui::Button(uidc.c_str()))
-    {
-        g_last_id = uid;
-        update_entity();
-    }
-    ImGui::SameLine();
-    ImGui::Text("%s", typec.c_str());
-    ImGui::SameLine();
-    ImGui::Text("%s", pname.c_str());
-    if (rembtn)
-    {
-        ImGui::SameLine();
-        ImGui::PushID(uid);
-        if (ImGui::Button("X"))
-            g_entity->remove_item(uid);
-        ImGui::PopID();
-    }
-    ImGui::PopID();
 }
 
 void render_camera()
@@ -4703,6 +4742,14 @@ void render_entity_props()
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }
     }
+    if (ImGui::CollapsingHeader("Illumination"))
+    {
+        if ((g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) //TODO: show all lit entities
+        {
+            if (g_entity->emitted_light)
+                render_illumination(g_entity->emitted_light, "Entity illumination");
+        }
+    }
     ImGui::PopItemWidth();
 }
 
@@ -5092,6 +5139,11 @@ void render_game_props()
                 }
             }
         }
+    }
+    if (ImGui::CollapsingHeader("Global illumination"))
+    {
+        if (g_state->illumination)
+            render_illumination(g_state->illumination, "Global illumination");
     }
     ImGui::PopItemWidth();
 }
