@@ -2150,7 +2150,7 @@ void tooltip(const char* tip)
         return;
     if (ImGui::IsItemHovered())
     {
-        ImGui::SetTooltip(tip);
+        ImGui::SetTooltip("%s", tip);
     }
 }
 
@@ -2158,17 +2158,15 @@ void tooltip(const char* tip, const char* key)
 {
     if (!options["show_tooltips"])
         return;
-    static std::string tiptext;
     if (ImGui::IsItemHovered())
     {
         if (key && keys[key])
         {
-            tiptext = fmt::format("({}) {}", key_string(keys[key]), tip);
-            ImGui::SetTooltip(tiptext.c_str());
+            ImGui::SetTooltip("(%s) %s", key_string(keys[key]).c_str(), tip);
         }
         else
         {
-            ImGui::SetTooltip(tip);
+            ImGui::SetTooltip("%s", tip);
         }
     }
 }
