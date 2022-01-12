@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.5c"
+meta.version = "2.6"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -94,7 +94,7 @@ local function register_options()
     register_option_int("room_big_maxy", "Level max height", default_options.room_big_maxy, 2, 15)
     register_option_float("room_dark", "Dark level chance", default_options.room_dark, 0, 100)
     register_option_float("pot_chance", "Pot contents chance", default_options.pot_chance, 0, 100)
-    register_option_float("treasure_chance", "Treasure chance", default_options.treasure_chance, 0, 100)
+    --register_option_float("treasure_chance", "Treasure chance", default_options.treasure_chance, 0, 100)
     register_option_float("ushabti_chance", "Correct ushabti chance", default_options.ushabti_chance, 0, 100)
     register_option_int("stats_health_min", "Min starting health", default_options.stats_health_min, 4, 99)
     register_option_int("stats_bombs_min", "Min starting bombs", default_options.stats_bombs_min, 4, 99)
@@ -661,12 +661,6 @@ local function enemy_small_spawn(x, y, l)
     if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
     end
-    if prng:random() < options.enemy_curse_chance/100 then
-        attach_ball_and_chain(uid, 0.5, 0)
-    end
-    if prng:random() < options.enemy_curse_chance/100 then
-        poison_entity(uid)
-    end
 end
 local function enemy_small_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
@@ -689,8 +683,6 @@ local function enemy_big_spawn(x, y, l)
         carry(uid, rider)
     elseif prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
-    elseif prng:random() < options.enemy_curse_chance/100 then
-        poison_entity(uid)
     end
 end
 local function enemy_big_valid(x, y, l)
@@ -720,9 +712,6 @@ local function enemy_climb_spawn(x, y, l)
         if prng:random() < options.enemy_curse_chance/100 then
             ent:set_cursed(true)
         end
-        if prng:random() < options.enemy_curse_chance/100 then
-            poison_entity(uid)
-        end
     end
 end
 local function enemy_climb_valid(x, y, l)
@@ -740,9 +729,6 @@ local function enemy_ceiling_spawn(x, y, l)
     local ent = get_entity(uid)
     if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
-    end
-    if prng:random() < options.enemy_curse_chance/100 then
-        poison_entity(uid)
     end
 end
 local function enemy_ceiling_valid(x, y, l)
@@ -762,9 +748,6 @@ local function enemy_air_spawn(x, y, l)
     if prng:random() < options.enemy_curse_chance/100 then
         ent:set_cursed(true)
     end
-    if prng:random() < options.enemy_curse_chance/100 then
-        poison_entity(uid)
-    end
 end
 local function enemy_air_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 82 and y <= 90 then return false end
@@ -781,9 +764,6 @@ local function friend_spawn(x, y, l)
         local ent = get_entity(uid)
         if prng:random() < options.enemy_curse_chance/100 then
             attach_ball_and_chain(uid, 0.5, 0)
-        end
-        if prng:random() < options.enemy_curse_chance/100 then
-            poison_entity(uid)
         end
         friend_spawned = true
     end
@@ -1124,7 +1104,7 @@ set_callback(function()
         elseif new_width >= 7 and new_height >= 8 then
             if prng:random() < 0.5 then
                 new_height = 5
-            elseif rng:random() < 0.5 then
+            elseif prng:random() < 0.5 then
                 new_width = 5
             end
         end
@@ -1663,9 +1643,9 @@ set_post_entity_spawn(function(ent)
     replace_drop(DROP.BEG_TRUECROWN, pick(crate_items))
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HUNDUNS_SERVANT)
 
-set_post_entity_spawn(function(ent)
+--[[set_post_entity_spawn(function(ent)
     replace_drop(DROP.GHOSTJAR_DIAMOND, pick(crate_items))
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)]]
 
 set_post_entity_spawn(function(ent)
     if not options.chain then return end
@@ -1759,34 +1739,6 @@ set_post_entity_spawn(function(ent)
         spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
     end
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_CLONEGUN)
-
-set_pre_tile_code_callback(function(x, y, layer)
-    if prng:random() < options.treasure_chance / 100 then
-        spawn_critical(pick(join(crate_items, enemies_small)), x, y, layer, 0, 0)
-        return true
-    end
-end, "treasure")
-
-set_pre_tile_code_callback(function(x, y, layer)
-    if prng:random() < options.treasure_chance / 100 then
-        spawn_critical(pick(join(crate_items, enemies_small)), x, y, layer, 0, 0)
-        return true
-    end
-end, "treasure_chest")
-
-set_pre_tile_code_callback(function(x, y, layer)
-    if prng:random() < options.treasure_chance / 100 then
-        spawn_critical(pick(join(crate_items, enemies_small)), x, y, layer, 0, 0)
-        return true
-    end
-end, "treasure_vaultchest")
-
-set_pre_tile_code_callback(function(x, y, layer)
-    if prng:random() < options.treasure_chance / 500 then
-        spawn_critical(pick(orig_chain_items), x, y, layer, 0, 0)
-        return true
-    end
-end, "treasure_vaultchest")
 
 local swapping_spikes = false
 local ice_themes = {THEME.DWELLING, THEME.ICE_CAVES, THEME.OLMEC, THEME.TEMPLE, THEME.CITY_OF_GOLD}
@@ -1904,7 +1856,7 @@ local function init_run()
             add_level(w, l, t)
         end
     end
-    fix_chain()
+    --fix_chain()
     --[[level_order = {
         { w = 1, l = 1, t = THEME.DWELLING, b = false },
         { w = 1, l = 2, t = THEME.DWELLING, b = false },

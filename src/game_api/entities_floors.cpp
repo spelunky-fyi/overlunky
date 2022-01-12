@@ -362,7 +362,7 @@ int32_t Floor::get_decoration_entity_type() const
         assert(0xb == to_id("ENT_TYPE_FLOOR_TUNNEL_CURRENT"));
         assert(0xc == to_id("ENT_TYPE_FLOOR_TUNNEL_NEXT"));
         assert(0x5 == to_id("ENT_TYPE_FLOOR_SURFACE"));
-        assert(0x6 == to_id("ENT_TYPE_FLOOR_SURFACE_COVER"));
+        assert(0x6 == to_id("ENT_TYPE_FLOOR_SURFACE_HIDDEN"));
         assert(0xa == to_id("ENT_TYPE_FLOOR_JUNGLE"));
         assert(0x31 == to_id("ENT_TYPE_IDOL_TRAP_CEILING"));
         assert(0x47 == to_id("ENT_TYPE_FLOOR_DUAT_ALTAR"));
@@ -391,8 +391,8 @@ int32_t Floor::get_decoration_entity_type() const
         return 0x75;
     case 0x5: // FLOOR_SURFACE
         return 0x76;
-    case 0x6: // FLOOR_SURFACE_COVER
-        return 0x77;
+    //case 0x6: // FLOOR_SURFACE_HIDDEN
+    //    return 0x77;
     case 0xa: // FLOOR_JUNGLE
         return 0x77;
     case 0x31: // IDOL_TRAP_CEILING
