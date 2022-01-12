@@ -925,6 +925,6 @@ struct ShopOwnerDetails
 
 struct ShopsInfo
 {
-    std::set<ShopRestrictedItem> items;
+    std::set<ShopRestrictedItem> items; // could also be a map
     std::vector<ShopOwnerDetails> shop_owners;
 };

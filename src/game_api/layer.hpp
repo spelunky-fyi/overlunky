@@ -1,5 +1,7 @@
 #pragma once
 
+#include "aliases.hpp"
+
 class Entity;
 
 struct EntityList
@@ -119,11 +121,11 @@ struct Layer
     uint64_t unknown45;
     uint64_t unknown46; //next layer below
 
-    Entity* spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap);
+    Entity* spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx, float vy, bool snap);
 
-    Entity* spawn_entity_snap_to_floor(size_t id, float x, float y);
+    Entity* spawn_entity_snap_to_floor(ENT_TYPE id, float x, float y);
 
-    Entity* spawn_entity_over(size_t id, Entity* overlay, float x, float y);
+    Entity* spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y);
 
     Entity* spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 
