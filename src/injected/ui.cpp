@@ -1200,6 +1200,11 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->items->player_select_slots[0].texture_id = g_save->players[0] + ana_texture;
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
+    if (screen == 11) // this skips rope cutscene in camp
+    {
+        g_state->force_current_theme(17);
+        g_state->screen = 11;
+    }
     g_state->screen_next = screen;
     g_state->world_start = world;
     g_state->level_start = level;
