@@ -1701,6 +1701,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_after_inst("\x41\x0F\xB6\x87\x17\x01\x00\x00\x83\xF8"sv)
             .at_exe(),
     },
+    {
+        // Set write bp on State->shops->restricted_item_count, this structure is quite common so i chosen pattern before the call
+        "add_shopitem"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x4C\x8D\x84\x24\xD0\x00\x00\x00\xE8"sv)
+            .offset(-0x1)
+            .decode_call()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

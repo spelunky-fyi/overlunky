@@ -1257,6 +1257,9 @@ end
     /// If you set `health` above the game max health it will be forced down to the game max
     lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
 
+    /// Adds entity as shop item, has to be movable (haven't tested many)
+    lua["add_item_to_shop"] = add_item_to_shop;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
