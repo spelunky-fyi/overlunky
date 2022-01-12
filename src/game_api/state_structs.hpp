@@ -3,6 +3,7 @@
 #include "aliases.hpp"
 #include <array>
 #include <cstdint>
+#include <set>
 
 class Entity;
 
