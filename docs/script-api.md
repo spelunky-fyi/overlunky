@@ -742,6 +742,9 @@ Poisons entity, to cure poison set `poison_tick_timer` to -1
 Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
 `beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
 If you set `health` above the game max health it will be forced down to the game max
+### [`add_item_to_shop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_item_to_shop)
+`nil add_item_to_shop(int item_uid, int shop_owner)`<br/>
+Adds entity as shop item, has to be movable (haven't tested many)
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
@@ -1561,6 +1564,10 @@ Changes color based on given uColor
 - [`int search_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) &EntityDB::search_flags
 - [`float width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &EntityDB::width
 - [`float height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &EntityDB::height
+- [`offsetx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) sol::property([](EntityDB&e)-&gt;float{returne.rect_collision.offsetx;})
+- [`offsety`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) sol::property([](EntityDB&e)-&gt;float{returne.rect_collision.offsety;})
+- [`hitboxx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) sol::property([](EntityDB&e)-&gt;float{returne.rect_collision.hitboxx;})
+- [`hitboxy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) sol::property([](EntityDB&e)-&gt;float{returne.rect_collision.hitboxy;})
 - [`int draw_depth`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) &EntityDB::draw_depth
 - [`float friction`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) &EntityDB::friction
 - [`float elasticity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) &EntityDB::elasticity
